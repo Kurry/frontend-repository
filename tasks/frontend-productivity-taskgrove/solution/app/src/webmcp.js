@@ -11,6 +11,7 @@
 // webmcp_invoke_tool. Contract version zto-webmcp-v1.
 
 import { store } from './lib/store.svelte.js';
+import { TaskUpsertSchema } from './lib/schemas.js';
 
 const CONTRACT_VERSION = 'zto-webmcp-v1';
 
@@ -38,6 +39,9 @@ function nodeSummary(node) {
   return {
     id: node.id,
     title: node.title,
+    status: node.status ?? (node.completed ? 'done' : 'todo'),
+    priority: node.priority ?? 'medium',
+    dueDate: node.dueDate ?? '',
     completed: node.completed,
     collapsed: node.collapsed,
     tags: node.tags,
@@ -45,21 +49,43 @@ function nodeSummary(node) {
   };
 }
 
+function taskPayload(node) {
+  return {
+    title: node.title,
+    status: node.status ?? (node.completed ? 'done' : 'todo'),
+    priority: node.priority ?? 'medium',
+    dueDate: node.dueDate ?? '',
+  };
+}
+
 // ---- entity-collection-v1 --------------------------------------------------
 
 function entityCreate(args) {
   const title = String(args.title ?? '').trim();
+  const status = args.status != null ? String(args.status) : 'todo';
+  const priority = args.priority != null ? String(args.priority) : 'medium';
+  const dueDate = args.dueDate != null ? String(args.dueDate) : '';
+  const payload = { title, status, priority, dueDate };
+
   const parentId = args.parentId != null ? String(args.parentId) : null;
-  if (!title) return { ok: false, error: 'title is required' };
+  const parsed = TaskUpsertSchema.safeParse(payload);
+  if (!parsed.success) {
+    return {
+      ok: false,
+      error: parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join(', '),
+    };
+  }
+
   if (!parentId) {
     const before = store.tasks.length;
-    const created = store.addRootTask(title);
+    const created = store.addRootTask(parsed.data);
     return { ok: created, operation: 'create', scope: 'root', created, taskCount: store.tasks.length, delta: store.tasks.length - before };
   }
+
   const parent = findNode(store.tasks, parentId);
   if (!parent) return { ok: false, error: `parent not found: ${parentId}` };
   const before = parent.children.length;
-  const created = store.addChildTask(parentId, title);
+  const created = store.addChildTask(parentId, parsed.data);
   const parentAfter = findNode(store.tasks, parentId);
   return { ok: created, operation: 'create', scope: 'child', created, childCount: parentAfter ? parentAfter.children.length : before };
 }
@@ -79,8 +105,15 @@ function entityUpdate(args) {
   if (field === 'title') {
     const title = String(args.value ?? '').trim();
     if (!title) return { ok: false, error: 'title value is required' };
-    store.updateTaskTitle(id, title);
+    const updated = store.updateTask(id, { ...taskPayload(node), title });
+    if (!updated) return { ok: false, error: 'task update failed validation' };
     return { ok: true, operation: 'update', field: 'title', node: nodeSummary(findAnywhere(id)) };
+  }
+  if (['status', 'priority', 'dueDate'].includes(field)) {
+    const value = String(args.value ?? '');
+    const updated = store.updateTask(id, { ...taskPayload(node), [field]: value });
+    if (!updated) return { ok: false, error: 'task update failed validation' };
+    return { ok: true, operation: 'update', field, node: nodeSummary(findAnywhere(id)) };
   }
   if (field === 'reparent') {
     const newParentId = args.value != null ? String(args.value) : null;
@@ -165,6 +198,10 @@ function browseOpen(args) {
     store.zoomTo(null);
     return { ok: true, operation: 'open', destination, zoomed: store.zoomedNodeId };
   }
+  if (destination === 'grove-panel') {
+    store.showGrovePanel = true;
+    return { ok: true, operation: 'open', destination, panelOpen: store.showGrovePanel };
+  }
   const node = findNode(store.tasks, destination);
   if (!node) return { ok: false, error: `unknown destination: ${destination}` };
   if (!node.children.length) return { ok: false, error: 'destination has no children to zoom into' };
@@ -238,7 +275,7 @@ const TOOLS = [
   },
   {
     name: 'browse-open',
-    description: 'Zoom in to a node branch (args.destination: a node id) or zoom back to the true root (args.destination: "root") — same as Zoom In / breadcrumb click.',
+    description: 'Open the Grove package panel (args.destination: "grove-panel"), zoom in to a node branch (a node id), or zoom back to the true root ("root").',
     handler: browseOpen,
   },
   {
@@ -263,11 +300,66 @@ const TOOLS = [
   },
 ];
 
+function artifactExport(args) {
+  const format = String(args.format ?? '');
+  if (format === 'grove-json') {
+    store.grovePanelFormat = format;
+    store.showGrovePanel = true;
+    return { ok: true, operation: 'export', format, content: store.exportGroveJson() };
+  } else if (format === 'grove-csv') {
+    store.grovePanelFormat = format;
+    store.showGrovePanel = true;
+    return { ok: true, operation: 'export', format, content: store.exportGroveCsv() };
+  }
+  return { ok: false, error: `unsupported export format: ${format}` };
+}
+
+function artifactImport(args) {
+  const format = String(args.format ?? '');
+  const content = String(args.content ?? '');
+  if (!content) return { ok: false, error: 'content is required' };
+
+  if (format === 'grove-json' || format === 'grove-csv') {
+    const res = store.importGrove(content, format);
+    if (res.error) return { ok: false, error: res.error };
+    return { ok: true, operation: 'import', format, taskCount: store.tasks.length };
+  }
+  return { ok: false, error: `unsupported import format: ${format}` };
+}
+
+function artifactCopy(args) {
+  const format = String(args.format ?? '');
+  if (format === 'grove-json') {
+    return { ok: true, operation: 'copy', format, content: store.exportGroveJson() };
+  } else if (format === 'grove-csv') {
+    return { ok: true, operation: 'copy', format, content: store.exportGroveCsv() };
+  }
+  return { ok: false, error: `unsupported copy format: ${format}` };
+}
+
+TOOLS.push(
+  {
+    name: 'artifact-export',
+    description: 'Export grove JSON or CSV. Format must be "grove-json" or "grove-csv".',
+    handler: artifactExport,
+  },
+  {
+    name: 'artifact-import',
+    description: 'Import grove JSON or CSV. Format must be "grove-json" or "grove-csv", with document string in args.content.',
+    handler: artifactImport,
+  },
+  {
+    name: 'artifact-copy',
+    description: 'Copy grove JSON or CSV. Format must be "grove-json" or "grove-csv".',
+    handler: artifactCopy,
+  }
+);
+
 export function initWebMcp() {
   const w = window;
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
-    modules: ['entity-collection-v1', 'browse-query-v1'],
+    modules: ['entity-collection-v1', 'browse-query-v1', 'artifact-transfer-v1'],
     tools: TOOLS.map((t) => t.name),
   });
   w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));

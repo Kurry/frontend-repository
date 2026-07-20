@@ -7,6 +7,7 @@
   import ArchivePanel from './components/ArchivePanel.svelte';
   import TagManager from './components/TagManager.svelte';
   import MoveToPicker from './components/MoveToPicker.svelte';
+  import GrovePanel from './components/GrovePanel.svelte';
   import Toast from './components/Toast.svelte';
 
   // Root task creation
@@ -15,14 +16,18 @@
   let rootInput = $state(null);
 
   function addRootTask() {
-    if (!rootTitle.trim()) {
-      rootError = 'Enter a task title to continue';
+    const title = rootTitle.trim();
+    if (!title || title.length > 120) {
+      rootError = 'Task title must be 1 to 120 characters';
       rootInput?.focus();
       return;
     }
-    if (store.addRootTask(rootTitle)) {
+    if (store.addRootTask(title)) {
       rootTitle = '';
       rootError = '';
+    } else {
+      rootError = 'A root task with this title already exists';
+      rootInput?.focus();
     }
   }
 
@@ -92,6 +97,7 @@
 
   <!-- Modals & Overlays -->
   <MoveToPicker />
+  <GrovePanel />
 
   <!-- Toast Notifications -->
   <Toast />

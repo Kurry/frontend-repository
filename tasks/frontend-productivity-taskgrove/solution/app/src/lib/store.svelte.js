@@ -1,5 +1,8 @@
 // TaskGrove - State Management (Svelte 5 Runes)
 
+import Papa from 'papaparse';
+import { TagUpsertSchema, TaskUpsertSchema } from './schemas.js';
+
 let idCounter = 0;
 function generateId() {
   return `tg_${Date.now()}_${++idCounter}_${Math.random().toString(36).slice(2, 8)}`;
@@ -97,13 +100,43 @@ const TAG_COLORS = [
 
 const STORAGE_KEY = 'taskgrove_data';
 
-export function createNode(title) {
+function normalizeTaskInput(input) {
+  const value = typeof input === 'string' ? { title: input } : (input || {});
+  const parsed = TaskUpsertSchema.safeParse({
+    title: String(value.title || '').trim(),
+    status: value.status || 'todo',
+    priority: value.priority || 'medium',
+    dueDate: value.dueDate || ''
+  });
+  return parsed.success ? parsed.data : null;
+}
+
+function requireTaskInput(input) {
+  const value = typeof input === 'string' ? { title: input } : (input || {});
+  const parsed = TaskUpsertSchema.safeParse({
+    title: String(value.title || '').trim(),
+    status: value.status || 'todo',
+    priority: value.priority || 'medium',
+    dueDate: value.dueDate || ''
+  });
+  if (!parsed.success) {
+    throw new Error(parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join(', '));
+  }
+  return parsed.data;
+}
+
+export function createNode(input) {
+  const task = normalizeTaskInput(input);
+  if (!task) return null;
   return {
     id: generateId(),
-    title: title.trim(),
+    title: task.title,
+    status: task.status,
+    priority: task.priority,
+    dueDate: task.dueDate,
     children: [],
     collapsed: false,
-    completed: false,
+    completed: task.status === 'done',
     tags: []
   };
 }
@@ -121,6 +154,8 @@ class TaskStore {
   toasts = $state([]);
   showTagManager = $state(false);
   moveToSourceId = $state(null);
+  showGrovePanel = $state(false);
+  grovePanelFormat = $state('grove-json');
 
   constructor() {
     this._load();
@@ -167,28 +202,33 @@ class TaskStore {
 
   // --- CRUD ---
 
-  addRootTask(title) {
-    if (!title || !title.trim()) return false;
+  addRootTask(input) {
+    const task = normalizeTaskInput(input);
+    if (!task) {
+      this.addToast('Task title must be 1 to 120 characters');
+      return false;
+    }
     // Prevent exact duplicate root task titles (idempotent)
-    if (this.tasks.some(t => t.title === title.trim())) {
+    if (this.tasks.some(t => t.title === task.title)) {
       this.addToast('A task with this name already exists');
       return false;
     }
-    this.tasks = [...this.tasks, createNode(title)];
+    this.tasks = [...this.tasks, createNode(task)];
     this._save();
     this.addToast('Task created');
     return true;
   }
 
-  addChildTask(parentId, title) {
-    if (!title || !title.trim()) return false;
+  addChildTask(parentId, input) {
+    const task = normalizeTaskInput(input);
+    if (!task) return false;
     const result = this._mutateTree(this.tasks, parentId, (parent) => {
       // Prevent exact duplicate sibling titles
-      if (parent.children.some(c => c.title === title.trim())) {
+      if (parent.children.some(c => c.title === task.title)) {
         this.addToast('A sibling task with this name already exists');
         return false;
       }
-      parent.children = [...parent.children, createNode(title)];
+      parent.children = [...parent.children, createNode(task)];
       parent.collapsed = false;
       return true;
     });
@@ -210,17 +250,42 @@ class TaskStore {
   }
 
   updateTaskTitle(nodeId, title) {
-    if (!title || !title.trim()) return;
-    const node = findNode(this.tasks, nodeId);
-    if (node) node.title = title.trim();
-    // Also check archive
+    let node = findNode(this.tasks, nodeId);
     if (!node) {
       for (const a of this.archive) {
-        const an = findNode([a.branch], nodeId);
-        if (an) { an.title = title.trim(); break; }
+        node = findNode([a.branch], nodeId);
+        if (node) break;
       }
     }
+    if (!node) return false;
+    const task = normalizeTaskInput({ ...node, title });
+    if (!task) return false;
+    node.title = task.title;
     this._save();
+    return true;
+  }
+
+  updateTask(nodeId, input) {
+    const task = normalizeTaskInput(input);
+    if (!task) return false;
+    let node = findNode(this.tasks, nodeId);
+    if (!node) {
+      for (const entry of this.archive) {
+        node = findNode([entry.branch], nodeId);
+        if (node) break;
+      }
+    }
+    if (!node) return false;
+    node.title = task.title;
+    node.status = task.status;
+    node.priority = task.priority;
+    node.dueDate = task.dueDate;
+    node.completed = isLeaf(node)
+      ? task.status === 'done'
+      : getDescendantLeaves(node).every(leaf => leaf.completed);
+    this._save();
+    this.addToast('Task updated');
+    return true;
   }
 
   toggleComplete(nodeId) {
@@ -228,6 +293,7 @@ class TaskStore {
     if (!node) return;
     if (!isLeaf(node)) return; // parents auto-computed
     node.completed = !node.completed;
+    node.status = node.completed ? 'done' : 'todo';
     this._save();
   }
 
@@ -332,16 +398,23 @@ class TaskStore {
   // --- Tags ---
 
   addTag(name, color) {
-    if (!name || !name.trim()) return false;
-    const trimmed = name.trim();
-    if (this.tags.some(t => t.name.toLowerCase() === trimmed.toLowerCase())) {
+    const parsed = TagUpsertSchema.safeParse({
+      name: String(name ?? '').trim(),
+      color: color || TAG_COLORS[this.tags.length % TAG_COLORS.length]
+    });
+    if (!parsed.success) {
+      this.addToast(parsed.error.issues[0]?.message || 'Invalid tag');
+      return false;
+    }
+    const tag = parsed.data;
+    if (this.tags.some(t => t.name.toLowerCase() === tag.name.toLowerCase())) {
       this.addToast('Tag already exists');
       return false;
     }
     this.tags = [...this.tags, {
       id: generateId(),
-      name: trimmed,
-      color: color || TAG_COLORS[this.tags.length % TAG_COLORS.length]
+      name: tag.name,
+      color: tag.color
     }];
     this._save();
     return true;
@@ -465,6 +538,181 @@ class TaskStore {
   }
 
   // --- Export ---
+
+  _exportNode(node) {
+    return {
+      id: node.id,
+      title: node.title,
+      status: node.status || (node.completed ? 'done' : 'todo'),
+      priority: node.priority || 'medium',
+      dueDate: node.dueDate || '',
+      completed: !!node.completed,
+      collapsed: !!node.collapsed,
+      tags: (node.tags || []).map(tagId => this.getTagById(tagId)?.name).filter(Boolean),
+      children: node.children.map(child => this._exportNode(child))
+    };
+  }
+
+  exportGroveJson() {
+    return JSON.stringify({
+      schemaVersion: 1,
+      exportedAt: new Date().toISOString(),
+      theme: this.theme,
+      tags: this.tags.map(tag => ({ id: tag.id, name: tag.name, color: tag.color })),
+      tasks: this.tasks.map(task => this._exportNode(task)),
+      archive: this.archive.map(entry => this._exportNode(entry.branch))
+    }, null, 2);
+  }
+
+  exportGroveCsv() {
+    const rows = [];
+    const visit = (node, parentId, archived) => {
+      rows.push({
+        id: node.id,
+        title: node.title,
+        status: node.status || (node.completed ? 'done' : 'todo'),
+        priority: node.priority || 'medium',
+        dueDate: node.dueDate || '',
+        parentId: parentId || '',
+        completed: String(!!node.completed),
+        collapsed: String(!!node.collapsed),
+        tags: (node.tags || []).map(tagId => this.getTagById(tagId)?.name).filter(Boolean).join('|'),
+        archived: String(archived)
+      });
+      node.children.forEach(child => visit(child, node.id, archived));
+    };
+    this.tasks.forEach(task => visit(task, '', false));
+    this.archive.forEach(entry => visit(entry.branch, '', true));
+    return Papa.unparse(rows, {
+      columns: ['id', 'title', 'status', 'priority', 'dueDate', 'parentId', 'completed', 'collapsed', 'tags', 'archived']
+    });
+  }
+
+  _importNode(raw, tagIdsByName) {
+    const task = requireTaskInput(raw);
+    if (typeof raw.id !== 'string' || !raw.id) throw new Error('task id is required');
+    if (typeof raw.completed !== 'boolean') throw new Error('task completed must be boolean');
+    if (typeof raw.collapsed !== 'boolean') throw new Error('task collapsed must be boolean');
+    if (!Array.isArray(raw.tags) || raw.tags.length > 5) throw new Error('task tags must be an array of at most 5 names');
+    if (!Array.isArray(raw.children)) throw new Error('task children must be an array');
+    const tagIds = raw.tags.map(name => tagIdsByName.get(name));
+    if (tagIds.some(id => !id) || new Set(tagIds).size !== tagIds.length) {
+      throw new Error('task tags must be unique existing tag names');
+    }
+    const node = createNode(task);
+    node.id = raw.id;
+    node.completed = raw.completed;
+    node.collapsed = raw.collapsed;
+    node.tags = tagIds;
+    node.children = raw.children.map(child => this._importNode(child, tagIdsByName));
+    if (node.children.length === 0 && node.completed !== (node.status === 'done')) {
+      throw new Error('leaf completed must match status done');
+    }
+    return node;
+  }
+
+  importGrove(content, format) {
+    try {
+      if (format === 'grove-json') {
+        const document = JSON.parse(content);
+        if (document.schemaVersion !== 1) return { error: 'schemaVersion must equal 1' };
+        if (!['light', 'dark', 'forest'].includes(document.theme)) return { error: 'theme must be light, dark, or forest' };
+        if (!Array.isArray(document.tags) || !Array.isArray(document.tasks) || !Array.isArray(document.archive)) {
+          return { error: 'tags, tasks, and archive must be arrays' };
+        }
+        const tags = document.tags.map(tag => {
+          const parsed = TagUpsertSchema.safeParse(tag);
+          if (!parsed.success || typeof tag.id !== 'string' || !tag.id) {
+            throw new Error('tag id, name, or color is invalid');
+          }
+          return { id: tag.id, ...parsed.data };
+        });
+        if (new Set(tags.map(tag => tag.name.toLowerCase())).size !== tags.length) {
+          return { error: 'tag names must be unique case-insensitively' };
+        }
+        const tagIdsByName = new Map(tags.map(tag => [tag.name, tag.id]));
+        const tasks = document.tasks.map(task => this._importNode(task, tagIdsByName));
+        const archive = document.archive.map(branch => ({ id: generateId(), branch: this._importNode(branch, tagIdsByName), archivedAt: Date.now() }));
+        this.tags = tags;
+        this.tasks = tasks;
+        this.archive = archive;
+        this.theme = document.theme;
+      } else if (format === 'grove-csv') {
+        const parsed = Papa.parse(content, { header: true, skipEmptyLines: true });
+        if (parsed.errors.length) return { error: `CSV import: ${parsed.errors[0].message}` };
+        const expected = ['id', 'title', 'status', 'priority', 'dueDate', 'parentId', 'completed', 'collapsed', 'tags', 'archived'];
+        if (expected.some((field, index) => parsed.meta.fields?.[index] !== field)) return { error: `CSV header must be ${expected.join(',')}` };
+        const tagNamesByRow = new Map();
+        const importedTagNames = new Map();
+        for (const row of parsed.data) {
+          const tagNames = String(row.tags || '').split('|').filter(Boolean);
+          const uniqueNames = new Set(tagNames.map(name => name.toLowerCase()));
+          if (tagNames.length > 5 || uniqueNames.size !== tagNames.length) {
+            return { error: 'CSV tags must contain at most 5 unique names' };
+          }
+          for (const name of tagNames) {
+            const key = name.toLowerCase();
+            const color = TAG_COLORS[importedTagNames.size % TAG_COLORS.length];
+            if (!TagUpsertSchema.safeParse({ name, color }).success) return { error: 'CSV tag name must be 1 to 40 characters' };
+            if (!importedTagNames.has(key)) importedTagNames.set(key, name);
+          }
+          tagNamesByRow.set(row, tagNames);
+        }
+        const tags = [...importedTagNames.values()].map((name, index) => ({
+          id: generateId(),
+          name,
+          color: TAG_COLORS[index % TAG_COLORS.length]
+        }));
+        const tagIdsByName = new Map(tags.map(tag => [tag.name.toLowerCase(), tag.id]));
+        const byId = new Map();
+        for (const row of parsed.data) {
+          if (!row.id || byId.has(row.id)) return { error: 'CSV id must be present and unique' };
+          if (!['true', 'false'].includes(row.completed) || !['true', 'false'].includes(row.collapsed) || !['true', 'false'].includes(row.archived)) {
+            return { error: 'CSV completed, collapsed, and archived must be true or false' };
+          }
+          const task = requireTaskInput(row);
+          const tagIds = tagNamesByRow.get(row).map(name => tagIdsByName.get(name.toLowerCase()));
+          const node = createNode(task);
+          node.id = row.id;
+          node.completed = row.completed === 'true';
+          node.collapsed = row.collapsed === 'true';
+          node.tags = tagIds;
+          byId.set(node.id, { node, row });
+        }
+        const tasks = [];
+        const archived = [];
+        for (const { node, row } of byId.values()) {
+          if (row.parentId) {
+            const parent = byId.get(row.parentId);
+            if (!parent) return { error: `CSV parentId not found: ${row.parentId}` };
+            parent.node.children.push(node);
+          } else if (row.archived === 'true') archived.push({ id: generateId(), branch: node, archivedAt: Date.now() });
+          else tasks.push(node);
+        }
+        const completionIsValid = node => (
+          node.children.length === 0
+            ? node.completed === (node.status === 'done')
+            : node.children.every(completionIsValid)
+        );
+        if (![...tasks, ...archived.map(entry => entry.branch)].every(completionIsValid)) {
+          return { error: 'CSV leaf completed must match status done' };
+        }
+        this.tasks = tasks;
+        this.archive = archived;
+        this.tags = tags;
+      } else {
+        return { error: `unsupported import format: ${format}` };
+      }
+      this.zoomedNodeId = null;
+      this.searchQuery = '';
+      this.activeTagFilters = [];
+      this._save();
+      this.addToast('Grove imported');
+      return { error: null };
+    } catch (error) {
+      return { error: `Import failed: ${error instanceof Error ? error.message : String(error)}` };
+    }
+  }
 
   exportBranch(nodeId) {
     const node = findNode(this.tasks, nodeId);

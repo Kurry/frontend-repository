@@ -1,5 +1,8 @@
 <script>
+  import { createForm } from 'felte';
+  import { validator } from '@felte/validator-zod';
   import { store } from '../lib/store.svelte.js';
+  import { TaskUpsertSchema } from '../lib/schemas.js';
   import ProgressRing from './ProgressRing.svelte';
   import TaskNode from './TaskNode.svelte';
 
@@ -66,37 +69,29 @@
 
   // Child add form
   let addingChild = $state(false);
-  let childTitle = $state('');
-  let childError = $state('');
-  let childInput = $state(null);
+
+  const { form: childForm, errors: childErrors, reset: resetChild, setInitialValues: setChildInitial } = createForm({
+    extend: validator({ schema: TaskUpsertSchema }),
+    onSubmit: (values) => {
+      if (store.addChildTask(node.id, values)) {
+        addingChild = false;
+        resetChild();
+      }
+    }
+  });
 
   function openAddChild() {
+    setChildInitial({ title: '', status: 'todo', priority: 'medium', dueDate: '' });
+    resetChild();
     addingChild = true;
-    childTitle = '';
-    childError = '';
-    setTimeout(() => childInput?.focus(), 10);
-  }
-
-  function submitChild() {
-    if (!childTitle.trim()) {
-      childError = 'Title is required';
-      return;
-    }
-    if (store.addChildTask(node.id, childTitle)) {
-      addingChild = false;
-      childTitle = '';
-      childError = '';
-    }
-  }
-
-  function handleChildKey(e) {
-    if (e.key === 'Enter') submitChild();
-    if (e.key === 'Escape') cancelAddChild();
   }
 
   function cancelAddChild() {
     addingChild = false;
-    childError = '';
+  }
+
+  function handleChildKey(e) {
+    if (e.key === 'Escape') cancelAddChild();
   }
 
   // Export
@@ -328,23 +323,48 @@
 
   <!-- Add Child Form -->
   {#if addingChild}
-    <div class="add-child-form mb-1 flex flex-wrap items-center gap-1" style="margin-left: calc(({depth} + 1) * 20px + 20px);">
+    <form use:childForm class="add-child-form mb-1 flex flex-wrap items-center gap-1" style="margin-left: calc(({depth} + 1) * 20px + 20px);" onkeydown={handleChildKey}>
       <input
-        bind:this={childInput}
-        bind:value={childTitle}
-        onkeydown={handleChildKey}
+        name="title"
         placeholder="Child task title…"
         aria-label="Child task title"
-        aria-invalid={!!childError}
-        class="flex-1 bg-[var(--color-background)] border rounded px-2 py-1 text-[var(--color-text-primary)] outline-none"
-        style="font-size: 10px; {childError ? 'border-color: var(--color-danger);' : 'border-color: var(--color-border);'}"
+        class="flex-1 min-w-[80px] bg-[var(--color-background)] border rounded px-2 py-1 text-[var(--color-text-primary)] outline-none"
+        style="font-size: 10px; {$childErrors.title ? 'border-color: var(--color-danger);' : 'border-color: var(--color-border);'}"
       />
-      <button class="btn-primary !px-3 !py-1 !text-[8px] !rounded-lg" onclick={submitChild}>Add</button>
-      <button class="btn-secondary !px-3 !py-1 !text-[8px] !rounded-lg" onclick={cancelAddChild}>Cancel</button>
-    </div>
-    {#if childError}
-      <div class="text-[var(--color-danger)] text-[9px] mb-1 shake" style="margin-left: calc(({depth} + 1) * 20px + 20px);">{childError}</div>
-    {/if}
+      <select
+        name="status"
+        class="bg-[var(--color-background)] border rounded px-1 py-1 text-[var(--color-text-primary)] outline-none"
+        style="font-size: 10px; {$childErrors.status ? 'border-color: var(--color-danger);' : 'border-color: var(--color-border);'}"
+      >
+        <option value="todo">todo</option>
+        <option value="in_progress">in_progress</option>
+        <option value="done">done</option>
+        <option value="blocked">blocked</option>
+      </select>
+      <select
+        name="priority"
+        class="bg-[var(--color-background)] border rounded px-1 py-1 text-[var(--color-text-primary)] outline-none"
+        style="font-size: 10px; {$childErrors.priority ? 'border-color: var(--color-danger);' : 'border-color: var(--color-border);'}"
+      >
+        <option value="low">low</option>
+        <option value="medium" selected>medium</option>
+        <option value="high">high</option>
+        <option value="urgent">urgent</option>
+      </select>
+      <input
+        name="dueDate"
+        type="text"
+        placeholder="YYYY-MM-DD"
+        class="w-20 bg-[var(--color-background)] border rounded px-1 py-1 text-[var(--color-text-primary)] outline-none"
+        style="font-size: 10px; {$childErrors.dueDate ? 'border-color: var(--color-danger);' : 'border-color: var(--color-border);'}"
+      />
+      <button type="submit" class="btn-primary !px-3 !py-1 !text-[8px] !rounded-lg">Add</button>
+      <button type="button" class="btn-secondary !px-3 !py-1 !text-[8px] !rounded-lg" onclick={cancelAddChild}>Cancel</button>
+      {#if $childErrors.title}<div class="w-full text-[var(--color-danger)] text-[9px] shake" style="margin-left: 0;">{$childErrors.title[0]}</div>{/if}
+      {#if $childErrors.status}<div class="w-full text-[var(--color-danger)] text-[9px] shake" style="margin-left: 0;">{$childErrors.status[0]}</div>{/if}
+      {#if $childErrors.priority}<div class="w-full text-[var(--color-danger)] text-[9px] shake" style="margin-left: 0;">{$childErrors.priority[0]}</div>{/if}
+      {#if $childErrors.dueDate}<div class="w-full text-[var(--color-danger)] text-[9px] shake" style="margin-left: 0;">{$childErrors.dueDate[0]}</div>{/if}
+    </form>
   {/if}
 
   <!-- Children -->

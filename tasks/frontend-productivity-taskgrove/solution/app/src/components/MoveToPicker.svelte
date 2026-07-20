@@ -1,7 +1,25 @@
 <script>
   import { store } from '../lib/store.svelte.js';
+  import { createDialog } from '@melt-ui/svelte';
 
-  const isOpen = $derived(store.moveToSourceId !== null);
+  const {
+    elements: { portalled, overlay, content, title, description, close },
+    states: { open },
+  } = createDialog({
+    forceVisible: true,
+  });
+
+  // Sync internal state with store
+  $effect(() => {
+    open.set(store.moveToSourceId !== null);
+  });
+
+  $effect(() => {
+    if (!$open && store.moveToSourceId !== null) {
+      store.moveToSourceId = null;
+    }
+  });
+
   const sourceId = $derived(store.moveToSourceId);
   const targets = $derived(sourceId ? store.getMoveToTargets(sourceId) : []);
   const sourceNode = $derived(sourceId ? findNodeInTree(store.tasks, sourceId) : null);
@@ -17,37 +35,26 @@
 
   function selectTarget(targetId) {
     store.reparent(sourceId, targetId);
-  }
-
-  function close() {
-    store.moveToSourceId = null;
-  }
-
-  function closeOnEscape(e) {
-    if (e.key === 'Escape') close();
-  }
-
-  function stopKey(e) {
-    e.stopPropagation();
+    open.set(false);
   }
 </script>
 
-{#if isOpen}
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onclick={close} onkeydown={closeOnEscape} role="dialog" aria-modal="true" aria-label="Move task dialog" tabindex="-1">
+{#if $open}
+  <div {...$portalled}>
+    <div {...$overlay} class="fixed inset-0 z-50 bg-black/30 transition-opacity"></div>
     <div
-      class="bg-[var(--color-background)] border border-[var(--color-border)] rounded w-full max-w-sm mx-4 shadow-xl max-h-[70vh] flex flex-col"
-      onclick={(e) => e.stopPropagation()}
-      onkeydown={stopKey}
-      role="document"
+      {...$content}
+      class="fixed left-[50%] top-[50%] z-50 max-h-[70vh] w-full max-w-sm translate-x-[-50%] translate-y-[-50%] rounded bg-[var(--color-background)] border border-[var(--color-border)] shadow-xl flex flex-col"
     >
       <div class="p-3 border-b border-[var(--color-border)] flex items-center justify-between">
-        <h3 class="text-[12px] font-bold heading">Move "{sourceNode?.title || ''}" to…</h3>
+        <h3 {...$title} class="text-[12px] font-bold heading m-0">Move "{sourceNode?.title || ''}" to…</h3>
         <button
+          {...$close}
           class="text-[var(--color-muted)] hover:text-[var(--color-text-primary)] text-[14px]"
-          onclick={close}
           aria-label="Close"
         >✕</button>
       </div>
+      <div {...$description} class="sr-only">Select a new parent for this task</div>
       <div class="overflow-y-auto p-2 flex-1">
         {#each targets as target}
           <button

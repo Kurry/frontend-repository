@@ -54,6 +54,11 @@
     aria-label="Tag Manager"
   >Tags</button>
 
+  <button
+    class="btn-secondary !px-2.5 !py-1.5 !text-[9px] !rounded-lg flex items-center gap-1"
+    onclick={() => store.showGrovePanel = true}
+  >Export grove</button>
+
   <!-- Theme Switcher -->
   <button
     class="btn-secondary !px-2.5 !py-1.5 !text-[9px] !rounded-lg flex items-center gap-1"
