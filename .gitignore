@@ -59,3 +59,9 @@ venv/
 # directly (razorpay's dist is hand-patched), even though dist/ is ignored globally.
 !tasks/*/solution/app/dist/
 /.harden-locks
+.output/
+.nuxt/
+node_modules/
+tasks/frontend-planning-trip-itinerary/solution/app/.output/
+tasks/frontend-planning-trip-itinerary/solution/app/.nuxt/
+tasks/frontend-planning-trip-itinerary/solution/app/node_modules/
