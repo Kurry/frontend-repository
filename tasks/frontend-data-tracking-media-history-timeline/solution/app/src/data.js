@@ -642,12 +642,12 @@ export const MT_DATA = {
     },
     {
       id: "e60",
-      title: "SMS Text Messaging",
-      year: 1992,
-      place: "Europe",
-      categories: ["telecom", "mobile"],
-      summary: "The first person-to-person SMS message demonstrates short mobile text communication.",
-      detail: "Text messaging becomes a compact, asynchronous layer of everyday communication across mobile networks.",
+      title: "3G Mobile Networks",
+      year: 2003,
+      place: "Japan",
+      categories: ["mobile", "network"],
+      summary: "NTT DoCoMo scales the first commercial third-generation mobile network nationwide.",
+      detail: "Higher-bandwidth mobile data made always-on internet access, media streaming, and later smartphone apps practical over cellular networks.",
     },
   ],
 };
