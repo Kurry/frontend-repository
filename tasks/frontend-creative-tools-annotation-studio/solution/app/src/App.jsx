@@ -1,3 +1,4 @@
+import Onboarding from './components/Onboarding';
 import { useEffect, useMemo, useRef } from 'react';
 import { Button } from '@carbon/react';
 import {
@@ -102,6 +103,6 @@ export default function App() {
     </header>
     <div className="workspace"><Sidebar />{mobileOpen && <button className="sidebar-scrim" aria-label="Close queue" onClick={() => setMobile(false)} />}<main>{content}</main></div>
     {actionPanelOpen && <aside className="action-panel" aria-label="Recent action history"><header><div><p className="eyebrow">Undo stack</p><h2>Recent actions</h2></div><Button hasIconOnly kind="ghost" size="sm" renderIcon={Close} iconDescription="Close action history" onClick={() => setActionPanelOpen(false)} /></header><div>{actionHistory.length ? actionHistory.map((entry) => <article key={entry.id} className={entry.reverted ? 'reverted' : ''}><Time size={15} /><span><strong>{entry.label}</strong><small>{new Date(entry.at).toLocaleTimeString()} {entry.reverted && '· Undone'}</small></span></article>) : <p className="empty-mini">No annotation actions yet. Submits, skips, regions, taxonomy edits, and review changes appear here.</p>}</div></aside>}
-    <CommandPalette /><Toast /><div className="sr-only" aria-live="polite">{liveMessage}</div>
+    <CommandPalette /><Toast /><Onboarding /><div className="sr-only" aria-live="polite">{liveMessage}</div>
   </div>;
 }
