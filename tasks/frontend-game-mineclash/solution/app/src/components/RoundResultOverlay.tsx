@@ -14,16 +14,29 @@ export const RoundResultOverlay = component$(() => {
 
   useVisibleTask$(() => {
     playRoundEnd(store.soundEnabled, playerWon);
+
+    // Focus management
+    const activeElement = document.activeElement;
+    const dialog = document.getElementById('round-result-dialog');
+    if (dialog) dialog.focus();
+
+    return () => {
+      if (activeElement && activeElement instanceof HTMLElement) {
+        activeElement.focus();
+      }
+    };
   });
 
   return (
     <div class="overlay" style={{ zIndex: 200 }}>
       <div
+        id="round-result-dialog"
+        tabIndex={-1}
         class="panel animate-slide-in"
         role="dialog"
         aria-modal="true"
         aria-labelledby="round-result-title"
-        style={{ maxWidth: '380px', width: '90%', textAlign: 'center' }}
+        style={{ maxWidth: '380px', width: '90%', textAlign: 'center', outline: 'none' }}
       >
         {/* Winner announcement */}
         <div aria-hidden="true" style={{ fontSize: '40px', marginBottom: '8px' }}>
@@ -61,6 +74,7 @@ export const RoundResultOverlay = component$(() => {
 
         {/* Buttons */}
         <button
+          autoFocus
           class="btn-primary"
           style={{ width: '100%', fontSize: '16px', padding: '12px' }}
           onClick$={() => { startNextRound(store); }}

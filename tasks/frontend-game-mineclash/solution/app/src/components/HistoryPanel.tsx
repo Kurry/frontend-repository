@@ -1,6 +1,7 @@
 import { component$, useContext } from '@builder.io/qwik';
 import { AppCtx } from '../context';
 import { undoHistory, redoHistory, applyHistoryNode } from '../gameLogic';
+import autoAnimate from '@formkit/auto-animate';
 
 export const HistoryPanel = component$(() => {
   const store = useContext(AppCtx);
@@ -35,7 +36,10 @@ export const HistoryPanel = component$(() => {
       </div>
 
       {/* History list */}
-      <div style={{ maxHeight: '120px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '8px' }}>
+      <div
+         ref={(el: HTMLElement) => { if (el) autoAnimate(el); }}
+         style={{ maxHeight: '120px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '8px' }}
+      >
         {store.historyNodes.map(node => {
           const isCur = node.id === store.currentHistoryId;
           const isSel = node.id === store.selectedHistoryId;
@@ -59,7 +63,7 @@ export const HistoryPanel = component$(() => {
       </div>
 
       {/* History state display */}
-      <div style={{ background: '#1C1917', borderRadius: '8px', padding: '8px', border: '1px solid #44403C', marginBottom: '8px' }}>
+      <div role="region" aria-label="History state" style={{ background: '#1C1917', borderRadius: '8px', padding: '8px', border: '1px solid #44403C', marginBottom: '8px' }}>
         <div style={{ color: '#A8A29E', fontSize: '11px', letterSpacing: '0.4px', marginBottom: '6px' }}>
           History state
         </div>

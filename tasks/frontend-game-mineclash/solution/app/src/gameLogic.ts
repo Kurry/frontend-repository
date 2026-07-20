@@ -230,10 +230,14 @@ export function revealTile(store: AppStore, row: number, col: number, by: Turn):
 
 function endRound(store: AppStore, winner: Turn | 'draw', reason: string) {
   const result: RoundResult = {
+    roundNumber: store.roundNumber,
     playerScore: store.player.score,
     rivalScore: store.rival.score,
+    playerStrikes: store.player.strikes,
+    rivalStrikes: store.rival.strikes,
     winner,
     reason,
+    outcomeReason: reason,
   };
   store.lastRoundResult = result;
   store.matchRounds.push(result);
@@ -278,6 +282,26 @@ export function startNextRound(store: AppStore) {
     const d = store.difficulty;
     store.stats[d].matchesPlayed++;
     if (store.playerMatchWins >= 2) store.stats[d].matchesWon++;
+
+    let playerTotalOre = 0;
+    let rivalTotalOre = 0;
+    for (const r of store.matchRounds) {
+      playerTotalOre += r.playerScore;
+      rivalTotalOre += r.rivalScore;
+    }
+    const matchWinner = store.playerMatchWins >= 2 ? 'player' : 'rival';
+    store.matchLog.unshift({
+      playerName: store.playerName,
+      difficulty: store.difficulty,
+      playerRoundWins: store.playerMatchWins,
+      rivalRoundWins: store.rivalMatchWins,
+      playerTotalOre,
+      rivalTotalOre,
+      winner: matchWinner,
+      rounds: [...store.matchRounds],
+      endedAt: new Date().toISOString(),
+    });
+
     store.phase = 'match-complete';
     return;
   }

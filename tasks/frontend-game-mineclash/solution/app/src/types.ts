@@ -1,5 +1,5 @@
 export type Difficulty = 'easy' | 'medium' | 'hard';
-export type Phase = 'setup' | 'playing' | 'round-result' | 'match-complete' | 'stats';
+export type Phase = 'setup' | 'playing' | 'round-result' | 'match-complete' | 'stats' | 'match-log' | 'export-center';
 export type Turn = 'player' | 'rival';
 export type HintStatus = 'none' | 'safe' | 'mine';
 export type PlayerMode = 'reveal' | 'flag' | 'hint';
@@ -20,10 +20,26 @@ export interface PlayerState {
 }
 
 export interface RoundResult {
+  roundNumber: number;
   playerScore: number;
   rivalScore: number;
+  playerStrikes: number;
+  rivalStrikes: number;
   winner: Turn | 'draw';
   reason: string;
+  outcomeReason?: string;
+}
+
+export interface MatchResult {
+  playerName: string;
+  difficulty: Difficulty;
+  playerRoundWins: number;
+  rivalRoundWins: number;
+  playerTotalOre: number;
+  rivalTotalOre: number;
+  winner: Turn | 'draw';
+  rounds: RoundResult[];
+  endedAt: string;
 }
 
 export interface DifficultyStats {
@@ -60,6 +76,7 @@ export interface HistoryNode {
 
 export interface AppStore {
   phase: Phase;
+  playerName: string;
   difficulty: Difficulty;
   soundEnabled: boolean;
 
@@ -84,6 +101,7 @@ export interface AppStore {
   playerMatchWins: number;
   rivalMatchWins: number;
   lastRoundResult: RoundResult | null;
+  matchLog: MatchResult[];
 
   historyNodes: HistoryNode[];
   currentHistoryId: string | null;

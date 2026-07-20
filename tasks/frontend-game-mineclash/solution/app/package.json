@@ -11,11 +11,16 @@
   },
   "dependencies": {
     "@builder.io/qwik": "1.20.0",
+    "@formkit/auto-animate": "^0.10.0",
+    "@iconify/tailwind4": "^1.2.3",
     "@tailwindcss/vite": "4.3.2",
+    "canvas-confetti": "^1.9.4",
+    "daisyui": "^5.6.18",
     "tailwindcss": "4.3.2",
     "xstate": "5.32.4"
   },
   "devDependencies": {
+    "@types/canvas-confetti": "^1.9.0",
     "http-server": "14.1.1",
     "typescript": "6.0.3",
     "vite": "7.3.6"

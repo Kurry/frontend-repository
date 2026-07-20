@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@plugin "daisyui";
+@plugin "@iconify/tailwind4";
 
 @theme {
   --color-primary: #F59E0B;
@@ -15,18 +17,11 @@
   --font-mono: 'Courier New', monospace;
 }
 
-:root {
-  --color-primary: #F59E0B;
-  --color-accent: #38BDF8;
-  --color-background: #1C1917;
-  --color-surface: #292524;
-  --color-success: #4ADE80;
-  --color-warning: #FACC15;
-  --color-error: #EF4444;
-  --color-text-primary: #FAFAF9;
-  --color-text-secondary: #A8A29E;
+body {
+  background-color: #1C1917;
+  color: #FAFAF9;
+  font-family: var(--font-sans);
 }
-
 * {
   box-sizing: border-box;
 }

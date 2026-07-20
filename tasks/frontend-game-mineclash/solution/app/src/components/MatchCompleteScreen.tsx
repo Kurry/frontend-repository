@@ -1,17 +1,40 @@
-import { component$, useContext } from '@builder.io/qwik';
+import { component$, useContext, useVisibleTask$, useSignal } from '@builder.io/qwik';
 import { AppCtx } from '../context';
-import { initNewMatch } from '../gameLogic';
+import { resetMatch } from '../gameLogic';
+import confetti from 'canvas-confetti';
 
 export const MatchCompleteScreen = component$(() => {
   const store = useContext(AppCtx);
   const playerWon = store.playerMatchWins >= 2;
+  const copiedState = useSignal(false);
+
+  useVisibleTask$(() => {
+    if (playerWon) {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+    }
+
+    // Focus management
+    const activeElement = document.activeElement;
+    const dialog = document.getElementById('match-complete-dialog');
+    if (dialog) dialog.focus();
+
+    return () => {
+      if (activeElement && activeElement instanceof HTMLElement) {
+        activeElement.focus();
+      }
+    };
+  });
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+    <div id="match-complete-dialog" role="dialog" aria-modal="true" aria-labelledby="match-complete-title" tabIndex={-1} style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', outline: 'none' }}>
       {/* Trophy */}
       <div aria-hidden="true" style={{ fontSize: '64px', marginBottom: '16px' }}>{playerWon ? '🏆' : '🤖'}</div>
 
-      <h1 style={{ fontSize: '30px', fontWeight: '800', margin: '0 0 8px', textAlign: 'center', color: playerWon ? '#4ADE80' : '#EF4444' }}>
+      <h1 id="match-complete-title" style={{ fontSize: '30px', fontWeight: '800', margin: '0 0 8px', textAlign: 'center', color: playerWon ? '#4ADE80' : '#EF4444' }}>
         {playerWon ? 'Victory!' : 'Defeated!'}
       </h1>
       <p style={{ color: '#A8A29E', margin: '0 0 24px', fontSize: '16px' }}>
@@ -33,7 +56,7 @@ export const MatchCompleteScreen = component$(() => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
           {store.matchRounds.map((r, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px', background: '#1C1917', borderRadius: '8px' }}>
-              <span style={{ color: '#A8A29E', fontSize: '13px' }}>Round {i + 1}</span>
+              <span style={{ color: '#A8A29E', fontSize: '13px' }}>Round {r.roundNumber || (i + 1)}</span>
               <span style={{ fontFamily: "'Courier New', monospace", fontSize: '14px' }}>
                 <span style={{ color: '#38BDF8' }}>{r.playerScore}</span>
                 {' vs '}
@@ -51,12 +74,19 @@ export const MatchCompleteScreen = component$(() => {
         </div>
       </div>
 
+      {copiedState.value && (
+         <div role="status" style={{ textAlign: 'center', marginBottom: '16px', color: '#4ADE80', fontWeight: 'bold' }}>
+            Copied
+         </div>
+      )}
+
       {/* Actions */}
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', justifyContent: 'center' }}>
         <button
+          autoFocus
           class="btn-primary"
           style={{ fontSize: '15px', padding: '12px 28px' }}
-          onClick$={() => { initNewMatch(store); }}
+          onClick$={() => { resetMatch(store); }}
         >
           🔄 Rematch
         </button>
@@ -64,7 +94,10 @@ export const MatchCompleteScreen = component$(() => {
           class="btn-secondary"
           style={{ fontSize: '15px', padding: '12px 28px' }}
           onClick$={() => {
-            if (store.phase === 'match-complete') store.phase = 'setup';
+            if (store.phase === 'match-complete') {
+              store.paused = false;
+              store.phase = 'setup';
+            }
           }}
         >
           🏠 New match
@@ -77,6 +110,33 @@ export const MatchCompleteScreen = component$(() => {
           }}
         >
           📊 Stats
+        </button>
+        <button
+          class="btn-secondary"
+          style={{ fontSize: '15px', padding: '12px 28px' }}
+          onClick$={() => {
+            if (store.phase === 'match-complete') {
+              store.phase = 'match-log';
+            }
+          }}
+        >
+          📜 Match log
+        </button>
+        <button
+          class="btn-secondary"
+          style={{ fontSize: '15px', padding: '12px 28px' }}
+          onClick$={() => {
+            const latestMatch = store.matchLog[0];
+            if (latestMatch) {
+              const jsonStr = JSON.stringify(latestMatch, null, 2);
+              navigator.clipboard.writeText(jsonStr).then(() => {
+                copiedState.value = true;
+                setTimeout(() => copiedState.value = false, 2000);
+              });
+            }
+          }}
+        >
+          📤 Export Match
         </button>
       </div>
     </div>

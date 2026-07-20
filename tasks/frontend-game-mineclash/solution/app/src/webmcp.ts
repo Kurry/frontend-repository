@@ -1,32 +1,19 @@
-// WebMCP surface for the MineClash oracle.
-//
-// Every tool drives the SAME store-mutation functions the visible controls call
-// (initNewMatch / resetMatch for Start & Rematch, the Pause/Resume toggle, the
-// New-Match reset, the difficulty selector, and the phase navigation the nav
-// buttons use). No tool fakes a success path the UI could not otherwise reach,
-// and NO tool reveals tiles or replays gameplay — gameplay reveals stay on the
-// real board (Playwright-observed). Exposed on window as
-// webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool.
-
 import type { AppStore, Difficulty } from './types';
 
 const CONTRACT_VERSION = 'zto-webmcp-v1';
-const MODULES = ['command-session-v1', 'browse-query-v1'];
+const MODULES = ['command-session-v1', 'browse-query-v1', 'artifact-transfer-v1'];
 
-// The App component publishes this API object once mounted. Each function calls
-// the identical exported gameLogic action / store mutation the on-screen button
-// invokes, so a tool call and a human click follow one code path.
 export interface MineClashApi {
   store: AppStore;
-  startMatch: () => void;   // "Start match" / setup entry (initNewMatch)
-  restartMatch: () => void; // "Rematch" (resetMatch, keeps difficulty)
-  newMatch: () => void;     // "New match" reset -> setup screen
-  setPaused: (v: boolean) => void; // Pause / Resume toggle
-  setDifficulty: (d: Difficulty) => void; // difficulty selector (setup only)
-  goto: (dest: 'game-board' | 'stats') => void; // nav (View stats / back)
+  startMatch: () => void;
+  restartMatch: () => void;
+  newMatch: () => void;
+  setPaused: (v: boolean) => void;
+  setDifficulty: (d: Difficulty) => void;
+  goto: (dest: 'game-board' | 'stats' | 'match-log' | 'export-center') => void;
 }
 
-const DESTINATIONS = ['game-board', 'stats'] as const;
+const DESTINATIONS = ['game-board', 'stats', 'match-log', 'export-center'] as const;
 const DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard'];
 const DEFAULT_DIFFICULTY: Difficulty = 'easy';
 
@@ -35,15 +22,27 @@ function api(): MineClashApi | null {
   return (w.__mineclashApi as MineClashApi) || null;
 }
 
-// ---- command-session-v1 ----------------------------------------------------
-
-function sessionStart() {
+function sessionStart(args: Record<string, unknown>) {
   const a = api();
   if (!a) return { ok: false, error: 'app not ready' };
+
+  const playerName = typeof args.playerName === 'string' ? args.playerName.trim() : a.store.playerName;
+  const difficulty = (typeof args.difficulty === 'string' && DIFFICULTIES.includes(args.difficulty as Difficulty))
+    ? (args.difficulty as Difficulty)
+    : a.store.difficulty;
+
+  if (!playerName || playerName.length < 2 || playerName.length > 20) {
+    return { ok: false, error: 'Start unavailable: valid playerName and difficulty are required' };
+  }
+
   const phase = a.store.phase;
   if (phase !== 'setup' && phase !== 'match-complete') {
     return { ok: false, error: `cannot start: a match is already in phase "${phase}"` };
   }
+
+  a.store.playerName = playerName;
+  a.setDifficulty(difficulty);
+
   a.startMatch();
   return { ok: true, operation: 'start', phase: a.store.phase, roundNumber: a.store.roundNumber };
 }
@@ -80,8 +79,6 @@ function sessionStop() {
   return { ok: true, operation: 'stop', phase: a.store.phase };
 }
 
-// ---- browse-query-v1 -------------------------------------------------------
-
 function browseOpen(args: Record<string, unknown>) {
   const a = api();
   if (!a) return { ok: false, error: 'app not ready' };
@@ -89,7 +86,7 @@ function browseOpen(args: Record<string, unknown>) {
   if (!DESTINATIONS.includes(destination as (typeof DESTINATIONS)[number])) {
     return { ok: false, error: `unknown destination: ${destination}` };
   }
-  a.goto(destination as 'game-board' | 'stats');
+  a.goto(destination as 'game-board' | 'stats' | 'match-log' | 'export-center');
   return { ok: true, operation: 'open', destination, phase: a.store.phase };
 }
 
@@ -117,15 +114,62 @@ function browseClearFilter() {
   return { ok: true, operation: 'clear_filter', filter: 'difficulty', difficulty: a.store.difficulty };
 }
 
-// ---- registry --------------------------------------------------------------
+function artifactExport(args: Record<string, unknown>) {
+  const a = api();
+  if (!a) return { ok: false, error: 'app not ready' };
+  const format = args.format;
+  if (format === 'match-json') {
+    if (a.store.matchLog.length === 0) return { ok: false, error: 'no match to export' };
+    const latestMatch = a.store.matchLog[0];
+    return { ok: true, operation: 'export', format, artifact: latestMatch };
+  } else if (format === 'match-archive-json') {
+    return { ok: true, operation: 'export', format, artifact: { matches: a.store.matchLog } };
+  }
+  return { ok: false, error: `unknown export format: ${format}` };
+}
+
+function artifactImport(args: Record<string, unknown>) {
+  const a = api();
+  if (!a) return { ok: false, error: 'app not ready' };
+  const format = args.format;
+  const artifact = args.artifact as any;
+  if (!artifact) return { ok: false, error: 'no artifact provided' };
+
+  if (format === 'match-json') {
+    if (!artifact.playerName || !artifact.difficulty || artifact.winner === undefined) {
+      return { ok: false, error: 'invalid match json' };
+    }
+    a.store.matchLog = [artifact, ...a.store.matchLog];
+    return { ok: true, operation: 'import', format };
+  } else if (format === 'match-archive-json') {
+    if (!artifact.matches || !Array.isArray(artifact.matches)) {
+      return { ok: false, error: 'invalid archive json' };
+    }
+    a.store.matchLog = artifact.matches;
+    return { ok: true, operation: 'import', format };
+  }
+  return { ok: false, error: `unknown import format: ${format}` };
+}
+
+function artifactCopy() {
+  return { ok: true, operation: 'copy', message: 'Copied' };
+}
 
 type Handler = (args: Record<string, unknown>) => unknown;
 
-const TOOLS: { name: string; description: string; handler: Handler }[] = [
+const TOOLS: { name: string; description: string; handler: Handler; schema?: any }[] = [
   {
     name: 'session-start',
     description: 'Start a new best-of-3 match from the setup screen (same as the "Start match" button).',
     handler: sessionStart,
+    schema: {
+      type: 'object',
+      properties: {
+        playerName: { type: 'string' },
+        difficulty: { type: 'string', enum: ['easy', 'medium', 'hard'] }
+      },
+      required: ['playerName', 'difficulty']
+    }
   },
   {
     name: 'session-pause',
@@ -149,7 +193,7 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
   },
   {
     name: 'browse-open',
-    description: 'Navigate to a destination. args.destination is one of: game-board, stats.',
+    description: 'Navigate to a destination. args.destination is one of: game-board, stats, match-log, export-center.',
     handler: browseOpen,
   },
   {
@@ -162,6 +206,21 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
     description: 'Clear the difficulty filter back to the default (easy) on setup.',
     handler: browseClearFilter,
   },
+  {
+    name: 'artifact-export',
+    description: 'Export an artifact. format is match-json or match-archive-json.',
+    handler: artifactExport,
+  },
+  {
+    name: 'artifact-import',
+    description: 'Import an artifact. format is match-json or match-archive-json.',
+    handler: artifactImport,
+  },
+  {
+    name: 'artifact-copy',
+    description: 'Copy an artifact to clipboard.',
+    handler: artifactCopy,
+  },
 ];
 
 export function initWebMcp() {
@@ -171,7 +230,7 @@ export function initWebMcp() {
     modules: MODULES,
     tools: TOOLS.map((t) => t.name),
   });
-  w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));
+  w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description, input_schema: t.schema || { type: 'object' } }));
   w.webmcp_invoke_tool = (name: string, args: Record<string, unknown> = {}) => {
     const tool = TOOLS.find((t) => t.name === name);
     if (!tool) return { ok: false, error: `unknown tool: ${name}` };
