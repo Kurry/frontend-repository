@@ -241,9 +241,28 @@ function restoreState(snap) {
   state.snapshotView = "after";
 }
 
+// Structural operations each deserve their own undo step even in a rapid
+// burst (two quick duplicates/creates/removals must undo one at a time);
+// coalescing is only for continuous edits of one control — a color-picker
+// drag, a rename typed keystroke by keystroke, a nudge-repeat.
+const STRUCTURAL_HISTORY_KEYS = new Set([
+  "create",
+  "remove",
+  "duplicate",
+  "reset",
+  "random",
+  "snapshot",
+  "import",
+]);
+
 function pushHistory(key) {
   const now = Date.now();
-  if (key && history._lastKey === key && now - history._lastTime < 450) {
+  if (
+    key &&
+    !STRUCTURAL_HISTORY_KEYS.has(key) &&
+    history._lastKey === key &&
+    now - history._lastTime < 450
+  ) {
     history._lastTime = now; // coalesce rapid edits of the same token into one undo step
     return;
   }
