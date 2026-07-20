@@ -1,11 +1,39 @@
 {
-  "name": "oracle-static",
-  "private": true,
+  "name": "app",
+  "type": "module",
+  "version": "0.0.1",
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "verify:build": "npm run build && node -e \"require('fs').accessSync('dist/index.html')\"",
+    "start": "npx --yes serve dist -l 3000 -n"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "@astrojs/react": "^4.2.0",
+    "@hello-pangea/dnd": "^16.5.0",
+    "@hookform/resolvers": "^3.3.4",
+    "@iconify-json/ri": "^1.1.19",
+    "@nanostores/react": "^1.1.0",
+    "@types/uuid": "^9.0.8",
+    "astro": "^4.5.3",
+    "astro-icon": "^1.1.0",
+    "daisyui": "4.10.2",
+    "gsap": "^3.12.5",
+    "lucide-react": "^0.365.0",
+    "marked": "^12.0.1",
+    "nanostores": "^1.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.51.2",
+    "serve": "^14.2.4",
+    "uuid": "^9.0.1",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@astrojs/tailwind": "^5.1.0",
+    "autoprefixer": "^10.4.17",
+    "tailwindcss": "^3.4.1"
   }
 }
