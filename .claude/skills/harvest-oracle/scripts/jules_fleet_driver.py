@@ -214,12 +214,19 @@ def reconcile_pass(args, state_path, term_cache) -> dict:
             return {"error": "push_failed", "dispatched": 0}
 
     # Phase C: dispatch one Jules session per task.
-    dispatched = 0
-    for slug, sub in committed:
+    if args.no_dispatch or args.dry_run:
+        for slug, sub in committed:
+            print(f"[dry] would dispatch jules for {slug}", file=sys.stderr)
+        return {"live_before": live, "dispatched": 0, "queued_remaining": len(queue)}
+
+    # Dispatch in parallel — each `jules create` is an independent ~10s API call,
+    # so serial dispatch is the ramp bottleneck. Thread pool + a lock on the append.
+    import threading
+    write_lock = threading.Lock()
+
+    def dispatch_one(item):
+        slug, sub = item
         prompt = build_prompt(slug, sub)
-        if args.no_dispatch or args.dry_run:
-            print(f"[dry] would dispatch jules for {slug} (prompt {len(prompt)} chars)", file=sys.stderr)
-            continue
         res = jules("create", "--source", args.source, "--prompt", prompt,
                     "--title", f"oracle fix: {slug}", want_json=True, timeout=120)
         sid = ""
@@ -231,10 +238,16 @@ def reconcile_pass(args, state_path, term_cache) -> dict:
                 pass
         if not sid:
             sys.stderr.write(f"DISPATCH FAILED {slug}: {res.stdout}{res.stderr}\n")
-            continue
-        append_state(state_path, {"slug": slug, "session_id": sid, "trial": sub.name})
-        dispatched += 1
+            return 0
+        with write_lock:
+            append_state(state_path, {"slug": slug, "session_id": sid, "trial": sub.name})
         print(f"dispatched {slug} -> session {sid}", file=sys.stderr)
+        return 1
+
+    dispatched = 0
+    with ThreadPoolExecutor(max_workers=8) as ex:
+        for got in ex.map(dispatch_one, committed):
+            dispatched += got
 
     return {"live_before": live, "dispatched": dispatched, "queued_remaining": len(queue) - dispatched}
 
