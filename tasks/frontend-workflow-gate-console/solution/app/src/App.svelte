@@ -157,7 +157,7 @@
             <div class="run-meta">
               <span><GitBranch size={13} />{consoleStore.selectedRun.branch}</span>
               <span><Hash size={13} />{consoleStore.selectedRun.commit}</span>
-              <span>Submitted {new Date(consoleStore.selectedRun.submittedAt).toLocaleString('en', { timeZone:'UTC' })} UTC</span>
+              <span>Submitted {formatSubmitted(consoleStore.selectedRun.submittedAt)} UTC</span>
             </div>
           </div>
           <div class="run-detail-actions">
@@ -234,7 +234,10 @@
                   type="checkbox" role="switch"
                   checked={consoleStore.whatIf.active}
                   disabled={consoleStore.rerun.active}
-                  onchange={() => consoleStore.toggleWhatIf()}
+                  onchange={(event) => {
+                    if (event.currentTarget.checked) consoleStore.enterWhatIf();
+                    else consoleStore.revertWhatIf();
+                  }}
                 />
                 <span class="switch"><i></i></span>
                 <span>What-if mode</span>
