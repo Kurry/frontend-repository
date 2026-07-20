@@ -2,10 +2,12 @@
 import AddFindingDialog from './AddFindingDialog.vue'
 import RevisionDialog from './RevisionDialog.vue'
 import OverrideDialog from './OverrideDialog.vue'
+import ApproveDialog from './ApproveDialog.vue'
 </script>
 
 <template>
   <AddFindingDialog />
   <RevisionDialog />
   <OverrideDialog />
+  <ApproveDialog />
 </template>

@@ -1,0 +1,287 @@
+=== accessibility ===
+[1.2] modals_manage_focus:
+  Review action dialogs, the contributor drawer, and the command palette trap focus while open, close on Escape, and return focus to the originating control
+  FAIL: Add finding and contributor dialogs returned focus when closed, but Escape did not close either dialog as required. Evidence: a11y-forms-modal.png, a11y-drawer.png
+
+[1.4] feedback_uses_live_regions:
+  Validation errors, gate explanations, copy export confirmation, and bulk action feedback are conveyed visually and via ARIA live regions where confirmations appear
+  FAIL: Gate feedback was exposed via status, but Add finding validation messages appeared as ordinary paragraphs without live-region semantics. Evidence: a11y-forms-modal.png, a11y-detail-real.png
+
+[1.5] forms_have_explicit_labels:
+  Add finding, Request revision, Override, and bulk action fields use explicit labels; each validation message names its field and is associated with it
+  FAIL: Add finding fields showed visible labels, but the custom Tier and Category controls were non-semantic and label elements had no for association; validation text was not programmatically associated with fields. Evidence: a11y-forms-modal.png
+
+[1.9] semantic_html_roles_are_used:
+  Interactive controls use semantic button/link/checkbox roles; queue selection checkboxes are real checkboxes or correctly ARIA-checked
+  FAIL: Queue filters, sort, and finding-tier selectors were rendered as focusable DIV elements without semantic button/combobox roles, although checkboxes and major buttons used appropriate roles. Evidence: a11y-initial.png, a11y-detail-real.png
+
+=== anticheat ===
+=== behavioral ===
+[14.1] multi_facet_round_trip:
+  Multi-facet round-trip: open a submission, add a finding, apply a stage filter, select two rows for bulk hold, open Export and note the preview, then reload. All facets coherently reset to the seeded baseline — seeded submissions/stages/findings/payouts, no filters, empty undo history, export matching the seeded package — never a mix of persisted and reset state
+  FAIL: The complete workflow was not exercised with the required stage filter before reload. Reload showed the seeded baseline. Evidence: sort_reversal_proves_live_data-shared.png
+
+[14.2] sort_reversal_proves_live_data:
+  Sort-reversal proof: sort the queue by open finding count ascending, note the order, then sort descending; the order reverses correctly relative to ascending without changing the visible row count, proving sort is derived from live data rather than two hardcoded orders
+  FAIL: Ascending sort left the queue in the same visible order as the default descending order. Evidence: sort_reversal_proves_live_data-shared.png
+
+[14.3] derived_view_responds_to_input:
+  Derived-view sensitivity: narrow the failure-profile date range and confirm bars/percentages/mean scores change; restore the full range and confirm original values return; separately, add a blocker and confirm the gate banner and export gate_status both flip
+  FAIL: The date-range control changed the failure profile, but the separate blocker-to-gate/export flip was not completed. Evidence: derived_view_responds_to_input-shared.png
+
+[14.4] cross_view_echo_without_reload:
+  Cross-view echo: request revision on a submission in the detail view and confirm the queue row stage, contributor drawer timeline, and Export preview history/stage all update to needs-revision without a reload
+  FAIL: Request revision returned success, but detail and export remained in-review without reload. Evidence: cross_view_echo_without_reload-shared.png
+
+[14.6] different_inputs_change_outcomes:
+  Input-dependent output: add two findings with different tiers and categories (for example blocker/correctness vs minor/tooling) and confirm the findings list, queue chips, and export findings array differ accordingly rather than producing identical records
+  BLOCKED: Only one new finding was added through the visible UI; the required two differing new inputs were not completed. Evidence: count_delta_is_exact-shared.png
+
+[14.7] interleaved_flows_preserve_state:
+  Interleaved-flow integrity: start Add finding on submission A, switch to submission B and complete a Request revision, return to A and finish Add finding; A's new finding and B's needs-revision stage both persist without corrupting each other, and Export reflects both
+  BLOCKED: The interleaved A/B workflow was not completed end-to-end. Evidence: cross_view_echo_without_reload-shared.png
+
+[14.8] empty_to_repopulated_round_trip:
+  Edge-state round-trip: override every finding on a submission so open tier chips are zero and the gate is passed, then add a new blocker; chips, gate, and export regenerate through both transitions
+  BLOCKED: No submission was driven through override-all-to-empty and then blocker re-add. Evidence: count_delta_is_exact-shared.png
+
+[14.n4] cross_view_state_is_stale:
+  State changes appear in one view but not another (queue vs detail vs export) until reload
+  A successful Request revision did not update the visible detail stage or the later export stage, which remained in-review without reload. Evidence: cross_view_echo_without_reload-shared.png
+
+=== core_features ===
+[1.3] filters_combine_and_clear:
+  Filtering by stage, tier, and contributor each narrows the queue to matching rows, active filters combine and are visibly indicated, clearing filters restores the full row set exactly, and a zero-match combination shows a designed empty state with a control that clears the filters
+  FAIL: Stage and tier filters combined correctly and produced a designed zero-match state, but contributor filtering was not successfully confirmed. Evidence: filters_combine_and_clear-zero.png
+
+[1.4] sort_by_finding_count_reverses:
+  Scripted probe: sort the queue by open finding count ascending, note the row order, then switch to descending; the order reverses relative to ascending without changing the visible row count, proving sort derives from live data
+  FAIL: Ascending and descending finding-count probes produced the same visible row order, although the row count stayed at 12. Evidence: sort_by_finding_count_reverses-shared.png
+
+[1.6] gate_banner_derives_live:
+  Scripted probe: on a submission with no open blockers the gate banner reads passed; adding a blocker finding through the UI flips it to failed immediately, re-tiering or overriding that blocker flips it back to passed, all without a reload, and the failed and passed treatments are visibly different
+  FAIL: An existing blocker was overridden and the gate changed from failed to passed, but the required add-blocker transition from a no-blocker submission was not completed. Evidence: override_flow_gate_flip-after.png
+
+[1.13] contributor_drawer_timeline:
+  Clicking a contributor's name opens a slide-in drawer listing that contributor's submissions with current stages plus a stage-history timeline of ordered, timestamped events; requesting a revision on one of their submissions appends a matching timestamped revision-requested event to the timeline without a reload, and the drawer closes via its close control and by clicking outside
+  FAIL: The contributor drawer and ordered timestamped history were observed and its close control worked, but closing by clicking outside was not verified. Evidence: contributor_drawer_timeline-shared.png
+
+[1.14] recheck_progress_list:
+  Activating Run re-check starts a simulated run rendered as a task progress list of at least 4 named steps that tick to completion one by one with per-step status icons, an overall progress indicator, and a visible loading affordance while running; completion shows a summary line, and starting a new run resets the steps to pending and replays the progression
+  FAIL: A run displayed four named pending steps, progress/loading state, per-step completion, and a completion summary, but replay/reset behavior from starting a second run was not verified. Evidence: recheck_progress_list-shared.png
+
+[1.15] bulk_queue_actions:
+  Selecting one or more queue row checkboxes reveals a bulk action bar with the live selected count; Move to in-review sets every selected submitted-stage row to in-review; Hold payout sets selected non-released rows to held; both update affected queue rows and any open detail view immediately; Clear selection hides the bar again
+  FAIL: Selection, live count, move-to-in-review, hold-payout, and clear-selection worked for queue rows, but propagation to an open detail view was not verified. Evidence: bulk_queue_actions-shared.png
+
+[1.16] command_palette_navigation:
+  Pressing Ctrl+K (Cmd+K on macOS) opens a command palette with search focused; typing fuzzy-matches submission titles, contributor names, and view names; Enter on a submission opens its detail, on a contributor opens its drawer, and on a view switches to that view; Escape closes the palette; a no-match query shows an empty-state line
+  FAIL: Ctrl+K opened a focused searchable palette and a no-match query showed an empty state, but Enter navigation for submission, contributor, and view targets was not fully verified. Evidence: command_palette_navigation-shared.png
+
+[1.17] undo_redo_restores_mutations:
+  Scripted probe: add a finding (or perform a bulk payout hold), confirm the mutation is visible in detail/queue and in the Export preview, activate Undo, and confirm stages, findings, gate banner, queue chips, and export preview restore to the prior state; Redo reapplies the mutation; empty undo/redo stacks disable their controls
+  FAIL: Undo and redo restored and reapplied a bulk payout mutation, but the required corresponding export-preview restoration was not verified. Evidence: undo_redo_keyboard_shortcuts-shared.png
+
+=== design_fidelity ===
+[3.4] specified_state_changes_animate:
+  Transitions are applied to the state changes the instruction calls out (drawer, finding add/override, gate swap, profile bars, re-check steps, toasts, palette, bulk bar)
+  BLOCKED: Some transitions were observable, but the complete set of specified drawer, finding, gate, profile, re-check, toast, palette, and bulk-bar transitions could not be fully exercised and verified. Evidence: add-finding-dialog.png, drawer-375.png
+
+[3.5] responsive_behavior_matches_spec:
+  Responsive behavior matches the instruction: table condenses at 768px, findings stack above profile, 375px has no page-level horizontal scroll, drawer goes full-width
+  FAIL: At 768px the queue table remained approximately 1024px wide instead of condensing, although the 375px detail view stacked findings above the profile and the drawer became full-width without page-level horizontal scroll. Evidence: queue-375.png, drawer-375.png
+
+[3.8] component_states_match_spec:
+  Component states (default, hover, active/selected, disabled, error) match the instruction where specified, including selected queue rows distinct from hover
+  FAIL: Default, active, disabled, hover, and error states were observed, but the selected queue row was not visibly distinct after selection; its checkbox remained visually unchecked in the captured state. Evidence: queue-selected.png, add-finding-dialog.png
+
+=== edge_cases ===
+[4.2] forms_validate_inline:
+  Add finding, Request revision, and Override show inline validation naming the offending fields before submit; category is constrained to the six allowed values; description under 10 characters, revision summary under 20, and override justification under 10 are rejected with no state change
+  BLOCKED: Add finding and Request revision inline minimum-length validation was observed, but Override’s under-10-character validation was not exercised. Evidence: revision-validation.png
+
+[4.4] actions_show_confirmation:
+  Success feedback appears after add finding, request revision, approve, override, bulk actions, and copy export (toast or equivalent)
+  FAIL: Confirmation was observed for add finding, bulk move, and copy export, but not for every required action including request revision, approve, and override. Evidence: add-success.png, bulk-move-result.png, copy-export-confirmation.png
+
+[4.7] approve_wrong_stage_explanation:
+  Approve remains disabled on submitted, needs-revision, and approved stages even with zero blockers, with the wrong-stage explanation visible
+  BLOCKED: Submitted-stage Approve was disabled with a wrong-stage explanation, but needs-revision and approved stages were not independently exercised. Evidence: empty-findings.png
+
+[4.9] modal_supports_close_paths:
+  Review action dialogs and the command palette close via explicit close/cancel and Escape; the contributor drawer also closes on outside click
+  BLOCKED: Escape and Cancel were observed for dialogs/palette and Escape for the contributor drawer, but the contributor drawer’s required outside-click path was not conclusively verified. Evidence: palette-open.png, revision-validation.png, drawer-outside-close.png
+
+[4.10] bulk_skips_non_submitted_and_export_baseline:
+  Bulk Move to in-review leaves non-submitted stages in the selection unchanged; Export before any mutation still shows a complete seeded package, and after mutations the preview differs in the mutated fields
+  Bulk Move changed the selected submitted record to in-review while the already in-review record remained unchanged, with confirmation. However, the required pre-mutation export baseline was not observed. Evidence: bulk-move-result.png, export-center.png
+
+=== innovation ===
+[11.1] delightful_microinteractions:
+  Beyond the required motion, the app adds a delightful microinteraction somewhere in triage (for example a satisfying gate-pass flourish or bulk-bar entrance) that feels intentional
+  FAIL: Selection reveals a functional bulk-action bar, but no distinctive flourish or delightful microinteraction was directly observed. Evidence: enhanced-interactive-graphics-shared.png
+
+[11.2] advanced_motion_mechanics:
+  The app goes beyond the required transitions with an advanced motion detail (for example staggered finding list entrances or coordinated chip updates) that remains tasteful
+  FAIL: Observed transitions were standard UI transitions; no staggered entrances or coordinated motion detail was evident. Evidence: polished-brand-narrative-shared.png
+
+[11.3] guided_onboarding:
+  Optional guided onboarding or coachmarks help a first-time reviewer discover Export, bulk actions, or the command palette without blocking required flows
+  FAIL: No coachmarks, onboarding prompts, or first-use guidance appeared in the queue or command palette. Evidence: genre-appropriate-platform-features-shared.png
+
+[11.4] enhanced_interactive_graphics:
+  The failure-profile panel or another chart offers an extra usability aid beyond the required bars (tooltips with counts, brushable range, or comparable ranking callouts)
+  FAIL: The failure-profile panel renders bars and date shortcuts, but no tooltip, brushable range, or ranking callout was observed. Evidence: enhanced-interactive-graphics-shared.png
+
+[11.6] preference_personalization:
+  Optional personalization such as density, default sort, or column visibility helps operators tailor the queue without breaking seeded behavior
+  FAIL: No density, default-sort preference, or column-visibility personalization controls were observed. Evidence: polished-brand-narrative-shared.png
+
+[11.8] dynamic_theming_beyond_requirements:
+  Optional light/dark or theme density beyond the required visual system is available without interfering with stage/tier semantics
+  FAIL: No light/dark switch or optional density theme control was visible in the rendered interface. Evidence: polished-brand-narrative-shared.png
+
+[innovation.catchall] innovation_catchall:
+  The app exhibits a significant, browser-observable innovation or polish strength beyond the specification that is NOT covered by any other criterion in this file. If present, name it and cite the concrete evidence. If already covered by another criterion in this file, answer no here and let that criterion carry it.
+  No separate major innovation was observed that is not already covered by the branding, platform-feature, or overall-craft criteria. Evidence: polished-brand-narrative-shared.png
+
+=== mcp_contract ===
+[12.2] handlers_match_visible_ui_logic:
+  Exposed tool handlers for submission select/update, form submit (add-finding, request-revision, override-finding, approve, mark-revised, bulk-update), and artifact export/copy call the same store commands as the visible UI
+  FAIL: browse_open(queue) returned success, but the visible page remained the QC package export view. Evidence: entity-queue-shared.png
+
+[12.3] only_documented_operations_exist:
+  Only documented operations and destinations are available: queue, submission-detail, contributor-drawer, export-center; filters stage/tier/contributor/date-range; sorts open-finding-count-asc/desc; artifact formats qc-package-json and qc-report-markdown
+  FAIL: the registered tool list additionally exposes browse_search, browse_set_locale, and browse_set_theme beyond the specified operation set. Evidence: initial-shared.png
+
+[12.4] contract_is_automation_exercisable:
+  The contract can be fully exercised via automation: browse open/filter/sort, entity select/update, form validate/submit/cancel, and artifact export/copy
+  FAIL: most operations invoked successfully, but browse_open(queue) did not produce the declared visible queue destination. Evidence: entity-queue-shared.png
+
+[12.8] capabilities_stay_declared:
+  No extra or undeclared module routes or capabilities are exposed beyond the four mandated modules and their bindings
+  FAIL: extra browse capabilities for search, locale, and theme were exposed in the registered tool list. Evidence: initial-shared.png
+
+[12.n2] handlers_diverge_from_ui_logic:
+  Invoking a mandated tool updates MCP-visible state while the queue, detail, or export UI still shows a different stage, finding set, or payout for the same submission
+  FAIL: browse_open(queue) reported success while the UI visibly stayed on QC package export. Evidence: entity-queue-shared.png
+
+[12.n3] undeclared_capabilities_exposed:
+  Undeclared destinations or entity operations are exposed
+  The registered list exposed browse_search, browse_set_locale, and browse_set_theme, which are outside the specified allowed operations. Evidence: initial-shared.png
+
+[12.n4] automation_cannot_exercise_contract:
+  The contract cannot be exercised from automation
+  FAIL: automation could invoke browse_open(queue), but the visible destination did not match the successful tool result. Evidence: entity-queue-shared.png
+
+[12.n6] session_or_tool_api_errors:
+  The session or tool API returns errors or incomplete data
+  FAIL: form_validate required submission_id for submission workflows even though submission_id was absent from its declared input schema; uppercase visible IDs also rejected while lowercase internal IDs were required. Evidence: detail-1047.png
+
+[12.n10] automated_contract_validation_fails:
+  The project fails automated MCP contract validation
+  FAIL: the observable destination mismatch and form schema/validation mismatch would fail complete contract validation. Evidence: entity-queue-shared.png
+
+=== motion ===
+[3.1] hover_system_present:
+  While actually hovering with the pointer, buttons ease background and shadow with a slight press effect on activation, table rows take a full-width hover wash, chips and tags lift subtly, and form controls show focus rings — verified via computed styles while the hover is held
+  FAIL: Row hover wash and basic transitions were observed, but the required full system (button press/shadow, chip lift, and focus-ring feedback) was not fully observed. Evidence: hover_system_present-shared.png
+
+[3.2] drawer_slides_view_transitions:
+  Opening the contributor drawer through its real trigger slides it in from the edge with an eased transition and closing slides it out, and the queue-to-detail switch transitions without a full page reload or a hard content snap
+  FAIL: The contributor drawer opened, but the observed drawer style had no transform transition and appeared settled without slide-in/out evidence. Evidence: drawer_slides_view_transitions-shared.png
+
+[3.3] finding_changes_animate:
+  Submitting a valid Add finding form animates the new finding into the list, overriding a finding animates its struck-through state in rather than snapping, and the queue row's tier chips update with a brief eased change — all through the real controls
+  FAIL: Adding a finding worked and produced a toast, but no transient insertion animation was directly observed; override animation and tier-chip updates were not verified. Evidence: finding_changes_animate-shared.png
+
+[3.4] gate_banner_animated_swap:
+  Adding, re-tiering, or overriding a finding through the UI animates the gate banner's failed/passed swap with a short cross-fade or slide of roughly 200 to 300 milliseconds rather than an instant hard swap, and changing the date-range control animates the failure-profile bars easing to their new widths rather than jumping instantly
+  FAIL: The date-range control changed, but no easing of the failure-profile bars or animated gate-banner swap was directly observed. Evidence: gate_banner_animated_swap-shared.png
+
+[3.7] disclosures_and_toasts_animate:
+  Evidence disclosures expand and collapse with an animated height transition and rotating chevron when clicked, and toasts after add finding, request revision, approve, override, bulk actions, and copy export slide in, remain readable, and auto-dismiss with a fade
+  FAIL: Evidence disclosure and add-finding toast were exercised, but animated height/chevron rotation and the required toast animation/dismissal behavior were not directly verified. Evidence: finding_changes_animate-shared.png
+
+[3.8] reduced_motion_respected:
+  With prefers-reduced-motion enabled, drawer, list, banner, bar, step, toast, palette, and bulk-bar animations are removed or reduced to instant state changes while every flow (triage, revision, approve, override, re-check, export, undo) remains fully available
+  FAIL: Reduced-motion emulation reduced the command-palette transition to near-instant, but the required reduced-motion behavior across all listed flows was not fully verified. Evidence: reduced_motion_respected-shared.png
+
+[3.9] palette_and_bulk_bar_animate:
+  Through the real keyboard shortcut, the command palette opens with a short opacity and scale transition of roughly 200 to 300 milliseconds; the bulk action bar appears and dismisses with a short eased height or fade rather than snapping when selection changes
+  FAIL: The keyboard shortcut opened the palette with an observed 0.24s opacity/transform transition, but the bulk bar showed only a generic transition and its animated dismissal was not verified. Evidence: palette_and_bulk_bar_animate-shared.png
+
+=== performance ===
+=== responsiveness ===
+[7.1] layout_adapts_desktop_to_mobile:
+  At 1440px the queue table shows all columns with filter toolbar; at 768px the table condenses (stacked or horizontally scrollable within its container) and the detail view stacks findings above the failure-profile panel; at 375px the layout remains usable
+  FAIL: Desktop is wide, but the 375px queue table remains 1024px wide and extends beyond the viewport. Evidence: layout-1440-shared.png, queue-375-shared.png
+
+[7.2] mobile_tap_targets_are_large_enough:
+  At 375px width, primary controls (filters, row actions, bulk bar buttons, Add finding, Approve, Export, Undo) present tap targets large enough to operate without precision miss-taps
+  FAIL: Most controls are usable, but mobile Undo/Redo targets measure only about 32×34px. Evidence: queue-375-shared.png
+
+[7.4] content_avoids_clipping_and_overflow:
+  At 375px width no content clips or overflows the viewport and no page-level horizontal scrolling appears
+  FAIL: The queue table measures 1024px wide at 375px and visibly extends beyond the viewport. Evidence: queue-375-shared.png
+
+[7.5] chrome_adapts_to_small_screens:
+  At 375px the contributor drawer becomes full-width; the bulk bar and command palette remain operable within the viewport
+  FAIL: Header and command palette fit, but no visible bulk bar appeared after selecting a submission through the app action. Evidence: command-375-shared.png
+
+[7.7] queue_scroll_container_on_narrow:
+  When the queue table cannot fit at narrow widths, it scrolls within its own container rather than forcing page-level horizontal scroll
+  FAIL: Although an internal overflow-scroll element exists, it measures about 970px wide at 375px and itself extends beyond the viewport rather than fitting within the page container. Evidence: queue-375-shared.png
+
+[7.n1] layout_breaks_at_breakpoints:
+  Layout breaks or overflows at 1440px, 768px, or 375px breakpoints
+  FAIL: At 375px the queue table overflows its visible layout, extending far beyond the viewport. Evidence: queue-375-shared.png
+
+[7.n2] mobile_controls_too_small_or_misaligned:
+  Controls are too small or misaligned on mobile to operate triage actions
+  FAIL: Undo and Redo shrink to approximately 32×34px on mobile, below comfortable touch-target sizing. Evidence: queue-375-shared.png
+
+[7.n4] content_cropped_or_unnecessary_scrollbars:
+  Content is cropped or unnecessary page-level horizontal scrollbars appear at narrow widths
+  FAIL: The queue table is visibly cropped to the narrow viewport while its full content remains far wider. Evidence: queue-375-shared.png
+
+=== technical ===
+[4.2] no_storage_reload_seeded:
+  localStorage and sessionStorage remain empty after adding findings, changing stages, overriding, bulk actions, filtering, sorting, running re-checks, undo/redo, opening drawers, and exporting, and a page reload returns the app to its seeded baseline (seeded submissions, stages, findings, payout states, no active filters, empty undo history)
+  BLOCKED: Reload restored the seeded 12-submission baseline with empty storage, but not every required mutation path was completed end-to-end. Evidence: reload-baseline-shared.png
+
+[4.5] rapid_input_stability:
+  Under rapid repeated input (fast filter toggling, quick row switching, rapid disclosure clicks, rapid undo/redo), the UI stays responsive with no hangs, derived surfaces settle to values consistent with the final input state, and rapidly double-activating the Add finding submit control appends exactly one finding
+  BLOCKED: The full rapid-input suite, including rapid undo/redo and disclosure interactions, was not completed; only rapid filter attempts and double-submit were observed. Evidence: finding-added-shared.png
+
+[4.6] keyboard_operability_focus:
+  Every interactive control — queue rows, row checkboxes, filters, sort, bulk actions, review action controls, finding disclosures, drawer, date-range control, re-check control, undo/redo, export controls, and command palette — is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), showing a visible focus indicator at each stop
+  BLOCKED: Queue controls and command-palette focus were verified, but every detail, export, drawer, and review control was not completed with keyboard-only traversal. Evidence: initial-shared.png
+
+[4.7] drawer_focus_and_semantics:
+  The contributor drawer and command palette trap focus while open, close on Escape, and return keyboard focus to the control that opened them; evidence disclosures expose an expanded or collapsed state attribute to the accessibility tree; every form field has a visible label and each validation message names its field and is programmatically associated with it; copy/bulk confirmations use an aria-live region
+  FAIL: Drawer and command palette trapped focus, closed on Escape, and restored focus, but Evidence buttons lacked aria-expanded/controls semantics and form fields were not programmatically label-associated. Evidence: drawer-shared.png
+
+=== user_flows ===
+[6.1] triage_end_to_end_flow:
+  Triage end to end: open a submitted submission, move it to in-review, add a blocker finding and observe the gate banner read gate failed and the queue row gain a blocker chip, then override that finding with justification and observe the finding struck-through, the gate flip to passed, and the queue chips update — all without a reload
+  FAIL: The existing blocker was overridden successfully and the gate passed, but the requested newly added blocker workflow was not completed. Evidence: override-passed.png.
+
+[6.6] undo_after_mutation_flow:
+  Undo after mutation: add a finding, confirm it appears in the detail list and the export preview, activate Undo, and confirm the finding is gone from the list, the gate and queue chips restore, and the export preview no longer contains that finding
+  FAIL: Undo removed the added finding and restored the detail count/gate, but the export preview was not rechecked after undo. Evidence: undo-finding.png.
+
+[6.7] filters_update_all_surfaces:
+  Filtering the queue by stage or contributor updates the visible row set immediately; clearing filters restores all rows; zero-match filters show the designed empty state with a clear-filters control
+  FAIL: Filtering and clearing visibly changed the row count, but a zero-match empty state with a clear-filters control was not observed end to end. Evidence: palette-open.png.
+
+[6.8] drawer_and_palette_support_flows:
+  Contributor drawer and command palette support expected flows: drawer opens from a contributor name and closes via close control, outside click, and Escape with focus return; palette opens via Ctrl/Cmd+K, navigates to a submission or Export view, and closes on Escape
+  FAIL: The drawer opened and closed via Escape, and the palette navigated to Export, but Ctrl/Cmd+K and outside-click drawer dismissal were not completed. Evidence: drawer-open.png, palette-open.png.
+
+[6.9] finding_revision_override_approve_overlays:
+  Overlays: Add finding, Request revision, Override, and Approve dialogs/forms open with their field contracts, accept valid submits or cancel cleanly, and dismiss without trapping the queue/detail workspace.
+  FAIL: Add finding, Request revision, and Override forms opened with validation contracts, but Approve executed immediately without an approval dialog/form and the full cancel set was not completed. Evidence: revision-requested.png, override-passed.png.
+
+=== visual_design ===
+=== writing ===

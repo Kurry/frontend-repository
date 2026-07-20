@@ -134,7 +134,7 @@ export const useQcStore = defineStore('qc', {
     toast: { visible: false, message: '', tone: 'success', key: 0 },
     locale: 'en',
     theme: 'dark',
-    dialogs: { add: false, revision: false, override: false, overrideFindingId: null },
+    dialogs: { add: false, revision: false, override: false, approve: false, overrideFindingId: null },
     exportFormat: 'json',
     copyConfirmed: false,
     nextFinding: 300,

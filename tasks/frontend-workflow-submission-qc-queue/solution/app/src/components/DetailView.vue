@@ -57,7 +57,7 @@ function beginReview() { store.updateSubmission(submission.value.id, 'stage', 'i
         <NButton @click="store.dialogs.add = true"><IconPlus /> Add finding</NButton>
         <NButton @click="store.dialogs.revision = true"><IconSend /> Request revision</NButton>
         <span class="approve-wrap">
-          <NButton type="primary" :disabled="!!approveReason" @click="store.approve(submission.id)"><IconCheckCircle /> Approve</NButton>
+          <NButton type="primary" :disabled="!!approveReason" @click="store.dialogs.approve = true"><IconCheckCircle /> Approve</NButton>
           <small v-if="approveReason" role="status">{{ approveReason }}</small>
         </span>
       </div>
