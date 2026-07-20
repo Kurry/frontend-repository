@@ -62,7 +62,9 @@ export default function SampleSite() {
       </div>
 
       <div className="flex-1 overflow-y-auto p-[var(--preview-spacing)]">
-        {renderSample()}
+        <div key={sample} className="sample-swap h-full">
+          {renderSample()}
+        </div>
       </div>
     </div>
   );

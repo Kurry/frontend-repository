@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Dialog, DialogContent, DialogTitle } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../store/store';
-import { loadTheme, setSample, setSearchQuery, setTab, setTool } from '../store/themeSlice';
+import { announce, loadTheme, setSample, setSearchQuery, setTab, setTool } from '../store/themeSlice';
+import Overlay from './Overlay';
 
 type Result = {
   id: string;
@@ -69,6 +69,7 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
         run: closeAfter(() => {
           dispatch(loadTheme(theme.id));
           dispatch(setTab('preview'));
+          dispatch(announce(`Theme ${theme.name} loaded`));
         }),
       })),
       ...[
@@ -117,37 +118,43 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
 
   useEffect(() => setHighlighted(0), [query]);
 
+  const runHighlighted = () => {
+    const result = results[highlighted];
+    if (result) result.run();
+  };
+
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" aria-labelledby="command-palette-title">
-      <DialogTitle id="command-palette-title" className="!pb-2">Command palette</DialogTitle>
-      <DialogContent className="!pt-2">
+    <Overlay open={open} onClose={onClose} labelledBy="command-palette-title" widthClass="w-full max-w-lg">
+      <div className="px-5 pt-4 pb-2">
+        <h2 id="command-palette-title" className="sr-only">
+          Command palette
+        </h2>
         <input
-          autoFocus
+          data-autofocus
           type="search"
           value={query}
           onChange={event => dispatch(setSearchQuery(event.target.value))}
           onKeyDown={event => {
             if (event.key === 'ArrowDown') {
               event.preventDefault();
-              setHighlighted(current => results.length ? (current + 1) % results.length : 0);
+              setHighlighted(current => (results.length ? (current + 1) % results.length : 0));
             } else if (event.key === 'ArrowUp') {
               event.preventDefault();
-              setHighlighted(current => results.length ? (current - 1 + results.length) % results.length : 0);
-            } else if (event.key === 'Enter' && results[highlighted]) {
+              setHighlighted(current => (results.length ? (current - 1 + results.length) % results.length : 0));
+            } else if (event.key === 'Enter') {
               event.preventDefault();
-              results[highlighted].run();
-            } else if (event.key === 'Escape') {
-              event.preventDefault();
-              onClose();
+              runHighlighted();
             }
           }}
           placeholder="Search tabs, tools, themes, samples, and components"
           aria-label="Search commands"
           aria-controls="command-palette-results"
           aria-activedescendant={results[highlighted]?.id}
-          className="w-full rounded border border-gray-500 px-3 py-3 outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          className="w-full rounded border border-gray-400 px-3 py-3 text-gray-900 outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
         />
-        <div id="command-palette-results" role="listbox" className="mt-3 max-h-[50vh] overflow-auto rounded border border-gray-300">
+      </div>
+      <div className="px-5 pb-5">
+        <div id="command-palette-results" role="listbox" aria-label="Command results" className="max-h-[46vh] overflow-auto rounded border border-gray-300">
           {results.map((result, index) => (
             <button
               id={result.id}
@@ -157,15 +164,24 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
               aria-selected={index === highlighted}
               onMouseEnter={() => setHighlighted(index)}
               onClick={result.run}
-              className={`flex w-full items-center justify-between px-3 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-blue-500 ${index === highlighted ? 'bg-blue-50 text-blue-900' : 'hover:bg-gray-100'}`}
+              className={`flex w-full items-center justify-between px-3 py-3 text-left outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 transition-colors duration-150 ${
+                index === highlighted ? 'bg-blue-50 text-blue-900' : 'text-gray-800 hover:bg-gray-100'
+              }`}
             >
               <span>{result.label}</span>
               <span className="text-xs text-gray-500">{result.group}</span>
             </button>
           ))}
-          {!results.length && <p className="px-3 py-6 text-center text-gray-500" role="status">No commands match “{query}”.</p>}
+          {!results.length && (
+            <p className="px-3 py-6 text-center text-gray-500" role="status">
+              No commands match “{query}”. Press Escape to close.
+            </p>
+          )}
         </div>
-      </DialogContent>
-    </Dialog>
+        <p className="mt-2 text-xs text-gray-500">
+          ↑ ↓ to highlight · Enter to run · Esc to close
+        </p>
+      </div>
+    </Overlay>
   );
 }

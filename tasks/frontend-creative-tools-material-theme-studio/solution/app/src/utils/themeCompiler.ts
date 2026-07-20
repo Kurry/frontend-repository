@@ -63,7 +63,7 @@ export function toEditorSource(options: ThemeOptions): string {
 
 export function parseEditorSource(src: string, defaultThemeOptions: ThemeOptions): ThemeOptions {
   if (!src || typeof src !== 'string') throw new Error('empty');
-  if (!/(?:export\s+)?const\s+themeOptions\s*:\s*ThemeOptions\s*=\s*\{/.test(src) || !/\};\s*$/.test(src)) {
+  if (!/(?:export\s+)?const\s+themeOptions\s*:\s*ThemeOptions\s*=\s*\{/.test(src) || !/\};/.test(src)) {
     throw new Error('invalid ThemeOptions declaration');
   }
 

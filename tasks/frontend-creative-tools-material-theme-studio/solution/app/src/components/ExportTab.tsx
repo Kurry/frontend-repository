@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
-import { importTheme } from '../store/themeSlice';
+import { announce, importTheme } from '../store/themeSlice';
 import { Button } from '@mui/material';
 import { parseImportedTheme } from '../utils/importTheme';
-import { copyThemeArtifact, getCssExport } from '../utils/themeArtifacts';
+import { getThemeArtifact, ThemeArtifactFormat } from '../utils/themeArtifacts';
+import { ToastView, useToast } from './Toast';
 
 export default function ExportTab() {
     const dispatch = useDispatch();
@@ -15,8 +16,10 @@ export default function ExportTab() {
     const activeTheme = themes.find(t => t.id === activeThemeId);
     const themeName = activeTheme?.name ?? 'Theme';
 
-    const [format, setFormat] = useState<'json' | 'css'>('json');
-    const [toastMsg, setToastMsg] = useState('');
+    const [format, setFormat] = useState<ThemeArtifactFormat>('json');
+    const { toast, show } = useToast();
+    const copyBusyRef = useRef(false);
+    const downloadBusyRef = useRef<{ format: ThemeArtifactFormat; at: number } | null>(null);
     const [importText, setImportText] = useState('');
     const [importError, setImportError] = useState('');
 
@@ -24,25 +27,45 @@ export default function ExportTab() {
         return JSON.stringify({ name: themeName, ...activeOptions }, null, 2);
     }, [activeOptions, themeName]);
 
-    const cssExport = useMemo(() => getCssExport(activeOptions), [activeOptions]);
+    const cssExport = useMemo(() => getThemeArtifact('css', themeName, activeOptions), [activeOptions, themeName]);
 
     const textToExport = format === 'json' ? jsonExport : cssExport;
 
     const copyText = () => {
-        copyThemeArtifact(format, themeName, activeOptions).then(() => {
-            setToastMsg('Export copied');
-            setTimeout(() => setToastMsg(''), 3000);
-        });
+        if (copyBusyRef.current) return;
+        copyBusyRef.current = true;
+        navigator.clipboard
+            .writeText(textToExport)
+            .then(() => {
+                show('Export copied');
+                dispatch(announce(`${format.toUpperCase()} export copied to clipboard`));
+            })
+            .catch(() => show('Copy failed — clipboard unavailable'))
+            .finally(() => {
+                setTimeout(() => {
+                    copyBusyRef.current = false;
+                }, 300);
+            });
     };
 
-    const downloadFile = () => {
-        const blob = new Blob([textToExport], { type: format === 'json' ? 'application/json' : 'text/css' });
+    const downloadFile = (downloadFormat: ThemeArtifactFormat) => {
+        // Dedupe rapid repeats of the same format (double-clicks) while still
+        // allowing JSON-then-CSS back-to-back downloads.
+        const now = Date.now();
+        if (downloadBusyRef.current && downloadBusyRef.current.format === downloadFormat && now - downloadBusyRef.current.at < 400) {
+            return;
+        }
+        downloadBusyRef.current = { format: downloadFormat, at: now };
+        const text = downloadFormat === 'json' ? jsonExport : cssExport;
+        const blob = new Blob([text], { type: downloadFormat === 'json' ? 'application/json' : 'text/css' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${themeName.toLowerCase().replace(/\s+/g, '-')}-theme.${format}`;
+        a.download = `${themeName.toLowerCase().replace(/\s+/g, '-')}-theme.${downloadFormat}`;
         a.click();
         URL.revokeObjectURL(url);
+        show(`Downloading ${downloadFormat.toUpperCase()} file`);
+        dispatch(announce(`Theme ${downloadFormat.toUpperCase()} file download started`));
     };
 
     const handleImport = () => {
@@ -50,67 +73,78 @@ export default function ExportTab() {
             dispatch(importTheme(parseImportedTheme(importText)));
             setImportText('');
             setImportError('');
-            setToastMsg('ThemeOptions imported successfully');
-            setTimeout(() => setToastMsg(''), 3000);
+            show('ThemeOptions imported');
+            dispatch(announce('ThemeOptions imported — editor, tools, preview, and export updated, status unsaved'));
         } catch (e: any) {
-            setImportError(e.message || "Invalid JSON payload");
+            const message = e.message || 'Invalid JSON payload';
+            setImportError(message);
+            dispatch(announce(`Import rejected: ${message}`));
         }
     };
 
+    const tabButton = (value: ThemeArtifactFormat, label: string) => (
+        <button
+            type="button"
+            role="tab"
+            aria-selected={format === value}
+            className={`px-6 py-3 font-medium min-h-11 transition-colors duration-150 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400 ${
+                format === value ? 'bg-gray-800 text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-white hover:bg-gray-800'
+            }`}
+            onClick={() => setFormat(value)}
+        >
+            {label}
+        </button>
+    );
+
     return (
-        <div className="flex h-full bg-[#121212] text-white overflow-hidden p-8 gap-8">
+        <div className="flex flex-col lg:flex-row h-full bg-[#121212] text-white overflow-auto lg:overflow-hidden p-4 lg:p-8 gap-6 lg:gap-8">
             <div className="flex-1 flex flex-col max-w-4xl min-w-0">
                 <header className="mb-6">
                     <h2 className="text-3xl font-normal mb-2">Export</h2>
-                    <p className="text-gray-400">Export your theme files to integrate into your app.</p>
+                    <p className="text-gray-400">Live-compiled theme files, regenerated on every edit.</p>
                 </header>
 
-                <div className="flex bg-gray-900 border border-gray-700 rounded-t overflow-hidden shrink-0">
-                    <button
-                        className={`px-6 py-3 font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${format === 'json' ? 'bg-gray-800 text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
-                        onClick={() => setFormat('json')}
-                    >
-                        JSON
-                    </button>
-                    <button
-                        className={`px-6 py-3 font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-blue-400 ${format === 'css' ? 'bg-gray-800 text-blue-400 border-b-2 border-blue-400' : 'text-gray-400 hover:text-white hover:bg-gray-800'}`}
-                        onClick={() => setFormat('css')}
-                    >
-                        CSS
-                    </button>
+                <div className="flex bg-gray-900 border border-gray-700 rounded-t overflow-hidden shrink-0" role="tablist" aria-label="Export format">
+                    {tabButton('json', 'JSON')}
+                    {tabButton('css', 'CSS')}
                 </div>
 
-                <div className="flex-1 overflow-auto bg-[#1e1e1e] p-4 font-mono text-sm border-x border-b border-gray-700 rounded-b">
-                    <pre className="text-gray-300 m-0">
+                <div className="min-h-[240px] lg:flex-1 overflow-auto bg-[#1e1e1e] p-4 font-mono text-sm border-x border-b border-gray-700 rounded-b">
+                    <pre className="text-gray-300 m-0" data-export-preview>
                         {textToExport}
                     </pre>
                 </div>
 
-                <div className="flex gap-4 mt-4 shrink-0">
-                    <Button variant="contained" color="primary" onClick={downloadFile}>Download {format.toUpperCase()}</Button>
-                    <Button variant="outlined" color="primary" onClick={copyText}>Copy export</Button>
+                <div className="flex flex-wrap gap-3 mt-4 shrink-0">
+                    <Button variant="contained" color="primary" onClick={() => downloadFile('json')} sx={{ minHeight: 44 }}>
+                        Download JSON
+                    </Button>
+                    <Button variant="contained" color="primary" onClick={() => downloadFile('css')} sx={{ minHeight: 44 }}>
+                        Download CSS
+                    </Button>
+                    <Button variant="outlined" color="primary" onClick={copyText} sx={{ minHeight: 44 }}>
+                        Copy export
+                    </Button>
                 </div>
             </div>
 
-            <div className="w-96 flex-shrink-0 flex flex-col bg-[#1e1e1e] border border-gray-700 rounded p-6">
+            <div className="w-full lg:w-96 flex-shrink-0 flex flex-col bg-[#1e1e1e] border border-gray-700 rounded p-6">
                 <h3 className="text-xl mb-2">Import ThemeOptions</h3>
                 <p className="text-gray-400 text-sm mb-4">Paste an exported ThemeOptions JSON package, including its name, to import it into the current session.</p>
                 <textarea
                     value={importText}
                     onChange={e => { setImportText(e.target.value); setImportError(''); }}
-                    className="flex-1 bg-gray-900 border border-gray-700 rounded p-2 text-sm font-mono text-gray-300 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 mb-2 resize-none"
+                    className="min-h-[180px] lg:flex-1 bg-gray-900 border border-gray-700 rounded p-2 text-sm font-mono text-gray-300 outline-none focus-visible:ring-2 focus-visible:ring-blue-400 mb-2 resize-none"
                     placeholder={jsonExport}
                     aria-label="Import ThemeOptions JSON"
                 />
-                {importError && <div className="text-red-400 text-sm mb-4">{importError}</div>}
-                <Button variant="contained" color="secondary" onClick={handleImport} disabled={!importText.trim()}>Import ThemeOptions</Button>
+                {importError && <div className="text-red-400 text-sm mb-4" role="alert">{importError}</div>}
+                <Button variant="contained" color="secondary" onClick={handleImport} disabled={!importText.trim()} sx={{ minHeight: 44 }}>
+                    Import ThemeOptions
+                </Button>
             </div>
 
-            {toastMsg && (
-                <div className="fixed bottom-4 left-1/2 -translate-x-1/2 bg-blue-500 text-white px-4 py-2 rounded shadow-lg z-50 transition-all duration-300" role="status" aria-live="polite">
-                    {toastMsg}
-                </div>
-            )}
+            <ToastView toast={toast} />
         </div>
     );
 }

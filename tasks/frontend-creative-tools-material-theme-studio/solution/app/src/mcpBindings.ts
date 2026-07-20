@@ -99,14 +99,24 @@ export function initializeWebMCP() {
           }
         }
         let options;
-        if (args.options !== undefined) {
-          if (!args.options || typeof args.options !== 'object' || Array.isArray(args.options)) {
-            throw new Error('options must be an object');
+        if (args.palette !== undefined || args.options !== undefined) {
+          let merged = JSON.parse(JSON.stringify(theme.options));
+          if (args.palette !== undefined) {
+            if (!args.palette || typeof args.palette !== 'object' || Array.isArray(args.palette)) {
+              throw new Error('palette must be an object');
+            }
+            merged.palette = mergePalette(merged.palette, args.palette);
           }
-          options = parseImportedTheme({ name, ...mergeThemeOptions(theme.options, args.options) });
+          if (args.options !== undefined) {
+            if (!args.options || typeof args.options !== 'object' || Array.isArray(args.options)) {
+              throw new Error('options must be an object');
+            }
+            merged = mergeThemeOptions(merged, args.options);
+          }
+          options = parseImportedTheme({ name, ...merged });
         }
         store.dispatch(updateTheme({ id: args.id, name, options }));
-        return { success: true };
+        return { success: true, id: args.id, name };
       }
       case 'entity_delete':
         if (!args.confirm) throw new Error("delete requires confirm=true");
@@ -146,8 +156,14 @@ export function initializeWebMCP() {
         store.dispatch(updateActiveOptions(newOptions));
         return { success: true };
       }
-      case 'editor_preview':
+      case 'editor_preview': {
+        if (args.object_type !== undefined && args.object_type !== 'material-theme') {
+          throw new Error('object_type must be material-theme');
+        }
+        // Surface the framed sample site + editor source for the current options.
+        store.dispatch(setTab('preview'));
         return { success: true };
+      }
 
       case 'artifact_export': {
         if (args.format !== 'json' && args.format !== 'css') throw new Error('format must be json or css');
