@@ -29,6 +29,7 @@
           rows="4"
           placeholder="Type your caption here…"
           aria-label="Shared editor"
+          :disabled="!!conflict"
           @input="onLocalInput"
         />
       </div>
@@ -41,9 +42,10 @@
           rows="4"
           placeholder="Peer types here (simulated)…"
           aria-label="Peer editor"
+          :disabled="!!conflict"
           @input="onPeerInput"
         />
-        <button type="button" class="pill-btn ghost peer-btn" @click="simulatePeerEdit">
+        <button type="button" class="pill-btn ghost peer-btn" :disabled="!!conflict" @click="simulatePeerEdit">
           <span aria-hidden="true">🤖</span> Simulate peer edit
         </button>
       </div>
@@ -258,6 +260,8 @@ function applyAuthorChange(author: 'You' | 'Peer', draft: string) {
 }
 
 function onLocalInput() {
+  // Resolve the open conflict first — live edits would race the frozen choices.
+  if (conflict.value) return
   if (isOnline.value) {
     applyAuthorChange('You', localText.value)
   } else {
@@ -266,6 +270,7 @@ function onLocalInput() {
 }
 
 function onPeerInput() {
+  if (conflict.value) return
   if (isOnline.value) {
     applyAuthorChange('Peer', peerText.value)
   } else {
@@ -393,6 +398,7 @@ const peerPhrases = [
 let peerPhraseIdx = 0
 
 function simulatePeerEdit() {
+  if (conflict.value) return
   const phrase = peerPhrases[peerPhraseIdx % peerPhrases.length]
   peerPhraseIdx++
   peerText.value = phrase
