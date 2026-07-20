@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { tasks, taskById, trialById } from './data'
+import { captureDialogOpener } from './dialogFocus'
 
 const emptyChrome = {
   noteOpen: false,
@@ -73,6 +74,7 @@ export const useAppStore = create((set, get) => ({
   redoStack: [],
   exportPreview: { json: '', markdown: '', format: 'json', exportedAt: '' },
   importDraft: '',
+  noteDrafts: {},
   chrome: emptyChrome,
   locale: 'en',
   theme: 'dark',
@@ -111,8 +113,12 @@ export const useAppStore = create((set, get) => ({
   toggleDisclosure: (stepIndex) => set((state) => ({ disclosureOpen: { ...state.disclosureOpen, [`${state.activeTrialId}:${stepIndex}`]: !state.disclosureOpen[`${state.activeTrialId}:${stepIndex}`] } })),
   toggleToolOutput: (stepIndex) => set((state) => ({ toolOutputOpen: { ...state.toolOutputOpen, [`${state.activeTrialId}:${stepIndex}`]: !state.toolOutputOpen[`${state.activeTrialId}:${stepIndex}`] } })),
   setTerminalState: (key, patch) => set((state) => ({ terminalByStep: { ...state.terminalByStep, [key]: { ...(state.terminalByStep[key] || {}), ...patch } } })),
-  setChrome: (patch) => set((state) => ({ chrome: { ...state.chrome, ...patch } })),
+  setChrome: (patch) => {
+    if (patch.paletteOpen && !get().chrome.paletteOpen) captureDialogOpener('palette')
+    set((state) => ({ chrome: { ...state.chrome, ...patch } }))
+  },
   setImportDraft: (importDraft) => set({ importDraft }),
+  setNoteDraft: (trialId, text) => set((state) => ({ noteDrafts: { ...state.noteDrafts, [trialId]: text } })),
   setExportFormat: (format) => set((state) => ({ exportPreview: { ...state.exportPreview, format } })),
   setLocale: (locale) => set({ locale }),
   setTheme: (theme) => set({ theme }),
@@ -124,10 +130,14 @@ export const useAppStore = create((set, get) => ({
     set({ exportPreview: { ...state.exportPreview, json: JSON.stringify(pkg, null, 2), markdown: buildMarkdown(pkg), exportedAt: pkg.exportedAt } })
   },
   openExport: () => {
+    if (!get().chrome.exportOpen) captureDialogOpener('export')
     get().refreshExport()
     set((state) => ({ chrome: { ...state.chrome, exportOpen: true, paletteOpen: false } }))
   },
-  openImport: () => set((state) => ({ chrome: { ...state.chrome, importOpen: true, paletteOpen: false } })),
+  openImport: () => {
+    if (!get().chrome.importOpen) captureDialogOpener('import')
+    set((state) => ({ chrome: { ...state.chrome, importOpen: true, paletteOpen: false } }))
+  },
 
   commitReview: (trialId, nextReview, label) => {
     const state = get()
@@ -190,4 +200,3 @@ export const useAppStore = create((set, get) => ({
 }))
 
 export { buildPackage, buildMarkdown }
-

@@ -8,19 +8,21 @@ const fail = (message) => { throw new Error(message) }
 
 export function useWebMcp() {
   useEffect(() => {
-    const context = navigator.modelContext
-    if (!context?.registerTool || window.__traceframeWebMcpRegistered) return
+    if (window.__traceframeWebMcpRegistered) return
     window.__traceframeWebMcpRegistered = true
+
     const tools = []
+    const handlers = {}
+
     const register = (name, description, properties, required, execute) => {
-      const definition = {
+      const toolDef = {
         name,
         description,
-        inputSchema: { type: 'object', properties, required, additionalProperties: false },
-        execute,
+        inputSchema: { type: 'object', properties, required, additionalProperties: false }
       }
-      context.registerTool(definition)
-      tools.push(name)
+      tools.push(toolDef)
+      handlers[name] = execute
+      window[`webmcp_${name}`] = execute
     }
     const state = () => useAppStore.getState()
     const activeTrial = () => trialById(state().activeTrialId)
@@ -113,6 +115,22 @@ export function useWebMcp() {
     register('artifact_copy', 'Open the live export surface so clipboard transfer can be completed visibly.', { format: { type: 'string', enum: ['json', 'markdown'] } }, ['format'], async ({ format }) => { state().setExportFormat(format); state().openExport(); return response({ export_preview_present: true, copy_control_present: true, format }) })
 
     window.__traceframeWebMcpTools = tools
+
+    window.webmcp_session_info = async () => ({ contract_version: "zto-webmcp-v1" })
+    window.webmcp_list_tools = async () => ({ tools })
+    window.webmcp_invoke_tool = async (name, args) => {
+      if (!handlers[name]) fail(`Tool ${name} not found`)
+      return handlers[name](args)
+    }
+
+    if (navigator.modelContext?.registerTool) {
+      for (const tool of tools) {
+        navigator.modelContext.registerTool({
+          ...tool,
+          execute: handlers[tool.name]
+        })
+      }
+    }
   }, [])
 }
 

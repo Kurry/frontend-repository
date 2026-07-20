@@ -12,8 +12,8 @@ export function Button({ variant = 'default', className = '', children, ...props
   return <button className={`focusable inline-flex min-h-9 items-center justify-center gap-2 rounded-md border px-3 text-[13px] font-medium transition duration-150 active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-35 ${styles[variant]} ${className}`} {...props}>{children}</button>
 }
 
-export function Label({ children, htmlFor, className = '' }) {
-  return <label htmlFor={htmlFor} className={`mb-1.5 block text-[11px] font-semibold uppercase tracking-[.12em] text-mist-500 ${className}`}>{children}</label>
+export function Label({ children, htmlFor, className = '', ...props }) {
+  return <label htmlFor={htmlFor} className={`mb-1.5 block text-[11px] font-semibold uppercase tracking-[.12em] text-mist-500 ${className}`} {...props}>{children}</label>
 }
 
 export function FieldError({ children, id }) {
@@ -29,10 +29,10 @@ export function Textarea({ className = '', ...props }) {
   return <textarea className={`focusable w-full resize-y rounded-md border border-ink-600 bg-ink-900 px-3 py-2.5 text-sm leading-relaxed text-mist-100 placeholder:text-mist-500 ${className}`} {...props} />
 }
 
-export function RadixSelect({ value, onValueChange, placeholder, options, ariaLabel }) {
+export function RadixSelect({ value, onValueChange, placeholder, options, ariaLabel, ...props }) {
   return (
-    <Select.Root value={value || ""} onValueChange={onValueChange}>
-      <Select.Trigger aria-label={ariaLabel} className="focusable flex h-10 w-full items-center justify-between rounded-md border border-ink-600 bg-ink-900 px-3 text-left text-sm text-mist-100 data-[placeholder]:text-mist-500">
+    <Select.Root value={value || undefined} onValueChange={onValueChange}>
+      <Select.Trigger aria-label={ariaLabel} aria-labelledby={props["aria-labelledby"]} className="focusable flex h-10 w-full items-center justify-between rounded-md border border-ink-600 bg-ink-900 px-3 text-left text-sm text-mist-100 data-[placeholder]:text-mist-500">
         <Select.Value placeholder={placeholder} /><Select.Icon><CaretDown size={14} /></Select.Icon>
       </Select.Trigger>
       <Select.Portal>
@@ -62,4 +62,3 @@ export function SectionLabel({ children, aside }) {
 }
 
 export const titleCase = (value) => value.split('-').map((part) => part[0].toUpperCase() + part.slice(1)).join(' ')
-

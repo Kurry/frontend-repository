@@ -39,6 +39,8 @@ textarea:focus-visible,
 .scrollbar { scrollbar-color: #344658 transparent; scrollbar-width: thin; }
 .panel-shadow { box-shadow: 0 18px 50px rgba(0, 0, 0, .28); }
 .pane-fade { animation: pane-fade .2s ease-out; }
+.ease-height { transition: grid-template-rows .2s ease-out, opacity .2s ease-out; }
+.ease-rotate { transition: transform .2s ease-out; }
 .annotation-enter { animation: item-enter .22s ease-out; }
 .report-enter { animation: report-enter .22s ease-out; }
 .dialog-enter { animation: dialog-enter .18s ease-out; }
@@ -57,7 +59,7 @@ textarea:focus-visible,
 @keyframes blink { 50% { opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
 
 @media (max-width: 1024px) {
