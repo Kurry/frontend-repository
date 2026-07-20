@@ -305,6 +305,7 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, textar
 .empty-column h3 { margin: 0 0 5px; color: #393939; font-size: 14px; }
 .empty-column p { max-width: 210px; margin: 0 0 14px; font-size: 12px; line-height: 17px; }
 .wip-breach .empty-column h3, .wip-breach .empty-column { color: #fddc69; }
+.board-column.wip-breach { background-color: #f1c21b !important; }
 
 .modal-form { display: grid; gap: 18px; padding: 4px 0 10px; }
 .cds--modal-header__heading { font-weight: 500; }
