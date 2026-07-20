@@ -10,7 +10,7 @@
   "dependencies": {
     "html2canvas": "^1.4.1",
     "qrious": "^4.0.2",
-    "serve": "14.2.4"
+    "serve": "14.2.6"
   },
   "devDependencies": {
     "@felte/validator-zod": "^1.0.18",
