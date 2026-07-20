@@ -1,47 +1,72 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useAtom } from "jotai";
+import { updateHabitAtom, deleteHabitAtom, toggleCompletionAtom, stepCompletionAtom, addToastAtom } from "../store";
 import type { Habit } from "../types";
-import { updateHabitAtom, toggleCompletionAtom, stepCompletionAtom, deleteHabitAtom, addToastAtom } from "../store";
 import { todayKey, getDayCount, isDayComplete, calcStreak } from "../utils/helpers";
-import FlameIcon from "./FlameIcon";
 import WeeklyGrid from "./WeeklyGrid";
+import FlameIcon from "./FlameIcon";
+import confetti from "canvas-confetti";
 
 interface HabitCardProps {
   habit: Habit;
   onDragStart?: (e: React.DragEvent, id: string) => void;
   onDragOver?: (e: React.DragEvent, id: string) => void;
-  onDragEnd?: () => void;
+  onDragEnd?: (e: React.DragEvent) => void;
   onOpenHeatmap?: (id: string) => void;
 }
 
 export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, onOpenHeatmap }: HabitCardProps) {
   const [, updateHabit] = useAtom(updateHabitAtom);
+  const [, deleteHabit] = useAtom(deleteHabitAtom);
   const [, toggleComplete] = useAtom(toggleCompletionAtom);
   const [, stepComplete] = useAtom(stepCompletionAtom);
-  const [, deleteHabit] = useAtom(deleteHabitAtom);
   const [, addToast] = useAtom(addToastAtom);
   const [showMenu, setShowMenu] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(habit.name);
   const [editReminder, setEditReminder] = useState(habit.reminder);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const today = todayKey();
   const count = getDayCount(habit, today);
   const done = isDayComplete(habit, today);
   const streak = calcStreak(habit);
 
-  const handleToggle = () => {
+  const triggerConfetti = (rect: DOMRect) => {
+    const x = (rect.left + rect.width / 2) / window.innerWidth;
+    const y = (rect.top + rect.height / 2) / window.innerHeight;
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { x, y },
+      colors: ["#0F9D74", "#FFB020", "#FF6B20"],
+    });
+  };
+
+  const handleToggle = (e?: React.MouseEvent | React.KeyboardEvent) => {
     if (habit.targetType === "once") {
       toggleComplete(habit.id, today);
-      if (!done) addToast("✓ Checked in!", "success");
+      if (!done) {
+        addToast("✓ Checked in!", "success");
+        const newStreak = streak + 1;
+        if (newStreak === 7 || newStreak === 30) {
+          const rect = cardRef.current?.getBoundingClientRect();
+          if (rect) triggerConfetti(rect);
+        }
+      }
     }
   };
 
-  const handleStep = (delta: number) => {
+  const handleStep = (e: React.MouseEvent | React.KeyboardEvent | undefined, delta: number) => {
     stepComplete(habit.id, today, delta);
     const newCount = Math.max(0, Math.min(habit.targetCount, count + delta));
     if (newCount >= habit.targetCount && count < habit.targetCount) {
       addToast("🎯 Daily target reached!", "success");
+      const newStreak = streak + 1;
+      if (newStreak === 7 || newStreak === 30) {
+        const rect = cardRef.current?.getBoundingClientRect();
+        if (rect) triggerConfetti(rect);
+      }
     }
   };
 
@@ -65,20 +90,36 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
     setEditing(false);
   };
 
-  const cardClass = `habit-row bg-[#FFFFFF] rounded-lg transition-all ${
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!editing) {
+      if (e.key === "c" || e.key === "C") {
+        if (habit.targetType === "once") {
+          handleToggle(e);
+        } else {
+          handleStep(e, 1);
+        }
+      }
+    }
+  };
+
+  const cardClass = `habit-row bg-[#FFFFFF] rounded-[8px] transition-all focus:outline-none focus:ring-2 focus:ring-[#0F9D74] focus:ring-offset-2 ${
     habit.paused ? "habit-card-paused" : "shadow-sm hover:shadow-md"
   }`;
 
   return (
     <div
+      ref={cardRef}
       className={cardClass}
       draggable={!editing}
       onDragStart={(e) => onDragStart?.(e, habit.id)}
       onDragOver={(e) => onDragOver?.(e, habit.id)}
       onDragEnd={onDragEnd}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
       data-habit-card
       data-habit-id={habit.id}
       data-habit-paused={habit.paused}
+      aria-label={`${habit.name}, ${streak} day streak. Press C to complete.`}
     >
       <div className="p-3 md:p-4">
         {/* Top row: drag handle, icon, name, streak, menu */}
@@ -89,7 +130,7 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
             aria-label="Drag to reorder"
             title="Drag to reorder"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
               <circle cx="5" cy="3" r="1.5" />
               <circle cx="11" cy="3" r="1.5" />
               <circle cx="5" cy="8" r="1.5" />
@@ -134,14 +175,14 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
               aria-label="Habit options"
               data-action="menu-toggle"
             >
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
                 <circle cx="9" cy="4" r="1.5" />
                 <circle cx="9" cy="9" r="1.5" />
                 <circle cx="9" cy="14" r="1.5" />
               </svg>
             </button>
             {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-[#E2E8F0] py-1 z-20 min-w-[140px]">
+              <div className="absolute right-0 top-full mt-1 bg-white rounded-[8px] shadow-lg border border-[#E2E8F0] py-1 z-20 min-w-[140px]">
                 <button
                   onClick={() => { setShowMenu(false); setEditing(true); }}
                   className="w-full text-left px-3 py-2 text-sm text-[#1B2430] hover:bg-[#F4F7F6] transition-colors"
@@ -203,14 +244,14 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
           <div className="flex gap-2 mt-2 ml-8">
             <button
               onClick={handleSaveEdit}
-              className="px-3 py-1 bg-[#0F9D74] text-white text-xs font-medium rounded-lg hover:bg-[#0B7D5C] transition-colors"
+              className="px-3 py-1 bg-[#0F9D74] text-white text-xs font-medium rounded-[8px] hover:bg-[#0B7D5C] transition-colors"
               data-action="save-edit"
             >
               Save
             </button>
             <button
               onClick={() => { setEditing(false); setEditName(habit.name); setEditReminder(habit.reminder); }}
-              className="px-3 py-1 border border-[#E2E8F0] text-[#64748B] text-xs rounded-lg hover:bg-[#F4F7F6] transition-colors"
+              className="px-3 py-1 border border-[#E2E8F0] text-[#64748B] text-xs rounded-[8px] hover:bg-[#F4F7F6] transition-colors"
               data-action="cancel-edit"
             >
               Cancel
@@ -229,13 +270,14 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
               <button
                 type="button"
                 onClick={handleToggle}
-                className={`complete-btn flex-shrink-0 px-3 rounded-lg flex items-center justify-center text-sm font-bold transition-all ${
+                className={`complete-btn flex-shrink-0 px-3 rounded-[8px] flex items-center justify-center text-sm font-bold transition-all ${
                   done
                     ? "bg-[#0F9D74] text-white"
                     : "border-2 border-[#E2E8F0] text-[#1B2430] hover:border-[#0F9D74] hover:text-[#0F9D74]"
                 }`}
                 aria-pressed={done}
                 data-action="toggle-complete"
+                tabIndex={-1}
               >
                 {done ? "✓ Done" : "Complete"}
               </button>
@@ -243,11 +285,12 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   type="button"
-                  onClick={() => handleStep(-1)}
-                  className="stepper-btn rounded-lg border border-[#E2E8F0] text-[#475569] hover:border-[#EF4444] hover:text-[#EF4444] flex items-center justify-center font-bold transition-colors"
+                  onClick={(e) => handleStep(e, -1)}
+                  className="stepper-btn rounded-[8px] border border-[#E2E8F0] text-[#475569] hover:border-[#EF4444] hover:text-[#EF4444] flex items-center justify-center font-bold transition-colors"
                   aria-label="Decrease count"
                   disabled={count <= 0}
                   data-action="step-dec"
+                  tabIndex={-1}
                 >
                   −
                 </button>
@@ -258,7 +301,7 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
                   {/* Mini progress bar */}
                   <div className="w-12 h-1 rounded-full bg-[#E2E8F0] mt-0.5 overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all ${
+                      className={`h-full rounded-full transition-all duration-300 ${
                         done ? "bg-[#0F9D74]" : "bg-[#0F9D74]/50"
                       }`}
                       style={{ width: `${Math.min(100, (count / habit.targetCount) * 100)}%` }}
@@ -267,11 +310,12 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
                 </div>
                 <button
                   type="button"
-                  onClick={() => handleStep(1)}
-                  className="stepper-btn rounded-lg bg-[#0F9D74] text-white hover:bg-[#0B7D5C] flex items-center justify-center font-bold transition-colors"
+                  onClick={(e) => handleStep(e, 1)}
+                  className="stepper-btn rounded-[8px] bg-[#0F9D74] text-white hover:bg-[#0B7D5C] flex items-center justify-center font-bold transition-colors"
                   aria-label="Increase count"
                   disabled={count >= habit.targetCount}
                   data-action="step-inc"
+                  tabIndex={-1}
                 >
                   +
                 </button>

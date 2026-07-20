@@ -412,14 +412,13 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
 ];
 
 export function initWebMcp() {
-  const w = window as unknown as Record<string, unknown>;
-  w.webmcp_session_info = () => ({
+  (window as any).webmcp_session_info = function webmcp_session_info() { return {
     contract_version: CONTRACT_VERSION,
     modules: ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "artifact-transfer-v1"],
     tools: TOOLS.map((t) => t.name),
-  });
-  w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));
-  w.webmcp_invoke_tool = (name: string, args: Record<string, unknown> = {}) => {
+  }; };
+  (window as any).webmcp_list_tools = function webmcp_list_tools() { return TOOLS.map((t) => ({ name: t.name, description: t.description })); };
+  (window as any).webmcp_invoke_tool = function webmcp_invoke_tool(name: string, args: Record<string, unknown> = {}) {
     const tool = TOOLS.find((t) => t.name === name);
     if (!tool) return { ok: false, error: `unknown tool: ${name}` };
     try {

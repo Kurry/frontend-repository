@@ -48,7 +48,10 @@ body {
 
 .btn-primary:active {
   background-color: #086B50;
-  transform: scale(0.98);
+  transform: scale(1.02);
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 12px 24px rgba(27, 36, 48, 0.12);
+  z-index: 10;
 }
 
 .btn-secondary {
@@ -66,7 +69,10 @@ body {
 
 .btn-secondary:active {
   background-color: #E2E8F0;
-  transform: scale(0.98);
+  transform: scale(1.02);
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 12px 24px rgba(27, 36, 48, 0.12);
+  z-index: 10;
 }
 
 .btn-danger {
@@ -84,7 +90,10 @@ body {
 
 .btn-danger:active {
   background-color: #FEE2E2;
-  transform: scale(0.98);
+  transform: scale(1.02);
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 12px 24px rgba(27, 36, 48, 0.12);
+  z-index: 10;
 }
 
 .btn-nav {
@@ -104,7 +113,10 @@ body {
 }
 
 .btn-nav:active {
-  transform: scale(0.98);
+  transform: scale(1.02);
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 12px 24px rgba(27, 36, 48, 0.12);
+  z-index: 10;
 }
 
 .btn-nav-active {
@@ -162,7 +174,10 @@ body {
 
 .dragging {
   opacity: 0.5;
-  transform: scale(0.98);
+  transform: scale(1.02);
+  transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 12px 24px rgba(27, 36, 48, 0.12);
+  z-index: 10;
 }
 
 .drag-over {
