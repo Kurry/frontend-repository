@@ -10,9 +10,9 @@
     "verify:build": "astro build"
   },
   "dependencies": {
-    "@astrojs/svelte": "8.1.2",
+    "@astrojs/svelte": "9.0.0",
     "@tailwindcss/vite": "4.3.2",
-    "astro": "6.4.8",
+    "astro": "7.1.1",
     "svelte": "5.56.4",
     "tailwindcss": "4.3.2",
     "xstate": "5.32.4"
