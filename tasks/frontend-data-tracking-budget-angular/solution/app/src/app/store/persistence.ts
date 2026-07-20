@@ -9,7 +9,8 @@ export function loadPersistedState(): Partial<BudgetState> | undefined {
     if (!raw) {
       return undefined;
     }
-    return JSON.parse(raw);
+    const { undoStack, redoStack, ...persisted } = JSON.parse(raw);
+    return persisted;
   } catch {
     return undefined;
   }
@@ -20,7 +21,8 @@ export function localStorageMetaReducer(reducer: ActionReducer<any>): ActionRedu
     const nextState = reducer(state, action);
     try {
       const { budget } = nextState;
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(budget));
+      const { undoStack, redoStack, ...persisted } = budget;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(persisted));
     } catch {
       // ignore quota / serialization errors
     }

@@ -10,6 +10,20 @@
           <div class="reporting-currency">Reporting currency: USD</div>
           <button mat-button color="primary" type="submit">Save</button>
         </form>
+
+        <form [formGroup]="thresholdForm" (ngSubmit)="saveThreshold()" class="threshold-form">
+          <mat-form-field class="full-width">
+            <mat-label>Spending threshold percent</mat-label>
+            <input matInput type="number" min="0" max="100" step="1" formControlName="thresholdPercent" />
+            <mat-error *ngIf="thresholdForm.controls.thresholdPercent.hasError('required')">
+              Threshold percent is required
+            </mat-error>
+            <mat-error *ngIf="thresholdForm.controls.thresholdPercent.hasError('threshold')">
+              {{ thresholdForm.controls.thresholdPercent.getError('threshold') }}
+            </mat-error>
+          </mat-form-field>
+          <button mat-button color="primary" type="submit">Save threshold</button>
+        </form>
       </div>
     </mat-tab>
 

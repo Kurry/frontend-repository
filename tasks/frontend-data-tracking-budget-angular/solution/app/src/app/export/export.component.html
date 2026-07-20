@@ -1,0 +1,101 @@
+<div class="export-drawer">
+  <h2>Export / Import</h2>
+  <mat-tab-group>
+    <mat-tab label="JSON">
+      <div class="tab-content">
+        <button mat-button color="primary" (click)="downloadJson()">Download Budget report JSON</button>
+        <button mat-button color="accent" (click)="copyJson()">Copy JSON</button>
+        <pre class="export-preview" aria-label="Budget report JSON preview">{{ jsonPreview }}</pre>
+        <mat-divider></mat-divider>
+        <h3>Import</h3>
+        <input type="file" (change)="importJson($event)" accept=".json" />
+        <p class="import-error" role="alert" *ngIf="importJsonError">{{ importJsonError }}</p>
+      </div>
+    </mat-tab>
+    <mat-tab label="CSV">
+      <div class="tab-content">
+        <label class="csv-scope">
+          <input
+            type="checkbox"
+            [checked]="includeAllPeriods"
+            (change)="setCsvScope($event)"
+          />
+          Include expenses from all periods
+        </label>
+        <button mat-button color="primary" (click)="downloadCsv()">Download Transactions CSV</button>
+        <button mat-button color="accent" (click)="copyCsv()">Copy CSV</button>
+        <pre class="export-preview" aria-label="Transactions CSV preview">{{ csvPreview }}</pre>
+        <mat-divider></mat-divider>
+        <h3>Import</h3>
+        <input type="file" (change)="importCsv($event)" accept=".csv" />
+
+        <div class="diagnostic" *ngIf="csvDiagnostics.length > 0">
+           <h4>CSV Import Diagnostic</h4>
+           <div class="diagnostic-row" *ngFor="let d of csvDiagnostics">
+             <label class="diagnostic-include">
+               <input
+                 type="checkbox"
+                 [(ngModel)]="d.included"
+                 (ngModelChange)="revalidateCsvRow(d)"
+               />
+               Include row {{ d.row }}
+             </label>
+             <div class="diagnostic-fields" [class.diagnostic-fields--excluded]="!d.included">
+               <label>
+                 Date
+                 <input
+                   type="text"
+                   [(ngModel)]="d.date"
+                   (ngModelChange)="revalidateCsvRow(d)"
+                   [disabled]="!d.included"
+                   [attr.aria-label]="'Date for CSV row ' + d.row"
+                 />
+               </label>
+               <label>
+                 Counterparty
+                 <input
+                   type="text"
+                   [(ngModel)]="d.counterparty"
+                   (ngModelChange)="revalidateCsvRow(d)"
+                   [disabled]="!d.included"
+                   [attr.aria-label]="'Counterparty for CSV row ' + d.row"
+                 />
+               </label>
+               <label>
+                 Category
+                 <input
+                   type="text"
+                   [(ngModel)]="d.category"
+                   (ngModelChange)="revalidateCsvRow(d)"
+                   [disabled]="!d.included"
+                   [attr.aria-label]="'Category for CSV row ' + d.row"
+                 />
+               </label>
+               <label>
+                 Value
+                 <input
+                   type="number"
+                   min="0.01"
+                   step="0.01"
+                   [(ngModel)]="d.value"
+                   (ngModelChange)="revalidateCsvRow(d)"
+                   [disabled]="!d.included"
+                   [attr.aria-label]="'Value for CSV row ' + d.row"
+                 />
+               </label>
+             </div>
+             <p
+               class="diagnostic-status"
+               [class.diagnostic-status--valid]="d.included && d.valid"
+               role="status"
+             >
+               {{ d.included ? d.message : 'Excluded' }}
+             </p>
+           </div>
+           <br />
+           <button mat-button color="primary" (click)="commitCsv()" [disabled]="pendingCsvExpenses.length === 0">Commit Included Valid Rows</button>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

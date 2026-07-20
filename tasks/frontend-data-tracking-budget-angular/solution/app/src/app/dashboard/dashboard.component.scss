@@ -5,7 +5,8 @@
 }
 
 .summary-card,
-.categories-card {
+.categories-card,
+.chart-card {
   padding: 16px 20px;
 }
 
@@ -16,10 +17,16 @@
   font-size: 16px;
 }
 
-.categories-card h2 {
+.categories-card h2,
+.chart-card h2 {
   font-size: 20px;
   font-weight: 500;
   margin: 0 0 12px;
+}
+
+.spending-chart {
+  width: 100%;
+  height: 320px;
 }
 
 .category-row {
@@ -58,4 +65,34 @@
   font-size: 13px;
   font-weight: 600;
   text-shadow: 0 0 2px rgba(0, 0, 0, 0.6);
+}
+
+.category-row.over-budget {
+  border-left: 4px solid #f44336;
+  padding-left: 12px;
+  margin-left: -16px;
+  background-color: #ffebee;
+}
+
+.flags {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.flag {
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+.projected-overage {
+  background-color: #ff9800;
+  color: #fff;
+}
+
+.over-threshold {
+  background-color: #c2185b;
+  color: #fff;
 }

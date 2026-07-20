@@ -3,7 +3,7 @@ import { Expense, Period } from '../models/models';
 
 export const setView = createAction(
   '[App] Set View',
-  props<{ view: 'dashboard' | 'expenses' | 'settings' }>()
+  props<{ view: 'dashboard' | 'expenses' | 'settings' | 'export' }>()
 );
 
 export const addExpense = createAction(
@@ -19,6 +19,11 @@ export const updateExpense = createAction(
 export const deleteExpense = createAction(
   '[Expenses] Delete Expense',
   props<{ id: string }>()
+);
+
+export const importExpenses = createAction(
+  '[Import] Commit CSV Expenses',
+  props<{ expenses: Expense[] }>()
 );
 
 export const setFilterCategory = createAction(
@@ -53,6 +58,14 @@ export const setDisplayName = createAction(
   '[Settings] Set Display Name',
   props<{ name: string }>()
 );
+
+export const setThresholdPercent = createAction(
+  '[Settings] Set Threshold Percent',
+  props<{ thresholdPercent: number }>()
+);
+
+export const undo = createAction('[App] Undo');
+export const redo = createAction('[App] Redo');
 
 export const hydrateState = createAction(
   '[App] Hydrate State',

@@ -16,15 +16,33 @@
 
   <mat-card class="categories-card">
     <h2>Budgets by category</h2>
-    <div class="category-row" *ngFor="let row of budgetsByCategory$ | async">
+    <div class="category-row" *ngFor="let row of budgetsByCategory$ | async" [class.over-budget]="row.isOverBudget">
       <div class="category-heading">
         <span class="category-name">{{ row.name }}</span>
-        <span class="category-left">left ${{ row.left.toFixed(2) }}</span>
+        <span class="category-left">
+          left ${{ row.left.toFixed(2) }}
+          (Variance: {{ row.variance > 0 ? '+' : '' }}${{ row.variance.toFixed(2) }})
+          · Projected ${{ row.projected.toFixed(2) }}
+        </span>
       </div>
       <div class="progress-wrap">
-        <mat-progress-bar mode="determinate" [value]="row.leftPercentage" [attr.aria-label]="row.name + ' budget progress'"></mat-progress-bar>
+        <mat-progress-bar mode="determinate" [value]="row.leftPercentage" [attr.aria-label]="row.name + ' budget progress ' + (row.isOverBudget ? 'over budget' : '')"></mat-progress-bar>
         <span class="progress-label">${{ row.currentExpenses.toFixed(2) }} / ${{ row.maxExpenses.toFixed(2) }}</span>
       </div>
+      <div class="flags">
+        <span class="flag projected-overage" *ngIf="row.projectedOverage">Projected overage</span>
+        <span class="flag over-threshold" *ngIf="row.overThreshold">Over threshold</span>
+      </div>
     </div>
+  </mat-card>
+
+  <mat-card class="chart-card" *ngIf="chartOptions$ | async as chartOptions">
+    <h2>Spending breakdown</h2>
+    <div
+      echarts
+      class="spending-chart"
+      [options]="chartOptions"
+      aria-label="Current period spending breakdown by category"
+    ></div>
   </mat-card>
 </div>

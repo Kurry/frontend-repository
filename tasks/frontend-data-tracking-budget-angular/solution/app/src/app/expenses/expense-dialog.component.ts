@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Store } from '@ngrx/store';
 import { selectCategories } from '../store/budget.selectors';
 import { Expense } from '../models/models';
+import { ExpenseFormSchema } from '../models/schemas';
 
 export interface ExpenseDialogResult {
   value: number;
@@ -46,11 +47,25 @@ export class ExpenseDialogComponent {
       return;
     }
     const raw = this.form.getRawValue();
-    this.dialogRef.close({
+    const parsed = ExpenseFormSchema.safeParse({
       value: Number(raw.value),
       datetime: String(raw.datetime),
       categoryId: String(raw.categoryId),
-      counterparty: String(raw.counterparty ?? ''),
+      counterparty: raw.counterparty,
+    });
+    if (!parsed.success) {
+      parsed.error.issues.forEach((issue) => {
+        const control = this.form.get(String(issue.path[0]));
+        control?.setErrors({ ...control.errors, schema: issue.message });
+      });
+      this.form.markAllAsTouched();
+      return;
+    }
+    this.dialogRef.close({
+      value: parsed.data.value,
+      datetime: parsed.data.datetime,
+      categoryId: parsed.data.categoryId,
+      counterparty: String(parsed.data.counterparty ?? ''),
     });
   }
 

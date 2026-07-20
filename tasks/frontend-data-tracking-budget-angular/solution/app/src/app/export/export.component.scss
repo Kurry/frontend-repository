@@ -1,0 +1,67 @@
+.export-drawer {
+  padding: 16px;
+}
+.tab-content {
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.csv-scope {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+}
+.import-error {
+  color: #b91c1c;
+  margin: 0;
+}
+.export-preview {
+  background: #111827;
+  border-radius: 4px;
+  color: #f9fafb;
+  margin: 0;
+  max-height: 320px;
+  overflow: auto;
+  padding: 12px;
+  white-space: pre;
+}
+.diagnostic-row {
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  margin-top: 12px;
+  padding: 12px;
+}
+.diagnostic-include {
+  align-items: center;
+  display: flex;
+  font-weight: 600;
+  gap: 8px;
+}
+.diagnostic-fields {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  margin-top: 10px;
+}
+.diagnostic-fields label {
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  gap: 4px;
+}
+.diagnostic-fields input {
+  border: 1px solid #9ca3af;
+  border-radius: 4px;
+  padding: 8px;
+}
+.diagnostic-fields--excluded {
+  opacity: 0.55;
+}
+.diagnostic-status {
+  color: #b91c1c;
+  margin: 8px 0 0;
+}
+.diagnostic-status--valid {
+  color: #15803d;
+}

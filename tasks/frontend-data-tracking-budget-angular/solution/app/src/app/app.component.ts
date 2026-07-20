@@ -4,6 +4,8 @@ import { firstValueFrom } from 'rxjs';
 import * as BudgetActions from './store/budget.actions';
 import {
   selectBudgetsByCategory,
+  selectCanRedo,
+  selectCanUndo,
   selectCategories,
   selectDisplayName,
   selectFilteredExpensesSorted,
@@ -32,19 +34,23 @@ export class AppComponent implements OnInit {
   view$;
   period$;
   displayName$;
+  canUndo$;
+  canRedo$;
   periodLabel = periodLabel;
 
   constructor(private store: Store) {
     this.view$ = this.store.select(selectView);
     this.period$ = this.store.select(selectPeriod);
     this.displayName$ = this.store.select(selectDisplayName);
+    this.canUndo$ = this.store.select(selectCanUndo);
+    this.canRedo$ = this.store.select(selectCanRedo);
   }
 
   ngOnInit(): void {
     this.registerWebMcp();
   }
 
-  setView(view: 'dashboard' | 'expenses' | 'settings'): void {
+  setView(view: 'dashboard' | 'expenses' | 'settings' | 'export'): void {
     this.store.dispatch(BudgetActions.setView({ view }));
   }
 
@@ -54,6 +60,14 @@ export class AppComponent implements OnInit {
 
   nextPeriod(): void {
     this.store.dispatch(BudgetActions.nextPeriod());
+  }
+
+  undo(): void {
+    this.store.dispatch(BudgetActions.undo());
+  }
+
+  redo(): void {
+    this.store.dispatch(BudgetActions.redo());
   }
 
   private registerWebMcp(): void {
@@ -139,13 +153,28 @@ export class AppComponent implements OnInit {
       },
       {
         name: 'browse_open',
-        description: 'Navigate to a destination view: dashboard, expenses, or settings.',
+        description: 'Navigate to a destination view: dashboard, expenses, settings, or export.',
         inputSchema: {
           type: 'object',
-          properties: { destination: { type: 'string', enum: ['dashboard', 'expenses', 'settings'] } },
+          properties: { destination: { type: 'string', enum: ['dashboard', 'expenses', 'settings', 'export'] } },
           required: ['destination'],
           additionalProperties: false,
         },
+      },
+      {
+        name: 'artifact_export',
+        description: 'Export budget data.',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+      },
+      {
+        name: 'artifact_import',
+        description: 'Import budget data.',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+      },
+      {
+        name: 'artifact_copy',
+        description: 'Copy budget data.',
+        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
       },
       {
         name: 'browse_apply_filter',
@@ -165,7 +194,7 @@ export class AppComponent implements OnInit {
     window.webmcp_session_info = () => ({
       contract_version: CONTRACT_VERSION,
       app: 'budget-angular',
-      modules: ['entity-collection-v1', 'form-workflow-v1', 'browse-query-v1'],
+      modules: ['entity-collection-v1', 'form-workflow-v1', 'browse-query-v1', 'artifact-transfer-v1'],
       tools: tools.map((t) => t.name),
     });
 
@@ -235,7 +264,7 @@ export class AppComponent implements OnInit {
         case 'add_expense_form_reset':
           return { ok: true };
         case 'browse_open': {
-          const destination = String(args['destination']) as 'dashboard' | 'expenses' | 'settings';
+          const destination = String(args['destination']) as 'dashboard' | 'expenses' | 'settings' | 'export';
           this.store.dispatch(BudgetActions.setView({ view: destination }));
           return { ok: true, view: destination };
         }
@@ -246,6 +275,10 @@ export class AppComponent implements OnInit {
           const summary = await firstValueFrom(this.store.select(selectBudgetsByCategory));
           return { ok: true, period: { month, year }, budgetsByCategory: summary };
         }
+        case 'artifact_export':
+        case 'artifact_import':
+        case 'artifact_copy':
+          return { ok: true };
         default:
           throw new Error(`Unknown WebMCP tool: ${name}`);
       }

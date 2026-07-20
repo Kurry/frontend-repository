@@ -29,6 +29,14 @@ export interface Expense {
   categoryId: string;
   counterparty: string;
   period: Period;
+  recurring?: boolean;
+}
+
+export interface RecurringRule {
+  name: string;
+  value: number;
+  categoryId: string;
+  dayOfMonth: number;
 }
 
 export interface View {
