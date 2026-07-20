@@ -34,7 +34,7 @@ export default function ExportDialog() {
 
   return (
     <Dialog open={open()} onOpenChange={setOpen}>
-      <Dialog.Trigger class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium transition hover:bg-slate-100 active:scale-95 dark:border-slate-700 dark:hover:bg-slate-800">
+      <Dialog.Trigger class="touch-target rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 dark:border-slate-700 dark:hover:bg-slate-800">
         Export Session
       </Dialog.Trigger>
       <Dialog.Portal>
@@ -46,7 +46,7 @@ export default function ExportDialog() {
                 Export Session Pack
               </Dialog.Title>
               <Dialog.CloseButton class="rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                    <path d="M18 6l-12 12"></path>
                    <path d="M6 6l12 12"></path>
@@ -66,10 +66,10 @@ export default function ExportDialog() {
             </div>
 
             <div class="flex justify-end gap-3 mt-auto">
-               <button onClick={handleCopy} class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium transition hover:bg-slate-100 active:scale-95 dark:border-slate-700 dark:hover:bg-slate-800">
+               <button onClick={handleCopy} class="touch-target rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 dark:border-slate-700 dark:hover:bg-slate-800">
                  {copied() ? "Copied!" : "Copy to Clipboard"}
                </button>
-               <button onClick={handleDownload} class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-500 active:scale-95">
+               <button onClick={handleDownload} class="touch-target rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500">
                  Download JSON
                </button>
             </div>

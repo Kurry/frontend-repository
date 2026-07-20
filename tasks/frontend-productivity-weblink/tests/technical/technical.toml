@@ -213,7 +213,7 @@ weight = 1.0
 [[criterion]]
 id = "4.17"
 name = "zod_field_contracts_drive_forms"
-description = "PeerIdentity, JoinSession, ChatMessage, and Import Session reject invalid payloads with inline per-field errors matching the declared field contracts (displayName 1–40, roomId character class and length, text 1–2000, Session Pack schemaVersion weblink-session-v1 and enums) before any join, send, or import proceeds"
+description = "PeerIdentity, JoinSession, ChatMessage, and Import Session reject invalid payloads with inline per-field errors matching the declared field contracts (displayName 1–40, roomId character class and length, text 1–2000, Session Pack schemaVersion weblink-session-v2 and enums) before any join, send, or import proceeds"
 type = "binary"
 weight = 1.0
 
