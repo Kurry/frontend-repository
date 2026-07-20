@@ -24,8 +24,13 @@ const tools = [
   { name: 'artifact_copy', description: 'Copy the currently selected live export preview.', inputSchema: { type: 'object', properties: { format: { type: 'string', enum: ['json', 'csv'] } }, required: ['format'], additionalProperties: false } },
 ]
 
+
+
+
+
 function visibleResult() {
   const state = useAppStore.getState()
+
   const rollups = deriveRollups(state.usageEvents)
   const total = rollups.reduce((sum, row) => sum + row.subtotal, 0)
   const query = state.searchQuery.toLowerCase()
@@ -98,7 +103,14 @@ async function invoke(name, args = {}) {
     live.setExportTab(args.format)
     live.navigateDestination('export-panel')
   } else throw new Error(`Unknown WebMCP tool: ${name}`)
-  return { ok: true, ...visibleResult() }
+  return new Promise(resolve => {
+    setTimeout(() => {
+      window.dispatchEvent(new Event('__webmcp_flush_state'));
+      setTimeout(() => {
+        resolve({ ok: true, ...visibleResult() });
+      }, 0);
+    }, 50);
+  });
 }
 
 export function registerWebMCP() {

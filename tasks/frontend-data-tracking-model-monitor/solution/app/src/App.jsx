@@ -59,7 +59,7 @@ import { csvFromEvents, deriveRollups, reportFromState, useAppStore } from './st
 
 const currency = (value, digits = 2) => `$${Number(value || 0).toFixed(digits)}`
 const compactNumber = (value) => Intl.NumberFormat('en-US', { notation: value >= 1_000_000 ? 'compact' : 'standard', maximumFractionDigits: 1 }).format(value)
-const time = (value) => new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' }).format(new Date(value))
+const time = (value) => new Date(value).toISOString()
 const slug = (value) => value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 const fuzzy = (text, query) => {
   const source = text.toLowerCase()
@@ -97,6 +97,7 @@ function BudgetForm({ total }) {
     <section className="budget-block" aria-labelledby="budget-heading">
       <div className="section-eyebrow" id="budget-heading">Session budget</div>
       <form className="budget-form" onSubmit={handleSubmit((data) => saveBudget(data.session_budget_usd))} noValidate>
+        <div className="sr-only" aria-live="polite">{errors.session_budget_usd?.message}</div>
         <TextInput
           id="session-budget"
           labelText="Budget ceiling (USD)"
@@ -131,7 +132,8 @@ function CostSidebar({ rollups, total }) {
   const disclosureOpen = useAppStore((state) => state.disclosureOpen)
   const toggleDisclosure = useAppStore((state) => state.toggleDisclosure)
   const highlightCatalogModel = useAppStore((state) => state.highlightCatalogModel)
-  const visibleData = rollups.filter((row) => !hidden.includes(row.model) && row.subtotal > 0)
+  const rollupsWithSubtotal = rollups.filter((row) => row.subtotal > 0)
+  const visibleData = rollupsWithSubtotal.filter((row) => !hidden.includes(row.model))
   return (
     <aside className="cost-sidebar" id="cost-sidebar" aria-label="Session cost tracker">
       <div className="cost-header">
@@ -147,7 +149,7 @@ function CostSidebar({ rollups, total }) {
           <ResponsiveContainer width="100%" height={190}>
             <PieChart>
               <Pie data={visibleData} dataKey="subtotal" nameKey="model" innerRadius={48} outerRadius={76} paddingAngle={2} stroke="transparent" isAnimationActive animationDuration={450}>
-                {visibleData.map((entry) => <Cell key={entry.model} fill={chartColors[rollups.findIndex((item) => item.model === entry.model) % chartColors.length]} />)}
+                {visibleData.map((entry) => <Cell key={entry.model} fill={chartColors[rollupsWithSubtotal.findIndex((item) => item.model === entry.model) % chartColors.length]} />)}
               </Pie>
               <Tooltip content={<CostTooltip />} />
             </PieChart>
@@ -159,7 +161,7 @@ function CostSidebar({ rollups, total }) {
       </div>
 
       <div className="chart-legend" aria-label="Chart legend">
-        {rollups.map((row, index) => {
+        {rollupsWithSubtotal.map((row, index) => {
           const isVisible = !hidden.includes(row.model)
           return (
             <button key={row.model} type="button" aria-pressed={isVisible} onClick={() => toggleLegend(row.model)} className={!isVisible ? 'muted' : ''}>
@@ -224,6 +226,8 @@ function AlertModal() {
   return (
     <Modal
       open={open}
+      preventCloseOnClickOutside
+      hasScrollingContent={false}
       modalHeading="Free model alerts"
       modalLabel="Routing watchlist"
       primaryButtonText="Save alerts"
@@ -247,6 +251,7 @@ function AlertModal() {
           invalidText={errors.min_context_window?.message}
           {...register('min_context_window', { setValueAs: (value) => value === '' ? undefined : Number(value) })}
         />
+        <div className="sr-only" aria-live="polite">{errors.min_context_window?.message}</div>
       </div>
     </Modal>
   )
@@ -273,11 +278,14 @@ function LogUsageModal() {
     if (lock.current) return
     lock.current = true
     addManualUsage(data, calculateCost(activeModels.find((item) => item.name === data.model), data.prompt_tokens, data.completion_tokens))
+    reset({ model: activeModels[0]?.name || '', request_label: '', prompt_tokens: 0, completion_tokens: 0 })
     window.setTimeout(() => { lock.current = false }, 300)
   }
   return (
     <Modal
       open={open}
+      preventCloseOnClickOutside
+      hasScrollingContent={false}
       modalHeading="Log model usage"
       modalLabel="Manual usage event"
       primaryButtonText="Log usage"
@@ -293,10 +301,12 @@ function LogUsageModal() {
           <SelectItem value="" text="Select a model" />
           {activeModels.map((item) => <SelectItem key={item.name} value={item.name} text={`${item.name} · ${item.provider}`} />)}
         </Select>
+        <div className="sr-only" aria-live="polite">{errors.model?.message}</div>
         <TextInput id="request-label" labelText="Request label" placeholder="e.g. Customer support summary" invalid={Boolean(errors.request_label)} invalidText={errors.request_label?.message} {...register('request_label')} />
+        <div className="sr-only" aria-live="polite">{errors.request_label?.message}</div>
         <div className="two-column-fields">
-          <TextInput id="prompt-tokens" type="number" labelText="Prompt tokens" min="0" invalid={Boolean(errors.prompt_tokens)} invalidText={errors.prompt_tokens?.message} {...register('prompt_tokens', { setValueAs: (value) => value === '' ? undefined : Number(value) })} />
-          <TextInput id="completion-tokens" type="number" labelText="Completion tokens" min="0" invalid={Boolean(errors.completion_tokens)} invalidText={errors.completion_tokens?.message} {...register('completion_tokens', { setValueAs: (value) => value === '' ? undefined : Number(value) })} />
+          <div><TextInput id="prompt-tokens" type="number" labelText="Prompt tokens" min="0" invalid={Boolean(errors.prompt_tokens)} invalidText={errors.prompt_tokens?.message} {...register('prompt_tokens', { setValueAs: (value) => value === '' ? undefined : Number(value) })} /><div className="sr-only" aria-live="polite">{errors.prompt_tokens?.message}</div></div>
+          <div><TextInput id="completion-tokens" type="number" labelText="Completion tokens" min="0" invalid={Boolean(errors.completion_tokens)} invalidText={errors.completion_tokens?.message} {...register('completion_tokens', { setValueAs: (value) => value === '' ? undefined : Number(value) })} /><div className="sr-only" aria-live="polite">{errors.completion_tokens?.message}</div></div>
         </div>
         <div className="cost-preview"><span>Computed cost</span><strong>{currency(preview, 6)}</strong><small>Read-only · based on catalog rates</small></div>
       </div>
@@ -319,7 +329,7 @@ function ComparisonModal() {
     ['Pinned', (m) => m.pinned ? 'Yes' : 'No'],
   ]
   return (
-    <Modal open={open} passiveModal modalHeading="Compare selected models" modalLabel={`${selected.length} routing candidates`} onRequestClose={() => setOverlay('compareOpen', false)} className="compare-modal">
+    <Modal open={open} passiveModal preventCloseOnClickOutside hasScrollingContent={false} modalHeading="Compare selected models" modalLabel={`${selected.length} routing candidates`} onRequestClose={() => setOverlay('compareOpen', false)} className="compare-modal">
       <div className="comparison-scroll">
         <table className="comparison-table">
           <thead><tr><th>Attribute</th>{selected.map((model) => <th key={model.name}>{model.name}</th>)}</tr></thead>
@@ -348,7 +358,7 @@ function ImportForm({ onImported }) {
   }
   return (
     <form className="import-form" onSubmit={handleSubmit(submit)} noValidate>
-      <TextArea id="import-json" labelText="Import Session JSON" placeholder="Paste a routing-session-report-v1 document…" rows={4} invalid={Boolean(errors.import_json)} invalidText={errors.import_json?.message} {...register('import_json')} />
+      <TextArea id="import-json" labelText="Import Session JSON" placeholder="Paste a routing-session-report-v1 document…" rows={4} invalid={Boolean(errors.import_json)} invalidText={errors.import_json?.message} {...register('import_json')} /><div className="sr-only" aria-live="polite">{errors.import_json?.message}</div>
       <Button type="submit" size="sm" kind="tertiary" renderIcon={Upload} disabled={!isValid}>Import and replace</Button>
     </form>
   )
@@ -384,7 +394,7 @@ function ExportModal() {
     URL.revokeObjectURL(url)
   }
   return (
-    <Modal open={open} passiveModal modalHeading="Export routing session" modalLabel="Live session artifact" onRequestClose={() => setOverlay('exportOpen', false)} className="export-modal">
+    <Modal open={open} passiveModal preventCloseOnClickOutside hasScrollingContent={false} modalHeading="Export routing session" modalLabel="Live session artifact" onRequestClose={() => setOverlay('exportOpen', false)} className="export-modal">
       <div className="export-tabs" role="tablist" aria-label="Export format">
         <button type="button" role="tab" aria-selected={tab === 'json'} onClick={() => setTab('json')}>Session JSON</button>
         <button type="button" role="tab" aria-selected={tab === 'csv'} onClick={() => setTab('csv')}>Usage CSV</button>
@@ -431,7 +441,7 @@ function CommandPalette() {
     if (command.value === 'refresh') { triggerRefresh(); setOverlay('commandOpen', false) }
   }
   return (
-    <Modal open={open} passiveModal modalHeading="Command palette" modalLabel="Navigate or run an action" onRequestClose={() => setOverlay('commandOpen', false)} selectorPrimaryFocus="#command-search" className="command-modal">
+    <Modal open={open} passiveModal preventCloseOnClickOutside hasScrollingContent={false} modalHeading="Command palette" modalLabel="Navigate or run an action" onRequestClose={() => setOverlay('commandOpen', false)} selectorPrimaryFocus="#command-search" className="command-modal">
       <div className="command-search-wrap"><SearchIcon size={18} /><input id="command-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search destinations and actions…" aria-label="Search commands" autoComplete="off" /><kbd>ESC</kbd></div>
       <div className="command-results" role="listbox" aria-label="Commands">
         {matches.map((command) => {
@@ -565,6 +575,18 @@ function App() {
   const rollups = useMemo(() => deriveRollups(usageEvents), [usageEvents])
   const total = useMemo(() => Number(rollups.reduce((sum, row) => sum + row.subtotal, 0).toFixed(8)), [rollups])
   const previousFocus = useRef(null)
+  const focusRestoreTimer = useRef(null)
+  const [, setWebMcpRevision] = useState(0)
+  const openOverlay = (name) => {
+    previousFocus.current = document.activeElement
+    state.setOverlay(name, true)
+  }
+
+  useEffect(() => {
+    const flushWebMcpState = () => setWebMcpRevision((revision) => revision + 1)
+    window.addEventListener('__webmcp_flush_state', flushWebMcpState)
+    return () => window.removeEventListener('__webmcp_flush_state', flushWebMcpState)
+  }, [])
 
   useEffect(() => {
     if (!simulationRunning) return undefined
@@ -577,8 +599,11 @@ function App() {
     const onKey = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
-        previousFocus.current = document.activeElement
-        state.setOverlay('commandOpen', !useAppStore.getState().commandOpen)
+        const current = useAppStore.getState()
+        const opening = !current.commandOpen
+        const anotherOverlayOpen = current.alertOpen || current.logOpen || current.compareOpen || current.exportOpen
+        if (opening && !anotherOverlayOpen) previousFocus.current = document.activeElement
+        state.setOverlay('commandOpen', opening)
       }
     }
     window.addEventListener('keydown', onKey)
@@ -586,10 +611,39 @@ function App() {
   }, [state.setOverlay])
 
   useEffect(() => {
-    if (!state.commandOpen && previousFocus.current && document.contains(previousFocus.current)) {
-      window.setTimeout(() => previousFocus.current?.focus(), 0)
+    const isOpen = state.alertOpen || state.logOpen || state.compareOpen || state.exportOpen || state.commandOpen;
+    if (isOpen || !previousFocus.current) return undefined;
+    if (!document.body.contains(previousFocus.current)) {
+      previousFocus.current = null;
+      return undefined;
     }
-  }, [state.commandOpen])
+    const el = previousFocus.current;
+    let attempts = 0;
+    let timer;
+    const restoreFocus = () => {
+      if (previousFocus.current !== el) return;
+      el.focus();
+      if (document.activeElement === el) {
+        previousFocus.current = null;
+        focusRestoreTimer.current = null;
+        return;
+      }
+      attempts += 1;
+      if (attempts < 4) {
+        timer = window.setTimeout(restoreFocus, 25 * attempts);
+        focusRestoreTimer.current = timer;
+      } else {
+        previousFocus.current = null;
+        focusRestoreTimer.current = null;
+      }
+    };
+    timer = window.setTimeout(restoreFocus, 10);
+    focusRestoreTimer.current = timer;
+    return () => {
+      window.clearTimeout(timer);
+      if (focusRestoreTimer.current === timer) focusRestoreTimer.current = null;
+    };
+  }, [state.alertOpen, state.logOpen, state.compareOpen, state.exportOpen, state.commandOpen]);
 
   useEffect(() => {
     if (!navTarget) return
@@ -628,17 +682,17 @@ function App() {
             <nav className="action-toolbar" aria-label="Session actions">
               <div className="toolbar-primary">
                 <ToolbarButton label={simulationRunning ? 'Pause simulation' : 'Start simulation'} icon={simulationRunning ? PauseFilled : PlayFilledAlt} active={simulationRunning} onClick={() => state.setSimulationRunning(!simulationRunning)} />
-                <ToolbarButton label="Log usage" icon={Add} onClick={() => state.setOverlay('logOpen', true)} />
+                <ToolbarButton label="Log usage" icon={Add} onClick={() => openOverlay('logOpen')} />
                 <ToolbarButton label="Refresh" icon={Renew} disabled={state.refreshLoading} onClick={state.triggerRefresh} />
-                <ToolbarButton label={`Compare ${compareSelected.length ? `(${compareSelected.length})` : ''}`} icon={Compare} disabled={compareSelected.length < 2} onClick={() => state.setOverlay('compareOpen', true)} />
+                <ToolbarButton label={`Compare ${compareSelected.length ? `(${compareSelected.length})` : ''}`} icon={Compare} disabled={compareSelected.length < 2} onClick={() => openOverlay('compareOpen')} />
               </div>
               <div className="toolbar-secondary">
                 <ToolbarButton label="Undo" icon={Undo} disabled={!state.undoStack.length} onClick={state.undo} />
                 <ToolbarButton label="Redo" icon={Redo} disabled={!state.redoStack.length} onClick={state.redo} />
-                <ToolbarButton label="Alerts" icon={Notification} onClick={() => state.setOverlay('alertOpen', true)} />
+                <ToolbarButton label="Alerts" icon={Notification} onClick={() => openOverlay('alertOpen')} />
                 <ToolbarButton label="Costs" icon={ChartPie} className="mobile-cost-button" onClick={() => state.setOverlay('mobileCostsOpen', true)} />
-                <ToolbarButton label="Export" icon={Download} onClick={() => state.setOverlay('exportOpen', true)} />
-                <button type="button" className="command-key-button" onClick={() => state.setOverlay('commandOpen', true)} aria-label="Open command palette"><SearchIcon size={16} /><span>Commands</span><kbd>⌘K</kbd></button>
+                <ToolbarButton label="Export" icon={Download} onClick={() => openOverlay('exportOpen')} />
+                <button type="button" className="command-key-button" onClick={() => openOverlay('commandOpen')} aria-label="Open command palette"><SearchIcon size={16} /><span>Commands</span><kbd>⌘K</kbd></button>
               </div>
             </nav>
 
