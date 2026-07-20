@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Gabarito';
+  src: url('/assets/fonts/gabarito-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+
+:root {
+  --color-primary: #facc15; /* Yellow accent */
+  --color-bg-workspace: #f8fafc; /* Light workspace */
+}
+
+body {
+  font-family: "Gabarito", system-ui, sans-serif;
+  background-color: var(--color-bg-workspace);
+  color: #1e293b;
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom styling for specific workspace regions */
+.scene-description.is-editing {
+  background-color: #fef08a; /* yellow wash */
+  outline: 2px solid #eab308;
+}
+
+.thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.thin-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0,0,0,0.2);
+  border-radius: 3px;
+}
+
+/* Utility classes for layout */
+.canvas-mode .scene-card {
+  position: absolute;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.canvas-mode .scene-card.dragging {
+  box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Checkbox rendering */
+.markdown-body ul {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+}
+.markdown-body input[type="checkbox"] {
+  margin-right: 0.5rem;
+  accent-color: var(--color-primary);
+}
