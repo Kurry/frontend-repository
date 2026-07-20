@@ -1,11 +1,24 @@
 {
-  "name": "oracle-static",
+  "name": "exposure-control-lab",
   "private": true,
+  "type": "module",
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "start": "vite preview --port 3000 --host 0.0.0.0",
+    "verify:build": "vite build"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "@tailwindcss/vite": "4.3.2",
+    "@vee-validate/zod": "^4.14.0",
+    "@vueuse/core": "^12.0.0",
+    "@vueuse/motion": "^2.2.6",
+    "pinia": "^2.3.1",
+    "tailwindcss": "4.3.2",
+    "vee-validate": "^4.14.0",
+    "vue": "^3.5.13",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "vite": "^6.0.0"
   }
 }
