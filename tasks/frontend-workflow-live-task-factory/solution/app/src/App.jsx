@@ -80,7 +80,7 @@ function TopBar() {
       </div>
       <div className="top-actions">
         <ModeChip />
-        <div className="status-pair" aria-label="Connection status">
+        <div className="status-pair" aria-label="Connection status" aria-live="polite">
           <span className={cx('connection-chip', githubStatus === 'connected' && 'connected')}><GithubLogo size={13} /> GitHub {githubStatus === 'connected' ? 'ready' : 'off'}</span>
           <span className={cx('connection-chip', aiStatus === 'connected' && 'connected')}><Robot size={13} /> AI {aiStatus === 'connected' ? 'ready' : 'off'}</span>
         </div>
