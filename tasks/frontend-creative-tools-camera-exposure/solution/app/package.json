@@ -1,11 +1,27 @@
 {
   "name": "oracle-static",
   "private": true,
+  "type": "module",
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "verify:build": "vite build",
+    "start": "npx serve -l 3000 dist"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "@iconify-json/ph": "^1.2.2",
+    "@kobalte/core": "^0.13.12",
+    "@tailwindcss/vite": "^4.3.3",
+    "@tanstack/solid-form": "^1.33.2",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "motion": "^12.42.2",
+    "phosphor-icons": "^1.4.2",
+    "serve": "14.2.4",
+    "solid-icons": "^1.2.0",
+    "solid-js": "^1.9.14",
+    "tailwindcss": "^4.3.3",
+    "unplugin-icons": "^23.0.1",
+    "vite": "^6.4.3",
+    "vite-plugin-solid": "^2.11.13",
+    "zod": "^4.4.3"
   }
 }
