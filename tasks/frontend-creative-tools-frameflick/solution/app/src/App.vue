@@ -116,7 +116,14 @@ watch(
 function onPaletteShortcut(e: KeyboardEvent) {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault()
-    paletteOpen.value = !paletteOpen.value
+    if (paletteOpen.value) {
+      paletteOpen.value = false // Ctrl+K still toggles the palette closed
+      return
+    }
+    // Don't open the palette on top of another modal dialog (import, paste,
+    // confirm) — they render role="dialog" + aria-modal="true" while open.
+    if (document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]')) return
+    paletteOpen.value = true
   }
 }
 

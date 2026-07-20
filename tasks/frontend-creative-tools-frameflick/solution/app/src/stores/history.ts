@@ -149,6 +149,9 @@ export const useHistoryStore = defineStore('history', () => {
       merged.watermarkCorner = clip.watermarkCorner
     }
     canvas.applySettings(merged)
+    // Match the preset/snapshot/import apply paths: leave the Before baseline
+    // so the canvas shows the freshly pasted look.
+    canvas.showingBefore = false
   }
 
   return {
