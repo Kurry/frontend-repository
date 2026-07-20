@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useAtom } from "jotai";
 import { habitsAtom, activeFilterAtom, reorderHabitsAtom, addToastAtom } from "./store";
 import HabitCard from "./components/HabitCard";
@@ -9,6 +9,7 @@ import StatsView from "./components/StatsView";
 import ImportExport from "./components/ImportExport";
 import Toast from "./components/Toast";
 import RecoveryBanner from "./components/RecoveryBanner";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 type ViewMode = "habits" | "stats" | "heatmap" | "import";
 
@@ -22,6 +23,23 @@ export default function App() {
   const [showForm, setShowForm] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+
+  const [activeListRef] = useAutoAnimate<HTMLDivElement>();
+  const [pausedListRef] = useAutoAnimate<HTMLDivElement>();
+
+  useEffect(() => {
+    const savedView = localStorage.getItem("loopdaily-last-view");
+    if (savedView && ["habits", "stats", "import"].includes(savedView)) {
+      setView(savedView as ViewMode);
+    }
+  }, []);
+
+  const handleSetView = (newView: ViewMode) => {
+    setView(newView);
+    if (newView !== "heatmap") {
+      localStorage.setItem("loopdaily-last-view", newView);
+    }
+  };
 
   // Filtered habits sorted by order
   const sortedHabits = [...habits].sort((a, b) => a.order - b.order);
@@ -79,17 +97,20 @@ export default function App() {
 
   const openHeatmap = useCallback((id: string) => {
     setHeatmapHabitId(id);
-    setView("heatmap");
+    handleSetView("heatmap");
   }, []);
 
   const goHome = useCallback(() => {
-    setView("habits");
+    handleSetView("habits");
     setHeatmapHabitId(null);
   }, []);
 
   // Empty state
   const EmptyState = () => (
-    <div className="text-center py-12">
+    <div className="text-center py-12 relative">
+      <div className="absolute -top-4 right-4 bg-[#0F9D74] text-white text-xs px-3 py-2 rounded shadow-lg pointer-events-none after:content-[''] after:absolute after:bottom-full after:right-4 after:border-8 after:border-transparent after:border-b-[#0F9D74]">
+        Try creating your first New Habit here! Once created, you can organize them with category chips, and Export as JSON from the Data tab.
+      </div>
       <span className="text-5xl mb-4 block">🌱</span>
       <h3 className="text-lg font-bold text-[#1B2430] mb-2">No habits yet</h3>
       <p className="text-sm text-[#475569] mb-6 max-w-xs mx-auto">
@@ -98,10 +119,12 @@ export default function App() {
       <button
         type="button"
         onClick={() => setShowForm(true)}
-        className="btn-primary px-6 py-3 font-semibold"
+        className="btn-primary px-6 py-3 font-semibold relative"
         data-action="open-habit-form"
       >
         Create habit
+        <div className="absolute -top-3 -right-3 w-4 h-4 rounded-full bg-[#FFB020] animate-ping" />
+        <div className="absolute -top-3 -right-3 w-4 h-4 rounded-full bg-[#FFB020]" />
       </button>
     </div>
   );
@@ -132,7 +155,7 @@ export default function App() {
               </button>
               <button
                 type="button"
-                onClick={() => setView("stats")}
+                onClick={() => handleSetView("stats")}
                 aria-current={view === "stats" ? "page" : undefined}
                 className={`btn-nav ${view === "stats" ? "btn-nav-active" : ""}`}
                 data-nav="stats"
@@ -141,7 +164,7 @@ export default function App() {
               </button>
               <button
                 type="button"
-                onClick={() => setView("import")}
+                onClick={() => handleSetView("import")}
                 aria-current={view === "import" ? "page" : undefined}
                 className={`btn-nav ${view === "import" ? "btn-nav-active" : ""}`}
                 data-nav="import"
@@ -173,11 +196,11 @@ export default function App() {
             ) : (
               <>
                 {/* Active habits */}
-                <div className="space-y-2">
+                <div className="space-y-2" ref={activeListRef}>
                   {activeHabits.map((habit) => (
                     <div
                       key={habit.id}
-                      className={dragOverId === habit.id ? "drag-over rounded-lg" : ""}
+                      className={dragOverId === habit.id ? "drag-over rounded-[8px]" : ""}
                       onDragOver={(e) => handleDragOver(e, habit.id)}
                       onDrop={(e) => handleDrop(e, habit.id)}
                     >
@@ -198,11 +221,11 @@ export default function App() {
                     <h3 className="text-sm font-semibold text-[#64748B] mb-2 px-1">
                       Paused Habits ({pausedHabits.length})
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-2" ref={pausedListRef}>
                       {pausedHabits.map((habit) => (
                         <div
                           key={habit.id}
-                          className={dragOverId === habit.id ? "drag-over rounded-lg" : ""}
+                          className={dragOverId === habit.id ? "drag-over rounded-[8px]" : ""}
                           onDragOver={(e) => handleDragOver(e, habit.id)}
                           onDrop={(e) => handleDrop(e, habit.id)}
                         >
@@ -232,7 +255,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setShowForm(true)}
-                    className="w-full min-h-12 py-3 border-2 border-dashed border-[#E2E8F0] rounded-lg text-sm font-medium text-[#475569] hover:border-[#0F9D74] hover:text-[#0F9D74] transition-colors"
+                    className="w-full min-h-12 py-3 border-2 border-dashed border-[#E2E8F0] rounded-[8px] text-sm font-medium text-[#475569] hover:border-[#0F9D74] hover:text-[#0F9D74] transition-colors"
                     data-action="open-habit-form"
                   >
                     + New habit

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import {
   appStateAtom,
@@ -14,9 +14,57 @@ export default function ImportExport() {
   const [, addToast] = useAtom(addToastAtom);
   const [, setRecovery] = useAtom(recoveryAtom);
   const fileRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingData, setPendingData] = useState<unknown>(null);
   const [importResult, setImportResult] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (showConfirm) {
+      // Focus dialog logic here if needed
+      setTimeout(() => {
+         const firstFocusable = dialogRef.current?.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+         if (firstFocusable) (firstFocusable as HTMLElement).focus();
+      }, 0);
+    } else {
+      triggerRef.current?.focus();
+    }
+  }, [showConfirm]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!showConfirm) return;
+
+      if (e.key === 'Escape') {
+        setShowConfirm(false);
+        setPendingData(null);
+      } else if (e.key === 'Tab') {
+        const focusableElements = dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusableElements && focusableElements.length > 0) {
+          const firstElement = focusableElements[0];
+          const lastElement = focusableElements[focusableElements.length - 1];
+
+          if (e.shiftKey) { // if shift+tab and on first element
+            if (document.activeElement === firstElement) {
+              lastElement.focus();
+              e.preventDefault();
+            }
+          } else { // if tab and on last element
+            if (document.activeElement === lastElement) {
+              firstElement.focus();
+              e.preventDefault();
+            }
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showConfirm]);
 
   const handleExport = () => {
     const data = {
@@ -92,7 +140,7 @@ export default function ImportExport() {
   };
 
   return (
-    <div className="bg-[#FFFFFF] rounded-lg p-4 md:p-6">
+    <div className="bg-[#FFFFFF] rounded-[8px] p-4 md:p-6">
       <h2 className="text-lg font-bold text-[#1B2430] mb-4">Export and import</h2>
 
       <div className="flex flex-wrap gap-3 mb-3">
@@ -107,6 +155,7 @@ export default function ImportExport() {
 
         <button
           type="button"
+          ref={triggerRef}
           onClick={() => fileRef.current?.click()}
           className="btn-secondary px-4 py-2 text-sm font-medium"
           data-action="import-trigger"
@@ -135,7 +184,7 @@ export default function ImportExport() {
       </div>
 
       {importResult && (
-        <div role="alert" aria-live="assertive" className="mt-3 px-3 py-2 bg-[#F4F7F6] rounded-lg text-sm text-[#1B2430]">
+        <div role="alert" aria-live="assertive" className="mt-3 px-3 py-2 bg-[#F4F7F6] rounded-[8px] text-sm text-[#1B2430]">
           {importResult}
         </div>
       )}
@@ -146,8 +195,11 @@ export default function ImportExport() {
           onClick={() => setShowConfirm(false)}
         >
           <div
-            className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl"
+            ref={dialogRef}
+            className="bg-white rounded-[8px] p-6 max-w-md mx-4 shadow-xl"
             onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
           >
             <h3 className="text-lg font-bold text-[#1B2430] mb-2">Confirm import</h3>
             <p className="text-sm text-[#475569] mb-4">

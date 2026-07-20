@@ -27,7 +27,7 @@ export default function HabitForm({ onClose }: HabitFormProps) {
     const trimmed = name.trim();
     if (!trimmed) {
       setNameError(true);
-      formRef.current?.classList.add("shake");
+      formRef.current?.classList.remove("shake"); void formRef.current?.offsetWidth; formRef.current?.classList.add("shake");
       setTimeout(() => formRef.current?.classList.remove("shake"), 500);
       return;
     }
