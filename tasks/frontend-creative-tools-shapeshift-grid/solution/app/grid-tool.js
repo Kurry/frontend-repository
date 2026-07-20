@@ -293,6 +293,7 @@
       const nh = img.naturalHeight * scale;
       t.drawImage(img, (cols - nw) / 2, (rows - nh) / 2, nw, nh);
       pushHistory();
+      gpDisableSlider();
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           const p = t.getImageData(x, y, 1, 1).data;
@@ -338,6 +339,7 @@
     t.imageSmoothingEnabled = false;
     t.drawImage(cameraFeed, sx, sy, side, side, 0, 0, cols, rows);
     pushHistory();
+    gpDisableSlider();
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const p = t.getImageData(x, y, 1, 1).data;
