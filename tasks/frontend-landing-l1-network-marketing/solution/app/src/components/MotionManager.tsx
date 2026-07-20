@@ -11,43 +11,27 @@ export default function MotionManager() {
 
     // --- Lenis Smooth Scrolling ---
     let lenis: Lenis | undefined;
-    let lenisRafId: number | undefined;
-    const syncScrollTrigger = () => ScrollTrigger.update();
-    const startLenis = () => {
-      if (lenis || window.innerWidth < 1024) return;
+    if (!reduceMotion && window.innerWidth >= 1024) {
       lenis = new Lenis({
         lerp: 0.1,
         smoothWheel: true,
       });
-      lenis.on('scroll', syncScrollTrigger);
 
       function raf(time: number) {
         lenis?.raf(time);
-        lenisRafId = requestAnimationFrame(raf);
+        requestAnimationFrame(raf);
       }
-      lenisRafId = requestAnimationFrame(raf);
-    };
-    const stopLenis = () => {
-      if (lenisRafId !== undefined) cancelAnimationFrame(lenisRafId);
-      lenisRafId = undefined;
-      lenis?.off('scroll', syncScrollTrigger);
-      lenis?.destroy();
-      lenis = undefined;
-    };
-    const syncLenisForViewport = () => {
-      if (window.innerWidth >= 1024) startLenis();
-      else stopLenis();
-    };
+      requestAnimationFrame(raf);
+    }
 
     if (reduceMotion) {
       document.documentElement.classList.add('is-mounted');
+      const headline = document.getElementById('eventsHeadline');
+      if (headline) headline.textContent = "RIDGE GLOBAL EVENTS";
       const blurb = document.getElementById('eventsBlurb');
       if (blurb) blurb.classList.add('opacity-100');
-      gsap.set('.blurb-line', { y: '0%' });
       return;
     }
-    syncLenisForViewport();
-    window.addEventListener('resize', syncLenisForViewport);
 
     // --- Page Load Entrance Sequence ---
     const entranceTimeline = gsap.timeline();
@@ -59,15 +43,13 @@ export default function MotionManager() {
 
     // Mount sequence
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        document.documentElement.classList.add('is-mounted');
+      document.documentElement.classList.add('is-mounted');
 
-        entranceTimeline
-          .to('#chrome', { yPercent: 0, duration: 1.7, ease: "power4.inOut" }, 0.85)
-          .to('.bento-mission', { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.8, ease: "power4.inOut" }, 0.9)
-          .to('.bento-clock', { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.8, ease: "power4.inOut" }, 1.05)
-          .to('.hero-plane', { clipPath: 'inset(0% 0 0 0)', scale: 1, duration: 1.9, ease: "power4.inOut" }, 1.35);
-      });
+      entranceTimeline
+        .to('#chrome', { yPercent: 0, duration: 1.7, ease: "power4.inOut" }, 0.85)
+        .to('.bento-mission', { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.8, ease: "power4.inOut" }, 0.9)
+        .to('.bento-clock', { clipPath: 'inset(0% 0 0 0)', y: 0, duration: 1.8, ease: "power4.inOut" }, 1.05)
+        .to('.hero-plane', { clipPath: 'inset(0% 0 0 0)', scale: 1, duration: 1.9, ease: "power4.inOut" }, 1.35);
     });
 
     // --- Why Ridge Sticky Pile ---
@@ -92,11 +74,6 @@ export default function MotionManager() {
     window.addEventListener('resize', updateSticky);
 
     // --- Get Started Trio Rise ---
-    const showTrioOnDesktop = () => {
-      if (window.innerWidth >= 1024) {
-        gsap.set('.trio-card', { y: '0%', opacity: 1 });
-      }
-    };
     if (window.innerWidth < 1024) {
        gsap.set('.trio-card', { y: '50%', opacity: 0 });
        ScrollTrigger.create({
@@ -113,15 +90,30 @@ export default function MotionManager() {
          }
        });
     }
-    window.addEventListener('resize', showTrioOnDesktop);
 
     // --- Global Events Text Decode ---
+    const headlineText = "RIDGE GLOBAL EVENTS";
     const headlineElement = document.getElementById('eventsHeadline');
     const blurbElement = document.getElementById('eventsBlurb');
     const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+{}|:<>?";
 
     if (headlineElement && blurbElement) {
        let animated = false;
+
+       // Setup blurb lines (wrapped for reveal)
+       const lines = ["Join our worldwide network", "of developers, founders, and", "enterprise partners building", "the future of institutional infrastructure."];
+       blurbElement.innerHTML = '';
+       lines.forEach(line => {
+         const wrapper = document.createElement('div');
+         wrapper.style.overflow = 'hidden';
+         const text = document.createElement('span');
+         text.textContent = line;
+         text.style.display = 'block';
+         text.style.transform = 'translateY(-100%)';
+         text.classList.add('blurb-line');
+         wrapper.appendChild(text);
+         blurbElement.appendChild(wrapper);
+       });
 
        ScrollTrigger.create({
          trigger: '#events',
@@ -131,8 +123,15 @@ export default function MotionManager() {
            animated = true;
 
            // Headline Decode
-           const spanArray = Array.from(headlineElement.querySelectorAll<HTMLElement>('[data-decode-character]'))
-             .map(el => ({ el, finalChar: el.dataset.decodeCharacter ?? '' }));
+           const spanArray = headlineText.split('').map(char => {
+             const span = document.createElement('span');
+             span.style.opacity = '0';
+             span.setAttribute('aria-hidden', 'true');
+             headlineElement.appendChild(span);
+             return { el: span, finalChar: char };
+           });
+           // Set accessible name fully, hide visual chars from screen readers.
+           headlineElement.setAttribute('aria-label', headlineText);
 
            spanArray.forEach((item, index) => {
              const startDelay = index * 60;
@@ -171,11 +170,9 @@ export default function MotionManager() {
     }
 
     return () => {
-      stopLenis();
+      lenis?.destroy();
       ScrollTrigger.getAll().forEach(t => t.kill());
       window.removeEventListener('resize', updateSticky);
-      window.removeEventListener('resize', syncLenisForViewport);
-      window.removeEventListener('resize', showTrioOnDesktop);
     };
   }, []);
 

@@ -1,10 +1,26 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { RidgeEvent, addEvent, updateEvent } from '../store';
-import { eventSchema } from '../schemas';
+import { z } from 'zod';
+import { RidgeEvent, addEvent, updateEvent, EventStatus, EventCategory } from '../store';
 
-type FormValues = import('zod').infer<typeof eventSchema>;
+const schema = z.object({
+  title: z.string().min(2, "Title must be at least 2 characters"),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Must be YYYY-MM-DD"),
+  city: z.string().min(2, "City must be at least 2 characters"),
+  category: z.enum(['Summit', 'Meetup', 'Workshop', 'Hackathon', 'Webinar'], { errorMap: () => ({ message: "Invalid category" }) }),
+  status: z.enum(['upcoming', 'featured', 'past'], { errorMap: () => ({ message: "Invalid status" }) }),
+  featured: z.boolean(),
+}).refine(data => {
+  if (data.featured) return data.status === 'featured';
+  if (data.status === 'featured') return data.featured === true;
+  return true;
+}, {
+  message: "If featured is true, status must be featured, and vice versa.",
+  path: ["featured"] // Put error on featured field
+});
+
+type FormValues = z.infer<typeof schema>;
 
 interface Props {
   eventToEdit: RidgeEvent | null;
@@ -12,10 +28,8 @@ interface Props {
 }
 
 export default function EventForm({ eventToEdit, onClose }: Props) {
-  const submittingRef = useRef(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, formState: { errors, isValid }, reset, watch, setValue, trigger } = useForm<FormValues>({
-    resolver: zodResolver(eventSchema),
+    resolver: zodResolver(schema),
     mode: 'onChange',
     defaultValues: eventToEdit ? {
       title: eventToEdit.title,
@@ -36,42 +50,15 @@ export default function EventForm({ eventToEdit, onClose }: Props) {
 
   const featured = watch('featured');
   const status = watch('status');
-  const validationMessage = Object.values(errors)
-    .map(error => error?.message)
-    .filter(Boolean)
-    .join('. ');
-
-  useEffect(() => {
-    reset(eventToEdit ? {
-      title: eventToEdit.title,
-      date: eventToEdit.date,
-      city: eventToEdit.city,
-      category: eventToEdit.category,
-      status: eventToEdit.status,
-      featured: eventToEdit.featured,
-    } : {
-      title: '',
-      date: '',
-      city: '',
-      category: 'Meetup',
-      status: 'upcoming',
-      featured: false,
-    });
-    submittingRef.current = false;
-    setIsSubmitting(false);
-    void trigger();
-  }, [eventToEdit, reset, trigger]);
 
   // Cross-field logic enforcing during edit
   useEffect(() => {
-    if (featured && status !== 'featured') setValue('status', 'featured', { shouldValidate: true });
-    if (!featured && status === 'featured') setValue('status', 'upcoming', { shouldValidate: true });
-  }, [featured, setValue, status]);
+    if (featured && status !== 'featured') setValue('status', 'featured');
+    if (!featured && status === 'featured') setValue('status', 'upcoming');
+    trigger();
+  }, [featured, setValue, status, trigger]);
 
   const onSubmit = (data: FormValues) => {
-    if (submittingRef.current) return;
-    submittingRef.current = true;
-    setIsSubmitting(true);
     if (eventToEdit) {
       updateEvent({ ...data, id: eventToEdit.id });
     } else {
@@ -90,7 +77,6 @@ export default function EventForm({ eventToEdit, onClose }: Props) {
         <h2 className="text-2xl font-bold display-font mb-6">{eventToEdit ? 'Edit Event' : 'Create Event'}</h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <p className="sr-only" aria-live="polite" aria-atomic="true">{validationMessage}</p>
           <div>
             <label htmlFor="title" className="block text-sm font-medium mb-1">Title</label>
             <input
@@ -99,7 +85,7 @@ export default function EventForm({ eventToEdit, onClose }: Props) {
               className={`input input-bordered w-full notch-br ${errors.title ? 'input-error' : ''}`}
               {...register('title')}
             />
-            {errors.title && <span className="text-error text-sm mt-1">{errors.title.message}</span>}
+            {errors.title && <span className="text-error text-sm mt-1" role="alert" aria-live="polite">{errors.title.message}</span>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -111,7 +97,7 @@ export default function EventForm({ eventToEdit, onClose }: Props) {
                 className={`input input-bordered w-full notch-br ${errors.date ? 'input-error' : ''}`}
                 {...register('date')}
               />
-              {errors.date && <span className="text-error text-sm mt-1">{errors.date.message}</span>}
+              {errors.date && <span className="text-error text-sm mt-1" role="alert" aria-live="polite">{errors.date.message}</span>}
             </div>
             <div>
               <label htmlFor="city" className="block text-sm font-medium mb-1">City</label>
@@ -121,7 +107,7 @@ export default function EventForm({ eventToEdit, onClose }: Props) {
                 className={`input input-bordered w-full notch-br ${errors.city ? 'input-error' : ''}`}
                 {...register('city')}
               />
-              {errors.city && <span className="text-error text-sm mt-1">{errors.city.message}</span>}
+              {errors.city && <span className="text-error text-sm mt-1" role="alert" aria-live="polite">{errors.city.message}</span>}
             </div>
           </div>
 
@@ -150,11 +136,11 @@ export default function EventForm({ eventToEdit, onClose }: Props) {
             <input id="featured" type="checkbox" className="checkbox notch-br" {...register('featured')} />
             <label htmlFor="featured" className="text-sm cursor-pointer">Featured Event</label>
           </div>
-          {errors.featured && <span className="text-error text-sm block">{errors.featured.message}</span>}
+          {errors.featured && <span className="text-error text-sm block" role="alert" aria-live="polite">{errors.featured.message}</span>}
 
           <div className="flex justify-end gap-3 mt-8 pt-4 border-t border-white/10">
             <button type="button" className="btn btn-ghost notch-br" onClick={onClose}>Cancel</button>
-            <button type="submit" className="btn btn-primary notch-br" disabled={!isValid || isSubmitting}>
+            <button type="submit" className="btn btn-primary notch-br" disabled={!isValid}>
               {eventToEdit ? 'Save Changes' : 'Create Event'}
             </button>
           </div>

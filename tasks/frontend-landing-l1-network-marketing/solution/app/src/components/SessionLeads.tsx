@@ -2,14 +2,20 @@ import React, { useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { $leads, $theme, undoLastLead } from '../store';
 import { Download, Copy, ArrowUUpLeft } from 'phosphor-react';
-import { buildLeadsJson, copyArtifactText } from '../artifacts';
 
 export default function SessionLeads() {
   const leads = useStore($leads);
   const theme = useStore($theme);
-  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle');
+  const [copied, setCopied] = useState(false);
 
-  const getExportData = () => buildLeadsJson(leads, theme);
+  const getExportData = () => {
+    return JSON.stringify({
+      version: 1,
+      theme,
+      counts: { total: leads.length },
+      leads
+    }, null, 2);
+  };
 
   const handleDownload = () => {
     const blob = new Blob([getExportData()], { type: 'application/json' });
@@ -22,20 +28,9 @@ export default function SessionLeads() {
   };
 
   const handleCopy = async () => {
-    try {
-      await copyArtifactText(getExportData());
-      setCopyStatus('idle');
-      requestAnimationFrame(() => {
-        setCopyStatus('copied');
-        setTimeout(() => setCopyStatus('idle'), 3000);
-      });
-    } catch {
-      setCopyStatus('idle');
-      requestAnimationFrame(() => {
-        setCopyStatus('error');
-        setTimeout(() => setCopyStatus('idle'), 3000);
-      });
-    }
+    await navigator.clipboard.writeText(getExportData());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 3000);
   };
 
   return (
@@ -49,7 +44,7 @@ export default function SessionLeads() {
           <div className="flex gap-2">
              <button
                className="btn btn-sm btn-ghost notch-br gap-2"
-               disabled={leads.length === 0}
+               disabled={leads.length < 2}
                onClick={undoLastLead}
              >
                <ArrowUUpLeft size={16} /> Undo last lead
@@ -58,7 +53,7 @@ export default function SessionLeads() {
                className="btn btn-sm btn-outline notch-br gap-2 text-current border-current"
                onClick={handleCopy}
              >
-               <Copy size={16} /> {copyStatus === 'copied' ? 'Copied' : copyStatus === 'error' ? 'Copy failed' : 'Copy leads JSON'}
+               <Copy size={16} /> {copied ? 'Copied' : 'Copy leads JSON'}
              </button>
              <button
                className="btn btn-sm btn-primary notch-br gap-2"
@@ -93,7 +88,7 @@ export default function SessionLeads() {
 
         {/* ARIA live region for copied announcement */}
         <div aria-live="polite" className="sr-only">
-          {copyStatus === 'copied' ? 'Copied leads JSON' : copyStatus === 'error' ? 'Unable to copy leads JSON' : ''}
+          {copied ? 'Copied' : ''}
         </div>
       </div>
     </section>

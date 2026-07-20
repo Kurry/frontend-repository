@@ -54,7 +54,7 @@ export default function Header() {
               type="button"
               className="theme-pill btn btn-sm btn-outline rounded-full w-12 flex items-center justify-center p-0 overflow-hidden"
               id="themeToggle"
-              aria-label={`Current theme: ${theme}. Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+              aria-label={theme === 'dark' ? "Switch to light theme" : "Switch to dark theme"}
               onClick={toggleTheme}
             >
                {theme === 'dark' ? <Moon size={16} /> : <Sun size={16} />}

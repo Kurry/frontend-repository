@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useLayoutEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import {
   $events, $eventsManagerOpen, $eventsFilter, $eventsSort,
@@ -19,10 +19,7 @@ export default function EventsManager() {
 
   const [editingEvent, setEditingEvent] = useState<RidgeEvent | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [exitingIds, setExitingIds] = useState<string[]>([]);
   const firstFocusRef = useRef<HTMLButtonElement>(null);
-  const rowRefs = useRef(new Map<string, HTMLTableRowElement>());
-  const previousRows = useRef(new Map<string, DOMRect>());
 
   useEffect(() => {
     if (isOpen) {
@@ -57,34 +54,6 @@ export default function EventsManager() {
     past: events.filter(e => e.status === 'past').length,
   };
 
-  useLayoutEffect(() => {
-    const currentRows = new Map<string, DOMRect>();
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    rowRefs.current.forEach((row, id) => {
-      const next = row.getBoundingClientRect();
-      const previous = previousRows.current.get(id);
-      currentRows.set(id, next);
-      if (reduceMotion) return;
-      if (!previous) {
-        row.animate(
-          [{ opacity: 0, transform: 'translateY(-10px) scale(0.98)' }, { opacity: 1, transform: 'translateY(0) scale(1)' }],
-          { duration: 260, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
-        );
-      } else {
-        const deltaY = previous.top - next.top;
-        if (Math.abs(deltaY) > 1) {
-          row.animate(
-            [{ transform: `translateY(${deltaY}px)` }, { transform: 'translateY(0)' }],
-            { duration: 260, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
-          );
-        }
-      }
-    });
-
-    previousRows.current = currentRows;
-  }, [filteredEvents]);
-
   const handleToggleSort = (field: 'date' | 'title') => {
     if (sort.by === field) {
       $eventsSort.set({ by: field, direction: sort.direction === 'asc' ? 'desc' : 'asc' });
@@ -109,24 +78,10 @@ export default function EventsManager() {
     }
   };
 
-  const handleDeleteSelected = async () => {
-    if (selectedIds.length === 0 || exitingIds.length > 0) return;
-    const ids = [...selectedIds];
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduceMotion) {
-      setExitingIds(ids);
-      const animations = ids.flatMap(id => {
-        const row = rowRefs.current.get(id);
-        if (!row) return [];
-        return [row.animate(
-          [{ opacity: 1, transform: 'translateX(0) scale(1)' }, { opacity: 0, transform: 'translateX(18px) scale(0.98)' }],
-          { duration: 180, easing: 'ease-in', fill: 'forwards' },
-        ).finished];
-      });
-      await Promise.allSettled(animations);
+  const handleDeleteSelected = () => {
+    if (selectedIds.length > 0) {
+      deleteEvents(selectedIds);
     }
-    deleteEvents(ids);
-    setExitingIds([]);
   };
 
   if (!isOpen) return null;
@@ -248,15 +203,7 @@ export default function EventsManager() {
               </thead>
               <tbody>
                 {filteredEvents.map(event => (
-                  <tr
-                    key={event.id}
-                    ref={row => {
-                      if (row) rowRefs.current.set(event.id, row);
-                      else rowRefs.current.delete(event.id);
-                    }}
-                    className="hover:bg-white/5 transition-colors group"
-                    aria-busy={exitingIds.includes(event.id) || undefined}
-                  >
+                  <tr key={event.id} className="hover:bg-white/5 transition-colors group">
                     <td>
                       <label>
                         <input type="checkbox" className="checkbox checkbox-sm notch-br"

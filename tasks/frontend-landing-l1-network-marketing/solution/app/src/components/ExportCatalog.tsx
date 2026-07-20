@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { $exportCatalogOpen, $events, $leads, $theme, loadCatalog } from '../store';
 import { X, Copy, Download, UploadSimple } from 'phosphor-react';
-import { buildCatalogJson, buildEventsIcs, copyArtifactText } from '../artifacts';
 
 export default function ExportCatalog() {
   const isOpen = useStore($exportCatalogOpen);
@@ -28,34 +27,40 @@ export default function ExportCatalog() {
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    const handleWebMcpImport = (event: Event) => {
-      const detail = (event as CustomEvent).detail;
-      if (!detail || detail.format !== 'declared-catalog') return;
-      const success = loadCatalog(detail.payload);
-      $exportCatalogOpen.set(true);
-      if (success) {
-        setImportSuccess("Catalog loaded successfully");
-        setImportError(null);
-      } else {
-        setImportError("Invalid catalog format");
-        setImportSuccess(null);
-      }
-      detail.result = success
-        ? { success: true }
-        : { success: false, error: "Invalid catalog format" };
-    };
-    document.addEventListener('webmcp:catalog-import', handleWebMcpImport);
-    return () => document.removeEventListener('webmcp:catalog-import', handleWebMcpImport);
-  }, []);
-
   if (!isOpen) return null;
 
-  const jsonPayload = buildCatalogJson(events, leads, theme);
-  const icsPayload = buildEventsIcs(events);
+  const jsonPayload = JSON.stringify({
+    version: 1,
+    theme,
+    counts: {
+      events: events.length,
+      leads: leads.length,
+      upcoming: events.filter(e => e.status === 'upcoming').length,
+      featured: events.filter(e => e.status === 'featured').length,
+      past: events.filter(e => e.status === 'past').length
+    },
+    events,
+    leads
+  }, null, 2);
+
+  const icsPayload = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Ridge//Events//EN',
+    ...events.map(e => [
+      'BEGIN:VEVENT',
+      `UID:${e.id}@ridge`,
+      `DTSTART:${e.date.replace(/-/g, '')}T000000Z`,
+      `SUMMARY:${e.title}`,
+      `LOCATION:${e.city}`,
+      `DESCRIPTION:${e.category} - ${e.status}`,
+      'END:VEVENT'
+    ].join('\r\n')),
+    'END:VCALENDAR'
+  ].join('\r\n');
 
   const copyText = async (text: string, setter: (val: boolean) => void) => {
-    await copyArtifactText(text);
+    await navigator.clipboard.writeText(text);
     setter(true);
     setTimeout(() => setter(false), 3000);
   };
@@ -169,7 +174,8 @@ export default function ExportCatalog() {
 
         {/* Global Aria Live */}
         <div aria-live="polite" className="sr-only">
-          {copiedJson || copiedIcs ? 'Copied' : ''}
+          {copiedJson ? 'Copied JSON preview' : ''}
+          {copiedIcs ? 'Copied ICS preview' : ''}
         </div>
       </div>
     </div>

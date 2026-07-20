@@ -1,5 +1,4 @@
 import { atom, map } from 'nanostores';
-import { eventSchema, leadSchema } from './schemas';
 
 export type EventStatus = 'upcoming' | 'featured' | 'past';
 export type EventCategory = 'Summit' | 'Meetup' | 'Workshop' | 'Hackathon' | 'Webinar';
@@ -103,7 +102,6 @@ export function updateEvent(updated: RidgeEvent) {
 }
 
 export function deleteEvents(ids: string[]) {
-  if (ids.length === 0) return;
   saveHistoryState();
   const current = $events.get();
   $events.set(current.filter(e => !ids.includes(e.id)));
@@ -141,49 +139,23 @@ export function resetSessionToSeed() {
 export function loadCatalog(jsonStr: string): boolean {
   try {
     const data = JSON.parse(jsonStr);
-    if (!data.version || !Array.isArray(data.events) || !Array.isArray(data.leads) || !data.counts) {
+    if (!data.version || !data.events || !data.leads || !data.counts) {
       throw new Error("Missing keys");
     }
-    if (data.theme !== 'light' && data.theme !== 'dark') {
-      throw new Error("Invalid theme");
+
+    // Cross-field validation (featured == true <-> status == 'featured')
+    for (const e of data.events) {
+       if (e.featured && e.status !== 'featured') throw new Error("Invalid cross-field: featured but status not featured");
+       if (e.status === 'featured' && !e.featured) throw new Error("Invalid cross-field: status featured but not featured");
+       // Basic enum check
+       if (!['upcoming', 'featured', 'past'].includes(e.status)) throw new Error("Invalid status enum");
+       if (!['Summit', 'Meetup', 'Workshop', 'Hackathon', 'Webinar'].includes(e.category)) throw new Error("Invalid category enum");
     }
 
-    const eventIds = new Set<string>();
-    const events = data.events.map((event: unknown) => {
-      const id = typeof (event as RidgeEvent | null)?.id === 'string' ? (event as RidgeEvent).id.trim() : '';
-      if (!id || eventIds.has(id)) throw new Error("Event ids must be non-empty and unique");
-      const parsed = eventSchema.safeParse(event);
-      if (!parsed.success) throw new Error("Invalid event shape");
-      eventIds.add(id);
-      return { ...parsed.data, id };
-    });
-    const leads = data.leads.map((lead: unknown) => {
-      const parsed = leadSchema.safeParse(lead);
-      if (!parsed.success) throw new Error("Invalid lead shape");
-      return parsed.data;
-    });
-    const expectedCounts = {
-      events: events.length,
-      leads: leads.length,
-      upcoming: events.filter(event => event.status === 'upcoming').length,
-      featured: events.filter(event => event.status === 'featured').length,
-      past: events.filter(event => event.status === 'past').length,
-    };
-    if (
-      typeof data.counts !== 'object' ||
-      data.counts === null ||
-      Object.entries(expectedCounts).some(([key, value]) => data.counts[key] !== value)
-    ) {
-      throw new Error("Catalog counts do not match contents");
+    $events.set(data.events);
+    if (Array.isArray(data.leads)) {
+      $leads.set(data.leads);
     }
-
-    $events.set(events);
-    $leads.set(leads);
-    $theme.set(data.theme);
-    $eventsFilter.set({ status: '', category: '' });
-    $selectedEventIds.set([]);
-    $historyUndo.set([]);
-    $historyRedo.set([]);
     return true;
   } catch (e) {
     console.error(e);

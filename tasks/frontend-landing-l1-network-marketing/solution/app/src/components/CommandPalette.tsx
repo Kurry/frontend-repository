@@ -16,59 +16,32 @@ export default function CommandPalette() {
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
-  const dialogRef = useRef<HTMLDivElement>(null);
-  const openerRef = useRef<HTMLElement | null>(null);
 
   const filtered = destinations.filter(d => d.label.toLowerCase().includes(query.toLowerCase()));
 
   useEffect(() => {
     if (isOpen) {
-      openerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       setTimeout(() => inputRef.current?.focus(), 100);
       setQuery('');
       setActiveIndex(0);
-    } else if (openerRef.current) {
-      openerRef.current.focus();
-      openerRef.current = null;
     }
   }, [isOpen]);
-
-  const closePalette = () => {
-    $commandPaletteOpen.set(false);
-  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isOpen) return;
       if (e.key === 'Escape') {
-        e.preventDefault();
-        closePalette();
-      } else if (e.key === 'Tab') {
-        const focusable = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        ) ?? []);
-        if (focusable.length === 0) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (e.shiftKey && document.activeElement === first) {
-          e.preventDefault();
-          last.focus();
-        } else if (!e.shiftKey && document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
+        $commandPaletteOpen.set(false);
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
-        if (filtered.length === 0) return;
         setActiveIndex(prev => (prev + 1) % filtered.length);
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
-        if (filtered.length === 0) return;
         setActiveIndex(prev => (prev - 1 + filtered.length) % filtered.length);
       } else if (e.key === 'Enter' && filtered.length > 0) {
         e.preventDefault();
         filtered[activeIndex].action();
-        closePalette();
+        $commandPaletteOpen.set(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -79,7 +52,7 @@ export default function CommandPalette() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-black/60 backdrop-blur-sm transition-opacity" role="dialog" aria-modal="true">
-      <div ref={dialogRef} className="bg-surface w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-white/10 mx-4">
+      <div className="bg-surface w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-white/10 mx-4">
         <div className="flex items-center p-4 border-b border-white/10">
           <MagnifyingGlass size={20} className="text-gray-400 mr-3" />
           <input
@@ -100,7 +73,7 @@ export default function CommandPalette() {
                 <button
                   type="button"
                   className={`w-full text-left px-4 py-3 transition-colors focus:outline-none ${i === activeIndex ? 'bg-accent/20 text-accent font-medium' : 'hover:bg-white/5'}`}
-                  onClick={() => { dest.action(); closePalette(); }}
+                  onClick={() => { dest.action(); $commandPaletteOpen.set(false); }}
                   onMouseEnter={() => setActiveIndex(i)}
                 >
                   {dest.label}

@@ -35,7 +35,7 @@ export default function AppClient() {
       <footer>
         <SessionLeads />
         <div className="footer-band p-6 text-center text-sm text-gray-500 border-t border-white/5">
-          <p>Ridge L1 · Institutional infrastructure for the open network</p>
+          <p>Shape &amp; motion lab · placeholders only</p>
         </div>
       </footer>
       <EventsManager />

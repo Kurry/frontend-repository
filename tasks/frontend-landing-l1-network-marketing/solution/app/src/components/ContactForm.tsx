@@ -1,92 +1,34 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { addLead } from '../store';
-import { contactSchema } from '../schemas';
 
-type FormValues = import('zod').infer<typeof contactSchema>;
+const schema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email").refine(val => val.includes('@') && val.split('@')[1].includes('.'), "Must contain a domain segment"),
+  company: z.string().optional(),
+  interest: z.enum(['Build', 'Solutions', 'Community', 'Enterprise'], { errorMap: () => ({ message: "Invalid interest" }) }),
+  privacy_consent: z.literal(true, { errorMap: () => ({ message: "Consent is required" }) }),
+  message: z.string().optional().refine(val => !val || val.length >= 10, "Message must be at least 10 characters if provided"),
+});
 
-const EMPTY_FORM: FormValues = {
-  name: '',
-  email: '',
-  company: '',
-  interest: '' as FormValues['interest'],
-  privacy_consent: false as FormValues['privacy_consent'],
-  message: '',
-};
+type FormValues = z.infer<typeof schema>;
 
 export default function ContactForm() {
   const [success, setSuccess] = useState(false);
-  const submittingRef = useRef(false);
 
-  const { register, handleSubmit, formState: { errors, isValid }, reset, trigger } = useForm<FormValues>({
-    resolver: zodResolver(contactSchema),
+  const { register, handleSubmit, formState: { errors, isValid }, reset } = useForm<FormValues>({
+    resolver: zodResolver(schema),
     mode: 'onChange',
-    defaultValues: EMPTY_FORM,
   });
-  const validationMessage = Object.values(errors)
-    .map(error => error?.message)
-    .filter(Boolean)
-    .join('. ');
 
-  const showEmptyForm = useCallback(() => {
-    submittingRef.current = false;
-    setSuccess(false);
-    requestAnimationFrame(() => { void trigger(); });
-  }, [trigger]);
-
-  const onSubmit = useCallback((data: FormValues) => {
-    if (submittingRef.current) return false;
-    submittingRef.current = true;
+  const onSubmit = (data: FormValues) => {
     addLead(data);
     setSuccess(true);
     reset();
-    setTimeout(showEmptyForm, 5000);
-    return true;
-  }, [reset, showEmptyForm]);
-
-  useEffect(() => {
-    trigger();
-  }, [trigger]);
-
-  useEffect(() => {
-    const handleWebMcpForm = (event: Event) => {
-      const detail = (event as CustomEvent).detail;
-      if (!detail || detail.form !== 'contact') return;
-
-      if (detail.action === 'cancel' || detail.action === 'reset') {
-        reset(EMPTY_FORM);
-        showEmptyForm();
-        detail.result = { success: true };
-        return;
-      }
-
-      const payload = { ...EMPTY_FORM, ...(detail.payload || {}) };
-      reset(payload);
-      void trigger();
-      const parsed = contactSchema.safeParse(payload);
-      if (detail.action === 'validate') {
-        detail.result = parsed.success
-          ? { success: true, valid: true }
-          : { success: true, valid: false, errors: parsed.error.flatten().fieldErrors };
-        return;
-      }
-      if (detail.action !== 'submit') {
-        detail.result = { success: false, error: 'Unknown form action' };
-        return;
-      }
-      if (!parsed.success) {
-        detail.result = { success: false, errors: parsed.error.flatten().fieldErrors };
-        return;
-      }
-      detail.result = onSubmit(parsed.data)
-        ? { success: true }
-        : { success: false, error: 'Contact form submission is already in progress' };
-    };
-
-    document.addEventListener('webmcp:form', handleWebMcpForm);
-    return () => document.removeEventListener('webmcp:form', handleWebMcpForm);
-  }, [onSubmit, reset, showEmptyForm, trigger]);
+    setTimeout(() => setSuccess(false), 5000);
+  };
 
   return (
     <section className="contact chapter py-24 bg-void relative z-20" id="contact" aria-label="Contact">
@@ -101,12 +43,11 @@ export default function ContactForm() {
                </div>
                <h3 className="text-2xl display-font font-bold mb-2">Message Sent</h3>
                <p className="text-gray-400">We'll be in touch shortly.</p>
-               <button className="btn btn-outline mt-8 notch-br text-current border-current" onClick={showEmptyForm}>Send another</button>
+               <button className="btn btn-outline mt-8 notch-br text-current border-current" onClick={() => setSuccess(false)}>Send another</button>
             </div>
           ) : null}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <p className="sr-only" aria-live="polite" aria-atomic="true">{validationMessage}</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium mb-2">Name</label>
@@ -116,7 +57,7 @@ export default function ContactForm() {
                   className={`input input-bordered w-full notch-br ${errors.name ? 'input-error' : ''}`}
                   {...register('name')}
                 />
-                {errors.name && <span className="text-error text-sm mt-1 block">{errors.name.message}</span>}
+                {errors.name && <span className="text-error text-sm mt-1 block" role="alert" aria-live="polite">{errors.name.message}</span>}
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-2">Email</label>
@@ -126,7 +67,7 @@ export default function ContactForm() {
                   className={`input input-bordered w-full notch-br ${errors.email ? 'input-error' : ''}`}
                   {...register('email')}
                 />
-                {errors.email && <span className="text-error text-sm mt-1 block">{errors.email.message}</span>}
+                {errors.email && <span className="text-error text-sm mt-1 block" role="alert" aria-live="polite">{errors.email.message}</span>}
               </div>
             </div>
 
@@ -149,7 +90,7 @@ export default function ContactForm() {
                   <option value="Community">Community</option>
                   <option value="Enterprise">Enterprise</option>
                 </select>
-                {errors.interest && <span className="text-error text-sm mt-1 block">{errors.interest.message}</span>}
+                {errors.interest && <span className="text-error text-sm mt-1 block" role="alert" aria-live="polite">{errors.interest.message}</span>}
               </div>
             </div>
 
@@ -160,7 +101,7 @@ export default function ContactForm() {
                 className={`textarea textarea-bordered w-full notch-br h-32 ${errors.message ? 'textarea-error' : ''}`}
                 {...register('message')}
               ></textarea>
-              {errors.message && <span className="text-error text-sm mt-1 block">{errors.message.message}</span>}
+              {errors.message && <span className="text-error text-sm mt-1 block" role="alert" aria-live="polite">{errors.message.message}</span>}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -168,7 +109,7 @@ export default function ContactForm() {
                 <input id="privacy_consent" type="checkbox" className="checkbox notch-br" {...register('privacy_consent')} />
                 <span className="text-sm">I agree to the privacy policy</span>
               </label>
-              {errors.privacy_consent && <span className="text-error text-sm block">{errors.privacy_consent.message}</span>}
+              {errors.privacy_consent && <span className="text-error text-sm block" role="alert" aria-live="polite">{errors.privacy_consent.message}</span>}
             </div>
 
             <button type="submit" className="btn btn-primary w-full notch-br" disabled={!isValid}>Submit</button>
