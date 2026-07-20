@@ -10,9 +10,15 @@
     "verify:build": "vite build"
   },
   "dependencies": {
+    "@ark-ui/solid": "^5.37.1",
+    "@felte/solid": "^1.2.14",
+    "@felte/validator-zod": "^1.0.18",
+    "@tabler/icons-solidjs": "^3.45.0",
+    "motion": "^12.42.2",
     "nostr-tools": "2.10.4",
     "solid-js": "1.9.3",
-    "tailwindcss": "4.0.9"
+    "tailwindcss": "4.0.9",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@tailwindcss/vite": "4.0.9",
