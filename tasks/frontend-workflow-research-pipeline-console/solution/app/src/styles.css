@@ -327,17 +327,22 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible { outline: 
   .mobile-header { position: fixed; inset: 0 0 auto 0; z-index: 30; display: flex; height: 54px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); background: rgba(250,251,252,.95); padding: 0 14px; backdrop-filter: blur(12px); }
   .mobile-header .brand { padding: 0; }
   .rollup-strip { top: 54px; min-height: 58px; padding: 7px 14px; }
-  .rollup { padding: 0 9px; }
+  .rollup { padding: 0 9px; min-height: 44px; }
   .rollup-icon { width: 27px; height: 27px; }
   .rollup > div > span { font-size: 7px; }
   .rollup strong { font-size: 12px; }
   .rollup em { display: none; }
-  .canvas { padding: 0 14px 36px; }
+  .canvas { padding: 0 14px 36px; overflow-x: hidden; }
   .view { padding-top: 22px; }
   .submission-layout { grid-template-columns: 1fr; }
   .preview-panel { position: static; }
   .preview-panel pre { min-height: 180px; }
   .dataset-grid { grid-template-columns: 1fr 1fr; }
+  .nav-item, .mantine-Button-root, .mantine-Select-root, .mantine-TextInput-root, .mantine-NumberInput-root { min-height: 44px; }
+  .board-toolbar { overflow-x: auto; white-space: nowrap; }
+  .table-scroll { overflow-x: auto; white-space: nowrap; }
+  .run-strip { flex-direction: column; }
+  .dataset-card { flex-direction: column; }
 }
 
 @media (max-width: 560px) {
