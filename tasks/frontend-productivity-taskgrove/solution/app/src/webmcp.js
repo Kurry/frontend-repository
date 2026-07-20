@@ -39,22 +39,10 @@ function nodeSummary(node) {
   return {
     id: node.id,
     title: node.title,
-    status: node.status ?? (node.completed ? 'done' : 'todo'),
-    priority: node.priority ?? 'medium',
-    dueDate: node.dueDate ?? '',
     completed: node.completed,
     collapsed: node.collapsed,
     tags: node.tags,
     childCount: node.children.length,
-  };
-}
-
-function taskPayload(node) {
-  return {
-    title: node.title,
-    status: node.status ?? (node.completed ? 'done' : 'todo'),
-    priority: node.priority ?? 'medium',
-    dueDate: node.dueDate ?? '',
   };
 }
 
@@ -65,29 +53,35 @@ function entityCreate(args) {
   const status = args.status != null ? String(args.status) : 'todo';
   const priority = args.priority != null ? String(args.priority) : 'medium';
   const dueDate = args.dueDate != null ? String(args.dueDate) : '';
-  const payload = { title, status, priority, dueDate };
+  const parsed = TaskUpsertSchema.safeParse({ title, status, priority, dueDate });
 
   const parentId = args.parentId != null ? String(args.parentId) : null;
-  const parsed = TaskUpsertSchema.safeParse(payload);
   if (!parsed.success) {
-    return {
-      ok: false,
-      error: parsed.error.issues.map(issue => `${issue.path.join('.')}: ${issue.message}`).join(', '),
-    };
+    const error = parsed.error.issues.map(issue => issue.message).join(', ');
+    return { ok: false, error };
   }
+  const payload = parsed.data;
 
   if (!parentId) {
+    if (store.tasks.some(task => task.title === payload.title)) {
+      return { ok: false, error: 'a task with this name already exists' };
+    }
     const before = store.tasks.length;
-    const created = store.addRootTask(parsed.data);
-    return { ok: created, operation: 'create', scope: 'root', created, taskCount: store.tasks.length, delta: store.tasks.length - before };
+    const created = store.addRootTask(payload);
+    if (!created) return { ok: false, error: 'task could not be created' };
+    return { ok: true, operation: 'create', scope: 'root', created, taskCount: store.tasks.length, delta: store.tasks.length - before };
   }
 
   const parent = findNode(store.tasks, parentId);
   if (!parent) return { ok: false, error: `parent not found: ${parentId}` };
+  if (parent.children.some(child => child.title === payload.title)) {
+    return { ok: false, error: 'a sibling task with this name already exists' };
+  }
   const before = parent.children.length;
-  const created = store.addChildTask(parentId, parsed.data);
+  const created = store.addChildTask(parentId, payload);
+  if (!created) return { ok: false, error: 'child task could not be created' };
   const parentAfter = findNode(store.tasks, parentId);
-  return { ok: created, operation: 'create', scope: 'child', created, childCount: parentAfter ? parentAfter.children.length : before };
+  return { ok: true, operation: 'create', scope: 'child', created, childCount: parentAfter ? parentAfter.children.length : before };
 }
 
 function entitySelect(args) {
@@ -105,14 +99,14 @@ function entityUpdate(args) {
   if (field === 'title') {
     const title = String(args.value ?? '').trim();
     if (!title) return { ok: false, error: 'title value is required' };
-    const updated = store.updateTask(id, { ...taskPayload(node), title });
-    if (!updated) return { ok: false, error: 'task update failed validation' };
+    const updated = store.updateTaskTitle(id, title);
+    if (!updated) return { ok: false, error: 'title must be 1 to 120 characters' };
     return { ok: true, operation: 'update', field: 'title', node: nodeSummary(findAnywhere(id)) };
   }
   if (['status', 'priority', 'dueDate'].includes(field)) {
     const value = String(args.value ?? '');
-    const updated = store.updateTask(id, { ...taskPayload(node), [field]: value });
-    if (!updated) return { ok: false, error: 'task update failed validation' };
+    const updated = store.updateTask(id, { title: node.title, status: node.status, priority: node.priority, dueDate: node.dueDate, [field]: value });
+    if (!updated) return { ok: false, error: `invalid ${field} value` };
     return { ok: true, operation: 'update', field, node: nodeSummary(findAnywhere(id)) };
   }
   if (field === 'reparent') {
@@ -194,13 +188,13 @@ function tagDelete(args) {
 
 function browseOpen(args) {
   const destination = String(args.destination ?? '');
-  if (destination === 'root') {
-    store.zoomTo(null);
-    return { ok: true, operation: 'open', destination, zoomed: store.zoomedNodeId };
-  }
   if (destination === 'grove-panel') {
     store.showGrovePanel = true;
     return { ok: true, operation: 'open', destination, panelOpen: store.showGrovePanel };
+  }
+  if (destination === 'root') {
+    store.zoomTo(null);
+    return { ok: true, operation: 'open', destination, zoomed: store.zoomedNodeId };
   }
   const node = findNode(store.tasks, destination);
   if (!node) return { ok: false, error: `unknown destination: ${destination}` };

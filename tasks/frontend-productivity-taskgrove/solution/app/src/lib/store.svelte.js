@@ -253,36 +253,52 @@ class TaskStore {
     let node = findNode(this.tasks, nodeId);
     if (!node) {
       for (const a of this.archive) {
-        node = findNode([a.branch], nodeId);
-        if (node) break;
+        const an = findNode([a.branch], nodeId);
+        if (an) {
+          node = an;
+          break;
+        }
       }
     }
     if (!node) return false;
-    const task = normalizeTaskInput({ ...node, title });
-    if (!task) return false;
+
+    const task = normalizeTaskInput({
+      title,
+      status: node.status,
+      priority: node.priority,
+      dueDate: node.dueDate,
+    });
+    if (!task) {
+      this.addToast('Task title must be 1 to 120 characters');
+      return false;
+    }
+
     node.title = task.title;
     this._save();
     return true;
   }
 
   updateTask(nodeId, input) {
-    const task = normalizeTaskInput(input);
-    if (!task) return false;
     let node = findNode(this.tasks, nodeId);
     if (!node) {
-      for (const entry of this.archive) {
-        node = findNode([entry.branch], nodeId);
+      for (const a of this.archive) {
+        node = findNode([a.branch], nodeId);
         if (node) break;
       }
     }
     if (!node) return false;
+
+    const task = normalizeTaskInput(input);
+    if (!task) {
+      this.addToast('Task fields are invalid');
+      return false;
+    }
+
     node.title = task.title;
     node.status = task.status;
     node.priority = task.priority;
     node.dueDate = task.dueDate;
-    node.completed = isLeaf(node)
-      ? task.status === 'done'
-      : getDescendantLeaves(node).every(leaf => leaf.completed);
+    node.completed = isLeaf(node) ? task.status === 'done' : completionPercent(node) >= 100;
     this._save();
     this.addToast('Task updated');
     return true;
@@ -399,22 +415,21 @@ class TaskStore {
 
   addTag(name, color) {
     const parsed = TagUpsertSchema.safeParse({
-      name: String(name ?? '').trim(),
+      name: String(name || '').trim(),
       color: color || TAG_COLORS[this.tags.length % TAG_COLORS.length]
     });
     if (!parsed.success) {
-      this.addToast(parsed.error.issues[0]?.message || 'Invalid tag');
+      this.addToast(parsed.error.issues[0]?.message || 'Tag is invalid');
       return false;
     }
-    const tag = parsed.data;
-    if (this.tags.some(t => t.name.toLowerCase() === tag.name.toLowerCase())) {
+    if (this.tags.some(t => t.name.toLowerCase() === parsed.data.name.toLowerCase())) {
       this.addToast('Tag already exists');
       return false;
     }
     this.tags = [...this.tags, {
       id: generateId(),
-      name: tag.name,
-      color: tag.color
+      name: parsed.data.name,
+      color: parsed.data.color
     }];
     this._save();
     return true;
@@ -659,9 +674,7 @@ class TaskStore {
           tagNamesByRow.set(row, tagNames);
         }
         const tags = [...importedTagNames.values()].map((name, index) => ({
-          id: generateId(),
-          name,
-          color: TAG_COLORS[index % TAG_COLORS.length]
+          id: generateId(), name, color: TAG_COLORS[index % TAG_COLORS.length]
         }));
         const tagIdsByName = new Map(tags.map(tag => [tag.name.toLowerCase(), tag.id]));
         const byId = new Map();
@@ -690,9 +703,7 @@ class TaskStore {
           else tasks.push(node);
         }
         const completionIsValid = node => (
-          node.children.length === 0
-            ? node.completed === (node.status === 'done')
-            : node.children.every(completionIsValid)
+          node.children.length === 0 ? node.completed === (node.status === 'done') : node.children.every(completionIsValid)
         );
         if (![...tasks, ...archived.map(entry => entry.branch)].every(completionIsValid)) {
           return { error: 'CSV leaf completed must match status done' };

@@ -17,8 +17,13 @@
 
   function addRootTask() {
     const title = rootTitle.trim();
-    if (!title || title.length > 120) {
-      rootError = 'Task title must be 1 to 120 characters';
+    if (!title) {
+      rootError = 'Enter a task title to continue';
+      rootInput?.focus();
+      return;
+    }
+    if (title.length > 120) {
+      rootError = 'Task titles must be 120 characters or fewer';
       rootInput?.focus();
       return;
     }
@@ -83,6 +88,7 @@
         style="font-size: 10px; {rootError ? 'border-color: var(--color-danger);' : 'border-color: var(--color-border);'}"
         aria-label="New root task title"
         aria-invalid={!!rootError}
+        aria-describedby={rootError ? 'root-title-error' : undefined}
       />
       <button
         class="btn-primary !px-4 !py-2"
@@ -91,7 +97,7 @@
       </div>
     </div>
     {#if rootError}
-      <div class="max-w-3xl mx-auto mt-1 text-[var(--color-danger)] text-[9px] shake">{rootError}</div>
+      <div id="root-title-error" role="alert" class="max-w-3xl mx-auto mt-1 text-[var(--color-danger)] text-[9px] shake">{rootError}</div>
     {/if}
   </footer>
 

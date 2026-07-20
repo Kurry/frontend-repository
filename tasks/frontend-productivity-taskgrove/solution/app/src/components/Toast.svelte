@@ -16,15 +16,12 @@
 
   $effect(() => {
     if (store.toasts.length > 0) {
-      const pending = [...store.toasts];
-      // Clear the store queue before forwarding every pending message so the
-      // effect cannot enqueue the same toast twice.
+      const pending = store.toasts[store.toasts.length - 1];
+      helpers.addToast({
+        data: { title: pending.message },
+      });
+      // Clear the store queue so it doesn't get added twice
       store.toasts = [];
-      for (const toast of pending) {
-        helpers.addToast({
-          data: { title: toast.message },
-        });
-      }
     }
   });
 </script>
