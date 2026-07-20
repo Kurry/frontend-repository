@@ -204,6 +204,30 @@ For each source, report authority, date, finding, and link.
 Note uncertainty, limitations, and contradictory evidence.
 Use a compact evidence table.
 End with the strongest supported conclusion.` },
+      {
+        versionId: 'research-v5', versionNumber: 5, author: 'Ansel Grey', timestamp: '2026-07-05T09:05:00Z',
+        changeNote: 'Formatting sweep from the docs migration: adjusted indentation and spacing only, wording deliberately untouched for parity.',
+        kind: 'main', parentIds: ['research-v4'],
+        text: `Find five credible sources that directly address the research question.
+  Expand the query with two related terms and report them.
+Rank  primary  sources before commentary and prefer recent publications.
+For each source, report authority, date, finding, and link.
+   Note uncertainty, limitations, and contradictory evidence.
+Use a compact evidence table.
+End with the strongest supported conclusion.  `,
+      },
+      {
+        versionId: 'research-v6', versionNumber: 6, author: 'Kei Moss', timestamp: '2026-07-18T15:40:00Z',
+        changeNote: 'Header casing pass for the analyst handbook: capitalized key terms without rewording any instruction.',
+        kind: 'main', parentIds: ['research-v5'],
+        text: `Find five Credible Sources that directly address the Research Question.
+  Expand the query with two related terms and report them.
+Rank  Primary  Sources before commentary and prefer recent Publications.
+For each source, report Authority, Date, Finding, and Link.
+   Note Uncertainty, Limitations, and contradictory Evidence.
+Use a compact Evidence Table.
+End with the strongest supported Conclusion.  `,
+      },
     ],
   },
   {
