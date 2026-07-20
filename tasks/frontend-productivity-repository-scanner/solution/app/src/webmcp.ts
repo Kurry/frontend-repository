@@ -37,7 +37,11 @@ const tools: ToolDefinition[] = [
         displayName: { type: 'string', maxLength: 80 },
       },
     },
-    handler: ({ path, displayName }) => useAppStore.getState().addRepository({ path: String(path ?? ''), displayName: displayName === undefined ? '' : String(displayName) }),
+    handler: ({ path, displayName }) => {
+      const res = useAppStore.getState().addRepository({ path: String(path ?? ''), displayName: displayName === undefined ? '' : String(displayName) });
+      if (!res.ok) useAppStore.getState().setGlobalError(res.error || 'Failed to create repository');
+      return res;
+    },
   },
   {
     name: 'entity_repository_select',
@@ -64,9 +68,11 @@ const tools: ToolDefinition[] = [
         value: { type: 'string', maxLength: 80 },
       },
     },
-    handler: ({ repositoryId, field, value }) => field === 'display-name'
-      ? useAppStore.getState().renameRepository(String(repositoryId), String(value ?? ''))
-      : { ok: false, error: 'field must be display-name' },
+    handler: ({ repositoryId, field, value }) => {
+      const res = field === 'display-name' ? useAppStore.getState().renameRepository(String(repositoryId), String(value ?? '')) : { ok: false, error: 'field must be display-name' };
+      if (!res.ok) useAppStore.getState().setGlobalError(res.error || 'Failed to update repository');
+      return res;
+    },
   },
   {
     name: 'entity_repository_delete',

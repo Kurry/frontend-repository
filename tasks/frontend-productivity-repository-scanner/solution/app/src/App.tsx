@@ -22,8 +22,10 @@ import {
 } from '@carbon/react'
 import {
   Add,
+  InProgress,
   ArrowLeft,
   CheckmarkFilled,
+  CheckmarkOutline,
   ChevronDown,
   ChevronRight,
   Close,
@@ -111,6 +113,20 @@ function useEscape(handler: () => void, active: boolean) {
   }, [active, handler])
 }
 
+function useRestoreFocus(open: boolean) {
+  const openerRef = useRef<HTMLElement | null>(null)
+  useEffect(() => {
+    if (open) {
+      openerRef.current = (document.activeElement as HTMLElement) || document.body
+    } else {
+      if (openerRef.current) {
+        const el = openerRef.current
+        window.setTimeout(() => el.focus(), 0)
+      }
+    }
+  }, [open])
+}
+
 function AddRepositoryModal() {
   const open = useAppStore((state) => state.ui.addOpen)
   const setUi = useAppStore((state) => state.setUi)
@@ -129,6 +145,7 @@ function AddRepositoryModal() {
     defaultValues: { path: '', displayName: '' },
   })
   const path = watch('path') || ''
+  useRestoreFocus(open)
 
   const close = () => {
     setUi('addOpen', false)
@@ -162,14 +179,14 @@ function AddRepositoryModal() {
       preventCloseOnClickOutside
       size="sm"
     >
-      <form onSubmit={submit} className="modal-form" noValidate>
+      <form onSubmit={submit} className="modal-form" autoComplete="off" noValidate>
         <p className="modal-intro">Track a local repository path. Files are simulated in this browser-only workspace.</p>
         <TextInput
           id="repository-path"
           labelText="Local path"
           placeholder="/workspace/my-project"
-          invalid={!path.trim() || Boolean(errors.path)}
-          invalidText={errors.path?.message || 'Path is required and cannot be whitespace only.'}
+          invalid={Boolean(errors.path)}
+          invalidText={errors.path?.message}
           {...register('path')}
         />
         <TextInput
@@ -197,7 +214,7 @@ function RenameEditor({ repository, onClose }: { repository: Repository; onClose
   const value = watch('displayName')
 
   return (
-    <form
+    <form autoComplete="off"
       className="rename-editor"
       onSubmit={handleSubmit(({ displayName }) => {
         const result = rename(repository.id, displayName || '')
@@ -374,7 +391,7 @@ function PatternSettings() {
           <h2 id="settings-heading">Scan configuration</h2>
         </div>
       </div>
-      <form className="pattern-grid" onSubmit={(event) => event.preventDefault()}>
+      <form className="pattern-grid" autoComplete="off" onSubmit={(event) => event.preventDefault()}>
         {PATTERN_KEYS.map((key) => (
           <div className="pattern-item" key={key}>
             <div>
@@ -402,8 +419,16 @@ function PatternSettings() {
   )
 }
 
+const statusIcons: Record<StepStatus, React.ElementType> = {
+  pending: Time,
+  running: InProgress,
+  complete: CheckmarkOutline,
+  failed: ErrorFilled,
+  retrying: Renew,
+}
+
 function StatusTag({ status }: { status: StepStatus }) {
-  return <Tag size="sm" type={statusKinds[status]} className={`status-tag status-${status}`}>{status}</Tag>
+  return <Tag size="sm" type={statusKinds[status]} renderIcon={statusIcons[status]} className={`status-tag status-${status}`}>{status}</Tag>
 }
 
 function ScanPanel() {
@@ -465,6 +490,7 @@ function ScanPanel() {
               <motion.li
                 layout
                 key={step.id}
+                id={`step-${step.id}`}
                 className={`step-row ${selectedStep === step.id ? 'is-highlighted' : ''}`}
                 data-status={step.status}
               >
@@ -508,7 +534,7 @@ function ScanPanel() {
             <AnimatePresence initial={false}>
               {events.map((event) => (
                 <motion.li key={event.id} initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-                  <button className={selectedStep === event.stepId ? 'is-highlighted' : ''} onClick={() => selectStep(event.stepId)}>
+                  <button className={selectedStep === event.stepId ? 'is-highlighted' : ''} onClick={() => { selectStep(event.stepId); document.getElementById(`step-${event.stepId}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }) }}>
                     <StatusTag status={event.status} />
                     <span>{event.message}</span>
                     <time>{new Date(event.timestamp).toLocaleTimeString()}</time>
@@ -693,6 +719,7 @@ function ExportModal() {
   const [confirmation, setConfirmation] = useState('')
   const activeText = tab === 0 ? json : markdown
   const format = tab === 0 ? 'Scan Index JSON' : 'Inventory Markdown'
+  useRestoreFocus(open)
 
   const confirm = (message: string) => {
     setConfirmation(message)
@@ -756,6 +783,7 @@ function ImportModal() {
     defaultValues: { payload: '' },
   })
   const payload = watch('payload') || ''
+  useRestoreFocus(open)
   const close = () => {
     setUi('importOpen', false)
     reset()
@@ -781,7 +809,7 @@ function ImportModal() {
       preventCloseOnClickOutside
       size="md"
     >
-      <form className="modal-form" onSubmit={submit} noValidate>
+      <form className="modal-form" autoComplete="off" onSubmit={submit} noValidate>
         <div className="import-file-row">
           <p>Paste a complete <strong>repo-scan-index/v1</strong> payload or choose a JSON file.</p>
           <input
@@ -825,17 +853,17 @@ function CommandPalette() {
   const [query, setQuery] = useState('')
   const [highlight, setHighlight] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
-  const openerRef = useRef<HTMLElement | null>(null)
+  useRestoreFocus(open)
 
   const close = () => {
     setUi('paletteOpen', false)
-    window.setTimeout(() => openerRef.current?.focus(), 0)
+
   }
   useEscape(close, open)
 
   useEffect(() => {
     if (open) {
-      openerRef.current = document.activeElement as HTMLElement
+
       setQuery('')
       setHighlight(0)
       window.setTimeout(() => inputRef.current?.focus(), 0)
@@ -889,7 +917,7 @@ function CommandPalette() {
       >
         <div className="palette-search">
           <Search size={20} />
-          <input ref={inputRef} value={query} onChange={(event) => { setQuery(event.target.value); setHighlight(0) }} placeholder="Search commands or repositories" aria-label="Filter commands" />
+          <input ref={inputRef} autoComplete="off" value={query} onChange={(event) => { setQuery(event.target.value); setHighlight(0) }} placeholder="Search commands or repositories" aria-label="Filter commands" />
           <kbd>Esc</kbd>
         </div>
         <h2 id="palette-title" className="sr-only">Command palette</h2>
@@ -963,8 +991,12 @@ export default function App() {
   const totalDocuments = repositories.reduce((total, repository) => total + (documents[repository.id]?.length || 0), 0)
   const totalFindings = repositories.reduce((total, repository) => total + (documents[repository.id] || []).reduce((sum, document) => sum + document.findings.length, 0), 0)
 
+  const overlayOpen = useAppStore((state) => state.ui.addOpen || state.ui.exportOpen || state.ui.importOpen || state.ui.paletteOpen)
+  const globalError = useAppStore((state) => state.globalError)
+
   return (
-    <div className="app-shell">
+    <>
+    <div className="app-shell" inert={overlayOpen ? "" : undefined}>
       <header className="app-header">
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true"><Search size={20} /></div>
@@ -972,6 +1004,9 @@ export default function App() {
         </div>
         <div className="session-indicator"><span className="status-dot" />In-memory session</div>
       </header>
+      {globalError && (
+        <InlineNotification kind="error" lowContrast title="Action failed" subtitle={globalError} onCloseButtonClick={() => useAppStore.getState().setGlobalError(null)} />
+      )}
       <main>
         <section className="hero">
           <div>
@@ -1004,7 +1039,8 @@ export default function App() {
       <AddRepositoryModal />
       <ExportModal />
       <ImportModal />
-      <AnimatePresence><CommandPalette /></AnimatePresence>
     </div>
+    <AnimatePresence><CommandPalette /></AnimatePresence>
+    </>
   )
 }
