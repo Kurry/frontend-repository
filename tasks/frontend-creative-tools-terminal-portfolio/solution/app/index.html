@@ -43,9 +43,9 @@
   <div class="close-overlay" id="closeOverlay">
     <div class="close-window">
       <div class="titlebar">
-        <div class="titlebar-dot red" title="Close"></div>
-        <div class="titlebar-dot yellow" title="Minimize"></div>
-        <div class="titlebar-dot green" title="Maximize"></div>
+        <button type="button" class="titlebar-dot red" title="Close terminal" aria-label="Close terminal"></button>
+        <button type="button" class="titlebar-dot yellow" title="Minimize terminal" aria-label="Minimize terminal"></button>
+        <button type="button" class="titlebar-dot green" title="Maximize terminal" aria-label="Maximize terminal"></button>
         <div class="titlebar-title">designer@portfolio ~ /exit</div>
       </div>
       <div class="close-body">
@@ -67,9 +67,9 @@
   <!-- tip: /secrets · sudo hire designer · konami -->
   <div class="terminal-window booting" id="terminal">
     <div class="titlebar">
-      <div class="titlebar-dot red" title="Close"></div>
-      <div class="titlebar-dot yellow" title="Minimize"></div>
-      <div class="titlebar-dot green" title="Maximize"></div>
+      <button type="button" class="titlebar-dot red" title="Close terminal" aria-label="Close terminal"></button>
+      <button type="button" class="titlebar-dot yellow" title="Minimize terminal" aria-label="Minimize terminal"></button>
+      <button type="button" class="titlebar-dot green" title="Maximize terminal" aria-label="Maximize terminal"></button>
       <div class="titlebar-title">designer@portfolio ~ /portfolio</div>
     </div>
 
@@ -159,13 +159,14 @@
         </div>
       </div>
 
-      <div class="output-area" id="outputArea"></div>
+      <div class="output-area" id="outputArea" aria-live="polite"></div>
     </div>
 
     <div class="input-area">
       <span class="input-prompt">&gt;</span>
       <div class="input-wrapper">
         <div class="autocomplete" id="autocomplete"></div>
+        <label for="cmdInput" class="sr-only">Command Prompt</label>
         <input
           type="text"
           class="input-field"
