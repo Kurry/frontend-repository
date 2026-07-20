@@ -34,6 +34,7 @@ const {
   meta: triageMeta,
   resetForm: resetTriageForm,
   validate: validateTriage,
+  setFieldError: setTriageFieldError,
 } = useForm({ validationSchema: toTypedSchema(classificationSchema), initialValues: { task: '', classification: '', rationale: '' } })
 
 const [taskField, taskAttrs] = defineTriageField('task', { validateOnModelUpdate: true })
@@ -183,7 +184,13 @@ async function submitTriage() {
   const result = triageMode.value === 'bulk'
     ? store.bulkClassify([...store.selectedVarianceTasks], values.classification, values.rationale)
     : store.classify(values)
-  if (result.ok) triageOpen.value = false
+  if (result.ok) {
+    triageOpen.value = false
+  } else {
+    const msg = result.message || (result.error && result.error.issues ? result.error.issues[0].message : 'Classification failed');
+    const field = result.field || (result.error && result.error.issues ? result.error.issues[0].path[0] : 'task');
+    setTriageFieldError(field, msg);
+  }
 }
 
 function closeTriage() {
@@ -309,7 +316,7 @@ async function submitImport() {
 function onGlobalKeydown(event) {
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
     event.preventDefault()
-    store.ui.paletteOpen = true
+    lastCellTrigger.value = $event?.currentTarget || document.activeElement; store.ui.paletteOpen = true
     return
   }
   if (event.key === 'Escape') {
@@ -329,10 +336,20 @@ function onGlobalKeydown(event) {
 }
 
 function trapDrawerFocus(event) {
-  if (event.key !== 'Tab' || !store.ui.cellDrawerOpen) return
-  const root = drawerRef.value?.$el || drawerRef.value
-  const focusable = root?.querySelectorAll?.('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
-  if (!focusable?.length) return
+  if (event.key === 'Escape') {
+    if (store.ui.cellDrawerOpen) closeCell()
+    else if (store.ui.exportOpen) { store.ui.exportOpen = false; if (lastCellTrigger.value) lastCellTrigger.value.focus(); lastCellTrigger.value = null; }
+    else if (store.ui.paletteOpen) { store.ui.paletteOpen = false; if (lastCellTrigger.value) lastCellTrigger.value.focus(); lastCellTrigger.value = null; }
+    return
+  }
+  if (event.key !== 'Tab') return
+  let root = null
+  if (store.ui.cellDrawerOpen) root = drawerRef.value?.$el || drawerRef.value
+  else if (store.ui.exportOpen) root = document.querySelector('.export-drawer')
+  else if (store.ui.paletteOpen) root = document.querySelector('.palette-dialog')
+  if (!root) return
+  const focusable = root.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+  if (!focusable.length) return
   const first = focusable[0]
   const last = focusable[focusable.length - 1]
   if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
@@ -380,7 +397,7 @@ onBeforeUnmount(() => {
         </v-tooltip>
         <v-btn class="toolbar-button" prepend-icon="mdi-import" variant="tonal" size="small" @click="openImport">Import</v-btn>
         <v-btn class="toolbar-button" prepend-icon="mdi-export-variant" color="primary" size="small" @click="store.openExport()">Export</v-btn>
-        <button class="command-key" aria-label="Open command palette" @click="store.ui.paletteOpen = true"><v-icon icon="mdi-magnify" size="17" /> <span>⌘ K</span></button>
+        <button class="command-key" aria-label="Open command palette" @click="lastCellTrigger.value = $event?.currentTarget || document.activeElement; store.ui.paletteOpen = true"><v-icon icon="mdi-magnify" size="17" /> <span>⌘ K</span></button>
       </div>
     </header>
 
@@ -525,7 +542,7 @@ onBeforeUnmount(() => {
 
         <article class="panel-card variance-card">
           <div class="panel-heading"><div><p class="section-label">TASK AGREEMENT</p><h3>Per-task variance</h3></div><span class="subtle-note">CV across {{ store.activeHarnesses.length }} harnesses</span></div>
-          <div v-if="store.varianceRows.length && store.activeHarnesses.length" class="variance-table-scroll">
+          <div v-if="store.varianceRows.length && store.activeHarnesses.length && store.activeModels.length" class="variance-table-scroll">
             <table class="variance-table">
               <thead><tr><th class="check-col"><span class="sr-only">Select</span></th><th>Task</th><th>Category</th><th v-for="harness in store.activeHarnesses" :key="harness">{{ harness }}</th><th>CV</th><th>Status</th><th>Triage</th><th></th></tr></thead>
               <tbody>
@@ -596,8 +613,10 @@ onBeforeUnmount(() => {
           <section class="drawer-section"><div class="drawer-section-title"><h3>Reward distribution</h3><span>0–1 scale</span></div><div class="distribution-chart"><VChart autoresize :option="distributionOption" /></div></section>
           <section v-if="selectedRun && ['queued', 'running'].includes(selectedRun.status)" class="run-progress">
             <div class="drawer-section-title"><h3>Re-run progress</h3><span class="run-status">{{ selectedRun.status }}</span></div>
-            <div v-if="selectedRun.status === 'queued'" class="queue-message"><v-progress-circular indeterminate size="18" width="2" />Preparing trial workers…</div>
-            <div v-else class="progress-list"><div v-for="item in selectedRun.progress" :key="item.id" :class="{ done: item.complete }"><v-icon :icon="item.complete ? 'mdi-check-circle' : 'mdi-circle-outline'" size="17" /><span>{{ item.id }}</span><b>{{ item.complete ? 'complete' : 'running' }}</b></div></div>
+            <transition name="fade" mode="out-in">
+              <div v-if="selectedRun.status === 'queued'" class="queue-message"><v-progress-circular indeterminate size="18" width="2" />Preparing trial workers…</div>
+              <div v-else class="progress-list"><div v-for="item in selectedRun.progress" :key="item.id" :class="{ done: item.complete }"><v-icon :icon="item.complete ? 'mdi-check-circle' : 'mdi-circle-outline'" size="17" /><span>{{ item.id }}</span><b>{{ item.complete ? 'complete' : 'running' }}</b></div></div>
+            </transition>
           </section>
           <section class="drawer-section"><div class="drawer-section-title"><h3>Trial ledger</h3><span>{{ store.selectedCell.trials.length }} records</span></div>
             <div class="trial-table-wrap"><table class="trial-table"><thead><tr><th>Trial id</th><th>Reward</th><th>Runtime</th><th>Cost</th></tr></thead><tbody><tr v-for="trial in store.selectedCell.trials" :key="trial.id"><td>{{ trial.id }}</td><td>{{ trial.reward.toFixed(3) }}</td><td>{{ trial.runtime.toFixed(2) }}s</td><td>${{ trial.cost.toFixed(4) }}</td></tr></tbody></table></div>
@@ -617,7 +636,7 @@ onBeforeUnmount(() => {
       </div>
       <div class="export-footer">
         <span class="live-compiled"><i></i> Compiled live from Pinia</span>
-        <div><v-btn variant="text" :prepend-icon="copied ? 'mdi-check' : 'mdi-content-copy'" @click="copyActive">{{ copied ? 'Copied' : 'Copy' }}</v-btn><v-btn color="primary" prepend-icon="mdi-download" @click="downloadActive">Download {{ store.ui.exportTab.toUpperCase() }}</v-btn></div>
+        <div><v-btn variant="text" :prepend-icon="copied ? 'mdi-check' : 'mdi-content-copy'" @click="copyActive">{{ copied ? `Copied ${store.ui.exportTab.toUpperCase()}` : 'Copy' }}</v-btn><v-btn color="primary" prepend-icon="mdi-download" @click="downloadActive">Download {{ store.ui.exportTab.toUpperCase() }}</v-btn></div>
       </div>
     </v-navigation-drawer>
 
