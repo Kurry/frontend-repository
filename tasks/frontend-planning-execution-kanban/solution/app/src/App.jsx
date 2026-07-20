@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { compileJSON, compileMarkdown } from "./exporters.js"
 import {
   Button,
   Checkbox,
@@ -45,7 +46,7 @@ import {
   DragOverlay,
   KeyboardSensor,
   PointerSensor,
-  closestCenter,
+  closestCorners,
   useDroppable,
   useSensor,
   useSensors,
@@ -111,7 +112,7 @@ function TaskList({ card, backoff, detailed = false }) {
               <span className="task-attempt">attempt {task.attempts}</span>
             )}
             {task.status === 'retrying' && backoff?.taskId === task.id && (
-              <span className="backoff-copy">waiting {backoff.seconds}s before retry {backoff.nextAttempt} of {backoff.maxAttempts}</span>
+              <span className="backoff-copy">waiting {backoff.seconds} seconds before retry {backoff.nextAttempt} of {backoff.maxAttempts}</span>
             )}
             {task.status === 'failed' && <span className="task-error">The execution step did not return a valid result.</span>}
           </span>
@@ -139,6 +140,7 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
   } = useSortable({ id: card.id, data: { column: card.column } })
   const complete = card.tasks.filter((task) => task.status === 'complete').length
   const isBusy = card.status === 'running' || card.status === 'retrying'
+  const boardTitle = card.title.length > 80 ? `${card.title.slice(0, 79).trimEnd()}…` : card.title
   const style = { transform: CSS.Transform.toString(transform), transition: transition || 'transform 200ms ease' }
   const stop = (event) => event.stopPropagation()
 
@@ -203,7 +205,7 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
           </div>
         </div>
 
-        <h3 className="card-title" title={card.title}>{card.title}</h3>
+        <h3 className="card-title" title={card.title}>{boardTitle}</h3>
         {card.description && <p className="card-description">{card.description}</p>}
 
         {prompt && (
@@ -325,24 +327,20 @@ function CreateCardModal() {
     () => createCardSchema(state.prompts.map((item) => item.id), state.assignees.map((item) => item.id)),
     [state.prompts, state.assignees],
   )
-  const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
     mode: 'onChange',
     defaultValues: { title: '', description: '', attached_prompt: '', assignee: '', column: target, position: 0 },
   })
-  const submitLock = useRef(false)
   const title = watch('title') || ''
   useEffect(() => {
     if (target) {
-      setValue('column', target)
-      setValue('position', 0)
+      reset({ title: '', description: '', attached_prompt: '', assignee: '', column: target, position: 0 })
     }
-  }, [target, setValue])
+  }, [target, reset])
   if (!target) return null
 
   const submit = handleSubmit((payload) => {
-    if (submitLock.current) return
-    submitLock.current = true
     state.createCard(payload)
     state.setCreateColumn(null)
   })
@@ -369,7 +367,7 @@ function CreateCardModal() {
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={() => state.setCreateColumn(null)}>Cancel</Button>
-        <Button type="submit" form="create-card-form" disabled={!title.trim() || isSubmitting} onClick={submit}>Add Card</Button>
+        <Button type="submit" form="create-card-form" disabled={!title.trim() || isSubmitting}>Add Card</Button>
       </ModalFooter>
     </ComposedModal>
   )
@@ -415,6 +413,7 @@ function CardDetailModal() {
                 <SelectItem value="" text="Unassigned" />
                 {state.assignees.map((person) => <SelectItem key={person.id} value={person.id} text={person.name} />)}
               </Select>
+              <div className="sr-only" aria-live="assertive">{Object.values(errors).map((error) => error?.message).filter(Boolean).join(' ')}</div>
             </form>
 
             <section className="detail-section">
@@ -456,7 +455,7 @@ function CardDetailModal() {
           {card.status === 'failed' ? 'Retry' : card.status === 'complete' ? 'Run again' : isBusy ? 'Running' : 'Run'}
         </Button>
         <Button kind="secondary" onClick={() => state.setDetailId(null)}>Cancel</Button>
-        <Button type="submit" form="detail-edit-form" onClick={save}>Save</Button>
+        <Button type="submit" form="detail-edit-form">Save</Button>
       </ModalFooter>
     </ComposedModal>
   )
@@ -479,9 +478,25 @@ function useFocusTrap(open, onClose) {
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
     }
     document.addEventListener('keydown', keydown)
-    return () => { document.removeEventListener('keydown', keydown); origin?.focus?.() }
+    return () => {
+      document.removeEventListener('keydown', keydown)
+      requestAnimationFrame(() => origin?.focus?.())
+    }
   }, [open, onClose])
   return ref
+}
+
+function useReturnFocus(open) {
+  const originRef = useRef(null)
+  useEffect(() => {
+    if (open) {
+      originRef.current = document.activeElement
+    } else if (originRef.current) {
+      const el = originRef.current
+      requestAnimationFrame(() => el?.focus?.())
+      originRef.current = null
+    }
+  }, [open])
 }
 
 function PromptPanel() {
@@ -522,11 +537,22 @@ function ExportPreview({ text, format, onCopy, onDownload }) {
   )
 }
 
+
+
 function ExportDrawer() {
   const state = useBoardStore()
   const close = () => state.setExportOpen(false)
   const drawerRef = useFocusTrap(state.exportOpen, close)
   const importForm = useForm({ resolver: zodResolver(importFormSchema), defaultValues: { import: state.importDraft } })
+
+  const exportData = useMemo(() => {
+    if (!state.exportOpen) return { json: '', markdown: '' }
+    return {
+      json: compileJSON(state),
+      markdown: compileMarkdown(state)
+    }
+  }, [state.exportOpen, state.board, state.cards, state.order, state.prompts, state.assignees, state.wipLimits])
+
   if (!state.exportOpen) return null
   const selectedIndex = state.exportFormat === 'json' ? 0 : 1
   const importReg = importForm.register('import')
@@ -565,8 +591,8 @@ function ExportDrawer() {
               <Tab>Markdown digest</Tab>
             </TabList>
             <TabPanels>
-              <TabPanel><ExportPreview text={state.exportDraft.json} format="json" onCopy={copy} onDownload={download} /></TabPanel>
-              <TabPanel><ExportPreview text={state.exportDraft.markdown} format="markdown" onCopy={copy} onDownload={download} /></TabPanel>
+              <TabPanel><ExportPreview text={exportData.json} format="json" onCopy={copy} onDownload={download} /></TabPanel>
+              <TabPanel><ExportPreview text={exportData.markdown} format="markdown" onCopy={copy} onDownload={download} /></TabPanel>
             </TabPanels>
           </Tabs>
           <div className="import-divider" />
@@ -623,7 +649,6 @@ function App() {
   }, [state.cards, state.order, state.filterAssignee, state.search])
 
   useEffect(() => registerWebMCP(), [])
-  useEffect(() => state.syncExportDraft(), [state.board, state.cards, state.order, state.prompts, state.assignees, state.wipLimits])
   useEffect(() => {
     if (!state.toast) return undefined
     const timer = setTimeout(state.clearToast, 3800)
@@ -649,21 +674,43 @@ function App() {
     const targetColumn = event.over.data.current?.column || event.over.id.toString().replace('column-', '')
     if (!state.order[targetColumn]) return null
     const targetVisible = visibleByColumn[targetColumn].filter((id) => id !== event.active.id)
-    if (event.over.data.current?.isColumn) return { column: targetColumn, position: targetVisible.length }
+
+    const activeRect = event.active.rect.current.translated
+    if (!activeRect) return { column: targetColumn, position: targetVisible.length }
+    const activeCenterY = activeRect.top + activeRect.height / 2
+
+    if (event.over.data.current?.isColumn) {
+      return { column: targetColumn, position: targetVisible.length }
+    }
+
     const overIndex = targetVisible.indexOf(event.over.id)
     if (overIndex < 0) return { column: targetColumn, position: targetVisible.length }
-    const translated = event.active.rect.current.translated
-    const below = translated && event.over.rect && translated.top + translated.height / 2 > event.over.rect.top + event.over.rect.height / 2
+    const overRect = event.over.rect
+    if (!overRect) return { column: targetColumn, position: overIndex }
+
+    const overCenterY = overRect.top + overRect.height / 2
+    const below = activeCenterY > overCenterY
     return { column: targetColumn, position: overIndex + (below ? 1 : 0) }
   }
   const endDrag = (event) => {
-    const hint = calculateDrop(event) || dropHint
-    if (hint) state.moveCard(event.active.id, hint.column, hint.position)
+    const hint = calculateDrop(event)
+    if (hint) {
+      const fullTarget = state.order[hint.column].filter((id) => id !== event.active.id)
+      const visibleTarget = visibleByColumn[hint.column].filter((id) => id !== event.active.id)
+      const nextVisibleId = visibleTarget[hint.position]
+      const fullPosition = nextVisibleId ? fullTarget.indexOf(nextVisibleId) : fullTarget.length
+      state.moveCard(event.active.id, hint.column, fullPosition)
+    }
     setActiveId(null); setDropHint(null)
   }
 
-  const filtersActive = state.filterAssignee !== 'all' || state.search !== ''
+  const filtersActive = state.filterAssignee !== 'all' || state.search.trim() !== ''
   const activeCard = activeId ? state.cards[activeId] : null
+
+  useReturnFocus(state.createColumn !== null)
+  useReturnFocus(state.detailId !== null)
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   return (
     <div className="app-shell">
@@ -694,7 +741,7 @@ function App() {
 
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={closestCorners}
           autoScroll={false}
           onDragStart={({ active }) => setActiveId(active.id)}
           onDragOver={(event) => setDropHint(calculateDrop(event))}
@@ -706,7 +753,7 @@ function App() {
               {columns.map((column) => <BoardColumn key={column.id} column={column} visibleIds={visibleByColumn[column.id]} dropHint={activeId ? dropHint : null} />)}
             </div>
           </div>
-          <DragOverlay dropAnimation={{ duration: 200, easing: 'ease' }}>
+          <DragOverlay dropAnimation={reduceMotion ? null : { duration: 200, easing: 'ease' }}>
             {activeCard ? <CardPreview card={activeCard} /> : null}
           </DragOverlay>
         </DndContext>

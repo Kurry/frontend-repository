@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { columns, failurePlans, seededAssignees, seededCards, seededOrder, seededPrompts } from './data.js'
-import { compileJSON, compileMarkdown } from './exporters.js'
 
 const clone = (value) => structuredClone(value)
 const uid = (prefix) => `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`}`
@@ -37,8 +36,6 @@ const updateCardRecord = (cards, cardId, updater) => {
   return { ...cards, [cardId]: updater(card) }
 }
 
-const initialExportSource = { ...initialDomain }
-
 export const useBoardStore = create((set, get) => ({
   ...clone(initialDomain),
   filterAssignee: 'all',
@@ -54,10 +51,6 @@ export const useBoardStore = create((set, get) => ({
   promptPanelId: null,
   exportOpen: false,
   exportFormat: 'json',
-  exportDraft: {
-    json: compileJSON(initialExportSource),
-    markdown: compileMarkdown(initialExportSource),
-  },
   importDraft: '',
   importError: '',
 
@@ -74,11 +67,6 @@ export const useBoardStore = create((set, get) => ({
   clearToast: () => set({ toast: null }),
   notify: (kind, title, subtitle) => set({ toast: { id: uid('toast'), kind, title, subtitle } }),
   announce: (announcement) => set({ announcement }),
-
-  syncExportDraft: () => {
-    const state = get()
-    set({ exportDraft: { json: compileJSON(state), markdown: compileMarkdown(state) } })
-  },
 
   createCard: (payload) => {
     const state = get()
@@ -97,10 +85,18 @@ export const useBoardStore = create((set, get) => ({
       comments: [],
     }
     const nextOrder = clone(state.order)
-    nextOrder[payload.column] = [id, ...nextOrder[payload.column]]
+    const position = Math.min(payload.position, nextOrder[payload.column].length)
+    nextOrder[payload.column].splice(position, 0, id)
     set(historyCommit(state, { cards: { ...state.cards, [id]: newCard }, order: nextOrder }))
-    get().notify('success', 'Card created', `${newCard.title} was added to ${columns.find((column) => column.id === payload.column)?.name}.`)
+    const targetName = columns.find((column) => column.id === payload.column)?.name
+    get().notify('success', 'Card created', `${newCard.title} was added to ${targetName}.`)
     get().announce(`Card ${newCard.title} created.`)
+
+    const limit = state.wipLimits[payload.column]
+    if (limit !== null && limit !== undefined && nextOrder[payload.column].length > limit) {
+      get().announce(`WIP limit breached in ${targetName}.`)
+    }
+
     return id
   },
 
@@ -123,6 +119,11 @@ export const useBoardStore = create((set, get) => ({
     const state = get()
     const card = state.cards[cardId]
     if (!card) return false
+    if (activeRuns.has(cardId)) {
+      get().notify('error', 'Card is running', 'Wait for execution to finish before deleting this card.')
+      get().announce(`${card.title} cannot be deleted while it is running.`)
+      return false
+    }
     const nextCards = { ...state.cards }
     delete nextCards[cardId]
     const nextOrder = Object.fromEntries(Object.entries(state.order).map(([column, ids]) => [column, ids.filter((id) => id !== cardId)]))
@@ -148,6 +149,12 @@ export const useBoardStore = create((set, get) => ({
     set(historyCommit(state, { order: nextOrder, cards: nextCards }))
     const targetName = columns.find((column) => column.id === targetColumn)?.name
     get().announce(`${card.title} moved to ${targetName}, position ${position + 1}.`)
+
+    const limit = state.wipLimits[targetColumn]
+    if (limit !== null && limit !== undefined && nextOrder[targetColumn].length > limit) {
+      get().announce(`WIP limit breached in ${targetName}.`)
+    }
+
     return true
   },
 
@@ -193,6 +200,10 @@ export const useBoardStore = create((set, get) => ({
   },
 
   undo: () => {
+    if (activeRuns.size) {
+      set({ announcement: 'Wait for card execution to finish before undoing.' })
+      return false
+    }
     const state = get()
     const previous = state.undoStack.at(-1)
     if (!previous) return false
@@ -207,6 +218,10 @@ export const useBoardStore = create((set, get) => ({
   },
 
   redo: () => {
+    if (activeRuns.size) {
+      set({ announcement: 'Wait for card execution to finish before redoing.' })
+      return false
+    }
     const state = get()
     const next = state.redoStack.at(-1)
     if (!next) return false
@@ -221,6 +236,12 @@ export const useBoardStore = create((set, get) => ({
   },
 
   importBoard: (payload) => {
+    if (activeRuns.size) {
+      const message = 'Wait for card execution to finish before importing.'
+      set({ importError: message, announcement: message })
+      get().notify('error', 'Import unavailable', message)
+      return false
+    }
     const state = get()
     const order = Object.fromEntries(payload.columns.map((column) => [column.id, [...column.card_ids]]))
     const cards = Object.fromEntries(payload.cards.map(({ position: _position, ...card }) => [card.id, clone(card)]))
@@ -267,6 +288,9 @@ export const useBoardStore = create((set, get) => ({
 
         const plan = failurePlans[cardId]
         if (plan?.taskId === currentTask.id && attempt <= plan.failAttempts) {
+          if (attempt >= plan.maxAttempts) {
+            throw new Error(`${currentTask.title} failed after ${attempt} attempts.`)
+          }
           for (let seconds = 2; seconds >= 1; seconds -= 1) {
             set((state) => ({
               cards: updateCardRecord(state.cards, cardId, (value) => ({ ...value, status: 'retrying', tasks: value.tasks.map((item, taskIndex) => taskIndex === index ? { ...item, status: 'retrying' } : item) })),
@@ -301,18 +325,39 @@ export const useBoardStore = create((set, get) => ({
       get().notify('success', 'Execution complete', `${get().cards[cardId]?.title} completed successfully.`)
       return true
     } catch (error) {
-      set((state) => ({
-        cards: updateCardRecord(state.cards, cardId, (value) => ({ ...value, status: 'failed' })),
-        announcement: `Execution failed: ${error.message}`,
-      }))
+      set((state) => {
+        const card = state.cards[cardId]
+        const activeIndex = card?.tasks.findIndex((t) => t.status !== 'complete') ?? -1
+        return {
+          cards: updateCardRecord(state.cards, cardId, (value) => ({
+            ...value,
+            status: 'failed',
+            tasks: value.tasks.map((t, i) => i === activeIndex ? { ...t, status: 'failed', error: error.message } : t)
+          })),
+          announcement: `Execution failed: ${error.message}`,
+        }
+      })
       get().notify('error', 'Execution failed', 'Retry resumes from the failed task item.')
       return false
     } finally {
       activeRuns.delete(cardId)
     }
   },
-  retryCard: (cardId) => get().runCard(cardId, false),
+  retryCard: (cardId) => {
+    const card = get().cards[cardId]
+    if (card?.status === 'failed') {
+      set((state) => ({
+        cards: updateCardRecord(state.cards, cardId, (value) => ({
+          ...value,
+          status: 'pending',
+          tasks: value.tasks.map((task) => task.status === 'failed'
+            ? { ...task, status: 'pending', attempts: 0, error: undefined }
+            : task),
+        })),
+      }))
+    }
+    return get().runCard(cardId, false)
+  },
 }))
 
 export const getBoardState = () => useBoardStore.getState()
-

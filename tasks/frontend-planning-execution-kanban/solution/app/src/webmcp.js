@@ -43,7 +43,10 @@ const tools = [
     execute: async (args) => {
       const state = getBoardState(); const card = state.cards[args.card_id]
       if (!card) return { success: false, error: 'Card not found.' }
-      if (args.column || Number.isInteger(args.position)) state.moveCard(args.card_id, args.column || card.column, args.position ?? state.order[args.column || card.column].length)
+      const targetColumn = args.column || card.column
+      if ((args.column && args.column !== card.column) || Number.isInteger(args.position)) {
+        state.moveCard(args.card_id, targetColumn, args.position ?? state.order[targetColumn].length)
+      }
       const edits = Object.fromEntries(['title', 'description', 'assignee'].filter((key) => key in args).map((key) => [key, args[key]]))
       if ('attached-prompt' in args) edits.attached_prompt = args['attached-prompt']
       if (Object.keys(edits).length) state.updateCard(args.card_id, edits)
