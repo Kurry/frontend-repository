@@ -121,6 +121,7 @@ export const DEFAULT_CONFIG = JSON.stringify({ theme: 'default' }, null, 2);
 const PARSED_TYPE_MAP = {
   flowchart: 'flowchart',
   'flowchart-v2': 'flowchart',
+  'flowchart-elk': 'flowchart',
   flow: 'flowchart',
   class: 'class',
   classDiagram: 'class',
@@ -128,6 +129,7 @@ const PARSED_TYPE_MAP = {
   er: 'entity-relationship',
   state: 'state',
   stateDiagram: 'state',
+  'stateDiagram-v2': 'state',
   mindmap: 'mindmap',
   pie: 'pie',
   gantt: 'gantt'
@@ -164,10 +166,15 @@ const ensureInit = () => {
     configObj = { theme: 'default' };
   }
   mermaid.initialize({
+    ...configObj,
+    // The app's safety/logging invariants always win: the Config document is
+    // passthrough-validated (it models the full Mermaid initialize payload),
+    // so a logLevel/securityLevel/startOnLoad key inside it must not defeat
+    // them and let parse-error flows emit console noise. Theme and every
+    // render-affecting key in the config still apply via the spread above.
     startOnLoad: false,
     securityLevel: 'loose',
-    logLevel: 'fatal',
-    ...configObj
+    logLevel: 'fatal'
   });
   initialized = true;
 };
