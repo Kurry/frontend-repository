@@ -46,19 +46,43 @@ button, input, textarea, select { font: inherit; }
 .roll-cell.pulse { animation:pulse .65s ease; }
 .error-text { color:#b04432; font-size:12px; margin-top:5px; font-weight:650; }
 .field-label { font-size:12px; font-weight:800; color:#505950; margin-bottom:5px; display:block; }
+.native-select { width:100%; min-height:40px; border:1px solid #d5dacf; border-radius:10px; background:#fff; color:#20251f; padding:8px 12px; font-weight:650; transition:border-color .18s ease, box-shadow .18s ease, background .18s ease; }
+.native-select:hover { border-color:#b7c0b3; background:#fbfcf8; }
+.native-select:focus { border-color:#4f6f52; box-shadow:0 0 0 3px rgba(79,111,82,.18); outline:none; }
+.native-select:disabled { opacity:.55; cursor:not-allowed; }
+.native-select.error, .n-input.error { border-color:#b04432 !important; box-shadow:0 0 0 3px rgba(176,68,50,.12); }
+.filter-field { display:block; min-width:0; }
 .mono-preview { white-space:pre; overflow:auto; background:#1f2520; color:#e8eee7; border-radius:14px; padding:18px; font:12px/1.65 var(--font-mono); min-height:500px; max-height:70vh; }
-.step-card { border:1px solid #e2e5de; border-radius:12px; padding:10px; transition:.2s ease; }
+.step-card { border:1px solid #e2e5de; border-radius:12px; padding:10px; transition:opacity .22s ease, transform .22s ease, border-color .2s ease, box-shadow .2s ease; }
 .step-card.highlighted { border-color:#55765a; box-shadow:0 0 0 3px rgba(79,111,82,.12); }
 .status-running{color:#3d668f}.status-running .status-dot{animation:spin 1s linear infinite}.status-retrying{color:#9a6d17}.status-failed{color:#ad4331}.status-complete{color:#33713f}.status-pending{color:#818781}
+.queue-table { border-collapse:collapse; }
+.queue-table th, .queue-table td { border-bottom:1px solid #e7ebe2; padding:10px 12px; vertical-align:middle; }
+.queue-table thead th { background:#f4f6f1; position:sticky; top:0; z-index:1; }
+.queue-table tbody tr:nth-child(even) { background:#fbfcf8; }
+.chart-frame { min-width:0; max-width:100%; overflow:hidden; }
+.report-check-table th, .report-check-table td { border-bottom:1px solid #e7ebe2; }
+.toast-banner { pointer-events:none; }
 .detail-enter-active,.detail-leave-active{transition:.28s ease}.detail-enter-from{opacity:0;transform:translateX(18px)}.detail-leave-to{opacity:0;transform:translateX(-18px)}
 .toast-enter-active,.toast-leave-active{transition:.25s ease}.toast-enter-from,.toast-leave-to{opacity:0;transform:translateY(-12px)}
 .fade-enter-active,.fade-leave-active{transition:.2s ease}.fade-enter-from,.fade-leave-to{opacity:0;transform:scale(.98)}
 .expand-enter-active,.expand-leave-active{transition:.22s ease;overflow:hidden}.expand-enter-from,.expand-leave-to{opacity:0;max-height:0}.expand-enter-to,.expand-leave-from{max-height:140px}
+.queue-row-enter-active,.queue-row-leave-active{transition:all .28s ease}.queue-row-enter-from,.queue-row-leave-to{opacity:0;transform:translateY(-8px)}.queue-row-leave-active{position:absolute;width:100%}
+.queue-row-move{transition:transform .28s ease}
+.desk-modal .n-modal,.desk-modal .n-card{animation:modal-in .24s ease both}
+@keyframes modal-in{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{50%{background:#e4f1df;box-shadow:0 0 0 5px rgba(79,111,82,.12)}}@keyframes badge-in{from{opacity:0;transform:scale(.86)}}
-@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .desk-modal .n-modal,.desk-modal .n-card,.stage-badge{animation:none!important}
+}
 @media (max-width:768px){.desktop-rail{display:none!important}.main-shell{margin-left:0!important;padding:14px!important}.mobile-top{display:flex!important}
-  .check-pill{min-height:44px;display:inline-flex;align-items:center}
-  .roll-cell{min-height:44px}
-  .n-button{min-height:44px}
+  .check-pill,.verdict-btn,.roll-cell,.n-button,.native-select{min-height:44px!important}
+  .verdict-btn{display:inline-flex!important;align-items:center}
+  .lifecycle-strip{min-width:100%!important;flex-wrap:wrap;gap:10px 0}
+  .chart-frame, .chart-frame .echarts{width:100%!important;max-width:100%!important}
+  .queue-table{min-width:720px}
 }
 @media (min-width:769px){.mobile-top{display:none!important}}
+@media (max-width:1440px){
+  .roll-cell{min-width:118px}
+}
