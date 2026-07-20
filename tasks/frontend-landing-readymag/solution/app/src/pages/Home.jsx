@@ -3,6 +3,7 @@ import styled from '@emotion/styled'
 import { css, keyframes } from '@emotion/react'
 import { colors, fonts, layout, motion, hairlines, exampleTags, type } from '../theme/tokens'
 import { webmcpBus } from '../webmcp/registerWebmcp'
+import TrialBrief from '../components/TrialBrief'
 
 /**
  * Native homepage — React/Emotion implementation of the 1024px Readymag
@@ -783,6 +784,7 @@ export default function Home() {
             <PrimaryCta href="/join">Try Readymag</PrimaryCta>
             <GhostLink href="/pricing">View pricing</GhostLink>
           </CtaRow>
+          <TrialBrief />
         </Closing>
       </Artboard>
     </ScrollWrapper>
