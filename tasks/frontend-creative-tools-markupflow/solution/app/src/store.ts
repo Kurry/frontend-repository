@@ -324,6 +324,8 @@ export function useAppStore() {
       setState('redoStack', []);
       setState('selectedAnnotationId', null);
       setState('compareMode', false);
+      // Return to the edit view so the tool rail is visible on the emptied canvas
+      setState('viewMode', 'edit');
       persistState();
     },
 

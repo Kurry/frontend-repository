@@ -315,6 +315,7 @@ export default function App() {
   const [theme, setTheme] = createSignal<'dark' | 'light'>('dark');
   let copyToastTimer: ReturnType<typeof setTimeout> | undefined;
   let importErrorTimer: ReturnType<typeof setTimeout> | undefined;
+  let layerDeleteTimer: ReturnType<typeof setTimeout> | undefined;
 
   const projectForm = createForm(() => ({
     defaultValues: { name: '' },
@@ -1226,6 +1227,13 @@ export default function App() {
           <button
             class="header-action"
             onClick={() => {
+              // Cancel any pending animated layer delete so it cannot fire after the reset
+              // and push a bogus undo snapshot against the emptied workspace.
+              if (layerDeleteTimer) {
+                clearTimeout(layerDeleteTimer);
+                layerDeleteTimer = undefined;
+              }
+              setExitingLayerId(null);
               store.clearState();
               setLoadedImage(null);
               setSharedContent('');
@@ -1270,6 +1278,50 @@ export default function App() {
           >
             ↪ Redo
           </button>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const name = snapshotNameValue();
+              const trimmed = name.trim();
+              if (!trimmed) {
+                setSnapshotNameError('Snapshot name is required');
+                return;
+              }
+              if (trimmed.length > 80) {
+                setSnapshotNameError('Snapshot name must be at most 80 characters');
+                return;
+              }
+              setSnapshotNameError('');
+              if (store.saveSnapshot(name)) {
+                announce(`Snapshot ${name} saved`);
+                setSnapshotNameValue('');
+              }
+            }}
+            class="relative flex items-center gap-1 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg p-0.5"
+          >
+            <input
+              name="snapshotName"
+              placeholder="Snapshot name"
+              value={snapshotNameValue()}
+              onInput={(e) => { setSnapshotNameValue(e.currentTarget.value); if (snapshotNameError()) setSnapshotNameError(''); }}
+              class="bg-transparent text-sm text-[var(--color-text-primary)] px-2 py-0.5 w-32 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] rounded"
+              aria-label="Snapshot name"
+              aria-invalid={!!snapshotNameError()}
+              aria-describedby={snapshotNameError() ? 'snapshot-name-error' : undefined}
+            />
+            <button
+              type="submit"
+              class={`header-action ${snapshotNameValue().trim().length === 0 ? 'is-disabled' : ''}`}
+              disabled={snapshotNameValue().trim().length === 0}
+              aria-label="Save snapshot"
+            >
+              Save snapshot
+            </button>
+            <Show when={snapshotNameError()}>
+              <p id="snapshot-name-error" class="absolute left-0 top-full mt-1 z-50 whitespace-nowrap rounded-md border border-red-500 bg-[var(--color-surface)] px-2 py-1 text-[10px] text-red-400" role="alert" aria-live="polite">{snapshotNameError()}</p>
+            </Show>
+          </form>
 
           <button
             class={`header-action ${state.compareMode ? 'is-active' : ''}`}
@@ -1770,6 +1822,14 @@ export default function App() {
                       const id = ann.id;
                       const kind = ann.type;
                       const remove = () => {
+                        layerDeleteTimer = undefined;
+                        // Bail out if the annotation is already gone (e.g. the workspace was
+                        // reset while the exit animation was pending) — otherwise we would push
+                        // a bogus undo snapshot and mutate history after the reset.
+                        if (!state.annotations.some((a) => a.id === id)) {
+                          setExitingLayerId(null);
+                          return;
+                        }
                         store.deleteAnnotation(id);
                         setExitingLayerId(null);
                         announce(`${kind} annotation deleted`);
@@ -1777,7 +1837,8 @@ export default function App() {
                       };
                       if (prefersReducedMotion()) { remove(); return; }
                       setExitingLayerId(id);
-                      setTimeout(remove, 240);
+                      if (layerDeleteTimer) clearTimeout(layerDeleteTimer);
+                      layerDeleteTimer = setTimeout(remove, 240);
                     }}
                     onDragStart={handleLayerDragStart}
                     onDragOver={handleLayerDragOver}
@@ -1824,51 +1885,6 @@ export default function App() {
           {/* Versions Panel */}
           <section class="versions-panel border-t border-[var(--color-border)] p-3 flex-shrink-0 max-h-56 overflow-y-auto" aria-labelledby="versions-heading">
             <h3 id="versions-heading" class="text-xs font-bold text-[var(--color-text-primary)] mb-2">Versions</h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const name = snapshotNameValue();
-                const trimmed = name.trim();
-                if (!trimmed) {
-                  setSnapshotNameError('Snapshot name is required');
-                  return;
-                }
-                if (trimmed.length > 80) {
-                  setSnapshotNameError('Snapshot name must be at most 80 characters');
-                  return;
-                }
-                setSnapshotNameError('');
-                if (store.saveSnapshot(name)) {
-                  announce(`Snapshot ${name} saved`);
-                  setSnapshotNameValue('');
-                }
-              }}
-              class="mb-2"
-            >
-              <div class="flex gap-1">
-                <input
-                  name="snapshotName"
-                  placeholder="Snapshot name"
-                  value={snapshotNameValue()}
-                  onInput={(e) => { setSnapshotNameValue(e.currentTarget.value); if (snapshotNameError()) setSnapshotNameError(''); }}
-                  class={`flex-1 min-w-0 bg-[var(--color-bg)] text-[var(--color-text-primary)] text-[11px] px-2 py-1 rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] ${snapshotNameError() ? 'border border-red-500' : 'form-control-border'}`}
-                  aria-label="Snapshot name"
-                  aria-invalid={!!snapshotNameError()}
-                  aria-describedby={snapshotNameError() ? 'snapshot-name-error' : undefined}
-                />
-                <button
-                  type="submit"
-                  class="project-action text-[11px]"
-                  disabled={snapshotNameValue().trim().length === 0}
-                  aria-label="Save snapshot"
-                >
-                  Save snapshot
-                </button>
-              </div>
-              <Show when={snapshotNameError()}>
-                <p id="snapshot-name-error" class="text-[10px] text-red-400 mt-0.5" role="alert" aria-live="polite">{snapshotNameError()}</p>
-              </Show>
-            </form>
             <Show when={state.versions.length > 0} fallback={
               <p class="text-[10px] text-[var(--color-text-secondary)] text-center py-2">No versions saved. Save a snapshot to see it here.</p>
             }>
