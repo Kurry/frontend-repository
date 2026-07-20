@@ -288,3 +288,9 @@ main { width: min(1540px, 100%); margin: 0 auto; padding: 20px 28px 46px; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Missing animations added */
+.new-row { animation: row-enter 0.4s ease-out; }
+.timeline-event { animation: event-enter 0.35s ease both; }
+.trial-running { animation: status-flip 0.3s ease; }
+.dialog-content { overflow-y: auto !important; }
