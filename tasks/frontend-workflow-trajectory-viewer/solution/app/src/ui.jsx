@@ -29,10 +29,10 @@ export function Textarea({ className = '', ...props }) {
   return <textarea className={`focusable w-full resize-y rounded-md border border-ink-600 bg-ink-900 px-3 py-2.5 text-sm leading-relaxed text-mist-100 placeholder:text-mist-500 ${className}`} {...props} />
 }
 
-export function RadixSelect({ value, onValueChange, placeholder, options, ariaLabel }) {
+export function RadixSelect({ value, onValueChange, placeholder, options, ariaLabel, ...props }) {
   return (
     <Select.Root value={value || undefined} onValueChange={onValueChange}>
-      <Select.Trigger aria-label={ariaLabel} className="focusable flex h-10 w-full items-center justify-between rounded-md border border-ink-600 bg-ink-900 px-3 text-left text-sm text-mist-100 data-[placeholder]:text-mist-500">
+      <Select.Trigger aria-label={ariaLabel} aria-labelledby={props["aria-labelledby"]} className="focusable flex h-10 w-full items-center justify-between rounded-md border border-ink-600 bg-ink-900 px-3 text-left text-sm text-mist-100 data-[placeholder]:text-mist-500">
         <Select.Value placeholder={placeholder} /><Select.Icon><CaretDown size={14} /></Select.Icon>
       </Select.Trigger>
       <Select.Portal>

@@ -51,12 +51,16 @@ const types = [
   'reasoning', 'tool-call', 'observation', 'reasoning', 'terminal', 'observation', 'tool-call',
   'observation', 'terminal', 'tool-call', 'tool-call', 'screenshot', 'terminal', 'reasoning',
 ]
+const missingScreenshotTypes = [
+  'reasoning', 'tool-call', 'observation', 'reasoning', 'terminal', 'observation', 'tool-call',
+  'observation', 'terminal', 'tool-call', 'tool-call', 'terminal', 'terminal', 'reasoning',
+]
 
 function makeSteps(task, trialIndex, failed) {
   return summaries(task.focus).map((summary, i) => {
     const index = i + 1
     const isError = failed && index === 9
-    const type = types[i]
+    const type = trialIndex === 0 ? missingScreenshotTypes[i] : types[i]
     const toolName = type === 'tool-call' ? (index === 7 ? 'apply_patch' : index === 10 ? 'read_file' : index === 11 ? 'delete_file' : 'list_files') : undefined
     const terminal = type === 'terminal'
       ? index === 5
@@ -91,6 +95,7 @@ function makeSteps(task, trialIndex, failed) {
 }
 
 const referenceFiles = (task) => [
+  { path: 'src/utils/a_very_long_file_name_that_should_truncate_in_the_sidebar_and_show_ellipsis.py', type: 'code', content: 'def test():\n  pass', change: null },
   { path: 'README.md', type: 'markdown', content: `# ${task.name}\n\nReference workspace for the **${task.name.toLowerCase()}** benchmark.\n\n- deterministic evaluator\n- isolated dependencies\n- documented public interface` },
   { path: 'src/engine.ts', type: 'code', language: 'typescript', content: `export function reconcile(input: number[]) {\n  return input.reduce((total, value) => total + value, 0)\n}\n\nexport const invariant = '${task.focus}'\n` },
   { path: 'assets/reference-state.png', type: 'image', content: '/trial-capture.svg' },
@@ -100,6 +105,7 @@ const referenceFiles = (task) => [
 ]
 
 const trialFiles = (task) => [
+  { path: 'src/utils/a_very_long_file_name_that_should_truncate_in_the_sidebar_and_show_ellipsis.py', type: 'code', content: 'def test():\n  pass', change: null, step: 1 },
   { path: 'README.md', type: 'markdown', content: `# ${task.name}\n\nThe repair preserves the public contract and documents the **${task.focus}** invariant.`, change: 'Modified', step: 4 },
   { path: 'src/engine.ts', type: 'code', language: 'typescript', content: `type Entry = { value: number; touchedAt: number }\n\nexport function reconcile(entries: Entry[]) {\n  return entries\n    .sort((a, b) => a.touchedAt - b.touchedAt)\n    .reduce((sum, entry) => sum + entry.value, 0)\n}\n`, before: `export function reconcile(input: number[]) {\n  return input.reduce((total, value) => total + value, 0)\n}\n`, change: 'Added', step: 2 },
   { path: 'tests/engine.spec.ts', type: 'code', language: 'typescript', content: `import { reconcile } from '../src/engine'\n\ntest('keeps deterministic order', () => {\n  expect(reconcile([{ value: 4, touchedAt: 1 }])).toBe(4)\n})`, change: 'Modified', step: 7 },
