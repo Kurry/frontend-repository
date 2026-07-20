@@ -7,9 +7,12 @@
     onOpenMasks: () => void;
     onOpenHistory: () => void;
     onOpenReset: () => void;
+    onOpenExport: () => void;
+    onOpenImport: () => void;
+    onOpenSettings: () => void;
   }
 
-  let { onStart, onOpenShop, onOpenMasks, onOpenHistory, onOpenReset }: Props = $props();
+  let { onStart, onOpenShop, onOpenMasks, onOpenHistory, onOpenReset, onOpenExport, onOpenImport, onOpenSettings }: Props = $props();
 
   function getNodeClass(stage: (typeof STAGES)[0]): string {
     const unlocked = gameState.unlockedStages.includes(stage.id);
@@ -30,7 +33,7 @@
   <div class="relative z-10 w-full max-w-2xl">
     <div class="text-center mb-8 sm:mb-12">
       <h1 class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight">
-        <span class="text-fury-gold">Fandango</span><span class="text-fury-red">Fury</span>
+        <span class="text-fury-gold">{gameState.fighterDisplayName || 'Fandango'}</span><span class="text-fury-red">Fury</span>
       </h1>
       <p class="text-slate-200 mt-2 text-sm sm:text-base">Hack and slash through the festival town</p>
     </div>
@@ -103,6 +106,20 @@
 
     <div class="flex flex-wrap justify-center gap-2 sm:gap-3">
       <button
+        class="btn-interactive min-h-12 px-4 sm:px-6 py-3 bg-emerald-700 hover:bg-emerald-600 rounded-xl font-bold text-sm sm:text-base text-white border border-emerald-400/30"
+        onclick={() => {
+          if (gameState.checkpoint) {
+            game.restoreCheckpoint();
+            onStart(gameState.checkpoint.stageId);
+          }
+        }}
+        disabled={!gameState.checkpoint}
+        aria-label="Resume run"
+        style={!gameState.checkpoint ? 'display: none;' : ''}
+      >
+        ▶️ Resume run
+      </button>
+      <button
         class="btn-interactive min-h-12 px-4 sm:px-6 py-3 bg-amber-600 hover:bg-amber-500 rounded-xl font-bold text-sm sm:text-base text-white border border-amber-400/30"
         onclick={onOpenShop}
         aria-label="Open cantina shop"
@@ -122,6 +139,27 @@
         aria-label="Reset progress"
       >
         🗑️ Reset progress
+      </button>
+      <button
+        class="btn-interactive min-h-12 px-4 sm:px-6 py-3 bg-purple-600 hover:bg-purple-500 rounded-xl font-bold text-sm sm:text-base text-white border border-purple-400/30"
+        onclick={onOpenExport}
+        aria-label="Export campaign"
+      >
+        📤 Export Campaign
+      </button>
+      <button
+        class="btn-interactive min-h-12 px-4 sm:px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold text-sm sm:text-base text-white border border-blue-400/30"
+        onclick={onOpenImport}
+        aria-label="Import campaign"
+      >
+        📥 Import Campaign
+      </button>
+      <button
+        class="btn-interactive min-h-12 px-4 sm:px-6 py-3 bg-teal-600 hover:bg-teal-500 rounded-xl font-bold text-sm sm:text-base text-white border border-teal-400/30"
+        onclick={onOpenSettings}
+        aria-label="Fighter settings"
+      >
+        ⚙️ Fighter Settings
       </button>
     </div>
 

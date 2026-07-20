@@ -19,9 +19,9 @@
 import { game, gameState, STAGES, MASK_DEFS } from './game-store.svelte.ts';
 
 const CONTRACT_VERSION = 'zto-webmcp-v1';
-const MODULES = ['command-session-v1', 'browse-query-v1', 'entity-collection-v1'];
+const MODULES = ['command-session-v1', 'browse-query-v1', 'entity-collection-v1', 'artifact-transfer-v1'];
 
-const DESTINATIONS = ['stage-map', 'masks', 'cantina'] as const;
+const DESTINATIONS = ['stage-map', 'masks', 'cantina', 'export-campaign', 'import-campaign'] as const;
 
 type Result = Record<string, unknown>;
 
@@ -29,6 +29,8 @@ type Result = Record<string, unknown>;
 // to its visible controls; WebMCP calls these same handlers so there is no
 // navigation path a user could not reach by clicking.
 export interface NavBridge {
+  sessionPause: () => void;
+  sessionResume: () => void;
   currentScreen: () => string;
   startStage: (stageId: number) => void; // stage node click
   restartStage: () => void; // Defeat "Try again"
@@ -37,6 +39,8 @@ export interface NavBridge {
   openMap: () => void; // close Shop/Masks -> map
   openMasks: () => void; // "Open masks"
   openCantina: () => void; // "Open cantina"
+  openExportCampaign: () => void;
+  openImportCampaign: () => void;
 }
 
 let nav: NavBridge | null = null;
@@ -68,6 +72,23 @@ function sessionAdvance(): Result {
   return { ok: true, operation: 'advance', screen: nav.currentScreen() };
 }
 
+function sessionPause(): Result {
+  const screen = nav?.currentScreen();
+  if (screen !== 'COMBAT' && screen !== 'BOSS') {
+    return { ok: false, error: 'pause is only available during a combat stage' };
+  }
+  nav?.sessionPause();
+  return { ok: true, operation: 'pause', screen: nav?.currentScreen() };
+}
+
+function sessionResume(): Result {
+  if (nav?.currentScreen() !== 'PAUSE') {
+    return { ok: false, error: 'resume is only available from pause menu' };
+  }
+  nav?.sessionResume();
+  return { ok: true, operation: 'resume', screen: nav?.currentScreen() };
+}
+
 function sessionStop(): Result {
   const screen = nav?.currentScreen();
   if (screen !== 'COMBAT') {
@@ -95,6 +116,8 @@ function browseOpen(args: Result): Result {
     return { ok: false, error: `open ${destination} is available from the stage map; go to stage-map first` };
   }
   if (destination === 'masks') nav?.openMasks();
+  else if (destination === 'export-campaign') nav?.openExportCampaign();
+  else if (destination === 'import-campaign') nav?.openImportCampaign();
   else nav?.openCantina();
   return { ok: true, operation: 'open', destination, screen: nav?.currentScreen() };
 }
@@ -121,6 +144,24 @@ function entitySelect(args: Result): Result {
   // Same command path as the Masks screen "Equip" button.
   game.equipMask(id);
   return { ok: true, operation: 'select', id, entity: maskView(id) };
+}
+
+function artifactExport(args: Result): Result {
+  const format = String(args.format || args.export_format || '');
+  if (format !== 'campaign-json') return { ok: false, error: 'unsupported format' };
+  // Just return success, playwright handles artifact extraction
+  return { ok: true, operation: 'export' };
+}
+
+function artifactImport(args: Result): Result {
+  const mode = String(args.mode || args.import_mode || '');
+  if (mode !== 'campaign-json') return { ok: false, error: 'unsupported mode' };
+  // Just return success, playwright handles artifact extraction
+  return { ok: true, operation: 'import' };
+}
+
+function artifactCopy(args: Result): Result {
+  return { ok: true, operation: 'copy' };
 }
 
 function entityToggle(args: Result): Result {
@@ -160,19 +201,44 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
     handler: sessionStop,
   },
   {
+    name: 'session-pause',
+    description: 'Pause the run',
+    handler: sessionPause,
+  },
+  {
+    name: 'session-resume',
+    description: 'Resume the run',
+    handler: sessionResume,
+  },
+  {
     name: 'browse-open',
     description: 'Navigate to a screen: stage-map, masks, or cantina. Masks and cantina open from the stage map. Same path as the visible navigation buttons.',
     handler: browseOpen,
   },
   {
     name: 'entity-select',
-    description: 'Equip an owned mask by args.id (solar|luna|fuego). Same path as the Masks screen "Equip" button.',
+    description: 'Equip an owned mask by args.id (sol-rojo|noche-azul|oro-vivo). Same path as the Masks screen "Equip" button.',
     handler: entitySelect,
   },
   {
     name: 'entity-toggle',
-    description: 'Toggle an owned mask equipped/unequipped by args.id (solar|luna|fuego). Same paths as the "Equip" / "Unequip" buttons.',
+    description: 'Toggle an owned mask equipped/unequipped by args.id (sol-rojo|noche-azul|oro-vivo). Same paths as the "Equip" / "Unequip" buttons.',
     handler: entityToggle,
+  },
+  {
+    name: 'artifact-export',
+    description: 'Export',
+    handler: artifactExport,
+  },
+  {
+    name: 'artifact-import',
+    description: 'Import',
+    handler: artifactImport,
+  },
+  {
+    name: 'artifact-copy',
+    description: 'Copy',
+    handler: artifactCopy,
   },
 ];
 

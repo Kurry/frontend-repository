@@ -11,6 +11,10 @@
   import VictoryScreen from './VictoryScreen.svelte';
   import DefeatScreen from './DefeatScreen.svelte';
   import HistoryPanel from './HistoryPanel.svelte';
+  import PauseOverlay from './PauseOverlay.svelte';
+  import ExportCampaign from './ExportCampaign.svelte';
+  import ImportCampaign from './ImportCampaign.svelte';
+  import FighterSettings from './FighterSettings.svelte';
   import { initWebMcp } from '../lib/webmcp.ts';
 
   let currentScreen = $state('MAP');
@@ -62,7 +66,7 @@
         if (currentScreen === 'VICTORY') send('CONTINUE');
       },
       retreatToMap: () => {
-        if (currentScreen === 'COMBAT') send('PAUSE_TO_MAP');
+        if (currentScreen === 'COMBAT') send('PAUSE');
       },
       openMap: () => {
         if (currentScreen === 'SHOP') send('CLOSE_SHOP');
@@ -74,6 +78,18 @@
       openCantina: () => {
         if (currentScreen === 'MAP') send('OPEN_SHOP');
       },
+      openExportCampaign: () => {
+        if (currentScreen === 'MAP') send('OPEN_EXPORT');
+      },
+      openImportCampaign: () => {
+        if (currentScreen === 'MAP') send('OPEN_IMPORT');
+      },
+      sessionPause: () => {
+        if (currentScreen === 'COMBAT' || currentScreen === 'BOSS') send('PAUSE');
+      },
+      sessionResume: () => {
+        if (currentScreen === 'PAUSE') send(gameState.isBoss ? 'RESUME_BOSS' : 'RESUME');
+      },
     });
 
     function handleKeydown(e: KeyboardEvent) {
@@ -82,6 +98,13 @@
         else if (currentScreen === 'MASKS') send('CLOSE_MASKS');
         else if (currentScreen === 'HISTORY') closeHistory();
         else if (currentScreen === 'RESET_CONFIRM') send('CANCEL_RESET');
+        else if (currentScreen === 'PAUSE') send(gameState.isBoss ? 'RESUME_BOSS' : 'RESUME');
+        else if (currentScreen === 'EXPORT') send('CLOSE_EXPORT');
+        else if (currentScreen === 'IMPORT') send('CLOSE_IMPORT');
+        else if (currentScreen === 'SETTINGS') send('CLOSE_SETTINGS');
+      } else if (e.key.toLowerCase() === 'p') {
+        if (currentScreen === 'COMBAT' || currentScreen === 'BOSS') send('PAUSE');
+        else if (currentScreen === 'PAUSE') send(gameState.isBoss ? 'RESUME_BOSS' : 'RESUME');
       }
     }
     window.addEventListener('keydown', handleKeydown);
@@ -97,6 +120,9 @@
       onOpenMasks={() => send('OPEN_MASKS')}
       onOpenHistory={openHistory}
       onOpenReset={() => send('OPEN_RESET')}
+      onOpenExport={() => send('OPEN_EXPORT')}
+      onOpenImport={() => send('OPEN_IMPORT')}
+      onOpenSettings={() => send('OPEN_SETTINGS')}
     />
   {:else if currentScreen === 'COMBAT' || currentScreen === 'BOSS'}
     <CombatScene
@@ -134,6 +160,36 @@
         </div>
       </div>
     </div>
+  {:else if currentScreen === 'PAUSE'}
+    <CombatScene
+      screen={gameState.isBoss ? 'BOSS' : 'COMBAT'}
+      onBossStart={() => {}}
+      onVictory={() => {}}
+      onDefeat={() => {}}
+    />
+    <PauseOverlay
+      onResume={() => send(gameState.isBoss ? 'RESUME_BOSS' : 'RESUME')}
+      onSaveCheckpoint={() => { game.saveCheckpoint(); send('SAVE_CHECKPOINT'); }}
+      onAbandon={() => { game.clearCheckpoint(); send('ABANDON'); }}
+    />
+  {:else if currentScreen === 'EXPORT'}
+    <StageMap onStart={startCombat} onOpenShop={() => {}} onOpenMasks={() => {}} onOpenHistory={() => {}} onOpenReset={() => {}}
+        onOpenExport={() => {}}
+        onOpenImport={() => {}}
+        onOpenSettings={() => {}} />
+    <ExportCampaign onClose={() => send('CLOSE_EXPORT')} />
+  {:else if currentScreen === 'IMPORT'}
+    <StageMap onStart={startCombat} onOpenShop={() => {}} onOpenMasks={() => {}} onOpenHistory={() => {}} onOpenReset={() => {}}
+        onOpenExport={() => {}}
+        onOpenImport={() => {}}
+        onOpenSettings={() => {}} />
+    <ImportCampaign onClose={() => send('CLOSE_IMPORT')} />
+  {:else if currentScreen === 'SETTINGS'}
+    <StageMap onStart={startCombat} onOpenShop={() => {}} onOpenMasks={() => {}} onOpenHistory={() => {}} onOpenReset={() => {}}
+        onOpenExport={() => {}}
+        onOpenImport={() => {}}
+        onOpenSettings={() => {}} />
+    <FighterSettings onClose={() => send('CLOSE_SETTINGS')} />
   {:else if currentScreen === 'HISTORY'}
     {#if prevScreen === 'MAP'}
       <StageMap
@@ -142,6 +198,9 @@
         onOpenMasks={() => send('CLOSE_HISTORY')}
         onOpenHistory={() => {}}
         onOpenReset={() => send('CLOSE_HISTORY')}
+        onOpenExport={() => {}}
+        onOpenImport={() => {}}
+        onOpenSettings={() => {}}
       />
     {:else if prevScreen === 'SHOP'}
       <Shop onClose={() => {}} />
@@ -154,6 +213,9 @@
         onOpenMasks={() => {}}
         onOpenHistory={() => {}}
         onOpenReset={() => {}}
+        onOpenExport={() => {}}
+        onOpenImport={() => {}}
+        onOpenSettings={() => {}}
       />
     {/if}
     <HistoryPanel onClose={closeHistory} />
@@ -163,13 +225,13 @@
     <HUD />
   {/if}
 
-  {#if currentScreen === 'COMBAT'}
+  {#if currentScreen === 'COMBAT' || currentScreen === 'BOSS'}
     <button
       class="fixed top-16 right-2 z-40 bg-gray-800/90 hover:bg-gray-700 text-xs min-h-12 px-3 py-2 rounded-lg border border-fury-orange/40 hover:border-fury-orange btn-interactive text-slate-100"
-      onclick={() => send('PAUSE_TO_MAP')}
-      aria-label="Retreat to stage map"
+      onclick={() => send('PAUSE')}
+      aria-label="Pause"
     >
-      🏳️ Retreat to map
+      ⏸️ Pause
     </button>
   {/if}
 

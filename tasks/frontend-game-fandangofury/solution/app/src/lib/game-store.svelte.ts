@@ -37,15 +37,15 @@ export interface HistorySnapshot {
 }
 
 export const STAGES = [
-  { id: 1, name: 'Plaza del Sol', waves: 3, bossName: 'El Bandido', bossHealth: 120, bossAttack: 12, banditHealth: 30, banditAttack: 5, bruteHealth: 60, bruteAttack: 8, pesoReward: 50, maskDrop: 'solar' },
-  { id: 2, name: 'Mercado Nocturno', waves: 4, bossName: 'La Sombra', bossHealth: 200, bossAttack: 18, banditHealth: 45, banditAttack: 8, bruteHealth: 80, bruteAttack: 12, pesoReward: 80, maskDrop: 'luna' },
-  { id: 3, name: 'Fortaleza Roja', waves: 5, bossName: 'El Rey Bandido', bossHealth: 350, bossAttack: 25, banditHealth: 60, banditAttack: 10, bruteHealth: 100, bruteAttack: 16, pesoReward: 120, maskDrop: 'fuego' },
+  { id: 1, name: 'Plaza del Sol', waves: 3, bossName: 'El Bandido', bossHealth: 120, bossAttack: 12, banditHealth: 30, banditAttack: 5, bruteHealth: 60, bruteAttack: 8, pesoReward: 50, maskDrop: 'sol-rojo' },
+  { id: 2, name: 'Mercado Nocturno', waves: 4, bossName: 'La Sombra', bossHealth: 200, bossAttack: 18, banditHealth: 45, banditAttack: 8, bruteHealth: 80, bruteAttack: 12, pesoReward: 80, maskDrop: 'noche-azul' },
+  { id: 3, name: 'Fortaleza Roja', waves: 5, bossName: 'El Rey Bandido', bossHealth: 350, bossAttack: 25, banditHealth: 60, banditAttack: 10, bruteHealth: 100, bruteAttack: 16, pesoReward: 120, maskDrop: 'oro-vivo' },
 ];
 
 export const MASK_DEFS = [
-  { id: 'solar', name: 'Solar Mask', emoji: '☀️', bonus: 'damage' as const, bonusValue: 1.2, furyColor: '#e63946' },
-  { id: 'luna', name: 'Luna Mask', emoji: '🌙', bonus: 'speed' as const, bonusValue: 1.3, furyColor: '#457b9d' },
-  { id: 'fuego', name: 'Fuego Mask', emoji: '🔥', bonus: 'defense' as const, bonusValue: 1.25, furyColor: '#f4a261' },
+  { id: 'sol-rojo', name: 'Solar Mask', emoji: '☀️', bonus: 'damage' as const, bonusValue: 1.2, furyColor: '#e63946' },
+  { id: 'noche-azul', name: 'Luna Mask', emoji: '🌙', bonus: 'speed' as const, bonusValue: 1.3, furyColor: '#457b9d' },
+  { id: 'oro-vivo', name: 'Fuego Mask', emoji: '🔥', bonus: 'defense' as const, bonusValue: 1.25, furyColor: '#f4a261' },
 ];
 
 export const UPGRADES = [
@@ -97,6 +97,9 @@ export interface GameState {
   enemies: Enemy[];
   currentWave: number;
   isBoss: boolean;
+  checkpoint: any;
+  fighterDisplayName: string;
+  fighterEffectsIntensity: number;
   combo: { chain: ('light' | 'heavy')[]; count: number; timer: number; lastFiesta: boolean };
   comboDisplay: string;
   fiestaFlash: boolean;
@@ -360,6 +363,90 @@ function enemyStrike(enemy: Enemy) {
 }
 
 export const game = {
+  updateFighterSettings(displayName: string, effectsIntensity: number) {
+    pushHistory('Update Fighter Settings');
+    gameState.fighterDisplayName = displayName;
+    gameState.fighterEffectsIntensity = effectsIntensity;
+    savePersisted();
+  },
+  
+  exportCampaign() {
+    return {
+      schemaVersion: 'fandangofury.campaign.v1',
+      fighter: {
+        displayName: gameState.fighterDisplayName,
+        effectsIntensity: gameState.fighterEffectsIntensity,
+      },
+      pesos: gameState.pesos,
+      upgrades: {
+        maxHealth: gameState.upgrades['maxHealth'] || 0,
+        attackPower: gameState.upgrades['attackPower'] || 0,
+        furyGain: gameState.upgrades['furyGain'] || 0,
+      },
+      masks: {
+        owned: gameState.ownedMasks,
+        equipped: gameState.equippedMask || null,
+      },
+      stages: {
+        unlocked: gameState.unlockedStages,
+        completed: gameState.completedStages,
+      },
+      checkpoint: gameState.checkpoint || null,
+    };
+  },
+  
+  importCampaign(data: any) {
+    pushHistory('Import Campaign');
+    gameState.fighterDisplayName = data.fighter.displayName;
+    gameState.fighterEffectsIntensity = data.fighter.effectsIntensity;
+    gameState.pesos = data.pesos;
+    gameState.upgrades = data.upgrades;
+    gameState.ownedMasks = data.masks.owned;
+    gameState.equippedMask = data.masks.equipped;
+    gameState.unlockedStages = data.stages.unlocked;
+    gameState.completedStages = data.stages.completed;
+    gameState.checkpoint = data.checkpoint;
+    savePersisted();
+  },
+
+  saveCheckpoint() {
+    gameState.checkpoint = {
+      stageId: gameState.currentStage,
+      waveIndex: gameState.currentWave,
+      phase: gameState.isBoss ? 'boss' : 'wave',
+      fighterHealth: gameState.playerHealth,
+      furyMeter: gameState.furyMeter,
+      pesosEarnedThisRun: gameState.runPesos,
+      comboCount: gameState.combo.count,
+    };
+    savePersisted();
+  },
+  
+  clearCheckpoint() {
+    gameState.checkpoint = null;
+    savePersisted();
+  },
+  
+  restoreCheckpoint() {
+    if (!gameState.checkpoint) return;
+    const cp = gameState.checkpoint;
+    gameState.currentStage = cp.stageId;
+    gameState.currentWave = cp.waveIndex;
+    gameState.isBoss = cp.phase === 'boss';
+    gameState.playerHealth = cp.fighterHealth;
+    gameState.furyMeter = cp.furyMeter;
+    gameState.runPesos = cp.pesosEarnedThisRun;
+    gameState.combo.count = cp.comboCount;
+    // Don't restart enemies array, let spawnWave or spawnBoss handle it for now, 
+    // or just let game loop take over. Wait, instructions say:
+    // "Resume Run from the Stage-select map restores that checkpoint exactly: same Stage, same wave index or boss phase, same fighter Health, same Fury meter value, and same Pesos earned this run, then combat continues from that point"
+    // So spawn wave/boss based on current state.
+    if (gameState.isBoss) {
+        this.spawnBoss();
+    } else {
+        this.spawnWave();
+    }
+  },
   getMaxHealth,
   getAttack,
   getFuryGain,
@@ -459,6 +546,9 @@ export const game = {
     Object.assign(gameState, persistedDefaults, {
       history: [],
       historyIndex: -1,
+      checkpoint: null,
+      fighterDisplayName: 'Fandango',
+      fighterEffectsIntensity: 100,
       playerHealth: 100,
       enemies: [],
       currentWave: 1,
@@ -469,6 +559,9 @@ export const game = {
       combo: { chain: [], count: 0, timer: 0, lastFiesta: false },
       feedbacks: [],
     });
+    if (d.checkpoint !== undefined) gameState.checkpoint = d.checkpoint;
+    if (d.fighterDisplayName !== undefined) gameState.fighterDisplayName = d.fighterDisplayName;
+    if (d.fighterEffectsIntensity !== undefined) gameState.fighterEffectsIntensity = d.fighterEffectsIntensity;
     savePersisted();
     pushHistory('Progress reset');
   },
@@ -484,6 +577,7 @@ export const game = {
     gameState.runMasks = [];
     gameState.dodgeCooldown = 0;
     gameState.combo = { chain: [], count: 0, timer: 0, lastFiesta: false };
+    gameState.checkpoint = null;
     gameState.feedbacks = [];
     gameState.screenFuryActive = false;
     gameState.fiestaFlash = false;
@@ -705,6 +799,7 @@ export const game = {
       gameState.combo = { ...gameState.combo, timer: gameState.combo.timer - 1 };
       if (gameState.combo.timer <= 0) {
         gameState.combo = { chain: [], count: 0, timer: 0, lastFiesta: false };
+    gameState.checkpoint = null;
       }
     }
     if (gameState.dodgeCooldown > 0) {

@@ -9,7 +9,7 @@ export type GameScreen =
   | 'VICTORY'
   | 'DEFEAT'
   | 'RESET_CONFIRM'
-  | 'HISTORY';
+  | 'HISTORY' | 'PAUSE' | 'EXPORT' | 'IMPORT' | 'SETTINGS';
 
 export const gameMachine = createMachine({
   id: 'fandangoFury',
@@ -22,6 +22,9 @@ export const gameMachine = createMachine({
         OPEN_MASKS: 'MASKS',
         OPEN_HISTORY: 'HISTORY',
         OPEN_RESET: 'RESET_CONFIRM',
+        OPEN_EXPORT: 'EXPORT',
+        OPEN_IMPORT: 'IMPORT',
+        OPEN_SETTINGS: 'SETTINGS',
       },
     },
     COMBAT: {
@@ -31,7 +34,7 @@ export const gameMachine = createMachine({
         PLAYER_DEFEATED: 'DEFEAT',
         OPEN_SHOP: 'SHOP',
         OPEN_MASKS: 'MASKS',
-        PAUSE_TO_MAP: 'MAP',
+        PAUSE: 'PAUSE',
         OPEN_HISTORY: 'HISTORY',
       },
     },
@@ -40,6 +43,7 @@ export const gameMachine = createMachine({
         BOSS_DEFEATED: 'VICTORY',
         PLAYER_DEFEATED: 'DEFEAT',
         OPEN_HISTORY: 'HISTORY',
+        PAUSE: 'PAUSE',
       },
     },
     SHOP: {
@@ -73,6 +77,23 @@ export const gameMachine = createMachine({
         CONFIRM_RESET: 'MAP',
         CANCEL_RESET: 'MAP',
       },
+    },
+    PAUSE: {
+      on: {
+        RESUME: 'COMBAT',
+        RESUME_BOSS: 'BOSS',
+        ABANDON: 'MAP',
+        SAVE_CHECKPOINT: 'MAP',
+      },
+    },
+    EXPORT: {
+      on: { CLOSE_EXPORT: 'MAP' },
+    },
+    IMPORT: {
+      on: { CLOSE_IMPORT: 'MAP' },
+    },
+    SETTINGS: {
+      on: { CLOSE_SETTINGS: 'MAP' },
     },
     HISTORY: {
       on: {
