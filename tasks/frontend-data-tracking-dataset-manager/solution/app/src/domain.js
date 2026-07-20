@@ -128,9 +128,11 @@ export function computeStats(dataset) {
 }
 
 export function makePackage(dataset) {
+  const stats = computeStats(dataset);
   return {
     schemaVersion: 'dataset-manager.package/v1',
     generatedAt: new Date().toISOString(),
+    stats: { totalRows: dataset.rows.length, verifiedCount: stats.verifiedCount },
     dataset: {
       id: dataset.id,
       name: dataset.name,
