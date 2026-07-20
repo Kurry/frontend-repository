@@ -149,7 +149,7 @@ function CostSidebar({ rollups, total }) {
           <ResponsiveContainer width="100%" height={190}>
             <PieChart>
               <Pie data={visibleData} dataKey="subtotal" nameKey="model" innerRadius={48} outerRadius={76} paddingAngle={2} stroke="transparent" isAnimationActive animationDuration={450}>
-                {visibleData.map((entry) => <Cell key={entry.model} fill={chartColors[rollupsWithSubtotal.findIndex((item) => item.model === entry.model) % chartColors.length]} />)}
+                {visibleData.map((entry) => <Cell key={entry.model} fill={chartColors[rollups.findIndex((item) => item.model === entry.model) % chartColors.length]} />)}
               </Pie>
               <Tooltip content={<CostTooltip />} />
             </PieChart>
@@ -264,12 +264,12 @@ function LogUsageModal() {
   const addManualUsage = useAppStore((state) => state.addManualUsage)
   const activeModels = useMemo(() => models.filter((item) => item.lifecycle !== 'departing'), [models])
   const schema = useMemo(() => makeUsageFormSchema(activeModels.map((item) => item.name)), [activeModels])
-  const { register, watch, reset, handleSubmit, formState: { errors, isValid, isSubmitting } } = useForm({
+  const { register, watch, reset, handleSubmit, formState: { errors, isValid, isSubmitting, isDirty } } = useForm({
     resolver: zodResolver(schema),
     mode: 'onChange',
     defaultValues: { model: activeModels[0]?.name || '', request_label: '', prompt_tokens: 0, completion_tokens: 0 },
   })
-  useEffect(() => { if (open) reset({ model: activeModels[0]?.name || '', request_label: '', prompt_tokens: 0, completion_tokens: 0 }) }, [open, activeModels, reset])
+  useEffect(() => { if (open && !isDirty) reset({ model: activeModels[0]?.name || '', request_label: '', prompt_tokens: 0, completion_tokens: 0 }) }, [open, activeModels, reset, isDirty])
   const values = watch()
   const selected = activeModels.find((item) => item.name === values.model)
   const preview = calculateCost(selected, values.prompt_tokens, values.completion_tokens)
@@ -509,6 +509,7 @@ function Catalog({ models, visibleModels, providers }) {
           <SelectItem value="All providers" text="All providers" />
           {providers.map((provider) => <SelectItem key={provider} value={provider} text={provider} />)}
         </Select>
+        <div className="sr-only" aria-live="polite">{errors.model?.message}</div>
       </div>
       <div className="suggestion-scroller" aria-label="Suggested filters">
         <span className="suggestion-label">Explore</span>
@@ -575,18 +576,6 @@ function App() {
   const rollups = useMemo(() => deriveRollups(usageEvents), [usageEvents])
   const total = useMemo(() => Number(rollups.reduce((sum, row) => sum + row.subtotal, 0).toFixed(8)), [rollups])
   const previousFocus = useRef(null)
-  const focusRestoreTimer = useRef(null)
-  const [, setWebMcpRevision] = useState(0)
-  const openOverlay = (name) => {
-    previousFocus.current = document.activeElement
-    state.setOverlay(name, true)
-  }
-
-  useEffect(() => {
-    const flushWebMcpState = () => setWebMcpRevision((revision) => revision + 1)
-    window.addEventListener('__webmcp_flush_state', flushWebMcpState)
-    return () => window.removeEventListener('__webmcp_flush_state', flushWebMcpState)
-  }, [])
 
   useEffect(() => {
     if (!simulationRunning) return undefined
@@ -599,11 +588,8 @@ function App() {
     const onKey = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
-        const current = useAppStore.getState()
-        const opening = !current.commandOpen
-        const anotherOverlayOpen = current.alertOpen || current.logOpen || current.compareOpen || current.exportOpen
-        if (opening && !anotherOverlayOpen) previousFocus.current = document.activeElement
-        state.setOverlay('commandOpen', opening)
+        previousFocus.current = document.activeElement
+        state.setOverlay('commandOpen', !useAppStore.getState().commandOpen)
       }
     }
     window.addEventListener('keydown', onKey)
@@ -612,37 +598,19 @@ function App() {
 
   useEffect(() => {
     const isOpen = state.alertOpen || state.logOpen || state.compareOpen || state.exportOpen || state.commandOpen;
-    if (isOpen || !previousFocus.current) return undefined;
-    if (!document.body.contains(previousFocus.current)) {
-      previousFocus.current = null;
-      return undefined;
+    if (isOpen) {
+      if (!previousFocus.current || !document.body.contains(previousFocus.current)) {
+        previousFocus.current = document.activeElement;
+      }
+    } else {
+      if (previousFocus.current && document.body.contains(previousFocus.current)) {
+        const el = previousFocus.current;
+        window.setTimeout(() => {
+          el.focus();
+          previousFocus.current = null;
+        }, 10);
+      }
     }
-    const el = previousFocus.current;
-    let attempts = 0;
-    let timer;
-    const restoreFocus = () => {
-      if (previousFocus.current !== el) return;
-      el.focus();
-      if (document.activeElement === el) {
-        previousFocus.current = null;
-        focusRestoreTimer.current = null;
-        return;
-      }
-      attempts += 1;
-      if (attempts < 4) {
-        timer = window.setTimeout(restoreFocus, 25 * attempts);
-        focusRestoreTimer.current = timer;
-      } else {
-        previousFocus.current = null;
-        focusRestoreTimer.current = null;
-      }
-    };
-    timer = window.setTimeout(restoreFocus, 10);
-    focusRestoreTimer.current = timer;
-    return () => {
-      window.clearTimeout(timer);
-      if (focusRestoreTimer.current === timer) focusRestoreTimer.current = null;
-    };
   }, [state.alertOpen, state.logOpen, state.compareOpen, state.exportOpen, state.commandOpen]);
 
   useEffect(() => {
@@ -682,17 +650,17 @@ function App() {
             <nav className="action-toolbar" aria-label="Session actions">
               <div className="toolbar-primary">
                 <ToolbarButton label={simulationRunning ? 'Pause simulation' : 'Start simulation'} icon={simulationRunning ? PauseFilled : PlayFilledAlt} active={simulationRunning} onClick={() => state.setSimulationRunning(!simulationRunning)} />
-                <ToolbarButton label="Log usage" icon={Add} onClick={() => openOverlay('logOpen')} />
+                <ToolbarButton label="Log usage" icon={Add} onClick={() => state.setOverlay('logOpen', true)} />
                 <ToolbarButton label="Refresh" icon={Renew} disabled={state.refreshLoading} onClick={state.triggerRefresh} />
-                <ToolbarButton label={`Compare ${compareSelected.length ? `(${compareSelected.length})` : ''}`} icon={Compare} disabled={compareSelected.length < 2} onClick={() => openOverlay('compareOpen')} />
+                <ToolbarButton label={`Compare ${compareSelected.length ? `(${compareSelected.length})` : ''}`} icon={Compare} disabled={compareSelected.length < 2} onClick={() => state.setOverlay('compareOpen', true)} />
               </div>
               <div className="toolbar-secondary">
                 <ToolbarButton label="Undo" icon={Undo} disabled={!state.undoStack.length} onClick={state.undo} />
                 <ToolbarButton label="Redo" icon={Redo} disabled={!state.redoStack.length} onClick={state.redo} />
-                <ToolbarButton label="Alerts" icon={Notification} onClick={() => openOverlay('alertOpen')} />
+                <ToolbarButton label="Alerts" icon={Notification} onClick={() => state.setOverlay('alertOpen', true)} />
                 <ToolbarButton label="Costs" icon={ChartPie} className="mobile-cost-button" onClick={() => state.setOverlay('mobileCostsOpen', true)} />
-                <ToolbarButton label="Export" icon={Download} onClick={() => openOverlay('exportOpen')} />
-                <button type="button" className="command-key-button" onClick={() => openOverlay('commandOpen')} aria-label="Open command palette"><SearchIcon size={16} /><span>Commands</span><kbd>⌘K</kbd></button>
+                <ToolbarButton label="Export" icon={Download} onClick={() => state.setOverlay('exportOpen', true)} />
+                <button type="button" className="command-key-button" onClick={() => state.setOverlay('commandOpen', true)} aria-label="Open command palette"><SearchIcon size={16} /><span>Commands</span><kbd>⌘K</kbd></button>
               </div>
             </nav>
 
