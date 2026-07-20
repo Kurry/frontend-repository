@@ -53,6 +53,8 @@ def main() -> None:
     ap.add_argument("--mercor-remote", default="mercor")
     ap.add_argument("--state", type=Path,
                     default=ROOT / "jobs" / "trial-codex-sol-xhigh-max-50-concurrent" / ".mirrored-prs.jsonl")
+    ap.add_argument("--reprocess", action="store_true",
+                    help="re-push already-mirrored branches (e.g. after excluding dist)")
     ap.add_argument("--worktree", type=Path,
                     default=Path("/private/tmp/claude-501/-Users-kurrytran-frontend-repository/0a2c5e5d-30a3-4e80-a8b2-fc368a34c16a/scratchpad/mirror-wt"))
     args = ap.parse_args()
@@ -75,7 +77,8 @@ def main() -> None:
     done = mirrored = skipped = 0
     for p in prs:
         br = p["headRefName"]
-        if br in tgt_heads or (br in state and state[br].get("status") in ("mirrored", "empty")):
+        already = br in tgt_heads or (br in state and state[br].get("status") in ("mirrored", "empty"))
+        if already and not args.reprocess:
             done += 1
             continue
         title, body, num = p["title"], (p.get("body") or ""), p["number"]
@@ -84,16 +87,25 @@ def main() -> None:
         # main, so replaying its commits is fragile — instead take the FIXED
         # solution/app from its tip and commit it fresh on current mercor/main.
         sh("git", "fetch", args.origin, br)  # updates refs/remotes/origin/<br>
-        tip = f"origin/{br}"
-        # task slug(s) the tip commit actually touched (stable across worktrees)
-        paths = sh("git", "diff-tree", "--no-commit-id", "--name-only", "-r", tip, cwd=wt).stdout
+        # Resolve to a full SHA in ROOT — a SHA is resolvable from any worktree
+        # (shared object store), unlike a fresh remote ref name.
+        tip = sh("git", "rev-parse", f"origin/{br}").stdout.strip()
+        if not tip:
+            print(f"skip #{num} {br}: could not resolve origin ref", file=sys.stderr); skipped += 1; continue
+        paths = sh("git", "diff-tree", "--no-commit-id", "--name-only", "-r", tip).stdout
         slugs = sorted({p.split("/")[1] for p in paths.splitlines()
                         if p.startswith("tasks/") and len(p.split("/")) > 2})
         if not slugs:
             print(f"skip #{num} {br}: touches no tasks/<slug>", file=sys.stderr); skipped += 1; continue
         sh("git", "checkout", "-B", f"mir-{num}", f"{args.mercor_remote}/main", cwd=wt)
         for slug in slugs:
-            sh("git", "checkout", tip, "--", f"tasks/{slug}/solution/app", cwd=wt)
+            # source only — never mirror built dist/ (bloats the PR; rebuilt by verify:build)
+            sh("git", "checkout", tip, "--", f"tasks/{slug}/solution/app",
+               f":(exclude)tasks/{slug}/solution/app/dist", cwd=wt)
+            # drop any dist that slipped in (base had it, or nested)
+            for d in (Path(wt) / "tasks" / slug / "solution" / "app").glob("**/dist"):
+                if d.is_dir():
+                    sh("git", "rm", "-rq", "--", str(d.relative_to(wt)), cwd=wt)
         sh("git", "add", "-A", cwd=wt)
         staged = sh("git", "diff", "--cached", "--name-only", cwd=wt).stdout.strip()
         if not staged:
@@ -106,6 +118,11 @@ def main() -> None:
         push = sh("git", "push", "-f", args.mercor_remote, f"mir-{num}:{br}", cwd=wt)
         if push.returncode != 0:
             print(f"FAIL push #{num} {br}: {push.stderr[:200]}", file=sys.stderr)
+            continue
+        if br in tgt_heads:
+            # branch already has an open PR; the force-push above updated it
+            print(f"updated #{num} {br}: force-pushed (dropped dist)", file=sys.stderr)
+            mirrored += 1
             continue
         nb = body + f"\n\n---\nMirrored from {args.origin}#{num} (Jules oracle-fix), re-authored + re-signed."
         pr = sh("gh", "pr", "create", "--repo", args.target, "--head", br, "--base", "main",
