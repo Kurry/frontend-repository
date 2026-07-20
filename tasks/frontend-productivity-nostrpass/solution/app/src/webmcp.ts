@@ -8,26 +8,46 @@ import {
   renameIdentity,
   deleteIdentity,
   importVault,
+  importBackup,
   setSearchQuery,
   setSortOrder,
+  setAuditFilter,
+  setVaultDrawerOpen,
+  exportVaultJson,
+  exportBackupJson,
   APPS,
   ViewId,
+  AuditActionType,
 } from './store';
 
-type ToolHandler = (args: Record<string, any>) => any;
+type ToolHandler = (args: Record<string, unknown>) => unknown;
 
 interface ToolDef {
   name: string;
   description: string;
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
   handler: ToolHandler;
 }
 
 const DESTINATIONS: ViewId[] = ['dashboard', 'identities', 'permissions', 'audit-log', 'settings'];
-// Added export-drawer as per <webmcp_action_contract> binding destinations
 const ALL_DESTINATIONS = [...DESTINATIONS, 'export-drawer'];
 const THEMES = ['light', 'dark'];
 const APP_IDS = APPS.map((a) => a.id);
+const AUDIT_FILTERS: AuditActionType[] = [
+  'all',
+  'identity-created',
+  'identity-renamed',
+  'identity-deleted',
+  'identity-selected',
+  'permission-changed',
+  'bulk-permission',
+  'key-rotated',
+  'backup-exported',
+  'backup-imported',
+  'vault-exported',
+  'vault-imported',
+  'theme-changed',
+];
 
 const tools: ToolDef[] = [
   {
@@ -35,20 +55,19 @@ const tools: ToolDef[] = [
     description: 'Navigate the vault to a named destination view.',
     parameters: {
       type: 'object',
-      properties: {
-        destination: { type: 'string', enum: ALL_DESTINATIONS },
-      },
+      properties: { destination: { type: 'string', enum: ALL_DESTINATIONS } },
       required: ['destination'],
     },
     handler: (args) => {
-      if (!ALL_DESTINATIONS.includes(args.destination)) {
-        throw new Error(`Unknown destination: ${args.destination}`);
+      const destination = String(args.destination ?? '');
+      if (!ALL_DESTINATIONS.includes(destination as ViewId | 'export-drawer')) {
+        throw new Error(`Unknown destination: ${destination}`);
       }
-      if (args.destination === 'export-drawer') {
-        // Just mock open drawer state for WebMCP bounds
+      if (destination === 'export-drawer') {
+        setVaultDrawerOpen(true);
         return { drawerOpened: true };
       }
-      setView(args.destination as ViewId);
+      setView(destination as ViewId);
       return { view: store.view };
     },
   },
@@ -57,49 +76,55 @@ const tools: ToolDef[] = [
     description: 'Search identities.',
     parameters: {
       type: 'object',
-      properties: {
-        query: { type: 'string' }
-      },
-      required: ['query']
+      properties: { query: { type: 'string' } },
+      required: ['query'],
     },
     handler: (args) => {
-      setSearchQuery(args.query);
+      setSearchQuery(String(args.query ?? ''));
       return { query: store.searchQuery };
-    }
+    },
   },
   {
     name: 'browse_sort',
     description: 'Sort identities.',
     parameters: {
       type: 'object',
-      properties: {
-        sorts: { type: 'string', enum: ['label-asc', 'label-desc'] }
-      },
-      required: ['sorts']
+      properties: { sorts: { type: 'string', enum: ['label-asc', 'label-desc'] } },
+      required: ['sorts'],
     },
     handler: (args) => {
-      if (!['label-asc', 'label-desc'].includes(args.sorts)) {
-        throw new Error(`Unknown sort: ${args.sorts}`);
-      }
-      setSortOrder(args.sorts);
+      const sorts = String(args.sorts ?? '');
+      if (!['label-asc', 'label-desc'].includes(sorts)) throw new Error(`Unknown sort: ${sorts}`);
+      setSortOrder(sorts as 'label-asc' | 'label-desc');
       return { sortOrder: store.sortOrder };
-    }
+    },
+  },
+  {
+    name: 'browse_apply_filter',
+    description: 'Apply an audit log action-type filter.',
+    parameters: {
+      type: 'object',
+      properties: { filter: { type: 'string', enum: AUDIT_FILTERS } },
+      required: ['filter'],
+    },
+    handler: (args) => {
+      const filter = String(args.filter ?? 'all') as AuditActionType;
+      setAuditFilter(filter);
+      return { auditFilter: store.auditFilter };
+    },
   },
   {
     name: 'browse_set_theme',
     description: 'Switch the vault appearance between light and dark theme.',
     parameters: {
       type: 'object',
-      properties: {
-        theme: { type: 'string', enum: THEMES },
-      },
+      properties: { theme: { type: 'string', enum: THEMES } },
       required: ['theme'],
     },
     handler: (args) => {
-      if (!THEMES.includes(args.theme)) {
-        throw new Error(`Unknown theme: ${args.theme}`);
-      }
-      setTheme(args.theme as 'light' | 'dark');
+      const theme = String(args.theme ?? '');
+      if (!THEMES.includes(theme)) throw new Error(`Unknown theme: ${theme}`);
+      setTheme(theme as 'light' | 'dark');
       return { theme: store.theme };
     },
   },
@@ -108,9 +133,7 @@ const tools: ToolDef[] = [
     description: 'Create a new Nostr identity with a generated keypair and switch to it.',
     parameters: {
       type: 'object',
-      properties: {
-        label: { type: 'string' },
-      },
+      properties: { label: { type: 'string' } },
       required: ['label'],
     },
     handler: (args) => {
@@ -124,15 +147,13 @@ const tools: ToolDef[] = [
     description: 'Select an existing identity as the active identity.',
     parameters: {
       type: 'object',
-      properties: {
-        id: { type: 'string' },
-      },
+      properties: { id: { type: 'string' } },
       required: ['id'],
     },
     handler: (args) => {
-      const exists = store.identities.some((i) => i.id === args.id);
-      if (!exists) throw new Error(`Unknown identity id: ${args.id}`);
-      selectIdentity(args.id);
+      const id = String(args.id ?? '');
+      if (!store.identities.some((i) => i.id === id)) throw new Error(`Unknown identity id: ${id}`);
+      selectIdentity(id);
       return { activeIdentityId: store.activeIdentityId };
     },
   },
@@ -141,37 +162,31 @@ const tools: ToolDef[] = [
     description: 'Update identity label.',
     parameters: {
       type: 'object',
-      properties: {
-        id: { type: 'string' },
-        label: { type: 'string' }
-      },
-      required: ['id', 'label']
+      properties: { id: { type: 'string' }, label: { type: 'string' } },
+      required: ['id', 'label'],
     },
     handler: (args) => {
-      const exists = store.identities.some((i) => i.id === args.id);
-      if (!exists) throw new Error(`Unknown identity id: ${args.id}`);
-      renameIdentity(args.id, args.label);
+      const id = String(args.id ?? '');
+      if (!store.identities.some((i) => i.id === id)) throw new Error(`Unknown identity id: ${id}`);
+      renameIdentity(id, String(args.label ?? ''));
       return { success: true };
-    }
+    },
   },
   {
     name: 'entity_identity_delete',
     description: 'Delete an identity.',
     parameters: {
       type: 'object',
-      properties: {
-        id: { type: 'string' },
-        confirm: { type: 'boolean' }
-      },
-      required: ['id', 'confirm']
+      properties: { id: { type: 'string' }, confirm: { type: 'boolean' } },
+      required: ['id', 'confirm'],
     },
     handler: (args) => {
       if (!args.confirm) throw new Error('Delete requires explicit confirm=true.');
-      const exists = store.identities.some((i) => i.id === args.id);
-      if (!exists) throw new Error(`Unknown identity id: ${args.id}`);
-      deleteIdentity(args.id);
+      const id = String(args.id ?? '');
+      if (!store.identities.some((i) => i.id === id)) throw new Error(`Unknown identity id: ${id}`);
+      deleteIdentity(id);
       return { success: true };
-    }
+    },
   },
   {
     name: 'entity_identity_toggle',
@@ -185,68 +200,91 @@ const tools: ToolDef[] = [
       required: ['identityId', 'appId'],
     },
     handler: (args) => {
-      const exists = store.identities.some((i) => i.id === args.identityId);
-      if (!exists) throw new Error(`Unknown identity id: ${args.identityId}`);
-      if (!APP_IDS.includes(args.appId)) throw new Error(`Unknown app id: ${args.appId}`);
-      toggleAppPermission(args.identityId, args.appId);
-      return { granted: store.grants[args.identityId]?.[args.appId] ?? false };
+      const identityId = String(args.identityId ?? '');
+      const appId = String(args.appId ?? '');
+      if (!store.identities.some((i) => i.id === identityId)) throw new Error(`Unknown identity id: ${identityId}`);
+      if (!APP_IDS.includes(appId as (typeof APP_IDS)[number])) throw new Error(`Unknown app id: ${appId}`);
+      toggleAppPermission(identityId, appId as (typeof APP_IDS)[number]);
+      return { granted: store.grants[identityId]?.[appId as (typeof APP_IDS)[number]] ?? false };
     },
   },
   {
     name: 'artifact_export',
-    description: 'Export vault data to JSON.',
+    description: 'Export vault or backup JSON preview metadata.',
     parameters: {
       type: 'object',
       properties: {
-        format: { type: 'string', enum: ['json'] }
+        format: { type: 'string', enum: ['json', 'backup-json'] },
+        identityId: { type: 'string' },
       },
-      required: ['format']
+      required: ['format'],
     },
     handler: (args) => {
-      const data = {
-        version: 1,
-        activeLabel: store.identities.find(i => i.id === store.activeIdentityId)?.nickname || '',
-        theme: store.theme,
-        identities: store.identities.map(i => ({
-          label: i.nickname,
-          npub: i.npub,
-          nsec: i.nsec,
-          grants: store.grants[i.id] || {}
-        }))
-      };
-      return { preview: data }; // Do not return raw string file per mechanics exclusions
-    }
+      const format = String(args.format ?? 'json');
+      if (format === 'json') {
+        return { preview: exportVaultJson(), surface: 'vault-json' };
+      }
+      if (format === 'backup-json') {
+        const identityId = String(args.identityId ?? store.activeIdentityId);
+        const preview = exportBackupJson(identityId);
+        if (!preview) throw new Error(`Unknown identity id: ${identityId}`);
+        return { preview, surface: 'backup-json', identityId };
+      }
+      throw new Error(`Unknown export format: ${format}`);
+    },
   },
   {
     name: 'artifact_import',
-    description: 'Import vault data from JSON.',
+    description: 'Import vault or backup JSON.',
     parameters: {
       type: 'object',
       properties: {
-        mode: { type: 'string', enum: ['vault-json'] },
-        vaultData: { type: 'object' } // Accepts the parsed object for WebMCP binding
+        mode: { type: 'string', enum: ['vault-json', 'backup-json'] },
+        vaultData: { type: 'object' },
+        backupData: { type: 'object' },
       },
-      required: ['mode', 'vaultData']
+      required: ['mode'],
     },
     handler: (args) => {
-      importVault(args.vaultData);
-      return { success: true };
-    }
+      const mode = String(args.mode ?? '');
+      if (mode === 'vault-json') {
+        const result = importVault(args.vaultData);
+        if (!result.ok) throw new Error(result.error);
+        return { success: true, surface: 'vault-json' };
+      }
+      if (mode === 'backup-json') {
+        const result = importBackup(args.backupData);
+        if (!result.ok) throw new Error(result.error);
+        return { success: true, surface: 'backup-json' };
+      }
+      throw new Error(`Unknown import mode: ${mode}`);
+    },
   },
   {
     name: 'artifact_copy',
-    description: 'Copy item to clipboard.',
+    description: 'Copy export preview metadata for vault or backup surfaces.',
     parameters: {
       type: 'object',
       properties: {
-        target: { type: 'string' }
+        target: { type: 'string', enum: ['vault-json', 'backup-json'] },
+        identityId: { type: 'string' },
       },
-      required: ['target']
+      required: ['target'],
     },
     handler: (args) => {
-      return { success: true, warning: 'Clipboard operations must be validated by Playwright directly.' };
-    }
-  }
+      const target = String(args.target ?? '');
+      if (target === 'vault-json') {
+        return { preview: exportVaultJson(), surface: 'vault-json' };
+      }
+      if (target === 'backup-json') {
+        const identityId = String(args.identityId ?? store.activeIdentityId);
+        const preview = exportBackupJson(identityId);
+        if (!preview) throw new Error(`Unknown identity id: ${identityId}`);
+        return { preview, surface: 'backup-json' };
+      }
+      throw new Error(`Unknown copy target: ${target}`);
+    },
+  },
 ];
 
 const toolMap = new Map(tools.map((t) => [t.name, t]));
@@ -267,11 +305,9 @@ function webmcp_list_tools() {
   }));
 }
 
-function webmcp_invoke_tool(name: string, args: Record<string, any> = {}) {
+function webmcp_invoke_tool(name: string, args: Record<string, unknown> = {}) {
   const tool = toolMap.get(name);
-  if (!tool) {
-    throw new Error(`Unknown tool: ${name}`);
-  }
+  if (!tool) throw new Error(`Unknown tool: ${name}`);
   return tool.handler(args ?? {});
 }
 
@@ -287,17 +323,20 @@ window.webmcp_session_info = webmcp_session_info;
 window.webmcp_list_tools = webmcp_list_tools;
 window.webmcp_invoke_tool = webmcp_invoke_tool;
 
-if ((navigator as any).modelContext && typeof (navigator as any).modelContext.registerTool === 'function') {
+if ((navigator as Navigator & { modelContext?: { registerTool: (tool: unknown) => void } }).modelContext?.registerTool) {
+  const mc = (navigator as Navigator & { modelContext: { registerTool: (tool: unknown) => void } }).modelContext;
   for (const tool of tools) {
     try {
-      (navigator as any).modelContext.registerTool({
+      mc.registerTool({
         name: tool.name,
         description: tool.description,
         inputSchema: tool.parameters,
-        execute: (args: Record<string, any>) => tool.handler(args),
+        execute: (args: Record<string, unknown>) => tool.handler(args),
       });
     } catch {
-      // optional surface; ignore registration failures
+      /* optional */
     }
   }
 }
+
+export { webmcp_session_info, webmcp_list_tools, webmcp_invoke_tool };

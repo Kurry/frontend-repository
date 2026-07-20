@@ -1,12 +1,16 @@
 import { createStore, reconcile, unwrap } from 'solid-js/store';
+import { nip19 } from 'nostr-tools';
 import { bytesToHex, generateKeyPair, keyPairFromSkHex } from './crypto';
+import { backupSchema, vaultImportSchema } from './validation';
 
 export const APPS = [
   { id: 'damus', name: 'Damus' },
   { id: 'snort', name: 'Snort' },
   { id: 'coracle', name: 'Coracle' },
   { id: 'iris', name: 'Iris' },
-];
+] as const;
+
+export type AppId = (typeof APPS)[number]['id'];
 
 export interface Identity {
   id: string;
@@ -17,13 +21,30 @@ export interface Identity {
   createdAt: number;
 }
 
-export type Grants = Record<string, Record<string, boolean>>;
+export type Grants = Record<string, Record<AppId, boolean>>;
 
 export type ViewId = 'dashboard' | 'identities' | 'permissions' | 'audit-log' | 'settings';
+
+export type AuditActionType =
+  | 'all'
+  | 'identity-created'
+  | 'identity-renamed'
+  | 'identity-deleted'
+  | 'identity-selected'
+  | 'permission-changed'
+  | 'bulk-permission'
+  | 'key-rotated'
+  | 'backup-exported'
+  | 'backup-imported'
+  | 'vault-exported'
+  | 'vault-imported'
+  | 'theme-changed';
 
 export interface AuditEntry {
   ts: number;
   message: string;
+  action: AuditActionType;
+  identityLabel?: string;
 }
 
 export interface StateShape {
@@ -41,6 +62,14 @@ interface AppState extends StateShape {
   historyIndex: number;
   searchQuery: string;
   sortOrder: 'label-asc' | 'label-desc';
+  auditFilter: AuditActionType;
+  vaultDrawerOpen: boolean;
+  backupDrawerIdentityId: string | null;
+  isCreatingIdentity: boolean;
+}
+
+function emptyGrants(): Record<AppId, boolean> {
+  return { damus: false, snort: false, coracle: false, iris: false };
 }
 
 function seedIdentity(nickname: string): Identity {
@@ -73,7 +102,12 @@ function buildSeed(): AppState {
   return {
     ...initialState,
     auditLog: [
-      { ts: Date.now(), message: 'Vault initialized with 2 seeded identities.' },
+      {
+        ts: Date.now(),
+        message: 'Vault ready for Personal.',
+        action: 'identity-selected',
+        identityLabel: 'Personal',
+      },
     ],
     view: 'dashboard',
     revealedIdentityId: null,
@@ -81,6 +115,10 @@ function buildSeed(): AppState {
     historyIndex: 0,
     searchQuery: '',
     sortOrder: 'label-asc',
+    auditFilter: 'all',
+    vaultDrawerOpen: false,
+    backupDrawerIdentityId: null,
+    isCreatingIdentity: false,
   };
 }
 
@@ -88,8 +126,14 @@ const initial = buildSeed();
 
 export const [store, setStore] = createStore<AppState>(initial);
 
-export function logAudit(message: string) {
-  setStore('auditLog', (log) => [{ ts: Date.now(), message }, ...log].slice(0, 50));
+export function logAudit(
+  message: string,
+  action: AuditActionType,
+  identityLabel?: string,
+) {
+  setStore('auditLog', (log) =>
+    [{ ts: Date.now(), message, action, identityLabel }, ...log].slice(0, 100),
+  );
 }
 
 function pushHistory() {
@@ -105,7 +149,7 @@ function pushHistory() {
     newHistory.push(currentState);
     return {
       history: newHistory,
-      historyIndex: newHistory.length - 1
+      historyIndex: newHistory.length - 1,
     };
   });
 }
@@ -135,7 +179,7 @@ export function setView(view: ViewId) {
 
 export function setTheme(theme: 'light' | 'dark') {
   setStore('theme', theme);
-  logAudit(`Theme switched to ${theme}.`);
+  logAudit(`Theme switched to ${theme} for ${activeIdentity()?.nickname ?? 'vault'}.`, 'theme-changed', activeIdentity()?.nickname);
 }
 
 export function toggleTheme() {
@@ -150,64 +194,82 @@ export function setSortOrder(order: 'label-asc' | 'label-desc') {
   setStore('sortOrder', order);
 }
 
+export function setAuditFilter(filter: AuditActionType) {
+  setStore('auditFilter', filter);
+}
+
+export function setVaultDrawerOpen(open: boolean) {
+  setStore('vaultDrawerOpen', open);
+}
+
+export function setBackupDrawerIdentityId(id: string | null) {
+  setStore('backupDrawerIdentityId', id);
+}
+
 export function createIdentity(nickname: string): string {
+  if (store.isCreatingIdentity) return store.activeIdentityId;
+  setStore('isCreatingIdentity', true);
   const trimmed = nickname.trim() || `Identity ${store.identities.length + 1}`;
   const identity = seedIdentity(trimmed);
   setStore('identities', (list) => [...list, identity]);
-  setStore('grants', identity.id, { damus: false, snort: false, coracle: false, iris: false });
+  setStore('grants', identity.id, emptyGrants());
   setStore('activeIdentityId', identity.id);
-  logAudit(`Created identity "${trimmed}" and switched to it.`);
+  logAudit(`Created identity "${trimmed}".`, 'identity-created', trimmed);
   pushHistory();
+  setStore('isCreatingIdentity', false);
   return identity.id;
 }
 
 export function renameIdentity(id: string, nickname: string) {
   const trimmed = nickname.trim();
   if (!trimmed) return;
+  const prev = store.identities.find((i) => i.id === id);
   setStore('identities', (i) => i.id === id, 'nickname', trimmed);
-  logAudit(`Renamed identity to "${trimmed}".`);
+  logAudit(`Renamed identity from "${prev?.nickname}" to "${trimmed}".`, 'identity-renamed', trimmed);
   pushHistory();
 }
 
 export function rotateIdentityKeys(id: string) {
   const kp = generateKeyPair();
-  const identity = store.identities.find(i => i.id === id);
+  const identity = store.identities.find((i) => i.id === id);
   if (!identity) return;
+  const shortOld = identity.npub.slice(0, 8) + '…';
+  const shortNew = kp.npub.slice(0, 8) + '…';
   setStore('identities', (i) => i.id === id, {
     skHex: kp.skHex,
     npub: kp.npub,
     nsec: kp.nsec,
   });
-
-  const shortOld = identity.npub.substring(0, 8) + '...';
-  const shortNew = kp.npub.substring(0, 8) + '...';
-
-  logAudit(`Rotated keys for "${identity.nickname}" (old: ${shortOld}, new: ${shortNew}).`);
+  logAudit(
+    `Rotated keys for "${identity.nickname}" (old: ${shortOld}, new: ${shortNew}).`,
+    'key-rotated',
+    identity.nickname,
+  );
   pushHistory();
 }
 
 export function deleteIdentity(id: string) {
-  if (store.identities.length <= 1) return; // Cannot delete last identity
+  if (store.identities.length <= 1) return;
 
   const identity = store.identities.find((i) => i.id === id);
   if (!identity) return;
 
-  setStore('identities', (list) => list.filter(i => i.id !== id));
+  setStore('identities', (list) => list.filter((i) => i.id !== id));
 
-  // Clean up grants
   const newGrants = { ...unwrap(store.grants) };
   delete newGrants[id];
   setStore('grants', newGrants);
 
   if (store.activeIdentityId === id) {
-    setStore('activeIdentityId', store.identities[0].id);
+    const remaining = store.identities.filter((i) => i.id !== id);
+    setStore('activeIdentityId', remaining[0]?.id ?? '');
   }
 
   if (store.revealedIdentityId === id) {
     setStore('revealedIdentityId', null);
   }
 
-  logAudit(`Deleted identity "${identity.nickname}".`);
+  logAudit(`Deleted identity "${identity.nickname}".`, 'identity-deleted', identity.nickname);
   pushHistory();
 }
 
@@ -216,36 +278,48 @@ export function selectIdentity(id: string) {
   if (!identity) return;
   setStore('activeIdentityId', id);
   setStore('revealedIdentityId', null);
-  logAudit(`Switched active identity to "${identity.nickname}".`);
+  logAudit(`Switched active identity to "${identity.nickname}".`, 'identity-selected', identity.nickname);
   pushHistory();
 }
 
-export function toggleAppPermission(identityId: string, appId: string) {
+export function toggleAppPermission(identityId: string, appId: AppId) {
   const identity = store.identities.find((i) => i.id === identityId);
   const current = store.grants[identityId]?.[appId] ?? false;
   setStore('grants', identityId, appId, !current);
   const appName = APPS.find((a) => a.id === appId)?.name ?? appId;
   logAudit(
-    `${!current ? 'Granted' : 'Revoked'} ${appName} access for "${identity?.nickname ?? identityId}".`
+    `${!current ? 'Granted' : 'Revoked'} ${appName} access for "${identity?.nickname ?? identityId}".`,
+    'permission-changed',
+    identity?.nickname,
   );
   pushHistory();
 }
 
-export function bulkGrant(appId: string) {
+export function bulkGrant(appId: AppId) {
   const appName = APPS.find((a) => a.id === appId)?.name ?? appId;
+  let changed = 0;
   for (const identity of store.identities) {
+    if (!store.grants[identity.id]?.[appId]) changed += 1;
     setStore('grants', identity.id, appId, true);
   }
-  logAudit(`Bulk granted ${appName} access to all identities.`);
+  logAudit(
+    `Bulk granted ${appName} access to ${changed} ${changed === 1 ? 'identity' : 'identities'}.`,
+    'bulk-permission',
+  );
   pushHistory();
 }
 
-export function bulkRevoke(appId: string) {
+export function bulkRevoke(appId: AppId) {
   const appName = APPS.find((a) => a.id === appId)?.name ?? appId;
+  let changed = 0;
   for (const identity of store.identities) {
+    if (store.grants[identity.id]?.[appId]) changed += 1;
     setStore('grants', identity.id, appId, false);
   }
-  logAudit(`Bulk revoked ${appName} access from all identities.`);
+  logAudit(
+    `Bulk revoked ${appName} access from ${changed} ${changed === 1 ? 'identity' : 'identities'}.`,
+    'bulk-permission',
+  );
   pushHistory();
 }
 
@@ -257,49 +331,169 @@ export function activeIdentity(): Identity | undefined {
   return store.identities.find((i) => i.id === store.activeIdentityId);
 }
 
-export function grantsFor(identityId: string): Record<string, boolean> {
-  return store.grants[identityId] ?? { damus: false, snort: false, coracle: false, iris: false };
+export function grantsFor(identityId: string): Record<AppId, boolean> {
+  return store.grants[identityId] ?? emptyGrants();
 }
 
-import { nip19 } from 'nostr-tools';
+export function connectedAppCount(identityId: string): number {
+  const grants = grantsFor(identityId);
+  return APPS.filter((a) => grants[a.id]).length;
+}
 
-export function importVault(vault: any) {
-  const finalIdentities = vault.identities.map((item: any) => {
+export function filteredIdentities(): Identity[] {
+  const q = store.searchQuery.trim().toLowerCase();
+  let list = [...store.identities];
+  if (q) {
+    list = list.filter(
+      (i) => i.nickname.toLowerCase().includes(q) || i.npub.toLowerCase().includes(q),
+    );
+  }
+  list.sort((a, b) => {
+    const cmp = a.nickname.localeCompare(b.nickname);
+    return store.sortOrder === 'label-asc' ? cmp : -cmp;
+  });
+  return list;
+}
+
+export function filteredAuditLog(): AuditEntry[] {
+  if (store.auditFilter === 'all') return store.auditLog;
+  return store.auditLog.filter((e) => e.action === store.auditFilter);
+}
+
+export function exportVaultJson() {
+  return {
+    version: 'nostrpass-vault-v1' as const,
+    activeLabel: store.identities.find((i) => i.id === store.activeIdentityId)?.nickname ?? '',
+    theme: store.theme,
+    identities: store.identities.map((i) => ({
+      label: i.nickname,
+      npub: i.npub,
+      nsec: i.nsec,
+      grants: store.grants[i.id] ?? emptyGrants(),
+    })),
+  };
+}
+
+export function exportBackupJson(identityId: string) {
+  const identity = store.identities.find((i) => i.id === identityId);
+  if (!identity) return null;
+  return {
+    version: 'nostrpass-backup-v1' as const,
+    exportedAt: new Date().toISOString(),
+    identity: {
+      label: identity.nickname,
+      npub: identity.npub,
+      nsec: identity.nsec,
+      grants: store.grants[identity.id] ?? emptyGrants(),
+    },
+  };
+}
+
+export function importVault(vault: unknown): { ok: true } | { ok: false; error: string } {
+  const parsed = vaultImportSchema.safeParse(vault);
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    const field = issue?.path.join('.') || 'vault import';
+    return { ok: false, error: `${field}: ${issue?.message ?? 'Invalid vault JSON.'}` };
+  }
+
+  const data = parsed.data;
+  const finalIdentities: Identity[] = data.identities.map((item) => {
     let skHex = '';
     try {
-        const decoded = nip19.decode(item.nsec);
-        if (decoded.type === 'nsec' && decoded.data instanceof Uint8Array) {
-            skHex = bytesToHex(decoded.data);
-        }
-    } catch(e) {}
-
+      const decoded = nip19.decode(item.nsec);
+      if (decoded.type === 'nsec' && decoded.data instanceof Uint8Array) {
+        skHex = bytesToHex(decoded.data);
+      }
+    } catch {
+      /* keep empty skHex */
+    }
     return {
       id: crypto.randomUUID(),
       nickname: item.label,
-      skHex: skHex,
+      skHex,
       npub: item.npub,
       nsec: item.nsec,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
   });
 
   const grants: Grants = {};
   for (let i = 0; i < finalIdentities.length; i++) {
-    grants[finalIdentities[i].id] = vault.identities[i].grants;
+    grants[finalIdentities[i].id] = data.identities[i].grants;
   }
 
   let activeId = finalIdentities[0].id;
-  const activeLabelObj = finalIdentities.find((i: any) => i.nickname === vault.activeLabel);
-  if (activeLabelObj) {
-      activeId = activeLabelObj.id;
-  }
+  const activeMatch = finalIdentities.find((i) => i.nickname === data.activeLabel);
+  if (activeMatch) activeId = activeMatch.id;
 
   setStore('identities', finalIdentities);
   setStore('grants', grants);
   setStore('activeIdentityId', activeId);
-  if (vault.theme) {
-      setTheme(vault.theme);
-  }
-  logAudit('Imported vault configuration.');
+  setStore('theme', data.theme);
+  logAudit(
+    `Imported vault configuration for ${finalIdentities.length} ${finalIdentities.length === 1 ? 'identity' : 'identities'}.`,
+    'vault-imported',
+    activeMatch?.nickname,
+  );
   pushHistory();
+  return { ok: true };
 }
+
+export function importBackup(backup: unknown): { ok: true } | { ok: false; error: string } {
+  const parsed = backupSchema.safeParse(backup);
+  if (!parsed.success) {
+    const issue = parsed.error.issues[0];
+    const field = issue?.path.join('.') || 'backup import';
+    return { ok: false, error: `${field}: ${issue?.message ?? 'Invalid Key Backup JSON.'}` };
+  }
+
+  const conflict = store.identities.find((i) => i.npub === parsed.data.identity.npub);
+  if (conflict) {
+    return {
+      ok: false,
+      error: `npub conflict: backup npub ${parsed.data.identity.npub.slice(0, 12)}… already exists for "${conflict.nickname}".`,
+    };
+  }
+
+  let skHex = '';
+  try {
+    const decoded = nip19.decode(parsed.data.identity.nsec);
+    if (decoded.type === 'nsec' && decoded.data instanceof Uint8Array) {
+      skHex = bytesToHex(decoded.data);
+    }
+  } catch {
+    /* keep empty */
+  }
+
+  const identity: Identity = {
+    id: crypto.randomUUID(),
+    nickname: parsed.data.identity.label,
+    skHex,
+    npub: parsed.data.identity.npub,
+    nsec: parsed.data.identity.nsec,
+    createdAt: Date.now(),
+  };
+
+  setStore('identities', (list) => [...list, identity]);
+  setStore('grants', identity.id, parsed.data.identity.grants);
+  logAudit(`Imported backup for "${identity.nickname}".`, 'backup-imported', identity.nickname);
+  pushHistory();
+  return { ok: true };
+}
+
+export const AUDIT_FILTER_OPTIONS: { value: AuditActionType; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'identity-created', label: 'Identity created' },
+  { value: 'identity-renamed', label: 'Identity renamed' },
+  { value: 'identity-deleted', label: 'Identity deleted' },
+  { value: 'identity-selected', label: 'Identity selected' },
+  { value: 'permission-changed', label: 'Permission changed' },
+  { value: 'bulk-permission', label: 'Bulk permission' },
+  { value: 'key-rotated', label: 'Key rotated' },
+  { value: 'backup-exported', label: 'Backup exported' },
+  { value: 'backup-imported', label: 'Backup imported' },
+  { value: 'vault-exported', label: 'Vault exported' },
+  { value: 'vault-imported', label: 'Vault imported' },
+  { value: 'theme-changed', label: 'Theme changed' },
+];
