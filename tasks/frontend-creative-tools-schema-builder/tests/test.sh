@@ -34,18 +34,6 @@ done
 curl -fsS "$WEBMCP_CDP_ENDPOINT/json/version" > /dev/null 2>&1 \
   || { echo "[test] judge Chrome unreachable (infra); see /logs/verifier/chrome.log" >&2; exit 1; }
 
-# Reduced-motion Chrome (entrypoint's second instance, --force-prefers-reduced-motion):
-# backs the playwright_reduced_motion judge MCP server so reduced-motion criteria
-# are verifiable. Same infra gate: unreachable = infra error, never a 0.0.
-export WEBMCP_RM_CDP_PORT=9223
-export WEBMCP_RM_CDP_ENDPOINT="http://127.0.0.1:$WEBMCP_RM_CDP_PORT"
-for _ in $(seq 1 30); do
-  curl -fsS "$WEBMCP_RM_CDP_ENDPOINT/json/version" > /dev/null 2>&1 && break
-  sleep 1
-done
-curl -fsS "$WEBMCP_RM_CDP_ENDPOINT/json/version" > /dev/null 2>&1 \
-  || { echo "[test] reduced-motion judge Chrome unreachable (infra); see /logs/verifier/chrome-rm.log" >&2; exit 1; }
-
 # Requires /app/package.json scripts named exactly: verify:build (exit 0), start (port 3000).
 # When grading restored artifacts (harbor score), node_modules is excluded — reinstall.
 if [ -f /app/package.json ] && [ ! -d /app/node_modules ]; then

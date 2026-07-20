@@ -40,17 +40,16 @@ export const metadataFieldSchema = z.object({
   if (value.type === 'dropdown' && (!value.options || value.options.length === 0)) ctx.addIssue({ code: 'custom', path: ['options'], message: 'Options are required for dropdown metadata' });
 });
 
-export const versionSnapshotSchema = z.object({ name: z.string().min(1, 'Version name is required').max(80, 'Version name must contain at most 80 characters') });
+export const versionSnapshotSchema = z.object({ name: z.string().min(1, 'Version name is required (1 to 80 characters)').max(80, 'Version name must contain at most 80 characters') });
 
-const jsonObject = z.record(z.string(), z.unknown());
 export const schemaPackageSchema = z.object({
   schemaVersion: z.literal('schema-package-v1', { error: 'schemaVersion must be exactly schema-package-v1' }),
-  name: z.string().min(1, 'Name is required'),
-  jsonSchema: jsonObject,
-  fields: z.array(fieldDefinitionSchema),
-  metadata: z.record(z.string(), z.string()),
-  examplePayload: jsonObject,
-  formatInstruction: z.string(),
+  name: z.string({ error: 'name is required — the active library schema name' }).min(1, 'name is required — the active library schema name'),
+  jsonSchema: z.record(z.string(), z.unknown(), { error: 'jsonSchema is required and must be a draft-07 JSON object' }),
+  fields: z.array(fieldDefinitionSchema, { error: 'fields is required and must be an array of FieldDefinition records' }),
+  metadata: z.record(z.string(), z.string(), { error: 'metadata is required and must map each label to a string value' }),
+  examplePayload: z.record(z.string(), z.unknown(), { error: 'examplePayload is required and must be a JSON object' }),
+  formatInstruction: z.string({ error: 'formatInstruction is required as a string' }),
 });
 
 export function validateSiblingKeys(fields, path = 'fields') {

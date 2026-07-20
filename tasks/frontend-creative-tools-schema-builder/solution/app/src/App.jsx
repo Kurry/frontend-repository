@@ -15,13 +15,13 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
 import {
-  FIELD_TYPES, fieldDefinitionSchema, findParent, flattenFields, metadataFieldSchema,
+  FIELD_TYPES, diffFields, fieldDefinitionSchema, findParent, flattenFields, metadataFieldSchema,
   versionSnapshotSchema,
 } from './domain';
 import {
@@ -31,6 +31,55 @@ import {
 
 const cx = (...classes) => classes.filter(Boolean).join(' ');
 const waitFrame = () => new Promise((resolve) => setTimeout(resolve, 0));
+// Shared with ConfigDrawerInner's exit transition so the workspace keeps its
+// reserved padding for exactly as long as the sliding panel is still visible.
+const CONFIG_DRAWER_EXIT_MS = 220;
+
+// Mirrors `value` when true; when it flips to false, stays true for `delay`ms
+// before following. Used to hold layout state (like drawer padding) until an
+// exit animation actually finishes instead of collapsing the instant the
+// underlying selection clears.
+function useDelayedFalse(value, delay) {
+  const [delayed, setDelayed] = useState(value);
+  useEffect(() => {
+    if (value) { setDelayed(true); return undefined; }
+    const id = setTimeout(() => setDelayed(false), delay);
+    return () => clearTimeout(id);
+  }, [value, delay]);
+  return delayed;
+}
+
+// Guarantees overlay dismissal on Escape and returns focus to the opener when it
+// closes, regardless of the underlying component's own focus handling.
+function useOverlayDismiss(open, onClose) {
+  const openerRef = useRef(null);
+  const closeRef = useRef(onClose);
+  const restoreTimerRef = useRef(null);
+  closeRef.current = onClose;
+  useEffect(() => {
+    const clearRestore = () => {
+      if (restoreTimerRef.current !== null) { clearTimeout(restoreTimerRef.current); restoreTimerRef.current = null; }
+    };
+    // Cancel any pending focus-restore from a previous close so a rapid
+    // reopen can't have that stale callback yank focus away later.
+    clearRestore();
+    if (open) {
+      openerRef.current = document.activeElement;
+      const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); closeRef.current(); } };
+      document.addEventListener('keydown', onKey, true);
+      return () => document.removeEventListener('keydown', onKey, true);
+    }
+    const opener = openerRef.current;
+    openerRef.current = null;
+    if (opener && typeof opener.focus === 'function') {
+      restoreTimerRef.current = setTimeout(() => {
+        restoreTimerRef.current = null;
+        try { opener.focus(); } catch { /* opener detached */ }
+      }, 0);
+    }
+    return clearRestore;
+  }, [open]);
+}
 
 function IconAction({ label, children, className, ...props }) {
   return <button type="button" className={cx('icon-action focusable', className)} aria-label={label} title={label} {...props}>{children}</button>;
@@ -52,7 +101,7 @@ function AppHeader() {
       <IconAction className="mobile-menu !text-white hover:!bg-white/15" label="Toggle schema library" onClick={() => setSidebarOpen(!sidebarOpen)}><Menu size={20} /></IconAction>
       <div className="brand-mark" aria-hidden="true">S/</div>
       <div className="min-w-0">
-        <div className="text-[17px] font-semibold leading-tight tracking-[-.02em]">Schema Forge</div>
+        <h1 className="text-[22px] font-semibold leading-tight tracking-[-.02em]">Schema Forge</h1>
         <div className="hidden text-[11px] text-[#b7b7ae] sm:block">Structured output workbench</div>
       </div>
       <div className="ml-auto hidden min-w-0 items-center gap-2 md:flex">
@@ -244,7 +293,9 @@ function TreeEditor() {
 function TreeLevel({ fields, level }) {
   return (
     <SortableContext items={fields.map((field) => field.id)} strategy={verticalListSortingStrategy}>
-      {fields.map((field) => <TreeNode key={field.id} field={field} level={level} />)}
+      <AnimatePresence initial={false}>
+        {fields.map((field) => <TreeNode key={field.id} field={field} level={level} />)}
+      </AnimatePresence>
     </SortableContext>
   );
 }
@@ -274,11 +325,18 @@ function TreeNode({ field, level }) {
     actions.update(field.id, { key: draft }, 'Rename field'); setEditing(false); setError('');
   };
   return (
-    <motion.div ref={setNodeRef} className="tree-row-wrap" layout transition={{ duration: .2 }} style={{ transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? .45 : 1 }}>
+    <motion.div ref={setNodeRef} className="tree-row-wrap" layout="position" initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: isDragging ? .45 : 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: .15, layout: { duration: .2 } }} style={{ transform: CSS.Transform.toString(transform), transition }}>
       <div
         className={cx('tree-row', selectedNodeId === field.id && 'selected', annotation?.status === 'pass' && 'validation-pass', annotation?.status === 'fail' && 'validation-fail')}
-        style={{ paddingLeft: `${Math.min(6 + (level - 1) * 17, 68)}px` }} role="treeitem" aria-level={level} aria-expanded={hasChildren ? !collapsed : undefined}
+        style={{ paddingLeft: `${Math.min(6 + (level - 1) * 17, 68)}px` }} role="treeitem" aria-level={level} aria-selected={selectedNodeId === field.id} aria-expanded={hasChildren ? !collapsed : undefined}
+        tabIndex={0}
         onClick={() => actions.select(field.id)}
+        onKeyDown={(e) => {
+          if (e.target !== e.currentTarget) return;
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); actions.select(field.id); }
+          else if (hasChildren && e.key === 'ArrowRight' && collapsed) { e.preventDefault(); actions.toggleCollapse(field.id); }
+          else if (hasChildren && e.key === 'ArrowLeft' && !collapsed) { e.preventDefault(); actions.toggleCollapse(field.id); }
+        }}
       >
         <button className="drag-handle focusable" aria-label={`Drag ${field.key}`} {...attributes} {...listeners}><DragVertical size={16} /></button>
         <Checkbox id={`multi-${field.id}`} labelText={`Select ${field.key}`} hideLabel checked={multi.includes(field.id)} onChange={(_, data) => actions.toggleMulti(field.id)} onClick={(e) => e.stopPropagation()} />
@@ -337,15 +395,15 @@ function OutputRegion() {
         <TabPanels>
           <TabPanel>
             <div className="code-toolbar"><span className="text-xs subtle">draft-07 · JSON</span><Button kind="ghost" size="sm" renderIcon={Copy} onClick={() => copy(compiledText, 'Compiled schema')}>Copy</Button></div>
-            <motion.pre key={compiledText} className="code-surface" initial={{ opacity: .7 }} animate={{ opacity: 1 }}>{compiledText}</motion.pre>
+            <motion.pre key={compiledText} className="code-surface" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: .28 }}>{compiledText}</motion.pre>
           </TabPanel>
           <TabPanel>
             <div className="code-toolbar"><span className="text-xs subtle">Generated from every visible field</span><div className="flex gap-1"><Button kind="ghost" size="sm" renderIcon={Renew} onClick={regenerate}>Regenerate</Button><Button kind="ghost" size="sm" renderIcon={Copy} onClick={() => copy(JSON.stringify(example, null, 2), 'Example payload')}>Copy</Button></div></div>
-            <motion.pre key={JSON.stringify(example)} className="code-surface" initial={{ opacity: .7 }} animate={{ opacity: 1 }}>{JSON.stringify(example, null, 2)}</motion.pre>
+            <motion.pre key={JSON.stringify(example)} className="code-surface" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: .28 }}>{JSON.stringify(example, null, 2)}</motion.pre>
           </TabPanel>
           <TabPanel>
             <div className="code-toolbar"><span className="text-xs subtle">Paste-ready response instruction</span><Button kind="primary" size="sm" renderIcon={WatsonHealthTextAnnotationToggle} onClick={insertPrompt}>Insert into prompt draft</Button></div>
-            <motion.pre key={instruction} className="code-surface !whitespace-pre-wrap !text-[#f4f4f4]" initial={{ opacity: .7 }} animate={{ opacity: 1 }}>{instruction}</motion.pre>
+            <motion.pre key={instruction} className="code-surface !whitespace-pre-wrap !text-[#f4f4f4]" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: .28 }}>{instruction}</motion.pre>
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -355,6 +413,14 @@ function OutputRegion() {
 
 function FieldConfigDrawer() {
   const field = useSchemaStore(getSelectedField);
+  return (
+    <AnimatePresence>
+      {field && <ConfigDrawerInner key={field.id} field={field} />}
+    </AnimatePresence>
+  );
+}
+
+function ConfigDrawerInner({ field }) {
   const fields = useSchemaStore(getActiveFields);
   const close = useSchemaStore((s) => s.selectNode);
   const update = useSchemaStore((s) => s.updateField);
@@ -362,9 +428,8 @@ function FieldConfigDrawer() {
   const type = watch('type');
   const timer = useRef();
   useEffect(() => {
-    if (field) reset({ ...field, enumValues: field.enumValues?.join('\n') || '' });
-  }, [field?.id, reset]);
-  if (!field) return null;
+    reset({ ...field, enumValues: field.enumValues?.join('\n') || '' });
+  }, [field.id, reset]);
   const commit = async () => {
     clearTimeout(timer.current);
     timer.current = setTimeout(async () => {
@@ -405,7 +470,7 @@ function FieldConfigDrawer() {
     return { ...props, onChange: (e) => { props.onChange(e); clearErrors(name); commit(); } };
   };
   return (
-    <aside className="config-drawer" aria-label={`Configure ${field.key}`}>
+    <motion.aside className="config-drawer" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ duration: CONFIG_DRAWER_EXIT_MS / 1000, ease: 'easeOut' }} aria-label={`Configure ${field.key}`}>
       <div className="drawer-header"><div><div className="eyebrow">FieldDefinition</div><h2 className="mt-1 text-lg font-medium">Configure field</h2></div><IconAction label="Close configuration" onClick={() => close(null)}><Close /></IconAction></div>
       <form className="form-stack" onSubmit={(e) => e.preventDefault()}>
         <TextInput id="config-key" labelText="Key" value={watch('key') || ''} invalid={!!errors.key} invalidText={errors.key?.message} {...reg('key')} />
@@ -431,7 +496,7 @@ function FieldConfigDrawer() {
           </div>
         </div>
       </form>
-    </aside>
+    </motion.aside>
   );
 }
 
@@ -465,7 +530,12 @@ function VersionsPanel() {
   const diffA = useSchemaStore((s) => s.diffA);
   const diffB = useSchemaStore((s) => s.diffB);
   const setDiff = useSchemaStore((s) => s.setDiff);
-  const results = useSchemaStore(useShallow((s) => s.diffResults()));
+  const allVersions = useSchemaStore((s) => s.versions);
+  const results = useMemo(() => {
+    const a = allVersions.find((v) => v.id === diffA);
+    const b = allVersions.find((v) => v.id === diffB);
+    return a && b ? diffFields(a.fields, b.fields) : [];
+  }, [allVersions, diffA, diffB]);
   const { register, handleSubmit, reset, formState: { errors } } = useForm({ resolver: zodResolver(versionSnapshotSchema), defaultValues: { name: '' } });
   return (
     <div>
@@ -568,6 +638,7 @@ function ExportModal() {
   const pkg = useMemo(() => JSON.parse(packageText), [packageText]);
   const instruction = useSchemaStore((s) => s.instruction());
   const [format, setFormat] = useState('package');
+  useOverlayDismiss(open, () => close(false));
   const report = JSON.stringify({
     schemaName: pkg.name,
     payloadSummary: validation.payload ? { keys: Object.keys(validation.payload), fieldCount: Object.keys(validation.payload).length } : null,
@@ -600,6 +671,7 @@ function ImportPackageModal() {
   const packageError = useSchemaStore((s) => s.packageImportError);
   const schema = z.object({ text: z.string().min(1, 'SchemaPackage JSON is required') });
   const { register, handleSubmit, reset, formState: { errors } } = useForm({ resolver: zodResolver(schema), defaultValues: { text: '' } });
+  useOverlayDismiss(open, () => { close(false); reset(); });
   return (
     <Modal open={open} passiveModal size="lg" onRequestClose={() => { close(false); reset(); }} modalHeading="Import SchemaPackage" modalLabel="schema-package-v1">
       <form onSubmit={handleSubmit(({ text }) => importPackage(text))}>
@@ -616,6 +688,7 @@ function PromptDrawer() {
   const close = useSchemaStore((s) => s.setPromptDrawerOpen);
   const draft = useSchemaStore((s) => s.promptDraft);
   const setDraft = useSchemaStore((s) => s.setPromptDraft);
+  useOverlayDismiss(open, () => close(false));
   if (!open) return null;
   return <><div className="overlay-backdrop" onClick={() => close(false)} /><aside className="prompt-drawer" aria-label="Prompt draft drawer"><div className="drawer-header"><div><div className="eyebrow">Working prompt</div><h2 className="mt-1 text-lg font-medium">Prompt draft</h2></div><IconAction label="Close prompt draft" onClick={() => close(false)}><Close /></IconAction></div><div className="p-5"><TextArea id="prompt-draft" labelText="Editable prompt draft" rows={20} value={draft} onChange={(e) => setDraft(e.target.value)} /><p className="mt-3 text-xs subtle">Format instructions append here without leaving the workbench.</p></div></aside></>;
 }
@@ -628,15 +701,19 @@ function ToastHost() {
 }
 
 export default function App() {
+  const selectedNodeId = useSchemaStore((s) => !!s.selectedNodeId);
+  const drawerOpen = useDelayedFalse(selectedNodeId, CONFIG_DRAWER_EXIT_MS);
   return (
+    <MotionConfig reducedMotion="user">
     <div className="app-shell">
       <AppHeader />
-      <div className="workspace"><SchemaLibrary /><TreeEditor /><OutputRegion /></div>
+      <div className={cx('workspace', drawerOpen && 'drawer-open')}><SchemaLibrary /><TreeEditor /><OutputRegion /></div>
       <FieldConfigDrawer />
       <ExportModal />
       <ImportPackageModal />
       <PromptDrawer />
       <ToastHost />
     </div>
+    </MotionConfig>
   );
 }

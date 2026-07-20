@@ -415,7 +415,11 @@ export const useSchemaStore = create((set, get) => ({
   },
 }));
 
-export const getActiveFields = (state) => state.schemas.find((schema) => schema.id === state.activeSchemaId)?.fields || [];
+const EMPTY_FIELDS = [];
+// Must return a STABLE reference when there is no active schema — a fresh `[]`
+// literal here is a new getSnapshot value every render and drives useSyncExternalStore
+// into an infinite update loop (blank page) the moment the active schema is deleted.
+export const getActiveFields = (state) => state.schemas.find((schema) => schema.id === state.activeSchemaId)?.fields || EMPTY_FIELDS;
 export const getSelectedField = (state) => findField(getActiveFields(state), state.selectedNodeId);
 export const getActiveSchema = (state) => state.schemas.find((schema) => schema.id === state.activeSchemaId) || null;
 export const getRollup = (state) => ({

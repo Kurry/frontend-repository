@@ -76,7 +76,8 @@ button { -webkit-tap-highlight-color: transparent; }
 .output-tabs .cds--tab-content { padding: 0; }
 .output-tabs .cds--tabs .cds--tab--list { width: 100%; }
 .output-tabs .cds--tabs__nav-item { flex: 1; }
-.config-drawer { position: fixed; right: 0; top: 64px; bottom: 0; width: 330px; background: #fcfbf7; border-left: 1px solid #b8b7af; z-index: 40; box-shadow: -12px 0 30px #00000018; overflow-y: auto; animation: slide-in .18s ease-out; }
+.config-drawer { position: fixed; right: 0; top: 64px; bottom: 0; width: 280px; background: #fcfbf7; border-left: 1px solid #b8b7af; z-index: 40; box-shadow: -12px 0 30px #00000018; overflow-y: auto; }
+.workspace.drawer-open { padding-right: 280px; }
 .drawer-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 20px; border-bottom: 1px solid #deddd5; position: sticky; top: 0; background: #fcfbf7; z-index: 2; }
 .form-stack { display: grid; gap: 18px; padding: 20px; }
 .constraint-card { border: 1px solid #deddd5; background: #f4f3ed; padding: 13px; display: grid; gap: 10px; }
@@ -130,8 +131,15 @@ button { -webkit-tap-highlight-color: transparent; }
   .output-panel { border-top: 1px solid #deddd5; }
   .code-surface { min-height: 330px; max-height: 520px; }
   .config-drawer { top: 58px; width: min(360px, 100vw); }
+  .workspace.drawer-open { padding-right: 0; }
   .overlay-backdrop { inset: 58px 0 0; }
   .prompt-drawer { top: 58px; }
+  /* Mobile tap targets: every tree control reaches the 44px minimum */
+  .tree-row { min-height: 52px; gap: 9px; }
+  .tree-row .icon-action, .tree-row .drag-handle { width: 44px; height: 44px; }
+  .tree-row .cds--checkbox-wrapper, .tree-row .cds--toggle { min-width: 44px; min-height: 44px; display: flex; align-items: center; }
+  .tree-row .cds--checkbox-label { min-width: 44px; min-height: 44px; }
+  .tree-row .cds--checkbox-label::before, .tree-row .cds--checkbox-label::after { margin-top: 12px; }
 }
 @media (max-width: 430px) {
   .top-header { gap: 10px; }
