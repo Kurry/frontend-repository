@@ -118,44 +118,50 @@ def live_count(state: list[dict], term_cache: set[str]) -> tuple[int, dict]:
 
 def build_prompt(slug: str, sub: Path) -> str:
     rd = json.loads((sub / "verifier" / "reward-details.json").read_text())
-    fails: dict[str, list[str]] = {}
+    # Per-dimension fail counts — the SCOPE Jules must grasp. The complete list
+    # (every id + description + judge reasoning) lives in the committed
+    # solution/reward-details.json, which Jules reads directly — the prompt no
+    # longer truncates it.
+    per_dim: dict[str, tuple[int, int]] = {}
+    total_fail = total = 0
     for dim, block in rd.items():
         if not isinstance(block, dict) or "criteria" not in block:
             continue
+        f = t = 0
         for c in block["criteria"]:
+            t += 1
             if c.get("value", 1) == 0 or str(c.get("reasoning", "")).startswith(("BLOCKED:", "FAIL:")):
-                # Description alone is enough for Jules to act; keep it terse so
-                # the prompt stays well under Jules' size limit (cap per dim below).
-                desc = " ".join(str(c.get("description", "")).split())[:150]
-                fails.setdefault(dim, []).append(f"- [{c.get('id')}] {desc}")
-    # Cap: <=6 failures/dimension so a heavily-failing task can't blow the prompt.
-    lines = []
-    for dim, items in sorted(fails.items()):
-        if not items:
-            continue
-        shown = items[:6]
-        extra = f"\n  (+{len(items) - 6} more {dim} criteria)" if len(items) > 6 else ""
-        lines.append(f"## {dim}\n" + "\n".join(shown) + extra)
-    body = "\n\n".join(lines) if lines else "(no explicit failures recorded — polish toward the instruction.)"
-    if len(body) > 9000:
-        body = body[:9000] + "\n… (truncated; read reward-details.json in solution/ for the rest)"
-    return f"""Improve the reference app at `tasks/{slug}/solution/app` so it satisfies the graded criteria below.
+                f += 1
+        if t:
+            per_dim[dim] = (f, t); total_fail += f; total += t
+    scope = "\n".join(f"  - {dim}: {f}/{t} failing" for dim, (f, t) in sorted(per_dim.items(), key=lambda x: -x[1][0]) if f)
+    return f"""Bring the reference app at `tasks/{slug}/solution/app` to a PASSING build on EVERY graded criterion.
+This is the task ORACLE (reference solution) — the target is 100%, not a partial fix.
 
-The spec is `tasks/{slug}/instruction.md` — read it and make the app fully honor it. The app must keep its
-`package.json` scripts `start` (serves on port 3000) and `verify:build` (exits 0 when the build succeeds);
-`npm run verify:build` must pass and `npm start` must serve. This is the task's ORACLE (reference solution),
-so aim for a build that would pass every criterion, not a partial fix.
+THE COMPLETE FAILURE LIST IS IN THE REPO. Read `tasks/{slug}/solution/reward-details.json` — it holds every
+criterion with its `value` (0 = failing), `description`, and the judge's `reasoning`. You MUST address EVERY
+criterion whose value is 0 or whose reasoning begins with `BLOCKED:` or `FAIL:`. Do not fix a sample — work
+the whole list. Also read `tasks/{slug}/instruction.md` (the spec) and make the app fully honor it.
 
-SCOPE: edit ONLY files under `tasks/{slug}/solution/app`. Do NOT touch `tests/`, other tasks, or shared
-scripts. This session owns a disjoint file surface.
+Scope of work — {total_fail} of {total} criteria are currently failing, by dimension:
+{scope}
 
-Failing / blocked criteria from the last grading (fix all that are real defects):
+Priority order when working the list: (1) core_features, user_flows, behavioral — the app must work
+end-to-end with the exact stated evidence and state persistence; (2) anticheat — real handlers, no fake
+success; (3) technical, edge_cases, mcp_contract — zero console/network errors, boundary/empty states,
+WebMCP tools call the same logic as the UI; (4) accessibility, responsiveness; (5) visual_design, motion,
+design_fidelity, writing.
 
-{body}
+REQUIREMENTS: keep `package.json` scripts `start` (serves on port 3000) and `verify:build` (exits 0 on a
+successful build). `npm run verify:build` MUST pass and `npm start` MUST serve. Re-read reward-details.json
+as you go and keep fixing until you have genuinely addressed every failing criterion.
+
+SCOPE: edit ONLY files under `tasks/{slug}/solution/app`. Do NOT touch `tests/`, `reward-details.json`,
+other tasks, or shared scripts. This session owns a disjoint file surface.
 
 FINISH LINE: a clean commit IS the deliverable. Do NOT `git push` — the sandbox blocks direct pushes by
-design and AUTO_CREATE_PR opens the PR from your committed changeset. Once you have committed working
-changes (verify:build passing, app serving), you are DONE — conclude; do not loop on push failures.
+design and AUTO_CREATE_PR opens the PR from your committed changeset. Work autonomously to completion; do
+not pause to ask what to prioritize, and do not loop on push failures.
 """
 
 
