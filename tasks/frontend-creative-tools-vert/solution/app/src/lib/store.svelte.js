@@ -92,9 +92,14 @@ export function targetsFor() {
 }
 
 // ---- state history for undo/redo ----
+// Snapshots capture everything an action can mutate -- including selection,
+// which the checkbox UI depends on -- so Undo restores the exact prior state
+// rather than an approximation of it.
 const takeSnapshot = () => ({
 	files: store.files.map(f => ({...$state.snapshot(f), file: f.file})),
 	presets: $state.snapshot(store.presets),
+	selection: Array.from(store.selection),
+	selectedId: store.selectedId,
 	settings: {
 		theme: store.theme,
 		category: store.category,
@@ -104,19 +109,49 @@ const takeSnapshot = () => ({
 	},
 });
 
+// ---- blob URL lifetime -------------------------------------------------
+// Object URLs referenced by undo/redo snapshots must stay alive until no
+// snapshot (or the live queue) can reach them any more -- revoking one the
+// moment a mutation drops it from the live file would permanently break any
+// snapshot that still points at the same URL string, so Undo would restore a
+// "Done" row whose Download silently fails.
+function urlsInSnapshot(snapshot) {
+	const set = new Set();
+	for (const f of snapshot.files) if (f.resultUrl) set.add(f.resultUrl);
+	return set;
+}
+
+function reachableResultUrls() {
+	const set = new Set();
+	for (const f of store.files) if (f.resultUrl) set.add(f.resultUrl);
+	for (const snap of store.history.undo) for (const url of urlsInSnapshot(snap)) set.add(url);
+	for (const snap of store.history.redo) for (const url of urlsInSnapshot(snap)) set.add(url);
+	return set;
+}
+
+// Call AFTER the live reference to `url` has already been cleared/replaced.
+// Only actually revokes once nothing else (current queue or any undo/redo
+// snapshot) still needs it.
+function releaseResultUrl(url) {
+	if (!url) return;
+	if (!reachableResultUrls().has(url)) URL.revokeObjectURL(url);
+}
+
 export function saveQueueSnapshot() {
 	store.history.undo.push(takeSnapshot());
-	if (store.history.undo.length > 50) store.history.undo.shift();
+	const discarded = [];
+	if (store.history.undo.length > 50) discarded.push(store.history.undo.shift());
+	if (store.history.redo.length > 0) discarded.push(...store.history.redo);
 	store.history.redo = [];
+	for (const snap of discarded) {
+		for (const url of urlsInSnapshot(snap)) releaseResultUrl(url);
+	}
 }
 
 function restoreSnapshot(snap) {
-	const oldUrls = new Set(store.files.map(f => f.resultUrl).filter(Boolean));
-	const newUrls = new Set(snap.files.map(f => f.resultUrl).filter(Boolean));
-	for (const url of oldUrls) {
-		if (!newUrls.has(url)) URL.revokeObjectURL(url);
-	}
-
+	// The state being replaced was already pushed onto the opposite history
+	// stack (redo on undo, undo on redo) by the caller, so nothing reachable
+	// from here needs revoking -- it's still retained by that entry.
 	store.files = snap.files.map(f => ({...f}));
 	store.presets = snap.presets.map(preset => ({...preset}));
 	Object.assign(store, snap.settings);
@@ -124,12 +159,8 @@ function restoreSnapshot(snap) {
 	persist();
 
 	const validIds = new Set(store.files.map(f => f.id));
-	const newSelection = new Set();
-	for (const id of store.selection) {
-		if (validIds.has(id)) newSelection.add(id);
-	}
-	store.selection = newSelection;
-	if (store.selectedId && !validIds.has(store.selectedId)) store.selectedId = null;
+	store.selection = new Set(snap.selection.filter((id) => validIds.has(id)));
+	store.selectedId = snap.selectedId && validIds.has(snap.selectedId) ? snap.selectedId : null;
 }
 
 export function queueUndo() {
@@ -235,10 +266,11 @@ function invalidateDoneFiles(recordHistory = true) {
 	for (const f of store.files) {
 		if (f.status === "done" || f.status === "failed") {
 			if (f.resultUrl) {
-				URL.revokeObjectURL(f.resultUrl);
+				const oldUrl = f.resultUrl;
 				f.resultUrl = null;
 				f.resultName = null;
 				f.resultSize = null;
+				releaseResultUrl(oldUrl);
 			}
 			f.status = "ready";
 			changed = true;
@@ -284,10 +316,11 @@ export function loadPreset(id) {
 		const staleOutput = outputSettingsChanged && (file.status === "done" || file.status === "failed");
 		if (targetChanged) file.to = p.target;
 		if (targetChanged || staleOutput) {
-			if (file.resultUrl) URL.revokeObjectURL(file.resultUrl);
+			const oldUrl = file.resultUrl;
 			file.resultUrl = null;
 			file.resultName = null;
 			file.resultSize = null;
+			releaseResultUrl(oldUrl);
 			if (file.status === "done" || file.status === "failed") file.status = "ready";
 			changed = true;
 		}
@@ -363,10 +396,11 @@ export function setTarget(id, to) {
 	saveQueueSnapshot();
 	f.to = to;
 	if (f.resultUrl) {
-		URL.revokeObjectURL(f.resultUrl);
+		const oldUrl = f.resultUrl;
 		f.resultUrl = null;
 		f.resultName = null;
 		f.resultSize = null;
+		releaseResultUrl(oldUrl);
 	}
 	if (f.status === "done" || f.status === "failed") f.status = "ready";
 	return true;
@@ -381,10 +415,11 @@ export function batchSetTarget(to) {
 		if (f && f.status !== "unsupported" && f.to !== to) {
 			f.to = to;
 			if (f.resultUrl) {
-				URL.revokeObjectURL(f.resultUrl);
+				const oldUrl = f.resultUrl;
 				f.resultUrl = null;
 				f.resultName = null;
 				f.resultSize = null;
+				releaseResultUrl(oldUrl);
 			}
 			if (f.status === "done" || f.status === "failed") f.status = "ready";
 			changed = true;
@@ -402,7 +437,7 @@ export function removeFile(id) {
 		return false;
 	}
 	const [f] = store.files.splice(i, 1);
-	if (f?.resultUrl) URL.revokeObjectURL(f.resultUrl);
+	releaseResultUrl(f?.resultUrl);
 
 	store.selection.delete(id);
 	store.selection = new Set(store.selection);
@@ -418,8 +453,9 @@ export function removeSelectedFiles() {
 	for (let i = store.files.length - 1; i >= 0; i--) {
 		const f = store.files[i];
 		if (toRemove.has(f.id)) {
-			if (f.resultUrl) URL.revokeObjectURL(f.resultUrl);
+			const oldUrl = f.resultUrl;
 			store.files.splice(i, 1);
+			releaseResultUrl(oldUrl);
 			removed = true;
 		}
 	}
@@ -436,11 +472,12 @@ export function removeSelectedFiles() {
 export function clearQueue() {
 	if (store.files.length === 0) return;
 	saveQueueSnapshot();
-	for (const f of store.files) if (f.resultUrl) URL.revokeObjectURL(f.resultUrl);
+	const oldUrls = store.files.map((f) => f.resultUrl).filter(Boolean);
 	store.files = [];
 	store.selectedId = null;
 	store.selection.clear();
 	store.selection = new Set();
+	for (const url of oldUrls) releaseResultUrl(url);
 }
 
 let _cancel = false;
@@ -455,7 +492,11 @@ export async function convertOne(entry) {
 			entry.status = "ready";
 			return;
 		}
-		if (entry.resultUrl) URL.revokeObjectURL(entry.resultUrl);
+		if (entry.resultUrl) {
+			const oldUrl = entry.resultUrl;
+			entry.resultUrl = null;
+			releaseResultUrl(oldUrl);
+		}
 		entry.resultUrl = URL.createObjectURL(blob);
 		entry.resultName = name;
 		entry.resultSize = blob.size;
@@ -614,8 +655,9 @@ export function importSession(doc) {
 			const target = withDot(importedFile.to);
 			if (!file) continue;
 
-			if (file.resultUrl) URL.revokeObjectURL(file.resultUrl);
+			const oldUrl = file.resultUrl;
 			file.resultUrl = null;
+			releaseResultUrl(oldUrl);
 			file.resultName = null;
 			file.to = target;
 			file.status = importedFile.status === "Done" ? "ready" : STATUS_VALUES[importedFile.status];
