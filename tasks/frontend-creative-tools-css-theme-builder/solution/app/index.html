@@ -92,10 +92,13 @@
           </div>
           <div class="panel-body">
             <div class="editor-toolbar">
-              <label class="name-field">
-                <span aria-hidden="true">✎</span>
-                <input id="theme-name" type="text" placeholder="mytheme" autocomplete="off" />
-              </label>
+              <div class="name-field-wrap">
+                <label class="name-field">
+                  <span aria-hidden="true">✎</span>
+                  <input id="theme-name" type="text" placeholder="mytheme" autocomplete="off" aria-describedby="theme-name-error" aria-invalid="false" />
+                </label>
+                <span id="theme-name-error" class="validation-error" role="alert" hidden></span>
+              </div>
               <button type="button" class="btn" id="btn-random">Random</button>
               <button type="button" class="btn btn-primary" id="btn-css">{ }</button>
             </div>
@@ -364,16 +367,52 @@
       </main>
     </div>
 
-    <div class="modal-backdrop" id="css-modal" role="dialog" aria-modal="true" aria-label="Theme CSS">
+    <div class="modal-backdrop" id="css-modal" role="dialog" aria-modal="true" aria-label="Export Theme">
       <div class="modal">
         <header>
-          <strong>Theme CSS</strong>
+          <strong>Export Theme</strong>
           <button type="button" class="btn" id="css-close">Close</button>
         </header>
+
+        <div class="export-tabs" role="tablist">
+          <label role="tab" tabindex="0">
+             <input type="radio" name="export-tab" value="css" checked tabindex="-1" />
+             CSS
+          </label>
+          <label role="tab" tabindex="0">
+             <input type="radio" name="export-tab" value="json" tabindex="-1" />
+             JSON
+          </label>
+          <label role="tab" tabindex="0">
+             <input type="radio" name="export-tab" value="extension" tabindex="-1" />
+             Extension Link
+          </label>
+        </div>
+
         <pre id="css-output"></pre>
+
         <footer>
           <span class="hint">Copy into your stylesheet or daisyUI theme config.</span>
-          <button type="button" class="btn btn-primary" id="css-copy">Copy CSS</button>
+          <button type="button" class="btn btn-primary" id="css-copy">Copy</button>
+          <button type="button" class="btn" id="css-download">Download</button>
+        </footer>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="import-modal" role="dialog" aria-modal="true" aria-label="Import Theme">
+      <div class="modal">
+        <header>
+          <strong>Import Theme (JSON)</strong>
+          <button type="button" class="btn" id="import-close">Close</button>
+        </header>
+
+        <div style="padding: 1rem;">
+          <textarea id="import-input" rows="8" aria-describedby="import-error" aria-invalid="false" style="width: 100%; resize: vertical; border: 1px solid var(--color-base-300); border-radius: 4px; padding: 0.5rem; background: var(--color-base-200); color: var(--color-base-content);" placeholder='{"name": "...", "--color-primary": "..."}'></textarea>
+          <span id="import-error" class="validation-error" role="alert" aria-live="assertive" style="color: var(--color-error); font-size: 0.75rem; display: block; margin-top: 0.25rem;"></span>
+        </div>
+
+        <footer>
+          <button type="button" class="btn btn-primary" id="import-submit">Import</button>
         </footer>
       </div>
     </div>

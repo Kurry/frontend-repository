@@ -92,6 +92,60 @@ export function serializeTheme(theme) {
   return out;
 }
 
+const COLOR_KEYS = TOKEN_KEYS.filter((key) => key.startsWith("--color-"));
+const COLOR_PATTERN = /^(?:oklch\([^)]+\)|#[0-9a-f]{6})$/i;
+const ENUM_FIELDS = {
+  "--radius-box": ["0rem", "0.25rem", "0.5rem", "1rem", "2rem"],
+  "--radius-field": ["0rem", "0.25rem", "0.5rem", "1rem", "2rem"],
+  "--radius-selector": ["0rem", "0.25rem", "0.5rem", "1rem", "2rem"],
+  "--size-field": ["0.1875rem", "0.21875rem", "0.25rem", "0.28125rem", "0.3125rem"],
+  "--size-selector": ["0.1875rem", "0.21875rem", "0.25rem", "0.28125rem", "0.3125rem"],
+  "--border": ["0.5px", "1px", "1.5px", "2px"],
+  "--depth": ["0", "1"],
+  "--noise": ["0", "1"],
+};
+
+export function validateThemeDocument(input) {
+  const data = typeof input === "string" ? JSON.parse(input) : input;
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    throw new Error("theme: expected a JSON object");
+  }
+
+  const name = String(data.name ?? "").trim();
+  if (!name || name.length > 64 || !/^[a-z0-9_-]+$/.test(name)) {
+    throw new Error("name: use 1-64 lowercase letters, digits, hyphens, or underscores");
+  }
+  if (!['light', 'dark'].includes(data["color-scheme"])) {
+    throw new Error("color-scheme: expected light or dark");
+  }
+  for (const key of COLOR_KEYS) {
+    if (!COLOR_PATTERN.test(String(data[key] ?? ""))) {
+      throw new Error(`${key}: expected oklch(...) or #RRGGBB`);
+    }
+  }
+  for (const [key, allowed] of Object.entries(ENUM_FIELDS)) {
+    if (!allowed.includes(String(data[key] ?? ""))) {
+      throw new Error(`${key}: value is outside the allowed set`);
+    }
+  }
+
+  const result = serializeTheme(data);
+  result.name = name;
+  result["--depth"] = String(data["--depth"]);
+  result["--noise"] = String(data["--noise"]);
+  return result;
+}
+
+export function themeToExtension(theme) {
+  const lines = ["@theme {"];
+  for (const key of TOKEN_KEYS) {
+    if (key === "name") continue;
+    if (theme[key] != null) lines.push(`  ${key}: ${theme[key]};`);
+  }
+  lines.push("}");
+  return lines.join("\n");
+}
+
 function cssThemeName(name) {
   const cleaned = String(name || "mytheme")
     .toLowerCase()

@@ -4,11 +4,10 @@ import {
   writeThemeHash,
   serializeTheme,
   themeToCss,
+  themeToExtension,
+  validateThemeDocument,
 } from "./theme-codec.js";
-
-const STORAGE_THEMES = "gen-themes-0.2";
-const STORAGE_THEME_ID = "gen-theme-id";
-const STORAGE_CHROME = "theme";
+import { registerWebMCP } from "./webmcp.js";
 
 const COLOR_PAIRS = [
   ["--color-base-100", "--color-base-content"],
@@ -94,6 +93,24 @@ function sanitizeThemeName(name) {
   return cleaned || "mytheme";
 }
 
+function validateThemeName(name) {
+  const trimmed = String(name ?? "").trim();
+  if (!trimmed) return "name is required";
+  if (trimmed.length > 64) return "name must be 64 characters or fewer";
+  if (!/^[a-z0-9_-]+$/.test(trimmed)) return "name may only contain lowercase letters, numbers, hyphens, and underscores";
+  return null;
+}
+
+function clearThemeNameError() {
+  const input = document.getElementById("theme-name");
+  const errorElement = document.getElementById("theme-name-error");
+  if (input) input.setAttribute("aria-invalid", "false");
+  if (errorElement) {
+    errorElement.textContent = "";
+    errorElement.hidden = true;
+  }
+}
+
 const THEME_VAR_KEYS = [
   "--color-base-100",
   "--color-base-200",
@@ -133,7 +150,7 @@ function clearThemeInlineStyles(el) {
 
 function loadCustoms() {
   try {
-    const raw = localStorage.getItem(STORAGE_THEMES);
+    const raw = null;
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed.map(cloneTheme) : [];
@@ -143,7 +160,7 @@ function loadCustoms() {
 }
 
 function saveCustoms() {
-  localStorage.setItem(STORAGE_THEMES, JSON.stringify(state.customs));
+
 }
 
 function allThemes() {
@@ -208,9 +225,12 @@ function applyThemeVars(theme) {
 function setActiveTheme(theme, { persist = true, syncHash = true } = {}) {
   state.active = cloneTheme(theme);
   if (!state.active.id) state.active.id = uid();
+  const nameInput = document.getElementById("theme-name");
+  if (nameInput) nameInput.value = state.active.name;
+  clearThemeNameError();
   applyThemeVars(state.active);
   if (persist) {
-    localStorage.setItem(STORAGE_THEME_ID, state.active.id);
+
     if (state.active.type === "custom") {
       const idx = state.customs.findIndex((t) => t.id === state.active.id);
       if (idx >= 0) state.customs[idx] = cloneTheme(state.active);
@@ -223,7 +243,6 @@ function setActiveTheme(theme, { persist = true, syncHash = true } = {}) {
 
 function mutateActive(patch) {
   if (!state.active) return;
-  if ("name" in patch) patch = { ...patch, name: sanitizeThemeName(patch.name) };
   Object.assign(state.active, patch);
   if (state.active.type === "builtin") {
     // Editing a builtin forks into a custom working copy
@@ -236,7 +255,7 @@ function mutateActive(patch) {
     };
     state.customs.unshift(cloneTheme(state.active));
     saveCustoms();
-    localStorage.setItem(STORAGE_THEME_ID, state.active.id);
+
   }
   applyThemeVars(state.active);
   if (state.active.type === "custom") {
@@ -289,13 +308,17 @@ function randomizeTheme() {
   toast("Randomized colors");
 }
 
-function addCustomFromActive() {
+function addCustomFromActive(name) {
   const base = state.active || state.builtins[0];
+  const nameError = name == null ? null : validateThemeName(name);
+  if (nameError) throw new Error(nameError);
   const theme = {
     ...cloneTheme(base),
     id: uid(),
     type: "custom",
-    name: `mytheme-${state.customs.length + 1}`,
+    name: name == null
+      ? `mytheme-${state.customs.length + 1}`
+      : String(name).trim(),
     default: false,
     prefersdark: false,
   };
@@ -303,6 +326,7 @@ function addCustomFromActive() {
   saveCustoms();
   setActiveTheme(theme);
   toast("Theme added");
+  return theme;
 }
 
 function removeActiveTheme() {
@@ -368,7 +392,7 @@ function renderThemeLists() {
 
     const name = document.createElement("span");
     name.className = "theme-name";
-    name.textContent = sanitizeThemeName(theme.name);
+    name.textContent = theme.name;
 
     btn.append(swatches, name);
     btn.addEventListener("click", () => setActiveTheme(theme));
@@ -388,7 +412,7 @@ function renderEditor() {
   if (!theme) return;
 
   const nameInput = document.getElementById("theme-name");
-  if (document.activeElement !== nameInput) nameInput.value = sanitizeThemeName(theme.name);
+  if (document.activeElement !== nameInput) nameInput.value = theme.name;
 
   document.getElementById("opt-default").checked = !!theme.default;
   document.getElementById("opt-prefersdark").checked = !!theme.prefersdark;
@@ -569,24 +593,181 @@ function renderAll() {
   renderPalette();
 }
 
+let modalLastFocus = null;
+
+function renderExportOutput() {
+  const tab = document.querySelector('input[name="export-tab"]:checked').value;
+  const out = document.getElementById("css-output");
+  const raw = serializeTheme(state.active);
+  if (tab === "css") {
+    out.textContent = themeToCss(raw);
+  } else if (tab === "json") {
+    const clone = { ...raw };
+    delete clone.id;
+    delete clone.type;
+    out.textContent = JSON.stringify(clone, null, 2);
+  } else if (tab === "extension") {
+    out.textContent = themeToExtension(raw);
+  }
+
+  const dl = document.getElementById("css-download");
+  dl.style.display = "";
+}
+
+function selectExportFormat(format) {
+  const tab = format === "theme-extension" ? "extension" : format;
+  const input = document.querySelector(`input[name="export-tab"][value="${tab}"]`);
+  if (!input) throw new Error(`Unknown format: ${format}`);
+  input.checked = true;
+  renderExportOutput();
+}
+
+function openArtifact(format) {
+  selectExportFormat(format);
+  if (!document.getElementById("css-modal").classList.contains("open")) openCssModal();
+}
+
 function openCssModal() {
-  const css = themeToCss(serializeTheme(state.active));
-  document.getElementById("css-output").textContent = css;
-  document.getElementById("css-modal").classList.add("open");
+  const importModal = document.getElementById("import-modal");
+  if (importModal.classList.contains("open")) closeImportModal();
+  modalLastFocus = document.activeElement;
+  renderExportOutput();
+  const modal = document.getElementById("css-modal");
+  modal.classList.add("open");
+  const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (focusable.length) focusable[0].focus();
+}
+
+function trapFocus(e) {
+  const modal = e.currentTarget;
+  if (!modal.classList.contains('open')) return;
+  if (e.key === 'Tab') {
+    const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        last.focus();
+        e.preventDefault();
+      }
+    } else {
+      if (document.activeElement === last) {
+        first.focus();
+        e.preventDefault();
+      }
+    }
+  } else if (e.key === 'Escape') {
+    if (modal.id === 'css-modal') closeCssModal();
+    if (modal.id === 'import-modal') closeImportModal();
+  }
 }
 
 function closeCssModal() {
-  document.getElementById("css-modal").classList.remove("open");
+  const modal = document.getElementById("css-modal");
+  modal.classList.remove("open");
+  if (modalLastFocus) {
+    modalLastFocus.focus();
+    modalLastFocus = null;
+  }
 }
 
 async function copyCss() {
-  const css = document.getElementById("css-output").textContent;
+  const text = document.getElementById("css-output").textContent;
   try {
-    await navigator.clipboard.writeText(css);
-    toast("CSS copied");
+    await navigator.clipboard.writeText(text);
+    toast("Copied to clipboard");
+    return true;
   } catch {
     toast("Copy failed");
+    return false;
   }
+}
+
+async function copyArtifact(format) {
+  selectExportFormat(format);
+  return copyCss();
+}
+
+function downloadExport() {
+  const tab = document.querySelector('input[name="export-tab"]:checked').value;
+  const text = document.getElementById("css-output").textContent;
+  const blob = new Blob([text], { type: tab === "json" ? "application/json" : "text/css" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${sanitizeThemeName(state.active.name)}.${tab === "extension" ? "theme.css" : tab}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function openImportModal() {
+  const cssModal = document.getElementById("css-modal");
+  if (cssModal.classList.contains("open")) closeCssModal();
+  modalLastFocus = document.activeElement;
+  const importInput = document.getElementById("import-input");
+  importInput.value = "";
+  importInput.setAttribute("aria-invalid", "false");
+  document.getElementById("import-error").textContent = "";
+  const modal = document.getElementById("import-modal");
+  modal.classList.add("open");
+  const focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (focusable.length) focusable[0].focus();
+}
+
+function closeImportModal() {
+  const modal = document.getElementById("import-modal");
+  modal.classList.remove("open");
+  if (modalLastFocus) {
+    modalLastFocus.focus();
+    modalLastFocus = null;
+  }
+}
+
+function submitImport() {
+  const inputElement = document.getElementById("import-input");
+  const input = inputElement.value;
+  const err = document.getElementById("import-error");
+  err.textContent = "";
+  inputElement.setAttribute("aria-invalid", "false");
+
+  if (!input.trim()) {
+     err.textContent = "Please provide JSON data.";
+     inputElement.setAttribute("aria-invalid", "true");
+     return;
+  }
+
+  try {
+    importThemeDocument(input);
+    closeImportModal();
+    toast("Theme imported");
+  } catch (e) {
+    err.textContent = e instanceof Error ? e.message : "Invalid theme document";
+    inputElement.setAttribute("aria-invalid", "true");
+  }
+}
+
+function importThemeDocument(input) {
+  const data = validateThemeDocument(input);
+  const activeCustom = state.active?.type === "custom" ? state.active : null;
+  const theme = {
+    ...data,
+    id: activeCustom?.id ?? uid(),
+    type: "custom",
+    default: activeCustom?.default ?? false,
+    prefersdark: activeCustom?.prefersdark ?? false,
+  };
+  if (activeCustom) {
+    const index = state.customs.findIndex((candidate) => candidate.id === activeCustom.id);
+    if (index >= 0) state.customs[index] = theme;
+    else state.customs.unshift(theme);
+  } else {
+    state.customs.unshift(theme);
+  }
+  setActiveTheme(theme);
+  return theme;
 }
 
 function wireHoldToAdd() {
@@ -685,18 +866,51 @@ function wireChrome() {
   });
 
   document.getElementById("theme-name").addEventListener("input", (e) => {
-    mutateActive({ name: sanitizeThemeName(e.target.value) });
+    const input = e.target;
+    const error = validateThemeName(input.value);
+    const errorElement = document.getElementById("theme-name-error");
+    input.setAttribute("aria-invalid", error ? "true" : "false");
+    errorElement.textContent = error ? `Theme name: ${error}` : "";
+    errorElement.hidden = !error;
+    if (error) return;
+    mutateActive({ name: String(input.value).trim() });
   });
   document.getElementById("btn-random").addEventListener("click", randomizeTheme);
   document.getElementById("btn-css").addEventListener("click", openCssModal);
   document.getElementById("css-close").addEventListener("click", closeCssModal);
   document.getElementById("css-copy").addEventListener("click", copyCss);
+  document.getElementById("css-download").addEventListener("click", downloadExport);
+  document.querySelectorAll('input[name="export-tab"]').forEach((input) => {
+    input.addEventListener("change", renderExportOutput);
+  });
   document.getElementById("css-modal").addEventListener("click", (e) => {
     if (e.target.id === "css-modal") closeCssModal();
   });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeCssModal();
+  document.getElementById("css-modal").addEventListener("keydown", trapFocus);
+
+  const importBtn = document.createElement("button");
+  importBtn.className = "btn";
+  importBtn.textContent = "Import theme";
+  importBtn.id = "btn-import";
+  importBtn.type = "button";
+  importBtn.addEventListener("click", openImportModal);
+  document.getElementById("btn-css").parentNode.insertBefore(importBtn, document.getElementById("btn-css"));
+
+  document.getElementById("import-close").addEventListener("click", closeImportModal);
+  document.getElementById("import-submit").addEventListener("click", submitImport);
+  document.getElementById("import-modal").addEventListener("click", (e) => {
+    if (e.target.id === "import-modal") closeImportModal();
   });
+  document.getElementById("import-modal").addEventListener("keydown", trapFocus);
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (document.getElementById("import-modal").classList.contains("open")) {
+      closeImportModal();
+    } else if (document.getElementById("css-modal").classList.contains("open")) {
+      closeCssModal();
+    }
+  });
+
   document.getElementById("btn-remove").addEventListener("click", removeActiveTheme);
   document.getElementById("btn-reset").addEventListener("click", resetActiveTheme);
 
@@ -727,7 +941,7 @@ function wireChrome() {
 function applyChromeTheme(name) {
   const allowed = new Set(["light", "dark", "cupcake", "synthwave"]);
   const theme = allowed.has(name) ? name : "dark";
-  localStorage.setItem(STORAGE_CHROME, theme);
+
   clearThemeInlineStyles(document.documentElement);
   document.documentElement.setAttribute("data-theme", theme);
   document.documentElement.style.colorScheme =
@@ -764,7 +978,7 @@ function boot() {
   wireChrome();
   wireHoldToAdd();
 
-  applyChromeTheme(localStorage.getItem(STORAGE_CHROME) || "dark");
+  applyChromeTheme(null || "dark");
 
   state.customs = state.customs.map((t) => ({
     ...t,
@@ -773,7 +987,7 @@ function boot() {
   saveCustoms();
 
   if (!applyFromHash({ syncHash: true })) {
-    const savedId = localStorage.getItem(STORAGE_THEME_ID);
+    const savedId = null;
     const theme = (savedId && findTheme(savedId)) || state.builtins[0];
     setActiveTheme(theme);
   }
@@ -781,6 +995,20 @@ function boot() {
   window.addEventListener("hashchange", () => {
     applyFromHash({ syncHash: false });
   });
+
+  registerWebMCP(
+    state,
+    mutateActive,
+    setActiveTheme,
+    addCustomFromActive,
+    renderAll,
+    removeActiveTheme,
+    validateThemeName,
+    validateThemeDocument,
+    importThemeDocument,
+    openArtifact,
+    copyArtifact,
+  );
 
   window.__themeBuilderReady = true;
 }
