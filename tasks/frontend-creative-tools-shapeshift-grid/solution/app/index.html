@@ -51,68 +51,76 @@
             </label>
 
             <div class="gp-modes">
-              <button id="modeQR" class="on" title="Q" type="button">QR Brush</button>
-              <button id="modeColor" title="B" type="button">Color Brush</button>
-              <button id="modeEraser" title="E" type="button">Eraser</button>
-              <button id="toggleGrid" title="G" type="button">Grid On</button>
+              <button id="modeQR" tabindex="0" class="on" title="Q" type="button">QR Brush</button>
+              <button id="modeColor" tabindex="0" title="B" type="button">Color Brush</button>
+              <button id="modeEraser" tabindex="0" title="E" type="button">Eraser</button>
+              <button id="toggleGrid" tabindex="0" title="G" type="button">Grid On</button>
+            </div>
+
+
+            <div class="gp-mirror-stats">
+              <button id="mirrorModeBtn" class="new-primary-btn white" tabindex="0" title="Mirror Mode">Mirror: Off</button>
+              <div id="fillStats" style="font-size: 12px; margin-top: 5px;">
+                painted: <span id="statPainted">0</span> | qr: <span id="statQr">0</span> | colorFilled: <span id="statColor">0</span> | blank: <span id="statBlank">1600</span>
+              </div>
             </div>
 
             <div class="gp-palette">
-              <button class="gp-swatch active" data-color="#000000" title="2 black" type="button"></button>
-              <button class="gp-swatch" data-color="#ffffff" title="1 white" type="button"></button>
-              <button class="gp-swatch" data-color="#ff0000" title="3 red" type="button"></button>
-              <button class="gp-swatch" data-color="#ffff00" title="4 yellow" type="button"></button>
-              <button class="gp-swatch" data-color="#00ff00" title="5 green" type="button"></button>
-              <button class="gp-swatch" data-color="#0000ff" title="6 blue" type="button"></button>
-              <button class="gp-swatch" data-color="#ff0098" title="7 pink" type="button"></button>
+              <button class="gp-swatch active" tabindex="0" data-color="#000000" title="2 black" type="button"></button>
+              <button class="gp-swatch" tabindex="0" data-color="#ffffff" title="1 white" type="button"></button>
+              <button class="gp-swatch" tabindex="0" data-color="#ff0000" title="3 red" type="button"></button>
+              <button class="gp-swatch" tabindex="0" data-color="#ffff00" title="4 yellow" type="button"></button>
+              <button class="gp-swatch" tabindex="0" data-color="#00ff00" title="5 green" type="button"></button>
+              <button class="gp-swatch" tabindex="0" data-color="#0000ff" title="6 blue" type="button"></button>
+              <button class="gp-swatch" tabindex="0" data-color="#ff0098" title="7 pink" type="button"></button>
             </div>
 
             <div class="buttons-wrapper">
               <div class="buttons-inner">
-                <button id="uploadBtn" class="new-primary-btn white text-scramble-btn" aria-label="Upload" type="button">
+                <button id="uploadBtn" tabindex="0" class="new-primary-btn white text-scramble-btn" aria-label="Upload" type="button">
                   <span>Upload</span>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M3.5 12.5H12.654L9.827 8.73L7.212 12.038L5.462 9.923L3.5 12.5ZM0 16V0H16V16H0Z" fill="black"></path>
                   </svg>
                 </button>
-                <button id="cameraBtn" class="new-primary-btn white text-scramble-btn" aria-label="Camera" type="button">
+                <button id="cameraBtn" tabindex="0" class="new-primary-btn white text-scramble-btn" aria-label="Camera" type="button">
                   <span>CAMERA</span>
                   <svg width="22" height="19" viewBox="0 0 22 19" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M6.882 0H15.118L16.618 3H22V19H0V3H5.382L6.882 0ZM5.75 10.75C5.75 12.1424 6.30312 13.4777 7.28769 14.4623C8.27225 15.4469 9.60761 16 11 16C12.3924 16 13.7277 15.4469 14.7123 14.4623C15.6969 13.4777 16.25 12.1424 16.25 10.75C16.25 9.35761 15.6969 8.02225 14.7123 7.03769C13.7277 6.05312 12.3924 5.5 11 5.5C9.60761 5.5 8.27225 6.05312 7.28769 7.03769C6.30312 8.02225 5.75 9.35761 5.75 10.75Z" fill="black"></path>
                   </svg>
                 </button>
                 <div class="undo-clear">
-                  <button id="undoBtn" class="mb-0 linkish" type="button">Undo</button>
-                  <button id="clearBtn" class="mb-0 linkish" type="button">Clear</button>
+                  <button id="undoBtn" tabindex="0" class="mb-0 linkish" type="button">Undo</button>
+                  <button id="clearBtn" tabindex="0" class="mb-0 linkish" type="button">Clear</button>
                 </div>
               </div>
 
               <div class="gp-stage-share-option">
-                <button id="saveBtn" class="new-primary-btn yellow text-scramble-btn" aria-label="Download" type="button">
-                  <span>Download</span>
+                <button id="exportBtn" tabindex="0" class="new-primary-btn yellow text-scramble-btn" aria-label="Download" type="button">
+                  <span>Export</span>
                   <svg width="5" height="10" viewBox="0 0 5 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M0 10L5 5L8.74228e-07 -4.37114e-07L0 10Z" fill="black"></path>
                   </svg>
                 </button>
-                <button id="shareBtn" class="new-primary-btn yellow text-scramble-btn xl:hidden" aria-label="Share" type="button">
-                  <span>Share</span>
-                  <svg width="5" height="10" viewBox="0 0 5 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M0 10L5 5L8.74228e-07 -4.37114e-07L0 10Z" fill="black"></path>
-                  </svg>
-                </button>
+                <button id="galleryModeBtn" class="new-primary-btn black text-scramble-btn" aria-label="Gallery" type="button" tabindex="0">
+    <span>Gallery</span>
+  </button>
+  <button id="saveBoardActionBtn" class="new-primary-btn yellow text-scramble-btn" aria-label="Save board" type="button" tabindex="0">
+    <span>Save board</span>
+  </button>
               </div>
             </div>
 
             <div id="cameraOverlay" class="gp-camera-overlay">
               <video id="cameraFeed" autoplay playsinline muted></video>
               <div class="gp-camera-controls">
-                <button id="captureBtn" class="new-primary-btn yellow text-scramble-btn" aria-label="Capture" type="button">
+                <button id="captureBtn" tabindex="0" class="new-primary-btn yellow text-scramble-btn" aria-label="Capture" type="button">
                   <span>Capture</span>
                   <svg width="5" height="10" viewBox="0 0 5 10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                     <path d="M0 10L5 5L8.74228e-07 -4.37114e-07L0 10Z" fill="black"></path>
                   </svg>
                 </button>
-                <button id="cancelCameraBtn" class="new-primary-btn black text-scramble-btn" aria-label="Cancel" type="button">
+                <button id="cancelCameraBtn" tabindex="0" class="new-primary-btn black text-scramble-btn" aria-label="Cancel" type="button">
                   <span>Cancel</span>
                 </button>
               </div>
@@ -126,6 +134,122 @@
         </div>
       </div>
     </section>
+
+    <!-- Gallery Section (hidden by default) -->
+    <section id="gallery-section" class="gp-section" style="display: none;">
+      <div class="container gp-header-row">
+        <div>
+          <h1 class="h2 page-title text-new-site-black">&lt;GALLERY&gt;</h1>
+        </div>
+        <div class="gp-intro">
+          <p>Browse saved boards.</p>
+          <button id="backToPaintBtn" class="new-primary-btn black" tabindex="0">Back to Paint</button>
+        </div>
+      </div>
+
+      <div class="container mx-auto">
+        <div class="gallery-controls" style="margin-bottom: 20px;">
+          <input type="text" id="tagFilter" placeholder="Filter by tag..." tabindex="0" style="padding: 8px; border: 1px solid #000;">
+          <button id="clearFilterBtn" class="new-primary-btn white" tabindex="0" style="display:none;">Clear Filter</button>
+        </div>
+
+        <div id="gallery-empty-state" style="display: none; padding: 40px; text-align: center; border: 1px dashed #000;">
+          <p>No boards found.</p>
+          <p>Return to paint mode, draw something, and use "Save board" to add to your gallery.</p>
+        </div>
+
+        <div id="gallery-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
+          <!-- Cards injected here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Save Board Modal -->
+    <div id="saveBoardModal" class="gp-modal" style="display: none;" role="dialog" aria-modal="true">
+      <div class="gp-modal-content">
+        <h2>Save board</h2>
+        <form id="saveBoardForm">
+          <div>
+            <label for="boardName">Name</label>
+            <input type="text" id="boardName" name="name" tabindex="0">
+            <div id="boardNameError" class="error-msg" style="color: red; display: none; opacity: 0;">name: use 40 characters or fewer and make it unique</div>
+          </div>
+          <div>
+            <label for="boardTag">Tag</label>
+            <input type="text" id="boardTag" name="tag" tabindex="0">
+            <div id="boardTagError" class="error-msg" style="color: red; display: none; opacity: 0;">tag: required, use 24 characters or fewer</div>
+          </div>
+          <div style="margin-top: 20px;">
+            <button type="submit" id="saveBoardConfirmBtn" class="new-primary-btn yellow" tabindex="0">Save board</button>
+            <button type="button" id="saveBoardCancelBtn" class="new-primary-btn black" tabindex="0">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Rename Modal -->
+    <div id="renameModal" class="gp-modal" style="display: none;" role="dialog" aria-modal="true">
+      <div class="gp-modal-content">
+        <h2>Rename board</h2>
+        <form id="renameForm">
+          <input type="hidden" id="renameOldName">
+          <div>
+            <label for="renameName">Name</label>
+            <input type="text" id="renameName" name="name" tabindex="0">
+            <div id="renameNameError" class="error-msg" style="color: red; display: none; opacity: 0;">name: use 40 characters or fewer and make it unique</div>
+          </div>
+          <div>
+            <label for="renameTag">Tag</label>
+            <input type="text" id="renameTag" name="tag" tabindex="0">
+            <div id="renameTagError" class="error-msg" style="color: red; display: none; opacity: 0;">tag: required, use 24 characters or fewer</div>
+          </div>
+          <div style="margin-top: 20px;">
+            <button type="submit" id="renameConfirmBtn" class="new-primary-btn yellow" tabindex="0">Rename</button>
+            <button type="button" id="renameCancelBtn" class="new-primary-btn black" tabindex="0">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+
+    <!-- Export/Import Modal -->
+    <div id="exportModal" class="gp-modal" style="display: none;" role="dialog" aria-modal="true">
+      <div class="gp-modal-content" style="max-width: 600px;">
+        <h2>Export / Import</h2>
+        <div class="tabs">
+          <button id="tabExportJSON" class="new-primary-btn active" tabindex="0">Session JSON</button>
+          <button id="tabExportPNG" class="new-primary-btn" tabindex="0">PNG</button>
+          <button id="tabImport" class="new-primary-btn" tabindex="0">Import</button>
+        </div>
+
+        <div id="paneExportJSON" class="tab-pane">
+          <textarea id="exportJsonPreview" readonly style="width: 100%; height: 200px;" tabindex="0"></textarea>
+          <div style="margin-top: 10px;">
+            <button id="copyJsonBtn" class="new-primary-btn yellow" tabindex="0">Copy</button>
+            <button id="downloadJsonBtn" class="new-primary-btn black" tabindex="0">Download</button>
+            <span id="copyConfirmMsg" style="display:none; color:green;">Copied!</span>
+          </div>
+        </div>
+
+        <div id="paneExportPNG" class="tab-pane" style="display:none;">
+          <img id="exportPngPreview" style="max-width: 100%; border: 1px solid #ccc;" alt="PNG Preview">
+          <div style="margin-top: 10px;">
+            <button id="downloadPngBtn" class="new-primary-btn black" tabindex="0">Download</button>
+          </div>
+        </div>
+
+        <div id="paneImport" class="tab-pane" style="display:none;">
+          <textarea id="importJsonInput" placeholder="Paste Session JSON here..." style="width: 100%; height: 150px;" tabindex="0"></textarea>
+          <div id="importErrorMsg" class="error-msg" style="color: red; display: none;"></div>
+          <div style="margin-top: 10px;">
+            <button id="importConfirmBtn" class="new-primary-btn yellow" tabindex="0">Import</button>
+          </div>
+        </div>
+
+        <button id="closeExportModal" class="new-primary-btn white" style="margin-top: 20px;" tabindex="0">Close</button>
+      </div>
+    </div>
+
   </main>
 
   <script src="vendor/qrious.min.js"></script>
