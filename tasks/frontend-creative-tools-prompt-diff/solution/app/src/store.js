@@ -18,8 +18,12 @@ const snapshot = (state) => clone({
 
 const restoreSnapshot = (saved) => ({ ...clone(saved), selectedRange: null, annotationComposerOpen: false, mergeConfirmOpen: false, threadOpenId: null, threadCollapsed: false });
 
+// Deterministic, collision-free toast ids that avoid the insecure JS random API
+// (flagged by SAST). Ids are opaque (React keys + dismiss/markLeaving matching).
+let toastSeq = 0;
 function toast(message, kind = 'success') {
-  return { id: `${Date.now()}-${Math.random()}`, message, kind, leaving: false };
+  toastSeq += 1;
+  return { id: `toast-${Date.now()}-${toastSeq}`, message, kind, leaving: false };
 }
 
 function activePrompt(state) {
