@@ -161,6 +161,24 @@ export function applyHistoryNode(store: AppStore, nodeId: string) {
   store.selectedHistoryId = nodeId;
 }
 
+// Rebuilds historyNodes into a single root reflecting the store's CURRENT
+// board/scores/turn. Used both when a fresh round starts and when a saved
+// checkpoint is resumed, so Undo/Redo/History never carry a stale branch
+// from a previous round or an earlier session.
+export function resetHistoryRoot(store: AppStore, label: string) {
+  _hid = 1;
+  const rootSnap = cloneGameState(store);
+  store.historyNodes = [{
+    id: '0',
+    parentId: null,
+    childIds: [],
+    label,
+    snapshot: rootSnap,
+  }];
+  store.currentHistoryId = '0';
+  store.selectedHistoryId = '0';
+}
+
 // ── Stats ─────────────────────────────────────────────────────────────────────
 
 function emptyDiffStats() {
@@ -185,6 +203,7 @@ export function initRound(store: AppStore) {
   store.rival.score = 0;
   store.rival.strikes = 0;
   store.roundPlayerOreMined = 0;
+  store.roundRivalOreMined = 0;
   store.currentTurn = 'player';
   store.playerMode = 'reveal';
   store.isRivalThinking = false;
@@ -195,17 +214,7 @@ export function initRound(store: AppStore) {
   store.showHistoryPanel = false;
   store.feedback = 'Your turn. Reveal, flag or inspect a tile.';
 
-  _hid = 1;
-  const rootSnap = cloneGameState(store);
-  store.historyNodes = [{
-    id: '0',
-    parentId: null,
-    childIds: [],
-    label: 'Round start',
-    snapshot: rootSnap,
-  }];
-  store.currentHistoryId = '0';
-  store.selectedHistoryId = '0';
+  resetHistoryRoot(store, 'Round start');
 }
 
 // ── Tile Actions ──────────────────────────────────────────────────────────────
@@ -224,14 +233,20 @@ export function revealTile(store: AppStore, row: number, col: number, by: Turn):
   } else {
     actor.score += tile.oreValue;
     if (by === 'player') store.roundPlayerOreMined += tile.oreValue;
+    else store.roundRivalOreMined += tile.oreValue;
     return 'safe';
   }
 }
 
 function endRound(store: AppStore, winner: Turn | 'draw', reason: string) {
   const result: RoundResult = {
+    roundNumber: store.roundNumber,
     playerScore: store.player.score,
     rivalScore: store.rival.score,
+    playerStrikes: store.player.strikes,
+    rivalStrikes: store.rival.strikes,
+    playerOreMined: store.roundPlayerOreMined,
+    rivalOreMined: store.roundRivalOreMined,
     winner,
     reason,
   };
@@ -278,6 +293,28 @@ export function startNextRound(store: AppStore) {
     const d = store.difficulty;
     store.stats[d].matchesPlayed++;
     if (store.playerMatchWins >= 2) store.stats[d].matchesWon++;
+    store.matchLog.push({
+      playerName: store.playerName,
+      difficulty: d,
+      playerRoundWins: store.playerMatchWins,
+      rivalRoundWins: store.rivalMatchWins,
+      playerTotalOre: store.matchRounds.reduce((sum, r) => sum + r.playerOreMined, 0),
+      rivalTotalOre: store.matchRounds.reduce((sum, r) => sum + r.rivalOreMined, 0),
+      winner: store.playerMatchWins >= 2 ? 'player' : 'rival',
+      rounds: store.matchRounds.map((r) => ({
+        roundNumber: r.roundNumber,
+        playerScore: r.playerScore,
+        rivalScore: r.rivalScore,
+        playerStrikes: r.playerStrikes,
+        rivalStrikes: r.rivalStrikes,
+        outcomeReason: r.reason,
+      })),
+      endedAt: new Date().toISOString(),
+    });
+    // The match is over; a checkpoint saved mid-round now points at a round
+    // that no longer exists, so drop it rather than leave Resume Saved Match
+    // able to reload an obsolete board.
+    store.savedCheckpoint = null;
     store.phase = 'match-complete';
     return;
   }
@@ -422,6 +459,9 @@ export function resetMatch(store: AppStore) {
   store.playerMode = 'reveal';
   store.isRivalThinking = false;
   store.paused = false;
+  // Starting a fresh match (Start match / Rematch) makes any previously
+  // saved in-progress checkpoint obsolete.
+  store.savedCheckpoint = null;
   initRound(store);
   store.phase = 'playing';
 }

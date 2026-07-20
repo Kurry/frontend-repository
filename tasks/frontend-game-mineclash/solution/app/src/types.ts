@@ -1,5 +1,5 @@
 export type Difficulty = 'easy' | 'medium' | 'hard';
-export type Phase = 'setup' | 'playing' | 'round-result' | 'match-complete' | 'stats';
+export type Phase = 'setup' | 'playing' | 'round-result' | 'match-complete' | 'stats' | 'match-log' | 'export-center';
 export type Turn = 'player' | 'rival';
 export type HintStatus = 'none' | 'safe' | 'mine';
 export type PlayerMode = 'reveal' | 'flag' | 'hint';
@@ -20,10 +20,24 @@ export interface PlayerState {
 }
 
 export interface RoundResult {
+  roundNumber: number;
   playerScore: number;
   rivalScore: number;
+  playerStrikes: number;
+  rivalStrikes: number;
+  playerOreMined: number;
+  rivalOreMined: number;
   winner: Turn | 'draw';
   reason: string;
+}
+
+export interface MatchRoundSummary {
+  roundNumber: number;
+  playerScore: number;
+  rivalScore: number;
+  playerStrikes: number;
+  rivalStrikes: number;
+  outcomeReason: string;
 }
 
 export interface DifficultyStats {
@@ -58,10 +72,43 @@ export interface HistoryNode {
   snapshot: GameSnapshot;
 }
 
+export interface MatchCheckpoint {
+  playerName: string;
+  difficulty: Difficulty;
+  roundNumber: number;
+  playerScore: number;
+  rivalScore: number;
+  playerStrikes: number;
+  rivalStrikes: number;
+  sideToMove: Turn;
+  hintsRemaining: number;
+  playerRoundWins: number;
+  rivalRoundWins: number;
+  board: TileData[][];
+  targetScore: number;
+  mineCount: number;
+  paused: boolean;
+  roundPlayerOreMined: number;
+  roundRivalOreMined: number;
+}
+
+export interface MatchLogEntry {
+  playerName: string;
+  difficulty: Difficulty;
+  playerRoundWins: number;
+  rivalRoundWins: number;
+  playerTotalOre: number;
+  rivalTotalOre: number;
+  winner: Turn | 'draw';
+  rounds: MatchRoundSummary[];
+  endedAt: string;
+}
+
 export interface AppStore {
   phase: Phase;
   difficulty: Difficulty;
   soundEnabled: boolean;
+  playerName: string;
 
   playerMode: PlayerMode;
   isRivalThinking: boolean;
@@ -77,6 +124,7 @@ export interface AppStore {
   player: PlayerState;
   rival: PlayerState;
   roundPlayerOreMined: number;
+  roundRivalOreMined: number;
   currentTurn: Turn;
 
   roundNumber: number;
@@ -94,4 +142,7 @@ export interface AppStore {
   showHistoryPanel: boolean;
   lastPlayerActionLabel: string;
   feedback: string;
+
+  savedCheckpoint: MatchCheckpoint | null;
+  matchLog: MatchLogEntry[];
 }

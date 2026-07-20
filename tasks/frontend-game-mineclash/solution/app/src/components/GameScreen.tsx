@@ -9,6 +9,7 @@ export const GameScreen = component$(() => {
   const store = useContext(AppCtx);
   const isPlayerTurn = store.currentTurn === 'player' && !store.isRivalThinking && store.phase === 'playing' && !store.paused;
   const hintsLeft = MAX_HINTS - store.hintsUsed;
+  const hasRevealedTile = store.tiles.some(row => row.some(t => t.revealed));
 
   return (
     <div class="game-shell" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', padding: '12px', maxWidth: '720px', margin: '0 auto' }}>
@@ -91,6 +92,40 @@ export const GameScreen = component$(() => {
           >
             🔍 Hint ({hintsLeft}/{MAX_HINTS})
             {hintsLeft > 0 && <span style={{ fontSize: '10px', color: '#A8A29E', display: 'block' }}>−{HINT_COST} pts</span>}
+          </button>
+
+          {/* Save progress */}
+          <button
+            class="btn-secondary"
+            style={{ fontSize: '13px', padding: '8px 12px', opacity: hasRevealedTile ? 1 : 0.4 }}
+            disabled={!hasRevealedTile}
+            onClick$={() => {
+              if (store.phase !== 'playing') return;
+              const revealed = store.tiles.some(row => row.some(t => t.revealed));
+              if (!revealed) return;
+              store.savedCheckpoint = {
+                playerName: store.playerName,
+                difficulty: store.difficulty,
+                roundNumber: store.roundNumber,
+                playerScore: store.player.score,
+                rivalScore: store.rival.score,
+                playerStrikes: store.player.strikes,
+                rivalStrikes: store.rival.strikes,
+                sideToMove: store.currentTurn,
+                hintsRemaining: 2 - store.hintsUsed,
+                playerRoundWins: store.playerMatchWins,
+                rivalRoundWins: store.rivalMatchWins,
+                board: JSON.parse(JSON.stringify(store.tiles)),
+                targetScore: store.targetScore,
+                mineCount: store.mineCount,
+                paused: store.paused,
+                roundPlayerOreMined: store.roundPlayerOreMined,
+                roundRivalOreMined: store.roundRivalOreMined
+              };
+              store.feedback = 'Match saved.';
+            }}
+          >
+            💾 Save Progress
           </button>
 
           {/* Pause / Resume */}

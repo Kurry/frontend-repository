@@ -10,12 +10,15 @@ import { GameScreen } from './GameScreen';
 import { RoundResultOverlay } from './RoundResultOverlay';
 import { MatchCompleteScreen } from './MatchCompleteScreen';
 import { StatsScreen } from './StatsScreen';
+import { MatchLogScreen } from './MatchLogScreen';
+import { ExportCenterScreen } from './ExportCenterScreen';
 
 function makeStore(): AppStore {
   return {
     phase: 'setup',
     difficulty: 'easy',
     soundEnabled: true,
+    playerName: '',
     playerMode: 'reveal',
     isRivalThinking: false,
     paused: false,
@@ -28,6 +31,7 @@ function makeStore(): AppStore {
     player: { score: 0, strikes: 0 },
     rival: { score: 0, strikes: 0 },
     roundPlayerOreMined: 0,
+    roundRivalOreMined: 0,
     currentTurn: 'player',
     roundNumber: 1,
     matchRounds: [],
@@ -41,6 +45,8 @@ function makeStore(): AppStore {
     showHistoryPanel: false,
     lastPlayerActionLabel: '',
     feedback: '',
+    savedCheckpoint: null,
+    matchLog: [],
   };
 }
 
@@ -72,9 +78,13 @@ export const App = component$(() => {
       setDifficulty: (d: Difficulty) => {
         if (store.phase === 'setup') store.difficulty = d;
       },
-      goto: (dest: 'game-board' | 'stats') => {
+      goto: (dest: 'game-board' | 'stats' | 'match-log' | 'export-center') => {
         if (dest === 'stats') {
           store.phase = 'stats';
+        } else if (dest === 'match-log') {
+          if (store.phase === 'setup') store.phase = 'match-log';
+        } else if (dest === 'export-center') {
+          if (store.phase === 'setup') store.phase = 'export-center';
         } else if (store.phase !== 'playing' && store.phase !== 'round-result') {
           store.phase = 'setup';
         }
@@ -82,12 +92,14 @@ export const App = component$(() => {
     };
     w.__mineclashApi = mcApi;
     initWebMcp();
+    w.API = mcApi;
   });
 
   useVisibleTask$(({ track }) => {
     const ready = track(() => storageReady.value);
     track(() => store.soundEnabled);
     track(() => store.difficulty);
+    track(() => store.playerName);
     track(() => store.stats.easy.matchesPlayed);
     track(() => store.stats.medium.matchesPlayed);
     track(() => store.stats.hard.matchesPlayed);
@@ -100,6 +112,8 @@ export const App = component$(() => {
     track(() => store.stats.easy.bestSingleRoundScore);
     track(() => store.stats.medium.bestSingleRoundScore);
     track(() => store.stats.hard.bestSingleRoundScore);
+    track(() => store.savedCheckpoint);
+    track(() => store.matchLog.length);
     if (!ready) return;
     saveToStorage(store);
   }, { strategy: 'document-ready' });
@@ -123,6 +137,8 @@ export const App = component$(() => {
       {store.phase === 'round-result' && <RoundResultOverlay />}
       {store.phase === 'match-complete' && <MatchCompleteScreen />}
       {store.phase === 'stats' && <StatsScreen />}
+      {store.phase === 'match-log' && <MatchLogScreen />}
+      {store.phase === 'export-center' && <ExportCenterScreen />}
     </main>
   );
 });

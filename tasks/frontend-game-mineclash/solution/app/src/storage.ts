@@ -1,11 +1,14 @@
-import type { AppStore, StatsData } from './types';
+import type { AppStore, MatchCheckpoint, MatchLogEntry, StatsData } from './types';
 
 const KEY = 'mineclash_v1';
 
 interface Saved {
   soundEnabled: boolean;
   difficulty: 'easy' | 'medium' | 'hard';
+  playerName: string;
   stats: StatsData;
+  savedCheckpoint: MatchCheckpoint | null;
+  matchLog: MatchLogEntry[];
 }
 
 function ls(): Storage | null {
@@ -21,6 +24,7 @@ export function loadFromStorage(store: AppStore) {
     const d: Saved = JSON.parse(raw);
     if (d.soundEnabled !== undefined) store.soundEnabled = d.soundEnabled;
     if (d.difficulty) store.difficulty = d.difficulty;
+    if (d.playerName) store.playerName = d.playerName;
     if (d.stats) {
       for (const k of ['easy', 'medium', 'hard'] as const) {
         if (d.stats[k]) {
@@ -31,6 +35,8 @@ export function loadFromStorage(store: AppStore) {
         }
       }
     }
+    if (d.savedCheckpoint) store.savedCheckpoint = d.savedCheckpoint;
+    if (Array.isArray(d.matchLog)) store.matchLog = d.matchLog;
   } catch { /* ignore */ }
 }
 
@@ -41,11 +47,14 @@ export function saveToStorage(store: AppStore) {
     const d: Saved = {
       soundEnabled: store.soundEnabled,
       difficulty: store.difficulty,
+      playerName: store.playerName,
       stats: {
         easy: { ...store.stats.easy },
         medium: { ...store.stats.medium },
         hard: { ...store.stats.hard },
       },
+      savedCheckpoint: store.savedCheckpoint,
+      matchLog: store.matchLog,
     };
     s.setItem(KEY, JSON.stringify(d));
   } catch { /* ignore */ }

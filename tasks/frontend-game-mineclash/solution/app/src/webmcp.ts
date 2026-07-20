@@ -23,10 +23,10 @@ export interface MineClashApi {
   newMatch: () => void;     // "New match" reset -> setup screen
   setPaused: (v: boolean) => void; // Pause / Resume toggle
   setDifficulty: (d: Difficulty) => void; // difficulty selector (setup only)
-  goto: (dest: 'game-board' | 'stats') => void; // nav (View stats / back)
+  goto: (dest: 'game-board' | 'stats' | 'match-log' | 'export-center') => void; // nav (View stats / match log / export center / back)
 }
 
-const DESTINATIONS = ['game-board', 'stats'] as const;
+const DESTINATIONS = ['game-board', 'stats', 'match-log', 'export-center'] as const;
 const DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard'];
 const DEFAULT_DIFFICULTY: Difficulty = 'easy';
 
@@ -89,7 +89,7 @@ function browseOpen(args: Record<string, unknown>) {
   if (!DESTINATIONS.includes(destination as (typeof DESTINATIONS)[number])) {
     return { ok: false, error: `unknown destination: ${destination}` };
   }
-  a.goto(destination as 'game-board' | 'stats');
+  a.goto(destination as 'game-board' | 'stats' | 'match-log' | 'export-center');
   return { ok: true, operation: 'open', destination, phase: a.store.phase };
 }
 
@@ -149,7 +149,7 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
   },
   {
     name: 'browse-open',
-    description: 'Navigate to a destination. args.destination is one of: game-board, stats.',
+    description: 'Navigate to a destination. args.destination is one of: game-board, stats, match-log, export-center.',
     handler: browseOpen,
   },
   {

@@ -1,6 +1,6 @@
-import { component$, useContext } from '@builder.io/qwik';
+import { component$, useContext, useSignal } from '@builder.io/qwik';
 import { AppCtx } from '../context';
-import { initNewMatch } from '../gameLogic';
+import { DIFFICULTY_CONFIG, MAX_HINTS, initNewMatch, resetHistoryRoot } from '../gameLogic';
 import type { Difficulty } from '../types';
 
 const DIFF_LABELS: Record<Difficulty, string> = {
@@ -17,6 +17,8 @@ const DIFF_DESC: Record<Difficulty, string> = {
 
 export const SetupScreen = component$(() => {
   const store = useContext(AppCtx);
+  const nameError = useSignal('');
+  const diffError = useSignal('');
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
@@ -27,9 +29,36 @@ export const SetupScreen = component$(() => {
         <p style={{ color: '#A8A29E', margin: 0, fontSize: '16px' }}>A mining duel · Best of 3 rounds</p>
       </div>
 
-      {/* Difficulty */}
+      {/* Player Name and Difficulty container */}
       <div style={{ marginBottom: '32px', width: '100%', maxWidth: '340px' }}>
-        <p id="difficulty-label" style={{ color: '#A8A29E', fontSize: '13px', letterSpacing: '0.4px', marginBottom: '12px', textAlign: 'center' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <label for="playerName" style={{ display: 'block', color: '#A8A29E', fontSize: '13px', letterSpacing: '0.4px', marginBottom: '8px' }}>
+            Player Name
+          </label>
+          <input
+            id="playerName"
+            type="text"
+            class="input input-bordered w-full"
+            style={{ background: '#292524', border: '1px solid #44403C', color: '#FAFAF9', padding: '12px', borderRadius: '8px', fontSize: '16px', width: '100%' }}
+            value={store.playerName}
+            onInput$={(e) => {
+              const val = (e.target as HTMLInputElement).value;
+              store.playerName = val;
+              if (val.length < 2 || val.length > 20) {
+                nameError.value = 'playerName must be 2 to 20 characters';
+              } else {
+                nameError.value = '';
+              }
+            }}
+          />
+          {nameError.value && (
+            <div style={{ color: '#EF4444', fontSize: '12px', marginTop: '4px' }}>{nameError.value}</div>
+          )}
+        </div>
+
+        {/* Difficulty */}
+        <div>
+          <p id="difficulty-label" style={{ color: '#A8A29E', fontSize: '13px', letterSpacing: '0.4px', marginBottom: '12px', textAlign: 'center' }}>
           Select difficulty
         </p>
         <div role="group" aria-labelledby="difficulty-label" style={{ display: 'flex', gap: '8px' }}>
@@ -40,13 +69,20 @@ export const SetupScreen = component$(() => {
               style={{ flex: 1, flexDirection: 'column', display: 'flex', alignItems: 'center', padding: '12px 8px', gap: '4px' }}
               aria-pressed={store.difficulty === d}
               onClick$={() => {
-                if (store.phase === 'setup') store.difficulty = d;
+                if (store.phase === 'setup') {
+                  store.difficulty = d;
+                  diffError.value = '';
+                }
               }}
             >
               <span style={{ fontWeight: '700', fontSize: '14px' }}>{DIFF_LABELS[d]}</span>
               <span style={{ fontSize: '11px', color: '#A8A29E', fontFamily: "'Courier New', monospace" }}>{DIFF_DESC[d]}</span>
             </button>
           ))}
+        </div>
+        {diffError.value && (
+            <div style={{ color: '#EF4444', fontSize: '12px', marginTop: '4px', textAlign: 'center' }}>{diffError.value}</div>
+          )}
         </div>
       </div>
 
@@ -55,19 +91,96 @@ export const SetupScreen = component$(() => {
         <button
           class="btn-primary"
           style={{ fontSize: '18px', padding: '14px', width: '100%' }}
-          onClick$={() => { initNewMatch(store); }}
+          disabled={!!nameError.value || !!diffError.value || store.playerName.length < 2 || store.playerName.length > 20 || !store.difficulty}
+          onClick$={() => {
+            let valid = true;
+            if (!store.playerName || store.playerName.length < 2 || store.playerName.length > 20) {
+              nameError.value = 'playerName must be 2 to 20 characters';
+              valid = false;
+            }
+            if (!store.difficulty) {
+              diffError.value = 'difficulty must be selected';
+              valid = false;
+            }
+            if (valid) {
+              initNewMatch(store);
+            }
+          }}
         >
           ⚔️ Start match
         </button>
         <button
-          class="btn-secondary"
-          style={{ width: '100%' }}
-          onClick$={() => {
-            if (store.phase === 'setup') store.phase = 'stats';
-          }}
-        >
-          📊 View stats
-        </button>
+            type="button"
+            class="btn-secondary"
+            style={{ width: '100%', marginBottom: '12px' }}
+            onClick$={() => {
+              if (store.phase === 'setup') store.phase = 'stats';
+            }}
+          >
+            📊 View stats
+          </button>
+          <div style={{ display: 'flex', gap: '8px', width: '100%', marginBottom: '12px' }}>
+            <button
+              type="button"
+              class="btn-secondary"
+              style={{ flex: 1, fontSize: '14px' }}
+              onClick$={() => {
+                if (store.phase === 'setup') store.phase = 'match-log';
+              }}
+            >
+              📜 Match log
+            </button>
+            <button
+              type="button"
+              class="btn-secondary"
+              style={{ flex: 1, fontSize: '14px' }}
+              onClick$={() => {
+                if (store.phase === 'setup') store.phase = 'export-center';
+              }}
+            >
+              📥 Export / Import
+            </button>
+          </div>
+          <button
+            type="button"
+            class="btn-secondary"
+            style={{ width: '100%', fontSize: '14px' }}
+            disabled={!store.savedCheckpoint}
+            onClick$={() => {
+              if (store.phase === 'setup' && store.savedCheckpoint) {
+                const checkpoint = store.savedCheckpoint;
+                // Restore scalar + nested fields from the checkpoint.
+                Object.assign(store, checkpoint);
+                store.tiles = checkpoint.board;
+                store.player.score = checkpoint.playerScore;
+                store.player.strikes = checkpoint.playerStrikes;
+                store.rival.score = checkpoint.rivalScore;
+                store.rival.strikes = checkpoint.rivalStrikes;
+                store.currentTurn = checkpoint.sideToMove;
+                store.hintsUsed = MAX_HINTS - checkpoint.hintsRemaining;
+                store.playerMatchWins = checkpoint.playerRoundWins;
+                store.rivalMatchWins = checkpoint.rivalRoundWins;
+                // The checkpoint doesn't carry board dimensions directly (only
+                // mineCount) — derive rows/cols from the restored difficulty so
+                // the board renderer and win detection use the right grid size.
+                const cfg = DIFFICULTY_CONFIG[checkpoint.difficulty];
+                store.rows = cfg.rows;
+                store.cols = cfg.cols;
+                store.paused = checkpoint.paused;
+                // Re-arm the rival's auto-turn effect (App.tsx only acts while
+                // isRivalThinking is true) so a rival-to-move checkpoint doesn't
+                // stall after resume.
+                store.isRivalThinking = checkpoint.sideToMove === 'rival';
+                store.feedback = 'Match resumed from saved checkpoint.';
+                // Rebuild history from the resumed board so Undo/Redo/History
+                // don't reflect a stale branch left over from before the save.
+                resetHistoryRoot(store, 'Resumed');
+                store.phase = 'playing';
+              }
+            }}
+          >
+            ▶️ Resume Saved Match
+          </button>
       </div>
 
       {/* Sound toggle */}
