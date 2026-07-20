@@ -74,7 +74,7 @@ import {
 } from './store';
 import { registerWebMCP } from './webmcp';
 
-const PALETTE = ['#007d79', '#8a3ffc', '#1192e8', '#b28600', '#fa4d56'];
+const PALETTE = ['#007d79', '#8a3ffc', '#1192e8', '#b28600', '#eb6200'];
 const TEAM_COLORS = { Research: '#007d79', Product: '#8a3ffc', Support: '#1192e8', Platform: '#b28600' };
 const currency = (value, decimals = 2) => `${value < 0 ? '−' : ''}$${Math.abs(value || 0).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
 const compactCurrency = (value) => `$${Number(value || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
@@ -104,6 +104,34 @@ function useAnimatedNumber(value, duration = 600) {
   return display;
 }
 
+function useDialogKeyboard(open, onClose, focusId, restoreId) {
+  const opener = useRef(null);
+  const wasOpen = useRef(false);
+  const onCloseRef = useRef(onClose);
+  if (open && !wasOpen.current) opener.current = document.activeElement;
+  wasOpen.current = open;
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+  useEffect(() => {
+    if (!open) return undefined;
+    const focusTimer = window.setTimeout(() => document.getElementById(focusId)?.focus(), 30);
+    const escape = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onCloseRef.current();
+      }
+    };
+    document.addEventListener('keydown', escape, true);
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener('keydown', escape, true);
+      window.setTimeout(() => {
+        const restoreTarget = opener.current?.isConnected ? opener.current : document.getElementById(restoreId);
+        restoreTarget?.focus();
+      }, 0);
+    };
+  }, [open, focusId, restoreId]);
+}
+
 function BudgetCapForm() {
   const cap = useCostStore((s) => s.budgetCap);
   const setBudgetCap = useCostStore((s) => s.setBudgetCap);
@@ -125,6 +153,9 @@ function BudgetCapForm() {
 }
 
 function Header({ onSaveView, onSchedule }) {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const headerRef = useRef(null);
+  const mobileButtonRef = useRef(null);
   const eventCount = useCostStore((s) => s.events.length);
   const savedCount = useCostStore((s) => s.savedViews.length);
   const reportCount = useCostStore((s) => s.snapshots.length);
@@ -133,21 +164,51 @@ function Header({ onSaveView, onSchedule }) {
   const undo = useCostStore((s) => s.undo);
   const redo = useCostStore((s) => s.redo);
   const count = eventCount + savedCount + reportCount;
+  useEffect(() => {
+    if (!mobileOpen) return undefined;
+    const mobileViewport = window.matchMedia('(max-width: 768px)');
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setMobileOpen(false);
+        mobileButtonRef.current?.focus();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const focusable = [...headerRef.current.querySelectorAll('button:not(:disabled), input:not(:disabled), select:not(:disabled), [tabindex]:not([tabindex="-1"])')];
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable.at(-1);
+      if (!headerRef.current.contains(document.activeElement)) { event.preventDefault(); (event.shiftKey ? last : first).focus(); }
+      else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    };
+    const handleViewportChange = (event) => { if (!event.matches) setMobileOpen(false); };
+    document.addEventListener('keydown', handleKeyDown, true);
+    mobileViewport.addEventListener('change', handleViewportChange);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown, true);
+      mobileViewport.removeEventListener('change', handleViewportChange);
+    };
+  }, [mobileOpen]);
   return (
     <header className="topbar">
-      <div className="topbar-inner">
+      <div ref={headerRef} className={`topbar-inner ${mobileOpen ? 'mobile-expanded' : ''}`}>
         <div>
           <div className="brand-eyebrow">Inference operations</div>
           <h1 className="brand-title">Cost Command</h1>
           <div className="brand-subtitle">Live AI spend intelligence · July 2026</div>
         </div>
+        <button ref={mobileButtonRef} className="mobile-menu" type="button" aria-expanded={mobileOpen} aria-controls="header-workspace-controls" onClick={() => setMobileOpen((open) => !open)}>
+          <span>{mobileOpen ? 'Close controls' : 'Workspace controls'}</span><ChevronDown className={mobileOpen ? 'open' : ''} size={18} aria-hidden="true" />
+        </button>
         <BudgetCapForm />
         <div className="capacity" aria-label={`${count} of 2000 records stored`}>
           <span className="header-label">Records capacity</span>
           <div className="capacity-copy"><span>{count.toLocaleString()} stored</span><span>2,000 max</span></div>
           <div className="capacity-track"><div className="capacity-fill" style={{ width: `${Math.min(100, count / 20)}%` }} /></div>
         </div>
-        <div className="toolbar" aria-label="History and workspace actions">
+        <div className="toolbar" id="header-workspace-controls" aria-label="History and workspace actions">
           <Button kind="ghost" size="sm" hasIconOnly renderIcon={Undo} iconDescription="Undo" disabled={!historyCount} onClick={undo} />
           <Button kind="ghost" size="sm" hasIconOnly renderIcon={Redo} iconDescription="Redo" disabled={!futureCount} onClick={redo} />
           <Button kind="ghost" size="sm" renderIcon={Save} onClick={onSaveView}><span className="label">Save view</span></Button>
@@ -165,8 +226,8 @@ function KpiCard({ label, value, delta, compare, error, accent, caption }) {
     <article className={`kpi ${error ? 'error' : ''}`} style={{ '--accent': error ? '#da1e28' : accent }} aria-label={`${label}: ${currency(value)}`}>
       <div className="kpi-label">{label}</div>
       <div className="kpi-value">{currency(animated)}</div>
-      {error && <div className="over-label"><WarningAlt size={14} /> Over budget</div>}
-      {!error && <div className="trend">{positive ? <ArrowUp size={16} /> : <ArrowDown size={16} />} {caption}</div>}
+      {error && <div className="over-label"><WarningAlt size={14} aria-hidden="true" /> Over budget</div>}
+      {!error && <div className="trend" aria-label={`${positive ? 'Up' : 'Down'} trend, ${caption}`}>{positive ? <ArrowUp size={16} aria-hidden="true" /> : <ArrowDown size={16} aria-hidden="true" />} {caption}</div>}
       {compare && <div style={{ position: 'absolute', right: 14, top: 14 }} className={`delta-chip ${positive ? '' : 'negative'}`}>{positive ? '+' : ''}{delta.toFixed(1)}%</div>}
     </article>
   );
@@ -190,7 +251,10 @@ function RangeForm() {
   const applyRange = useCostStore((s) => s.applyRange);
   const compare = useCostStore((s) => s.compare);
   const setCompare = useCostStore((s) => s.setCompare);
-  const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(dateRangeSchema), mode: 'onChange', defaultValues: range });
+  const { register, handleSubmit, reset, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(dateRangeSchema), mode: 'onChange', defaultValues: range });
+  const from = watch('from');
+  const to = watch('to');
+  const backwards = Boolean(from && to && to < from);
   useEffect(() => reset(range), [range, reset]);
   return (
     <div>
@@ -200,7 +264,7 @@ function RangeForm() {
         <Button type="submit" size="sm" disabled={!isValid}>Apply</Button>
         <label className="compare-toggle"><input type="checkbox" checked={compare} onChange={(e) => setCompare(e.target.checked)} /> Compare prior period</label>
       </form>
-      {errors.to && <div className="inline-error" role="alert">{errors.to.message}</div>}
+      {(errors.to || backwards) && <div className="inline-error" role="alert">date range: to must be on or after from</div>}
     </div>
   );
 }
@@ -224,7 +288,7 @@ function SpendChart() {
   const data = primary.map((row, index) => ({ ...row, previous: previous[index]?.cumulative || 0 }));
   const anomalyDot = (props) => {
     if (!anomalyDates.has(props.payload.date)) return <circle key={`dot-${props.payload.date}`} cx={props.cx} cy={props.cy} r={2} fill="#007d79" />;
-    return <path key={`dot-${props.payload.date}`} d={`M ${props.cx} ${props.cy - 7} L ${props.cx + 7} ${props.cy} L ${props.cx} ${props.cy + 7} L ${props.cx - 7} ${props.cy} Z`} fill="#da1e28" stroke="white" strokeWidth="2" />;
+    return <path key={`dot-${props.payload.date}`} role="img" aria-label={`Anomaly on ${props.payload.date}`} d={`M ${props.cx} ${props.cy - 7} L ${props.cx + 7} ${props.cy} L ${props.cx} ${props.cy + 7} L ${props.cx - 7} ${props.cy} Z`} fill="#da1e28" stroke="white" strokeWidth="2" />;
   };
   return (
     <section className="panel" id="spend-over-time">
@@ -407,7 +471,7 @@ function FormulaBox({ events }) {
     <div className="formula-wrap">
       <div className="formula-row">
         <TextInput id="formula" labelText="Formula over filtered events" value={expression} invalid={Boolean(result.error)} invalidText={result.error || ''} onChange={(e) => setFormula(e.target.value)} list="formula-options" />
-        {!result.error && <div className="formula-result" aria-live="polite"><span>{result.label} · {events.length} events</span><strong>{result.currency ? currency(result.value, 6) : Number(result.value).toLocaleString()}</strong></div>}
+        {!result.error && <div className="formula-result" aria-live="polite"><span>{result.label} · {events.length} events</span><strong>{result.currency ? currency(result.value, 2) : Number(result.value).toLocaleString()}</strong></div>}
       </div>
       <datalist id="formula-options">{formulaValues.map((formula) => <option key={formula} value={formula} />)}</datalist>
     </div>
@@ -451,6 +515,7 @@ function EventLedger({ onSaveView }) {
   const setSelected = useCostStore((s) => s.setSelected);
   const setSort = useCostStore((s) => s.setSort);
   const clearFilter = useCostStore((s) => s.clearFilter);
+  const clearAllFilters = useCostStore((s) => s.clearAllFilters);
   const events = useMemo(() => {
     const rows = scopedEvents(state);
     const key = state.sort.key;
@@ -485,7 +550,7 @@ function EventLedger({ onSaveView }) {
         <div className="event-check"><input type="checkbox" aria-label="Select all filtered events" checked={allSelected} onChange={selectAll} /></div>
         {columns.map(([key, label]) => <button key={key} className="header-cell" onClick={() => setSort(key)}>{label}{state.sort.key === key && (state.sort.direction === 'asc' ? <ArrowUp size={12} /> : <ArrowDown size={12} />)}</button>)}
       </div>
-      {events.length === 0 ? <div className="zero-state"><div><h3>No events match these filters</h3><p>The formula result remains valid at zero.</p><Button size="sm" onClick={clearFilter}>Clear filters</Button></div></div> : (
+      {events.length === 0 ? <div className="zero-state"><div><h3>No events match these filters</h3><p>The formula result remains valid at zero.</p><Button size="sm" onClick={clearAllFilters}>Clear filters</Button></div></div> : (
         <div className="table-scroll" ref={parentRef} role="table" aria-rowcount={events.length}>
           <div className="virtual-spacer" style={{ height: virtualizer.getTotalSize() }}>
             {virtualizer.getVirtualItems().map((virtualRow) => {
@@ -496,7 +561,7 @@ function EventLedger({ onSaveView }) {
                 <div className="event-cell">{format(parseISO(event.timestamp), 'MMM d, yyyy HH:mm')} UTC</div>
                 <div className="event-cell">{event.model}</div><div className="event-cell">{event.feature}</div><div className="event-cell">{event.team}</div>
                 <div className="event-cell">{event.promptTokens.toLocaleString()}</div><div className="event-cell">{event.completionTokens.toLocaleString()}</div>
-                <div className="event-cell"><strong>{currency(pricedCost(event, state), 6)}</strong></div><div className="event-cell"><span className="tag-pill">{event.tag}</span></div>
+                <div className="event-cell"><strong>{currency(pricedCost(event, state), 4)}</strong></div><div className="event-cell"><span className="tag-pill">{event.tag}</span></div>
               </div>;
             })}
           </div>
@@ -544,6 +609,7 @@ function SaveViewModal({ open, onClose }) {
   const state = useCostStore();
   const saveView = useCostStore((s) => s.saveView);
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(savedViewSchema), mode: 'onChange', defaultValues: { name: '', dimension: state.dimension, range: state.range } });
+  useDialogKeyboard(open, onClose, 'view-name');
   useEffect(() => { if (open) reset({ name: '', dimension: state.dimension, range: state.range }); }, [open, state.dimension, state.range, reset]);
   const submit = (body) => { saveView(body); onClose(); };
   return (
@@ -562,6 +628,7 @@ function ScheduleModal({ open, onClose }) {
   const existing = useCostStore((s) => s.schedule);
   const saveSchedule = useCostStore((s) => s.saveSchedule);
   const { register, handleSubmit, reset, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(scheduleSchema), mode: 'onChange', defaultValues: existing || { frequency: 'weekly', sections: [] } });
+  useDialogKeyboard(open, onClose, 'report-frequency');
   useEffect(() => { if (open) reset(existing || { frequency: 'weekly', sections: [] }); }, [open, existing, reset]);
   const sections = watch('sections') || [];
   const submit = (body) => { saveSchedule(body); onClose(); };
@@ -584,13 +651,18 @@ function SavedViewsPanel({ onCreate }) {
   const active = useCostStore((s) => s.activeViewId);
   const applyView = useCostStore((s) => s.applyView);
   const deleteView = useCostStore((s) => s.deleteView);
+  const [pendingDelete, setPendingDelete] = useState(null);
+  useDialogKeyboard(Boolean(pendingDelete), () => setPendingDelete(null), 'confirm-delete-view', 'saved-view-new');
   return (
     <section className="panel">
-      <div className="panel-head"><div><div className="section-kicker">Workspace</div><h2 className="panel-title">Saved views</h2><div className="panel-subtitle">Restore range, dimension, and drill-down</div></div><Button size="sm" renderIcon={Add} onClick={onCreate}>New</Button></div>
+      <div className="panel-head"><div><div className="section-kicker">Workspace</div><h2 className="panel-title">Saved views</h2><div className="panel-subtitle">Restore range, dimension, and drill-down</div></div><Button id="saved-view-new" size="sm" renderIcon={Add} onClick={onCreate}>New</Button></div>
       <div className="panel-body">
         {!views.length && <div className="panel-subtitle">No saved views yet. Capture the current analytics scope.</div>}
-        <div className="saved-list">{views.map((view) => <div key={view.id} className={`saved-item ${active === view.id ? 'active' : ''}`}><button onClick={() => applyView(view.id)}><strong>{view.name}</strong><div className="panel-subtitle">{view.dimension} · {view.range.from} → {view.range.to}</div></button><button className="saved-delete" aria-label={`Delete ${view.name}`} onClick={() => { if (window.confirm(`Delete saved view “${view.name}”?`)) deleteView(view.id); }}><TrashCan size={16} /></button></div>)}</div>
+        <div className="saved-list">{views.map((view) => <div key={view.id} className={`saved-item ${active === view.id ? 'active' : ''}`}><button onClick={() => applyView(view.id)}><strong>{view.name}</strong><div className="panel-subtitle">{view.dimension} · {view.range.from} → {view.range.to}</div></button><button className="saved-delete" aria-label={`Delete ${view.name}`} onClick={() => setPendingDelete(view)}><TrashCan size={16} aria-hidden="true" /></button></div>)}</div>
       </div>
+      <Modal open={Boolean(pendingDelete)} danger modalHeading="Delete saved view?" primaryButtonText="Delete view" primaryButtonProps={{ id: 'confirm-delete-view' }} secondaryButtonText="Cancel" onRequestSubmit={() => { if (pendingDelete) deleteView(pendingDelete.id); setPendingDelete(null); }} onRequestClose={() => setPendingDelete(null)} size="xs">
+        <p>Delete <strong>{pendingDelete?.name}</strong>? Its currently applied filters will remain active.</p>
+      </Modal>
     </section>
   );
 }
@@ -604,7 +676,7 @@ function ReportPanel({ onSchedule }) {
     <section className="panel" id="report-history">
       <div className="panel-head"><div><div className="section-kicker">Delivery</div><h2 className="panel-title">Scheduled reports</h2><div className="panel-subtitle">Snapshots preserve live totals at generation</div></div><Button size="sm" kind="secondary" onClick={onSchedule}>{schedule ? 'Edit' : 'Set schedule'}</Button></div>
       <div className="panel-body">
-        {schedule ? <div className="schedule-summary"><strong>{schedule.frequency[0].toUpperCase() + schedule.frequency.slice(1)}</strong> · {schedule.sections.join(', ')}</div> : <div className="panel-subtitle" style={{ marginBottom: 12 }}>No active schedule.</div>}
+        {schedule ? <div className="schedule-summary"><strong>{schedule.frequency[0].toUpperCase() + schedule.frequency.slice(1)}</strong> · {schedule.sections.join(', ')}</div> : snapshots.length ? <div className="schedule-summary"><strong>No active schedule</strong> · showing saved snapshots</div> : <div className="empty-report"><strong>No report snapshots yet</strong><span>Set a schedule, then run it to preserve live totals.</span></div>}
         <Button renderIcon={Play} size="sm" disabled={!schedule} onClick={run}>Run schedule now</Button>
         <div className="history-list" style={{ marginTop: 12 }}>{snapshots.slice().reverse().map((snapshot) => <button className="history-item" key={snapshot.id} onClick={() => setOpened(snapshot)}><span><strong>{format(parseISO(snapshot.generatedAt), 'MMM d, HH:mm:ss')} UTC</strong><br /><span className="panel-subtitle">{snapshot.totals.eventCount.toLocaleString()} events</span></span><strong>{currency(snapshot.totals.cost)}</strong></button>)}</div>
       </div>

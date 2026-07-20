@@ -35,15 +35,6 @@ const tools = {
     if (id) document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); else window.scrollTo({ top: 0, behavior: 'smooth' });
     return ok(`Opened ${args.destination}`);
   },
-  browse_search: (args = {}) => {
-    const query = String(args.query || '').trim().toLowerCase().slice(0, 40);
-    if (!query) return fail('query is required');
-    const state = useCostStore.getState();
-    const ids = state.events.filter((event) => [event.model, event.feature, event.team, event.tag].some((v) => v.toLowerCase().includes(query))).map((e) => e.id);
-    state.setSelected(ids);
-    document.getElementById('event-table')?.scrollIntoView({ behavior: 'smooth' });
-    return ok(`Selected ${ids.length} matching usage events`, { count: ids.length });
-  },
   browse_apply_filter: (args = {}) => {
     const state = useCostStore.getState();
     if (args.filter === 'date-range') {
@@ -61,9 +52,6 @@ const tools = {
   },
   browse_clear_filter: () => { useCostStore.getState().clearFilter(); return ok('Applied drill-down filters cleared'); },
   browse_sort: (args = {}) => { if (!SORTS[args.sort]) return fail('sort is outside the declared set'); useCostStore.getState().setSort(SORTS[args.sort]); return ok(`Sorted by ${args.sort}`); },
-  browse_set_locale: () => fail('No alternate locales are declared'),
-  browse_set_theme: () => fail('No alternate themes are declared'),
-
   entity_select: (args = {}) => {
     const ids = Array.isArray(args.ids) ? args.ids : args.id ? [args.id] : [];
     const valid = new Set(useCostStore.getState().events.map((e) => e.id));
@@ -79,7 +67,12 @@ const tools = {
       if (sum > state.budgetCap) return fail(`team ceilings exceed capUsd by $${(sum - state.budgetCap).toFixed(2)}`);
       state.setTeamCeiling(parsed.data); return ok('Team ceiling updated');
     }
-    if (args.field === 'what-if-rate') { if (!MODELS.includes(args.model) || !(Number(args.value) > 0)) return fail('model or rate is invalid'); state.setRate(args.model, Number(args.value)); return ok('What-if rate updated'); }
+    if (args.field === 'what-if-rate') {
+      const rate = Number(args.value ?? args.rate);
+      if (!MODELS.includes(args.model) || !(rate > 0)) return fail('model or rate is invalid');
+      state.setRate(args.model, rate);
+      return ok('What-if rate updated', { model: args.model, rate });
+    }
     if (args.field === 'formula-expression') { state.setFormula(String(args.value)); return ok('Formula expression updated'); }
     if (args.field === 'team' || args.field === 'feature') {
       const valid = args.field === 'team' ? TEAMS : FEATURES; if (!valid.includes(args.value) || !state.selectedIds.length) return fail('value must use the seeded closed set and events must be selected');
@@ -101,20 +94,7 @@ const tools = {
     if (args.savedViewId && state.savedViews.some((v) => v.id === args.savedViewId)) { state.deleteView(args.savedViewId); return ok('Saved view deleted; active filters remain visible'); }
     return fail('Only declared saved views can be deleted');
   },
-  entity_toggle: (args = {}) => tools.browse_apply_filter({ filter: 'series-toggle', member: args.member }),
-  entity_quantity: () => fail('Quantity is not supported for usage events'),
-  entity_reorder: () => fail('Reordering is not supported for usage events'),
-
   session_trigger_demo: (args = {}) => { if (args.demo !== 'run-schedule-now') return fail('demo must be run-schedule-now'); if (!useCostStore.getState().schedule) return fail('Save a valid schedule first'); useCostStore.getState().runScheduleNow(); return ok('One report snapshot generated'); },
-  session_start: () => fail('Only trigger_demo is bound for this dashboard'),
-  session_pause: () => fail('Only trigger_demo is bound for this dashboard'),
-  session_resume: () => fail('Only trigger_demo is bound for this dashboard'),
-  session_stop: () => fail('Only trigger_demo is bound for this dashboard'),
-  session_restart: () => fail('Only trigger_demo is bound for this dashboard'),
-  session_advance: () => fail('Only trigger_demo is bound for this dashboard'),
-  session_connect: () => fail('Only trigger_demo is bound for this dashboard'),
-  session_disconnect: () => fail('Only trigger_demo is bound for this dashboard'),
-
   artifact_export: (args = {}) => {
     const report = buildCostReport(useCostStore.getState());
     if (args.format === 'cost-report-json') download('cost-analytics-report.json', 'application/json', JSON.stringify(report, null, 2));
@@ -122,15 +102,10 @@ const tools = {
     else return fail('format must be cost-report-json or cost-report-csv');
     return ok(`${args.format} download started`, { eventCount: report.totals.eventCount });
   },
-  artifact_copy: async (args = {}) => { if (args.format !== 'cost-report-json') return fail('copy format must be cost-report-json'); await navigator.clipboard.writeText(JSON.stringify(buildCostReport(useCostStore.getState()), null, 2)); return ok('Cost report JSON copied'); },
-  artifact_import: () => fail('Import modes are not declared'),
-  artifact_print_preview: () => fail('Print preview is not declared'),
-  artifact_convert: () => fail('Conversion modes are not declared'),
 };
 
 const descriptions = {
   browse_open: 'Open a declared Cost Command dashboard destination.',
-  browse_search: 'Search bounded usage-event text and visibly select matches.',
   browse_apply_filter: 'Apply one declared analytics filter using visible dashboard state.',
   browse_clear_filter: 'Clear the active drill-down or anomaly filter.',
   browse_sort: 'Sort the visible usage-event table by a declared column.',
@@ -138,26 +113,29 @@ const descriptions = {
   entity_update: 'Update one bounded analytics entity field.',
   entity_create: 'Create a saved view through its bounded field contract.',
   entity_delete: 'Delete a saved view with explicit confirmation.',
-  entity_toggle: 'Toggle a declared breakdown series.',
   session_trigger_demo: 'Run the saved report schedule once.',
   artifact_export: 'Download the live cost report as JSON or CSV.',
-  artifact_copy: 'Copy the live cost report JSON.',
 };
+
+function toolArgs(value) {
+  if (value && typeof value === 'object' && value.arguments && typeof value.arguments === 'object') return value.arguments;
+  if (value && typeof value === 'object' && value.args && typeof value.args === 'object') return value.args;
+  return value || {};
+}
 
 let registered = false;
 export function registerWebMCP() {
   if (registered) return;
   registered = true;
   window.webmcp_list_tools = () => Object.keys(tools).map((name) => ({ name, description: descriptions[name] || `${name.replaceAll('_', ' ')} operation` }));
-  window.webmcp_invoke_tool = async (name, args = {}) => tools[name] ? tools[name](args) : fail('Unknown WebMCP tool');
+  window.webmcp_invoke_tool = async (name, args = {}) => tools[name] ? tools[name](toolArgs(args)) : fail('Unknown WebMCP tool');
   window.webmcp_session_info = () => ({ contractVersion: 'zto-webmcp-v1', app: 'Cost Command', toolCount: Object.keys(tools).length });
   const modelContext = navigator.modelContext;
   if (modelContext?.registerTool) {
     Object.entries(tools).forEach(([name, handler]) => {
       try {
-        modelContext.registerTool({ name, description: descriptions[name] || `${name.replaceAll('_', ' ')} operation`, inputSchema: { type: 'object', additionalProperties: true }, execute: handler });
+        modelContext.registerTool({ name, description: descriptions[name] || `${name.replaceAll('_', ' ')} operation`, inputSchema: { type: 'object', additionalProperties: true }, execute: (args) => handler(toolArgs(args)) });
       } catch { /* The compatibility globals above remain available. */ }
     });
   }
 }
-

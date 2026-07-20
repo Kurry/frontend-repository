@@ -173,6 +173,7 @@ export const useCostStore = create((set, get) => ({
   applyDrilldown: (day, dimension, member) => set({ filter: { day, dimension, member }, selectedIds: [], activeViewId: null }),
   applyAnomalyDay: (day) => set({ filter: { day, dimension: null, member: null }, selectedIds: [], activeViewId: null }),
   clearFilter: () => set({ filter: { day: null, dimension: null, member: null }, selectedIds: [], activeViewId: null }),
+  clearAllFilters: () => set({ range: DEFAULT_RANGE, filter: { day: null, dimension: null, member: null }, selectedIds: [], activeViewId: null }),
   setSort: (key) => set((state) => ({ sort: { key, direction: state.sort.key === key && state.sort.direction === 'asc' ? 'desc' : 'asc' } })),
   setSelected: (ids) => set({ selectedIds: ids }),
   toggleSelected: (id) => set((state) => ({ selectedIds: state.selectedIds.includes(id) ? state.selectedIds.filter((x) => x !== id) : [...state.selectedIds, id] })),
@@ -187,14 +188,23 @@ export const useCostStore = create((set, get) => ({
   setFormula: (formula) => set({ formula }),
   saveView: ({ name, dimension, range }) => set((state) => {
     const view = { id: `view-${Date.now()}`, name: name.trim(), dimension, range, filter: state.filter };
-    return withHistory(state, { savedViews: [...state.savedViews, view], activeViewId: view.id });
+    return withHistory(state, {
+      savedViews: [...state.savedViews, view],
+      activeViewId: view.id,
+      toast: { kind: 'success', title: 'View saved', subtitle: `${view.name} is ready to restore.` },
+      announce: `Saved view ${view.name}`,
+    });
   }),
   applyView: (id) => set((state) => {
     const view = state.savedViews.find((item) => item.id === id);
     return view ? { range: view.range, dimension: view.dimension, filter: view.filter, activeViewId: id, hiddenSeries: {}, selectedIds: [] } : {};
   }),
   deleteView: (id) => set((state) => withHistory(state, { savedViews: state.savedViews.filter((view) => view.id !== id), activeViewId: state.activeViewId === id ? null : state.activeViewId })),
-  saveSchedule: (schedule) => set((state) => withHistory(state, { schedule })),
+  saveSchedule: (schedule) => set((state) => withHistory(state, {
+    schedule,
+    toast: { kind: 'success', title: 'Schedule saved', subtitle: `${schedule.frequency} report schedule is active.` },
+    announce: `${schedule.frequency} report schedule saved`,
+  })),
   runScheduleNow: () => set((state) => {
     const now = Date.now();
     if (now - state.lastReportRunAt < 600) return {};
@@ -205,7 +215,7 @@ export const useCostStore = create((set, get) => ({
   undo: () => set((state) => {
     if (!state.history.length) return {};
     const prior = state.history.at(-1);
-    return { ...prior, history: state.history.slice(0, -1), future: [snapshot(state), ...state.future], selectedIds: [], announce: 'Change undone' };
+    return { ...prior, history: state.history.slice(0, -1), future: [snapshot(state), ...state.future], selectedIds: [], toast: null, announce: 'Change undone' };
   }),
   redo: () => set((state) => {
     if (!state.future.length) return {};
