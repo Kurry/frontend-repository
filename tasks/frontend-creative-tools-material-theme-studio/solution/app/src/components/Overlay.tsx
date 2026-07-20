@@ -44,6 +44,12 @@ export default function Overlay({
   useEffect(() => {
     if (open) {
       restoreRef.current = (document.activeElement as HTMLElement) ?? null;
+      // Reopening before the close animation's unmount timer fires cancels the
+      // timer that would have removed the earlier entry — drop any stale entry
+      // first so the stack holds exactly one id per mounted overlay (and the
+      // reopened overlay reclaims the topmost slot).
+      const stale = overlayStack.indexOf(id);
+      if (stale >= 0) overlayStack.splice(stale, 1);
       overlayStack.push(id);
       setMounted(true);
       const raf = requestAnimationFrame(() => requestAnimationFrame(() => setShown(true)));

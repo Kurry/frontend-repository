@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button } from '@mui/material';
 import { RootState } from '../store/store';
@@ -104,23 +104,28 @@ export default function Shell({ children }: { children: ReactNode }) {
   const dispatch = useDispatch();
   const tab = useSelector((state: RootState) => state.theme.tab);
   const announcement = useSelector((state: RootState) => state.theme.announcement);
+  const announceSeq = useSelector((state: RootState) => state.theme.announceSeq);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
   const tabRefs = useRef<Partial<Record<string, HTMLButtonElement | null>>>({});
   const [indicator, setIndicator] = useState({ left: 0, width: 0, ready: false });
 
-  const measure = () => {
+  // Recreated when `tab` changes so the resize listener always measures the
+  // currently selected tab instead of a stale closure from mount.
+  const measure = useCallback(() => {
     const element = tabRefs.current[tab];
     if (element) setIndicator({ left: element.offsetLeft, width: element.offsetWidth, ready: true });
-  };
+  }, [tab]);
 
-  useLayoutEffect(measure, [tab]);
+  useLayoutEffect(() => {
+    measure();
+  }, [measure]);
 
   useEffect(() => {
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
-  }, []);
+  }, [measure]);
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
@@ -216,9 +221,11 @@ export default function Shell({ children }: { children: ReactNode }) {
 
       <main className="flex-1 overflow-hidden relative">{children}</main>
 
-      {/* Polite live region for validation + status announcements */}
+      {/* Polite live region for validation + status announcements. The span is
+          re-keyed on every announce dispatch so identical consecutive messages
+          still mutate the DOM and re-fire for assistive tech. */}
       <div className="sr-only" role="status" aria-live="polite" data-announcer>
-        {announcement}
+        <span key={announceSeq}>{announcement}</span>
       </div>
 
       <TutorialDialog open={tutorialOpen} onClose={() => setTutorialOpen(false)} />

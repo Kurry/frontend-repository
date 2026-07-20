@@ -16,6 +16,7 @@ export default function SavedThemes() {
   const dispatch = useDispatch();
   const themes = useSelector((state: RootState) => state.theme.themes);
   const activeId = useSelector((state: RootState) => state.theme.activeId);
+  const dirty = useSelector((state: RootState) => state.theme.dirty);
   const activeTheme = themes.find(theme => theme.id === activeId);
   const [search, setSearch] = useState('');
   const [versionName, setVersionName] = useState('');
@@ -106,6 +107,7 @@ export default function SavedThemes() {
             {filtered.map(t => {
               const p = t.options.palette;
               const isActive = t.id === activeId;
+              const loadDisabled = isActive && dirty;
               const exiting = exitingIds.includes(t.id);
 
               return (
@@ -140,6 +142,8 @@ export default function SavedThemes() {
                       variant="contained"
                       color="primary"
                       size="small"
+                      disabled={loadDisabled}
+                      title={loadDisabled ? 'Already loaded — save or undo your unsaved changes first' : undefined}
                       onClick={() => {
                         dispatch(loadTheme(t.id));
                         dispatch(announce(`Theme ${t.name} loaded into the editor and preview`));
