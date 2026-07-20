@@ -290,7 +290,4 @@ main { width: min(1540px, 100%); margin: 0 auto; padding: 20px 28px 46px; }
 }
 
 /* Missing animations added */
-.new-row { animation: row-enter 0.4s ease-out; }
-.timeline-event { animation: event-enter 0.35s ease both; }
-.trial-running { animation: status-flip 0.3s ease; }
 .dialog-content { overflow-y: auto !important; }
