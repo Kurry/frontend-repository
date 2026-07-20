@@ -232,6 +232,21 @@ function applyRegions(content: string, regions: ConflictRegion[]): string {
   return out
 }
 
+/**
+ * Both authors can converge on the exact same edit (same span, same text);
+ * `regionsOverlap` correctly treats that as non-conflicting, but applying it
+ * twice would duplicate the text. Collapse identical regions into one.
+ */
+function dedupeRegions(regions: ConflictRegion[]): ConflictRegion[] {
+  const out: ConflictRegion[] = []
+  for (const r of regions) {
+    if (!out.some(o => o.start === r.start && o.end === r.end && o.insert === r.insert)) {
+      out.push(r)
+    }
+  }
+  return out
+}
+
 // ---- online path -----------------------------------------------------------
 
 function applyAuthorChange(author: 'You' | 'Peer', draft: string) {
@@ -330,10 +345,12 @@ function reconnect() {
 
   // Non-conflicting: apply in canonical order (position, then author) so either
   // delivery order converges to the same content. Re-delivery of an already
-  // applied operation identity is a no-op.
-  const regions: ConflictRegion[] = []
-  if (mine) regions.push(mine.region)
-  if (their) regions.push(their.region)
+  // applied operation identity is a no-op. Identical edits from both authors are
+  // collapsed so the same change is applied once, not duplicated.
+  const regions = dedupeRegions([
+    ...(mine ? [mine.region] : []),
+    ...(their ? [their.region] : []),
+  ])
 
   if (regions.length > 0) {
     content = applyRegions(content, regions)

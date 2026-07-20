@@ -148,6 +148,10 @@ let lastX = 0
 let lastY = 0
 let dragStartX = 0
 let dragStartY = 0
+// The element that owns the drag listeners + pointer capture, so any teardown
+// path (pointer up/cancel, or Escape from either key handler) can remove them.
+let dragTarget: HTMLElement | null = null
+let dragPointerId = -1
 
 function displayScale(): number {
   const el = afterCanvas.value
@@ -156,13 +160,36 @@ function displayScale(): number {
   return rect.width > 0 ? el.width / rect.width : 1
 }
 
+/** Remove every listener + capture registered by onPointerDown and end the drag. */
+function teardownDrag() {
+  const target = dragTarget
+  if (target) {
+    target.removeEventListener('pointermove', onPointerMove)
+    target.removeEventListener('pointerup', onPointerUp)
+    target.removeEventListener('pointercancel', onPointerCancel)
+    if (dragPointerId !== -1) {
+      try {
+        if (target.hasPointerCapture(dragPointerId)) target.releasePointerCapture(dragPointerId)
+      } catch { /* noop */ }
+    }
+  }
+  window.removeEventListener('keydown', onDragEscape)
+  dragTarget = null
+  dragPointerId = -1
+  dragging.value = false
+}
+
+/** Cancel the drag: revert to the pre-drag position, then tear everything down. */
+function cancelDrag() {
+  store.posX = dragStartX
+  store.posY = dragStartY
+  teardownDrag()
+}
+
 function onDragEscape(e: KeyboardEvent) {
   if (e.key === 'Escape' && dragging.value) {
     e.preventDefault()
-    store.posX = dragStartX
-    store.posY = dragStartY
-    dragging.value = false
-    window.removeEventListener('keydown', onDragEscape)
+    cancelDrag()
   }
 }
 
@@ -176,6 +203,8 @@ function onPointerDown(e: PointerEvent) {
   lastY = e.clientY
   dragStartX = store.posX
   dragStartY = store.posY
+  dragTarget = target
+  dragPointerId = e.pointerId
   try { target.setPointerCapture(e.pointerId) } catch { /* noop */ }
   target.addEventListener('pointermove', onPointerMove)
   target.addEventListener('pointerup', onPointerUp)
@@ -194,34 +223,21 @@ function onPointerMove(e: PointerEvent) {
   store.posY += dy
 }
 
-function endDragListeners(e: PointerEvent) {
-  const target = e.currentTarget as HTMLElement
-  target.removeEventListener('pointermove', onPointerMove)
-  target.removeEventListener('pointerup', onPointerUp)
-  target.removeEventListener('pointercancel', onPointerCancel)
-  window.removeEventListener('keydown', onDragEscape)
-  dragging.value = false
+function onPointerUp() {
+  if (!dragging.value) return
+  teardownDrag() // releasing commits the position
 }
 
-function onPointerUp(e: PointerEvent) {
+function onPointerCancel() {
   if (!dragging.value) return
-  endDragListeners(e) // release commits the position
-}
-
-function onPointerCancel(e: PointerEvent) {
-  if (!dragging.value) return
-  store.posX = dragStartX
-  store.posY = dragStartY
-  endDragListeners(e)
+  cancelDrag()
 }
 
 function onKeyDown(e: KeyboardEvent) {
   if (!store.imageDataUrl) return
   if (e.key === 'Escape' && dragging.value) {
     e.preventDefault()
-    store.posX = dragStartX
-    store.posY = dragStartY
-    dragging.value = false
+    cancelDrag() // revert + drop listeners/capture, same as the window handler
     return
   }
   if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return

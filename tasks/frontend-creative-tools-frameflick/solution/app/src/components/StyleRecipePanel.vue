@@ -33,13 +33,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useCanvasStore } from '../stores/canvas'
-import { useHistoryStore } from '../stores/history'
 import { useAnnouncer } from '../stores/announcer'
 import { recipeJson } from '../utils/recipe'
 import ImportStyleDialog from './ImportStyleDialog.vue'
 
 const store = useCanvasStore()
-const history = useHistoryStore()
 const announcer = useAnnouncer()
 
 const copiedStyle = ref(false)

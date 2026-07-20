@@ -42,7 +42,9 @@ function loadRecent(item: RecentItem) {
   store.imageDataUrl = item.dataUrl
   store.imageName = item.name
   store.applySettings(item.settings)
-  store.baseline = JSON.parse(JSON.stringify(item.baseline))
+  // Older persisted entries predate the baseline field — fall back to the saved
+  // settings rather than throwing on an undefined baseline.
+  store.baseline = JSON.parse(JSON.stringify(item.baseline ?? item.settings))
   store.showingBefore = false
   recentStore.setActive(item.id)
   announcer.announce(`Loaded ${item.name} with its saved settings.`)

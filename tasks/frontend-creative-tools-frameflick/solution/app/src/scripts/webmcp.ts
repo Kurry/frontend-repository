@@ -242,7 +242,9 @@ function entitySelect(args: Record<string, unknown>) {
     canvas.imageDataUrl = item.dataUrl
     canvas.imageName = item.name
     canvas.applySettings(item.settings)
-    canvas.baseline = JSON.parse(JSON.stringify(item.baseline))
+    // Legacy persisted entries may predate the baseline field — fall back to the
+    // saved settings instead of throwing on an undefined baseline.
+    canvas.baseline = JSON.parse(JSON.stringify(item.baseline ?? item.settings))
     recent.setActive(item.id)
     return { ok: true, kind, name: item.name }
   }
