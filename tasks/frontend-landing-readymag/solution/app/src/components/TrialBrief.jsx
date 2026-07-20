@@ -10,10 +10,9 @@ const trialBriefSchema = z.object({
   product: z.literal("Canvasly"),
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(80, "Name must not exceed 80 characters"),
   email: z.string().email("Email must be a valid address"),
-  plan: z.enum(["Free trial", "Pro", "Team"], { required_error: "Plan required" }),
-  team_size: z.enum(["1", "2-10", "11-50", "51+"], { required_error: "Team size required" }),
-  interests: z.array(z.enum(["Portfolios", "Presentations", "Editorials", "Companies", "Freelancers", "Students"]))
-    .refine(interests => new Set(interests).size === interests.length, "Interests must not contain duplicates"),
+  plan: z.enum(["Free trial", "Pro", "Team"], { errorMap: () => ({ message: "Plan required" }) }),
+  team_size: z.enum(["1", "2-10", "11-50", "51+"], { errorMap: () => ({ message: "Team size required" }) }),
+  interests: z.array(z.enum(["Portfolios", "Presentations", "Editorials", "Companies", "Freelancers", "Students"])),
   generated_at: z.string(),
 }).strict().refine(data => {
     if (data.plan === "Free trial" && data.team_size !== "1") return false;
@@ -32,6 +31,12 @@ const trialBriefSchema = z.object({
     return true;
 }, {
     message: "Interests required for Pro or Team",
+    path: ["interests"]
+}).refine(data => {
+    const unique = new Set(data.interests);
+    return unique.size === data.interests.length;
+}, {
+    message: "Interests must be unique",
     path: ["interests"]
 });
 
@@ -109,7 +114,7 @@ const ChipContainer = styled.div`
   gap: 8px;
 `;
 
-const Chip = styled('button', { shouldForwardProp: prop => prop !== '$selected' })`
+const Chip = styled.button`
   padding: 6px 12px;
   border-radius: 16px;
   border: 1px solid ${props => props.$selected ? colors.dark : colors.grayB8};
@@ -210,33 +215,40 @@ export default function TrialBrief() {
     appStore.setKey('trialBriefRedoStore', redoStack.slice(0, -1));
     appStore.setKey('trialBrief', next);
     setSuccessMsg("");
-  }, [redoStack, undoStack, brief]);
+  }, [undoStack, redoStack, brief]);
 
   useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (!(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== 'z') return;
-      event.preventDefault();
-      if (event.shiftKey) handleRedo();
-      else handleUndo();
+    const handleKeyDown = (e) => {
+      const isMod = e.metaKey || e.ctrlKey;
+      if (!isMod || e.key.toLowerCase() !== 'z') return;
+      const target = e.target;
+      const isTextInput = target && (
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable
+      );
+      if (isTextInput) return;
+      e.preventDefault();
+      if (e.shiftKey) {
+        handleRedo();
+      } else {
+        handleUndo();
+      }
     };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleUndo, handleRedo]);
 
-  const validation = useMemo(() => trialBriefSchema.safeParse(brief), [brief]);
+  const validationResult = useMemo(() => trialBriefSchema.safeParse(brief), [brief]);
+  const isValid = validationResult.success;
   const errors = useMemo(() => {
-    if (!validation.success) {
-      const formErrors = {};
-      validation.error.issues.forEach(issue => {
-        formErrors[issue.path[0]] = issue.message;
-      });
-      return formErrors;
-    }
-    return {};
-  }, [validation]);
-
-  const isValid = validation.success;
+    if (validationResult.success) return {};
+    const formErrors = {};
+    validationResult.error.issues.forEach(issue => {
+      formErrors[issue.path[0]] = issue.message;
+    });
+    return formErrors;
+  }, [validationResult]);
 
   const handleSubmit = useCallback(() => {
     if (isValid) {
@@ -276,11 +288,11 @@ export default function TrialBrief() {
                   updateBrief(result.data);
               } else {
                   const issue = result.error.issues[0];
-                  const field = issue.path.length ? `${issue.path.join('.')}: ` : '';
-                  setImportError(`Import failed: ${field}${issue.message}`);
+                  const field = issue.path.length ? issue.path.join(".") : "payload";
+                  setImportError(`Import failed — ${field}: ${issue.message}`);
               }
           } catch {
-              setImportError("Import failed: invalid JSON.");
+              setImportError("Import failed — file is not valid JSON");
           }
       };
       reader.readAsText(file);
@@ -310,7 +322,7 @@ export default function TrialBrief() {
             handleDownload();
             return { ok: true, format: 'json', downloaded: true };
         }
-        return { ok: false };
+        return { ok: false, error: 'format must be json' };
     };
     webmcpBus.copyBrief = () => {
         handleCopy();
@@ -319,7 +331,7 @@ export default function TrialBrief() {
     webmcpBus.importBrief = (mode) => {
         if (mode !== 'replace') return { ok: false, error: 'mode must be replace' };
         const loaded = handleLoadSample();
-        return { ok: loaded, mode, loadedSample: loaded };
+        return loaded ? { ok: true, mode: 'replace', loadedSample: true } : { ok: false, error: 'cancelled' };
     };
     webmcpBus.validateBrief = () => {
          return { ok: isValid, errors: errors };
@@ -335,7 +347,7 @@ export default function TrialBrief() {
         handleReset();
         return { ok: true };
     };
-  }, [isValid, errors, brief, handleSubmit, handleReset, handleCopy, handleDownload, handleLoadSample]);
+  }, [isValid, errors, handleSubmit, handleReset, handleCopy, handleDownload, handleLoadSample]);
 
 
   return (
@@ -350,8 +362,10 @@ export default function TrialBrief() {
             value={brief.name}
             onChange={e => updateBrief({...brief, name: e.target.value})}
             onBlur={e => {
-              const name = e.target.value.trim();
-              if (name !== brief.name) updateBrief({...brief, name});
+              const trimmed = e.target.value.trim();
+              if (trimmed !== brief.name) {
+                updateBrief({...brief, name: trimmed});
+              }
             }}
           />
           {errors.name && <ErrorText>{errors.name}</ErrorText>}
@@ -450,13 +464,13 @@ export default function TrialBrief() {
               onChange={handleImport}
           />
         </ButtonGroup>
-        {importError && <ErrorText role="alert">{importError}</ErrorText>}
+        {importError && <ErrorText style={{display: 'block', marginBottom: '16px'}}>{importError}</ErrorText>}
         {JSON.stringify(brief, null, 2)}
       </PreviewSection>
       <LiveRegion aria-live="polite">
         {Object.values(errors).join(". ")}
-        {successMsg && `. ${successMsg}`}
-        {importError && `. ${importError}`}
+        {successMsg ? `. ${successMsg}` : ""}
+        {importError ? `. ${importError}` : ""}
       </LiveRegion>
     </Container>
   );

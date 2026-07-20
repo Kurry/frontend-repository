@@ -1,6 +1,6 @@
 const CONTRACT = 'zto-webmcp-v1'
 const DESTINATIONS = ['hero', 'workflow', 'teams', 'support', 'closing', 'trial-brief']
-const SESSION_OPERATIONS = ['advance']
+const SESSION_OPERATIONS = ['advance', 'trigger_demo']
 const DEMOS = ['solutions-menu']
 
 export const webmcpBus = {

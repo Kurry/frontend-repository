@@ -784,7 +784,9 @@ export default function Home() {
             <PrimaryCta href="/join">Try Readymag</PrimaryCta>
             <GhostLink href="/pricing">View pricing</GhostLink>
           </CtaRow>
-          <TrialBrief />
+          <div style={{ marginTop: 64 }}>
+            <TrialBrief />
+          </div>
         </Closing>
       </Artboard>
     </ScrollWrapper>
