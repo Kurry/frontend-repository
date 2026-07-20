@@ -46,12 +46,15 @@ export const useLibraryStore = create((set, get) => ({
   exportFormat: 'json',
   mobileActionsOpen: false,
   newPromptId: null,
+  sortColumn: 'created',
+  sortDirection: 'desc',
 
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setTechniqueFilter: (techniqueFilter) => set({ techniqueFilter }),
   clearFilters: () => set({ searchQuery: '', techniqueFilter: 'all' }),
   setExportFormat: (exportFormat) => set({ exportFormat }),
   setMobileActionsOpen: (mobileActionsOpen) => set({ mobileActionsOpen }),
+  setSort: (col) => set((state) => ({ sortColumn: col, sortDirection: state.sortColumn === col && state.sortDirection === 'asc' ? 'desc' : 'asc' })),
 
   toggleSelected: (id) => set((state) => ({
     selectedIds: state.selectedIds.includes(id)
@@ -154,7 +157,10 @@ export const useLibraryStore = create((set, get) => ({
     });
   },
 
-  importLibrary: (rawPayload) => {
+  isLoading: false,
+  importLibrary: async (rawPayload) => {
+    set({ isLoading: true });
+    await new Promise(r => setTimeout(r, 500));
     const document = librarySchema.parse(typeof rawPayload === 'string' ? JSON.parse(rawPayload) : rawPayload);
     const prompts = document.prompts.map((item) => {
       const data = promptRequestSchema.parse(item);
@@ -184,6 +190,7 @@ export const useLibraryStore = create((set, get) => ({
       historyPromptId: null,
     });
     showTimedToast(set, { kind: 'success', title: 'Library imported', subtitle: `${prompts.length} prompts restored from JSON.` });
+    set({ isLoading: false });
     return prompts;
   },
 }));
@@ -196,6 +203,11 @@ export function selectVisiblePrompts(state) {
       || prompt.body.toLocaleLowerCase().includes(query);
     const matchesTechnique = state.techniqueFilter === 'all' || prompt.technique === state.techniqueFilter;
     return matchesQuery && matchesTechnique;
+  }).sort((a, b) => {
+    const valA = a[state.sortColumn] || '';
+    const valB = b[state.sortColumn] || '';
+    const factor = state.sortDirection === 'asc' ? 1 : -1;
+    return valA > valB ? factor : (valA < valB ? -factor : 0);
   });
 }
 
