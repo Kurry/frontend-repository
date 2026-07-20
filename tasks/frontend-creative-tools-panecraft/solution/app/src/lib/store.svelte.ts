@@ -889,7 +889,7 @@ export function submitCreateWizard(): ActionResult & { id?: string } {
   }
 }
 
-function maybeCoachAfterEdit() {
+export function maybeCoachAfterEdit() {
   try {
     if (storage?.getItem(coachSeenKey)) return;
     storage?.setItem(coachSeenKey, '1');

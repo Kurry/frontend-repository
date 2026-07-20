@@ -60,6 +60,7 @@
     });
     if (result.ok) {
       store.announce('Pane updated in place.');
+      store.maybeCoachAfterEdit();
       close();
     } else {
       errors = { [result.field]: result.message };

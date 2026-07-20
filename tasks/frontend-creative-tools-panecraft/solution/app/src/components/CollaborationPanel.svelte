@@ -32,6 +32,14 @@
     appliedIds = saved.appliedIds;
     appliedChanges = Array.isArray(saved.appliedChanges) ? saved.appliedChanges : [];
     version = Number(saved.version) || 0;
+    // Resume the id counter above every counter already present in the
+    // restored appliedIds, so a reloaded session never mints an id that
+    // applyChange would then reject as a duplicate (which would silently
+    // drop a fresh non-conflicting change).
+    for (const id of appliedIds) {
+      const match = /^[ab]-(\d+)-\d+$/.exec(id);
+      if (match) changeCounter = Math.max(changeCounter, Number(match[1]));
+    }
   }
 
   function persist() {

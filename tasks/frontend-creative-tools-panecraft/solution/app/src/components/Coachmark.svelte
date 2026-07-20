@@ -5,7 +5,7 @@
 
   const steps = [
     {
-      title: 'Pane edited — now export it',
+      title: 'Pane saved — now export it',
       body: 'Your change is already in the Workspace JSON. Open Export in the header to see the live preview, copy it, or download it.',
     },
     {
