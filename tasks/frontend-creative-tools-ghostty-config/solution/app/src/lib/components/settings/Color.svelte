@@ -54,7 +54,7 @@
 
 <div class="color-wrap" style:width="{size}px" style:height="{size}px" style:background-color={value} style:border-color={borderColor} class:disabled {@attach swatchTooltip}>
     {#if label}<span class="label" style:color={labelColor}>{label}</span>{/if}
-    <input id={inputId ?? setting?.controlId} aria-labelledby={setting?.labelId} type="color" bind:value style:width="{size}px" style:height="{size}px" onclick={click} oncontextmenu={reset} {disabled} />
+    <input id={inputId ?? setting?.controlId} aria-label={label ? `Palette color ${label}` : undefined} aria-labelledby={label ? undefined : setting?.labelId} type="color" bind:value style:width="{size}px" style:height="{size}px" onclick={click} oncontextmenu={reset} {disabled} />
 </div>
 
 {#if popoutOpen}

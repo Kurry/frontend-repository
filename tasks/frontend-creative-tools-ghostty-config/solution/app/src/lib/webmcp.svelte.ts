@@ -21,7 +21,7 @@ import {THEMES, validateKeyValue} from "$lib/utils/contracts";
 import {success} from "$lib/stores/toasts.svelte";
 import {applyConfigText} from "$lib/stores/import.svelte";
 import {applyProfile, deleteProfile, findProfileByName, profileOverrideCount, saveProfile} from "$lib/stores/profiles.svelte";
-import {closeCompare, openCompare, panels, setEditorMode} from "$lib/stores/editor.svelte";
+import {closeCompare, openCompare, panels, setEditorMode, type EditorMode} from "$lib/stores/editor.svelte";
 import {setQuery} from "$lib/stores/search.svelte";
 
 type ToolResult = Record<string, unknown>;
@@ -172,7 +172,7 @@ const tools: Tool[] = [
             if (mode === "compare") openCompare();
             else {
                 closeCompare();
-                setEditorMode(mode);
+                setEditorMode(mode as EditorMode);
             }
             return {ok: true, mode};
         }

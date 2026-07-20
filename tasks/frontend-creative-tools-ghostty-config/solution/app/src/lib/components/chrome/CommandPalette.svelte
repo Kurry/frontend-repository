@@ -41,6 +41,7 @@
         {id: "cmd-diff", label: "Toggle diff mode", detail: "Show each override beside its default", hints: ["⌘", "D"], disabled: false, run: () => {toggleDiff();}},
         {id: "cmd-profiles", label: "Profiles…", detail: "Save and re-apply named sets of overrides", hints: ["⌘", "P"], disabled: false, run: () => {panels.profilesOpen = true;}},
         {id: "cmd-compare", label: "Compare themes…", detail: "Preview two themes side by side", hints: [], disabled: false, run: () => {panels.compareOpen = true;}},
+        {id: "cmd-share", label: "Share config link…", detail: "Encode your overrides into a shareable URL", hints: [], disabled: !overridesPresent, run: () => {void goto(resolve("/app/import-export"));}},
     ]);
 
     function fuzzyScore(token: string, text: string): number | null {
@@ -59,11 +60,12 @@
     }
 
     function matchScore(text: string): number | null {
+        const haystack = text.toLocaleLowerCase();
         const tokens = query.toLocaleLowerCase().split(/\s+/).filter(Boolean);
         if (!tokens.length) return 0;
         let total = 0;
         for (const token of tokens) {
-            const tokenScore = fuzzyScore(token, text);
+            const tokenScore = fuzzyScore(token, haystack);
             if (tokenScore === null) return null;
             total += tokenScore;
         }
@@ -165,6 +167,12 @@
         if ((event.metaKey || event.ctrlKey) && event.key.toLocaleLowerCase() === "k") {
             event.preventDefault();
             toggle();
+            return;
+        }
+        // Escape closes the palette no matter which element holds focus.
+        if (event.key === "Escape" && panels.paletteOpen) {
+            event.stopPropagation();
+            close();
         }
     }
 

@@ -128,4 +128,12 @@
     padding: 8px 20px 10px 20px;
     flex: 1;
 }
+
+/* On narrow stacked layouts the fixed dock must never cover the page's bottom controls:
+   scroll clearance keeps them reachable above the dock. */
+@media (max-width: 900px) {
+    .content-container {
+        padding-bottom: 150px;
+    }
+}
 </style>

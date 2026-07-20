@@ -90,4 +90,26 @@
     outline: 2px solid rgba(122, 162, 255, 0.9);
     outline-offset: -2px;
 }
+
+/* Keep the dock low and narrow on small screens so it can never cover stacked-page
+   controls or overflow the viewport. */
+@media (max-width: 640px) {
+    .dock-terminal {
+        width: 130px;
+    }
+
+    .dock-terminal-body {
+        height: 44px;
+    }
+
+    .dt-title {
+        display: none;
+    }
+}
+
+@media (max-width: 400px) {
+    .dock-terminal {
+        width: 116px;
+    }
+}
 </style>

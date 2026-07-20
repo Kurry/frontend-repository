@@ -31,7 +31,7 @@
         recolors only its own side; nothing is applied until you choose Apply.
     </p>
     <div class="compare-grid">
-        {#each ["A", "B"] as side (side)}
+        {#each (["A", "B"] as Array<"A" | "B">) as side (side)}
             {@const selection = side === "A" ? compare.sideA : compare.sideB}
             <section class="compare-side" aria-label={`Compare side ${side}`}>
                 <header class="compare-side-head">

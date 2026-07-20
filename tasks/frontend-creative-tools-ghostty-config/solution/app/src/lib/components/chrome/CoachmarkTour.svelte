@@ -67,12 +67,14 @@
 {/if}
 
 <style>
+/* Below overlay panels (z 600+) so an open dialog simply covers the tour card — the tour
+   can never block a dialog's controls. */
 .tour-card {
     position: absolute;
     right: 20px;
-    bottom: 110px;
+    bottom: 150px;
     width: 290px;
-    z-index: 800;
+    z-index: 550;
     background: rgba(from var(--bg-level-1) r g b / 0.92);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);

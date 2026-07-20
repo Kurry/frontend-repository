@@ -499,7 +499,7 @@ export const registry = {
         description: "Font size in points. This value can be a non-integer and the nearest integer pixel size will be selected.\n\nDefaults to 13 on macOS and 12 on other platforms.",
         key: "font-size",
         name: "Base font size",
-        widget: {type: "range", min: 4, max: 60, step: 0.5}
+        widget: {type: "range", min: 4, max: 60, step: 0.5, showInput: true}
     },
     fontStyle: {
         default: "default",

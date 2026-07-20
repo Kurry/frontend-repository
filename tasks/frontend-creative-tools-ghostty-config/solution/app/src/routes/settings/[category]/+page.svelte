@@ -137,7 +137,7 @@
                             {:else if widget.type === "text"}
                                 <Text bind:value={config[settingId] as string} placeholder={widget.placeholder} size={widget.size} />
                             {:else if widget.type === "range"}
-                                <Range bind:value={config[settingId] as string} min={widget.min} max={widget.max} step={widget.step} showLabels={widget.showLabels} />
+                                <Range bind:value={config[settingId] as string} min={widget.min} max={widget.max} step={widget.step} showLabels={widget.showLabels} showInput={widget.showInput} />
                             {:else if widget.type === "number"}
                                 <!-- Per the AGENTS.md defaults convention, `default: ""` means the setting is genuinely unset by default — exactly the ones a user may clear back to unset. -->
                                 <Number bind:value={config[settingId] as string} min={widget.min} max={widget.max} step={widget.step} size={widget.size} placeholder={widget.placeholder} integer={widget.integer} nullable={setting.default === ""} />

@@ -45,6 +45,7 @@
     <div class="input-row">
         {@render label()}
         <input
+            id={setting?.controlId}
             aria-labelledby={setting?.labelId}
             class="duration-input"
             class:error={showError}

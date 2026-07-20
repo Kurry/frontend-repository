@@ -26,6 +26,17 @@
         onclose();
     }
 
+    // Escape dismisses no matter where focus is (focus may sit on a confirm modal that was
+    // opened from this panel, or on the body after a deleted row's button disappears).
+    function handleWindowKeydown(event: KeyboardEvent) {
+        if (event.key !== "Escape") return;
+        // Let a higher confirm/alert modal consume Escape first.
+        const topModal = document.querySelector(".alert-backdrop");
+        if (topModal) return;
+        event.stopPropagation();
+        onclose();
+    }
+
     function handleKeydown(event: KeyboardEvent) {
         if (event.key === "Escape") {
             event.stopPropagation();
@@ -64,6 +75,8 @@
         };
     });
 </script>
+
+<svelte:window onkeydown={handleWindowKeydown} />
 
 <div
     class="panel-backdrop"

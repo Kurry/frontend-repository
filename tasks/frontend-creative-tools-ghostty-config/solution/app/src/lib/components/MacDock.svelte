@@ -175,4 +175,15 @@
     align-self: center;
     margin: 0 12px;
 }
+
+@media (max-width: 400px) {
+    .dock {
+        gap: 8px;
+        padding: 6px 10px;
+    }
+
+    .dock-separator {
+        margin: 0 2px;
+    }
+}
 </style>

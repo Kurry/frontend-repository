@@ -10,7 +10,7 @@
     import CompareThemes from "$lib/components/chrome/CompareThemes.svelte";
     import {diff} from "$lib/stores/config.svelte";
     import {editor, panels, toggleDiff} from "$lib/stores/editor.svelte";
-    import {canRedo, canUndo, redo, undo} from "$lib/stores/undo.svelte";
+    import {redo, undo} from "$lib/stores/undo.svelte";
     import {copyConfig, downloadConfig, resetAll} from "$lib/stores/actions.svelte";
     import {success} from "$lib/stores/toasts.svelte";
 
@@ -74,11 +74,6 @@
         }
     }
 
-    // Referenced so the disabled states stay reactive for assistive tech.
-    const undoAvailable = $derived(canUndo());
-    const redoAvailable = $derived(canRedo());
-    void undoAvailable;
-    void redoAvailable;
 </script>
 
 <svelte:window onkeydown={handleWindowKeydown} />
@@ -94,9 +89,9 @@
         </div>
         <div class="aside-preview" id="generated-config">
             {#if diffMode}
-                <DiffView key="diff" />
+                <DiffView />
             {:else}
-                <div class="preview-wrap" key="edit" in:fade={{duration: 200}} out:fade={{duration: 160}}>
+                <div class="preview-wrap" in:fade={{duration: 200}} out:fade={{duration: 160}}>
                     <ConfigPreview parsed={currentDiff} parsedDiff={currentDiff} />
                 </div>
             {/if}
@@ -105,8 +100,8 @@
             <Button primary onclick={() => {void copyConfig();}} disabled={!changesPresent} title={changesPresent ? "Copy the generated config" : "No changes yet"}>
                 Copy <span class="action-kbd"><Kbd>⌘⇧C</Kbd></span>
             </Button>
-            <Button onclick={downloadConfig} disabled={!changesPresent} title={changesPresent ? "Download as ghostty-config" : "No changes yet"}>Download</Button>
-            <Button danger onclick={resetAll} disabled={!changesPresent} title={changesPresent ? "Clear every override" : "No changes yet"}>Reset all</Button>
+            <Button onclick={() => {downloadConfig();}} disabled={!changesPresent} title={changesPresent ? "Download as ghostty-config" : "No changes yet"}>Download</Button>
+            <Button danger onclick={() => {resetAll();}} disabled={!changesPresent} title={changesPresent ? "Clear every override" : "No changes yet"}>Reset all</Button>
         </div>
     </aside>
 </div>
@@ -198,6 +193,8 @@
         border-left: none;
         border-top: 1px solid var(--border-level-1);
         padding-top: 16px;
+        /* Keep the export actions clear of the fixed dock at the bottom of the stack. */
+        padding-bottom: 150px;
     }
 
     .action-kbd {

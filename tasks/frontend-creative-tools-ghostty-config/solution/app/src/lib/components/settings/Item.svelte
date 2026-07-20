@@ -26,7 +26,15 @@
 
     const {name = "", note = "", platform, since, description, settingId, children, onReset, isNonDefault = false, inline = true, themeBadge}: Props = $props();
     const labelId = $derived(settingId ? `${settingId}-label` : undefined);
-    const controlId = $derived(settingId ? `control-${settingId}` : undefined);
+
+    // Only widgets whose primary control is a labelable element (input/select/button) get a
+    // real <label for> association and a controlId; group-style controls (sliders, palettes,
+    // pill groups, …) keep aria-labelledby instead, and must not leak a shared id into the
+    // multiple inputs they render.
+    const LABELABLE_WIDGETS = new Set(["text", "number", "dropdown", "switch", "color", "repeatable-text", "duration"]);
+    const widgetType = $derived(settingId ? (registry[settingId as keyof typeof registry] as {widget?: {type?: string}} | undefined)?.widget?.type : undefined);
+    const isLabelable = $derived(widgetType === undefined || LABELABLE_WIDGETS.has(widgetType));
+    const controlId = $derived(settingId && isLabelable ? `control-${settingId}` : undefined);
     const tooltipAttachment = createTooltipAttachment("Reset to default");
 
 
@@ -111,6 +119,7 @@
             {:else}
                 <span id={labelId} class="setting-name">{name}</span>
             {/if}
+            <!-- controlId is intentionally undefined for group-style widgets via the context -->
             {#if infoBadges.length > 0 || (isNonDefault && onReset)}
                 <div class="setting-extra">
                     {#each infoBadges as badge (badge.label)}
