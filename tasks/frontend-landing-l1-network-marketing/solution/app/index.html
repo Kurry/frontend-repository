@@ -26,10 +26,26 @@
           </button>
         </div>
       </div>
+
+      <div id="megaMenu" class="mega-menu" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Main Navigation">
+        <div class="mega-menu-inner">
+          <button type="button" id="closeMegaMenu" aria-label="Close menu">X</button>
+          <nav>
+            <ul>
+              <li><button class="nav-link" data-dest="marketing-home">Marketing Home</button></li>
+              <li><button class="nav-link" data-dest="events-manager">Events Manager</button></li>
+              <li><button class="nav-link" data-dest="global-events">Global Events</button></li>
+              <li><button class="nav-link" data-dest="export-catalog">Export Catalog</button></li>
+              <li><button class="nav-link" data-dest="session-leads">Session Leads</button></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
     </header>
 
     <!-- First viewport: bentos + hero plane -->
-    <section class="hero" id="hero" aria-label="Hero">
+    <section class="hero view-section view-marketing-home" id="hero" aria-label="Hero">
       <div class="bento-row">
         <div class="bento bento-mission load-target notch-br">
           <p class="label">01 / Mission</p>
@@ -50,7 +66,7 @@
     </section>
 
     <!-- Why Ridge sticky pile -->
-    <section class="why chapter" id="why" aria-label="Why">
+    <section class="why chapter view-section view-marketing-home" id="why" aria-label="Why">
       <div class="chapter-shell">
         <h2 class="chapter-title sticky-title">WHY RIDGE</h2>
         <div class="why-pile" id="whyPile">
@@ -98,8 +114,47 @@
       </div>
     </section>
 
+
+      <!-- Contact Form -->
+      <div class="contact-form-wrapper">
+        <form id="contactForm">
+          <div>
+            <label for="contactName">Name</label>
+            <input type="text" id="contactName" required />
+          </div>
+          <div>
+            <label for="contactEmail">Email</label>
+            <input type="email" id="contactEmail" required />
+          </div>
+          <div>
+            <label for="contactCompany">Company</label>
+            <input type="text" id="contactCompany" />
+          </div>
+          <div>
+            <label for="contactInterest">Interest</label>
+            <select id="contactInterest">
+              <option value="events">Events</option>
+              <option value="partnership">Partnership</option>
+              <option value="general">General</option>
+            </select>
+          </div>
+          <div>
+            <label for="contactPrivacy">
+              <input type="checkbox" id="contactPrivacy" required /> I consent to privacy policy
+            </label>
+          </div>
+          <div>
+            <label for="contactMessage">Message</label>
+            <textarea id="contactMessage"></textarea>
+          </div>
+          <button type="submit" id="contactSubmitBtn">Submit</button>
+          <div id="contactFormErrors" aria-live="polite"></div>
+          <div id="contactFormSuccess" aria-live="polite"></div>
+        </form>
+      </div>
+
     <!-- Get started trio -->
-    <section class="get-started chapter" id="getStarted" aria-label="Get started">
+    <section class="get-started chapter view-section view-marketing-home" id="getStarted" aria-label="Get started">
       <h2 class="chapter-title">GET STARTED</h2>
       <div class="trio" id="trio">
         <article class="trio-card" style="--i: 0">
@@ -121,7 +176,7 @@
     </section>
 
     <!-- Global Events -->
-    <section class="events chapter" id="events" aria-label="Global Events">
+    <section class="events chapter view-section view-marketing-home view-global-events" id="events" aria-label="Global Events">
       <div class="events-copy">
         <h2 class="events-headline" id="eventsHeadline" aria-label="RIDGE GLOBAL EVENTS"></h2>
         <div class="events-blurb" id="eventsBlurb" aria-hidden="true">
@@ -137,6 +192,151 @@
         <h3>Headline</h3>
         <button type="button" class="cta notch-br">Learn more →</button>
       </div>
+    </section>
+
+
+    <!-- Events Manager View -->
+    <section class="events-manager chapter view-section view-events-manager" id="eventsManagerView" style="display:none;" aria-label="Events Manager">
+      <h2>Events Manager</h2>
+
+      <div class="events-manager-controls">
+        <label for="filterStatus">Status</label>
+        <select id="filterStatus">
+          <option value="">All</option>
+          <option value="draft">Draft</option>
+          <option value="published">Published</option>
+        </select>
+
+        <label for="filterCategory">Category</label>
+        <select id="filterCategory">
+          <option value="">All</option>
+          <option value="conference">Conference</option>
+          <option value="meetup">Meetup</option>
+          <option value="hackathon">Hackathon</option>
+          <option value="workshop">Workshop</option>
+        </select>
+
+        <button id="clearFiltersBtn">Clear Filters</button>
+
+        <label for="sortDate">Sort Date</label>
+        <select id="sortDate">
+          <option value="">None</option>
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+
+        <label for="sortTitle">Sort Title</label>
+        <select id="sortTitle">
+          <option value="">None</option>
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </div>
+
+      <div class="events-manager-content">
+        <div class="events-table-wrapper">
+          <button id="bulkDeleteBtn">Bulk Delete Selected</button>
+          <table>
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Title</th>
+                <th>Date</th>
+                <th>City</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Featured</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="eventsTableBody">
+            </tbody>
+          </table>
+          <div id="eventsEmptyState" style="display:none;">No events found. <button id="emptyStateClearBtn">Clear Filters</button></div>
+        </div>
+
+        <div class="event-form-wrapper">
+          <form id="eventForm">
+            <input type="hidden" id="eventId" />
+            <div>
+              <label for="eventTitle">Title</label>
+              <input type="text" id="eventTitle" required />
+            </div>
+            <div>
+              <label for="eventDate">Date</label>
+              <input type="date" id="eventDate" required />
+            </div>
+            <div>
+              <label for="eventCity">City</label>
+              <input type="text" id="eventCity" />
+            </div>
+            <div>
+              <label for="eventCategory">Category</label>
+              <select id="eventCategory">
+                <option value="conference">Conference</option>
+                <option value="meetup">Meetup</option>
+                <option value="hackathon">Hackathon</option>
+                <option value="workshop">Workshop</option>
+              </select>
+            </div>
+            <div>
+              <label for="eventStatus">Status</label>
+              <select id="eventStatus">
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
+            <div>
+              <label for="eventFeatured">Featured</label>
+              <select id="eventFeatured">
+                <option value="false">False</option>
+                <option value="true">True</option>
+              </select>
+            </div>
+            <button type="submit" id="eventSubmitBtn">Save Event</button>
+            <button type="button" id="eventCancelBtn">Cancel</button>
+            <div id="eventFormErrors" aria-live="polite"></div>
+          </form>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Export Catalog View -->
+    <section class="export-catalog chapter view-section view-export-catalog" id="exportCatalogView" style="display:none;" aria-label="Export Catalog">
+      <h2>Export Catalog</h2>
+
+      <div class="export-catalog-content">
+        <button id="exportJsonBtn">Download Events JSON</button>
+        <button id="copyJsonBtn">Copy JSON</button>
+        <span id="copySuccessMsg" style="display:none;" aria-live="polite">Copied!</span>
+        <textarea id="exportTextarea" readonly rows="20" style="width: 100%;"></textarea>
+      </div>
+
+    </section>
+
+    <!-- Session Leads View -->
+    <section class="session-leads chapter view-section view-session-leads" id="sessionLeadsView" style="display:none;" aria-label="Session Leads">
+      <h2>Session Leads</h2>
+
+      <div class="session-leads-content">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Company</th>
+              <th>Interest</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody id="leadsTableBody">
+          </tbody>
+        </table>
+        <button id="downloadLeadsBtn">Download leads.json</button>
+        <button id="undoLastLeadBtn">Undo Last Lead</button>
+      </div>
+
     </section>
 
     <footer class="footer-band">
