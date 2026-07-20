@@ -22,17 +22,20 @@ import { OPENINGS, FAMILIES } from './openings';
 import {
   currentOpening, currentOpeningId, favorites, savedLines, boardTheme,
   searchQuery, showFavoritesOnly, showSavedPanel, selectedNodeId, userLine,
-  practiceActive, relay,
+  practiceActive, relay, showExportCenter,
   getNodeMoves, loadOpening, toggleFavorite, setBoardTheme,
   startPractice, exitPractice, resetToStart, stepNext,
-  addSavedLine, loadSavedLine, deleteSavedLine, renameSavedLine,
-  relayStart, relayPause, relayReconnect, relayDisconnect, relayDeliverOutOfOrder
+  addSavedLine, loadSavedLine, deleteSavedLine, updateSavedLine,
+  relayStart, relayPause, relayReconnect, relayDisconnect, relayDeliverOutOfOrder,
+  buildStudyPack, buildCurrentPGN, toSavedLinePayload, validateTagsNotes
 } from './store';
 
 const THEMES = ['classic', 'forest', 'slate'];
-const DESTINATIONS = ['library', 'explorer', 'practice', 'notable-games', 'saved-lines'];
+const DESTINATIONS = ['library', 'explorer', 'practice', 'notable-games', 'saved-lines', 'export-center'];
 const FILTERS = ['favorites', 'family'];
 const DEMOS = ['deliver-out-of-order'];
+const EXPORT_FORMATS = ['study-pack-json', 'pgn'];
+const IMPORT_MODES = ['study-pack'];
 
 function requireOpening() {
   const o = currentOpening.value;
@@ -58,6 +61,7 @@ export function initWebmcp() {
           return { ok: false, error: 'Unknown destination; use one of ' + DESTINATIONS.join(', ') };
         }
         if (dest === 'saved-lines') { showSavedPanel.value = true; return { ok: true, destination: dest, savedPanelOpen: true }; }
+        if (dest === 'export-center') { showExportCenter.value = true; return { ok: true, destination: dest, exportCenterOpen: true }; }
         if (dest === 'practice') {
           const g = requireOpening(); if (!g.ok) return g;
           startPractice();
@@ -65,6 +69,7 @@ export function initWebmcp() {
         }
         // library / explorer / notable-games: leave practice, close overlay
         showSavedPanel.value = false;
+        showExportCenter.value = false;
         if (practiceActive.value && dest !== 'notable-games') exitPractice();
         if (dest !== 'library') { const g = requireOpening(); if (!g.ok) return g; }
         return { ok: true, destination: dest, practiceActive: practiceActive.value };
@@ -118,15 +123,20 @@ export function initWebmcp() {
     // ---- entity-collection-v1 --------------------------------------------
     entity_create: {
       description:
-        'Create a saved line. entity="saved-line", name=<1-40 chars>: stores the ' +
-        'currently displayed move sequence into My Saved Lines (same as Save this line).',
+        'Create a saved line. entity="saved-line", name=<1-80 chars>, tags=<optional array ' +
+        'of up to 8 tags from the allowed set>, notes=<optional string up to 280 chars>: ' +
+        'stores the currently displayed move sequence into My Saved Lines (same as Save this line).',
       handler(args) {
         args = args || {};
         if (args.entity !== 'saved-line') return { ok: false, error: 'entity must be "saved-line"' };
         const g = requireOpening(); if (!g.ok) return g;
         const name = typeof args.name === 'string' ? args.name.trim() : '';
         if (!name) return { ok: false, error: 'name is required' };
-        if (name.length > 40) return { ok: false, error: 'name too long (max 40 chars)' };
+        if (name.length > 80) return { ok: false, error: 'name too long (max 80 chars)' };
+        const tags = args.tags !== undefined ? args.tags : undefined;
+        const notes = args.notes !== undefined ? args.notes : undefined;
+        const fieldError = validateTagsNotes(tags, notes);
+        if (fieldError) return { ok: false, error: fieldError };
         const path = getNodeMoves();
         const moves = path.length > 0 ? path : [...g.opening.moves];
         const nid = selectedNodeId.value;
@@ -136,8 +146,9 @@ export function initWebmcp() {
           const idx = parseInt(nid.split('-')[1], 10);
           snapshot = { base: ul.base, moves: ul.moves.slice(0, idx + 1) };
         }
-        const id = addSavedLine(name, g.opening.id, moves, snapshot);
-        return { ok: true, id, name, moves: moves.length, count: savedLines.value.length };
+        const id = addSavedLine(name, g.opening.id, moves, snapshot, { tags, notes });
+        const line = findSaved(id);
+        return { ok: true, id, count: savedLines.value.length, savedLine: toSavedLinePayload(line) };
       }
     },
     entity_select: {
@@ -162,17 +173,34 @@ export function initWebmcp() {
       }
     },
     entity_update: {
-      description: 'Update a saved line name. entity="saved-line", id=<saved id>, name=<new 1-40 char name>.',
+      description:
+        'Update a saved line. entity="saved-line", id=<saved id>, and one or more of: ' +
+        'name=<new 1-80 char name>, tags=<array of up to 8 tags from the allowed set>, ' +
+        'notes=<string up to 280 chars>.',
       handler(args) {
         args = args || {};
         if (args.entity !== 'saved-line') return { ok: false, error: 'entity must be "saved-line"' };
         const line = findSaved(args.id);
         if (!line) return { ok: false, error: 'Unknown saved line' };
-        const name = typeof args.name === 'string' ? args.name.trim() : '';
-        if (!name) return { ok: false, error: 'name is required' };
-        if (name.length > 40) return { ok: false, error: 'name too long (max 40 chars)' };
-        renameSavedLine(line.id, name);
-        return { ok: true, id: line.id, name };
+        const patch = {};
+        if (args.name !== undefined) {
+          const name = typeof args.name === 'string' ? args.name.trim() : '';
+          if (!name) return { ok: false, error: 'name is required' };
+          if (name.length > 80) return { ok: false, error: 'name too long (max 80 chars)' };
+          patch.name = name;
+        }
+        if (args.tags !== undefined || args.notes !== undefined) {
+          const fieldError = validateTagsNotes(args.tags, args.notes);
+          if (fieldError) return { ok: false, error: fieldError };
+          if (args.tags !== undefined) patch.tags = args.tags;
+          if (args.notes !== undefined) patch.notes = args.notes;
+        }
+        if (Object.keys(patch).length === 0) {
+          return { ok: false, error: 'at least one of name, tags, notes is required' };
+        }
+        updateSavedLine(line.id, patch);
+        const updated = findSaved(line.id);
+        return { ok: true, id: line.id, savedLine: toSavedLinePayload(updated) };
       }
     },
     entity_delete: {
@@ -241,6 +269,49 @@ export function initWebmcp() {
         relayDeliverOutOfOrder();
         return { ok: true, demo, status: relay.value.status, applied: relay.value.applied.length };
       }
+    },
+
+    // ---- artifact-transfer-v1 --------------------------------------------
+    artifact_export: {
+      description:
+        'Open Export center for an artifact. format="study-pack-json" or "pgn". ' +
+        'Opens the same Export center panel as the visible control; artifact bytes ' +
+        'and the download interaction stay Playwright-driven.',
+      handler(args) {
+        const format = (args || {}).format;
+        if (!EXPORT_FORMATS.includes(format)) {
+          return { ok: false, error: 'Unknown format; use one of ' + EXPORT_FORMATS.join(', ') };
+        }
+        showExportCenter.value = true;
+        const bytes = format === 'pgn' ? buildCurrentPGN().length : JSON.stringify(buildStudyPack()).length;
+        return { ok: true, format, exportCenterOpen: true, byteLength: bytes };
+      }
+    },
+    artifact_copy: {
+      description:
+        'Open Export center to copy an artifact. format="study-pack-json" or "pgn". ' +
+        'Clipboard contents stay a Playwright responsibility.',
+      handler(args) {
+        const format = (args || {}).format;
+        if (!EXPORT_FORMATS.includes(format)) {
+          return { ok: false, error: 'Unknown format; use one of ' + EXPORT_FORMATS.join(', ') };
+        }
+        showExportCenter.value = true;
+        return { ok: true, format, exportCenterOpen: true };
+      }
+    },
+    artifact_import: {
+      description:
+        'Open Export center import panel. mode="study-pack". The pasted JSON / file ' +
+        'picker interaction stays a Playwright responsibility per the contract.',
+      handler(args) {
+        const mode = (args || {}).mode;
+        if (!IMPORT_MODES.includes(mode)) {
+          return { ok: false, error: 'Unknown mode; use one of ' + IMPORT_MODES.join(', ') };
+        }
+        showExportCenter.value = true;
+        return { ok: true, mode, exportCenterOpen: true };
+      }
     }
   };
 
@@ -248,15 +319,19 @@ export function initWebmcp() {
     return {
       contract_version: 'zto-webmcp-v1',
       app: 'lineforge',
-      modules: ['browse-query-v1', 'entity-collection-v1', 'command-session-v1'],
+      modules: ['browse-query-v1', 'entity-collection-v1', 'command-session-v1', 'artifact-transfer-v1'],
       browsable_entity: 'openings',
       destinations: DESTINATIONS.slice(),
       filters: FILTERS.slice(),
       themes: THEMES.slice(),
       entities: ['opening', 'saved-line', 'favorite'],
       entity_operations: ['create', 'select', 'update', 'delete', 'toggle'],
+      entity_fields: ['name', 'opening-code', 'moves', 'ply', 'tags', 'notes', 'side-to-move'],
       session_operations: ['start', 'pause', 'resume', 'disconnect', 'restart', 'advance', 'trigger_demo'],
       demos: DEMOS.slice(),
+      artifact_operations: ['export', 'import', 'copy'],
+      export_formats: EXPORT_FORMATS.slice(),
+      import_modes: IMPORT_MODES.slice(),
       tool_count: Object.keys(tools).length
     };
   };

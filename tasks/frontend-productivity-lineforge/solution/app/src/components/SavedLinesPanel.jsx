@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { useSignal } from '@preact/signals';
 import {
   savedLines, showSavedPanel,
-  deleteSavedLine, renameSavedLine, loadSavedLine
+  deleteSavedLine, updateSavedLine, loadSavedLine, validateTagsNotes, TAG_SET
 } from '../store';
 import { OPENINGS } from '../openings';
 
@@ -10,7 +10,16 @@ export function SavedLinesPanel() {
   const lines = savedLines.value;
   const editingId = useSignal(null);
   const editName = useSignal('');
+  const editTags = useSignal([]);
+  const editNotes = useSignal('');
   const editError = useSignal('');
+
+  const toggleEditTag = (tag) => {
+    editTags.value = editTags.value.includes(tag)
+      ? editTags.value.filter(t => t !== tag)
+      : [...editTags.value, tag];
+    if (editError.value) editError.value = '';
+  };
 
   const commitRename = (id) => {
     const name = editName.value.trim();
@@ -18,11 +27,18 @@ export function SavedLinesPanel() {
       editError.value = 'Name is required — type a name for this line, then select Save';
       return;
     }
-    if (name.length > 40) {
-      editError.value = 'Name is too long — use 40 characters or fewer, then select Save';
+    if (name.length > 80) {
+      editError.value = 'Name is too long — use 80 characters or fewer, then select Save';
       return;
     }
-    renameSavedLine(id, name);
+    const fieldError = validateTagsNotes(editTags.value, editNotes.value);
+    if (fieldError) {
+      editError.value = fieldError.startsWith('notes')
+        ? 'Notes is too long — use 280 characters or fewer, then select Save'
+        : 'Tags — select up to 8 tags from the allowed set, then select Save';
+      return;
+    }
+    updateSavedLine(id, { name, tags: editTags.value, notes: editNotes.value });
     editingId.value = null;
     editError.value = '';
   };
@@ -62,7 +78,7 @@ export function SavedLinesPanel() {
                 {editingId.value === line.id ? (
                   <form onSubmit={e => { e.preventDefault(); commitRename(line.id); }}>
                     <label class="block text-sm font-medium mb-1" for={`rename-${line.id}`}>Line name</label>
-                    <p id={`rename-help-${line.id}`} class="text-sm text-neutral-600 mb-1">Use 1–40 characters</p>
+                    <p id={`rename-help-${line.id}`} class="text-sm text-neutral-600 mb-1">Use 1–80 characters</p>
                     <input
                       id={`rename-${line.id}`}
                       type="text"
@@ -80,6 +96,31 @@ export function SavedLinesPanel() {
                         ? `rename-help-${line.id} rename-error-${line.id}`
                         : `rename-help-${line.id}`}
                       aria-invalid={editError.value ? 'true' : undefined}
+                    />
+                    <fieldset class="mt-2 border-0 p-0 m-0">
+                      <legend class="block text-sm font-medium mb-1">Tags (optional, up to 8)</legend>
+                      <div class="flex gap-2 flex-wrap">
+                        {TAG_SET.map(tag => (
+                          <label key={tag} class="tag-chip-label text-sm">
+                            <input
+                              type="checkbox"
+                              checked={editTags.value.includes(tag)}
+                              onChange={() => toggleEditTag(tag)}
+                            />
+                            {' '}{tag}
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
+                    <label class="block text-sm font-medium mb-1 mt-2" for={`rename-notes-${line.id}`}>Notes (optional)</label>
+                    <p id={`rename-notes-help-${line.id}`} class="text-sm text-neutral-600 mb-1">Use 0–280 characters</p>
+                    <textarea
+                      id={`rename-notes-${line.id}`}
+                      class="text-input w-full"
+                      rows="2"
+                      value={editNotes.value}
+                      onInput={e => { editNotes.value = e.target.value; if (editError.value) editError.value = ''; }}
+                      aria-describedby={`rename-notes-help-${line.id}`}
                     />
                     {editError.value && (
                       <p id={`rename-error-${line.id}`} class="mt-1 text-sm font-medium" style="color: var(--color-danger);">
@@ -117,6 +158,8 @@ export function SavedLinesPanel() {
                         onClick={() => {
                           editingId.value = line.id;
                           editName.value = line.name;
+                          editTags.value = Array.isArray(line.tags) ? line.tags.slice() : [];
+                          editNotes.value = typeof line.notes === 'string' ? line.notes : '';
                           editError.value = '';
                         }}
                       >

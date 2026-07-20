@@ -8,7 +8,7 @@ import {
   practiceActive, userLine, activeGame, showSavedPanel, saveFormOpen,
   getNodeMoves, scrubberSequence, stepPrev, stepNext, resetToStart,
   toggleFavorite, toggleAllFavorites, loadOpening, setBoardTheme, startPractice, exitPractice,
-  clearBoardInteraction, boardSelection
+  clearBoardInteraction, boardSelection, showExportCenter
 } from './store';
 
 import { ChessBoard } from './components/ChessBoard';
@@ -18,6 +18,7 @@ import { NotableGames } from './components/NotableGames';
 import { SavedLinesPanel } from './components/SavedLinesPanel';
 import { PracticePanel } from './components/PracticePanel';
 import { LiveRelay } from './components/LiveRelay';
+import { ExportCenter } from './components/ExportCenter';
 import { Toast } from './components/Toast';
 import { OPENINGS } from './openings';
 
@@ -47,6 +48,13 @@ function Header() {
             ))}
           </select>
         </div>
+        <button
+          type="button"
+          class="header-btn"
+          onClick={() => { showExportCenter.value = true; }}
+        >
+          Export center
+        </button>
         <button
           type="button"
           class="header-btn"
@@ -338,6 +346,7 @@ export function App() {
         )}
       </main>
       {showSavedPanel.value && <SavedLinesPanel />}
+      {showExportCenter.value && <ExportCenter />}
       <Toast />
     </div>
   );

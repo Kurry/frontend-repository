@@ -1,8 +1,8 @@
 import { h } from 'preact';
 import {
   currentOpening, selectedNodeId, userLine, practiceActive,
-  saveFormOpen, saveName, saveError,
-  getNodeMoves, selectNode, addSavedLine, showToast
+  saveFormOpen, saveName, saveTags, saveNotes, saveError,
+  getNodeMoves, selectNode, addSavedLine, showToast, validateTagsNotes, TAG_SET
 } from '../store';
 
 function moveLabel(index, san) {
@@ -36,8 +36,17 @@ export function MoveTree() {
 
   const openSaveForm = () => {
     saveName.value = `${opening.name} line`;
+    saveTags.value = [];
+    saveNotes.value = '';
     saveError.value = '';
     saveFormOpen.value = true;
+  };
+
+  const toggleSaveTag = (tag) => {
+    saveTags.value = saveTags.value.includes(tag)
+      ? saveTags.value.filter(t => t !== tag)
+      : [...saveTags.value, tag];
+    if (saveError.value) saveError.value = '';
   };
 
   const submitSave = () => {
@@ -46,8 +55,16 @@ export function MoveTree() {
       saveError.value = 'Name is required — type a name for this line, then select Save';
       return;
     }
-    if (name.length > 40) {
-      saveError.value = 'Name is too long — use 40 characters or fewer, then select Save';
+    if (name.length > 80) {
+      saveError.value = 'Name is too long — use 80 characters or fewer, then select Save';
+      return;
+    }
+    const notes = saveNotes.value;
+    const tagsError = validateTagsNotes(saveTags.value, notes);
+    if (tagsError) {
+      saveError.value = tagsError.startsWith('notes')
+        ? 'Notes is too long — use 280 characters or fewer, then select Save'
+        : 'Tags — select up to 8 tags from the allowed set, then select Save';
       return;
     }
     const path = getNodeMoves();
@@ -58,7 +75,7 @@ export function MoveTree() {
       const idx = parseInt(nid.split('-')[1], 10);
       snapshot = { base: ul.base, moves: ul.moves.slice(0, idx + 1) };
     }
-    addSavedLine(name, opening.id, moves, snapshot);
+    addSavedLine(name, opening.id, moves, snapshot, { tags: saveTags.value, notes });
     saveFormOpen.value = false;
     saveError.value = '';
     showToast('Line saved');
@@ -78,7 +95,7 @@ export function MoveTree() {
           onSubmit={e => { e.preventDefault(); submitSave(); }}
         >
           <label class="block text-sm font-medium mb-1" for="line-name">Line name</label>
-          <p id="line-name-help" class="text-sm text-neutral-600 mb-1">Use 1–40 characters</p>
+          <p id="line-name-help" class="text-sm text-neutral-600 mb-1">Use 1–80 characters</p>
           <input
             id="line-name"
             type="text"
@@ -88,6 +105,31 @@ export function MoveTree() {
             onKeyDown={e => { if (e.key === 'Escape') { e.stopPropagation(); saveFormOpen.value = false; } }}
             aria-describedby={saveError.value ? 'line-name-help line-name-error' : 'line-name-help'}
             aria-invalid={saveError.value ? 'true' : undefined}
+          />
+          <fieldset class="mt-2 border-0 p-0 m-0">
+            <legend class="block text-sm font-medium mb-1">Tags (optional, up to 8)</legend>
+            <div class="flex gap-2 flex-wrap">
+              {TAG_SET.map(tag => (
+                <label key={tag} class="tag-chip-label text-sm">
+                  <input
+                    type="checkbox"
+                    checked={saveTags.value.includes(tag)}
+                    onChange={() => toggleSaveTag(tag)}
+                  />
+                  {' '}{tag}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <label class="block text-sm font-medium mb-1 mt-2" for="line-notes">Notes (optional)</label>
+          <p id="line-notes-help" class="text-sm text-neutral-600 mb-1">Use 0–280 characters</p>
+          <textarea
+            id="line-notes"
+            class="text-input w-full"
+            rows="2"
+            value={saveNotes.value}
+            onInput={e => { saveNotes.value = e.target.value; if (saveError.value) saveError.value = ''; }}
+            aria-describedby="line-notes-help"
           />
           {saveError.value && (
             <p id="line-name-error" class="mt-1 text-sm font-medium" style="color: var(--color-danger);">

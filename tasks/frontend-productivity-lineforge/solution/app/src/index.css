@@ -344,6 +344,18 @@ header :focus-visible {
   border: 1px solid #B4600F;
 }
 
+.tag-chip-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  min-height: 28px;
+  border: 1px solid rgba(27, 27, 27, 0.16);
+  border-radius: 999px;
+  background-color: rgba(27, 27, 27, 0.04);
+  cursor: pointer;
+}
+
 .relay-status {
   display: inline-block;
   padding: 4px 10px;
@@ -394,4 +406,27 @@ header :focus-visible {
 
 .toast {
   animation: slideIn 0.25s ease-out;
+}
+
+/* Export center previews */
+.export-preview {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre;
+  overflow-x: auto;
+  max-height: 240px;
+  overflow-y: auto;
+  background-color: #F4F1EA;
+  border: 1px solid #6B7280;
+  border-radius: 10px;
+  padding: 12px;
+  color: #1B1B1B;
+}
+
+.export-overlay { animation: fade-in 0.18s ease-out; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .export-overlay { animation: none; }
 }

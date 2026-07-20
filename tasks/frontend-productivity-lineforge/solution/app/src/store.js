@@ -1,23 +1,14 @@
-import { signal, computed, effect } from '@preact/signals';
+import { signal, computed } from '@preact/signals';
 import { OPENINGS } from './openings';
 import { sanEq } from './chess';
 
-// Guarded localStorage helpers
-function safeGet(key, fallback) {
-  try {
-    const v = localStorage.getItem(key);
-    return v !== null ? JSON.parse(v) : fallback;
-  } catch { return fallback; }
-}
-function safeSet(key, value) {
-  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* storage unavailable */ }
-}
-
-// Persistent state
-export const currentOpeningId = signal(safeGet('lineforge_opening', null));
-export const favorites = signal(safeGet('lineforge_favorites', []));
-export const savedLines = signal(safeGet('lineforge_saved', []));
-export const boardTheme = signal(safeGet('lineforge_theme', 'classic'));
+// In-memory session state only — no localStorage/sessionStorage. A page reload
+// returns the app to its seeded baseline (empty favorites and saved lines,
+// Classic theme). This is a hard requirement of the good-app genre.
+export const currentOpeningId = signal(null);
+export const favorites = signal([]);
+export const savedLines = signal([]);
+export const boardTheme = signal('classic');
 
 // Session state
 export const boardFlipped = signal(false);
@@ -50,13 +41,9 @@ export const userLine = signal(null);
 // Save-line form
 export const saveFormOpen = signal(false);
 export const saveName = signal('');
+export const saveTags = signal([]);
+export const saveNotes = signal('');
 export const saveError = signal('');
-
-// Persistence effects
-effect(() => safeSet('lineforge_opening', currentOpeningId.value));
-effect(() => safeSet('lineforge_favorites', favorites.value));
-effect(() => safeSet('lineforge_saved', savedLines.value));
-effect(() => safeSet('lineforge_theme', boardTheme.value));
 
 // Derived state
 export const currentOpening = computed(() =>
@@ -118,6 +105,8 @@ export function loadOpening(id) {
   resetPractice();
   clearBoardInteraction();
   saveFormOpen.value = false;
+  saveTags.value = [];
+  saveNotes.value = '';
   saveError.value = '';
 }
 
@@ -311,9 +300,16 @@ export function exitPractice() {
 
 // --- Saved lines --------------------------------------------------------------
 
-export function addSavedLine(name, openingId, moves, userLineSnapshot) {
+export function addSavedLine(name, openingId, moves, userLineSnapshot, opts) {
   const id = 'line-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
-  savedLines.value = [...savedLines.value, { id, name, openingId, moves, userLine: userLineSnapshot || null }];
+  const o = opts || {};
+  savedLines.value = [...savedLines.value, {
+    id, name, openingId, moves,
+    ply: typeof o.ply === 'number' ? o.ply : moves.length,
+    tags: Array.isArray(o.tags) ? o.tags.slice() : [],
+    notes: typeof o.notes === 'string' ? o.notes : '',
+    userLine: userLineSnapshot || null
+  }];
   return id;
 }
 
@@ -322,11 +318,21 @@ export function deleteSavedLine(id) {
   showToast('Line deleted');
 }
 
-export function renameSavedLine(id, newName) {
-  savedLines.value = savedLines.value.map(l =>
-    l.id === id ? { ...l, name: newName } : l
-  );
-  showToast('Line renamed');
+// Update a saved line's name/tags/notes. Only the provided (defined) fields
+// are patched — undefined fields leave the existing value untouched. Callers
+// (rename UI, WebMCP entity_update) must validate with validateTagsNotes first.
+export function updateSavedLine(id, patch) {
+  const p = patch || {};
+  savedLines.value = savedLines.value.map(l => {
+    if (l.id !== id) return l;
+    return {
+      ...l,
+      name: typeof p.name === 'string' ? p.name : l.name,
+      tags: Array.isArray(p.tags) ? p.tags.slice() : l.tags,
+      notes: typeof p.notes === 'string' ? p.notes : l.notes
+    };
+  });
+  showToast('Line updated');
 }
 
 export function loadSavedLine(line) {
@@ -335,7 +341,8 @@ export function loadSavedLine(line) {
     userLine.value = { base: line.userLine.base, moves: line.userLine.moves };
     selectedNodeId.value = `user-${line.userLine.moves.length - 1}`;
   } else {
-    selectedNodeId.value = nodeIdForPath(line.moves) || 'root';
+    const ply = typeof line.ply === 'number' ? line.ply : line.moves.length;
+    selectedNodeId.value = nodeIdForPath(line.moves.slice(0, ply)) || 'root';
   }
   showSavedPanel.value = false;
   showToast('Line loaded');
@@ -491,4 +498,189 @@ export function relayReconnect() {
       }, 900);
     }
   }, 700);
+}
+
+// --- Export center / study artifacts (in-memory, live-compiled) --------------
+
+export const showExportCenter = signal(false);
+export const importError = signal('');
+
+const CODE_BY_ID = {};
+const ID_BY_CODE = {};
+for (const o of OPENINGS) { CODE_BY_ID[o.id] = o.code; ID_BY_CODE[o.code] = o.id; }
+
+const THEMES_SET = ['classic', 'forest', 'slate'];
+export const TAG_SET = ['study', 'sharp', 'solid', 'trap', 'endgame'];
+
+function sideForPly(ply) { return ply % 2 === 0 ? 'white' : 'black'; }
+
+// Shared SavedLine.tags / SavedLine.notes bounds check, used by the save form,
+// WebMCP entity_create/entity_update, and Study pack import validation.
+export function validateTagsNotes(tags, notes) {
+  if (tags !== undefined) {
+    if (!Array.isArray(tags) || tags.length > 8) return 'tags: at most 8 tags';
+    for (const t of tags) {
+      if (typeof t !== 'string' || t.length > 24 || !TAG_SET.includes(t)) {
+        return `tags: "${t}" is outside the allowed tag set`;
+      }
+    }
+  }
+  if (notes !== undefined && (typeof notes !== 'string' || notes.length > 280)) {
+    return 'notes: string of length 0 to 280';
+  }
+  return null;
+}
+
+// Map an internal saved line to the API-shaped SavedLine payload.
+export function toSavedLinePayload(line) {
+  const moves = Array.isArray(line.moves) ? line.moves.slice() : [];
+  const ply = typeof line.ply === 'number' ? line.ply : moves.length;
+  return {
+    name: line.name,
+    openingCode: CODE_BY_ID[line.openingId] || '',
+    moves,
+    ply,
+    tags: Array.isArray(line.tags) ? line.tags.slice() : [],
+    notes: typeof line.notes === 'string' ? line.notes : '',
+    sideToMove: sideForPly(ply)
+  };
+}
+
+// Live StudyPackDocument compiled from current session state.
+export function buildStudyPack() {
+  return {
+    formatVersion: '1',
+    boardTheme: boardTheme.value,
+    favorites: favorites.value.map(id => CODE_BY_ID[id]).filter(Boolean),
+    savedLines: savedLines.value.map(toSavedLinePayload),
+    generatedAt: new Date().toISOString()
+  };
+}
+
+export function buildStudyPackText() {
+  return JSON.stringify(buildStudyPack(), null, 2);
+}
+
+// Standard PGN for the currently displayed move sequence.
+export function buildCurrentPGN() {
+  const open = currentOpening.value;
+  const moves = getNodeMoves();
+  const name = open ? open.name : 'Study line';
+  const code = open ? open.code : '?';
+  let body = '';
+  moves.forEach((san, i) => {
+    if (i % 2 === 0) body += `${Math.floor(i / 2) + 1}. `;
+    body += san + ' ';
+  });
+  body = (body.trim() || '') + ' *';
+  const tags = [
+    '[Event "LineForge study"]',
+    '[Site "LineForge"]',
+    '[White "Study"]',
+    '[Black "Study"]',
+    `[Opening "${name}"]`,
+    `[ECO "${code}"]`,
+    '[Result "*"]'
+  ].join('\n');
+  return `${tags}\n\n${body.trim()}`;
+}
+
+// Validate a parsed StudyPackDocument; returns a field-naming error string or null.
+export function validateStudyPack(doc) {
+  if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return 'payload: not a JSON object';
+  if (doc.formatVersion !== '1') return 'formatVersion: must be exactly the string "1"';
+  if (!THEMES_SET.includes(doc.boardTheme)) return 'boardTheme: must be one of classic, forest, slate';
+  if (typeof doc.generatedAt !== 'string' || Number.isNaN(Date.parse(doc.generatedAt))) {
+    return 'generatedAt: required ISO-8601 timestamp string';
+  }
+  if (!Array.isArray(doc.favorites)) return 'favorites: must be an array';
+  for (const c of doc.favorites) {
+    if (!ID_BY_CODE[c]) return `favorites: "${c}" is not a bundled opening code`;
+  }
+  if (!Array.isArray(doc.savedLines)) return 'savedLines: must be an array';
+  for (let i = 0; i < doc.savedLines.length; i++) {
+    const s = doc.savedLines[i];
+    const p = `savedLines[${i}]`;
+    if (!s || typeof s !== 'object') return `${p}: must be an object`;
+    const nm = typeof s.name === 'string' ? s.name.trim() : '';
+    if (nm.length < 1 || nm.length > 80) return `${p}.name: required string of length 1 to 80`;
+    if (!ID_BY_CODE[s.openingCode]) return `${p}.openingCode: "${s.openingCode}" is not a bundled opening code`;
+    if (!Array.isArray(s.moves) || s.moves.length < 1 || !s.moves.every(m => typeof m === 'string')) {
+      return `${p}.moves: required array of one or more SAN strings`;
+    }
+    if (!Number.isInteger(s.ply) || s.ply < 0 || s.ply > s.moves.length) {
+      return `${p}.ply: required integer from 0 through moves length`;
+    }
+    if (s.tags !== undefined) {
+      if (!Array.isArray(s.tags) || s.tags.length > 8) return `${p}.tags: at most 8 tags`;
+      for (const t of s.tags) {
+        if (typeof t !== 'string' || t.length > 24 || !TAG_SET.includes(t)) {
+          return `${p}.tags: "${t}" is outside the allowed tag set`;
+        }
+      }
+    }
+    if (s.notes !== undefined && (typeof s.notes !== 'string' || s.notes.length > 280)) {
+      return `${p}.notes: string of length 0 to 280`;
+    }
+    if (s.sideToMove !== 'white' && s.sideToMove !== 'black') {
+      return `${p}.sideToMove: required, must be exactly white or black`;
+    }
+    if (s.sideToMove !== sideForPly(s.ply)) {
+      return `${p}.sideToMove: must match ply (even ply is white, odd ply is black)`;
+    }
+  }
+  return null;
+}
+
+// The StudyPack wire format only carries a flat SAN `moves` list, not the
+// { base, moves } "Your Line" snapshot loadSavedLine() prefers — reconstruct
+// that snapshot from the bundled tree so an off-book saved line still lands
+// on its saved ply after import instead of falling back to nodeIdForPath
+// (which only resolves paths against the *current* session's userLine).
+function reconstructUserLine(openingId, path) {
+  const open = OPENINGS.find(o => o.id === openingId);
+  if (!open || path.length === 0) return null;
+  if (isPrefixOf(path, open.moves)) return null;
+  if (open.branches) {
+    for (const b of open.branches) {
+      if (isPrefixOf(path, b.moves)) return null;
+    }
+  }
+  let bestLen = 0;
+  const bookLines = [open.moves, ...(open.branches ? open.branches.map(b => b.moves) : [])];
+  for (const book of bookLines) {
+    let n = 0;
+    while (n < path.length && n < book.length && sanEq(path[n], book[n])) n++;
+    if (n > bestLen) bestLen = n;
+  }
+  const moves = path.slice(bestLen);
+  if (moves.length === 0) return null;
+  return { base: path.slice(0, bestLen), moves };
+}
+
+// Import a StudyPack from raw text; replaces favorites, boardTheme, savedLines.
+export function importStudyPackText(text) {
+  let doc;
+  try { doc = JSON.parse(text); }
+  catch { importError.value = 'payload: the JSON could not be parsed'; return { ok: false, error: importError.value }; }
+  const err = validateStudyPack(doc);
+  if (err) { importError.value = err; return { ok: false, error: err }; }
+  importError.value = '';
+  boardTheme.value = doc.boardTheme;
+  favorites.value = doc.favorites.map(c => ID_BY_CODE[c]);
+  savedLines.value = doc.savedLines.map(s => {
+    const openingId = ID_BY_CODE[s.openingCode];
+    return {
+      id: 'line-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+      name: s.name.trim(),
+      openingId,
+      moves: s.moves.slice(),
+      ply: s.ply,
+      tags: Array.isArray(s.tags) ? s.tags.slice() : [],
+      notes: typeof s.notes === 'string' ? s.notes : '',
+      userLine: reconstructUserLine(openingId, s.moves.slice(0, s.ply))
+    };
+  });
+  showToast('Study pack imported');
+  return { ok: true, favorites: favorites.value.length, savedLines: savedLines.value.length };
 }
