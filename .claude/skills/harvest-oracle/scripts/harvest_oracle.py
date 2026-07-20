@@ -25,7 +25,8 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[4]
-EXCLUDE = {"node_modules", ".git", ".DS_Store"}
+# Never copy build output or deps into the oracle — dist is rebuilt by verify:build.
+EXCLUDE = {"node_modules", ".git", ".DS_Store", "dist"}
 
 
 def newest_job() -> Path:

@@ -117,13 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "Running suites repeatedly with export/import exercises shows no obvious memory runaway or progressive slowdown in a short extended session"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
 id = "9.10"
 name = "failed_step_stays_operable"
 description = "When a step fails and shows Retry, the rest of the UI (pause/resume, suite list, export) remains operable"

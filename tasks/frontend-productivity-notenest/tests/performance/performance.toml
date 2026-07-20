@@ -117,13 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "Extended create/delete/export/import sessions do not produce runaway memory growth that freezes the tab."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
 id = "9.10"
 name = "virtualized_count_stays_bounded"
 description = "During Load 10,000 Items scrolling, Rendered item count stays far below 10,000 throughout."

@@ -1,1 +1,0 @@
-import{v as t}from"./core.min-Dne1Y5Yk.js";import{x as n}from"./core.min-Dne1Y5Yk.js";import"./preloader-Bns9QiKi.js";const m=()=>{const[o]=t();o.month===11?(o.month=0,o.year++):o.month++};export{n as _hW,m as s_GbJxRWKPqrk};

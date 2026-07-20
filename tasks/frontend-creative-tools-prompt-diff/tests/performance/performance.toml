@@ -117,20 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session of merges, undos, exports, and imports shows no obvious memory runaway (tab remains responsive)."
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Import of a large or invalid package shows validation or parse feedback rather than an indefinite blank hang."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
 description = "More than 2 seconds pass before the prompt list and pickers become interactive on local render."

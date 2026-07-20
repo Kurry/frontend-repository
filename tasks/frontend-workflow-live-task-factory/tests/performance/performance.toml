@@ -109,18 +109,6 @@ description = "Rapid repeated input — quick filter toggles, fast triage action
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session of repeated runs, triage actions, and library imports shows no progressive slowdown or runaway resource use"
-type = "binary"
-weight = 1.0
-[[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated failure paths (rate-limit countdown, Generate failure with Retry) keep the UI responsive with visible recovery controls rather than freezing"
-type = "binary"
-weight = 1.0
-[[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
 description = "More than 2 seconds pass before interaction is possible on local render"

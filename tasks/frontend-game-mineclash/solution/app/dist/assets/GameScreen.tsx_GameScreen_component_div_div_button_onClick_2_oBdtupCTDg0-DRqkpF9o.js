@@ -1,1 +1,0 @@
-import{v as t}from"./core.min-DGtNB905.js";import"./preloader-Bns9QiKi.js";const u=()=>{const[e]=t();e.phase==="playing"&&(e.paused=!e.paused,e.feedback=e.paused?"Match paused. Resume to continue.":"Match resumed. Your turn continues.")};export{u as s_oBdtupCTDg0};

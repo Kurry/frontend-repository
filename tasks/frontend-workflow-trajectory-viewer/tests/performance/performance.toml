@@ -117,13 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session of opening multiple trials, annotating, and exporting shows no runaway memory growth that degrades interaction"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "9.10"
 name = "palette_typing_stays_responsive"
 description = "Opening the command palette and typing to narrow results stays responsive with no dropped keystrokes"

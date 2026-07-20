@@ -55,7 +55,10 @@ venv/
 # Regenerable capture output at repo root (installed copies in tasks/*/environment/ ARE tracked)
 /reference-screenshots/
 
-# Oracle build outputs ARE tracked: capture harness and fresh clones serve them
-# directly (razorpay's dist is hand-patched), even though dist/ is ignored globally.
-!tasks/*/solution/app/dist/
 /.harden-locks
+
+# Built oracle output — rebuilt by verify:build, never committed
+tasks/*/solution/app/dist/
+
+# Transient git worktrees (jules teleport / agent checkouts)
+.worktrees/

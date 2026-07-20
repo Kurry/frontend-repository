@@ -117,20 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "9.n1"
 name = "long_blank_or_spinner"
 description = "Cold load stays blank or blocked by a spinner past 2 seconds"

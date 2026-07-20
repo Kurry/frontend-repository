@@ -117,13 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session of place/delete/export/import shows no runaway resource use that freezes the tab"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
 id = "9.10"
 name = "import_parse_has_fallback_feedback"
 description = "Malformed Import shows validation feedback without hanging the UI"

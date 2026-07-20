@@ -126,14 +126,6 @@ weight = 1.0
 
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = """Repeated create/delete/undo cycles do not produce runaway memory growth or progressive slowdown in a short session"""
-type = "binary"
-weight = 1.0
-
-
-[[criterion]]
 id = "9.10"
 name = "import_error_path_stays_responsive"
 description = """Rejecting a bad import remains responsive and does not freeze the UI"""

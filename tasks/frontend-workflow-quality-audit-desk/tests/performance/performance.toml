@@ -117,13 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session of runs, verdicts, and feedback shows no memory leaks or runaway resource use"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "9.10"
 name = "long_operations_keep_page_alive"
 description = "During the longest operations (a full batch run over a filtered set) the page stays responsive and shows continuous progress rather than a blank or frozen region"

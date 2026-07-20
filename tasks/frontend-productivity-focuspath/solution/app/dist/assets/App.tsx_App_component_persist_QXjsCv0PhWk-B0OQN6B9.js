@@ -1,1 +1,0 @@
-import{v as o}from"./core.min-DB8N_m9v.js";import{x as f}from"./core.min-DB8N_m9v.js";import{s}from"./store-B4tRoc3j.js";import"./preloader-Bns9QiKi.js";const m=()=>{const[t]=o();s(t)};export{f as _hW,m as s_QXjsCv0PhWk};

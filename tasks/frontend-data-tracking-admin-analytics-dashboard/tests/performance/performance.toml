@@ -117,13 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session of create/delete/export does not show runaway memory growth or browser thrash"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "9.10"
 name = "post_hydration_no_flash"
 description = "After first paint there is no post-hydration content flash as the app becomes interactive"

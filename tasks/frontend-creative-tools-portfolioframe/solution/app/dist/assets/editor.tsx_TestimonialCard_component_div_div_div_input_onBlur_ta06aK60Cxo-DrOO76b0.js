@@ -1,1 +1,0 @@
-import{v as o}from"./core.min-C6O5v62Y.js";import{n as i}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const e=()=>{const[t]=o();return i(t.state,t.history,t.testimonial.id,"name",t.testimonial.name)};export{e as s_ta06aK60Cxo};

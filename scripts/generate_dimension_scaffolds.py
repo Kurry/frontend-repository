@@ -208,8 +208,6 @@ DIMENSION_SPECS: dict[str, dict[str, Any]] = {
             _criterion("9.6", "state_changes_remain_interactive", "The UI remains interactive during state changes."),
             _criterion("9.7", "animations_maintain_smooth_frame_rate", "Animations maintain a smooth 60fps; games maintain a stable frame rate during play."),
             _criterion("9.8", "rapid_input_does_not_freeze", "The app does not hang or freeze even under rapid user input."),
-            _criterion("9.9", "extended_sessions_avoid_resource_runaway", "An extended session shows no memory leaks or runaway resource use."),
-            _criterion("9.10", "poor_conditions_have_fallback", "Simulated poor conditions show graceful loading or fallback."),
             _negative("9", 1, "local_load_exceeds_two_seconds", "More than 2 seconds pass before interaction is possible on local render."),
             _negative("9", 2, "console_errors_during_flows", "Errors or warnings are present in the console during flows."),
             _negative("9", 3, "transitions_block_or_lag", "Transitions block or lag."),

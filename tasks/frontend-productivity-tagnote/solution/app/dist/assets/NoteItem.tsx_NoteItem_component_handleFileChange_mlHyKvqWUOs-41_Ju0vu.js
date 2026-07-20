@@ -1,1 +1,0 @@
-import{v as i}from"./core.min-Dne1Y5Yk.js";import{x as c}from"./core.min-Dne1Y5Yk.js";import"./preloader-Bns9QiKi.js";const a=s=>{const[e]=i(),o=s.target,t=o.files?.[0];t&&e.onAttachFile(e.note.id,{name:t.name,size:t.size}),o.value=""};export{c as _hW,a as s_mlHyKvqWUOs};

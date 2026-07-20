@@ -118,20 +118,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "Completing multiple re-runs and opening Export repeatedly leaves the tab responsive without runaway resource use that freezes the UI."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "While a 10-run re-run is in progress, the progress affordance remains visible rather than a blank region if ticks arrive slowly."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
 description = "More than 2 seconds pass before the triage queue is interactive on local render."

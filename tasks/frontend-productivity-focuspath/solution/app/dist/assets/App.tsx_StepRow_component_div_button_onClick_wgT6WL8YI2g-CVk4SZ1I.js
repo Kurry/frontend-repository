@@ -1,1 +1,0 @@
-import{v as s}from"./core.min-DB8N_m9v.js";import"./preloader-Bns9QiKi.js";const p=()=>{const[t,o]=s();if(!o.step.focusToday&&t>=3){o.onFocusLimit$();return}o.toggleFocusStep$(o.goal.id,o.milestone.id,o.step.id)};export{p as s_wgT6WL8YI2g};

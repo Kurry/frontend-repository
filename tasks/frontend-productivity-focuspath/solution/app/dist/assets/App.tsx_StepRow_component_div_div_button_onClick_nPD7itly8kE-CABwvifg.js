@@ -1,1 +1,0 @@
-import{v as r}from"./core.min-DB8N_m9v.js";import"./preloader-Bns9QiKi.js";const e=()=>{const[t,i]=r();t.draft.trim()&&(i.step.title=t.draft.trim()),t.editing=!1,i.persist$()};export{e as s_nPD7itly8kE};

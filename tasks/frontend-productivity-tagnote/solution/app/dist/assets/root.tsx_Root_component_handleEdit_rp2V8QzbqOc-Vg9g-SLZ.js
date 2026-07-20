@@ -1,1 +1,0 @@
-import{v as s}from"./core.min-Dne1Y5Yk.js";import{x as c}from"./core.min-Dne1Y5Yk.js";import"./preloader-Bns9QiKi.js";const x=e=>{const[o,i]=s(),t=i.present.notes.find(r=>r.id===e);t&&(o.value={id:t.id,text:t.text})};export{c as _hW,x as s_rp2V8QzbqOc};

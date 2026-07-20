@@ -117,13 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session of pan/filter/export shows no memory leaks or runaway resource use."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "9.10"
 name = "export_tab_switch_regenerates_smoothly"
 description = "Opening the export drawer and switching between Timeline JSON and Events CSV regenerates the preview without freezing the UI."

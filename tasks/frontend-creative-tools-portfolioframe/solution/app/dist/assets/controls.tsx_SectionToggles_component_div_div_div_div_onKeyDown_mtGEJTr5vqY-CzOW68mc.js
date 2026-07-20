@@ -1,1 +1,0 @@
-import{v as r}from"./core.min-C6O5v62Y.js";import{t as e}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const a=t=>{const[o,i]=r();(t.key==="Enter"||t.key===" ")&&(t.preventDefault(),e(o.state,i))};export{a as s_mtGEJTr5vqY};

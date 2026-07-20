@@ -1,1 +1,0 @@
-import{v as a}from"./core.min-Dne1Y5Yk.js";import{x as f}from"./core.min-Dne1Y5Yk.js";import{k as l}from"./store-CK9GeNlI.js";import"./preloader-Bns9QiKi.js";import"./utils-ah47JOmW.js";const n=()=>{const[t,e,o,r]=a();e.value&&(t(l(o.present,e.value),"Deleted note"),e.value=null,r("Note deleted"))};export{f as _hW,n as s_cZGnnEi8AQQ};

@@ -1,1 +1,0 @@
-import{v as s}from"./core.min-C6O5v62Y.js";import{C as n,s as r}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const m=()=>{const[t]=s(),o=n(t.history);o&&(t.state.content=o.content,r(t.state))};export{m as s_hUbzMbl22Zg};

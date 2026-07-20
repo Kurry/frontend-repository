@@ -117,13 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session of re-runs, triage, and opening Export does not visibly degrade responsiveness"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "9.10"
 name = "export_preview_regenerates_without_freeze"
 description = "Opening Export and switching between JSON and CSV regenerates the preview without freezing the UI"

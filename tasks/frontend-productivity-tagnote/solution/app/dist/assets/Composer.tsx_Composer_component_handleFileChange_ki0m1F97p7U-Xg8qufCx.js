@@ -1,1 +1,0 @@
-import{v as s}from"./core.min-Dne1Y5Yk.js";import{x as l}from"./core.min-Dne1Y5Yk.js";import"./preloader-Bns9QiKi.js";const n=o=>{const[i]=s(),t=o.target,e=t.files?.[0];e&&(i.attachedFile={name:e.name,size:e.size}),t.value=""};export{l as _hW,n as s_ki0m1F97p7U};

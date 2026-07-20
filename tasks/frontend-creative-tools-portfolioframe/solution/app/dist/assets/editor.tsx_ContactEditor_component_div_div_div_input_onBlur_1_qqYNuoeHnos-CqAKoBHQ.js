@@ -1,1 +1,0 @@
-import{v as o}from"./core.min-C6O5v62Y.js";import{a as r}from"./store-CcC-Cn2p.js";import"./preloader-Bns9QiKi.js";import"./types-BMbUCgPc.js";const e=()=>{const[t]=o();return r(t.state,t.history,"location",t.state.content.contact.location)};export{e as s_qqYNuoeHnos};

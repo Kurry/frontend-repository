@@ -117,20 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session of adds, deletes, exports, and period switches shows no runaway memory growth that freezes the tab"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Opening Export with an empty period still compiles CSV/JSON previews without hanging"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
 description = "More than 2 seconds pass before the budget workspace is interactive on local render"

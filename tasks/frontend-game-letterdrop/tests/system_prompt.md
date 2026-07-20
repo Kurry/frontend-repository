@@ -209,6 +209,16 @@ Do not retry or route around: an application-level crash; a dead documented cont
 validation failure produced by the app; a genuinely missing feature; or a path that only
 works after reload when the criterion does not ask for reload. When evidence remains
 ambiguous after the allowed observation, score the criterion "no".
+Session-death recovery: browser tool timeouts or a wedged session mid-run are
+infrastructure faults, not app verdicts — never mark the remaining criteria
+"BLOCKED:" wholesale because tooling stopped responding. Recover first: close any
+stuck tab state, re-navigate (`browser_navigate`) to http://localhost:3000, take a
+fresh snapshot, and retry the failed observation at least twice; when both tool
+surfaces are connected, re-check the other one too (webmcp_session_info /
+Playwright) before concluding the session is dead. Only after repeated recovery
+attempts still fail may a criterion be scored "BLOCKED:", and its reasoning must
+state that recovery was attempted and how. A single tool timeout is never
+sufficient grounds to BLOCK the rest of the rubric.
 
 7. Render-gate procedure
 For a globally unusable app:

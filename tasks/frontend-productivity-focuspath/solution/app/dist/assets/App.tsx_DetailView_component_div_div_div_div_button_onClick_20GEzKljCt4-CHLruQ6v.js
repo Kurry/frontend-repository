@@ -1,1 +1,0 @@
-import{v as e}from"./core.min-DB8N_m9v.js";import"./preloader-Bns9QiKi.js";const s=()=>{const[t]=e();t.goal.completed=!0,t.goal.completedAt=new Date().toISOString(),t.persist$(),t.state.view="overview",t.state.activeGoalId=""};export{s as s_20GEzKljCt4};

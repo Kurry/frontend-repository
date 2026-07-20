@@ -1,6 +1,15 @@
-# Modal real-agent trial sweep for all tasks/ using Codex with GPT-5.6 Sol Pro
-# as the builder, and Codex with gpt-5.6-luna-pro as the rewardkit judge
-# (same OpenAI API key; REWARDKIT_MODEL overrides the toml default gpt-5.6-sol).
+# Modal real-agent trial sweep for all tasks/ using Codex with gpt-5.6-sol at
+# xhigh reasoning effort as the builder, and Codex with gpt-5.6-luna as the
+# rewardkit judge (same OpenAI API key; REWARDKIT_MODEL overrides the toml
+# default gpt-5.6-sol).
+#
+# Model naming (learned the hard way — the first sweep 400'd every trial):
+#   - Real 5.6-family codex/API model ids: gpt-5.6-sol | gpt-5.6-luna | gpt-5.6-terra
+#     ("gpt-5.6-sol-pro" is NOT a model id -> model_not_found).
+#   - "pro" is a Responses API reasoning MODE (reasoning: {mode: "pro"}), which
+#     codex CLI (<= 0.144.6) cannot express — no reasoning_mode config key.
+#     Nearest codex equivalent: model_reasoning_effort=xhigh (efforts:
+#     minimal|low|medium|high|xhigh; harbor codex agent default is high).
 #
 # Setup:
 #   export OPENAI_API_KEY=sk-...
@@ -12,9 +21,9 @@
 # Optional one-task smoke first with -i/--include-task-name, e.g.:
 #   uv run harbor run -c configs/trial-codex-sol-pro.yaml \
 #     -i frontend-landing-avax-network \
-#     --job-name smoke-codex-sol-pro --yes
+#     --job-name smoke-codex-sol-xhigh --yes
 
-job_name: trial-codex-sol-pro-max-50-concurrent
+job_name: trial-codex-sol-xhigh-max-50-concurrent
 jobs_dir: jobs
 n_attempts: 1
 n_concurrent_trials: 50
@@ -35,7 +44,9 @@ retry:
 
 agents:
   - name: codex
-    model_name: openai/gpt-5.6-sol-pro
+    model_name: openai/gpt-5.6-sol
+    kwargs:
+      reasoning_effort: xhigh
     env:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
 
@@ -43,7 +54,7 @@ verifier:
   env:
     OPENAI_API_KEY: "${OPENAI_API_KEY}"
     REWARDKIT_JUDGE: codex
-    REWARDKIT_MODEL: gpt-5.6-luna-pro
+    REWARDKIT_MODEL: gpt-5.6-luna
 
 datasets:
   - path: tasks

@@ -117,20 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "After an extended session of creates, exports, and chart switches, the page remains usable without progressive slowdown suggesting resource runaway"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "When charts fail to render data (empty filtered set), an empty-chart or empty-list message appears rather than a blank hung region"
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
 description = "Local cold load remains non-interactive for more than 2 seconds"

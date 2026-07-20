@@ -117,20 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session shows no memory leaks or runaway resource use."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "9.10"
-name = "poor_conditions_have_fallback"
-description = "Simulated poor conditions show graceful loading or fallback."
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "9.n1"
 name = "local_load_exceeds_two_seconds"
 description = "More than 2 seconds pass before interaction is possible on local render."

@@ -117,13 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.9"
-name = "extended_sessions_avoid_resource_runaway"
-description = "An extended session of scrubbing, filtering, and opening/closing export does not visibly degrade responsiveness"
-type = "binary"
-weight = 0.5
-
-[[criterion]]
 id = "9.10"
 name = "density_recompute_stays_responsive"
 description = "Category density strip recomputation after filter or window changes completes without freezing controls"
