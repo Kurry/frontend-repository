@@ -779,7 +779,7 @@ function CodeBlock({ content, language = "typescript", filePath }) {
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      <Highlight theme={themes.nightOwl} code={content} language={language}>
+      <Highlight theme={themes.nightOwl} code={content || ""} language={language}>
         <pre className="scroll-thin max-h-64 overflow-auto p-3 font-mono text-[11px] leading-5">
           {({ tokens, getLineProps, getTokenProps }) =>
             tokens.map((line, i) => (
@@ -1016,7 +1016,7 @@ function TrajectoryPane({ pane, trial, ui, hidden }) {
         <div className="flex items-center gap-2">
           {pane === "agent" ? <IconRobot size={18} /> : <IconScale size={18} />}
           <h2 className="text-sm font-extrabold capitalize">
-            {pane} trajectory
+            {pane} Trajectory
           </h2>
           {focused && <StatusPill tone="accent">Focused</StatusPill>}
         </div>
@@ -1232,7 +1232,8 @@ function AdjudicationDialog({
         evidenceStepIds: record?.evidenceStepIds || [],
       });
   }, [open, criterion.id, record, reset]);
-  const submit = handleSubmit((values) => {
+  const submit = handleSubmit(async (values) => {
+    if (isSubmitting) return;
     const maxIndex =
       Math.max(trial.agentSteps.length, trial.scorerSteps.length) - 1;
     if (
@@ -1254,6 +1255,8 @@ function AdjudicationDialog({
         ? { evidenceStepIds: values.evidenceStepIds }
         : {}),
     };
+    // await to ensure isSubmitting blocks effectively for double-clicks
+    await new Promise((resolve) => setTimeout(resolve, 0));
     recordAdjudications(
       [body],
       record ? "Replaced adjudication" : "Recorded adjudication",
@@ -1712,27 +1715,36 @@ function AdjudicationSummary({ records }) {
         <h3 className="text-xs font-extrabold">Adjudication summary</h3>
         <StatusPill className="ml-auto">{records.length} recorded</StatusPill>
       </div>
-      <div className="grid grid-cols-3 gap-2">
-        {classifications.map((classification) => (
-          <div
-            key={classification}
-            className={cx(
-              "rounded-md border px-3 py-2",
-              styles[classification],
-            )}
-          >
+      {records.length === 0 ? (
+        <div className="rounded-md border border-dashed border-line bg-canvas p-4 text-center">
+          <div className="text-[11px] font-bold">0 recorded</div>
+          <p className="mt-1 text-[11px] leading-5 text-muted">
+            Select a criterion below and click Adjudicate to record your first finding.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-2">
+          {classifications.map((classification) => (
             <div
-              className="count-pop font-mono text-xl font-extrabold"
-              key={`${classification}-${counts[classification]}`}
+              key={classification}
+              className={cx(
+                "rounded-md border px-3 py-2",
+                styles[classification],
+              )}
             >
-              {counts[classification]}
+              <div
+                className="count-pop font-mono text-xl font-extrabold"
+                key={`${classification}-${counts[classification]}`}
+              >
+                {counts[classification]}
+              </div>
+              <div className="truncate text-[10px] font-bold">
+                {classification}
+              </div>
             </div>
-            <div className="truncate text-[10px] font-bold">
-              {classification}
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -1918,14 +1930,14 @@ function PaneSwitcher({ ui }) {
           className="focus-ring flex items-center justify-center gap-2 rounded-md px-3 py-2 text-xs font-bold data-[selected]:bg-accent data-[selected]:text-white"
         >
           <IconRobot size={16} />
-          Agent trajectory
+          Agent Trajectory
         </ToggleButton>
         <ToggleButton
           id="scorer"
           className="focus-ring flex items-center justify-center gap-2 rounded-md px-3 py-2 text-xs font-bold data-[selected]:bg-accent data-[selected]:text-white"
         >
           <IconScale size={16} />
-          Scorer trajectory
+          Scorer Trajectory
         </ToggleButton>
       </ToggleButtonGroup>
     </div>
@@ -1939,25 +1951,12 @@ function ExportDrawer({ trial, ui }) {
   const setTab = useReviewStore((s) => s.setExportTab);
   const setAnnouncement = useReviewStore((s) => s.setAnnouncement);
   const [copied, setCopied] = useState(false);
-  const packageText = useMemo(
-    () =>
-      JSON.stringify(buildReviewPackage(useReviewStore.getState()), null, 2),
-    [
-      trial.id,
-      ui.activeLabel,
-      ui.comparedLabels.join("|"),
-      JSON.stringify(ui.adjudications),
-    ],
+  const packageText = JSON.stringify(
+    buildReviewPackage(useReviewStore.getState()),
+    null,
+    2,
   );
-  const memoText = useMemo(
-    () => buildMemo(useReviewStore.getState()),
-    [
-      trial.id,
-      ui.activeLabel,
-      ui.comparedLabels.join("|"),
-      JSON.stringify(ui.adjudications),
-    ],
-  );
+  const memoText = buildMemo(useReviewStore.getState());
   const activeText = tab === "json" ? packageText : memoText;
   const copy = async () => {
     await copyText(activeText);
