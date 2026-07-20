@@ -9,7 +9,6 @@ was recorded as empty (cherry-pick produced no diff) in the state file.
 One pass (call from the loop):
   mirror_prs_to_mercor.py [--origin Kurry/frontend-repository]
      [--target Mercor-Intelligence/frontend-repository] [--mercor-remote mercor]
-     [--origin-remote origin]
      [--state <jsonl>] [--worktree <dir>]
 """
 from __future__ import annotations
@@ -52,21 +51,31 @@ def load_state(p: Path) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--origin", default="Kurry/frontend-repository")
+    ap.add_argument("--origin", default="Kurry/frontend-repository",
+                    help="gh repo slug (for gh pr list)")
+    ap.add_argument("--origin-remote", default="origin",
+                    help="git remote NAME for fetches (not the gh slug)")
     ap.add_argument("--target", default="Mercor-Intelligence/frontend-repository")
     ap.add_argument("--mercor-remote", default="mercor")
-    ap.add_argument("--origin-remote", default="origin")
     ap.add_argument("--state", type=Path,
                     default=ROOT / "jobs" / "trial-codex-sol-xhigh-max-50-concurrent" / ".mirrored-prs.jsonl")
+    ap.add_argument("--reprocess", action="store_true",
+                    help="re-push already-mirrored branches (e.g. after excluding dist)")
     ap.add_argument("--worktree", type=Path,
-                    default=Path(tempfile.gettempdir()) / "harvest-oracle-mirror-wt")
+                    default=Path(tempfile.gettempdir()) / f"{ROOT.name}-mirror-wt")
     args = ap.parse_args()
 
     state = load_state(args.state)
     # keep mercor/main current — the PR base
-    base_fetch = sh("git", "fetch", args.mercor_remote, "main")
-    if base_fetch.returncode != 0:
-        raise RuntimeError(f"git fetch {args.mercor_remote} main failed: {base_fetch.stderr.strip()}")
+    fetch_base = sh("git", "fetch", args.mercor_remote, "main")
+    if fetch_base.returncode != 0:
+        raise SystemExit(f"FAIL fetch {args.mercor_remote}/main: {fetch_base.stderr.strip()}")
+    # bulk-fetch ALL origin branches up front so every origin/<pr-branch> is
+    # resolvable on the first pass (per-branch fetch had a first-pass race that
+    # made new branches skip until a second run).
+    fetch_all = sh("git", "fetch", args.origin_remote, "+refs/heads/*:refs/remotes/origin/*")
+    if fetch_all.returncode != 0:
+        raise SystemExit(f"FAIL fetch {args.origin_remote}/*: {fetch_all.stderr.strip()}")
 
     prs = gh_json("pr", "list", "--repo", args.origin, "--state", "open",
                   "--limit", "300", "--json", "number,title,headRefName,headRefOid,body")
@@ -77,16 +86,20 @@ def main() -> None:
 
     # ensure worktree
     if not (args.worktree / ".git").exists():
-        added = sh("git", "worktree", "add", "--detach", str(args.worktree), f"{args.mercor_remote}/main")
+        added = sh("git", "worktree", "add", "--detach", str(args.worktree),
+                   f"{args.mercor_remote}/main")
         if added.returncode != 0:
-            raise RuntimeError(f"git worktree add failed for {args.worktree}: {added.stderr.strip()}")
+            raise SystemExit(f"FAIL create worktree {args.worktree}: {added.stderr.strip()}")
 
     done = mirrored = skipped = 0
     for p in prs:
         br = p["headRefName"]
+        # Re-mirror when the target PR is gone or the origin head moved: skip
+        # only if the target still has an open PR, or the branch was recorded
+        # empty against this exact origin head. --reprocess forces a re-push.
         prior = state.get(br, {})
         same_empty_head = prior.get("status") == "empty" and prior.get("origin_head") == p["headRefOid"]
-        if br in tgt_heads or same_empty_head:
+        if (br in tgt_heads or same_empty_head) and not args.reprocess:
             done += 1
             continue
         title, body, num = p["title"], (p.get("body") or ""), p["number"]
@@ -94,18 +107,20 @@ def main() -> None:
         # Fetch the Jules branch tip. The branch is based on a stale/divergent
         # main, so replaying its commits is fragile — instead take the FIXED
         # solution/app from its tip and commit it fresh on current mercor/main.
-        tip = f"refs/remotes/{args.origin_remote}/{br}"
-        fetched = sh("git", "fetch", args.origin_remote, f"{br}:{tip}")
-        if fetched.returncode != 0:
-            print(f"FAIL fetch #{num} {br}: {fetched.stderr[:200]}", file=sys.stderr)
+        fetch_br = sh("git", "fetch", args.origin_remote, br)  # updates refs/remotes/origin/<br>
+        if fetch_br.returncode != 0:
+            print(f"skip #{num} {br}: fetch failed: {fetch_br.stderr.strip()[:200]}", file=sys.stderr)
+            skipped += 1
             continue
-        # Inspect the complete PR diff, not only its tip commit: later commits
-        # may contain metadata-only fixes while solution/app changed earlier.
-        diff = sh("gh", "pr", "diff", str(num), "--repo", args.origin, "--name-only")
-        if diff.returncode != 0:
-            print(f"FAIL diff #{num} {br}: {diff.stderr[:200]}", file=sys.stderr)
-            continue
-        paths = diff.stdout
+        # Resolve to a full SHA in ROOT — a SHA is resolvable from any worktree
+        # (shared object store), unlike a fresh remote ref name.
+        tip = sh("git", "rev-parse", f"origin/{br}").stdout.strip()
+        if not tip:
+            print(f"skip #{num} {br}: could not resolve origin ref", file=sys.stderr); skipped += 1; continue
+        # Files the branch changed vs its fork point — robust for merge commits
+        # (plain diff-tree shows nothing on a merge) and normal commits alike.
+        base = sh("git", "merge-base", "origin/main", tip).stdout.strip() or "origin/main"
+        paths = sh("git", "diff", "--name-only", base, tip).stdout
         slugs = sorted({p.split("/")[1] for p in paths.splitlines()
                         if p.startswith("tasks/") and len(p.split("/")) > 2})
         if not slugs:
@@ -114,14 +129,20 @@ def main() -> None:
         if checkout.returncode != 0:
             print(f"FAIL checkout base #{num} {br}: {checkout.stderr[:200]}", file=sys.stderr)
             continue
+        copy_failed = False
         for slug in slugs:
-            copied = sh("git", "checkout", tip, "--", f"tasks/{slug}/solution/app", cwd=wt)
+            # source only — never mirror built dist/ (bloats the PR; rebuilt by verify:build)
+            copied = sh("git", "checkout", tip, "--", f"tasks/{slug}/solution/app",
+                        f":(exclude)tasks/{slug}/solution/app/dist", cwd=wt)
             if copied.returncode != 0:
                 print(f"FAIL copy #{num} {br} {slug}: {copied.stderr[:200]}", file=sys.stderr)
+                copy_failed = True
                 break
-        else:
-            copied = None
-        if copied is not None and copied.returncode != 0:
+            # drop any dist that slipped in (base had it, or nested)
+            for d in (Path(wt) / "tasks" / slug / "solution" / "app").glob("**/dist"):
+                if d.is_dir():
+                    sh("git", "rm", "-rq", "--", str(d.relative_to(wt)), cwd=wt)
+        if copy_failed:
             continue
         sh("git", "add", "-A", cwd=wt)
         staged = sh("git", "diff", "--cached", "--name-only", cwd=wt).stdout.strip()
@@ -138,6 +159,11 @@ def main() -> None:
         push = sh("git", "push", "-f", args.mercor_remote, f"mir-{num}:{br}", cwd=wt)
         if push.returncode != 0:
             print(f"FAIL push #{num} {br}: {push.stderr[:200]}", file=sys.stderr)
+            continue
+        if br in tgt_heads:
+            # branch already has an open PR; the force-push above updated it
+            print(f"updated #{num} {br}: force-pushed (dropped dist)", file=sys.stderr)
+            mirrored += 1
             continue
         nb = body + f"\n\n---\nMirrored from {args.origin}#{num} (Jules oracle-fix), re-authored + re-signed."
         pr = sh("gh", "pr", "create", "--repo", args.target, "--head", br, "--base", "main",

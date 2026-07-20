@@ -195,6 +195,9 @@ Use the first criterion ID plus `-shared` as the filename (e.g. `TASK-FUNC-001-s
 Each applicable reasoning entry cites the same exact filename. Do not share a screenshot
 across different viewport sizes, materially different states, or criteria whose decisive
 evidence is not represented in the image.
+Only cite an evidence filename after you have verified the screenshot was actually saved
+to /logs/verifier (e.g. it appears in your screenshot tool output); never cite a filename
+you did not persist.
 
 5. Image read-back policy
 Taking a screenshot and reading its pixels back into context are separate decisions.
