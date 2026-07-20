@@ -1,17 +1,14 @@
 {
-  "name": "wolverineworldwide-oracle",
+  "name": "northstar-collective-oracle",
   "private": true,
   "version": "1.0.0",
-  "description": "Reference oracle for the wolverineworldwide.com corporate marketing homepage \u2014 air-gapped static Craft/Vite/GSAP/Swup capture served on port 3000.",
+  "description": "Original, air-gapped Northstar Collective corporate homepage oracle served on port 3000.",
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "verify:build": "node -e \"const fs=require('fs');if(fs.existsSync('web/index.html')){console.log('build ok');process.exit(0)}else{console.error('missing web/index.html');process.exit(1)}\""
+    "verify:build": "node --check web/northstar.js && node --check web/webmcp.js && node --check server.mjs && node -e \"const fs=require('fs');const files=['web/index.html','web/northstar.css','web/assets/hero-poster.jpg','web/assets/hero-montage.webm','web/assets/northstar-annual-report-2025.pdf','web/assets/og-northstar.jpg'];const missing=files.filter(f=>!fs.existsSync(f)||!fs.statSync(f).size);if(missing.length){console.error('missing build assets:',missing);process.exit(1)}console.log('build ok')\""
   },
   "engines": {
     "node": ">=18"
-  },
-  "dependencies": {
-    "serve": "14.2.4"
   }
 }
