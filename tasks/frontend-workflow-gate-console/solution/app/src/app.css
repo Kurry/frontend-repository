@@ -109,45 +109,7 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select
 @keyframes timeline-in { from { opacity: 0; transform: translateX(8px); } }
 @keyframes modal-in { from { opacity: 0; transform: scale(.97); } }
 
-@media (max-width: 768px) {
-  .action, button, select, .gate-disclosure, .gate-state, .whatif-toggle {
-    min-height: 44px;
-  }
-  .action, button {
-    min-width: 44px;
-  }
-}
-
-@media (max-width: 560px) {
-  .stage-strip:not(.compact) {
-    min-width: 0 !important;
-    grid-template-columns: 1fr !important;
-  }
-  .stage-strip .stage-segment {
-    min-height: 44px !important;
-  }
-  .chain {
-    min-width: 0 !important;
-    flex-direction: column;
-    align-items: stretch !important;
-    gap: 1rem;
-  }
-  .chain-link {
-    width: 2px !important;
-    height: 1rem !important;
-    margin: 0 auto;
-    flex-direction: column;
-  }
-  .chain-link span {
-    width: 2px !important;
-    height: auto !important;
-  }
-  .chain-link :global(svg) {
-    transform: rotate(90deg);
-    margin: 0.2rem 0;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
 }
+@media (max-width: 768px) { button, .action, .header-action, .close-button, .icon-button, select, input { min-height: 44px; } .close-button, .icon-button, .header-action { min-width: 44px; justify-content: center; align-items: center; } }

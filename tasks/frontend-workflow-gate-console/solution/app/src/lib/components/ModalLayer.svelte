@@ -8,6 +8,7 @@
   } from 'phosphor-svelte';
   import { importFormSchema } from '../contracts';
   import { consoleStore } from '../console-store.svelte';
+  import { focusTrap } from '../actions';
 
   let copied = $state<string | null>(null);
   let priorFocus: HTMLElement | null = null;
@@ -40,25 +41,8 @@
     consoleStore.closeModal();
   }
 
-  function handleKeydown(event: KeyboardEvent) {
+  function escape(event: KeyboardEvent) {
     if (event.key === 'Escape') close();
-    if (event.key === 'Tab') {
-      const container = document.querySelector<HTMLElement>('[data-modal-card]');
-      if (!container) return;
-      const focusable = Array.from(container.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-      ));
-      if (!focusable.length) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    }
   }
 
   async function writeClipboard(value: string, key: string) {
@@ -92,7 +76,7 @@
   }
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={escape} />
 
 <div class="modal-backdrop" role="presentation" onclick={(event) => event.target === event.currentTarget && close()}>
   <div
@@ -102,6 +86,7 @@
     role="dialog"
     aria-modal="true"
     aria-labelledby="modal-title"
+    use:focusTrap
   >
     {#if consoleStore.modal === 'export'}
       <header class="modal-head">
@@ -110,7 +95,7 @@
           <h2 id="modal-title">Export acceptance package</h2>
           <p>Compiled from the current recorded store state · {consoleStore.selectedRun.id}</p>
         </div>
-        <button type="button" class="close-button" aria-label="Close export" onclick={close}><X size={19} weight="bold" /></button>
+        <button type="button" class="close-button" aria-label="Close export" onclick={close}><X size={19} weight="bold" aria-hidden="true" /></button>
       </header>
 
       <div class="format-tabs" role="tablist" aria-label="Export format">
@@ -143,7 +128,7 @@
           <h2 id="modal-title">Import acceptance package</h2>
           <p>Valid JSON replaces stages, certificates, gate notes, and timeline.</p>
         </div>
-        <button type="button" class="close-button" aria-label="Close import" onclick={close}><X size={19} weight="bold" /></button>
+        <button type="button" class="close-button" aria-label="Close import" onclick={close}><X size={19} weight="bold" aria-hidden="true" /></button>
       </header>
 
       <form use:importForm class="import-form">
@@ -171,9 +156,9 @@
         <div>
           <span class="eyebrow">Stage acceptance certificate</span>
           <h2 id="modal-title">{certificateStage.name}</h2>
-          <p>Issued {new Intl.DateTimeFormat('en', { month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'UTC' }).format(new Date(certificateStage.certificate.issuedAt))} UTC</p>
+          <p>Issued {new Date(certificateStage.certificate.issuedAt).toLocaleString()}</p>
         </div>
-        <button type="button" class="close-button" aria-label="Close certificate" onclick={close}><X size={19} weight="bold" /></button>
+        <button type="button" class="close-button" aria-label="Close certificate" onclick={close}><X size={19} weight="bold" aria-hidden="true" /></button>
       </header>
       <div class="fingerprint-block">
         <span>Fingerprint hash</span>
@@ -202,17 +187,17 @@
   .modal-card { width:min(610px, 100%); max-height:calc(100vh - 2rem); overflow:auto; border-radius:.95rem; padding:1rem; }
   .modal-card.wide { width:min(880px, 100%); }
   .modal-head { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; padding:.15rem .15rem .9rem; }
-  .eyebrow { color:#16869a; font-size:.57rem; font-weight:850; letter-spacing:.09em; text-transform:uppercase; }
+  .eyebrow { color:#126f80; font-size:.57rem; font-weight:850; letter-spacing:.09em; text-transform:uppercase; }
   h2 { margin:.15rem 0 0; font-size:1.2rem; letter-spacing:-.02em; }
-  .modal-head p { margin:.22rem 0 0; color:#708096; font-size:.67rem; }
+  .modal-head p { margin:.22rem 0 0; color:#546478; font-size:.67rem; }
   .close-button { flex:none; display:grid; place-items:center; width:2rem; height:2rem; color:inherit; background:transparent; border:1px solid transparent; border-radius:.45rem; cursor:pointer; }
   .close-button:hover { background:rgba(113,132,153,.12); border-color:rgba(113,132,153,.2); }
   .format-tabs { display:grid; grid-template-columns:1fr 1fr; padding:.25rem; background:#eef3f7; border:1px solid #dae3ec; border-radius:.62rem; }
   :global(.dark) .format-tabs { background:#091626; border-color:#263a50; }
-  .format-tabs button { display:flex; align-items:center; justify-content:center; gap:.4rem; padding:.52rem; color:#6c7c90; background:transparent; border:0; border-radius:.42rem; font-size:.68rem; font-weight:800; cursor:pointer; }
+  .format-tabs button { display:flex; align-items:center; justify-content:center; gap:.4rem; padding:.52rem; color:#546478; background:transparent; border:0; border-radius:.42rem; font-size:.68rem; font-weight:800; cursor:pointer; }
   .format-tabs button.active { color:#126f80; background:white; box-shadow:0 2px 8px rgba(30,48,76,.09); }
   :global(.dark) .format-tabs button.active { color:#69d7e8; background:#172a3f; }
-  .preview-meta { display:flex; justify-content:space-between; gap:1rem; padding:.75rem .15rem .4rem; color:#79899d; font: .59rem var(--font-mono); }
+  .preview-meta { display:flex; justify-content:space-between; gap:1rem; padding:.75rem .15rem .4rem; color:#66778d; font: .59rem var(--font-mono); }
   .preview { height:min(50vh, 480px); overflow:auto; margin:0; padding:.85rem; color:#cbe2f2; background:#07111f; border:1px solid #243a50; border-radius:.62rem; font: .65rem/1.55 var(--font-mono); white-space:pre; }
   .modal-actions { display:flex; justify-content:flex-end; gap:.5rem; padding-top:.85rem; }
   .import-form label { display:flex; justify-content:space-between; margin:.15rem 0 .4rem; font-size:.68rem; font-weight:800; }
@@ -221,14 +206,14 @@
   :global(.dark) .import-form textarea { background:#071421; border-color:#31475e; }
   .import-form textarea[aria-invalid="true"] { border-color:#df5265; box-shadow:0 0 0 2px rgba(223,82,101,.1); }
   .import-error { margin:.35rem 0 0; color:#d33f53; font-size:.66rem; }
-  .schema-hint { margin:.35rem 0 0; color:#738398; font-size:.62rem; }
+  .schema-hint { margin:.35rem 0 0; color:#5c6b7e; font-size:.62rem; }
   .certificate-head { align-items:center; }
   .certificate-title-icon { flex:none; display:grid; place-items:center; width:2.8rem; height:2.8rem; color:#158961; background:#ddf6ed; border:1px solid #99dbc4; border-radius:.7rem; }
   :global(.dark) .certificate-title-icon { color:#45d4a2; background:#0d322a; border-color:#286b56; }
   .certificate-head > div:nth-child(2) { flex:1; }
   .fingerprint-block { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:.42rem .7rem; align-items:center; padding:.75rem; background:#f5f8fb; border:1px solid #dfe7ef; border-radius:.65rem; }
   :global(.dark) .fingerprint-block { background:#091727; border-color:#263b51; }
-  .fingerprint-block > span { grid-column:1 / -1; color:#718196; font-size:.56rem; font-weight:850; text-transform:uppercase; letter-spacing:.08em; }
+  .fingerprint-block > span { grid-column:1 / -1; color:#546478; font-size:.56rem; font-weight:850; text-transform:uppercase; letter-spacing:.08em; }
   .fingerprint-block code { min-width:0; overflow-wrap:anywhere; color:#286b78; font:650 .68rem/1.45 var(--font-mono); }
   :global(.dark) .fingerprint-block code { color:#77d7e6; }
   .certificate-gates { margin-top:.85rem; border:1px solid #dfe6ee; border-radius:.62rem; overflow:hidden; }

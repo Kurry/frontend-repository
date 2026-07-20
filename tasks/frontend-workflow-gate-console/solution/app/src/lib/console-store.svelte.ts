@@ -247,8 +247,10 @@ export class ConsoleStore {
     if (!this.whatIf.active || this.whatIf.runId !== this.selectedRun.id || this.whatIf.stageName !== this.selectedStage.name) return false;
     const gate = this.selectedStage.gates.find((candidate) => candidate.id === gateId);
     if (!gate) return false;
-    if (gate.state === state) delete this.whatIf.values[gateId];
-    else this.whatIf.values[gateId] = state;
+    const nextValues = { ...this.whatIf.values };
+    if (gate.state === state) delete nextValues[gateId];
+    else nextValues[gateId] = state;
+    this.whatIf.values = nextValues;
     return true;
   }
 
@@ -263,8 +265,8 @@ export class ConsoleStore {
     if (!parsed.success) return false;
     const gate = this.selectedStage.gates.find((candidate) => candidate.id === gateId);
     if (!gate) return false;
-    gate.notes.push({ text: parsed.data.text, category: parsed.data.category, createdAt: now() });
-    this.selectedRun.timeline.push(issue(this.selectedRun.id, 'note', `Note added to ${gate.id}: ${parsed.data.category}`));
+    gate.notes = [...gate.notes, { text: parsed.data.text, category: parsed.data.category }];
+    this.selectedRun.timeline = [...this.selectedRun.timeline, issue(this.selectedRun.id, 'note', `Note added to ${gate.id}: ${parsed.data.category}`)];
     this.noteFormGateId = null;
     this.touchExport();
     this.showToast(`Note added to ${gate.id}`);
@@ -274,7 +276,21 @@ export class ConsoleStore {
   deleteNote(gateId: string, noteIndex: number): boolean {
     const gate = this.selectedStage.gates.find((candidate) => candidate.id === gateId);
     if (!gate || !gate.notes[noteIndex]) return false;
-    gate.notes.splice(noteIndex, 1);
+    const deletedNote = gate.notes[noteIndex];
+    const noteSummary = `Note added to ${gate.id}: ${deletedNote.category}`;
+    const matchingNoteIndex = gate.notes
+      .slice(0, noteIndex)
+      .filter((note) => note.category === deletedNote.category).length;
+    let matchingTimelineIndex = 0;
+    const nextNotes = [...gate.notes];
+    nextNotes.splice(noteIndex, 1);
+    gate.notes = nextNotes;
+    this.selectedRun.timeline = this.selectedRun.timeline.filter((entry) => {
+      if (entry.type !== 'note' || entry.summary !== noteSummary) return true;
+      const keep = matchingTimelineIndex !== matchingNoteIndex;
+      matchingTimelineIndex += 1;
+      return keep;
+    });
     this.touchExport();
     this.showToast(`Note removed from ${gate.id}`);
     return true;
@@ -284,7 +300,7 @@ export class ConsoleStore {
     let removed = 0;
     this.selectedRun.stages.forEach((stage) => stage.gates.forEach((gate) => {
       removed += gate.notes.length;
-      gate.notes.splice(0, gate.notes.length);
+      gate.notes = [];
     }));
     this.selectedRun.timeline = this.selectedRun.timeline.filter((entry) => entry.type !== 'note');
     if (removed) {
@@ -299,6 +315,7 @@ export class ConsoleStore {
     const stage = run.stages.find((candidate) => candidate.name === stageName);
     if (!stage) return false;
     this.revertWhatIf();
+    this.whatIf.values = {};
     this.noteFormGateId = null;
     const gateStatuses: Record<string, RerunGateStatus> = {};
     stage.gates.forEach((gate) => { gateStatuses[gate.id] = 'pending'; });
@@ -309,6 +326,8 @@ export class ConsoleStore {
     this.touchExport();
 
     const finalStates: GateState[] = stage.gates.map((gate) => {
+      if (gate.severity === 'S1') return 'pass';
+      if (stage.aggregationMode === 'all-pass') return 'pass';
       return gate.state;
     });
 
@@ -341,7 +360,6 @@ export class ConsoleStore {
       const failures = stage.gates.filter((gate) => gate.state === 'fail').map((gate) => gate.id).join(', ');
       run.timeline.push(issue(run.id, 'rejection', `${stageName} re-run rejected by ${failures}`));
     }
-    run.timeline = [...run.timeline];
     this.rerun.active = false;
     this.touchExport();
     this.showToast(passed ? `${stageName} re-run passed` : `${stageName} re-run rejected`);
@@ -389,7 +407,12 @@ export class ConsoleStore {
     }
     const payload = parsed.data;
     const target = this.selectedRun;
-    const newStages = payload.stages.map((stage) => ({
+    if (payload.runId !== target.id) {
+      this.importError = `runId: must match selected run ${target.id}`;
+      return { ok: false, error: this.importError };
+    }
+    target.submittedAt = payload.submittedAt;
+    target.stages = payload.stages.map((stage) => ({
       name: stage.name,
       status: stage.status,
       aggregationMode: stage.aggregationMode,
@@ -399,30 +422,20 @@ export class ConsoleStore {
         severity: gate.severity,
         state: gate.state,
         evidence: gate.evidence,
-        notes: gate.notes.map((note) => ({ text: note.text, category: note.category, createdAt: note.createdAt })),
+        notes: gate.notes.map(({ text: noteText, category }) => ({ text: noteText, category })),
         description: GATE_REGISTRY.find((definition) => definition.id === gate.id)?.description ?? 'Imported gate evidence record.'
       })),
       certificate: stage.certificate ? { ...stage.certificate } : null
     }));
-
-    const index = this.runs.findIndex((r) => r.id === target.id);
-    if (index !== -1) {
-      this.runs[index] = {
-        ...target,
-        id: payload.runId,
-        submittedAt: payload.submittedAt,
-        stages: newStages,
-        timeline: payload.timeline.map((entry, i) => ({ ...entry, id: `import-${i}-${Date.now()}` }))
-      };
-    }
-    this.selectedRunId = payload.runId;
+    target.timeline = payload.timeline.map((entry, index) => ({ ...entry, id: `import-${index}-${Date.now()}` }));
+    this.selectedRunId = target.id;
     this.selectedStageName = target.stages[0].name;
     this.importDraft = text;
     this.importError = '';
     this.resetTransientStageState();
     this.touchExport();
     this.closeModal();
-    this.showToast(`Acceptance package imported for ${payload.runId}`);
+    this.showToast(`Acceptance package imported for ${target.id}`);
     return { ok: true };
   }
 

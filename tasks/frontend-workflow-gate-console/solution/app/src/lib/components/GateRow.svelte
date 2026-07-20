@@ -152,10 +152,9 @@
   :global(.dark) .add-note { color:#62d2e4; }
   :global(.dark) .add-note:hover { background:#11303a; }
   @media (max-width:520px) {
-    .gate-state { min-width:44px; min-height:44px; justify-content:center; margin-right:.45rem; }
+    .gate-state { min-width:2.5rem; justify-content:center; margin-right:.45rem; }
     .gate-state span { display:none; }
-    .gate-disclosure { padding-left:.55rem; gap:.45rem; min-height:44px; }
+    .gate-disclosure { padding-left:.55rem; gap:.45rem; }
     .evidence-inner { padding-left:2rem; padding-right:.65rem; }
-    .add-note { min-height:44px; min-width:44px; justify-content:center; }
   }
 </style>

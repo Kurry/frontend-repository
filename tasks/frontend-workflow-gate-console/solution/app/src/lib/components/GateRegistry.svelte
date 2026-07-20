@@ -11,7 +11,7 @@
         <ArrowLeft size={16} weight="bold" /> Run detail
       </button>
       <span class="eyebrow">Policy catalog</span>
-      <h2 id="registry-title">Gate registry</h2>
+      <h1 id="registry-title">Gate registry</h1>
       <p>Every evaluation used across the five pipeline suites.</p>
     </div>
     <div class="filter-block">
@@ -83,7 +83,7 @@
   .registry-header { display:flex; align-items:flex-end; justify-content:space-between; gap:2rem; margin-bottom:1rem; }
   .back { display:none; align-items:center; gap:.35rem; padding:.3rem 0; color:#178296; background:transparent; border:0; font-size:.7rem; font-weight:800; cursor:pointer; }
   .eyebrow { color:#18879a; font-size:.6rem; font-weight:850; letter-spacing:.1em; text-transform:uppercase; }
-  h2 { margin:.15rem 0 0; font-size:1.5rem; letter-spacing:-.025em; }
+  h1 { margin:.15rem 0 0; font-size:1.5rem; letter-spacing:-.025em; }
   .registry-header p { margin:.25rem 0 0; color:#697a90; font-size:.75rem; }
   .filter-block { display:grid; grid-template-columns:auto auto; gap:.35rem .55rem; align-items:center; }
   .filter-block label { grid-column:1 / -1; display:flex; align-items:center; gap:.3rem; color:#65768b; font-size:.62rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; }
