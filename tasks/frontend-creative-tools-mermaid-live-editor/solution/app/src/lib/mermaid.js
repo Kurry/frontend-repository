@@ -2,8 +2,9 @@ import mermaid from 'mermaid';
 import { store } from './state.svelte.js';
 
 // Sample diagrams shown in the "Sample Diagrams" picker. The keys are the
-// visible button labels; ids are the stable browse destinations. Each source is
-// real Mermaid syntax and renders as a distinct diagram type.
+// visible button labels; ids are the stable browse destinations and match the
+// closed diagramType enum of the MermaidSession contract. Each source is real
+// Mermaid syntax and renders as a distinct diagram type.
 export const SAMPLE_DIAGRAMS = [
   {
     id: 'flowchart',
@@ -19,10 +20,11 @@ export const SAMPLE_DIAGRAMS = [
   {
     id: 'class',
     label: 'Class',
-    diagramType: 'classDiagram',
+    diagramType: 'class',
     code: `classDiagram
     Animal <|-- Duck
     Animal <|-- Fish
+    Animal <|-- Zebra
     Animal : +int age
     Animal : +String gender
     Animal: +isMammal()
@@ -30,6 +32,14 @@ export const SAMPLE_DIAGRAMS = [
       +String beakColor
       +swim()
       +quack()
+    }
+    class Fish{
+      -int sizeInFeet
+      -canEat()
+    }
+    class Zebra{
+      +bool is_wild
+      +run()
     }`
   },
   {
@@ -44,7 +54,7 @@ export const SAMPLE_DIAGRAMS = [
   {
     id: 'entity-relationship',
     label: 'Entity Relationship',
-    diagramType: 'er',
+    diagramType: 'entity-relationship',
     code: `erDiagram
     CUSTOMER ||--o{ ORDER : places
     ORDER ||--|{ LINE-ITEM : contains
@@ -53,7 +63,7 @@ export const SAMPLE_DIAGRAMS = [
   {
     id: 'state',
     label: 'State',
-    diagramType: 'stateDiagram',
+    diagramType: 'state',
     code: `stateDiagram-v2
     [*] --> Still
     Still --> [*]
@@ -73,7 +83,10 @@ export const SAMPLE_DIAGRAMS = [
       Popularisation
     Research
       On effectiveness
-      On features`
+      On features
+    Tools
+      Mermaid
+      Live editor`
   },
   {
     id: 'pie',
@@ -97,26 +110,63 @@ export const SAMPLE_DIAGRAMS = [
   }
 ];
 
+export const DIAGRAM_TYPE_LABELS = Object.fromEntries(
+  SAMPLE_DIAGRAMS.map((s) => [s.id, s.label])
+);
+
 export const DEFAULT_CODE = SAMPLE_DIAGRAMS[0].code;
 export const DEFAULT_CONFIG = JSON.stringify({ theme: 'default' }, null, 2);
 
+// Map mermaid's internal parse type names onto the closed diagramType enum.
+const PARSED_TYPE_MAP = {
+  flowchart: 'flowchart',
+  'flowchart-v2': 'flowchart',
+  flow: 'flowchart',
+  class: 'class',
+  classDiagram: 'class',
+  sequence: 'sequence',
+  er: 'entity-relationship',
+  state: 'state',
+  stateDiagram: 'state',
+  mindmap: 'mindmap',
+  pie: 'pie',
+  gantt: 'gantt'
+};
+
+// Detect the diagram type from the source's first line. Deterministic, and
+// always returns a value from the closed diagramType enum (or undefined).
+export const detectDiagramType = (code) => {
+  const firstLine = (String(code).trim().split(/\r?\n/, 1)[0] || '').trim();
+  if (/^(flowchart|graph)\b/.test(firstLine)) return 'flowchart';
+  if (/^classDiagram\b/.test(firstLine)) return 'class';
+  if (/^sequenceDiagram\b/.test(firstLine)) return 'sequence';
+  if (/^erDiagram\b/.test(firstLine)) return 'entity-relationship';
+  if (/^stateDiagram\b/.test(firstLine)) return 'state';
+  if (/^mindmap\b/.test(firstLine)) return 'mindmap';
+  if (/^pie\b/.test(firstLine)) return 'pie';
+  if (/^gantt\b/.test(firstLine)) return 'gantt';
+  return undefined;
+};
+
 let initialized = false;
-const ensureInit = (mermaidTheme) => {
-  let configObj = { theme: mermaidTheme || 'default' };
+
+// The rendered diagram's palette comes from the last VALID Mermaid Config
+// document (theme key included) — nothing overrides it, so a config theme
+// edit is always visible in the render. The header theme toggle keeps the
+// config document in sync through applyMermaidTheme().
+const ensureInit = () => {
+  let configObj = { theme: 'default' };
   try {
     if (store && store.lastValidMermaid) {
       configObj = JSON.parse(store.lastValidMermaid);
-      if (mermaidTheme) {
-        configObj.theme = mermaidTheme;
-      }
     }
-  } catch (e) {
-    // fallback
+  } catch {
+    configObj = { theme: 'default' };
   }
-
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'loose',
+    logLevel: 'fatal',
     ...configObj
   });
   initialized = true;
@@ -124,8 +174,8 @@ const ensureInit = (mermaidTheme) => {
 
 let renderSeq = 0;
 
-// Parse the source to detect syntax errors and the diagram type without
-// touching the DOM. Throws on invalid syntax.
+// Parse the source to detect syntax errors without touching the DOM.
+// Throws on invalid syntax.
 export const parse = async (code) => {
   if (!initialized) ensureInit();
   const result = await mermaid.parse(code, { suppressErrors: false });
@@ -133,8 +183,8 @@ export const parse = async (code) => {
 };
 
 // Render the diagram source into an <svg>. Returns the svg markup string.
-export const render = async (code, mermaidTheme) => {
-  ensureInit(mermaidTheme);
+export const render = async (code) => {
+  ensureInit();
   const id = `graph-${++renderSeq}`;
   const { svg } = await mermaid.render(id, code);
   return svg;

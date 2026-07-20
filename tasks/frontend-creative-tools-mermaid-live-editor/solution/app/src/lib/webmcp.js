@@ -2,7 +2,7 @@
 // command the visible UI uses — there are no success paths the UI lacks.
 import { store, setCode, setEditorMode, setTheme, loadSample, getSessionJSON, importSessionJSON, importMMD } from './state.svelte.js';
 import { SAMPLE_DIAGRAMS } from './mermaid.js';
-import { downloadSVG, downloadPNG, copySVGMarkup, downloadMMD, downloadJSON, copyToClipboard } from './export.js';
+import { downloadSVG, downloadPNG, copyImage, downloadMMD, downloadJSON } from './export.js';
 
 const SESSION = {
   contract_version: 'zto-webmcp-v1',
@@ -30,7 +30,12 @@ const TOOLS = [
       setEditorMode('code');
       setCode(String(content));
       await waitForPreview();
-      return { ok: true, editorMode: store.editorMode, error: store.error ?? null };
+      return {
+        ok: true,
+        editorMode: store.editorMode,
+        diagramType: store.diagramType ?? null,
+        error: store.error ?? null
+      };
     }
   },
   {
@@ -120,11 +125,12 @@ const TOOLS = [
   {
     name: 'artifact_copy',
     module: 'artifact-transfer-v1',
-    description: 'Copy the current rendered diagram SVG markup or Session JSON to the clipboard.',
+    description:
+      'Copy the current rendered diagram to the clipboard as a PNG image (falls back to SVG markup text).',
     parameters: { type: 'object', properties: {} },
     handler: async () => {
-      const length = await copySVGMarkup();
-      return { ok: true, copied: true, length };
+      const what = await copyImage();
+      return { ok: true, copied: what };
     }
   },
   {
@@ -139,13 +145,21 @@ const TOOLS = [
     handler: async ({ mode, payload }) => {
       if (mode === 'mmd') {
         const result = importMMD(payload);
-        if (!result.ok) throw new Error(result.error);
+        if (!result.ok) throw new Error(result.message ?? 'Import failed');
       } else {
         const result = importSessionJSON(payload);
-        if (!result.ok) throw new Error(result.error);
+        if (!result.ok) {
+          throw new Error(`Invalid field '${result.field}': ${result.message}`);
+        }
       }
       await waitForPreview();
-      return { ok: true, mode };
+      return {
+        ok: true,
+        mode,
+        diagramType: store.diagramType ?? null,
+        appTheme: store.theme,
+        activeTab: store.editorMode
+      };
     }
   }
 ];
