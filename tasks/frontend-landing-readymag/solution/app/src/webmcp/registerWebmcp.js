@@ -1,29 +1,17 @@
-/**
- * WebMCP surface for the Readymag homepage (contract zto-webmcp-v1).
- *
- * Exposes window.webmcp_session_info(), window.webmcp_list_tools(), and
- * window.webmcp_invoke_tool(name, args). Every tool calls the SAME state
- * setter/ref the visible UI control uses — no success path the UI lacks.
- *
- * Modules:
- * - browse-query-v1 (prefix "browse"): browse_open scrolls an on-page section
- *   into view (hero, workflow, teams, support, closing).
- * - command-session-v1 (prefix "session"): session_advance advances the
- *   six-image project slideshow (same call as its 2200ms timed advance);
- *   session_trigger_demo with demo="solutions-menu" opens the Solutions
- *   combobox menu (same call as clicking the Solutions trigger).
- */
-
 const CONTRACT = 'zto-webmcp-v1'
-const DESTINATIONS = ['hero', 'workflow', 'teams', 'support', 'closing']
-const SESSION_OPERATIONS = ['advance']
+const DESTINATIONS = ['hero', 'workflow', 'teams', 'support', 'closing', 'trial-brief']
+const SESSION_OPERATIONS = ['advance', 'trigger_demo']
 const DEMOS = ['solutions-menu']
 
-// Handlers the React components populate (in useEffect) so WebMCP drives the
-// exact same state as the visible controls.
 export const webmcpBus = {
-  advanceSlideshow: null, // () => { ok, active }
-  openSolutions: null, // () => { ok, expanded }
+  advanceSlideshow: null,
+  openSolutions: null,
+  validateBrief: null,
+  submitBrief: null,
+  resetBrief: null,
+  exportBrief: null,
+  copyBrief: null,
+  importBrief: null
 }
 
 function scrollToSection(dest) {
@@ -36,8 +24,7 @@ function scrollToSection(dest) {
 const tools = {
   browse_open: {
     module: 'browse-query-v1',
-    description:
-      'Open (scroll into view) an on-page section. destination: one of hero, workflow, teams, support, closing.',
+    description: 'Open section',
     handler: (args) => {
       const dest = (args || {}).destination
       if (!DESTINATIONS.includes(dest)) {
@@ -48,28 +35,70 @@ const tools = {
   },
   session_advance: {
     module: 'command-session-v1',
-    description: 'Advance the six-image project slideshow to its next slide (same as the timed advance).',
+    description: 'Advance slideshow',
     handler: () => {
-      if (typeof webmcpBus.advanceSlideshow !== 'function') {
-        return { ok: false, error: 'slideshow not ready' }
-      }
+      if (typeof webmcpBus.advanceSlideshow !== 'function') return { ok: false, error: 'not ready' }
       return webmcpBus.advanceSlideshow()
     },
   },
   session_trigger_demo: {
     module: 'command-session-v1',
-    description: 'Trigger a demo. demo="solutions-menu" opens the Solutions combobox menu (same as clicking Solutions).',
+    description: 'Trigger demo',
     handler: (args) => {
       const demo = (args || {}).demo
-      if (demo !== 'solutions-menu') {
-        return { ok: false, error: 'demo must be one of solutions-menu' }
-      }
-      if (typeof webmcpBus.openSolutions !== 'function') {
-        return { ok: false, error: 'solutions menu not ready' }
-      }
+      if (demo !== 'solutions-menu') return { ok: false, error: 'demo must be solutions-menu' }
+      if (typeof webmcpBus.openSolutions !== 'function') return { ok: false, error: 'not ready' }
       return webmcpBus.openSolutions()
     },
   },
+  form_validate: {
+    module: 'form-workflow-v1',
+    description: 'Validate form',
+    handler: () => {
+      if (typeof webmcpBus.validateBrief !== 'function') return { ok: false, error: 'not ready' }
+      return webmcpBus.validateBrief()
+    }
+  },
+  form_submit: {
+    module: 'form-workflow-v1',
+    description: 'Submit form',
+    handler: () => {
+      if (typeof webmcpBus.submitBrief !== 'function') return { ok: false, error: 'not ready' }
+      return webmcpBus.submitBrief()
+    }
+  },
+  form_reset: {
+    module: 'form-workflow-v1',
+    description: 'Reset form',
+    handler: () => {
+      if (typeof webmcpBus.resetBrief !== 'function') return { ok: false, error: 'not ready' }
+      return webmcpBus.resetBrief()
+    }
+  },
+  artifact_export: {
+    module: 'artifact-transfer-v1',
+    description: 'Export JSON',
+    handler: (args) => {
+      if (typeof webmcpBus.exportBrief !== 'function') return { ok: false, error: 'not ready' }
+      return webmcpBus.exportBrief(args.format)
+    }
+  },
+  artifact_copy: {
+    module: 'artifact-transfer-v1',
+    description: 'Copy JSON',
+    handler: () => {
+      if (typeof webmcpBus.copyBrief !== 'function') return { ok: false, error: 'not ready' }
+      return webmcpBus.copyBrief()
+    }
+  },
+  artifact_import: {
+    module: 'artifact-transfer-v1',
+    description: 'Import JSON',
+    handler: (args) => {
+      if (typeof webmcpBus.importBrief !== 'function') return { ok: false, error: 'not ready' }
+      return webmcpBus.importBrief(args.mode)
+    }
+  }
 }
 
 let installed = false
@@ -80,11 +109,16 @@ export function registerWebmcp() {
 
   window.webmcp_session_info = () => ({
     contract_version: CONTRACT,
-    app: 'readymag-homepage',
-    modules: ['browse-query-v1', 'command-session-v1'],
+    app: 'canvasly-homepage',
+    modules: ['browse-query-v1', 'command-session-v1', 'form-workflow-v1', 'artifact-transfer-v1'],
     destinations: DESTINATIONS,
     session_operations: SESSION_OPERATIONS,
     demos: DEMOS,
+    form_fields: ['name', 'email', 'plan', 'team_size', 'interests'],
+    form_operations: ['validate', 'submit', 'reset'],
+    artifact_operations: ['export', 'copy', 'import'],
+    export_formats: ['json'],
+    import_modes: ['replace'],
     tool_count: Object.keys(tools).length,
   })
 
