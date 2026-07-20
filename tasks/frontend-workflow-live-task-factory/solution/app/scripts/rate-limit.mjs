@@ -1,0 +1,28 @@
+import { chromium } from '/usr/lib/node_modules/playwright/index.mjs'
+
+const browser = await chromium.connectOverCDP('http://127.0.0.1:9222')
+const context = browser.contexts()[0]
+const page = await context.newPage()
+const logs = []
+page.on('console', (message) => { if (['error', 'warning'].includes(message.type())) logs.push(`${message.type()}: ${message.text()}`) })
+page.on('pageerror', (error) => logs.push(`pageerror: ${error.message}`))
+await page.setViewportSize({ width: 1440, height: 1000 })
+await page.goto('http://127.0.0.1:3000', { waitUntil: 'networkidle' })
+await page.evaluate(() => localStorage.clear())
+await page.reload({ waitUntil: 'networkidle' })
+await page.getByRole('button', { name: 'Runs', exact: true }).click()
+const driftlineRow = page.locator('.pr-row').filter({ hasText: 'nimbusworks/driftline' })
+await driftlineRow.getByRole('button', { name: /Run pipeline/ }).click()
+await page.locator('#stage-evaluate .status.status-retrying').waitFor({ timeout: 10000 })
+const retryText = await page.locator('#stage-evaluate').innerText()
+await page.getByRole('button', { name: 'Pause' }).click()
+await page.waitForTimeout(1200)
+const pausedCountdown = await page.locator('#stage-evaluate .notice').innerText()
+await page.waitForTimeout(1400)
+const pausedCountdownLater = await page.locator('#stage-evaluate .notice').innerText()
+await page.getByRole('button', { name: 'Resume' }).click()
+await page.locator('#stage-package .status.status-complete').waitFor({ timeout: 30000 })
+const attemptText = await page.locator('#stage-evaluate .status').last().textContent()
+console.log(JSON.stringify({ saw429: retryText.includes('429'), pausedCountdown, pausedCountdownLater, pausedFrozen: pausedCountdown === pausedCountdownLater, finalEvaluateStatus: attemptText, logs }, null, 2))
+await page.close()
+await browser.close()
