@@ -1,0 +1,76 @@
+
+> md-uy-collaborative-markdown@1.0.0 dev
+> vite
+
+1:11:15 PM [vite] (client) Forced re-optimization of dependencies
+
+  VITE v6.4.3  ready in 1147 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: use --host to expose
+1:16:32 PM [vite-plugin-svelte] svelte config changed: restarting vite server. - file: /app/tasks/frontend-productivity-md-uy/solution/app/svelte.config.js
+1:16:32 PM [vite] (client) Re-optimizing dependencies because lockfile has changed
+1:16:32 PM [vite] server restarted.
+1:17:57 PM [vite] vite.config.ts changed, restarting server...
+src/app.html does not exist
+1:17:57 PM [vite] (client) Forced re-optimization of dependencies
+1:17:57 PM [vite] server restarted.
+src/app.html does not exist
+src/app.html does not exist
+1:18:17 PM [vite] (client) page reload index.html
+1:18:23 PM [vite] (client) page reload src/app.html
+1:18:23 PM [vite] (client) page reload src/app.html
+1:21:08 PM [vite] (client) page reload build/index.html
+1:34:05 PM [vite] (client) page reload build/index.html
+1:40:00 PM [vite] (client) page reload build/index.html
+1:42:54 PM [vite] (client) page reload build/index.html
+1:42:54 PM [vite] (client) page reload build/index.html
+1:58:12 PM [vite] (client) page reload build/index.html
+2:02:04 PM [vite] (client) page reload build/index.html
+2:07:20 PM [vite] (client) page reload build/index.html
+2:09:42 PM [vite] (client) page reload build/index.html
+2:29:27 PM [vite] (client) page reload build/index.html
+2:33:06 PM [vite] (client) page reload build/index.html
+2:36:21 PM [vite] (client) page reload build/index.html
+2:39:40 PM [vite-plugin-svelte] src/routes/[...path]/+page.svelte:27:36 This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+2:39:40 PM [vite-plugin-svelte] src/routes/[...path]/+page.svelte:47:33 This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+2:39:49 PM [vite] (client) ✨ new dependencies optimized: yjs, marked, sveltekit-superforms, bits-ui, sveltekit-superforms/adapters, zod, nanoid, y-indexeddb, y-codemirror.next, codemirror, @codemirror/state, @codemirror/lang-markdown
+2:39:49 PM [vite] (client) ✨ optimized dependencies changed. reloading
+The file does not exist at "/app/tasks/frontend-productivity-md-uy/solution/app/node_modules/.vite/deps/chunk-76IAQEHP.js?v=4c0e89d1" which is in the optimize deps directory. The dependency might be incompatible with the dep optimizer. Try adding it to `optimizeDeps.exclude`.
+The file does not exist at "/app/tasks/frontend-productivity-md-uy/solution/app/node_modules/.vite/deps/chunk-HHGL4BBH.js?v=4c0e89d1" which is in the optimize deps directory. The dependency might be incompatible with the dep optimizer. Try adding it to `optimizeDeps.exclude`.
+2:39:51 PM [vite-plugin-svelte] src/routes/[...path]/+page.svelte:27:36 This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+2:39:51 PM [vite-plugin-svelte] src/routes/[...path]/+page.svelte:47:33 This reference only captures the initial value of `data`. Did you mean to reference it inside a closure instead?
+https://svelte.dev/e/state_referenced_locally
+2:40:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+2:40:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+2:40:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+2:40:15 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+2:40:15 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:40:15 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+2:40:15 PM [vite] (ssr) page reload .svelte-kit/generated/shared/error-template.js
+2:40:15 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+2:40:15 PM [vite] (client) page reload .svelte-kit/generated/root.js
+2:40:15 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+2:40:22 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+2:40:22 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+2:40:22 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+2:40:22 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+2:40:22 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:40:22 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+2:40:22 PM [vite] (ssr) page reload .svelte-kit/generated/shared/error-template.js
+2:40:22 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+2:40:22 PM [vite] (client) page reload .svelte-kit/generated/root.js
+2:40:22 PM [vite] (ssr) page reload .svelte-kit/generated/root.js
+2:40:39 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/0.js
+2:40:39 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/1.js
+2:40:39 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/2.js
+2:40:39 PM [vite] (client) page reload .svelte-kit/generated/client/nodes/3.js
+2:40:39 PM [vite] (client) page reload .svelte-kit/generated/client/app.js
+2:40:39 PM [vite] (client) page reload .svelte-kit/generated/client/matchers.js
+2:40:39 PM [vite] (ssr) page reload .svelte-kit/generated/shared/error-template.js
+2:40:39 PM [vite] (ssr) page reload .svelte-kit/generated/server/internal.js
+2:40:39 PM [vite] (client) page reload .svelte-kit/generated/root.js
+2:40:39 PM [vite] (ssr) page reload .svelte-kit/generated/root.js

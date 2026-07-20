@@ -1,14 +1,20 @@
 <script lang="ts">
+	import { fade } from 'svelte/transition';
+	import { prefersReducedMotion } from 'svelte/motion';
 	import { marked } from 'marked';
 	import * as Y from 'yjs';
 	import { onMount, onDestroy } from 'svelte';
 
-	let { ytext, isVisible } = $props<{ ytext: Y.Text; isVisible: boolean }>();
+	let { ytext, isVisible } = $props<{ ytext: Y.Text | null; isVisible: boolean }>();
 
 	let currentSlide = $state(0);
 	let slides = $state<string[]>([]);
 
 	const parseSlides = () => {
+		if (!ytext) {
+			slides = [];
+			return;
+		}
 		const content = ytext.toString() as string;
 		const rawSlides = content.split(/^\s*---\s*$/m);
 		slides = rawSlides.map(
@@ -35,19 +41,23 @@
 		}
 	};
 
-	onMount(() => {
+	$effect(() => {
+		if (!ytext) return;
 		parseSlides();
 		window.addEventListener('keydown', handleKeydown);
-		ytext.observe(parseSlides);
+		const observer = () => parseSlides();
+		ytext.observe(observer);
+		return () => {
+			window.removeEventListener('keydown', handleKeydown);
+			if (ytext) ytext.unobserve(observer);
+		};
 	});
-	onDestroy(() => {
-		window.removeEventListener('keydown', handleKeydown);
-	});
+
 </script>
 
 <div
 	class="bg-card relative flex h-full w-full flex-col overflow-hidden rounded"
-	class:hidden={!isVisible}
+	class:hidden={!isVisible} in:fade|global={{ duration: prefersReducedMotion.current ? 0 : 150 }} out:fade|global={{ duration: prefersReducedMotion.current ? 0 : 150 }}
 >
 	{#if slides.length === 0 && isVisible}
 		<div class="text-foreground/40 absolute top-5.5 left-4 z-10 sm:left-11">
@@ -79,7 +89,7 @@
 				<button
 					class="border-input bg-background hover:bg-accent hover:text-accent-foreground h-7 rounded border px-2 text-xs font-medium transition-colors disabled:opacity-50"
 					onclick={nextSlide}
-					disabled={currentSlide >= slides.length - 1}>Next</button
+					disabled={currentSlide >= Math.max(0, slides.length - 1)}>Next</button
 				>
 			</div>
 		</div>
