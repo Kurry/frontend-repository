@@ -279,6 +279,8 @@ function makeSeedJobs(): Job[] {
 }
 
 const timers = new Map<string, number>()
+const launchLocks = new Set<string>()
+const createLocks = new Set<string>()
 
 function snapshotOf(state: Pick<Store, 'jobs' | 'selectedJobId' | 'selectedRunId'>): Snapshot {
   return deepClone({ jobs: state.jobs, selectedJobId: state.selectedJobId, selectedRunId: state.selectedRunId })
@@ -324,7 +326,7 @@ export const useBatchStore = create<Store>()((set, get) => ({
     compareOpen: false,
     deleteJobId: null,
     inspectorIndex: null,
-    sidebarOpen: false,
+    sidebarOpen: typeof window !== 'undefined' && window.matchMedia('(min-width: 769px)').matches,
     timelineFilter: 'all',
     highlightedIndex: null,
     compareA: null,
@@ -338,6 +340,9 @@ export const useBatchStore = create<Store>()((set, get) => ({
   }),
   selectRun: (id) => set((state) => ({ selectedRunId: id, ui: { ...state.ui, inspectorIndex: null, highlightedIndex: null } })),
   createJob: (payload) => {
+    if (createLocks.has('create')) return ''
+    createLocks.add('create')
+    window.setTimeout(() => createLocks.delete('create'), 600)
     const parsed = createJobSchema.parse(payload)
     const id = uid('job')
     set((state) => ({
@@ -381,8 +386,11 @@ export const useBatchStore = create<Store>()((set, get) => ({
     const state = get()
     const id = explicitId ?? state.selectedJobId
     if (!id) return
+    if (launchLocks.has(id)) return
     const job = state.jobs.find((entry) => entry.id === id)
     if (!job || job.status === 'Running' || job.status === 'Paused') return
+    launchLocks.add(id)
+    window.setTimeout(() => launchLocks.delete(id), 600)
     const ordinal = job.runs.length + 1
     const items = makeItems(job.dataset)
     const run: Run = {
@@ -465,7 +473,16 @@ export const useBatchStore = create<Store>()((set, get) => ({
           ...run,
           status: 'running',
           endedAt: undefined,
-          items: run.items.map((item) => item.status === 'failed' ? { ...item, status: 'pending', error: undefined, manualRetry: true, reconciling: true } : item),
+          items: run.items.map((item) => item.status === 'failed' ? {
+            ...item,
+            status: 'pending',
+            error: undefined,
+            output: null,
+            manualRetry: true,
+            attempts: 1,
+            latencyMs: null,
+            reconciling: true,
+          } : item),
           queue: [...run.queue, ...failed.map((item) => item.index)],
           timeline: [...run.timeline, ...failed.map((item) => timelineEntry(item.index, 'pending', `Item ${item.index + 1} re-queued by operator`))],
           updatedAt: Date.now(),

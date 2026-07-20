@@ -102,9 +102,9 @@ function App() {
         <div className="topbar-spacer" />
         <IconButton className="desktop-tool" kind="ghost" size="md" label="Undo last state edit" disabled={!pastLength} onClick={undo}><Undo /></IconButton>
         <IconButton className="desktop-tool" kind="ghost" size="md" label="Redo state edit" disabled={!futureLength} onClick={redo}><Redo /></IconButton>
-        <Button className="desktop-tool" kind="ghost" size="sm" renderIcon={Calendar} onClick={() => setUi({ calendarOpen: true })}>Calendar ({scheduledCount})</Button>
-        <Button className="desktop-tool" kind="ghost" size="sm" renderIcon={DocumentImport} onClick={() => setUi({ importOpen: true })}>Import run</Button>
-        <Button size="sm" renderIcon={Add} onClick={() => setUi({ composerOpen: true, editingJobId: null })}>New job</Button>
+        <Button className="desktop-tool" kind="ghost" size="sm" renderIcon={Calendar} data-modal-opener="calendar" onClick={() => setUi({ calendarOpen: true })}>Calendar ({scheduledCount})</Button>
+        <Button className="desktop-tool" kind="ghost" size="sm" renderIcon={DocumentImport} data-modal-opener="import" onClick={() => setUi({ importOpen: true })}>Import run</Button>
+        <Button size="sm" renderIcon={Add} data-modal-opener="composer" onClick={() => setUi({ composerOpen: true, editingJobId: null })}>New job</Button>
       </header>
       <div className="workspace">
         {ui.sidebarOpen && <button className="sidebar-backdrop" aria-label="Close job sidebar" onClick={() => setUi({ sidebarOpen: false })} />}
@@ -121,7 +121,6 @@ function App() {
       <CalendarModal />
       <CompareModal />
       <DeleteModal />
-      {selectedJob && selectedRun && ui.inspectorIndex !== null && <Inspector job={selectedJob} run={selectedRun} itemIndex={ui.inspectorIndex} />}
       {ui.toast && <div className="toast-layer"><ToastNotification kind={ui.toast.kind} lowContrast title={ui.toast.title} subtitle={ui.toast.subtitle} timeout={0} onCloseButtonClick={clearToast} /></div>}
       <div className="sr-only" aria-live="polite" aria-atomic="true">{ui.announcement}</div>
     </div>
@@ -164,7 +163,7 @@ function JobSidebar() {
 
 function EmptySelection() {
   const setUi = useBatchStore((state) => state.setUi)
-  return <div className="empty-state"><div className="empty-state-inner"><div className="empty-icon"><Events size={24} /></div><h1 className="text-2xl font-normal">No job selected</h1><p className="mt-2 mb-5 text-sm text-subtle">Select a job from the sidebar to inspect its runs, or compose a new API-shaped batch job.</p><Button renderIcon={Add} onClick={() => setUi({ composerOpen: true, editingJobId: null })}>Create a job</Button></div></div>
+  return <div className="empty-state"><div className="empty-state-inner"><div className="empty-icon"><Events size={24} /></div><h1 className="text-2xl font-normal">No job selected</h1><p className="mt-2 mb-5 text-sm text-subtle">Select a job from the sidebar to inspect its runs, or compose a new API-shaped batch job.</p><Button renderIcon={Add} data-modal-opener="composer" onClick={() => setUi({ composerOpen: true, editingJobId: null })}>Create a job</Button></div></div>
 }
 
 function JobDetail({ job, run }: { job: Job; run?: Run }) {
@@ -193,11 +192,11 @@ function JobDetail({ job, run }: { job: Job; run?: Run }) {
         </div>
         <div className="action-row" aria-label="Job actions">
           <Button kind="ghost" size="sm" renderIcon={Edit} onClick={() => setUi({ composerOpen: true, editingJobId: job.id })}>Edit</Button>
-          <Button kind="ghost" size="sm" renderIcon={CalendarAdd} onClick={() => setUi({ scheduleOpen: true })}>Schedule</Button>
+          <Button kind="ghost" size="sm" renderIcon={CalendarAdd} data-modal-opener="schedule" onClick={() => setUi({ scheduleOpen: true })}>Schedule</Button>
           <Button kind="ghost" size="sm" renderIcon={Compare} disabled={job.runs.length < 2} onClick={openCompare}>Compare runs</Button>
           <OpenExportButton kind="ghost" size="sm" />
-          <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} onClick={() => requestDelete(job.id)}>Delete</Button>
-          {isRunning ? <Button size="sm" renderIcon={Pause} onClick={() => pauseJob(job.id)}>Pause</Button> : isPaused ? <Button size="sm" renderIcon={Play} onClick={() => resumeJob(job.id)}>Resume</Button> : <Button size="sm" renderIcon={Launch} disabled={!canLaunch} onClick={() => launchJob(job.id)}>Launch</Button>}
+          <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} data-modal-opener="delete" onClick={() => requestDelete(job.id)}>Delete</Button>
+          {isRunning ? <Button size="sm" renderIcon={Pause} onClick={() => pauseJob(job.id)}>Pause</Button> : isPaused ? <Button size="sm" renderIcon={Play} onClick={() => resumeJob(job.id)}>Resume</Button> : <Button size="sm" renderIcon={Launch} disabled={!canLaunch} data-action="launch-job" onClick={() => launchJob(job.id)}>Launch</Button>}
         </div>
       </section>
       {!run ? <ReadyState job={job} /> : <RunWorkspace job={job} run={run} />}
@@ -249,6 +248,7 @@ function RunWorkspace({ job, run }: { job: Job; run: Run }) {
       <div className="content-grid">
         <ExecutionGrid run={run} />
         <div className="side-stack"><PendingQueue run={run} /><Timeline run={run} /><RunHistory job={job} run={run} /></div>
+        <InspectorPanel job={job} run={run} />
       </div>
     </>
   )
@@ -268,15 +268,16 @@ function ExecutionGrid({ run }: { run: Run }) {
       <div className="panel-head"><div><h2 className="panel-heading">Per-item execution</h2><p className="panel-caption">Virtualized · {run.items.length} item rows</p></div><Tag type={run.status === 'running' ? 'blue' : run.status === 'paused' ? 'warm-gray' : 'gray'}>{run.status}</Tag></div>
       <div className="virtual-grid" ref={parentRef} role="grid" aria-rowcount={run.items.length} tabIndex={0}>
         <div className="grid-header" role="row"><span role="columnheader">Row</span><span role="columnheader">Input</span><span role="columnheader">Status</span><span role="columnheader">Attempts</span><span role="columnheader">Latency</span><span role="columnheader">Cost</span></div>
-        <div style={{ height: `${virtualizer.getTotalSize() + 40}px`, minWidth: '47rem', position: 'relative' }}>
+        <div style={{ height: `${virtualizer.getTotalSize() + 40}px`, position: 'relative', width: '100%' }}>
           {virtualizer.getVirtualItems().map((virtualRow) => {
             const item = run.items[virtualRow.index]
             const countdown = item.retryAt ? Math.max(0, Math.ceil((item.retryAt - Date.now()) / 1000)) : undefined
+            const settling = item.status === 'complete' && item.completedAt && Date.now() - Date.parse(item.completedAt) < 400
             return (
               <button
                 key={item.index}
-                className={`grid-row ${highlightedIndex === item.index ? 'highlighted' : ''} ${item.reconciling ? 'reconciling' : ''}`}
-                style={{ transform: `translateY(${virtualRow.start}px)` }}
+                className={`grid-row ${highlightedIndex === item.index ? 'highlighted' : ''} ${inspectorIndex === item.index ? 'inspected' : ''} ${item.reconciling ? 'reconciling' : ''} ${settling ? 'item-settling' : ''}`}
+                style={{ transform: `translateY(${virtualRow.start}px)`, animationDelay: settling ? `${(item.index % 8) * 60}ms` : undefined }}
                 role="row"
                 aria-rowindex={item.index + 1}
                 aria-label={`Inspect item ${item.index + 1}, ${item.status}`}
@@ -302,6 +303,17 @@ function PendingQueue({ run }: { run: Run }) {
   const moveQueueItem = useBatchStore((state) => state.moveQueueItem)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const visibleQueue = run.queue.slice(0, 80)
+
+  const focusQueueEntry = (itemIndex: number) => {
+    window.requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>(`[data-queue-item="${itemIndex}"] [aria-label^="Move item"]`)?.focus()
+    })
+  }
+
+  const moveEntry = (itemIndex: number, direction: -1 | 1) => {
+    moveQueueItem(itemIndex, direction)
+    focusQueueEntry(itemIndex)
+  }
   return (
     <section className="panel" aria-label="Pending queue">
       <div className="panel-head"><div><h2 className="panel-heading">Pending queue</h2><p className="panel-caption">Launch order · drag or use arrow controls</p></div><Tag size="sm" type="gray">{run.queue.length}</Tag></div>
@@ -309,6 +321,7 @@ function PendingQueue({ run }: { run: Run }) {
         const item = run.items[itemIndex]
         return <div
           key={itemIndex}
+          data-queue-item={itemIndex}
           className={`queue-entry ${dragIndex === position ? 'dragging' : ''}`}
           draggable
           onDragStart={(event) => { setDragIndex(position); event.dataTransfer.effectAllowed = 'move'; event.dataTransfer.setData('text/plain', String(position)) }}
@@ -318,7 +331,7 @@ function PendingQueue({ run }: { run: Run }) {
         >
           <span className="queue-handle" aria-hidden="true">⋮⋮</span>
           <span className="queue-copy"><span className="queue-index">#{item.index + 1}</span><span className="queue-input" title={item.input}>{summarize(item.input)}</span></span>
-          <span className="queue-buttons"><button className="mini-icon-button" aria-label={`Move item ${item.index + 1} up`} disabled={position === 0} onClick={() => moveQueueItem(itemIndex, -1)}><ArrowUp size={14} /></button><button className="mini-icon-button" aria-label={`Move item ${item.index + 1} down`} disabled={position === run.queue.length - 1} onClick={() => moveQueueItem(itemIndex, 1)}><ArrowDown size={14} /></button></span>
+          <span className="queue-buttons"><button type="button" className="mini-icon-button queue-move" aria-label={`Move item ${item.index + 1} up`} disabled={position === 0} onClick={() => moveEntry(itemIndex, -1)}><ArrowUp size={14} /></button><button type="button" className="mini-icon-button queue-move" aria-label={`Move item ${item.index + 1} down`} disabled={position === run.queue.length - 1} onClick={() => moveEntry(itemIndex, 1)}><ArrowDown size={14} /></button></span>
         </div>
       })}{run.queue.length > visibleQueue.length && <div className="panel-empty">Showing the next {visibleQueue.length} of {run.queue.length} queued items.</div>}</div> : <div className="panel-empty">No pending items. New work appears here before it starts.</div>}
     </section>
@@ -353,40 +366,57 @@ function RunHistory({ job, run }: { job: Job; run: Run }) {
 }
 
 function TokenDiff({ expected, actual }: { expected: string; actual: string }) {
-  const expectedTokens = expected.split(/(\s+)/)
-  const actualTokens = actual.split(/(\s+)/)
+  const expectedTokens = expected.trim().split(/\s+/).filter(Boolean)
+  const actualTokens = actual.trim().split(/\s+/).filter(Boolean)
   const max = Math.max(expectedTokens.length, actualTokens.length)
-  return <div>{Array.from({ length: max }, (_, index) => {
+  return <div className="token-diff">{Array.from({ length: max }, (_, index) => {
     const act = actualTokens[index]
     const exp = expectedTokens[index]
-    const token = act !== undefined ? act : `∅ ${exp || ''}`
-    if (/^\s+$/.test(token)) return <span key={index}>{token}</span>
+    if (act === undefined && exp !== undefined) {
+      return <span key={index} className="diff-token different" title={`Different from expected: ${exp}`}>≠ missing: {exp}</span>
+    }
+    if (exp === undefined && act !== undefined) {
+      return <span key={index} className="diff-token different" title="Extra output not in expected">≠ extra: {act}</span>
+    }
     const match = act === exp
-    const title = match ? 'Matching segment' : (exp !== undefined ? `Different from expected: ${exp}` : 'Extra output not in expected')
-    return <span key={index} className={`diff-token ${match ? 'match' : 'different'}`} title={title}>{match ? '✓ ' : '≠ '}{token}</span>
+    const title = match ? 'Matching segment' : `Different from expected: ${exp}`
+    return <span key={index} className={`diff-token ${match ? 'match' : 'different'}`} title={title}>{match ? '✓ ' : '≠ '}{act}</span>
   })}</div>
 }
 
-function Inspector({ job, run, itemIndex }: { job: Job; run: Run; itemIndex: number }) {
+function InspectorPanel({ job, run }: { job: Job; run: Run }) {
+  const inspectorIndex = useBatchStore((state) => state.ui.inspectorIndex)
   const setUi = useBatchStore((state) => state.setUi)
-  const item = run.items.find((entry) => entry.index === itemIndex)
-  if (!item) return null
-  const match = item.expected !== undefined && item.output === item.expected
+  const item = inspectorIndex === null ? null : run.items.find((entry) => entry.index === inspectorIndex)
+  const match = item?.expected !== undefined && item.output !== null && item.output.trim() === item.expected.trim()
+
   return (
-    <>
-      <button className="inspector-scrim" aria-label="Close result inspector" onClick={() => setUi({ inspectorIndex: null })} />
-      <aside className="inspector" aria-label={`Result inspector for item ${item.index + 1}`}>
-        <div className="inspector-head"><div><div className="topbar-kicker">Result inspector</div><h2 className="text-lg font-semibold">Item {item.index + 1}</h2></div><IconButton kind="ghost" label="Close inspector" onClick={() => setUi({ inspectorIndex: null })}><Close /></IconButton></div>
-        <div className="inspector-body">
-          <div className="flex flex-wrap gap-2"><StatusBadge status={item.status} /><Tag type="gray">{item.attempts} {item.attempts === 1 ? 'attempt' : 'attempts'}</Tag><Tag type="blue">{formatMoney(item.cost)}</Tag>{item.latencyMs !== null && <Tag type="cool-gray">{Math.round(item.latencyMs)} ms</Tag>}</div>
-          <section className="inspect-section"><div className="inspect-label">Full input</div><div className="inspect-content">{item.input}</div></section>
-          <section className="inspect-section"><div className="inspect-label">Full simulated output</div><div className="inspect-content">{item.output ?? (item.error ? `No output — ${item.error}` : 'Output has not been produced yet.')}</div></section>
-          {item.expected !== undefined && <section className="inspect-section"><div className="inspect-label flex justify-between"><span>Expected / actual comparison</span><Tag size="sm" type={match ? 'green' : 'red'}>{match ? '✓ Match' : '≠ Mismatch'}</Tag></div><div className="inspect-content diff-block"><div className={match ? 'diff-line diff-match' : 'diff-line diff-expected'}><strong>Expected:</strong> {item.expected}</div><div className={match ? 'diff-line diff-match' : 'diff-line diff-actual'}><strong>Actual:</strong> {item.output ?? '∅ no output'}</div>{item.output && <TokenDiff expected={item.expected} actual={item.output} />}</div></section>}
-          <section className="inspect-section"><div className="inspect-label">Attempts log</div>{item.attemptsLog.length ? item.attemptsLog.map((attempt, index) => <div className="attempt-line" key={`${attempt.attempt}-${index}`}><strong>Attempt {attempt.attempt}</strong><span>{new Date(attempt.timestamp).toLocaleString()}<br /><span className="text-subtle">{attempt.detail}</span></span>{attempt.outcome === 'complete' ? <CheckmarkFilled className="text-success" /> : <ErrorFilled className="text-danger" />}</div>) : <div className="panel-empty">No attempts have started for this item.</div>}</section>
-          <p className="text-xs text-subtle">Model: {job.model} · Run started {new Date(run.startedAt).toLocaleString()}</p>
-        </div>
-      </aside>
-    </>
+    <aside className={`inspector-dock ${item ? 'open' : ''}`} aria-label="Result inspector">
+      <div className="inspector-head"><div><div className="topbar-kicker">Result inspector</div><h2 className="panel-heading">{item ? `Item ${item.index + 1}` : 'Select a row'}</h2></div>{item && <IconButton kind="ghost" label="Close inspector" onClick={() => setUi({ inspectorIndex: null })}><Close /></IconButton>}</div>
+      <div className="inspector-body">
+        {!item ? (
+          <div className="panel-empty">Click an execution grid row to inspect full input, simulated output, attempts log, and expected comparison.</div>
+        ) : (
+          <>
+            <div className="flex flex-wrap gap-2"><StatusBadge status={item.status} /><Tag type="gray">{item.attempts} {item.attempts === 1 ? 'attempt' : 'attempts'}</Tag><Tag type="blue">{formatMoney(item.cost)}</Tag>{item.latencyMs !== null && <Tag type="cool-gray">{Math.round(item.latencyMs)} ms</Tag>}</div>
+            <section className="inspect-section"><div className="inspect-label">Full input</div><div className="inspect-content">{item.input}</div></section>
+            <section className="inspect-section"><div className="inspect-label">Full simulated output</div><div className="inspect-content">{item.output ?? (item.error ? `No output — ${item.error}` : 'Output has not been produced yet.')}</div></section>
+            {item.expected !== undefined && item.output !== null && (
+              <section className="inspect-section">
+                <div className="inspect-label flex justify-between"><span>Expected / actual comparison</span><Tag size="sm" type={match ? 'green' : 'red'}>{match ? '✓ Match' : '≠ Mismatch'}</Tag></div>
+                <div className="inspect-content diff-block">
+                  <div className={match ? 'diff-line diff-match' : 'diff-line diff-expected'}><strong>Expected:</strong> {item.expected}</div>
+                  <div className={match ? 'diff-line diff-match' : 'diff-line diff-actual'}><strong>Actual:</strong> {item.output}</div>
+                  <TokenDiff expected={item.expected} actual={item.output} />
+                </div>
+              </section>
+            )}
+            <section className="inspect-section"><div className="inspect-label">Attempts log</div>{item.attemptsLog.length ? item.attemptsLog.map((attempt, index) => <div className="attempt-line" key={`${attempt.attempt}-${index}`}><strong>Attempt {attempt.attempt}</strong><span>{new Date(attempt.timestamp).toLocaleString()}<br /><span className="text-subtle">{attempt.detail}</span></span>{attempt.outcome === 'complete' ? <CheckmarkFilled className="text-success" /> : <ErrorFilled className="text-danger" />}</div>) : <div className="panel-empty">No attempts have started for this item.</div>}</section>
+            <p className="text-xs text-subtle">Model: {job.model} · Run started {new Date(run.startedAt).toLocaleString()}</p>
+          </>
+        )}
+      </div>
+    </aside>
   )
 }
 
