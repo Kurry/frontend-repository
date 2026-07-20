@@ -70,14 +70,15 @@
 </script>
 
 {#if store.paletteOpen}
-  <div class="fixed inset-0 z-[60] flex items-start justify-center pt-20 px-4">
+  <div class="fixed inset-0 z-[60] flex items-start sm:items-start justify-center p-4 pt-[max(1rem,env(safe-area-inset-top))] sm:pt-20 overflow-y-auto">
     <button class="absolute inset-0 bg-black/40 cursor-default" aria-label="Close command palette" onclick={close} tabindex="-1"></button>
     <div
       bind:this={dialogRef}
-      class="relative w-full max-w-lg bg-white rounded-xl shadow-2xl overflow-hidden drawer-enter"
+      class="relative w-full max-w-lg max-h-[min(80vh,calc(100vh-2rem))] bg-white rounded-xl shadow-2xl overflow-hidden drawer-enter my-auto sm:my-0"
       role="dialog"
       aria-modal="true"
       aria-label="Command palette"
+      tabindex="-1"
       onkeydown={onKeydown}
     >
       <input

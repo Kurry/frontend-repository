@@ -231,7 +231,7 @@ class AppStore {
       parentId,
       collapsed: false,
     };
-    this.folders.push(folder);
+    this.folders = [...this.folders, folder];
     addToast('Folder created');
     return folder;
   }
@@ -293,7 +293,13 @@ class AppStore {
 
   // --- Note operations ---
 
+  #creatingNote = false;
+
   createNote(folderId: string | null = null): Note | null {
+    if (this.#creatingNote) return null;
+    this.#creatingNote = true;
+    queueMicrotask(() => { this.#creatingNote = false; });
+
     this.#capture();
     const now = Date.now();
     const note: Note = {
@@ -309,7 +315,7 @@ class AppStore {
       updatedAt: now,
       deleted: false,
     };
-    this.notes.push(note);
+    this.notes = [...this.notes, note];
     this.selectedNoteId = note.id;
     addToast('Note created');
     return note;
@@ -407,7 +413,8 @@ class AppStore {
   addImage(noteId: string, dataUrl: string, name: string): void {
     const note = this.notes.find(n => n.id === noteId);
     if (note) {
-      note.images.push({ id: generateId(), dataUrl, name });
+      this.#capture();
+      note.images = [...note.images, { id: generateId(), dataUrl, name }];
       note.updatedAt = Date.now();
     }
   }
@@ -423,8 +430,12 @@ class AppStore {
   addChecklistBlock(noteId: string): ChecklistBlock {
     const note = this.notes.find(n => n.id === noteId);
     if (!note) return { id: '', items: [] };
-    const block: ChecklistBlock = { id: generateId(), items: [] };
-    note.checklists.push(block);
+    this.#capture();
+    const block: ChecklistBlock = {
+      id: generateId(),
+      items: [{ id: generateId(), text: '', done: false }],
+    };
+    note.checklists = [...note.checklists, block];
     note.updatedAt = Date.now();
     return block;
   }
@@ -442,8 +453,18 @@ class AppStore {
     if (!note) return { id: '', text: '', done: false };
     const block = note.checklists.find(b => b.id === blockId);
     if (!block) return { id: '', text: '', done: false };
-    const item: ChecklistItem = { id: generateId(), text: 'New item', done: false };
-    block.items.push(item);
+    this.#capture();
+    const item: ChecklistItem = { id: generateId(), text: '', done: false };
+    const blockIdx = note.checklists.findIndex(b => b.id === blockId);
+    const updatedBlock = {
+      ...block,
+      items: [...block.items, item],
+    };
+    note.checklists = [
+      ...note.checklists.slice(0, blockIdx),
+      updatedBlock,
+      ...note.checklists.slice(blockIdx + 1),
+    ];
     note.updatedAt = Date.now();
     return item;
   }
@@ -685,9 +706,16 @@ class AppStore {
   get filteredNotes(): Note[] {
     const query = this.searchQuery.toLowerCase().trim();
     if (!query) return [];
-    return this.activeNotes.filter(
-      n => n.title.toLowerCase().includes(query) || n.bodyHtml.toLowerCase().includes(query)
-    );
+    return this.activeNotes.filter((n) => {
+      const title = n.title.toLowerCase();
+      const body = n.bodyHtml.replace(/<[^>]*>/g, ' ').toLowerCase();
+      const checklistText = n.checklists
+        .flatMap((b) => b.items.map((i) => i.text))
+        .join(' ')
+        .toLowerCase();
+      const haystack = `${title} ${body} ${checklistText}`;
+      return haystack.includes(query);
+    });
   }
 
   get selectedNote(): Note | null {

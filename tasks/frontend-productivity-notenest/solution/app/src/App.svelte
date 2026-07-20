@@ -1,5 +1,6 @@
 <script lang="ts">
   import './app.css';
+  import { untrack } from 'svelte';
   import { store } from './lib/store.svelte';
   import Sidebar from './components/Sidebar.svelte';
   import SearchBar from './components/SearchBar.svelte';
@@ -58,10 +59,12 @@
     [...store.filteredNotes].sort((a, b) => b.updatedAt - a.updatedAt)
   );
 
-  // Persistence must be owned by the mounted component so the effect has
-  // a valid Svelte lifecycle context.
+  // Persistence hook — saveData is a no-op (in-memory contract), but keep
+  // the subscription out of the render path to avoid state_unsafe_mutation.
   $effect(() => {
-    store.persist();
+    store.folders;
+    store.notes;
+    untrack(() => queueMicrotask(() => store.persist()));
   });
 
   // View title
@@ -217,18 +220,22 @@
 
         <!-- Export / Import Nest -->
         <button
-          class="hidden sm:flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium rounded-lg transition flex-shrink-0 cursor-pointer"
+          class="flex items-center gap-1 px-2 py-2 sm:px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium rounded-lg transition flex-shrink-0 cursor-pointer"
           onclick={() => store.exportOpen = true}
           title="Export Nest"
+          aria-label="Export Nest"
         >
-          Export Nest
+          <span class="hidden sm:inline">Export Nest</span>
+          <span class="sm:hidden">Export</span>
         </button>
         <button
-          class="hidden sm:flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium rounded-lg transition flex-shrink-0 cursor-pointer"
+          class="flex items-center gap-1 px-2 py-2 sm:px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium rounded-lg transition flex-shrink-0 cursor-pointer"
           onclick={() => store.importOpen = true}
           title="Import Nest"
+          aria-label="Import Nest"
         >
-          Import Nest
+          <span class="hidden sm:inline">Import Nest</span>
+          <span class="sm:hidden">Import</span>
         </button>
 
         <!-- New Note button -->
@@ -282,7 +289,7 @@
           >
             <!-- View header -->
             <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between flex-shrink-0">
-              <h2 class="font-semibold text-slate-800 truncate">{viewTitle}</h2>
+              <h1 class="text-base font-semibold text-slate-800 truncate">{viewTitle}</h1>
             </div>
 
             <!-- Empty trash controls -->
@@ -362,7 +369,7 @@
                       <svg class="w-12 h-12 text-slate-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                       </svg>
-                      <p class="text-slate-400 text-sm">No notes yet</p>
+                      <h2 class="text-slate-400 text-sm font-medium">No notes yet</h2>
                       <p class="text-slate-300 text-xs mt-1">Click "New Note" to create your first note</p>
                     </div>
                   {:else}
@@ -370,7 +377,7 @@
                       <svg class="w-12 h-12 text-slate-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
                       </svg>
-                      <p class="text-slate-400 text-sm">This folder is empty</p>
+                      <h2 class="text-slate-400 text-sm font-medium">This folder is empty</h2>
                       <p class="text-slate-300 text-xs mt-1">Create a note in this folder to get started</p>
                     </div>
                   {/if}

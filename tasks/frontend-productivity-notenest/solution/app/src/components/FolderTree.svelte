@@ -11,18 +11,28 @@
 
   let editingFolderId: string | null = $state(null);
   let editName: string = $state('');
+  let folderNameError: string = $state('');
 
   let children = $derived(store.getFolderChildren(parentId));
 
   function startRename(folderId: string, currentName: string) {
     editingFolderId = folderId;
     editName = currentName;
+    folderNameError = '';
   }
 
   function finishRename(folderId: string) {
-    if (editName.trim()) {
-      store.renameFolder(folderId, editName);
+    const trimmed = editName.trim();
+    if (!trimmed) {
+      folderNameError = 'folder.name: name cannot be blank';
+      return;
     }
+    if (trimmed.length > 100) {
+      folderNameError = 'folder.name: name exceeds 100 characters';
+      return;
+    }
+    folderNameError = '';
+    store.renameFolder(folderId, trimmed);
     editingFolderId = null;
   }
 </script>
@@ -31,21 +41,21 @@
   {#each children as folder (folder.id)}
     <li class="select-none group/item">
       <!-- Folder row -->
-      <button
+      <div
         class="w-full flex items-center gap-1 px-2 py-1.5 rounded cursor-pointer transition text-sm text-left
-          hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          hover:bg-slate-100 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-300"
         class:bg-indigo-50={store.selectedFolderId === folder.id}
         class:text-indigo-700={store.selectedFolderId === folder.id}
         class:text-slate-700={store.selectedFolderId !== folder.id}
-        onclick={() => { store.selectedFolderId = folder.id; store.selectedNoteId = null; store.searchQuery = ''; }}
         style="padding-left: {depth * 16 + 8}px"
         role="treeitem"
         aria-selected={store.selectedFolderId === folder.id}
         aria-expanded={!folder.collapsed}
       >
         <!-- Expand/Collapse -->
-        <span
-          class="w-4 h-4 flex items-center justify-center flex-shrink-0 text-slate-400 hover:text-slate-600 transition"
+        <button
+          type="button"
+          class="w-4 h-4 flex items-center justify-center flex-shrink-0 text-slate-400 hover:text-slate-600 transition bg-transparent border-none p-0 cursor-pointer"
           onclick={(e) => { e.stopPropagation(); store.toggleFolderCollapse(folder.id); }}
           aria-label={folder.collapsed ? 'Expand folder' : 'Collapse folder'}
           style="visibility: {store.getFolderChildren(folder.id).length > 0 ? 'visible' : 'hidden'}"
@@ -53,33 +63,43 @@
           <svg class="w-3 h-3 transition-transform {folder.collapsed ? '' : 'rotate-90'}" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
           </svg>
-        </span>
+        </button>
 
-        <!-- Folder icon -->
-        <svg class="w-4 h-4 flex-shrink-0 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
-        </svg>
-
-        <!-- Name or input -->
+        <button
+          type="button"
+          class="flex-1 min-w-0 flex items-center gap-1 text-left bg-transparent border-none p-0 cursor-pointer"
+          onclick={() => { store.selectedFolderId = folder.id; store.selectedNoteId = null; store.searchQuery = ''; }}
+        >
         {#if editingFolderId === folder.id}
-          <input
-            type="text"
-            bind:value={editName}
-            class="flex-1 min-w-0 px-1 py-0.5 text-sm border border-indigo-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            onblur={() => finishRename(folder.id)}
-            onkeydown={(e) => { if (e.key === 'Enter') finishRename(folder.id); if (e.key === 'Escape') editingFolderId = null; e.stopPropagation(); }}
-            onclick={(e) => e.stopPropagation()}
-            autofocus
-          />
+          <div class="flex-1 min-w-0">
+            <input
+              type="text"
+              bind:value={editName}
+              class="w-full px-1 py-0.5 text-sm border border-indigo-300 rounded bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              onblur={() => finishRename(folder.id)}
+              onkeydown={(e) => { if (e.key === 'Enter') finishRename(folder.id); if (e.key === 'Escape') { editingFolderId = null; folderNameError = ''; } e.stopPropagation(); }}
+              onclick={(e) => e.stopPropagation()}
+              aria-label="Folder name"
+              aria-invalid={!!folderNameError}
+              aria-describedby={folderNameError ? `folder-error-${folder.id}` : undefined}
+            />
+            {#if folderNameError}
+              <p id="folder-error-{folder.id}" class="text-xs text-red-500 mt-0.5">{folderNameError}</p>
+            {/if}
+          </div>
         {:else}
           <span class="flex-1 min-w-0 truncate">{folder.name}</span>
           <!-- Count badge -->
           <span class="flex-shrink-0 text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full ml-1">
             {store.getNoteCountInFolder(folder.id)}
           </span>
+        {/if}
+        </button>
           <!-- Actions (shown on group hover) -->
+          {#if editingFolderId !== folder.id}
           <span class="hidden group-hover/item:flex items-center gap-0.5 ml-1">
             <button
+              type="button"
               class="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded transition flex-shrink-0"
               onclick={(e) => { e.stopPropagation(); startRename(folder.id, folder.name); }}
               title="Rename"
@@ -90,6 +110,7 @@
               </svg>
             </button>
             <button
+              type="button"
               class="w-5 h-5 flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition flex-shrink-0"
               onclick={(e) => { e.stopPropagation(); if (confirm('Delete this folder? Notes will be moved to the root level.')) store.deleteFolder(folder.id); }}
               title="Delete folder"
@@ -100,8 +121,8 @@
               </svg>
             </button>
           </span>
-        {/if}
-      </button>
+          {/if}
+      </div>
 
       <!-- Children -->
       {#if !folder.collapsed}
