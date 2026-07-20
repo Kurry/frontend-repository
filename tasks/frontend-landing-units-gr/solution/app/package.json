@@ -11,6 +11,6 @@
     "verify:build": "node -e \"require('fs').accessSync('./prebuilt/index.html')\""
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "serve": "14.2.6"
   }
 }
