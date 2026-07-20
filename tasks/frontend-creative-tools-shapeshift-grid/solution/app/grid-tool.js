@@ -271,7 +271,7 @@
     else if (gpMode === 'erase') next = null;
     if (JSON.stringify(prev) !== JSON.stringify(next)) {
       gpDisableSlider();
-      pushHistory();
+      pushHistory(); lockSlider();
       board[gy][gx] = next;
       gpRender();
     }
@@ -292,7 +292,7 @@
       const nw = img.naturalWidth * scale;
       const nh = img.naturalHeight * scale;
       t.drawImage(img, (cols - nw) / 2, (rows - nh) / 2, nw, nh);
-      pushHistory();
+      pushHistory(); lockSlider();
       for (let y = 0; y < rows; y++) {
         for (let x = 0; x < cols; x++) {
           const p = t.getImageData(x, y, 1, 1).data;
@@ -337,7 +337,7 @@
     const t = tmp.getContext('2d', { willReadFrequently: true });
     t.imageSmoothingEnabled = false;
     t.drawImage(cameraFeed, sx, sy, side, side, 0, 0, cols, rows);
-    pushHistory();
+    pushHistory(); lockSlider();
     for (let y = 0; y < rows; y++) {
       for (let x = 0; x < cols; x++) {
         const p = t.getImageData(x, y, 1, 1).data;
@@ -419,7 +419,7 @@
     gpUndo();
   };
   clearBtn.onclick = () => {
-    pushHistory();
+    pushHistory(); lockSlider();
     board = Array(rows)
       .fill(0)
       .map(() => Array(cols).fill(null));
