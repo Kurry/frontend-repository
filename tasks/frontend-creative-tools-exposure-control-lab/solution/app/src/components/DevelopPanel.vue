@@ -126,35 +126,37 @@
     </div>
 
     <!-- Copy Settings Dialog -->
-    <div v-if="showCopyDialog" class="fixed inset-0 z-[2600] flex items-center justify-center bg-black/50" @keydown.esc="showCopyDialog = false" @keydown.tab="handleCopyDialogKeydown" tabindex="-1" ref="copyDialogRef">
-      <div class="bg-panel p-6 rounded-[10px] w-80 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="copy-dialog-title">
-        <h2 id="copy-dialog-title" class="text-lg font-medium mb-4">Copy settings</h2>
-        <div class="flex flex-col gap-3 mb-6">
-          <label class="flex items-center gap-2 text-sm">
-            <input type="checkbox" v-model="copyGroups.dials" class="w-4 h-4 accent-primary">
-            Dials (Aperture, Shutter, ISO)
-          </label>
-          <label class="flex items-center gap-2 text-sm">
-            <input type="checkbox" v-model="copyGroups.light" class="w-4 h-4 accent-primary">
-            Light
-          </label>
-          <label class="flex items-center gap-2 text-sm">
-            <input type="checkbox" v-model="copyGroups.effects" class="w-4 h-4 accent-primary">
-            Effects
-          </label>
-        </div>
-        <div class="flex justify-end gap-2">
-          <button class="px-4 py-2 rounded bg-black/10 hover:bg-black/20 text-sm font-medium" @click="showCopyDialog = false">Cancel</button>
-          <button
-            class="px-4 py-2 rounded bg-primary hover:bg-red-600 text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            :disabled="!canCopy"
-            @click="confirmCopy"
-          >
-            Copy
-          </button>
+    <Transition name="dialog">
+      <div v-if="showCopyDialog" class="fixed inset-0 z-[2600] flex items-center justify-center bg-black/50" @keydown.esc="showCopyDialog = false" @keydown.tab="handleCopyDialogKeydown" tabindex="-1" ref="copyDialogRef">
+        <div class="dialog-card bg-panel p-6 rounded-[10px] w-80 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="copy-dialog-title">
+          <h2 id="copy-dialog-title" class="text-lg font-medium mb-4 mt-0">Copy settings</h2>
+          <div class="flex flex-col gap-3 mb-6">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" v-model="copyGroups.dials" class="w-4 h-4 accent-primary">
+              Dials (Aperture, Shutter, ISO)
+            </label>
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" v-model="copyGroups.light" class="w-4 h-4 accent-primary">
+              Light
+            </label>
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" v-model="copyGroups.effects" class="w-4 h-4 accent-primary">
+              Effects
+            </label>
+          </div>
+          <div class="flex justify-end gap-2">
+            <button class="px-4 py-2 rounded bg-black/10 hover:bg-black/20 text-sm font-medium" @click="showCopyDialog = false">Cancel</button>
+            <button
+              class="px-4 py-2 rounded bg-primary hover:bg-red-600 text-white text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              :disabled="!canCopy"
+              @click="confirmCopy"
+            >
+              Copy
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>
 

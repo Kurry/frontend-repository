@@ -20,6 +20,8 @@
       <span class="absolute w-[180px] text-center tracking-[2px] text-text-light text-[12px] font-medium -rotate-90 bottom-[80px]">UNDER EXPOSED</span>
       <span class="absolute w-[180px] text-center tracking-[2px] text-text-light text-[12px] font-medium -rotate-90 top-[80px]">OVER EXPOSED</span>
       <span class="absolute w-5 h-5 rounded-full bg-white/50" aria-hidden="true"></span>
+      <!-- Text readout of the current exposure state for assistive tech -->
+      <span class="sr-live" aria-live="polite">Exposure: {{ meterCaption }}</span>
     </div>
 
     <!-- Dials -->
@@ -28,8 +30,12 @@
       <!-- Aperture -->
       <div class="relative flex md:flex-row flex-col items-center justify-center md:w-[180px] md:h-[100px] w-[72px] h-[140px]" data-control="aperture">
         <button type="button"
-                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-down.svg')] md:bg-[url('/assets/arrow.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:28px] transition-opacity duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:order-1"
+                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-down.svg')] md:bg-[url('/assets/arrow.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:28px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:order-1"
                 @click="stepAperture('down')"
+                @pointerdown="beginHold($event, 'down', stepAperture)"
+                @pointerup="endHold"
+                @pointerleave="endHold"
+                @pointercancel="endHold"
                 @keydown.up.prevent="stepAperture('up')"
                 @keydown.down.prevent="stepAperture('down')"
                 :disabled="atApertureEnd"
@@ -38,25 +44,35 @@
                 aria-label="Widen aperture (lower f-number)"></button>
         <div class="relative z-40 w-[72px] md:w-[100px] h-[72px] md:h-auto md:bg-transparent bg-dial md:rounded-none rounded-[10px] flex flex-col items-center justify-center text-center pointer-events-none">
           <span class="text-text-light tracking-[1px] md:text-[14px] text-[12px] font-normal">APERTURE</span>
-          <span class="text-white text-[22px] font-light leading-[26px] w-[72px] md:w-20 h-8 flex items-center justify-center">f/{{ store.aperture }}</span>
+          <Transition name="dial-val" mode="out-in">
+            <span :key="'a' + store.aperture" class="text-white text-[22px] font-light leading-[26px] w-[72px] md:w-20 h-8 flex items-center justify-center">f/{{ store.aperture }}</span>
+          </Transition>
         </div>
         <button type="button"
-                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-up.svg')] md:bg-[url('/assets/arrow-up.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:30px] transition-opacity duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:-order-1"
+                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-up.svg')] md:bg-[url('/assets/arrow-up.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:30px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:-order-1"
                 @click="stepAperture('up')"
+                @pointerdown="beginHold($event, 'up', stepAperture)"
+                @pointerup="endHold"
+                @pointerleave="endHold"
+                @pointercancel="endHold"
                 @keydown.up.prevent="stepAperture('up')"
                 @keydown.down.prevent="stepAperture('down')"
                 :disabled="atApertureStart"
                 :aria-disabled="atApertureStart"
                 :style="{ opacity: atApertureStart ? 0 : 1, pointerEvents: atApertureStart ? 'none' : 'auto' }"
                 aria-label="Narrow aperture (higher f-number)"></button>
-        <div class="absolute w-[100px] h-[100px] rounded-[20px] bg-dial z-0 hidden md:block" aria-hidden="true" style="pointer-events: none;"></div>
+        <div class="absolute w-[100px] h-[100px] rounded-[20px] bg-dial z-0 hidden md:block transition-shadow duration-300" :class="{ 'ring-2 ring-primary/80': store.editorSelected === 'exposure' }" aria-hidden="true" style="pointer-events: none;"></div>
       </div>
 
       <!-- Shutter -->
       <div class="relative flex md:flex-row flex-col items-center justify-center md:w-[180px] md:h-[100px] w-[72px] h-[140px]" data-control="shutter">
         <button type="button"
-                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-down.svg')] md:bg-[url('/assets/arrow.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:28px] transition-opacity duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:order-1"
+                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-down.svg')] md:bg-[url('/assets/arrow.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:28px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:order-1"
                 @click="stepShutter('down')"
+                @pointerdown="beginHold($event, 'down', stepShutter)"
+                @pointerup="endHold"
+                @pointerleave="endHold"
+                @pointercancel="endHold"
                 @keydown.up.prevent="stepShutter('up')"
                 @keydown.down.prevent="stepShutter('down')"
                 :disabled="atShutterStart"
@@ -65,25 +81,35 @@
                 aria-label="Decrease shutter speed"></button>
         <div class="relative z-40 w-[72px] md:w-[100px] h-[72px] md:h-auto md:bg-transparent bg-dial md:rounded-none rounded-[10px] flex flex-col items-center justify-center text-center pointer-events-none">
           <span class="text-text-light tracking-[1px] md:text-[14px] text-[12px] font-normal">SPEED</span>
-          <span class="text-white text-[22px] font-light leading-[26px] w-[72px] md:w-20 h-8 flex items-center justify-center">1/{{ store.shutter }}</span>
+          <Transition name="dial-val" mode="out-in">
+            <span :key="'s' + store.shutter" class="text-white text-[22px] font-light leading-[26px] w-[72px] md:w-20 h-8 flex items-center justify-center">1/{{ store.shutter }}</span>
+          </Transition>
         </div>
         <button type="button"
-                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-up.svg')] md:bg-[url('/assets/arrow-up.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:30px] transition-opacity duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:-order-1"
+                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-up.svg')] md:bg-[url('/assets/arrow-up.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:30px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:-order-1"
                 @click="stepShutter('up')"
+                @pointerdown="beginHold($event, 'up', stepShutter)"
+                @pointerup="endHold"
+                @pointerleave="endHold"
+                @pointercancel="endHold"
                 @keydown.up.prevent="stepShutter('up')"
                 @keydown.down.prevent="stepShutter('down')"
                 :disabled="atShutterEnd"
                 :aria-disabled="atShutterEnd"
                 :style="{ opacity: atShutterEnd ? 0 : 1, pointerEvents: atShutterEnd ? 'none' : 'auto' }"
                 aria-label="Increase shutter speed"></button>
-        <div class="absolute w-[100px] h-[100px] rounded-[20px] bg-dial z-0 hidden md:block" aria-hidden="true" style="pointer-events: none;"></div>
+        <div class="absolute w-[100px] h-[100px] rounded-[20px] bg-dial z-0 hidden md:block transition-shadow duration-300" :class="{ 'ring-2 ring-primary/80': store.editorSelected === 'exposure' }" aria-hidden="true" style="pointer-events: none;"></div>
       </div>
 
       <!-- ISO -->
       <div class="relative flex md:flex-row flex-col items-center justify-center md:w-[180px] md:h-[100px] w-[72px] h-[140px]" data-control="iso">
         <button type="button"
-                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-down.svg')] md:bg-[url('/assets/arrow.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:28px] transition-opacity duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:order-1"
+                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-down.svg')] md:bg-[url('/assets/arrow.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:28px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:order-1"
                 @click="stepIso('down')"
+                @pointerdown="beginHold($event, 'down', stepIso)"
+                @pointerup="endHold"
+                @pointerleave="endHold"
+                @pointercancel="endHold"
                 @keydown.up.prevent="stepIso('up')"
                 @keydown.down.prevent="stepIso('down')"
                 :disabled="atIsoStart"
@@ -92,18 +118,24 @@
                 aria-label="Decrease ISO"></button>
         <div class="relative z-40 w-[72px] md:w-[100px] h-[72px] md:h-auto md:bg-transparent bg-dial md:rounded-none rounded-[10px] flex flex-col items-center justify-center text-center pointer-events-none">
           <span class="text-text-light tracking-[1px] md:text-[14px] text-[12px] font-normal">ISO</span>
-          <span class="text-white text-[22px] font-light leading-[26px] w-[72px] md:w-20 h-8 flex items-center justify-center">{{ store.iso }}</span>
+          <Transition name="dial-val" mode="out-in">
+            <span :key="'i' + store.iso" class="text-white text-[22px] font-light leading-[26px] w-[72px] md:w-20 h-8 flex items-center justify-center">{{ store.iso }}</span>
+          </Transition>
         </div>
         <button type="button"
-                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-up.svg')] md:bg-[url('/assets/arrow-up.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:30px] transition-opacity duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:-order-1"
+                class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-up.svg')] md:bg-[url('/assets/arrow-up.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:30px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:-order-1"
                 @click="stepIso('up')"
+                @pointerdown="beginHold($event, 'up', stepIso)"
+                @pointerup="endHold"
+                @pointerleave="endHold"
+                @pointercancel="endHold"
                 @keydown.up.prevent="stepIso('up')"
                 @keydown.down.prevent="stepIso('down')"
                 :disabled="atIsoEnd"
                 :aria-disabled="atIsoEnd"
                 :style="{ opacity: atIsoEnd ? 0 : 1, pointerEvents: atIsoEnd ? 'none' : 'auto' }"
                 aria-label="Increase ISO"></button>
-        <div class="absolute w-[100px] h-[100px] rounded-[20px] bg-dial z-0 hidden md:block" aria-hidden="true" style="pointer-events: none;"></div>
+        <div class="absolute w-[100px] h-[100px] rounded-[20px] bg-dial z-0 hidden md:block transition-shadow duration-300" :class="{ 'ring-2 ring-primary/80': store.editorSelected === 'exposure' }" aria-hidden="true" style="pointer-events: none;"></div>
       </div>
 
     </div>
@@ -111,7 +143,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeUnmount } from 'vue'
 import { useStore } from '../store.js'
 import { apertureStops, shutterStops, isoStops } from '../domain.js'
 import { usePreferredReducedMotion } from '@vueuse/core'
@@ -179,4 +211,25 @@ function stepIso(dir) {
     store.iso = isoStops[idx]
   })
 }
+
+// Hold-to-repeat: the first step fires on click; holding the stepper keeps
+// stepping (after a short delay) until release. Stepping clamps inside the
+// stop lists, so a held stepper at an edge simply stops advancing.
+let holdTimeout = null
+let holdInterval = null
+
+function beginHold(event, dir, stepFn) {
+  if (event.button !== undefined && event.button !== 0) return
+  endHold()
+  holdTimeout = setTimeout(() => {
+    holdInterval = setInterval(() => stepFn(dir), 130)
+  }, 450)
+}
+
+function endHold() {
+  if (holdTimeout) { clearTimeout(holdTimeout); holdTimeout = null }
+  if (holdInterval) { clearInterval(holdInterval); holdInterval = null }
+}
+
+onBeforeUnmount(endHold)
 </script>
