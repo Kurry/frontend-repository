@@ -48,6 +48,9 @@ yarn-error.log*
 jobs/
 trials/
 
+# Playwright MCP session output (console logs, page snapshots)
+.playwright-mcp/
+
 # Python virtualenvs
 .venv/
 venv/
