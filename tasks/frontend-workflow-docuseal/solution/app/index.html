@@ -1,73 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Docuseal — Template editor</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%2314b8a6'/%3E%3Cpath d='M4 8.5l2.5 2.5L12 5' stroke='%23fff' stroke-width='2' fill='none'/%3E%3C/svg%3E" />
-    <link rel="stylesheet" href="./styles.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f8fafc" />
+    <link rel="icon" href="data:," />
+    <title>Docuseal — Template builder</title>
   </head>
   <body>
-    <div id="app" class="app">
-      <!-- Top bar -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <span class="brand" aria-hidden="true">✦</span>
-          <strong class="brand-name">Docuseal</strong>
-          <span class="crumb">Templates</span>
-          <span class="crumb-sep" aria-hidden="true">/</span>
-          <label class="tpl-name-label">
-            <span class="sr-only">Template name</span>
-            <input id="tpl-name" class="tpl-name" type="text" aria-label="Template name" />
-          </label>
-        </div>
-        <div class="topbar-right">
-          <div class="mode-switch" role="group" aria-label="Editor mode">
-            <button id="mode-build" class="mode-btn is-active" type="button" aria-pressed="true">Build</button>
-            <button id="mode-preview" class="mode-btn" type="button" aria-pressed="false">Preview</button>
-          </div>
-          <span id="status-pill" class="status-pill" aria-live="polite">Draft</span>
-          <button id="advance-btn" class="btn btn-ghost" type="button" hidden>Advance</button>
-          <button id="send-btn" class="btn btn-primary" type="button">Send for signing</button>
-        </div>
-      </header>
-
-      <div class="workspace">
-        <!-- Left rail: templates, submitters, field palette -->
-        <aside class="rail" aria-label="Builder tools">
-          <section class="rail-block" aria-labelledby="tpl-h">
-            <h2 id="tpl-h" class="rail-h">Templates</h2>
-            <ul id="tpl-list" class="tpl-list"></ul>
-          </section>
-
-          <section class="rail-block" aria-labelledby="sub-h">
-            <div class="rail-h-row">
-              <h2 id="sub-h" class="rail-h">Submitters</h2>
-              <button id="add-submitter" class="btn btn-mini" type="button">Add submitter</button>
-            </div>
-            <ul id="submitter-list" class="submitter-list"></ul>
-          </section>
-
-          <section class="rail-block rail-block-grow" aria-labelledby="pal-h">
-            <h2 id="pal-h" class="rail-h">Fields</h2>
-            <p class="rail-hint">Add a field to the active submitter, then place it on the document.</p>
-            <div id="palette" class="palette"></div>
-          </section>
-        </aside>
-
-        <!-- Center: document canvas -->
-        <main class="canvas-wrap" aria-label="Document canvas">
-          <div id="canvas" class="canvas"></div>
-        </main>
-
-        <!-- Right: properties -->
-        <aside class="props" aria-label="Properties">
-          <div id="props-body" class="props-body"></div>
-        </aside>
-      </div>
-
-      <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
-    </div>
-    <script src="./app.js"></script>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
