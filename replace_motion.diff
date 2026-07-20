@@ -1,0 +1,64 @@
+<<<<<<< SEARCH
+          <div class="flex-1 overflow-y-auto p-2 space-y-1" role="list" aria-label="Annotation layers">
+            <Show when={state.annotations.length > 0} fallback={
+              <div class="flex flex-col items-center justify-center py-8 text-[var(--color-text-secondary)]">
+                <span class="text-2xl mb-2">📋</span>
+                <p class="text-sm text-center px-4">No annotations yet.<br/>Use the tools to start annotating!</p>
+              </div>
+            }>
+              <For each={state.annotations}>
+                {(ann, i) => (
+                  <LayerRow
+=======
+          <div class="flex-1 overflow-y-auto p-2 space-y-1" role="list" aria-label="Annotation layers" ref={(el) => {
+            // Check prefers-reduced-motion
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+              import('@formkit/auto-animate').then(({ default: autoAnimate }) => {
+                autoAnimate(el);
+              }).catch(() => {});
+            }
+          }}>
+            <Show when={state.annotations.length > 0} fallback={
+              <div class="flex flex-col items-center justify-center py-8 text-[var(--color-text-secondary)]">
+                <span class="text-2xl mb-2">📋</span>
+                <p class="text-sm text-center px-4">No annotations yet.<br/>Use the tools to start annotating!</p>
+              </div>
+            }>
+              <For each={state.annotations}>
+                {(ann, i) => (
+                  <LayerRow
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+            <div class="saved-project-list space-y-1" role="list" aria-label="Saved projects">
+              <For each={state.savedProjects}>
+                {(project) => (
+                  <div class="saved-project-row flex items-center gap-1" role="listitem">
+=======
+            <div class="saved-project-list space-y-1" role="list" aria-label="Saved projects" ref={(el) => {
+              if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                import('@formkit/auto-animate').then(({ default: autoAnimate }) => {
+                  autoAnimate(el);
+                }).catch(() => {});
+              }
+            }}>
+              <For each={state.savedProjects}>
+                {(project) => (
+                  <div class="saved-project-row flex items-center gap-1" role="listitem">
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+              <ul class="space-y-1">
+                <For each={state.versions}>
+                  {(snapshot) => (
+                    <li class="flex items-center justify-between text-[10px] text-[var(--color-text-secondary)]">
+=======
+              <ul class="space-y-1" ref={(el) => {
+                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                  import('@formkit/auto-animate').then(({ default: autoAnimate }) => {
+                    autoAnimate(el);
+                  }).catch(() => {});
+                }
+              }}>
+                <For each={state.versions}>
+                  {(snapshot) => (
+                    <li class="flex items-center justify-between text-[10px] text-[var(--color-text-secondary)]">
+>>>>>>> REPLACE
