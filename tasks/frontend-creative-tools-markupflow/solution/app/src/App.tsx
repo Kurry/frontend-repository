@@ -308,6 +308,12 @@ export default function App() {
   const [statusMessage, setStatusMessage] = createSignal('Ready');
   const [snapshotNameValue, setSnapshotNameValue] = createSignal('');
   const [snapshotNameError, setSnapshotNameError] = createSignal('');
+  // Snapshot name validation mirrors the Saved projects field contract (trimmed non-empty,
+  // at most 80 characters): the Save control disables for empty or over-limit names and the
+  // over-limit error is surfaced inline as the user types.
+  const snapshotTrimmed = () => snapshotNameValue().trim();
+  const snapshotTooLong = () => snapshotTrimmed().length > 80;
+  const snapshotShownError = () => (snapshotTooLong() ? 'Snapshot name must be at most 80 characters' : snapshotNameError());
   const [importError, setImportError] = createSignal('');
   const [showExportPreview, setShowExportPreview] = createSignal(false);
   const [copyToast, setCopyToast] = createSignal(false);
@@ -1303,21 +1309,21 @@ export default function App() {
               placeholder="Snapshot name"
               value={snapshotNameValue()}
               onInput={(e) => { setSnapshotNameValue(e.currentTarget.value); if (snapshotNameError()) setSnapshotNameError(''); }}
-              class="bg-transparent text-sm text-[var(--color-text-primary)] px-2 py-0.5 w-32 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] rounded"
+              class={`bg-transparent text-sm text-[var(--color-text-primary)] px-2 py-0.5 w-32 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] rounded ${snapshotShownError() ? 'border border-red-500' : ''}`}
               aria-label="Snapshot name"
-              aria-invalid={!!snapshotNameError()}
-              aria-describedby={snapshotNameError() ? 'snapshot-name-error' : undefined}
+              aria-invalid={!!snapshotShownError()}
+              aria-describedby={snapshotShownError() ? 'snapshot-name-error' : undefined}
             />
             <button
               type="submit"
-              class={`header-action ${snapshotNameValue().trim().length === 0 ? 'is-disabled' : ''}`}
-              disabled={snapshotNameValue().trim().length === 0}
+              class={`header-action ${snapshotTrimmed().length === 0 || snapshotTooLong() ? 'is-disabled' : ''}`}
+              disabled={snapshotTrimmed().length === 0 || snapshotTooLong()}
               aria-label="Save snapshot"
             >
               Save snapshot
             </button>
-            <Show when={snapshotNameError()}>
-              <p id="snapshot-name-error" class="absolute left-0 top-full mt-1 z-50 whitespace-nowrap rounded-md border border-red-500 bg-[var(--color-surface)] px-2 py-1 text-[10px] text-red-400" role="alert" aria-live="polite">{snapshotNameError()}</p>
+            <Show when={snapshotShownError()}>
+              <p id="snapshot-name-error" class="absolute left-0 top-full mt-1 z-50 whitespace-nowrap rounded-md border border-red-500 bg-[var(--color-surface)] px-2 py-1 text-[10px] text-red-400" role="alert" aria-live="polite">{snapshotShownError()}</p>
             </Show>
           </form>
 
