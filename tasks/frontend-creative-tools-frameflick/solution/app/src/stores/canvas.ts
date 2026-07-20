@@ -114,6 +114,9 @@ export const useCanvasStore = defineStore('canvas', () => {
   const baseline = ref<RenderSettings>(load('ff_baseline', defaultSettings()))
   /** True while the Before/After toggle shows the baseline ("Before") composition. */
   const showingBefore = ref(false)
+  /** Bumped on every image load, so observers can reset even when the dataUrl is
+   *  unchanged (the same image re-uploaded). Never persisted. */
+  const loadCount = ref(0)
 
   const persist = () => {
     save('ff_imageDataUrl', imageDataUrl.value)
@@ -226,6 +229,7 @@ export const useCanvasStore = defineStore('canvas', () => {
   function captureBaseline() {
     baseline.value = getSettings()
     showingBefore.value = false
+    loadCount.value++ // signal a fresh image load (even for an unchanged dataUrl)
   }
 
   return {
@@ -234,7 +238,7 @@ export const useCanvasStore = defineStore('canvas', () => {
     padding, cornerRadius, shadow, frameStyle, canvasSize,
     captionText, captionPosition, captionFontSize, captionColor,
     watermarkEnabled, watermarkText, watermarkColor, watermarkOpacity, watermarkCorner,
-    zoom, posX, posY, exportScale, baseline, showingBefore,
+    zoom, posX, posY, exportScale, baseline, showingBefore, loadCount,
     getSettings, applySettings, resetPosition, resetStyle, captureBaseline,
   }
 })

@@ -65,12 +65,14 @@ export const useHistoryStore = defineStore('history', () => {
     { deep: true }
   )
 
-  // Style snapshots are tied to one image, so switching the active image
-  // (upload, Recent thumbnail, WebMCP select) starts a fresh undo/redo context —
-  // otherwise Undo would re-apply the previous image's look onto the new one.
-  // Created after the settings watcher so, in the flush triggered by a switch,
-  // this runs second and clears the entry that watcher just recorded.
-  watch(() => canvas.imageDataUrl, () => {
+  // Style snapshots are tied to one image, so a fresh image load (upload, Recent
+  // thumbnail, WebMCP select) starts a new undo/redo context — otherwise Undo
+  // would re-apply the previous image's look onto the new one. loadCount also
+  // covers re-uploading the same image, where imageDataUrl is unchanged so a
+  // plain imageDataUrl watch wouldn't fire. Created after the settings watcher
+  // so, in the flush triggered by a load, this runs second and clears the entry
+  // that watcher just recorded.
+  watch(() => [canvas.imageDataUrl, canvas.loadCount] as const, () => {
     undoStack.value = []
     redoStack.value = []
     lastChangeAt = 0

@@ -101,14 +101,14 @@ const canvasStore = useCanvasStore()
 const recentStore = useRecentStore()
 
 // Keep the active Recent entry's saved settings in sync with live edits, so
-// thumbnail switching always restores each image's own last-used look.
+// thumbnail switching always restores each image's own last-used look. Match by
+// dataUrl (unique in the Recent list) rather than activeId, so edits still sync
+// when activeId is stale or absent (e.g. a pre-ff_recentActive persisted state).
 watch(
   () => canvasStore.getSettings(),
   settings => {
-    const active = recentStore.items.find(item => item.id === recentStore.activeId)
-    if (active && canvasStore.imageDataUrl === active.dataUrl) {
-      recentStore.updateSettings(active.id, settings)
-    }
+    const match = recentStore.items.find(item => item.dataUrl === canvasStore.imageDataUrl)
+    if (match) recentStore.updateSettings(match.id, settings)
   },
   { deep: true }
 )
