@@ -39,9 +39,9 @@ const { h2, lead, cards, form } = data.cta;
   </div>
 
   <!-- Contact popup -->
-  <div class="cta-pop-up" data-cta-popup>
+  <dialog class="cta-pop-up" data-cta-popup>
     <div class="cta-pop-up_form theme-chrome">
-      <div class="cta-pop-up_close" data-cta-popup-close role="button" aria-label="Close contact form"></div>
+      <button type="button" class="cta-pop-up_close" data-cta-popup-close aria-label="Close contact form"></button>
       <div class="contact-form">
         <div class="contact-form_emoji">
           <img src={form.emoji} alt="High five emoji" loading="lazy" />
@@ -109,7 +109,7 @@ const { h2, lead, cards, form } = data.cta;
               </div>
             </div>
           </form>
-          <div class="form-notifcation w-form-done theme-white" data-form-success>
+          <div class="form-notifcation w-form-done theme-white" data-form-success role="alert" aria-live="assertive">
             <div class="form-notifcation_wrapper">
               <div class="max-width-448px">
                 <h4 class="heading-style-64px-2" data-split-visible>{form.successTitle}</h4>
@@ -117,11 +117,11 @@ const { h2, lead, cards, form } = data.cta;
               <div class="form-notification-p paragraph-regular" data-split-visible>{form.successBody}</div>
             </div>
           </div>
-          <div class="form-notifcation is--error w-form-fail" data-form-error>
+          <div class="form-notifcation is--error w-form-fail" data-form-error role="alert" aria-live="assertive">
             <div class="form-notification-p paragraph-regular" data-split-visible>{form.errorBody}</div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </dialog>
 </section>

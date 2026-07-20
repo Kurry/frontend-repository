@@ -1,0 +1,117 @@
+---
+---
+<dialog id="discovery-brief-panel" class="theme-chrome discovery-brief" aria-label="Discovery brief">
+  <div class="discovery-brief_wrapper">
+    <div class="discovery-brief_header">
+      <h2 class="heading-m">Discovery brief — Cinder & Bloom</h2>
+      <button id="discovery-brief-close" aria-label="Close brief" class="btn-icon-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div class="discovery-brief_tabs" role="tablist" aria-label="Brief format">
+      <button type="button" class="discovery-brief_tab is-active" id="brief-tab-json" role="tab" aria-selected="true" aria-controls="brief-panel-json" data-brief-tab="json">JSON</button>
+      <button type="button" class="discovery-brief_tab" id="brief-tab-markdown" role="tab" aria-selected="false" aria-controls="brief-panel-markdown" data-brief-tab="markdown">Markdown</button>
+    </div>
+    <div class="discovery-brief_content">
+      <div id="brief-panel-json" class="discovery-brief_panel" role="tabpanel" aria-labelledby="brief-tab-json">
+        <textarea id="brief-json-output" readonly></textarea>
+      </div>
+      <div id="brief-panel-markdown" class="discovery-brief_panel" role="tabpanel" aria-labelledby="brief-tab-markdown" hidden>
+        <textarea id="brief-markdown-output" readonly></textarea>
+      </div>
+    </div>
+    <div class="discovery-brief_actions">
+      <button id="btn-download-brief" class="w-button btn-primary">Download</button>
+      <button id="btn-copy-brief" class="w-button btn-secondary">Copy</button>
+      <div style="flex:1"></div>
+      <button id="btn-import-brief-trigger" class="w-button btn-outline">Import</button>
+    </div>
+    
+    <div id="import-section" style="display:none; margin-top: 1em; padding-top: 1em; border-top: 1px solid rgba(0,0,0,0.1)">
+      <textarea id="import-json-input" placeholder="Paste JSON here..." rows="4" style="width:100%; padding:0.5em; margin-bottom: 0.5em; background: transparent; border: 1px solid rgba(0,0,0,0.2)"></textarea>
+      <button id="btn-import-brief-submit" class="w-button btn-primary">Load Import</button>
+      <div id="import-error" role="alert" aria-live="assertive" style="color: red; margin-top: 0.5em;"></div>
+    </div>
+  </div>
+</dialog>
+
+<style>
+dialog.discovery-brief {
+  border: none;
+  background: var(--_theme---background, #eae9e6);
+  color: var(--_theme---body-text, #181818);
+  padding: 2em;
+  max-width: 600px;
+  width: 90%;
+  margin: auto;
+  border-radius: 8px;
+}
+dialog.discovery-brief::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+.discovery-brief_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5em;
+}
+.discovery-brief_content {
+  margin-bottom: 1.5em;
+}
+.discovery-brief_tabs {
+  display: flex;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+.discovery-brief_tab {
+  padding: 0.5em 1em;
+  background: transparent;
+  color: inherit;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  opacity: 0.65;
+}
+.discovery-brief_tab.is-active {
+  opacity: 1;
+  background: rgba(0,0,0,0.08);
+  border-color: currentColor;
+}
+.discovery-brief_panel[hidden] {
+  display: none;
+}
+#brief-json-output,
+#brief-markdown-output {
+  width: 100%;
+  height: 200px;
+  background: rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.1);
+  padding: 1em;
+  font-family: monospace;
+  font-size: 0.9em;
+  border-radius: 4px;
+  resize: vertical;
+}
+.discovery-brief_actions {
+  display: flex;
+  gap: 1em;
+  align-items: center;
+}
+.btn-secondary {
+  padding: 0.8em 1.5em;
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-outline {
+  padding: 0.8em 1.5em;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+  border: none;
+  cursor: pointer;
+}
+</style>

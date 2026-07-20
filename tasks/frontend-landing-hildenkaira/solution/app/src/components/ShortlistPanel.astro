@@ -1,0 +1,75 @@
+---
+---
+<dialog id="shortlist-panel" class="theme-dark shortlist-panel" aria-label="Shortlist">
+  <div class="shortlist-panel_wrapper">
+    <div class="shortlist-panel_header">
+      <h2 class="heading-m">Shortlist</h2>
+      <button id="shortlist-panel-close" aria-label="Close shortlist" class="btn-icon-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="24" height="24"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <div id="shortlist-items-container" class="shortlist-items">
+      <!-- Injected by JS -->
+    </div>
+    <div class="shortlist-panel_actions">
+      <button id="btn-export-brief" class="w-button btn-primary">Export brief</button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+dialog.shortlist-panel {
+  border: none;
+  background: var(--_theme---background, #181818);
+  color: var(--_theme---body-text, #eae9e6);
+  padding: 2em;
+  max-width: 400px;
+  width: 90%;
+  margin: auto;
+  border-radius: 8px;
+}
+dialog.shortlist-panel::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+.shortlist-panel_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5em;
+}
+.shortlist-items {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  margin-bottom: 2em;
+}
+.shortlist-panel_actions {
+  display: flex;
+  gap: 1em;
+}
+.btn-primary {
+  padding: 0.8em 1.5em;
+  background: var(--_theme---button-primary-bg, #ecfdad);
+  color: #181818;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.shortlist-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5em 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.shortlist-item-remove {
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.shortlist-item-remove:hover {
+  opacity: 1;
+}
+</style>

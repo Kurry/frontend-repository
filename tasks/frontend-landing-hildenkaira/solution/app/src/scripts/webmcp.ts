@@ -38,11 +38,11 @@ function contactForm(): HTMLFormElement | null {
 }
 
 function openContactPopup() {
-  const popup = q("[data-cta-popup]");
-  if (popup && !popup.classList.contains("is-open")) {
+  const popup = q<HTMLDialogElement>("[data-cta-popup]");
+  if (popup && !popup.open) {
     const opener = q<HTMLElement>("[data-cta-popup-open]");
     if (opener) opener.click();
-    else popup.classList.add("is-open");
+    else popup.showModal();
   }
 }
 
@@ -199,11 +199,62 @@ function sessionStop(_args: Record<string, unknown>) {
   return { ok: true, operation: "stop", status: el.getAttribute("data-player-status") };
 }
 
+
+// ---- artifact-transfer-v1 --------------------------------------------------
+
+function artifactExport(_args: Record<string, unknown>) {
+  const w = window as any;
+  if (!w.exportBriefJSON) return { ok: false, error: "export function not found" };
+  const jsonStr = w.exportBriefJSON();
+  
+  // Show UI if possible
+  const briefPanel = document.getElementById("discovery-brief-panel") as HTMLDialogElement;
+  if (briefPanel) briefPanel.showModal();
+  
+  return { ok: true, operation: "export", format: "json", data: jsonStr };
+}
+
+function artifactCopy(_args: Record<string, unknown>) {
+  const w = window as any;
+  if (!w.exportBriefJSON) return { ok: false, error: "export function not found" };
+  const jsonStr = w.exportBriefJSON();
+  return { ok: true, operation: "copy", format: "json", data: jsonStr };
+}
+
+function artifactImport(args: Record<string, unknown>) {
+  const w = window as any;
+  if (!w.importBriefJSON) return { ok: false, error: "import function not found" };
+  const success = w.importBriefJSON(args.data);
+  if (!success) {
+    const detail = w.importBriefJSON.lastError;
+    return { ok: false, error: typeof detail === "string" && detail ? detail : "invalid format" };
+  }
+
+  return { ok: true, operation: "import", mode: "discovery-brief" };
+}
+
 // ---- registry --------------------------------------------------------------
+
 
 type Handler = (args: Record<string, unknown>) => unknown;
 
 const TOOLS: { name: string; description: string; handler: Handler }[] = [
+  {
+    name: "artifact-export",
+    description: "Export the current session state as a discovery brief JSON.",
+    handler: artifactExport,
+  },
+  {
+    name: "artifact-copy",
+    description: "Copy the current session state as a discovery brief JSON.",
+    handler: artifactCopy,
+  },
+  {
+    name: "artifact-import",
+    description: "Import a discovery brief JSON to restore session state.",
+    handler: artifactImport,
+  },
+
   {
     name: "browse-open",
     description:
@@ -256,7 +307,7 @@ export function initWebMcp() {
   const w = window as unknown as Record<string, unknown>;
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
-    modules: ["browse-query-v1", "form-workflow-v1", "command-session-v1"],
+    modules: ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
     tools: TOOLS.map((t) => t.name),
   });
   w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));

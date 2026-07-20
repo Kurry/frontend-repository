@@ -1,0 +1,66 @@
+---
+---
+<dialog id="command-palette" class="theme-dark command-palette" aria-label="Command palette">
+  <div class="command-palette_wrapper">
+    <input type="text" id="command-input" placeholder="Search commands..." autocomplete="off" />
+    <ul id="command-list" class="command-list">
+      <li><button data-cmd="export">Export brief</button></li>
+      <li><button data-cmd="services">Jump to services</button></li>
+    </ul>
+  </div>
+</dialog>
+
+<style>
+dialog.command-palette {
+  border: none;
+  background: var(--_theme---background, #181818);
+  color: var(--_theme---body-text, #eae9e6);
+  padding: 1.5em;
+  max-width: 500px;
+  width: 90%;
+  margin: 10vh auto auto;
+  border-radius: 8px;
+}
+dialog.command-palette::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+.command-palette_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+}
+#command-input {
+  width: 100%;
+  padding: 0.8em;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  color: inherit;
+  font-size: 1.1em;
+  border-radius: 4px;
+}
+#command-input:focus {
+  outline: none;
+  border-color: var(--_theme---primary, #ecfdad);
+}
+.command-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+.command-list button {
+  width: 100%;
+  text-align: left;
+  padding: 0.8em;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.command-list button:hover, .command-list button:focus {
+  background: rgba(255,255,255,0.1);
+}
+</style>

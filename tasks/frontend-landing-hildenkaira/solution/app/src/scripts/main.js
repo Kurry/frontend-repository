@@ -19,6 +19,7 @@ const isMobile = () => window.matchMedia("(max-width: 767px)").matches;
 
 /* ------------------------------------------------ smooth scroll (>=768) */
 let lenis = null;
+let clientDeckSwiper = null;
 function initLenis() {
   if (window.matchMedia("(min-width: 768px)").matches) {
     lenis = new Lenis({
@@ -264,8 +265,14 @@ function initLocaleDropdown() {
   root.querySelectorAll("[data-locale-option]").forEach((opt) => {
     opt.addEventListener("click", (e) => {
       e.preventDefault();
-      current.textContent = opt.getAttribute("data-locale-option");
+      const label = opt.getAttribute("data-locale-option");
+      current.textContent = label;
       root.classList.remove("is-open");
+      // Keep the session store in sync so exported briefs carry the choice.
+      if (window.appState) {
+        window.appState.locale = (label || "en").toLowerCase();
+        updateUIFromState();
+      }
     });
   });
   document.addEventListener("click", (e) => {
@@ -278,7 +285,7 @@ function initSwiper() {
   const group = document.querySelector("[data-swiper-group]");
   if (!group) return;
   const el = group.querySelector(".swiper");
-  new Swiper(el, {
+  clientDeckSwiper = new Swiper(el, {
     modules: [Navigation, Keyboard],
     slidesPerView: "auto",
     speed: 600,
@@ -379,6 +386,8 @@ function initTestimonials() {
   wrap.querySelector("[data-next]")?.addEventListener("click", () => { show(index + 1); restart(); });
   wrap.querySelector("[data-prev]")?.addEventListener("click", () => { show(index - 1); restart(); });
   restart();
+  // Exposed so state import can drive the real rotator to a specific index.
+  wrap._testimonialSetIndex = (i) => { show(i); restart(); };
 }
 
 /* ------------------------------------------------ momentum hover (CTA cards) */
@@ -445,12 +454,16 @@ function initContact() {
     document.querySelectorAll("[data-cta-popup-open]").forEach((btn) =>
       btn.addEventListener("click", (e) => {
         e.preventDefault();
-        popup.classList.add("is-open");
+        popup.showModal();
+        // Move focus into the dialog (first form field, falling back to the
+        // close button) instead of leaving it on the <dialog> element itself.
+        const firstField = popup.querySelector(".form-input");
+        (firstField || popup.querySelector("[data-cta-popup-close]"))?.focus();
       })
     );
-    popup.querySelector("[data-cta-popup-close]")?.addEventListener("click", () => popup.classList.remove("is-open"));
+    popup.querySelector("[data-cta-popup-close]")?.addEventListener("click", () => popup.close());
     popup.addEventListener("click", (e) => {
-      if (e.target === popup) popup.classList.remove("is-open");
+      if (e.target === popup) popup.close();
     });
   }
 
@@ -495,6 +508,11 @@ function initContact() {
       if (res.ok) {
         success?.classList.add("is-visible");
         fail?.classList.remove("is-visible");
+        // Record the successful lead in the discovery-brief session state.
+        window.appState.contactSubmitted = true;
+        window.appState.contactEmail = email.value;
+        pushHistory();
+        updateUIFromState();
       } else {
         fail?.classList.add("is-visible");
       }
@@ -505,6 +523,40 @@ function initContact() {
 }
 
 /* ------------------------------------------------ cookie flow */
+// Toggle checkboxes inside the preferences panel are matched to appState
+// categories by their input name (falls back to the label's data-toggle
+// value so markup variants without an explicit name still work).
+function cookieCategoryFor(input, label) {
+  const key = (input?.name || label.getAttribute("data-toggle") || "").toLowerCase();
+  if (key.includes("market")) return "marketing";
+  if (key.includes("analytic")) return "analytics";
+  if (key.includes("personal")) return "personalization";
+  return null;
+}
+
+function syncCookieTogglesFromState(prefs) {
+  if (!prefs || !window.appState) return;
+  prefs.querySelectorAll("[data-toggle]").forEach((label) => {
+    const input = label.querySelector("input");
+    const category = cookieCategoryFor(input, label);
+    if (!input || !category) return;
+    const checked = category === "essential" ? true : Boolean(window.appState.cookieCategories[category]);
+    input.checked = checked;
+    label.classList.toggle("is-on", checked);
+  });
+}
+
+function applyCookieCategories(categories) {
+  window.appState.cookieCategories = {
+    essential: true,
+    marketing: Boolean(categories.marketing),
+    analytics: Boolean(categories.analytics),
+    personalization: Boolean(categories.personalization),
+  };
+  pushHistory();
+  updateUIFromState();
+}
+
 function initCookies() {
   const banner = document.querySelector('[data-cookie-banner="zone-1"]');
   const prefs = document.querySelector("[data-cookie-prefs]");
@@ -513,10 +565,12 @@ function initCookies() {
     banner.querySelector("[data-cookie-close]")?.addEventListener("click", () => banner.classList.remove("is-visible"));
     banner.querySelector("[data-cookie-accept]")?.addEventListener("click", (e) => {
       e.preventDefault();
+      applyCookieCategories({ marketing: true, analytics: true, personalization: true });
       banner.classList.remove("is-visible");
     });
     banner.querySelector("[data-cookie-prefs-open]")?.addEventListener("click", (e) => {
       e.preventDefault();
+      syncCookieTogglesFromState(prefs);
       prefs?.classList.add("is-visible");
     });
   }
@@ -524,17 +578,36 @@ function initCookies() {
     const close = () => prefs.classList.remove("is-visible");
     prefs.querySelector("[data-cookie-prefs-close]")?.addEventListener("click", close);
     prefs.querySelector("[data-cookie-prefs-close-target]")?.addEventListener("click", close);
-    ["[data-cookie-reject]", "[data-cookie-accept-all]", "[data-cookie-accept-selected]"].forEach((sel) => {
-      prefs.querySelector(sel)?.addEventListener("click", (e) => {
-        e.preventDefault();
-        close();
-        banner?.classList.remove("is-visible");
+    prefs.querySelector("[data-cookie-reject]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      applyCookieCategories({ marketing: false, analytics: false, personalization: false });
+      close();
+      banner?.classList.remove("is-visible");
+    });
+    prefs.querySelector("[data-cookie-accept-all]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      applyCookieCategories({ marketing: true, analytics: true, personalization: true });
+      close();
+      banner?.classList.remove("is-visible");
+    });
+    prefs.querySelector("[data-cookie-accept-selected]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      const selected = { marketing: false, analytics: false, personalization: false };
+      prefs.querySelectorAll("[data-toggle]").forEach((label) => {
+        const input = label.querySelector("input");
+        const category = cookieCategoryFor(input, label);
+        if (input && category && category in selected) selected[category] = input.checked;
       });
+      applyCookieCategories(selected);
+      close();
+      banner?.classList.remove("is-visible");
     });
     prefs.querySelectorAll("[data-toggle]").forEach((label) => {
       const input = label.querySelector("input");
       input?.addEventListener("change", () => label.classList.toggle("is-on", input.checked));
     });
+    // Reflect current state whenever the banner (re)opens the panel.
+    syncCookieTogglesFromState(prefs);
   }
 }
 
@@ -547,22 +620,23 @@ function initMisc() {
 
 /* ------------------------------------------------ boot */
 function boot() {
-  initLenis();
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reducedMotion) initLenis();
   initMisc();
   initHero();
   initNavDock();
   initNavThemeSync();
   initMobileMenu();
   initLocaleDropdown();
-  initSplitReveals();
+  if (!reducedMotion) initSplitReveals();
   initSwiper();
   initFlickGroups(gsap);
   initPlayers();
-  initCounters();
-  initServices();
-  initTestimonials();
-  initMomentumHover();
-  initParallax();
+  if (!reducedMotion) initCounters();
+  if (!reducedMotion) initServices();
+  if (!reducedMotion) initTestimonials(); else initTestimonialsNoAnim();
+  if (!reducedMotion) initMomentumHover();
+  if (!reducedMotion) initParallax();
   initContact();
   initCookies();
   ScrollTrigger.refresh();
@@ -573,3 +647,508 @@ if (document.readyState === "loading") {
 } else {
   boot();
 }
+
+function initTestimonialsNoAnim() {
+  const wrap = document.querySelector("[data-testimonial-wrap]");
+  if (!wrap) return;
+  const items = Array.from(wrap.querySelectorAll("[data-testimonial-item]"));
+  const count = wrap.querySelector("[data-current]");
+  let index = 0;
+  const show = (next) => {
+    if (next === index) return;
+    const prev = items[index];
+    index = (next + items.length) % items.length;
+    const active = items[index];
+    prev.classList.remove("is--active");
+    active.classList.add("is--active");
+    count && (count.textContent = String(index + 1));
+  };
+  wrap.querySelector("[data-next]")?.addEventListener("click", () => show(index + 1));
+  wrap.querySelector("[data-prev]")?.addEventListener("click", () => show(index - 1));
+  // Exposed so state import can drive the real rotator to a specific index.
+  wrap._testimonialSetIndex = (i) => show(i);
+}
+
+// Global State Management
+window.appState = {
+  shortlist: [],
+  cookieCategories: {
+    essential: true,
+    marketing: false,
+    analytics: false,
+    personalization: false
+  },
+  contactSubmitted: false,
+  contactEmail: null,
+  locale: "en"
+};
+window.appHistory = [];
+window.appHistoryPointer = -1;
+
+function pushHistory() {
+  // Discard future states if we are not at the end
+  window.appHistory = window.appHistory.slice(0, window.appHistoryPointer + 1);
+  window.appHistory.push(JSON.stringify(window.appState));
+  window.appHistoryPointer++;
+}
+
+function restoreHistory(stateStr) {
+  if (!stateStr) return;
+  window.appState = JSON.parse(stateStr);
+  updateUIFromState();
+}
+
+window.undoAction = function() {
+  if (window.appHistoryPointer > 0) {
+    window.appHistoryPointer--;
+    restoreHistory(window.appHistory[window.appHistoryPointer]);
+  }
+};
+
+window.redoAction = function() {
+  if (window.appHistoryPointer < window.appHistory.length - 1) {
+    window.appHistoryPointer++;
+    restoreHistory(window.appHistory[window.appHistoryPointer]);
+  }
+};
+
+// Deck Shortlist controls only add (deduplicated); removal happens via the
+// Shortlist panel's Remove control.
+window.addToShortlist = function(clientName) {
+  if (window.appState.shortlist.includes(clientName)) return;
+  window.appState.shortlist.push(clientName);
+  pushHistory();
+  updateUIFromState();
+};
+
+window.removeFromShortlist = function(clientName) {
+  if (!window.appState.shortlist.includes(clientName)) return;
+  window.appState.shortlist = window.appState.shortlist.filter(n => n !== clientName);
+  pushHistory();
+  updateUIFromState();
+};
+
+// Live session facts read from the DOM so the brief always reflects the page.
+function readClientDeckFacts() {
+  const facts = {
+    activeClient: null,
+    flickIndexByClient: {},
+    activeOrganicViews: "",
+    activeLikes: ""
+  };
+  document.querySelectorAll(".swiper-slide").forEach((slide) => {
+    const name = slide.querySelector("[data-shortlist-btn]")?.getAttribute("data-shortlist-btn");
+    if (!name) return;
+    const items = Array.from(slide.querySelectorAll("[data-flick-cards-item]"));
+    const idx = items.findIndex((it) => it.getAttribute("data-flick-cards-item-status") === "active");
+    facts.flickIndexByClient[name] = idx >= 0 ? idx : 0;
+    if (facts.activeClient === null) facts.activeClient = name; // fallback: first slide
+    if (slide.classList.contains("swiper-slide-active")) {
+      facts.activeClient = name;
+      facts.activeOrganicViews = slide.querySelector('[data-count="organic-views"]')?.textContent.trim() ?? "";
+      facts.activeLikes = slide.querySelector('[data-count="likes"]')?.textContent.trim() ?? "";
+    }
+  });
+  if (!facts.activeOrganicViews) {
+    facts.activeOrganicViews = document.querySelector('[data-count="organic-views"]')?.textContent.trim() ?? "";
+  }
+  if (!facts.activeLikes) {
+    facts.activeLikes = document.querySelector('[data-count="likes"]')?.textContent.trim() ?? "";
+  }
+  return facts;
+}
+
+function readTestimonialIndex() {
+  const wrap = document.querySelector("[data-testimonial-wrap]");
+  if (!wrap) return 0;
+  const items = Array.from(wrap.querySelectorAll("[data-testimonial-item]"));
+  const idx = items.findIndex((it) => it.classList.contains("is--active"));
+  return idx >= 0 ? idx : 0;
+}
+
+function buildBriefData() {
+  const deckFacts = readClientDeckFacts();
+  return {
+    schemaVersion: 1,
+    brand: "Cinder & Bloom",
+    shortlistedClients: window.appState.shortlist,
+    activeClient: deckFacts.activeClient,
+    flickIndexByClient: deckFacts.flickIndexByClient,
+    locale: window.appState.locale,
+    cookieCategories: window.appState.cookieCategories,
+    contactSubmitted: Boolean(window.appState.contactSubmitted),
+    contactEmail: window.appState.contactSubmitted ? window.appState.contactEmail : null,
+    activeOrganicViews: deckFacts.activeOrganicViews,
+    activeLikes: deckFacts.activeLikes,
+    testimonialIndex: readTestimonialIndex()
+  };
+}
+
+window.exportBriefJSON = function() {
+  return JSON.stringify(buildBriefData(), null, 2);
+};
+
+// Live Markdown summary rendered in the Discovery Brief's Markdown tab,
+// generated from the exact same brief data as the JSON export.
+window.exportBriefMarkdown = function() {
+  const data = buildBriefData();
+  const cookies = data.cookieCategories || {};
+  return [
+    `# Discovery Brief — ${data.brand}`,
+    "",
+    `**Active client:** ${data.activeClient || "—"}`,
+    `**Shortlisted clients:** ${data.shortlistedClients.length ? data.shortlistedClients.join(", ") : "None"}`,
+    `**Locale:** ${(data.locale || "en").toUpperCase()}`,
+    "",
+    "## Cookie preferences",
+    `- Essential: ${cookies.essential ? "Yes" : "No"}`,
+    `- Marketing: ${cookies.marketing ? "Yes" : "No"}`,
+    `- Analytics: ${cookies.analytics ? "Yes" : "No"}`,
+    `- Personalization: ${cookies.personalization ? "Yes" : "No"}`,
+    "",
+    "## Contact",
+    `- Submitted: ${data.contactSubmitted ? "Yes" : "No"}`,
+    `- Email: ${data.contactEmail || "—"}`,
+    "",
+    "## Session snapshot",
+    `- Active organic views: ${data.activeOrganicViews || "—"}`,
+    `- Active likes: ${data.activeLikes || "—"}`,
+    `- Testimonial index: ${data.testimonialIndex}`
+  ].join("\n");
+};
+
+// Validates an imported cookieCategories object against the discovery-brief
+// contract: all four keys must be present booleans, and essential must be
+// true. Anything else (missing key, non-boolean value, or essential:false)
+// is an invalid brief and must be rejected rather than silently coerced.
+function validateCookieCategories(input) {
+  if (!input || typeof input !== "object") {
+    throw new Error("Missing cookieCategories");
+  }
+  for (const key of ["essential", "marketing", "analytics", "personalization"]) {
+    if (typeof input[key] !== "boolean") {
+      throw new Error(`Invalid cookieCategories.${key}`);
+    }
+  }
+  if (input.essential !== true) {
+    throw new Error("cookieCategories.essential must be true");
+  }
+  return {
+    essential: true,
+    marketing: input.marketing,
+    analytics: input.analytics,
+    personalization: input.personalization
+  };
+}
+
+window.importBriefJSON = function(jsonString) {
+  window.importBriefJSON.lastError = null;
+  try {
+    const data = typeof jsonString === "string" ? JSON.parse(jsonString) : jsonString;
+    if (data.schemaVersion !== 1 || !data.shortlistedClients) {
+      throw new Error("Invalid schema");
+    }
+    // Discovery-brief schema requires the brand to match exactly.
+    if (data.brand !== "Cinder & Bloom") {
+      throw new Error(`Invalid brand: expected "Cinder & Bloom"`);
+    }
+    const allowedLocales = ["en", "fi"];
+    if (data.locale && !allowedLocales.includes(data.locale)) {
+      throw new Error("Invalid locale");
+    }
+    // Broken pairing in either direction is invalid: a submitted lead must
+    // carry its email, and a non-submitted brief must not carry a leaked one.
+    if (data.contactSubmitted && !data.contactEmail) {
+      throw new Error("Broken contact Submitted pairing");
+    }
+    if (!data.contactSubmitted && data.contactEmail) {
+      throw new Error("Broken contact Submitted pairing");
+    }
+    // The five canonical client titles used across the export/data contract
+    // (shortlist entries, activeClient, flickIndexByClient keys).
+    const allowedTitles = ["Loom House", "Second Circle", "New Current", "Roadkind", "Motive Lab"];
+    const referencedTitles = new Set(data.shortlistedClients || []);
+    if (data.activeClient) referencedTitles.add(data.activeClient);
+    if (data.flickIndexByClient) {
+      Object.keys(data.flickIndexByClient).forEach((k) => referencedTitles.add(k));
+    }
+    for (const title of referencedTitles) {
+      if (!allowedTitles.includes(title)) {
+        throw new Error(`Unknown client title: ${title}`);
+      }
+    }
+    // flickIndexByClient must carry all five canonical titles, each with a
+    // non-negative integer index, per the discovery-brief schema contract.
+    if (!data.flickIndexByClient || typeof data.flickIndexByClient !== "object") {
+      throw new Error("Missing flickIndexByClient");
+    }
+    for (const title of allowedTitles) {
+      const idx = data.flickIndexByClient[title];
+      if (!Number.isInteger(idx) || idx < 0) {
+        throw new Error(`Invalid flickIndexByClient.${title}`);
+      }
+    }
+    // Validate cookie categories before mutating any state so a rejected
+    // brief (including essential:false) leaves session state untouched.
+    const validatedCookieCategories = validateCookieCategories(data.cookieCategories);
+
+    window.appState.shortlist = data.shortlistedClients || [];
+    if (data.locale) window.appState.locale = data.locale;
+    // Assign contact state unconditionally so a brief without a submitted lead
+    // clears any previously stored email instead of leaking it into re-exports.
+    window.appState.contactSubmitted = Boolean(data.contactSubmitted);
+    window.appState.contactEmail = window.appState.contactSubmitted ? data.contactEmail : null;
+    window.appState.cookieCategories = validatedCookieCategories;
+
+    pushHistory();
+    updateUIFromState();
+    restoreDeckPositions(data);
+    return true;
+  } catch (err) {
+    window.importBriefJSON.lastError = (err && err.message) ? err.message : "Invalid discovery brief format.";
+    return false;
+  }
+};
+
+// Drives the real UI controls (swiper, flick deck, testimonial rotator) so
+// an imported brief's carousel/flick/testimonial indices are visibly
+// reflected on the page, not just stored in memory.
+function restoreDeckPositions(data) {
+  if (data.activeClient) {
+    const slides = Array.from(document.querySelectorAll(".swiper-slide"));
+    const idx = slides.findIndex(
+      (slide) => slide.querySelector("[data-shortlist-btn]")?.getAttribute("data-shortlist-btn") === data.activeClient
+    );
+    if (idx >= 0 && clientDeckSwiper) clientDeckSwiper.slideTo(idx, 0);
+  }
+  if (data.flickIndexByClient) {
+    document.querySelectorAll(".swiper-slide").forEach((slide) => {
+      const name = slide.querySelector("[data-shortlist-btn]")?.getAttribute("data-shortlist-btn");
+      if (!name || !(name in data.flickIndexByClient)) return;
+      const group = slide.querySelector("[data-flick-cards-init]");
+      if (group && typeof group._flickSetIndex === "function") {
+        group._flickSetIndex(data.flickIndexByClient[name]);
+      }
+    });
+  }
+  if (typeof data.testimonialIndex === "number") {
+    const wrap = document.querySelector("[data-testimonial-wrap]");
+    if (wrap && typeof wrap._testimonialSetIndex === "function") {
+      wrap._testimonialSetIndex(data.testimonialIndex);
+    }
+  }
+}
+
+function updateUIFromState() {
+  const countEl = document.getElementById("nav-shortlist-count");
+  if (countEl) countEl.textContent = window.appState.shortlist.length;
+  
+  const container = document.getElementById("shortlist-items-container");
+  if (container) {
+    container.innerHTML = "";
+    window.appState.shortlist.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "shortlist-item";
+      div.innerHTML = `<span>${item}</span><button class="shortlist-item-remove" data-remove="${item}">Remove</button>`;
+      container.appendChild(div);
+    });
+    container.querySelectorAll(".shortlist-item-remove").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        window.removeFromShortlist(e.target.getAttribute("data-remove"));
+      });
+    });
+  }
+  
+  document.querySelectorAll("[data-shortlist-btn]").forEach(btn => {
+    const name = btn.getAttribute("data-shortlist-btn");
+    if (window.appState.shortlist.includes(name)) {
+      btn.classList.add("is-active");
+    } else {
+      btn.classList.remove("is-active");
+    }
+  });
+
+  const localeLabel = document.querySelector("[data-locale-current]");
+  if (localeLabel) localeLabel.textContent = (window.appState.locale || "en").toUpperCase();
+
+  const textarea = document.getElementById("brief-json-output");
+  if (textarea) {
+    textarea.value = window.exportBriefJSON();
+  }
+
+  const markdownOutput = document.getElementById("brief-markdown-output");
+  if (markdownOutput) {
+    markdownOutput.value = window.exportBriefMarkdown();
+  }
+
+  // Undo/redo can revert contactSubmitted in memory; keep the contact-form
+  // success/error UI layers in sync so a reverted state doesn't keep
+  // "Thanks for your submission!" visible.
+  const contactSuccess = document.querySelector("[data-form-success]");
+  if (contactSuccess) {
+    contactSuccess.classList.toggle("is-visible", Boolean(window.appState.contactSubmitted));
+  }
+  const contactFail = document.querySelector("[data-form-error]");
+  if (contactFail && window.appState.contactSubmitted) {
+    contactFail.classList.remove("is-visible");
+  }
+  
+  // Dispatch a custom event in case webmcp wants to know
+  window.dispatchEvent(new Event("appStateUpdated"));
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  pushHistory(); // Initial state
+  
+  document.querySelectorAll("[data-shortlist-btn]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      window.addToShortlist(btn.getAttribute("data-shortlist-btn"));
+    });
+  });
+
+  // Shortlist Panel
+  const slPanel = document.getElementById("shortlist-panel");
+  if (slPanel) {
+    const trigger = document.getElementById("nav-shortlist-trigger"); // Needs to be added to Nav.astro
+    if (trigger) trigger.addEventListener("click", () => {
+      updateUIFromState();
+      slPanel.showModal();
+    });
+    const close = document.getElementById("shortlist-panel-close");
+    if (close) close.addEventListener("click", () => slPanel.close());
+    const exportBtn = document.getElementById("btn-export-brief");
+    if (exportBtn) exportBtn.addEventListener("click", () => {
+      slPanel.close();
+      const briefPanel = document.getElementById("discovery-brief-panel");
+      if (briefPanel) {
+        updateUIFromState();
+        briefPanel.showModal();
+      }
+    });
+  }
+
+  // Command Palette
+  const cp = document.getElementById("command-palette");
+  if (cp) {
+    document.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        cp.showModal();
+        const input = document.getElementById("command-input");
+        if (input) input.focus();
+      }
+    });
+    cp.addEventListener("click", (e) => {
+      if (e.target === cp) cp.close();
+    });
+    cp.querySelectorAll("[data-cmd]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const cmd = btn.getAttribute("data-cmd");
+        cp.close();
+        if (cmd === "export") {
+          const briefPanel = document.getElementById("discovery-brief-panel");
+          if (briefPanel) {
+            updateUIFromState();
+            briefPanel.showModal();
+          }
+        } else if (cmd === "services") {
+          const services = document.querySelector(".section_services");
+          if (services) services.scrollIntoView({ behavior: "smooth" });
+        }
+      });
+    });
+  }
+
+  // Discovery Brief
+  const db = document.getElementById("discovery-brief-panel");
+  if (db) {
+    const close = document.getElementById("discovery-brief-close");
+    if (close) close.addEventListener("click", () => db.close());
+    db.addEventListener("click", (e) => {
+      if (e.target === db) db.close();
+    });
+    
+    document.getElementById("btn-download-brief")?.addEventListener("click", () => {
+      const blob = new Blob([window.exportBriefJSON()], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "discovery-brief.json";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+    
+    const copyBtn = document.getElementById("btn-copy-brief");
+    if (copyBtn) {
+      const copyLabel = copyBtn.textContent;
+      let copyRevertTimer = null;
+      copyBtn.addEventListener("click", () => {
+        // Copy whatever format is currently visible (JSON or Markdown tab),
+        // not always the JSON export.
+        const activeTab = db.querySelector("[data-brief-tab].is-active")?.getAttribute("data-brief-tab");
+        const text = activeTab === "markdown" ? window.exportBriefMarkdown() : window.exportBriefJSON();
+        navigator.clipboard.writeText(text).then(() => {
+          copyBtn.textContent = "Copied!";
+          if (copyRevertTimer) clearTimeout(copyRevertTimer);
+          copyRevertTimer = setTimeout(() => {
+            copyBtn.textContent = copyLabel;
+            copyRevertTimer = null;
+          }, 2000);
+        });
+      });
+    }
+    
+    document.getElementById("btn-import-brief-trigger")?.addEventListener("click", () => {
+      const sec = document.getElementById("import-section");
+      if (sec) sec.style.display = "block";
+    });
+    
+    document.getElementById("btn-import-brief-submit")?.addEventListener("click", () => {
+      const input = document.getElementById("import-json-input");
+      const err = document.getElementById("import-error");
+      if (input && err) {
+        err.textContent = "";
+        const success = window.importBriefJSON(input.value);
+        if (success) {
+          db.close();
+        } else {
+          err.textContent = window.importBriefJSON.lastError || "Invalid discovery brief format.";
+        }
+      }
+    });
+
+    // JSON / Markdown tab control for the discovery brief panel.
+    db.querySelectorAll("[data-brief-tab]").forEach((tabBtn) => {
+      tabBtn.addEventListener("click", () => {
+        const target = tabBtn.getAttribute("data-brief-tab");
+        db.querySelectorAll("[data-brief-tab]").forEach((btn) => {
+          const isActive = btn === tabBtn;
+          btn.classList.toggle("is-active", isActive);
+          btn.setAttribute("aria-selected", String(isActive));
+        });
+        db.querySelectorAll(".discovery-brief_panel").forEach((panel) => {
+          panel.hidden = panel.id !== `brief-panel-${target}`;
+        });
+      });
+    });
+  }
+
+  // Undo / Redo Shortcuts
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+      const active = document.activeElement;
+      const isTextEditable =
+        active &&
+        (active.tagName === "INPUT" ||
+          active.tagName === "TEXTAREA" ||
+          active.tagName === "SELECT" ||
+          active.isContentEditable);
+      if (isTextEditable) return;
+      if (e.shiftKey) window.redoAction();
+      else window.undoAction();
+    }
+  });
+  // Contact state is recorded by initContact's guarded submit handler only
+  // after validation passes and the local endpoint responds OK.
+});
+

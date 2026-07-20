@@ -80,5 +80,17 @@ export function initFlickGroups(gsap) {
         if (i !== active && Math.abs(relFor(i)) <= 2) step(relFor(i) > 0 ? 1 : -1);
       });
     });
+
+    // Exposed so external code (e.g. discovery-brief import) can jump this
+    // deck directly to an index, keeping the closure's `active` index and
+    // the visible card layout in sync.
+    group._flickSetIndex = (index) => {
+      const n = items.length;
+      if (!n) return;
+      const clamped = ((index % n) + n) % n;
+      if (clamped === active) return;
+      active = clamped;
+      layout(false);
+    };
   });
 }

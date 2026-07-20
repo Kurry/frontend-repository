@@ -2,7 +2,19 @@
 import data from "../data/home.json";
 import Button from "./Button.astro";
 import BunnyPlayer from "./BunnyPlayer.astro";
-const decks = data.decks;
+// The client slugs in home.json map to the five canonical display titles
+// used across the shortlist / export / flick-index contract.
+const CLIENT_TITLES: Record<string, string> = {
+  finlayson: "Loom House",
+  kierratyskeskus: "Second Circle",
+  "uusi-juttu": "New Current",
+  autoliitto: "Roadkind",
+  liikku: "Motive Lab",
+};
+const decks = data.decks.map((deck) => ({
+  ...deck,
+  clientTitle: CLIENT_TITLES[deck.client] || deck.client,
+}));
 const arrow = `<svg class="slider-button_arrow" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg>`;
 const arrowPrev = `<svg class="slider-button_arrow is--prev" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="square"/></svg>`;
 const eye = `<svg class="flick-card_data-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12Z"/><circle cx="12" cy="12" r="2.6"/></svg>`;
@@ -24,6 +36,7 @@ const eye = `<svg class="flick-card_data-icon-svg" viewBox="0 0 24 24" fill="non
                       <h2 class="client-deck_title">{deck.title}</h2>
                       <div class="client-deck_button">
                         <Button label="Show case" href={deck.caseHref} variant="secondary" />
+                        <button class="w-button btn-outline" data-shortlist-btn={deck.clientTitle} style="margin-left: 0.5em; padding: 0.5em 1em; border: 1px solid currentColor; border-radius: 4px; background: transparent; color: inherit; cursor: pointer;">Shortlist</button>
                       </div>
                     </div>
 
