@@ -34,7 +34,7 @@ type StoreState = {
   toggleFix: (slug: string, id: string, resolved?: boolean) => void;
   setStepNotes: (slug: string, step: ReviewerStepName, notes: string) => void;
   setStepDone: (slug: string, step: ReviewerStepName, done: boolean) => { ok: boolean; error?: string };
-  saveRecommendation: (slug: string, recommendation: Recommendation, overrideJustification: string | null, overrideEnabled: boolean) => { ok: boolean; error?: string };
+  saveRecommendation: (slug: string, recommendation: Recommendation | null, overrideJustification: string | null, overrideEnabled: boolean) => { ok: boolean; error?: string };
   setOverrideEnabled: (slug: string, enabled: boolean) => void;
   completeBundling: (slug: string) => { ok: boolean; error?: string };
   startRerun: (slug: string, gateName: GateName) => void;
@@ -196,6 +196,10 @@ export const useReviewStore = create<StoreState>((set, get) => ({
     return { ok: true };
   },
   saveRecommendation: (slug, recommendation, overrideJustification, overrideEnabled) => {
+    if (recommendation === null) {
+      set((state) => ({ bundles: updateBundle(state.bundles, slug, (next) => { next.recommendation = null; next.overrideJustification = null; }) }));
+      return { ok: true };
+    }
     const bundle = get().bundles.find((item) => item.slug === slug);
     if (!bundle) return { ok: false, error: 'Bundle not found.' };
     const outside = !deriveConstraint(bundle).allowed.includes(recommendation);
@@ -251,7 +255,7 @@ export const useReviewStore = create<StoreState>((set, get) => ({
   },
   advanceRerun: (slug, gateName) => {
     let shouldContinue = false;
-    let delay = 650;
+    let delay = 1200;
     let announcement = '';
     set((state) => ({ bundles: updateBundle(state.bundles, slug, (bundle) => {
       const session = bundle.reruns[gateName];
@@ -273,9 +277,10 @@ export const useReviewStore = create<StoreState>((set, get) => ({
       }
       if (step.status !== 'running') return;
       const forcedFailure = bundle.slug === 'basalt-runtime-audit' && gateName === 'Analysis' && step.name === 'evaluate checks' && step.attempt <= 3;
+      const exhaustedFailure = bundle.slug === 'drift-ledger-repair' && gateName === 'Analysis' && step.name === 'publish result' && step.attempt <= 3;
       const retryOnce = bundle.slug === 'linen-timeout-guard' && gateName === 'No-op' && step.name === 'collect trials' && step.attempt === 1;
-      if (forcedFailure || retryOnce) {
-        step.error = forcedFailure ? 'Evidence worker could not reconcile the retained trace.' : 'Probe runner lost its first result envelope.';
+      if (forcedFailure || retryOnce || exhaustedFailure) {
+        step.error = forcedFailure ? 'Evidence worker could not reconcile the retained trace.' : exhaustedFailure ? 'Target artifact missing from runner.' : 'Probe runner lost its first result envelope.';
         if (step.attempt >= step.maxAttempts) {
           step.status = 'failed';
           session.status = 'failed';
@@ -311,14 +316,14 @@ export const useReviewStore = create<StoreState>((set, get) => ({
         const model = gateName.endsWith('Sable-4') ? 'Sable-4' : 'Quartz-Mini';
         const modelTrials = bundle.trials.filter((trial) => trial.model === model);
         const invalid = modelTrials.find((trial) => !isTrialValid(trial));
-        if (invalid) {
+        if (invalid && !(bundle.slug === 'ember-relay-router' && model === 'Quartz-Mini')) {
           invalid.checks.forEach((check) => {
             if (['answer-determinacy', 'refusals', 'low-timeout'].includes(check.name)) check.outcome = 'pass';
           });
         }
         gate.validTrials = modelTrials.filter(isTrialValid).length;
         gate.totalTrials = modelTrials.length;
-        gate.score = Math.min(0.94, 0.83 + rerunCount * 0.01);
+        if (bundle.slug === 'ember-relay-router' && model === 'Quartz-Mini') { gate.score = 0.78; } else { gate.score = Math.min(0.94, 0.83 + rerunCount * 0.01); }
         gate.status = gate.validTrials >= 3 && gate.score >= 0.8 ? 'pass' : gate.validTrials < 3 ? 'inconclusive' : 'fail';
         gate.summary = `${model} now measures ${gate.score.toFixed(2)} with ${gate.validTrials} of ${gate.totalTrials} valid trials.`;
       } else if (gateName === 'Oracle') {
@@ -373,7 +378,7 @@ export const useReviewStore = create<StoreState>((set, get) => ({
   setTimelineKind: (kind) => set((state) => ({ ui: { ...state.ui, timelineKind: kind } })),
   enterDiff: () => set((state) => ({ ui: { ...state.ui, diff: { ...baseDiff, enabled: true, previousTrialId: state.selection.trialId } } })),
   setDiffTrials: (left, right) => set((state) => ({ ui: { ...state.ui, diff: left === right ? { ...state.ui.diff, error: 'Choose two different trials.' } : { ...state.ui.diff, leftTrialId: left, rightTrialId: right, error: null } } })),
-  exitDiff: () => set((state) => ({ selection: { ...state.selection, trialId: state.ui.diff.previousTrialId ?? state.selection.trialId }, ui: { ...state.ui, diff: baseDiff } })),
+  exitDiff: () => set((state) => { return { selection: { ...state.selection, trialId: state.ui.diff.previousTrialId || state.selection.trialId }, ui: { ...state.ui, diff: baseDiff } }; }),
   setExportOpen: (open) => set((state) => ({ ui: { ...state.ui, exportOpen: open, exportGeneratedAt: open ? new Date().toISOString() : state.ui.exportGeneratedAt } })),
   setExportFormat: (format) => set((state) => ({ ui: { ...state.ui, exportFormat: format } })),
   setExportPreviewText: (text) => set((state) => ({ ui: { ...state.ui, exportPreviewText: text } })),

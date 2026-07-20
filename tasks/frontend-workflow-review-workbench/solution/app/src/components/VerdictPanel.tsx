@@ -51,22 +51,22 @@ export default function VerdictPanel({ bundle }: { bundle: ReviewBundle }) {
 
   return (
     <section aria-labelledby="verdict-title">
-      <div className="section-heading"><div><Text className="eyebrow">Ordered constraint rules</Text><Title id="verdict-title" order={2}>Constrained verdict</Title><Text size="sm" c="dimmed">Choose from the live allowed set or document an explicit override.</Text></div><Group>{bundle.recommendation && <Badge size="lg" variant="light" leftSection={<IconShieldCheck size={15} />}>Current: {bundle.recommendation}</Badge>}{bundle.overrideJustification && <Badge size="lg" color="orange">Override</Badge>}</Group></div>
+      <div className="section-heading"><div><Text className="eyebrow">Ordered constraint rules</Text><Title id="verdict-title" order={2}>Constrained Verdict</Title><Text size="sm" c="dimmed">Choose from the live allowed set or document an explicit override.</Text></div><Group>{bundle.recommendation && <Badge size="lg" variant="light" leftSection={<IconShieldCheck size={15} />}>Current: {bundle.recommendation}</Badge>}{bundle.overrideJustification && <Badge size="lg" color="orange">Override</Badge>}</Group></div>
       <div className="verdict-grid">
-        <Paper component="form" className="verdict-form" onSubmit={handleSubmit(submit)}>
+        <Paper component="form" className="verdict-form" onSubmit={handleSubmit(submit)} style={{ transition: 'opacity 0.2s ease, transform 0.2s ease' }}>
           <Controller name="recommendation" control={control} render={({ field }) => (
             <Radio.Group value={field.value ?? ''} onChange={(value) => { clearErrors('recommendation'); field.onChange(value as Recommendation); }} label="Recommendation" description="Disabled choices require Override constraint." error={errors.recommendation?.message} required>
               <Stack mt="sm" gap="sm">
                 {RECOMMENDATIONS.map((value) => {
                   const allowed = constraint.allowed.includes(value);
                   const disabled = !allowed && !overrideEnabled;
-                  return <label key={value} className={`recommendation-option ${allowed ? 'allowed' : 'outside'} ${disabled ? 'disabled' : ''} ${field.value === value ? 'selected' : ''}`}><Radio value={value} disabled={disabled} /><span><Text fw={800}>{value}</Text><Text size="xs" c="dimmed">{allowed ? 'Allowed by the current highest-priority rule.' : overrideEnabled ? 'Outside the allowed set; justification required.' : 'Locked by the current constraint.'}</Text></span>{allowed ? <Badge color="teal" variant="light">Allowed</Badge> : <Badge color="gray" variant="outline">Override only</Badge>}</label>;
+                  return <label key={value}  style={{ transition: 'opacity 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.16s ease' }}><Radio value={value} disabled={disabled} /><span><Text fw={800}>{value}</Text><Text size="xs" c="dimmed">{allowed ? 'Allowed by the current highest-priority rule.' : overrideEnabled ? 'Outside the allowed set; justification required.' : 'Locked by the current constraint.'}</Text></span>{allowed ? <Badge color="teal" variant="light">Allowed</Badge> : <Badge color="gray" variant="outline">Override only</Badge>}</label>;
                 })}
               </Stack>
             </Radio.Group>
           )} />
           <Controller name="overrideEnabled" control={control} render={({ field }) => (
-            <Switch mt="lg" checked={field.value} onChange={(event) => { const enabled = event.currentTarget.checked; field.onChange(enabled); setOverrideEnabled(bundle.slug, enabled); if (!enabled && recommendation && !constraint.allowed.includes(recommendation)) reset({ recommendation: null, overrideEnabled: false, overrideJustification: '' }); }} label="Override constraint" description="Unlock out-of-set recommendations and require a written justification." thumbIcon={field.value ? <IconLockOpen size={12} /> : undefined} />
+            <Switch mt="lg" checked={field.value} onChange={(event) => { const enabled = event.currentTarget.checked; field.onChange(enabled); setOverrideEnabled(bundle.slug, enabled); if (!enabled && recommendation && !constraint.allowed.includes(recommendation)) { reset({ recommendation: null, overrideEnabled: false, overrideJustification: '' }); clearErrors('recommendation'); clearErrors('overrideJustification'); saveRecommendation(bundle.slug, null, null, false); } }} label="Override constraint" description="Unlock out-of-set recommendations and require a written justification." thumbIcon={field.value ? <IconLockOpen size={12} /> : undefined} />
           )} />
           {overrideEnabled && outside && (
             <Controller name="overrideJustification" control={control} render={({ field }) => (

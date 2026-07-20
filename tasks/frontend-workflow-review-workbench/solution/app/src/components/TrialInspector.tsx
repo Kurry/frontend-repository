@@ -27,13 +27,13 @@ function TrialDiff({ bundle }: { bundle: ReviewBundle }) {
   const flips = left && right ? CHECK_NAMES.filter((name) => left.checks.find((check) => check.name === name)?.outcome !== right.checks.find((check) => check.name === name)?.outcome) : [];
   return (
     <section className="diff-mode" aria-labelledby="diff-title">
-      <Group justify="space-between"><div><Text className="eyebrow">Same-gate comparison</Text><Title id="diff-title" order={2}>Trial check diff</Title></div><Button variant="default" leftSection={<IconArrowBackUp size={16} />} onClick={exitDiff}>Leave diff mode</Button></Group>
+      <Group justify="space-between"><div><Text className="eyebrow">Same-gate comparison</Text><Title id="diff-title" order={2}>Trial Check Diff</Title></div><Button variant="default" leftSection={<IconArrowBackUp size={16} />} onClick={exitDiff}>Leave diff mode</Button></Group>
       {!left || !right ? (
-        <Paper component="form" className="diff-picker" onSubmit={handleSubmit((values) => setDiffTrials(values.leftTrialId, values.rightTrialId))}>
+        <Paper component="form" className="diff-picker" onSubmit={handleSubmit((values) => { if (values.leftTrialId === values.rightTrialId) return; setDiffTrials(values.leftTrialId, values.rightTrialId) })}>
           <Text fw={750}>Pick two {model} trials</Text>
           <Group align="start" mt="sm">
             <Controller name="leftTrialId" control={control} render={({ field }) => <Select {...field} label="First trial" data={trials.map((trial) => ({ value: trial.id, label: `${trial.model} · trial ${trial.number} · ${isTrialValid(trial) ? 'valid' : 'invalid'}` }))} />} />
-            <Controller name="rightTrialId" control={control} render={({ field }) => <Select {...field} label="Second trial" error={errors.rightTrialId?.message} data={trials.filter((trial) => trial.id !== leftId).map((trial) => ({ value: trial.id, label: `${trial.model} · trial ${trial.number} · ${isTrialValid(trial) ? 'valid' : 'invalid'}` }))} />} />
+            <Controller name="rightTrialId" control={control} render={({ field }) => <Select {...field} label="Second trial" error={errors.rightTrialId?.message} data={trials.map((trial) => ({ value: trial.id, label: `${trial.model} · trial ${trial.number} · ${isTrialValid(trial) ? 'valid' : 'invalid'}` }))} />} />
             <Button type="submit" mt={25} leftSection={<IconArrowsDiff size={16} />}>Compare trials</Button>
           </Group>
           {diff.error && <Text c="red.7" size="sm" role="alert">{diff.error}</Text>}
@@ -77,32 +77,32 @@ export default function TrialInspector({ bundle }: { bundle: ReviewBundle }) {
   return (
     <section className="inspector-shell" aria-labelledby="inspector-title">
       <div className="section-heading">
-        <div><Text className="eyebrow">Linked read-only evidence</Text><Title id="inspector-title" order={2}>{model} trial inspector</Title><Text size="sm" c="dimmed">Select a criterion or its reasoning to move all three panes together.</Text></div>
+        <div><Text className="eyebrow">Linked read-only evidence</Text><Title id="inspector-title" order={2}>{model} Trial Inspector</Title><Text size="sm" c="dimmed">Select a criterion or its reasoning to move all three panes together.</Text></div>
         <Button leftSection={<IconArrowsDiff size={16} />} onClick={enterDiff}>Compare trials</Button>
       </div>
       <div className="trial-strip" role="listbox" aria-label={`${model} trials`}>
-        {trials.map((item) => <button type="button" role="option" aria-selected={item.id === trial.id} key={item.id} className={`trial-entry ${item.id === trial.id ? 'selected' : ''}`} onClick={() => selectTrial(item.id)}><span><strong>{item.model}</strong> · trial {item.number}</span><Badge className={isTrialValid(item) ? 'valid-badge' : 'invalid-badge'} leftSection={isTrialValid(item) ? <IconCheck size={12} /> : <IconCircleX size={12} />}>{isTrialValid(item) ? 'valid' : 'invalid'}</Badge></button>)}
+        {trials.map((item) => <button type="button" role="option" aria-label={`Select trial ${item.number}`} aria-selected={item.id === trial.id} key={item.id} className={`trial-entry ${item.id === trial.id ? 'selected' : ''}`} onClick={() => selectTrial(item.id)} style={{ transition: 'background-color 0.18s ease' }}><span><strong>{item.model}</strong> · trial {item.number}</span><Badge className={isTrialValid(item) ? 'valid-badge' : 'invalid-badge'} leftSection={isTrialValid(item) ? <IconCheck size={12} /> : <IconCircleX size={12} />}>{isTrialValid(item) ? 'valid' : 'invalid'}</Badge></button>)}
       </div>
-      <div className="inspector-grid">
+      <div className="inspector-grid inspector-three-column">
         <Paper className="inspector-pane criteria-pane" component="section" aria-label="Rubric criteria">
           <div className="pane-heading"><Text fw={800}>Rubric criteria</Text><Badge variant="outline">{bundle.criteria.length}</Badge></div>
           <Stack gap="xs">{bundle.criteria.map((criterion) => {
             const id = criterion.id.split('-').at(-1);
-            return <button type="button" key={criterion.id} className={`criterion-item ${selectedCriterion === criterion.id ? 'selected' : ''}`} onClick={() => selectCriterion(criterion.id)}><Group justify="space-between" align="start" wrap="nowrap"><span className="criterion-id">{id}</span><Text ta="left" size="sm" fw={700}>{criterion.name}</Text><Text size="xs" fw={750}>{Math.round(criterion.weight * 100)}%</Text></Group>{criterion.negated && <Badge className="negated-badge">Negated · inverted scoring</Badge>}</button>;
+            return <button type="button" aria-label={`Select criterion ${id}`} key={criterion.id} className={`criterion-item ${selectedCriterion === criterion.id ? 'selected' : ''}`} onClick={() => selectCriterion(criterion.id)} style={{ transition: 'background-color 0.18s ease' }}><Group justify="space-between" align="start" wrap="nowrap"><span className="criterion-id">{id}</span><Text ta="left" size="sm" fw={700}>{criterion.name}</Text><Text size="xs" fw={750}>{Math.round(criterion.weight * 100)}%</Text></Group>{criterion.negated && <Badge className="negated-badge">Negated · inverted scoring</Badge>}</button>;
           })}</Stack>
         </Paper>
         <Paper className="inspector-pane reasoning-pane" component="section" aria-label="Scorer reasoning and validity checks">
           <div className="pane-heading"><Text fw={800}>Scorer reasoning</Text><Badge variant="outline">{trial.model}</Badge></div>
           <div className="reasoning-list">{trial.reasoning.map((reason) => {
             const criterion = bundle.criteria.find((item) => item.id === reason.criterionId)!;
-            return <button type="button" key={reason.criterionId} className={`reasoning-block ${selectedCriterion === reason.criterionId ? 'selected' : ''}`} onClick={() => selectCriterion(reason.criterionId)}><Group justify="space-between"><Text size="xs" fw={800}>{criterion.id.split('-').at(-1)} · {criterion.name}</Text><OutcomeBadge outcome={reason.outcome} /></Group><Text ta="left" size="sm" mt={5}>{reason.text}</Text><Text size="xs" className="citation-line" mt={6}><IconLink size={12} /> {reason.citedPassageIds.length} cited answer passage</Text></button>;
+            return <button type="button" aria-label={`Select reasoning for criterion ${criterion.id.split('-').at(-1)}`} key={reason.criterionId} className={`reasoning-block ${selectedCriterion === reason.criterionId ? 'selected' : ''}`} onClick={() => selectCriterion(reason.criterionId)} style={{ transition: 'background-color 0.18s ease' }}><Group justify="space-between"><Text size="xs" fw={800}>{criterion.id.split('-').at(-1)} · {criterion.name}</Text><OutcomeBadge outcome={reason.outcome} /></Group><Text ta="left" size="sm" mt={5}>{reason.text}</Text><Text size="xs" className="citation-line" mt={6}><IconLink size={12} /> {reason.citedPassageIds.length} cited answer passage</Text></button>;
           })}</div>
           <div className="validity-section"><Group justify="space-between"><Text fw={800}>Eight validity checks</Text><Badge className={isTrialValid(trial) ? 'valid-badge' : 'invalid-badge'}>{isTrialValid(trial) ? 'valid' : 'invalid'}</Badge></Group><Text size="xs" c="dimmed" mb="sm">Valid exactly when answer-determinacy, refusals, and low-timeout all pass.</Text>{trial.checks.map((check) => <div className="validity-row" key={check.name}><div><Text size="sm" fw={700}>{check.name}</Text><Text size="xs" c="dimmed">{check.detail}</Text></div><OutcomeBadge outcome={check.outcome} /></div>)}</div>
         </Paper>
         <Paper className="inspector-pane answer-pane" component="section" aria-label="Agent answer">
           <div className="pane-heading"><Text fw={800}>Agent answer</Text><Badge variant="outline">Trial {trial.number}</Badge></div>
           <Text size="xs" c="dimmed" mb="md">Cited passages are shaded; the active criterion uses the stronger highlight.</Text>
-          <div className="answer-document">{trial.answerPassages.map((passage) => <p key={passage.id} className={`answer-passage cited-passage ${selectedCriterion && passage.criterionIds.includes(selectedCriterion) ? 'active-passage' : ''}`}>{passage.text}</p>)}</div>
+          <div className="answer-document">{trial.answerPassages.map((passage) => <p key={passage.id} className={`answer-passage cited-passage ${selectedCriterion && passage.criterionIds.includes(selectedCriterion) ? 'active-passage' : ''}`} style={{ transition: 'background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, transform 0.25s ease' }}>{passage.text}</p>)}</div>
         </Paper>
       </div>
     </section>
