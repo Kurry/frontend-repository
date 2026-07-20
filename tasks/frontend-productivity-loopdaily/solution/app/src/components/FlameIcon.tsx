@@ -13,10 +13,10 @@ export default function FlameIcon({ habit }: FlameIconProps) {
   let flameLabel = "";
 
   if (streak >= 30) {
-    flameClass = "text-[#FFB020] drop-shadow-[0_0_6px_rgba(255,176,32,0.6)]";
-    flameLabel = `${streak}🔥`;
+    flameClass = "text-[#FFB020] drop-shadow-[0_0_6px_rgba(255,176,32,0.8)]";
+    flameLabel = `${streak}🏆`;
   } else if (streak >= 7) {
-    flameClass = "text-[#FF6B20] drop-shadow-[0_0_4px_rgba(255,107,32,0.4)]";
+    flameClass = "text-[#FF6B20] drop-shadow-[0_0_4px_rgba(255,107,32,0.6)]";
     flameLabel = `${streak}🔥`;
   } else {
     flameClass = "text-[#FF8C42]";
@@ -25,7 +25,7 @@ export default function FlameIcon({ habit }: FlameIconProps) {
 
   return (
     <div className="flex items-center gap-1" title={`${streak} day streak`}>
-      <span className={`text-lg leading-none ${flameClass}`}>
+      <span className={`text-lg leading-none transition-all duration-300 ${flameClass}`} aria-hidden="true">
         {streak >= 30 ? "🏆" : "🔥"}
       </span>
       <span className={`text-xs font-semibold ${streak === 0 ? "text-[#64748B]" : "text-[#1B2430]"}`}>

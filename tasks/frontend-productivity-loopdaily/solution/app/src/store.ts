@@ -1,33 +1,71 @@
 import { atom, createStore } from "jotai";
-import type { AppState, Habit, Category, ToastMessage } from "./types";
+import { Habit, Category, AppState, EMOJI_PALETTE } from "./types";
+import { z } from "zod";
 
-// Explicit Jotai store instance (rather than the implicit default store) so
-// the WebMCP surface (src/webmcp.ts) can read/write the SAME atoms the React
-// tree renders from, via store.get(atom) / store.set(atom, ...). This is not
-// a parallel state implementation — it is the identical store the <Provider>
-// below is wired to.
-export const jotaiStore = createStore();
+const STORAGE_KEY = "loopdaily.appState.v1";
+const BACKUP_STORAGE_KEY = "loopdaily.appState.backup.v1";
 
-function genId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+function genId() {
+  return Math.random().toString(36).substring(2, 9);
 }
 
-const STORAGE_KEY = "loopdaily_state_v1";
-const BACKUP_STORAGE_KEY = "loopdaily_state_backup_v1";
-
-const defaultState: AppState = {
+export const defaultState: AppState = {
   habits: [],
   categories: [],
   activeCategoryFilter: null,
 };
 
-function saveToStorage(key: string, value: unknown): void {
+function saveToStorage(key: string, state: AppState) {
   try {
-    if (typeof window === "undefined") return;
-    localStorage.setItem(key, JSON.stringify(value));
+    if (typeof window !== "undefined") {
+      localStorage.setItem(key, JSON.stringify(state));
+    }
   } catch {
-    // ignore quota errors
+    // ignore
   }
+}
+
+const CategorySchema = z.object({
+  id: z.string().min(1),
+  name: z.string().max(40),
+});
+
+const HabitSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().trim().min(1).max(80),
+  icon: z.string().refine((val) => EMOJI_PALETTE.includes(val as any)),
+  targetType: z.enum(["once", "count"]),
+  targetCount: z.number().int().min(1).max(100),
+  categoryId: z.string().nullable(),
+  reminder: z.string().trim().max(40).optional().default(""),
+  paused: z.boolean(),
+  completions: z.record(z.string().regex(/^\d{4}-\d{2}-\d{2}$/), z.number().int().min(0)),
+  order: z.number().int().min(0),
+  createdAt: z.string().datetime(),
+}).refine(data => {
+  if (data.targetType === "once" && data.targetCount !== 1) return false;
+  return true;
+});
+
+const WorkspaceSchema = z.object({
+  schemaVersion: z.literal("loopdaily.workspace.v1"),
+  exportedAt: z.string().datetime(),
+  habits: z.array(HabitSchema),
+  categories: z.array(CategorySchema),
+  activeCategoryFilter: z.string().nullable(),
+}).refine(data => {
+  const categoryIds = new Set(data.categories.map(c => c.id));
+  if (data.activeCategoryFilter !== null && !categoryIds.has(data.activeCategoryFilter)) return false;
+  for (const habit of data.habits) {
+    if (habit.categoryId !== null && !categoryIds.has(habit.categoryId)) return false;
+  }
+  return true;
+});
+
+function isValidCategory(value: unknown): value is Category {
+  if (!value || typeof value !== "object") return false;
+  const c = value as Record<string, unknown>;
+  return typeof c.id === "string" && typeof c.name === "string";
 }
 
 function isValidHabit(value: unknown): value is Habit {
@@ -42,17 +80,12 @@ function isValidHabit(value: unknown): value is Habit {
     (h.categoryId === null || typeof h.categoryId === "string") &&
     typeof h.reminder === "string" &&
     typeof h.paused === "boolean" &&
+    h.completions &&
     typeof h.completions === "object" &&
-    h.completions !== null &&
+    !Array.isArray(h.completions) &&
     typeof h.order === "number" &&
     typeof h.createdAt === "string"
   );
-}
-
-function isValidCategory(value: unknown): value is Category {
-  if (!value || typeof value !== "object") return false;
-  const c = value as Record<string, unknown>;
-  return typeof c.id === "string" && typeof c.name === "string";
 }
 
 function isValidAppState(value: unknown): value is AppState {
@@ -298,6 +331,36 @@ function normalizeImportedData(data: unknown): AppState | null {
 }
 
 export const importDataAtom = atom(null, (get, set, data: unknown) => {
+  try {
+    WorkspaceSchema.parse(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const firstError = error.errors[0];
+      return { success: false, error: `${firstError.path.join(".")}: ${firstError.message}`, habitCount: 0, categoryCount: 0 };
+    }
+    return { success: false, error: "Invalid document structure", habitCount: 0, categoryCount: 0 };
+  }
+
+  const normalized = normalizeImportedData(data);
+  if (!normalized) {
+    return { success: false, error: "Normalization failed", habitCount: 0, categoryCount: 0 };
+  }
+
+  const current = get(appStateAtom);
+  saveToStorage(BACKUP_STORAGE_KEY, current);
+
+  set(appStateAtom, {
+    ...normalized,
+    activeCategoryFilter: (data as any).activeCategoryFilter,
+  });
+  return {
+    success: true,
+    habitCount: normalized.habits.length,
+    categoryCount: normalized.categories.length,
+  };
+});
+
+export const importMalformedDataAtom = atom(null, (get, set, data: unknown) => {
   const normalized = normalizeImportedData(data);
   if (!normalized) {
     return { success: false, habitCount: 0, categoryCount: 0 };
@@ -313,6 +376,7 @@ export const importDataAtom = atom(null, (get, set, data: unknown) => {
     categoryCount: normalized.categories.length,
   };
 });
+
 
 export const retryRecoveryAtom = atom(null, (get, set) => {
   const backup = parseStoredState(
@@ -340,26 +404,6 @@ export const resetAppAtom = atom(null, (_get, set) => {
   set(recoveryAtom, { active: false, message: "" });
 });
 
-export const toastsAtom = atom<ToastMessage[]>([]);
-
-export const addToastAtom = atom(
-  null,
-  (get, set, text: string, type: ToastMessage["type"] = "success") => {
-    const toast: ToastMessage = { id: genId(), text, type };
-    set(toastsAtom, [...get(toastsAtom), toast]);
-    setTimeout(() => {
-      set(removeToastAtom, toast.id);
-    }, 3000);
-  }
-);
-
-export const removeToastAtom = atom(null, (get, set, id: string) => {
-  set(
-    toastsAtom,
-    get(toastsAtom).filter((t) => t.id !== id)
-  );
-});
-
 export const malformedSample = {
   habits: [
     { id: "test1", name: "Malformed Habit", icon: "🔥", targetType: "once", completions: "not_an_object" },
@@ -371,3 +415,5 @@ export const malformedSample = {
   categories: [{ id: "cat1", name: "Test" }, null, "invalid"],
   extraField: "should be ignored",
 };
+
+export const jotaiStore = createStore();
