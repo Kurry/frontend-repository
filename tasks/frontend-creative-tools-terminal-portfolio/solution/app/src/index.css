@@ -1,0 +1,95 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@theme {
+  --color-primary: var(--primary);
+  --color-bg-base: var(--bg-base);
+  --color-text-main: var(--text-main);
+  --color-text-dim: var(--text-dim);
+  --color-border: var(--border);
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+:root {
+  --bg-base: #0f1115;
+  --text-main: #e2e8f0;
+  --text-dim: #94a3b8;
+  --border: #334155;
+  --primary: #38bdf8;
+  --panel-bg: rgba(15, 17, 21, 0.85);
+  --terminal-bg: rgba(15, 17, 21, 0.85);
+}
+
+:root.light {
+  --bg-base: #f8fafc;
+  --text-main: #0f172a;
+  --text-dim: #64748b;
+  --border: #cbd5e1;
+  --primary: #0284c7;
+  --panel-bg: rgba(248, 250, 252, 0.85);
+  --terminal-bg: rgba(248, 250, 252, 0.85);
+}
+
+:root.retro {
+  --bg-base: #2a211c;
+  --text-main: #ffb000;
+  --text-dim: #cc8c00;
+  --border: #7a5c29;
+  --primary: #ff6600;
+  --panel-bg: rgba(42, 33, 28, 0.95);
+  --terminal-bg: rgba(42, 33, 28, 0.95);
+}
+
+:root.glass {
+  --bg-base: #000000;
+  --text-main: #ffffff;
+  --text-dim: #cccccc;
+  --border: rgba(255, 255, 255, 0.2);
+  --primary: #ffffff;
+  --panel-bg: rgba(255, 255, 255, 0.1);
+  --terminal-bg: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.terminal-window {
+  background: var(--terminal-bg);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border-radius: 8px;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+
+.output-line { line-height: 1.6; }
+.output-line.dim { color: var(--text-dim); }
+.output-line.accent { color: var(--primary); }
+.output-line.error { color: #f87171; }
+.output-line.success { color: #4ade80; }
+
+.project-card {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.project-card:hover {
+  border-color: var(--primary);
+  background: rgba(255,255,255,0.02);
+}
+
+.cmd-desc {
+  color: var(--text-dim);
+}
+
+.seo-fallback { display: none; }
