@@ -6,6 +6,6 @@ export const universal = {
   "prerender": "auto"
 };
 export const universal_id = "src/routes/[...path]/+layout.ts";
-export const imports = ["_app/immutable/nodes/2.Cjd8jcpW.js","_app/immutable/nodes/0.BWYKTmaI.js","_app/immutable/chunks/Bzak7iHL.js","_app/immutable/chunks/CB6zC0U1.js","_app/immutable/chunks/BktESSWG.js","_app/immutable/chunks/C_7YdnXx.js"];
+export const imports = ["_app/immutable/nodes/2.DGr5ROC6.js","_app/immutable/nodes/0.D3yr8sZZ.js","_app/immutable/chunks/BjkWb9MB.js","_app/immutable/chunks/cnHa7thY.js","_app/immutable/chunks/CdiIMTNR.js"];
 export const stylesheets = [];
 export const fonts = [];

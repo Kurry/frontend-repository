@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-	import { prefersReducedMotion } from 'svelte/motion';
 	import { markedAction } from '../editor/marked-action.svelte';
 	import * as Y from 'yjs';
 
@@ -24,7 +22,7 @@
 	});
 </script>
 
-<div class="bg-card relative h-full w-full overflow-hidden rounded" class:hidden={!isVisible} in:fade|global={{ duration: prefersReducedMotion.current ? 0 : 150 }} out:fade|global={{ duration: prefersReducedMotion.current ? 0 : 150 }}>
+<div class="bg-card relative h-full w-full overflow-hidden rounded" class:hidden={!isVisible}>
 	{#if isEmpty && isVisible}
 		<div class="text-foreground/40 absolute top-5.5 left-4 z-10 sm:left-11">
 			No content to preview yet

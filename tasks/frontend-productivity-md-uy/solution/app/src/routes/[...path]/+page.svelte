@@ -9,56 +9,8 @@
 	import { generateId, isValidId } from '$lib/utils';
 	import { SEED_ROOM_ID, SEED_CONTENT, Y_TEXT_KEY } from '$lib/constants';
 	import { installWebmcp } from '$lib/webmcp';
-	import DocumentPackageModal from '$lib/components/DocumentPackageModal.svelte';
-
 
 	type EditorMode = 'edit' | 'preview' | 'presentation';
-
-	import { fade, slide } from 'svelte/transition';
-import { cubicInOut } from 'svelte/easing';
-import { prefersReducedMotion } from 'svelte/motion';
-import { derived } from 'svelte/store';
-import { superForm } from 'sveltekit-superforms';
-	import { Dialog } from 'bits-ui';
-	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { ProfileSchema, JoinRoomSchema } from '$lib/schemas';
-	let { data } = $props();
-
-	const profileSuperForm = superForm(data.profileForm, {
-		resetForm: false,
-		validators: zodClient(ProfileSchema),
-		SPA: true,
-		onSubmit({ cancel }) {
-			// handled below
-		},
-		onUpdate({ form }) {
-			if (form.valid) {
-				userName = form.data.displayName;
-				userColor = form.data.color;
-				try {
-					localStorage.setItem('mduy-user', JSON.stringify({ name: userName, color: userColor }));
-				} catch {}
-				profileOpen = false;
-			}
-		}
-	});
-	const { form: pForm, errors: pErrors, enhance: pEnhance } = profileSuperForm;
-
-	const joinSuperForm = superForm(data.joinForm, {
-		resetForm: false,
-		validators: zodClient(JoinRoomSchema),
-		SPA: true,
-		onSubmit({ cancel }) {
-			// handled below
-		},
-		onUpdate({ form }) {
-			if (form.valid) {
-				window.location.href = `/${form.data.roomId}`;
-			}
-		}
-	});
-	const { form: jForm, errors: jErrors, enhance: jEnhance } = joinSuperForm;
-
 
 	let ready = $state(false);
 	let roomId = $state('');
@@ -75,16 +27,11 @@ import { superForm } from 'sveltekit-superforms';
 	let copied = $state(false);
 
 	let profileOpen = $state(false);
-	$effect(() => {
-		$pForm.displayName = userName;
-		$pForm.color = userColor;
-	});
 	let userName = $state('Anonymous');
 	let userColor = $state('#559ede');
 
 	let contentCopied = $state(false);
 	let packageOpen = $state(false);
-	let packageJsonPreview = $state("");
 	let packageCopied = $state(false);
 	let packageDownloaded = $state(false);
 	let downloaded = $state(false);
@@ -145,60 +92,6 @@ import { superForm } from 'sveltekit-superforms';
 		downloaded = true;
 		setTimeout(() => (downloaded = false), 800);
 		return content;
-	}
-
-
-	function openPackage() {
-		const pkg = {
-			schemaVersion: "mduy-document-v1",
-			roomId,
-			markdown: ytext?.toString() ?? "",
-			theme,
-			profile: {
-				displayName: userName,
-				color: userColor
-			}
-		};
-		packageJsonPreview = JSON.stringify(pkg, null, 2);
-		packageOpen = true;
-	}
-
-	function handleImport(importText: string) {
-		const parsed = JSON.parse(importText);
-		if (ydoc && ytext) {
-			ydoc.transact(() => {
-				ytext.delete(0, ytext?.length ?? 0);
-				ytext.insert(0, parsed.markdown);
-			});
-		}
-
-		userName = parsed.profile.displayName;
-		userColor = parsed.profile.color;
-		try {
-			localStorage.setItem('mduy-user', JSON.stringify({ name: userName, color: userColor }));
-		} catch {}
-
-		applyTheme(parsed.theme);
-	}
-
-	function copyPackage() {
-		navigator.clipboard?.writeText(packageJsonPreview).catch(() => {});
-		packageCopied = true;
-		setTimeout(() => (packageCopied = false), 800);
-	}
-
-	function downloadPackage() {
-		const blob = new Blob([packageJsonPreview], { type: 'application/json' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'document-package.json';
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
-		packageDownloaded = true;
-		setTimeout(() => (packageDownloaded = false), 800);
 	}
 
 	function openShare() {
@@ -364,7 +257,7 @@ import { superForm } from 'sveltekit-superforms';
 	</header>
 
 	{#if ready}
-		<main id="main-content" class="mx-auto flex w-full max-w-3xl flex-1 flex-col overflow-hidden px-4 pt-3 pb-4">
+		<div class="mx-auto flex w-full max-w-3xl flex-1 flex-col overflow-hidden px-4 pt-3 pb-4">
 			<!-- Toolbar: mode toggle + actions -->
 			<div class="mb-3 flex flex-row flex-wrap items-center justify-between gap-3">
 				<div class="flex items-center gap-2" role="group" aria-label="Editor mode">
@@ -429,7 +322,8 @@ import { superForm } from 'sveltekit-superforms';
 				<Preview {ytext} isVisible={viewMode === 'preview'} />
 				<Presentation {ytext} isVisible={viewMode === 'presentation'} />
 			</div>
-		<!-- Status row: profile + connection -->
+
+			<!-- Status row: profile + connection -->
 			<div class="mt-3 flex items-center justify-between text-xs">
 				<button
 					onclick={() => (profileOpen = true)}
@@ -442,17 +336,8 @@ import { superForm } from 'sveltekit-superforms';
 					<span class="size-2 rounded-full {isSyncing ? 'bg-primary' : 'bg-muted-foreground/40'}"></span>
 					<span>{isSyncing ? 'Live sync on — no users connected' : 'Local only'}</span>
 				</div>
-
-				<button
-					onclick={openPackage}
-					class="border-input bg-background hover:bg-accent hover:text-accent-foreground ml-2 flex h-7 items-center gap-1 rounded border px-2 text-xs font-medium transition-colors"
-					title="Document Package"
-				>
-					Package
-				</button>
-
-						</div>
-				</main>
+			</div>
+		</div>
 	{:else}
 		<div class="text-muted-foreground flex flex-1 items-center justify-center text-sm">Loading…</div>
 	{/if}
@@ -466,34 +351,13 @@ import { superForm } from 'sveltekit-superforms';
 	</footer>
 </div>
 
-
-	<div aria-live="polite" class="sr-only">
-		{#if contentCopied}
-			Copied markdown to clipboard
-		{/if}
-		{#if downloaded}
-			Downloaded markdown file
-		{/if}
-		{#if packageCopied}
-			Copied document package to clipboard
-		{/if}
-		{#if packageDownloaded}
-			Downloaded document package file
-		{/if}
-	</div>
-
-
 <!-- Share dialog -->
-<Dialog.Root bind:open={shareOpen}>
-	<Dialog.Portal>
-		<Dialog.Overlay class="fixed inset-0 z-50 bg-black/50" transition={fade} transitionConfig={{ duration: prefersReducedMotion.current ? 0 : 150 }} />
-		<Dialog.Content class="bg-popover text-popover-foreground fixed left-[50%] top-[50%] z-50 w-full max-w-md translate-x-[-50%] translate-y-[-50%] rounded-lg border p-6 shadow-lg outline-none" transition={fade} transitionConfig={{ duration: prefersReducedMotion.current ? 0 : 150 }}>
-			<Dialog.Close class="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 focus:outline-none">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-				<span class="sr-only">Close</span>
-			</Dialog.Close>
-			<Dialog.Title class="text-lg font-semibold">Share</Dialog.Title>
-			<Dialog.Description class="text-muted-foreground mt-1 text-sm">Choose how you want to share your note</Dialog.Description>
+{#if shareOpen}
+	<div class="fixed inset-0 z-50 flex items-center justify-center">
+		<button class="absolute inset-0 bg-black/50" aria-label="Close" onclick={() => (shareOpen = false)}></button>
+		<div class="bg-popover text-popover-foreground relative z-10 w-[90%] max-w-md rounded-lg border p-6 shadow-lg">
+			<h2 class="text-lg font-semibold">Share</h2>
+			<p class="text-muted-foreground mt-1 text-sm">Choose how you want to share your note</p>
 			<div class="mt-4 grid grid-cols-2 gap-1">
 				<button
 					onclick={() => (shareTab = 'live')}
@@ -541,50 +405,32 @@ import { superForm } from 'sveltekit-superforms';
 					{/if}
 				</div>
 			{/if}
-		</Dialog.Content>
-	</Dialog.Portal>
-</Dialog.Root>
+		</div>
+	</div>
+{/if}
 
 <!-- Profile dialog -->
-<Dialog.Root bind:open={profileOpen}>
-	<Dialog.Portal>
-		<Dialog.Overlay class="fixed inset-0 z-50 bg-black/50" transition={fade} transitionConfig={{ duration: prefersReducedMotion.current ? 0 : 150 }} />
-		<Dialog.Content class="bg-popover text-popover-foreground fixed left-[50%] top-[50%] z-50 w-full max-w-sm translate-x-[-50%] translate-y-[-50%] rounded-lg border p-6 shadow-lg outline-none" transition={fade} transitionConfig={{ duration: prefersReducedMotion.current ? 0 : 150 }}>
-			<Dialog.Close class="absolute right-4 top-4 rounded-sm opacity-70 hover:opacity-100 focus:outline-none">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-				<span class="sr-only">Close</span>
-			</Dialog.Close>
-			<Dialog.Title class="text-lg font-semibold">Edit profile</Dialog.Title>
-			<Dialog.Description class="sr-only">Edit your profile</Dialog.Description>
-			<form use:pEnhance class="mt-4 grid gap-4">
+{#if profileOpen}
+	<div class="fixed inset-0 z-50 flex items-center justify-center">
+		<button class="absolute inset-0 bg-black/50" aria-label="Close" onclick={() => (profileOpen = false)}></button>
+		<div class="bg-popover text-popover-foreground relative z-10 w-[90%] max-w-sm rounded-lg border p-6 shadow-lg">
+			<h2 class="text-lg font-semibold">Edit profile</h2>
+			<div class="mt-4 grid gap-4">
 				<div class="grid grid-cols-5 items-center gap-3">
 					<label for="pname" class="text-right text-sm">Name</label>
-					<div class="col-span-4 flex flex-col">
-					<input id="pname" name="displayName" bind:value={$pForm.displayName} placeholder="Enter your name" class="border-input bg-background w-full rounded border px-2 py-1.5 text-sm" />
-					{#if $pErrors.displayName}
-						<span class="text-destructive mt-1 text-xs text-red-500">{$pErrors.displayName}</span>
-					{/if}
-					</div>
+					<input id="pname" bind:value={userName} placeholder="Enter your name" class="border-input bg-background col-span-4 rounded border px-2 py-1.5 text-sm" />
 				</div>
 				<div class="grid grid-cols-5 items-center gap-3">
 					<label for="pcolor" class="text-right text-sm">Color</label>
-					<div class="col-span-4 flex flex-col">
-					<div class="flex items-center gap-2">
-						<input id="pcolor" name="color" type="color" bind:value={$pForm.color} class="size-8 cursor-pointer rounded" />
-						<span class="font-mono text-sm">{$pForm.color}</span>
-					</div>
-					{#if $pErrors.color}
-						<span class="text-destructive mt-1 text-xs text-red-500">{$pErrors.color}</span>
-					{/if}
+					<div class="col-span-4 flex items-center gap-2">
+						<input id="pcolor" type="color" bind:value={userColor} class="size-8 cursor-pointer rounded" />
+						<span class="font-mono text-sm">{userColor}</span>
 					</div>
 				</div>
-				<div class="mt-5 flex justify-end">
-					<button type="submit" class="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1.5 text-sm">Done</button>
-				</div>
-			</form>
-		</Dialog.Content>
-	</Dialog.Portal>
-</Dialog.Root>
-
-
-<DocumentPackageModal bind:open={packageOpen} packageJson={packageJsonPreview} onImport={handleImport} onCopy={copyPackage} onDownload={downloadPackage} />
+			</div>
+			<div class="mt-5 flex justify-end">
+				<button onclick={() => (profileOpen = false)} class="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1.5 text-sm">Done</button>
+			</div>
+		</div>
+	</div>
+{/if}

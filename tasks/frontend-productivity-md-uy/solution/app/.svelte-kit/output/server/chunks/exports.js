@@ -1,4 +1,5 @@
-import { t as noop, v as safe_not_equal, w as subscribe_to_store, x as run_all } from "./root.js";
+import { n as noop } from "./attributes.js";
+import { s as safe_not_equal } from "./root.js";
 const subscriber_queue = [];
 function readable(value, start) {
   return {
@@ -51,65 +52,6 @@ function writable(value, start = noop) {
     };
   }
   return { set, update, subscribe };
-}
-function derived(stores, fn, initial_value) {
-  const single = !Array.isArray(stores);
-  const stores_array = single ? [stores] : stores;
-  if (!stores_array.every(Boolean)) {
-    throw new Error("derived() expects stores as input, got a falsy value");
-  }
-  const auto = fn.length < 2;
-  return readable(initial_value, (set, update) => {
-    let started = false;
-    const values = [];
-    let pending = 0;
-    let cleanup = noop;
-    const sync = () => {
-      if (pending) {
-        return;
-      }
-      cleanup();
-      const result = fn(single ? values[0] : values, set, update);
-      if (auto) {
-        set(result);
-      } else {
-        cleanup = typeof result === "function" ? result : noop;
-      }
-    };
-    const unsubscribers = stores_array.map(
-      (store, i) => subscribe_to_store(
-        store,
-        (value) => {
-          values[i] = value;
-          pending &= ~(1 << i);
-          if (started) {
-            sync();
-          }
-        },
-        () => {
-          pending |= 1 << i;
-        }
-      )
-    );
-    started = true;
-    sync();
-    return function stop() {
-      run_all(unsubscribers);
-      cleanup();
-      started = false;
-    };
-  });
-}
-function readonly(store) {
-  return {
-    // @ts-expect-error TODO i suspect the bind is unnecessary
-    subscribe: store.subscribe.bind(store)
-  };
-}
-function get(store) {
-  let value;
-  subscribe_to_store(store, (_) => value = _)();
-  return value;
 }
 const SCHEME = /^[a-z][a-z\d+\-.]+:/i;
 const internal = new URL("sveltekit-internal://");
@@ -281,9 +223,6 @@ export {
   resolve as f,
   decode_pathname as g,
   validate_server_exports as h,
-  derived as i,
-  get as j,
-  readonly as k,
   make_trackable as m,
   normalize_path as n,
   readable as r,

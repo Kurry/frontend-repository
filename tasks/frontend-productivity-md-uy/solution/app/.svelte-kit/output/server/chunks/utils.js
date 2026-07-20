@@ -4,11 +4,21 @@ import { json, text } from "@sveltejs/kit";
 import { SvelteKitError, HttpError } from "@sveltejs/kit/internal";
 import { with_request_store } from "@sveltejs/kit/internal/server";
 import * as set_cookie_parser from "set-cookie-parser";
-import { n as noop } from "./functions.js";
 const SVELTE_KIT_ASSETS = "/_svelte_kit_assets";
 const ENDPOINT_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"];
 const MUTATIVE_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
 const PAGE_METHODS = ["GET", "POST", "HEAD"];
+function noop() {
+}
+function once(fn) {
+  let done = false;
+  let result;
+  return () => {
+    if (done) return result;
+    done = true;
+    return result = fn();
+  };
+}
 const decoder = new TextDecoder();
 function set_nested_value(object, path_string, value) {
   if (path_string.startsWith("n:")) {
@@ -964,39 +974,41 @@ function create_replacer(transport) {
   return replacer;
 }
 export {
-  get_set_cookies as A,
-  handle_fatal_error as B,
-  format_server_error as C,
+  once as A,
+  has_prerendered_path as B,
+  get_set_cookies as C,
+  handle_fatal_error as D,
   ENDPOINT_METHODS as E,
+  format_server_error as F,
   INVALIDATED_PARAM as I,
   MUTATIVE_METHODS as M,
   PAGE_METHODS as P,
   SVELTE_KIT_ASSETS as S,
   TRAILING_SLASH_PARAM as T,
   stringify_remote_arg as a,
-  stringify as b,
+  noop as b,
   create_field_proxy as c,
   deep_set as d,
-  create_remote_key as e,
+  stringify as e,
   flatten_issues as f,
-  negotiate as g,
+  create_remote_key as g,
   handle_error_and_jsonify as h,
-  get_status as i,
-  is_form_content_type as j,
-  normalize_error as k,
-  create_replacer as l,
+  negotiate as i,
+  get_status as j,
+  is_form_content_type as k,
+  normalize_error as l,
   method_not_allowed as m,
   normalize_issue as n,
-  get_global_name as o,
+  create_replacer as o,
   parse_remote_arg as p,
-  serialize_uses as q,
-  clarify_devalue_error as r,
+  get_global_name as q,
+  serialize_uses as r,
   set_nested_value as s,
-  get_node_type as t,
-  escape_html as u,
-  deserialize_binary_form as v,
-  split_remote_key as w,
-  static_error_page as x,
-  redirect_response as y,
-  has_prerendered_path as z
+  clarify_devalue_error as t,
+  get_node_type as u,
+  escape_html as v,
+  deserialize_binary_form as w,
+  split_remote_key as x,
+  static_error_page as y,
+  redirect_response as z
 };

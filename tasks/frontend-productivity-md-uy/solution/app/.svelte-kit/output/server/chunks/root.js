@@ -1,4 +1,4 @@
-import { clsx as clsx$1 } from "clsx";
+import { r as run_all, o as object_prototype, a as array_prototype, g as get_descriptor, b as get_prototype_of, i as is_array, c as is_extensible, n as noop, d as deferred, f as includes, h as index_of, j as define_property, k as array_from, e as escape_html, l as has_own_property, t as to_style, m as clsx, p as to_class, q as attr } from "./attributes.js";
 import * as devalue from "devalue";
 const DERIVED = 1 << 1;
 const EFFECT = 1 << 2;
@@ -36,37 +36,7 @@ const STALE_REACTION = new class StaleReactionError extends Error {
   message = "The reaction that called `getAbortSignal()` was re-run or destroyed";
 }();
 const COMMENT_NODE = 8;
-const browser = false;
-var is_array = Array.isArray;
-var index_of = Array.prototype.indexOf;
-var includes = Array.prototype.includes;
-var array_from = Array.from;
-var define_property = Object.defineProperty;
-var get_descriptor = Object.getOwnPropertyDescriptor;
-var object_prototype = Object.prototype;
-var array_prototype = Array.prototype;
-var get_prototype_of = Object.getPrototypeOf;
-var is_extensible = Object.isExtensible;
-var has_own_property = Object.prototype.hasOwnProperty;
-const noop = () => {
-};
-function run(fn) {
-  return fn();
-}
-function run_all(arr) {
-  for (var i = 0; i < arr.length; i++) {
-    arr[i]();
-  }
-}
-function deferred() {
-  var resolve;
-  var reject;
-  var promise = new Promise((res, rej) => {
-    resolve = res;
-    reject = rej;
-  });
-  return { promise, resolve, reject };
-}
+const DEV = false;
 function equals(value) {
   return value === this.v;
 }
@@ -121,7 +91,6 @@ const ELEMENT_IS_NAMESPACED = 1;
 const ELEMENT_PRESERVE_ATTRIBUTE_CASE = 1 << 1;
 const ELEMENT_IS_INPUT = 1 << 2;
 const UNINITIALIZED = Symbol("uninitialized");
-const ATTACHMENT_KEY = "@attach";
 let component_context = null;
 function set_component_context(context) {
   component_context = context;
@@ -545,21 +514,6 @@ function defer_effect(effect, dirty_effects, maybe_dirty_effects) {
   }
   clear_marked(effect.deps);
   set_signal_status(effect, CLEAN);
-}
-function subscribe_to_store(store, run2, invalidate) {
-  if (store == null) {
-    run2(void 0);
-    if (invalidate) invalidate(void 0);
-    return noop;
-  }
-  const unsub = untrack(
-    () => store.subscribe(
-      run2,
-      // @ts-expect-error
-      invalidate
-    )
-  );
-  return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
 }
 function without_reactive_context(fn) {
   var previous_reaction = active_reaction;
@@ -1463,7 +1417,7 @@ class Batch {
   }
   flush() {
     try {
-      if (browser) ;
+      if (DEV) ;
       is_processing = true;
       current_batch = this;
       this.#process();
@@ -2248,7 +2202,7 @@ function update_effect(effect) {
     effect.teardown = typeof teardown === "function" ? teardown : null;
     effect.wv = write_version;
     var dep;
-    if (browser && tracing_mode_flag && (effect.f & DIRTY) !== 0 && effect.deps !== null) ;
+    if (DEV && tracing_mode_flag && (effect.f & DIRTY) !== 0 && effect.deps !== null) ;
   } finally {
     is_updating_effect = was_updating_effect;
     active_effect = previous_effect;
@@ -2611,32 +2565,6 @@ function move_effect(effect, fragment) {
 const event_symbol = Symbol("events");
 const all_registered_events = /* @__PURE__ */ new Set();
 const root_event_handles = /* @__PURE__ */ new Set();
-function create_event(event_name, dom, handler, options = {}) {
-  function target_handler(event) {
-    if (!options.capture) {
-      handle_event_propagation.call(dom, event);
-    }
-    if (!event.cancelBubble) {
-      return without_reactive_context(() => {
-        return handler?.call(this, event);
-      });
-    }
-  }
-  if (event_name.startsWith("pointer") || event_name.startsWith("touch") || event_name === "wheel") {
-    queue_micro_task(() => {
-      dom.addEventListener(event_name, target_handler, options);
-    });
-  } else {
-    dom.addEventListener(event_name, target_handler, options);
-  }
-  return target_handler;
-}
-function on(element, type, handler, options = {}) {
-  var target_handler = create_event(type, element, handler, options);
-  return () => {
-    element.removeEventListener(type, target_handler, options);
-  };
-}
 let last_propagated_event = null;
 function handle_event_propagation(event) {
   var handler_element = this;
@@ -3028,163 +2956,6 @@ class Svelte4Component {
     this.#instance.$destroy();
   }
 }
-const ATTR_REGEX = /[&"<]/g;
-const CONTENT_REGEX = /[&<]/g;
-function escape_html(value, is_attr) {
-  const str = String(value ?? "");
-  const pattern = is_attr ? ATTR_REGEX : CONTENT_REGEX;
-  pattern.lastIndex = 0;
-  let escaped = "";
-  let last = 0;
-  while (pattern.test(str)) {
-    const i = pattern.lastIndex - 1;
-    const ch = str[i];
-    escaped += str.substring(last, i) + (ch === "&" ? "&amp;" : ch === '"' ? "&quot;" : "&lt;");
-    last = i + 1;
-  }
-  return escaped + str.substring(last);
-}
-const replacements = {
-  translate: /* @__PURE__ */ new Map([
-    [true, "yes"],
-    [false, "no"]
-  ])
-};
-function attr(name, value, is_boolean = false) {
-  if (name === "hidden" && value !== "until-found") {
-    is_boolean = true;
-  }
-  if (value == null || !value && is_boolean) return "";
-  const normalized = has_own_property.call(replacements, name) && replacements[name].get(value) || value;
-  const assignment = is_boolean ? `=""` : `="${escape_html(normalized, true)}"`;
-  return ` ${name}${assignment}`;
-}
-function clsx(value) {
-  if (typeof value === "object") {
-    return clsx$1(value);
-  } else {
-    return value ?? "";
-  }
-}
-const whitespace = [..." 	\n\r\f \v\uFEFF"];
-function to_class(value, hash, directives) {
-  var classname = value == null ? "" : "" + value;
-  if (hash) {
-    classname = classname ? classname + " " + hash : hash;
-  }
-  if (directives) {
-    for (var key of Object.keys(directives)) {
-      if (directives[key]) {
-        classname = classname ? classname + " " + key : key;
-      } else if (classname.length) {
-        var len = key.length;
-        var a = 0;
-        while ((a = classname.indexOf(key, a)) >= 0) {
-          var b = a + len;
-          if ((a === 0 || whitespace.includes(classname[a - 1])) && (b === classname.length || whitespace.includes(classname[b]))) {
-            classname = (a === 0 ? "" : classname.substring(0, a)) + classname.substring(b + 1);
-          } else {
-            a = b;
-          }
-        }
-      }
-    }
-  }
-  return classname === "" ? null : classname;
-}
-function append_styles(styles, important = false) {
-  var separator = important ? " !important;" : ";";
-  var css = "";
-  for (var key of Object.keys(styles)) {
-    var value = styles[key];
-    if (value != null && value !== "") {
-      css += " " + key + ": " + value + separator;
-    }
-  }
-  return css;
-}
-function to_css_name(name) {
-  if (name[0] !== "-" || name[1] !== "-") {
-    return name.toLowerCase();
-  }
-  return name;
-}
-function to_style(value, styles) {
-  if (styles) {
-    var new_style = "";
-    var normal_styles;
-    var important_styles;
-    if (Array.isArray(styles)) {
-      normal_styles = styles[0];
-      important_styles = styles[1];
-    } else {
-      normal_styles = styles;
-    }
-    if (value) {
-      value = String(value).replaceAll(/\s*\/\*.*?\*\/\s*/g, "").trim();
-      var in_str = false;
-      var in_apo = 0;
-      var in_comment = false;
-      var reserved_names = [];
-      if (normal_styles) {
-        reserved_names.push(...Object.keys(normal_styles).map(to_css_name));
-      }
-      if (important_styles) {
-        reserved_names.push(...Object.keys(important_styles).map(to_css_name));
-      }
-      var start_index = 0;
-      var name_index = -1;
-      const len = value.length;
-      for (var i = 0; i < len; i++) {
-        var c = value[i];
-        if (in_comment) {
-          if (c === "/" && value[i - 1] === "*") {
-            in_comment = false;
-          }
-        } else if (in_str) {
-          if (in_str === c) {
-            in_str = false;
-          }
-        } else if (c === "/" && value[i + 1] === "*") {
-          in_comment = true;
-        } else if (c === '"' || c === "'") {
-          in_str = c;
-        } else if (c === "(") {
-          in_apo++;
-        } else if (c === ")") {
-          in_apo--;
-        }
-        if (!in_comment && in_str === false && in_apo === 0) {
-          if (c === ":" && name_index === -1) {
-            name_index = i;
-          } else if (c === ";" || i === len - 1) {
-            if (name_index !== -1) {
-              var name = to_css_name(value.substring(start_index, name_index).trim());
-              if (!reserved_names.includes(name)) {
-                if (c !== ";") {
-                  i++;
-                }
-                var property = value.substring(start_index, i).trim();
-                new_style += " " + property + ";";
-              }
-            }
-            start_index = i + 1;
-            name_index = -1;
-          }
-        }
-      }
-    }
-    if (normal_styles) {
-      new_style += append_styles(normal_styles);
-    }
-    if (important_styles) {
-      new_style += append_styles(important_styles, true);
-    }
-    new_style = new_style.trim();
-    return new_style === "" ? null : new_style;
-  }
-  return value == null ? null : String(value);
-}
 const BLOCK_OPEN = `<!--${HYDRATION_START}-->`;
 const BLOCK_CLOSE = `<!--${HYDRATION_END}-->`;
 let controller = null;
@@ -3213,13 +2984,6 @@ https://svelte.dev/e/invalid_id_prefix`);
   error.name = "Svelte error";
   throw error;
 }
-function lifecycle_function_unavailable(name) {
-  const error = new Error(`lifecycle_function_unavailable
-\`${name}(...)\` is not available on the server
-https://svelte.dev/e/lifecycle_function_unavailable`);
-  error.name = "Svelte error";
-  throw error;
-}
 function server_context_required() {
   const error = new Error(`server_context_required
 Could not resolve \`render\` context.
@@ -3242,12 +3006,6 @@ function getContext(key) {
 function setContext(key, context) {
   get_or_init_context_map().set(key, context);
   return context;
-}
-function hasContext(key) {
-  return get_or_init_context_map().has(key);
-}
-function getAllContexts() {
-  return get_or_init_context_map();
 }
 function get_or_init_context_map(name) {
   if (ssr_context === null) {
@@ -4098,55 +3856,6 @@ function attributes(attrs, css_hash, classes, styles, flags2 = 0) {
   }
   return attr_str;
 }
-function spread_props(props) {
-  const merged_props = {};
-  let key;
-  for (let i = 0; i < props.length; i++) {
-    const obj = props[i];
-    if (obj == null) continue;
-    for (key of Object.keys(obj)) {
-      const desc = Object.getOwnPropertyDescriptor(obj, key);
-      if (desc) {
-        Object.defineProperty(merged_props, key, desc);
-      } else {
-        merged_props[key] = obj[key];
-      }
-    }
-  }
-  return merged_props;
-}
-function attr_class(value, hash, directives) {
-  var result = to_class(value, hash, directives);
-  return result ? ` class="${escape_html(result, true)}"` : "";
-}
-function store_get(store_values, store_name, store) {
-  if (store_name in store_values && store_values[store_name][0] === store) {
-    return store_values[store_name][2];
-  }
-  store_values[store_name]?.[1]();
-  store_values[store_name] = [store, null, void 0];
-  const unsub = subscribe_to_store(
-    store,
-    /** @param {any} v */
-    (v) => store_values[store_name][2] = v
-  );
-  store_values[store_name][1] = unsub;
-  return store_values[store_name][2];
-}
-function unsubscribe_stores(store_values) {
-  for (const store_name of Object.keys(store_values)) {
-    store_values[store_name][1]();
-  }
-}
-function bind_props(props_parent, props_now) {
-  for (const key of Object.keys(props_now)) {
-    const initial_value = props_parent[key];
-    const value = props_now[key];
-    if (initial_value === void 0 && value !== void 0 && Object.getOwnPropertyDescriptor(props_parent, key)?.set) {
-      props_parent[key] = value;
-    }
-  }
-}
 function once(get_value) {
   let value = (
     /** @type {V} */
@@ -4158,11 +3867,6 @@ function once(get_value) {
     }
     return value;
   };
-}
-function props_id(renderer) {
-  const uid2 = renderer.global.uid();
-  renderer.push("<!--$" + uid2 + "-->");
-  return uid2;
 }
 function derived(fn) {
   const get_value = ssr_context === null ? fn : once(fn);
@@ -4316,29 +4020,8 @@ function Root($$renderer, $$props) {
 }
 const root = asClassComponent(Root);
 export {
-  ATTACHMENT_KEY as A,
-  run as a,
-  browser as b,
-  attributes as c,
-  derived as d,
-  escape_html as e,
-  bind_props as f,
+  DEV as D,
   getContext as g,
-  hasContext as h,
-  getAllContexts as i,
-  spread_props as j,
-  attr as k,
-  attr_class as l,
-  store_get as m,
-  ssr_context as n,
-  on as o,
-  props_id as p,
-  lifecycle_function_unavailable as q,
   root as r,
-  setContext as s,
-  noop as t,
-  unsubscribe_stores as u,
-  safe_not_equal as v,
-  subscribe_to_store as w,
-  run_all as x
+  safe_not_equal as s
 };

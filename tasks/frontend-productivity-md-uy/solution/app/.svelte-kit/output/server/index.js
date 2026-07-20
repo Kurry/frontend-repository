@@ -1,17 +1,15 @@
-import { n as noop, o as once } from "./chunks/functions.js";
-import { b as browser } from "./chunks/root.js";
+import { E as ENDPOINT_METHODS, P as PAGE_METHODS, i as negotiate, m as method_not_allowed, h as handle_error_and_jsonify, j as get_status, k as is_form_content_type, l as normalize_error, o as create_replacer, b as noop, q as get_global_name, r as serialize_uses, t as clarify_devalue_error, u as get_node_type, v as escape_html, g as create_remote_key, p as parse_remote_arg, w as deserialize_binary_form, e as stringify, x as split_remote_key, S as SVELTE_KIT_ASSETS, y as static_error_page, z as redirect_response, A as once, B as has_prerendered_path, C as get_set_cookies, T as TRAILING_SLASH_PARAM, I as INVALIDATED_PARAM, D as handle_fatal_error, F as format_server_error } from "./chunks/utils.js";
+import { D as DEV } from "./chunks/root.js";
 import { json, text, error, isRedirect } from "@sveltejs/kit";
 import { Redirect, SvelteKitError, ActionFailure, HttpError } from "@sveltejs/kit/internal";
 import { with_request_store, merge_tracing, try_get_request_store } from "@sveltejs/kit/internal/server";
 import { c as assets, b as base, a as app_dir, r as relative, o as override, d as reset } from "./chunks/server.js";
-import { E as ENDPOINT_METHODS, P as PAGE_METHODS, g as negotiate, m as method_not_allowed, h as handle_error_and_jsonify, i as get_status, j as is_form_content_type, k as normalize_error, l as create_replacer, o as get_global_name, q as serialize_uses, r as clarify_devalue_error, t as get_node_type, u as escape_html, e as create_remote_key, p as parse_remote_arg, v as deserialize_binary_form, b as stringify, w as split_remote_key, S as SVELTE_KIT_ASSETS, x as static_error_page, y as redirect_response, z as has_prerendered_path, A as get_set_cookies, T as TRAILING_SLASH_PARAM, I as INVALIDATED_PARAM, B as handle_fatal_error, C as format_server_error } from "./chunks/utils.js";
 import * as devalue from "devalue";
-import { d as decode_params, m as make_trackable, a as disable_search, r as readable, S as SCHEME, w as writable, v as validate_layout_server_exports, b as validate_layout_exports, c as validate_page_server_exports, e as validate_page_exports, n as normalize_path, f as resolve, g as decode_pathname, h as validate_server_exports } from "./chunks/exports.js";
+import { d as decode_params, m as make_trackable, a as disable_search, S as SCHEME, w as writable, r as readable, v as validate_layout_server_exports, b as validate_layout_exports, c as validate_page_server_exports, e as validate_page_exports, n as normalize_path, f as resolve, g as decode_pathname, h as validate_server_exports } from "./chunks/exports.js";
 import { b as base64_encode, t as text_encoder, g as get_relative_path } from "./chunks/utils2.js";
 import { p as public_env, r as read_implementation, o as options, s as set_private_env, a as set_public_env, g as get_hooks, b as set_read_implementation } from "./chunks/internal.js";
 import { parse, serialize } from "cookie";
 import * as set_cookie_parser from "set-cookie-parser";
-import { s as set_app } from "./chunks/app.js";
 const s = JSON.stringify;
 function exec(match, params, matchers) {
   const result = {};
@@ -279,7 +277,7 @@ async function handle_action_json_request(event, event_state, options2, server) 
   check_named_default_separate(actions);
   try {
     const data = await call_action(event, event_state, actions);
-    if (browser) ;
+    if (DEV) ;
     if (data instanceof ActionFailure) {
       return action_json({
         type: "failure",
@@ -364,7 +362,7 @@ async function handle_action_request(event, event_state, server) {
   check_named_default_separate(actions);
   try {
     const data = await call_action(event, event_state, actions);
-    if (browser) ;
+    if (DEV) ;
     if (data instanceof ActionFailure) {
       return {
         type: "failure",
@@ -2006,7 +2004,7 @@ async function render_response({
     };
     const fetch2 = globalThis.fetch;
     try {
-      if (browser) ;
+      if (DEV) ;
       const state2 = { ...event_state, is_in_render: true };
       rendered = await with_request_store({ event, state: state2 }, async () => {
         if (relative) override({ base: base$1, assets: assets$1 });
@@ -2621,7 +2619,7 @@ async function render_page(event, event_state, page, options2, manifest, state, 
     const ssr = nodes.ssr();
     const csr = nodes.csr();
     if (ssr === false && !(state.prerendering && should_prerender_data)) {
-      if (browser && action_result && !event.request.headers.has("x-sveltekit-action")) ;
+      if (DEV && action_result && !event.request.headers.has("x-sveltekit-action")) ;
       return await render_response({
         // provide nodes without running load functions so that the styles and
         // fonts are linked in the head before CSR takes over
@@ -3515,12 +3513,12 @@ async function internal_respond(request, options2, manifest, state) {
       if (url.pathname === base || url.pathname === base + "/") {
         trailing_slash = "always";
       } else if (page_nodes) {
-        if (browser) ;
+        if (DEV) ;
         trailing_slash = page_nodes.trailing_slash();
       } else if (route.endpoint) {
         const node = await route.endpoint();
         trailing_slash = node.trailingSlash ?? "never";
-        if (browser) ;
+        if (DEV) ;
       }
       if (!is_data_request) {
         const normalized = normalize_path(url.pathname, trailing_slash);
@@ -3856,6 +3854,8 @@ function filter_env(env, allowed, disallowed) {
       ([k]) => k.startsWith(allowed) && (disallowed === "" || !k.startsWith(disallowed))
     )
   );
+}
+function set_app(value) {
 }
 let init_promise;
 let current = null;

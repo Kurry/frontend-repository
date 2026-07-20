@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
-	import { prefersReducedMotion } from 'svelte/motion';
 	import { marked } from 'marked';
 	import * as Y from 'yjs';
 	import { onMount, onDestroy } from 'svelte';
@@ -57,7 +55,7 @@
 
 <div
 	class="bg-card relative flex h-full w-full flex-col overflow-hidden rounded"
-	class:hidden={!isVisible} in:fade|global={{ duration: prefersReducedMotion.current ? 0 : 150 }} out:fade|global={{ duration: prefersReducedMotion.current ? 0 : 150 }}
+	class:hidden={!isVisible}
 >
 	{#if slides.length === 0 && isVisible}
 		<div class="text-foreground/40 absolute top-5.5 left-4 z-10 sm:left-11">

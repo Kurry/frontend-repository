@@ -1,6 +1,37 @@
-import { g as getContext, e as escape_html } from "../../chunks/root.js";
+import { n as noop, e as escape_html } from "../../chunks/attributes.js";
 import "clsx";
-import { s as stores } from "../../chunks/client.js";
+import { w as writable } from "../../chunks/exports.js";
+import "@sveltejs/kit/internal/server";
+import { g as getContext } from "../../chunks/root.js";
+import "@sveltejs/kit/internal";
+import "../../chunks/utils2.js";
+function create_updated_store() {
+  const { set, subscribe } = writable(false);
+  {
+    return {
+      subscribe,
+      // eslint-disable-next-line @typescript-eslint/require-await
+      check: async () => false
+    };
+  }
+}
+const is_legacy = noop.toString().includes("$$") || /function \w+\(\) \{\}/.test(noop.toString());
+const placeholder_url = "a:";
+if (is_legacy) {
+  ({
+    data: {},
+    form: null,
+    error: null,
+    params: {},
+    route: { id: null },
+    state: {},
+    status: -1,
+    url: new URL(placeholder_url)
+  });
+}
+const stores = {
+  updated: /* @__PURE__ */ create_updated_store()
+};
 ({
   check: stores.updated.check
 });
