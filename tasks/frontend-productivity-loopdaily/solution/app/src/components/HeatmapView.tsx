@@ -64,12 +64,12 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
           aria-label="Go back"
           data-action="back"
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <path d="M13 4l-6 6 6 6" />
           </svg>
         </button>
         <h2 className="text-lg font-bold text-[#1B2430]">
-          {habit.icon} {habit.name} — {monthLabel}
+          <span aria-hidden="true">{habit.icon}</span> {habit.name} — {monthLabel}
         </h2>
       </div>
 
@@ -95,22 +95,26 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
           return (
             <div
               key={day}
-              className={`aspect-square rounded flex items-center justify-center text-xs font-medium transition-colors ${intensityClass(
+              className={`group relative aspect-square rounded flex items-center justify-center text-xs font-medium transition-colors cursor-default ${intensityClass(
                 intensity
               )} ${
                 ["full", "high"].includes(intensity) ? "text-white" : "text-[#1B2430]"
               } ${isToday ? "ring-2 ring-[#0F9D74] ring-offset-1" : ""}`}
-              title={`${day}: ${
-                intensity === "full"
-                  ? "Complete"
-                  : intensity === "high" || intensity === "low"
-                  ? `Partial (${getDayCount(habit, day)}/${habit.targetCount})`
-                  : intensity === "future"
-                  ? "Future"
-                  : "Not done"
-              }`}
             >
               {dateNum}
+              <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-[#1B2430] px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 z-10">
+                {`${day}: ${
+                  intensity === "full"
+                    ? "Complete"
+                    : intensity === "high" || intensity === "low"
+                    ? `Partial (${getDayCount(habit, day)}/${habit.targetCount})`
+                    : intensity === "future"
+                    ? "Future"
+                    : "Not done"
+                }`}
+                {/* Tooltip arrow */}
+                <div className="absolute left-1/2 top-full -mt-px -translate-x-1/2 border-4 border-transparent border-t-[#1B2430]" />
+              </div>
             </div>
           );
         })}
