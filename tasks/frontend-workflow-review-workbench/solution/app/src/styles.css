@@ -133,7 +133,7 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 3px s
 .step-button strong, .step-button small { display: block; }
 .step-button strong { font-size: 13px; }
 .step-button small { font-size: 10px; color: var(--muted); margin-top: 1px; }
-.timeline-button { margin-top: 15px; border-top: 1px solid #c8d2d0; border-radius: 0 0 10px 10px; padding-top: 15px; }
+.timeline-button { flex: 0 0 auto;  flex: 0 0 auto;  margin-top: 15px; border-top: 1px solid #c8d2d0; border-radius: 0 0 10px 10px; padding-top: 15px; }
 .rail-note { display: flex; gap: 7px; align-items: flex-start; margin-top: 22px; padding: 10px; border: 1px solid #cad6d3; background: rgba(255,255,255,.55); }
 .workspace-main { min-width: 0; padding: clamp(22px, 3vw, 40px); }
 .panel-enter { animation: panel-in .22s ease both; }
@@ -304,7 +304,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
 }
 
 @media (max-width: 1024px) {
-  .inspector-grid { grid-template-columns: 1fr; }
+  .inspector-grid { grid-template-columns: 1fr; display: flex; flex-direction: column; }
   .inspector-pane + .inspector-pane { border-left: 0; border-top: 1px solid var(--line); }
   .criteria-pane, .reasoning-pane, .answer-pane { scroll-margin-top: 130px; }
   .verdict-grid { grid-template-columns: 1fr; }
@@ -325,12 +325,12 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
   .rollup-total { grid-column: span 2; }
   .calibration-cells { grid-template-columns: repeat(4, 1fr); }
   .workspace-layout { grid-template-columns: 1fr; }
-  .step-rail { position: static; min-height: 0; padding: 12px 14px; border-right: 0; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .step-rail { position: static; min-height: 0; padding: 12px 14px; border-right: 0; border-bottom: 1px solid var(--line); overflow-x: hidden; width: 100%; box-sizing: border-box; flex-wrap: wrap; }
   .step-rail-heading { display: none; }
-  .step-buttons { flex-direction: row; min-width: 610px; }
-  .step-button { grid-template-columns: 26px max-content; width: auto; flex: 1; padding: 7px; }
+  .step-buttons { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .step-button { grid-template-columns: 26px max-content; width: auto; flex: 0 0 auto; padding: 7px; }
   .step-button.active { transform: translateY(2px); }
-  .timeline-button { display: inline-grid; margin: 8px 0 0; border: 1px solid transparent; border-radius: 9px; padding: 7px; }
+  .timeline-button { flex: 0 0 auto;  flex: 0 0 auto;  display: inline-grid; margin: 8px 0 0; border: 1px solid transparent; border-radius: 9px; padding: 7px; }
   .rail-note { display: none; }
   .workspace-title-line { grid-template-columns: 1fr; }
   .workspace-title-line > .mantine-Button-root { width: fit-content; }
@@ -375,3 +375,39 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+
+.status-chip { transition: background 0.25s ease, color 0.25s ease, transform 0.18s ease; }
+
+@media (max-width: 768px) {
+  button, .mantine-Button-root, .mantine-Select-input, .mantine-TextInput-input, .mantine-Textarea-input {
+    min-height: 44px;
+  }
+  .step-rail {
+    flex-wrap: wrap; /* allow wrapping instead of overflowing */
+  }
+  .step-buttons {
+    flex-wrap: wrap; /* allow step buttons to wrap */
+    min-width: unset;
+  }
+}
+
+.hero-banner { transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease, opacity 0.4s ease; }
+.gate-recently-published { animation: gate-emphasis 0.6s ease; }
+@keyframes gate-emphasis {
+  0% { transform: scale(1); box-shadow: var(--shadow-sm); }
+  50% { transform: scale(1.02); box-shadow: 0 4px 14px rgba(27, 139, 126, 0.15); border-color: var(--teal); }
+  100% { transform: scale(1); box-shadow: var(--shadow-sm); }
+}
+
+.bundle-row { animation: list-enter 0.25s ease both; }
+.bundle-card { animation: list-enter 0.25s ease both; }
+@keyframes list-enter {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.step-button.active::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--teal);
+  border-radius: 4px; animation: slide-in 0.2s ease forwards;
+}
+@keyframes slide-in { from { transform: scaleY(0); } to { transform: scaleY(1); } }

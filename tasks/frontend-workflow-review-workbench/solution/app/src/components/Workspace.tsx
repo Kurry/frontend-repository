@@ -56,7 +56,7 @@ function StepControls({ bundle, stepName, locked }: { bundle: ReviewBundle; step
 }
 
 function LockedStep({ stepName, blockedBy }: { stepName: ReviewerStepName; blockedBy: ReviewerStepName }) {
-  return <Paper className="locked-step"><div className="lock-icon"><IconLock size={25} /></div><Title order={2}>{stepName} is locked</Title><Text>Finish the {blockedBy} step first. Notes and completion controls for {stepName} remain unavailable until every earlier step is done.</Text></Paper>;
+  return <Paper className="locked-step panel-enter"><div className="lock-icon"><IconLock size={25} /></div><Title order={2}>{stepName} is locked</Title><Text>Finish the {blockedBy} step first. Notes and completion controls for {stepName} remain unavailable until every earlier step is done.</Text></Paper>;
 }
 
 export default function Workspace() {
@@ -100,7 +100,7 @@ export default function Workspace() {
             {bundle.reviewerSteps.map((step, index) => {
               const stepLocked = bundle.reviewerSteps.slice(0, index).some((item) => !item.done);
               const isActive = panel === step.name;
-              return <button type="button" key={step.name} className={`step-button ${step.done ? 'done' : ''} ${stepLocked ? 'locked' : ''} ${isActive ? 'active' : ''}`} onClick={() => setPanel(step.name)} aria-current={isActive ? 'step' : undefined}><span className="step-index">{step.done ? <IconCheck size={15} /> : stepLocked ? <IconLock size={13} /> : index + 1}</span><span><strong>{step.name}</strong><small>{step.done ? 'Done' : stepLocked ? 'Locked' : 'Available'}</small></span></button>;
+              return <button type="button" key={step.name} style={{ transition: 'transform 0.18s ease' }} className={`step-button ${step.done ? 'done' : ''} ${stepLocked ? 'locked' : ''} ${isActive ? 'active' : ''}`} onClick={() => setPanel(step.name)} aria-current={isActive ? 'step' : undefined}><span className="step-index">{step.done ? <IconCheck size={15} /> : stepLocked ? <IconLock size={13} /> : index + 1}</span><span><strong>{step.name}</strong><small>{step.done ? 'Done' : stepLocked ? 'Locked' : 'Available'}</small></span></button>;
             })}
           </div>
           <button type="button" className={`step-button timeline-button ${panel === 'Timeline' ? 'active' : ''}`} onClick={() => setPanel('Timeline')}><span className="step-index"><IconClock size={15} /></span><span><strong>Timeline</strong><small>{bundle.timeline.length} events</small></span></button>

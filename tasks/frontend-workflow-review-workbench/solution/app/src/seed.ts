@@ -202,7 +202,7 @@ function makeBundle(profile: (typeof PROFILES)[number]): ReviewBundle {
       fixItems = standardFixes(profile.slug, profile.subject, 'Difficulty — Sable-4');
       break;
     case 'fixable-analysis':
-      setGate(gates, 'Analysis', 'fail', 'Analysis omits the out-of-order acknowledgement boundary.', null);
+      setGate(gates, 'Analysis', 'missing', 'No evidence published.', null);
       fixItems = standardFixes(profile.slug, profile.subject, 'Analysis');
       break;
     case 'fixable-noop':

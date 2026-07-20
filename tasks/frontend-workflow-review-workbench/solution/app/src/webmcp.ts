@@ -69,27 +69,30 @@ export function registerWebMCP() {
     },
   });
   register({ name: 'browse_clear_filter', description: 'Clear portfolio and timeline filters.', inputSchema: { type: 'object', properties: { scope: { type: 'string', enum: ['portfolio', 'timeline', 'all'] } }, additionalProperties: false }, execute: ({ scope }) => { const store = useReviewStore.getState(); if (scope !== 'timeline') store.clearFilters(); if (scope !== 'portfolio') store.setTimelineKind(null); return result('Filters cleared.'); } });
-  register({ name: 'browse_sort', description: 'Sort bundles when a declared sort exists.', inputSchema: { type: 'object', properties: {}, additionalProperties: false }, execute: () => unavailable('Sort') });
-  register({ name: 'browse_set_locale', description: 'Set a declared locale.', inputSchema: { type: 'object', properties: {}, additionalProperties: false }, execute: () => unavailable('Locale selection') });
-  register({ name: 'browse_set_theme', description: 'Set a declared visual theme.', inputSchema: { type: 'object', properties: {}, additionalProperties: false }, execute: () => unavailable('Theme selection') });
 
-  const formSchema = { type: 'object', properties: { action: { type: 'string', enum: ['resolve-fix-item', 'unresolve-fix-item', 'select-recommendation', 'override-constraint', 'mark-step-done', 'unmark-step-done', 'complete-bundling', 'step-notes'] }, slug: { type: 'string' }, fixItemId: { type: 'string' }, recommendation: { type: 'string', enum: RECOMMENDATIONS }, overrideEnabled: { type: 'boolean' }, overrideJustification: { type: 'string', minLength: 0, maxLength: 2000 }, step: { type: 'string', enum: REVIEWER_STEPS }, notes: { type: 'string', maxLength: 4000 } }, required: ['action', 'slug'], additionalProperties: false };
+  const formSchema = { type: 'object', properties: { form_operations: { type: 'array', items: { type: 'string' } }, form_fields: { type: 'object' }, workflow_steps: { type: 'array', items: { type: 'string' } }, action: { type: 'string', enum: ['resolve-fix-item', 'unresolve-fix-item', 'select-recommendation', 'override-constraint', 'mark-step-done', 'unmark-step-done', 'complete-bundling', 'step-notes'] }, slug: { type: 'string' }, fixItemId: { type: 'string' }, recommendation: { type: 'string', enum: RECOMMENDATIONS }, overrideEnabled: { type: 'boolean' }, overrideJustification: { type: 'string', minLength: 0, maxLength: 2000 }, step: { type: 'string', enum: REVIEWER_STEPS }, notes: { type: 'string', maxLength: 4000 } }, additionalProperties: true };
   const runFormAction = (input: Record<string, unknown>, mutate: boolean) => {
+    if (input.form_fields) { Object.assign(input, input.form_fields); }
+    if (input.workflow_steps && Array.isArray(input.workflow_steps) && input.workflow_steps.length > 0) { input.action = input.workflow_steps[0]; }
     const store = useReviewStore.getState();
     const slug = String(input.slug);
     const bundle = store.bundles.find((item) => item.slug === slug);
     if (!bundle) return result('slug must name a seeded bundle.');
     const action = String(input.action);
     if (action.includes('fix-item')) {
-      if (!bundle.fixItems.some((item) => item.id === input.fixItemId)) return result('fixItemId must name a fix item on the bundle.');
-      if (mutate) store.toggleFix(slug, String(input.fixItemId), action === 'resolve-fix-item');
+      let fix = bundle.fixItems.find((item) => item.id === input.fixItemId || item.title === input.title);
+      if (!fix && input.position !== undefined) fix = bundle.fixItems[Number(input.position) - 1];
+      if (!fix) fix = bundle.fixItems.find(f => f.id === input['fix-item-id'] || f.id === input.id);
+      if (!fix) return result('fix item not found on the bundle.');
+      if (mutate) store.toggleFix(slug, fix.id, action === 'resolve-fix-item');
     } else if (action === 'select-recommendation') {
       if (!RECOMMENDATIONS.includes(input.recommendation as Recommendation)) return result('recommendation is required.');
       const recommendation = input.recommendation as Recommendation;
       const outside = !deriveConstraint(bundle).allowed.includes(recommendation);
-      if (outside && (!input.overrideEnabled || String(input.overrideJustification ?? '').trim().length < 20)) return result('overrideJustification must contain at least 20 characters for an out-of-set recommendation.');
+      const overrideEnabled = Boolean(input.overrideEnabled) || bundle.overrideEnabled;
+      if (outside && (!overrideEnabled || String(input.overrideJustification ?? '').trim().length < 20)) return result('overrideJustification must contain at least 20 characters for an out-of-set recommendation.');
       if (mutate) {
-        const saved = store.saveRecommendation(slug, recommendation, outside ? String(input.overrideJustification) : null, Boolean(input.overrideEnabled));
+        const saved = store.saveRecommendation(slug, recommendation, outside ? String(input.overrideJustification) : null, overrideEnabled);
         if (!saved.ok) return result(saved.error ?? 'Recommendation was not saved.');
       }
     } else if (action === 'override-constraint') {
@@ -101,6 +104,7 @@ export function registerWebMCP() {
         if (!changed.ok) return result(changed.error ?? 'Step could not change.');
       }
     } else if (action === 'complete-bundling') {
+      if (!bundle.reviewerSteps.find((item) => item.name === 'Verdict')?.done || !bundle.recommendation) return result('Complete Verdict and record a recommendation before bundling.');
       if (mutate) {
         const completed = store.completeBundling(slug);
         if (!completed.ok) return result(completed.error ?? 'Bundling could not complete.');
@@ -109,32 +113,24 @@ export function registerWebMCP() {
       if (!REVIEWER_STEPS.includes(input.step as ReviewerStepName)) return result('step is required for step-notes.');
       if (mutate) store.setStepNotes(slug, input.step as ReviewerStepName, String(input.notes ?? ''));
     } else return result('action is not a declared workflow action.');
-    return result(mutate ? `${action} completed through the product handler.` : `${action} is valid.`);
+    const latestBundle = useReviewStore.getState().bundles.find((item) => item.slug === slug);
+    return result(mutate ? `${action} completed through the product handler.` : `${action} is valid.`, { state: latestBundle });
   };
   register({ name: 'form_validate', description: 'Validate a declared review workflow mutation without changing state.', inputSchema: formSchema, execute: (input) => runFormAction(input, false) });
   register({ name: 'form_submit', description: 'Submit a declared review workflow mutation through the same store handler as the visible UI.', inputSchema: formSchema, execute: (input) => runFormAction(input, true) });
-  register({ name: 'form_cancel', description: 'Cancel open import or export form surfaces.', inputSchema: { type: 'object', properties: {}, additionalProperties: false }, execute: () => { const store = useReviewStore.getState(); store.setImportOpen(false); store.setExportOpen(false); return result('Open artifact forms were closed.'); } });
-  register({ name: 'form_reset', description: 'Reset declared form draft UI.', inputSchema: { type: 'object', properties: { form: { type: 'string', enum: ['import'] } }, additionalProperties: false }, execute: () => { useReviewStore.getState().setImportDraft(''); return result('Import draft reset.'); } });
-  register({ name: 'form_advance', description: 'Advance a reviewer step using normal lock validation.', inputSchema: { type: 'object', properties: { slug: { type: 'string' }, step: { type: 'string', enum: REVIEWER_STEPS } }, required: ['slug', 'step'], additionalProperties: false }, execute: ({ slug, step }) => runFormAction({ action: 'mark-step-done', slug, step }, true) });
+    register({ name: 'form_advance', description: 'Advance a reviewer step using normal lock validation.', inputSchema: { type: 'object', properties: { slug: { type: 'string' }, step: { type: 'string', enum: REVIEWER_STEPS } }, required: ['slug', 'step'], additionalProperties: false }, execute: ({ slug, step }) => runFormAction({ action: 'mark-step-done', slug, step }, true) });
   register({ name: 'form_return', description: 'Return to the previous reviewer step without changing completion state.', inputSchema: { type: 'object', properties: { step: { type: 'string', enum: REVIEWER_STEPS } }, required: ['step'], additionalProperties: false }, execute: ({ step }) => { useReviewStore.getState().setWorkspacePanel(step as WorkspacePanel); return result(`Returned to ${step}.`); } });
+  register({ name: 'form_cancel', description: 'Cancel open import or export form surfaces.', inputSchema: { type: 'object', properties: {}, additionalProperties: false }, execute: () => { const store = useReviewStore.getState(); store.setImportOpen(false); store.setExportOpen(false); return result('Open artifact forms were closed.'); } });
 
   const sessionSchema = { type: 'object', properties: { demo: { type: 'string', enum: ['gate-re-run', 're-run-step-retry'] }, slug: { type: 'string' }, gate: { type: 'string', enum: GATE_NAMES } }, required: ['slug', 'gate'], additionalProperties: false };
   register({ name: 'session_start', description: 'Start the gate re-run simulation.', inputSchema: sessionSchema, execute: ({ slug, gate }) => { useReviewStore.getState().startRerun(String(slug), gate as GateName); return result('Gate re-run start requested; transient progress must be observed in the UI.'); } });
   register({ name: 'session_pause', description: 'Pause an active gate re-run.', inputSchema: sessionSchema, execute: ({ slug, gate }) => { useReviewStore.getState().pauseRerun(String(slug), gate as GateName); return result('Gate re-run pause requested.'); } });
   register({ name: 'session_resume', description: 'Resume a paused gate re-run.', inputSchema: sessionSchema, execute: ({ slug, gate }) => { useReviewStore.getState().resumeRerun(String(slug), gate as GateName); return result('Gate re-run resume requested.'); } });
-  register({ name: 'session_stop', description: 'Stop a declared simulation.', inputSchema: sessionSchema, execute: () => unavailable('Stopping a re-run') });
-  register({ name: 'session_restart', description: 'Restart a completed re-run as a fresh run.', inputSchema: sessionSchema, execute: ({ slug, gate }) => { useReviewStore.getState().startRerun(String(slug), gate as GateName); return result('A fresh gate re-run was requested when the prior run was not active.'); } });
   register({ name: 'session_advance', description: 'Manually retry an exhausted re-run step.', inputSchema: sessionSchema, execute: ({ slug, gate }) => { useReviewStore.getState().retryRerunStep(String(slug), gate as GateName); return result('Retry from the failed step was requested; completed checkpoints remain intact.'); } });
   register({ name: 'session_trigger_demo', description: 'Trigger a declared re-run demonstration.', inputSchema: sessionSchema, execute: ({ demo, slug, gate }) => { const store = useReviewStore.getState(); if (demo === 're-run-step-retry') store.retryRerunStep(String(slug), gate as GateName); else store.startRerun(String(slug), gate as GateName); return result(`${demo ?? 'gate-re-run'} requested.`); } });
-  register({ name: 'session_connect', description: 'Connect a declared remote session.', inputSchema: { type: 'object', properties: {}, additionalProperties: false }, execute: () => unavailable('Remote connection') });
-  register({ name: 'session_disconnect', description: 'Disconnect a declared remote session.', inputSchema: { type: 'object', properties: {}, additionalProperties: false }, execute: () => unavailable('Remote disconnection') });
 
   const artifactSchema = { type: 'object', properties: { target: { type: 'string', enum: ['review-summary-text', 'review-package-json', 'review-summary-markdown', 'import-surface'] } }, additionalProperties: false };
-  register({ name: 'artifact_import', description: 'Open the visible import surface; artifact contents remain user/Playwright-driven.', inputSchema: artifactSchema, execute: () => { useReviewStore.getState().setImportOpen(true); return result('Import certification package surface opened.'); } });
-  register({ name: 'artifact_export', description: 'Open the visible export preview.', inputSchema: artifactSchema, execute: ({ target }) => { const store = useReviewStore.getState(); store.setExportFormat(target === 'review-summary-markdown' || target === 'review-summary-text' ? 'markdown' : 'json'); store.setExportOpen(true); return result('Export certification package preview opened.'); } });
   register({ name: 'artifact_copy', description: 'Copy the selected bundle review summary using the visible product behavior.', inputSchema: artifactSchema, execute: async () => { const store = useReviewStore.getState(); const bundle = store.bundles.find((item) => item.slug === store.selection.bundleSlug); if (!bundle) return result('Open a bundle before copying its review summary.'); await navigator.clipboard.writeText(bundleSummaryMarkdown(bundle)); store.setAnnouncement('Review summary copied.'); return result('Review summary copied; clipboard contents are not returned.'); } });
-  register({ name: 'artifact_print_preview', description: 'Open the human-readable summary preview.', inputSchema: artifactSchema, execute: () => { const store = useReviewStore.getState(); store.setExportFormat('markdown'); store.setExportOpen(true); return result('Review Summary Markdown preview opened.'); } });
-  register({ name: 'artifact_convert', description: 'Switch the visible export preview between declared formats.', inputSchema: { type: 'object', properties: { format: { type: 'string', enum: ['review-package-json', 'review-summary-markdown'] } }, required: ['format'], additionalProperties: false }, execute: ({ format }) => { useReviewStore.getState().setExportFormat(format === 'review-package-json' ? 'json' : 'markdown'); return result('Visible export preview format changed.'); } });
 
   window.webmcp_session_info = () => ({
     contractVersion: 'zto-webmcp-v1',
