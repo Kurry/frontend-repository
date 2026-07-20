@@ -1,4 +1,4 @@
-/* Docuseal — PDF form builder / document signing workspace (oracle).
+/* Docuseal — PDF form builder / document signing workspace .
  * Self-contained, in-memory state mirrored to localStorage so a reload restores.
  * The WebMCP handlers call the SAME action functions the visible UI controls call.
  */
@@ -767,7 +767,6 @@
   } catch (e) {}
 
   // expose a few action fns for debugging/self-test parity (non-authoritative)
-  window.__docuseal = { state: function () { return state; }, placeField: placeField, deleteField: deleteField };
 
   // ---------------------------------------------------------------- boot
   document.addEventListener("DOMContentLoaded", function () {
