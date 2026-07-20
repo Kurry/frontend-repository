@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import {
   Button,
   Checkbox,
@@ -129,6 +130,8 @@ function TechniqueTag({ technique }) {
 }
 
 function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm' }) {
+
+  const [parent] = useAutoAnimate({ duration: 150 });
   const copyFeedback = useLibraryStore((state) => state.copyFeedback);
   const showCopyFeedback = useLibraryStore((state) => state.showCopyFeedback);
   const copied = copyFeedback?.key === feedbackKey;
@@ -143,11 +146,13 @@ function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm'
       type="button"
       kind="ghost"
       size={size}
-      renderIcon={copied ? Checkmark : Copy}
       onClick={copy}
       aria-label={copied ? 'Copied' : label}
     >
-      {copied ? 'Copied' : 'Copy'}
+      <div ref={parent} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        {copied ? <Checkmark size={16} key="check" /> : <Copy size={16} key="copy" />}
+        <span key={copied ? 'text-copied' : 'text-copy'}>{copied ? 'Copied' : 'Copy'}</span>
+      </div>
     </Button>
   );
 }
@@ -190,7 +195,7 @@ function AttachmentBadges({ prompt }) {
             <span>{item.filename}</span>
           </Button>
           <div className="attachment-preview" role="tooltip">
-            {item.kind === 'image' ? <img src={item.src} alt="" /> : <AttachmentIcon attachment={item} size={28} />}
+            {item.kind === 'image' ? <img src={item.src} alt={`Preview of ${item.filename}`} /> : <AttachmentIcon attachment={item} size={28} />}
             <strong>{item.filename}</strong>
             <span>{item.type}</span>
             <span>{item.detail}</span>
@@ -209,7 +214,7 @@ function AttachmentRows({ attachments, editable = false, onRemove }) {
       {attachments.map((item) => (
         <div className="attachment-row" key={item.id}>
           <div className="attachment-row__preview">
-            {item.kind === 'image' ? <img src={item.src} alt="" /> : <AttachmentIcon attachment={item} size={24} />}
+            {item.kind === 'image' ? <img src={item.src} alt={`Preview of ${item.filename}`} /> : <AttachmentIcon attachment={item} size={24} />}
           </div>
           <div className="attachment-row__meta">
             <strong>{item.filename}</strong>
@@ -398,6 +403,7 @@ function LibraryToolbar({ visibleCount, totalCount }) {
 }
 
 function LibraryTable({ prompts }) {
+  const [parent] = useAutoAnimate({ duration: 150 });
   const selectedIds = useLibraryStore((state) => state.selectedIds);
   const newPromptId = useLibraryStore((state) => state.newPromptId);
   const toggleSelected = useLibraryStore((state) => state.toggleSelected);
@@ -425,7 +431,7 @@ function LibraryTable({ prompts }) {
   };
 
   return (
-    <DataTable rows={rows} headers={TABLE_HEADERS}>
+    <DataTable rows={rows} headers={TABLE_HEADERS} isSortable>
       {({ rows: carbonRows, headers, getTableProps, getHeaderProps, getRowProps }) => (
         <TableContainer className="library-table-container">
           <Table {...getTableProps()} className="library-table" aria-label="Prompt library">
@@ -448,7 +454,7 @@ function LibraryTable({ prompts }) {
                 })}
               </TableRow>
             </TableHead>
-            <TableBody>
+            <TableBody ref={parent}>
               {carbonRows.map((row) => {
                 const prompt = prompts.find((item) => item.id === row.id);
                 if (!prompt) return null;
@@ -507,7 +513,7 @@ function LibraryTable({ prompts }) {
   );
 }
 
-function PromptFormModal({ modal }) {
+function PromptFormModal({ modal, isOpen }) {
   const prompts = useLibraryStore((state) => state.prompts);
   const closeModal = useLibraryStore((state) => state.closeModal);
   const createPrompt = useLibraryStore((state) => state.createPrompt);
@@ -521,11 +527,18 @@ function PromptFormModal({ modal }) {
     handleSubmit,
     watch,
     trigger,
+    reset,
     formState: { errors, isValid },
   } = useForm({ resolver: zodResolver(promptRequestSchema), mode: 'all', defaultValues: initial });
   const values = watch();
 
-  useEffect(() => { trigger(); }, [trigger]);
+  useEffect(() => {
+    if (isOpen) {
+      reset(initial);
+      submitLock.current = false;
+      trigger();
+    }
+  }, [isOpen, reset, trigger]);
 
   const submit = (data) => {
     if (submitLock.current) return;
@@ -535,15 +548,12 @@ function PromptFormModal({ modal }) {
   };
 
   return (
-    <Modal
-      open
-      size="lg"
-      className="prompt-form-modal"
+    <Modal open={isOpen} size="lg" className="prompt-form-modal"
       modalHeading={existing ? 'Edit prompt' : 'Create a new prompt'}
       modalLabel={existing ? `Version ${existing.version}` : 'Prompt Library'}
       primaryButtonText={existing ? 'Save new version' : 'Create prompt'}
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid || submitLock.current}
+
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit(submit)}
@@ -611,16 +621,13 @@ function PromptFormModal({ modal }) {
   );
 }
 
-function DeleteModal({ promptId }) {
+function DeleteModal({ promptId, isOpen }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
   const closeModal = useLibraryStore((state) => state.closeModal);
   const deletePrompt = useLibraryStore((state) => state.deletePrompt);
   if (!prompt) return null;
   return (
-    <Modal
-      danger
-      open
-      size="sm"
+    <Modal danger open={isOpen} size="sm"
       modalHeading="Delete prompt?"
       modalLabel="This action cannot be undone"
       primaryButtonText="Delete prompt"
@@ -634,28 +641,35 @@ function DeleteModal({ promptId }) {
   );
 }
 
-function ExtendModal({ promptIds }) {
+function ExtendModal({ promptIds, isOpen }) {
   const prompts = useLibraryStore((state) => state.prompts);
   const closeModal = useLibraryStore((state) => state.closeModal);
   const createPrompt = useLibraryStore((state) => state.createPrompt);
   const base = prompts.find((prompt) => prompt.id === promptIds[0]);
   const submitLock = useRef(false);
+  const initial = useMemo(() => ({
+    title: base ? `${base.title} — extended`.slice(0, 60) : '',
+    body: base?.body || '',
+    technique: base?.technique || '',
+    description: base ? `Extended from ${base.title}`.slice(0, 280) : '',
+    extensionText: '',
+  }), [base]);
   const {
-    register, handleSubmit, watch, trigger,
+    register, handleSubmit, watch, trigger, reset,
     formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(extendFormSchema),
     mode: 'all',
-    defaultValues: {
-      title: base ? `${base.title} — extended`.slice(0, 60) : '',
-      body: base?.body || '',
-      technique: base?.technique || '',
-      description: base ? `Extended from ${base.title}`.slice(0, 280) : '',
-      extensionText: '',
-    },
+    defaultValues: initial,
   });
   const values = watch();
-  useEffect(() => { trigger(); }, [trigger]);
+  useEffect(() => {
+    if (isOpen) {
+      reset(initial);
+      submitLock.current = false;
+      trigger();
+    }
+  }, [isOpen, reset, trigger, initial]);
   if (!base) return null;
 
   const submit = (data) => {
@@ -670,14 +684,11 @@ function ExtendModal({ promptIds }) {
   };
 
   return (
-    <Modal
-      open
-      size="lg"
-      modalHeading="Extend a prompt"
+    <Modal open={isOpen} size="lg" modalHeading="Extend a prompt"
       modalLabel={`Source · ${base.title}`}
       primaryButtonText="Create extension"
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid || submitLock.current}
+
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit(submit)}
@@ -710,28 +721,35 @@ function ExtendModal({ promptIds }) {
   );
 }
 
-function CombineModal({ promptIds }) {
+function CombineModal({ promptIds, isOpen }) {
   const prompts = useLibraryStore((state) => state.prompts);
   const closeModal = useLibraryStore((state) => state.closeModal);
   const createPrompt = useLibraryStore((state) => state.createPrompt);
   const selected = promptIds.map((id) => prompts.find((prompt) => prompt.id === id)).filter(Boolean);
   const composite = selected.map((prompt) => prompt.body).join('\n\n---\n\n');
   const submitLock = useRef(false);
+  const initial = useMemo(() => ({
+    title: 'Combined prompt',
+    body: composite,
+    combinedBody: composite,
+    technique: selected[0]?.technique || '',
+    description: `Combined from ${selected.length} source prompts`,
+  }), [composite, selected]);
   const {
-    register, handleSubmit, trigger,
+    register, handleSubmit, trigger, reset,
     formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(combineFormSchema),
     mode: 'all',
-    defaultValues: {
-      title: 'Combined prompt',
-      body: composite,
-      combinedBody: composite,
-      technique: selected[0]?.technique || '',
-      description: `Combined from ${selected.length} source prompts`,
-    },
+    defaultValues: initial,
   });
-  useEffect(() => { trigger(); }, [trigger]);
+  useEffect(() => {
+    if (isOpen) {
+      reset(initial);
+      submitLock.current = false;
+      trigger();
+    }
+  }, [isOpen, reset, trigger, initial]);
   if (selected.length < 2) return null;
 
   const submit = (data) => {
@@ -744,14 +762,11 @@ function CombineModal({ promptIds }) {
   };
 
   return (
-    <Modal
-      open
-      size="lg"
-      modalHeading="Combine selected prompts"
+    <Modal open={isOpen} size="lg" modalHeading="Combine selected prompts"
       modalLabel={`${selected.length} linked sources`}
       primaryButtonText="Create combined prompt"
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid || submitLock.current}
+
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit(submit)}
@@ -783,7 +798,8 @@ function CombineModal({ promptIds }) {
   );
 }
 
-function ExportModal() {
+function ExportModal({ isOpen }) {
+  const [parent] = useAutoAnimate({ duration: 150 });
   const prompts = useLibraryStore((state) => state.prompts);
   const exportFormat = useLibraryStore((state) => state.exportFormat);
   const closeModal = useLibraryStore((state) => state.closeModal);
@@ -802,7 +818,7 @@ function ExportModal() {
   };
 
   return (
-    <Modal open passiveModal size="lg" modalHeading="Export library" modalLabel={`${prompts.length} live prompts`} onRequestClose={closeModal}>
+    <Modal open={isOpen} passiveModal size="lg" modalHeading="Export library" modalLabel={`${prompts.length} live prompts`} onRequestClose={closeModal}>
       <p className="modal-intro">Both artifacts are compiled from the current in-memory collection. Create, edit, delete, Extend, and Combine changes are included immediately.</p>
       <div className="format-switch" role="group" aria-label="Export format">
         <Button type="button" kind={exportFormat === 'json' ? 'primary' : 'secondary'} size="sm" onClick={() => setExportFormat('json')}>JSON</Button>
@@ -811,7 +827,12 @@ function ExportModal() {
       <div className="export-filebar">
         <div><Document size={20} /><span><strong>{filename}</strong><small>{visible.length.toLocaleString()} characters</small></span></div>
         <div>
-          <Button type="button" kind="ghost" size="sm" renderIcon={copied ? Checkmark : Copy} onClick={copy}>{copied ? 'Copied' : 'Copy'}</Button>
+          <Button type="button" kind="ghost" size="sm" onClick={copy}>
+            <div ref={parent} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              {copied ? <Checkmark size={16} key="check" /> : <Copy size={16} key="copy" />}
+              <span key={copied ? 'text-copied' : 'text-copy'}>{copied ? 'Copied' : 'Copy'}</span>
+            </div>
+          </Button>
           <Button
             type="button"
             kind="primary"
@@ -828,15 +849,21 @@ function ExportModal() {
   );
 }
 
-function ImportModal() {
+function ImportModal({ isOpen }) {
   const closeModal = useLibraryStore((state) => state.closeModal);
   const importLibrary = useLibraryStore((state) => state.importLibrary);
   const [fileName, setFileName] = useState('');
   const {
-    register, handleSubmit, setValue, trigger,
+    register, handleSubmit, setValue, trigger, reset,
     formState: { errors, isValid },
   } = useForm({ resolver: zodResolver(importFormSchema), mode: 'all', defaultValues: { payload: '' } });
-  useEffect(() => { trigger(); }, [trigger]);
+  useEffect(() => {
+    if (isOpen) {
+      reset({ payload: '' });
+      setFileName('');
+      trigger();
+    }
+  }, [isOpen, reset, trigger]);
 
   const chooseFile = async (event) => {
     const file = event.target.files?.[0];
@@ -847,14 +874,11 @@ function ImportModal() {
   };
 
   return (
-    <Modal
-      open
-      size="lg"
-      modalHeading="Import library JSON"
+    <Modal open={isOpen} size="lg" modalHeading="Import library JSON"
       modalLabel="Replace the current session collection"
       primaryButtonText="Import and replace"
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid}
+
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit((data) => importLibrary(data.payload))}
@@ -885,7 +909,7 @@ function ImportModal() {
   );
 }
 
-function DetailModal({ promptId }) {
+function DetailModal({ promptId, isOpen }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
   const closeDetail = useLibraryStore((state) => state.closeDetail);
   const openModal = useLibraryStore((state) => state.openModal);
@@ -893,7 +917,7 @@ function DetailModal({ promptId }) {
   const openSources = useLibraryStore((state) => state.openSources);
   if (!prompt) return null;
   return (
-    <Modal open passiveModal size="lg" modalHeading={prompt.title} modalLabel="Prompt detail" onRequestClose={closeDetail}>
+    <Modal open={isOpen} passiveModal size="lg" modalHeading={prompt.title} modalLabel="Prompt detail" onRequestClose={closeDetail}>
       <div className="detail-meta">
         <TechniqueTag technique={prompt.technique} />
         <span>Created {formatDate(prompt.created)}</span>
@@ -991,17 +1015,18 @@ function SourcesPanel({ promptId }) {
 }
 
 function ToastRegion() {
+  const [parent] = useAutoAnimate({ duration: 250 });
   const toast = useLibraryStore((state) => state.toast);
-  if (!toast) return <div className="sr-only" aria-live="polite" />;
+
   return (
-    <div className="toast-region" aria-live="polite">
-      <InlineNotification
+    <div className="toast-region" aria-live="polite" ref={parent}>
+      {toast && <InlineNotification key={toast.id}
         lowContrast
         hideCloseButton
         kind={toast.kind}
         title={toast.title}
         subtitle={toast.subtitle}
-      />
+      />}
     </div>
   );
 }
@@ -1256,6 +1281,21 @@ export default function App() {
 
   const filtered = searchQuery.trim() !== '' || techniqueFilter !== 'all';
 
+
+  const [prevModal, setPrevModal] = useState(null);
+  const [prevDetail, setPrevDetail] = useState(null);
+
+  useEffect(() => {
+    if (activeModal) setPrevModal(activeModal);
+  }, [activeModal]);
+
+  useEffect(() => {
+    if (detailPromptId) setPrevDetail(detailPromptId);
+  }, [detailPromptId]);
+
+  const modalState = activeModal || prevModal;
+  const detailState = detailPromptId || prevDetail;
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#library-content">Skip to prompt library</a>
@@ -1287,14 +1327,14 @@ export default function App() {
         </section>
       </main>
 
-      {activeModal?.type === 'create' && <PromptFormModal key="create" modal={activeModal} />}
-      {activeModal?.type === 'edit' && <PromptFormModal key={`edit-${activeModal.promptId}-${activeModal.restoredVersion || 'current'}`} modal={activeModal} />}
-      {activeModal?.type === 'delete' && <DeleteModal promptId={activeModal.promptId} />}
-      {activeModal?.type === 'extend' && <ExtendModal promptIds={activeModal.promptIds} />}
-      {activeModal?.type === 'combine' && <CombineModal promptIds={activeModal.promptIds} />}
-      {activeModal?.type === 'export' && <ExportModal />}
-      {activeModal?.type === 'import' && <ImportModal />}
-      {detailPromptId && <DetailModal promptId={detailPromptId} />}
+      {modalState?.type === 'create' && <PromptFormModal key="create" modal={modalState} isOpen={activeModal?.type === 'create'} />}
+      {modalState?.type === 'edit' && <PromptFormModal key={`edit-${modalState.promptId}-${modalState.restoredVersion || 'current'}`} modal={modalState} isOpen={activeModal?.type === 'edit'} />}
+      {modalState?.type === 'delete' && <DeleteModal promptId={modalState.promptId} isOpen={activeModal?.type === 'delete'} />}
+      {modalState?.type === 'extend' && <ExtendModal promptIds={modalState.promptIds} isOpen={activeModal?.type === 'extend'} />}
+      {modalState?.type === 'combine' && <CombineModal promptIds={modalState.promptIds} isOpen={activeModal?.type === 'combine'} />}
+      {modalState?.type === 'export' && <ExportModal isOpen={activeModal?.type === 'export'} />}
+      {modalState?.type === 'import' && <ImportModal isOpen={activeModal?.type === 'import'} />}
+      {detailState && <DetailModal promptId={detailState} isOpen={!!detailPromptId} />}
       {historyPromptId && <HistoryPanel promptId={historyPromptId} />}
       {sourceListPromptId && <SourcesPanel promptId={sourceListPromptId} />}
       <ToastRegion />
