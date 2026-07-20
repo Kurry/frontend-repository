@@ -60,7 +60,7 @@ export function AssistPanel() {
       <div className="timeline-list">
         {events.length ? events.slice().reverse().map((event) => <button key={event.id} className={run.selectedEventId === event.id ? 'selected' : ''} onClick={() => selectEvent(run.suiteId, event.id)}>
           <span>{new Date(event.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>{event.text}
-        </button>) : <p className="empty-mini">No events match this status.</p>}
+        </button>) : <p className="sidebar-empty">No events match this status.</p>}
       </div>
     </section>
   );
@@ -73,7 +73,8 @@ export default function Sidebar() {
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => state.selected.includes(id));
   const history = state.historyOrder.map((id) => state.items[id]).filter((item) => item?.annotation);
   const jsonl = useMemo(() => compileJsonl(state), [state.items, state.suites]);
-  const startAssist = (suiteId) => {
+  const startAssist = (suiteId, remaining) => {
+    if (remaining === 0) { state.setToast("Suite fully annotated. Nothing to pre-label.", 'info'); return; }
     const result = state.startAssist(suiteId);
     if (!result.ok) state.setToast(result.error, 'info');
   };
@@ -94,7 +95,7 @@ export default function Sidebar() {
                 <span><strong>{suite.name}</strong><small>{suite.itemIds.length - remaining} completed</small></span>
                 <span className="suite-badges"><b>{remaining}</b>{skipped > 0 && <em>{skipped} skipped</em>}</span>
               </button>
-              <Button hasIconOnly kind="ghost" size="sm" renderIcon={Play} iconDescription={`Run Assist on ${suite.name}`} onClick={() => startAssist(suite.id)} />
+              <Button hasIconOnly kind="ghost" size="sm" renderIcon={Play} iconDescription={`Run Assist on ${suite.name}`} onClick={() => startAssist(suite.id, remaining)} />
             </div>;
           })}
         </nav>
@@ -118,7 +119,7 @@ export default function Sidebar() {
         <AssistPanel />
       </> : <div className="history-list">
         {history.map((item) => <button key={item.id} className={state.historyItemId === item.id ? 'active' : ''} onClick={() => state.openHistory(item.id)}>
-          <span><strong>{item.title}</strong><small>{item.response.slice(0, 70)}…</small></span>
+          <span><strong>{item.title}</strong><small>{item.response.length > 70 ? item.response.slice(0, 70) + '…' : item.response}</small></span>
           <span className={`rating-dot ${item.annotation.rating}`}>{item.annotation.rating === 'up' ? '↑' : '↓'}</span>
           <time>{new Date(item.submittedAt).toLocaleDateString()}</time>
         </button>)}

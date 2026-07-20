@@ -34,9 +34,12 @@ export default function ReviewView() {
   ], [items]);
   return <div className="view-shell review-view"><header className="view-heading"><div><p className="eyebrow">Priority queue</p><h1>Review queue</h1><p>Disputed work stays ahead of labeled and reviewed annotations.</p></div></header>
     <div className="review-tiers">{tiers.map((tier) => <section key={tier.state} className={`review-tier tier-${tier.state}`}><header><div><h2>{tier.title}</h2><p>{tier.description}</p></div><Tag type={tier.state === 'disputed' ? 'red' : tier.state === 'reviewed' ? 'green' : 'blue'}>{tier.items.length}</Tag></header>
-      <div>{tier.items.map((item) => <article key={item.id} className="review-item"><button className="review-main" onClick={() => openHistory(item.id)}><span><strong>{item.title}</strong><small>{item.response.slice(0, 105)}…</small></span><StateChip state={item.review_state} /><b className={`rating-dot ${item.annotation?.rating}`}>{item.annotation?.rating === 'up' ? '↑' : '↓'}</b></button><div className="review-actions">
+      <div>{tier.items.map((item) => <article key={item.id} className="review-item"><button className="review-main" onClick={() => openHistory(item.id)}><span><strong>{item.title}</strong><small>{item.response.length > 105 ? item.response.slice(0, 105) + '…' : item.response}</small></span><StateChip state={item.review_state} /><b className={`rating-dot ${item.annotation?.rating}`}>{item.annotation?.rating === 'up' ? '↑' : '↓'}</b></button><div className="review-actions">
         {tier.state === 'disputed' ? <Button size="sm" renderIcon={Checkmark} onClick={() => setResolveItem(item)}>Resolve</Button> : <><Button size="sm" kind="ghost" renderIcon={Flag} onClick={() => setDisputeItem(item)}>Dispute</Button>{tier.state === 'labeled' && <Button size="sm" kind="tertiary" onClick={() => markState(item.id, 'reviewed')}>Mark reviewed</Button>}</>}
-      </div></article>)}</div>{!tier.items.length && <p className="tier-empty">No {tier.title.toLowerCase()} items.</p>}</section>)}</div>
+      </div></article>)}</div>{!tier.items.length && <p className="tier-empty">
+        {tier.state === 'disputed' ? 'No disputed items. Disagreeing labels from the Agreement view or manually flagged items appear here.' : `No ${tier.title.toLowerCase()} items.`}
+      </p>}
+    </section>)}</div>
     {disputeItem && <DisputeForm item={disputeItem} onClose={() => setDisputeItem(null)} />}{resolveItem && <ResolveForm item={resolveItem} onClose={() => setResolveItem(null)} />}
   </div>;
 }
