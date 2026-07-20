@@ -395,3 +395,12 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--brand)
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
 }
+
+/* Focus rings for interactive custom elements */
+.graph-node:focus-visible, .history-main:focus-visible, .prompt-card:focus-visible, .search-result:focus-visible, .blame-attribution:focus-visible, .choice-card:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Fix close button off-screen issue on narrow devices */
+@media (max-width: 768px) {
+  .rail-heading { justify-content: flex-start; }
+  .rail-close { position: absolute; right: 12px; top: 12px; }
+}

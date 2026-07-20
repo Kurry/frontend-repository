@@ -278,7 +278,7 @@ function BranchCompare({ prompt }) {
   return <div className="merge-workspace">
     <div className="three-pane"><ThreePane version={base} label="Common base" accent="base" /><ThreePane version={left} label="Left branch" accent="left" /><ThreePane version={right} label="Right branch" accent="right" /></div>
     <div className="merge-launch"><div><span className="eyebrow">Three conflicting regions</span><h2>Ready for a region-level merge</h2><p>Review the base and both branches above, then resolve every conflict in a focused merge flow.</p></div><Button size="lg" renderIcon={Branch} onClick={() => state.setMergeFlowOpen(true)}>Merge branches</Button></div>
-    <ComposedModal className="merge-modal" open={state.mergeFlowOpen} onClose={() => state.setMergeFlowOpen(false)} size="lg"><ModalHeader label={`v${left.versionNumber} + v${right.versionNumber}`} title="Merge branch regions" buttonOnClick={() => state.setMergeFlowOpen(false)} /><ModalBody><section className="merge-flow">
+    <div onKeyDown={(e) => { if (e.key === 'Escape') state.setMergeFlowOpen(false); }}><ComposedModal className="merge-modal" open={state.mergeFlowOpen} onClose={() => state.setMergeFlowOpen(false)} size="lg"><ModalHeader label={`v${left.versionNumber} + v${right.versionNumber}`} title="Merge branch regions" buttonOnClick={() => state.setMergeFlowOpen(false)} /><ModalBody><section className="merge-flow">
       <div className="merge-flow-head"><div><span className="eyebrow">Region-by-region merge</span><h2>Resolve branch conflicts</h2><p>Each resolution becomes a MergeRegionResolution payload.</p></div><div className="merge-progress"><strong>{resolved} of {total} resolved</strong><ProgressBar label={`${resolved} of ${total} regions resolved`} hideLabel value={(resolved / total) * 100} /></div></div>
       <div className="bulk-actions"><span>Resolve every remaining region:</span><Button size="sm" kind="tertiary" onClick={() => state.bulkResolveMerge('left')}>Use all left</Button><Button size="sm" kind="tertiary" onClick={() => state.bulkResolveMerge('right')}>Use all right</Button></div>
       <div className="merge-regions">{session.regions.map((region, index) => <article className={`merge-region ${region.resolution ? 'is-resolved' : ''}`} key={region.regionId}>
@@ -289,7 +289,7 @@ function BranchCompare({ prompt }) {
         {region.resolution && <div className="result-preview"><span>Result preview</span><code>{region.resolution === 'choose-left' ? region.leftText : region.resolution === 'choose-right' ? region.rightText : region.manualText}</code></div>}
       </article>)}</div>
       <div className="merge-complete"><p>{resolved === total ? 'All regions have valid resolutions. The merge will create one immutable head version.' : `Resolve ${total - resolved} remaining ${total - resolved === 1 ? 'region' : 'regions'} to continue.`}</p></div>
-    </section></ModalBody><ModalFooter><Button kind="secondary" onClick={() => state.setMergeFlowOpen(false)}>Cancel</Button><Button renderIcon={Checkmark} disabled={resolved !== total} onClick={state.completeMerge}>Complete merge</Button></ModalFooter></ComposedModal>
+    </section></ModalBody><ModalFooter><Button kind="secondary" onClick={() => state.setMergeFlowOpen(false)}>Cancel</Button><Button renderIcon={Checkmark} disabled={resolved !== total} onClick={state.completeMerge}>Complete merge</Button></ModalFooter></ComposedModal></div>
   </div>;
 }
 
@@ -329,6 +329,13 @@ function VersionGraph({ prompt }) {
 
 function RestoreModal({ prompt }) {
   const state = useStudioStore();
+  const isOpen = Boolean(state.restoreDialog);
+  useEffect(() => {
+    if (isOpen) {
+      const active = document.activeElement;
+      return () => { if (active) active.focus(); };
+    }
+  }, [isOpen]);
   const source = prompt?.versions.find((version) => version.versionId === state.restoreDialog?.versionId);
   const { register, handleSubmit, watch, reset, setError, formState: { errors } } = useForm({ resolver: zodResolver(restoreCreateSchema), defaultValues: { sourceVersionId: source?.versionId || '', changeNote: '' } });
   useEffect(() => reset({ sourceVersionId: source?.versionId || '', changeNote: '' }), [source?.versionId, reset]);
@@ -339,16 +346,23 @@ function RestoreModal({ prompt }) {
     if (!payload.changeNote.toLocaleLowerCase().includes(`v${source.versionNumber}`.toLocaleLowerCase())) { setError('changeNote', { message: `changeNote must name restore source v${source.versionNumber}.` }); return; }
     state.restoreVersion(payload.sourceVersionId, payload.changeNote);
   };
-  return <ComposedModal open={Boolean(state.restoreDialog)} onClose={() => state.setRestoreDialog(null)} size="sm" selectorPrimaryFocus="#restore-change-note"><ModalHeader label="Immutable history" title={`Restore source v${source?.versionNumber || ''}`} buttonOnClick={() => state.setRestoreDialog(null)} /><ModalBody><p className="modal-lead">This creates one new head version whose text exactly matches <strong>v{source?.versionNumber}</strong>. Existing versions remain untouched.</p><form id="restore-form" onSubmit={handleSubmit(submit)}><input type="hidden" {...register('sourceVersionId')} /><TextArea id="restore-change-note" labelText="Change note" helperText={`Required · 1–200 characters · must include v${source?.versionNumber || ''}`} rows={4} {...register('changeNote')} invalid={Boolean(noteError)} invalidText={noteError} /></form></ModalBody><ModalFooter><Button kind="secondary" onClick={() => state.setRestoreDialog(null)}>Cancel</Button><Button type="submit" form="restore-form" disabled={!valid}>Restore version</Button></ModalFooter></ComposedModal>;
+  return <div onKeyDown={(e) => { if (e.key === 'Escape') state.setRestoreDialog(null); }}><ComposedModal open={isOpen} onClose={() => state.setRestoreDialog(null)} size="sm" selectorPrimaryFocus="#restore-change-note"><ModalHeader label="Immutable history" title={`Restore source v${source?.versionNumber || ''}`} buttonOnClick={() => state.setRestoreDialog(null)} /><ModalBody><p className="modal-lead">This creates one new head version whose text exactly matches <strong>v{source?.versionNumber}</strong>. Existing versions remain untouched.</p><form id="restore-form" onSubmit={handleSubmit(submit)}><input type="hidden" {...register('sourceVersionId')} /><TextArea id="restore-change-note" labelText="Change note" helperText={`Required · 1–200 characters · must include v${source?.versionNumber || ''}`} rows={4} {...register('changeNote')} invalid={Boolean(noteError)} invalidText={noteError} /></form></ModalBody><ModalFooter><Button kind="secondary" onClick={() => state.setRestoreDialog(null)}>Cancel</Button><Button type="submit" form="restore-form" disabled={!valid}>Restore version</Button></ModalFooter></ComposedModal></div>;
 }
 
 function AnnotationModal() {
   const state = useStudioStore();
+  const isOpen = state.annotationComposerOpen;
+  useEffect(() => {
+    if (isOpen) {
+      const active = document.activeElement;
+      return () => { if (active) active.focus(); };
+    }
+  }, [isOpen]);
   const range = state.selectedRange || { lineStart: 1, lineEnd: 1 };
   const { register, handleSubmit, watch, reset, formState: { errors } } = useForm({ resolver: zodResolver(annotationCreateSchema), defaultValues: { bodyMarkdown: '', author: 'Mara Sol', lineStart: range.lineStart, lineEnd: range.lineEnd } });
   useEffect(() => reset({ bodyMarkdown: '', author: 'Mara Sol', lineStart: range.lineStart, lineEnd: range.lineEnd }), [range.lineStart, range.lineEnd, reset, state.annotationComposerOpen]);
   const markdown = watch('bodyMarkdown') || '';
-  return <ComposedModal open={state.annotationComposerOpen} onClose={() => state.setAnnotationComposerOpen(false)} size="md" selectorPrimaryFocus="#annotation-body"><ModalHeader label={`Lines ${range.lineStart}–${range.lineEnd}`} title="Add annotation" buttonOnClick={() => state.setAnnotationComposerOpen(false)} /><ModalBody><form id="annotation-form" className="annotation-form" onSubmit={handleSubmit(state.postAnnotation)}><div className="annotation-fields"><TextInput id="annotation-author" labelText="Author" {...register('author')} invalid={Boolean(errors.author)} invalidText={errors.author?.message} /><div className="range-inputs"><TextInput id="line-start" type="number" labelText="Line start" {...register('lineStart')} invalid={Boolean(errors.lineStart)} invalidText={errors.lineStart?.message} /><TextInput id="line-end" type="number" labelText="Line end" {...register('lineEnd')} invalid={Boolean(errors.lineEnd)} invalidText={errors.lineEnd?.message} /></div><TextArea id="annotation-body" labelText="bodyMarkdown" helperText="Markdown, fenced code, and checklists supported · 1–4000 characters" rows={8} {...register('bodyMarkdown')} invalid={Boolean(errors.bodyMarkdown)} invalidText={errors.bodyMarkdown?.message} /></div><div className="annotation-preview"><span className="eyebrow">Live preview</span>{markdown.trim() ? <MarkdownView markdown={markdown} /> : <p className="preview-empty">Formatted annotation text will appear here.</p>}</div></form></ModalBody><ModalFooter><Button kind="secondary" onClick={() => state.setAnnotationComposerOpen(false)}>Cancel</Button><Button type="submit" form="annotation-form">Post annotation</Button></ModalFooter></ComposedModal>;
+  return <div onKeyDown={(e) => { if (e.key === 'Escape') state.setAnnotationComposerOpen(false); }}><ComposedModal open={isOpen} onClose={() => state.setAnnotationComposerOpen(false)} size="md" selectorPrimaryFocus="#annotation-body"><ModalHeader label={`Lines ${range.lineStart}–${range.lineEnd}`} title="Add annotation" buttonOnClick={() => state.setAnnotationComposerOpen(false)} /><ModalBody><form id="annotation-form" className="annotation-form" onSubmit={handleSubmit(state.postAnnotation)}><div className="annotation-fields"><TextInput id="annotation-author" labelText="Author" {...register('author')} invalid={Boolean(errors.author)} invalidText={errors.author?.message} /><div className="range-inputs"><TextInput id="line-start" type="number" labelText="Line start" {...register('lineStart')} invalid={Boolean(errors.lineStart)} invalidText={errors.lineStart?.message} /><TextInput id="line-end" type="number" labelText="Line end" {...register('lineEnd')} invalid={Boolean(errors.lineEnd)} invalidText={errors.lineEnd?.message} /></div><TextArea id="annotation-body" labelText="bodyMarkdown" helperText="Markdown, fenced code, and checklists supported · 1–4000 characters" rows={8} {...register('bodyMarkdown')} invalid={Boolean(errors.bodyMarkdown)} invalidText={errors.bodyMarkdown?.message} /></div><div className="annotation-preview"><span className="eyebrow">Live preview</span>{markdown.trim() ? <MarkdownView markdown={markdown} /> : <p className="preview-empty">Formatted annotation text will appear here.</p>}</div></form></ModalBody><ModalFooter><Button kind="secondary" onClick={() => state.setAnnotationComposerOpen(false)}>Cancel</Button><Button type="submit" form="annotation-form">Post annotation</Button></ModalFooter></ComposedModal></div>;
 }
 
 function ImportForm() {
@@ -369,6 +383,13 @@ function ImportForm() {
 
 function ExportModal() {
   const state = useStudioStore();
+  const isOpen = state.exportOpen;
+  useEffect(() => {
+    if (isOpen) {
+      const active = document.activeElement;
+      return () => { if (active) active.focus(); };
+    }
+  }, [isOpen]);
   const content = artifactForTab(state, state.exportTab);
   const [copied, setCopied] = useState(false);
   const hasMerged = Boolean(getMergedText(state));
@@ -386,12 +407,12 @@ function ExportModal() {
     const blob = new Blob([content], { type: types[state.exportTab] }); const href = URL.createObjectURL(blob); const anchor = document.createElement('a'); anchor.href = href; anchor.download = `prompt-ledger-${state.exportTab}.${extensions[state.exportTab]}`; anchor.click(); URL.revokeObjectURL(href);
     useStudioStore.setState((current) => ({ toasts: [...current.toasts, { id: `${Date.now()}`, kind: 'success', message: 'Artifact download started.' }] }));
   };
-  return <ComposedModal className="export-modal" open={state.exportOpen} onClose={() => state.setExportOpen(false)} size="lg"><ModalHeader label="Live artifacts" title="Export prompt history" buttonOnClick={() => state.setExportOpen(false)} /><ModalBody>{state.importOpen ? <ImportForm /> : <>
+  return <div onKeyDown={(e) => { if (e.key === 'Escape') state.setExportOpen(false); }}><ComposedModal className="export-modal" open={isOpen} onClose={() => state.setExportOpen(false)} size="lg"><ModalHeader label="Live artifacts" title="Export prompt history" buttonOnClick={() => state.setExportOpen(false)} /><ModalBody>{state.importOpen ? <ImportForm /> : <>
     <div className="export-tab-row" role="tablist" aria-label="Export formats"><Button role="tab" aria-selected={state.exportTab === 'history'} size="sm" kind={state.exportTab === 'history' ? 'secondary' : 'ghost'} onClick={() => state.setExportTab('history')}>History report</Button><Button role="tab" aria-selected={state.exportTab === 'package'} size="sm" kind={state.exportTab === 'package' ? 'secondary' : 'ghost'} onClick={() => state.setExportTab('package')}>Version package</Button><Button role="tab" aria-selected={state.exportTab === 'merged'} size="sm" kind={state.exportTab === 'merged' ? 'secondary' : 'ghost'} disabled={!hasMerged} onClick={() => state.setExportTab('merged')}>Merged prompt text</Button></div>
     <div className="export-meta"><span>{state.exportTab === 'history' ? 'Markdown' : state.exportTab === 'package' ? 'JSON · prompt-diff-package-v1' : 'Plain text · byte-identical merge output'}</span><span>{new Blob([content]).size.toLocaleString()} bytes</span></div>
     <pre className="artifact-preview" tabIndex="0">{content || 'Complete a merge to produce merged prompt text.'}</pre>
     {state.exportTab === 'package' && <div className="schema-chips"><Tag type="blue">schemaVersion</Tag><Tag type="cool-gray">versions[]</Tag><Tag type="cool-gray">counters</Tag><Tag type="cool-gray">annotations[]</Tag><Tag type="purple">merge</Tag></div>}
-  </>}</ModalBody>{!state.importOpen && <ModalFooter><Button kind="ghost" renderIcon={ImportExport} onClick={() => state.setImportOpen(true)}>Import</Button><Button kind="secondary" renderIcon={Copy} onClick={copy}>{copied ? 'Copied' : 'Copy'}</Button><Button renderIcon={Download} onClick={download}>Download</Button></ModalFooter>}</ComposedModal>;
+  </>}</ModalBody>{!state.importOpen && <ModalFooter><Button kind="ghost" renderIcon={ImportExport} onClick={() => state.setImportOpen(true)}>Import</Button><Button kind="secondary" renderIcon={Copy} onClick={copy}>{copied ? 'Copied' : 'Copy'}</Button><Button renderIcon={Download} onClick={download}>Download</Button></ModalFooter>}</ComposedModal></div>;
 }
 
 function ToastStack() {
