@@ -1,3 +1,21 @@
+@import "tailwindcss";
+
+@theme inline {
+	--color-bg: var(--bg);
+	--color-surface: var(--surface);
+	--color-surface-2: var(--surface-2);
+	--color-text: var(--text);
+	--color-text-muted: var(--text-muted);
+	--color-border: var(--border);
+	--color-accent: var(--accent);
+	--color-accent-strong: var(--accent-strong);
+	--color-accent-ink: var(--accent-ink);
+	--color-ring: var(--ring);
+	--color-good: var(--good);
+	--color-bad: var(--bad);
+	--color-warn: var(--warn);
+}
+
 :root {
 	--bg: #f4f4f5;
 	--surface: #ffffff;

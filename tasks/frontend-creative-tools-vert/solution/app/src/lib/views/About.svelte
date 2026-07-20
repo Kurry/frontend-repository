@@ -1,7 +1,3 @@
-<script>
-	import { setView } from "../store.svelte.js";
-</script>
-
 <div class="page">
 	<h1>About VERT</h1>
 	<p>
@@ -19,9 +15,9 @@
 	<h2>Privacy</h2>
 	<p>
 		Your privacy comes first. Read how VERT handles your files on the
-		<button class="linkish" style="color:var(--accent-strong);text-decoration:underline" onclick={() => setView("privacy")}>
+		<a class="linkish" style="color:var(--accent-strong);text-decoration:underline" href="/privacy">
 			privacy policy
-		</button>
+		</a>
 		page.
 	</p>
 
