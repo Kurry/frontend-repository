@@ -183,10 +183,12 @@ export const useWorkflowStore = create((set, get) => ({
   ui: {
     modal: null,
     modalNodeId: null,
+    modalOpener: null,
     pendingWorkflowId: null,
     pendingImport: null,
     savedPanelOpen: true,
     paletteOpen: true,
+    artifactOpen: false,
     artifactMode: 'json',
   },
 
@@ -217,6 +219,32 @@ export const useWorkflowStore = create((set, get) => ({
     nodes: state.nodes.map((node) => ({ ...node, selected: node.id === id })),
     edges: state.edges.map((edge) => ({ ...edge, selected: false })),
   })),
+  toggleNodeSelection: (id) => set((state) => {
+    const nodes = state.nodes.map((node) => (node.id === id ? { ...node, selected: !node.selected } : node));
+    const selectedIds = nodes.filter((node) => node.selected).map((node) => node.id);
+    return {
+      nodes,
+      selectedNodeId: selectedIds[0] || null,
+      selectedEdgeId: null,
+      edges: state.edges.map((edge) => ({ ...edge, selected: false })),
+    };
+  }),
+  setSelection: (nodeIds, edgeIds = []) => {
+    const state = get();
+    const nextNodes = [...nodeIds].sort().join('|');
+    const nextEdges = [...edgeIds].sort().join('|');
+    const currentNodes = state.nodes.filter((node) => node.selected).map((node) => node.id).sort().join('|');
+    const currentEdges = state.edges.filter((edge) => edge.selected).map((edge) => edge.id).sort().join('|');
+    if (nextNodes === currentNodes && nextEdges === currentEdges) return;
+    const nodeSet = new Set(nodeIds);
+    const edgeSet = new Set(edgeIds);
+    set({
+      selectedNodeId: nodeIds[0] || null,
+      selectedEdgeId: edgeIds[0] || null,
+      nodes: state.nodes.map((node) => ({ ...node, selected: nodeSet.has(node.id) })),
+      edges: state.edges.map((edge) => ({ ...edge, selected: edgeSet.has(edge.id) })),
+    });
+  },
   selectEdge: (id) => set((state) => ({
     selectedNodeId: null,
     selectedEdgeId: id,
@@ -268,7 +296,7 @@ export const useWorkflowStore = create((set, get) => ({
       },
     };
     set((state) => ({ nodes: [...state.nodes.map((item) => ({ ...item, selected: false })), { ...node, selected: true }], selectedNodeId: id, selectedEdgeId: null }));
-    setTimeout(() => set((state) => ({ nodes: state.nodes.map((item) => item.id === id ? { ...item, data: { ...item.data, justDropped: false } } : item) })), 220);
+    setTimeout(() => set((state) => ({ nodes: state.nodes.map((item) => item.id === id ? { ...item, data: { ...item.data, justDropped: false } } : item) })), 450);
     return id;
   },
 
@@ -296,7 +324,7 @@ export const useWorkflowStore = create((set, get) => ({
       if (!quiet) get().showToast('error', 'Connection incompatible: that edge already exists.');
       return false;
     }
-    const edge = { ...connection, id: connection.id || `edge-${source.id}-${target.id}-${Date.now().toString(36)}`, sourceHandle: 'out', targetHandle: 'in', type: 'smoothstep' };
+    const edge = { ...connection, id: connection.id || `edge-${source.id}-${target.id}-${Date.now().toString(36)}`, sourceHandle: 'out', targetHandle: 'in', type: 'default', interactionWidth: 24 };
     if (!get().pushHistory()) return false;
     set((current) => ({ edges: addEdge(edge, current.edges) }));
     return true;
@@ -334,10 +362,26 @@ export const useWorkflowStore = create((set, get) => ({
   },
   toggleNodeExpanded: (id) => set((state) => ({ nodes: state.nodes.map((node) => node.id === id ? { ...node, data: { ...node.data, expanded: !node.data.expanded } } : node) })),
 
-  openModal: (modal, options = {}) => set((state) => ({ ui: { ...state.ui, modal, modalNodeId: options.nodeId || null, pendingWorkflowId: options.workflowId || state.ui.pendingWorkflowId } })),
-  closeModal: () => set((state) => ({ ui: { ...state.ui, modal: null, modalNodeId: null } })),
+  openModal: (modal, options = {}) => set((state) => ({
+    ui: {
+      ...state.ui,
+      modal,
+      modalNodeId: options.nodeId || null,
+      pendingWorkflowId: options.workflowId || state.ui.pendingWorkflowId,
+      modalOpener: document.activeElement instanceof HTMLElement ? document.activeElement : null,
+    },
+  })),
+  closeModal: () => {
+    const opener = get().ui.modalOpener;
+    set((state) => ({ ui: { ...state.ui, modal: null, modalNodeId: null, modalOpener: null } }));
+    queueMicrotask(() => {
+      if (opener && typeof opener.focus === 'function' && document.contains(opener)) opener.focus();
+    });
+  },
   toggleSavedPanel: () => set((state) => ({ ui: { ...state.ui, savedPanelOpen: !state.ui.savedPanelOpen } })),
   togglePalette: () => set((state) => ({ ui: { ...state.ui, paletteOpen: !state.ui.paletteOpen } })),
+  toggleArtifactPanel: () => set((state) => ({ ui: { ...state.ui, artifactOpen: !state.ui.artifactOpen } })),
+  setArtifactOpen: (artifactOpen) => set((state) => ({ ui: { ...state.ui, artifactOpen } })),
   applyResponsiveDefaults: (width) => set((state) => ({
     ui: {
       ...state.ui,
@@ -355,7 +399,16 @@ export const useWorkflowStore = create((set, get) => ({
   saveWorkflow: (name) => {
     const record = get().getSaveRecord(name);
     const saved = { ...structuredClone(record), savedId: `saved-${Date.now().toString(36)}` };
-    set((state) => ({ savedWorkflows: [...state.savedWorkflows, saved], activeWorkflowName: record.name, announcement: `${record.name} saved`, ui: { ...state.ui, modal: null } }));
+    const opener = get().ui.modalOpener;
+    set((state) => ({
+      savedWorkflows: [...state.savedWorkflows, saved],
+      activeWorkflowName: record.name,
+      announcement: `${record.name} saved`,
+      ui: { ...state.ui, modal: null, modalOpener: null, savedPanelOpen: true },
+    }));
+    queueMicrotask(() => {
+      if (opener && typeof opener.focus === 'function' && document.contains(opener)) opener.focus();
+    });
     return saved;
   },
   requestLoadWorkflow: (savedId) => set((state) => ({ ui: { ...state.ui, modal: 'confirm-load', pendingWorkflowId: savedId } })),
@@ -369,7 +422,7 @@ export const useWorkflowStore = create((set, get) => ({
       past: [],
       future: [],
       nodes: saved.nodes.map(fromContractNode),
-      edges: saved.edges.map((edge) => ({ ...edge, type: 'smoothstep' })),
+      edges: saved.edges.map((edge) => ({ ...edge, type: 'default', interactionWidth: 24 })),
       selectedNodeId: null,
       selectedEdgeId: null,
       activeWorkflowName: saved.name,
@@ -382,18 +435,31 @@ export const useWorkflowStore = create((set, get) => ({
   },
   deleteSavedWorkflow: (savedId) => set((state) => ({ savedWorkflows: state.savedWorkflows.filter((workflow) => workflow.savedId !== savedId) })),
 
-  exportDefinition: (savedId = null) => {
+  exportDefinition: (savedId = null, { validate = true } = {}) => {
     const state = get();
     const saved = savedId ? state.savedWorkflows.find((item) => item.savedId === savedId) : null;
     const body = saved
       ? { name: saved.name, nodes: saved.nodes, edges: saved.edges }
       : { name: state.activeWorkflowName || 'Untitled workflow', nodes: state.nodes.map(toContractNode), edges: state.edges.map(toContractEdge) };
-    return workflowDefinitionSchema.parse({ schemaVersion: 1, generatedAt: new Date().toISOString(), ...structuredClone(body) });
+    const payload = { schemaVersion: 1, generatedAt: new Date().toISOString(), ...structuredClone(body) };
+    if (!validate || !payload.nodes.length) return payload;
+    return workflowDefinitionSchema.parse(payload);
   },
-  exportMermaid: (savedId = null) => workflowToMermaid(get().exportDefinition(savedId)),
+  exportMermaid: (savedId = null) => {
+    const definition = get().exportDefinition(savedId, { validate: false });
+    if (!definition.nodes.length) return 'flowchart LR\n  empty["Empty canvas — add nodes to export Mermaid"]';
+    return workflowToMermaid(definition);
+  },
   prepareImport: (definition) => {
     const parsed = workflowDefinitionSchema.parse(definition);
-    set((state) => ({ ui: { ...state.ui, pendingImport: parsed, modal: 'confirm-import' } }));
+    set((state) => ({
+      ui: {
+        ...state.ui,
+        pendingImport: parsed,
+        modal: 'confirm-import',
+        modalOpener: document.activeElement instanceof HTMLElement ? document.activeElement : state.ui.modalOpener,
+      },
+    }));
     return parsed;
   },
   confirmImport: () => {
@@ -402,18 +468,39 @@ export const useWorkflowStore = create((set, get) => ({
     if (!get().pushHistory()) return false;
     executionToken += 1;
     stopElapsed();
+    const opener = get().ui.modalOpener;
     set((state) => ({
       nodes: definition.nodes.map(fromContractNode),
-      edges: definition.edges.map((edge) => ({ ...edge, type: 'smoothstep' })),
+      edges: definition.edges.map((edge) => ({ ...edge, type: 'default', interactionWidth: 24 })),
       activeWorkflowName: definition.name,
       selectedNodeId: null,
       selectedEdgeId: null,
       timeline: [],
       run: blankRun(),
       announcement: `${definition.name} imported`,
-      ui: { ...state.ui, pendingImport: null, modal: null },
+      ui: { ...state.ui, pendingImport: null, modal: null, modalOpener: null, artifactOpen: true },
     }));
+    queueMicrotask(() => {
+      if (opener && typeof opener.focus === 'function' && document.contains(opener)) opener.focus();
+    });
     return true;
+  },
+  runSeededWorkflowDemo: async () => {
+    const state = get();
+    const agent = state.nodes.find((node) => node.id === 'agent-1');
+    if (agent && agent.data.config.agent !== 'Atlas Agent') {
+      get().updateNode('agent-1', { config: { ...agent.data.config, agent: 'Atlas Agent' } });
+    }
+    return get().startRun();
+  },
+  runRetryFromFailedDemo: async () => {
+    const state = get();
+    if (state.run.phase === 'failed') return get().retryFailed();
+    const agent = state.nodes.find((node) => node.id === 'agent-1' || node.type === 'Agent');
+    if (agent) {
+      get().updateNode(agent.id, { config: { ...agent.data.config, agent: 'Faultline Agent' } });
+    }
+    return get().startRun();
   },
 
   appendEvent: (nodeId, event, status, detail = '') => set((state) => ({

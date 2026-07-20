@@ -8,6 +8,7 @@ import {
   MiniMap,
   Position,
   ReactFlow,
+  SelectionMode,
   useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
@@ -67,6 +68,7 @@ import {
   RUBRICS,
   TYPE_META,
   configSchemas,
+  describeGraphValidity,
   importFormSchema,
   saveFormSchema,
   summarizeConfig,
@@ -85,7 +87,7 @@ const TYPE_ICONS = {
 const STATUS_TAG = {
   pending: { type: 'gray', label: 'Pending' },
   running: { type: 'blue', label: 'Running' },
-  retrying: { type: 'warm-gray', label: 'Retrying' },
+  retrying: { type: 'cool-gray', label: 'Retrying' },
   failed: { type: 'red', label: 'Failed' },
   complete: { type: 'green', label: 'Complete' },
 };
@@ -93,6 +95,7 @@ const STATUS_TAG = {
 function WorkflowNode({ id, type, data, selected }) {
   const openModal = useWorkflowStore((state) => state.openModal);
   const toggleNodeExpanded = useWorkflowStore((state) => state.toggleNodeExpanded);
+  const multiSelected = useWorkflowStore((state) => state.nodes.filter((node) => node.selected).length > 1);
   const Icon = TYPE_ICONS[type];
   const status = data.status ? STATUS_TAG[data.status] : null;
   const retryText = data.status === 'retrying'
@@ -101,7 +104,7 @@ function WorkflowNode({ id, type, data, selected }) {
 
   return (
     <article
-      className={`workflow-node nodrag ${selected ? 'is-selected' : ''} ${data.status === 'running' ? 'is-running' : ''} ${data.justDropped ? 'just-dropped' : ''}`}
+      className={`workflow-node nodrag ${selected ? 'is-selected' : ''} ${selected && multiSelected ? 'is-multi-selected' : ''} ${data.status === 'running' ? 'is-running' : ''} ${data.justDropped ? 'just-dropped' : ''} ${data.exiting ? 'is-exiting' : ''}`}
       style={{ '--type-color': TYPE_META[type].color }}
       aria-label={`${type} node, ${data.title}${data.status ? `, ${data.status}` : ''}`}
       tabIndex={0}
@@ -210,10 +213,14 @@ function Toolbar() {
   const resumeRun = useWorkflowStore((state) => state.resumeRun);
   const retryFailed = useWorkflowStore((state) => state.retryFailed);
   const openModal = useWorkflowStore((state) => state.openModal);
+  const toggleArtifactPanel = useWorkflowStore((state) => state.toggleArtifactPanel);
+  const artifactOpen = useWorkflowStore((state) => state.ui.artifactOpen);
   const cycleNodeSelection = useWorkflowStore((state) => state.cycleNodeSelection);
   const deleteSelected = useWorkflowStore((state) => state.deleteSelected);
-  const hasSelection = useWorkflowStore((state) => state.nodes.some(n => n.selected) || state.edges.some(e => e.selected) || state.selectedNodeId || state.selectedEdgeId);
+  const selectedCount = useWorkflowStore((state) => state.nodes.filter((node) => node.selected).length + state.edges.filter((edge) => edge.selected).length);
+  const hasSelection = useWorkflowStore((state) => state.nodes.some((node) => node.selected) || state.edges.some((edge) => edge.selected) || !!state.selectedNodeId || !!state.selectedEdgeId);
   const rollup = getRollup({ nodes, run });
+  const validity = useMemo(() => describeGraphValidity(nodes, edges), [nodes, edges]);
   const busy = run.phase === 'running' || run.phase === 'pausing';
   const historyLocked = busy || run.phase === 'paused';
   const elapsed = `${(rollup.elapsedMs / 1000).toFixed(1)}s`;
@@ -226,13 +233,17 @@ function Toolbar() {
         {run.phase === 'paused' && <Button kind="secondary" size="sm" renderIcon={Play} onClick={resumeRun}>Resume</Button>}
         {run.phase === 'failed' && <Button kind="danger--tertiary" size="sm" renderIcon={Restart} onClick={retryFailed}>Retry from failed node</Button>}
         <div className="toolbar-divider" />
-        <Button kind="ghost" size="sm" renderIcon={Undo} onClick={undo} disabled={!canUndo || historyLocked} iconDescription="Undo (Ctrl+Z)" hasIconOnly />
-        <Button kind="ghost" size="sm" renderIcon={Redo} onClick={redo} disabled={!canRedo || historyLocked} iconDescription="Redo (Ctrl+Y)" hasIconOnly />
+        <Button kind="ghost" size="sm" renderIcon={Undo} onClick={undo} disabled={!canUndo || historyLocked}>Undo</Button>
+        <Button kind="ghost" size="sm" renderIcon={Redo} onClick={redo} disabled={!canRedo || historyLocked}>Redo</Button>
         <Button kind="tertiary" size="sm" renderIcon={Save} onClick={() => openModal('save')}>Save</Button>
-        <Button kind="ghost" size="sm" renderIcon={Export} onClick={() => openModal('artifact')}>Export</Button>
-        <Button hasIconOnly iconDescription="Import workflow" renderIcon={Upload} kind="ghost" size="sm" onClick={() => openModal('import')} />
-        <Button hasIconOnly iconDescription="Delete selected" renderIcon={TrashCan} kind="ghost" size="sm" onClick={deleteSelected} disabled={!hasSelection} />
-        <Button hasIconOnly iconDescription="Cycle node selection (Alt+N)" renderIcon={DataConnected} kind="ghost" size="sm" onClick={cycleNodeSelection} />
+        <Button kind={artifactOpen ? 'secondary' : 'ghost'} size="sm" renderIcon={Export} onClick={toggleArtifactPanel}>Artifact</Button>
+        <Button kind="ghost" size="sm" renderIcon={Upload} onClick={() => openModal('import')}>Import</Button>
+        <Button kind="ghost" size="sm" renderIcon={TrashCan} onClick={deleteSelected} disabled={!hasSelection}>Delete selected</Button>
+        <Button kind="ghost" size="sm" renderIcon={DataConnected} onClick={cycleNodeSelection}>Cycle</Button>
+        {selectedCount > 0 && <span className="selection-count" aria-live="polite">{selectedCount} selected</span>}
+      </div>
+      <div className={`validity-badge ${validity.valid ? 'is-valid' : 'is-incomplete'}`} title={validity.reason} aria-label={`Graph ${validity.label}: ${validity.reason}`}>
+        <span>{validity.label}</span>
       </div>
       <div className="rollup" aria-label={`${rollup.complete} of ${rollup.total} nodes complete, ${rollup.failures} failures, ${elapsed} elapsed`}>
         <div className="rollup-stat"><strong>{rollup.complete}/{rollup.total}</strong><span>complete</span></div>
@@ -253,6 +264,7 @@ function Canvas() {
   const addConnection = useWorkflowStore((state) => state.addConnection);
   const addNode = useWorkflowStore((state) => state.addNode);
   const selectNode = useWorkflowStore((state) => state.selectNode);
+  const setSelection = useWorkflowStore((state) => state.setSelection);
   const selectEdge = useWorkflowStore((state) => state.selectEdge);
   const clearSelection = useWorkflowStore((state) => state.clearSelection);
   const openModal = useWorkflowStore((state) => state.openModal);
@@ -291,7 +303,9 @@ function Canvas() {
 
   const decoratedEdges = useMemo(() => edges.map((edge) => ({
     ...edge,
-    style: { stroke: edge.selected ? '#0f62fe' : (edge.animated ? '#0f62fe' : '#8d8d8d'), strokeWidth: edge.selected ? 3 : 2 },
+    type: 'default',
+    interactionWidth: 28,
+    style: { stroke: edge.selected ? '#0f62fe' : (edge.animated ? '#0f62fe' : '#8d8d8d'), strokeWidth: edge.selected ? 3.5 : 2.25 },
   })), [edges]);
 
   return (
@@ -314,15 +328,25 @@ function Canvas() {
         onConnectEnd={onConnectEnd}
         isValidConnection={isValidConnection}
         connectionMode={ConnectionMode.Strict}
-        onNodeClick={(_, node) => selectNode(node.id)}
+        onNodeClick={(event, node) => {
+          if (event.shiftKey) return;
+          selectNode(node.id);
+        }}
         onNodeDoubleClick={(_, node) => openModal('configure', { nodeId: node.id })}
         onEdgeClick={(_, edge) => selectEdge(edge.id)}
         onPaneClick={clearSelection}
+        onSelectionChange={({ nodes: selectedNodes, edges: selectedEdges }) => {
+          setSelection(selectedNodes.map((node) => node.id), selectedEdges.map((edge) => edge.id));
+        }}
+        selectionOnDrag
+        selectionMode={SelectionMode.Partial}
+        panOnDrag={[1, 2]}
+        multiSelectionKeyCode="Shift"
         fitView
         fitViewOptions={{ padding: 0.12 }}
         minZoom={0.35}
         maxZoom={1.8}
-        defaultEdgeOptions={{ type: 'smoothstep' }}
+        defaultEdgeOptions={{ type: 'default', interactionWidth: 28 }}
         deleteKeyCode={null}
         proOptions={{ hideAttribution: true }}
         aria-label="Workflow canvas"
@@ -331,7 +355,7 @@ function Canvas() {
         <Controls position="bottom-left" showInteractive={false} />
         <MiniMap position="bottom-right" pannable zoomable nodeColor={(node) => TYPE_META[node.type]?.color || '#8d8d8d'} />
       </ReactFlow>
-      <div className="canvas-hint"><Flow size={14} /> Drag to pan · Scroll to zoom · Double-click to configure</div>
+      <div className="canvas-hint"><Flow size={14} /> Drag to pan · Scroll to zoom · Shift-click or marquee to multi-select · Double-click to configure</div>
     </div>
   );
 }
@@ -345,7 +369,7 @@ function SavedPanel() {
   return (
     <aside className={`saved-panel ${open ? 'open' : 'closed'}`} aria-label="Saved workflows">
       <div className="panel-heading">
-        {open && <div><span className="eyebrow">LIBRARY</span><h2>Saved workflows</h2></div>}
+        <div className={open ? '' : 'sr-only'}><span className="eyebrow">LIBRARY</span><h2>Saved workflows</h2></div>
         <Button hasIconOnly iconDescription={open ? 'Collapse saved workflows' : 'Open saved workflows'} renderIcon={open ? Close : Document} kind="ghost" size="sm" onClick={toggle} />
       </div>
       {open && (
@@ -472,26 +496,26 @@ function ConfigurationModal() {
       className="orchestrate-modal"
     >
       <form onSubmit={submit} className="modal-form" aria-live="polite">
-        <TextInput id="node-title" labelText="Display title" invalid={!!errors.title} invalidText={errors.title?.message} {...register('title')} />
+        <TextInput id="node-title" labelText="Display title" invalid={!!errors.title} invalidText={errors.title?.message || 'Display title is required'} aria-describedby={errors.title ? 'node-title-error-msg' : undefined} {...register('title')} />
         {node.type === 'Prompt' && (
-          <Select id="prompt-select" labelText="Prompt" invalid={!!configErrors.prompt} invalidText={configErrors.prompt?.message} {...register('config.prompt')}>
+          <Select id="prompt-select" labelText="Prompt" invalid={!!configErrors.prompt} invalidText={configErrors.prompt?.message || 'Prompt is required'} aria-describedby={configErrors.prompt ? 'prompt-select-error-msg' : undefined} {...register('config.prompt')}>
             {PROMPTS.map((prompt) => <SelectItem key={prompt} value={prompt} text={prompt} />)}
           </Select>
         )}
         {node.type === 'Agent' && <>
-          <Select id="agent-select" labelText="Agent" invalid={!!configErrors.agent} invalidText={configErrors.agent?.message} {...register('config.agent')}>
+          <Select id="agent-select" labelText="Agent" invalid={!!configErrors.agent} invalidText={configErrors.agent?.message || 'Agent is required'} aria-describedby={configErrors.agent ? 'agent-select-error-msg' : undefined} {...register('config.agent')}>
             {AGENTS.map((agent) => <SelectItem key={agent} value={agent} text={agent} />)}
           </Select>
-          <TextInput id="timeout-seconds" type="number" min={1} max={300} labelText="Timeout (seconds)" helperText="Required · 1 to 300 seconds" invalid={!!configErrors.timeoutSeconds} invalidText={configErrors.timeoutSeconds?.message} {...register('config.timeoutSeconds')} />
-          {node.id === 'agent-1' && <InlineNotification lowContrast hideCloseButton kind="info" title="Retry demo enabled" subtitle="Atlas Agent fails twice, then succeeds on its third attempt. Faultline Agent exhausts all retries." />}
+          <TextInput id="timeout-seconds" type="number" min={1} max={300} labelText="Timeout (seconds)" helperText="Required · 1 to 300 seconds" invalid={!!configErrors.timeoutSeconds} invalidText={configErrors.timeoutSeconds?.message || 'Timeout is required'} aria-describedby={configErrors.timeoutSeconds ? 'timeout-seconds-error-msg' : undefined} {...register('config.timeoutSeconds')} />
+          {node.id === 'agent-1' && <InlineNotification lowContrast hideCloseButton kind="info" title="Retry demo enabled" subtitle="Atlas Agent fails twice, then succeeds on its third attempt. Faultline Agent exhausts all retries so Retry from failed node appears." />}
         </>}
         {node.type === 'Eval' && (
-          <Select id="rubric-select" labelText="Rubric" invalid={!!configErrors.rubric} invalidText={configErrors.rubric?.message} {...register('config.rubric')}>
+          <Select id="rubric-select" labelText="Rubric" invalid={!!configErrors.rubric} invalidText={configErrors.rubric?.message || 'Rubric is required'} aria-describedby={configErrors.rubric ? 'rubric-select-error-msg' : undefined} {...register('config.rubric')}>
             {RUBRICS.map((rubric) => <SelectItem key={rubric} value={rubric} text={rubric} />)}
           </Select>
         )}
-        {node.type === 'Condition' && <TextInput id="condition-expression" labelText="Condition expression" placeholder="score >= 0.8" invalid={!!configErrors.conditionExpression} invalidText={configErrors.conditionExpression?.message} {...register('config.conditionExpression')} />}
-        {node.type === 'Output' && <TextInput id="destination-name" labelText="Destination name" placeholder="Review queue" invalid={!!configErrors.destinationName} invalidText={configErrors.destinationName?.message} {...register('config.destinationName')} />}
+        {node.type === 'Condition' && <TextInput id="condition-expression" labelText="Condition expression" placeholder="score >= 0.8" invalid={!!configErrors.conditionExpression} invalidText={configErrors.conditionExpression?.message || 'Condition expression is required'} aria-describedby={configErrors.conditionExpression ? 'condition-expression-error-msg' : undefined} {...register('config.conditionExpression')} />}
+        {node.type === 'Output' && <TextInput id="destination-name" labelText="Destination name" placeholder="Review queue" invalid={!!configErrors.destinationName} invalidText={configErrors.destinationName?.message || 'Destination name is required'} aria-describedby={configErrors.destinationName ? 'destination-name-error-msg' : undefined} {...register('config.destinationName')} />}
       </form>
     </Modal>
   );
@@ -510,7 +534,7 @@ function SaveModal() {
   return (
     <Modal open={open} modalHeading="Save workflow" modalLabel="Create an in-memory snapshot" primaryButtonText="Save workflow" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || empty} onRequestSubmit={submit} onRequestClose={close} selectorPrimaryFocus="#workflow-name">
       <form onSubmit={submit} className="modal-form" aria-live="polite">
-        <TextInput id="workflow-name" labelText="Workflow name" placeholder="e.g. Customer response pipeline" invalid={empty || !!errors.name} invalidText={errors.name?.message || 'Workflow name is required'} {...register('name')} />
+        <TextInput id="workflow-name" labelText="Workflow name" placeholder="e.g. Customer response pipeline" invalid={empty || !!errors.name} invalidText={errors.name?.message || 'Workflow name is required'} aria-describedby={empty || errors.name ? 'workflow-name-error-msg' : undefined} {...register('name')} />
         <p className="form-footnote">Saved workflows live only in this browser session and include every current node and edge.</p>
       </form>
     </Modal>
@@ -529,30 +553,40 @@ function ConfirmLoadModal() {
   );
 }
 
-function ArtifactModal() {
-  const open = useWorkflowStore((state) => state.ui.modal === 'artifact');
+function ArtifactPanel() {
+  const open = useWorkflowStore((state) => state.ui.artifactOpen);
   const mode = useWorkflowStore((state) => state.ui.artifactMode);
   const nodes = useWorkflowStore((state) => state.nodes);
   const edges = useWorkflowStore((state) => state.edges);
   const activeName = useWorkflowStore((state) => state.activeWorkflowName);
-  const close = useWorkflowStore((state) => state.closeModal);
+  const close = useWorkflowStore((state) => state.setArtifactOpen);
   const setMode = useWorkflowStore((state) => state.setArtifactMode);
+  const openModal = useWorkflowStore((state) => state.openModal);
   const exportDefinition = useWorkflowStore((state) => state.exportDefinition);
   const exportMermaid = useWorkflowStore((state) => state.exportMermaid);
   const showToast = useWorkflowStore((state) => state.showToast);
-  const [generatedAt, setGeneratedAt] = useState(() => new Date().toISOString());
-  useEffect(() => { if (open) setGeneratedAt(new Date().toISOString()); }, [open, nodes, edges, activeName]);
+  const [copied, setCopied] = useState(false);
   const content = useMemo(() => {
     if (!open) return '';
     if (mode === 'mermaid') return exportMermaid();
-    const definition = exportDefinition();
-    return JSON.stringify({ ...definition, generatedAt }, null, 2);
-  }, [open, mode, nodes, edges, activeName, generatedAt, exportDefinition, exportMermaid]);
+    try {
+      return JSON.stringify(exportDefinition(null, { validate: false }), null, 2);
+    } catch {
+      return '{\n  "error": "Unable to serialize workflow"\n}';
+    }
+  }, [open, mode, nodes, edges, activeName, exportDefinition, exportMermaid]);
   const copy = async () => {
-    try { await navigator.clipboard.writeText(content); showToast('success', `${mode === 'json' ? 'JSON' : 'Mermaid'} copied to clipboard.`); }
-    catch { showToast('error', 'Clipboard access was unavailable. Select the preview text to copy it.'); }
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopied(true);
+      showToast('success', `${mode === 'json' ? 'JSON' : 'Mermaid'} copied to clipboard.`);
+      setTimeout(() => setCopied(false), 1600);
+    } catch {
+      showToast('error', 'Clipboard access was unavailable. Select the preview text to copy it.');
+    }
   };
   const download = () => {
+    if (!nodes.length) return;
     const blob = new Blob([content], { type: mode === 'json' ? 'application/json' : 'text/plain' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
@@ -561,19 +595,34 @@ function ArtifactModal() {
     anchor.click();
     setTimeout(() => URL.revokeObjectURL(url), 0);
   };
+  if (!open) return null;
   return (
-    <Modal passiveModal open={open} modalHeading="Export workflow" modalLabel="Live artifact preview" onRequestClose={close} size="lg" className="artifact-modal">
-      {nodes.length === 0 && <p className="empty-artifact-state">The canvas is empty. Add nodes from the palette to export a workflow.</p>}
-      <div className="artifact-tabs" role="tablist" aria-label="Export format">
-        <Button kind={mode === 'json' ? 'secondary' : 'ghost'} size="sm" renderIcon={Code} onClick={() => setMode('json')} role="tab" aria-selected={mode === 'json'}>JSON</Button>
-        <Button kind={mode === 'mermaid' ? 'secondary' : 'ghost'} size="sm" renderIcon={Flow} onClick={() => setMode('mermaid')} role="tab" aria-selected={mode === 'mermaid'}>Mermaid</Button>
+    <section className="artifact-panel" aria-label="Artifact panel">
+      <div className="artifact-panel-heading">
+        <div><span className="eyebrow">DELIVER</span><h2>Artifact</h2></div>
+        <Button hasIconOnly iconDescription="Close Artifact panel" renderIcon={Close} kind="ghost" size="sm" onClick={() => close(false)} />
       </div>
-      <pre className="artifact-preview" aria-label={`${mode} artifact preview`}>{content}</pre>
+      {nodes.length === 0 ? (
+        <div className="empty-artifact-state">
+          <Document size={22} />
+          <strong>Empty canvas</strong>
+          <span>Add nodes from the palette, or Import a Workflow Definition JSON to restore a graph before exporting.</span>
+        </div>
+      ) : (
+        <>
+          <div className="artifact-tabs" role="tablist" aria-label="Export format">
+            <Button kind={mode === 'json' ? 'secondary' : 'ghost'} size="sm" renderIcon={Code} onClick={() => setMode('json')} role="tab" aria-selected={mode === 'json'}>JSON</Button>
+            <Button kind={mode === 'mermaid' ? 'secondary' : 'ghost'} size="sm" renderIcon={Flow} onClick={() => setMode('mermaid')} role="tab" aria-selected={mode === 'mermaid'}>Mermaid</Button>
+          </div>
+          <pre className="artifact-preview" aria-label={`${mode} artifact preview`}>{content}</pre>
+        </>
+      )}
       <div className="artifact-actions">
         <Button kind="primary" size="sm" renderIcon={Download} onClick={download} disabled={nodes.length === 0}>{mode === 'json' ? 'Download workflow.json' : 'Download workflow.mmd'}</Button>
-        <Button kind="tertiary" size="sm" renderIcon={Copy} onClick={copy} disabled={nodes.length === 0}>{mode === 'json' ? 'Copy JSON' : 'Copy Mermaid'}</Button>
+        <Button kind="tertiary" size="sm" renderIcon={copied ? CheckmarkFilled : Copy} onClick={copy} disabled={nodes.length === 0}>{copied ? 'Copied' : (mode === 'json' ? 'Copy JSON' : 'Copy Mermaid')}</Button>
+        <Button kind="ghost" size="sm" renderIcon={Upload} onClick={() => openModal('import')}>Import</Button>
       </div>
-    </Modal>
+    </section>
   );
 }
 
@@ -595,7 +644,7 @@ function ImportModal() {
   return (
     <Modal open={open} modalHeading="Import workflow definition" modalLabel="JSON · schema version 1" primaryButtonText="Review import" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || !value.trim()} onRequestSubmit={submit} onRequestClose={close} size="lg">
       <form onSubmit={submit} className="modal-form" aria-live="polite">
-        <TextArea id="import-definition" rows={12} labelText="Workflow definition JSON" placeholder={'{\n  "schemaVersion": 1,\n  ...\n}'} invalid={!!errors.definition || !!parseError} invalidText={parseError || errors.definition?.message} {...register('definition')} />
+        <TextArea id="import-definition" rows={12} labelText="Workflow definition JSON" placeholder={'{\n  "schemaVersion": 1,\n  ...\n}'} invalid={!!errors.definition || !!parseError} invalidText={parseError || errors.definition?.message || 'Workflow definition is required'} aria-describedby={errors.definition || parseError ? 'import-definition-error-msg' : undefined} {...register('definition')} />
         <p className="form-footnote">The canvas changes only after validation and confirmation.</p>
       </form>
     </Modal>
@@ -628,11 +677,14 @@ function App() {
   const announcement = useWorkflowStore((state) => state.announcement);
   const activeName = useWorkflowStore((state) => state.activeWorkflowName);
   const activeModal = useWorkflowStore((state) => state.ui.modal);
+  const artifactOpen = useWorkflowStore((state) => state.ui.artifactOpen);
   const selectedNodeId = useWorkflowStore((state) => state.selectedNodeId);
   const hasSelection = useWorkflowStore((state) => state.nodes.some((node) => node.selected) || state.edges.some((edge) => edge.selected) || state.selectedNodeId || state.selectedEdgeId);
   const cycleNodeSelection = useWorkflowStore((state) => state.cycleNodeSelection);
   const deleteSelected = useWorkflowStore((state) => state.deleteSelected);
   const openModal = useWorkflowStore((state) => state.openModal);
+  const toggleArtifactPanel = useWorkflowStore((state) => state.toggleArtifactPanel);
+  const setArtifactOpen = useWorkflowStore((state) => state.setArtifactOpen);
   const applyResponsiveDefaults = useWorkflowStore((state) => state.applyResponsiveDefaults);
 
   useEffect(() => { registerWebMCPTools(); }, []);
@@ -649,6 +701,15 @@ function App() {
       if (event.altKey && event.key.toLowerCase() === 'n') {
         event.preventDefault();
         cycleNodeSelection();
+        return;
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'e' && !typing) {
+        event.preventDefault();
+        toggleArtifactPanel();
+        return;
+      }
+      if (event.key === 'Escape' && artifactOpen && !activeModal) {
+        setArtifactOpen(false);
         return;
       }
       if (typing || activeModal) return;
@@ -673,7 +734,7 @@ function App() {
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [activeModal, cycleNodeSelection, deleteSelected, hasSelection, openModal, selectedNodeId]);
+  }, [activeModal, artifactOpen, cycleNodeSelection, deleteSelected, hasSelection, openModal, selectedNodeId, setArtifactOpen, toggleArtifactPanel]);
 
   return (
     <div className="app-shell">
@@ -688,8 +749,19 @@ function App() {
         <Palette open={paletteOpen} onToggle={togglePalette} />
         <div className="center-column">
           <Toolbar />
-          {coachmarkVisible && <div className="coachmark"><InlineNotification kind="info" title="Welcome to Orchestrate Studio" subtitle="Drag a Prompt node from the palette to begin, or click Import to load an existing workflow. Run the orchestration using the toolbar." hideCloseButton={false} onCloseButtonClick={() => setCoachmarkVisible(false)} /></div>}
+          {coachmarkVisible && (
+            <div className="coachmark">
+              <InlineNotification
+                kind="info"
+                title="First-run tip"
+                subtitle="Drag a Prompt node from the palette onto the canvas, press Run to watch the seeded retries, then open Artifact to export JSON or Mermaid. Shortcuts: Alt+N cycle · Ctrl+Z undo · Ctrl+E Artifact."
+                hideCloseButton={false}
+                onCloseButtonClick={() => setCoachmarkVisible(false)}
+              />
+            </div>
+          )}
           <Canvas />
+          <ArtifactPanel />
           <Timeline />
         </div>
         <SavedPanel />
@@ -697,7 +769,6 @@ function App() {
       <ConfigurationModal />
       <SaveModal />
       <ConfirmLoadModal />
-      <ArtifactModal />
       <ImportModal />
       <ConfirmImportModal />
       <ToastLayer />
