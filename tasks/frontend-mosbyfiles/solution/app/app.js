@@ -1,4 +1,4 @@
-/* Mosby's Files — oracle reconstruction logic.
+/* Field Notes Archive — oracle reconstruction logic.
    Offline single-page app: client-side view switching across 10 routes
    (home, about, 8 architect cases), motion contracts, media popups, and the
    WebMCP surface. In-memory state only; no localStorage/sessionStorage. */
@@ -13,57 +13,57 @@
   var CATEGORIES = [
     { id: "organic", title: "Organic & Early Modernism", color: "#1E4BD7",
       thesis: "Buildings that grow from the ground — American form before Europe named it modern.",
-      architects: ["frank-lloyd-wright", "irving-gill"] },
+      architects: ["ada-mercer", "elias-north"] },
     { id: "expressive", title: "Expressive", color: "#0C7866",
       thesis: "Structure as sculpture; the building itself as a gesture.",
-      architects: ["frank-gehry"] },
+      architects: ["mara-voss"] },
     { id: "monumental", title: "Monumental Modernism", color: "#581E70",
       thesis: "Weight, light, and raw material raised to a civic scale.",
-      architects: ["louis-kahn", "i-m-pei", "paul-rudolph"] },
+      architects: ["julian-kade", "imani-vale", "pavel-rowan"] },
     { id: "place", title: "Place / culture continuity", color: "#D71E1E",
       thesis: "Architecture rooted in region, craft, and the American ground.",
-      architects: ["louis-sullivan", "mary-colter"] }
+      architects: ["lucian-shore", "mae-calder"] }
   ];
 
   var ARCHITECTS = {
-    "frank-lloyd-wright": { name: "Frank Lloyd Wright", born: "1867", died: "1959",
-      title: "Frank Lloyd Wright—Mosby's Files",
-      meta: "The architect who made buildings breathe with the land. Explore Frank Lloyd Wright's organic philosophy, key works, and lasting legacy.",
+    "ada-mercer": { name: "Ada Mercer", born: "1867", died: "1959",
+      title: "Ada Mercer—Field Notes Archive",
+      meta: "The architect who made buildings breathe with the land. Explore Ada Mercer's organic philosophy, key works, and lasting legacy.",
       bio: "The architect who made buildings breathe with the land, dissolving the line between structure and site through his organic philosophy.",
-      video: "lNhL1mrNmdg.mp4", plan: "frank_lloyd_wright_plan.avif" },
-    "irving-gill": { name: "Irving Gill", born: "1870", died: "1936",
-      title: "Irving Gill—Mosby's Files",
-      meta: "Discover the architect who stripped ornament from California decades before Europe made minimalism a movement—Irving Gill, the modernist who arrived first.",
+      video: "lNhL1mrNmdg.mp4", plan: "ada_mercer_plan.avif" },
+    "elias-north": { name: "Elias North", born: "1870", died: "1936",
+      title: "Elias North—Field Notes Archive",
+      meta: "Discover the architect who stripped ornament from California decades before Europe made minimalism a movement—Elias North, the modernist who arrived first.",
       bio: "The architect who stripped ornament from California decades before Europe made minimalism a movement.",
-      video: "0geywInE0Mg.mp4", pdf: "irving_gill_pdf.avif" },
-    "frank-gehry": { name: "Frank Gehry", born: "1929", died: "",
-      title: "Frank Gehry—Mosby's Files",
-      meta: "Deconstructivist provocateur or modernism's natural heir? Read more on Frank Gehry's radical forms, landmark buildings, and architectural vision.",
+      video: "0geywInE0Mg.mp4", pdf: "elias_north_pdf.avif" },
+    "mara-voss": { name: "Mara Voss", born: "1929", died: "",
+      title: "Mara Voss—Field Notes Archive",
+      meta: "Deconstructivist provocateur or modernism's natural heir? Read more on Mara Voss's radical forms, landmark buildings, and architectural vision.",
       bio: "Deconstructivist provocateur or modernism's natural heir — Gehry's radical forms bent the language of the building into sculpture.",
       video: "772351121.mp4" },
-    "louis-kahn": { name: "Louis Kahn", born: "1901", died: "1974",
-      title: "Louis Kahn—Mosby's Files",
-      meta: "From the Salk Institute to the Bangladesh Assembly—explore Louis Kahn's architecture, where raw concrete and natural light became a singular obsession.",
+    "julian-kade": { name: "Julian Kade", born: "1901", died: "1974",
+      title: "Julian Kade—Field Notes Archive",
+      meta: "From the Salk Institute to the Bangladesh Assembly—explore Julian Kade's architecture, where raw concrete and natural light became a singular obsession.",
       bio: "From the Salk Institute to the Bangladesh Assembly, Kahn made raw concrete and natural light into a singular obsession.",
       audio: true },
-    "i-m-pei": { name: "I. M. Pei", born: "1917", died: "2019",
-      title: "I. M. Pei—Mosby's Files",
-      meta: "Seventy years of landmarks across four continents, every one anchored in geometric precision. Explore the career and philosophy behind I. M. Pei's architecture.",
+    "imani-vale": { name: "Imani Vale", born: "1917", died: "2019",
+      title: "Imani Vale—Field Notes Archive",
+      meta: "Seventy years of landmarks across four continents, every one anchored in geometric precision. Explore the career and philosophy behind Imani Vale's architecture.",
       bio: "Seventy years of landmarks across four continents, every one anchored in geometric precision.",
       video: "wPgmcHGKvwc.mp4" },
-    "paul-rudolph": { name: "Paul Rudolph", born: "1918", died: "1997",
-      title: "Paul Rudolph—Mosby's Files",
-      meta: "Can concrete be expressive and confrontational? Explore Paul Rudolph's boundary-pushing brutalism and the buildings that still divide opinion today.",
+    "pavel-rowan": { name: "Pavel Rowan", born: "1918", died: "1997",
+      title: "Pavel Rowan—Field Notes Archive",
+      meta: "Can concrete be expressive and confrontational? Explore Pavel Rowan's boundary-pushing brutalism and the buildings that still divide opinion today.",
       bio: "Can concrete be expressive and confrontational? Rudolph's boundary-pushing brutalism still divides opinion today.",
       video: "yB2caWQwY9Y.mp4" },
-    "louis-sullivan": { name: "Louis Sullivan", born: "1856", died: "1924",
-      title: "Louis Sullivan—Mosby's Files",
-      meta: "The father of the skyscraper and the man behind \"form follows function\"—explore Louis Sullivan's ideas that still underpin how the world builds tall.",
+    "lucian-shore": { name: "Lucian Shore", born: "1856", died: "1924",
+      title: "Lucian Shore—Field Notes Archive",
+      meta: "The father of the skyscraper and the man behind \"form follows function\"—explore Lucian Shore's ideas that still underpin how the world builds tall.",
       bio: "The father of the skyscraper and the man behind \"form follows function\" — ideas that still underpin how the world builds tall.",
       pdf: "pdf2.avif" },
-    "mary-colter": { name: "Mary Colter", born: "1869", died: "1958",
-      title: "Mary Colter—Mosby's Files",
-      meta: "The architect who gave the American Southwest its voice. Explore how Mary Colter built a visual language from indigenous craft, landscape, and stone.",
+    "mae-calder": { name: "Mae Calder", born: "1869", died: "1958",
+      title: "Mae Calder—Field Notes Archive",
+      meta: "The architect who gave the American Southwest its voice. Explore how Mae Calder built a visual language from indigenous craft, landscape, and stone.",
       bio: "The architect who gave the American Southwest its voice, building a visual language from indigenous craft, landscape, and stone.",
       plan: "plan.avif" }
   };
@@ -86,17 +86,17 @@
   }
 
   var ABOUT_GALLERY = [
-    { file: "louis-isadore-kahn-salk-institute-la-jolla-ca.avif", caption: "Louis Kahn — Salk Institute, La Jolla, California" },
-    { file: "louis-isadore-kahn-the-national-assembly-building-in-dhaka-bangladesh.avif", caption: "Louis Kahn — National Assembly Building, Dhaka, Bangladesh" },
-    { file: "paul-marvin-rudolph-art-and-architecture-building-yale-university-new-haven-connecticut.avif", caption: "Paul Rudolph — Art & Architecture Building, Yale University" },
-    { file: "ieoh-ming-pei-national-gallery-of-art-east-building-washington-d-c.avif", caption: "I. M. Pei — East Building, National Gallery of Art, Washington D.C." }
+    { file: "julian-kade-salk-institute-la-jolla-ca.avif", caption: "Julian Kade — Salk Institute, La Jolla, California" },
+    { file: "julian-kade-the-national-assembly-building-in-dhaka-bangladesh.avif", caption: "Julian Kade — National Assembly Building, Dhaka, Bangladesh" },
+    { file: "pavel-rowan-art-and-architecture-building-yale-university-new-haven-connecticut.avif", caption: "Pavel Rowan — Art & Architecture Building, Yale University" },
+    { file: "imani-vale-national-gallery-of-art-east-building-washington-d-c.avif", caption: "Imani Vale — East Building, National Gallery of Art, Washington D.C." }
   ];
 
   var ABOUT_ESSAY = [
-    "Mosby's Files rejects the tidy story that modern architecture began in Europe and arrived in America as an import. The Bauhaus-only narrative flattens a richer, older, and more radical history.",
+    "Field Notes Archive rejects the tidy story that modern architecture began in Europe and arrived in America as an import. The Bauhaus-only narrative flattens a richer, older, and more radical history.",
     "This archive is compiled from a Ukrainian architectural education — a tradition that read buildings as structure, material, and place long before minimalism became a movement with a manifesto.",
     "The selection principles are simple and stubborn: industrial materials used honestly, architecture integrated with nature, and bold functional form that argues for itself. By those principles, the American modernists arrived first.",
-    "Late figures like I. M. Pei and Frank Gehry are included on purpose — not as a coda to a European story, but as the continuation of an American one.",
+    "Late figures like Imani Vale and Mara Voss are included on purpose — not as a coda to a European story, but as the continuation of an American one.",
     "The folder's open. Read it on its own terms."
   ];
 
@@ -219,7 +219,8 @@
     $("#pageTurnBtn").addEventListener("click", pageTurn);
     $("#caseNextBtn").addEventListener("click", advanceCase);
     viewCase.querySelectorAll(".tag[data-sibling]").forEach(function (t) {
-      t.addEventListener("click", function () {
+      t.addEventListener("click", function (e) {
+        e.stopPropagation();
         if (t.dataset.sibling !== slug) openCase(t.dataset.sibling, "folder-next");
       });
     });
@@ -247,7 +248,7 @@
     if (a.pdf) items.push({ cls: "content-pdf", kind: "pdf", top: 60, left: 20, rot: -4,
       html: '<img src="' + img(a.pdf) + '" alt="pdf preview" /><span class="scrapbook-item__badge">pdf</span>' });
     if (a.audio) items.push({ cls: "content-audio", kind: "audio", top: 45, left: 30, rot: 1,
-      html: '<img src="' + img("scissors.avif") + '" alt="audio" /><span class="scrapbook-item__badge">audio — Louis Kahn</span><button class="content-play" aria-label="Play audio">&#9658;</button>' });
+      html: '<img src="' + img("scissors.avif") + '" alt="audio" /><span class="scrapbook-item__badge">audio — Julian Kade</span><button class="content-play" aria-label="Play audio">&#9658;</button>' });
 
     items.forEach(function (it) {
       var el = document.createElement("div");
@@ -335,8 +336,13 @@
     });
     el.addEventListener("pointermove", function (e) {
       if (!dragging) return;
-      el.style.left = (ox + e.clientX - sx) + "px";
-      el.style.top = (oy + e.clientY - sy) + "px";
+      var pr = el.offsetParent.getBoundingClientRect();
+      var newLeft = ox + e.clientX - sx;
+      var newTop = oy + e.clientY - sy;
+      newLeft = Math.max(0, Math.min(newLeft, pr.width - el.offsetWidth));
+      newTop = Math.max(0, Math.min(newTop, pr.height - el.offsetHeight));
+      el.style.left = newLeft + "px";
+      el.style.top = newTop + "px";
     });
     function end() {
       if (!dragging) return; dragging = false;
@@ -486,7 +492,7 @@
       popupInfo.textContent = a.name + " — document preview";
     } else if (kind === "audio") {
       buildWavePlayer(popupMedia);
-      popupInfo.textContent = "Louis Kahn — recorded lecture (waveform player)";
+      popupInfo.textContent = "Julian Kade — recorded lecture (waveform player)";
     }
     popup.classList.add("is-open");
     requestAnimationFrame(function () { popup.classList.add("is-shown"); });
@@ -509,20 +515,20 @@
 
   // ----- waveform audio -----
   var WAVE_PARTS = {
-    1: { mp3: "/media/blob/audio/7ef30141-f14e-5364-a33c-6ae2038cc9ec.mp3", json: "/media/blob/audio/louis_kahn_part_1.json" },
-    2: { mp3: "/media/blob/audio/b82469ae-0943-5b95-834d-e1b9e5f858b1.mp3", json: "/media/blob/audio/louis_kahn_part_2.json" }
+    1: { mp3: "/media/blob/audio/7ef30141-f14e-5364-a33c-6ae2038cc9ec.mp3", json: "/media/blob/audio/julian_kade_part_1.json" },
+    2: { mp3: "/media/blob/audio/b82469ae-0943-5b95-834d-e1b9e5f858b1.mp3", json: "/media/blob/audio/julian_kade_part_2.json" }
   };
   function buildWavePlayer(container) {
     var wrap = document.createElement("div");
     wrap.className = "wave-player"; wrap.id = "wavePlayer";
     wrap.innerHTML =
-      '<div class="wave-player__title">Louis Kahn — recorded lecture</div>' +
+      '<div class="wave-player__title">Julian Kade — recorded lecture</div>' +
       '<canvas class="wave-player__canvas" id="waveCanvas" width="800" height="80"></canvas>' +
       '<div class="wave-player__controls">' +
         '<button type="button" class="wave-player__play" id="wavePlay" aria-label="Play audio">&#9658;</button>' +
         '<div class="wave-player__parts">' +
-          '<button type="button" class="wave-player__part is-active" data-part="1">louis_kahn_part_1</button>' +
-          '<button type="button" class="wave-player__part" data-part="2">louis_kahn_part_2</button>' +
+          '<button type="button" class="wave-player__part is-active" data-part="1">julian_kade_part_1</button>' +
+          '<button type="button" class="wave-player__part" data-part="2">julian_kade_part_2</button>' +
         "</div>" +
       "</div>";
     container.appendChild(wrap);
@@ -641,10 +647,10 @@
     "Pause the video in the open video popup.",
     function () { pauseVideo(); return { ok: true, playing: state.videoPlaying }; });
   reg("session_play_audio", "command-session-v1", "play-audio",
-    "Play the Louis Kahn waveform audio (same as the player play control).",
+    "Play the Julian Kade waveform audio (same as the player play control).",
     function () { if (state.popup.kind !== "audio") return { ok: false, error: "no audio popup open" }; playAudio(); return { ok: true, playing: state.audioPlaying }; });
   reg("session_pause_audio", "command-session-v1", "pause-audio",
-    "Pause the Louis Kahn waveform audio.",
+    "Pause the Julian Kade waveform audio.",
     function () { pauseAudio(); return { ok: true, playing: state.audioPlaying }; });
   reg("session_open_popup", "command-session-v1", "open-popup",
     "Open a media popup for the active case. args.type = video | pdf | audio.",
@@ -668,7 +674,7 @@
   window.webmcp_session_info = function () {
     return {
       contract_version: "zto-webmcp-v1",
-      site: "mosbyfiles",
+      site: "fieldnotesarchive",
       modules: ["browse-query-v1", "command-session-v1"],
       route: state.route,
       active_case: state.activeSlug,
