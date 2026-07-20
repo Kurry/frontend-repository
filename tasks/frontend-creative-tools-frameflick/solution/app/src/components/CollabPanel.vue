@@ -314,7 +314,9 @@ function reconnect() {
     localText.value = final
     peerText.value = final
     for (const op of ops) appliedOpIds.add(op.id)
-    pendingOps.value = []
+    // Drop exactly the ops we applied; anything queued after this reconnect
+    // started (e.g. mid-conflict) stays in the queue instead of being lost.
+    pendingOps.value = pendingOps.value.filter(op => !appliedOpIds.has(op.id))
     addLog('System', 'system', note)
     announcer.announce(note)
   }
@@ -336,8 +338,10 @@ function reconnect() {
         conflict.value = null
       },
     }
-    for (const op of ops) appliedOpIds.add(op.id)
-    pendingOps.value = []
+    // Leave the queued ops in place (unmarked) until the user resolves: the
+    // resolve callback's finish() marks them applied and clears the queue. That
+    // way going offline before choosing doesn't silently discard the edits — the
+    // conflict stays visible and a later reconnect re-detects it.
     addLog('System', 'system', 'Conflict detected — choose Use mine, Use theirs, or Merge')
     announcer.announce('Merge conflict detected — choose Use mine, Use theirs, or Merge.')
     return
@@ -372,7 +376,8 @@ function toggleOnline() {
     reconnect()
   } else {
     offlineBase = sharedContent.value
-    conflict.value = null
+    // Don't clear an unresolved merge conflict: the user must still choose a
+    // resolution, and dropping it here would discard the queued edits silently.
     addLog('System', 'system', 'Went offline — edits will be queued by stable operation identity')
     announcer.announce('Offline — edits will be queued.')
   }

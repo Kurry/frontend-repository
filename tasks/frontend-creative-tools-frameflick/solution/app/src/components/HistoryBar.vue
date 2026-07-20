@@ -108,6 +108,11 @@ function onShortcut(e: KeyboardEvent) {
   const tag = target?.tagName ?? ''
   const editable = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target?.isContentEditable === true
   if (editable) return
+  // While a modal dialog is open (confirm, paste settings, style import, command
+  // palette — all rendered as role="dialog" + aria-modal), undo/redo must not act
+  // on the canvas behind it. (The inline, non-modal conflict box has no
+  // aria-modal, so it deliberately doesn't suppress shortcuts.)
+  if (document.querySelector('dialog[open], [role="dialog"][aria-modal="true"]')) return
   const mod = e.ctrlKey || e.metaKey
   if (!mod) return
   const key = e.key.toLowerCase()

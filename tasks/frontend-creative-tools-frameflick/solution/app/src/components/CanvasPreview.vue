@@ -240,6 +240,9 @@ function onKeyDown(e: KeyboardEvent) {
     cancelDrag() // revert + drop listeners/capture, same as the window handler
     return
   }
+  // Position is locked while previewing Before, same as pointer drag — nudging
+  // would silently edit the live composition hidden behind the baseline view.
+  if (store.showingBefore) return
   if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return
   e.preventDefault()
   const step = e.shiftKey ? 20 : 5
