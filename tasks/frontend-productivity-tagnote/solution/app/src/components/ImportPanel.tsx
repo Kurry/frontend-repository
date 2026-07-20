@@ -32,23 +32,28 @@ export const ImportPanel = component$<ImportPanelProps>(({ onImport, onClose }) 
         return;
       }
       if (parsed.schemaVersion !== 'tagnote-session/v1') {
-        local.error = 'Invalid schemaVersion. Expected "tagnote-session/v1"';
+        local.error = 'schemaVersion: Expected "tagnote-session/v1". Set schemaVersion to exactly "tagnote-session/v1".';
         local.fieldError = 'schemaVersion';
         return;
       }
+      if (typeof parsed.exportedAt !== 'string' || !parsed.exportedAt.trim() || Number.isNaN(new Date(parsed.exportedAt).getTime())) {
+        local.error = 'exportedAt: Must be a non-empty ISO-8601 timestamp. Provide exportedAt as an ISO-8601 string.';
+        local.fieldError = 'exportedAt';
+        return;
+      }
       if (!Array.isArray(parsed.todoTags)) {
-        local.error = 'Missing or invalid todoTags';
+        local.error = 'todoTags: Must be an array of lowercase tag strings. Add a todoTags array.';
         local.fieldError = 'todoTags';
         return;
       }
       if (!Array.isArray(parsed.notes)) {
-        local.error = 'Missing or invalid notes';
+        local.error = 'notes: Must be an array of note objects. Add a notes array.';
         local.fieldError = 'notes';
         return;
       }
       for (const note of parsed.notes) {
         if (typeof note.id !== 'string' || !note.id.trim()) {
-            local.error = 'Invalid id: must be a non-empty string';
+            local.error = 'id: Must be a non-empty string. Provide a unique id for each note.';
             local.fieldError = 'id';
             return;
         }
@@ -76,8 +81,13 @@ export const ImportPanel = component$<ImportPanelProps>(({ onImport, onClose }) 
             return;
         }
         const trimmedText = typeof note.text === 'string' ? note.text.trim() : '';
-        if (typeof note.text !== 'string' || !trimmedText || trimmedText.length > 2000) {
-            local.error = 'Invalid text: must be a non-empty string of at most 2000 characters';
+        if (typeof note.text !== 'string' || !trimmedText) {
+            local.error = 'text: Must be a non-empty trimmed string. Provide note text before importing.';
+            local.fieldError = 'text';
+            return;
+        }
+        if (trimmedText.length > 2000) {
+            local.error = 'text: Must be at most 2000 characters. Shorten the note text and try again.';
             local.fieldError = 'text';
             return;
         }
@@ -89,7 +99,7 @@ export const ImportPanel = component$<ImportPanelProps>(({ onImport, onClose }) 
         if (Array.isArray(note.marks)) {
            for (const mark of note.marks) {
                if (mark.style !== 'bold' && mark.style !== 'italic') {
-                   local.error = 'Invalid mark style: must be "bold" or "italic"';
+                   local.error = 'marks: style must be "bold" or "italic". Use only bold or italic mark styles.';
                    local.fieldError = 'marks';
                    return;
                }
@@ -107,17 +117,17 @@ export const ImportPanel = component$<ImportPanelProps>(({ onImport, onClose }) 
            }
         }
         if (typeof note.pinned !== 'boolean') {
-            local.error = 'Invalid pinned: must be boolean';
+            local.error = 'pinned: Must be a boolean. Set pinned to true or false.';
             local.fieldError = 'pinned';
             return;
         }
         if (typeof note.archived !== 'boolean') {
-            local.error = 'Invalid archived: must be boolean';
+            local.error = 'archived: Must be a boolean. Set archived to true or false.';
             local.fieldError = 'archived';
             return;
         }
         if (typeof note.done !== 'boolean') {
-            local.error = 'Invalid done: must be boolean';
+            local.error = 'done: Must be a boolean. Set done to true or false.';
             local.fieldError = 'done';
             return;
         }
@@ -142,7 +152,7 @@ export const ImportPanel = component$<ImportPanelProps>(({ onImport, onClose }) 
       onImport(importedState);
       onClose();
     } catch (e) {
-      local.error = 'Invalid JSON payload';
+      local.error = 'json: Malformed JSON payload. Fix the JSON syntax and try again.';
       local.fieldError = 'json';
     }
   });
