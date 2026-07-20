@@ -1812,6 +1812,7 @@ function boot() {
   } finally {
     registerWebMCP({
       state,
+      pushHistory,
       mutateActive,
       selectTheme,
       createTheme,

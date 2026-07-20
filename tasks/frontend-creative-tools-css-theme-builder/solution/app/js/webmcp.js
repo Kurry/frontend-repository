@@ -5,6 +5,7 @@
 export function registerWebMCP(api) {
   const {
     state,
+    pushHistory,
     mutateActive,
     selectTheme,
     createTheme,
@@ -219,8 +220,16 @@ export function registerWebMCP(api) {
       }
 
       case "entity_create": {
+        const rawName = args?.name ?? null;
+        if (rawName != null && String(rawName).trim() !== "") {
+          const nameError = validateThemeName(rawName);
+          if (nameError) return { error: nameError };
+        }
+        // Same handler chain as the hold-to-add UI control: record the undo
+        // snapshot first, so a programmatic create is reversible like a UI one.
+        pushHistory("create");
         try {
-          const created = createTheme(args?.name ?? null);
+          const created = createTheme(rawName);
           return { success: true, id: created.id, name: created.name };
         } catch (error) {
           return { error: error instanceof Error ? error.message : "Create failed" };
