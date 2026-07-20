@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button, Tag, Tile } from '@carbon/react'
 import { Checkmark, Copy, Download, Save } from '@carbon/icons-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { markdownForPrompt, techniqueById } from '../domain'
 import { useStudioStore } from '../store'
 
@@ -78,11 +79,22 @@ export default function PreviewPanel({ saveButtonRef }) {
             type="button"
             kind="ghost"
             size="sm"
-            renderIcon={copied ? Checkmark : Copy}
             onClick={handleCopy}
             aria-label={copied ? 'Prompt copied' : 'Copy assembled prompt'}
           >
-            {copied ? 'Copied' : 'Copy'}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={copied ? 'check' : 'copy'}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.15 }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                {copied ? 'Copied' : 'Copy'}
+                {copied ? <Checkmark aria-hidden="true" /> : <Copy aria-hidden="true" />}
+              </motion.span>
+            </AnimatePresence>
           </Button>
         </div>
         <pre tabIndex={0}>{promptText}</pre>
@@ -92,7 +104,7 @@ export default function PreviewPanel({ saveButtonRef }) {
           type="button"
           kind="tertiary"
           size="md"
-          renderIcon={Download}
+          renderIcon={(props) => <Download {...props} aria-hidden="true" />}
           onClick={() => downloadText(`${technique}-prompt.md`, markdown, 'text/markdown')}
         >
           Download markdown
@@ -102,7 +114,7 @@ export default function PreviewPanel({ saveButtonRef }) {
           type="button"
           kind="primary"
           size="md"
-          renderIcon={Save}
+          renderIcon={(props) => <Save {...props} aria-hidden="true" />}
           onClick={() => setChrome({ saveModalOpen: true })}
         >
           Save to library

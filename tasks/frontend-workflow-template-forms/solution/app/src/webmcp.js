@@ -80,6 +80,10 @@ async function invoke(name, args = {}) {
     else throw new Error('Destination is not declared.')
     return { ok: true, destination: args.destination }
   }
+  if (name === 'browse_sort') {
+    state.toggleSortOrder()
+    return { ok: true }
+  }
   if (name.startsWith('browse_')) return unavailable(name.slice(7))
 
   if (name === 'entity_create') {

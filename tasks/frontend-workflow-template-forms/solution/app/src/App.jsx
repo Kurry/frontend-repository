@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { Button, Select, SelectItem, Tag, ToastNotification } from '@carbon/react'
+import { Button, Select, SelectItem, Tag, ToastNotification, Modal } from '@carbon/react'
 import {
   Book,
   ChevronRight,
@@ -8,6 +8,7 @@ import {
   Template,
 } from '@carbon/icons-react'
 import { TECHNIQUES, techniqueById } from './domain'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useStudioStore } from './store'
 import TechniqueForm from './components/TechniqueForm'
 import PreviewPanel from './components/PreviewPanel'
@@ -17,10 +18,25 @@ import ImportModal from './components/ImportModal'
 import { registerWebMCP } from './webmcp'
 
 function StatusChip({ status }) {
-  if (status === 'neutral') return null
   const labels = { 'in-progress': 'In progress', generated: 'Generated', saved: 'Saved' }
   const types = { 'in-progress': 'warm-gray', generated: 'blue', saved: 'green' }
-  return <Tag size="sm" type={types[status]} key={status} className={`status-chip status-${status}`}>{labels[status]}</Tag>
+  return (
+    <AnimatePresence mode="wait">
+      {status !== 'neutral' && (
+        <motion.span
+          key={status}
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.15 }}
+          className={`status-chip status-${status}`}
+          style={{ display: 'flex' }}
+        >
+          <Tag size="sm" type={types[status]}>{labels[status]}</Tag>
+        </motion.span>
+      )}
+    </AnimatePresence>
+  )
 }
 
 function Sidebar() {
@@ -79,12 +95,12 @@ function AppHeader() {
   return (
     <header className="app-header">
       <button type="button" className="brand" onClick={() => setView('forms')} aria-label="Template Forms home">
-        <span className="brand-mark"><IbmGranite size={20} /></span>
+        <span className="brand-mark"><IbmGranite size={20} aria-hidden="true" /></span>
         <span><strong>Template</strong> Forms</span>
       </button>
       <nav className="view-nav" aria-label="Primary navigation">
-        <Button type="button" kind="ghost" size="md" renderIcon={Template} className={activeView === 'forms' ? 'nav-active' : ''} onClick={() => setView('forms')}>Studio</Button>
-        <Button type="button" kind="ghost" size="md" renderIcon={Book} className={activeView === 'library' ? 'nav-active' : ''} onClick={() => setView('library')}>
+        <Button type="button" kind="ghost" size="md" renderIcon={(props) => <Template {...props} aria-hidden="true" />} className={activeView === 'forms' ? 'nav-active' : ''} onClick={() => setView('forms')}>Studio</Button>
+        <Button type="button" kind="ghost" size="md" renderIcon={(props) => <Book {...props} aria-hidden="true" />} className={activeView === 'library' ? 'nav-active' : ''} onClick={() => setView('library')}>
           Library <span className="nav-count">{libraryCount}</span>
         </Button>
       </nav>
@@ -147,9 +163,13 @@ function ToastRegion() {
 
 export default function App() {
   const activeView = useStudioStore((state) => state.activeView)
+  const hasSeenOnboarding = useStudioStore((state) => state.hasSeenOnboarding)
+  const setChrome = useStudioStore((state) => state.setChrome)
+
   useEffect(() => {
     registerWebMCP()
   }, [])
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">Skip to main content</a>
@@ -157,6 +177,20 @@ export default function App() {
       {activeView === 'forms' ? <FormsView /> : <LibraryView />}
       <ImportModal />
       <ToastRegion />
+
+      <Modal
+        open={!hasSeenOnboarding}
+        modalHeading="Welcome to Template Forms"
+        primaryButtonText="Get started"
+        onRequestSubmit={() => setChrome({ hasSeenOnboarding: true })}
+        onRequestClose={() => setChrome({ hasSeenOnboarding: true })}
+        focusTrap={true}
+        size="sm"
+      >
+        <p className="modal-copy">
+          Welcome to the prompt engineering studio. Choose a technique from the sidebar, fill out the required schema fields, and generate your prompt. Save it to your Library when you are satisfied with the result!
+        </p>
+      </Modal>
     </div>
   )
 }

@@ -24,7 +24,7 @@ export default function AttachmentsField({ selected, onChange }) {
           type="button"
           kind="tertiary"
           size="sm"
-          renderIcon={Add}
+          renderIcon={(props) => <Add {...props} aria-hidden="true" />}
           onClick={() => setChrome({ assetPickerOpen: !open })}
           aria-expanded={open}
           aria-controls="asset-picker"
@@ -39,7 +39,7 @@ export default function AttachmentsField({ selected, onChange }) {
             const asset = REFERENCE_ASSETS.find((item) => item.name === name)
             return (
               <span className="asset-badge" key={name} tabIndex={0}>
-                <Tag type="cool-gray" renderIcon={DocumentAttachment}>{name}</Tag>
+                <Tag type="cool-gray" renderIcon={(props) => <DocumentAttachment {...props} aria-hidden="true" />}>{name}</Tag>
                 <span className="asset-preview" role="tooltip">
                   <strong>{name}</strong>
                   <span>{asset?.type} · {asset?.detail}</span>
@@ -67,7 +67,7 @@ export default function AttachmentsField({ selected, onChange }) {
               <strong>Reference library</strong>
               <span>Choose one of 6 seeded assets</span>
             </div>
-            <Button type="button" kind="ghost" size="sm" hasIconOnly renderIcon={Close} iconDescription="Close document picker" onClick={() => setChrome({ assetPickerOpen: false })} />
+            <Button type="button" kind="ghost" size="sm" hasIconOnly renderIcon={(props) => <Close {...props} aria-hidden="true" />} iconDescription="Close document picker" onClick={() => setChrome({ assetPickerOpen: false })} />
           </div>
           <div className="asset-grid">
             {REFERENCE_ASSETS.map((asset) => {
