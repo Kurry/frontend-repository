@@ -29,18 +29,20 @@ const approveReason = computed(() => {
   if (gateFailed.value) return `Approval unavailable: ${counts.value.blocker} open blocker finding${counts.value.blocker === 1 ? '' : 's'}.`
   return ''
 })
-const dateRangeValue = computed(() => store.profileRange.map((d) => Date.UTC(+d.slice(0, 4), +d.slice(5, 7) - 1, +d.slice(8, 10))))
+const dateRangeValue = computed(() => store.profileRange.map((d) => {
+  const [y, m, day] = d.split('-').map(Number)
+  return new Date(y, m - 1, day).getTime()
+}))
 const tierOptions = [{ label: 'Blocker', value: 'blocker' }, { label: 'Major', value: 'major' }, { label: 'Minor', value: 'minor' }]
 
 function openOverride(id) { store.dialogs.overrideFindingId = id; store.dialogs.override = true }
 function updateDateRange(value) {
   if (!value?.length || value.length !== 2) return
-  // Keep calendar-day semantics in UTC so timezone offsets don't shift the seeded trial window.
   store.setProfileRange(value.map((t) => {
     const date = new Date(t)
-    const y = date.getUTCFullYear()
-    const m = String(date.getUTCMonth() + 1).padStart(2, '0')
-    const d = String(date.getUTCDate()).padStart(2, '0')
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const d = String(date.getDate()).padStart(2, '0')
     return `${y}-${m}-${d}`
   }))
 }

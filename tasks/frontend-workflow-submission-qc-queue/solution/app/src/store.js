@@ -195,6 +195,7 @@ export const useQcStore = defineStore('qc', {
     },
     jsonPreview() { return JSON.stringify(this.packageObject, null, 2) },
     markdownPreview(state) {
+      void state.mutationEpoch
       const q = this.queueSummary
       const lines = ['# Arcfield quality-control report', '', `Exported: ${now()}`, '', '## Queue summary', '', `- Total submissions: ${q.total}`, `- Stages: submitted ${q.stages.submitted}, in-review ${q.stages['in-review']}, needs-revision ${q.stages['needs-revision']}, approved ${q.stages.approved}`, `- Payouts: pending ${q.payout_states.pending}, held ${q.payout_states.held}, released ${q.payout_states.released}`, '']
       state.submissions.forEach((s) => {
