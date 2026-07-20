@@ -68,7 +68,13 @@ export const LivePreview = component$<LivePreviewProps>(({ state }) => {
               <HeaderPreview key={sectionKey} profile={profile} theme={theme} spacing={spacing} />
             );
 
-          case 'projects':
+          case 'projects': {
+            // Sort to ensure featured project is first
+            const sortedProjects = [...projects].sort((a, b) => {
+                if (a.featured && !b.featured) return -1;
+                if (!a.featured && b.featured) return 1;
+                return 0;
+            });
             return (
               <section key={sectionKey} class={`preview-section ${spacing.section} border-b`} style={{ borderColor: '#e7e5e4' }}>
                 <h2
@@ -77,33 +83,52 @@ export const LivePreview = component$<LivePreviewProps>(({ state }) => {
                 >
                   Projects
                 </h2>
-                {projects.length === 0 ? (
+                {sortedProjects.length === 0 ? (
                   <p style={{ color: '#78716c', fontSize: '13px' }}>No projects added yet.</p>
                 ) : (
                   <div class={`grid grid-cols-1 sm:grid-cols-2 ${spacing.gap}`}>
-                    {projects.map((p) => (
+                    {sortedProjects.map((p) => (
                       <div
                         key={p.id}
-                        class={`preview-card rounded-2xl border ${spacing.card}`}
-                        style={{ borderColor: '#e7e5e4' }}
+                        class={`preview-card rounded-2xl border ${spacing.card} ${p.featured ? 'ring-2 ring-violet-500 bg-violet-50/20' : ''}`}
+                        style={{ borderColor: p.featured ? theme.accent : '#e7e5e4' }}
                       >
-                        <h3 class="text-base font-semibold mb-1" style={{ fontFamily: '"Poppins", sans-serif', color: '#1c1917' }}>
-                          {p.title || 'Untitled'}
-                        </h3>
-                        {p.category && (
+                        <div class="flex items-start justify-between mb-1">
+                          <h3 class="text-base font-semibold" style={{ fontFamily: '"Poppins", sans-serif', color: '#1c1917' }}>
+                            {p.title || 'Untitled'}
+                          </h3>
+                          {p.featured && (
+                              <span class="text-xs font-bold px-2 py-0.5 rounded text-white" style={{ background: theme.accent }}>
+                                  Featured
+                              </span>
+                          )}
+                        </div>
+                        <div class="flex flex-wrap gap-2 mb-2">
+                          {p.category && (
+                            <span
+                              class="inline-block text-xs font-medium px-2 py-0.5 rounded-full"
+                              style={{ background: theme.support, color: theme.accent }}
+                            >
+                              {p.category}
+                            </span>
+                          )}
                           <span
-                            class="inline-block text-xs font-medium px-2 py-0.5 rounded-full mb-2"
-                            style={{ background: theme.support, color: theme.accent }}
+                              class="inline-block text-xs font-medium px-2 py-0.5 rounded-full"
+                              style={{ 
+                                  background: p.status === 'shipped' ? '#dcfce7' : p.status === 'wip' ? '#fef08a' : '#e0e7ff',
+                                  color: p.status === 'shipped' ? '#166534' : p.status === 'wip' ? '#854d0e' : '#3730a3',
+                                  border: `1px solid ${p.status === 'shipped' ? '#bbf7d0' : p.status === 'wip' ? '#fde047' : '#c7d2fe'}`
+                              }}
                           >
-                            {p.category}
+                              {p.status === 'shipped' ? 'Shipped' : p.status === 'wip' ? 'WIP' : 'Concept'}
                           </span>
-                        )}
+                        </div>
                         {p.description && (
                           <p class="text-sm" style={{ color: '#78716c' }}>{p.description}</p>
                         )}
                         {p.linkLabel && (
                           <a
-                            class="inline-block text-sm font-medium mt-2"
+                            class="inline-block text-sm font-medium mt-2 hover:underline"
                             href={p.linkUrl || '#'}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -119,6 +144,7 @@ export const LivePreview = component$<LivePreviewProps>(({ state }) => {
                 )}
               </section>
             );
+          }
 
           case 'skills':
             return (

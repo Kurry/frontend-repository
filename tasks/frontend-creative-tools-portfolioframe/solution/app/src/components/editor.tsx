@@ -90,11 +90,18 @@ interface ProjectsEditorProps {
   history: HistoryManager;
 }
 
+import { toggleProjectSelection, deleteSelectedProjects } from '../store';
+import type { ProjectStatus } from '../types';
+
 export const ProjectsEditor = component$<ProjectsEditorProps>(({ state, history }) => {
   const formTitle = useSignal('');
   const formDescription = useSignal('');
   const formCategory = useSignal('');
   const formLinkLabel = useSignal('');
+  const formLinkUrl = useSignal('');
+  const formStatus = useSignal<ProjectStatus>('wip');
+  const formFeatured = useSignal(false);
+  const errorMsg = useSignal('');
 
   return (
     <div class="editor-section">
@@ -107,55 +114,136 @@ export const ProjectsEditor = component$<ProjectsEditorProps>(({ state, history 
         style={{ borderColor: 'var(--color-border)', background: '#fafaf9' }}
         preventdefault:submit
         onSubmit$={() => {
+          if (!formTitle.value.trim()) {
+            errorMsg.value = 'Title is required';
+            return;
+          }
+          if (formTitle.value.trim().length > 80) {
+            errorMsg.value = 'Title must be 80 characters or fewer';
+            return;
+          }
+          if (!formCategory.value.trim()) {
+            errorMsg.value = 'Category Tag is required';
+            return;
+          }
+          if (formCategory.value.trim().length > 32) {
+            errorMsg.value = 'Category Tag must be 32 characters or fewer';
+            return;
+          }
+          if (formDescription.value.trim().length > 500) {
+            errorMsg.value = 'Description must be 500 characters or fewer';
+            return;
+          }
+          if (formLinkLabel.value.trim().length > 40) {
+            errorMsg.value = 'Link Label must be 40 characters or fewer';
+            return;
+          }
+          if (!['shipped', 'wip', 'concept'].includes(formStatus.value)) {
+            errorMsg.value = 'Status must be shipped, wip, or concept';
+            return;
+          }
+
+          errorMsg.value = '';
           submitProject(state, history, {
             title: formTitle.value,
             description: formDescription.value,
             category: formCategory.value,
             linkLabel: formLinkLabel.value,
-            linkUrl: formLinkLabel.value ? 'https://example.com' : '',
+            linkUrl: formLinkUrl.value,
+            status: formStatus.value,
+            featured: formFeatured.value,
           });
           formTitle.value = '';
           formDescription.value = '';
           formCategory.value = '';
           formLinkLabel.value = '';
+          formLinkUrl.value = '';
+          formStatus.value = 'wip';
+          formFeatured.value = false;
         }}
       >
         <p class="text-sm font-medium">Add Project</p>
+        {errorMsg.value && (
+          <p class="text-sm mb-2" style={{ color: '#dc2626' }}>
+            {errorMsg.value}
+          </p>
+        )}
         <div>
-          <label class="editor-label">Title</label>
+          <label class="editor-label" for="proj-title">Title</label>
           <input
+            id="proj-title"
             class="editor-input"
             value={formTitle.value}
             placeholder="Project title"
-            onInput$={(e) => { formTitle.value = (e.target as HTMLInputElement).value; }}
+            onInput$={(e) => { formTitle.value = (e.target as HTMLInputElement).value; errorMsg.value = ''; }}
           />
         </div>
         <div>
-          <label class="editor-label">Description</label>
+          <label class="editor-label" for="proj-desc">Description</label>
           <textarea
+            id="proj-desc"
             class="editor-textarea"
             value={formDescription.value}
             placeholder="What does this project do?"
-            onInput$={(e) => { formDescription.value = (e.target as HTMLTextAreaElement).value; }}
+            onInput$={(e) => { formDescription.value = (e.target as HTMLTextAreaElement).value; errorMsg.value = ''; }}
           />
         </div>
         <div>
-          <label class="editor-label">Category Tag</label>
+          <label class="editor-label" for="proj-cat">Category Tag</label>
           <input
+            id="proj-cat"
             class="editor-input"
             value={formCategory.value}
             placeholder="e.g. Web App"
-            onInput$={(e) => { formCategory.value = (e.target as HTMLInputElement).value; }}
+            onInput$={(e) => { formCategory.value = (e.target as HTMLInputElement).value; errorMsg.value = ''; }}
           />
         </div>
-        <div>
-          <label class="editor-label">Link Label</label>
-          <input
-            class="editor-input"
-            value={formLinkLabel.value}
-            placeholder="e.g. View Demo"
-            onInput$={(e) => { formLinkLabel.value = (e.target as HTMLInputElement).value; }}
-          />
+        <div class="grid grid-cols-2 gap-2">
+            <div>
+            <label class="editor-label" for="proj-label">Link Label</label>
+            <input
+                id="proj-label"
+                class="editor-input"
+                value={formLinkLabel.value}
+                placeholder="e.g. View Demo"
+                onInput$={(e) => { formLinkLabel.value = (e.target as HTMLInputElement).value; errorMsg.value = ''; }}
+            />
+            </div>
+            <div>
+            <label class="editor-label" for="proj-url">Link URL</label>
+            <input
+                id="proj-url"
+                class="editor-input"
+                value={formLinkUrl.value}
+                placeholder="https://..."
+                onInput$={(e) => { formLinkUrl.value = (e.target as HTMLInputElement).value; errorMsg.value = ''; }}
+            />
+            </div>
+        </div>
+        <div class="flex gap-4 items-center">
+            <div class="flex-1">
+                <label class="editor-label" for="proj-status">Status</label>
+                <select 
+                    id="proj-status"
+                    class="editor-input" 
+                    value={formStatus.value} 
+                    onChange$={(e) => formStatus.value = (e.target as HTMLSelectElement).value as ProjectStatus}
+                >
+                    <option value="wip">WIP</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="concept">Concept</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2 mt-4">
+                <input 
+                    type="checkbox" 
+                    id="proj-feat"
+                    class="checkbox"
+                    checked={formFeatured.value}
+                    onChange$={(e) => formFeatured.value = (e.target as HTMLInputElement).checked}
+                />
+                <label class="text-sm cursor-pointer" for="proj-feat">Featured</label>
+            </div>
         </div>
         <button class="btn-primary" type="submit">
           Add Project
@@ -166,6 +254,18 @@ export const ProjectsEditor = component$<ProjectsEditorProps>(({ state, history 
         <p class="text-sm" style={{ color: 'var(--color-text-muted)' }}>
           No projects yet. Click "Add Project" to get started.
         </p>
+      )}
+
+      {state.selectedProjects.length > 0 && (
+          <div class="mb-3 p-3 bg-violet-50 rounded-lg flex items-center justify-between border border-violet-100">
+              <span class="text-sm font-medium text-violet-900">{state.selectedProjects.length} selected</span>
+              <button 
+                  class="btn-small text-red-600 border-red-200 hover:bg-red-50"
+                  onClick$={() => deleteSelectedProjects(state, history)}
+              >
+                  Delete selected
+              </button>
+          </div>
       )}
 
       <div class="space-y-3">
@@ -185,13 +285,23 @@ interface ProjectCardProps {
 
 export const ProjectCard = component$<ProjectCardProps>(({ project, state, history }) => {
   const editing = useSignal(false);
+  const isSelected = state.selectedProjects.includes(project.id);
 
   return (
-    <div class="border rounded-xl p-4 space-y-3" style={{ borderColor: 'var(--color-border)' }}>
+    <div class={`border rounded-xl p-4 space-y-3 ${isSelected ? 'ring-2 ring-violet-500 bg-violet-50/30' : ''}`} style={{ borderColor: 'var(--color-border)' }}>
       <div class="flex items-center justify-between">
-        <span class="text-sm font-medium truncate">
-          {project.title || 'Untitled Project'}
-        </span>
+        <div class="flex items-center gap-2 overflow-hidden">
+            <input 
+                type="checkbox" 
+                class="checkbox"
+                checked={isSelected}
+                onChange$={() => toggleProjectSelection(state, project.id)}
+                aria-label={`Select ${project.title || 'project'}`}
+            />
+            <span class="text-sm font-medium truncate flex-1">
+            {project.title || 'Untitled Project'}
+            </span>
+        </div>
         <div class="flex gap-2">
           <button
             class="btn-small"
@@ -211,18 +321,20 @@ export const ProjectCard = component$<ProjectCardProps>(({ project, state, histo
       {editing.value && (
         <div class="space-y-2">
           <div>
-            <label class="editor-label">Title</label>
+            <label class="editor-label" for={`edit-title-${project.id}`}>Title</label>
             <input
+              id={`edit-title-${project.id}`}
               class="editor-input"
               value={project.title}
               placeholder="Project title"
-              onInput$={(e) => { project.title = (e.target as HTMLInputElement).value; saveState(state); }}
+              onInput$={(e) => { project.title = (e.target as HTMLInputElement).value; }}
               onBlur$={() => updateProject(state, history, project.id, 'title', project.title)}
             />
           </div>
           <div>
-            <label class="editor-label">Description</label>
+            <label class="editor-label" for={`edit-desc-${project.id}`}>Description</label>
             <textarea
+              id={`edit-desc-${project.id}`}
               class="editor-textarea"
               value={project.description}
               placeholder="What does this project do?"
@@ -232,8 +344,9 @@ export const ProjectCard = component$<ProjectCardProps>(({ project, state, histo
           </div>
           <div class="grid grid-cols-2 gap-2">
             <div>
-              <label class="editor-label">Category Tag</label>
+              <label class="editor-label" for={`edit-cat-${project.id}`}>Category Tag</label>
               <input
+                id={`edit-cat-${project.id}`}
                 class="editor-input"
                 value={project.category}
                 placeholder="e.g. Web App"
@@ -242,8 +355,9 @@ export const ProjectCard = component$<ProjectCardProps>(({ project, state, histo
               />
             </div>
             <div>
-              <label class="editor-label">Link Label</label>
+              <label class="editor-label" for={`edit-label-${project.id}`}>Link Label</label>
               <input
+                id={`edit-label-${project.id}`}
                 class="editor-input"
                 value={project.linkLabel}
                 placeholder="e.g. View Demo"
@@ -253,14 +367,48 @@ export const ProjectCard = component$<ProjectCardProps>(({ project, state, histo
             </div>
           </div>
           <div>
-            <label class="editor-label">Link URL</label>
+            <label class="editor-label" for={`edit-url-${project.id}`}>Link URL</label>
             <input
+              id={`edit-url-${project.id}`}
               class="editor-input"
               value={project.linkUrl}
               placeholder="https://..."
               onInput$={(e) => { project.linkUrl = (e.target as HTMLInputElement).value; }}
               onBlur$={() => updateProject(state, history, project.id, 'linkUrl', project.linkUrl)}
             />
+          </div>
+          <div class="flex gap-4 items-center">
+            <div class="flex-1">
+                <label class="editor-label" for={`edit-status-${project.id}`}>Status</label>
+                <select 
+                    id={`edit-status-${project.id}`}
+                    class="editor-input" 
+                    value={project.status} 
+                    onChange$={(e) => {
+                        const val = (e.target as HTMLSelectElement).value as ProjectStatus;
+                        project.status = val;
+                        updateProject(state, history, project.id, 'status', val);
+                    }}
+                >
+                    <option value="wip">WIP</option>
+                    <option value="shipped">Shipped</option>
+                    <option value="concept">Concept</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2 mt-4">
+                <input 
+                    type="checkbox" 
+                    id={`edit-feat-${project.id}`}
+                    class="checkbox"
+                    checked={project.featured}
+                    onChange$={(e) => {
+                        const checked = (e.target as HTMLInputElement).checked;
+                        project.featured = checked;
+                        updateProject(state, history, project.id, 'featured', checked);
+                    }}
+                />
+                <label class="text-sm cursor-pointer" for={`edit-feat-${project.id}`}>Featured</label>
+            </div>
           </div>
         </div>
       )}

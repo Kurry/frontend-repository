@@ -31,6 +31,9 @@ import {
 
 // Preview component
 import { LivePreview } from './components/preview';
+import { ExportPanel } from './components/ExportPanel';
+import { CommandPalette } from './components/CommandPalette';
+import { useSignal } from '@builder.io/qwik';
 
 export default component$(() => {
   // Initialize state from localStorage or defaults
@@ -40,6 +43,8 @@ export default component$(() => {
   const history = useStore<HistoryManager>(
     createHistoryManager(state.content)
   );
+  
+  const isExportOpen = useSignal(false);
 
   // Required WebMCP delivery surface — binds to the same store commands the UI uses.
   // eslint-disable-next-line qwik/no-use-visible-task
@@ -75,6 +80,12 @@ export default component$(() => {
           <div class="flex items-center gap-3">
             <button
               class="btn-secondary"
+              onClick$={() => isExportOpen.value = true}
+            >
+              Export package
+            </button>
+            <button
+              class="btn-secondary"
               onClick$={handleDownloadPDF}
             >
               Download PDF
@@ -82,6 +93,10 @@ export default component$(() => {
           </div>
         </div>
       </header>
+
+      {/* Command Palette and Export Panel */}
+      <CommandPalette state={state} history={history} onOpenExport={$(() => isExportOpen.value = true)} />
+      <ExportPanel state={state} history={history} isOpen={isExportOpen.value} onClose={$(() => isExportOpen.value = false)} />
 
       {/* Main Layout: Editor + Preview */}
       <div class="max-w-screen-2xl mx-auto flex flex-col lg:flex-row no-print">

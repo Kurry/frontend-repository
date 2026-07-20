@@ -37,6 +37,7 @@ export function createDefaultState(): PortfolioState {
     theme: 'sunrise',
     density: 'spacious',
     drafts: [],
+    selectedProjects: [],
   };
 }
 
@@ -186,6 +187,8 @@ export function addProject(state: PortfolioState, history: HistoryManager): Proj
     category: '',
     linkLabel: '',
     linkUrl: '',
+    status: 'wip',
+    featured: false,
   };
   state.content.projects.push(project);
   pushHistory(history, state.content, `Add project`);
@@ -196,7 +199,7 @@ export function addProject(state: PortfolioState, history: HistoryManager): Proj
 export function submitProject(
   state: PortfolioState,
   history: HistoryManager,
-  fields: Pick<Project, 'title' | 'description' | 'category' | 'linkLabel' | 'linkUrl'>
+  fields: Pick<Project, 'title' | 'description' | 'category' | 'linkLabel' | 'linkUrl' | 'status' | 'featured'>
 ): Project {
   const project: Project = {
     id: generateId(),
@@ -205,7 +208,14 @@ export function submitProject(
     category: fields.category.trim(),
     linkLabel: fields.linkLabel.trim(),
     linkUrl: fields.linkUrl.trim(),
+    status: fields.status,
+    featured: fields.featured,
   };
+  
+  if (project.featured) {
+      state.content.projects.forEach(p => p.featured = false);
+  }
+  
   state.content.projects.push(project);
   pushHistory(history, state.content, `Add project: ${project.title || 'Untitled'}`);
   saveState(state);
@@ -217,11 +227,14 @@ export function updateProject(
   history: HistoryManager,
   projectId: string,
   field: keyof Project,
-  value: string
+  value: any
 ): void {
   const project = state.content.projects.find((p) => p.id === projectId);
   if (project) {
-    (project[field] as string) = value;
+    if (field === 'featured' && value === true) {
+       state.content.projects.forEach(p => p.featured = false);
+    }
+    (project[field] as any) = value;
     pushHistory(history, state.content, `Edit project ${field}`);
     saveState(state);
   }
@@ -233,7 +246,24 @@ export function deleteProject(
   projectId: string
 ): void {
   state.content.projects = state.content.projects.filter((p) => p.id !== projectId);
+  state.selectedProjects = state.selectedProjects.filter((id) => id !== projectId);
   pushHistory(history, state.content, 'Delete project');
+  saveState(state);
+}
+
+export function toggleProjectSelection(state: PortfolioState, projectId: string): void {
+  if (state.selectedProjects.includes(projectId)) {
+    state.selectedProjects = state.selectedProjects.filter(id => id !== projectId);
+  } else {
+    state.selectedProjects.push(projectId);
+  }
+}
+
+export function deleteSelectedProjects(state: PortfolioState, history: HistoryManager): void {
+  const toDelete = state.selectedProjects;
+  state.content.projects = state.content.projects.filter((p) => !toDelete.includes(p.id));
+  state.selectedProjects = [];
+  pushHistory(history, state.content, 'Delete selected projects');
   saveState(state);
 }
 
@@ -476,6 +506,153 @@ export function completenessCount(state: PortfolioState): { done: number; total:
   const items = getChecklist(state);
   const done = items.filter((i) => i.complete).length;
   return { done, total: items.length };
+}
+
+export function generatePortfolioJSON(state: PortfolioState): string {
+  const data = {
+    schemaVersion: 'portfolioframe-v1',
+    profile: state.content.profile,
+    projects: state.content.projects.map(({ id, ...rest }) => rest),
+    skills: state.content.skills.map(s => s.label),
+    testimonials: state.content.testimonials.map(({ id, ...rest }) => rest),
+    contact: {
+      email: state.content.contact.email,
+      location: state.content.contact.location,
+      links: state.content.contact.links.map(({ id, ...rest }) => rest)
+    },
+    preferences: {
+      sectionOrder: state.sectionOrder,
+      sectionVisibility: state.sectionVisibility,
+      theme: state.theme,
+      density: state.density
+    }
+  };
+  return JSON.stringify(data, null, 2);
+}
+
+export function generateMarkdownResume(state: PortfolioState): string {
+  const p = state.content.profile;
+  let md = `# ${p.name || 'Untitled'}\n`;
+  if (p.title) md += `**${p.title}**\n\n`;
+  if (p.bio) md += `${p.bio}\n\n`;
+
+  const c = state.content.contact;
+  if (c.email || c.location || c.links.length > 0) {
+    md += `## Contact\n`;
+    if (c.email) md += `- Email: ${c.email}\n`;
+    if (c.location) md += `- Location: ${c.location}\n`;
+    c.links.forEach(l => {
+      md += `- [${l.label}](${l.url})\n`;
+    });
+    md += '\n';
+  }
+
+  if (state.content.projects.length > 0) {
+    md += `## Projects\n`;
+    state.content.projects.forEach(proj => {
+      md += `### ${proj.title}\n`;
+      if (proj.category) md += `*${proj.category}* | Status: ${proj.status}${proj.featured ? ' | Featured' : ''}\n\n`;
+      if (proj.description) md += `${proj.description}\n\n`;
+      if (proj.linkLabel && proj.linkUrl) md += `[${proj.linkLabel}](${proj.linkUrl})\n\n`;
+    });
+  }
+
+  if (state.content.skills.length > 0) {
+    md += `## Skills\n`;
+    md += state.content.skills.map(s => s.label).join(', ') + '\n\n';
+  }
+
+  if (state.content.testimonials.length > 0) {
+    md += `## Testimonials\n`;
+    state.content.testimonials.forEach(t => {
+      md += `> "${t.quote}"\n> — **${t.name}**, ${t.role}\n\n`;
+    });
+  }
+
+  return md.trim();
+}
+
+export function importPortfolioJSON(state: PortfolioState, history: HistoryManager, jsonString: string): { success: boolean, error?: string } {
+  try {
+    const data = JSON.parse(jsonString);
+    if (data.schemaVersion !== 'portfolioframe-v1') {
+      return { success: false, error: 'Invalid schemaVersion. Expected portfolioframe-v1' };
+    }
+
+    if (!data.profile || !data.projects || !data.skills || !data.testimonials || !data.contact || !data.preferences) {
+        return { success: false, error: 'Missing required keys in JSON' };
+    }
+    
+    // Status validation
+    for (const proj of data.projects) {
+        if (!['shipped', 'wip', 'concept'].includes(proj.status)) {
+            return { success: false, error: `Invalid project status: ${proj.status}` };
+        }
+    }
+    
+    // Featured validation
+    const featuredCount = data.projects.filter((p: any) => p.featured).length;
+    if (featuredCount > 1) {
+        return { success: false, error: 'More than one featured project is not allowed' };
+    }
+    
+    // Theme and density validation
+    const themes = ['sunrise', 'slate', 'forest', 'blossom'];
+    if (!themes.includes(data.preferences.theme)) {
+        return { success: false, error: `Invalid theme: ${data.preferences.theme}` };
+    }
+    const densities = ['compact', 'spacious'];
+    if (!densities.includes(data.preferences.density)) {
+        return { success: false, error: `Invalid density: ${data.preferences.density}` };
+    }
+
+    state.content = {
+      profile: {
+        name: data.profile.name || '',
+        title: data.profile.title || '',
+        bio: data.profile.bio || ''
+      },
+      projects: data.projects.map((p: any) => ({
+        id: generateId(),
+        title: p.title || '',
+        description: p.description || '',
+        category: p.category || '',
+        linkLabel: p.linkLabel || '',
+        linkUrl: p.linkUrl || '',
+        status: p.status || 'wip',
+        featured: !!p.featured
+      })),
+      skills: data.skills.map((s: string) => ({ id: generateId(), label: s })),
+      testimonials: data.testimonials.map((t: any) => ({
+        id: generateId(),
+        quote: t.quote || '',
+        name: t.name || '',
+        role: t.role || ''
+      })),
+      contact: {
+        email: data.contact.email || '',
+        location: data.contact.location || '',
+        links: (data.contact.links || []).map((l: any) => ({
+          id: generateId(),
+          label: l.label || '',
+          url: l.url || ''
+        }))
+      }
+    };
+
+    state.sectionOrder = data.preferences.sectionOrder;
+    state.sectionVisibility = data.preferences.sectionVisibility;
+    state.theme = data.preferences.theme;
+    state.density = data.preferences.density;
+    state.selectedProjects = [];
+
+    pushHistory(history, state.content, 'Import Portfolio JSON');
+    saveState(state);
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: `Malformed JSON: ${err.message}` };
+  }
 }
 
 export { SECTION_LABELS, generateId };

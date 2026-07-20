@@ -4,6 +4,8 @@ export interface ProfileHeader {
   bio: string;
 }
 
+export type ProjectStatus = 'shipped' | 'wip' | 'concept';
+
 export interface Project {
   id: string;
   title: string;
@@ -11,6 +13,8 @@ export interface Project {
   category: string;
   linkLabel: string;
   linkUrl: string;
+  status: ProjectStatus;
+  featured: boolean;
 }
 
 export interface Skill {
@@ -64,6 +68,7 @@ export interface PortfolioState {
   theme: ThemeName;
   density: DensityMode;
   drafts: DraftEntry[];
+  selectedProjects: string[];
 }
 
 export interface DraftEntry {
