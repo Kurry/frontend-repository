@@ -2156,3 +2156,123 @@ footer p, footer span, footer a {
     min-width: 75%;
   }
 }
+.gp-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+}
+.gp-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  min-width: 300px;
+  transform: translateY(0);
+  transition: transform 0.3s ease;
+}
+.gp-modal.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.gp-modal.hidden .gp-modal-content {
+  transform: translateY(20px);
+}
+.gallery-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.gallery-card.hidden {
+  opacity: 0;
+  transform: scale(0.95);
+}
+.tabs button { margin-right: 5px; }
+.tabs button.active { background: #ff0098; color: white; }
+
+/* Accessibility & Touch Targets */
+.gp-modes button,
+.gp-swatch,
+.new-primary-btn,
+.gallery-card button,
+.gp-ctrl input[type="range"] {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+@media (max-width: 768px) {
+  .gp-modes button,
+  .new-primary-btn {
+    font-size: 14px !important;
+  }
+}
+
+/* Reduced Motion & Transitions */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Typewriter animation */
+.type-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 2s steps(40, end);
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+/* Focus indicator */
+:focus-visible,
+[tabindex="0"]:focus {
+  outline: 2px solid #ff0098;
+  outline-offset: 2px;
+}
+
+.gp-ctrl.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.page-title {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 1.5s steps(30, end);
+}
+
+/* Error messages should ease in */
+.error-msg {
+  transition: opacity 0.3s ease;
+}
+
+/* Hover washes */
+.gp-modes button:not(:disabled):hover,
+.new-primary-btn:not(:disabled):hover,
+.gallery-card button:not(:disabled):hover {
+  filter: brightness(1.1);
+  background-color: rgba(0, 0, 0, 0.05); /* or similar wash depending on base color */
+  transition: all 0.2s ease;
+}
+.new-primary-btn.black:hover {
+  background-color: #333;
+}
+.new-primary-btn.white:hover {
+  background-color: #f0f0f0;
+}
+.gp-swatch:hover {
+  transform: scale(1.05);
+}
+.gallery-card:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
