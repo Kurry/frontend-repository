@@ -32,17 +32,6 @@ const DESTINATIONS = {
 
 const DEMOS = ["mobile-menu", "command-palette"];
 
-// bound filter slug -> label used by the visible #theme-filter <select> options
-const THEME_FILTERS = {
-  all: "All",
-  "agentic-stack": "Agentic Stack",
-  international: "International Payments",
-  "payment-gateway": "Payment Gateway",
-  d2c: "D2C",
-  marketing: "Marketing",
-  "business-banking": "Business Banking"
-};
-
 export function initWebmcp() {
   const tools = {
     // ---- browse-query-v1 -------------------------------------------------
@@ -80,32 +69,14 @@ export function initWebmcp() {
       handler(args) {
         args = args || {};
         if (args.themes && args.themes.length > 0) {
-           const slug = args.themes[0];
-           const label = THEME_FILTERS[slug];
-           if (!label) {
-              return {
-                ok: false,
-                error: "Unknown theme filter: " + slug + "; use one of " + Object.keys(THEME_FILTERS).join(", ")
-              };
-           }
            const themeSelect = document.getElementById("theme-filter");
            if (themeSelect) {
-              themeSelect.value = label;
+              themeSelect.value = args.themes[0];
               themeSelect.dispatchEvent(new Event('change'));
-              return { ok: true, filter: slug, applied: label };
+              return { ok: true, filter: args.themes[0] };
            }
         }
         return { ok: false, error: "Missing themes argument" };
-      }
-    },
-    browse_clear_filter: {
-      description: "Clear the theme filter (reset to All).",
-      handler() {
-        const themeSelect = document.getElementById("theme-filter");
-        if (!themeSelect) return { ok: false, error: "Theme filter control not found" };
-        themeSelect.value = THEME_FILTERS.all;
-        themeSelect.dispatchEvent(new Event('change'));
-        return { ok: true, filter: "all", applied: THEME_FILTERS.all };
       }
     },
 
@@ -173,14 +144,11 @@ export function initWebmcp() {
       }
     },
     entity_delete: {
-      description: "Delete (unpin) a shortlist item. Requires explicit confirm=true.",
+      description: "Delete (unpin) a shortlist item.",
       handler(args) {
         args = args || {};
         const name = args.entity_fields?.feature_name;
         if (!name) return { ok: false, error: "Missing feature_name" };
-        if (args.confirm !== true) {
-          return { ok: false, error: "Delete requires explicit confirm=true" };
-        }
         const unpinBtn = document.querySelector(`button.btn-unpin[data-feature="${name}"]`);
         if (unpinBtn) unpinBtn.click();
         else if (window.appMutations) window.appMutations.unpinFeature(name);

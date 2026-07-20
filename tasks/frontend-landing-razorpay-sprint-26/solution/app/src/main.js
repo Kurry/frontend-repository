@@ -290,10 +290,8 @@ function initVideoModal() {
   const video = document.getElementById("dynamic-video");
   const close = document.querySelector(".video-close-button");
   if (!modal || !box || !video) return;
-  let lastTrigger = null;
 
-  function open(id, trigger) {
-    lastTrigger = trigger || document.activeElement;
+  function open(id) {
     video.poster = `/assets/video-thumbs/${id}.jpg`;
     // Prefer VP9 webm (broad codec support incl. headless chromium); fall back
     // to h264 mp4 when webm is unplayable.
@@ -319,7 +317,6 @@ function initVideoModal() {
     box.style.opacity = "1";
     box.style.transform = "scale(1)";
     document.body.style.overflow = "hidden";
-    if (close) close.focus();
   }
   function shut() {
     modal.style.opacity = "0";
@@ -333,15 +330,11 @@ function initVideoModal() {
     video.removeAttribute("src");
     video.removeAttribute("poster");
     document.body.style.overflow = "";
-    if (lastTrigger && typeof lastTrigger.focus === "function" && document.contains(lastTrigger)) {
-      lastTrigger.focus();
-    }
-    lastTrigger = null;
   }
   document.addEventListener("click", (e) => {
     const trigger = e.target.closest("[data-video]");
     if (trigger) {
-      open(trigger.getAttribute("data-video"), trigger);
+      open(trigger.getAttribute("data-video"));
       return;
     }
   });
@@ -352,7 +345,7 @@ function initVideoModal() {
     media.style.cursor = "pointer";
     media.addEventListener("click", (e) => {
       if (e.target.closest("[data-video]")) return;
-      open(play.getAttribute("data-video"), play);
+      open(play.getAttribute("data-video"));
     });
   });
   if (close) close.addEventListener("click", shut);
@@ -723,12 +716,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const paletteResults = document.getElementById('palette-results');
 
   if (cmdPalette) {
-    let paletteOpener = null;
-
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        paletteOpener = document.activeElement;
         cmdPalette.style.display = 'flex';
         void cmdPalette.offsetWidth;
         cmdPalette.style.opacity = '1';
@@ -774,10 +764,8 @@ document.addEventListener('DOMContentLoaded', () => {
        cmdPalette.querySelector('#command-palette-inner').style.transform = 'translateY(-20px)';
        setTimeout(() => {
           cmdPalette.style.display = 'none';
-          if (paletteOpener && typeof paletteOpener.focus === 'function' && document.contains(paletteOpener)) {
-             paletteOpener.focus();
-          }
-          paletteOpener = null;
+          const opener = document.querySelector(':focus');
+          if (opener) opener.focus();
        }, 200);
     }
 
@@ -870,38 +858,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   };
 
-  window.generateBriefMarkdown = function (data) {
-    const list = (items) => (items.length ? items.map((i) => `- ${i}`) : ["- (none)"]);
-    return [
-      `# ${data.brand} — ${data.event} Sprint Brief`,
-      "",
-      `Generated at: ${data.generatedAt}`,
-      "",
-      "## Shortlisted launches",
-      ...list(data.shortlistedFeatures),
-      "",
-      "## Compare set",
-      ...list(data.compareFeatures),
-      "",
-      "## Theme filter",
-      `- ${data.themeFilter}`,
-      "",
-      "## Search",
-      `- ${data.searchQuery || "(none)"}`,
-      "",
-      "## Watched executives",
-      ...list(data.watchedExecutives)
-    ].join("\n");
-  };
 
-  window.updateBriefPreview = function () {
-    const data = window.generateBriefData();
-    if (jsonContent) jsonContent.textContent = JSON.stringify(data, null, 2);
-    if (markdownContent) {
-      markdownContent.style.whiteSpace = "pre-wrap";
-      markdownContent.textContent = window.generateBriefMarkdown(data);
-    }
-  };
 
   if (btnExport && briefPanel) {
     btnExport.addEventListener("click", () => {
@@ -979,9 +936,6 @@ document.addEventListener("DOMContentLoaded", () => {
       window.appState.themeFilter = parsed.themeFilter;
       window.appState.searchQuery = parsed.searchQuery;
       window.appState.watchLog = parsed.watchedExecutives;
-      window.appState.undoStack = [];
-      window.appState.redoStack = [];
-      updateUndoRedoButtons();
 
       const themeSelect = document.getElementById("theme-filter");
       if (themeSelect) themeSelect.value = window.appState.themeFilter;
