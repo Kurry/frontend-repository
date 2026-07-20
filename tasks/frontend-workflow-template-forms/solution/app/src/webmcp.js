@@ -80,6 +80,11 @@ async function invoke(name, args = {}) {
     else throw new Error('Destination is not declared.')
     return { ok: true, destination: args.destination }
   }
+  if (name === 'browse_sort') {
+    const currentSort = studioActions().librarySort || 'none'
+    studioActions().setChrome({ librarySort: currentSort === 'asc' ? 'desc' : 'asc' })
+    return { ok: true, sorted: studioActions().librarySort }
+  }
   if (name.startsWith('browse_')) return unavailable(name.slice(7))
 
   if (name === 'entity_create') {

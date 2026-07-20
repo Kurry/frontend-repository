@@ -498,6 +498,8 @@ a:focus-visible,
 .library-list { border-top: 1px solid #cfd4dc; }
 .list-head, .library-row { display: grid; grid-template-columns: minmax(280px, 1fr) 170px 110px 94px; align-items: center; }
 .list-head { min-height: 38px; padding: 0 12px; color: #727a86; font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+.sort-button { border: none; background: transparent; color: inherit; font: inherit; padding: 0; cursor: pointer; text-align: left; letter-spacing: inherit; text-transform: inherit; font-weight: inherit; }
+.sort-button:hover { color: #0f62fe; }
 .library-row { position: relative; min-height: 92px; border-bottom: 1px solid #dfe3e8; background: rgba(255,255,255,.78); animation: library-in 180ms var(--ease-out); transition: opacity 150ms ease, transform 150ms ease, background 150ms ease; }
 .library-row:hover { background: #edf3ff; }
 .library-row.is-deleting { opacity: 0; transform: translateX(12px); }
@@ -506,7 +508,7 @@ a:focus-visible,
 .row-icon { flex: none; width: 40px; height: 40px; display: grid; place-items: center; color: #0f62fe; border: 1px solid #b9cdf4; background: #f1f6ff; font-family: var(--font-mono); font-size: 11px; }
 .row-copy { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
 .row-copy strong { overflow: hidden; font-size: 14px; font-weight: 550; text-overflow: ellipsis; white-space: nowrap; }
-.row-copy small { display: -webkit-box; overflow: hidden; color: #6c7480; font-size: 11px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+.row-copy small { display: -webkit-box; overflow: hidden; color: #6c7480; font-size: 11px; line-height: 1.35; -webkit-box-orient: vertical; -webkit-line-clamp: 1; word-break: break-all; overflow-wrap: anywhere; }
 .row-time { display: flex; flex-direction: column; gap: 3px; }
 .row-time strong { color: #3e4652; font-size: 11px; font-weight: 500; }
 .row-time span { color: #777f8b; font-size: 10px; }

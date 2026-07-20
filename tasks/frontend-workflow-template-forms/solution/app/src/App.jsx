@@ -79,7 +79,7 @@ function AppHeader() {
   return (
     <header className="app-header">
       <button type="button" className="brand" onClick={() => setView('forms')} aria-label="Template Forms home">
-        <span className="brand-mark"><IbmGranite size={20} /></span>
+        <span className="brand-mark"><IbmGranite size={20} aria-hidden="true" /></span>
         <span><strong>Template</strong> Forms</span>
       </button>
       <nav className="view-nav" aria-label="Primary navigation">
@@ -155,7 +155,6 @@ export default function App() {
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <AppHeader />
       {activeView === 'forms' ? <FormsView /> : <LibraryView />}
-      <ImportModal />
       <ToastRegion />
     </div>
   )
