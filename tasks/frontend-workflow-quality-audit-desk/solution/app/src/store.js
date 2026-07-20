@@ -121,6 +121,7 @@ export const useAuditStore = defineStore('audit', {
       const run=this.runs[slug]
       const steps=run.steps
       this.markMutation(record,'run-started','Deterministic nine-step audit started.')
+      this.liveMessage=`${record.slug} audit run started`
       const start=Date.now()
       const work=(async()=>{
         for(let i=0;i<steps.length;i++){
