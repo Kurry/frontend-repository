@@ -1,11 +1,22 @@
 {
   "name": "oracle-static",
   "private": true,
+  "type": "module",
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "verify:build": "npm run build && node -e \"require('fs').accessSync('dist/index.html')\"",
+    "start": "npx --yes serve dist -l 3000 -n"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "@tailwindcss/vite": "4.3.2",
+    "daisyui": "5.0.0-beta.8",
+    "pako": "^2.1.0",
+    "serve": "14.2.4",
+    "tailwindcss": "4.3.2"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
   }
 }
