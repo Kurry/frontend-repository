@@ -102,7 +102,7 @@
   li button { display: flex; width: 100%; min-height: 36px; align-items: center; justify-content: space-between; gap: 9px; border: 0; border-radius: 8px; background: transparent; padding: 6px 7px; color: #3d4b45; text-align: left; transition: background-color 150ms ease, transform 120ms ease; }
   li button:hover { background: #f0f5f2; }
   li button:active { transform: scale(.995); }
-  li button > span:first-child { max-width: 75%; overflow: hidden; font-size: 9px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+  li button > span:first-child { max-width: 75%; overflow: hidden; font-size: 12px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
   .empty-list { display: flex; min-height: 42px; align-items: center; gap: 7px; border: 1px dashed #dbe3df; border-radius: 9px; padding: 9px; color: #7a8781; font-size: 10px; line-height: 1.35; }
   .correlation { border-top: 1px solid #e2e8e4; padding-top: 14px; }
   .correlation-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }

@@ -92,7 +92,11 @@ export function registerWebMcpTools(): void {
       name: 'entity_select',
       description: 'Select a test in the active suite and show its detail.',
       inputSchema: objectSchema({ testId: { type: 'string', minLength: 1, maxLength: 180 } }, ['testId']),
-      execute: ({ testId }) => ({ selected: triage.selectTest(String(testId)), testId }),
+      execute: ({ testId }) => {
+        const id = String(testId);
+        const selected = triage.selectTest(id);
+        return { selected, testId: id, selectedTestId: triage.selectedTestId };
+      },
     },
     {
       name: 'entity_update',
@@ -116,7 +120,13 @@ export function registerWebMcpTools(): void {
         },
         ['testId', 'runCount'],
       ),
-      execute: ({ testId, runCount }) => ({ started: triage.startRerun(String(testId), { runCount: runCount as RunCount }), testId, runCount }),
+      execute: ({ testId, runCount }) => {
+        const id = String(testId);
+        triage.selectTest(id);
+        triage.openRerun(id);
+        const started = triage.startRerun(id, { runCount: runCount as RunCount });
+        return { started, testId: id, runCount, status: triage.rerunFor(id)?.status ?? null };
+      },
     },
     {
       name: 'session_stop',
@@ -129,8 +139,9 @@ export function registerWebMcpTools(): void {
       description: 'Open a live export preview for a declared report format.',
       inputSchema: objectSchema({ format: { type: 'string', enum: ['quarantine-text', 'triage-report-json'] } }, ['format']),
       execute: ({ format }) => {
-        triage.openExport(format as 'quarantine-text' | 'triage-report-json');
-        return { opened: true, format, suiteId: triage.activeSuite.id };
+        const selected = format as 'quarantine-text' | 'triage-report-json';
+        triage.openExport(selected);
+        return { opened: triage.exportOpen, format: selected, suiteId: triage.activeSuite.id };
       },
     },
     {
@@ -140,7 +151,7 @@ export function registerWebMcpTools(): void {
       execute: async ({ format }) => {
         const selected = format as 'quarantine-text' | 'triage-report-json';
         triage.openExport(selected);
-        return { copied: await triage.copyExport(selected), format };
+        return { copied: await triage.copyExport(selected), format: selected };
       },
     },
     {
@@ -149,7 +160,7 @@ export function registerWebMcpTools(): void {
       inputSchema: objectSchema({ mode: { type: 'string', enum: ['replace-suite'] } }, ['mode']),
       execute: ({ mode }) => {
         triage.openImport();
-        return { opened: true, mode };
+        return { opened: triage.importOpen, mode };
       },
     },
   ];

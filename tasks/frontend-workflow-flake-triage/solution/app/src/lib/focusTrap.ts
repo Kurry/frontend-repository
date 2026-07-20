@@ -1,61 +1,109 @@
 export function focusTrap(node: HTMLElement, { returnFocus }: { returnFocus?: HTMLElement | null } = {}) {
-  const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-  let focusTarget = returnFocus;
+  const focusableSelector =
+    'button:not([disabled]):not([tabindex="-1"]), [href], input:not([disabled]):not([tabindex="-1"]), select:not([disabled]):not([tabindex="-1"]), textarea:not([disabled]):not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])';
+  let focusTarget = returnFocus ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
 
-  function keydownHandler(e: KeyboardEvent) {
-    if (e.key !== 'Tab') return;
+  function getFocusable(): HTMLElement[] {
+    return Array.from(node.querySelectorAll<HTMLElement>(focusableSelector)).filter((el) => {
+      if (el.closest('[inert]')) return false;
+      if (el.getAttribute('aria-hidden') === 'true') return false;
+      const style = window.getComputedStyle(el);
+      if (style.display === 'none' || style.visibility === 'hidden') return false;
+      return el.offsetWidth > 0 || el.offsetHeight > 0 || el.getClientRects().length > 0;
+    });
+  }
 
-    const focusable = Array.from(node.querySelectorAll<HTMLElement>(focusableElements)).filter(
-      (el) => !el.hasAttribute('disabled') && el.tabIndex !== -1 && el.offsetParent !== null
-    );
+  function focusInitial(): void {
+    const autofocus = node.querySelector<HTMLElement>('[data-autofocus]');
+    if (autofocus && !autofocus.hasAttribute('disabled')) {
+      autofocus.focus();
+      return;
+    }
+    const focusable = getFocusable();
+    if (focusable.length > 0) {
+      focusable[0].focus();
+      return;
+    }
+    if (!node.hasAttribute('tabindex')) node.tabIndex = -1;
+    node.focus();
+  }
 
+  function redirectFocus(preferLast = false): void {
+    const focusable = getFocusable();
+    if (focusable.length > 0) {
+      (preferLast ? focusable[focusable.length - 1] : focusable[0]).focus();
+      return;
+    }
+    node.focus();
+  }
+
+  function keydownHandler(event: KeyboardEvent): void {
+    if (event.key !== 'Tab') return;
+
+    const focusable = getFocusable();
     if (focusable.length === 0) {
-      e.preventDefault();
+      event.preventDefault();
+      event.stopPropagation();
+      node.focus();
       return;
     }
 
     const first = focusable[0];
     const last = focusable[focusable.length - 1];
+    const active = document.activeElement;
 
-    if (e.shiftKey && document.activeElement === first) {
+    if (!node.contains(active)) {
+      event.preventDefault();
+      event.stopPropagation();
+      redirectFocus(event.shiftKey);
+      return;
+    }
+
+    if (event.shiftKey && active === first) {
+      event.preventDefault();
+      event.stopPropagation();
       last.focus();
-      e.preventDefault();
-    } else if (!e.shiftKey && document.activeElement === last) {
+      return;
+    }
+
+    if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      event.stopPropagation();
       first.focus();
-      e.preventDefault();
     }
   }
 
-  node.addEventListener('keydown', keydownHandler);
-  
-  // Set initial focus
-  const focusable = Array.from(node.querySelectorAll<HTMLElement>(focusableElements)).filter(
-    (el) => !el.hasAttribute('disabled') && el.tabIndex !== -1 && el.offsetParent !== null
-  );
-  const initialFocus = node.querySelector<HTMLElement>('[data-autofocus]');
-  if (initialFocus && !initialFocus.hasAttribute('disabled')) {
-    initialFocus.focus();
-  } else if (focusable.length > 0) {
-    focusable[0].focus();
-  } else {
-    node.focus();
+  function focusInHandler(event: FocusEvent): void {
+    const target = event.target;
+    if (!(target instanceof Node) || node.contains(target)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    redirectFocus();
   }
+
+  document.addEventListener('keydown', keydownHandler, true);
+  document.addEventListener('focusin', focusInHandler, true);
+  requestAnimationFrame(focusInitial);
 
   return {
     update({ returnFocus: nextReturnFocus }: { returnFocus?: HTMLElement | null } = {}) {
-      focusTarget = nextReturnFocus;
+      if (nextReturnFocus) focusTarget = nextReturnFocus;
     },
     destroy() {
-      node.removeEventListener('keydown', keydownHandler);
+      document.removeEventListener('keydown', keydownHandler, true);
+      document.removeEventListener('focusin', focusInHandler, true);
       const target = focusTarget;
-      setTimeout(() => {
-        if (target?.isConnected && !target.hidden && !target.hasAttribute('disabled')) {
-          target.focus();
-          return;
+      requestAnimationFrame(() => {
+        if (target?.isConnected && !target.hasAttribute('disabled') && target.getAttribute('aria-hidden') !== 'true') {
+          const style = window.getComputedStyle(target);
+          if (style.display !== 'none' && style.visibility !== 'hidden' && !target.hidden) {
+            target.focus();
+            return;
+          }
         }
-        const fallback = target?.closest<HTMLElement>('section');
-        if (fallback?.isConnected) fallback.focus();
-      }, 0);
-    }
+        const fallback = document.querySelector<HTMLElement>('[data-rerun-opener="true"], #test-detail, #triage-queue');
+        fallback?.focus?.();
+      });
+    },
   };
 }
