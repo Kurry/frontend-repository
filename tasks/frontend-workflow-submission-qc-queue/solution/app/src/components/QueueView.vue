@@ -1,6 +1,6 @@
 <script setup>
 import { computed, h } from 'vue'
-import { NButton, NCheckbox, NDataTable, NSelect } from 'naive-ui'
+import { NButton, NCheckbox, NDataTable } from 'naive-ui'
 import { useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
@@ -11,7 +11,7 @@ import IconInbox from '~icons/lucide/inbox'
 import IconLayers from '~icons/lucide/layers-3'
 import IconPause from '~icons/lucide/pause-circle'
 import IconX from '~icons/lucide/x'
-import { contributors, openFindingCounts, useQcStore } from '../store'
+import { contributors, useQcStore } from '../store'
 import StatusPill from './StatusPill.vue'
 import TierChips from './TierChips.vue'
 
@@ -97,7 +97,7 @@ const columns = [
   { title: 'Stage', key: 'stage', width: 152, render: (row) => h(StatusPill, { kind: row.stage }) },
   {
     title: () => h('span', { class: 'table-heading-with-meta' }, ['Findings', h('small', {}, 'OPEN')]),
-    key: 'findings', minWidth: 220, sorter: (a, b) => openFindingCounts(a).blocker + openFindingCounts(a).major + openFindingCounts(a).minor - openFindingCounts(b).blocker - openFindingCounts(b).major - openFindingCounts(b).minor,
+    key: 'findings', minWidth: 220,
     render: (row) => h(TierChips, { submission: row }),
   },
   { title: 'Payout', key: 'payout_state', width: 120, render: (row) => h(StatusPill, { kind: row.payout_state, type: 'payout' }) },
@@ -178,7 +178,8 @@ function rowProps(row) {
         :row-key="(row) => row.id"
         :row-props="rowProps"
         :bordered="false"
-        :single-line="false" :scroll-x="900"
+        :single-line="false"
+        :scroll-x="920"
         class="queue-table"
       />
       <div v-else class="designed-empty table-empty">

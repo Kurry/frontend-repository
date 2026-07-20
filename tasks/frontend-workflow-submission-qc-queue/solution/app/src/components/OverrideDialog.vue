@@ -14,12 +14,12 @@ const submit = handleSubmit(async (values) => { if (store.overrideFinding(submis
 watch(() => store.dialogs.override, async (open) => { if (open) { await nextTick(); await validate() } })
 </script>
 <template>
-  <NModal v-model:show="store.dialogs.override" :mask-closable="true" class="review-modal" transform-origin="center">
-    <NCard role="dialog" aria-modal="true" aria-labelledby="override-title" class="modal-card">
+  <NModal v-if="store.dialogs.override" :show="true" :mask-closable="true" :close-on-esc="true" display-directive="if" class="review-modal" transform-origin="center" @update:show="(v) => { if (!v) store.dialogs.override = false }" @esc="store.dialogs.override = false">
+    <NCard role="dialog" aria-modal="true" aria-labelledby="override-title" class="modal-card" tabindex="-1">
       <div class="modal-heading"><span class="modal-icon override-icon"><IconShieldOff /></span><div><p class="eyebrow">Gate exception</p><h2 id="override-title">Override finding</h2><p>The finding remains in the record but stops counting toward the gate.</p></div></div>
       <form class="review-form" novalidate @submit.prevent="submit">
         <Field v-slot="{ value, handleChange, handleBlur, errorMessage }" name="justification">
-          <div class="form-field" :class="{ invalid: errorMessage || !value || value.trim().length < 10 }"><label for="justification">Justification <b>Min. 10 characters</b></label><NInput :input-props="{ id: 'justification' }" id="justification" :value="value" type="textarea" :autosize="{ minRows: 4, maxRows: 8 }" placeholder="Explain why this exception is appropriate…" aria-describedby="justification-error" @update:value="handleChange" @blur="handleBlur" /></div><p v-if="errorMessage || !value || value.trim().length < 10" id="justification-error" class="field-error" aria-live="polite">{{ errorMessage || 'Justification must be at least 10 characters.' }}</p>
+          <div class="form-field" :class="{ invalid: errorMessage || !value || value.trim().length < 10 }"><label for="justification">Justification <b>Min. 10 characters</b></label><NInput :input-props="{ id: 'justification', name: 'justification', 'aria-label': 'Justification', 'aria-describedby': 'justification-error' }" :value="value" type="textarea" :autosize="{ minRows: 4, maxRows: 8 }" placeholder="Explain why this exception is appropriate…" @update:value="handleChange" @blur="handleBlur" /></div><p v-if="errorMessage || !value || value.trim().length < 10" id="justification-error" class="field-error" role="alert" aria-live="assertive">{{ errorMessage || 'Justification must be at least 10 characters.' }}</p>
         </Field>
         <div class="modal-actions"><NButton @click="store.dialogs.override = false">Cancel</NButton><NButton attr-type="submit" type="primary" :disabled="!meta.valid || isSubmitting" :loading="isSubmitting"><IconShieldOff /> Confirm override</NButton></div>
       </form>

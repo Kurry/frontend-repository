@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import { NDrawer, NDrawerContent } from 'naive-ui'
 import IconClock from '~icons/lucide/clock-3'
 import IconFileText from '~icons/lucide/file-text'
@@ -8,15 +8,34 @@ import { contributors, useQcStore } from '../store'
 import StatusPill from './StatusPill.vue'
 
 const store = useQcStore()
+const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1200)
+function onResize() { viewportWidth.value = window.innerWidth }
+onMounted(() => window.addEventListener('resize', onResize))
+onBeforeUnmount(() => window.removeEventListener('resize', onResize))
+
+const drawerWidth = computed(() => (viewportWidth.value <= 768 ? Math.min(viewportWidth.value, 520) : 520))
 const profile = computed(() => contributors.find((c) => c.name === store.drawerContributor))
 const submissions = computed(() => store.drawerContributor ? store.contributorSubmissions(store.drawerContributor) : [])
 const timeline = computed(() => store.drawerContributor ? store.contributorTimeline(store.drawerContributor) : [])
 function openSubmission(id) { store.drawerContributor = null; store.openSubmission(id) }
+function closeDrawer() { store.drawerContributor = null }
 </script>
 
 <template>
-  <NDrawer :show="!!store.drawerContributor" :width="520" placement="right" :block-scroll="true" :trap-focus="true" :auto-focus="true" @mask-click="store.drawerContributor = null" @update:show="!$event && (store.drawerContributor = null)">
-    <NDrawerContent closable :native-scrollbar="false" class="contributor-drawer" @close="store.drawerContributor = null">
+  <NDrawer
+    :show="!!store.drawerContributor"
+    :width="drawerWidth"
+    placement="right"
+    :block-scroll="true"
+    :trap-focus="true"
+    :auto-focus="true"
+    display-directive="show"
+    class="contributor-drawer-host"
+    @mask-click="closeDrawer"
+    @esc="closeDrawer"
+    @update:show="!$event && closeDrawer()"
+  >
+    <NDrawerContent closable :native-scrollbar="false" class="contributor-drawer" @close="closeDrawer">
       <template #header><span class="drawer-kicker">Contributor record</span></template>
       <div v-if="profile" class="drawer-profile">
         <div class="profile-avatar">{{ profile.initials }}</div>
