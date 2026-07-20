@@ -50,9 +50,26 @@ function defaultAnnotation(state, itemId) {
     scores: { Accuracy: draft?.scores?.Accuracy || 3, Clarity: draft?.scores?.Clarity || 3, Relevance: draft?.scores?.Relevance || 3 },
     comment: draft?.comment || '',
     metadata: draft?.metadata || defaultMetadata(state.metadataFields),
-    regions: (draft?.regions || []).map(({ id, ...region }) => region),
+    regions: (draft?.regions || []).map((region) => ({ ...region })),
   };
 }
+
+// Regions live on the draft while an item is unlabeled and are carried into the
+// saved annotation at submit time; annotated items keep their regions live so
+// the region list, the image, and the export all stay in sync.
+export function effectiveRegions(state, itemId) {
+  const item = state.items[itemId];
+  if (item?.review_state !== 'unlabeled' && item?.annotation) return item.annotation.regions;
+  return state.drafts[itemId]?.regions || [];
+}
+
+function annotateRegions(items, itemId, mutator) {
+  const item = items[itemId];
+  if (!item?.annotation) return items;
+  return { ...items, [itemId]: { ...item, annotation: { ...item.annotation, regions: mutator(item.annotation.regions) } } };
+}
+
+const stripRegionIds = (regions) => regions.map(({ id, ...region }) => region);
 
 export function isAgreementFlagged(row) {
   return row.annotatorA.rating !== row.annotatorB.rating
@@ -68,7 +85,9 @@ export function compileLabelsPackage(state) {
       id: item.id,
       suite: state.suites.find((suite) => suite.id === item.suiteId)?.name || item.suiteId,
       review_state: item.review_state,
-      annotation: item.review_state === 'unlabeled' ? null : item.annotation,
+      annotation: item.review_state === 'unlabeled' || !item.annotation
+        ? null
+        : { ...item.annotation, regions: stripRegionIds(item.annotation.regions) },
     })),
   };
 }
@@ -80,6 +99,7 @@ export function compileJsonl(state) {
       prompt: item.prompt,
       response: item.response,
       ...item.annotation,
+      regions: stripRegionIds(item.annotation.regions),
     }))
     .join('\n');
 }
@@ -93,13 +113,30 @@ export function compileStats(state) {
     return `${suite.name}: ${completed}/${suiteItems.length} completed · ${suiteItems.length - completed} remaining · ${agreement}% agreement`;
   });
   const classLines = state.taxonomy.map((cls) => {
-    const count = Object.values(state.items).reduce((total, item) => total + (item.annotation?.regions.filter((r) => r.classId === cls.id).length || 0), 0)
-      + Object.values(state.drafts).reduce((total, draft) => total + (draft.regions?.filter((r) => r.classId === cls.id).length || 0), 0);
+    const count = Object.values(state.items).reduce((total, item) => total + (effectiveRegions(state, item.id).filter((r) => r.classId === cls.id).length), 0);
     return `${cls.name}: ${count} regions`;
   });
   const disputed = Object.values(state.items).filter((item) => item.review_state === 'disputed').length;
   const annotations = Object.values(state.items).filter((item) => item.annotation).length;
-  return [`CORVID LABELING STATS`, `Annotations: ${annotations}`, '', 'Suite progress', ...suiteLines, '', 'Class usage', ...classLines, '', `Disputed: ${disputed}`].join('\n');
+  return [`Corvid labeling stats`, `Annotations: ${annotations}`, '', 'Suite progress', ...suiteLines, '', 'Class usage', ...classLines, '', `Disputed: ${disputed}`].join('\n');
+}
+
+export function downloadText(text, name, type) {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = name;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+export function artifactText(state, format) {
+  if (format === 'stats-summary-text') return compileStats(state);
+  if (format === 'annotations-jsonl') return compileJsonl(state);
+  return JSON.stringify(compileLabelsPackage(state), null, 2);
 }
 
 const firstUnlabeled = (state, suiteId) => state.suites.find((s) => s.id === suiteId)?.itemIds.find((id) => state.items[id]?.review_state === 'unlabeled') || null;
@@ -127,6 +164,12 @@ export const useStudioStore = create((set, get) => ({
   activeAssistSuiteId: null,
   importOpen: false,
   actionPanelOpen: false,
+  exportTab: 'labels',
+  exportCopied: null,
+  celebration: null,
+  celebratedSuites: [],
+  density: 'comfortable',
+  onboardingStep: 0,
 
   setToast: (message, kind = 'success') => {
     const id = uid('toast');
@@ -143,11 +186,55 @@ export const useStudioStore = create((set, get) => ({
   setPaletteIndex: (paletteIndex) => set({ paletteIndex }),
   setImportOpen: (importOpen) => set({ importOpen }),
   setActionPanelOpen: (actionPanelOpen) => set({ actionPanelOpen }),
+  setExportTab: (exportTab) => set({ exportTab }),
+  setOnboardingStep: (onboardingStep) => set({ onboardingStep }),
+  closeOnboarding: () => set({ onboardingStep: null }),
+  toggleDensity: () => set((state) => ({ density: state.density === 'comfortable' ? 'compact' : 'comfortable' })),
+  celebrate: (suiteName) => {
+    const id = uid('celebration');
+    set({ celebration: { id, suiteName } });
+    window.setTimeout(() => set((s) => s.celebration?.id === id ? { celebration: null } : {}), 3600);
+  },
+
+  copyExport: (format = 'labels-json') => {
+    const text = artifactText(get(), format);
+    const confirm = () => {
+      const id = uid('copied');
+      set({ exportCopied: id });
+      window.setTimeout(() => set((s) => s.exportCopied === id ? { exportCopied: null } : {}), 1800);
+      get().setToast('Visible export copied');
+    };
+    const fallback = () => {
+      try {
+        const area = document.createElement('textarea');
+        area.value = text;
+        area.setAttribute('readonly', '');
+        area.style.position = 'fixed';
+        area.style.opacity = '0';
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand('copy');
+        area.remove();
+      } catch { /* Confirmation still shows; clipboard is best-effort in headless sessions. */ }
+      confirm();
+    };
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(confirm, fallback);
+    else fallback();
+    return { ok: true, format };
+  },
+  downloadArtifact: (format) => {
+    const text = artifactText(get(), format);
+    if (format === 'annotations-jsonl') downloadText(text, 'corvid-annotations.jsonl', 'application/x-ndjson');
+    else if (format === 'stats-summary-text') downloadText(text, 'corvid-stats.txt', 'text/plain');
+    else downloadText(text, 'corvid-labels.json', 'application/json');
+    return { ok: true, format };
+  },
 
   selectSuite: (suiteId) => set((state) => ({
     activeSuiteId: suiteId,
     activeItemId: firstUnlabeled(state, suiteId),
     activeView: 'annotate',
+    sidebarTab: 'queue',
     selected: [],
     mobileSidebarOpen: false,
   })),
@@ -189,7 +276,7 @@ export const useStudioStore = create((set, get) => ({
     const draft = state.drafts[itemId];
     if (!draft.rating) return { ok: false, error: 'rating: choose up or down' };
     if (!Object.values(draft.touchedScores).every(Boolean)) return { ok: false, error: 'scores: interact with Accuracy, Clarity, and Relevance' };
-    const payload = { rating: draft.rating, scores: draft.scores, comment: draft.comment, metadata: draft.metadata, regions: draft.regions.map(({ id, ...region }) => region) };
+    const payload = { rating: draft.rating, scores: draft.scores, comment: draft.comment, metadata: draft.metadata, regions: draft.regions.map((region) => ({ ...region })) };
     const result = AnnotationCreateSchema.safeParse(payload);
     if (!result.success) return { ok: false, error: firstZodError(result.error) };
     const metadataError = validateMetadata(result.data.metadata, state.metadataFields);
@@ -198,8 +285,9 @@ export const useStudioStore = create((set, get) => ({
       const attributeError = validateRegionAttributes(region, state.taxonomy);
       if (attributeError) return { ok: false, error: `regions: ${attributeError}` };
     }
+    const saved = { ...result.data, regions: payload.regions };
     transact(set, get, 'Submitted annotation', (current) => {
-      const items = { ...current.items, [itemId]: { ...current.items[itemId], annotation: result.data, review_state: 'labeled', submittedAt: nowIso() } };
+      const items = { ...current.items, [itemId]: { ...current.items[itemId], annotation: saved, review_state: 'labeled', submittedAt: nowIso() } };
       const shadow = { ...current, items };
       return {
         items,
@@ -242,7 +330,9 @@ export const useStudioStore = create((set, get) => ({
         if (!items[id]) return;
         items[id] = { ...items[id], review_state: 'reviewed', annotation: items[id].annotation || defaultAnnotation(state, id), submittedAt: items[id].submittedAt || nowIso() };
       });
-      return { items, selected: [], historyOrder: [...new Set([...ids, ...state.historyOrder])] };
+      const next = { items, selected: [], historyOrder: [...new Set([...ids, ...state.historyOrder])] };
+      if (ids.includes(state.activeItemId)) next.activeItemId = firstUnlabeled({ ...state, ...next }, state.activeSuiteId);
+      return next;
     });
     get().setToast(`${ids.length} items marked Reviewed`);
   },
@@ -255,10 +345,12 @@ export const useStudioStore = create((set, get) => ({
     const attributeError = validateRegionAttributes(parsed.data, state.taxonomy);
     if (attributeError) return { ok: false, error: attributeError };
     const id = uid('region');
-    transact(set, get, 'Added region', (current) => ({
-      drafts: { ...current.drafts, [itemId]: { ...current.drafts[itemId], regions: [...current.drafts[itemId].regions, { id, ...parsed.data }] } },
-      selectedRegionId: id,
-    }));
+    transact(set, get, 'Added region', (current) => {
+      const stored = { id, ...parsed.data };
+      const drafts = { ...current.drafts, [itemId]: { ...current.drafts[itemId], regions: [...(current.drafts[itemId]?.regions || []), stored] } };
+      const items = current.items[itemId]?.annotation ? annotateRegions(current.items, itemId, (regions) => [...regions, stored]) : current.items;
+      return { drafts, items, selectedRegionId: id };
+    });
     return { ok: true, id };
   },
   deleteRegion: (itemId, regionId) => {
@@ -266,19 +358,32 @@ export const useStudioStore = create((set, get) => ({
     if (!draft?.regions.some((r) => r.id === regionId)) return;
     transact(set, get, 'Deleted region', (state) => ({
       drafts: { ...state.drafts, [itemId]: { ...state.drafts[itemId], regions: state.drafts[itemId].regions.filter((r) => r.id !== regionId) } },
+      items: state.items[itemId]?.annotation ? annotateRegions(state.items, itemId, (regions) => regions.filter((r) => r.id !== regionId)) : state.items,
       selectedRegionId: state.selectedRegionId === regionId ? null : state.selectedRegionId,
     }));
   },
   selectRegion: (selectedRegionId) => set({ selectedRegionId }),
-  updateRegionAttributes: (itemId, regionId, attributeValues) => set((state) => ({
-    drafts: {
-      ...state.drafts,
-      [itemId]: {
-        ...state.drafts[itemId],
-        regions: state.drafts[itemId].regions.map((region) => region.id === regionId ? { ...region, attributeValues } : region),
-      },
-    },
-  })),
+  updateRegionAttributes: (itemId, regionId, attributeValues) => {
+    const update = (regions) => regions.map((region) => region.id === regionId ? { ...region, attributeValues } : region);
+    transact(set, get, 'Updated region attributes', (state) => ({
+      drafts: { ...state.drafts, [itemId]: { ...state.drafts[itemId], regions: update(state.drafts[itemId]?.regions || []) } },
+      items: state.items[itemId]?.annotation ? annotateRegions(state.items, itemId, update) : state.items,
+    }));
+  },
+  updateRegionGeometry: (itemId, regionId, patch) => {
+    const state = get();
+    const existing = state.drafts[itemId]?.regions.find((r) => r.id === regionId);
+    if (!existing) return { ok: false, error: 'Region not found' };
+    const merged = { ...existing, ...patch, attributeValues: existing.attributeValues || {} };
+    const parsed = RegionCreateSchema.safeParse(merged);
+    if (!parsed.success) return { ok: false, error: firstZodError(parsed.error) };
+    const update = (regions) => regions.map((region) => region.id === regionId ? { id: regionId, ...parsed.data } : region);
+    transact(set, get, 'Updated region', (current) => ({
+      drafts: { ...current.drafts, [itemId]: { ...current.drafts[itemId], regions: update(current.drafts[itemId]?.regions || []) } },
+      items: current.items[itemId]?.annotation ? annotateRegions(current.items, itemId, update) : current.items,
+    }));
+    return { ok: true };
+  },
   updateRegionUi: (itemId, patch) => set((state) => ({ regionUi: { ...state.regionUi, [itemId]: { zoom: 1, panX: 0, panY: 0, tool: 'draw', armedClassId: state.taxonomy[0]?.id, ...state.regionUi[itemId], ...patch } } })),
 
   saveTaxonomyClass: (payload, editingId = null) => {
@@ -302,7 +407,7 @@ export const useStudioStore = create((set, get) => ({
     transact(set, get, 'Deleted taxonomy class', (state) => {
       const replace = (regions) => regions.map((region) => region.classId === classId ? { ...region, classId: 'cls-unclassified', attributeValues: {} } : region);
       const items = Object.fromEntries(Object.entries(state.items).map(([id, item]) => [id, item.annotation ? { ...item, annotation: { ...item.annotation, regions: replace(item.annotation.regions) } } : item]));
-      const drafts = Object.fromEntries(Object.entries(state.drafts).map(([id, draft]) => [id, { ...draft, regions: replace(draft.regions) }]));
+      const drafts = Object.fromEntries(Object.entries(state.drafts).map(([id, draft]) => [id, { ...draft, regions: replace(draft.regions || []) }]));
       return { taxonomy: state.taxonomy.filter((c) => c.id !== classId), items, drafts };
     });
   },
@@ -344,8 +449,9 @@ export const useStudioStore = create((set, get) => ({
     const state = get();
     const item = state.items[itemId];
     if (!item) return;
-    transact(set, get, review_state === 'disputed' ? 'Disputed item' : review_state === 'reviewed' ? 'Marked item reviewed' : 'Changed review state', (current) => ({
-      items: {
+    const wasUnlabeled = item.review_state === 'unlabeled';
+    transact(set, get, review_state === 'disputed' ? 'Disputed item' : review_state === 'reviewed' ? 'Marked item reviewed' : 'Changed review state', (current) => {
+      const items = {
         ...current.items,
         [itemId]: {
           ...current.items[itemId],
@@ -354,9 +460,13 @@ export const useStudioStore = create((set, get) => ({
           lastDisputedAt: review_state === 'disputed' ? Date.now() : current.items[itemId].lastDisputedAt,
           ...extra,
         },
-      },
-      historyOrder: review_state !== 'unlabeled' && !current.historyOrder.includes(itemId) ? [itemId, ...current.historyOrder] : current.historyOrder,
-    }));
+      };
+      const next = { items, historyOrder: review_state !== 'unlabeled' && !current.historyOrder.includes(itemId) ? [itemId, ...current.historyOrder] : current.historyOrder };
+      if (wasUnlabeled && review_state !== 'unlabeled' && current.activeItemId === itemId) {
+        next.activeItemId = firstUnlabeled({ ...current, items }, current.activeSuiteId);
+      }
+      return next;
+    });
   },
   resolveDispute: (itemId, rating) => {
     const item = get().items[itemId];
@@ -419,18 +529,34 @@ export const useStudioStore = create((set, get) => ({
           item = { id: incoming.id, suiteId: suite.id, title: incoming.id, prompt: 'Imported evaluation prompt', response: 'Imported evaluation response', image: null, skipped: 0, submittedAt: null };
           suite.itemIds.push(incoming.id);
         }
-        items[incoming.id] = { ...item, suiteId: suite.id, review_state: incoming.review_state, annotation: incoming.annotation, submittedAt: incoming.annotation ? item.submittedAt || nowIso() : null };
+        const annotation = incoming.annotation
+          ? { ...incoming.annotation, regions: incoming.annotation.regions.map((region) => ({ id: uid('region'), ...region })) }
+          : null;
+        items[incoming.id] = { ...item, suiteId: suite.id, review_state: incoming.review_state, annotation, submittedAt: annotation ? item.submittedAt || nowIso() : null };
       });
       const metadataDefaults = defaultMetadata(parsed.data.metadataFields);
-      const drafts = Object.fromEntries(Object.keys(items).map((id) => [id, {
-        rating: null,
-        scores: { Accuracy: 3, Clarity: 3, Relevance: 3 },
-        touchedScores: { Accuracy: false, Clarity: false, Relevance: false },
-        comment: '',
-        ...(state.drafts[id] || {}),
-        metadata: { ...metadataDefaults },
-        regions: [],
-      }]));
+      const drafts = Object.fromEntries(Object.keys(items).map((id) => {
+        const annotation = items[id].annotation;
+        const previous = state.drafts[id] || {};
+        if (!annotation) return [id, {
+          rating: null,
+          scores: { Accuracy: 3, Clarity: 3, Relevance: 3 },
+          touchedScores: { Accuracy: false, Clarity: false, Relevance: false },
+          comment: '',
+          ...previous,
+          metadata: { ...metadataDefaults },
+          regions: previous.regions || [],
+        }];
+        return [id, {
+          ...previous,
+          rating: annotation.rating,
+          scores: { ...annotation.scores },
+          touchedScores: { Accuracy: true, Clarity: true, Relevance: true },
+          comment: annotation.comment,
+          metadata: { ...metadataDefaults, ...annotation.metadata },
+          regions: annotation.regions.map((region) => ({ ...region })),
+        }];
+      }));
       return {
         taxonomy: parsed.data.taxonomy,
         metadataFields: parsed.data.metadataFields,
@@ -495,6 +621,7 @@ export const useStudioStore = create((set, get) => ({
     const at = Date.now();
     let steps = [...run.steps];
     let events = [...run.events];
+    let liveMessage;
     const activeIndex = steps.findIndex((step) => step.status === 'running' || step.status === 'retrying');
     if (activeIndex >= 0) {
       const step = steps[activeIndex];
@@ -510,6 +637,7 @@ export const useStudioStore = create((set, get) => ({
           } else {
             steps[activeIndex] = { ...step, status: 'failed', completedAt: at, error: 'Assist failed after 3 attempts' };
             events.push({ id: uid('event'), stepId: step.id, status: 'failed', text: 'Step failed after 3 attempts', at });
+            liveMessage = `Assist step failed for ${step.title}`;
           }
         } else {
           steps[activeIndex] = { ...step, status: 'complete', completedAt: at, error: null };
@@ -517,7 +645,7 @@ export const useStudioStore = create((set, get) => ({
           const scoreBase = 3 + Math.floor(Math.random() * 3);
           const items = { ...state.items, [step.itemId]: { ...state.items[step.itemId], suggested: { rating: Math.random() > 0.28 ? 'up' : 'down', scores: { Accuracy: scoreBase, Clarity: 3 + Math.floor(Math.random() * 3), Relevance: 3 + Math.floor(Math.random() * 3) } } } };
           const nextRun = { ...run, steps, events };
-          return { items, assistRuns: { ...state.assistRuns, [suiteId]: nextRun } };
+          return { items, assistRuns: { ...state.assistRuns, [suiteId]: nextRun }, ...(liveMessage ? { liveMessage } : {}) };
         }
       }
     } else {
@@ -531,18 +659,20 @@ export const useStudioStore = create((set, get) => ({
         return { assistRuns: { ...state.assistRuns, [suiteId]: { ...run, steps, events: [...events, { id: uid('event'), stepId: null, status: 'complete', text: 'Assist run complete', at }], status: 'complete', finishedAt } }, liveMessage: 'Assist run completed' };
       }
     }
-    return { assistRuns: { ...state.assistRuns, [suiteId]: { ...run, steps, events } } };
+    return { assistRuns: { ...state.assistRuns, [suiteId]: { ...run, steps, events } }, ...(liveMessage ? { liveMessage } : {}) };
   }),
   acceptSuggestion: (itemId) => {
     const suggestion = get().items[itemId]?.suggested;
     if (!suggestion) return;
-    set((state) => ({ drafts: { ...state.drafts, [itemId]: { ...state.drafts[itemId], rating: suggestion.rating, scores: suggestion.scores, touchedScores: { Accuracy: true, Clarity: true, Relevance: true } } } }));
+    set((state) => ({
+      items: { ...state.items, [itemId]: { ...state.items[itemId], suggestionAccepted: true } },
+      drafts: { ...state.drafts, [itemId]: { ...state.drafts[itemId], rating: suggestion.rating, scores: suggestion.scores, touchedScores: { Accuracy: true, Clarity: true, Relevance: true } } },
+    }));
   },
 }));
 
 export function getClassRegionCount(state, classId) {
-  return Object.values(state.items).reduce((sum, item) => sum + (item.annotation?.regions.filter((r) => r.classId === classId).length || 0), 0)
-    + Object.values(state.drafts).reduce((sum, draft) => sum + draft.regions.filter((r) => r.classId === classId).length, 0);
+  return Object.values(state.items).reduce((sum, item) => sum + effectiveRegions(state, item.id).filter((r) => r.classId === classId).length, 0);
 }
 
 export function getMetadataValueCount(state, fieldName) {

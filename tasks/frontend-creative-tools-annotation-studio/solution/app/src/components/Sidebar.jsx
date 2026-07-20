@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { Button, Checkbox, Tag } from '@carbon/react';
 import { Download, Play, Time, TaskComplete, InProgress, Error as ErrorIcon, Restart } from '@carbon/icons-react';
-import { useStudioStore, compileJsonl } from '../store';
+import { useStudioStore, downloadText, compileJsonl } from '../store';
 
 const stateLabels = { unlabeled: 'Unlabeled', labeled: 'Labeled', reviewed: 'Reviewed', disputed: 'Disputed' };
 
@@ -9,15 +10,18 @@ export function StateChip({ state }) {
   return <span className={`state-chip state-${state}`}>{stateLabels[state]}</span>;
 }
 
-function downloadText(text, name, type) {
-  const blob = new Blob([text], { type });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a');
-  anchor.href = url;
-  anchor.download = name;
-  anchor.click();
-  URL.revokeObjectURL(url);
+function ProgressRing({ completed, total }) {
+  const ratio = total ? completed / total : 0;
+  const radius = 11;
+  const circumference = 2 * Math.PI * radius;
+  return <svg className="progress-ring" width="30" height="30" viewBox="0 0 30 30" role="img" aria-label={`${completed} of ${total} completed`}>
+    <circle cx="15" cy="15" r={radius} className="ring-track" />
+    <circle cx="15" cy="15" r={radius} className="ring-fill" strokeDasharray={circumference} strokeDashoffset={circumference * (1 - ratio)} />
+    {ratio === 1 && <TaskComplete size={12} x="9" y="9" className="ring-done" />}
+  </svg>;
 }
+
+const assistStatusCopy = { pending: 'Pending', running: 'Running', retrying: 'Retrying', complete: 'Complete', failed: 'Failed' };
 
 export function AssistPanel() {
   const run = useStudioStore((s) => s.activeAssistSuiteId ? s.assistRuns[s.activeAssistSuiteId] : null);
@@ -44,9 +48,9 @@ export function AssistPanel() {
           const Icon = step.status === 'complete' ? TaskComplete : step.status === 'failed' ? ErrorIcon : step.status === 'running' ? InProgress : Time;
           const waiting = step.status === 'retrying' ? Math.max(0, Math.ceil((step.retryAt - Date.now()) / 1000)) : null;
           const highlighted = run.events.find((event) => event.id === run.selectedEventId)?.stepId === step.id;
-          return <div key={step.id} className={`assist-step ${highlighted ? 'highlighted' : ''}`}>
+          return <div key={step.id} className={`assist-step status-${step.status} ${highlighted ? 'highlighted' : ''}`}>
             <Icon size={16} className={step.status === 'running' ? 'spinning' : ''} />
-            <div className="grow"><strong>{step.title}</strong><span>{step.status === 'retrying' ? `Retrying in ${waiting}s · attempt ${step.attempts + 1} of ${step.maxAttempts}` : step.status} {step.error && `· ${step.error}`}</span></div>
+            <div className="grow"><strong>{step.title}</strong><span key={step.status + (waiting ?? '')} className="status-line">{step.status === 'retrying' ? `Retrying in ${waiting}s · attempt ${step.attempts + 1} of ${step.maxAttempts}` : assistStatusCopy[step.status] || step.status} {step.error && `· ${step.error}`}</span></div>
             {step.status === 'failed' && <Button hasIconOnly size="sm" kind="ghost" renderIcon={Restart} iconDescription="Retry failed step" onClick={() => retry(run.suiteId, step.id)} />}
           </div>;
         })}
@@ -60,7 +64,7 @@ export function AssistPanel() {
       <div className="timeline-list">
         {events.length ? events.slice().reverse().map((event) => <button key={event.id} className={run.selectedEventId === event.id ? 'selected' : ''} onClick={() => selectEvent(run.suiteId, event.id)}>
           <span>{new Date(event.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>{event.text}
-        </button>) : <p className="empty-mini">No events match this status.</p>}
+        </button>) : <p className="empty-mini">No events match this status filter. Choose another status or keep the run going.</p>}
       </div>
     </section>
   );
@@ -68,6 +72,7 @@ export function AssistPanel() {
 
 export default function Sidebar() {
   const state = useStudioStore();
+  const [queueRef] = useAutoAnimate();
   const activeSuite = state.suites.find((suite) => suite.id === state.activeSuiteId);
   const visibleIds = activeSuite?.itemIds.filter((id) => state.items[id]?.review_state === 'unlabeled') || [];
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => state.selected.includes(id));
@@ -88,11 +93,13 @@ export default function Sidebar() {
         <nav className="suite-list" aria-label="Evaluation suites">
           {state.suites.map((suite) => {
             const remaining = suite.itemIds.filter((id) => state.items[id]?.review_state === 'unlabeled').length;
+            const completed = suite.itemIds.length - remaining;
             const skipped = suite.itemIds.reduce((n, id) => n + (state.items[id]?.skipped || 0), 0);
             return <div key={suite.id} className={`suite-row ${suite.id === state.activeSuiteId ? 'active' : ''}`}>
+              <ProgressRing completed={completed} total={suite.itemIds.length} />
               <button className="suite-select" onClick={() => state.selectSuite(suite.id)}>
-                <span><strong>{suite.name}</strong><small>{suite.itemIds.length - remaining} completed</small></span>
-                <span className="suite-badges"><b>{remaining}</b>{skipped > 0 && <em>{skipped} skipped</em>}</span>
+                <span><strong>{suite.name}</strong><small>{completed} completed</small></span>
+                <span className="suite-badges"><b key={remaining} className="badge-pulse">{remaining}</b>{skipped > 0 && <em>{skipped} skipped</em>}</span>
               </button>
               <Button hasIconOnly kind="ghost" size="sm" renderIcon={Play} iconDescription={`Run Assist on ${suite.name}`} onClick={() => startAssist(suite.id)} />
             </div>;
@@ -105,7 +112,7 @@ export default function Sidebar() {
           <strong>{state.selected.length} selected</strong>
           <div><Button size="sm" kind="secondary" onClick={() => state.skipItems(state.selected)}>Skip selected</Button><Button size="sm" kind="tertiary" onClick={state.bulkMarkReviewed}>Mark reviewed</Button><Button size="sm" kind="ghost" onClick={state.clearSelection}>Clear selection</Button></div>
         </div>}
-        <div className="queue-list" aria-live="polite">
+        <div className="queue-list" ref={queueRef} aria-live="polite">
           {visibleIds.map((id) => {
             const item = state.items[id];
             return <div key={id} className={`queue-item ${id === state.activeItemId ? 'active' : ''}`}>
@@ -113,12 +120,12 @@ export default function Sidebar() {
               <button onClick={() => state.selectItem(id)}><strong>{item.title}</strong><span><StateChip state={item.review_state} />{item.skipped > 0 && <em>{item.skipped}× skipped</em>}{item.suggested && <b>Suggested</b>}</span></button>
             </div>;
           })}
-          {visibleIds.length === 0 && <p className="sidebar-empty">No unannotated items remain in this suite.</p>}
+          {visibleIds.length === 0 && <p className="sidebar-empty">No unannotated items remain in this suite. Switch suites above, or open the Review queue to check labeled work.</p>}
         </div>
         <AssistPanel />
       </> : <div className="history-list">
         {history.map((item) => <button key={item.id} className={state.historyItemId === item.id ? 'active' : ''} onClick={() => state.openHistory(item.id)}>
-          <span><strong>{item.title}</strong><small>{item.response.slice(0, 70)}…</small></span>
+          <span><strong>{item.title}</strong><small className="clamp-2">{item.response}</small></span>
           <span className={`rating-dot ${item.annotation.rating}`}>{item.annotation.rating === 'up' ? '↑' : '↓'}</span>
           <time>{new Date(item.submittedAt).toLocaleDateString()}</time>
         </button>)}
