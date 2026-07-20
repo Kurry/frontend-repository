@@ -62,13 +62,16 @@ const DynamicRow = memo(function DynamicRow({ index, title, onRemove, children }
 function TextAreaField({ name, label, required, register, errors, watch, placeholder, rows = 5 }) {
   const error = errors[name]
   const value = watch(name)
+  const [parent] = useAutoAnimate()
   return (
-    <div className="field-stack">
+    <div className="field-stack" ref={parent}>
       <TextArea
         id={name}
         labelText={<Label required={required}>{label}</Label>}
         placeholder={placeholder}
         rows={rows}
+        required={required}
+        aria-required={required}
         invalid={Boolean(error)}
         invalidText={error?.message}
         aria-describedby={`${name}-count`}
@@ -81,30 +84,40 @@ function TextAreaField({ name, label, required, register, errors, watch, placeho
 
 function TextField({ name, label, required, register, errors, placeholder }) {
   const error = name.split('.').reduce((current, part) => current?.[part], errors)
+  const [parent] = useAutoAnimate()
   return (
-    <TextInput
-      id={name.replaceAll('.', '-')}
-      labelText={<Label required={required}>{label}</Label>}
-      placeholder={placeholder}
-      invalid={Boolean(error)}
-      invalidText={error?.message}
-      {...register(name)}
-    />
+    <div className="field-stack" ref={parent}>
+      <TextInput
+        id={name.replaceAll('.', '-')}
+        labelText={<Label required={required}>{label}</Label>}
+        placeholder={placeholder}
+        required={required}
+        aria-required={required}
+        invalid={Boolean(error)}
+        invalidText={error?.message}
+        {...register(name)}
+      />
+    </div>
   )
 }
 
 function SelectField({ name, label, options, register, errors, required = false }) {
   const error = errors[name]
+  const [parent] = useAutoAnimate()
   return (
-    <Select
-      id={name}
-      labelText={<Label required={required}>{label}</Label>}
-      invalid={Boolean(error)}
-      invalidText={error?.message}
-      {...register(name)}
-    >
-      {options.map(([value, text]) => <SelectItem key={value} value={value} text={text} />)}
-    </Select>
+    <div className="field-stack" ref={parent}>
+      <Select
+        id={name}
+        labelText={<Label required={required}>{label}</Label>}
+        required={required}
+        aria-required={required}
+        invalid={Boolean(error)}
+        invalidText={error?.message}
+        {...register(name)}
+      >
+        {options.map(([val, text]) => <SelectItem key={val} value={val} text={text} />)}
+      </Select>
+    </div>
   )
 }
 
@@ -147,7 +160,6 @@ export default function TechniqueForm({ technique }) {
   const successCriteria = useFieldArray({ control, name: 'successCriteria' })
   const constraints = useFieldArray({ control, name: 'constraints' })
   const values = watch()
-
   const [parent] = useAutoAnimate()
 
   useEffect(() => {
@@ -355,7 +367,7 @@ export default function TechniqueForm({ technique }) {
               {constraints.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Constraint" onRemove={() => constraints.remove(index)}>
                   <div className="constraint-grid">
-                    <Select id={`constraints-${index}-type`} labelText={<Label required>Constraint type</Label>} {...register(`constraints.${index}.type`)}>
+                    <Select id={`constraints-${index}-type`} required aria-required labelText={<Label required>Constraint type</Label>} {...register(`constraints.${index}.type`)}>
                       <SelectItem value="length" text="Length" />
                       <SelectItem value="format" text="Format" />
                       <SelectItem value="content" text="Content" />

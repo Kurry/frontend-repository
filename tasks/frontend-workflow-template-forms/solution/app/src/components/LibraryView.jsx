@@ -14,7 +14,7 @@ import { makeLibraryDocument, techniqueById } from '../domain'
 import { useStudioStore } from '../store'
 import { copyText, downloadText } from './PreviewPanel'
 
-export default function LibraryView() {
+export default function LibraryView({ importLauncherRef }) {
   const library = useStudioStore((state) => state.library)
   const exportOpen = useStudioStore((state) => state.exportPanelOpen)
   const setChrome = useStudioStore((state) => state.setChrome)
@@ -88,7 +88,7 @@ export default function LibraryView() {
           <p>Every saved template keeps its exact fields, references, and assembled prompt together.</p>
         </div>
         <div className="library-actions">
-          <Button ref={libraryActionFallback} type="button" kind="tertiary" renderIcon={(props) => <DocumentImport {...props} aria-hidden="true" />} onClick={() => setChrome({ importModalOpen: true })}>Import JSON</Button>
+          <Button ref={importLauncherRef || libraryActionFallback} type="button" kind="tertiary" renderIcon={(props) => <DocumentImport {...props} aria-hidden="true" />} onClick={() => setChrome({ importModalOpen: true })}>Import JSON</Button>
           <Button type="button" kind="primary" renderIcon={(props) => <DocumentExport {...props} aria-hidden="true" />} onClick={() => setChrome({ exportPanelOpen: !exportOpen })}>Export library</Button>
         </div>
       </div>

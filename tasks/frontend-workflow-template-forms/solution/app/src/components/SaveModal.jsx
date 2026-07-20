@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Modal, TextInput } from '@carbon/react'
@@ -32,6 +31,7 @@ export default function SaveModal({ launcherButtonRef }) {
 
   useEffect(() => {
     if (open) {
+      setSubmitting(false)
       reset({ title: `${techniqueById[technique].name} prompt` })
       requestAnimationFrame(() => trigger())
     }
@@ -55,8 +55,11 @@ export default function SaveModal({ launcherButtonRef }) {
     if (!parsed.success || parsed.data.technique !== technique || parsed.data.promptText !== promptText) return
     setSubmitting(true)
     const saved = saveCurrent(parsed.data.title)
-    if (saved) showToast('success', 'Saved to library', `“${saved.title}” is ready in your library.`)
-    setSubmitting(false)
+    if (saved) {
+      showToast('success', 'Saved to library', `“${saved.title}” is ready in your library.`)
+      requestAnimationFrame(() => launcherButtonRef.current?.focus())
+    }
+    setTimeout(() => { setSubmitting(false) }, 300)
   }
 
   return (

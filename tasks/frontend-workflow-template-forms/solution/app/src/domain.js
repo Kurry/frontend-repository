@@ -136,9 +136,14 @@ export const savePayloadSchema = z.object({
   promptText: z.string().min(1, 'Prompt text is required.'),
   attachments: attachmentsSchema.optional(),
 }).superRefine((record, context) => {
-  const parsed = fieldSchemas[record.technique].safeParse(record.fields)
+  const parsed = formSchemas[record.technique].safeParse({ ...record.fields, ...(record.attachments ? { attachments: record.attachments } : {}) })
   if (!parsed.success) {
     context.addIssue({ code: 'custom', path: ['fields'], message: `Fields do not match the ${techniqueById[record.technique].name} schema.` })
+    return
+  }
+  const expectedPrompt = assemblePrompt(record.technique, parsed.data, record.attachments || [])
+  if (record.promptText !== expectedPrompt) {
+    context.addIssue({ code: 'custom', path: ['promptText'], message: 'Prompt text must match the assembled preview.' })
   }
 })
 

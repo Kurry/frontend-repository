@@ -165,6 +165,7 @@ export default function App() {
   const activeView = useStudioStore((state) => state.activeView)
   const hasSeenOnboarding = useStudioStore((state) => state.hasSeenOnboarding)
   const setChrome = useStudioStore((state) => state.setChrome)
+  const importLauncherRef = useRef(null)
 
   useEffect(() => {
     registerWebMCP()
@@ -174,8 +175,8 @@ export default function App() {
     <div className="app-shell">
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <AppHeader />
-      {activeView === 'forms' ? <FormsView /> : <LibraryView />}
-      <ImportModal />
+      {activeView === 'forms' ? <FormsView /> : <LibraryView importLauncherRef={importLauncherRef} />}
+      <ImportModal launcherButtonRef={importLauncherRef} />
       <ToastRegion />
 
       <Modal

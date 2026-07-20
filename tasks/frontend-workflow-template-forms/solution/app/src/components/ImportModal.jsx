@@ -20,7 +20,7 @@ const importSchema = z.object({
   }
 })
 
-export default function ImportModal() {
+export default function ImportModal({ launcherButtonRef }) {
   const open = useStudioStore((state) => state.importModalOpen)
   const setChrome = useStudioStore((state) => state.setChrome)
   const replaceLibrary = useStudioStore((state) => state.replaceLibrary)
@@ -44,6 +44,7 @@ export default function ImportModal() {
 
   function close() {
     setChrome({ importModalOpen: false })
+    requestAnimationFrame(() => launcherButtonRef?.current?.focus())
   }
 
   function confirm({ documentText }) {
@@ -75,6 +76,7 @@ export default function ImportModal() {
       primaryButtonDisabled={!isValid}
       onRequestSubmit={handleSubmit(confirm)}
       onRequestClose={close}
+      launcherButtonRef={launcherButtonRef}
       size="md"
     >
       <p className="modal-copy">Importing a conforming Template Forms document replaces the current in-memory library. Invalid files leave it unchanged.</p>
