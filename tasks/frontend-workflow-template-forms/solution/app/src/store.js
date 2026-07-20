@@ -16,7 +16,10 @@ export const useStudioStore = create((set, get) => ({
   exportPanelOpen: false,
   importModalOpen: false,
   toast: null,
+  sortOrder: 'asc',
+  hasSeenOnboarding: false,
 
+  toggleSortOrder: () => set((state) => ({ sortOrder: state.sortOrder === 'asc' ? 'desc' : 'asc' })),
   selectTechnique: (technique) => set({ activeTechnique: technique, activeView: 'forms', assetPickerOpen: false }),
   setView: (activeView) => set({ activeView, assetPickerOpen: false }),
   setChrome: (patch) => set(patch),

@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react'
-import { Button, Tag } from '@carbon/react'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
+import { useMemo, useState, useRef } from 'react'
+import { Button, Tag, Toggle, Modal } from '@carbon/react'
 import {
   ArrowLeft,
   Copy,
@@ -22,16 +23,34 @@ export default function LibraryView() {
   const deleteLibraryEntry = useStudioStore((state) => state.deleteLibraryEntry)
   const showToast = useStudioStore((state) => state.showToast)
   const [deleting, setDeleting] = useState(null)
+  const sortOrder = useStudioStore((state) => state.sortOrder)
+  const toggleSortOrder = useStudioStore((state) => state.toggleSortOrder)
   const document = useMemo(() => makeLibraryDocument(library), [library])
   const jsonText = useMemo(() => JSON.stringify(document, null, 2), [document])
+  const [parent] = useAutoAnimate()
+  const [confirmDelete, setConfirmDelete] = useState(null)
+  const deleteLauncher = useRef(null)
 
-  function remove(index, title) {
+  const sortedLibrary = useMemo(() => {
+    return [...library].map((item, originalIndex) => ({ ...item, originalIndex })).sort((a, b) => {
+      return sortOrder === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+    })
+  }, [library, sortOrder])
+
+  function confirmRemove(index, title, event) {
+    deleteLauncher.current = event.currentTarget
+    setConfirmDelete({ index, title })
+  }
+
+  function commitRemove() {
+    if (!confirmDelete) return
+    const { index, title } = confirmDelete
     setDeleting(index)
-    setTimeout(() => {
-      deleteLibraryEntry(index)
-      setDeleting(null)
-      showToast('success', 'Prompt deleted', `“${title}” was removed from the library.`)
-    }, 150)
+    deleteLibraryEntry(index)
+    setDeleting(null)
+    setConfirmDelete(null)
+    showToast('success', 'Prompt deleted', `“${title}” was removed from the library.`)
+    requestAnimationFrame(() => deleteLauncher.current?.focus())
   }
 
   async function copyExport() {
@@ -48,8 +67,8 @@ export default function LibraryView() {
           <p>Every saved template keeps its exact fields, references, and assembled prompt together.</p>
         </div>
         <div className="library-actions">
-          <Button type="button" kind="tertiary" renderIcon={DocumentImport} onClick={() => setChrome({ importModalOpen: true })}>Import JSON</Button>
-          <Button type="button" kind="primary" renderIcon={DocumentExport} onClick={() => setChrome({ exportPanelOpen: !exportOpen })}>Export library</Button>
+          <Button type="button" kind="tertiary" renderIcon={(props) => <DocumentImport {...props} aria-hidden="true" />} onClick={() => setChrome({ importModalOpen: true })}>Import JSON</Button>
+          <Button type="button" kind="primary" renderIcon={(props) => <DocumentExport {...props} aria-hidden="true" />} onClick={() => setChrome({ exportPanelOpen: !exportOpen })}>Export library</Button>
         </div>
       </div>
 
@@ -57,6 +76,8 @@ export default function LibraryView() {
         <div><strong>{library.length}</strong><span>saved {library.length === 1 ? 'prompt' : 'prompts'}</span></div>
         <div className="summary-rule" />
         <p>Stored in memory for this session · Reload to restore the 5 seeded templates.</p>
+        <div className="summary-rule" />
+        <Toggle size="sm" id="sort-toggle" labelA="Ascending" labelB="Descending" toggled={sortOrder === 'desc'} onToggle={toggleSortOrder} />
       </div>
 
       {exportOpen && (
@@ -64,18 +85,19 @@ export default function LibraryView() {
           <div className="export-panel__heading">
             <div><span className="eyebrow">Current session artifact</span><h2>template-library.json</h2></div>
             <div className="export-actions">
-              <Button type="button" kind="ghost" size="sm" renderIcon={Copy} onClick={copyExport}>Copy</Button>
-              <Button type="button" kind="tertiary" size="sm" renderIcon={Download} onClick={() => downloadText('template-library.json', jsonText, 'application/json')}>Download JSON</Button>
+              <Button type="button" kind="ghost" size="sm" renderIcon={(props) => <Copy {...props} aria-hidden="true" />} onClick={copyExport}>Copy</Button>
+              <Button type="button" kind="tertiary" size="sm" renderIcon={(props) => <Download {...props} aria-hidden="true" />} onClick={() => downloadText('template-library.json', jsonText, 'application/json')}>Download JSON</Button>
             </div>
           </div>
           <pre tabIndex={0}>{jsonText}</pre>
         </section>
       )}
 
-      {library.length > 0 ? (
-        <section className="library-list" aria-label="Saved prompts">
+      {sortedLibrary.length > 0 ? (
+        <section className="library-list" aria-label="Saved prompts" ref={parent}>
           <div className="list-head"><span>Prompt</span><span>Technique</span><span>Saved</span><span>Actions</span></div>
-          {library.map((record, index) => {
+          {sortedLibrary.map((record) => {
+            const index = record.originalIndex
             const summary = record.fields.taskDescription || record.fields.goal || `A ${techniqueById[record.technique].name} template`
             return (
               <article className={`library-row ${deleting === index ? 'is-deleting' : ''}`} key={`${record.title}-${index}`}>
@@ -86,8 +108,8 @@ export default function LibraryView() {
                 <div className="row-technique"><Tag type="cool-gray">{techniqueById[record.technique].name}</Tag></div>
                 <div className="row-time"><strong>Saved</strong><span>this session</span></div>
                 <div className="row-actions">
-                  <Button type="button" kind="ghost" size="sm" hasIconOnly renderIcon={Launch} iconDescription={`Open ${record.title}`} onClick={() => openLibraryEntry(index)} />
-                  <Button type="button" kind="danger--ghost" size="sm" hasIconOnly renderIcon={TrashCan} iconDescription={`Delete ${record.title}`} onClick={() => remove(index, record.title)} />
+                  <Button type="button" kind="ghost" size="sm" hasIconOnly renderIcon={(props) => <Launch {...props} aria-hidden="true" />} iconDescription={`Open ${record.title}`} onClick={() => openLibraryEntry(index)} />
+                  <Button type="button" kind="danger--ghost" size="sm" hasIconOnly renderIcon={(props) => <TrashCan {...props} aria-hidden="true" />} iconDescription={`Delete ${record.title}`} onClick={(e) => confirmRemove(index, record.title, e)} />
                 </div>
               </article>
             )
@@ -98,9 +120,25 @@ export default function LibraryView() {
           <div className="empty-orbit"><span>0</span></div>
           <h2>Your library is ready for its first prompt</h2>
           <p>Build and generate a template, then save it here for future use.</p>
-          <Button type="button" kind="primary" renderIcon={ArrowLeft} onClick={() => setView('forms')}>Return to forms</Button>
+          <Button type="button" kind="primary" renderIcon={(props) => <ArrowLeft {...props} aria-hidden="true" />} onClick={() => setView('forms')}>Return to forms</Button>
         </section>
       )}
+
+      <Modal
+        open={Boolean(confirmDelete)}
+        danger
+        modalHeading="Delete prompt"
+        primaryButtonText="Delete"
+        secondaryButtonText="Cancel"
+        onRequestSubmit={commitRemove}
+        onRequestClose={() => {
+          setConfirmDelete(null)
+          requestAnimationFrame(() => deleteLauncher.current?.focus())
+        }}
+        focusTrap={true}
+      >
+        <p className="modal-copy">Are you sure you want to delete this prompt? This action cannot be undone.</p>
+      </Modal>
     </main>
   )
 }
