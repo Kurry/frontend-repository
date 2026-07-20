@@ -1,4 +1,4 @@
-import type { Note } from './types';
+import type { AppState, Note } from './types';
 
 export function parseTags(text: string): string[] {
   const tagSet = new Set<string>();
@@ -91,4 +91,56 @@ export function dateToKey(date: Date): string {
 export function noteToDateKey(note: Note): string {
   const d = new Date(note.createdAt);
   return dateToKey(d);
+}
+
+// Shared with the WebMCP artifact_copy tool so automation and the Export
+// panel's Copy control produce byte-identical output from one code path.
+export function buildSessionJson(state: AppState): string {
+  const exportObj = {
+    schemaVersion: 'tagnote-session/v1',
+    exportedAt: new Date().toISOString(),
+    todoTags: state.todoTags,
+    notes: state.notes.map((n) => ({
+      id: n.id,
+      text: n.text,
+      tags: n.tags,
+      marks: n.marks ?? [],
+      pinned: n.pinned,
+      archived: n.archived,
+      done: n.done,
+      createdAt: new Date(n.createdAt).toISOString(),
+      attachment: n.file ? { name: n.file.name, sizeBytes: n.file.size } : null,
+    })),
+  };
+  return JSON.stringify(exportObj, null, 2);
+}
+
+export function buildTimelineMarkdown(state: AppState): string {
+  let md = '';
+  const groups = new Map<string, Note[]>();
+  const sortedNotes = [...state.notes].sort((a, b) => a.createdAt - b.createdAt);
+  for (const note of sortedNotes) {
+    if (note.archived) continue;
+    const label = formatDate(note.createdAt);
+    if (!groups.has(label)) groups.set(label, []);
+    groups.get(label)!.push(note);
+  }
+
+  for (const [label, notes] of groups) {
+    md += `## ${label}\n\n`;
+    for (const note of notes) {
+      let prefix = '';
+      if (note.pinned) prefix += '📌 ';
+      if (note.tags.some((t) => state.todoTags.includes(t))) {
+        prefix += note.done ? '[x] ' : '[ ] ';
+      }
+      md += `- ${prefix}${note.text}\n`;
+      const visibleTags = note.tags.filter((t) => t !== 'file' && t !== 'link');
+      if (visibleTags.length > 0) {
+        md += `  ${visibleTags.map((t) => `#${t}`).join(' ')}\n`;
+      }
+    }
+    md += '\n';
+  }
+  return md.trim();
 }

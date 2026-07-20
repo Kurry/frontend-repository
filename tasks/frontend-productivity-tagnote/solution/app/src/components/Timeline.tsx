@@ -12,10 +12,12 @@ interface TimelineProps {
   onToggleArchive: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 }
 
 export const Timeline = component$<TimelineProps>(
-  ({ notes, todoTags, emptyMessage, onToggleDone, onTogglePin, onToggleArchive, onEdit, onDelete }) => {
+  ({ notes, todoTags, emptyMessage, onToggleDone, onTogglePin, onToggleArchive, onEdit, onDelete, selectedIds, onToggleSelect }) => {
     if (notes.length === 0) {
       return (
         <div class="flex flex-col items-center justify-center py-16 text-center">
@@ -64,6 +66,8 @@ export const Timeline = component$<TimelineProps>(
                   onToggleArchive={onToggleArchive}
                   onEdit={onEdit}
                   onDelete={onDelete}
+                  isSelected={selectedIds?.has(note.id)}
+                  onToggleSelect={onToggleSelect}
                 />
               ))}
             </div>

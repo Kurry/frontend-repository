@@ -1,7 +1,14 @@
+export interface NoteMark {
+  start: number;
+  end: number;
+  style: 'bold' | 'italic';
+}
+
 export interface Note {
   id: string;
   text: string;
   tags: string[];
+  marks: NoteMark[]; // bold/italic formatting spans over `text`
   createdAt: number; // timestamp
   pinned: boolean;
   archived: boolean;

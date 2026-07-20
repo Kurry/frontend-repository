@@ -27,7 +27,15 @@ export const Composer = component$<ComposerProps>(({ onSubmit, editText, onCance
   const handleSubmit = $(() => {
     const trimmed = local.text.trim();
     if (!trimmed) {
-      local.error = 'Please enter a note before sending.';
+      local.error = 'text: Please enter a note before sending.';
+      local.shake = true;
+      setTimeout(() => {
+        local.shake = false;
+      }, 300);
+      return;
+    }
+    if (trimmed.length > 2000) {
+      local.error = 'text: Note text must be at most 2000 characters.';
       local.shake = true;
       setTimeout(() => {
         local.shake = false;

@@ -11,6 +11,8 @@ interface NoteItemProps {
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onAttachFile: (id: string, file: { name: string; size: number }) => void;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 export const NoteItem = component$<NoteItemProps>(
@@ -23,6 +25,8 @@ export const NoteItem = component$<NoteItemProps>(
     onEdit,
     onDelete,
     onAttachFile,
+    isSelected,
+    onToggleSelect,
   }) => {
     const isTodoNote = note.tags.some((t) => todoTags.includes(t));
     const fileInputId = `file-${note.id}`;
@@ -40,6 +44,7 @@ export const NoteItem = component$<NoteItemProps>(
       }
       input.value = '';
     });
+    const handleSelect = $(() => onToggleSelect && onToggleSelect(note.id));
 
     return (
       <div
@@ -57,6 +62,15 @@ export const NoteItem = component$<NoteItemProps>(
         )}
 
         <div class="flex items-start gap-3">
+          {onToggleSelect && (
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange$={handleSelect}
+              aria-label="Select note"
+              class="mt-1 h-5 w-5 cursor-pointer accent-[var(--color-accent)]"
+            />
+          )}
           {isTodoNote && (
             <input
               type="checkbox"

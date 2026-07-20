@@ -1,4 +1,4 @@
-import { component$, $, useStore, useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import { component$, $, useStore, useSignal, useTask$, useVisibleTask$ } from '@builder.io/qwik';
 import type { Signal } from '@builder.io/qwik';
 import type { Note, AppState, HistoryState } from './types';
 import {
@@ -15,9 +15,10 @@ import {
   toggleTodoTag,
   attachFileToNote,
   getTagMap,
-  filterByTag,
-  filterBySearch,
-  filterByDate,
+  bulkArchive,
+  bulkPin,
+  bulkDelete,
+  computeVisibleNotes,
 } from './store';
 
 import { Composer } from './components/Composer';
@@ -28,7 +29,9 @@ import { ConfirmDialog } from './components/ConfirmDialog';
 import { Toast } from './components/Toast';
 import { HistoryPanel } from './components/HistoryPanel';
 import { NoteItem } from './components/NoteItem';
-import { formatDate } from './utils';
+import { ExportPanel } from './components/ExportPanel';
+import { ImportPanel } from './components/ImportPanel';
+import { formatDate, buildSessionJson } from './utils';
 
 export const Root = component$(() => {
   const historyState = useStore<HistoryState>(createInitialHistory());
@@ -43,6 +46,34 @@ export const Root = component$(() => {
   const editText = useSignal<{ id: string; text: string } | null>(null);
   const confirmDelete = useSignal(false);
   const deleteTargetId = useSignal<string | null>(null);
+  const selectedIds = useStore<{ ids: string[] }>({ ids: [] });
+  const showExport = useSignal(false);
+  const showImport = useSignal(false);
+
+  // Bulk selection must never outlive visibility: if a filter/search change
+  // hides a selected note, drop it from selectedIds so the tray count stays
+  // accurate and bulk archive/pin/delete can't silently act on hidden notes.
+  useTask$(({ track }) => {
+    track(() => activeTag.value);
+    track(() => activeDateFilter.value);
+    track(() => searchQuery.value);
+    track(() => showArchived.value);
+    track(() => historyState.present.notes);
+
+    if (selectedIds.ids.length === 0) return;
+
+    const visible = computeVisibleNotes(historyState.present.notes, historyState.present.todoTags, {
+      showArchived: showArchived.value,
+      activeTag: activeTag.value,
+      activeDateFilter: activeDateFilter.value,
+      searchQuery: searchQuery.value,
+    });
+    const visibleIds = new Set(visible.map((n) => n.id));
+    const pruned = selectedIds.ids.filter((id) => visibleIds.has(id));
+    if (pruned.length !== selectedIds.ids.length) {
+      selectedIds.ids = pruned;
+    }
+  });
 
   const syncHistory = $((next: HistoryState) => {
     historyState.past = next.past;
@@ -115,15 +146,27 @@ export const Root = component$(() => {
   });
 
   const handleDeleteConfirm = $(() => {
+    if (deleteTargetId.value === 'bulk') {
+      const ns = bulkDelete(historyState.present, selectedIds.ids);
+      applyState(ns, 'Bulk delete');
+      selectedIds.ids = [];
+      deleteTargetId.value = null;
+      confirmDelete.value = false;
+      showToast('Notes deleted');
+      return;
+    }
     if (deleteTargetId.value) {
       applyState(deleteNote(historyState.present, deleteTargetId.value), 'Deleted note');
+      selectedIds.ids = selectedIds.ids.filter(id => id !== deleteTargetId.value);
       deleteTargetId.value = null;
+      confirmDelete.value = false;
       showToast('Note deleted');
     }
   });
 
   const handleDeleteCancel = $(() => {
     deleteTargetId.value = null;
+    confirmDelete.value = false;
   });
 
   const handleToggleTodoTag = $((tag: string) => {
@@ -147,20 +190,51 @@ export const Root = component$(() => {
     activeDateFilter.value = null;
   });
 
+  const handleToggleSelect = $((id: string) => {
+    selectedIds.ids = selectedIds.ids.includes(id)
+      ? selectedIds.ids.filter((x) => x !== id)
+      : [...selectedIds.ids, id];
+  });
+
+  const handleClearSelection = $(() => {
+    selectedIds.ids = [];
+  });
+
+  const handleSelectAllVisible = $((ids: string[]) => {
+    selectedIds.ids = ids;
+  });
+
+  const handleBulkArchive = $(() => {
+    const count = selectedIds.ids.length;
+    if (count === 0) return;
+    applyState(bulkArchive(historyState.present, selectedIds.ids), 'Bulk archive');
+    showToast(`${count} note${count === 1 ? '' : 's'} archived`);
+    selectedIds.ids = [];
+  });
+
+  const handleBulkPin = $(() => {
+    const count = selectedIds.ids.length;
+    if (count === 0) return;
+    applyState(bulkPin(historyState.present, selectedIds.ids), 'Bulk pin');
+    showToast(`${count} note${count === 1 ? '' : 's'} pinned`);
+    selectedIds.ids = [];
+  });
+
+  const handleBulkDeleteRequest = $(() => {
+    if (selectedIds.ids.length === 0) return;
+    deleteTargetId.value = 'bulk';
+    confirmDelete.value = true;
+  });
+
   const allNotes = historyState.present.notes;
   const todoTags = historyState.present.todoTags;
 
-  let visibleNotes: Note[];
-  if (showArchived.value) {
-    visibleNotes = allNotes.filter((n) => n.archived);
-  } else {
-    visibleNotes = allNotes.filter((n) => !n.archived);
-    if (activeTag.value) visibleNotes = filterByTag(visibleNotes, activeTag.value);
-    if (activeDateFilter.value) visibleNotes = filterByDate(visibleNotes, activeDateFilter.value);
-  }
-  if (searchQuery.value.trim()) {
-    visibleNotes = filterBySearch(visibleNotes, searchQuery.value);
-  }
+  const visibleNotes: Note[] = computeVisibleNotes(allNotes, todoTags, {
+    showArchived: showArchived.value,
+    activeTag: activeTag.value,
+    activeDateFilter: activeDateFilter.value,
+    searchQuery: searchQuery.value,
+  });
 
   const tagEntries = Array.from(getTagMap(allNotes.filter((n) => !n.archived)).entries()).sort(
     (a, b) => b[1] - a[1]
@@ -415,6 +489,37 @@ export const Root = component$(() => {
           return { cleared: true };
         },
       },
+      artifact_export: {
+        description: 'Open the export panel.',
+        input_schema: { type: 'object', properties: {} },
+        run: () => {
+          showExport.value = true;
+          return { success: true };
+        }
+      },
+      artifact_import: {
+        description: 'Open the import panel.',
+        input_schema: { type: 'object', properties: {} },
+        run: () => {
+          showImport.value = true;
+          return { success: true };
+        }
+      },
+      artifact_copy: {
+        description:
+          'Open the export panel and copy the Session JSON export to clipboard, using the same content-generation and clipboard-write logic as the Export panel\'s Copy control. This will no-op in a headless environment, Playwright checks the visual confirmation instead.',
+        input_schema: { type: 'object', properties: {} },
+        run: () => {
+          showExport.value = true;
+          const content = buildSessionJson(historyState.present);
+          if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(content).catch(() => {
+              // best-effort, mirrors ExportPanel's fallback for headless/unsupported environments
+            });
+          }
+          return { copied: true };
+        }
+      },
     };
 
     const listing = Object.entries(tools).map(([name, def]) => ({
@@ -427,7 +532,7 @@ export const Root = component$(() => {
     w.webmcp_session_info = () => ({
       contract: 'zto-webmcp-v1',
       app: 'TagNote',
-      modules: ['entity-collection-v1', 'browse-query-v1'],
+      modules: ['entity-collection-v1', 'browse-query-v1', 'artifact-transfer-v1'],
       tool_count: listing.length,
     });
     w.webmcp_list_tools = () => listing;
@@ -495,6 +600,26 @@ export const Root = component$(() => {
             </button>
             <button
               onClick$={() => {
+                showExport.value = true;
+              }}
+              class={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                showExport.value
+                  ? 'bg-[var(--color-accent)] text-white'
+                  : 'bg-[var(--color-primary)] text-[var(--color-accent)] hover:bg-[#D4E0F0]'
+              }`}
+            >
+              Export
+            </button>
+            <button
+              onClick$={() => {
+                showImport.value = true;
+              }}
+              class="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]"
+            >
+              Import
+            </button>
+            <button
+              onClick$={() => {
                 showHistory.value = true;
               }}
               class="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]"
@@ -552,7 +677,42 @@ export const Root = component$(() => {
           />
         )}
 
+        {selectedIds.ids.length > 0 && (
+          <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 rounded-full bg-white px-6 py-3 shadow-lg border border-gray-200" style={{ transform: 'translateX(-50%)' }}>
+            <span class="text-sm font-semibold text-gray-700">{selectedIds.ids.length} selected</span>
+            <button onClick$={handleBulkArchive} class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]">
+              Archive selected
+            </button>
+            <button onClick$={handleBulkPin} class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]">
+              Pin selected
+            </button>
+            <button onClick$={handleBulkDeleteRequest} class="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100">
+              Delete selected
+            </button>
+            <button onClick$={() => selectedIds.ids = []} class="ml-2 text-gray-400 hover:text-gray-600">
+              ✕
+            </button>
+          </div>
+        )}
+
         <div class="flex-1 overflow-y-auto px-4 py-4">
+          {!showNoResults && visibleNotes.length > 0 && (
+            <div class="mb-3 flex items-center justify-end gap-3 text-xs">
+              <button
+                onClick$={() => handleSelectAllVisible(visibleNotes.map((n) => n.id))}
+                class="font-medium text-[var(--color-accent)] hover:underline"
+              >
+                Select all visible
+              </button>
+              <button
+                onClick$={handleClearSelection}
+                class="font-medium text-gray-400 hover:text-gray-600 hover:underline"
+              >
+                Clear selection
+              </button>
+            </div>
+          )}
+
           {showCalendar.value && !showArchived.value && (
             <div class="mb-4">
               <CalendarView
@@ -589,6 +749,8 @@ export const Root = component$(() => {
                   onEdit={handleEdit}
                   onDelete={handleDeleteRequest}
                   onAttachFile={handleAttachFile}
+                  selectedIds={new Set(selectedIds.ids)}
+                  onToggleSelect={handleToggleSelect}
                 />
               )}
             </div>
@@ -611,6 +773,8 @@ export const Root = component$(() => {
                     onEdit={handleEdit}
                     onDelete={handleDeleteRequest}
                     onAttachFile={handleAttachFile}
+                    selectedIds={new Set(selectedIds.ids)}
+                    onToggleSelect={handleToggleSelect}
                   />
                 )}
               </div>
@@ -631,6 +795,8 @@ export const Root = component$(() => {
                     onEdit={handleEdit}
                     onDelete={handleDeleteRequest}
                     onAttachFile={handleAttachFile}
+                    selectedIds={new Set(selectedIds.ids)}
+                    onToggleSelect={handleToggleSelect}
                   />
                 )}
               </div>
@@ -651,6 +817,8 @@ export const Root = component$(() => {
                     onEdit={handleEdit}
                     onDelete={handleDeleteRequest}
                     onAttachFile={handleAttachFile}
+                    selectedIds={new Set(selectedIds.ids)}
+                    onToggleSelect={handleToggleSelect}
                   />
                 </div>
               )}
@@ -674,6 +842,8 @@ export const Root = component$(() => {
                     onEdit={handleEdit}
                     onDelete={handleDeleteRequest}
                     onAttachFile={handleAttachFile}
+                    selectedIds={new Set(selectedIds.ids)}
+                    onToggleSelect={handleToggleSelect}
                   />
                 )}
               </div>
@@ -692,7 +862,7 @@ export const Root = component$(() => {
 
       <Toast message={toastMessage} />
       <ConfirmDialog
-        message="Are you sure you want to permanently delete this note?"
+        message={deleteTargetId.value === 'bulk' ? `Are you sure you want to permanently delete ${selectedIds.ids.length} notes?` : "Are you sure you want to permanently delete this note?"}
         open={confirmDelete}
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
@@ -707,6 +877,8 @@ export const Root = component$(() => {
         canRedo={historyState.future.length > 0}
         open={showHistory}
       />
+      {showExport.value && <ExportPanel state={historyState.present} onClose={$(() => showExport.value = false)} />}
+      {showImport.value && <ImportPanel onImport={$((ns: AppState) => { applyState(ns, 'Imported Session JSON'); selectedIds.ids = []; activeTag.value = null; activeDateFilter.value = null; searchQuery.value = ''; showImport.value = false; showToast('State imported'); })} onClose={$(() => showImport.value = false)} />}
     </div>
   );
 });
@@ -720,7 +892,9 @@ const NoteList = component$<{
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
   onAttachFile: (id: string, file: { name: string; size: number }) => void;
-}>(({ notes, todoTags, onToggleDone, onTogglePin, onToggleArchive, onEdit, onDelete, onAttachFile }) => {
+  selectedIds?: Set<string>;
+  onToggleSelect?: (id: string) => void;
+}>(({ notes, todoTags, onToggleDone, onTogglePin, onToggleArchive, onEdit, onDelete, onAttachFile, selectedIds, onToggleSelect }) => {
   if (notes.length === 0) return null;
 
   const groups: { label: string; notes: Note[] }[] = [];
@@ -751,6 +925,8 @@ const NoteList = component$<{
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onAttachFile={onAttachFile}
+                isSelected={selectedIds?.has(note.id)}
+                onToggleSelect={onToggleSelect}
               />
             ))}
           </div>

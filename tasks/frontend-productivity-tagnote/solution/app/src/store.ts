@@ -214,7 +214,8 @@ export function applyBranch(history: HistoryState, branch: HistoryBranch): Histo
 export function addNote(
   state: AppState,
   text: string,
-  file?: { name: string; size: number }
+  file?: { name: string; size: number },
+  marks: Note['marks'] = []
 ): AppState {
   const tags = getAllTags(text);
   if (file && !tags.includes('file')) {
@@ -224,6 +225,7 @@ export function addNote(
     id: generateId(),
     text,
     tags,
+    marks,
     createdAt: Date.now(),
     pinned: false,
     archived: false,
@@ -252,7 +254,12 @@ export function attachFileToNote(
   };
 }
 
-export function editNote(state: AppState, noteId: string, newText: string): AppState {
+export function editNote(
+  state: AppState,
+  noteId: string,
+  newText: string,
+  marks?: Note['marks']
+): AppState {
   return {
     ...state,
     notes: state.notes.map((n) => {
@@ -265,6 +272,7 @@ export function editNote(state: AppState, noteId: string, newText: string): AppS
           ...n,
           text: newText,
           tags,
+          marks: marks ?? n.marks ?? [],
         };
       }
       return n;
@@ -332,13 +340,27 @@ export function filterByTag(notes: Note[], tag: string): Note[] {
   return notes.filter((n) => n.tags.includes(t));
 }
 
-export function filterBySearch(notes: Note[], query: string): Note[] {
+export function filterBySearch(notes: Note[], query: string, todoTags: string[] = []): Note[] {
   if (!query.trim()) return notes;
-  const q = query.toLowerCase();
-  return notes.filter(
-    (n) =>
-      n.text.toLowerCase().includes(q) || n.tags.some((t) => t.includes(q))
-  );
+  const q = query.toLowerCase().trim();
+  const tokens = q.split(' ');
+
+  return notes.filter((n) => {
+    let match = true;
+    for (const token of tokens) {
+       if (token.startsWith('tag:')) {
+           const t = token.slice(4);
+           if (!n.tags.includes(t)) match = false;
+       } else if (token === 'done:open') {
+           if (n.done || !n.tags.some((t) => todoTags.includes(t))) match = false;
+       } else if (token === 'done:done') {
+           if (!n.done || !n.tags.some((t) => todoTags.includes(t))) match = false;
+       } else {
+           if (!n.text.toLowerCase().includes(token) && !n.tags.some((t) => t.includes(token))) match = false;
+       }
+    }
+    return match;
+  });
 }
 
 export function filterByDate(notes: Note[], dateKey: string): Note[] {
@@ -347,4 +369,56 @@ export function filterByDate(notes: Note[], dateKey: string): Note[] {
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     return key === dateKey;
   });
+}
+
+// Shared with the bulk-selection pruning task so "visible" always means the
+// same thing to the note list and to what bulk actions are allowed to touch.
+export interface VisibleNotesFilters {
+  showArchived: boolean;
+  activeTag: string | null;
+  activeDateFilter: string | null;
+  searchQuery: string;
+}
+
+export function computeVisibleNotes(
+  notes: Note[],
+  todoTags: string[],
+  filters: VisibleNotesFilters
+): Note[] {
+  let visible: Note[];
+  if (filters.showArchived) {
+    visible = notes.filter((n) => n.archived);
+  } else {
+    visible = notes.filter((n) => !n.archived);
+    if (filters.activeTag) visible = filterByTag(visible, filters.activeTag);
+    if (filters.activeDateFilter) visible = filterByDate(visible, filters.activeDateFilter);
+  }
+  if (filters.searchQuery.trim()) {
+    visible = filterBySearch(visible, filters.searchQuery, todoTags);
+  }
+  return visible;
+}
+
+export function bulkArchive(state: AppState, noteIds: string[]): AppState {
+  const ids = new Set(noteIds);
+  return {
+    ...state,
+    notes: state.notes.map(n => ids.has(n.id) ? { ...n, archived: true } : n)
+  };
+}
+
+export function bulkPin(state: AppState, noteIds: string[]): AppState {
+  const ids = new Set(noteIds);
+  return {
+    ...state,
+    notes: state.notes.map(n => ids.has(n.id) ? { ...n, pinned: true } : n)
+  };
+}
+
+export function bulkDelete(state: AppState, noteIds: string[]): AppState {
+  const ids = new Set(noteIds);
+  return {
+    ...state,
+    notes: state.notes.filter(n => !ids.has(n.id))
+  };
 }
