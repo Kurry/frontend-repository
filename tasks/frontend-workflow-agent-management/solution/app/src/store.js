@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { captureFocus, restoreFocus } from './focus'
 import { createRun, seedAgents } from './seed'
 import { createAgentSchema, fleetSnapshotSchema, STATUSES } from './schemas'
 
@@ -70,6 +71,14 @@ function transition(agent, nextStatus, label, extra = {}) {
   })
 }
 
+const STATUS_LABELS = { idle: 'Idle', running: 'Running', paused: 'Paused', error: 'Error', offline: 'Offline' }
+
+function announceStatus(get, agentName, nextStatus, detail = '') {
+  const label = STATUS_LABELS[nextStatus] || nextStatus
+  const message = detail || `${agentName} status changed to ${label}`
+  get().announce(message)
+}
+
 function mutationSnapshot(state) {
   return { agents: clone(state.agents), detailAgentId: state.detailAgentId }
 }
@@ -119,10 +128,10 @@ export const useFleetStore = create((set, get) => ({
   dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })),
   announce: (announcement) => set({ announcement }),
 
-  openRegister: () => set({ modal: { mode: 'register', agentId: null }, paletteOpen: false }),
-  openEdit: (agentId) => set({ modal: { mode: 'edit', agentId }, paletteOpen: false }),
-  openRemove: (agentId) => set({ modal: { mode: 'remove', agentId } }),
-  closeModal: () => set({ modal: null }),
+  openRegister: () => { captureFocus(); set({ modal: { mode: 'register', agentId: null }, paletteOpen: false, exportOpen: false, importOpen: false }) },
+  openEdit: (agentId) => { captureFocus(); set({ modal: { mode: 'edit', agentId }, paletteOpen: false, exportOpen: false, importOpen: false }) },
+  openRemove: (agentId) => { captureFocus(); set({ modal: { mode: 'remove', agentId }, paletteOpen: false }) },
+  closeModal: () => { set({ modal: null }); restoreFocus() },
   selectAgent: (agentId, tab = 0) => set({ detailAgentId: agentId, detailTab: tab, highlightedStepId: null, paletteOpen: false }),
   closeDetail: () => set({ detailAgentId: null, highlightedStepId: null }),
   setDetailTab: (detailTab) => set({ detailTab }),
@@ -148,13 +157,14 @@ export const useFleetStore = create((set, get) => ({
       isNew: true,
     }
     set((state) => ({
-      agents: [...state.agents, agent],
+      agents: [...state.agents.map((item) => ({ ...item, isNew: false })), agent],
       modal: null,
       undoStack: [...state.undoStack, before],
       redoStack: [],
-      announcement: `${agent.name} registered`,
+      announcement: `${agent.name} registered with Idle status`,
     }))
     get().addToast(`${agent.name} registered`)
+    setTimeout(() => set((state) => ({ agents: state.agents.map((item) => item.id === id ? { ...item, isNew: false } : item) })), 260)
     return { ok: true, agent }
   },
 
@@ -233,11 +243,14 @@ export const useFleetStore = create((set, get) => ({
   toggleSort: () => set((state) => ({ sortDirection: state.sortDirection === 'asc' ? 'desc' : 'asc' })),
 
   retryAgent: (agentId) => {
+    const target = get().agents.find((agent) => agent.id === agentId)
+    if (!target || target.status !== 'error') return false
     set((state) => ({
       agents: state.agents.map((agent) => agent.id === agentId && agent.status === 'error' ? transition(agent, 'idle', 'Manual retry cleared the error') : agent),
-      announcement: 'Agent returned to idle',
     }))
+    announceStatus(get, target.name, 'idle', `${target.name} error cleared and returned to Idle`)
     get().addToast('Agent returned to idle')
+    return true
   },
 
   startRun: (agentId, forcedFailure = false) => {
@@ -251,8 +264,8 @@ export const useFleetStore = create((set, get) => ({
       agents: state.agents.map((agent) => agent.id === agentId ? transition({ ...agent, run, runSerial: serial, activity: [activity, ...agent.activity] }, 'running', `Run ${serial} started`, { kind: 'run' }) : agent),
       detailAgentId: agentId,
       detailTab: 2,
-      announcement: `${target.name} run started`,
     }))
+    announceStatus(get, target.name, 'running', `${target.name} run started`)
     get().addToast(`${target.name} run started`, 'info')
     return true
   },
@@ -268,8 +281,8 @@ export const useFleetStore = create((set, get) => ({
         const steps = agent.run.steps.map((step, stepIndex) => stepIndex === index ? { ...step, checkpoint } : step)
         return transition({ ...agent, run: { ...agent.run, status: 'paused', steps } }, 'paused', bulk ? 'Paused by Pause All' : 'Manual pause checkpoint saved', { kind: 'checkpoint', stepId: steps[index]?.id })
       }),
-      announcement: `${target.name} paused`,
     }))
+    announceStatus(get, target.name, 'paused', `${target.name} paused`)
     return true
   },
   resumeAgent: (agentId, bulk = false) => {
@@ -277,8 +290,8 @@ export const useFleetStore = create((set, get) => ({
     if (!target || target.status !== 'paused' || !target.run) return false
     set((state) => ({
       agents: state.agents.map((agent) => agent.id === agentId ? transition({ ...agent, run: { ...agent.run, status: 'running' } }, 'running', bulk ? 'Resumed by Resume All' : 'Resumed from checkpoint', { kind: 'checkpoint', stepId: agent.run.steps[agent.run.currentStep]?.id }) : agent),
-      announcement: `${target.name} resumed`,
     }))
+    announceStatus(get, target.name, 'running', `${target.name} resumed`)
     return true
   },
   pauseSelected: () => {
@@ -359,7 +372,7 @@ export const useFleetStore = create((set, get) => ({
             const duration = Math.max(1, Math.round((Date.now() - new Date(run.startedAt).getTime()) / 1000))
             const completedRun = { ...run, status: 'complete', steps, progressComplete, endedAt: completedAt, duration }
             updatedAgent = transition({ ...updatedAgent, run: completedRun }, 'idle', `Run completed in ${duration}s`, { kind: 'run', stepId: current.id })
-            announcement = `${agent.name} run completed`
+            announcement = `${agent.name} run completed in ${duration}s`
             return updatedAgent
           }
           const nextIndex = index + 1
@@ -374,10 +387,11 @@ export const useFleetStore = create((set, get) => ({
   },
 
   openExport: () => {
+    captureFocus()
     const text = JSON.stringify(compileSnapshot(get().agents), null, 2)
-    set({ exportOpen: true, exportPreviewText: text, paletteOpen: false })
+    set({ exportOpen: true, exportPreviewText: text, paletteOpen: false, importOpen: false, modal: null })
   },
-  closeExport: () => set({ exportOpen: false }),
+  closeExport: () => { set({ exportOpen: false }); restoreFocus() },
   refreshExport: () => {
     if (get().exportOpen) set({ exportPreviewText: JSON.stringify(compileSnapshot(get().agents), null, 2) })
   },
@@ -403,8 +417,8 @@ export const useFleetStore = create((set, get) => ({
     anchor.click()
     URL.revokeObjectURL(url)
   },
-  openImport: () => set({ importOpen: true, importError: '', paletteOpen: false }),
-  closeImport: () => set({ importOpen: false, importError: '' }),
+  openImport: () => { captureFocus(); set({ importOpen: true, importError: '', paletteOpen: false, exportOpen: false, modal: null }) },
+  closeImport: () => { set({ importOpen: false, importError: '' }); restoreFocus() },
   setImportDraft: (importDraft) => set({ importDraft }),
   importFleet: (snapshot) => {
     const parsed = fleetSnapshotSchema.safeParse(snapshot)
@@ -414,21 +428,24 @@ export const useFleetStore = create((set, get) => ({
       return { ok: false }
     }
     const before = mutationSnapshot(get())
-    const imported = parsed.data.agents.map((agent, index) => ({
-      id: uid(`imported-${index}`),
-      name: agent.name,
-      agentType: agent.agentType,
-      editorIntegration: agent.editorIntegration,
-      accessKey: agent.accessKey,
-      status: agent.status,
-      lastSeen: agent.lastSeen,
-      timeline: clone(agent.timeline),
-      activity: [],
-      run: restoreImportedRun(`imported-${index}`, agent.run),
-      failureScenario: false,
-      runSerial: 1,
-      isNew: true,
-    }))
+    const imported = parsed.data.agents.map((agent, index) => {
+      const id = uid(`imported-${index}`)
+      return {
+        id,
+        name: agent.name,
+        agentType: agent.agentType,
+        editorIntegration: agent.editorIntegration,
+        accessKey: agent.accessKey,
+        status: agent.status,
+        lastSeen: agent.lastSeen,
+        timeline: clone(agent.timeline),
+        activity: [],
+        run: restoreImportedRun(id, agent.run),
+        failureScenario: false,
+        runSerial: agent.run ? 1 : 0,
+        isNew: false,
+      }
+    })
     set((state) => ({
       agents: imported,
       selectedIds: [],
@@ -444,8 +461,8 @@ export const useFleetStore = create((set, get) => ({
     return { ok: true }
   },
 
-  openPalette: () => set({ paletteOpen: true, paletteQuery: '' }),
-  closePalette: () => set({ paletteOpen: false, paletteQuery: '' }),
+  openPalette: () => { captureFocus(); set({ paletteOpen: true, paletteQuery: '', modal: null, exportOpen: false, importOpen: false }) },
+  closePalette: () => { set({ paletteOpen: false, paletteQuery: '' }); restoreFocus() },
   setPaletteQuery: (paletteQuery) => set({ paletteQuery }),
   setTheme: (theme) => set({ theme }),
   setLocale: (locale) => set({ locale }),
