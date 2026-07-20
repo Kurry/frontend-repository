@@ -23,10 +23,12 @@ function FacetRail() {
   return (
     <aside className={`facet-rail ${filtersOpen ? 'open' : ''}`} aria-label="Tag facets">
       <div className="facet-title"><div><span>DISCOVER</span><h2>Tags</h2></div><Button className="facet-close" kind="ghost" size="sm" hasIconOnly renderIcon={Close} iconDescription="Close filters" onClick={() => useAppStore.getState().setUI({ filtersOpen: false })} /></div>
-      <button className={!filters.tag ? 'facet-entry active' : 'facet-entry'} onClick={() => setFilters({ tag: null })}><span>All tags</span><b>{candidates.length}</b></button>
+      <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+      <li><button className={!filters.tag ? 'facet-entry active' : 'facet-entry'} onClick={() => setFilters({ tag: null })}><span>All tags</span><b>{candidates.length}</b></button></li>
       {entries.map(([tag, count]) => (
-        <button key={tag} className={filters.tag === tag ? 'facet-entry active' : 'facet-entry'} aria-pressed={filters.tag === tag} onClick={() => setFilters({ tag: filters.tag === tag ? null : tag })}><span>{tag}</span><b>{count}</b></button>
+        <li key={tag}><button className={filters.tag === tag ? 'facet-entry active' : 'facet-entry'} aria-pressed={filters.tag === tag} onClick={() => setFilters({ tag: filters.tag === tag ? null : tag })}><span>{tag}</span><b>{count}</b></button></li>
       ))}
+      </ul>
     </aside>
   )
 }
@@ -87,7 +89,7 @@ export default function LibraryView() {
           <div className="heading-actions"><Button kind="tertiary" renderIcon={Merge} onClick={() => setUI({ composeOpen: true })}>Compose</Button><Button renderIcon={Add} onClick={() => openEditor(null)}>New Persona</Button></div>
         </header>
         {visible.length ? (
-          <div className="persona-grid">{visible.map((persona) => <PersonaCard key={persona.id} persona={persona} />)}</div>
+          <div className="persona-grid">{visible.map((persona, index) => <PersonaCard key={persona.id} index={index} persona={persona} />)}</div>
         ) : (
           <div className="empty-state">
             <div className="empty-orbit"><span /></div>

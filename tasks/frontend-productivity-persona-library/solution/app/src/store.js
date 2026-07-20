@@ -281,7 +281,7 @@ export const useAppStore = create((set, get) => ({
     const persona = s.personas.find((p) => p.id === id)
     return { activeView: 'test-bench', testBench: { ...s.testBench, personaId: id }, ui: { ...s.ui, toast: { id: uid('toast'), message: `${persona?.name} opened in Test Bench` } }, announce: `${persona?.name} opened in Test Bench` }
   }),
-  setTestPersona: (id) => set((s) => ({ testBench: { ...s.testBench, personaId: id }, ui: { ...s.ui, attacherOpen: false } })),
+  setTestPersona: (id) => set((s) => { const p = s.personas.find(x => x.id === id); return { testBench: { ...s.testBench, personaId: id }, ui: { ...s.ui, attacherOpen: false, toast: { id: uid('toast'), message: `Attached ${p?.name || 'Persona'} to Test Bench` } }, announce: `Attached ${p?.name || 'Persona'} to Test Bench` } }),
   setScenario: (scenarioId) => set((s) => ({ testBench: { ...s.testBench, scenarioId } })),
   startRun: (target) => set((s) => {
     if (s.testBench.status === 'waiting' || s.testBench.status === 'streaming') return s

@@ -55,7 +55,7 @@ function PollOverlay() {
   if (!persona) return null
   const counts = poll.votes.reduce((acc, vote) => ({ ...acc, [vote.iterationId]: (acc[vote.iterationId] || 0) + 1 }), {})
   return (
-    <Modal open={poll.open} modalLabel="Iteration voting" modalHeading={`Poll · ${persona.name}`} passiveModal onRequestClose={closePoll} size="sm">
+    <Modal open={poll.open} modalLabel="Iteration voting" modalHeading={`Poll · ${persona.name}`} passiveModal onRequestClose={() => { document.activeElement?.blur(); closePoll() }} size="sm">
       <div className="poll-status"><span className={poll.running ? 'vote-pulse' : 'vote-complete'}><UserMultiple /></span><div><strong>{poll.running ? 'Teammates are voting…' : 'Poll closed'}</strong><p>{poll.running ? `${poll.votes.length} of 3 votes received` : 'The winning iteration is now promoted.'}</p></div></div>
       <div className="poll-options">
         {[...persona.iterations].reverse().map((iteration, index) => {
@@ -83,7 +83,7 @@ export default function DetailAndPoll() {
   const selectedIterations = selected.map((id) => persona?.iterations.find((iteration) => iteration.id === id)).filter(Boolean).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
   return (
     <>
-      <Modal open={Boolean(persona)} modalLabel="Persona detail" modalHeading={persona?.name || 'Persona detail'} passiveModal onRequestClose={() => setUI({ detailId: null })} size="lg">
+      <Modal open={Boolean(persona)} modalLabel="Persona detail" modalHeading={persona?.name || 'Persona detail'} passiveModal onRequestClose={() => { document.activeElement?.blur(); setUI({ detailId: null }) }} size="lg">
         {persona && <div className="detail-layout">
           <section className="iterations-panel"><div className="section-heading"><div><h3>Version history</h3><p>Newest first · select two iterations for a field-level diff.</p></div><Button size="sm" kind="tertiary" renderIcon={UserMultiple} onClick={() => startPoll(persona.id)}>Start poll</Button></div>
             {pollMessage && persona.iterations.length < 2 && <p className="inline-notice">{pollMessage}</p>}

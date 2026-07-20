@@ -120,7 +120,7 @@ export default function PersonaEditor() {
       secondaryButtonText="Cancel"
       primaryButtonDisabled={!valid || saving.current}
       onRequestSubmit={() => { syncActiveVariant(); trigger().then((ok) => ok && save()) }}
-      onRequestClose={closeEditor}
+      onRequestClose={() => { document.activeElement?.blur(); closeEditor(); }}
       size="lg"
       selectorPrimaryFocus="#persona-name"
       className="persona-editor-modal"
@@ -216,7 +216,7 @@ export default function PersonaEditor() {
                       setTraitInputErrors((current) => { const next = { ...current }; if (message) next[trait] = message; else delete next[trait]; return next })
                       if (!message) setValue(`traits.${trait}`, Number(raw), { shouldValidate: true, shouldDirty: true })
                     }} /></div>
-                    <Slider id={`trait-${trait}`} labelText="" hideTextInput min={0} max={100} step={1} value={value} onChange={({ value: next }) => {
+                    <Slider id={`trait-${trait}`} labelText="" aria-label={`${pretty(trait)} slider`} hideTextInput min={0} max={100} step={1} value={value} onChange={({ value: next }) => {
                       setTraitDrafts((current) => ({ ...current, [trait]: String(next) }))
                       setTraitInputErrors((current) => { const updated = { ...current }; delete updated[trait]; return updated })
                       setValue(`traits.${trait}`, Number(next), { shouldValidate: true, shouldDirty: true })

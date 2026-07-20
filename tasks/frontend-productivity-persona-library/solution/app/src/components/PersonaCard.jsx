@@ -6,7 +6,7 @@ import { TRAITS, useAppStore } from '../store'
 const plainText = (html) => html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 const pretty = (value) => value.charAt(0).toUpperCase() + value.slice(1)
 
-export default function PersonaCard({ persona }) {
+export default function PersonaCard({ persona, index = 0 }) {
   const flipped = useAppStore((s) => s.flippedIds.includes(persona.id))
   const selected = useAppStore((s) => s.selectedIds.includes(persona.id))
   const toggleFlip = useAppStore((s) => s.toggleFlip)
@@ -28,6 +28,7 @@ export default function PersonaCard({ persona }) {
   return (
     <article
       className={`card-shell role-${persona.role.toLowerCase()} ${persona.archived ? 'archived' : ''}`}
+      style={{ animationDelay: `${index * 0.04}s` }}
       aria-label={`${persona.name}, ${persona.role}${persona.archived ? ', archived' : ''}`}
       tabIndex={0}
       onClick={flip}
@@ -54,15 +55,15 @@ export default function PersonaCard({ persona }) {
             {TRAITS.map((trait) => <span key={trait} title={`${pretty(trait)} ${persona.traits[trait]}`}><i style={{ width: `${persona.traits[trait]}%` }} />{trait.slice(0, 3)} {persona.traits[trait]}</span>)}
           </div>
           <div className="card-actions" onClick={(e) => e.stopPropagation()}>
-            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Edit} iconDescription={`Edit ${persona.name}`} onClick={() => openEditor(persona.id)} />
-            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Renew} iconDescription={`Clone ${persona.name}`} onClick={() => clonePersona(persona.id)} />
-            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Information} iconDescription={`Details for ${persona.name}`} onClick={() => openDetail(persona.id)} />
-            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Chemistry} iconDescription={`Open ${persona.name} in Test Bench`} onClick={() => openInTestBench(persona.id)} />
-            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Scale} iconDescription={`Add ${persona.name} to comparison`} onClick={() => addToComparison(persona.id)} />
+            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Edit} tooltipAlignment="center" tooltipPosition="bottom" iconDescription={`Edit ${persona.name}`} onClick={() => openEditor(persona.id)} />
+            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Renew} tooltipAlignment="center" tooltipPosition="bottom" iconDescription={`Clone ${persona.name}`} onClick={() => clonePersona(persona.id)} />
+            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Information} tooltipAlignment="center" tooltipPosition="bottom" iconDescription={`Details for ${persona.name}`} onClick={() => openDetail(persona.id)} />
+            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Chemistry} tooltipAlignment="center" tooltipPosition="bottom" iconDescription={`Open ${persona.name} in Test Bench`} onClick={() => openInTestBench(persona.id)} />
+            <Button kind="ghost" size="sm" hasIconOnly renderIcon={Scale} tooltipAlignment="center" tooltipPosition="bottom" iconDescription={`Add ${persona.name} to comparison`} onClick={() => addToComparison(persona.id)} />
           </div>
         </div>
         <div className="card-face card-back" aria-hidden={!flipped}>
-          <div className="card-back-heading"><div><span>System prompt</span><strong>{persona.name}</strong></div><Button kind="ghost" size="sm" hasIconOnly renderIcon={Copy} iconDescription="Copy system prompt" onClick={(e) => { e.stopPropagation(); navigator.clipboard?.writeText(prompt); toast('System prompt copied') }} /></div>
+          <div className="card-back-heading"><div><span>System prompt</span><strong>{persona.name}</strong></div><Button kind="ghost" size="sm" hasIconOnly renderIcon={Copy} tooltipAlignment="center" tooltipPosition="bottom" iconDescription="Copy system prompt" onClick={(e) => { e.stopPropagation(); navigator.clipboard?.writeText(prompt); toast('System prompt copied') }} /></div>
           <pre>{prompt}</pre>
           <p>Click the card or press Enter to flip back.</p>
           <Button kind="tertiary" size="sm" renderIcon={Launch} onClick={(e) => { e.stopPropagation(); openEditor(persona.id) }}>Edit prompt</Button>

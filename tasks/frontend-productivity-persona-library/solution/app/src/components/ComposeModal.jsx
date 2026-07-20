@@ -23,6 +23,7 @@ export default function ComposeModal() {
   const second = personas.find((p) => p.id === values.sourceB)
   const traits = useMemo(() => Object.fromEntries(TRAITS.map((trait) => [trait, Math.round((first?.traits[trait] || 0) * (1 - Number(values.weight || 0) / 100) + (second?.traits[trait] || 0) * Number(values.weight || 0) / 100)])), [first, second, values.weight])
   const constraints = [...new Set([...(first?.constraints || []), ...(second?.constraints || [])])]
+  const valid = composeSchema.safeParse(values).success
 
   useEffect(() => {
     if (!open) return
@@ -52,7 +53,7 @@ export default function ComposeModal() {
   })
 
   return (
-    <Modal open={open} size="lg" modalLabel="Composition builder" modalHeading="Compose a blended persona" primaryButtonText="Save blend" secondaryButtonText="Cancel" primaryButtonDisabled={!composeSchema.safeParse(values).success} onRequestClose={() => setUI({ composeOpen: false })} onRequestSubmit={submit}>
+    <Modal open={open} size="lg" modalLabel="Composition builder" modalHeading="Compose a blended persona" primaryButtonText="Save blend" secondaryButtonText="Cancel" primaryButtonDisabled={!valid} onRequestClose={() => { document.activeElement?.blur(); setUI({ composeOpen: false }) }} onRequestSubmit={submit}>
       <form className="compose-form" onSubmit={submit}>
         <div className="form-grid form-grid--2">
           <Select id="blend-source-a" labelText="First persona *" {...register('sourceA')} invalid={Boolean(errors.sourceA)} invalidText={errors.sourceA?.message}>{personas.map((p) => <SelectItem key={p.id} value={p.id} text={p.name} />)}</Select>
@@ -61,7 +62,7 @@ export default function ComposeModal() {
         <TextInput id="blend-name" labelText="Blend name *" {...register('name')} invalid={Boolean(errors.name)} invalidText={errors.name?.message} />
         <div className="blend-weight">
           <div className="trait-label-row"><label htmlFor="blend-weight">Blend weighting</label><strong>{Number(values.weight || 0)}% toward second persona</strong></div>
-          <Slider id="blend-weight" labelText="" hideTextInput min={0} max={100} value={Number(values.weight || 0)} onChange={({ value }) => setValue('weight', Number(value), { shouldValidate: true })} />
+          <Slider id="blend-weight" labelText="" aria-label="Blend weight slider" hideTextInput min={0} max={100} value={Number(values.weight || 0)} onChange={({ value }) => setValue('weight', Number(value), { shouldValidate: true })} />
           {errors.weight && <p className="field-error">Blend weight: {errors.weight.message}</p>}
         </div>
         <div className="blend-preview">
