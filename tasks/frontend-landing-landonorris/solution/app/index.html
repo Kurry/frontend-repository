@@ -40,12 +40,15 @@
       </div>
 
       <div class="nav-right">
+        <span class="nav-state-count" id="nav-selected-races" data-selected-races-count aria-live="polite">Selected races 0</span>
+        <span class="nav-state-count" id="nav-shortlist-count" aria-live="polite">Shortlist 0</span>
         <button type="button" class="btn-w is-nav" id="storeBtn" data-store-cta>
           <span class="btn-icon-w" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8V6a3 3 0 0 1 6 0v2m-9 0h12l-1 12H4L3 8z"/></svg>
           </span>
           <span class="btn-text is-nav" data-split-text>STORE</span>
         </button>
+        <button type="button" class="nav-press-kit" id="pressKitBtn">PRESS KIT</button>
         <button type="button" class="nav-ham" id="navHam" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
           <span class="nav-ham-lines" aria-hidden="true"><span></span><span></span></span>
         </button>
@@ -70,7 +73,7 @@
             </li>
             <li class="nav-menu-link-w" data-menu-link data-dest="horizontal-media" data-anim="text-hover"><span class="nav-menu-link-label">ON TRACK</span></li>
             <li class="nav-menu-link-w" data-menu-link data-dest="social-stream" data-anim="text-hover"><span class="nav-menu-link-label">OFF TRACK</span></li>
-            <li class="nav-menu-link-w" data-menu-link data-dest="helmet-grid" data-anim="text-hover"><span class="nav-menu-link-label">CALENDAR</span></li>
+            <li class="nav-menu-link-w" data-menu-link data-dest="race-calendar" data-anim="text-hover"><span class="nav-menu-link-label">CALENDAR</span></li>
           </ul>
           <div class="nav-menu-social-w">
             <ul class="nav-menu-socials" role="list">
@@ -124,12 +127,12 @@
     <section class="horizontal-section" id="horizontal-media" data-section="horizontal-media">
       <div class="horizontal-pin">
         <div class="horizontal-track" id="horizontalTrack" data-horizontal-track>
-          <div class="horizontal-item-w"><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baa04b14a1ca33c0b25_ln-home-horiz-1.webp" alt="Lando on track" /><span class="horizontal-item-cap">ON TRACK</span></div>
-          <div class="horizontal-item-w"><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baab12220595c8223b3_ln-home-horiz-2.webp" alt="Lando racing" /><span class="horizontal-item-cap">SPEED</span></div>
-          <div class="horizontal-item-w"><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302babcf12f0111d96322e_ln-home-horiz-3.webp" alt="Lando lifestyle" /><span class="horizontal-item-cap">OFF TRACK</span></div>
-          <div class="horizontal-item-w"><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baa798e2cc6e02ac38a_ln-home-horiz-4.webp" alt="Lando portrait" /><span class="horizontal-item-cap">FOCUS</span></div>
-          <div class="horizontal-item-w"><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baa14a96f3cdd2f9a95_ln-home-horiz-6.webp" alt="Lando garage" /><span class="horizontal-item-cap">GARAGE</span></div>
-          <div class="horizontal-item-w"><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baaedf821dd2e3a7c74_ln-home-horiz-8.webp" alt="Lando podium" /><span class="horizontal-item-cap">PODIUM</span></div>
+          <div class="horizontal-item-w" data-shortlist-item="editorial"><button type="button" class="shortlist-btn" data-shortlist-btn>Shortlist</button><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baa04b14a1ca33c0b25_ln-home-horiz-1.webp" alt="Lando on track" /><span class="horizontal-item-cap">ON TRACK</span></div>
+          <div class="horizontal-item-w" data-shortlist-item="editorial"><button type="button" class="shortlist-btn" data-shortlist-btn>Shortlist</button><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baab12220595c8223b3_ln-home-horiz-2.webp" alt="Lando racing" /><span class="horizontal-item-cap">SPEED</span></div>
+          <div class="horizontal-item-w" data-shortlist-item="editorial"><button type="button" class="shortlist-btn" data-shortlist-btn>Shortlist</button><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302babcf12f0111d96322e_ln-home-horiz-3.webp" alt="Lando lifestyle" /><span class="horizontal-item-cap">OFF TRACK</span></div>
+          <div class="horizontal-item-w" data-shortlist-item="editorial"><button type="button" class="shortlist-btn" data-shortlist-btn>Shortlist</button><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baa798e2cc6e02ac38a_ln-home-horiz-4.webp" alt="Lando portrait" /><span class="horizontal-item-cap">FOCUS</span></div>
+          <div class="horizontal-item-w" data-shortlist-item="editorial"><button type="button" class="shortlist-btn" data-shortlist-btn>Shortlist</button><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baa14a96f3cdd2f9a95_ln-home-horiz-6.webp" alt="Lando garage" /><span class="horizontal-item-cap">GARAGE</span></div>
+          <div class="horizontal-item-w" data-shortlist-item="editorial"><button type="button" class="shortlist-btn" data-shortlist-btn>Shortlist</button><img src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baaedf821dd2e3a7c74_ln-home-horiz-8.webp" alt="Lando podium" /><span class="horizontal-item-cap">PODIUM</span></div>
         </div>
       </div>
     </section>
@@ -143,22 +146,42 @@
     <section class="helmet-grid-section" id="helmet-grid" data-section="helmet-grid">
       <h2 class="section-eyebrow">THE HELMET</h2>
       <div class="helmet-grid">
-        <div class="helmet-grid-item-w" data-helmet-item>
+        <div class="helmet-grid-item-w" data-helmet-item data-shortlist-item="helmet">
+          <button type="button" class="shortlist-btn" data-shortlist-btn>Shortlist</button>
           <img class="helmet-grid-item-img-helmet" src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/67d43d6e276c436a378a1da6_ln-360-helm-1.webp" alt="Helmet" />
           <img class="helmet-grid-item-reveal-img" src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302ff5ff89a9a4afb8c19e_ln-home-helm-large.webp" alt="" />
           <span class="helmet-grid-extender-img">01</span>
         </div>
-        <div class="helmet-grid-item-w" data-helmet-item>
+        <div class="helmet-grid-item-w" data-helmet-item data-shortlist-item="helmet">
+          <button type="button" class="shortlist-btn" data-shortlist-btn>Shortlist</button>
           <img class="helmet-grid-item-img-helmet" src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302ff5ff89a9a4afb8c19e_ln-home-helm-large.webp" alt="Helmet detail" />
           <img class="helmet-grid-item-reveal-img" src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/67d43d6e276c436a378a1da6_ln-360-helm-1.webp" alt="" />
           <span class="helmet-grid-extender-img">02</span>
         </div>
-        <div class="helmet-grid-item-w" data-helmet-item>
+        <div class="helmet-grid-item-w" data-helmet-item data-shortlist-item="helmet">
+          <button type="button" class="shortlist-btn" data-shortlist-btn>Shortlist</button>
           <img class="helmet-grid-item-img-helmet" src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/67d18655b032045a4dc78e56_ln4-hp-lando-head-p-800.webp" alt="Lando head" />
           <img class="helmet-grid-item-reveal-img" src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68302baa14a96f3cdd2f9a95_ln-home-horiz-6.webp" alt="" />
           <span class="helmet-grid-extender-img">03</span>
         </div>
       </div>
+    </section>
+
+    <!-- RACE CALENDAR -->
+    <section class="race-calendar-section" id="race-calendar" data-section="race-calendar">
+      <div class="race-calendar-head">
+        <div>
+          <p class="section-eyebrow">2025 SEASON</p>
+          <h2>RACE CALENDAR</h2>
+        </div>
+        <p id="calendar-selected-races" class="race-selection-count" data-selected-races-count aria-live="polite">Selected races 0</p>
+      </div>
+      <div class="race-filter" aria-label="Filter race calendar">
+        <button type="button" class="race-filter-btn is-active" data-filter="All">All</button>
+        <button type="button" class="race-filter-btn" data-filter="Upcoming">Upcoming</button>
+        <button type="button" class="race-filter-btn" data-filter="Completed">Completed</button>
+      </div>
+      <div id="raceList" class="race-list"></div>
     </section>
 
     <!-- COLLABS / PARTNERS MARQUEE -->
@@ -216,6 +239,15 @@
               <li><img class="footer-marquee-svg" src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68dbd5d722f5ba2f4074cbe7_ln4-footer-logo-ralph-lauren.svg" alt="Ralph Lauren" /></li>
             </ul>
           </div>
+          <form class="newsletter-form" id="newsletterForm" novalidate>
+            <label for="newsletterEmail">Join the Nova Racing dispatch</label>
+            <div class="newsletter-row">
+              <input id="newsletterEmail" type="email" inputmode="email" autocomplete="email" placeholder="fan@example.com" aria-describedby="newsletterError newsletterSuccess" />
+              <button type="submit" id="newsletterSubmitBtn" disabled>Subscribe</button>
+            </div>
+            <p id="newsletterError" class="newsletter-message error" role="alert"></p>
+            <p id="newsletterSuccess" class="newsletter-message success" role="status" aria-live="polite"></p>
+          </form>
           <div class="footer-bottom">
             <span class="footer-brand">LANDO NORRIS</span>
             <ul class="footer-legal" role="list">
@@ -229,6 +261,33 @@
       </div>
     </footer>
   </main>
+
+  <dialog class="command-palette" id="cmdPalette" aria-labelledby="cmdPaletteTitle">
+    <h2 id="cmdPaletteTitle">Command palette</h2>
+    <input id="cmdInput" type="search" autocomplete="off" placeholder="Search actions…" aria-label="Search commands" />
+    <ul id="cmdList" role="listbox" aria-label="Available commands"></ul>
+  </dialog>
+
+  <dialog class="press-kit-drawer" id="pressKitDrawer" aria-labelledby="pressKitTitle">
+    <header class="press-kit-header">
+      <h2 id="pressKitTitle">Press kit</h2>
+      <button type="button" id="pressKitClose" aria-label="Close press kit">Close</button>
+    </header>
+    <div class="press-kit-tabs" role="tablist" aria-label="Press kit format">
+      <button type="button" class="press-kit-tab is-active" data-tab="json" role="tab">JSON</button>
+      <button type="button" class="press-kit-tab" data-tab="markdown" role="tab">Markdown</button>
+      <button type="button" class="press-kit-tab" data-tab="ics" role="tab">ICS</button>
+    </div>
+    <textarea id="pressKitPreview" class="press-kit-preview" rows="16" readonly aria-label="Press kit preview"></textarea>
+    <div class="press-kit-actions">
+      <button type="button" id="pressKitCopyBtn">Copy</button>
+      <button type="button" id="pressKitDownloadBtn">Download</button>
+      <button type="button" id="pressKitImportPasteBtn">Import clipboard</button>
+      <button type="button" id="pressKitImportFileBtn">Import file</button>
+      <input id="pressKitFileInput" type="file" accept="application/json,.json" hidden />
+    </div>
+    <p id="pressKitMessage" class="press-kit-message" role="status" aria-live="polite"></p>
+  </dialog>
 
   <script src="/app.js"></script>
 </body>
