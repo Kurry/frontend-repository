@@ -34,11 +34,13 @@ function normalizeFormInput(input: Record<string, unknown>) {
     if (fields['step-notes'] !== undefined) next.notes = fields['step-notes'];
     if (fields.recommendation !== undefined) next.recommendation = fields.recommendation;
   }
-  if ((!next.action || next.action === '') && Array.isArray(next.form_operations) && next.form_operations.length > 0) {
-    next.action = next.form_operations[0];
-  }
+  const moduleFormOps = new Set(['submit', 'validate', 'cancel']);
   if ((!next.action || next.action === '') && Array.isArray(next.workflow_steps) && next.workflow_steps.length > 0) {
     next.action = next.workflow_steps[0];
+  }
+  if ((!next.action || next.action === '') && Array.isArray(next.form_operations) && next.form_operations.length > 0) {
+    const workflowOp = next.form_operations.find((op) => typeof op === 'string' && !moduleFormOps.has(op));
+    next.action = workflowOp ?? next.form_operations[0];
   }
   if (typeof next.action === 'string') {
     const aliases: Record<string, string> = {
