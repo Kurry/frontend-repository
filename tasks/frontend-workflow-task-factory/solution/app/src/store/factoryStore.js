@@ -60,6 +60,8 @@ const repositories = [
   { id: 'lattice-db', name: 'lattice-db', language: 'Python', description: 'Embedded analytical storage engine' },
 ]
 
+const cleanTrials = trialSeed.filter((trial) => trial.verdict !== 'bad-success')
+
 const prs = {
   'quartz-orm': [
     makePr('quartz-orm', 184, 'Preserve parameter order across nested relation filters', 9, {
@@ -73,12 +75,25 @@ const prs = {
       generatedAt: '2026-07-14T09:42:18.000Z',
       createdAt: '2026-07-14T09:30:00.000Z',
     }),
+    makePr('quartz-orm', 183, 'Stabilize cursor pagination without bad-success trial noise', 8, {
+      checks: {
+        baseline: check('passing', 1, 'FAIL cursor_pagination\nBaseline reproduced the regression.'),
+        reference: check('passing', 1, 'PASS cursor_pagination\nReference fix passed all checks.'),
+      },
+      trials: cleanTrials,
+      request: { repository: 'quartz-orm', pullRequestNumber: '183', minFiles: 2, maxFiles: 20 },
+      generatedAt: '2026-07-13T16:12:00.000Z',
+      createdAt: '2026-07-13T16:00:00.000Z',
+    }),
     makePr('quartz-orm', 181, 'Refresh query builder documentation examples', 3, { linkedIssue: null, rejectionReason: 'docs-only', statuses: ['complete', 'complete', 'skipped', 'skipped', 'skipped'] }),
     makePr('quartz-orm', 179, 'Normalize whitespace in generated migration snapshots', 6, { rejectionReason: 'formatting-only', statuses: ['complete', 'complete', 'skipped', 'skipped', 'skipped'] }),
     makePr('quartz-orm', 176, 'Add composite cursor support for paginated relation loading', 14, { statuses: ['complete', 'complete', 'complete', 'running', 'pending'] }),
     makePr('quartz-orm', 173, 'Repair nullable enum coercion during batch insert operations', 7, { checks: { baseline: check('passing', 1, 'FAIL nullable_enum_batch\nRegression reproduced.'), reference: check('failing', 2, 'FAIL nullable_enum_batch\nUnexpected null coercion in row 14.') }, trials: trialSeed.slice(2) }),
     makePr('quartz-orm', 170, 'Rename internal token helper', 1, { rejectionReason: 'too-few-files', statuses: ['complete', 'complete', 'skipped', 'skipped', 'skipped'] }),
-    makePr('quartz-orm', 168, 'Split tenant-aware transaction context from connection pool acquisition', 18),
+    makePr('quartz-orm', 168, 'Split tenant-aware transaction context from connection pool acquisition', 18, {
+      trials: cleanTrials,
+      request: { repository: 'quartz-orm', pullRequestNumber: '168', minFiles: 2, maxFiles: 40 },
+    }),
     makePr('quartz-orm', 165, 'Guard relation mapper when projected keys contain duplicate aliases', 8, { linkedIssue: null, rejectionReason: 'no-linked-issue', statuses: ['complete', 'complete', 'skipped', 'skipped', 'skipped'] }),
   ],
   copperline: [
@@ -155,10 +170,14 @@ export const useFactoryStore = create((set, get) => ({
   mobileNavOpen: false,
   toasts: [],
   runningIds: [],
+  manifestLedger: [],
+  theme: 'light',
+  onboardingStep: 0,
+  createDraft: { repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
 
-  navigate: (view) => set({ activeView: view, mobileNavOpen: false }),
-  openRepository: (repoId) => set({ activeView: 'repository-pipeline', selectedRepositoryId: repoId, selectedPrId: null, mobileNavOpen: false }),
-  openTask: (repoId, prId) => set({ activeView: 'task-detail', selectedRepositoryId: repoId, selectedPrId: prId }),
+  navigate: (view) => set({ activeView: view, mobileNavOpen: false, createDialogOpen: false }),
+  openRepository: (repoId) => set({ activeView: 'repository-pipeline', selectedRepositoryId: repoId, selectedPrId: null, mobileNavOpen: false, createDialogOpen: false }),
+  openTask: (repoId, prId) => set({ activeView: 'task-detail', selectedRepositoryId: repoId, selectedPrId: prId, createDialogOpen: false, trialFilter: null }),
   backToPipeline: () => set({ activeView: 'repository-pipeline', selectedPrId: null }),
   setTrialFilter: (trialFilter) => set({ trialFilter }),
   setTimelineFilter: (timelineFilter) => set({ timelineFilter }),
@@ -173,6 +192,12 @@ export const useFactoryStore = create((set, get) => ({
     }
   },
   setMobileNavOpen: (mobileNavOpen) => set({ mobileNavOpen }),
+  setTheme: (theme) => {
+    set({ theme })
+    if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme
+  },
+  setOnboardingStep: (onboardingStep) => set({ onboardingStep }),
+  setCreateDraft: (createDraft) => set({ createDraft }),
   addToast: (message, kind = 'info') => {
     const id = `${Date.now()}-${Math.random()}`
     set((state) => ({ toasts: [...state.toasts, { id, message, kind }] }))
@@ -182,17 +207,33 @@ export const useFactoryStore = create((set, get) => ({
 
   getManifest: (pr) => {
     if (!pr?.request || pr.checks?.baseline?.status !== 'passing' || pr.checks?.reference?.status !== 'passing') return null
-    return taskManifestSchema.parse({
+    const stages = pr.stages.map(({ name, status, attemptCount }) => ({
+      name,
+      status: status === 'skipped' ? 'complete' : status,
+      attemptCount: Math.max(1, Number(attemptCount) || 1),
+    }))
+    const payload = {
       schemaVersion: 1,
       id: pr.id,
       repository: pr.request.repository,
       pullRequestNumber: Number(pr.request.pullRequestNumber),
-      minFiles: pr.request.minFiles,
-      maxFiles: pr.request.maxFiles,
+      minFiles: Number(pr.request.minFiles),
+      maxFiles: Number(pr.request.maxFiles),
       checks: { skeleton: true, validate: true },
-      stages: pr.stages.map(({ name, status, attemptCount }) => ({ name, status, attemptCount })),
-      generatedAt: pr.generatedAt,
-    })
+      stages,
+      generatedAt: pr.generatedAt || new Date().toISOString(),
+    }
+    const parsed = taskManifestSchema.safeParse(payload)
+    return parsed.success ? parsed.data : payload
+  },
+
+  listAcceptedManifests: () => {
+    const state = get()
+    const live = acceptedTasks(state).map((pr) => state.getManifest(pr)).filter(Boolean)
+    const byId = new Map()
+    state.manifestLedger.forEach((manifest) => byId.set(manifest.id, manifest))
+    live.forEach((manifest) => byId.set(manifest.id, manifest))
+    return [...byId.values()]
   },
 
   startRun: (body) => {
@@ -263,17 +304,55 @@ export const useFactoryStore = create((set, get) => ({
     })
     window.setTimeout(() => {
       const generatedAt = new Date().toISOString()
-      updatePr(set, body.repository, id, (pr) => ({
-        ...pr,
-        checks: {
-          baseline: check('passing', 1, 'FAIL regression_case\nExpected current behavior to fail.\nBaseline reproduced the reported defect.'),
-          reference: check('passing', 1, 'PASS regression_case\nPASS related_behavior\nReference fix completed successfully.'),
-        },
-        trials: trialSeed.map((trial, index) => ({ ...trial, id: `${id}-trial-${index + 1}` })),
-        generatedAt,
-      }))
+      let manifest = null
+      set((state) => {
+        const nextPullRequests = {
+          ...state.pullRequests,
+          [body.repository]: state.pullRequests[body.repository].map((pr) => {
+            if (pr.id !== id) return pr
+            const updated = {
+              ...pr,
+              checks: {
+                baseline: check('passing', 1, 'FAIL regression_case\nExpected current behavior to fail.\nBaseline reproduced the reported defect.'),
+                reference: check('passing', 1, 'PASS regression_case\nPASS related_behavior\nReference fix completed successfully.'),
+              },
+              trials: trialSeed.map((trial, index) => ({ ...trial, id: `${id}-trial-${index + 1}` })),
+              generatedAt,
+            }
+            return updated
+          }),
+        }
+        const accepted = nextPullRequests[body.repository].find((pr) => pr.id === id)
+        const stages = (accepted?.stages || []).map(({ name, status, attemptCount }) => ({
+          name,
+          status: status === 'skipped' ? 'complete' : status,
+          attemptCount: Math.max(1, Number(attemptCount) || 1),
+        }))
+        const payload = accepted ? {
+          schemaVersion: 1,
+          id: accepted.id,
+          repository: accepted.request.repository,
+          pullRequestNumber: Number(accepted.request.pullRequestNumber),
+          minFiles: Number(accepted.request.minFiles),
+          maxFiles: Number(accepted.request.maxFiles),
+          checks: { skeleton: true, validate: true },
+          stages,
+          generatedAt,
+        } : null
+        const parsed = payload ? taskManifestSchema.safeParse(payload) : null
+        manifest = parsed?.success ? parsed.data : payload
+        return {
+          pullRequests: nextPullRequests,
+          runningIds: state.runningIds.filter((item) => item !== runKey),
+          selectedPrId: id,
+          selectedRepositoryId: body.repository,
+          activeView: 'task-detail',
+          manifestLedger: manifest
+            ? [...state.manifestLedger.filter((item) => item.id !== manifest.id), manifest]
+            : state.manifestLedger,
+        }
+      })
       addEvent(set, { status: 'accepted', repository: body.repository, prNumber: Number(body.pullRequestNumber), text: 'Task accepted' })
-      set((state) => ({ runningIds: state.runningIds.filter((item) => item !== runKey) }))
       get().addToast(`Task accepted · ${body.repository} #${body.pullRequestNumber}`, 'success')
     }, delay + 200)
     return id
