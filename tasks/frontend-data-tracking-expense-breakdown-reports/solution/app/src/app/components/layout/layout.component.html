@@ -1,0 +1,80 @@
+<div class="app" (click)="handleDemoClick($event)">
+  <aside class="sidebar" aria-label="Primary">
+    <div class="sidebar-top">
+      <button type="button" class="brand inert-nav" aria-label="Ledger home">
+        <img src="./assets/logo.svg" width="28" height="28" alt="Ledger" class="brand-mark">
+        <span class="brand-name">Ledger</span>
+      </button>
+      <div class="sidebar-icons">
+        <button type="button" class="icon-btn inert-nav" aria-label="Notifications">🔔</button>
+        <button type="button" class="icon-btn inert-nav" aria-label="Settings">⚙️</button>
+      </div>
+    </div>
+    <nav class="nav" aria-label="App">
+      <button type="button" class="nav-item inert-nav">Dashboard</button>
+      <button type="button" class="nav-item inert-nav">Accounts</button>
+      <button type="button" class="nav-item inert-nav">Transactions</button>
+      <button type="button" class="nav-item inert-nav">Cash Flow</button>
+      <button type="button" class="nav-item is-active inert-nav" aria-current="page">Reports</button>
+      <button type="button" class="nav-item inert-nav">Budget</button>
+      <button type="button" class="nav-item inert-nav">Recurring</button>
+      <button type="button" class="nav-item inert-nav">Goals</button>
+      <button type="button" class="nav-item inert-nav">Investments</button>
+      <button type="button" class="nav-item inert-nav">Forecasting</button>
+      <button type="button" class="nav-item inert-nav">Advice</button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="demo-chips">
+        <span class="chip">Demo mode</span>
+        <span class="chip">Sample data</span>
+      </div>
+      <button type="button" class="nav-item subtle inert-nav">Assistant</button>
+      <button type="button" class="nav-item subtle inert-nav">Help (demo)</button>
+      <button type="button" class="nav-item subtle inert-nav">Invite teammates (demo)</button>
+      <button type="button" class="profile inert-nav" aria-label="Profile">
+        <span class="avatar" aria-hidden="true">AR</span>
+        <span>Alex Rivera</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="page-header">
+      <div>
+        <p class="eyebrow">Shared demo report</p>
+        <h1>Reports</h1>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn ghost" (click)="openDrawer()">Export report</button>
+        <button type="button" class="btn ghost" (click)="openImport()">Import CSV</button>
+        <button type="button" class="btn ghost" data-demo-action="Date">Date · All time</button>
+        <button type="button" class="btn primary" data-demo-action="Save">Save</button>
+      </div>
+    </header>
+
+    <app-stats></app-stats>
+
+    <section class="chart-card" aria-label="Category charts">
+      <div class="chart-card-head">
+        <div>
+          <h2>Spending</h2>
+          <p class="chart-sub">By category &amp; group</p>
+        </div>
+        <div class="pill-tabs" role="tablist" aria-label="Chart mode">
+          <button type="button" class="pill" [class.is-active]="(chartMode$ | async) === 'breakdown'" role="tab" [attr.aria-selected]="(chartMode$ | async) === 'breakdown'" (click)="setTab('breakdown')">Breakdown</button>
+          <button type="button" class="pill" [class.is-active]="(chartMode$ | async) === 'trends'" role="tab" [attr.aria-selected]="(chartMode$ | async) === 'trends'" (click)="setTab('trends')">Trends</button>
+        </div>
+      </div>
+      
+      @if ((chartMode$ | async) === 'breakdown') {
+        <app-chart-breakdown></app-chart-breakdown>
+      } @else {
+        <app-chart-trends></app-chart-trends>
+      }
+    </section>
+
+    <app-transaction-list></app-transaction-list>
+  </main>
+  
+  
+</div>

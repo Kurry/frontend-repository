@@ -1,11 +1,52 @@
 {
-  "name": "oracle-static",
-  "private": true,
+  "name": "app",
+  "version": "0.0.0",
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "ng": "ng",
+    "start": "ng serve --port 3000",
+    "build": "ng build",
+    "verify:build": "ng build && node -e \"require('fs').accessSync('dist/app/browser/index.html')\"",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
   },
+  "private": true,
   "dependencies": {
-    "serve": "14.2.4"
+    "@angular/common": "^19.2.0",
+    "@angular/compiler": "^19.2.0",
+    "@angular/core": "^19.2.0",
+    "@angular/forms": "^19.2.0",
+    "@angular/platform-browser": "^19.2.0",
+    "@angular/platform-browser-dynamic": "^19.2.0",
+    "@angular/router": "^19.2.0",
+    "@formkit/auto-animate": "^0.10.0",
+    "@ngrx/effects": "^19.2.1",
+    "@ngrx/store": "^19.2.1",
+    "@ngrx/store-devtools": "^19.2.1",
+    "@primeng/themes": "^21.0.4",
+    "@tailwindcss/postcss": "^4.3.3",
+    "echarts": "^6.1.0",
+    "ngx-echarts": "^19.0.0",
+    "postcss": "^8.5.20",
+    "primeicons": "^8.0.0",
+    "primeng": "^19.1.4",
+    "rxjs": "~7.8.0",
+    "serve": "^14.2.6",
+    "tailwindcss": "^4.3.2",
+    "tslib": "^2.3.0",
+    "zod": "^4.4.3",
+    "zone.js": "~0.15.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^19.2.27",
+    "@angular/cli": "^19.2.27",
+    "@angular/compiler-cli": "^19.2.0",
+    "@types/jasmine": "~5.1.0",
+    "jasmine-core": "~5.6.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "typescript": "~5.7.2"
   }
 }

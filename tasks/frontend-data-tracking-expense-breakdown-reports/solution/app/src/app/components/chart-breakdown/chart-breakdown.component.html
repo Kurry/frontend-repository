@@ -1,0 +1,12 @@
+<div id="demo-breakdown-panel" class="chart-panel" role="tabpanel" aria-labelledby="tab-breakdown">
+  <div class="sankey-wrap" style="height: 420px; width: 100%;">
+    <div echarts [options]="(options$ | async)" style="height: 100%; width: 100%;"></div>
+  </div>
+  <ul class="flow-legend" id="breakdown-legend">
+    <li *ngFor="let item of (legendData$ | async)">
+      <span class="swatch" [style.background]="item.color"></span>
+      <span>{{ item.name }}</span>
+      <span class="legend-meta">{{ item.amount | currency:'USD':'symbol':'1.2-2' }} ({{ item.percent | number:'1.2-2' }}%)</span>
+    </li>
+  </ul>
+</div>
