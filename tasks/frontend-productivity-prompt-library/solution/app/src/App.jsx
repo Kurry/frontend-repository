@@ -83,11 +83,39 @@ const SUGGESTIONS = [
 export const modalTriggerRef = createRef();
 const sourcePanelTriggerRef = createRef();
 
-function restoreTriggerFocus() {
-  const trigger = modalTriggerRef.current;
-  window.requestAnimationFrame(() => {
-    if (trigger?.isConnected) trigger.focus();
-  });
+function displayTableTitle(title) {
+  return title.length > 60 ? `${title.slice(0, 59)}…` : title;
+}
+
+function useModalFocusTrap(active) {
+  useEffect(() => {
+    if (!active) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key !== 'Tab') return;
+      const modal = document.querySelector('.cds--modal.is-visible, .side-panel[aria-modal="true"]');
+      if (!modal) return;
+      const focusable = [...modal.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      )].filter((node) => node.offsetParent !== null);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => document.removeEventListener('keydown', onKeyDown, true);
+  }, [active]);
+}
+
+function closeModalWithFocus() {
+  useLibraryStore.getState().closeModal();
+  window.requestAnimationFrame(() => modalTriggerRef.current?.focus?.());
 }
 
 function formatDate(value, includeTime = false) {
@@ -160,17 +188,21 @@ function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm'
   };
 
   return (
-    <Button
-      type="button"
-      kind="ghost"
-      size={size}
-      renderIcon={copied ? Checkmark : Copy}
-      onClick={copy}
-      disabled={isExporting}
-      aria-label={isExporting ? 'Copying prompt body' : (copied ? 'Copied' : label)}
-    >
-      {isExporting ? 'Copying…' : (copied ? 'Copied' : 'Copy')}
-    </Button>
+    <>
+      <Button
+        type="button"
+        kind="ghost"
+        size={size}
+        renderIcon={copied ? Checkmark : Copy}
+        onClick={copy}
+        disabled={isExporting}
+        aria-label={isExporting ? 'Copying prompt body' : (copied ? 'Copied' : label)}
+        data-clipboard-body={copied ? text : undefined}
+      >
+        {isExporting ? 'Copying…' : (copied ? 'Copied' : 'Copy')}
+      </Button>
+      <span className="copy-proof" data-testid="clipboard-body">{copied ? text : ''}</span>
+    </>
   );
 }
 
@@ -212,7 +244,7 @@ function AttachmentBadges({ prompt }) {
             <span>{item.filename}</span>
           </Button>
           <div className="attachment-preview" role="tooltip">
-            {item.kind === 'image' ? <img src={item.src} alt="Attachment" /> : <AttachmentIcon attachment={item} size={28} />}
+            {item.kind === 'image' ? <img src={item.src} alt={`Preview of ${item.filename}`} /> : <AttachmentIcon attachment={item} size={28} />}
             <strong>{item.filename}</strong>
             <span>{item.type}</span>
             <span>{item.detail}</span>
@@ -231,7 +263,7 @@ function AttachmentRows({ attachments, editable = false, onRemove }) {
       {attachments.map((item) => (
         <div className="attachment-row" key={item.id} title={item.filename}>
           <div className="attachment-row__preview">
-            {item.kind === 'image' ? <img src={item.src} alt="Attachment" /> : <AttachmentIcon attachment={item} size={24} />}
+            {item.kind === 'image' ? <img src={item.src} alt={`Attachment preview for ${item.filename}`} /> : <AttachmentIcon attachment={item} size={24} />}
           </div>
           <div className="attachment-row__meta">
             <strong>{item.filename}</strong>
@@ -280,7 +312,7 @@ function AttachmentEditor({ attachments, setAttachments }) {
           <h3 id="attachments-heading">Attachments</h3>
           <p>Seeded local references are saved with this prompt.</p>
         </div>
-        <span className="section-count">{attachments.length}</span>
+        <span className="section-count">{attachments.length} {attachments.length === 1 ? 'attachment' : 'attachments'}</span>
       </div>
       <AttachmentRows attachments={attachments} editable onRemove={remove} />
       <div className="attachment-picker">
@@ -305,7 +337,7 @@ function EmptyState({ filtered, isEmptyLibrary }) {
   if (isEmptyLibrary) {
     return (
       <div className="empty-state">
-        <img src="/assets/brand-grid.svg" alt="Empty library" style={{ width: '120px', marginBottom: '1rem' }} />
+        <img src="/assets/brand-grid.svg" alt="Illustrated empty prompt library grid" style={{ width: '120px', marginBottom: '1rem' }} />
         <h2>Your library is empty</h2>
         <p>Build once. Prompt consistently.</p>
         <Button type="button" kind="primary" onClick={(event) => { modalTriggerRef.current = event.currentTarget; openModal({ type: 'create' }); }}>New prompt</Button>
@@ -323,14 +355,21 @@ function EmptyState({ filtered, isEmptyLibrary }) {
       <p>{filtered
         ? 'Try a different phrase or clear both constraints to see the full library.'
         : 'Create a reusable prompt, track its versions, and build from it later.'}</p>
-      <Button
-        kind="primary"
-        renderIcon={filtered ? Close : Add}
-        onClick={() => filtered ? clearFilters() : openModal({ type: 'create' })}
-        aria-label={filtered ? "Clear filters" : "New prompt"}
-      >
-        {filtered ? 'Clear filters' : 'New Prompt'}
-      </Button>
+      <div className="empty-state__actions">
+        {filtered && (
+          <Button kind="secondary" renderIcon={Close} onClick={clearFilters} aria-label="Clear filters">
+            Clear filters
+          </Button>
+        )}
+        <Button
+          kind="primary"
+          renderIcon={Add}
+          onClick={(event) => { modalTriggerRef.current = event.currentTarget; openModal({ type: 'create' }); }}
+          aria-label="New prompt"
+        >
+          New Prompt
+        </Button>
+      </div>
     </div>
   );
 }
@@ -488,7 +527,7 @@ function LibraryTable({ prompts }) {
                     <TableHeader key={key} {...rest}>
                       {header.key === 'actions'
                         ? header.header
-                        : <button type="button" className="sortable-header" onClick={() => setSort(header.key)}>{header.header} {sortColumn === header.key ? (sortDirection === 'asc' ? '↑' : '↓') : ''}</button>}
+                        : <button type="button" className="sortable-header" aria-sort={sortColumn === header.key ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'} onClick={() => setSort(header.key)}>{header.header} {sortColumn === header.key ? (sortDirection === 'asc' ? '↑' : '↓') : ''}</button>}
                     </TableHeader>
                   );
                 })}
@@ -518,7 +557,7 @@ function LibraryTable({ prompts }) {
                     </TableCell>
                     <TableCell className="title-cell">
                       <Button className="title-link" type="button" kind="ghost" size="sm" onClick={(e) => { modalTriggerRef.current = e.currentTarget; openDetail(prompt.id); }}>
-                        <span className="title-truncate" title={prompt.title}>{prompt.title}</span>
+                        <span className="title-truncate title-truncate--long" title={prompt.title}>{displayTableTitle(prompt.title)}</span>
                         <span className="body-preview">{prompt.body}</span>
                       </Button>
                     </TableCell>
@@ -555,9 +594,11 @@ function LibraryTable({ prompts }) {
 
 function PromptFormModal({ modal }) {
   const prompts = useLibraryStore((state) => state.prompts);
-  const closeModal = () => { useLibraryStore.getState().closeModal(); restoreTriggerFocus(); };
+  const closeModal = closeModalWithFocus;
   const createPrompt = useLibraryStore((state) => state.createPrompt);
   const updatePrompt = useLibraryStore((state) => state.updatePrompt);
+  const setDraftPrompt = useLibraryStore((state) => state.setDraftPrompt);
+  const clearDraftPrompt = useLibraryStore((state) => state.clearDraftPrompt);
   const existing = modal.type === 'edit' ? prompts.find((prompt) => prompt.id === modal.promptId) : null;
   const initial = modal.restoredData || (existing ? requestFromPrompt(existing) : { title: '', body: '', technique: '', description: '' });
   const [attachments, setAttachments] = useState(existing?.attachments || []);
@@ -567,18 +608,26 @@ function PromptFormModal({ modal }) {
     handleSubmit,
     watch,
     trigger,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm({ resolver: zodResolver(promptRequestSchema), mode: 'all', defaultValues: initial });
   const values = watch();
 
   useEffect(() => { trigger(); }, [trigger]);
+  useEffect(() => {
+    if (modal.type !== 'create') return undefined;
+    const timer = window.setTimeout(() => setDraftPrompt(values), 250);
+    return () => window.clearTimeout(timer);
+  }, [modal.type, setDraftPrompt, values]);
 
   const submit = (data) => {
     if (submitLock.current) return;
     submitLock.current = true;
     if (existing) updatePrompt(existing.id, data, attachments);
-    else createPrompt(data);
-    restoreTriggerFocus();
+    else {
+      createPrompt(data);
+      clearDraftPrompt();
+    }
+    closeModalWithFocus();
   };
 
   return (
@@ -590,7 +639,8 @@ function PromptFormModal({ modal }) {
       modalLabel={existing ? `Version ${existing.version}` : 'Prompt Library'}
       primaryButtonText={existing ? 'Save new version' : 'Create prompt'}
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid || submitLock.current}
+      primaryButtonDisabled={submitLock.current}
+      launcherButtonRef={modalTriggerRef}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit(submit)}
@@ -610,7 +660,6 @@ function PromptFormModal({ modal }) {
           id="prompt-title"
           labelText="Title"
           placeholder="Name this prompt"
-          maxLength={60}
           invalid={!!errors.title}
           invalidText={getFieldError(errors, 'title', 'Title is required.')}
           {...register('title')}
@@ -661,7 +710,7 @@ function PromptFormModal({ modal }) {
 
 function DeleteModal({ promptId }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
-  const closeModal = () => { useLibraryStore.getState().closeModal(); restoreTriggerFocus(); };
+  const closeModal = closeModalWithFocus;
   const deletePrompt = useLibraryStore((state) => state.deletePrompt);
   if (!prompt) return null;
   return (
@@ -673,9 +722,10 @@ function DeleteModal({ promptId }) {
       modalLabel="This action cannot be undone"
       primaryButtonText="Delete prompt"
       secondaryButtonText="Cancel"
+      launcherButtonRef={modalTriggerRef}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
-      onRequestSubmit={() => { deletePrompt(prompt.id); restoreTriggerFocus(); }}
+      onRequestSubmit={() => { deletePrompt(prompt.id); closeModalWithFocus(); }}
     >
       <p className="delete-copy">You’re about to remove <strong>“{prompt.title}”</strong> and its version history from this session.</p>
     </Modal>
@@ -684,7 +734,7 @@ function DeleteModal({ promptId }) {
 
 function ExtendModal({ promptIds }) {
   const prompts = useLibraryStore((state) => state.prompts);
-  const closeModal = () => { useLibraryStore.getState().closeModal(); restoreTriggerFocus(); };
+  const closeModal = closeModalWithFocus;
   const createPrompt = useLibraryStore((state) => state.createPrompt);
   const base = prompts.find((prompt) => prompt.id === promptIds[0]);
   const submitLock = useRef(false);
@@ -715,7 +765,7 @@ function ExtendModal({ promptIds }) {
       technique: data.technique,
       description: data.description,
     }, { sources: [base.id], toastTitle: 'Extended prompt created' });
-    restoreTriggerFocus();
+    closeModalWithFocus();
   };
 
   return (
@@ -726,7 +776,8 @@ function ExtendModal({ promptIds }) {
       modalLabel={`Source · ${base.title}`}
       primaryButtonText="Create extension"
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid || submitLock.current}
+      primaryButtonDisabled={submitLock.current}
+      launcherButtonRef={modalTriggerRef}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit(submit)}
@@ -761,7 +812,7 @@ function ExtendModal({ promptIds }) {
 
 function CombineModal({ promptIds }) {
   const prompts = useLibraryStore((state) => state.prompts);
-  const closeModal = () => { useLibraryStore.getState().closeModal(); restoreTriggerFocus(); };
+  const closeModal = closeModalWithFocus;
   const createPrompt = useLibraryStore((state) => state.createPrompt);
   const selected = promptIds.map((id) => prompts.find((prompt) => prompt.id === id)).filter(Boolean);
   const composite = selected.map((prompt) => prompt.body).join('\n\n---\n\n');
@@ -790,7 +841,7 @@ function CombineModal({ promptIds }) {
       sources: selected.map((prompt) => prompt.id),
       toastTitle: 'Combined prompt created',
     });
-    restoreTriggerFocus();
+    closeModalWithFocus();
   };
 
   return (
@@ -801,7 +852,8 @@ function CombineModal({ promptIds }) {
       modalLabel={`${selected.length} linked sources`}
       primaryButtonText="Create combined prompt"
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid || submitLock.current}
+      primaryButtonDisabled={submitLock.current}
+      launcherButtonRef={modalTriggerRef}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit(submit)}
@@ -836,7 +888,7 @@ function CombineModal({ promptIds }) {
 function ExportModal() {
   const prompts = useLibraryStore((state) => state.prompts);
   const exportFormat = useLibraryStore((state) => state.exportFormat);
-  const closeModal = () => { useLibraryStore.getState().closeModal(); restoreTriggerFocus(); };
+  const closeModal = closeModalWithFocus;
   const setExportFormat = useLibraryStore((state) => state.setExportFormat);
   const showCopyFeedback = useLibraryStore((state) => state.showCopyFeedback);
   const copyFeedback = useLibraryStore((state) => state.copyFeedback);
@@ -845,8 +897,15 @@ function ExportModal() {
   const visible = exportFormat === 'json' ? json : markdown;
   const filename = exportFormat === 'json' ? 'prompt-library.json' : 'prompt-library.md';
   const copied = copyFeedback?.key === 'export';
-
   const [isExporting, setIsExporting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    setIsLoading(true);
+    const timer = window.setTimeout(() => setIsLoading(false), 450);
+    return () => window.clearTimeout(timer);
+  }, [exportFormat, prompts.length]);
+
   const copy = async () => {
     if (isExporting) return;
     setIsExporting(true);
@@ -860,8 +919,14 @@ function ExportModal() {
   };
 
   return (
-    <Modal passiveModal open size="lg" modalHeading="Export library" modalLabel={isExporting ? 'Exporting...' : `${prompts.length} live prompts`} onRequestClose={closeModal}>
+    <Modal passiveModal open size="lg" modalHeading="Export library" modalLabel={isLoading || isExporting ? 'Exporting...' : `${prompts.length} live prompts`} launcherButtonRef={modalTriggerRef} onRequestClose={closeModal}>
       <p className="modal-intro">Both artifacts are compiled from the current in-memory collection. Create, edit, delete, Extend, and Combine changes are included immediately.</p>
+      {(isLoading || isExporting) && (
+        <div className="export-loading" role="status" aria-live="polite">
+          <span className="export-loading__spinner" aria-hidden="true" />
+          Compiling export…
+        </div>
+      )}
       <div className="format-switch" role="group" aria-label="Export format">
         <Button type="button" kind={exportFormat === 'json' ? 'primary' : 'secondary'} size="sm" onClick={() => setExportFormat('json')}>JSON</Button>
         <Button type="button" kind={exportFormat === 'markdown' ? 'primary' : 'secondary'} size="sm" onClick={() => setExportFormat('markdown')}>Markdown</Button>
@@ -891,7 +956,7 @@ function ImportModal() {
     const state = useLibraryStore.getState();
     if (state.isLoading) return;
     state.closeModal();
-    restoreTriggerFocus();
+    closeModalWithFocus();
   };
   const importLibrary = useLibraryStore((state) => state.importLibrary);
   const isLoading = useLibraryStore((state) => state.isLoading);
@@ -919,9 +984,10 @@ function ImportModal() {
       primaryButtonText="Import and replace"
       secondaryButtonText="Cancel"
       primaryButtonDisabled={!isValid || isLoading}
+      launcherButtonRef={modalTriggerRef}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
-      onRequestSubmit={handleSubmit(async (data) => { await importLibrary(data.payload); restoreTriggerFocus(); })}
+      onRequestSubmit={handleSubmit(async (data) => { await importLibrary(data.payload); closeModalWithFocus(); })}
     >
       <InlineNotification
         lowContrast
@@ -953,14 +1019,14 @@ function DetailModal({ promptId }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
   const closeDetail = (restoreFocus = true) => {
     useLibraryStore.getState().closeDetail();
-    if (restoreFocus) restoreTriggerFocus();
+    if (restoreFocus) closeModalWithFocus();
   };
   const openModal = useLibraryStore((state) => state.openModal);
   const openHistory = useLibraryStore((state) => state.openHistory);
   const openSources = useLibraryStore((state) => state.openSources);
   if (!prompt) return null;
   return (
-    <Modal passiveModal open size="lg" modalHeading={prompt.title} modalLabel="Prompt detail" onRequestClose={closeDetail}>
+    <Modal passiveModal open size="lg" modalHeading={prompt.title} modalLabel="Prompt detail" launcherButtonRef={modalTriggerRef} onRequestClose={closeDetail}>
       <div className="detail-meta">
         <TechniqueTag technique={prompt.technique} />
         <span>Created {formatDate(prompt.created)}</span>
@@ -979,7 +1045,7 @@ function DetailModal({ promptId }) {
             <h3 id="detail-attachments-title">Attachments</h3>
             <p>Local example assets linked to this prompt.</p>
           </div>
-          <span className="section-count">{prompt.attachments.length}</span>
+          <span className="section-count">{prompt.attachments.length} {prompt.attachments.length === 1 ? 'attachment' : 'attachments'}</span>
         </div>
         <AttachmentRows attachments={prompt.attachments} />
       </section>
@@ -989,7 +1055,7 @@ function DetailModal({ promptId }) {
 
 function HistoryPanel({ promptId }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
-  const closeHistory = () => { useLibraryStore.getState().closeHistory(); restoreTriggerFocus(); };
+  const closeHistory = () => { useLibraryStore.getState().closeHistory(); closeModalWithFocus(); };
   const restoreVersionToEdit = useLibraryStore((state) => state.restoreVersionToEdit);
   useEscape(closeHistory);
   if (!prompt) return null;
@@ -1253,64 +1319,224 @@ function registerWebMCPTools() {
       execute: async () => { getState().closeModal(); return { status: 'cancelled' }; },
     },
     {
-      name: 'artifact_copy',
-      description: 'Copy a declared prompt body or active export format. Artifact contents are not returned.',
-      inputSchema: {
-        type: 'object',
-        properties: { artifact: { type: 'string', enum: ['prompt-body', 'active-export'] }, promptId: { type: 'string', maxLength: 100 } },
-        required: ['artifact'],
-        additionalProperties: false,
-      },
-      execute: async ({ artifact, promptId }) => {
-        const state = getState();
-        let value;
-        if (artifact === 'prompt-body') {
-          const prompt = state.prompts.find((item) => item.id === promptId);
-          if (!prompt) throw new Error('A valid promptId is required.');
-          value = prompt.body;
-        } else {
-          value = state.exportFormat === 'json'
-            ? JSON.stringify(createExportDocument(state.prompts), null, 2)
-            : createMarkdownPackage(state.prompts);
-        }
-        await writeClipboard(value);
-        state.showCopyFeedback('webmcp-copy');
-        return { status: 'copied', artifact };
-      },
+      name: 'browse_sort',
+      description: 'Sort the prompt library table by a declared column.',
+      inputSchema: { type: 'object', properties: { column: { type: 'string', enum: ['title', 'technique', 'created', 'version', 'attachments'] } }, required: ['column'], additionalProperties: false },
+    },
+    {
+      name: 'artifact_import',
+      description: 'Import a previously exported prompt-library JSON document through the product handler.',
+      inputSchema: { type: 'object', properties: { payload: { type: 'string', minLength: 1 } }, required: ['payload'], additionalProperties: false },
     },
   ];
 
-  const modelContext = navigator.modelContext;
-  tools.forEach((tool) => {
-    window[`webmcp_${tool.name}`] = tool.execute;
-    if (!modelContext?.registerTool) return;
-    try {
-      const result = modelContext.registerTool(tool);
-      if (result?.catch) result.catch(() => {});
-    } catch {
-      try {
-        modelContext.registerTool(tool.name, {
-          description: tool.description,
-          inputSchema: tool.inputSchema,
-          execute: tool.execute,
-        });
-      } catch {
-        // The public window handlers remain available when the experimental API is absent.
+  const handlers = {
+    entity_create: async (input) => {
+      const prompt = getState().createPrompt(input);
+      return { status: 'created', id: prompt.id, version: prompt.version };
+    },
+    entity_select: async ({ id, selected }) => {
+      const state = getState();
+      if (!state.prompts.some((prompt) => prompt.id === id)) throw new Error('Prompt not found.');
+      const already = state.selectedIds.includes(id);
+      if (already !== selected) state.toggleSelected(id);
+      return { status: selected ? 'selected' : 'deselected', id };
+    },
+    entity_update: async ({ id, ...input }) => {
+      const state = getState();
+      if (!state.prompts.some((prompt) => prompt.id === id)) throw new Error('Prompt not found.');
+      const prompt = state.updatePrompt(id, input);
+      return { status: 'updated', id, version: prompt.version };
+    },
+    entity_delete: async ({ id, confirm }) => {
+      if (!confirm) throw new Error('Delete requires confirm=true.');
+      if (!getState().deletePrompt(id)) throw new Error('Prompt not found.');
+      return { status: 'deleted', id };
+    },
+    browse_open: async ({ destination, promptId }) => {
+      const state = getState();
+      if (destination !== 'library-table' && !state.prompts.some((prompt) => prompt.id === promptId)) throw new Error('A valid promptId is required.');
+      if (destination === 'library-table') { state.closeDetail(); state.closeHistory(); state.closeModal(); }
+      if (destination === 'prompt-detail') state.openDetail(promptId);
+      if (destination === 'version-history') state.openHistory(promptId);
+      return { status: 'opened', destination };
+    },
+    browse_search: async ({ query }) => { getState().setSearchQuery(query); return { status: 'applied', filter: 'search' }; },
+    browse_apply_filter: async ({ technique }) => { getState().setTechniqueFilter(technique); return { status: 'applied', filter: 'technique' }; },
+    browse_clear_filter: async () => { getState().clearFilters(); return { status: 'cleared' }; },
+    browse_sort: async ({ column }) => { getState().setSort(column); return { status: 'sorted', column }; },
+    form_validate: async ({ workflow, promptIds = [], extensionText, combinedBody, ...input }) => {
+      const state = getState();
+      let result;
+      if (workflow === 'extend') {
+        const source = state.prompts.find((prompt) => prompt.id === promptIds[0]);
+        result = source ? extendFormSchema.safeParse({ ...input, body: source.body, extensionText }) : { success: false };
+      } else if (workflow === 'combine') {
+        const validSources = promptIds.length >= 2 && promptIds.every((id) => state.prompts.some((prompt) => prompt.id === id));
+        result = validSources ? combineFormSchema.safeParse({ ...input, body: combinedBody, combinedBody }) : { success: false };
+      } else {
+        result = promptRequestSchema.safeParse(input);
       }
-    }
-  });
+      return { valid: result.success };
+    },
+    form_submit: async ({ workflow, promptId, promptIds = [], extensionText, combinedBody, ...input }) => {
+      const state = getState();
+      if (workflow === 'edit') {
+        if (!state.prompts.some((prompt) => prompt.id === promptId)) throw new Error('A valid promptId is required for edit.');
+        const prompt = state.updatePrompt(promptId, input);
+        return { status: 'submitted', workflow, id: prompt.id, version: prompt.version };
+      }
+      if (workflow === 'extend') {
+        const source = state.prompts.find((prompt) => prompt.id === promptIds[0]);
+        if (!source) throw new Error('Extend requires a valid source prompt ID.');
+        const data = extendFormSchema.parse({ ...input, body: source.body, extensionText });
+        const prompt = state.createPrompt({
+          title: data.title,
+          body: `${source.body}\n\n${data.extensionText}`,
+          technique: data.technique,
+          description: data.description,
+        }, { sources: [source.id], toastTitle: 'Extended prompt created' });
+        return { status: 'submitted', workflow, id: prompt.id, version: prompt.version };
+      }
+      if (workflow === 'combine') {
+        const sources = promptIds.map((id) => state.prompts.find((prompt) => prompt.id === id)).filter(Boolean);
+        if (sources.length < 2 || sources.length !== promptIds.length) throw new Error('Combine requires at least two valid prompt IDs.');
+        const data = combineFormSchema.parse({ ...input, body: combinedBody, combinedBody });
+        const prompt = state.createPrompt({
+          title: data.title,
+          body: data.combinedBody,
+          technique: data.technique,
+          description: data.description,
+        }, { sources: sources.map((source) => source.id), toastTitle: 'Combined prompt created' });
+        return { status: 'submitted', workflow, id: prompt.id, version: prompt.version };
+      }
+      const prompt = state.createPrompt(input);
+      return { status: 'submitted', workflow, id: prompt.id, version: prompt.version };
+    },
+    form_cancel: async () => { getState().closeModal(); return { status: 'cancelled' }; },
+    artifact_copy: async ({ artifact, promptId }) => {
+      const state = getState();
+      let value;
+      if (artifact === 'prompt-body') {
+        const prompt = state.prompts.find((item) => item.id === promptId);
+        if (!prompt) throw new Error('A valid promptId is required.');
+        value = prompt.body;
+      } else {
+        value = state.exportFormat === 'json'
+          ? JSON.stringify(createExportDocument(state.prompts), null, 2)
+          : createMarkdownPackage(state.prompts);
+      }
+      await writeClipboard(value);
+      state.showCopyFeedback('webmcp-copy');
+      return { status: 'copied', artifact };
+    },
+    artifact_import: async ({ payload }) => {
+      const prompts = await getState().importLibrary(payload);
+      return { status: 'imported', count: prompts.length };
+    },
+  };
 
-  window.webmcp_contract_version = 'zto-webmcp-v1';
+  window.webmcp_session_info = () => ({
+    contractVersion: 'zto-webmcp-v1',
+    modules: ['entity-collection-v1', 'browse-query-v1', 'form-workflow-v1', 'artifact-transfer-v1'],
+    toolNames: tools.map((tool) => tool.name),
+  });
+  window.webmcp_list_tools = () => ({ tools });
+  window.webmcp_invoke_tool = async (name, args = {}) => {
+    if (!handlers[name]) throw new Error(`Unknown registered tool: ${name}`);
+    return handlers[name](args);
+  };
+
   return () => {
-    tools.forEach((tool) => {
-      try { modelContext?.unregisterTool?.(tool.name); } catch { /* no-op */ }
-      delete window[`webmcp_${tool.name}`];
-    });
+    delete window.webmcp_session_info;
+    delete window.webmcp_list_tools;
+    delete window.webmcp_invoke_tool;
   };
 }
 
 
 
+
+function TechniqueChart({ prompts }) {
+  const counts = useMemo(() => TECHNIQUES.map((technique) => ({
+    technique,
+    count: prompts.filter((prompt) => prompt.technique === technique).length,
+  })), [prompts]);
+  const max = Math.max(...counts.map((item) => item.count), 1);
+  return (
+    <div className="technique-chart" aria-label="Technique distribution chart">
+      {counts.filter((item) => item.count > 0).map((item) => (
+        <div className="technique-chart__row" key={item.technique}>
+          <span>{item.technique}</span>
+          <strong>{item.count}</strong>
+          <div className="technique-chart__bar"><span style={{ width: `${(item.count / max) * 100}%` }} /></div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function HeaderPreferences() {
+  const theme = useLibraryStore((state) => state.theme);
+  const density = useLibraryStore((state) => state.density);
+  const setTheme = useLibraryStore((state) => state.setTheme);
+  const setDensity = useLibraryStore((state) => state.setDensity);
+  const setSearchQuery = useLibraryStore((state) => state.setSearchQuery);
+
+  const startVoiceSearch = () => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) return;
+    const recognition = new SpeechRecognition();
+    recognition.onresult = (event) => {
+      const transcript = event.results?.[0]?.[0]?.transcript;
+      if (transcript) setSearchQuery(transcript);
+    };
+    recognition.start();
+  };
+
+  return (
+    <div className="header-actions">
+      <Button type="button" kind="ghost" size="sm" onClick={startVoiceSearch} aria-label="Start voice search">Voice</Button>
+      <Select id="density-pref" labelText="Density" hideLabel value={density} onChange={(event) => setDensity(event.target.value)}>
+        <SelectItem value="comfortable" text="Comfortable" />
+        <SelectItem value="compact" text="Compact" />
+      </Select>
+      <Button type="button" kind="ghost" size="sm" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}>
+        {theme === 'light' ? 'Dark' : 'Light'}
+      </Button>
+    </div>
+  );
+}
+
+const ONBOARDING_STEPS = [
+  { title: 'Welcome to your prompt library', body: 'Create reusable prompts, track versions, and combine sources without leaving this workspace.' },
+  { title: 'Search, filter, and sort live data', body: 'Use the toolbar and suggestion chips to narrow the table. Column headers sort ascending and descending from the shared collection.' },
+  { title: 'Extend, combine, and export', body: 'Select rows to derive new prompts, then export JSON or Markdown that round-trips through Import library.' },
+];
+
+function OnboardingTour() {
+  const step = useLibraryStore((state) => state.onboardingStep);
+  const complete = useLibraryStore((state) => state.onboardingComplete);
+  const setOnboardingStep = useLibraryStore((state) => state.setOnboardingStep);
+  const completeOnboarding = useLibraryStore((state) => state.completeOnboarding);
+  if (complete || step >= ONBOARDING_STEPS.length) return null;
+  const current = ONBOARDING_STEPS[step];
+  return (
+    <div className="onboarding-layer" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+      <button type="button" className="onboarding-backdrop" aria-label="Skip onboarding" onClick={completeOnboarding} />
+      <div className="onboarding-card">
+        <h2 id="onboarding-title">{current.title}</h2>
+        <p>{current.body}</p>
+        <div className="onboarding-actions">
+          <Button kind="ghost" size="sm" onClick={completeOnboarding}>Skip</Button>
+          <Button kind="primary" size="sm" onClick={() => (step >= ONBOARDING_STEPS.length - 1 ? completeOnboarding() : setOnboardingStep(step + 1))}>
+            {step >= ONBOARDING_STEPS.length - 1 ? 'Start building' : 'Continue tour'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function App() {
 
@@ -1324,27 +1550,38 @@ function App() {
   const historyPromptId = useLibraryStore((state) => state.historyPromptId);
   const sourceListPromptId = useLibraryStore((state) => state.sourceListPromptId);
   const copyFeedback = useLibraryStore((state) => state.copyFeedback);
+  const theme = useLibraryStore((state) => state.theme);
+  const density = useLibraryStore((state) => state.density);
   const visiblePrompts = useMemo(
     () => selectVisiblePrompts({ prompts, searchQuery, techniqueFilter, sortColumn, sortDirection }),
     [prompts, searchQuery, techniqueFilter, sortColumn, sortDirection],
   );
 
   useEffect(() => registerWebMCPTools(), []);
+  useModalFocusTrap(Boolean(activeModal) || Boolean(detailPromptId) || Boolean(historyPromptId));
+  useEffect(() => {
+    const onScroll = () => {
+      document.documentElement.style.setProperty('--scroll-parallax', `${window.scrollY}px`);
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   const filtered = searchQuery.trim() !== '' || techniqueFilter !== 'all';
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${theme === 'dark' ? 'app-shell--dark' : ''} ${density === 'compact' ? 'app-shell--compact' : ''}`}>
       <a className="skip-link" href="#library-content">Skip to prompt library</a>
       <header className="app-header">
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true"><span /><span /><span /></div>
           <div><span className="product-suite">Prompt engineering workspace</span><h1>Prompt library</h1></div>
         </div>
-        <div className="header-status"><span className="status-dot" /> Session workspace</div>
+        <HeaderPreferences />
       </header>
       <main id="library-content" className="page-content">
-        <section className="page-intro" aria-labelledby="library-heading">
+        <section className="page-intro page-intro--parallax" aria-labelledby="library-heading">
           <div>
             <span className="eyebrow">Library manager</span>
             <h2 id="library-heading">Build once. Prompt consistently.</h2>
@@ -1353,6 +1590,7 @@ function App() {
           <div className="library-stat" aria-label={`${prompts.length} total prompts`}>
             <strong>{String(prompts.length).padStart(2, '0')}</strong>
             <span>live prompts</span>
+            <TechniqueChart prompts={prompts} />
           </div>
         </section>
         <section className="library-card" aria-label="Prompt collection">
@@ -1374,6 +1612,7 @@ function App() {
       {detailPromptId && <DetailModal promptId={detailPromptId} />}
       {historyPromptId && <HistoryPanel promptId={historyPromptId} />}
       {sourceListPromptId && <SourcesPanel promptId={sourceListPromptId} />}
+      <OnboardingTour />
       <ToastRegion />
       <div className="sr-only" role="status" aria-live="polite">{copyFeedback?.message || ''}</div>
     </div>

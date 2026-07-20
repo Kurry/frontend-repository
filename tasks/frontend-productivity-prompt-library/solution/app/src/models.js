@@ -112,12 +112,12 @@ const attachment = (id) => ATTACHMENT_CATALOG.find((item) => item.id === id);
 
 const seedDefinitions = [
   ['p-001', 'Executive summary from research', 'You are a senior research analyst. Summarize the material into five concise findings, then state the single most important implication for an executive audience.', 'Role prompting', 'Turns dense research into a decisive leadership brief.', ['att-research-notes']],
-  ['p-002', 'Support reply with examples', 'Write a helpful support response. Follow these examples for tone:\n\nExample 1: “Thanks for flagging this — I can help.”\nExample 2: “Here is the quickest path forward.”\n\nNow respond to: {{customer_message}}', 'Few-shot', 'A warm and direct customer-support response.', []],
+  ['p-002', 'Support reply with examples', 'Write a helpful support response. Follow these examples for tone:\n\nExample 1: “Thanks for flagging this — I can help.”\nExample 2: “Here is the quickest path forward.”\n\nNow respond to the customer message supplied in the ticket.', 'Few-shot', 'A warm and direct customer-support response.', []],
   ['p-003', 'Reason through a pricing decision', 'Evaluate the pricing decision step by step. Identify assumptions, compare three options, test the strongest counterargument, and conclude with a recommendation.', 'Chain-of-thought', 'A structured internal decision analysis.', []],
   ['p-004', 'JSON issue classifier', 'Classify the issue and return only JSON matching: {"category":"billing|technical|account|other","urgency":"low|medium|high","summary":"string"}.', 'Structured output', 'Produces machine-readable issue routing.', ['att-response-schema']],
   ['p-005', 'Landing page under strict limits', 'Write landing-page copy with one headline under 55 characters, one subhead under 120 characters, and exactly three benefit bullets. Do not use exclamation marks.', 'Constraint-based', 'Compact launch copy with hard editorial limits.', ['att-brand-grid', 'att-tone-guide']],
   ['p-006', 'Critique and improve product copy', 'Critique the draft for clarity, specificity, evidence, and tone. List the three highest-impact issues, then provide a revised version that addresses them.', 'Critique & revise', 'A two-pass editorial improvement prompt.', []],
-  ['p-007', 'Tutoring study partner', 'Act as a patient Socratic tutor. Ask one question at a time, adapt to the learner’s last answer, and avoid revealing the final solution until they have attempted it.', 'Role prompting', 'Guides learning through progressive questions.', []],
+  ['p-007', 'Tutoring study partner', 'Act as a patient guided tutor. Ask one question at a time, adapt to the learner’s last answer, and avoid revealing the final solution until they have attempted it.', 'Role prompting', 'Guides learning through progressive questions.', []],
   ['p-008', 'Extract meeting actions', 'From the meeting transcript, return a JSON array of action items. Each item must include owner, action, dueDate, and confidence. Use null when the transcript does not specify a value.', 'Structured output', 'Reliable action extraction for workflow automation.', ['att-interview-audio']],
   ['p-009', 'Campaign concept variations', 'Create three campaign concepts using the pattern in these examples: concept name, audience tension, central idea, and sample line. Keep each concept distinct and practical.', 'Few-shot', 'Generates consistently framed campaign options.', []],
   ['p-010', 'Debug a failing API call', 'Analyze the failing API call step by step. Separate observed facts from hypotheses, rank likely causes, and propose the smallest diagnostic test for each cause.', 'Chain-of-thought', 'A disciplined debugging sequence.', []],
@@ -152,6 +152,11 @@ export function createSeedPrompts() {
       versions: [{ id: `${id}-v1`, version: 1, timestamp: created, summary: 'Initial version', data }],
     };
   });
+}
+
+export function truncateTitle(title, max = 60) {
+  const trimmed = title.trim();
+  return trimmed.length <= max ? trimmed : `${trimmed.slice(0, max - 1)}…`;
 }
 
 export function requestFromPrompt(prompt) {
