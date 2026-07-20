@@ -97,6 +97,45 @@
     </div>
   </nav>
 
+  <!-- ===================== PRESS KIT DRAWER ===================== -->
+  <div class="press-kit-drawer" id="pressKit" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Press Kit">
+    <button type="button" class="close-kit" aria-label="Close press kit">X</button>
+    <div class="press-kit-inner">
+      <h2>PRESS KIT</h2>
+      <div class="kit-tabs">
+        <button type="button" class="tab-btn is-active" data-tab="json">JSON</button>
+        <button type="button" class="tab-btn" data-tab="markdown">Markdown</button>
+        <button type="button" class="tab-btn" data-tab="ics">ICS</button>
+      </div>
+      <textarea id="kitPreview" readonly></textarea>
+      <div class="kit-actions">
+        <button type="button" id="copyKit">COPY</button>
+        <span id="copyConfirm" aria-live="polite"></span>
+        <button type="button" id="downloadKit">DOWNLOAD</button>
+        <div class="import-w">
+          <input type="file" id="importFile" accept=".json">
+          <span id="importError" class="import-error" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== COMMAND PALETTE ===================== -->
+  <div class="command-palette" id="commandPalette" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Command Palette">
+    <div class="palette-inner">
+      <input type="text" id="paletteSearch" placeholder="Search commands..." aria-label="Search commands">
+      <ul id="paletteResults" role="listbox">
+        <li role="option" tabindex="-1" data-action="go-home">Go HOME</li>
+        <li role="option" tabindex="-1" data-action="go-on-track">Go ON TRACK</li>
+        <li role="option" tabindex="-1" data-action="go-off-track">Go OFF TRACK</li>
+        <li role="option" tabindex="-1" data-action="go-calendar">Go CALENDAR</li>
+        <li role="option" tabindex="-1" data-action="open-press-kit">Open press kit</li>
+        <li role="option" tabindex="-1" data-action="undo">Undo</li>
+        <li role="option" tabindex="-1" data-action="redo">Redo</li>
+      </ul>
+    </div>
+  </div>
+
   <!-- ===================== MAIN PAGE ===================== -->
   <main class="page-w" id="top">
 
@@ -161,6 +200,57 @@
       </div>
     </section>
 
+    <!-- RACE CALENDAR -->
+    <section class="race-calendar-section" id="race-calendar" data-section="race-calendar">
+      <h2 class="section-eyebrow">CALENDAR</h2>
+      <div class="calendar-controls">
+        <div class="status-filter" role="group" aria-label="Filter races by status">
+          <button type="button" class="filter-btn is-active" data-filter="All">All</button>
+          <button type="button" class="filter-btn" data-filter="Upcoming">Upcoming</button>
+          <button type="button" class="filter-btn" data-filter="Completed">Completed</button>
+        </div>
+        <div class="selected-races-count" aria-live="polite">Selected races <span>0</span></div>
+      </div>
+      <div class="race-list" role="list">
+        <button type="button" class="race-row" data-race-id="alpine" data-circuit="Alpine GP" data-date="2025-03-16" data-status="Upcoming" aria-pressed="false">
+          <span class="race-circuit">Alpine GP</span>
+          <span class="race-date">2025-03-16</span>
+          <span class="race-status">Upcoming</span>
+          <span class="race-check" aria-hidden="true">+</span>
+        </button>
+        <button type="button" class="race-row" data-race-id="bayfront" data-circuit="Bayfront Circuit" data-date="2025-04-06" data-status="Upcoming" aria-pressed="false">
+          <span class="race-circuit">Bayfront Circuit</span>
+          <span class="race-date">2025-04-06</span>
+          <span class="race-status">Upcoming</span>
+          <span class="race-check" aria-hidden="true">+</span>
+        </button>
+        <button type="button" class="race-row" data-race-id="ridgeway" data-circuit="Ridgeway GP" data-date="2025-05-04" data-status="Completed" aria-pressed="false">
+          <span class="race-circuit">Ridgeway GP</span>
+          <span class="race-date">2025-05-04</span>
+          <span class="race-status">Completed</span>
+          <span class="race-check" aria-hidden="true">+</span>
+        </button>
+        <button type="button" class="race-row" data-race-id="solstice" data-circuit="Solstice GP" data-date="2025-06-15" data-status="Upcoming" aria-pressed="false">
+          <span class="race-circuit">Solstice GP</span>
+          <span class="race-date">2025-06-15</span>
+          <span class="race-status">Upcoming</span>
+          <span class="race-check" aria-hidden="true">+</span>
+        </button>
+        <button type="button" class="race-row" data-race-id="meridian" data-circuit="Meridian Night Run" data-date="2025-07-20" data-status="Upcoming" aria-pressed="false">
+          <span class="race-circuit">Meridian Night Run</span>
+          <span class="race-date">2025-07-20</span>
+          <span class="race-status">Upcoming</span>
+          <span class="race-check" aria-hidden="true">+</span>
+        </button>
+        <button type="button" class="race-row" data-race-id="cascade" data-circuit="Cascade Finale" data-date="2025-09-07" data-status="Upcoming" aria-pressed="false">
+          <span class="race-circuit">Cascade Finale</span>
+          <span class="race-date">2025-09-07</span>
+          <span class="race-status">Upcoming</span>
+          <span class="race-check" aria-hidden="true">+</span>
+        </button>
+      </div>
+    </section>
+
     <!-- COLLABS / PARTNERS MARQUEE -->
     <section class="home-collab-w" id="collabs" data-section="collabs">
       <h2 class="section-eyebrow">COLLABS</h2>
@@ -187,7 +277,7 @@
     <!-- SOCIAL VIDEO STREAM -->
     <section class="social-stream-section" id="social-stream" data-section="social-stream">
       <h2 class="section-eyebrow">SOCIAL</h2>
-      <div class="video-stream-wrap" data-video-stream-wrap>
+      <div class="video-stream-wrap" data-video-stream-wrap role="button" tabindex="0" aria-label="Play social video">
         <div class="video-stream" data-video-stream>
           <video id="socialVideo" data-video-el muted loop playsinline preload="metadata" poster="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/6830302d42237886d0c4b24c_ln-social-img-2.webp">
             <source src="/videos/hero.webm" type="video/webm" />
@@ -216,6 +306,15 @@
               <li><img class="footer-marquee-svg" src="/cdn.prod.website-files.com/67b5a02dc5d338960b17a7e9/68dbd5d722f5ba2f4074cbe7_ln4-footer-logo-ralph-lauren.svg" alt="Ralph Lauren" /></li>
             </ul>
           </div>
+          <div class="newsletter-w">
+              <form id="newsletterForm" novalidate>
+                <label for="newsletterEmail" class="sr-only">Email address</label>
+                <input type="email" id="newsletterEmail" placeholder="Enter email">
+                <button type="submit" id="newsletterSubmit" disabled>SUBSCRIBE</button>
+                <span id="newsletterError" class="error-msg" aria-live="polite"></span>
+                <span id="newsletterConfirm" class="confirm-msg" aria-live="polite"></span>
+              </form>
+            </div>
           <div class="footer-bottom">
             <span class="footer-brand">LANDO NORRIS</span>
             <ul class="footer-legal" role="list">
