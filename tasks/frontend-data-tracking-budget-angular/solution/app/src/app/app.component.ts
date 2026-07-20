@@ -13,6 +13,7 @@ import {
   selectView,
 } from './store/budget.selectors';
 import { periodLabel } from './models/models';
+import { downloadTextFile, generateCsvExport, generateJsonExport } from './export/export.component';
 
 declare global {
   interface Window {
@@ -163,17 +164,27 @@ export class AppComponent implements OnInit {
       },
       {
         name: 'artifact_export',
-        description: 'Export budget data.',
-        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        description: 'Open the Export view and download the Budget report in the requested format. Same action as the Download button.',
+        inputSchema: {
+          type: 'object',
+          properties: { format: { type: 'string', enum: ['csv', 'json'] } },
+          required: ['format'],
+          additionalProperties: false,
+        },
       },
       {
         name: 'artifact_import',
-        description: 'Import budget data.',
-        inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+        description: 'Open the Export view import mode. File bytes are not passed via WebMCP; use the visible file input to complete the import.',
+        inputSchema: {
+          type: 'object',
+          properties: { mode: { type: 'string', enum: ['budget-json'] } },
+          required: ['mode'],
+          additionalProperties: false,
+        },
       },
       {
         name: 'artifact_copy',
-        description: 'Copy budget data.',
+        description: 'Copy the Budget report JSON to the clipboard. Same action as the Copy JSON button.',
         inputSchema: { type: 'object', properties: {}, additionalProperties: false },
       },
       {
@@ -275,10 +286,28 @@ export class AppComponent implements OnInit {
           const summary = await firstValueFrom(this.store.select(selectBudgetsByCategory));
           return { ok: true, period: { month, year }, budgetsByCategory: summary };
         }
-        case 'artifact_export':
-        case 'artifact_import':
-        case 'artifact_copy':
+        case 'artifact_export': {
+          const format = String(args['format']) as 'csv' | 'json';
+          this.store.dispatch(BudgetActions.setView({ view: 'export' }));
+          if (format === 'csv') {
+            const csv = await generateCsvExport(this.store, false);
+            downloadTextFile(csv, 'expenses.csv', 'text/csv');
+          } else {
+            const json = await generateJsonExport(this.store);
+            downloadTextFile(json, 'budget-document.json', 'application/json');
+          }
+          return { ok: true, format };
+        }
+        case 'artifact_import': {
+          const mode = String(args['mode'] ?? 'budget-json');
+          this.store.dispatch(BudgetActions.setView({ view: 'export' }));
+          return { ok: true, mode };
+        }
+        case 'artifact_copy': {
+          const json = await generateJsonExport(this.store);
+          await navigator.clipboard.writeText(json);
           return { ok: true };
+        }
         default:
           throw new Error(`Unknown WebMCP tool: ${name}`);
       }

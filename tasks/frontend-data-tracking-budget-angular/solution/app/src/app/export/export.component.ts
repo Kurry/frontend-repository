@@ -7,6 +7,84 @@ import * as BudgetActions from '../store/budget.actions';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Expense, periodEquals } from '../models/models';
 
+/**
+ * Standalone generation helpers shared with app.component.ts's WebMCP
+ * artifact-transfer handlers, so those tools call the same report-building
+ * logic as the visible Export view instead of faking success.
+ */
+export async function generateJsonExport(store: Store): Promise<string> {
+  const state = await firstValueFrom(store.select(selectBudgetState));
+  const categoriesState = await firstValueFrom(store.select(selectBudgetsByCategory));
+
+  const totals = categoriesState.reduce((acc, cat) => {
+      acc.budget += cat.maxExpenses;
+      acc.spent += cat.currentExpenses;
+      acc.left += cat.left;
+      return acc;
+  }, { budget: 0, spent: 0, left: 0 });
+
+  const categories = categoriesState.map(cat => ({
+      id: cat.categoryId,
+      name: cat.name,
+      counterpartyPatterns: state.categories.find(c => c.id === cat.categoryId)?.counterpartyPatterns || [],
+      maxExpenses: cat.maxExpenses,
+      limit: cat.maxExpenses,
+      spent: cat.currentExpenses,
+      variance: cat.variance,
+      projected: cat.projected,
+      overThreshold: cat.overThreshold
+  }));
+
+  const jsonDoc = {
+    meta: {
+      exportedAt: new Date().toISOString(),
+      period: `${state.period.month}/${state.period.year}`,
+      expenseCount: state.expenses.length
+    },
+    totals,
+    displayName: state.displayName,
+    activePeriod: state.period,
+    settings: {
+      thresholdPercent: state.thresholdPercent,
+      accountName: state.displayName
+    },
+    categories,
+    recurringRules: state.recurringRules,
+    expenses: state.expenses.map(expense => ({ ...expense, recurring: Boolean(expense.recurring) }))
+  };
+
+  return JSON.stringify(jsonDoc, null, 2);
+}
+
+export async function generateCsvExport(store: Store, includeAllPeriods: boolean): Promise<string> {
+  const state = await firstValueFrom(store.select(selectBudgetState));
+  const categoryNames = new Map(state.categories.map(category => [category.id, category.name]));
+  const escapeCsv = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`;
+  let csv = "Date, Counterparty, Category, Value, Period\n";
+  state.expenses
+    .filter(expense => includeAllPeriods || periodEquals(expense.period, state.period))
+    .forEach(expense => {
+      csv += [
+        escapeCsv(expense.datetime),
+        escapeCsv(expense.counterparty || ''),
+        escapeCsv(categoryNames.get(expense.categoryId) || expense.categoryId),
+        expense.value,
+        escapeCsv(`${expense.period.month}/${expense.period.year}`)
+      ].join(',') + '\n';
+    });
+  return csv;
+}
+
+export function downloadTextFile(text: string, filename: string, mimeType: string): void {
+  const blob = new Blob([text], { type: mimeType });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
 function parseCsv(text: string): string[][] {
   const rows: string[][] = [];
   let row: string[] = [];
@@ -100,58 +178,12 @@ export class ExportComponent implements OnInit, OnDestroy {
   }
 
   async generateJsonExport() {
-    const state = await firstValueFrom(this.store.select(selectBudgetState));
-    const categoriesState = await firstValueFrom(this.store.select(selectBudgetsByCategory));
-
-    const totals = categoriesState.reduce((acc, cat) => {
-        acc.budget += cat.maxExpenses;
-        acc.spent += cat.currentExpenses;
-        acc.left += cat.left;
-        return acc;
-    }, { budget: 0, spent: 0, left: 0 });
-
-    const categories = categoriesState.map(cat => ({
-        id: cat.categoryId,
-        name: cat.name,
-        counterpartyPatterns: state.categories.find(c => c.id === cat.categoryId)?.counterpartyPatterns || [],
-        maxExpenses: cat.maxExpenses,
-        limit: cat.maxExpenses,
-        spent: cat.currentExpenses,
-        variance: cat.variance,
-        projected: cat.projected,
-        overThreshold: cat.overThreshold
-    }));
-
-    const jsonDoc = {
-      meta: {
-        exportedAt: new Date().toISOString(),
-        period: `${state.period.month}/${state.period.year}`,
-        expenseCount: state.expenses.length
-      },
-      totals,
-      displayName: state.displayName,
-      activePeriod: state.period,
-      settings: {
-        thresholdPercent: state.thresholdPercent,
-        accountName: state.displayName
-      },
-      categories,
-      recurringRules: state.recurringRules,
-      expenses: state.expenses.map(expense => ({ ...expense, recurring: Boolean(expense.recurring) }))
-    };
-
-    return JSON.stringify(jsonDoc, null, 2);
+    return generateJsonExport(this.store);
   }
 
   async downloadJson() {
     const json = this.jsonPreview || await this.generateJsonExport();
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'budget-document.json';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    downloadTextFile(json, 'budget-document.json', 'application/json');
   }
 
   async copyJson() {
@@ -199,22 +231,7 @@ export class ExportComponent implements OnInit, OnDestroy {
   }
 
   async generateCsvExport() {
-    const state = await firstValueFrom(this.store.select(selectBudgetState));
-    const categoryNames = new Map(state.categories.map(category => [category.id, category.name]));
-    const escapeCsv = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`;
-    let csv = "Date, Counterparty, Category, Value, Period\n";
-    state.expenses
-      .filter(expense => this.includeAllPeriods || periodEquals(expense.period, state.period))
-      .forEach(expense => {
-        csv += [
-          escapeCsv(expense.datetime),
-          escapeCsv(expense.counterparty || ''),
-          escapeCsv(categoryNames.get(expense.categoryId) || expense.categoryId),
-          expense.value,
-          escapeCsv(`${expense.period.month}/${expense.period.year}`)
-        ].join(',') + '\n';
-      });
-    return csv;
+    return generateCsvExport(this.store, this.includeAllPeriods);
   }
 
   setCsvScope(event: Event) {
@@ -224,13 +241,7 @@ export class ExportComponent implements OnInit, OnDestroy {
 
   async downloadCsv() {
     const csv = this.csvPreview || await this.generateCsvExport();
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'expenses.csv';
-    a.click();
-    window.URL.revokeObjectURL(url);
+    downloadTextFile(csv, 'expenses.csv', 'text/csv');
   }
 
   async copyCsv() {
