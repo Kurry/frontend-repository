@@ -251,8 +251,20 @@ function pushHistory(key) {
   updateUndoRedoButtons();
 }
 
+/* Deferred removal timers (row exit animation) keyed by theme id. Undo/Redo
+ * restores a snapshot that may resurrect a theme whose removal is still
+ * pending — the timer must be cancelled or it would delete the restored
+ * theme and toast a removal the user just undid. */
+const pendingRemovals = new Map();
+
+function cancelPendingRemovals() {
+  for (const timer of pendingRemovals.values()) clearTimeout(timer);
+  pendingRemovals.clear();
+}
+
 function undo() {
   if (!history.undo.length) return;
+  cancelPendingRemovals();
   history.redo.push(snapshotState());
   restoreState(history.undo.pop());
   history._lastKey = null;
@@ -261,6 +273,7 @@ function undo() {
 
 function redo() {
   if (!history.redo.length) return;
+  cancelPendingRemovals();
   history.undo.push(snapshotState());
   restoreState(history.redo.pop());
   history._lastKey = null;
@@ -420,6 +433,11 @@ function removeThemeById(id, { animate = true } = {}) {
   }
   pushHistory("remove");
   const finish = () => {
+    if (pendingRemovals.has(id)) {
+      clearTimeout(pendingRemovals.get(id));
+      pendingRemovals.delete(id);
+    }
+    if (!state.customs.some((t) => t.id === id)) return; // already removed — never toast twice
     state.customs = state.customs.filter((t) => t.id !== id);
     if (state.active?.id === id) {
       state.active = state.customs[0] || cloneTheme(defaultBuiltin());
@@ -435,7 +453,8 @@ function removeThemeById(id, { animate = true } = {}) {
     const row = document.querySelector(`#my-themes .theme-row[data-id="${cssEscape(id)}"]`);
     if (row) {
       animateRowOut(row);
-      setTimeout(finish, 230);
+      if (pendingRemovals.has(id)) clearTimeout(pendingRemovals.get(id));
+      pendingRemovals.set(id, setTimeout(finish, 230));
       return;
     }
   }
