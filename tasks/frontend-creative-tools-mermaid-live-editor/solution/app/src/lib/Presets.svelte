@@ -13,7 +13,7 @@
         type="button"
         data-sample={sample.id}
         aria-pressed={store.code === sample.code}
-        class="rounded-md border border-slate-300 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 transition-colors hover:bg-indigo-600 hover:text-white focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
+        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-md border border-slate-300 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 transition-all active:scale-95 hover:bg-indigo-600 hover:text-white focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200"
         onclick={() => loadSample(sample)}>
         {sample.label}
       </button>

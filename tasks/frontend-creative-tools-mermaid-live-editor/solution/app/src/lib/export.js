@@ -72,3 +72,22 @@ export const copySVGMarkup = async () => {
   }
   return markup.length;
 };
+
+export const downloadMMD = (code) => {
+  if (!code || !code.trim()) throw new Error('No code to export');
+  const href = `data:text/plain;base64,${toBase64(code)}`;
+  return simulateDownload(getFileName('mmd'), href);
+};
+
+export const downloadJSON = (jsonString) => {
+  const href = `data:application/json;base64,${toBase64(jsonString)}`;
+  return simulateDownload(getFileName('json'), href);
+};
+
+export const copyToClipboard = async (text) => {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    // fallback
+  }
+};

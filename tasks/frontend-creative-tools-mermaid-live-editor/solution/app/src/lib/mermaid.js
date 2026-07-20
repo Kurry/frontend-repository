@@ -1,4 +1,5 @@
 import mermaid from 'mermaid';
+import { store } from './state.svelte.js';
 
 // Sample diagrams shown in the "Sample Diagrams" picker. The keys are the
 // visible button labels; ids are the stable browse destinations. Each source is
@@ -101,10 +102,22 @@ export const DEFAULT_CONFIG = JSON.stringify({ theme: 'default' }, null, 2);
 
 let initialized = false;
 const ensureInit = (mermaidTheme) => {
+  let configObj = { theme: mermaidTheme || 'default' };
+  try {
+    if (store && store.lastValidMermaid) {
+      configObj = JSON.parse(store.lastValidMermaid);
+      if (mermaidTheme) {
+        configObj.theme = mermaidTheme;
+      }
+    }
+  } catch (e) {
+    // fallback
+  }
+
   mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'loose',
-    theme: mermaidTheme || 'default'
+    ...configObj
   });
   initialized = true;
 };

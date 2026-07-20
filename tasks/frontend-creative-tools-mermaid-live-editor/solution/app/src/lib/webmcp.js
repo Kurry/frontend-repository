@@ -1,8 +1,8 @@
 // WebMCP surface (contract zto-webmcp-v1). Every tool calls the same domain
 // command the visible UI uses — there are no success paths the UI lacks.
-import { store, setCode, setEditorMode, setTheme, loadSample } from './state.svelte.js';
+import { store, setCode, setEditorMode, setTheme, loadSample, getSessionJSON, importSessionJSON, importMMD } from './state.svelte.js';
 import { SAMPLE_DIAGRAMS } from './mermaid.js';
-import { downloadSVG, downloadPNG, copySVGMarkup } from './export.js';
+import { downloadSVG, downloadPNG, copySVGMarkup, downloadMMD, downloadJSON, copyToClipboard } from './export.js';
 
 const SESSION = {
   contract_version: 'zto-webmcp-v1',
@@ -100,26 +100,52 @@ const TOOLS = [
   {
     name: 'artifact_export',
     module: 'artifact-transfer-v1',
-    description: 'Export the current diagram as an SVG or PNG download.',
+    description: 'Export the current diagram as an SVG, PNG, MMD, or JSON download.',
     parameters: {
       type: 'object',
-      properties: { format: { type: 'string', enum: ['svg', 'png'] } },
+      properties: { format: { type: 'string', enum: ['svg', 'png', 'mmd', 'json'] } },
       required: ['format']
     },
     handler: async ({ format }) => {
-      if (store.error) throw new Error('Cannot export while the diagram has a syntax error');
-      const filename = format === 'png' ? await downloadPNG() : downloadSVG();
+      if (store.error && format !== 'json') throw new Error('Cannot export while the diagram has a syntax error');
+      if (!store.code.trim() && format !== 'json') throw new Error('Cannot export empty diagram');
+      let filename;
+      if (format === 'png') filename = await downloadPNG();
+      else if (format === 'svg') filename = downloadSVG();
+      else if (format === 'mmd') filename = downloadMMD(store.code);
+      else if (format === 'json') filename = downloadJSON(getSessionJSON());
       return { ok: true, format, filename };
     }
   },
   {
     name: 'artifact_copy',
     module: 'artifact-transfer-v1',
-    description: 'Copy the current rendered diagram SVG markup to the clipboard.',
+    description: 'Copy the current rendered diagram SVG markup or Session JSON to the clipboard.',
     parameters: { type: 'object', properties: {} },
     handler: async () => {
       const length = await copySVGMarkup();
       return { ok: true, copied: true, length };
+    }
+  },
+  {
+    name: 'artifact_import',
+    module: 'artifact-transfer-v1',
+    description: 'Import MMD or Session JSON payload.',
+    parameters: {
+      type: 'object',
+      properties: { mode: { type: 'string', enum: ['mmd', 'session-json'] }, payload: { type: 'string' } },
+      required: ['mode', 'payload']
+    },
+    handler: async ({ mode, payload }) => {
+      if (mode === 'mmd') {
+        const result = importMMD(payload);
+        if (!result.ok) throw new Error(result.error);
+      } else {
+        const result = importSessionJSON(payload);
+        if (!result.ok) throw new Error(result.error);
+      }
+      await waitForPreview();
+      return { ok: true, mode };
     }
   }
 ];
