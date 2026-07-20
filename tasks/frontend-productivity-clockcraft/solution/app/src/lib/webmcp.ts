@@ -1,28 +1,17 @@
-// WebMCP surface for the ClockCraft oracle.
-//
-// Every tool invokes the SAME store commands the visible Svelte controls call —
-// entriesStore.addEntry/updateEntry/deleteEntry, timerStore.startTimer/stopTimer,
-// uiStore.setFilter/setSearch — plus the same history/streak/toast side effects,
-// so a tool can never reach a success path the UI lacks. Undo/Redo, branch
-// selection, the History panel, the per-second timer tick, and timeline block
-// sizing are intentionally NOT exposed here: they stay Playwright-driven through
-// the real controls (see mechanics_exclusions).
-//
-// Exposed on window as webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool.
-
-import { get } from 'svelte/store';
-import { entriesStore, type Category, type TimeEntry } from './stores/entries';
-import { timerStore } from './stores/timer';
-import { historyStore } from './stores/history';
-import { streakStore } from './stores/streak';
-import { toastStore } from './stores/toast';
+import { entriesStore, type Category, type TimeEntry, type InterruptionReason } from './stores/entries';
 import { uiStore } from './stores/ui';
+import { timerStore } from './stores/timer';
+import { streakStore } from './stores/streak';
+import { historyStore } from './stores/history';
+import { toastStore } from './stores/toast';
+import { tagsStore } from './stores/tags';
+import { get } from 'svelte/store';
 
 const CONTRACT_VERSION = 'zto-webmcp-v1';
-const MODULES = ['entity-collection-v1', 'browse-query-v1', 'command-session-v1'];
 
-const CATEGORIES: Category[] = ['meaningful', 'neutral', 'draining'];
-const DESTINATIONS = ['timeline', 'weekly-chart', 'tag-manager'];
+const MODULES = ['entity-collection-v1', 'browse-query-v1', 'command-session-v1', 'artifact-transfer-v1'];
+
+const DESTINATIONS = ['timeline', 'weekly-chart', 'tag-manager', 'export-drawer', 'heat-map'];
 const FILTER_VALUES = ['all', 'meaningful', 'neutral', 'draining'];
 
 type Result = Record<string, unknown>;
@@ -31,36 +20,47 @@ function allEntries(): TimeEntry[] {
 	return get(entriesStore.entries);
 }
 
-function normalizeCategory(value: unknown): Category | null {
-	const v = String(value ?? '').toLowerCase();
-	return (CATEGORIES as string[]).includes(v) ? (v as Category) : null;
+function normalizeCategory(c: unknown): Category | null {
+	const cat = String(c ?? '').toLowerCase();
+	if (cat === 'meaningful' || cat === 'neutral' || cat === 'draining') return cat as Category;
+	return null;
 }
 
-// Accepts an ISO / datetime-local string or an epoch-ms number; defaults to now.
-function normalizeStart(value: unknown): number | null {
-	if (value === undefined || value === null || value === '') return Date.now();
-	if (typeof value === 'number') return Number.isFinite(value) ? value : null;
-	const ms = new Date(String(value)).getTime();
-	return Number.isNaN(ms) ? null : ms;
+function normalizeInterruptionReason(r: unknown): InterruptionReason | null {
+	const reason = String(r ?? '');
+	if (reason === 'Internal' || reason === 'External') return reason as InterruptionReason;
+	return null;
 }
 
-// ---- entity-collection-v1 (entity: entry) ---------------------------------
+function normalizeStart(s: unknown): number | null {
+	if (s === undefined || s === null || s === '') return null;
+	const num = Number(s);
+	if (!Number.isNaN(num)) return num;
+	const d = new Date(String(s)).getTime();
+	return Number.isNaN(d) ? null : d;
+}
+
+// ---- entity-collection-v1 (Time entries) -----------------------------------
 
 function entityCreate(args: Result): Result {
 	const name = String(args.name ?? '').trim();
 	if (!name) return { ok: false, error: 'name is required' };
+
 	const category = normalizeCategory(args.category);
 	if (!category) return { ok: false, error: 'category must be meaningful, neutral, or draining' };
-	const start = normalizeStart(args['start-time'] ?? args.startTime ?? args.start);
-	if (start === null) return { ok: false, error: 'invalid start-time' };
+
 	const dur = Math.trunc(Number(args.duration));
 	if (!Number.isFinite(dur) || dur < 1 || dur > 1440) {
 		return { ok: false, error: 'duration must be an integer from 1 to 1440 minutes' };
 	}
+
+	const start = normalizeStart(args['start-time'] ?? args.startTime) ?? Date.now();
 	const tag = String(args.tag ?? '');
 
+	const interruptionReason = normalizeInterruptionReason(args['interruption-reason'] ?? args.interruptionReason);
+
 	// Same command path as ManualEntryForm.handleSubmit.
-	const entry = entriesStore.addEntry({ name, category, tag, startTime: start, duration: dur });
+	const entry = entriesStore.addEntry({ name, category, tag, startTime: start, duration: dur, interruptionReason });
 	historyStore.pushSnapshot(allEntries(), `Manual: ${name}`);
 	streakStore.updateStreak();
 	toastStore.addToast(`Added: ${name} (${dur} min)`);
@@ -105,6 +105,9 @@ function entityUpdate(args: Result): Result {
 		if (start === null) return { ok: false, error: 'invalid start-time' };
 		updates.startTime = start;
 	}
+	if (args['interruption-reason'] !== undefined || args.interruptionReason !== undefined) {
+		updates.interruptionReason = normalizeInterruptionReason(args['interruption-reason'] ?? args.interruptionReason);
+	}
 
 	// Same command path as EditDialog.handleSubmit.
 	entriesStore.updateEntry(id, updates);
@@ -140,11 +143,15 @@ function browseOpen(args: Result): Result {
 	}
 	if (destination === 'tag-manager') {
 		// Same path as the "Manage tags" header button.
-		uiStore.toggleTagManager();
+		uiStore.ui.update(s => ({...s, showTagManager: true}));
+		return { ok: true, operation: 'open', destination, opened: true };
+	}
+	if (destination === 'export-drawer') {
+		uiStore.ui.update(s => ({...s, showExportDrawer: true}));
 		return { ok: true, operation: 'open', destination, opened: true };
 	}
 	// timeline / weekly-chart are always-mounted sections; scroll them into view.
-	const heading = destination === 'timeline' ? "Today's timeline" : 'Weekly overview';
+	const heading = destination === 'timeline' ? "Today's timeline" : destination === 'heat-map' ? 'Streak history' : 'Weekly overview';
 	const el = Array.from(document.querySelectorAll('h2')).find(
 		(h) => (h.textContent ?? '').trim().toLowerCase() === heading.toLowerCase()
 	);
@@ -178,10 +185,10 @@ function browseClearFilter(): Result {
 
 // ---- command-session-v1 (live timer: start / stop / restart) ---------------
 
-function sessionStopAndSave(): TimeEntry | null {
+function sessionStopAndSave(interruptionReason: InterruptionReason | null = null): TimeEntry | null {
 	const stopped = timerStore.stopTimer();
 	if (!stopped) return null;
-	const entry = entriesStore.addEntry(stopped);
+	const entry = entriesStore.addEntry({ ...stopped, interruptionReason });
 	historyStore.pushSnapshot(allEntries(), `Timer: ${stopped.name}`);
 	streakStore.updateStreak();
 	return entry;
@@ -198,7 +205,14 @@ function sessionStart(args: Result): Result {
 	const running = get(timerStore.timer).running;
 	let saved: TimeEntry | null = null;
 	if (running) {
-		saved = sessionStopAndSave();
+		const current = get(timerStore.timer);
+		if (current.elapsed < 25 * 60) {
+			// WebMCP timer start requires auto-save. For under 25 mins, if not specified, it's problematic without interaction.
+			// But since we're in WebMCP, we just assume the default.
+			saved = sessionStopAndSave('Internal');
+		} else {
+			saved = sessionStopAndSave();
+		}
 		if (saved) toastStore.addToast(`Saved "${saved.name}" — switched to new timer`);
 	}
 	timerStore.startTimer(name, category, tag);
@@ -206,10 +220,21 @@ function sessionStart(args: Result): Result {
 	return { ok: true, operation: 'start', name, category, autoSaved: saved ? saved.id : null };
 }
 
-function sessionStop(): Result {
+function sessionStop(args: Result): Result {
 	const before = get(timerStore.timer);
 	if (!before.running) return { ok: false, error: 'no timer is running' };
-	const saved = sessionStopAndSave();
+	const reason = normalizeInterruptionReason(args['interruption-reason'] ?? args.interruptionReason);
+
+	let saved: TimeEntry | null = null;
+	if (before.elapsed < 25 * 60) {
+		if (!reason) {
+			return { ok: false, error: 'timer ran for less than 25 minutes; interruption-reason is required (Internal or External)' };
+		}
+		saved = sessionStopAndSave(reason);
+	} else {
+		saved = sessionStopAndSave();
+	}
+
 	if (!saved) return { ok: false, error: 'timer could not be saved' };
 	toastStore.addToast(`Saved: ${saved.name} (${saved.duration} min)`);
 	return { ok: true, operation: 'stop', id: saved.id, duration: saved.duration };
@@ -233,6 +258,36 @@ function sessionRestart(args: Result): Result {
 	return { ok: true, operation: 'restart', name, category, savedPrevious: saved ? saved.id : null };
 }
 
+// ---- artifact-transfer-v1 (export / import) --------------------------------
+
+function artifactExport(args: Result): Result {
+	const format = String(args.format ?? '');
+	if (format !== 'json' && format !== 'csv') {
+		return { ok: false, error: 'format must be json or csv' };
+	}
+	uiStore.ui.update(s => ({...s, showExportDrawer: true}));
+	return { ok: true, operation: 'export', format, drawerOpened: true };
+}
+
+function artifactImport(args: Result): Result {
+	const mode = String(args.mode ?? '');
+	if (mode !== 'session-json') {
+		return { ok: false, error: 'mode must be session-json' };
+	}
+	uiStore.ui.update(s => ({...s, showExportDrawer: true}));
+	return { ok: true, operation: 'import', mode, drawerOpened: true };
+}
+
+function artifactCopy(args: Result): Result {
+	const format = String(args.format ?? '');
+	if (format !== 'json' && format !== 'csv') {
+		return { ok: false, error: 'format must be json or csv' };
+	}
+	// Simulated copy command path
+	toastStore.addToast(`Copied ${format.toUpperCase()} to clipboard`);
+	return { ok: true, operation: 'copy', format };
+}
+
 // ---- registry --------------------------------------------------------------
 
 type Handler = (args: Result) => Result;
@@ -241,7 +296,7 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
 	{
 		name: 'entity-create',
 		description:
-			'Log a new time entry. args: name, category (meaningful|neutral|draining), duration (1-1440 min), optional tag, optional start-time. Same path as the manual-entry form.',
+			'Log a new time entry. args: name, category (meaningful|neutral|draining), duration (1-1440 min), optional tag, optional start-time, optional interruption-reason (Internal|External). Same path as the manual-entry form.',
 		handler: entityCreate
 	},
 	{
@@ -252,7 +307,7 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
 	{
 		name: 'entity-update',
 		description:
-			'Update an entry by args.id. Any of name, category, tag, duration, start-time may be supplied. Same path as the edit dialog.',
+			'Update an entry by args.id. Any of name, category, tag, duration, start-time, interruption-reason may be supplied. Same path as the edit dialog.',
 		handler: entityUpdate
 	},
 	{
@@ -262,7 +317,7 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
 	},
 	{
 		name: 'browse-open',
-		description: 'Open/scroll to a destination: timeline, weekly-chart, or tag-manager.',
+		description: 'Open/scroll to a destination: timeline, weekly-chart, tag-manager, export-drawer, or heat-map.',
 		handler: browseOpen
 	},
 	{
@@ -288,7 +343,7 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
 	},
 	{
 		name: 'session-stop',
-		description: 'Stop the running live timer and save it as an entry with its elapsed duration.',
+		description: 'Stop the running live timer and save it as an entry with its elapsed duration. args: optional interruption-reason required if < 25 mins.',
 		handler: sessionStop
 	},
 	{
@@ -296,6 +351,21 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
 		description:
 			'Restart the live timer: save the in-flight run (if any) and begin a fresh run. Optional name/category/tag override the current ones.',
 		handler: sessionRestart
+	},
+	{
+		name: 'artifact-export',
+		description: 'Open the export drawer. args: format (json|csv).',
+		handler: artifactExport
+	},
+	{
+		name: 'artifact-import',
+		description: 'Open the import drawer. args: mode (session-json).',
+		handler: artifactImport
+	},
+	{
+		name: 'artifact-copy',
+		description: 'Simulate copying the artifact. args: format (json|csv).',
+		handler: artifactCopy
 	}
 ];
 

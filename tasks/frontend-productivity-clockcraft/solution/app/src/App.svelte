@@ -12,6 +12,9 @@
 	import EditDialog from './lib/components/EditDialog.svelte';
 	import DeleteConfirm from './lib/components/DeleteConfirm.svelte';
 	import HistoryPanel from './lib/components/HistoryPanel.svelte';
+	import InterruptionDialog from './lib/components/InterruptionDialog.svelte';
+	import ExportDrawer from './lib/components/ExportDrawer.svelte';
+	import CommandPalette from './lib/components/CommandPalette.svelte';
 	import Toast from './lib/components/Toast.svelte';
 	import { uiStore, historyStore, entriesStore, streakStore } from './lib/stores';
 
@@ -20,6 +23,8 @@
 	let showEditDialog = $state(false);
 	let showDeleteConfirm = $state(false);
 	let showHistoryPanel = $state(false);
+	let showInterruptionDialog = $state(false);
+	let showExportDrawer = $state(false);
 
 	uiStore.ui.subscribe((ui) => {
 		showManual = ui.showManualForm;
@@ -27,6 +32,8 @@
 		showEditDialog = ui.showEditDialog;
 		showDeleteConfirm = ui.showDeleteConfirm;
 		showHistoryPanel = ui.showHistoryPanel;
+		showInterruptionDialog = ui.showInterruptionDialog;
+		showExportDrawer = ui.showExportDrawer;
 	});
 
 	// On mount, take initial snapshot for history
@@ -109,6 +116,14 @@
 	{#if showHistoryPanel}
 		<HistoryPanel />
 	{/if}
+	{#if showInterruptionDialog}
+		<InterruptionDialog />
+	{/if}
+	{#if showExportDrawer}
+		<ExportDrawer />
+	{/if}
+
+	<CommandPalette />
 
 	<!-- Toasts -->
 	<Toast />

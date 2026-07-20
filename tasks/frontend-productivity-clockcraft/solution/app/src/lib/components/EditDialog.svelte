@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from "../utils/focusTrap";
 	import { entriesStore, type Category } from '../stores/entries';
 	import { tagsStore } from '../stores/tags';
 	import { toastStore } from '../stores/toast';
@@ -77,7 +78,7 @@
 	<div
 		class="bg-white radius-card p-6 w-full max-w-md shadow-xl"
 		onclick={(e) => e.stopPropagation()}
-		role="dialog"
+		role="dialog" use:focusTrap
 		aria-label="Edit entry"
 		tabindex="-1"
 		onkeydown={(e) => { if (e.key === 'Escape') uiStore.closeEditDialog(); }}
