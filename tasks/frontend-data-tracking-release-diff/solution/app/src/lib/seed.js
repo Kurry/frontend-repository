@@ -102,6 +102,7 @@ export function createSeedRotation() {
 export function createSeedTimeline() {
   return [
     { at: '2026-06-18T16:42:00.000Z', kind: 'release-cut', description: 'Sealed release 2.0.0 with 27 tasks.' },
+    { at: '2026-06-14T11:07:00.000Z', kind: 'rank-stability-failed', description: 'Rank-stability check for 2.0.0-rc1 failed at 0.941 against threshold 0.95.' },
     { at: '2026-06-10T10:18:00.000Z', kind: 'rotation-advance', description: 'Advanced held-out rotation to cycle 8.' },
     { at: '2026-04-02T14:05:00.000Z', kind: 'release-cut', description: 'Sealed release 1.2.0 with 25 tasks.' },
     { at: '2026-01-23T09:30:00.000Z', kind: 'release-cut', description: 'Sealed release 1.1.0 with 24 tasks.' },

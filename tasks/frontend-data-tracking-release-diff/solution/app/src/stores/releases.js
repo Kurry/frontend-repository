@@ -204,7 +204,10 @@ export const useReleaseStore = defineStore('releases', {
       this.cutRun.error = ''
       this.cutRun.correlation = 0
       step.status = 'running'
-      const willPass = this.cutRun.attempt > 1
+      // The draw re-randomizes every run and can pass or fail on any attempt so
+      // both outcomes remain reachable; a passing first attempt seals cleanly and
+      // appends exactly one timeline entry.
+      const willPass = Math.random() < 0.6
       const target = willPass ? 0.955 + Math.random() * 0.035 : 0.936 + Math.random() * 0.012
       for (let tick = 1; tick <= 20; tick += 1) {
         await pause(28)
@@ -214,8 +217,8 @@ export const useReleaseStore = defineStore('releases', {
       if (this.cutRun.correlation < this.cutRun.threshold) {
         step.status = 'failed'
         this.cutRun.error = `Correlation ${this.cutRun.correlation.toFixed(3)} is below the required threshold ${this.cutRun.threshold.toFixed(2)}. The release remains blocked.`
-        this.timeline.unshift({ at: new Date().toISOString(), kind: 'rank-stability-failed', description: `Rank-stability check failed at ${this.cutRun.correlation.toFixed(3)} against threshold ${this.cutRun.threshold.toFixed(2)}.` })
-        this.touchExport()
+        // A blocked check does not seal a version, so it appends no release event:
+        // completing one cut adds exactly one release-cut entry to the timeline.
         return false
       }
       step.status = 'complete'

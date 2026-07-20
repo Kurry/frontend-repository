@@ -8,7 +8,7 @@ const icons = { 'release-cut': PackageIcon, 'rank-stability-failed': WarningDiam
 const labels = { 'release-cut': 'Release cut', 'rank-stability-failed': 'Check failed', 'rotation-advance': 'Rotation', import: 'Import' }
 const formatted = computed(() => store.timeline.map((event) => ({
   ...event,
-  date: new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(new Date(event.at)),
+  date: event.at.slice(0, 10),
   time: new Intl.DateTimeFormat('en', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }).format(new Date(event.at)),
 })))
 </script>

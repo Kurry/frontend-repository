@@ -100,9 +100,36 @@ function toolsFor(store) {
   ]
 }
 
+const CONTRACT_VERSION = 'zto-webmcp-v1'
+const MODULES = ['browse-query-v1', 'form-workflow-v1', 'command-session-v1', 'artifact-transfer-v1']
+
 export function registerWebMCP(store) {
   const definitions = toolsFor(store)
   window.__larkspurWebMcpTools = definitions
+  const byName = new Map(definitions.map((definition) => [definition.name, definition]))
+
+  // WebMCP surface the verifier bridge probes:
+  // window.webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool.
+  // Handlers drive the same Pinia store commands as the visible UI.
+  window.webmcp_session_info = () => ({
+    contract_version: CONTRACT_VERSION,
+    title: 'Larkspur Releases',
+    modules: MODULES,
+    tools: definitions.map((definition) => definition.name),
+  })
+  window.webmcp_list_tools = () =>
+    definitions.map(({ name, description, inputSchema }) => ({ name, description, inputSchema }))
+  window.webmcp_invoke_tool = async (name, args = {}) => {
+    const tool = byName.get(name)
+    if (!tool) return { content: [{ type: 'text', text: JSON.stringify({ ok: false, error: `Unknown tool: ${name}` }) }], isError: true }
+    try {
+      return await tool.execute(args || {})
+    } catch (error) {
+      return { content: [{ type: 'text', text: JSON.stringify({ ok: false, error: String(error && error.message || error) }) }], isError: true }
+    }
+  }
+
+  // Also register with a native modelContext host when one is present (optional).
   let attempts = 0
   const tryRegister = () => {
     const context = navigator.modelContext || window.modelContext

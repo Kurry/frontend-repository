@@ -57,37 +57,6 @@ allowed_tools = [
   "browser_wait_for",
 ]
 
-# Observation browser with prefers-reduced-motion forced (the entrypoint's second
-# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
-# for reduced-motion criteria; every other criterion is graded on `playwright`.
-[[judge.mcp_servers]]
-name = "playwright_reduced_motion"
-transport = "stdio"
-command = "npx"
-args = [
-  "-y",
-  "@playwright/mcp@0.0.76",
-  "--browser",
-  "chromium",
-  "--cdp-endpoint",
-  "$WEBMCP_RM_CDP_ENDPOINT",
-  "--isolated",
-  "--output-dir",
-  "/logs/verifier/screenshots",
-]
-allowed_tools = [
-  "browser_navigate",
-  "browser_resize",
-  "browser_snapshot",
-  "browser_take_screenshot",
-  "browser_evaluate",
-  "browser_console_messages",
-  "browser_wait_for",
-  "browser_press_key",
-  "browser_click",
-  "browser_hover",
-]
-
 [scoring]
 aggregation = "weighted_mean"
 
@@ -144,6 +113,20 @@ weight = 1.0
 id = "9.8"
 name = "rapid_input_does_not_freeze"
 description = "The app does not hang or freeze even under rapid user input."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_sessions_avoid_resource_runaway"
+description = "An extended session shows no memory leaks or runaway resource use."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.10"
+name = "poor_conditions_have_fallback"
+description = "Simulated poor conditions show graceful loading or fallback."
 type = "binary"
 weight = 1.0
 

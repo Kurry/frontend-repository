@@ -36,6 +36,12 @@ const digest = (value) => value ? `${value.slice(0, 10)}…` : '—'
       <div class="summary-cell unchanged"><span>·</span><strong>{{ store.diffSummary.unchanged }}</strong><small>Unchanged</small></div>
     </div>
 
+    <div v-if="nonEmpty && !store.changedDiffRows.length" class="empty-state compact diff-identical">
+      <GitDiffIcon :size="30" />
+      <h2>These manifests are identical</h2>
+      <p>{{ store.diffBase === store.diffCompare ? `v${store.diffBase} compared against itself has no added, removed, or changed tasks.` : `v${store.diffBase} and v${store.diffCompare} share every task unchanged.` }} Expand the stable tasks below to review them.</p>
+    </div>
+
     <div v-if="nonEmpty" class="diff-list" aria-live="polite">
       <TransitionGroup name="diff-row">
         <article v-for="row in store.changedDiffRows" :key="`${store.diffBase}-${store.diffCompare}-${row.slug}`" class="diff-row" :class="row.kind">
@@ -61,6 +67,6 @@ const digest = (value) => value ? `${value.slice(0, 10)}…` : '—'
         </div>
       </Transition>
     </div>
-    <div v-else class="empty-state"><GitDiffIcon :size="34" /><h3>No tasks to compare</h3><p>Tasks from the selected manifest pair will appear here.</p></div>
+    <div v-else class="empty-state"><GitDiffIcon :size="34" /><h2>No tasks to compare</h2><p>Tasks from the selected manifest pair will appear here.</p></div>
   </section>
 </template>

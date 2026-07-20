@@ -5,7 +5,6 @@ prompt_template = "../system_prompt.md"
 cwd = "/logs/verifier"
 mode = "batched"
 timeout = 3000
-weight = 0.0
 
 [[judge.mcp_servers]]
 name = "webmcp"
@@ -56,37 +55,6 @@ allowed_tools = [
   "browser_take_screenshot",
   "browser_type",
   "browser_wait_for",
-]
-
-# Observation browser with prefers-reduced-motion forced (the entrypoint's second
-# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
-# for reduced-motion criteria; every other criterion is graded on `playwright`.
-[[judge.mcp_servers]]
-name = "playwright_reduced_motion"
-transport = "stdio"
-command = "npx"
-args = [
-  "-y",
-  "@playwright/mcp@0.0.76",
-  "--browser",
-  "chromium",
-  "--cdp-endpoint",
-  "$WEBMCP_RM_CDP_ENDPOINT",
-  "--isolated",
-  "--output-dir",
-  "/logs/verifier/screenshots",
-]
-allowed_tools = [
-  "browser_navigate",
-  "browser_resize",
-  "browser_snapshot",
-  "browser_take_screenshot",
-  "browser_evaluate",
-  "browser_console_messages",
-  "browser_wait_for",
-  "browser_press_key",
-  "browser_click",
-  "browser_hover",
 ]
 
 [scoring]

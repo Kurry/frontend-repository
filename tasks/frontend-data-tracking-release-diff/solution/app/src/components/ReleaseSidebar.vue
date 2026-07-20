@@ -13,7 +13,7 @@ const { versions, selectedVersionName, sidebarOpen } = storeToRefs(store)
     <div class="sidebar-heading">
       <div>
         <div class="eyebrow">Sealed register</div>
-        <h2>Releases</h2>
+        <p class="sidebar-title">Releases</p>
       </div>
       <span class="count-chip">{{ versions.length }}</span>
     </div>
