@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, onDestroy, tick } from 'svelte';
+  import { onMount, tick } from 'svelte';
   import { createForm } from 'felte';
   import { validator } from '@felte/validator-zod';
   import {
@@ -9,13 +9,13 @@
   import { importFormSchema } from '../contracts';
   import { consoleStore } from '../console-store.svelte';
   import { focusTrap } from '../actions';
+  import { formatTimestamp } from '../format';
 
   let copied = $state<string | null>(null);
-  let priorFocus: HTMLElement | null = null;
   const certificateStage = $derived(consoleStore.selectedRun.stages.find((stage) => stage.name === consoleStore.certificateStageName));
   const activePreview = $derived(consoleStore.exportTab === 'json' ? consoleStore.jsonPreview : consoleStore.markdownPreview);
 
-  const { form: importForm, errors: importErrors, data: importData } = createForm<{ payload: string }>({
+  const { form: importForm, errors: importErrors, data: importData, setFields } = createForm<{ payload: string }>({
     initialValues: { payload: consoleStore.importDraft },
     extend: validator({ schema: importFormSchema }),
     validateOnMount: true,
@@ -30,12 +30,10 @@
   });
 
   onMount(async () => {
-    priorFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     await tick();
-    document.querySelector<HTMLElement>('[data-modal-card] button, [data-modal-card] textarea')?.focus();
+    const first = document.querySelector<HTMLElement>('[data-modal-card] textarea, [data-modal-card] button');
+    first?.focus();
   });
-
-  onDestroy(() => priorFocus?.focus());
 
   function close() {
     consoleStore.closeModal();
@@ -135,9 +133,15 @@
         <label for="import-payload">Acceptance Package JSON <span>Required</span></label>
         <textarea
           id="import-payload" name="payload" rows="16"
+          value={consoleStore.importDraft}
           aria-describedby="import-error"
           aria-invalid={Boolean($importErrors.payload || consoleStore.importError)}
-          oninput={(event) => { consoleStore.importDraft = event.currentTarget.value; consoleStore.importError = ''; }}
+          oninput={(event) => {
+            const value = event.currentTarget.value;
+            consoleStore.importDraft = value;
+            consoleStore.importError = '';
+            setFields('payload', value, true);
+          }}
         ></textarea>
         {#if importIssue || $importErrors.payload || consoleStore.importError}
           <p id="import-error" class="import-error" role="alert">{importIssue || $importErrors.payload?.[0] || consoleStore.importError}</p>
@@ -156,7 +160,7 @@
         <div>
           <span class="eyebrow">Stage acceptance certificate</span>
           <h2 id="modal-title">{certificateStage.name}</h2>
-          <p>Issued {new Date(certificateStage.certificate.issuedAt).toLocaleString()}</p>
+          <p>Issued {formatTimestamp(certificateStage.certificate.issuedAt)} UTC</p>
         </div>
         <button type="button" class="close-button" aria-label="Close certificate" onclick={close}><X size={19} weight="bold" aria-hidden="true" /></button>
       </header>
@@ -183,9 +187,11 @@
 </div>
 
 <style>
-  .modal-backdrop { position:fixed; inset:0; z-index:80; display:grid; place-items:center; padding:1rem; background:rgba(2,9,18,.68); backdrop-filter:blur(5px); }
-  .modal-card { width:min(610px, 100%); max-height:calc(100vh - 2rem); overflow:auto; border-radius:.95rem; padding:1rem; }
+  .modal-backdrop { position:fixed; inset:0; z-index:80; display:grid; place-items:center; padding:1rem; background:rgba(2,9,18,.68); backdrop-filter:blur(5px); animation:backdrop-in .24s ease both; }
+  .modal-card { width:min(610px, 100%); max-height:calc(100vh - 2rem); overflow:auto; border-radius:.95rem; padding:1rem; opacity:1; transform:scale(1); transition:opacity .24s ease, transform .28s cubic-bezier(.2,.8,.2,1); animation:modal-in .28s cubic-bezier(.2,.8,.2,1) both; }
   .modal-card.wide { width:min(880px, 100%); }
+  @keyframes backdrop-in { from { opacity:0; } to { opacity:1; } }
+  @keyframes modal-in { from { opacity:0; transform:scale(.96); } to { opacity:1; transform:scale(1); } }
   .modal-head { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; padding:.15rem .15rem .9rem; }
   .eyebrow { color:#126f80; font-size:.57rem; font-weight:850; letter-spacing:.09em; text-transform:uppercase; }
   h2 { margin:.15rem 0 0; font-size:1.2rem; letter-spacing:-.02em; }

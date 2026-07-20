@@ -2,7 +2,6 @@ import {
   acceptancePackageSchema,
   gateNoteSchema,
   scoreFor,
-  STAGE_NAMES,
   suitePasses,
   type AcceptancePackage,
   type GateNote,
@@ -61,6 +60,8 @@ export class ConsoleStore {
   importDraft = $state('');
   importError = $state('');
   toast = $state<{ id: number; message: string } | null>(null);
+  modalOpener = $state<HTMLElement | null>(null);
+  noteFormOpener = $state<HTMLElement | null>(null);
   whatIf = $state<{
     active: boolean;
     runId: string | null;
@@ -75,66 +76,58 @@ export class ConsoleStore {
     gateStatuses: Record<string, RerunGateStatus>;
   }>({ active: false, runId: null, stageName: null, progress: 0, gateStatuses: {} });
 
-  get selectedRun(): RunRecord {
-    return this.runs.find((run) => run.id === this.selectedRunId) ?? this.runs[0];
-  }
+  selectedRun = $derived.by(() => this.runs.find((run) => run.id === this.selectedRunId) ?? this.runs[0]);
 
-  get selectedStage(): StageRecord {
-    return this.selectedRun.stages.find((stage) => stage.name === this.selectedStageName) ?? this.selectedRun.stages[0];
-  }
+  selectedStage = $derived.by(
+    () => this.selectedRun.stages.find((stage) => stage.name === this.selectedStageName) ?? this.selectedRun.stages[0]
+  );
 
-  get visibleRuns(): RunRecord[] {
+  visibleRuns = $derived.by(() => {
     const query = this.runSearch.trim().toLowerCase();
     return this.runs
       .filter((run) => !query || `${run.id} ${run.branch} ${run.commit}`.toLowerCase().includes(query))
       .toSorted((a, b) => this.runSort === 'newest'
         ? b.submittedAt.localeCompare(a.submittedAt)
         : a.submittedAt.localeCompare(b.submittedAt));
-  }
+  });
 
-  get registryGates() {
-    return GATE_REGISTRY.filter((gate) => this.severityFilter === 'all' || gate.severity === this.severityFilter);
-  }
+  registryGates = $derived.by(
+    () => GATE_REGISTRY.filter((gate) => this.severityFilter === 'all' || gate.severity === this.severityFilter)
+  );
 
-  get selectedRegistryGate() {
-    return GATE_REGISTRY.find((gate) => gate.id === this.selectedRegistryGateId) ?? null;
-  }
+  selectedRegistryGate = $derived.by(
+    () => GATE_REGISTRY.find((gate) => gate.id === this.selectedRegistryGateId) ?? null
+  );
 
-  get visibleTimeline(): TimelineEntry[] {
-    return this.selectedRun.timeline
-      .filter((entry) => this.timelineFilter === 'all' || entry.type === this.timelineFilter)
-      .toSorted((a, b) => b.timestamp.localeCompare(a.timestamp));
-  }
+  visibleTimeline = $derived.by(() => this.selectedRun.timeline
+    .filter((entry) => this.timelineFilter === 'all' || entry.type === this.timelineFilter)
+    .toSorted((a, b) => b.timestamp.localeCompare(a.timestamp)));
 
-  get displayedGates(): GateRecord[] {
+  displayedGates = $derived.by(() => {
     const stage = this.selectedStage;
     if (!this.whatIf.active || this.whatIf.runId !== this.selectedRun.id || this.whatIf.stageName !== stage.name) {
       return stage.gates;
     }
     return stage.gates.map((gate) => ({ ...gate, state: this.whatIf.values[gate.id] ?? gate.state }));
-  }
+  });
 
-  get displayedScore(): number {
-    return scoreFor(this.displayedGates);
-  }
+  displayedScore = $derived.by(() => scoreFor(this.displayedGates));
 
-  get displayedSuitePasses(): boolean {
-    return suitePasses(this.selectedStage.aggregationMode, this.displayedGates);
-  }
+  displayedSuitePasses = $derived.by(() => suitePasses(this.selectedStage.aggregationMode, this.displayedGates));
 
-  get displayedStageStatus(): StageStatus {
+  displayedStageStatus = $derived.by((): StageStatus => {
     const simulatingThisStage = this.whatIf.active
       && this.whatIf.runId === this.selectedRun.id
       && this.whatIf.stageName === this.selectedStage.name;
     if (simulatingThisStage) return this.displayedSuitePasses ? 'passed' : 'rejected';
     return this.selectedStage.status;
-  }
+  });
 
-  get failingHardGates(): GateRecord[] {
-    return this.displayedGates.filter((gate) => gate.severity === 'S1' && gate.state === 'fail');
-  }
+  failingHardGates = $derived.by(
+    () => this.displayedGates.filter((gate) => gate.severity === 'S1' && gate.state === 'fail')
+  );
 
-  get acceptancePackage(): AcceptancePackage {
+  acceptancePackage = $derived.by((): AcceptancePackage => {
     const run = this.selectedRun;
     return {
       schemaVersion: 'gate-console.acceptance-package.v1',
@@ -158,13 +151,11 @@ export class ConsoleStore {
       })),
       timeline: run.timeline.map(({ type, timestamp, summary }) => ({ type, timestamp, summary }))
     } as AcceptancePackage;
-  }
+  });
 
-  get jsonPreview(): string {
-    return JSON.stringify(this.acceptancePackage, null, 2);
-  }
+  jsonPreview = $derived.by(() => JSON.stringify(this.acceptancePackage, null, 2));
 
-  get markdownPreview(): string {
+  markdownPreview = $derived.by(() => {
     const run = this.selectedRun;
     const lines = [
       '# Certificate Chain', '',
@@ -183,6 +174,18 @@ export class ConsoleStore {
       lines.push('');
     }
     return lines.join('\n');
+  });
+
+  private captureOpener() {
+    this.modalOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  }
+
+  private appendTimeline(run: RunRecord, entry: TimelineEntry) {
+    run.timeline = [...run.timeline, entry];
+  }
+
+  private touchRuns() {
+    this.runs = [...this.runs];
   }
 
   selectRun(runId: string) {
@@ -215,12 +218,18 @@ export class ConsoleStore {
   }
 
   openNoteForm(gateId: string) {
+    this.noteFormOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     this.expandedGates.add(gateId);
     this.noteFormGateId = gateId;
   }
 
   closeNoteForm() {
+    const opener = this.noteFormOpener;
     this.noteFormGateId = null;
+    this.noteFormOpener = null;
+    queueMicrotask(() => {
+      if (opener?.isConnected) opener.focus();
+    });
   }
 
   enterWhatIf() {
@@ -244,13 +253,15 @@ export class ConsoleStore {
   }
 
   setSimulatedState(gateId: string, state: GateState) {
-    if (!this.whatIf.active || this.whatIf.runId !== this.selectedRun.id || this.whatIf.stageName !== this.selectedStage.name) return false;
+    if (!this.whatIf.active || this.whatIf.runId !== this.selectedRun.id || this.whatIf.stageName !== this.selectedStage.name) {
+      return false;
+    }
     const gate = this.selectedStage.gates.find((candidate) => candidate.id === gateId);
     if (!gate) return false;
     const nextValues = { ...this.whatIf.values };
     if (gate.state === state) delete nextValues[gateId];
     else nextValues[gateId] = state;
-    this.whatIf.values = nextValues;
+    this.whatIf = { ...this.whatIf, values: nextValues };
     return true;
   }
 
@@ -263,18 +274,23 @@ export class ConsoleStore {
   addNote(gateId: string, input: GateNote): boolean {
     const parsed = gateNoteSchema.safeParse(input);
     if (!parsed.success) return false;
-    const gate = this.selectedStage.gates.find((candidate) => candidate.id === gateId);
+    const run = this.selectedRun;
+    const stage = run.stages.find((candidate) => candidate.name === this.selectedStageName);
+    const gate = stage?.gates.find((candidate) => candidate.id === gateId);
     if (!gate) return false;
     gate.notes = [...gate.notes, { text: parsed.data.text, category: parsed.data.category }];
-    this.selectedRun.timeline = [...this.selectedRun.timeline, issue(this.selectedRun.id, 'note', `Note added to ${gate.id}: ${parsed.data.category}`)];
+    this.appendTimeline(run, issue(run.id, 'note', `Note added to ${gate.id}: ${parsed.data.category}`));
     this.noteFormGateId = null;
+    this.touchRuns();
     this.touchExport();
     this.showToast(`Note added to ${gate.id}`);
     return true;
   }
 
   deleteNote(gateId: string, noteIndex: number): boolean {
-    const gate = this.selectedStage.gates.find((candidate) => candidate.id === gateId);
+    const run = this.selectedRun;
+    const stage = run.stages.find((candidate) => candidate.name === this.selectedStageName);
+    const gate = stage?.gates.find((candidate) => candidate.id === gateId);
     if (!gate || !gate.notes[noteIndex]) return false;
     const deletedNote = gate.notes[noteIndex];
     const noteSummary = `Note added to ${gate.id}: ${deletedNote.category}`;
@@ -285,12 +301,13 @@ export class ConsoleStore {
     const nextNotes = [...gate.notes];
     nextNotes.splice(noteIndex, 1);
     gate.notes = nextNotes;
-    this.selectedRun.timeline = this.selectedRun.timeline.filter((entry) => {
+    run.timeline = run.timeline.filter((entry) => {
       if (entry.type !== 'note' || entry.summary !== noteSummary) return true;
       const keep = matchingTimelineIndex !== matchingNoteIndex;
       matchingTimelineIndex += 1;
       return keep;
     });
+    this.touchRuns();
     this.touchExport();
     this.showToast(`Note removed from ${gate.id}`);
     return true;
@@ -298,12 +315,14 @@ export class ConsoleStore {
 
   clearRunNotes() {
     let removed = 0;
-    this.selectedRun.stages.forEach((stage) => stage.gates.forEach((gate) => {
+    const run = this.selectedRun;
+    run.stages.forEach((stage) => stage.gates.forEach((gate) => {
       removed += gate.notes.length;
       gate.notes = [];
     }));
-    this.selectedRun.timeline = this.selectedRun.timeline.filter((entry) => entry.type !== 'note');
+    run.timeline = run.timeline.filter((entry) => entry.type !== 'note');
     if (removed) {
+      this.touchRuns();
       this.touchExport();
       this.showToast(`${removed} note${removed === 1 ? '' : 's'} cleared`);
     }
@@ -315,14 +334,14 @@ export class ConsoleStore {
     const stage = run.stages.find((candidate) => candidate.name === stageName);
     if (!stage) return false;
     this.revertWhatIf();
-    this.whatIf.values = {};
     this.noteFormGateId = null;
     const gateStatuses: Record<string, RerunGateStatus> = {};
     stage.gates.forEach((gate) => { gateStatuses[gate.id] = 'pending'; });
-    this.rerun = { active: true, runId: run.id, stageName, progress: 0, gateStatuses };
+    this.rerun = { active: true, runId: run.id, stageName, progress: 0, gateStatuses: { ...gateStatuses } };
     stage.status = 'running';
     stage.certificate = null;
-    run.timeline.push(issue(run.id, 're-run', `${stageName} re-run started`));
+    this.appendTimeline(run, issue(run.id, 're-run', `${stageName} re-run started`));
+    this.touchRuns();
     this.touchExport();
 
     const finalStates: GateState[] = stage.gates.map((gate) => {
@@ -333,13 +352,20 @@ export class ConsoleStore {
 
     for (let index = 0; index < stage.gates.length; index += 1) {
       const gate = stage.gates[index];
-      this.rerun.gateStatuses[gate.id] = 'running';
+      this.rerun = {
+        ...this.rerun,
+        gateStatuses: { ...this.rerun.gateStatuses, [gate.id]: 'running' }
+      };
       await wait(240);
       const state = finalStates[index];
-      this.rerun.gateStatuses[gate.id] = state;
-      this.rerun.progress = Math.round(((index + 1) / stage.gates.length) * 100);
+      this.rerun = {
+        ...this.rerun,
+        progress: Math.round(((index + 1) / stage.gates.length) * 100),
+        gateStatuses: { ...this.rerun.gateStatuses, [gate.id]: state }
+      };
       if (state === 'fail') {
-        run.timeline.push(issue(run.id, 'rejection', `${stageName} re-run gate failed: ${gate.id} ${gate.name}`));
+        this.appendTimeline(run, issue(run.id, 'rejection', `${stageName} re-run gate failed: ${gate.id} ${gate.name}`));
+        this.touchRuns();
       }
       await wait(95);
     }
@@ -354,25 +380,28 @@ export class ConsoleStore {
     stage.status = passed ? 'passed' : 'rejected';
     if (passed) {
       stage.certificate = { fingerprint: makeFingerprint(run.id, stageName), issuedAt: now() };
-      run.timeline.push(issue(run.id, 'certificate', `${stageName} re-run passed; certificate issued`));
+      this.appendTimeline(run, issue(run.id, 'certificate', `${stageName} re-run passed; certificate issued`));
     } else {
       stage.certificate = null;
       const failures = stage.gates.filter((gate) => gate.state === 'fail').map((gate) => gate.id).join(', ');
-      run.timeline.push(issue(run.id, 'rejection', `${stageName} re-run rejected by ${failures}`));
+      this.appendTimeline(run, issue(run.id, 'rejection', `${stageName} re-run rejected by ${failures}`));
     }
-    this.rerun.active = false;
+    this.rerun = { active: false, runId: null, stageName: null, progress: 0, gateStatuses: {} };
+    this.touchRuns();
     this.touchExport();
     this.showToast(passed ? `${stageName} re-run passed` : `${stageName} re-run rejected`);
     return true;
   }
 
   openExport(format: 'json' | 'markdown' = 'json') {
+    this.captureOpener();
     this.exportTab = format;
     this.touchExport();
     this.modal = 'export';
   }
 
   openImport() {
+    this.captureOpener();
     this.importError = '';
     this.modal = 'import';
   }
@@ -380,14 +409,20 @@ export class ConsoleStore {
   openCertificate(stageName: StageName = this.selectedStage.name) {
     const stage = this.selectedRun.stages.find((candidate) => candidate.name === stageName);
     if (!stage || stage.status !== 'passed' || !stage.certificate) return false;
+    this.captureOpener();
     this.certificateStageName = stageName;
     this.modal = 'certificate';
     return true;
   }
 
   closeModal() {
+    const opener = this.modalOpener;
     this.modal = null;
     this.certificateStageName = null;
+    this.modalOpener = null;
+    queueMicrotask(() => {
+      if (opener?.isConnected) opener.focus();
+    });
   }
 
   importPackageText(text: string): { ok: true } | { ok: false; error: string } {
@@ -406,36 +441,43 @@ export class ConsoleStore {
       return { ok: false, error: this.importError };
     }
     const payload = parsed.data;
-    const target = this.selectedRun;
-    if (payload.runId !== target.id) {
-      this.importError = `runId: must match selected run ${target.id}`;
+    const targetIndex = this.runs.findIndex((run) => run.id === this.selectedRunId);
+    const target = targetIndex >= 0 ? this.runs[targetIndex] : null;
+    if (!target || payload.runId !== target.id) {
+      this.importError = `runId: must match selected run ${this.selectedRunId}`;
       return { ok: false, error: this.importError };
     }
-    target.submittedAt = payload.submittedAt;
-    target.stages = payload.stages.map((stage) => ({
-      name: stage.name,
-      status: stage.status,
-      aggregationMode: stage.aggregationMode,
-      gates: stage.gates.map((gate) => ({
-        id: gate.id,
-        name: gate.name,
-        severity: gate.severity,
-        state: gate.state,
-        evidence: gate.evidence,
-        notes: gate.notes.map(({ text: noteText, category }) => ({ text: noteText, category })),
-        description: GATE_REGISTRY.find((definition) => definition.id === gate.id)?.description ?? 'Imported gate evidence record.'
+    const nextRun: RunRecord = {
+      ...target,
+      submittedAt: payload.submittedAt,
+      stages: payload.stages.map((stage) => ({
+        name: stage.name,
+        status: stage.status,
+        aggregationMode: stage.aggregationMode,
+        gates: stage.gates.map((gate) => ({
+          id: gate.id,
+          name: gate.name,
+          severity: gate.severity,
+          state: gate.state,
+          evidence: gate.evidence,
+          notes: gate.notes.map(({ text: noteText, category }) => ({ text: noteText, category })),
+          description: GATE_REGISTRY.find((definition) => definition.id === gate.id)?.description ?? 'Imported gate evidence record.'
+        })),
+        certificate: stage.certificate ? { ...stage.certificate } : null
       })),
-      certificate: stage.certificate ? { ...stage.certificate } : null
-    }));
-    target.timeline = payload.timeline.map((entry, index) => ({ ...entry, id: `import-${index}-${Date.now()}` }));
-    this.selectedRunId = target.id;
-    this.selectedStageName = target.stages[0].name;
+      timeline: payload.timeline.map((entry, index) => ({ ...entry, id: `import-${index}-${Date.now()}` }))
+    };
+    const nextRuns = [...this.runs];
+    nextRuns[targetIndex] = nextRun;
+    this.runs = nextRuns;
+    this.selectedRunId = nextRun.id;
+    this.selectedStageName = nextRun.stages[0].name;
     this.importDraft = text;
     this.importError = '';
     this.resetTransientStageState();
     this.touchExport();
     this.closeModal();
-    this.showToast(`Acceptance package imported for ${target.id}`);
+    this.showToast(`Acceptance package imported for ${nextRun.id}`);
     return { ok: true };
   }
 
