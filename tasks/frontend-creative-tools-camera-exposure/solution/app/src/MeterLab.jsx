@@ -69,7 +69,7 @@ function LivePreview() {
     const stops = getNetEV();
     return Math.max(10, 100 * Math.pow(1.2, stops));
   };
-  const noiseOpacity = () => Math.log2(store.iso / 100) * 0.1;
+  const noiseOpacity = () => Math.max(0, Math.min(0.5, Math.log2(store.iso / 100) * 0.1));
   const motionIndex = () => {
     const maxIdx = SHUTTER_STOPS.length - 1;
     const idx = SHUTTER_STOPS.indexOf(store.shutter);
@@ -324,7 +324,6 @@ function GenerateBracket() {
 }
 
 export default function MeterLab() {
-  const [beforeHold, setBeforeHold] = createSignal(false);
   const [copyMsg, setCopyMsg] = createSignal("");
 
   const applyLookPack = (pack) => {
@@ -348,15 +347,15 @@ export default function MeterLab() {
     }
   };
 
-  const handleBeforeDown = () => setBeforeHold(true);
-  const handleBeforeUp = () => setBeforeHold(false);
+  const handleBeforeDown = () => setStore('beforeHold', true);
+  const handleBeforeUp = () => setStore('beforeHold', false);
 
   return (
     <div class="relative w-full h-full flex overflow-hidden">
-      <Show when={!beforeHold()}>
+      <Show when={!store.beforeHold}>
         <LivePreview />
       </Show>
-      <Show when={beforeHold()}>
+      <Show when={store.beforeHold}>
         <div class="absolute inset-0 z-0 bg-cover bg-center" style={{ 'background-image': 'url(/assets/background.jpg)' }} />
       </Show>
 

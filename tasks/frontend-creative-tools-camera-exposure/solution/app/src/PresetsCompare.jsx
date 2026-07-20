@@ -27,6 +27,7 @@ export default function PresetsCompare() {
   });
 
   const applyPreset = (preset) => {
+    if (!preset) return;
     setStore('aperture', preset.aperture);
     setStore('shutter', preset.shutter);
     setStore('iso', preset.iso);
@@ -195,7 +196,14 @@ export default function PresetsCompare() {
               </div>
               <button
                 class="mt-8 w-full py-3 bg-primary hover:bg-blue-600 text-white rounded font-bold transition shadow-lg shadow-primary/20"
-                onClick={() => applyPreset(store.presets.find(p => p.id === compareId()))}
+                onClick={() => {
+                  const comparePreset = store.presets.find(p => p.id === compareId());
+                  if (!comparePreset) {
+                    setCompareId(null);
+                    return;
+                  }
+                  applyPreset(comparePreset);
+                }}
               >
                 Apply to Live Editor
               </button>

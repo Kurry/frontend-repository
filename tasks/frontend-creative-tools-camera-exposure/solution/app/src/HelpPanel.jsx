@@ -1,19 +1,15 @@
-import { createSignal } from 'solid-js';
 import { Dialog } from "@kobalte/core/dialog";
 import { store, setStore } from './store';
 import PhQuestion from '~icons/ph/question';
 import PhX from '~icons/ph/x';
 
 function HelpPanel() {
-  const [open, setOpen] = createSignal(false);
-
   return (
-    <Dialog open={open()} onOpenChange={(isOpen) => {
-      setOpen(isOpen);
+    <Dialog open={store.helpOpen} onOpenChange={(isOpen) => {
       setStore('helpOpen', isOpen);
     }}>
       <Dialog.Trigger class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-800 hover:bg-gray-700 transition-colors focus-visible:ring-2 focus-visible:ring-primary outline-none" aria-label="Toggle exposure help">
-        {open() ? <PhX /> : <PhQuestion />}
+        {store.helpOpen ? <PhX /> : <PhQuestion />}
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay class="fixed inset-0 z-40 bg-black/20 data-[expanded]:animate-in data-[closed]:animate-out data-[expanded]:fade-in data-[closed]:fade-out" />
