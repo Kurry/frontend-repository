@@ -1,4 +1,4 @@
-import { newScriptSchema, scheduleSchema, stepTypes } from './schemas'
+import { newScriptSchema, paramSchemas, scheduleSchema, stepTypes } from './schemas'
 import { useStudio } from './store'
 
 const destinations = ['step-editor', 'playground', 'runs', 'scheduled-queue', 'export']
@@ -16,9 +16,6 @@ const tools = [
   ['browse_search', 'Search the bounded script catalog and visible command results.', { query: { type: 'string' } }, ['query']],
   ['browse_apply_filter', 'Apply a declared timeline status or compare-pair filter.', { filter: { type: 'string', enum: ['timeline-status', 'compare-pair'] }, value: {} }, ['filter', 'value']],
   ['browse_clear_filter', 'Clear a declared filter.', { filter: { type: 'string', enum: ['timeline-status', 'compare-pair'] } }, ['filter']],
-  ['browse_sort', 'Sort scripts by name or latest run.', { sort: { type: 'string', enum: ['name', 'latest-run'] } }, ['sort']],
-  ['browse_set_locale', 'Set the bounded application locale.', { locale: { type: 'string', enum: ['en'] } }, ['locale']],
-  ['browse_set_theme', 'Set a named console theme.', { theme: { type: 'string', enum: themes } }, ['theme']],
   ['editor_select', 'Select a script, step, version, or run object.', { object_type: { type: 'string', enum: ['script', 'step', 'schedule', 'playground'] }, id: schemas.id }, ['object_type']],
   ['editor_add', 'Add a script or step through the shared editor actions.', { object_type: { type: 'string', enum: ['script', 'step'] }, name: { type: 'string' }, target_url: { type: 'string' }, description: { type: 'string' }, step_type: { type: 'string', enum: stepTypes } }, ['object_type']],
   ['editor_delete', 'Delete a declared script or step after explicit confirmation.', { object_type: { type: 'string', enum: ['script', 'step'] }, id: schemas.id, confirm: schemas.confirm }, ['object_type', 'id', 'confirm']],
@@ -51,9 +48,6 @@ const handlers = {
     return ok(`Applied ${filter}`)
   },
   browse_clear_filter: ({ filter }) => { if (filter === 'timeline-status') useStudio.getState().setTimelineFilter('all'); else useStudio.setState({ selectedRuns: [] }); return ok(`Cleared ${filter}`) },
-  browse_sort: ({ sort }) => { const scripts = [...useStudio.getState().scripts].sort(sort === 'name' ? (a,b) => a.name.localeCompare(b.name) : (a,b) => Date.parse(b.lastRunAt || 0) - Date.parse(a.lastRunAt || 0)); useStudio.setState({ scripts }); return ok(`Sorted scripts by ${sort}`) },
-  browse_set_locale: () => ok('Locale remains en'),
-  browse_set_theme: ({ theme }) => { useStudio.getState().setConsoleTheme(theme); return ok(`Console theme is ${theme}`) },
   editor_select: ({ object_type, id }) => {
     if (object_type === 'script') useStudio.getState().selectScript(id)
     else if (object_type === 'step') useStudio.getState().highlightStep(id)
@@ -68,10 +62,40 @@ const handlers = {
   editor_delete: ({ object_type, id, confirm }) => { if (!confirm) fail('Delete requires confirm=true'); if (object_type === 'script') useStudio.getState().deleteScripts([id]); else useStudio.getState().deleteSteps([id]); return ok(`Deleted ${object_type} and dependent state`) },
   editor_update_property: args => {
     const state = useStudio.getState(); const prop = args.property
-    if (args.object_type === 'script') state.updateScriptMeta(prop === 'target-url' ? 'target_url' : prop, args.value)
+    if (args.object_type === 'script') {
+      const key = prop === 'target-url' ? 'target_url' : prop
+      // Enforce the declared bounds so a tool never accepts values the UI's schema rejects.
+      if (key === 'target_url') { const parsed = newScriptSchema.shape.target_url.safeParse(args.value); if (!parsed.success) fail(parsed.error.issues[0].message) }
+      if (key === 'name') { const parsed = newScriptSchema.shape.name.safeParse(args.value); if (!parsed.success) fail(parsed.error.issues[0].message) }
+      state.updateScriptMeta(key, args.value)
+    }
     else if (args.object_type === 'step') {
       if (!args.id) fail('Step id is required')
-      const mapping = { 'step-type':'type', 'expected-text':'expected_text' }; state.updateStep(args.id, mapping[prop] || prop, args.value)
+      const script = state.scripts.find(s => s.id === state.selectedScriptId)
+      const step = script?.steps.find(s => s.id === args.id)
+      if (!step) fail(`No step ${args.id} in the selected script`)
+      const mapping = { 'step-type':'type', 'expected-text':'expected_text' }
+      const paramKey = mapping[prop] || prop
+      // Structural fields (type/disabled/order/label) pass through; typed params are bound-checked.
+      const paramFields = ['url','selector','text','variable','ms','expected_text']
+      if (paramFields.includes(paramKey)) {
+        // A step type's param schema only declares the keys the UI actually renders for it
+        // (e.g. `screenshot` has none, `click` has only `selector`) and Zod's object schema
+        // silently strips unknown keys on parse instead of rejecting them — so without this
+        // check a call could set e.g. `text` on a `screenshot`/`click` step, pass validation
+        // (the stripped key means nothing failed), and then still get written to state below.
+        if (!(paramKey in paramSchemas[step.type].shape)) fail(`${prop} does not apply to ${step.type} steps`)
+        const coerced = paramKey === 'ms' && args.value !== '' ? Number(args.value) : args.value
+        // Validate only the field being set, not the full merged params object: multi-field
+        // step types (type/extract/assert_text) let the UI edit one field at a time via
+        // updateStep, which writes without cross-field validation, so a sibling field that
+        // hasn't been filled in yet must not block this field's update.
+        const parsed = paramSchemas[step.type].shape[paramKey].safeParse(coerced)
+        if (!parsed.success) fail(parsed.error.issues[0].message)
+        state.updateStep(args.id, paramKey, coerced)
+      } else {
+        state.updateStep(args.id, paramKey, args.value)
+      }
     } else if (args.object_type === 'schedule') {
       const script = state.scripts.find(s => s.id === state.selectedScriptId); const schedule = { ...script.schedule }
       if (prop === 'schedule-enabled') schedule.enabled = !!args.value

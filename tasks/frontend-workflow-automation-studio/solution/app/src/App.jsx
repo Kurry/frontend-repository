@@ -382,7 +382,7 @@ function EditorView() {
         </div>
         <RunRollup script={script} />
         <div className="flex items-center justify-between border-y border-slate-200 px-4 py-2">
-          <div><strong className="text-sm">Steps</strong><span className="muted ml-2 text-xs">{script.steps.length} total</span></div>
+          <div><strong className="text-sm">Steps</strong>{' '}<span className="muted ml-2 text-xs">· {script.steps.length} total</span></div>
           <div className="relative"><Button size="sm" kind="ghost" renderIcon={Add} onClick={() => setStepMenu(!stepMenu)}>Add Step <ChevronDown size={13} className="ml-1" /></Button>
             {stepMenu && <div className="absolute right-0 z-20 mt-1 w-44 rounded border border-slate-200 bg-white p-1 shadow-xl">{stepTypes.map(type => <button key={type} className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-slate-100" onClick={() => { addStep(type); setStepMenu(false) }}>{typeLabels[type]}</button>)}</div>}
           </div>
@@ -415,6 +415,16 @@ function PlaygroundView() {
   }, [html, selector])
   const selectorError = errors.selector?.message || useStudio.getState().playgroundError
   const eligible = script?.steps.filter(s => ['click','type','extract','assert_text'].includes(s.type)) || []
+  const eligibleIds = eligible.map(s => s.id).join(',')
+  // Pre-select the first selector-bearing step so Send to step is immediately usable.
+  // Keyed on the actual id set (not just length) so a deleted/replaced step that keeps
+  // the eligible count unchanged still clears a now-stale target selection. When the
+  // eligible list goes empty (last selector-bearing step deleted/retyped), fall back to
+  // the placeholder instead of leaving a stale id referencing a step no longer offered.
+  useEffect(() => {
+    if (eligible.length) { if (!target || !eligible.some(s => s.id === target)) setPlayground({ playgroundTargetStep: eligible[0].id }) }
+    else if (target) setPlayground({ playgroundTargetStep: '' })
+  }, [script?.id, eligibleIds])
   return <section><div className="mb-5"><div className="eyebrow">Selector laboratory</div><h1 className="page-title">Playground</h1><p className="muted mt-2 text-sm">Test selectors against safe mock HTML, then send a match directly to a step.</p></div>
     <div className="playground-grid">
       <div className="panel p-5"><TextArea id="mock-html" labelText="Mock HTML" rows={14} value={html} {...register('mock_html', { onChange: e => { setValue('mock_html', e.target.value, { shouldValidate: true }); setPlayground({ playgroundHtml: e.target.value }) } })} />
