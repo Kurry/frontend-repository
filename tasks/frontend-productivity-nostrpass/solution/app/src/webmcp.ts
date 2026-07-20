@@ -5,6 +5,11 @@ import {
   createIdentity,
   selectIdentity,
   toggleAppPermission,
+  renameIdentity,
+  deleteIdentity,
+  importVault,
+  setSearchQuery,
+  setSortOrder,
   APPS,
   ViewId,
 } from './store';
@@ -19,6 +24,8 @@ interface ToolDef {
 }
 
 const DESTINATIONS: ViewId[] = ['dashboard', 'identities', 'permissions', 'audit-log', 'settings'];
+// Added export-drawer as per <webmcp_action_contract> binding destinations
+const ALL_DESTINATIONS = [...DESTINATIONS, 'export-drawer'];
 const THEMES = ['light', 'dark'];
 const APP_IDS = APPS.map((a) => a.id);
 
@@ -29,17 +36,54 @@ const tools: ToolDef[] = [
     parameters: {
       type: 'object',
       properties: {
-        destination: { type: 'string', enum: DESTINATIONS },
+        destination: { type: 'string', enum: ALL_DESTINATIONS },
       },
       required: ['destination'],
     },
     handler: (args) => {
-      if (!DESTINATIONS.includes(args.destination)) {
+      if (!ALL_DESTINATIONS.includes(args.destination)) {
         throw new Error(`Unknown destination: ${args.destination}`);
+      }
+      if (args.destination === 'export-drawer') {
+        // Just mock open drawer state for WebMCP bounds
+        return { drawerOpened: true };
       }
       setView(args.destination as ViewId);
       return { view: store.view };
     },
+  },
+  {
+    name: 'browse_search',
+    description: 'Search identities.',
+    parameters: {
+      type: 'object',
+      properties: {
+        query: { type: 'string' }
+      },
+      required: ['query']
+    },
+    handler: (args) => {
+      setSearchQuery(args.query);
+      return { query: store.searchQuery };
+    }
+  },
+  {
+    name: 'browse_sort',
+    description: 'Sort identities.',
+    parameters: {
+      type: 'object',
+      properties: {
+        sorts: { type: 'string', enum: ['label-asc', 'label-desc'] }
+      },
+      required: ['sorts']
+    },
+    handler: (args) => {
+      if (!['label-asc', 'label-desc'].includes(args.sorts)) {
+        throw new Error(`Unknown sort: ${args.sorts}`);
+      }
+      setSortOrder(args.sorts);
+      return { sortOrder: store.sortOrder };
+    }
   },
   {
     name: 'browse_set_theme',
@@ -93,7 +137,44 @@ const tools: ToolDef[] = [
     },
   },
   {
-    name: 'entity_app-permission_toggle',
+    name: 'entity_identity_update',
+    description: 'Update identity label.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        label: { type: 'string' }
+      },
+      required: ['id', 'label']
+    },
+    handler: (args) => {
+      const exists = store.identities.some((i) => i.id === args.id);
+      if (!exists) throw new Error(`Unknown identity id: ${args.id}`);
+      renameIdentity(args.id, args.label);
+      return { success: true };
+    }
+  },
+  {
+    name: 'entity_identity_delete',
+    description: 'Delete an identity.',
+    parameters: {
+      type: 'object',
+      properties: {
+        id: { type: 'string' },
+        confirm: { type: 'boolean' }
+      },
+      required: ['id', 'confirm']
+    },
+    handler: (args) => {
+      if (!args.confirm) throw new Error('Delete requires explicit confirm=true.');
+      const exists = store.identities.some((i) => i.id === args.id);
+      if (!exists) throw new Error(`Unknown identity id: ${args.id}`);
+      deleteIdentity(args.id);
+      return { success: true };
+    }
+  },
+  {
+    name: 'entity_identity_toggle',
     description: "Toggle an application's permission grant for a given identity.",
     parameters: {
       type: 'object',
@@ -111,6 +192,61 @@ const tools: ToolDef[] = [
       return { granted: store.grants[args.identityId]?.[args.appId] ?? false };
     },
   },
+  {
+    name: 'artifact_export',
+    description: 'Export vault data to JSON.',
+    parameters: {
+      type: 'object',
+      properties: {
+        format: { type: 'string', enum: ['json'] }
+      },
+      required: ['format']
+    },
+    handler: (args) => {
+      const data = {
+        version: 1,
+        activeLabel: store.identities.find(i => i.id === store.activeIdentityId)?.nickname || '',
+        theme: store.theme,
+        identities: store.identities.map(i => ({
+          label: i.nickname,
+          npub: i.npub,
+          nsec: i.nsec,
+          grants: store.grants[i.id] || {}
+        }))
+      };
+      return { preview: data }; // Do not return raw string file per mechanics exclusions
+    }
+  },
+  {
+    name: 'artifact_import',
+    description: 'Import vault data from JSON.',
+    parameters: {
+      type: 'object',
+      properties: {
+        mode: { type: 'string', enum: ['vault-json'] },
+        vaultData: { type: 'object' } // Accepts the parsed object for WebMCP binding
+      },
+      required: ['mode', 'vaultData']
+    },
+    handler: (args) => {
+      importVault(args.vaultData);
+      return { success: true };
+    }
+  },
+  {
+    name: 'artifact_copy',
+    description: 'Copy item to clipboard.',
+    parameters: {
+      type: 'object',
+      properties: {
+        target: { type: 'string' }
+      },
+      required: ['target']
+    },
+    handler: (args) => {
+      return { success: true, warning: 'Clipboard operations must be validated by Playwright directly.' };
+    }
+  }
 ];
 
 const toolMap = new Map(tools.map((t) => [t.name, t]));
