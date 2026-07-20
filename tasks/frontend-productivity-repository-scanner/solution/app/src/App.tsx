@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion, MotionConfig } from 'motion/react'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import {
   Button,
@@ -169,7 +169,12 @@ function AddRepositoryModal() {
           labelText="Local path"
           placeholder="/workspace/my-project"
           invalid={!path.trim() || Boolean(errors.path)}
-          invalidText={errors.path?.message || 'Path is required and cannot be whitespace only.'}
+          invalidText={
+            <span id="repository-path-error" aria-live="polite">
+              {errors.path?.message || 'Path is required and cannot be whitespace only.'}
+            </span>
+          }
+          aria-describedby="repository-path-error"
           {...register('path')}
         />
         <TextInput
@@ -177,7 +182,12 @@ function AddRepositoryModal() {
           labelText="Display name (optional)"
           helperText="Leave blank to use the path basename. Maximum 80 characters."
           invalid={Boolean(errors.displayName)}
-          invalidText={errors.displayName?.message}
+          invalidText={
+            <span id="repository-display-name-error" aria-live="polite">
+              {errors.displayName?.message}
+            </span>
+          }
+          aria-describedby="repository-display-name-error"
           {...register('displayName')}
         />
         {submitError && <InlineNotification kind="error" lowContrast title="Repository was not added" subtitle={submitError} hideCloseButton />}
@@ -403,7 +413,8 @@ function PatternSettings() {
 }
 
 function StatusTag({ status }: { status: StepStatus }) {
-  return <Tag size="sm" type={statusKinds[status]} className={`status-tag status-${status}`}>{status}</Tag>
+  const Icon = status === 'complete' ? CheckmarkFilled : status === 'failed' ? ErrorFilled : status === 'running' ? InlineLoading : status === 'retrying' ? Renew : Time
+  return <Tag size="sm" type={statusKinds[status]} className={`status-tag status-${status}`} renderIcon={Icon}>{status}</Tag>
 }
 
 function ScanPanel() {
@@ -615,9 +626,9 @@ function DocumentTree() {
             if (!groupDocuments.length) return null
             const open = expandedGroups[type]
             return (
-              <section className="document-group" key={type}>
+              <section key={type} className="document-group">
                 <button className="group-heading" aria-expanded={open} onClick={() => toggleGroup(type)}>
-                  <ChevronRight size={18} className={open ? 'rotate' : ''} />
+                  <ChevronRight size={16} className={open ? 'rotate' : ''} />
                   <span>{typeLabels[type]}</span>
                   <span className="group-count">{groupDocuments.length}</span>
                 </button>
@@ -631,6 +642,12 @@ function DocumentTree() {
               </section>
             )
           })}
+        </div>
+      ) : repositories.length === 0 ? (
+        <div className="empty-state">
+          <Document size={32} />
+          <h3>No documents</h3>
+          <p>Add a repository to begin viewing documents.</p>
         </div>
       ) : (
         <div className="empty-state">
@@ -719,7 +736,10 @@ function ExportModal() {
       modalHeading="Export scan index"
       modalLabel="Live scan package"
       passiveModal
+      hasScrollingContent
       size="lg"
+      aria-modal="true"
+      role="dialog"
       onRequestClose={() => setUi('exportOpen', false)}
     >
       <div className="export-controls">
@@ -766,7 +786,8 @@ function ImportModal() {
     try { parsed = JSON.parse(source) } catch { setFeedback('payload: Scan Index JSON contains malformed JSON.'); return }
     const result = importIndex(parsed)
     if (!result.ok) { setFeedback(result.error || 'Scan Index JSON is invalid.'); return }
-    close()
+    setFeedback('Import successful.')
+    setTimeout(close, 1500)
   })
   return (
     <Modal
@@ -803,9 +824,10 @@ function ImportModal() {
           placeholder="Paste the exported JSON object here"
           invalid={Boolean(errors.payload || feedback)}
           invalidText={errors.payload?.message || feedback}
+          aria-describedby="import-payload-error"
           {...register('payload', { onChange: () => setFeedback('') })}
         />
-        <div aria-live="assertive" className="import-live">{errors.payload?.message || feedback}</div>
+        <div id="import-payload-error" aria-live="assertive" className="import-live">{errors.payload?.message || feedback}</div>
       </form>
     </Modal>
   )
@@ -870,6 +892,11 @@ function CommandPalette() {
   if (!open) return null
   return (
     <motion.div className="palette-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(event) => { if (event.currentTarget === event.target) close() }}>
+      <div role="none" tabIndex={0} onFocus={() => {
+        const tabbable = Array.from(document.querySelectorAll('.command-palette button:not([disabled]), .command-palette input'))
+        const last = tabbable[tabbable.length - 1]
+        last?.focus()
+      }} />
       <motion.div
         role="dialog"
         aria-modal="true"
@@ -882,8 +909,16 @@ function CommandPalette() {
           if (event.key === 'ArrowUp') { event.preventDefault(); setHighlight((value) => Math.max(value - 1, 0)) }
           if (event.key === 'Enter') { event.preventDefault(); activate(filtered[highlight]) }
           if (event.key === 'Tab') {
-            event.preventDefault()
-            inputRef.current?.focus()
+            const tabbable = Array.from(event.currentTarget.querySelectorAll('button:not([disabled]), input'))
+            const first = tabbable[0] as HTMLElement
+            const last = tabbable[tabbable.length - 1] as HTMLElement
+            if (event.shiftKey && document.activeElement === first) {
+              event.preventDefault()
+              last?.focus()
+            } else if (!event.shiftKey && document.activeElement === last) {
+              event.preventDefault()
+              first?.focus()
+            }
           }
         }}
       >
@@ -912,6 +947,7 @@ function CommandPalette() {
           {!filtered.length && <li className="palette-empty">No matching actions</li>}
         </ul>
       </motion.div>
+      <div role="none" tabIndex={0} onFocus={() => inputRef.current?.focus()} />
     </motion.div>
   )
 }
@@ -957,6 +993,14 @@ function Toolbar() {
 }
 
 export default function App() {
+  return (
+    <MotionConfig reducedMotion="user">
+      <AppContent />
+    </MotionConfig>
+  )
+}
+
+function AppContent() {
   const activeView = useAppStore((state) => state.activeView)
   const repositories = useAppStore((state) => state.repositories)
   const documents = useAppStore((state) => state.documents)
