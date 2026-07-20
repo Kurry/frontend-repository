@@ -10,6 +10,80 @@
     "typecheck:webmcp-contracts": "npm run typecheck -w @zto/webmcp-contracts"
   },
   "devDependencies": {
-    "playwright": "^1.61.0"
-  }
+    "playwright": "^1.61.1"
+  },
+  "version": "1.0.0",
+  "description": "65 frontend-only Harbor eval tasks (`tasks/frontend-*`) in four genres: good-app rebuilds, pixel-perfect website-fidelity recreations, hard browser apps/games, and framework rebuilds. Each task asks a builder agent to recreate a reference web application from an observable-behavior PRD (`instruction.md`), then judges the built app in a real browser across four weighted dimensions — core_features, technical, visual_design, motion — with `pass` at reward >= 0.7.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "acorn": "^8.17.0",
+    "aria-query": "^5.3.1",
+    "assertion-error": "^2.0.1",
+    "axobject-query": "^4.1.0",
+    "cac": "^6.7.14",
+    "chai": "^5.3.3",
+    "check-error": "^2.1.3",
+    "clsx": "^2.1.1",
+    "csstype": "^3.2.3",
+    "debug": "^4.4.3",
+    "deep-eql": "^5.0.2",
+    "devalue": "^5.8.1",
+    "entities": "^7.0.1",
+    "es-module-lexer": "^1.7.0",
+    "esbuild": "^0.28.1",
+    "esm-env": "^1.2.2",
+    "esrap": "^2.2.13",
+    "estree-walker": "^3.0.3",
+    "expect-type": "^1.4.0",
+    "fdir": "^6.5.0",
+    "is-reference": "^3.0.3",
+    "js-tokens": "^9.0.1",
+    "locate-character": "^3.0.0",
+    "loupe": "^3.2.1",
+    "magic-string": "^0.30.21",
+    "ms": "^2.1.3",
+    "nanoid": "^3.3.16",
+    "pathe": "^2.0.3",
+    "pathval": "^2.0.1",
+    "picocolors": "^1.1.1",
+    "picomatch": "^4.0.5",
+    "playwright-core": "^1.61.0",
+    "postcss": "^8.5.19",
+    "react": "^19.2.7",
+    "rollup": "^4.62.2",
+    "siginfo": "^2.0.0",
+    "source-map-js": "^1.2.1",
+    "stackback": "^0.0.2",
+    "std-env": "^3.10.0",
+    "strip-literal": "^3.1.0",
+    "svelte": "^5.56.6",
+    "tinybench": "^2.9.0",
+    "tinyexec": "^0.3.2",
+    "tinyglobby": "^0.2.17",
+    "tinypool": "^1.1.1",
+    "tinyrainbow": "^2.0.0",
+    "tinyspy": "^4.0.4",
+    "undici-types": "^6.21.0",
+    "vite": "^7.3.6",
+    "vite-node": "^3.2.4",
+    "vitest": "^3.2.7",
+    "vue": "^3.5.40",
+    "why-is-node-running": "^2.3.0",
+    "zimmerframe": "^1.1.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kurry/frontend-repository.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Kurry/frontend-repository/issues"
+  },
+  "homepage": "https://github.com/Kurry/frontend-repository#readme"
 }
