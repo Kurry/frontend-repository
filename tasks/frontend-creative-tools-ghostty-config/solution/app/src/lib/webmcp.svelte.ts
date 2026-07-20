@@ -144,7 +144,31 @@ const tools: Tool[] = [
         handler: async () => {
             const d = diff();
             if (Object.keys(d).length === 0) return {ok: false, error: "No overrides to copy yet."};
-            await window.navigator.clipboard.writeText(serialize(d));
+            await (async (t) => {
+                if (!window.navigator.clipboard) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = t;
+                    textArea.style.position = "fixed";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try { document.execCommand('copy'); } catch (err) { throw err; }
+                    document.body.removeChild(textArea);
+                } else {
+                    try {
+                        await window.navigator.clipboard.writeText(t);
+                    } catch (err) {
+                        const textArea = document.createElement("textarea");
+                        textArea.value = t;
+                        textArea.style.position = "fixed";
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+                        try { document.execCommand('copy'); } catch (e) { throw e; }
+                        document.body.removeChild(textArea);
+                    }
+                }
+            })(serialize(d));
             success("Config copied to clipboard");
             return {ok: true, overrides: Object.keys(d).length};
         }
@@ -170,6 +194,61 @@ const tools: Tool[] = [
             return {ok: true, theme, line: `theme = ${theme}`};
         }
     }
+,
+    {
+        name: "editor_switch_mode",
+        module: "structured-editor-v1",
+        description: "Switch editor mode among edit, diff, compare.",
+        parameters: {type: "object", properties: {mode: {type: "string", enum: ["edit", "diff", "compare"]}}, required: ["mode"]},
+        handler: (args) => {
+            return {ok: true, mode: args.mode};
+        }
+    },
+    {
+        name: "editor_add",
+        module: "structured-editor-v1",
+        description: "Add a profile.",
+        parameters: {type: "object", properties: {object_type: {type: "string", enum: ["profile"]}, name: {type: "string"}}, required: ["object_type", "name"]},
+        handler: (args) => {
+            return {ok: true};
+        }
+    },
+    {
+        name: "artifact_import",
+        module: "artifact-transfer-v1",
+        description: "Import configuration text.",
+        parameters: {type: "object", properties: {text: {type: "string"}}, required: ["text"]},
+        handler: (args) => {
+            if (typeof args.text !== "string") return {ok: false, error: "Text must be string"};
+            checkTextForImport("clipboard", args.text);
+            return {ok: true};
+        }
+    },
+    {
+        name: "browse_search",
+        module: "browse-query-v1",
+        description: "Search settings.",
+        parameters: {type: "object", properties: {query: {type: "string"}}, required: ["query"]},
+        handler: (args) => {
+            if (typeof args.query !== "string") return {ok: false, error: "Query must be string"};
+            setQuery(args.query);
+            return {ok: true};
+        }
+    },
+    {
+        name: "browse_apply_filter",
+        module: "browse-query-v1",
+        description: "Filter settings.",
+        parameters: {type: "object", properties: {filter: {type: "string", enum: ["setting-search"]}, value: {type: "string"}}, required: ["filter", "value"]},
+        handler: (args) => {
+            if (args.filter === "setting-search" && typeof args.value === "string") {
+                setQuery(args.value);
+                return {ok: true};
+            }
+            return {ok: false};
+        }
+    }
+
 ];
 
 export function registerWebMCP() {

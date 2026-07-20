@@ -33,7 +33,14 @@
     // Button handlers
     async function pasteConfig() {
         try {
-            const text = await window.navigator.clipboard.readText();
+            const text = await (async () => {
+                if (window.navigator && window.navigator.clipboard && window.navigator.clipboard.readText) {
+                    return await window.navigator.clipboard.readText();
+                }
+                const fallbackText = prompt("Clipboard access denied. Please paste your config text here:");
+                if (fallbackText === null) throw new Error("Cancelled");
+                return fallbackText;
+            })();
             checkTextForImport("clipboard", text);
         }
         catch {
@@ -59,7 +66,31 @@
         if (!hasExportableConfig) return;
 
         try {
-            await window.navigator.clipboard.writeText(serialize(currentConfigDiff));
+            await (async (t) => {
+                if (!window.navigator.clipboard) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = t;
+                    textArea.style.position = "fixed";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try { document.execCommand('copy'); } catch (err) { throw err; }
+                    document.body.removeChild(textArea);
+                } else {
+                    try {
+                        await window.navigator.clipboard.writeText(t);
+                    } catch (err) {
+                        const textArea = document.createElement("textarea");
+                        textArea.value = t;
+                        textArea.style.position = "fixed";
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+                        try { document.execCommand('copy'); } catch (e) { throw e; }
+                        document.body.removeChild(textArea);
+                    }
+                }
+            })(serialize(currentConfigDiff));
             success("Config copied to clipboard");
         }
         catch {

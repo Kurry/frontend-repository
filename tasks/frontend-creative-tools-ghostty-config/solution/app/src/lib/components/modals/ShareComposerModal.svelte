@@ -33,7 +33,31 @@
     // Button handlers
     async function copyToClipboard(text: string, successNotice: string, failureNotice: string) {
         try {
-            await window.navigator.clipboard.writeText(text);
+            await (async (t) => {
+                if (!window.navigator.clipboard) {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = t;
+                    textArea.style.position = "fixed";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try { document.execCommand('copy'); } catch (err) { throw err; }
+                    document.body.removeChild(textArea);
+                } else {
+                    try {
+                        await window.navigator.clipboard.writeText(t);
+                    } catch (err) {
+                        const textArea = document.createElement("textarea");
+                        textArea.value = t;
+                        textArea.style.position = "fixed";
+                        document.body.appendChild(textArea);
+                        textArea.focus();
+                        textArea.select();
+                        try { document.execCommand('copy'); } catch (e) { throw e; }
+                        document.body.removeChild(textArea);
+                    }
+                }
+            })(text);
             notice = successNotice;
             success(successNotice);
         }
