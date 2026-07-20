@@ -39,8 +39,8 @@
 <svelte:window onkeydown={keydown} />
 
 {#if open}
-  <div class="modal-backdrop" role="presentation" onclick={(event) => event.target === event.currentTarget && onclose()} transition:fade={{ duration: 180 }}>
-    <div bind:this={panel} class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby={description ? 'modal-description' : undefined} tabindex="-1" transition:scale={{ duration: 220, start: 0.96 }}>
+  <div class="modal-backdrop" role="presentation" onclick={(event) => event.target === event.currentTarget && onclose()} transition:fade={{ duration: 250 }}>
+    <div bind:this={panel} class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby={description ? 'modal-description' : undefined} tabindex="-1" transition:scale={{ duration: 250, start: 0.95 }}>
       <header class="modal-header">
         <div>
           <h2 id="modal-title">{title}</h2>
