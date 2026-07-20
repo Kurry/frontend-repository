@@ -3,12 +3,9 @@
     <!-- Capture bar -->
     <section class="card p-5">
       <form @submit.prevent="handleAddSpark">
-        <label
-          for="capture-input"
-          class="block font-heading text-[1rem] font-semibold text-ink"
-        >
-          Capture a spark
-        </label>
+        <h2 class="block font-heading text-[1rem] font-semibold text-ink">
+          <label for="capture-input">Capture a spark</label>
+        </h2>
         <textarea
           id="capture-input"
           v-model="newSparkText"
@@ -20,7 +17,7 @@
           @keydown.enter.exact.prevent="handleAddSpark"
         ></textarea>
         <p v-if="captureError" id="capture-error" class="mt-1 text-[0.8rem] text-error">
-          Enter a thought to add a spark
+          {{ captureError }}
         </p>
         <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
           <span class="meta-mono">Press Enter or select Add Spark</span>
@@ -75,7 +72,7 @@
 
         <section v-else class="card p-5">
           <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 class="font-heading text-[1rem] font-semibold text-ink">Unthreaded</h2>
+            <h3 class="font-heading text-[1rem] font-semibold text-ink">Unthreaded</h3>
             <span class="meta-mono">{{ inboxCountLabel }}</span>
           </div>
 
@@ -159,7 +156,7 @@
         </section>
 
         <section v-if="visiblePinnedThreads.length > 0">
-          <h2 class="mb-2 flex items-center gap-2 section-title">
+          <h3 class="mb-2 flex items-center gap-2 section-title">
             <svg
               viewBox="0 0 24 24"
               class="h-4 w-4 text-primary"
@@ -174,7 +171,7 @@
               <path d="M6 3h12v18l-6-4-6 4V3z" />
             </svg>
             Pinned
-          </h2>
+          </h3>
           <ul class="space-y-3">
             <li v-for="thread in visiblePinnedThreads" :key="thread.id">
               <ThreadCard
@@ -188,10 +185,10 @@
         </section>
 
         <section>
-          <h2 class="mb-2 section-title">
+          <h3 class="mb-2 section-title">
             Threads
             <span class="meta-mono font-normal">{{ visibleRegularThreads.length }}</span>
-          </h2>
+          </h3>
 
           <div v-if="showThreadsEmptyState" class="card">
             <EmptyState
@@ -258,16 +255,21 @@ import ThreadCard from './ThreadCard.vue'
 import ThreadDetailView from './ThreadDetailView.vue'
 import VirtualizedItemsPanel from './VirtualizedItemsPanel.vue'
 
+import { SparkUpsertSchema, ThreadUpsertSchema } from '../stores/sparkStore'
+
+
 const store = useSparkStore()
 const { pinnedThreads, sparks, unpinnedThreads, unthreadedSparks } = storeToRefs(store)
 
 const ui = useUiStore()
 const { activeTags, openThreadId, searchQuery } = storeToRefs(ui)
 
+
 const newSparkText = ref('')
-const captureError = ref(false)
+const captureError = ref('')
 const newThreadTitle = ref('')
-const threadTitleError = ref(false)
+const threadTitleError = ref('')
+
 
 const trimmedQuery = computed(() => searchQuery.value.trim())
 const searchActive = computed(() => trimmedQuery.value.length > 0)

@@ -3,18 +3,6 @@ import { ref } from 'vue'
 
 export type ViewId = 'home' | 'today' | 'archived'
 
-const VIEW_STORAGE_KEY = 'mindthread_view'
-
-function restoreView(): ViewId {
-  try {
-    const stored = localStorage.getItem(VIEW_STORAGE_KEY)
-    if (stored === 'home' || stored === 'today' || stored === 'archived') return stored
-  } catch {
-    // Fall through to the default view.
-  }
-  return 'home'
-}
-
 /**
  * Navigation / browse state shared by the visible nav controls and the WebMCP
  * browse tools. Both the on-screen Home/Today/Archived tabs, the thread cards,
@@ -23,18 +11,13 @@ function restoreView(): ViewId {
  * same visible state a user reaches, never a separate path.
  */
 export const useUiStore = defineStore('ui', () => {
-  const currentView = ref<ViewId>(restoreView())
+  const currentView = ref<ViewId>("home")
   const openThreadId = ref<string | null>(null)
   const searchQuery = ref('')
   const activeTags = ref<string[]>([])
 
   function setView(view: ViewId) {
     currentView.value = view
-    try {
-      localStorage.setItem(VIEW_STORAGE_KEY, view)
-    } catch {
-      // The view switch still works without persistence.
-    }
   }
 
   function openThread(threadId: string) {

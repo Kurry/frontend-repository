@@ -14,7 +14,7 @@ import { useUiStore } from '../stores/uiStore'
 
 const CONTRACT_VERSION = 'zto-webmcp-v1'
 
-const MODULES = ['browse-query-v1', 'entity-collection-v1', 'form-workflow-v1']
+const MODULES = ['browse-query-v1', 'entity-collection-v1', 'form-workflow-v1', 'artifact-transfer-v1']
 
 type Args = Record<string, unknown>
 type Result = Record<string, unknown>
