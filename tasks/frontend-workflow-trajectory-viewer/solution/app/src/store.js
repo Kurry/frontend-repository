@@ -115,6 +115,7 @@ export const useAppStore = create((set, get) => ({
   setTerminalState: (key, patch) => set((state) => ({ terminalByStep: { ...state.terminalByStep, [key]: { ...(state.terminalByStep[key] || {}), ...patch } } })),
   setChrome: (patch) => {
     if (patch.paletteOpen && !get().chrome.paletteOpen) captureDialogOpener('palette')
+    if (patch.noteOpen && !get().chrome.noteOpen) captureDialogOpener('note')
     set((state) => ({ chrome: { ...state.chrome, ...patch } }))
   },
   setImportDraft: (importDraft) => set({ importDraft }),
