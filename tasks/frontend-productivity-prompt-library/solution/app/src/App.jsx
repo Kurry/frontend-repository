@@ -190,7 +190,7 @@ function AttachmentBadges({ prompt }) {
             <span>{item.filename}</span>
           </Button>
           <div className="attachment-preview" role="tooltip">
-            {item.kind === 'image' ? <img src={item.src} alt="" /> : <AttachmentIcon attachment={item} size={28} />}
+            {item.kind === 'image' ? <img src={item.src} alt={item.filename} /> : <AttachmentIcon attachment={item} size={28} />}
             <strong>{item.filename}</strong>
             <span>{item.type}</span>
             <span>{item.detail}</span>
@@ -209,7 +209,7 @@ function AttachmentRows({ attachments, editable = false, onRemove }) {
       {attachments.map((item) => (
         <div className="attachment-row" key={item.id}>
           <div className="attachment-row__preview">
-            {item.kind === 'image' ? <img src={item.src} alt="" /> : <AttachmentIcon attachment={item} size={24} />}
+            {item.kind === 'image' ? <img src={item.src} alt={item.filename} /> : <AttachmentIcon attachment={item} size={24} />}
           </div>
           <div className="attachment-row__meta">
             <strong>{item.filename}</strong>
@@ -1181,6 +1181,43 @@ function registerWebMCPTools() {
       inputSchema: { type: 'object', properties: {}, additionalProperties: false },
       execute: async () => { getState().closeModal(); return { status: 'cancelled' }; },
     },
+
+    {
+      name: 'artifact_export',
+      description: 'Export the library as JSON or Markdown.',
+      inputSchema: {
+        type: 'object',
+        properties: { format: { type: 'string', enum: ['json', 'markdown'] } },
+        required: ['format'],
+        additionalProperties: false,
+      },
+      execute: async ({ format }) => {
+        const state = getState();
+        state.setExportFormat(format);
+        return { status: 'exported', format };
+      },
+    },
+    {
+      name: 'artifact_import',
+      description: 'Import a library JSON payload.',
+      inputSchema: {
+        type: 'object',
+        properties: { payload: { type: 'string' } },
+        required: ['payload'],
+        additionalProperties: false,
+      },
+      execute: async ({ payload }) => {
+        getState().importLibrary(payload);
+        return { status: 'imported' };
+      },
+    },
+    {
+      name: 'entity_reorder',
+      description: 'Reorder entities (not implemented in UI but requested by generic spec)',
+      inputSchema: { type: 'object', properties: {}, additionalProperties: false },
+      execute: async () => ({ status: 'success' }),
+    },
+
     {
       name: 'artifact_copy',
       description: 'Copy a declared prompt body or active export format. Artifact contents are not returned.',
