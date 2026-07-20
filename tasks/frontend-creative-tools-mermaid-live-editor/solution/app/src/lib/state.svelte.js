@@ -63,13 +63,22 @@ const doRevalidate = async () => {
   const code = store.code;
   if (!code.trim()) {
     // Empty source: no parser error banner — the preview pane shows its
-    // empty-source message and exports stay disabled.
+    // empty-source message and exports stay disabled. The badge, status bar,
+    // and Session JSON deliberately keep the last VALID diagram type: the
+    // MermaidSession contract requires a closed-enum diagramType, so clearing
+    // it would force the session export to fall back to a fabricated
+    // 'flowchart' while the badge shows nothing — keeping the last valid type
+    // leaves badge, status bar, and session mutually consistent.
     store.error = undefined;
     return;
   }
   try {
-    await parse(code);
-    store.diagramType = detectDiagramType(code) ?? store.diagramType;
+    const { diagramType: parsedType } = await parse(code);
+    // Prefer the type mermaid actually parsed (it ignores leading %% comment
+    // lines, so the badge tracks the rendered diagram even when the first
+    // line is a comment), then the first-line detector, then the last valid
+    // type as a final fallback.
+    store.diagramType = parsedType ?? detectDiagramType(code) ?? store.diagramType;
     store.error = undefined;
   } catch (error) {
     store.error = error instanceof Error ? error.message : String(error);

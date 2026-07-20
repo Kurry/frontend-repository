@@ -175,11 +175,16 @@ const ensureInit = () => {
 let renderSeq = 0;
 
 // Parse the source to detect syntax errors without touching the DOM.
-// Throws on invalid syntax.
+// Throws on invalid syntax. On success, diagramType is mermaid's parsed
+// type mapped onto the closed diagramType enum — mermaid's own detection
+// ignores leading %% comment lines, so it stays correct even when the
+// first source line is a comment (undefined when mermaid reports a type
+// the closed enum does not cover).
 export const parse = async (code) => {
   if (!initialized) ensureInit();
   const result = await mermaid.parse(code, { suppressErrors: false });
-  return { diagramType: result ? result.diagramType : undefined };
+  const raw = result ? result.diagramType : undefined;
+  return { diagramType: raw ? PARSED_TYPE_MAP[raw] : undefined };
 };
 
 // Render the diagram source into an <svg>. Returns the svg markup string.
