@@ -1,0 +1,581 @@
+<script lang="ts">
+	import '../../app.css';
+	import { onMount } from 'svelte';
+	import * as Y from 'yjs';
+	import { marked } from 'marked';
+	import Editor from '$lib/components/Editor.svelte';
+	import Preview from '$lib/components/Preview.svelte';
+	import Presentation from '$lib/components/Presentation.svelte';
+	import DocumentPackageModal from '$lib/components/DocumentPackageModal.svelte';
+	import { initYjs } from '$lib/editor/initYjs';
+	import { generateId, isValidId } from '$lib/utils';
+	import { SEED_ROOM_ID, SEED_CONTENT, Y_TEXT_KEY } from '$lib/constants';
+	import { installWebmcp } from '$lib/webmcp';
+	import { ProfileSchema, JoinRoomSchema, type DocumentPackage } from '$lib/schemas';
+
+	type EditorMode = 'edit' | 'preview' | 'presentation';
+
+	let ready = $state(false);
+	let roomId = $state('');
+	let viewMode = $state<EditorMode>('edit');
+	let theme = $state<'light' | 'dark'>('light');
+	let joinId = $state('');
+	let joinError = $state<string | null>(null);
+
+	let shareOpen = $state(false);
+	let isSyncing = $state(false);
+	let shareTab = $state<'live' | 'static'>('live');
+	let liveUrl = $state('');
+	let staticUrl = $state('');
+	let staticGenerated = $state(false);
+	let copied = $state(false);
+
+	let profileOpen = $state(false);
+	let userName = $state('Anonymous');
+	let userColor = $state('#559ede');
+	let profileNameDraft = $state('');
+	let profileColorDraft = $state('');
+	let profileErrors = $state<{ displayName?: string; color?: string }>({});
+
+	let contentCopied = $state(false);
+	let packageOpen = $state(false);
+	let packageCopied = $state(false);
+	let packageDownloaded = $state(false);
+	let downloaded = $state(false);
+
+	let ydoc = $state<Y.Doc | null>(null);
+	let ytext = $state<Y.Text | null>(null);
+	let sourceText = $state('');
+	let cleanup: () => void = () => {};
+
+	const documentPackage = $derived<DocumentPackage>({
+		schemaVersion: 'mduy-document-v1',
+		roomId,
+		markdown: sourceText,
+		theme,
+		profile: { displayName: userName, color: userColor }
+	});
+
+	const packageJson = $derived(JSON.stringify(documentPackage, null, 2));
+
+	function resolveRoomId(): string {
+		const path = window.location.pathname.replace(/^\/+/, '').split('/')[0];
+		if (path && isValidId(path)) return path;
+		// Default: open directly into the seeded welcome document.
+		window.history.replaceState({}, '', `/${SEED_ROOM_ID}`);
+		return SEED_ROOM_ID;
+	}
+
+	function applyTheme(next: 'light' | 'dark') {
+		theme = next;
+		document.documentElement.classList.toggle('dark', next === 'dark');
+		try {
+			localStorage.setItem('mduy-theme', next);
+		} catch {
+			/* storage optional */
+		}
+	}
+
+	function toggleTheme() {
+		applyTheme(theme === 'dark' ? 'light' : 'dark');
+	}
+
+	function setContent(content: string) {
+		if (ydoc && ytext) { ydoc.transact(() => {
+			ytext.delete(0, ytext?.length ?? 0);
+			ytext.insert(0, content);
+		});
+		}
+	}
+
+	function copyContent() {
+		const text = ytext?.toString() ?? "";
+		navigator.clipboard?.writeText(text).catch(() => {});
+		contentCopied = true;
+		setTimeout(() => (contentCopied = false), 800);
+		return text;
+	}
+
+	function downloadFile() {
+		const content = ytext?.toString() ?? "";
+		const blob = new Blob([content], { type: 'text/markdown' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'document.md';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+		downloaded = true;
+		setTimeout(() => (downloaded = false), 800);
+		return content;
+	}
+
+	function copyPackage() {
+		navigator.clipboard?.writeText(packageJson).catch(() => {});
+		packageCopied = true;
+		setTimeout(() => (packageCopied = false), 800);
+	}
+
+	function downloadPackage() {
+		const blob = new Blob([packageJson], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'document-package.json';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+		packageDownloaded = true;
+		setTimeout(() => (packageDownloaded = false), 800);
+	}
+
+	function importPackage(data: DocumentPackage) {
+		setContent(data.markdown);
+		applyTheme(data.theme);
+		userName = data.profile.displayName;
+		userColor = data.profile.color;
+	}
+
+	function openShare() {
+		const url = new URL(window.location.href);
+		url.searchParams.set('sync', 'true');
+		liveUrl = url.toString();
+		shareTab = 'live';
+		staticGenerated = false;
+		staticUrl = '';
+		shareOpen = true;
+	}
+
+	function toggleSync() {
+		isSyncing = !isSyncing;
+		const url = new URL(window.location.href);
+		if (isSyncing) url.searchParams.set('sync', 'true');
+		else url.searchParams.delete('sync');
+		window.history.replaceState({}, '', url);
+	}
+
+	function generateStaticLink() {
+		const content = ytext?.toString() ?? "";
+		staticUrl = `${window.location.origin}/import?content=${encodeURIComponent(content)}`;
+		staticGenerated = true;
+	}
+
+	function copyShareUrl(url: string) {
+		navigator.clipboard?.writeText(url).catch(() => {});
+		copied = true;
+		setTimeout(() => (copied = false), 800);
+	}
+
+	function newDocument() {
+		const id = generateId();
+		window.location.href = `/${id}`;
+	}
+
+	function joinDocument() {
+		const result = JoinRoomSchema.safeParse({ roomId: joinId.trim() });
+		if (!result.success) {
+			joinError = result.error.issues[0]?.message ?? 'roomId is required';
+			return;
+		}
+		joinError = null;
+		window.location.href = `/${result.data.roomId}`;
+	}
+
+	function openProfile() {
+		profileNameDraft = userName;
+		profileColorDraft = userColor;
+		profileErrors = {};
+		profileOpen = true;
+	}
+
+	function saveProfile() {
+		const result = ProfileSchema.safeParse({
+			displayName: profileNameDraft,
+			color: profileColorDraft
+		});
+		if (!result.success) {
+			const errors: { displayName?: string; color?: string } = {};
+			for (const issue of result.error.issues) {
+				const key = issue.path[0] as 'displayName' | 'color' | undefined;
+				if (key && !errors[key]) errors[key] = issue.message;
+			}
+			profileErrors = errors;
+			return;
+		}
+		userName = result.data.displayName;
+		userColor = result.data.color;
+		profileErrors = {};
+		profileOpen = false;
+	}
+
+	onMount(() => {
+		try {
+			const savedTheme = localStorage.getItem('mduy-theme');
+			if (savedTheme === 'dark' || savedTheme === 'light') applyTheme(savedTheme);
+			const savedUser = localStorage.getItem('mduy-user');
+			if (savedUser) {
+				const u = JSON.parse(savedUser);
+				if (u.name) userName = u.name;
+				if (u.color) userColor = u.color;
+			}
+		} catch {
+			/* storage optional */
+		}
+
+		if (new URLSearchParams(window.location.search).get('sync') === 'true') isSyncing = true;
+
+		roomId = resolveRoomId();
+
+		let disposed = false;
+		initYjs(roomId).then((res) => {
+			if (disposed) {
+				res.cleanup();
+				return;
+			}
+			ydoc = res.ydoc;
+			ytext = res.ytext;
+			cleanup = res.cleanup;
+
+			// Seed the welcome document only when it is genuinely empty.
+			if (roomId === SEED_ROOM_ID && (ytext?.length ?? 0) === 0) {
+				ytext.insert(0, SEED_CONTENT);
+			}
+
+			installWebmcp({
+				setContent,
+				switchMode: (m) => (viewMode = m),
+				showPreview: () => {
+					viewMode = 'preview';
+					return marked.parse(ytext?.toString() ?? "", { gfm: true, breaks: true }) as string;
+				},
+				exportMarkdown: () => downloadFile(),
+				copyMarkdown: () => copyContent(),
+				getState: () => ({
+					roomId,
+					viewMode,
+					theme,
+					isSyncing,
+					sourceLength: ytext?.length ?? 0
+				})
+			});
+
+			ready = true;
+		});
+
+		return () => {
+			disposed = true;
+			cleanup();
+		};
+	});
+
+	$effect(() => {
+		try {
+			localStorage.setItem('mduy-user', JSON.stringify({ name: userName, color: userColor }));
+		} catch {
+			/* storage optional */
+		}
+	});
+
+	// Mirror the Yjs source into a plain reactive string so the Document
+	// package preview (packageJson) recomputes as the document is edited.
+	$effect(() => {
+		if (!ytext) {
+			sourceText = '';
+			return;
+		}
+		sourceText = ytext.toString();
+		const observer = () => {
+			sourceText = ytext?.toString() ?? '';
+		};
+		ytext.observe(observer);
+		return () => {
+			ytext?.unobserve(observer);
+		};
+	});
+</script>
+
+<div class="flex h-screen w-full flex-col overflow-hidden">
+	<!-- Top bar: brand + room breadcrumb, theme, join, new -->
+	<header class="flex items-center justify-between gap-2 border-b px-4 py-2">
+		<div class="flex items-center text-xs">
+			<a href="/" class="text-foreground/70 hover:text-foreground transition-colors">md.uy</a>
+			{#if roomId}
+				<span class="text-foreground/30 ml-1">/</span>
+				<span class="ml-1 pt-[2px] font-mono" data-testid="room-id">{roomId}</span>
+			{/if}
+		</div>
+		<div class="flex items-center gap-2">
+			<button
+				onclick={toggleTheme}
+				class="hover:bg-accent hover:text-accent-foreground relative flex size-7 items-center justify-center rounded transition-colors"
+				aria-label="Toggle theme"
+				title="Toggle theme"
+			>
+				{#if theme === 'dark'}
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+				{:else}
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+				{/if}
+			</button>
+			<div class="relative hidden md:block">
+				<input
+					bind:value={joinId}
+					oninput={() => (joinError = null)}
+					placeholder="document id"
+					autocomplete="off"
+					maxlength={20}
+					aria-invalid={joinError ? 'true' : undefined}
+					aria-describedby={joinError ? 'join-room-error' : undefined}
+					onkeydown={(e) => e.key === 'Enter' && joinDocument()}
+					class="border-input bg-background h-7 w-32 rounded border pr-8 pl-2 font-mono text-xs focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2"
+				/>
+				<button
+					onclick={joinDocument}
+					disabled={!isValidId(joinId)}
+					aria-label="Open document"
+					title="Open document"
+					class="hover:bg-accent hover:text-accent-foreground absolute top-1/2 right-1 flex size-5 -translate-y-1/2 items-center justify-center rounded transition-colors disabled:pointer-events-none disabled:opacity-40"
+				>
+					<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+				</button>
+				{#if joinError}
+					<span id="join-room-error" class="text-destructive bg-popover border-border absolute top-full left-0 mt-1 w-max max-w-64 rounded border px-2 py-1 text-xs text-red-500 shadow-sm">
+						{joinError}
+					</span>
+				{/if}
+			</div>
+			<button
+				onclick={newDocument}
+				class="bg-primary text-primary-foreground hover:bg-primary/90 flex size-7 items-center justify-center rounded transition-colors"
+				aria-label="New document"
+				title="New document"
+			>
+				<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+			</button>
+		</div>
+	</header>
+
+	{#if ready}
+		<div class="mx-auto flex w-full max-w-3xl flex-1 flex-col overflow-hidden px-4 pt-3 pb-4">
+			<!-- Toolbar: mode toggle + actions -->
+			<div class="mb-3 flex flex-row flex-wrap items-center justify-between gap-3">
+				<div class="flex items-center gap-2" role="group" aria-label="Editor mode">
+					{#each [['edit', 'Edit'], ['preview', 'Preview'], ['presentation', 'Present']] as [mode, label] (mode)}
+						<button
+							onclick={() => (viewMode = mode as EditorMode)}
+							aria-pressed={viewMode === mode}
+							class={'h-7 rounded px-2 text-xs font-medium transition-colors ' +
+								(viewMode === mode
+									? 'bg-secondary text-secondary-foreground'
+									: 'hover:bg-accent hover:text-accent-foreground')}
+						>
+							{label}
+						</button>
+					{/each}
+				</div>
+				<div class="flex items-center gap-1">
+					<button
+						onclick={copyContent}
+						class="hover:bg-accent hover:text-accent-foreground flex h-7 items-center gap-1 rounded px-2 text-xs font-medium transition-colors"
+						title="Copy content"
+					>
+						{#if contentCopied}
+							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-500" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+						{:else}
+							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+						{/if}
+						Copy
+					</button>
+					<button
+						onclick={downloadFile}
+						class="hover:bg-accent hover:text-accent-foreground flex h-7 items-center gap-1 rounded px-2 text-xs font-medium transition-colors"
+						title="Download markdown"
+					>
+						{#if downloaded}
+							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-500" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+						{:else}
+							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+						{/if}
+						Download
+					</button>
+					<button
+						onclick={openShare}
+						class="border-input bg-background hover:bg-accent hover:text-accent-foreground relative ml-2 flex h-7 items-center gap-1 rounded border px-2 text-xs font-medium transition-colors"
+						title="Share"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
+						Share
+						{#if isSyncing}
+							<span class="absolute -top-1 -right-1 flex size-2">
+								<span class="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
+								<span class="bg-primary relative inline-flex size-2 rounded-full"></span>
+							</span>
+						{/if}
+					</button>
+					<button
+						onclick={() => (packageOpen = true)}
+						class="border-input bg-background hover:bg-accent hover:text-accent-foreground relative ml-1 flex h-7 items-center gap-1 rounded border px-2 text-xs font-medium transition-colors"
+						title="Document package"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8V21H3V8"/><path d="M1 3H23V8H1V3Z"/><path d="M10 12H14"/></svg>
+						Package
+					</button>
+				</div>
+			</div>
+
+			<!-- Panes -->
+			<div class="border-border flex-1 overflow-hidden rounded border">
+				<Editor {ytext} isVisible={viewMode === 'edit'} />
+				<Preview {ytext} isVisible={viewMode === 'preview'} />
+				<Presentation {ytext} isVisible={viewMode === 'presentation'} />
+			</div>
+
+			<!-- Status row: profile + connection -->
+			<div class="mt-3 flex items-center justify-between text-xs">
+				<button
+					onclick={openProfile}
+					class="border-input bg-background hover:bg-accent hover:text-accent-foreground flex h-7 items-center gap-2 rounded border px-2 font-medium transition-colors"
+				>
+					<span class="border-foreground size-3 rounded-full border" style:background-color={userColor}></span>
+					<span>{userName}</span>
+				</button>
+				<div class="text-muted-foreground/70 flex items-center gap-2">
+					<span class="size-2 rounded-full {isSyncing ? 'bg-primary' : 'bg-muted-foreground/40'}"></span>
+					<span>{isSyncing ? 'Live sync on — no users connected' : 'Local only'}</span>
+				</div>
+			</div>
+		</div>
+	{:else}
+		<div class="text-muted-foreground flex flex-1 items-center justify-center text-sm">Loading…</div>
+	{/if}
+
+	<footer class="text-foreground/50 flex items-center justify-center gap-2 border-t px-3 py-2 font-mono text-[0.7rem]">
+		<span>md.uy</span>
+		<span>•</span>
+		<span>the peer-to-peer markdown editor</span>
+		<span>•</span>
+		<span>download important notes</span>
+	</footer>
+</div>
+
+<!-- Share dialog -->
+{#if shareOpen}
+	<div class="fixed inset-0 z-50 flex items-center justify-center">
+		<button class="absolute inset-0 bg-black/50" aria-label="Close" onclick={() => (shareOpen = false)}></button>
+		<div class="bg-popover text-popover-foreground relative z-10 w-[90%] max-w-md rounded-lg border p-6 shadow-lg">
+			<h2 class="text-lg font-semibold">Share</h2>
+			<p class="text-muted-foreground mt-1 text-sm">Choose how you want to share your note</p>
+			<div class="mt-4 grid grid-cols-2 gap-1">
+				<button
+					onclick={() => (shareTab = 'live')}
+					class={'flex items-center justify-center gap-2 rounded px-3 py-1.5 text-sm transition-colors ' +
+						(shareTab === 'live' ? 'bg-secondary text-secondary-foreground' : 'hover:bg-accent')}
+				>Live sync</button>
+				<button
+					onclick={() => (shareTab = 'static')}
+					class={'flex items-center justify-center gap-2 rounded px-3 py-1.5 text-sm transition-colors ' +
+						(shareTab === 'static' ? 'bg-secondary text-secondary-foreground' : 'hover:bg-accent')}
+				>Static</button>
+			</div>
+			{#if shareTab === 'live'}
+				<div class="flex flex-col items-center gap-3 py-4">
+					{#if isSyncing}
+						<div class="flex items-center gap-2">
+							<span class="text-sm font-medium">Live sync is active</span>
+							<button onclick={toggleSync} class="border-input hover:bg-accent rounded border px-2 py-1 text-xs">Turn off</button>
+						</div>
+						<p class="text-muted-foreground text-center text-sm">Anyone with this link can view and edit this note in real time.</p>
+						<div class="relative w-full">
+							<input readonly value={liveUrl} class="border-input bg-background w-full rounded border py-1.5 pr-9 pl-2 text-xs" />
+							<button onclick={() => copyShareUrl(liveUrl)} title="Copy to clipboard" class="hover:bg-accent absolute top-1/2 right-1.5 flex size-6 -translate-y-1/2 items-center justify-center rounded">
+								{#if copied}✓{:else}⧉{/if}
+							</button>
+						</div>
+					{:else}
+						<p class="text-muted-foreground text-center text-sm">Enable live sync to collaborate in real time with anyone who has the link.</p>
+						<button onclick={toggleSync} class="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1.5 text-sm">Start live sync</button>
+					{/if}
+				</div>
+			{:else}
+				<div class="flex flex-col items-center gap-3 py-4">
+					<p class="text-muted-foreground text-center text-sm">Share a static copy of this note. Changes will not sync between copies.</p>
+					<button onclick={generateStaticLink} disabled={staticGenerated} class="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1.5 text-sm disabled:opacity-50">
+						{staticGenerated ? 'Link generated' : 'Generate static link'}
+					</button>
+					{#if staticGenerated}
+						<div class="relative w-full">
+							<input readonly value={staticUrl} class="border-input bg-background w-full rounded border py-1.5 pr-9 pl-2 text-xs" />
+							<button onclick={() => copyShareUrl(staticUrl)} title="Copy to clipboard" class="hover:bg-accent absolute top-1/2 right-1.5 flex size-6 -translate-y-1/2 items-center justify-center rounded">
+								{#if copied}✓{:else}⧉{/if}
+							</button>
+						</div>
+					{/if}
+				</div>
+			{/if}
+		</div>
+	</div>
+{/if}
+
+<!-- Profile dialog -->
+{#if profileOpen}
+	<div class="fixed inset-0 z-50 flex items-center justify-center">
+		<button class="absolute inset-0 bg-black/50" aria-label="Close" onclick={() => (profileOpen = false)}></button>
+		<div class="bg-popover text-popover-foreground relative z-10 w-[90%] max-w-sm rounded-lg border p-6 shadow-lg">
+			<h2 class="text-lg font-semibold">Edit profile</h2>
+			<div class="mt-4 grid gap-4">
+				<div class="grid grid-cols-5 items-start gap-3">
+					<label for="pname" class="text-right text-sm pt-1.5">Name</label>
+					<div class="col-span-4">
+						<input
+							id="pname"
+							bind:value={profileNameDraft}
+							oninput={() => (profileErrors = { ...profileErrors, displayName: undefined })}
+							placeholder="Enter your name"
+							aria-invalid={profileErrors.displayName ? 'true' : undefined}
+							class="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+						/>
+						{#if profileErrors.displayName}
+							<p class="text-destructive mt-1 text-xs text-red-500">{profileErrors.displayName}</p>
+						{/if}
+					</div>
+				</div>
+				<div class="grid grid-cols-5 items-start gap-3">
+					<label for="pcolor" class="text-right text-sm pt-1.5">Color</label>
+					<div class="col-span-4">
+						<div class="flex items-center gap-2">
+							<input
+								id="pcolor"
+								type="color"
+								bind:value={profileColorDraft}
+								oninput={() => (profileErrors = { ...profileErrors, color: undefined })}
+								class="size-8 cursor-pointer rounded"
+							/>
+							<span class="font-mono text-sm">{profileColorDraft}</span>
+						</div>
+						{#if profileErrors.color}
+							<p class="text-destructive mt-1 text-xs text-red-500">{profileErrors.color}</p>
+						{/if}
+					</div>
+				</div>
+			</div>
+			<div class="mt-5 flex justify-end gap-2">
+				<button onclick={() => (profileOpen = false)} class="border-input hover:bg-accent rounded border px-3 py-1.5 text-sm">Cancel</button>
+				<button onclick={saveProfile} class="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1.5 text-sm">Save</button>
+			</div>
+		</div>
+	</div>
+{/if}
+
+<!-- Document package dialog -->
+<DocumentPackageModal
+	bind:open={packageOpen}
+	{packageJson}
+	onImport={importPackage}
+	onCopy={copyPackage}
+	onDownload={downloadPackage}
+	copied={packageCopied}
+	downloaded={packageDownloaded}
+/>

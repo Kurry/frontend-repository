@@ -1,0 +1,1 @@
+import{component as l}from"./0.Gz1OpEO_.js";const e=!1,o="auto",t=Object.freeze(Object.defineProperty({__proto__:null,prerender:o,ssr:e},Symbol.toStringTag,{value:"Module"}));export{l as component,t as universal};
