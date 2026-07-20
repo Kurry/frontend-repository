@@ -79,7 +79,7 @@ main { max-width: 1520px; margin: 0 auto; padding: 34px 40px 56px; }
 .left-column, .right-column { display: grid; gap: 18px; min-width: 0; }
 .panel { background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); min-width: 0; }
 .panel-heading { padding: 20px 22px 17px; border-bottom: 1px solid var(--border); }
-.panel-heading h2 { margin: 2px 0 0; color: var(--navy); font-weight: 500; font-size: 21px; letter-spacing: -.015em; }
+.panel-heading h2 { margin: 2px 0 0; color: var(--navy); font-weight: 600; font-size: 24px; letter-spacing: -.015em; }
 .split-heading { display: flex; justify-content: space-between; align-items: center; }
 .compact-heading { display: flex; align-items: center; gap: 10px; }
 .count-pill, .group-count { display: inline-flex; justify-content: center; align-items: center; min-width: 28px; height: 24px; padding: 0 8px; color: #334155; background: #e8edf2; font-size: 12px; font-weight: 600; }
@@ -184,7 +184,7 @@ main { max-width: 1520px; margin: 0 auto; padding: 34px 40px 56px; }
 .step-select .cds--inline-loading { min-height: 20px; width: 20px; }
 .step-title { display: flex; align-items: center; gap: 7px; }
 .step-title strong { font-size: 12px; color: var(--navy); }
-.status-tag { text-transform: capitalize; transition: background .18s, color .18s; }
+.status-tag { text-transform: capitalize; transition: background .18s, color .18s; font-weight: 600; padding: 0 8px; border-radius: 12px; }
 .step-path { display: block; margin-top: 4px; color: #697586; font: 10px "IBM Plex Mono", monospace; overflow-wrap: anywhere; }
 .retry-text { color: #6929c4; margin: 6px 0 0; font-size: 11px; font-weight: 600; }
 .step-output { color: #198038; margin: 5px 0 0; font-size: 10px; }
