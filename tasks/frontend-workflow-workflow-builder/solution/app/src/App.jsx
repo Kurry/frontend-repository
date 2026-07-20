@@ -53,6 +53,8 @@ import {
   TrashCan,
   Upload,
   WarningFilled,
+  Undo,
+  Redo,
 } from '@carbon/icons-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -207,6 +209,15 @@ function Toolbar() {
   const busy = run.phase === 'running' || run.phase === 'pausing';
   const elapsed = `${(rollup.elapsedMs / 1000).toFixed(1)}s`;
 
+  const pastLength = useWorkflowStore((state) => state.past.length);
+  const futureLength = useWorkflowStore((state) => state.future.length);
+  const undo = useWorkflowStore((state) => state.undo);
+  const redo = useWorkflowStore((state) => state.redo);
+  const deleteSelected = useWorkflowStore((state) => state.deleteSelected);
+  const selectedNodeId = useWorkflowStore((state) => state.selectedNodeId);
+  const selectedEdgeId = useWorkflowStore((state) => state.selectedEdgeId);
+  const hasSelection = nodes.some(n => n.selected) || edges.some(e => e.selected) || selectedNodeId || selectedEdgeId;
+
   return (
     <section className="workflow-toolbar" aria-label="Workflow controls">
       <div className="toolbar-actions">
@@ -215,8 +226,11 @@ function Toolbar() {
         {run.phase === 'paused' && <Button kind="secondary" size="sm" renderIcon={Play} onClick={resumeRun}>Resume</Button>}
         {run.phase === 'failed' && <Button kind="danger--tertiary" size="sm" renderIcon={Restart} onClick={retryFailed}>Retry from failed node</Button>}
         <div className="toolbar-divider" />
+        <Button hasIconOnly iconDescription="Undo" renderIcon={Undo} kind="ghost" size="sm" onClick={undo} disabled={pastLength === 0} />
+        <Button hasIconOnly iconDescription="Redo" renderIcon={Redo} kind="ghost" size="sm" onClick={redo} disabled={futureLength === 0} />
         <Button kind="tertiary" size="sm" renderIcon={Save} onClick={() => openModal('save')}>Save</Button>
-        <Button kind="ghost" size="sm" renderIcon={Export} onClick={() => openModal('artifact')}>Export</Button>
+        <Button kind="ghost" size="sm" renderIcon={Code} onClick={useWorkflowStore(state => state.toggleArtifactPanel)}>Artifact</Button>
+        <Button kind="danger--ghost" size="sm" renderIcon={TrashCan} onClick={deleteSelected} disabled={!hasSelection}>Delete selected</Button>
         <Button hasIconOnly iconDescription="Import workflow" renderIcon={Upload} kind="ghost" size="sm" onClick={() => openModal('import')} />
         <Button hasIconOnly iconDescription="Cycle node selection (Alt+N)" renderIcon={DataConnected} kind="ghost" size="sm" onClick={cycleNodeSelection} />
       </div>
@@ -443,7 +457,7 @@ function ConfigurationModal() {
   const configErrors = errors.config || {};
   const submit = handleSubmit((values) => { updateNode(node.id, values); close(); });
   return (
-    <Modal
+    <Modal role="dialog" aria-modal="true"
       open={ui.modal === 'configure'}
       modalHeading={`Configure ${node.type} node`}
       modalLabel="Node configuration"
@@ -492,7 +506,7 @@ function SaveModal() {
   const empty = !value.trim();
   const submit = handleSubmit(({ name }) => saveWorkflow(name));
   return (
-    <Modal open={open} modalHeading="Save workflow" modalLabel="Create an in-memory snapshot" primaryButtonText="Save workflow" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || empty} onRequestSubmit={submit} onRequestClose={close} selectorPrimaryFocus="#workflow-name">
+    <Modal role="dialog" aria-modal="true" open={open} modalHeading="Save workflow" modalLabel="Create an in-memory snapshot" primaryButtonText="Save workflow" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || empty} onRequestSubmit={submit} onRequestClose={close} selectorPrimaryFocus="#workflow-name">
       <form onSubmit={submit} className="modal-form" aria-live="polite">
         <TextInput id="workflow-name" labelText="Workflow name" placeholder="e.g. Customer response pipeline" invalid={empty || !!errors.name} invalidText={errors.name?.message || 'Workflow name is required'} {...register('name')} />
         <p className="form-footnote">Saved workflows live only in this browser session and include every current node and edge.</p>
@@ -507,35 +521,40 @@ function ConfirmLoadModal() {
   const close = useWorkflowStore((state) => state.closeModal);
   const confirm = useWorkflowStore((state) => state.confirmLoadWorkflow);
   return (
-    <Modal danger open={ui.modal === 'confirm-load'} modalHeading="Replace the current canvas?" primaryButtonText="Load workflow" secondaryButtonText="Keep current canvas" onRequestSubmit={confirm} onRequestClose={close}>
+    <Modal role="dialog" aria-modal="true" danger open={ui.modal === 'confirm-load'} modalHeading="Replace the current canvas?" primaryButtonText="Load workflow" secondaryButtonText="Keep current canvas" onRequestSubmit={confirm} onRequestClose={close}>
       <p>Loading <strong>{saved?.name}</strong> replaces the current nodes and edges. Its execution state starts fresh.</p>
     </Modal>
   );
 }
 
-function ArtifactModal() {
-  const open = useWorkflowStore((state) => state.ui.modal === 'artifact');
+function ArtifactPanel() {
+  const open = useWorkflowStore((state) => state.ui.artifactPanelOpen);
+  const toggle = useWorkflowStore((state) => state.toggleArtifactPanel);
   const mode = useWorkflowStore((state) => state.ui.artifactMode);
   const nodes = useWorkflowStore((state) => state.nodes);
   const edges = useWorkflowStore((state) => state.edges);
   const activeName = useWorkflowStore((state) => state.activeWorkflowName);
-  const close = useWorkflowStore((state) => state.closeModal);
   const setMode = useWorkflowStore((state) => state.setArtifactMode);
   const exportDefinition = useWorkflowStore((state) => state.exportDefinition);
   const exportMermaid = useWorkflowStore((state) => state.exportMermaid);
   const showToast = useWorkflowStore((state) => state.showToast);
   const [generatedAt, setGeneratedAt] = useState(() => new Date().toISOString());
   useEffect(() => { if (open) setGeneratedAt(new Date().toISOString()); }, [open, nodes, edges, activeName]);
+
+  const isEmpty = nodes.length === 0;
+
   const content = useMemo(() => {
-    if (!open) return '';
+    if (!open || isEmpty) return '';
     if (mode === 'mermaid') return exportMermaid();
     const definition = exportDefinition();
     return JSON.stringify({ ...definition, generatedAt }, null, 2);
-  }, [open, mode, nodes, edges, activeName, generatedAt, exportDefinition, exportMermaid]);
+  }, [open, mode, nodes, edges, activeName, generatedAt, exportDefinition, exportMermaid, isEmpty]);
+
   const copy = async () => {
     try { await navigator.clipboard.writeText(content); showToast('success', `${mode === 'json' ? 'JSON' : 'Mermaid'} copied to clipboard.`); }
     catch { showToast('error', 'Clipboard access was unavailable. Select the preview text to copy it.'); }
   };
+
   const download = () => {
     const blob = new Blob([content], { type: mode === 'json' ? 'application/json' : 'text/plain' });
     const url = URL.createObjectURL(blob);
@@ -546,17 +565,35 @@ function ArtifactModal() {
     setTimeout(() => URL.revokeObjectURL(url), 0);
   };
   return (
-    <Modal passiveModal open={open} modalHeading="Export workflow" modalLabel="Live artifact preview" onRequestClose={close} size="lg">
-      <div className="artifact-tabs" role="tablist" aria-label="Export format">
-        <Button kind={mode === 'json' ? 'secondary' : 'ghost'} size="sm" renderIcon={Code} onClick={() => setMode('json')} role="tab" aria-selected={mode === 'json'}>JSON</Button>
-        <Button kind={mode === 'mermaid' ? 'secondary' : 'ghost'} size="sm" renderIcon={Flow} onClick={() => setMode('mermaid')} role="tab" aria-selected={mode === 'mermaid'}>Mermaid</Button>
+    <aside className={`artifact-panel ${open ? 'open' : 'closed'}`} aria-label="Artifact">
+      <div className="panel-heading">
+        {open && <div><span className="eyebrow">EXPORT</span><h2>Artifact</h2></div>}
+        <Button hasIconOnly iconDescription={open ? 'Close Artifact' : 'Open Artifact'} renderIcon={open ? Close : Code} kind="ghost" size="sm" onClick={toggle} />
       </div>
-      <pre className="artifact-preview" aria-label={`${mode} artifact preview`}>{content}</pre>
-      <div className="artifact-actions">
-        <Button kind="primary" size="sm" renderIcon={Download} onClick={download}>{mode === 'json' ? 'Download workflow.json' : 'Download workflow.mmd'}</Button>
-        <Button kind="tertiary" size="sm" renderIcon={Copy} onClick={copy}>{mode === 'json' ? 'Copy JSON' : 'Copy Mermaid'}</Button>
-      </div>
-    </Modal>
+      {open && (
+        <div className="artifact-content" style={{ padding: '0 12px 16px' }}>
+          {isEmpty ? (
+            <div className="empty-state">
+              <Code size={24} />
+              <strong>Empty canvas</strong>
+              <span>Add nodes from the palette to build a workflow and generate artifacts.</span>
+            </div>
+          ) : (
+            <>
+              <div className="artifact-tabs" role="tablist" aria-label="Export format">
+                <Button kind={mode === 'json' ? 'secondary' : 'ghost'} size="sm" renderIcon={Code} onClick={() => setMode('json')} role="tab" aria-selected={mode === 'json'}>JSON</Button>
+                <Button kind={mode === 'mermaid' ? 'secondary' : 'ghost'} size="sm" renderIcon={Flow} onClick={() => setMode('mermaid')} role="tab" aria-selected={mode === 'mermaid'}>Mermaid</Button>
+              </div>
+              <pre className="artifact-preview" aria-label={`${mode} artifact preview`}>{content}</pre>
+              <div className="artifact-actions">
+                <Button kind="primary" size="sm" renderIcon={Download} onClick={download}>{mode === 'json' ? 'Download workflow.json' : 'Download workflow.mmd'}</Button>
+                <Button kind="tertiary" size="sm" renderIcon={Copy} onClick={copy}>{mode === 'json' ? 'Copy JSON' : 'Copy Mermaid'}</Button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </aside>
   );
 }
 
@@ -576,7 +613,7 @@ function ImportModal() {
     }
   });
   return (
-    <Modal open={open} modalHeading="Import workflow definition" modalLabel="JSON · schema version 1" primaryButtonText="Review import" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || !value.trim()} onRequestSubmit={submit} onRequestClose={close} size="lg">
+    <Modal role="dialog" aria-modal="true" open={open} modalHeading="Import workflow definition" modalLabel="JSON · schema version 1" primaryButtonText="Review import" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || !value.trim()} onRequestSubmit={submit} onRequestClose={close} size="lg">
       <form onSubmit={submit} className="modal-form" aria-live="polite">
         <TextArea id="import-definition" rows={12} labelText="Workflow definition JSON" placeholder={'{\n  "schemaVersion": 1,\n  ...\n}'} invalid={!!errors.definition || !!parseError} invalidText={parseError || errors.definition?.message} {...register('definition')} />
         <p className="form-footnote">The canvas changes only after validation and confirmation.</p>
@@ -591,7 +628,7 @@ function ConfirmImportModal() {
   const confirm = useWorkflowStore((state) => state.confirmImport);
   const workflow = ui.pendingImport;
   return (
-    <Modal danger open={ui.modal === 'confirm-import'} modalHeading="Import and replace the canvas?" primaryButtonText="Import workflow" secondaryButtonText="Cancel" onRequestSubmit={confirm} onRequestClose={close}>
+    <Modal role="dialog" aria-modal="true" danger open={ui.modal === 'confirm-import'} modalHeading="Import and replace the canvas?" primaryButtonText="Import workflow" secondaryButtonText="Cancel" onRequestSubmit={confirm} onRequestClose={close}>
       <p><strong>{workflow?.name}</strong> contains {workflow?.nodes.length || 0} nodes and {workflow?.edges.length || 0} edges. Current unsaved canvas changes will be replaced.</p>
     </Modal>
   );
@@ -602,6 +639,17 @@ function ToastLayer() {
   const dismiss = useWorkflowStore((state) => state.dismissToast);
   if (!toast) return null;
   return <div className="toast-layer"><ToastNotification lowContrast kind={toast.kind} title={toast.kind === 'error' ? 'Action unavailable' : 'Done'} subtitle={toast.message} timeout={0} onCloseButtonClick={dismiss} /></div>;
+}
+
+
+function Coachmark() {
+  const [visible, setVisible] = useState(true);
+  if (!visible) return null;
+  return (
+    <div className="coachmark" style={{ position: 'absolute', top: 16, right: 16, zIndex: 100 }}>
+      <InlineNotification kind="info" title="Welcome!" subtitle="Drag nodes from the palette, click Run, or Export Artifacts." onCloseButtonClick={() => setVisible(false)} />
+    </div>
+  );
 }
 
 function App() {
@@ -634,7 +682,26 @@ function App() {
         return;
       }
       if (typing || activeModal) return;
-      if ((event.key === 'Delete' || event.key === 'Backspace') && (selectedNodeId || selectedEdgeId)) {
+      if (event.ctrlKey || event.metaKey) {
+        if (event.key.toLowerCase() === 'z') {
+          event.preventDefault();
+          if (event.shiftKey) {
+            useWorkflowStore.getState().redo();
+          } else {
+            useWorkflowStore.getState().undo();
+          }
+        }
+        if (event.key.toLowerCase() === 'y') {
+          event.preventDefault();
+          useWorkflowStore.getState().redo();
+        }
+        if (event.key.toLowerCase() === 'e') { // Artifact toggle
+          event.preventDefault();
+          useWorkflowStore.getState().toggleArtifactPanel();
+        }
+      }
+      const hasSelection = useWorkflowStore.getState().nodes.some(n => n.selected) || useWorkflowStore.getState().edges.some(e => e.selected);
+      if ((event.key === 'Delete' || event.key === 'Backspace') && (selectedNodeId || selectedEdgeId || hasSelection)) {
         event.preventDefault();
         deleteSelected();
       }
@@ -664,14 +731,16 @@ function App() {
           <Timeline />
         </div>
         <SavedPanel />
+        <ArtifactPanel />
       </main>
       <ConfigurationModal />
       <SaveModal />
       <ConfirmLoadModal />
-      <ArtifactModal />
+
       <ImportModal />
       <ConfirmImportModal />
       <ToastLayer />
+      <Coachmark />
       <div className="sr-only" aria-live="assertive" aria-atomic="true">{announcement}</div>
     </div>
   );
