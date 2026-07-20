@@ -49,9 +49,12 @@
           <button class="btn btn-sm" @click="showBadges = !showBadges">
             {{ showBadges ? 'Hide badges' : 'Show badges' }}
           </button>
+          <button class="btn btn-sm" @click="showExport = !showExport">
+            {{ showExport ? 'Hide export' : 'Show export' }}
+          </button>
           <button class="btn btn-sm" @click="requestNewSession">Start new session</button>
         </div>
-        <div class="flex md:hidden gap-2 ml-auto">
+        <div class="flex md:hidden flex-wrap gap-2 ml-auto">
           <button class="btn btn-sm" @click="openDrawer">Show panels</button>
           <button class="btn btn-sm" @click="requestNewSession">Start new session</button>
         </div>
@@ -84,7 +87,10 @@
 
       <!-- Desktop panels -->
       <div class="hidden md:grid mt-8 grid-cols-1 lg:grid-cols-2 gap-4 items-start">
-        <StatsPanel />
+        <div class="flex flex-col gap-4">
+          <StatsPanel />
+          <ExportPanel v-if="showExport" />
+        </div>
         <div class="flex flex-col gap-4">
           <HandHistoryPanel v-if="showHistory" />
           <BadgesPanel v-if="showBadges" />
@@ -92,15 +98,27 @@
       </div>
 
       <!-- Mobile drawer: inline collapsible so it never obstructs the table -->
-      <div v-if="drawerOpen" class="drawer md:hidden mt-6" role="region" aria-label="Stats, history and badges">
+      <div v-if="drawerOpen" class="drawer md:hidden mt-6" role="region" aria-label="Stats, history, badges and export">
         <div class="flex items-center justify-between mb-3">
-          <span class="font-semibold" style="font-size: 18px;">Stats, history and badges</span>
+          <span class="font-semibold" style="font-size: 18px;">Stats, history, badges and export</span>
           <button ref="drawerCloseBtn" class="btn btn-sm" @click="drawerOpen = false">Hide panels</button>
         </div>
         <div class="flex flex-col gap-4">
+          <div class="flex flex-wrap gap-2" aria-label="Panel visibility">
+            <button class="btn btn-sm" @click="showHistory = !showHistory">
+              {{ showHistory ? 'Hide history' : 'Show history' }}
+            </button>
+            <button class="btn btn-sm" @click="showBadges = !showBadges">
+              {{ showBadges ? 'Hide badges' : 'Show badges' }}
+            </button>
+            <button class="btn btn-sm" @click="showExport = !showExport">
+              {{ showExport ? 'Hide export' : 'Show export' }}
+            </button>
+          </div>
           <StatsPanel />
-          <HandHistoryPanel />
-          <BadgesPanel />
+          <HandHistoryPanel v-if="showHistory" />
+          <BadgesPanel v-if="showBadges" />
+          <ExportPanel v-if="showExport" />
         </div>
       </div>
 
@@ -142,11 +160,12 @@ import BettingControls from './components/BettingControls.vue'
 import StatsPanel from './components/StatsPanel.vue'
 import HandHistoryPanel from './components/HandHistoryPanel.vue'
 import BadgesPanel from './components/BadgesPanel.vue'
+import ExportPanel from './components/ExportPanel.vue'
 import CollaborationSection from './components/CollaborationSection.vue'
 
 const store = useGameStore()
 const {
-  s, blinds, mode, toasts, confirmOpen, drawerOpen, showHistory, showBadges,
+  s, blinds, mode, toasts, confirmOpen, drawerOpen, showHistory, showBadges, showExport,
   isHumanTurn, human,
 } = storeToRefs(store)
 const { setMode, requestNewSession, cancelNewSession, confirmNewSession, dealNextHand, rebuy } = store

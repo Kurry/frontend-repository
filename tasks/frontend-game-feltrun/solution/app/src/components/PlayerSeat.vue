@@ -81,7 +81,7 @@
         >{{ displayEquity.toFixed(1) }}%</span>
       </div>
       <div class="equity-bar" aria-hidden="true">
-        <div class="equity-fill" :style="{ width: Math.min(displayEquity, 100) + '%' }"></div>
+        <div class="equity-fill" :style="{ width: equityWidth }"></div>
       </div>
     </div>
   </div>
@@ -126,27 +126,36 @@ function isWinCard(card: Card): boolean {
 }
 
 // Animated equity display: tweens between values so changes never snap.
+import confetti from 'canvas-confetti'
+
 const displayEquity = ref(0)
+const equityWidth = computed(() => `${Math.min(100, Math.max(0, displayEquity.value))}%`)
 const flash = ref(false)
-let raf = 0
 let flashTimer = 0
+let equityFrame = 0
+
+function animateEquityValue(target: number) {
+  window.cancelAnimationFrame(equityFrame)
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    displayEquity.value = target
+    return
+  }
+  const initial = displayEquity.value
+  const startedAt = performance.now()
+  const tick = (now: number) => {
+    const progress = Math.min(1, (now - startedAt) / 700)
+    const eased = 1 - Math.pow(1 - progress, 3)
+    displayEquity.value = initial + (target - initial) * eased
+    if (progress < 1) equityFrame = window.requestAnimationFrame(tick)
+  }
+  equityFrame = window.requestAnimationFrame(tick)
+}
 
 watch(
   () => (props.player.isHuman ? s.value.equity : null),
-  (next, prev) => {
+  (next) => {
     if (next === null || next === undefined) return
-    const from = typeof prev === 'number' ? prev : 0
-    const to = next
-    if (raf) cancelAnimationFrame(raf)
-    const start = performance.now()
-    const duration = 700
-    const step = (now: number) => {
-      const t = Math.min((now - start) / duration, 1)
-      const eased = 1 - Math.pow(1 - t, 3)
-      displayEquity.value = from + (to - from) * eased
-      if (t < 1) raf = requestAnimationFrame(step)
-    }
-    raf = requestAnimationFrame(step)
+    animateEquityValue(next)
     flash.value = false
     window.clearTimeout(flashTimer)
     flashTimer = window.setTimeout(() => {
@@ -157,8 +166,24 @@ watch(
   { immediate: true },
 )
 
+watch(isWinner, (winner) => {
+  if (
+    winner &&
+    props.player.isHuman &&
+    s.value.winLabel &&
+    s.value.winLabel !== 'Uncontested' &&
+    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ) {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+  }
+});
+
 onBeforeUnmount(() => {
-  if (raf) cancelAnimationFrame(raf)
+  window.cancelAnimationFrame(equityFrame)
   window.clearTimeout(flashTimer)
 })
 </script>

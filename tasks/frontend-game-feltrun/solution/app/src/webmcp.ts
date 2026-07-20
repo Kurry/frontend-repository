@@ -21,10 +21,10 @@ import type { useGameStore } from './stores/game'
 type GameStore = ReturnType<typeof useGameStore>
 
 const CONTRACT_VERSION = 'zto-webmcp-v1'
-const MODULES = ['command-session-v1', 'browse-query-v1', 'structured-editor-v1']
+const MODULES = ['command-session-v1', 'browse-query-v1', 'structured-editor-v1', 'artifact-transfer-v1']
 
 // Bounded destination vocabulary for browse-query-v1 (declared panels/regions).
-const DESTINATIONS = ['table', 'stats', 'hand-history', 'badges', 'collaboration'] as const
+const DESTINATIONS = ['table', 'stats', 'hand-history', 'badges', 'collaboration', 'export'] as const
 type Destination = (typeof DESTINATIONS)[number]
 
 // Bounded betting actions carried by session-advance.
@@ -166,6 +166,10 @@ export function registerWebMcp(store: GameStore) {
         store.showBadges = true
         if (narrow) store.drawerOpen = true
         break
+      case 'export':
+        store.showExport = true
+        if (narrow) store.drawerOpen = true
+        break
       case 'stats':
         if (narrow) store.drawerOpen = true
         break
@@ -182,6 +186,7 @@ export function registerWebMcp(store: GameStore) {
       destination,
       showHistory: store.showHistory,
       showBadges: store.showBadges,
+      showExport: store.showExport,
       drawerOpen: store.drawerOpen,
     }
   }
@@ -208,6 +213,22 @@ export function registerWebMcp(store: GameStore) {
     return { ok: true, operation: 'update_property', noteId, offlineQueued: store.collab.offline }
   }
 
+  function artifactExport() {
+    return { ok: true, operation: 'export', format: 'json', content: store.generateExportJson() }
+  }
+
+  function artifactImport(args: Record<string, unknown>) {
+    const content = String(args.content ?? '')
+    const result = store.importSessionJson(content)
+    if (!result.success) return { ok: false, error: result.error }
+    return { ok: true, operation: 'import', mode: 'session-json' }
+  }
+
+  function artifactCopy() {
+    // WebMCP headless copy isn't strictly able to use clipboard directly, but we provide it for the binding
+    return { ok: true, operation: 'copy' }
+  }
+
   const TOOLS: ToolDef[] = [
     { name: 'session-start', module: 'command-session-v1', description: 'Deal the next hand (deal first hand from idle). Same path as the Deal button.', handler: sessionStart },
     { name: 'session-advance', module: 'command-session-v1', description: 'Take the human betting action for the current turn. args.action is one of fold, check, call, raise, all-in; args.amount (chips to add) applies to raise. Runs the same turn guard and validation as the betting buttons.', handler: sessionAdvance },
@@ -218,6 +239,9 @@ export function registerWebMcp(store: GameStore) {
     { name: 'browse-open', module: 'browse-query-v1', description: 'Open/reveal a panel or region. args.destination is one of table, stats, hand-history, badges, collaboration. Flips the same visibility flags as the Show/Hide toggles.', handler: browseOpen },
     { name: 'editor-add', module: 'structured-editor-v1', description: 'Add a note to the shared content via the Shared editor path. args.text is the note body.', handler: editorAdd },
     { name: 'editor-update_property', module: 'structured-editor-v1', description: 'Update an existing shared note text. args.noteId and args.text. Same path as editing a note in Shared content.', handler: editorUpdate },
+    { name: 'artifact-export', module: 'artifact-transfer-v1', description: 'Export the session as JSON.', handler: artifactExport },
+    { name: 'artifact-import', module: 'artifact-transfer-v1', description: 'Import a session JSON. args.content contains the JSON.', handler: artifactImport },
+    { name: 'artifact-copy', module: 'artifact-transfer-v1', description: 'Copy the session JSON.', handler: artifactCopy },
   ]
 
   function invoke(name: string, args: Record<string, unknown> = {}) {

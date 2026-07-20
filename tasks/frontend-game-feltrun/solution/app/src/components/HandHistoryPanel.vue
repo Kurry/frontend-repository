@@ -19,6 +19,9 @@
         <li
           v-for="entry in s.history"
           :key="entry.id"
+          v-motion
+          :initial="prefersReducedMotion || initialIds.has(entry.id) ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }"
+          :enter="{ opacity: 1, y: 0 }"
           class="flex items-center gap-3 rounded-[5px] px-3 py-2"
           :style="{
             backgroundColor: selected.includes(entry.id) ? '#1a3050' : '#122540',
@@ -53,8 +56,17 @@ import { useGameStore } from '../stores/game'
 const store = useGameStore()
 const { s } = storeToRefs(store)
 const headingId = useId()
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 const selected = ref<string[]>([])
+
+// Hands already in the store when this panel instance mounts render
+// statically — that covers both a fresh load and hands that completed while
+// the panel was hidden (toggled via v-if), since those are equally "already
+// there" from this mount's point of view. Only a hand appended to history
+// while this instance stays mounted is genuinely new and gets the v-motion
+// entrance animation.
+const initialIds = new Set(s.value.history.map(entry => entry.id))
 
 watch(() => s.value.history.length, () => {
   selected.value = selected.value.filter(id => s.value.history.some(entry => entry.id === id))

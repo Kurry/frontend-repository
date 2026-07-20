@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { reactive, ref, computed, watch } from 'vue'
+import { z } from 'zod'
 import type { Card, HandType } from '../utils/poker'
 import {
   createDeck, shuffleDeck, evaluateHand, compareHands, estimateEquity,
@@ -29,6 +30,7 @@ export interface HistoryEntry {
   hand: number
   pot: number
   winner: string
+  winnerSeat?: number
   result: string
 }
 
@@ -83,8 +85,12 @@ export const BADGE_DEFS: BadgeDef[] = [
 
 const STORAGE_KEY = 'feltrun-state-v2'
 const STARTING_CHIPS = 1000
+const deserializeCard = (card: string | Card): Card => typeof card === 'string' ? parseCard(card) : card
 
 interface SessionState {
+  difficulty: 'Easy' | 'Standard' | 'Hard'
+  undoSnapshot: string | null
+  savedTable: string | null
   players: Player[]
   deck: Card[]
   board: Card[]
@@ -124,6 +130,9 @@ function newPlayers(): Player[] {
 
 function blankSession(): SessionState {
   return {
+    difficulty: 'Standard',
+    undoSnapshot: null,
+    savedTable: null,
     players: newPlayers(),
     deck: [],
     board: [],
@@ -189,6 +198,7 @@ export const useGameStore = defineStore('game', () => {
   const drawerOpen = ref(false)
   const showHistory = ref(false)
   const showBadges = ref(false)
+  const showExport = ref(true)
   let toastSeq = 0
   let loaded = false
 
@@ -239,39 +249,22 @@ export const useGameStore = defineStore('game', () => {
   }
 
   // ===== Persistence =====
+  function serializeSession(session: SessionState) {
+    return {
+      ...session,
+      players: session.players.map(player => ({ ...player, hole: player.hole.map(cardKey) })),
+      deck: session.deck.map(cardKey),
+      board: session.board.map(cardKey),
+    }
+  }
+
   function saveState() {
     if (!loaded) return
     try {
-      const t = tournament
       const payload = {
         mode: mode.value,
-        tournament: {
-          players: t.players.map(p => ({ ...p, hole: p.hole.map(cardKey) })),
-          deck: t.deck.map(cardKey),
-          board: t.board.map(cardKey),
-          pot: t.pot,
-          phase: t.phase,
-          currentBet: t.currentBet,
-          minRaiseInc: t.minRaiseInc,
-          turnIdx: t.turnIdx,
-          dealerIdx: t.dealerIdx,
-          awaitingHuman: t.awaitingHuman,
-          revealed: t.revealed,
-          completedHands: t.completedHands,
-          handsWon: t.handsWon,
-          biggestPot: t.biggestPot,
-          rebuys: t.rebuys,
-          history: t.history,
-          unlocked: t.unlocked,
-          equity: t.equity,
-          status: t.status,
-          winnerIds: t.winnerIds,
-          winCardKeys: t.winCardKeys,
-          winLabel: t.winLabel,
-          rebuyPending: t.rebuyPending,
-          humanWentAllIn: t.humanWentAllIn,
-          historySeq: t.historySeq,
-        },
+        tournament: serializeSession(tournament),
+        practice: serializeSession(practice),
         collab: {
           notes: collab.notes,
           seq: collab.seq,
@@ -293,57 +286,81 @@ export const useGameStore = defineStore('game', () => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY)
       if (!raw) return false
-      const data = JSON.parse(raw)
-      const t = data.tournament
-      if (t && Array.isArray(t.players) && t.players.length === 4) {
-        tournament.players = t.players.map((p: any, i: number) => ({
-          ...newPlayers()[i],
-          ...p,
-          hole: Array.isArray(p.hole) ? p.hole.map(parseCard) : [],
-        }))
-        tournament.deck = (t.deck || []).map(parseCard)
-        tournament.board = (t.board || []).map(parseCard)
-        tournament.pot = t.pot || 0
-        tournament.phase = t.phase || 'idle'
-        tournament.currentBet = t.currentBet || 0
-        tournament.minRaiseInc = t.minRaiseInc || 10
-        tournament.turnIdx = t.turnIdx ?? -1
-        tournament.dealerIdx = t.dealerIdx ?? 3
-        tournament.awaitingHuman = !!t.awaitingHuman
-        tournament.revealed = !!t.revealed
-        tournament.completedHands = t.completedHands || 0
-        tournament.handsWon = t.handsWon || 0
-        tournament.biggestPot = t.biggestPot || 0
-        tournament.rebuys = t.rebuys || 0
-        tournament.history = Array.isArray(t.history) ? t.history : []
-        tournament.unlocked = Array.isArray(t.unlocked) ? t.unlocked : []
-        tournament.equity = typeof t.equity === 'number' ? t.equity : null
-        tournament.status = t.status || ''
-        tournament.winnerIds = Array.isArray(t.winnerIds) ? t.winnerIds : []
-        tournament.winCardKeys = Array.isArray(t.winCardKeys) ? t.winCardKeys : []
-        tournament.winLabel = t.winLabel || ''
-        tournament.rebuyPending = !!t.rebuyPending
-        tournament.humanWentAllIn = !!t.humanWentAllIn
-        tournament.historySeq = t.historySeq || 0
+      const parsed = JSON.parse(raw)
+      mode.value = parsed.mode || 'tournament'
+      if (parsed.tournament) {
+        parsed.tournament.epoch = tournament.epoch + 1
+        Object.assign(tournament, parsed.tournament)
+        tournament.players.forEach((p: Player) => p.hole = p.hole.map(deserializeCard))
+        tournament.deck = tournament.deck.map(deserializeCard)
+        tournament.board = tournament.board.map(deserializeCard)
       }
-      const c = data.collab
-      if (c && Array.isArray(c.notes)) {
-        collab.notes = c.notes
-        collab.seq = c.seq || 0
-        collab.offline = !!c.offline
-        collab.queued = Array.isArray(c.queued) ? c.queued : []
-        collab.peerPending = Array.isArray(c.peerPending) ? c.peerPending : []
-        collab.appliedIds = Array.isArray(c.appliedIds) ? c.appliedIds : []
-        collab.pendingDelivery = !!c.pendingDelivery
-        collab.conflict = c.conflict || null
+      if (parsed.practice) {
+        parsed.practice.epoch = practice.epoch + 1
+        Object.assign(practice, parsed.practice)
+        practice.players.forEach((p: Player) => p.hole = p.hole.map(deserializeCard))
+        practice.deck = practice.deck.map(deserializeCard)
+        practice.board = practice.board.map(deserializeCard)
       }
-      if (data.mode === 'practice') {
-        // Practice progress never persists — return to the tournament table.
-        mode.value = 'tournament'
+      if (parsed.collab) {
+        Object.assign(collab, blankCollab(), parsed.collab)
       }
       return true
     } catch {
       return false
+    }
+  }
+
+  function saveTable() {
+    const session = s.value;
+    session.savedTable = JSON.stringify({
+      players: session.players.map(p => ({ ...p, hole: p.hole.map(cardKey) })),
+      deck: session.deck.map(cardKey),
+      board: session.board.map(cardKey),
+      pot: session.pot,
+      phase: session.phase,
+      currentBet: session.currentBet,
+      minRaiseInc: session.minRaiseInc,
+      turnIdx: session.turnIdx,
+      dealerIdx: session.dealerIdx,
+      revealed: session.revealed,
+      equity: session.equity,
+      awaitingHuman: session.awaitingHuman,
+      humanWentAllIn: session.humanWentAllIn,
+      completedHands: session.completedHands,
+      handsWon: session.handsWon,
+      biggestPot: session.biggestPot,
+      rebuys: session.rebuys,
+      rebuyPending: session.rebuyPending,
+      history: session.history,
+      historySeq: session.historySeq,
+      winnerIds: session.winnerIds,
+      winLabel: session.winLabel,
+      winCardKeys: session.winCardKeys,
+      status: session.status,
+      difficulty: session.difficulty,
+      unlocked: session.unlocked,
+    });
+    saveState();
+  }
+
+  function loadSavedTable() {
+    const session = s.value;
+    if (!session.savedTable) return false;
+    try {
+      const parsed = JSON.parse(session.savedTable);
+      const nextEpoch = session.epoch + 1;
+      Object.assign(session, parsed);
+      session.epoch = nextEpoch;
+      session.players.forEach((p: Player) => p.hole = p.hole.map(deserializeCard));
+      session.deck = session.deck.map(deserializeCard);
+      session.board = session.board.map(deserializeCard);
+      session.undoSnapshot = null;
+      resumeSession(session);
+      return true;
+    } catch (e) {
+      console.error('Failed to load saved table', e);
+      return false;
     }
   }
 
@@ -370,7 +387,7 @@ export const useGameStore = defineStore('game', () => {
     }
   }
 
-  watch([tournament, collab, mode], () => saveState(), { deep: true })
+  watch([tournament, practice, collab, mode], () => saveState(), { deep: true })
 
   // ===== Toasts =====
   function pushToast(title: string, body: string) {
@@ -521,6 +538,7 @@ export const useGameStore = defineStore('game', () => {
   }
 
   function nextStreet(session: SessionState) {
+    session.undoSnapshot = null;
     session.players.forEach(p => {
       p.bet = 0
       p.acted = false
@@ -632,11 +650,52 @@ export const useGameStore = defineStore('game', () => {
   }
 
   // ===== Human actions (guarded against stale or rapid input) =====
+  function createSnapshot(session: SessionState): string {
+    return JSON.stringify({
+      players: session.players.map(p => ({ ...p, hole: p.hole.map(cardKey) })),
+      deck: session.deck.map(cardKey),
+      board: session.board.map(cardKey),
+      pot: session.pot,
+      phase: session.phase,
+      currentBet: session.currentBet,
+      minRaiseInc: session.minRaiseInc,
+      turnIdx: session.turnIdx,
+      dealerIdx: session.dealerIdx,
+      revealed: session.revealed,
+      equity: session.equity,
+      awaitingHuman: session.awaitingHuman,
+      status: session.status,
+      difficulty: session.difficulty,
+      humanWentAllIn: session.humanWentAllIn,
+    });
+  }
+
+  function undoAction() {
+    const session = s.value;
+    if (!session.undoSnapshot || !['preflop', 'flop', 'turn', 'river'].includes(session.phase)) return false;
+    try {
+      const parsed = JSON.parse(session.undoSnapshot);
+      const nextEpoch = session.epoch + 1;
+      Object.assign(session, parsed);
+      session.epoch = nextEpoch;
+      session.players.forEach((p: Player) => p.hole = p.hole.map(deserializeCard));
+      session.deck = session.deck.map(deserializeCard);
+      session.board = session.board.map(deserializeCard);
+      session.undoSnapshot = null;
+      session.awaitingHuman = true; // Wait for human to act again
+      return true;
+    } catch (e) {
+      console.error('Failed to undo', e);
+      return false;
+    }
+  }
+
   function humanTurnGuard(): Player | null {
     const session = s.value
     if (!isHumanTurn.value) return null
     const p = session.players[session.turnIdx]
     if (!p || !p.isHuman || p.folded || p.allIn) return null
+    session.undoSnapshot = createSnapshot(session)
     session.awaitingHuman = false
     return p
   }
@@ -703,26 +762,36 @@ export const useGameStore = defineStore('game', () => {
   function aiAct(session: SessionState, p: Player) {
     if (!['preflop', 'flop', 'turn', 'river'].includes(session.phase)) return
     if (session.players[session.turnIdx] !== p || p.folded || p.allIn) return
+    session.undoSnapshot = null
     const toCall = Math.min(session.currentBet - p.bet, p.chips)
     const strength = handStrength(session, p)
     let raiseP = 0
     let callP = 0.5
 
+    const diffMulti = session.difficulty === 'Hard' ? 1.2 : session.difficulty === 'Easy' ? 0.8 : 1.0;
     switch (p.style) {
       case 'Aggressive':
-        raiseP = 0.42 + strength * 0.35
-        callP = 0.45
+        raiseP = (0.42 + strength * 0.35) * diffMulti
+        callP = 0.4 * diffMulti
         break
       case 'Tight':
-        raiseP = strength > 0.55 ? 0.3 : 0.04
-        callP = toCall === 0 ? 0.92 : (strength > 0.4 ? 0.6 : 0.16)
+        raiseP = (strength > 0.55 ? 0.3 : 0.04) * diffMulti
+        callP = (toCall === 0 ? 0.92 : (strength > 0.4 ? 0.6 : 0.16)) * diffMulti
         break
       case 'Bluffer':
-        raiseP = 0.24 + (1 - strength) * 0.28
+        raiseP = (0.24 + (1 - strength) * 0.28) * diffMulti
         callP = 0.4
         break
       default:
         break
+    }
+
+    const maxContinueProbability = session.difficulty === 'Hard' ? 0.94 : session.difficulty === 'Easy' ? 0.78 : 0.88
+    const continueProbability = raiseP + callP
+    if (continueProbability > maxContinueProbability) {
+      const scale = maxContinueProbability / continueProbability
+      raiseP *= scale
+      callP *= scale
     }
 
     const r = Math.random()
@@ -810,6 +879,7 @@ export const useGameStore = defineStore('game', () => {
     session.completedHands++
     session.phase = 'handOver'
     session.awaitingHuman = false
+    session.undoSnapshot = null
     session.winnerIds = winnerIds
     session.winLabel = result
 
@@ -833,6 +903,7 @@ export const useGameStore = defineStore('game', () => {
       hand: session.completedHands,
       pot: potAmount,
       winner: winnerLabel,
+      winnerSeat: winnerIds[0],
       result,
     })
     if (session.history.length > 60) session.history = session.history.slice(0, 60)
@@ -865,6 +936,7 @@ export const useGameStore = defineStore('game', () => {
     session.rebuys++
     session.rebuyPending = true
     session.status = `Rebuy complete — your stack is back to ${STARTING_CHIPS} chips`
+    saveState()
   }
 
   function removeHistory(ids: string[]) {
@@ -1037,17 +1109,188 @@ export const useGameStore = defineStore('game', () => {
     applyOp(op)
     collab.conflict = null
   }
+  
+  
+  function generateExportJson() {
+    const session = s.value;
+    const doc = {
+      schemaVersion: 'feltrun-session-v1',
+      session: {
+        handsPlayed: session.completedHands,
+        handsWon: session.handsWon,
+        biggestPot: session.biggestPot,
+        rebuys: session.rebuys,
+        blindLevel: blindsOf(session).level,
+        smallBlind: blindsOf(session).small,
+        bigBlind: blindsOf(session).big,
+        difficulty: session.difficulty || 'Standard',
+        badges: badges.value.filter(b => b.unlocked).map(b => b.name)
+      },
+      stacks: session.players.map(p => ({
+        seat: p.id,
+        chips: p.chips,
+        style: p.isHuman ? 'human' : p.style
+      })),
+      handHistory: session.history.map(h => ({
+        handNumber: h.hand,
+        pot: h.pot,
+        winnerSeat: h.winnerSeat ?? session.players.find(player => h.winner.split(' and ').includes(player.name))?.id ?? 0,
+        winnerName: h.winner,
+        handType: h.result,
+        board: [], // We don't store this in history yet
+        actions: [] // Not stored in history yet
+      })),
+      inProgressHand: session.phase === 'idle' || session.phase === 'handOver' ? null : {
+        street: session.phase,
+        pot: session.pot,
+        sideToAct: session.turnIdx,
+        board: session.board.map(cardKey),
+        holeCards: session.players[0].hole.map(cardKey)
+      }
+    };
+    return JSON.stringify(doc, null, 2);
+  }
+
+  const cardCodeSchema = z.string().regex(/^[2-9TJQKA][♠♥♦♣]$/, 'must be a valid card code')
+  const handHistorySchema = z.object({
+    handNumber: z.number().int().positive(),
+    pot: z.number().int().nonnegative(),
+    winnerSeat: z.number().int().min(0).max(3),
+    winnerName: z.string().min(1),
+    handType: z.string().min(1),
+    board: z.array(cardCodeSchema).max(5),
+    actions: z.array(z.object({
+      seat: z.number().int().min(0).max(3),
+      street: z.enum(['preflop', 'flop', 'turn', 'river']),
+      action: z.enum(['fold', 'check', 'call', 'raise', 'all-in']),
+      amount: z.number().int().nonnegative(),
+    })),
+  })
+  const sessionDocumentSchema = z.object({
+    schemaVersion: z.literal('feltrun-session-v1'),
+    session: z.object({
+      handsPlayed: z.number().int().nonnegative(),
+      handsWon: z.number().int().nonnegative(),
+      biggestPot: z.number().int().nonnegative(),
+      rebuys: z.number().int().nonnegative(),
+      blindLevel: z.number().int().positive(),
+      smallBlind: z.number().int().nonnegative(),
+      bigBlind: z.number().int().nonnegative(),
+      difficulty: z.enum(['Easy', 'Standard', 'Hard']),
+      badges: z.array(z.string()),
+    }),
+    stacks: z.array(z.object({
+      seat: z.number().int().min(0).max(3),
+      chips: z.number().int().nonnegative(),
+      style: z.enum(['human', 'Aggressive', 'Tight', 'Bluffer']),
+    })).length(4).refine(stacks => new Set(stacks.map(stack => stack.seat)).size === 4, 'seat values must be unique'),
+    handHistory: z.array(handHistorySchema),
+    inProgressHand: z.object({
+      street: z.enum(['preflop', 'flop', 'turn', 'river']),
+      pot: z.number().int().nonnegative(),
+      sideToAct: z.number().int().min(0).max(3),
+      board: z.array(cardCodeSchema).max(5),
+      holeCards: z.array(cardCodeSchema).length(2),
+    }).nullable(),
+  })
+
+  type SessionDocument = z.infer<typeof sessionDocumentSchema>
+  type SessionParseResult = { success: true; data: SessionDocument } | { success: false; error: string }
+
+  function parseSessionJson(json: string): SessionParseResult {
+    try {
+      const validation = sessionDocumentSchema.safeParse(JSON.parse(json))
+      if (!validation.success) {
+        const issue = validation.error.issues[0]
+        const field = issue.path.length ? issue.path.join('.') : 'session'
+        return { success: false, error: `${field}: ${issue.message}` }
+      }
+      return { success: true, data: validation.data }
+    } catch {
+      return { success: false, error: 'session: invalid JSON format' }
+    }
+  }
+
+  function validateSessionJson(json: string): { success: true } | { success: false; error: string } {
+    const result = parseSessionJson(json)
+    return result.success ? { success: true } : result
+  }
+
+  function importSessionJson(json: string): { success: true } | { success: false; error: string } {
+    const validation = parseSessionJson(json)
+    if (!validation.success) return validation
+
+    try {
+      const doc = validation.data
+      const session = s.value
+      const importedPlayers = newPlayers()
+      for (const stack of doc.stacks) {
+        const player = importedPlayers[stack.seat]
+        player.chips = stack.chips
+        player.style = stack.style === 'human' ? null : stack.style
+        player.allIn = stack.chips === 0
+      }
+
+      const previousEpoch = session.epoch
+      Object.assign(session, blankSession())
+      session.epoch = previousEpoch + 1
+      session.players = importedPlayers
+      session.completedHands = doc.session.handsPlayed
+      session.handsWon = doc.session.handsWon
+      session.biggestPot = doc.session.biggestPot
+      session.rebuys = doc.session.rebuys
+      session.difficulty = doc.session.difficulty
+      session.unlocked = BADGE_DEFS
+        .filter(badge => doc.session.badges.includes(badge.name))
+        .map(badge => badge.id)
+      session.history = doc.handHistory.map((hand, index) => ({
+        id: `imported-${hand.handNumber}-${index}`,
+        hand: hand.handNumber,
+        pot: hand.pot,
+        winner: hand.winnerName,
+        winnerSeat: hand.winnerSeat,
+        result: hand.handType,
+      }))
+      session.historySeq = Math.max(0, ...doc.handHistory.map(hand => hand.handNumber))
+
+      if (doc.inProgressHand) {
+        const importedHand = doc.inProgressHand
+        const knownCards = new Set([...importedHand.board, ...importedHand.holeCards])
+        const remainingDeck = shuffleDeck(createDeck().filter(card => !knownCards.has(cardKey(card))))
+        session.phase = importedHand.street
+        session.pot = importedHand.pot
+        session.turnIdx = importedHand.sideToAct
+        session.board = importedHand.board.map(parseCard)
+        session.players[0].hole = importedHand.holeCards.map(parseCard)
+        for (const player of session.players.slice(1)) {
+          player.hole = [remainingDeck.pop()!, remainingDeck.pop()!]
+        }
+        session.deck = remainingDeck
+        session.minRaiseInc = doc.session.bigBlind
+        session.awaitingHuman = importedHand.sideToAct === 0
+        session.status = `Imported ${importedHand.street} hand`
+        refreshEquity(session)
+      }
+
+      saveState()
+      resumeSession(session)
+      return { success: true }
+    } catch (e) {
+      return { success: false, error: 'session: invalid JSON format' }
+    }
+  }
+
 
   return {
     // state
     tournament, practice, collab, mode, toasts, confirmOpen, drawerOpen,
-    showHistory, showBadges,
+    showHistory, showBadges, showExport,
     // getters
     s, blinds, human, isHumanTurn, callAmount, canCheck, minRaiseAdd, winRate, badges,
     // actions
     initGame, dealNextHand, humanFold, humanCheck, humanCall, humanRaise, humanAllIn,
     rebuy, removeHistory, requestNewSession, cancelNewSession, confirmNewSession, setMode,
     addNote, editNote, peerAddNote, peerEditLatest, goOffline, goOnline, deliver, resolveConflict,
-    pushToast,
+    pushToast, generateExportJson, validateSessionJson, importSessionJson, saveTable, loadSavedTable, undoAction,
   }
 })
