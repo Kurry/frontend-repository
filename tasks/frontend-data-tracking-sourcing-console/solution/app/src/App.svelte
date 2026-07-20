@@ -34,6 +34,7 @@
   let paletteReturnFocus = null;
   let paletteInput = $state(null);
   let dragId = $state('');
+  let modalReturnFocus = null;
 
   const importFormSchema = z.object({ raw:z.string().min(1,'JSON field: paste a sourcing pack or choose the sample.').superRefine((raw,ctx) => {
     let data; try { data=JSON.parse(raw); } catch { ctx.addIssue({code:'custom',message:'JSON field: enter valid JSON.'}); return; }
@@ -57,17 +58,18 @@
   }));
 
   function openReject(ids, bulk=false) {
-    rejectReason=''; rejectionError=''; rejectionForm.reset(); app.modal={type:'reject',ids,bulk};
+    modalReturnFocus=document.activeElement; rejectReason=''; rejectionError=''; rejectionForm.reset(); app.modal={type:'reject',ids,bulk};
   }
   function openPin(candidate) {
-    pinNotes=''; pinError=''; pinForm.reset(); app.modal={type:'pin',id:candidate.id,commit:randomCommit()};
+    modalReturnFocus=document.activeElement; pinNotes=''; pinError=''; pinForm.reset(); app.modal={type:'pin',id:candidate.id,commit:randomCommit()};
   }
   function openPanel(type) {
+    modalReturnFocus=document.activeElement;
     if(type==='export') { exportTab='queue-json'; exportTexts=Object.fromEntries(exportTabs.map((tab)=>[tab.id,app.exportText(tab.id)])); }
     if(type==='import') { importRaw=''; importError=''; importForm.reset(); }
     app.modal={type}; app.mobileMenu=false;
   }
-  function closeModal() { app.modal=null; rejectionError=''; pinError=''; importError=''; }
+  function closeModal() { app.modal=null; rejectionError=''; pinError=''; importError=''; tick().then(()=>modalReturnFocus?.focus?.()); }
   async function submitReject() {
     rejectionError=''; rejectionForm.setFieldValue('reason',rejectReason);
     const parsed=rejectionSchema.safeParse({reason:rejectReason}); if(!parsed.success){rejectionError='Reason field: choose one of the five listed reasons.';return;}
@@ -216,7 +218,7 @@
                         <td><input type="checkbox" aria-label={`Select ${candidate.name}`} checked={app.selectedIds.includes(candidate.id)} onchange={(event)=>app.setSelection(candidate.id,event.currentTarget.checked)}/></td>
                         <td><div class="mono font-semibold text-[#eef7ff]">{candidate.name}</div>{#if candidate.rejectionReason}<div class="mt-1 text-[11px] text-[#f2a2af]">Reason: {candidate.rejectionReason}</div>{/if}{#if candidate.commit}<div class="mt-1 flex items-center gap-1.5"><code class="text-[10px] text-[#c7b2eb]">{candidate.commit}</code><button class="text-[#86a8c4] hover:text-white" aria-label={`Copy commit ${candidate.commit}`} onclick={(event)=>{event.stopPropagation();copyText(candidate.commit,'Commit hash')}}><IconCopy size={13}/></button>{#if copied==='Commit hash'}<span class="text-[10px] text-[#65dbc5]">Copied</span>{/if}</div>{/if}</td>
                         <td>{candidate.language}</td><td class="tabular-nums">{candidate.stars.toLocaleString()}</td>
-                        <td>{#if candidate.status==='candidate'}<span class="text-[#718ba4]">Not scored</span>{:else}<span class="font-semibold tabular-nums">{candidate.difficulty.toFixed(1)}</span><span class="ml-1 text-[10px] uppercase text-[#7891a8]">{titleCase(getBand(candidate.difficulty))}</span>{/if}</td>
+                        <td><span class="font-semibold tabular-nums">{candidate.difficulty.toFixed(1)}</span><span class="ml-1 text-[10px] uppercase text-[#7891a8]">{titleCase(getBand(candidate.difficulty))}</span></td>
                         <td>{candidate.category}</td><td><code class="text-[11px] text-[#91abc3]">{candidate.clusterId}</code></td><td><span class="license-chip">{titleCase(candidate.license)}</span></td>
                         <td><span class="status-chip status-{candidate.status}">{titleCase(candidate.status)}</span>{#if candidate.guardMessage}<div class="caution mt-2 max-w-[235px]">{candidate.guardMessage}</div>{/if}</td>
                         <td><div class="flex justify-end gap-1">
@@ -296,7 +298,7 @@
 {/if}
 {#if app.modal?.type==='pin'}
   <Modal open size="sm" modalLabel="Freeze source" modalHeading={`Pin ${app.find(app.modal.id)?.name}`} primaryButtonText="Confirm pin" secondaryButtonText="Cancel" primaryButtonDisabled={pinNotes.length>200} on:click:button--primary={submitPin} on:click:button--secondary={closeModal} on:close={closeModal} preventCloseOnClickOutside>
-    <form onsubmit={(event)=>{event.preventDefault();submitPin()}}><div class="mb-4 border border-[#344e67] bg-[#0a192a] p-3"><div class="eyebrow">Frozen commit</div><code class="mt-2 block text-lg font-semibold tracking-wider text-[#d3b9ff]">{app.modal.commit}</code><p class="mt-1 text-[11px] text-[#7893aa]">Generated locally; lowercase hexadecimal, 12 characters.</p></div><label class="label" for="pin-notes">Notes <span class="font-normal text-[#718ba3]">optional · {pinNotes.length}/200</span></label><textarea id="pin-notes" class="field" rows="4" maxlength="220" bind:value={pinNotes} aria-invalid={!!pinError||pinNotes.length>200} aria-describedby="pin-error" placeholder="Capture build flags, fixtures, or review context." data-modal-primary-focus></textarea>{#if pinNotes.length>200}<p id="pin-error" class="error">Notes field: use 200 characters or fewer.</p>{:else if pinError}<p id="pin-error" class="error">{pinError}</p>{/if}</form>
+    <form onsubmit={(event)=>{event.preventDefault();submitPin()}}><div class="mb-4 border border-[#344e67] bg-[#0a192a] p-3"><div class="eyebrow">Frozen commit</div><code class="mt-2 block text-lg font-semibold tracking-wider text-[#d3b9ff]">{app.modal.commit}</code><p class="mt-1 text-[11px] text-[#7893aa]">Generated locally; lowercase hexadecimal, 12 characters.</p></div><label class="label" for="pin-notes">Notes <span class="font-normal text-[#718ba3]">optional · {pinNotes.length}/200</span></label><textarea id="pin-notes" class="field" rows="4" maxlength="200" bind:value={pinNotes} aria-invalid={!!pinError||pinNotes.length>200} aria-describedby="pin-error" placeholder="Capture build flags, fixtures, or review context." data-modal-primary-focus></textarea>{#if pinNotes.length>200}<p id="pin-error" class="error">Notes field: use 200 characters or fewer.</p>{:else if pinError}<p id="pin-error" class="error">{pinError}</p>{/if}</form>
   </Modal>
 {/if}
 
@@ -315,7 +317,7 @@
 {/if}
 
 {#if app.modal?.type==='palette'}
-  <div class="overlay" role="presentation" onclick={(event)=>{if(event.currentTarget===event.target)closePalette()}} onkeydown={(event)=>{if(event.key==='Escape'){event.stopPropagation();closePalette()}else if(event.key==='Tab'){const nodes=[...event.currentTarget.querySelectorAll('input,button:not(:disabled)')];const first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus()}}}}>
+  <div class="overlay" role="presentation" onclick={(event)=>{if(event.currentTarget===event.target)closePalette()}} onkeydown={(event)=>{if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closePalette()}else if(event.key==='Tab'){const nodes=[...event.currentTarget.querySelectorAll('input,button:not(:disabled)')];const first=nodes[0],last=nodes.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus()}}}}>
     <div class="palette" role="dialog" aria-modal="true" aria-label="Command palette" transition:scale={{start:.96,duration:220}}>
       <div class="flex items-center gap-3 p-4"><IconSearch class="text-[#6c8aa5]" size={20}/><input class="min-w-0 flex-1 bg-transparent text-base text-white outline-none" bind:this={paletteInput} bind:value={paletteQuery} placeholder="Search destinations and actions" aria-label="Search commands"/><kbd class="rounded border border-[#3a536c] px-2 py-1 text-[10px] text-[#7f99b0]">Esc</kbd></div>
       <div class="max-h-[55vh] overflow-y-auto">{#each paletteItems() as item}<button class="palette-result" onclick={()=>choosePalette(item[2])}><span><span class="block text-sm font-semibold">{item[0]}</span><span class="mt-1 block text-[10px] uppercase tracking-wider text-[#708ba3]">{item[1]}</span></span><span class="text-[#6fdcc7]">↵</span></button>{:else}<div class="p-8 text-center"><IconSearch class="mx-auto text-[#526e88]" size={28}/><h3 class="mt-3 text-sm font-semibold">No matching commands</h3><p class="mt-1 text-xs text-[#849db3]">Try typing “quota”, “export”, or a candidate action.</p></div>{/each}</div>
