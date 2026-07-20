@@ -109,11 +109,15 @@ export const useLabStore = create((set, get) => ({
   setView: (activeView) => set({ activeView }),
   setTheme: (theme) => set({ theme }),
   toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
+  compareError: '',
   setCompare: (side, label) => set((state) => {
-    if ((side === 'A' && label === state.compareB) || (side === 'B' && label === state.compareA)) return { liveMessage: `${side === 'A' ? 'labelA' : 'labelB'}: choose a different label` }
+    if ((side === 'A' && label === state.compareB) || (side === 'B' && label === state.compareA)) {
+      const field = side === 'A' ? 'labelA' : 'labelB'
+      return { liveMessage: `${field}: choose a label that differs from the other side`, compareError: `${field}: pick a label that differs from the other side — self-comparison is blocked` }
+    }
     const compareA = side === 'A' ? label : state.compareA
     const compareB = side === 'B' ? label : state.compareB
-    return { compareA, compareB, deltaPair: compareA && compareB ? [compareA, compareB] : state.deltaPair, openedTrialId: null, highlightedTrialId: null }
+    return { compareA, compareB, deltaPair: compareA && compareB ? [compareA, compareB] : state.deltaPair, openedTrialId: null, highlightedTrialId: null, compareError: '' }
   }),
   setShownLabels: (names) => set((state) => ({ shownLabels: names, deltaPair: names.length >= 2 ? names.slice(-2) : state.deltaPair })),
   setFilter: (key, value) => set((state) => ({ filters: { ...state.filters, [key]: value }, sort: key === 'passLabel' ? { ...state.sort, label: value } : state.sort, activeChip: null })),
@@ -172,7 +176,7 @@ export const useLabStore = create((set, get) => ({
     }))
   },
   startRescore: async (payload) => {
-    if (get().run.active) return false
+    if (get().run.active || get().run.label) return false
     const steps = get().trials.map((trial) => ({ trialId: trial.id, taskName: trial.taskName, status: 'pending', attempt: 1 }))
     set({ run: { active: true, label: payload, steps, events: [{ id: `${Date.now()}-start`, trialId: null, status: 'started', time: nowTime(), text: `Run started for ${payload.labelName}` }], startedAt: Date.now(), elapsed: 0, failures: 0, completed: false, selectedStep: null } })
     const update = (trialId, status, attempt = 1, text) => set((state) => ({ run: {

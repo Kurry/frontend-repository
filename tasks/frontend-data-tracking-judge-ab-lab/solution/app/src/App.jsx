@@ -24,6 +24,26 @@ import {
 import { TASKS } from './seed.js'
 import { compileLabResults, deriveCompareSummary, pairedTrials, useLabStore, visibleTrials } from './store.js'
 
+async function copyText(text) {
+  try {
+    if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); return true }
+  } catch { /* fall through to legacy copy */ }
+  try {
+    const area = document.createElement('textarea')
+    area.value = text
+    area.setAttribute('readonly', '')
+    area.style.position = 'fixed'
+    area.style.top = '0'
+    area.style.opacity = '0'
+    document.body.appendChild(area)
+    area.focus()
+    area.select()
+    const ok = document.execCommand('copy')
+    document.body.removeChild(area)
+    return ok
+  } catch { return false }
+}
+
 const causeLabels = {
   'scorer-noise': 'Scorer noise',
   'rubric-change-effect': 'Rubric change effect',
@@ -37,7 +57,7 @@ function ScoreBadge({ result }) {
   return (
     <div className="score-cell">
       <span className="score-number">{result.totalReward.toFixed(2)}</span>
-      <Badge color={result.pass ? 'teal' : 'red'} variant="light" size="sm" leftSection={result.pass ? <IconCheck size={11} /> : <IconX size={11} />}>
+      <Badge color={result.pass ? 'teal.9' : 'red.9'} variant="filled" size="sm" leftSection={result.pass ? <IconCheck size={11} /> : <IconX size={11} />}>
         {result.pass ? 'Pass' : 'Fail'}
       </Badge>
     </div>
@@ -102,7 +122,7 @@ function FilterBar() {
     <Select label="Task" aria-label="Filter by task" value={filters.task} onChange={(value) => setFilter('task', value)} data={[{ value: 'all', label: 'All tasks' }, ...TASKS.map((task) => ({ value: task, label: task }))]} />
     <Select label="Pass state" aria-label="Filter by pass state" value={filters.passState} onChange={(value) => setFilter('passState', value)} data={[{ value: 'all', label: 'All outcomes' }, { value: 'pass', label: 'Pass' }, { value: 'fail', label: 'Fail' }]} />
     <Select label="Outcome / reward label" aria-label="Pass filter and reward sort label" value={filters.passLabel} onChange={(value) => setFilter('passLabel', value)} data={labels.map((label) => label.name)} />
-    <NumberInput label="Abs. delta above" aria-label="Minimum absolute delta" value={filters.deltaMin} onChange={(value) => setFilter('deltaMin', Number(value) || 0)} min={0} max={1} step={0.01} decimalScale={2} prefix="≥ " />
+    <NumberInput label="Abs. delta above" aria-label="Minimum absolute delta" value={filters.deltaMin} onChange={(value) => setFilter('deltaMin', Number(value) || 0)} min={0} max={1} step={0.01} decimalScale={2} prefix="≥ " hideControls />
     <div className="sort-control"><Select label="Sort rows" aria-label="Sort rows" value={sort.type} onChange={(value) => setSort(value)} data={[{ value: 'task-name', label: 'Task name' }, { value: 'label-reward', label: `${sort.label} reward` }, { value: 'delta-size', label: 'Delta size' }]} /><Tooltip label={`Reverse to ${sort.direction === 'asc' ? 'descending' : 'ascending'}`}><ActionIcon variant="default" aria-label={`Sort ${sort.direction === 'asc' ? 'descending' : 'ascending'}`} onClick={() => setSort(sort.type, sort.label)}>{sort.direction === 'asc' ? <IconArrowUp size={14} /> : <IconArrowDown size={14} />}</ActionIcon></Tooltip></div>
     <Button variant="subtle" leftSection={<IconRefresh size={15} />} onClick={clearFilters}>Clear all</Button>
   </Paper>
@@ -164,9 +184,9 @@ function PassWheel({ summary }) {
 function CompareChart({ rows, labelA, labelB, highlightedTrialId, setHighlighted }) {
   const data = rows.map((trial) => ({ id: trial.id, task: trial.taskName, a: trial.results[labelA].totalReward, b: trial.results[labelB].totalReward }))
   return <Paper className="chart-card compare-chart" withBorder><div className="card-heading"><div><span className="eyebrow">Paired rewards</span><h2>A × B agreement map</h2></div><span>{data.length} paired trials</span></div><div className="chart-area"><ResponsiveContainer width="100%" height="100%"><ScatterChart margin={{ top: 12, right: 16, bottom: 10, left: 0 }} onClick={(event) => event?.activePayload?.[0]?.payload?.id && setHighlighted(event.activePayload[0].payload.id)}>
-    <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" /><XAxis type="number" dataKey="a" name={labelA} domain={[0, 1]} tickFormatter={(value) => value.toFixed(1)} /><YAxis type="number" dataKey="b" name={labelB} domain={[0, 1]} tickFormatter={(value) => value.toFixed(1)} /><ZAxis range={[70, 70]} /><ReferenceLine segment={[{ x: 0, y: 0 }, { x: 1, y: 1 }]} stroke="var(--muted)" strokeDasharray="5 5" />
+    <CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" style={{ pointerEvents: 'none' }} /><XAxis type="number" dataKey="a" name={labelA} domain={[0, 1]} tickFormatter={(value) => value.toFixed(1)} /><YAxis type="number" dataKey="b" name={labelB} domain={[0, 1]} tickFormatter={(value) => value.toFixed(1)} /><ZAxis range={[70, 70]} /><ReferenceLine segment={[{ x: 0, y: 0 }, { x: 1, y: 1 }]} stroke="var(--muted)" strokeDasharray="5 5" style={{ pointerEvents: 'none' }} />
     <ChartTooltip cursor={{ strokeDasharray: '3 3' }} content={({ active, payload }) => active && payload?.length ? <div className="chart-tooltip"><strong>{payload[0].payload.id}</strong><span>{payload[0].payload.task}</span><div>{labelA} <b>{payload[0].payload.a.toFixed(2)}</b></div><div>{labelB} <b>{payload[0].payload.b.toFixed(2)}</b></div></div> : null} />
-    <Scatter data={data} fill="#6558d3" shape={(props) => <circle cx={props.cx} cy={props.cy} r={props.payload.id === highlightedTrialId ? 8 : 6} fill={props.payload.b >= props.payload.a ? '#16a394' : '#d64f72'} stroke="var(--surface)" strokeWidth="2" className="chart-mark" />} />
+    <Scatter data={data} fill="#6558d3" isAnimationActive={false} shape={(props) => <g className="chart-mark"><circle cx={props.cx} cy={props.cy} r={14} fill="transparent" stroke="none" /><circle cx={props.cx} cy={props.cy} r={props.payload.id === highlightedTrialId ? 9 : 7} fill={props.payload.b >= props.payload.a ? '#16a394' : '#d64f72'} stroke="var(--surface)" strokeWidth="2" /></g>} />
   </ScatterChart></ResponsiveContainer></div><div className="axis-labels"><span>← {labelA} reward →</span><span>{labelB} reward rises vertically</span></div></Paper>
 }
 
@@ -189,7 +209,7 @@ function CompareView({ onSavePair }) {
   const labelOptions = state.labels.map((label) => label.name)
   return <main className="page-shell">
     <SectionTitle eyebrow="Paired label analysis" title="Compare" description="Inspect decision shifts, scoring cost, and criterion-level disagreement on the same completed traces." actions={<SavedPairControls onSave={onSavePair} />} />
-    <Paper className="pair-picker" withBorder><div><span className="pair-letter a">A</span><Select label="Reference label" aria-label="Select label A" value={state.compareA} onChange={(value) => state.setCompare('A', value)} data={labelOptions.map((name) => ({ value: name, label: name, disabled: name === state.compareB }))} searchable clearable /></div><IconChevronRight className="pair-arrow" size={22} /><div><span className="pair-letter b">B</span><Select label="Candidate label" aria-label="Select label B" value={state.compareB} onChange={(value) => state.setCompare('B', value)} data={labelOptions.map((name) => ({ value: name, label: name, disabled: name === state.compareA }))} searchable clearable /></div><div className="pair-context"><span>{rows.length} paired traces</span><small>Positive delta means B improved</small></div></Paper>
+    <Paper className="pair-picker" withBorder><div><span className="pair-letter a">A</span><Select label="Reference label" aria-label="Select label A" value={state.compareA} onChange={(value) => state.setCompare('A', value)} data={labelOptions.map((name) => ({ value: name, label: name, disabled: name === state.compareB }))} searchable clearable /></div><IconChevronRight className="pair-arrow" size={22} /><div><span className="pair-letter b">B</span><Select label="Candidate label" aria-label="Select label B" value={state.compareB} onChange={(value) => state.setCompare('B', value)} data={labelOptions.map((name) => ({ value: name, label: name, disabled: name === state.compareA }))} searchable clearable /></div><div className="pair-context"><span>{rows.length} paired traces</span><small>Positive delta means B improved</small></div>{state.compareError && <p className="field-error pair-error" role="alert">{state.compareError}</p>}</Paper>
     <FilterBar />
     {!summary || !state.compareA || !state.compareB ? <Paper withBorder><EmptyState icon={IconAdjustments} title="Pick two distinct labels">Choose a reference label A and candidate label B to generate paired rewards, cost totals, and criterion flips.</EmptyState></Paper> : <>
       <div className="summary-layout"><Paper className="summary-strip" withBorder><SummaryMetric label="Mean Δ (B − A)" value={`${summary.meanDelta >= 0 ? '+' : ''}${summary.meanDelta.toFixed(3)}`} tone={summary.meanDelta >= 0 ? 'good' : 'bad'} /><SummaryMetric label="Wins / losses / ties" value={`${summary.wins} / ${summary.losses} / ${summary.ties}`} /><CostDisclosure side="A" label={state.compareA} total={summary.costA} rows={rows} /><CostDisclosure side="B" label={state.compareB} total={summary.costB} rows={rows} /><SummaryMetric label="Cost Δ" value={`${summary.costB - summary.costA >= 0 ? '+' : '−'}$${Math.abs(summary.costB - summary.costA).toFixed(3)}`} /></Paper><PassWheel summary={summary} /></div>
@@ -202,11 +222,11 @@ function CompareView({ onSavePair }) {
 function FlipRow({ criterionA, criterionB, labelA, labelB, trialId, onAttribute }) {
   const [expanded, setExpanded] = useState(false)
   const attribution = useLabStore((state) => state.attributions.find((item) => item.trialId === trialId && item.criterionId === criterionA.id && item.labelA === labelA && item.labelB === labelB))
-  return <div className="flip-row"><div className="flip-main"><button className="flip-expander" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}><IconChevronRight size={17} className={expanded ? 'rotated' : ''} /><span><strong>{criterionA.title || criterionA.id}</strong><small>{criterionA.id}</small></span></button><div className="verdict-pair"><Badge color={criterionA.verdict === 'pass' ? 'teal' : 'red'} variant="light">A · {criterionA.verdict}</Badge><IconChevronRight size={14} /><Badge color={criterionB.verdict === 'pass' ? 'teal' : 'red'} variant="light">B · {criterionB.verdict}</Badge></div>{attribution && <Badge color="violet" variant="outline">{causeLabels[attribution.cause]}</Badge>}<Button variant="subtle" size="compact-sm" onClick={() => onAttribute({ criterionA, criterionB, attribution })}>{attribution ? 'Edit attribution' : 'Attribute'}</Button></div><div className={expanded ? 'reasoning open' : 'reasoning'} aria-hidden={!expanded}><div><span>{labelA}</span><p>{criterionA.reasoning}</p></div><div><span>{labelB}</span><p>{criterionB.reasoning}</p></div></div></div>
+  return <div className="flip-row"><div className="flip-main"><button className="flip-expander" aria-expanded={expanded} onClick={() => setExpanded((value) => !value)}><IconChevronRight size={17} className={expanded ? 'rotated' : ''} /><span><strong>{criterionA.title || criterionA.id}</strong><small>{criterionA.id}</small></span></button><div className="verdict-pair"><Badge color={criterionA.verdict === 'pass' ? 'teal.9' : 'red.9'} variant="filled">A · {criterionA.verdict}</Badge><IconChevronRight size={14} /><Badge color={criterionB.verdict === 'pass' ? 'teal.9' : 'red.9'} variant="filled">B · {criterionB.verdict}</Badge></div>{attribution && <Badge color="violet" variant="outline">{causeLabels[attribution.cause]}</Badge>}<Button variant="subtle" size="compact-sm" onClick={() => onAttribute({ criterionA, criterionB, attribution })}>{attribution ? 'Edit attribution' : 'Attribute'}</Button></div><div className={expanded ? 'reasoning open' : 'reasoning'} aria-hidden={!expanded}><div><span>{labelA}</span><p>{criterionA.reasoning}</p></div><div><span>{labelB}</span><p>{criterionB.reasoning}</p></div></div></div>
 }
 
 function TrialDiffModal({ onAttribute, suspendEscape = false }) {
-  const { openedTrialId, closeTrial, trials, compareA, compareB } = useLabStore()
+  const { openedTrialId, closeTrial, trials, compareA, compareB, undo, redo, undoStack, redoStack } = useLabStore()
   const trial = trials.find((item) => item.id === openedTrialId)
   if (!trial || !compareA || !compareB) return null
   const resultA = trial.results[compareA]
@@ -219,9 +239,10 @@ function TrialDiffModal({ onAttribute, suspendEscape = false }) {
   ]
   const flips = groups[0].criteria.length + groups[1].criteria.length
   return <Modal opened onClose={closeTrial} closeOnEscape={!suspendEscape} closeOnClickOutside={!suspendEscape} size="xl" title={<div><Text size="xs" c="dimmed">Criterion verdict diff</Text><Text fw={700}>{trial.id} · {trial.taskName}</Text></div>}>
+    <Group justify="flex-end" gap="xs" mb="sm"><Tooltip label="Undo attribution"><ActionIcon variant="default" aria-label="Undo attribution" disabled={!undoStack.length} onClick={undo}><IconHistory size={16} /></ActionIcon></Tooltip><Tooltip label="Redo attribution"><ActionIcon variant="default" aria-label="Redo attribution" disabled={!redoStack.length} onClick={redo}><IconRotateClockwise size={16} /></ActionIcon></Tooltip></Group>
     <div className="diff-summary"><div><span className="pair-letter a">A</span><span className="diff-label"><strong>{compareA}</strong><small>{resultA.scorerModel} · ${resultA.scorerCost.toFixed(3)} · {resultA.toolCalls} calls · {resultA.duration.toFixed(1)}s</small></span><b>{resultA.totalReward.toFixed(2)}</b></div><IconChevronRight size={18} /><div><span className="pair-letter b">B</span><span className="diff-label"><strong>{compareB}</strong><small>{resultB.scorerModel} · ${resultB.scorerCost.toFixed(3)} · {resultB.toolCalls} calls · {resultB.duration.toFixed(1)}s</small></span><b>{resultB.totalReward.toFixed(2)}</b></div><Badge color={flips ? 'orange' : 'teal'} variant="light">{flips} verdict flip{flips === 1 ? '' : 's'}</Badge></div>
     <div className="dimension-scores" aria-label="Dimension score comparison">{DIMENSIONS.map((dimension) => <div key={dimension}><span>{dimension}</span><strong><i>A</i> {resultA.dimensions[dimension].toFixed(2)}</strong><strong><i>B</i> {resultB.dimensions[dimension].toFixed(2)}</strong></div>)}</div>
-    {flips === 0 ? <EmptyState icon={IconCircleCheck} title="The two labels fully agree on this trial">All 16 criteria have matching pass/fail verdicts across correctness, visual, motion, and technical. The reward may still differ because the labels weight evidence differently.</EmptyState> : <div className="diff-groups">{groups.map((group) => <section key={group.id} className={`diff-group ${group.tone}`}><div className="diff-group-title"><h3>{group.title}</h3><Badge variant="light">{group.criteria.length}</Badge></div>{group.criteria.length ? DIMENSIONS.map((dimension) => { const dimensionCriteria = group.criteria.filter((criterion) => criterion.dimension === dimension); return dimensionCriteria.length ? <div className="dimension-block" key={dimension}><h4>{dimension}</h4>{dimensionCriteria.map((criterionA) => { const criterionB = resultB.criteria.find((item) => item.id === criterionA.id); return criterionA.verdict !== criterionB.verdict ? <FlipRow key={criterionA.id} criterionA={criterionA} criterionB={criterionB} labelA={compareA} labelB={compareB} trialId={trial.id} onAttribute={onAttribute} /> : <div key={criterionA.id} className="agreement-row"><span>{criterionA.title || criterionA.id}</span><Badge color={criterionA.verdict === 'pass' ? 'teal' : 'red'} variant="light">Both {criterionA.verdict}</Badge></div> })}</div> : null }) : <p className="group-empty">No criteria in this group.</p>}</section>)}</div>}
+    {flips === 0 ? <EmptyState icon={IconCircleCheck} title="The two labels fully agree on this trial">All 16 criteria have matching pass/fail verdicts across correctness, visual, motion, and technical. The reward may still differ because the labels weight evidence differently.</EmptyState> : <div className="diff-groups">{groups.map((group) => <section key={group.id} className={`diff-group ${group.tone}`}><div className="diff-group-title"><h3>{group.title}</h3><Badge variant="light">{group.criteria.length}</Badge></div>{group.criteria.length ? DIMENSIONS.map((dimension) => { const dimensionCriteria = group.criteria.filter((criterion) => criterion.dimension === dimension); return dimensionCriteria.length ? <div className="dimension-block" key={dimension}><h4>{dimension}</h4>{dimensionCriteria.map((criterionA) => { const criterionB = resultB.criteria.find((item) => item.id === criterionA.id); return criterionA.verdict !== criterionB.verdict ? <FlipRow key={criterionA.id} criterionA={criterionA} criterionB={criterionB} labelA={compareA} labelB={compareB} trialId={trial.id} onAttribute={onAttribute} /> : <div key={criterionA.id} className="agreement-row"><span>{criterionA.title || criterionA.id}</span><Badge color={criterionA.verdict === 'pass' ? 'teal.9' : 'red.9'} variant="filled">Both {criterionA.verdict}</Badge></div> })}</div> : null }) : <p className="group-empty">No criteria in this group.</p>}</section>)}</div>}
   </Modal>
 }
 
@@ -257,7 +278,7 @@ function RescoreModal({ opened, onClose }) {
   const { labels, startRescore, run } = useLabStore()
   const schema = useMemo(() => createRescoreSchema(labels), [labels])
   const { register, control, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({ resolver: zodResolver(schema), defaultValues: { labelName: '', scorerModel: '', configNote: '' } })
-  const submit = (record) => { startRescore(record); reset() }
+  const submit = (record) => { if (run.active || run.label) return; startRescore(record); reset() }
   const canClose = !run.active
   return <Modal opened={opened} onClose={() => canClose && onClose()} closeOnEscape={canClose} withCloseButton={canClose} size={run.label ? 'xl' : 'md'} title={run.label ? 'Rescore run' : 'Rescore with new label'}>
     {!run.label || (!run.active && !run.completed) ? <form onSubmit={handleSubmit(submit)} className="modal-form" noValidate><div className="form-intro"><span className="form-icon"><IconSparkles size={20} /></span><div><strong>Create an alternative scoring label</strong><p>The 12 completed traces will be rescored in place. One step demonstrates retry handling.</p></div></div><TextInput label="Label name" placeholder="e.g. Rubric v3" {...register('labelName')} error={errors.labelName?.message} required /><Controller name="scorerModel" control={control} render={({ field }) => <Select {...field} label="Scorer model" placeholder="Choose a scorer" data={SCORER_MODELS} error={errors.scorerModel?.message} required />} /><Textarea label="Config note" description="Optional, up to 120 characters." maxLength={121} {...register('configNote')} error={errors.configNote?.message} /><Group justify="flex-end"><Button variant="default" onClick={onClose}>Cancel</Button><Button type="submit" loading={isSubmitting || run.active} leftSection={<IconPlayerPlay size={16} />}>Start rescore</Button></Group></form> : <RunPanel />}
@@ -278,7 +299,7 @@ function CostView() {
   const active = labels.filter((label) => visible[label.name])
   const copyConfig = async (label) => {
     const text = `label: ${label.name}\nscorerModel: ${label.scorerModel}\nconfigNote: ${label.configNote}`
-    await navigator.clipboard.writeText(text); setCopied(label.name); setTimeout(() => setCopied(null), 1800)
+    await copyText(text); setCopied(label.name); setTimeout(() => setCopied(null), 1800)
   }
   return <main className="page-shell"><SectionTitle eyebrow="Scoring spend" title="Cost analytics" description="Audit cumulative scoring cost in completed-trial order. Every series ends at the same derived total used throughout the lab." />
     <Paper className="chart-card cost-chart-card" withBorder><div className="card-heading"><div><span className="eyebrow">Cumulative cost</span><h2>Cost across ordered rescore events</h2></div><span>USD · {trials.length} events</span></div><div className="legend-controls" aria-label="Toggle cost series">{labels.map((label, index) => <button key={label.name} aria-pressed={!!visible[label.name]} onClick={() => setVisible((current) => ({ ...current, [label.name]: !current[label.name] }))} className={visible[label.name] ? 'active' : ''}><i style={{ background: palette[index % palette.length] }} />{label.name}<strong>${(data.at(-1)?.[label.name] ?? 0).toFixed(3)}</strong></button>)}</div>{active.length ? <div className="cost-chart"><ResponsiveContainer width="100%" height="100%"><LineChart data={data} margin={{ top: 12, right: 20, bottom: 8, left: 5 }}><CartesianGrid strokeDasharray="3 3" stroke="var(--chart-grid)" /><XAxis dataKey="event" /><YAxis tickFormatter={(value) => `$${value.toFixed(1)}`} /><ChartTooltip content={({ active: isActive, payload, label }) => isActive && payload?.length ? <div className="chart-tooltip"><strong>Event {label}</strong>{payload.map((item) => <div key={item.name}><i style={{ background: item.stroke }} />{item.name} <b>${item.value.toFixed(3)}</b></div>)}</div> : null} />{labels.map((item, index) => visible[item.name] && <Line key={item.name} type="monotone" dataKey={item.name} stroke={palette[index % palette.length]} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 6 }} animationDuration={500} />)}</LineChart></ResponsiveContainer></div> : <EmptyState icon={IconCoin} title="No cost series selected">Re-enable a label in the legend to restore its cumulative cost line.</EmptyState>}</Paper>
@@ -298,7 +319,7 @@ function ExportModal({ opened, onClose }) {
   let document
   let json = ''
   try { document = compileLabResults(state, generatedAt); json = JSON.stringify(document, null, 2) } catch (error) { json = JSON.stringify({ schemaVersion: 'rescore-ab-lab-v1', error: formatZodError(error) }, null, 2) }
-  const copy = async () => { await navigator.clipboard.writeText(json); setCopied(true); setTimeout(() => setCopied(false), 1800) }
+  const copy = async () => { await copyText(json); setCopied(true); setTimeout(() => setCopied(false), 1800) }
   const download = () => { const url = URL.createObjectURL(new Blob([json], { type: 'application/json' })); const link = window.document.createElement('a'); link.href = url; link.download = 'lab-results.json'; link.click(); URL.revokeObjectURL(url) }
   const importFile = async (event) => {
     const file = event.target.files?.[0]; if (!file) return
@@ -347,6 +368,26 @@ function Toast() {
     dismissToast()
   }, [toast, dismissToast])
   return null
+}
+
+function useDecorativeIcons() {
+  useEffect(() => {
+    const mark = () => {
+      document.querySelectorAll('svg.tabler-icon:not([aria-hidden])').forEach((icon) => {
+        icon.setAttribute('aria-hidden', 'true')
+        icon.setAttribute('focusable', 'false')
+      })
+      // Mantine renders pill remove buttons with tabindex="-1"; keep them keyboard-reachable and labelled.
+      document.querySelectorAll('.mantine-Pill-remove[tabindex="-1"]').forEach((button) => {
+        button.setAttribute('tabindex', '0')
+        if (!button.getAttribute('aria-label')) button.setAttribute('aria-label', 'Remove label column')
+      })
+    }
+    mark()
+    const observer = new MutationObserver(mark)
+    observer.observe(document.body, { childList: true, subtree: true })
+    return () => observer.disconnect()
+  }, [])
 }
 
 function useKeyboardPalette(setOpened) {
@@ -400,6 +441,7 @@ function AppInner() {
   const [savePairOpen, setSavePairOpen] = useState(false)
   const [attributionContext, setAttributionContext] = useState(null)
   useKeyboardPalette(setPaletteOpen)
+  useDecorativeIcons()
   useEffect(() => { document.documentElement.dataset.theme = state.theme }, [state.theme])
   const openAttribution = (detail) => setAttributionContext({ ...detail, trialId: state.openedTrialId, labelA: state.compareA, labelB: state.compareB })
   const webActions = useMemo(() => ({
@@ -411,7 +453,7 @@ function AppInner() {
     setTheme: (theme) => { state.setTheme(theme); return { theme } },
     createAttribution: (record) => { state.saveAttribution(record); return { saved: true, cause: record.cause } },
     selectTrial: (trialId) => { state.setView('compare'); state.openTrial(trialId); return { trialId } },
-    startRun: ({ demo, ...payload }) => { setRescoreOpen(true); state.startRescore(payload); return { started: demo, labelName: payload.labelName } },
+    startRun: ({ demo, ...payload }) => { state.prepareRescore(); setRescoreOpen(true); state.startRescore(payload); return { started: demo, labelName: payload.labelName } },
     exportArtifact: (format) => { if (format === 'lab-results-json') setExportOpen(true); else state.setView('cost'); return { opened: format } },
     openImport: () => { setExportOpen(true); return { opened: 'lab-results-json' } },
   }), [state])
