@@ -66,9 +66,15 @@ export interface StatusMessage {
   key: number;
 }
 
+export interface BoardHistoryState {
+  boards: Board[];
+  activeBoardId: string;
+}
+
 export interface AppState {
   boards: Board[];
   activeBoardId: string;
+  archive: { id: string, boardId: string, obj: CanvasObject }[];
   selectedIds: string[];
   activeTool: ToolType;
   connectFromId: string | null;
@@ -77,10 +83,13 @@ export interface AppState {
   searchMatchIds: string[];
   showExport: boolean;
   showDeleteConfirm: boolean;
+  showArchivePanel: boolean;
   boardDeleteId: string | null;
   viewMode: ViewMode;
   showLivePanel: boolean;
   stream: StreamState;
   statusMessage: StatusMessage;
   lastAddedId: string | null;
+  undoStack: BoardHistoryState[];
+  redoStack: BoardHistoryState[];
 }
