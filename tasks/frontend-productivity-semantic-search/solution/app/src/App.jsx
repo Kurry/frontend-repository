@@ -1,0 +1,360 @@
+import React, { useEffect, useMemo, useRef } from 'react'
+import {
+  Button, Search, Tag, Slider, Toggle, Modal, TextInput, TextArea, Select, SelectItem,
+  Checkbox, InlineNotification, ToastNotification, Tile,
+} from '@carbon/react'
+import {
+  Search as SearchIcon, Time, Bookmark, Compare, DataBase, Export, Undo, Redo, Menu,
+  Close, ThumbsUp, ThumbsDown, ChevronDown, ChevronRight, WarningAlt, Reset, Add,
+  TrashCan, Play, Pause, Restart, CheckmarkFilled, Document, MacCommand, Copy, Download,
+  Upload, Filter, FolderOpen, ArrowRight, Information, Save, WatsonHealthStackedScrolling_1,
+} from '@carbon/icons-react'
+import { Controller, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { DocumentSchema, SavedSearchSchema } from './schemas'
+import { useAppStore, rankDocuments, selectTopicGroups, stringifyArtifact } from './store'
+
+const formatTime = (value) => new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(value))
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+function HighlightedText({ text, term }) {
+  if (!term) return text
+  const pieces = text.split(new RegExp(`(${escapeRegExp(term)})`, 'ig'))
+  return pieces.map((piece, index) => piece.toLowerCase() === term.toLowerCase() ? <mark key={index}>{piece}</mark> : piece)
+}
+
+function Header() {
+  const state = useAppStore()
+  const undo = state.undoStack.at(-1)
+  const redo = state.redoStack.at(-1)
+  return <header className="topbar">
+    <Button className="mobile-rail-toggle" hasIconOnly kind="ghost" renderIcon={Menu} iconDescription={state.railOpen ? 'Close workspace rail' : 'Open workspace rail'} onClick={() => useAppStore.setState({ railOpen: !state.railOpen })} />
+    <div className="brand-mark" aria-hidden="true">A</div>
+    <div>
+      <div className="brand-kicker">Knowledge operations</div>
+      <div className="brand-title">Atlas semantic library</div>
+    </div>
+    <div className="header-actions">
+      <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Undo} title={undo ? `Undo ${undo.label}` : 'Nothing to undo'} disabled={!undo} onClick={state.undo}>{undo ? `Undo · ${undo.label}` : 'Undo'}</Button>
+      <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Redo} title={redo ? `Redo ${redo.label}` : 'Nothing to redo'} disabled={!redo} onClick={state.redo}>{redo ? `Redo · ${redo.label}` : 'Redo'}</Button>
+      <Button kind="ghost" renderIcon={MacCommand} onClick={() => state.setPalette(true)}><span className="action-label">Commands</span></Button>
+      <Button kind="primary" renderIcon={Export} onClick={() => state.openExport('report')}><span className="action-label">Export</span></Button>
+    </div>
+  </header>
+}
+
+const railTabs = [
+  ['history', 'History', Time], ['saved', 'Saved', Bookmark], ['compare', 'Compare', Compare], ['index', 'Index', DataBase],
+]
+
+function Rail() {
+  const state = useAppStore()
+  return <aside className={`left-rail ${state.railOpen ? 'open' : ''}`} aria-label="Library workspace">
+    <nav className="rail-nav" aria-label="Workspace sections">
+      {railTabs.map(([id, label, Icon]) => <button key={id} className={`rail-tab ${state.railView === id ? 'active' : ''}`} onClick={() => state.setRailView(id)} aria-current={state.railView === id ? 'page' : undefined}><Icon size={16} /><span>{label}</span></button>)}
+    </nav>
+    <div className="rail-content">
+      {state.railView === 'history' && <HistoryPanel />}
+      {state.railView === 'saved' && <SavedPanel />}
+      {state.railView === 'compare' && <ComparePanel />}
+      {state.railView === 'index' && <IndexPanel />}
+    </div>
+  </aside>
+}
+
+function HistoryPanel() {
+  const state = useAppStore()
+  const selected = state.selectedHistory.length
+  const confirmDelete = () => {
+    if (window.confirm(`Delete ${selected} selected histor${selected === 1 ? 'y entry' : 'y entries'}?`)) state.deleteSelectedHistory()
+  }
+  return <>
+    <div className="panel-heading"><div><div className="eyebrow">Session timeline</div><h2>Query history</h2></div><span className="fine">{state.history.length}</span></div>
+    {selected > 0 && <div className="context-bar"><span>{selected} selected</span><Button hasIconOnly size="sm" kind="ghost" renderIcon={TrashCan} iconDescription={`Delete ${selected} selected`} onClick={confirmDelete} /><Button hasIconOnly size="sm" kind="ghost" renderIcon={Close} iconDescription="Clear selection" onClick={() => useAppStore.setState({ selectedHistory: [] })} /></div>}
+    {!state.history.length ? <RailEmpty icon={Time} text="Executed queries appear here, newest first." /> : <div className="history-list">
+      {state.history.map((item) => <div key={item.id} className="history-item" role="button" tabIndex={0} onClick={() => state.rerunCaptured(item)} onKeyDown={(event) => event.key === 'Enter' && state.rerunCaptured(item)}>
+        <div className="history-line" onClick={(e) => e.stopPropagation()}><Checkbox id={`history-${item.id}`} hideLabel labelText={`Select ${item.raw || 'all documents'}`} checked={state.selectedHistory.includes(item.id)} onChange={() => state.toggleHistory(item.id)} /><div className="min-w-0 flex-1" onClick={() => state.rerunCaptured(item)}><div className="history-query">{item.raw || 'All documents'}</div><div className="fine">{formatTime(item.timestamp)} · {item.count} results</div></div></div>
+        {!!item.filters.length && <div className="mini-chips">{item.filters.map((f, i) => <span className="mini-chip" key={i}>{f.kind}:{f.value}</span>)}</div>}
+      </div>)}
+    </div>}
+  </>
+}
+
+function SavedPanel() {
+  const state = useAppStore()
+  return <>
+    <div className="panel-heading"><div><div className="eyebrow">Reusable views</div><h2>Saved searches</h2></div><span className="fine">{state.savedSearches.length}</span></div>
+    {!state.savedSearches.length ? <RailEmpty icon={Bookmark} text="Capture a query, filters, and threshold for later." /> : <div className="saved-list">
+      {state.savedSearches.map((item) => <div className="saved-item" key={item.name} role="button" tabIndex={0} onClick={() => state.rerunCaptured(item)} onKeyDown={(e) => e.key === 'Enter' && state.rerunCaptured(item)}><div><div className="history-query">{item.name}</div><div className="fine">{item.query || 'All documents'} · ≥ {item.threshold.toFixed(2)}</div><div className="mini-chips">{item.filters.map((f, i) => <span key={i} className="mini-chip">{f.kind}:{f.value}</span>)}</div></div><Button hasIconOnly kind="ghost" size="sm" renderIcon={TrashCan} iconDescription={`Delete ${item.name}`} onClick={(e) => { e.stopPropagation(); if (window.confirm(`Delete saved search “${item.name}”?`)) state.deleteSaved(item.name) }} /></div>)}
+    </div>}
+  </>
+}
+
+function RailEmpty({ icon: Icon, text }) {
+  return <div className="rail-empty"><Icon size={24} /><p>{text}</p></div>
+}
+
+function queryChoices(state) {
+  const saved = state.savedSearches.map((item) => ({ id: `saved:${item.name}`, label: item.name, ...item }))
+  const history = state.history.map((item) => ({ id: `history:${item.id}`, label: item.raw || 'All documents', ...item }))
+  return [...saved, ...history]
+}
+
+function ComparePanel() {
+  const state = useAppStore()
+  const choices = queryChoices(state)
+  const leftChoice = choices.find((item) => item.id === state.compareLeft)
+  const rightChoice = choices.find((item) => item.id === state.compareRight)
+  const compute = (choice) => choice ? rankDocuments({ documents: state.documents, indexedIds: state.indexedIds, query: choice.query, filters: choice.filters, threshold: choice.threshold, feedback: state.feedbackByQuery[`${choice.query.toLowerCase()}|${choice.filters.map((f) => `${f.kind}:${f.value.toLowerCase()}`).sort().join('|')}`] || {} }).items.slice(0, 12) : []
+  const left = compute(leftChoice), right = compute(rightChoice)
+  const leftIds = new Set(left.map((x) => x.id)), rightIds = new Set(right.map((x) => x.id))
+  const overlap = left.filter((x) => rightIds.has(x.id)).length
+  return <>
+    <div className="panel-heading"><div><div className="eyebrow">Set analysis</div><h2>Compare queries</h2></div></div>
+    {!choices.length ? <RailEmpty icon={Compare} text="Run or save two queries to compare their ranked sets." /> : <>
+      <div className="compare-controls">
+        <Select id="compare-left" labelText="Left query" value={state.compareLeft} onChange={(e) => useAppStore.setState({ compareLeft: e.target.value })}><SelectItem value="" text="Choose left query" />{choices.map((item) => <SelectItem key={item.id} value={item.id} text={item.label} />)}</Select>
+        <Select id="compare-right" labelText="Right query" value={state.compareRight} onChange={(e) => useAppStore.setState({ compareRight: e.target.value })}><SelectItem value="" text="Choose right query" />{choices.map((item) => <SelectItem key={item.id} value={item.id} text={item.label} />)}</Select>
+      </div>
+      {leftChoice && rightChoice && <><div className="compare-summary"><strong>{overlap} overlap</strong><br />{left.length - overlap} unique left · {right.length - overlap} unique right</div><div className="compare-columns"><div>{left.map((item) => <CompareCard key={item.id} item={item} overlap={rightIds.has(item.id)} />)}</div><div>{right.map((item) => <CompareCard key={item.id} item={item} overlap={leftIds.has(item.id)} />)}</div></div></>}
+    </>}
+  </>
+}
+
+function CompareCard({ item, overlap }) {
+  return <div className="compare-card"><span className={`marker ${overlap ? 'overlap' : 'unique'}`}>{overlap ? 'Overlap' : 'Unique'}</span><div>{item.title}</div><div className="fine">{item.score.toFixed(2)}</div></div>
+}
+
+function IndexPanel() {
+  const state = useAppStore()
+  const stats = state.getStats()
+  const run = state.indexRun
+  const complete = run?.steps.filter((step) => step.status === 'complete').length || 0
+  const failed = run?.steps.filter((step) => step.status === 'failed').length || 0
+  const currentStep = run?.steps[run.current]
+  const filteredEvents = run?.events.filter((event) => state.timelineFilter === 'all' || event.status === state.timelineFilter) || []
+  const selected = state.selectedDocuments.length
+  return <>
+    <div className="panel-heading"><div><div className="eyebrow">Corpus health</div><h2>Index management</h2></div><Button hasIconOnly size="sm" kind="ghost" renderIcon={Add} iconDescription="Add document" onClick={() => useAppStore.setState({ addOpen: true })} /></div>
+    <div className="stat-grid"><div className="stat"><span className="fine">Documents</span><strong>{stats.total}</strong></div><div className={`stat ${stats.stale ? 'warn' : ''}`}><span className="fine">Stale</span><strong>{stats.stale}</strong></div><div className="stat"><span className="fine">Distinct terms</span><strong>{stats.distinctTerms}</strong></div><div className="stat"><span className="fine">Last build</span><strong className="!text-xs !mt-2">{formatTime(state.indexBuiltAt)}</strong></div></div>
+    <div className={`status-strip ${run?.status === 'running' ? '' : stats.stale ? 'warning' : 'success'}`}>{run?.status === 'running' ? <><span className="status-dot" /> Indexing {complete}/{run.steps.length}</> : run?.status === 'paused' ? <><Pause size={16} /> Paused at {run.current + 1}/{run.steps.length}</> : stats.stale ? <><WarningAlt size={16} /> {stats.stale} documents need indexing</> : <><CheckmarkFilled size={16} /> Index current · {stats.total} documents</>}</div>
+    <div className="index-actions"><Button size="sm" renderIcon={Play} disabled={run?.status === 'running' || run?.status === 'paused'} onClick={state.startIndex}>Index now</Button>{run?.status === 'running' && <Button size="sm" kind="tertiary" renderIcon={Pause} onClick={state.pauseIndex}>Pause</Button>}{run?.status === 'paused' && <Button size="sm" kind="tertiary" renderIcon={Play} onClick={state.resumeIndex}>Resume</Button>}</div>
+    {run && <div className="run-box"><div className="run-rollup"><span><strong>{complete}/{run.steps.length}</strong>ingested</span><span><strong>{Math.round(((run.elapsed || Date.now() - run.startedAt) / 1000) * 10) / 10}s</strong>elapsed</span><span><strong>{failed}</strong>failed</span></div><div className="steps">{run.steps.map((step) => <div className={`step ${step.status}`} key={step.id}><span className="status-dot" /><span className="doc-row-title">{step.title}<br /><span className="fine">{step.status === 'retrying' ? `waiting ${step.retryIn}s · retry ${step.attempts + 1} of 3` : step.error || `${step.status}${step.attempts ? ` · attempt ${step.attempts}` : ''}`}</span></span>{step.status === 'failed' && <Button hasIconOnly size="sm" kind="ghost" renderIcon={Restart} iconDescription={`Retry ${step.title}`} onClick={state.retryStep} />}</div>)}</div><div className="p-2"><Select size="sm" id="timeline-filter" labelText="Timeline status" value={state.timelineFilter} onChange={(e) => useAppStore.setState({ timelineFilter: e.target.value })}><SelectItem value="all" text="All events" />{['running','retrying','failed','complete'].map((status) => <SelectItem key={status} value={status} text={status} />)}</Select></div><div className="timeline">{filteredEvents.slice().reverse().map((event) => <div key={event.id} className="event">{formatTime(event.time)} · {event.text}</div>)}</div></div>}
+    {selected > 0 && <div className="context-bar"><span>{selected} selected</span><Button hasIconOnly size="sm" kind="ghost" renderIcon={WarningAlt} iconDescription="Mark selected stale" onClick={() => state.markStale(state.selectedDocuments)} /><Button hasIconOnly size="sm" kind="ghost" renderIcon={TrashCan} iconDescription={`Delete ${selected} selected documents`} onClick={() => window.confirm(`Delete ${selected} selected document${selected === 1 ? '' : 's'}?`) && state.deleteDocuments(state.selectedDocuments)} /></div>}
+    <div className="document-list" aria-label="Indexed documents">{state.documents.map((doc) => <div className="doc-row" key={doc.id}><Checkbox id={`select-${doc.id}`} hideLabel labelText={`Select ${doc.title}`} checked={state.selectedDocuments.includes(doc.id)} onChange={() => state.toggleDocument(doc.id)} /><span className="doc-row-title" title={doc.title}>{doc.title}</span>{!state.indexedIds.includes(doc.id) && <span className="stale-dot" title="Stale" />}</div>)}</div>
+  </>
+}
+
+function SearchWorkspace() {
+  const state = useAppStore()
+  const visible = state.getVisible()
+  const submitLock = useRef({ value: '', time: 0 })
+  const submit = (event) => {
+    event.preventDefault()
+    const stamp = Date.now()
+    if (submitLock.current.value === state.activeRaw && stamp - submitLock.current.time < 350) return
+    submitLock.current = { value: state.activeRaw, time: stamp }
+    state.runQuery()
+  }
+  return <main className="main-panel">
+    <section className="search-hero">
+      <div className="search-kicker"><WatsonHealthStackedScrolling_1 size={16} /> Semantic workspace</div>
+      <h1 className="search-title">Find the idea, not just <em>the words.</em></h1>
+      <form className="search-row" role="search" onSubmit={submit}>
+        <Search size="lg" labelText="Search the knowledge library" placeholder="" value={state.activeRaw} onChange={(e) => state.setRaw(e.target.value)} autoComplete="off" />
+        <Button type="submit" renderIcon={SearchIcon}>Search library</Button>
+      </form>
+      <p className="syntax-help">Filter the corpus with <code>tag:react</code> <code>type:guide</code> or <code>before:2026-01-01</code></p>
+      {state.hasSearched && <ResultControls visible={visible} />}
+      {!state.hasSearched ? <WelcomeState /> : <Results visible={visible} />}
+    </section>
+  </main>
+}
+
+function ResultControls({ visible }) {
+  const state = useAppStore()
+  return <div className="result-tools">
+    {(state.filters.length > 0 || state.invalidFilters.length > 0) && <div className="chips-row" aria-label="Active search filters">{state.filters.map((filter, index) => <span className="filter-chip" key={`${filter.kind}-${filter.value}`}><Filter size={13} />{filter.kind}:{filter.value}<button aria-label={`Remove ${filter.kind} ${filter.value}`} onClick={() => state.removeFilter(index)}><Close size={12} /></button></span>)}{state.invalidFilters.map((filter) => <span className="unmatched" key={`${filter.kind}-${filter.value}`}><WarningAlt size={14} /> No matching {filter.kind}: “{filter.value}”</span>)}</div>}
+    <div className="controls-line"><div className="slider-wrap"><label id="threshold-label">Minimum score</label><Slider ariaLabelInput="Minimum similarity score" min={0} max={1} step={0.05} value={state.threshold} hideTextInput onChange={({ value }) => state.setThreshold(value)} /><output className="slider-value">{state.threshold.toFixed(2)}</output></div><div className="control-actions"><Toggle id="group-topic" size="sm" labelText="Group by topic" labelA="Off" labelB="On" toggled={state.grouped} onToggle={state.setGrouped} /><Button size="sm" kind="ghost" renderIcon={Reset} disabled={!Object.keys(state.feedbackByQuery[`${state.activeQuery.toLowerCase()}|${state.filters.map((f) => `${f.kind}:${f.value.toLowerCase()}`).sort().join('|')}`] || {}).length} onClick={state.resetFeedback}>Reset feedback</Button><Button size="sm" kind="tertiary" renderIcon={Save} onClick={() => useAppStore.setState({ saveOpen: true })}>Save search</Button></div></div>
+    <div className="result-summary"><div><div className="eyebrow">Ranked retrieval</div><h2>{visible.mode === 'keyword' ? 'Keyword results' : 'Semantic results'}</h2>{visible.mode === 'keyword' && <span className="fallback-label">No semantic matches above threshold</span>}</div><div role="status" aria-live="polite"><strong>{visible.items.length}</strong> <span className="muted">matching results</span></div></div>
+  </div>
+}
+
+function WelcomeState() {
+  return <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-3"><WelcomeTile number="01" title="Ask naturally" text="Use a question, goal, or fragment. Ranking is computed locally from the indexed corpus." /><WelcomeTile number="02" title="Shape relevance" text="Narrow with syntax chips, adjust the score floor, and teach the session with feedback." /><WelcomeTile number="03" title="Take it with you" text="Export an exact search report or round-trip the complete library package." /></div>
+}
+function WelcomeTile({ number, title, text }) { return <Tile className="!bg-white border border-line !p-5 min-h-40"><span className="font-mono text-moss text-sm">{number}</span><h2 className="mt-8 mb-2 text-lg">{title}</h2><p className="text-sm text-slate-600 leading-6">{text}</p></Tile> }
+
+function Results({ visible }) {
+  const state = useAppStore()
+  const groups = selectTopicGroups(visible.items)
+  if (!visible.items.length) return <div className="empty-state"><FolderOpen size={30} /><h3>No documents matched</h3><p className="muted">Remove a filter or lower the minimum score to widen this result set.</p><Button kind="tertiary" size="sm" renderIcon={Reset} onClick={state.clearNarrowing}>Clear filters and threshold</Button></div>
+  if (state.grouped) return <div className="results-list">{Object.entries(groups).map(([name, items]) => <section className="cluster" key={name}><button className="cluster-header" onClick={() => state.toggleGroup(name)} aria-expanded={!state.collapsedGroups[name]}><span>{name} <span className="fine">· {items.length} results</span></span>{state.collapsedGroups[name] ? <ChevronRight /> : <ChevronDown />}</button>{!state.collapsedGroups[name] && <div className="cluster-body">{items.map((item, i) => <ResultCard item={item} index={i} key={item.id} />)}</div>}</section>)}</div>
+  return <div className="results-list">{visible.items.map((item, index) => <ResultCard key={item.id} item={item} index={index} />)}</div>
+}
+
+function ResultCard({ item, index }) {
+  const state = useAppStore()
+  const open = state.disclosures[item.id]
+  return <article className={`result-card ${state.selectedResult === index ? 'selected' : ''}`} style={{ '--accent-opacity': Math.max(.15, item.score), animationDelay: `${Math.min(index, 12) * 40}ms`, viewTransitionName: `result-${item.id}` }} data-result-id={item.id}>
+    <div className="card-main" role="button" tabIndex={0} onClick={() => state.openDetail(item.id)} onKeyDown={(e) => e.key === 'Enter' && state.openDetail(item.id)} aria-label={`Open ${item.title}`}><div className="card-top"><div className="card-copy"><h3 className="card-title" title={item.title}>{item.title}</h3><div className="meta-row"><Tag size="sm" type="cool-gray">{item.type}</Tag>{item.tags.slice(0,3).map((tag) => <Tag className="topic-tag" size="sm" key={tag}>{tag}</Tag>)}{item.feedback !== 'none' && <span className="feedback-chip">Feedback: {item.feedback}</span>}</div></div><span className="score-badge" aria-label={`Similarity ${item.score.toFixed(2)}`}>{item.score.toFixed(2)}</span></div><p className="snippet"><HighlightedText text={item.snippet} term={item.highlight} /></p></div>
+    <div className="card-actions"><button className={`why-button ${open ? 'open' : ''}`} aria-expanded={!!open} onClick={() => state.toggleDisclosure(item.id)}><ChevronDown size={15} /> Why this ranks</button><div className="feedback-actions"><button className={`icon-control ${item.feedback === 'up' ? 'active' : ''}`} aria-label={`Mark ${item.title} relevant`} onClick={() => state.setFeedback(item.id, item.feedback === 'up' ? 'none' : 'up')}><ThumbsUp size={16} /></button><button className={`icon-control ${item.feedback === 'down' ? 'active' : ''}`} aria-label={`Mark ${item.title} not relevant`} onClick={() => state.setFeedback(item.id, item.feedback === 'down' ? 'none' : 'down')}><ThumbsDown size={16} /></button></div></div>
+    {open && <div className="explanation"><div className="fine">Matched terms and weighted contribution</div>{item.contributions.length ? item.contributions.map((term) => <div className="term-row" key={term.term}><span>{term.term}</span><span className="term-track"><span className="term-fill" style={{ width: `${term.normalized * 100}%` }} /></span><span className="font-mono">{term.value.toFixed(2)}</span></div>) : <p className="fine">No direct term contribution.</p>}<div className="fine mt-3">Feedback adjustment: {item.adjustment > 0 ? '+' : ''}{item.adjustment.toFixed(2)}</div></div>}
+  </article>
+}
+
+function DetailPanel() {
+  const state = useAppStore()
+  const doc = state.documents.find((item) => item.id === state.detailId)
+  const related = useMemo(() => doc ? rankDocuments({ documents: state.documents.filter((item) => item.id !== doc.id), indexedIds: state.documents.filter((item) => item.id !== doc.id).map((item) => item.id), query: `${doc.title} ${doc.tags.join(' ')}`, filters: [], threshold: 0, feedback: {} }).items.slice(0,3) : [], [doc, state.documents])
+  if (!doc) return null
+  return <aside className="detail-panel" aria-label="Document detail"><div className="detail-head"><div className="detail-topline"><span className="eyebrow !text-green-100">Document detail</span><button className="icon-control" onClick={state.closeDetail} aria-label="Close document detail"><Close /></button></div><div className="breadcrumbs">{state.breadcrumbs.map((id, index) => { const item = state.documents.find((d) => d.id === id); return <React.Fragment key={`${id}-${index}`}><button className="breadcrumb" onClick={() => state.goBreadcrumb(index)}>{item?.title.slice(0,22)}</button>{index < state.breadcrumbs.length - 1 && <ChevronRight size={12} />}</React.Fragment> })}</div><h2>{doc.title}</h2></div><div className="detail-body"><div className="meta-row"><Tag type="green">{doc.type}</Tag>{doc.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}</div><p className="full-body">{doc.body}</p><section className="related-list"><div className="eyebrow">Continue exploring</div><h3>Related documents</h3>{related.map((item) => <button className="related-row" key={item.id} onClick={() => state.openDetail(item.id)}><span><strong>{item.title}</strong><br/><span className="fine">{item.type} · {item.tags.slice(0,2).join(', ')}</span></span><span className="related-score">{item.score.toFixed(2)}</span></button>)}</section></div></aside>
+}
+
+function SaveSearchModal() {
+  const state = useAppStore()
+  const schema = SavedSearchSchema.superRefine((value, ctx) => { if (state.savedSearches.some((item) => item.name.toLowerCase() === value.name.toLowerCase())) ctx.addIssue({ code:'custom', path:['name'], message:'name must be unique' }) })
+  const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(schema), mode:'onChange', defaultValues:{ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold } })
+  useEffect(() => { if (state.saveOpen) reset({ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold }) }, [state.saveOpen, state.activeQuery, state.filters, state.threshold, reset])
+  return <Modal open={state.saveOpen} modalHeading="Save search" primaryButtonText="Save search" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => useAppStore.setState({ saveOpen:false })} onRequestSubmit={handleSubmit(state.saveSearch)}><div className="modal-copy"><TextInput id="saved-name" labelText="Search name" {...register('name')} invalid={!!errors.name} invalidText={errors.name?.message} /><div className="p-4 bg-gray-50 text-sm"><div><strong>Query</strong> {state.activeQuery || 'All documents'}</div><div><strong>Threshold</strong> {state.threshold.toFixed(2)}</div><div><strong>Filters</strong> {state.filters.map((f) => `${f.kind}:${f.value}`).join(', ') || 'None'}</div></div></div></Modal>
+}
+
+function AddDocumentModal() {
+  const state = useAppStore()
+  const { register, control, handleSubmit, reset, formState:{ errors, isValid } } = useForm({ resolver:zodResolver(DocumentSchema), mode:'onChange', defaultValues:{ title:'', body:'', type:'guide', tags:[] } })
+  useEffect(() => { if (state.addOpen) reset({ title:'', body:'', type:'guide', tags:[] }) }, [state.addOpen, reset])
+  return <Modal open={state.addOpen} modalHeading="Add document" primaryButtonText="Add document" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => useAppStore.setState({ addOpen:false })} onRequestSubmit={handleSubmit(state.addDocument)}><div className="modal-copy"><TextInput id="doc-title" labelText="Title" {...register('title')} invalid={!!errors.title} invalidText={errors.title?.message} /><TextArea id="doc-body" labelText="Body" rows={6} {...register('body')} invalid={!!errors.body} invalidText={errors.body?.message} /><div className="form-row"><Select id="doc-type" labelText="Type" {...register('type')} invalid={!!errors.type} invalidText={errors.type?.message}>{['guide','reference','prompt','checklist','paper','note'].map((type) => <SelectItem value={type} text={type} key={type} />)}</Select><Controller control={control} name="tags" render={({ field }) => <TextInput id="doc-tags" labelText="Tags, comma separated" value={field.value.join(', ')} onChange={(e) => field.onChange(e.target.value.split(',').map((tag) => tag.trim()).filter(Boolean))} onBlur={field.onBlur} invalid={!!errors.tags} invalidText={errors.tags?.message || errors.tags?.root?.message} />} /></div></div></Modal>
+}
+
+const ImportFormSchema = z.object({ packageText: z.string().trim().min(1, 'package is required') })
+function ImportModal() {
+  const state = useAppStore()
+  const [serverError, setServerError] = React.useState('')
+  const { register, handleSubmit, setValue, reset, formState:{ errors, isValid } } = useForm({ resolver:zodResolver(ImportFormSchema), mode:'onChange', defaultValues:{ packageText:'' } })
+  useEffect(() => { if (state.importOpen) { reset({ packageText:'' }); setServerError('') } }, [state.importOpen, reset])
+  const submit = ({ packageText }) => { const result = state.importPackage(packageText); if (!result.ok) setServerError(result.error) }
+  const file = async (event) => { const picked = event.target.files?.[0]; if (picked) setValue('packageText', await picked.text(), { shouldValidate:true }) }
+  return <Modal open={state.importOpen} modalHeading="Import library package" primaryButtonText="Import package" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => useAppStore.setState({ importOpen:false })} onRequestSubmit={handleSubmit(submit)}><div className="modal-copy"><p className="muted">A valid package replaces the current documents and saved searches. Imported documents remain stale until indexing completes.</p><label className="cds--label" htmlFor="package-file">Choose JSON file</label><input id="package-file" type="file" accept="application/json,.json" onChange={file} /><TextArea id="package-text" labelText="Package JSON" rows={10} {...register('packageText')} invalid={!!errors.packageText || !!serverError} invalidText={errors.packageText?.message || serverError} /></div></Modal>
+}
+
+function ExportModal() {
+  const state = useAppStore()
+  const value = state.exportTab === 'report' ? state.getReport() : state.getPackage()
+  const text = stringifyArtifact(value)
+  const copy = async () => { await navigator.clipboard.writeText(text); state.notify(`${state.exportTab === 'report' ? 'Search report' : 'Library package'} copied`) }
+  const download = () => { const blob = new Blob([text], { type:'application/json' }); const url=URL.createObjectURL(blob); const link=document.createElement('a'); link.href=url; link.download=state.exportTab === 'report' ? 'semantic-search-report.json' : 'semantic-library-package.json'; link.click(); URL.revokeObjectURL(url); state.notify('JSON download started') }
+  return <Modal open={state.exportOpen} modalHeading="Export workspace" passiveModal onRequestClose={() => useAppStore.setState({ exportOpen:false })}><div className="export-tabs" role="tablist"><button className={`export-tab ${state.exportTab === 'report' ? 'active' : ''}`} role="tab" aria-selected={state.exportTab === 'report'} onClick={() => useAppStore.setState({ exportTab:'report', exportGeneratedAt:new Date().toISOString() })}>Search report</button><button className={`export-tab ${state.exportTab === 'package' ? 'active' : ''}`} role="tab" aria-selected={state.exportTab === 'package'} onClick={() => useAppStore.setState({ exportTab:'package', exportGeneratedAt:new Date().toISOString() })}>Library package</button></div><div className="export-meta"><span>{state.exportTab === 'report' ? `${value.results.length} ranked results` : `${value.documents.length} documents · ${value.savedSearches.length} saved searches`}</span><span>Schema v1</span></div><pre className="json-preview" aria-label="JSON export preview">{text}</pre><div className="flex flex-wrap gap-2 mt-4"><Button renderIcon={Download} onClick={download}>{state.exportTab === 'report' ? 'Download report' : 'Download package'}</Button><Button kind="tertiary" renderIcon={Copy} onClick={copy}>{state.exportTab === 'report' ? 'Copy report' : 'Copy package'}</Button>{state.exportTab === 'package' && <Button kind="ghost" renderIcon={Upload} onClick={() => useAppStore.setState({ exportOpen:false, importOpen:true })}>Import package</Button>}</div></Modal>
+}
+
+function CommandPalette() {
+  const state = useAppStore()
+  const input = useRef(null)
+  const needle = state.paletteQuery.toLowerCase()
+  const entries = useMemo(() => {
+    const fuzzyMatch = (label) => {
+      if (!needle) return true
+      const haystack = label.toLowerCase()
+      let position = 0
+      for (const character of needle) {
+        position = haystack.indexOf(character, position)
+        if (position < 0) return false
+        position += 1
+      }
+      return true
+    }
+    const docs = state.documents.map((doc) => ({ id:`doc:${doc.id}`, label:doc.title, kind:'Document', icon:Document, action:() => { state.openDetail(doc.id); state.setPalette(false) } }))
+    const saved = state.savedSearches.map((item) => ({ id:`saved:${item.name}`, label:item.name, kind:'Saved search', icon:Bookmark, action:() => { state.rerunCaptured(item); state.setPalette(false) } }))
+    const commands = [
+      { id:'command:index', label:'Start index run', kind:'Command', icon:Play, action:() => { state.startIndex(); state.setRailView('index'); state.setPalette(false) } },
+      { id:'command:export', label:'Export search report', kind:'Command', icon:Export, action:() => { state.setPalette(false); state.openExport('report') } },
+      { id:'command:add', label:'Add document', kind:'Command', icon:Add, action:() => { state.setPalette(false); useAppStore.setState({ addOpen:true }) } },
+      { id:'command:history', label:'Open query history', kind:'Command', icon:Time, action:() => { state.setRailView('history'); state.setPalette(false) } },
+    ]
+    return [...commands,...saved,...docs].filter((entry) => fuzzyMatch(entry.label)).slice(0,40)
+  }, [state.documents, state.savedSearches, needle])
+  useEffect(() => { const previous = document.activeElement; input.current?.focus(); return () => previous?.focus?.() }, [])
+  const key = (event) => { if (event.key === 'Escape') state.setPalette(false); if (event.key === 'ArrowDown') { event.preventDefault(); useAppStore.setState({ paletteIndex:Math.min(state.paletteIndex+1,entries.length-1) }) } if(event.key==='ArrowUp'){event.preventDefault();useAppStore.setState({paletteIndex:Math.max(state.paletteIndex-1,0)})} if(event.key==='Enter'){event.preventDefault();entries[state.paletteIndex]?.action()} if(event.key==='Tab'){ const focusables=event.currentTarget.querySelectorAll('input,button'); if(!focusables.length)return; const first=focusables[0],last=focusables[focusables.length-1]; if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()} } }
+  return <div className="palette-backdrop" role="presentation" onMouseDown={(e) => e.target===e.currentTarget && state.setPalette(false)}><div className="palette" role="dialog" aria-modal="true" aria-label="Command palette" onKeyDown={key}><input ref={input} className="palette-input" aria-label="Search commands, documents, and saved searches" value={state.paletteQuery} onChange={(e) => useAppStore.setState({ paletteQuery:e.target.value, paletteIndex:0 })} /><div className="palette-list" role="listbox">{entries.map((entry,index) => { const Icon=entry.icon; return <button key={entry.id} role="option" aria-selected={index===state.paletteIndex} className={`palette-item ${index===state.paletteIndex?'active':''}`} onMouseEnter={() => useAppStore.setState({paletteIndex:index})} onClick={entry.action}><Icon size={17}/><span>{entry.label}</span><span className="palette-kind">{entry.kind}</span></button>})}</div><div className="palette-footer"><span>↑↓ Navigate</span><span>↵ Open</span><span>Esc Close</span></div></div></div>
+}
+
+function useKeyboardNavigation() {
+  const state = useAppStore()
+  useEffect(() => {
+    const handler = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); state.setPalette(!state.paletteOpen); return }
+      if (event.key === 'Escape') { if (state.detailId) state.closeDetail(); if (state.railOpen) useAppStore.setState({railOpen:false}); return }
+      if (state.paletteOpen || state.exportOpen || state.saveOpen || state.addOpen || state.importOpen) return
+      if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return
+      const results = state.getVisible().items
+      if (event.key === 'ArrowDown') { event.preventDefault(); const index=Math.min(state.selectedResult+1,results.length-1); useAppStore.setState({selectedResult:index}); document.querySelector(`[data-result-id="${results[index]?.id}"]`)?.scrollIntoView({block:'nearest',behavior:'smooth'}) }
+      if (event.key === 'ArrowUp') { event.preventDefault(); const index=Math.max(state.selectedResult-1,0); useAppStore.setState({selectedResult:index}); document.querySelector(`[data-result-id="${results[index]?.id}"]`)?.scrollIntoView({block:'nearest',behavior:'smooth'}) }
+      if (event.key === 'Enter' && state.selectedResult >= 0) state.openDetail(results[state.selectedResult]?.id)
+    }
+    window.addEventListener('keydown',handler); return () => window.removeEventListener('keydown',handler)
+  }, [state])
+}
+
+function registerWebMCP() {
+  if (window.__atlasWebMCPRegistered) return
+  window.__atlasWebMCPRegistered = true
+  const invoke = async (name,args={}) => {
+    const state=useAppStore.getState()
+    if(name==='browse_search'){state.runQuery(args.query||'');return {resultCount:state.getVisible().items.length}}
+    if(name==='browse_open'){const views={history:'history','saved-searches':'saved',compare:'compare','index-panel':'index'};if(args.destination==='results'){state.closeDetail()}else if(args.destination==='document-detail'&&args.id)state.openDetail(args.id);else if(args.destination==='export-report')state.openExport('report');else if(views[args.destination])state.setRailView(views[args.destination]);return {destination:args.destination}}
+    if(name==='browse_apply_filter'){
+      if(args.kind==='similarity-threshold'){const value=Number(args.value);if(value<0||value>1||!Number.isInteger(value*20))throw new Error('similarity-threshold must be 0.0-1.0 in 0.05 increments');state.setThreshold(value)}
+      else if(args.kind==='group-by-topic')state.setGrouped(!!args.value)
+      else if(args.kind==='timeline-status')useAppStore.setState({timelineFilter:args.value})
+      else if(['tag','type','before'].includes(args.kind))state.runQuery(`${state.activeQuery} ${state.filters.map((f)=>`${f.kind}:${f.value}`).join(' ')} ${args.kind}:${args.value}`)
+      return {resultCount:state.getVisible().items.length}
+    }
+    if(name==='browse_clear_filter'){
+      if(args.kind==='similarity-threshold')state.setThreshold(0)
+      else if(args.kind==='group-by-topic')state.setGrouped(false)
+      else if(args.kind==='timeline-status')useAppStore.setState({timelineFilter:'all'})
+      else if(['tag','type','before'].includes(args.kind)){const filters=state.filters.filter((filter)=>filter.kind!==args.kind);state.runQuery(`${state.activeQuery} ${filters.map((f)=>`${f.kind}:${f.value}`).join(' ')}`,{parsed:{query:state.activeQuery,filters,invalid:[]},threshold:state.threshold,record:false})}
+      return {resultCount:useAppStore.getState().getVisible().items.length}
+    }
+    if(name==='browse_sort'||name==='browse_set_locale')return {ok:true}
+    if(name==='browse_set_theme')return {theme:'light'}
+    if(name==='entity_create'){
+      if(args.title){const checked=DocumentSchema.safeParse({title:args.title,body:args.body,type:args.type,tags:args.tags||[]});if(!checked.success)throw new Error(`${checked.error.issues[0].path.join('.')}: ${checked.error.issues[0].message}`);state.addDocument(checked.data)}
+      else if(args['saved-search-name']){const payload={name:args['saved-search-name'].trim(),query:state.activeQuery,filters:state.filters,threshold:state.threshold};const checked=SavedSearchSchema.safeParse(payload);if(!checked.success)throw new Error(`${checked.error.issues[0].path.join('.')}: ${checked.error.issues[0].message}`);if(state.savedSearches.some((item)=>item.name.toLowerCase()===payload.name.toLowerCase()))throw new Error('saved-search-name must be unique');state.saveSearch(payload)}
+      else throw new Error('title or saved-search-name is required')
+      return {ok:true}
+    }
+    if(name==='entity_select'){if(args.id)state.openDetail(args.id);return {selected:args.id}}
+    if(name==='entity_update'&&args.id){
+      if(args.feedback){if(!['up','down','none'].includes(args.feedback))throw new Error('feedback must be up, down, or none');state.setFeedback(args.id,args.feedback)}
+      else {const current=state.documents.find((doc)=>doc.id===args.id);if(!current)throw new Error('document not found');const checked=DocumentSchema.safeParse({id:args.id,title:args.title??current.title,body:args.body??current.body,type:args.type??current.type,tags:args.tags??current.tags});if(!checked.success)throw new Error(`${checked.error.issues[0].path.join('.')}: ${checked.error.issues[0].message}`);state.updateDocument(args.id,checked.data)}
+      return {updated:args.id}
+    }
+    if(name==='entity_delete'){if(!args.confirm)throw new Error('confirm=true is required');state.deleteDocuments(args.ids||[args.id]);return {deleted:(args.ids||[args.id]).length}}
+    if(name==='entity_toggle'){if(args.field==='feedback')state.setFeedback(args.id,args.value);else if(args.field==='history-selection')state.toggleHistory(args.id);else if(args.field==='compare-selection')useAppStore.setState({[args.side==='right'?'compareRight':'compareLeft']:args.value});return {ok:true}}
+    if(name==='session_start'){state.startIndex();return {status:'running'}}
+    if(name==='session_pause'){state.pauseIndex();return {status:'paused'}}
+    if(name==='session_resume'){state.resumeIndex();return {status:'running'}}
+    if(name==='artifact_export'){state.openExport('report');return {format:'search-report-json',visible:true}}
+    if(name==='artifact_copy'){state.openExport('report');return {visible:true,requiresClipboardInteraction:true}}
+    return {ok:true}
+  }
+  const toolNames=['browse_open','browse_search','browse_apply_filter','browse_clear_filter','browse_sort','browse_set_locale','browse_set_theme','entity_create','entity_select','entity_update','entity_delete','entity_toggle','session_start','session_pause','session_resume','artifact_export','artifact_copy']
+  const descriptions={
+    browse_open:'Open a declared Atlas workspace destination.', browse_search:'Run a semantic document query.', browse_apply_filter:'Apply a declared search or timeline filter.', browse_clear_filter:'Clear a declared filter.', browse_sort:'Sort results by similarity descending.', browse_set_locale:'Set the bounded interface locale.', browse_set_theme:'Set the bounded interface theme.',
+    entity_create:'Create a validated document or saved search.', entity_select:'Select a declared document or collection item.', entity_update:'Update bounded document fields or relevance feedback.', entity_delete:'Delete confirmed document entities.', entity_toggle:'Toggle feedback or declared selection state.',
+    session_start:'Start the reindex-run demo.', session_pause:'Pause the active reindex run.', session_resume:'Resume the paused or failed reindex run.', artifact_export:'Open the search-report-json export.', artifact_copy:'Open the report so clipboard copy can be observed.',
+  }
+  const definitions=toolNames.map((name)=>({name,description:descriptions[name],inputSchema:{type:'object',additionalProperties:false,properties:name==='browse_open'?{destination:{type:'string',enum:['results','document-detail','history','saved-searches','compare','index-panel','export-report']},id:{type:'string'}}:name==='browse_search'?{query:{type:'string',maxLength:500}}:name.includes('filter')?{kind:{type:'string',enum:['tag','type','before','similarity-threshold','group-by-topic','timeline-status']},value:{}}:name.startsWith('entity_')?{id:{type:'string'},ids:{type:'array',items:{type:'string'}},title:{type:'string',maxLength:200},body:{type:'string',maxLength:20000},type:{type:'string',enum:['guide','reference','prompt','checklist','paper','note']},tags:{type:'array',maxItems:12,items:{type:'string'}},feedback:{type:'string',enum:['up','down','none']},field:{type:'string',enum:['feedback','history-selection','compare-selection']},side:{type:'string',enum:['left','right']},value:{},confirm:{type:'boolean'},'saved-search-name':{type:'string',maxLength:80}}:{}}}))
+  window.webmcp_invoke_tool=(name,args)=>invoke(name,args)
+  window.webmcp_list_tools=()=>definitions
+  window.webmcp_session_info=()=>({contract_version:'zto-webmcp-v1',app:'Atlas semantic library',modules:['browse-query-v1','entity-collection-v1','command-session-v1','artifact-transfer-v1'],tool_names:toolNames})
+  if(window.webmcp?.registerTool)definitions.forEach((definition)=>window.webmcp.registerTool(definition,(args)=>invoke(definition.name,args)))
+}
+
+export default function App() {
+  const state = useAppStore()
+  useKeyboardNavigation()
+  useEffect(registerWebMCP, [])
+  return <div className="app-shell"><Header /><div className={`workspace ${state.detailId ? 'has-detail' : ''}`}><Rail /><SearchWorkspace />{state.detailId && <DetailPanel />}</div><SaveSearchModal /><AddDocumentModal /><ImportModal /><ExportModal />{state.paletteOpen && <CommandPalette />}{state.toast && <div className="toast-wrap"><ToastNotification kind={state.toast.kind} title={state.toast.message} timeout={0} onCloseButtonClick={() => useAppStore.setState({toast:null})} /></div>}<div className="sr-only" aria-live="polite">{state.liveMessage}</div></div>
+}
