@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from "../utils/focusTrap";
 	import { entriesStore } from '../stores/entries';
 	import { toastStore } from '../stores/toast';
 	import { streakStore } from '../stores/streak';
@@ -36,6 +37,7 @@
 		class="bg-white radius-card p-6 w-full max-w-sm shadow-xl"
 		onclick={(e) => e.stopPropagation()}
 		role="alertdialog"
+		use:focusTrap
 		aria-label="Confirm delete"
 		tabindex="-1"
 		onkeydown={(e) => { if (e.key === 'Escape') uiStore.closeDeleteConfirm(); }}

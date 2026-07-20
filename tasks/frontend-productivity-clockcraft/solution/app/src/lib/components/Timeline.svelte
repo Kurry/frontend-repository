@@ -2,6 +2,8 @@
 	import { entriesStore, type Category, type TimeEntry } from '../stores/entries';
 	import { filterStore, searchStore, uiStore } from '../stores/ui';
 	import CategoryChip from './CategoryChip.svelte';
+	import { slide } from 'svelte/transition';
+	import { flip } from 'svelte/animate';
 
 	let entries: TimeEntry[] = $state([]);
 	let filter = $state<'all' | Category>('all');
@@ -52,7 +54,7 @@
 	<h2 class="text-base font-semibold mb-4">Today's timeline</h2>
 
 	{#if todayEntries().length === 0 && !hasAnyToday()}
-		<div class="text-center py-10">
+		<div class="text-center py-10" in:slide={{ duration: 250 }}>
 			<div class="text-3xl mb-2">⏱️</div>
 			<p class="text-sm text-[var(--color-text-muted)]">
 				No activities logged yet today.
@@ -62,7 +64,7 @@
 			</p>
 		</div>
 	{:else if todayEntries().length === 0 && hasAnyToday()}
-		<div class="text-center py-8">
+		<div class="text-center py-8" in:slide={{ duration: 250 }}>
 			<p class="text-sm text-[var(--color-text-muted)]">No results match your search or filter.</p>
 		</div>
 	{:else}
@@ -70,35 +72,47 @@
 			{#each todayEntries() as entry (entry.id)}
 				{@const blockHeight = Math.min(360, Math.max(56, entry.duration * 2))}
 				<li
-					class="entry-block relative mb-3 ml-4 flex items-stretch gap-3 group cursor-pointer rounded-lg hover:bg-slate-100 hover:shadow-sm"
+					class="entry-block relative mb-3 ml-4 flex items-stretch gap-3 group cursor-pointer"
 					style="height: {blockHeight}px"
+					animate:flip={{ duration: 250 }}
+					in:slide={{ duration: 250 }}
+					out:slide={{ duration: 250 }}
 				>
-					<div class="absolute -left-[7px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white shadow-sm transition-transform group-hover:scale-125
+					<div class="absolute -left-[23px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white shadow-sm transition-transform group-hover:scale-125
 						{entry.category === 'meaningful' ? 'bg-[var(--color-meaningful)]' : entry.category === 'draining' ? 'bg-[var(--color-draining)]' : 'bg-[var(--color-neutral)]'}"
 					></div>
 					<button
 						type="button"
 						onclick={() => uiStore.openEditDialog(entry.id)}
-						class="flex-1 text-left radius-card p-3 border border-[var(--color-border)] group-hover:shadow-md relative overflow-hidden
+						class="flex-1 text-left radius-card p-3 border border-[var(--color-border)] group-hover:shadow-md transition-shadow relative overflow-hidden
 							{entry.category === 'meaningful' ? 'bg-green-50 border-green-200' : entry.category === 'draining' ? 'bg-rose-50 border-rose-200' : 'bg-slate-50 border-slate-200'}"
 						aria-label="Edit entry: {entry.name}, {entry.duration} minutes"
 					>
 						<!-- Color accent bar -->
-						<div class="absolute left-0 top-0 bottom-0 w-1
+						<div class="absolute left-0 top-0 bottom-0 w-1 transition-all group-hover:w-1.5
 							{entry.category === 'meaningful' ? 'bg-[var(--color-meaningful)]' : entry.category === 'draining' ? 'bg-[var(--color-draining)]' : 'bg-[var(--color-neutral)]'}"
 						></div>
 						<div class="pl-3">
 							<div class="flex items-center justify-between gap-2">
-								<span class="text-sm font-medium truncate flex-1">{entry.name}</span>
+								<span class="text-sm font-medium truncate flex-1 group-hover:text-[var(--color-text-primary)] transition-colors">{entry.name}</span>
 								<CategoryChip category={entry.category} />
 							</div>
-							<div class="flex items-center gap-2 mt-1">
+							<div class="flex items-center gap-2 mt-1 flex-wrap">
 								<span class="text-xs text-[var(--color-text-muted)] mono">{formatTime(entry.startTime)}</span>
 								<span class="text-xs text-[var(--color-text-muted)]">•</span>
 								<span class="text-xs text-[var(--color-text-muted)] mono">{entry.duration} min</span>
 								{#if entry.tag}
 									<span class="text-xs text-[var(--color-text-muted)]">•</span>
 									<span class="text-xs text-[var(--color-text-primary)] bg-[var(--color-bg)] px-1.5 py-0.5 rounded-sm">{entry.tag}</span>
+								{/if}
+								{#if entry.interruptionReason}
+									<span class="text-xs text-[var(--color-text-muted)]">•</span>
+									<span class="text-xs bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-sm flex items-center gap-1">
+										<svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+										</svg>
+										{entry.interruptionReason}
+									</span>
 								{/if}
 							</div>
 						</div>

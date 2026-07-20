@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { entriesStore, type Category } from '../stores/entries';
+	import { focusTrap } from "../utils/focusTrap";
+	import { entriesStore, type Category, type InterruptionReason } from '../stores/entries';
 	import { tagsStore } from '../stores/tags';
 	import { toastStore } from '../stores/toast';
 	import { streakStore } from '../stores/streak';
@@ -12,6 +13,7 @@
 	let editCategory = $state<Category>('neutral');
 	let editTag = $state('');
 	let editDuration = $state('');
+	let editInterruptionReason = $state<InterruptionReason | ''>('');
 	let error = $state('');
 
 	let entry: import('../stores/entries').TimeEntry | null = $state(null);
@@ -29,6 +31,7 @@
 				editCategory = found.category;
 				editTag = found.tag;
 				editDuration = String(found.duration);
+				editInterruptionReason = found.interruptionReason ?? '';
 				loadedId = editId;
 			}
 		} else if (!editId) {
@@ -60,7 +63,8 @@
 			name: editName.trim(),
 			category: editCategory,
 			tag: editTag,
-			duration: dur
+			duration: dur,
+			interruptionReason: editInterruptionReason || null
 		});
 
 		let allEntries: import('../stores/entries').TimeEntry[] = [];
@@ -77,7 +81,7 @@
 	<div
 		class="bg-white radius-card p-6 w-full max-w-md shadow-xl"
 		onclick={(e) => e.stopPropagation()}
-		role="dialog"
+		role="dialog" use:focusTrap
 		aria-label="Edit entry"
 		tabindex="-1"
 		onkeydown={(e) => { if (e.key === 'Escape') uiStore.closeEditDialog(); }}
@@ -98,6 +102,17 @@
 					focus:outline-none focus:ring-2 focus:ring-[var(--color-text-primary)]"
 				aria-label="Activity name"
 			/>
+
+			<label for="edit-interruption" class="text-sm font-medium">Interruption reason</label>
+			<select
+				id="edit-interruption"
+				bind:value={editInterruptionReason}
+				class="radius-btn border border-[var(--color-control-border)] px-3 py-2 text-sm bg-white"
+			>
+				<option value="">None</option>
+				<option value="Internal">Internal</option>
+				<option value="External">External</option>
+			</select>
 
 			<div class="flex flex-wrap gap-2">
 				<div class="flex flex-col gap-1 flex-1 min-w-[120px]">

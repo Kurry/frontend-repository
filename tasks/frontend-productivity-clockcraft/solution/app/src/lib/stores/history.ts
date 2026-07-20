@@ -22,7 +22,7 @@ function loadHistory(): HistoryState {
 		return { snapshots: [], currentIndex: -1, branches: [] };
 	}
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		const raw = null;
 		return raw ? JSON.parse(raw) : { snapshots: [], currentIndex: -1, branches: [] };
 	} catch {
 		return { snapshots: [], currentIndex: -1, branches: [] };
@@ -39,7 +39,7 @@ function saveHistory(state: HistoryState) {
 		currentIndex: state.currentIndex < 0 ? -1 : Math.max(0, state.currentIndex - removedSnapshots),
 		branches: state.branches.slice(-20)
 	};
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+
 }
 
 function createHistoryStore() {
@@ -157,6 +157,14 @@ function createHistoryStore() {
 		_isUpdating = false;
 	}
 
+	function replaceWithSnapshot(entries: TimeEntry[], label: string) {
+		store.set({
+			snapshots: [{ entries: JSON.parse(JSON.stringify(entries)), timestamp: Date.now(), label }],
+			currentIndex: 0,
+			branches: []
+		});
+	}
+
 	return {
 		subscribe: store.subscribe,
 		pushSnapshot,
@@ -167,6 +175,7 @@ function createHistoryStore() {
 		selectBranch,
 		startExternalUpdate,
 		endExternalUpdate,
+		replaceWithSnapshot,
 		history: store,
 		derivedCurrent: derived(store, (s) => {
 			if (s.currentIndex >= 0 && s.currentIndex < s.snapshots.length) {

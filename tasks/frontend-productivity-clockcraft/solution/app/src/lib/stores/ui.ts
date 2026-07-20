@@ -12,6 +12,9 @@ interface UIState {
 	showDeleteConfirm: boolean;
 	deleteEntryId: string | null;
 	showHistoryPanel: boolean;
+	showInterruptionDialog: boolean;
+	pendingTimerData: { name: string; category: Category; tag: string } | null;
+	showExportDrawer: boolean;
 }
 
 const store: Writable<UIState> = writable({
@@ -23,7 +26,10 @@ const store: Writable<UIState> = writable({
 	editEntryId: null,
 	showDeleteConfirm: false,
 	deleteEntryId: null,
-	showHistoryPanel: false
+	showHistoryPanel: false,
+	showInterruptionDialog: false,
+	pendingTimerData: null,
+	showExportDrawer: false
 });
 
 export const uiStore = {
@@ -40,6 +46,14 @@ export const uiStore = {
 	closeDeleteConfirm: () => store.update((s) => ({ ...s, showDeleteConfirm: false, deleteEntryId: null })),
 	toggleHistoryPanel: () => store.update((s) => ({ ...s, showHistoryPanel: !s.showHistoryPanel })),
 	closeHistoryPanel: () => store.update((s) => ({ ...s, showHistoryPanel: false })),
+	openInterruptionDialog: (pendingTimerData: UIState['pendingTimerData'] = null) => store.update((s) => ({
+		...s,
+		showInterruptionDialog: true,
+		pendingTimerData
+	})),
+	closeInterruptionDialog: () => store.update((s) => ({ ...s, showInterruptionDialog: false, pendingTimerData: null })),
+	toggleExportDrawer: () => store.update((s) => ({ ...s, showExportDrawer: !s.showExportDrawer })),
+	closeExportDrawer: () => store.update((s) => ({ ...s, showExportDrawer: false })),
 	ui: store
 };
 

@@ -5,6 +5,7 @@
 	import ManualEntryForm from './lib/components/ManualEntryForm.svelte';
 	import Timeline from './lib/components/Timeline.svelte';
 	import WeeklyChart from './lib/components/WeeklyChart.svelte';
+	import HeatMap from './lib/components/HeatMap.svelte';
 	import EntryList from './lib/components/EntryList.svelte';
 	import FilterBar from './lib/components/FilterBar.svelte';
 	import SearchInput from './lib/components/SearchInput.svelte';
@@ -12,6 +13,9 @@
 	import EditDialog from './lib/components/EditDialog.svelte';
 	import DeleteConfirm from './lib/components/DeleteConfirm.svelte';
 	import HistoryPanel from './lib/components/HistoryPanel.svelte';
+	import InterruptionDialog from './lib/components/InterruptionDialog.svelte';
+	import ExportDrawer from './lib/components/ExportDrawer.svelte';
+	import CommandPalette from './lib/components/CommandPalette.svelte';
 	import Toast from './lib/components/Toast.svelte';
 	import { uiStore, historyStore, entriesStore, streakStore } from './lib/stores';
 
@@ -20,6 +24,8 @@
 	let showEditDialog = $state(false);
 	let showDeleteConfirm = $state(false);
 	let showHistoryPanel = $state(false);
+	let showInterruptionDialog = $state(false);
+	let showExportDrawer = $state(false);
 
 	uiStore.ui.subscribe((ui) => {
 		showManual = ui.showManualForm;
@@ -27,6 +33,8 @@
 		showEditDialog = ui.showEditDialog;
 		showDeleteConfirm = ui.showDeleteConfirm;
 		showHistoryPanel = ui.showHistoryPanel;
+		showInterruptionDialog = ui.showInterruptionDialog;
+		showExportDrawer = ui.showExportDrawer;
 	});
 
 	// On mount, take initial snapshot for history
@@ -87,6 +95,8 @@
 			<WeeklyChart />
 		</div>
 
+		<HeatMap />
+
 		<!-- Entry List -->
 		<EntryList />
 	</main>
@@ -109,6 +119,14 @@
 	{#if showHistoryPanel}
 		<HistoryPanel />
 	{/if}
+	{#if showInterruptionDialog}
+		<InterruptionDialog />
+	{/if}
+	{#if showExportDrawer}
+		<ExportDrawer />
+	{/if}
+
+	<CommandPalette />
 
 	<!-- Toasts -->
 	<Toast />

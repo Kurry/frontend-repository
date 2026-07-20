@@ -6,7 +6,7 @@ const STORAGE_KEY = 'clockcraft_tags';
 function loadTags(): string[] {
 	if (typeof localStorage === 'undefined') return [];
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		const raw = null;
 		return raw ? JSON.parse(raw) : [];
 	} catch {
 		return [];
@@ -15,7 +15,7 @@ function loadTags(): string[] {
 
 function saveTags(tags: string[]) {
 	if (typeof localStorage === 'undefined') return;
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(tags));
+
 }
 
 function createTagsStore() {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from "../utils/focusTrap";
 	import { historyStore, entriesStore } from '../stores';
 	import { uiStore } from '../stores/ui';
 	import { toastStore } from '../stores/toast';
@@ -80,7 +81,7 @@
 	<div
 		class="bg-white radius-card p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto shadow-xl"
 		onclick={(e) => e.stopPropagation()}
-		role="dialog"
+		role="dialog" use:focusTrap
 		aria-label="History Panel"
 		tabindex="-1"
 		onkeydown={(e) => { if (e.key === 'Escape') uiStore.closeHistoryPanel(); }}

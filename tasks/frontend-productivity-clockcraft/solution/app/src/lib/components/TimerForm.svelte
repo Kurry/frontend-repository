@@ -5,6 +5,7 @@
 	import { streakStore } from '../stores/streak';
 	import { historyStore } from '../stores/history';
 	import { tagsStore, type Category } from '../stores';
+	import { uiStore } from '../stores/ui';
 	import { get } from 'svelte/store';
 
 	let timer = $state({ running: false, name: '', category: 'neutral' as Category, tag: '', startTime: null as number | null, elapsed: 0 });
@@ -53,10 +54,17 @@
 
 		// If timer already running, stop and save current first
 		if (timer.running) {
-			const saved = doStopAndSave();
-			if (saved) {
-				toastStore.addToast(`Saved "${saved.name}" — switched to new timer`);
+			if (timer.elapsed < 25 * 60) {
+				timerStore.pauseTimer();
+				uiStore.openInterruptionDialog({ name: activityName.trim(), category, tag });
+				return;
 			}
+			const saved = doStopAndSave();
+			if (!saved) {
+				error = 'Running timer could not be saved';
+				return;
+			}
+			toastStore.addToast(`Saved "${saved.name}" — switched to new timer`);
 		}
 
 		timerStore.startTimer(activityName.trim(), category, tag);
@@ -67,6 +75,11 @@
 	}
 
 	function handleStop() {
+		if (timer.elapsed < 25 * 60) {
+			timerStore.pauseTimer();
+			uiStore.openInterruptionDialog();
+			return;
+		}
 		const saved = doStopAndSave();
 		if (saved) {
 			toastStore.addToast(`Saved: ${saved.name} (${saved.duration} min)`);

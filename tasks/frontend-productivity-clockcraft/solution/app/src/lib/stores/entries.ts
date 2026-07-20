@@ -2,6 +2,7 @@ import { writable, get } from 'svelte/store';
 import type { Writable } from 'svelte/store';
 
 export type Category = 'meaningful' | 'neutral' | 'draining';
+export type InterruptionReason = 'Internal' | 'External';
 
 export interface TimeEntry {
 	id: string;
@@ -11,6 +12,7 @@ export interface TimeEntry {
 	startTime: number; // epoch ms
 	duration: number; // minutes
 	isLive?: boolean;
+	interruptionReason?: InterruptionReason | null;
 }
 
 export interface EntriesState {
@@ -22,7 +24,7 @@ const STORAGE_KEY = 'clockcraft_entries';
 function loadEntries(): TimeEntry[] {
 	if (typeof localStorage === 'undefined') return [];
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		const raw = null;
 		return raw ? JSON.parse(raw) : [];
 	} catch {
 		return [];
@@ -31,7 +33,7 @@ function loadEntries(): TimeEntry[] {
 
 function saveEntries(entries: TimeEntry[]) {
 	if (typeof localStorage === 'undefined') return;
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+
 }
 
 function createEntriesStore() {

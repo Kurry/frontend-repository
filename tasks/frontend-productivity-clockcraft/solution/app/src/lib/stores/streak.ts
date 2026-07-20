@@ -1,6 +1,6 @@
 import { writable, get } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import { entriesStore } from './entries';
+import { entriesStore, type TimeEntry } from './entries';
 
 const STORAGE_KEY = 'clockcraft_streak';
 
@@ -16,7 +16,7 @@ function dateKey(d: Date): string {
 function loadStreak(): StreakData {
 	if (typeof localStorage === 'undefined') return { count: 0, lastDate: '' };
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		const raw = null;
 		return raw ? JSON.parse(raw) : { count: 0, lastDate: '' };
 	} catch {
 		return { count: 0, lastDate: '' };
@@ -25,11 +25,10 @@ function loadStreak(): StreakData {
 
 function saveStreak(data: StreakData) {
 	if (typeof localStorage === 'undefined') return;
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
 }
 
-function calculateStreak(): StreakData {
-	const entries = get(entriesStore.entries);
+export function calculateStreakForEntries(entries: TimeEntry[]): StreakData {
 	const daily = new Map<string, { meaningful: number; draining: number }>();
 	for (const e of entries) {
 		const key = dateKey(new Date(e.startTime));
@@ -53,6 +52,10 @@ function calculateStreak(): StreakData {
 		cursor.setDate(cursor.getDate() - 1);
 	}
 	return { count, lastDate: count > 0 ? lastDate : '' };
+}
+
+function calculateStreak(): StreakData {
+	return calculateStreakForEntries(get(entriesStore.entries));
 }
 
 function createStreakStore() {

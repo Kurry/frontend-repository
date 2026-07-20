@@ -18,7 +18,7 @@ function loadTimer(): TimerState {
 		return { running: false, name: '', category: 'neutral', tag: '', startTime: null, elapsed: 0 };
 	}
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		const raw = null;
 		if (raw) {
 			const state = JSON.parse(raw);
 			// If timer was running, recalc elapsed
@@ -33,7 +33,7 @@ function loadTimer(): TimerState {
 
 function saveTimer(state: TimerState) {
 	if (typeof localStorage === 'undefined') return;
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
 }
 
 function createTimerStore() {
@@ -76,7 +76,7 @@ function createTimerStore() {
 			intervalId = null;
 		}
 		const state = get(store);
-		if (!state.running || !state.startTime) {
+		if (!state.startTime) {
 			store.set({ running: false, name: '', category: 'neutral', tag: '', startTime: null, elapsed: 0 });
 			return null;
 		}
@@ -92,6 +92,20 @@ function createTimerStore() {
 		return result;
 	}
 
+	function pauseTimer() {
+		if (intervalId) {
+			clearInterval(intervalId);
+			intervalId = null;
+		}
+	}
+
+	function resumeTimer() {
+		const state = get(store);
+		if (intervalId || !state.startTime) return;
+		store.set({ ...state, running: true, startTime: Date.now() - state.elapsed * 1000 });
+		beginTicker();
+	}
+
 	function reset() {
 		if (intervalId) {
 			clearInterval(intervalId);
@@ -104,6 +118,8 @@ function createTimerStore() {
 		subscribe: store.subscribe,
 		startTimer,
 		stopTimer,
+		pauseTimer,
+		resumeTimer,
 		reset,
 		timer: store
 	};
