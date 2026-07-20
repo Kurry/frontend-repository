@@ -1,5 +1,8 @@
 <script lang="ts">
     import {boolCodec} from "$lib/settings/codecs";
+    import {getSetting} from "$lib/contexts";
+
+    const setting = getSetting();
 
     interface Props {
         disabled?: boolean;
@@ -21,7 +24,7 @@
 
 
 <div class="switch" class:disabled>
-    <input type="checkbox" {disabled} {checked} onchange={change} />
+    <input aria-labelledby={setting?.labelId} type="checkbox" {disabled} {checked} onchange={change} />
     <div class="switch-body">
         <svg class="switch-slider" viewBox="0 0 16 16" preserveAspectRatio="xMinYMid meet">
             <rect class="switch-handle" fill="white" x="0" y="0" height="16" width="16" rx="8" />

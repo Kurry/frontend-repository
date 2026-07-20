@@ -10,7 +10,7 @@
         clampHeight?: boolean;
     }
 
-    const {parsed, parsedDiff, parseError, text, showEmptyState = true, clampHeight = false}: Props = $props();
+    const {parsed = true, parsedDiff, parseError, text, showEmptyState = true, clampHeight = false}: Props = $props();
 
     const hasDiff = $derived(parsedDiff && Object.keys(parsedDiff).length > 0);
 </script>

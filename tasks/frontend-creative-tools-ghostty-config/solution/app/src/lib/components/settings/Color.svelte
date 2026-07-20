@@ -21,6 +21,8 @@
     const swatchTooltip = createTooltipAttachment(() => tooltip ?? "");
     const borderColor = $derived(`rgba(255, 255, 255, ${(value ? luminosity(value) : 0) * 0.0027451 + 0.3})`);
     const labelColor = $derived(value && isDark(value) ? `var(--font-color)` : "black");
+    import { getSetting } from "$lib/contexts";
+    const setting = getSetting();
     let popoutOpen = $state(false);
 
     function click(event: Event) {
@@ -51,7 +53,7 @@
 
 <div class="color-wrap" style:width="{size}px" style:height="{size}px" style:background-color={value} style:border-color={borderColor} class:disabled {@attach swatchTooltip}>
     {#if label}<span class="label" style:color={labelColor}>{label}</span>{/if}
-    <input type="color" bind:value style:width="{size}px" style:height="{size}px" onclick={click} oncontextmenu={reset} {disabled} />
+    <input aria-labelledby={setting?.labelId} type="color" bind:value style:width="{size}px" style:height="{size}px" onclick={click} oncontextmenu={reset} {disabled} />
 </div>
 
 {#if popoutOpen}

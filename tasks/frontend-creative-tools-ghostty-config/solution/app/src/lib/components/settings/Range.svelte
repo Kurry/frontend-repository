@@ -39,6 +39,8 @@
     }
 
     // Pointer event handlers for dragging the thumb
+    import { getSetting } from "$lib/contexts";
+    const setting = getSetting();
     let dragging = $state(false);
     function onPointerDown(e: PointerEvent) {
         if (!track || e.button !== 0) return;
@@ -81,7 +83,7 @@
 
 <div class="slider-setting">
     <div
-        class="slider"
+        aria-labelledby={setting?.labelId} class="slider"
         role="slider"
         tabindex="0"
         bind:this={track}

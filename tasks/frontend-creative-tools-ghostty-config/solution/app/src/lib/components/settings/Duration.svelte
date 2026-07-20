@@ -1,5 +1,8 @@
 <script lang="ts">
     import {humanizeDuration, parseDuration} from "$lib/settings/codecs";
+    import {getSetting} from "$lib/contexts";
+
+    const setting = getSetting();
 
     interface Props {
         value: string;
@@ -42,6 +45,7 @@
     <div class="input-row">
         {@render label()}
         <input
+            aria-labelledby={setting?.labelId}
             class="duration-input"
             class:error={showError}
             type="text"

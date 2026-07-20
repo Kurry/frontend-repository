@@ -1,6 +1,8 @@
 <script lang="ts">
     import {toRoot} from "$lib/attachments/portal";
     import {fly, scale} from "svelte/transition";
+    import { getSetting } from "$lib/contexts";
+    const setting = getSetting();
 
     type DropdownOptionInput =
         | string
@@ -368,6 +370,7 @@
 
 <div class="dropdown" bind:this={rootEl}>
     <button
+        aria-labelledby={setting?.labelId}
         class="trigger"
         class:open={isOpen}
         class:empty={!selectedOption}

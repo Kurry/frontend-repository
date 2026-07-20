@@ -12,12 +12,14 @@
     // eslint-disable-next-line prefer-const
     let {value = $bindable(), placeholder = "", blank = false, align = "right", size, change, onfocus}: Props = $props();
 
+    import { getSetting } from "$lib/contexts";
+    const setting = getSetting();
     function click(event: MouseEvent) {
         event.stopPropagation();
     }
 </script>
 
-<input class:blank class:empty={value === ""} class={align} type="text" {placeholder} style:width={size ? `${size}ch` : "auto"} onclick={click} onchange={change} {onfocus} bind:value />
+<input aria-labelledby={setting?.labelId} class:blank class:empty={value === ""} class={align} type="text" {placeholder} style:width={size ? `${size}ch` : "auto"} onclick={click} onchange={change} {onfocus} bind:value />
 
 <style>
 input {

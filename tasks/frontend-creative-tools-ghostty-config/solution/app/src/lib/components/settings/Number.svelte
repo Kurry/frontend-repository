@@ -21,6 +21,9 @@
 
     // The bound `value` is a string; all the numeric math below works off this parsed number
     // (undefined means "no value" / empty input).
+    import { getSetting } from "$lib/contexts";
+    const setting = getSetting();
+
     const num = $derived(numberCodec.parse(value));
 
     // Check if the current value is valid (within min/max bounds)
@@ -131,13 +134,20 @@
     // Reset any abnormal user input after they click out
     function onBlur(e: FocusEvent) {
         const target = e.target as HTMLInputElement;
+        if (!isNaN(parseFloat(target.value))) {
+            let numValue = isActuallyInteger ? parseInt(target.value, 10) : parseFloat(target.value);
+            let constrainedValue = isActuallyInteger ? Math.round(numValue) : numValue;
+            if (min !== undefined && constrainedValue < min) constrainedValue = min;
+            if (max !== undefined && constrainedValue > max) constrainedValue = max;
+            commit(constrainedValue);
+        }
         target.value = displayValue;
     }
 </script>
 
 
 <div class="number-input">
-    <input
+    <input aria-labelledby={setting?.labelId}
         type="text"
         value={displayValue}
         {size}

@@ -24,6 +24,7 @@
     }
 
     const {name = "", note = "", platform, since, description, settingId, children, onReset, isNonDefault = false, inline = true, themeBadge}: Props = $props();
+    const labelId = $derived(settingId ? `${settingId}-label` : undefined);
     const tooltipAttachment = createTooltipAttachment("Reset to default");
 
 
@@ -87,7 +88,7 @@
 
     // Give the setting context so that child components can access the setting info if needed
     // svelte-ignore state_referenced_locally
-    setSetting({name, note, platform, since, description: description || ""});
+    setSetting({name, note, platform, since, description: description || "", labelId});
 </script>
 
 <div
@@ -100,7 +101,7 @@
     <div class="row">
         {#if name}
         <div class="row-left">
-            <div class="setting-name">{name}</div>
+            <span id={labelId} class="setting-name">{name}</span>
             {#if infoBadges.length > 0 || (isNonDefault && onReset)}
                 <div class="setting-extra">
                     {#each infoBadges as badge (badge.label)}

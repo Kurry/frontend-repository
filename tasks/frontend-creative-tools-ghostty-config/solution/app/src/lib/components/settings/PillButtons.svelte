@@ -12,6 +12,10 @@
 
 
 <script lang="ts">
+    import {getSetting} from "$lib/contexts";
+
+    const setting = getSetting();
+
     interface Props {
         value: string;
         options: PillOption[];
@@ -29,7 +33,7 @@
 </script>
 
 
-<div class="pill-group" role="group" class:compact={size === "compact"}>
+<div class="pill-group" role="group" aria-labelledby={setting?.labelId} class:compact={size === "compact"}>
     {#each options as option (option.value)}
         <button
             type="button"
