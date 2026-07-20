@@ -24,8 +24,6 @@ export function registerWebMCP(app, ui) {
     if(filter==='all')app.clearFilters(); else { const key={language:'language','difficulty-band':'band',license:'license',status:'status','name-search':'search'}[filter]; app.filters[key]=''; app.selectedIds=[]; } return {ok:true,visibleCount:app.visibleCandidates.length};
   });
   add('browse_sort','Sort candidates by a declared column and direction.',objectSchema({sort:stringEnum(['name','stars','difficulty']),direction:stringEnum(['asc','desc'])},['sort','direction']),({sort,direction}) => { app.sort={key:sort,direction}; app.activeView='candidates'; return visible(`Sorted candidates by ${sort} ${direction}.`); });
-  add('browse_set_locale','Report locale availability for this bounded console.',objectSchema({locale:stringEnum(['en'])},['locale']),() => ({ok:false,error:'Sourcebench is currently available in English only; no state changed.'}));
-  add('browse_set_theme','Report theme availability for this bounded console.',objectSchema({theme:stringEnum(['dark'])},['theme']),() => ({ok:false,error:'Sourcebench uses its fixed dark sourcing-console theme; no state changed.'}));
 
   add('entity_select','Select or clear a candidate checkbox.',objectSchema({name:{type:'string',maxLength:120},selected:{type:'boolean'}},['name','selected']),({name,selected}) => { const candidate=app.find(name); if(!candidate)return {ok:false,error:'Candidate not found.'}; app.setSelection(candidate.id,selected); return {ok:true,selectedCount:app.selectedCount}; });
   add('entity_update','Run a declared candidate status command using the same product handler.',objectSchema({name:{type:'string',maxLength:120},status:stringEnum(STATUSES),'rejection-reason':stringEnum(REASONS),'pin-notes':{type:'string',maxLength:200}},['name','status']),args => {
@@ -40,13 +38,15 @@ export function registerWebMCP(app, ui) {
     return {ok:!!result,status:candidate.status,guard:candidate.guardMessage||undefined};
   });
   add('entity_reorder','Reorder a queued candidate for setup; gesture behavior remains in the UI.',objectSchema({name:{type:'string',maxLength:120},'queue-position':{type:'integer',minimum:1}},['name','queue-position']),args => { const candidate=app.find(args.name); if(!candidate)return {ok:false,error:'Candidate not found.'}; const ok=app.reorder(candidate.id,args['queue-position']-1); return {ok,position:app.queue.indexOf(candidate.id)+1}; });
-  add('entity_create','Report candidate creation availability.',objectSchema(),() => ({ok:false,error:'Individual candidate creation is unavailable; use the visible Fetch more candidates workflow.'}));
-  add('entity_delete','Report candidate deletion availability without changing state.',objectSchema({name:{type:'string',maxLength:120},confirm:{type:'boolean'}},['name','confirm']),() => ({ok:false,error:'Candidate deletion is not part of this session workflow; no state changed.'}));
-  add('entity_toggle','Report toggle availability for the candidate entity.',objectSchema({name:{type:'string',maxLength:120}},['name']),() => ({ok:false,error:'Candidate fields do not expose a generic toggle; use entity_select or entity_update.'}));
-  add('entity_quantity','Report quantity availability for the candidate entity.',objectSchema({name:{type:'string',maxLength:120},quantity:{type:'integer',minimum:0}},['name','quantity']),() => ({ok:false,error:'Candidates do not have a quantity field; no state changed.'}));
 
   add('form_validate','Validate declared rejection or pin form fields.',objectSchema({form:stringEnum(['rejection','pin']),'rejection-reason':{type:'string'},'pin-notes':{type:'string'}},['form']),args => {
-    const result=args.form==='rejection'?rejectionSchema.safeParse({reason:args['rejection-reason']}):pinSchema.safeParse({notes:args['pin-notes']??''}); return result.success?{ok:true}:{ok:false,error:result.error.issues[0].message};
+    const result=args.form==='rejection'?rejectionSchema.safeParse({reason:args['rejection-reason']}):pinSchema.safeParse({notes:args['pin-notes']??''});
+    if(!result.success) {
+      if(args.form==='rejection' && ui.rejectionError !== undefined) ui.rejectionError=result.error.issues[0].message;
+      if(args.form==='pin' && ui.pinError !== undefined) ui.pinError=result.error.issues[0].message;
+      return {ok:false,error:result.error.issues[0].message};
+    }
+    return {ok:true};
   });
   add('form_submit','Open or submit a declared candidate form through the visible product flow.',objectSchema({form:stringEnum(['rejection','pin']),name:{type:'string',maxLength:120},'rejection-reason':stringEnum(REASONS),'pin-notes':{type:'string',maxLength:200}},['form','name']),args => {
     const candidate=app.find(args.name); if(!candidate)return {ok:false,error:'Candidate not found.'};
@@ -54,9 +54,6 @@ export function registerWebMCP(app, ui) {
     ui.statusAction(candidate,'pin'); return visible(`Pin form opened for ${candidate.name}; confirm its generated commit in the visible dialog.`);
   });
   add('form_cancel','Cancel the open rejection or pin form.',objectSchema({form:stringEnum(['rejection','pin'])},['form']),() => { if(['reject','pin'].includes(app.modal?.type))app.modal=null; return visible('Form cancelled with no state change.'); });
-  add('form_reset','Reset the open declared form to its initial visible state.',objectSchema({form:stringEnum(['rejection','pin'])},['form']),({form}) => { if((form==='rejection'&&app.modal?.type==='reject')||(form==='pin'&&app.modal?.type==='pin')){ app.modal=null; return visible('Form reset and closed with no session mutation.'); } return {ok:false,error:'The requested form is not open.'}; });
-  add('form_advance','Report workflow advance availability.',objectSchema({form:stringEnum(['rejection','pin'])},['form']),() => ({ok:false,error:'This form has one step; submit it through normal validation.'}));
-  add('form_return','Return from the open form without applying it.',objectSchema({form:stringEnum(['rejection','pin'])},['form']),() => { if(['reject','pin'].includes(app.modal?.type)){app.modal=null;return visible('Returned from the form with no state change.');} return {ok:false,error:'No candidate form is open.'}; });
 
   add('artifact_export','Open a live export format without returning artifact contents.',objectSchema({format:stringEnum(['queue-json','candidates-csv','sourcing-report-markdown'])},['format']),({format}) => { ui.openPanel('export'); return visible(`Export panel opened for ${format}; use the visible controls to copy or download.`); });
   add('artifact_import','Start a declared sourcing-pack import mode without accepting raw artifact content.',objectSchema({mode:stringEnum(['sourcing-pack-json','seeded-sample'])},['mode']),({mode}) => {
@@ -64,10 +61,12 @@ export function registerWebMCP(app, ui) {
     ui.openPanel('import'); return visible('Import panel opened; choose a file or paste JSON in the visible form.');
   });
   add('artifact_copy','Open the export surface for a declared format; clipboard interaction remains visible.',objectSchema({format:stringEnum(['queue-json','candidates-csv','sourcing-report-markdown'])},['format']),({format}) => { ui.openPanel('export'); return visible(`Export panel opened for ${format}; activate Copy in the visible panel.`); });
-  add('artifact_print_preview','Report print-preview availability.',objectSchema(),() => ({ok:false,error:'Print preview is not available; export the sourcing report markdown instead.'}));
-  add('artifact_convert','Report conversion availability for declared artifacts.',objectSchema({format:stringEnum(['queue-json','candidates-csv','sourcing-report-markdown'])},['format']),() => ({ok:false,error:'Artifact conversion is not available; choose a live export tab.'}));
 
   window.sourcebenchWebMCPTools=tools;
+  window.webmcp_session_info=() => ({
+    "contract_version": "zto-webmcp-v1",
+    "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "artifact-transfer-v1"]
+  });
   window.webmcp_list_tools=() => tools.map(({name,description,inputSchema})=>({name,description,inputSchema}));
   window.webmcp_invoke_tool=async(name,args={}) => { const tool=tools.find((item)=>item.name===name); if(!tool)throw new Error(`Unknown WebMCP tool: ${name}`); return tool.execute(args); };
   if(navigator.modelContext?.registerTool){ window.webmcpRegistrationErrors=[]; for(const tool of tools){ try{ navigator.modelContext.registerTool(tool); }catch(error){ window.webmcpRegistrationErrors.push({name:tool.name,message:error.message}); } } }
