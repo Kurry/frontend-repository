@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: 'Georgia', serif;
+  --font-mono: 'Courier New', monospace;
+  --font-sans: 'Arial', sans-serif;
+}
