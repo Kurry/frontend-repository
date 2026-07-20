@@ -17,11 +17,12 @@
   let leaving = $state(false);
 
   $effect(() => {
+    let enterFrame = 0;
     if (open) {
       mounted = true;
       leaving = false;
       opener = document.activeElement;
-      requestAnimationFrame(() => {
+      enterFrame = requestAnimationFrame(() => {
         visible = true;
         tick().then(() => (panel?.querySelector<HTMLElement>('input, textarea, select, button') ?? panel)?.focus());
       });
@@ -33,8 +34,12 @@
         leaving = false;
         if (opener instanceof HTMLElement) opener.focus();
       }, 250);
-      return () => clearTimeout(timer);
+      return () => {
+        cancelAnimationFrame(enterFrame);
+        clearTimeout(timer);
+      };
     }
+    return () => cancelAnimationFrame(enterFrame);
   });
 
   function keydown(event: KeyboardEvent) {
