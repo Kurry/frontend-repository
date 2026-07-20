@@ -36,6 +36,8 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
   const dispatch = useDispatch();
   const query = useSelector((state: RootState) => state.theme.searchQuery);
   const themes = useSelector((state: RootState) => state.theme.themes);
+  const activeId = useSelector((state: RootState) => state.theme.activeId);
+  const dirty = useSelector((state: RootState) => state.theme.dirty);
   const [highlighted, setHighlighted] = useState(0);
 
   const results = useMemo<Result[]>(() => {
@@ -67,6 +69,12 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
         group: 'Saved themes',
         keywords: `${theme.name} saved theme load`,
         run: closeAfter(() => {
+          // Mirror the Saved Themes card guard: reloading the already-active
+          // theme while it has unsaved edits would silently discard them.
+          if (theme.id === activeId && dirty) {
+            dispatch(announce(`${theme.name} is already loaded — save or undo your unsaved changes first`));
+            return;
+          }
           dispatch(loadTheme(theme.id));
           dispatch(setTab('preview'));
           dispatch(announce(`Theme ${theme.name} loaded`));
@@ -107,7 +115,7 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
       })),
     ];
     return items.filter(item => fuzzyMatch(`${item.label} ${item.keywords}`, query));
-  }, [dispatch, onClose, query, themes]);
+  }, [dispatch, onClose, query, themes, activeId, dirty]);
 
   useEffect(() => {
     if (open) {

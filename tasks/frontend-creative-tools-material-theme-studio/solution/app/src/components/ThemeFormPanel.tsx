@@ -74,7 +74,15 @@ export default function ThemeFormPanel() {
 
   const onValid = (data: FormData) => {
     const name = data.name;
-    if (editingTheme) {
+    if (mode === 'rename') {
+      // The panel is click-through, so the target theme can be deleted while
+      // the rename form stays open — cancel instead of falling through to
+      // createTheme (which would spawn a duplicate under a "Rename" UI).
+      if (!editingTheme) {
+        dispatch(announce('That theme was deleted — rename cancelled'));
+        close();
+        return;
+      }
       dispatch(updateTheme({ id: editingTheme.id, name }));
       dispatch(announce(`Theme renamed to ${name}`));
     } else {
