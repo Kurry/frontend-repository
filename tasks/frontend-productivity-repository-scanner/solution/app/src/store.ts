@@ -117,6 +117,8 @@ export type AppState = {
   setUi: (key: keyof UiState, value: boolean) => void
   undo: () => void
   redo: () => void
+  globalError: string | null
+  setGlobalError: (error: string | null) => void
   importIndex: (payload: unknown) => { ok: boolean; error?: string }
   refreshArtifacts: () => void
   pauseScan: (repositoryId: string) => void
@@ -299,6 +301,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   artifactJson: compileJson(initialArtifactState),
   artifactMarkdown: compileMarkdown(initialArtifactState),
   ui: { addOpen: false, exportOpen: false, importOpen: false, paletteOpen: false },
+  globalError: null,
+  setGlobalError: (error) => set({ globalError: error }),
 
   addRepository: (values) => {
     const parsed = repositoryFormSchema.safeParse(values)
