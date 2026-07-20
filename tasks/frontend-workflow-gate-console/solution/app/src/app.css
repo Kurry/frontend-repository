@@ -112,3 +112,4 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
 }
+@media (max-width: 768px) { button, .action, .header-action, .close-button, .icon-button, select, input { min-height: 44px; } .close-button, .icon-button, .header-action { min-width: 44px; justify-content: center; align-items: center; } }

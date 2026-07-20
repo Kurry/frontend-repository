@@ -247,8 +247,10 @@ export class ConsoleStore {
     if (!this.whatIf.active || this.whatIf.runId !== this.selectedRun.id || this.whatIf.stageName !== this.selectedStage.name) return false;
     const gate = this.selectedStage.gates.find((candidate) => candidate.id === gateId);
     if (!gate) return false;
-    if (gate.state === state) delete this.whatIf.values[gateId];
-    else this.whatIf.values[gateId] = state;
+    const nextValues = { ...this.whatIf.values };
+    if (gate.state === state) delete nextValues[gateId];
+    else nextValues[gateId] = state;
+    this.whatIf.values = nextValues;
     return true;
   }
 
@@ -263,8 +265,8 @@ export class ConsoleStore {
     if (!parsed.success) return false;
     const gate = this.selectedStage.gates.find((candidate) => candidate.id === gateId);
     if (!gate) return false;
-    gate.notes.push({ text: parsed.data.text, category: parsed.data.category });
-    this.selectedRun.timeline.push(issue(this.selectedRun.id, 'note', `Note added to ${gate.id}: ${parsed.data.category}`));
+    gate.notes = [...gate.notes, { text: parsed.data.text, category: parsed.data.category }];
+    this.selectedRun.timeline = [...this.selectedRun.timeline, issue(this.selectedRun.id, 'note', `Note added to ${gate.id}: ${parsed.data.category}`)];
     this.noteFormGateId = null;
     this.touchExport();
     this.showToast(`Note added to ${gate.id}`);
@@ -274,7 +276,9 @@ export class ConsoleStore {
   deleteNote(gateId: string, noteIndex: number): boolean {
     const gate = this.selectedStage.gates.find((candidate) => candidate.id === gateId);
     if (!gate || !gate.notes[noteIndex]) return false;
-    gate.notes.splice(noteIndex, 1);
+    const nextNotes = [...gate.notes];
+    nextNotes.splice(noteIndex, 1);
+    gate.notes = nextNotes;
     this.touchExport();
     this.showToast(`Note removed from ${gate.id}`);
     return true;
@@ -284,7 +288,7 @@ export class ConsoleStore {
     let removed = 0;
     this.selectedRun.stages.forEach((stage) => stage.gates.forEach((gate) => {
       removed += gate.notes.length;
-      gate.notes.splice(0, gate.notes.length);
+      gate.notes = [];
     }));
     this.selectedRun.timeline = this.selectedRun.timeline.filter((entry) => entry.type !== 'note');
     if (removed) {
@@ -299,6 +303,7 @@ export class ConsoleStore {
     const stage = run.stages.find((candidate) => candidate.name === stageName);
     if (!stage) return false;
     this.revertWhatIf();
+    this.whatIf.values = {};
     this.noteFormGateId = null;
     const gateStatuses: Record<string, RerunGateStatus> = {};
     stage.gates.forEach((gate) => { gateStatuses[gate.id] = 'pending'; });
