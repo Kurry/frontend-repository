@@ -37,9 +37,12 @@
         class="input-field max-w-44 px-3 py-1 text-[0.8rem]"
         placeholder="New tag"
         autocomplete="off"
+        :aria-invalid="tagError ? 'true' : undefined"
+        :aria-describedby="tagError ? inputId + '-error' : undefined"
       />
       <button type="submit" class="btn-secondary min-h-8 px-3 text-[0.8rem]">Add Tag</button>
     </form>
+    <p v-if="tagError" :id="inputId + '-error'" class="mt-1 text-[0.75rem] text-error">{{ tagError }}</p>
   </div>
 </template>
 
@@ -47,6 +50,7 @@
 import { computed, ref } from 'vue'
 import { useSparkStore } from '../stores/sparkStore'
 import type { Spark } from '../stores/sparkStore'
+import { TagAddSchema } from '../stores/sparkStore'
 import { showToast } from '../utils/toast'
 
 const props = defineProps<{
@@ -55,12 +59,21 @@ const props = defineProps<{
 
 const store = useSparkStore()
 const draft = ref('')
+const tagError = ref('')
 
 const inputId = computed(() => `tag-input-${props.spark.id}`)
 
 function submitTag() {
   const value = draft.value.trim()
   if (!value) return
+
+  const validateResult = TagAddSchema.safeParse(value)
+  if (!validateResult.success) {
+    tagError.value = validateResult.error.issues[0].message
+    return
+  }
+  tagError.value = ''
+
   const result = store.addTagToSpark(props.spark.id, value)
   if (result === 'duplicate') {
     showToast(`Tag "${value}" is already on this spark`, 'info')
