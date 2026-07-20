@@ -177,7 +177,13 @@ export const useFactoryStore = create((set, get) => ({
 
   navigate: (view) => set({ activeView: view, mobileNavOpen: false, createDialogOpen: false }),
   openRepository: (repoId) => set({ activeView: 'repository-pipeline', selectedRepositoryId: repoId, selectedPrId: null, mobileNavOpen: false, createDialogOpen: false }),
-  openTask: (repoId, prId) => set({ activeView: 'task-detail', selectedRepositoryId: repoId, selectedPrId: prId, createDialogOpen: false, trialFilter: null }),
+  openTask: (repoId, prId) => set((state) => ({
+    activeView: 'task-detail',
+    selectedRepositoryId: repoId,
+    selectedPrId: prId,
+    createDialogOpen: false,
+    trialFilter: state.selectedRepositoryId === repoId && state.selectedPrId === prId ? state.trialFilter : null,
+  })),
   backToPipeline: () => set({ activeView: 'repository-pipeline', selectedPrId: null }),
   setTrialFilter: (trialFilter) => set({ trialFilter }),
   setTimelineFilter: (timelineFilter) => set({ timelineFilter }),

@@ -310,7 +310,11 @@ function ManifestPanel({ pr }) {
   const text = JSON.stringify(manifest, null, 2)
   const copy = async () => {
     taskManifestSchema.parse(manifest)
-    await copyText(text)
+    const ok = await copyText(text)
+    if (!ok) {
+      addToast('Could not copy task manifest to clipboard', 'error')
+      return
+    }
     setCopied(true)
     addToast('Task manifest copied to clipboard', 'success')
     window.setTimeout(() => setCopied(false), 1800)
@@ -361,10 +365,17 @@ function TaskDetailView() {
 function exportAllAccepted() {
   const state = useFactoryStore.getState()
   const manifests = state.listAcceptedManifests()
-  manifests.forEach((manifest) => taskManifestSchema.safeParse(manifest))
-  downloadText('accepted-task-manifests.json', JSON.stringify(manifests, null, 2))
-  state.addToast(`${manifests.length} accepted task manifest${manifests.length === 1 ? '' : 's'} exported`, 'success')
-  return manifests.length
+  const validated = manifests.flatMap((manifest) => {
+    const parsed = taskManifestSchema.safeParse(manifest)
+    return parsed.success ? [parsed.data] : []
+  })
+  if (!validated.length) {
+    state.addToast('No valid accepted manifests to export', 'error')
+    return 0
+  }
+  downloadText('accepted-task-manifests.json', JSON.stringify(validated, null, 2))
+  state.addToast(`${validated.length} accepted task manifest${validated.length === 1 ? '' : 's'} exported`, 'success')
+  return validated.length
 }
 
 function TimelineView() {
@@ -643,7 +654,8 @@ function registerWebMcp() {
       const state = useFactoryStore.getState(); const pr = state.pullRequests[state.selectedRepositoryId]?.find((item) => item.id === state.selectedPrId); const manifest = state.getManifest(pr)
       if (!manifest) throw new Error('Select an accepted task first')
       const text = JSON.stringify(manifest, null, 2)
-      await copyText(text)
+      const copied = await copyText(text)
+      if (!copied) return { ok: false, format: 'task-manifest', copied: false, error: 'Clipboard copy failed' }
       state.addToast('Task manifest copied to clipboard', 'success')
       return { ok: true, format: 'task-manifest', copied: true }
     },

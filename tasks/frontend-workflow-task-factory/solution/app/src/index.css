@@ -126,7 +126,7 @@ button:disabled { cursor: not-allowed; }
 .pipeline-row:hover { background: #eef5f0; }
 .pipeline-row.fresh { animation: rowIn .45s ease both; background: #f7fbf8; }
 .pr-number { font-weight: 740; font-variant-numeric: tabular-nums; color: #35463d; }
-.pr-title { display: block; max-width: 100%; white-space: normal; overflow: visible; font-weight: 650; color: #202b25; line-height: 1.35; }
+.pr-title { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 650; color: #202b25; line-height: 1.35; }
 .pr-sub { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
 .no-issue { color: #8a928e; font-size: 10px; display: inline-flex; align-items: center; gap: 4px; }
 .file-count { display: inline-flex; gap: 5px; align-items: center; font-variant-numeric: tabular-nums; color: #536159; }
