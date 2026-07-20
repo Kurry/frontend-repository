@@ -318,6 +318,112 @@ export function setConflictResolution(value: ConflictResolution | null) {
   conflictResolution = value;
 }
 
+// ---- workspace artifact (Export / Import / Copy) ---------------------------
+// Same compile/apply commands the Export, Copy, and Import controls call, so
+// the WebMCP artifact tools drive the exact logic the visible UI reaches
+// instead of fabricating a success state.
+
+const SAVED_ANALYSES_KEY = 'panecraft-saved-analyses';
+
+export interface WorkspaceExport {
+  version: string;
+  exportedAt: string;
+  activePageId: string;
+  dateRange: DateRange;
+  pages: Page[];
+  savedAnalyses: unknown[];
+}
+
+function loadSavedAnalyses(): unknown[] {
+  const storage = safeGetStorage();
+  if (!storage) return [];
+  try {
+    const raw = storage.getItem(SAVED_ANALYSES_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+export function compileWorkspaceExport(): WorkspaceExport {
+  return {
+    version: '1',
+    exportedAt: new Date().toISOString(),
+    activePageId,
+    dateRange,
+    pages: pages.map((page) => ({
+      id: page.id,
+      name: page.name,
+      panes: page.panes.map((pane) => ({ ...pane })),
+    })),
+    savedAnalyses: loadSavedAnalyses(),
+  };
+}
+
+export function compileMarkdownReport(): string {
+  const lines: string[] = ['# PaneCraft Workspace Report', '', `Generated ${new Date().toISOString()}`, ''];
+  for (const page of pages) {
+    lines.push(`## ${page.name}`, '');
+    if (page.panes.length === 0) {
+      lines.push('_No panes on this page._', '');
+      continue;
+    }
+    lines.push('| Pane | Type | Source | Metric | Dimension | Size | Refresh |', '| --- | --- | --- | --- | --- | --- | --- |');
+    for (const pane of page.panes) {
+      lines.push(`| ${pane.title} | ${pane.type} | ${pane.dataSourceId} | ${pane.metric} | ${pane.dimension ?? '—'} | ${pane.size} | ${pane.refreshInterval} |`);
+    }
+    lines.push('');
+  }
+  return lines.join('\n');
+}
+
+export function applyWorkspaceImport(raw: unknown): { ok: boolean; error?: string; pageCount?: number; paneCount?: number } {
+  if (!raw || typeof raw !== 'object') return { ok: false, error: 'workspace JSON must be an object' };
+  const data = raw as Partial<WorkspaceExport>;
+  if (!Array.isArray(data.pages) || data.pages.length === 0) {
+    return { ok: false, error: 'workspace JSON must include a non-empty pages array' };
+  }
+  const nextPages: Page[] = [];
+  for (const rawPage of data.pages) {
+    if (!rawPage || typeof rawPage !== 'object' || typeof rawPage.id !== 'string' || typeof rawPage.name !== 'string') {
+      return { ok: false, error: 'each page requires an id and a name' };
+    }
+    const rawPanes = Array.isArray(rawPage.panes) ? rawPage.panes : [];
+    const panes: Pane[] = [];
+    for (const rawPane of rawPanes) {
+      if (!rawPane || typeof rawPane !== 'object' || typeof rawPane.dataSourceId !== 'string' || typeof rawPane.metric !== 'string') {
+        return { ok: false, error: 'each pane requires dataSourceId and metric' };
+      }
+      panes.push({
+        id: typeof rawPane.id === 'string' ? rawPane.id : generateId('pane'),
+        title: typeof rawPane.title === 'string' && rawPane.title ? rawPane.title : 'Untitled pane',
+        type: rawPane.type,
+        dataSourceId: rawPane.dataSourceId,
+        metric: rawPane.metric,
+        dimension: rawPane.dimension,
+        size: rawPane.size ?? 'small',
+        refreshInterval: rawPane.refreshInterval ?? 'off',
+        lastRefreshTime: Date.now(),
+        refreshTick: 0,
+      });
+    }
+    nextPages.push({ id: rawPage.id, name: rawPage.name, panes });
+  }
+
+  pages = nextPages;
+  activePageId = data.activePageId && nextPages.some((page) => page.id === data.activePageId)
+    ? data.activePageId
+    : nextPages[0]!.id;
+  if (data.dateRange && ['1', '7', '30', '90'].includes(data.dateRange)) {
+    dateRange = data.dateRange;
+  }
+  persist();
+
+  const paneCount = nextPages.reduce((sum, page) => sum + page.panes.length, 0);
+  return { ok: true, pageCount: nextPages.length, paneCount };
+}
+
 export function filterRowsByDateRange(
   rows: Record<string, any>[],
   dateColumn: string | undefined,
