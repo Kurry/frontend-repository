@@ -92,7 +92,10 @@ def main() -> None:
         tip = sh("git", "rev-parse", f"origin/{br}").stdout.strip()
         if not tip:
             print(f"skip #{num} {br}: could not resolve origin ref", file=sys.stderr); skipped += 1; continue
-        paths = sh("git", "diff-tree", "--no-commit-id", "--name-only", "-r", tip).stdout
+        # Files the branch changed vs its fork point — robust for merge commits
+        # (plain diff-tree shows nothing on a merge) and normal commits alike.
+        base = sh("git", "merge-base", "origin/main", tip).stdout.strip() or "origin/main"
+        paths = sh("git", "diff", "--name-only", base, tip).stdout
         slugs = sorted({p.split("/")[1] for p in paths.splitlines()
                         if p.startswith("tasks/") and len(p.split("/")) > 2})
         if not slugs:
