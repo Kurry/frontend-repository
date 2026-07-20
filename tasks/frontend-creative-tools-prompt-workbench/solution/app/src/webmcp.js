@@ -210,36 +210,42 @@ const tools = [
 ]
 
 let registered = false
+const nativeRegisteredTools = new Set()
 
 export function registerWebMCP() {
+  const registry = new Map(tools.map((tool) => [tool.name, tool]))
   window.webmcp_session_info = () => ({
-    contract_version: 'zto-webmcp-v1',
-    modules: [
-      'structured-editor-v1',
-      'command-session-v1',
-      'entity-collection-v1',
-      'artifact-transfer-v1'
-    ],
-    bindings: {
-      editor_object_types: ['prompt-draft', 'variable', 'attachment', 'persona'],
-      editor_properties: ['prompt-text', 'variable-name', 'variable-value', 'model', 'persona-id'],
-      editor_operations: ['set_content', 'add', 'delete', 'update_property', 'select', 'preview', 'switch_mode'],
-      editor_modes: ['workbench', 'library'],
-      session_operations: ['start', 'stop', 'advance'],
-      entity: ['library-prompt'],
-      entity_operations: ['create', 'select', 'delete'],
-      entity_fields: ['title', 'technique', 'prompt-text', 'bindings', 'attachments', 'persona'],
-      artifact_operations: ['export', 'import', 'copy'],
-      export_formats: ['markdown', 'json'],
-      import_modes: ['json']
+    contractVersion: 'zto-webmcp-v1',
+    modules: ['structured-editor-v1', 'command-session-v1', 'entity-collection-v1', 'artifact-transfer-v1'],
+    tools: tools.map((tool) => tool.name),
+  })
+  window.webmcp_list_tools = () => tools.map(({ execute, ...tool }) => tool)
+  window.webmcp_invoke_tool = async (name, args = {}) => {
+    const tool = registry.get(name)
+    if (!tool) throw new Error(`Unknown WebMCP tool: ${name}`)
+    return tool.execute(args)
+  }
+
+  const attempt = async () => {
+    if (registered) return true
+    const context = document.modelContext || navigator.modelContext
+    if (!context?.registerTool) return false
+    for (const tool of tools) {
+      if (nativeRegisteredTools.has(tool.name)) continue
+      try {
+        await context.registerTool(tool)
+        nativeRegisteredTools.add(tool.name)
+      } catch (error) {
+        console.warn(`WebMCP registration failed for ${tool.name}`, error)
+      }
     }
-  });
-
-  window.webmcp_list_tools = () => tools.map(({ name, description, inputSchema }) => ({ name, description, inputSchema }));
-
-  window.webmcp_invoke_tool = async (name, args) => {
-    const tool = tools.find(t => t.name === name);
-    if (!tool) throw new Error(`Tool ${name} not found`);
-    return await tool.execute(args);
-  };
+    registered = nativeRegisteredTools.size === tools.length
+    return registered
+  }
+  attempt()
+  let tries = 0
+  const timer = window.setInterval(async () => {
+    tries += 1
+    if (await attempt() || tries > 40) window.clearInterval(timer)
+  }, 250)
 }
