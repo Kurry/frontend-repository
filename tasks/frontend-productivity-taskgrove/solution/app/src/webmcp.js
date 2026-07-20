@@ -350,7 +350,7 @@ TOOLS.push(
 );
 
 export function initWebMcp() {
-  const w = window;
+  const w = typeof window !== 'undefined' ? window : globalThis;
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
     modules: ['entity-collection-v1', 'browse-query-v1', 'artifact-transfer-v1'],
