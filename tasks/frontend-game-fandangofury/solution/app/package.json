@@ -24,7 +24,7 @@
     "tailwindcss": "4.3.2",
     "tsparticles": "^4.3.2",
     "xstate": "5.32.4",
-    "zod": "^4.4.3"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "typescript": "6.0.3"
