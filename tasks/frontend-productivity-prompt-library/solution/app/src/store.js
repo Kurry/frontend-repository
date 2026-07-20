@@ -8,6 +8,17 @@ import {
   summarizeChanges,
 } from './models';
 
+
+let returnFocusNode = null;
+const saveFocus = () => { if (!returnFocusNode) returnFocusNode = document.activeElement; };
+const restoreFocus = () => {
+  if (returnFocusNode) {
+    const node = returnFocusNode;
+    returnFocusNode = null;
+    setTimeout(() => node.focus(), 10);
+  }
+};
+
 let idCounter = 100;
 let toastTimer;
 let copyTimer;
@@ -61,14 +72,14 @@ export const useLibraryStore = create((set, get) => ({
   setSelected: (ids) => set({ selectedIds: [...new Set(ids)] }),
   clearSelection: () => set({ selectedIds: [] }),
 
-  openModal: (activeModal) => set({ activeModal }),
-  closeModal: () => set({ activeModal: null }),
-  openDetail: (detailPromptId) => set({ detailPromptId, sourceListPromptId: null }),
-  closeDetail: () => set({ detailPromptId: null }),
-  openHistory: (historyPromptId) => set({ historyPromptId }),
-  closeHistory: () => set({ historyPromptId: null }),
-  openSources: (sourceListPromptId) => set({ sourceListPromptId }),
-  closeSources: () => set({ sourceListPromptId: null }),
+  openModal: (activeModal) => { saveFocus(); set({ activeModal }); },
+  closeModal: () => { set({ activeModal: null }); restoreFocus(); },
+  openDetail: (detailPromptId) => { saveFocus(); set({ detailPromptId, sourceListPromptId: null }); },
+  closeDetail: () => { set({ detailPromptId: null }); restoreFocus(); },
+  openHistory: (historyPromptId) => { saveFocus(); set({ historyPromptId }); },
+  closeHistory: () => { set({ historyPromptId: null }); restoreFocus(); },
+  openSources: (sourceListPromptId) => { saveFocus(); set({ sourceListPromptId }); },
+  closeSources: () => { set({ sourceListPromptId: null }); restoreFocus(); },
 
   createPrompt: (draft, options = {}) => {
     const data = promptRequestSchema.parse(draft);
