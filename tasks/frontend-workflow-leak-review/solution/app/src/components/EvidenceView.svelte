@@ -1,8 +1,6 @@
 <script>
-  import { createForm } from 'felte';
-  import { validator } from '@felte/validator-zod';
   import { tick } from 'svelte';
-  import { Button, Textarea } from 'flowbite-svelte';
+  import { Button } from 'flowbite-svelte';
   import { ArrowLeft, ArrowRight, BracketsCurly, CheckCircle, WarningDiamond } from 'phosphor-svelte';
   import { decisionSchema } from '../lib/schemas.js';
   import StatusChip from './StatusChip.svelte';
@@ -10,25 +8,34 @@
   let { state: appState } = $props();
   let submissionPane = $state();
   let referencePane = $state();
+  let verdict = $state('');
+  let rationale = $state('');
   let submitError = $state('');
+  let touched = $state({ verdict: false, rationale: false });
+
   const submission = $derived(appState.selectedSubmission);
   const currentMatch = $derived(submission?.matches[appState.evidenceFocusIndex]);
   const existingDecision = $derived(appState.decisions.find((entry) => entry.submissionId === submission?.id));
 
-  const { form, errors, isValid, data, reset } = createForm({
-    initialValues: { verdict: '', rationale: '' },
-    extend: validator({ schema: decisionSchema }),
-    validateOnMount: true,
-    onSubmit: async (values) => {
-      submitError = '';
-      const result = await appState.submitDecision(values);
-      if (!result.ok) {
-        submitError = result.error;
-        return;
-      }
-      reset();
-      appState.navigate('queue');
+  const validation = $derived.by(() => {
+    const parsed = decisionSchema.safeParse({ verdict, rationale });
+    if (parsed.success) return { ok: true, errors: {} };
+    const errors = {};
+    for (const issue of parsed.error.issues) {
+      const key = issue.path[0] || 'form';
+      if (!errors[key]) errors[key] = issue.message;
     }
+    return { ok: false, errors };
+  });
+
+  $effect(() => {
+    // Reset draft fields when the selected submission changes.
+    const id = appState.selectedSubmissionId;
+    void id;
+    verdict = '';
+    rationale = '';
+    submitError = '';
+    touched = { verdict: false, rationale: false };
   });
 
   $effect(() => {
@@ -44,13 +51,28 @@
   function step(delta) {
     appState.setEvidenceFocus(appState.evidenceFocusIndex + delta);
   }
+
+  async function onSubmit(event) {
+    event.preventDefault();
+    touched = { verdict: true, rationale: true };
+    submitError = '';
+    if (!validation.ok) return;
+    const result = await appState.submitDecision({ verdict, rationale });
+    if (!result.ok) {
+      submitError = result.error;
+      return;
+    }
+    verdict = '';
+    rationale = '';
+    appState.navigate('queue');
+  }
 </script>
 
 {#if submission}
   <div class="space-y-5">
     <section class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <button class="interactive mb-3 inline-flex items-center gap-1 rounded-md text-xs font-bold text-teal-700 hover:text-teal-900" onclick={() => appState.navigate('queue')}>
+        <button class="interactive mb-3 inline-flex min-h-11 items-center gap-1 rounded-md px-1 text-xs font-bold text-teal-700 hover:text-teal-900" onclick={() => appState.navigate('queue')}>
           <ArrowLeft aria-hidden="true" size={14} /> Back to queue
         </button>
         <p class="eyebrow">Evidence review · {submission.id}</p>
@@ -71,10 +93,10 @@
             <p class="tabular text-xs font-extrabold text-ink-900">{appState.evidenceFocusIndex + 1} of {submission.matches.length}</p>
             <p class="tabular text-[10px] font-bold uppercase tracking-wide text-slate-500">Pair similarity {currentMatch.similarity.toFixed(2)}</p>
           </div>
-          <Button color="alternative" size="sm" class="interactive !rounded-lg" disabled={appState.evidenceFocusIndex === 0} onclick={() => step(-1)} aria-label="Previous matched pair">
+          <Button color="alternative" size="sm" class="interactive !min-h-11 !rounded-lg" disabled={appState.evidenceFocusIndex === 0} onclick={() => step(-1)} aria-label="Previous matched pair">
             <ArrowLeft aria-hidden="true" size={15} class="mr-1" /> Previous
           </Button>
-          <Button color="alternative" size="sm" class="interactive !rounded-lg" disabled={appState.evidenceFocusIndex === submission.matches.length - 1} onclick={() => step(1)} aria-label="Next matched pair">
+          <Button color="alternative" size="sm" class="interactive !min-h-11 !rounded-lg" disabled={appState.evidenceFocusIndex === submission.matches.length - 1} onclick={() => step(1)} aria-label="Next matched pair">
             Next <ArrowRight aria-hidden="true" size={15} class="ml-1" />
           </Button>
         </div>
@@ -88,7 +110,7 @@
           </div>
           <div bind:this={submissionPane} class="h-72 space-y-5 overflow-y-auto scroll-smooth bg-[#f8f7f3] p-4 font-mono text-[13px] leading-6 sm:p-5" aria-label="Submission matched snippets">
             {#each submission.matches as match, index}
-              <div data-pair={index} class={`rounded-lg border p-4 transition-all ${appState.evidenceFocusIndex === index ? 'border-gold-500 bg-white shadow-md ring-2 ring-gold-500/20' : 'border-line bg-white/55 opacity-65'}`}>
+              <div data-pair={index} class={`rounded-lg border p-4 transition-all duration-300 ${appState.evidenceFocusIndex === index ? 'border-gold-500 bg-white shadow-md ring-2 ring-gold-500/20' : 'border-line bg-white/55 opacity-65'}`}>
                 <p class="mb-2 text-[9px] font-bold uppercase tracking-[.13em] text-slate-400">Pair {index + 1}</p>
                 <pre class="whitespace-pre-wrap font-mono">{#each match.submission as segment}<span class:match-mark={segment[1]}>{segment[0]}</span>{/each}</pre>
               </div>
@@ -102,7 +124,7 @@
           </div>
           <div bind:this={referencePane} class="h-72 space-y-5 overflow-y-auto scroll-smooth bg-[#f8f7f3] p-4 font-mono text-[13px] leading-6 sm:p-5" aria-label="Reference matched snippets">
             {#each submission.matches as match, index}
-              <div data-pair={index} class={`rounded-lg border p-4 transition-all ${appState.evidenceFocusIndex === index ? 'border-gold-500 bg-white shadow-md ring-2 ring-gold-500/20' : 'border-line bg-white/55 opacity-65'}`}>
+              <div data-pair={index} class={`rounded-lg border p-4 transition-all duration-300 ${appState.evidenceFocusIndex === index ? 'border-gold-500 bg-white shadow-md ring-2 ring-gold-500/20' : 'border-line bg-white/55 opacity-65'}`}>
                 <p class="mb-2 text-[9px] font-bold uppercase tracking-[.13em] text-slate-400">Pair {index + 1}</p>
                 <pre class="whitespace-pre-wrap font-mono">{#each match.reference as segment}<span class:match-mark={segment[1]}>{segment[0]}</span>{/each}</pre>
               </div>
@@ -126,51 +148,70 @@
         <div class="rounded-xl border border-emerald-300 bg-emerald-50 p-4">
           <div class="flex items-center gap-2 font-extrabold text-emerald-900"><CheckCircle aria-hidden="true" size={19} weight="fill" /> Decision recorded</div>
           <p class="mt-2 text-sm text-emerald-950">{existingDecision.requestBody.rationale}</p>
-          <button class="interactive mt-4 rounded-lg border border-emerald-300 bg-white px-3 py-2 text-xs font-bold text-emerald-800" onclick={() => appState.navigate('audit')}>View audit timeline</button>
+          <button class="interactive mt-4 min-h-11 rounded-lg border border-emerald-300 bg-white px-3 py-2 text-xs font-bold text-emerald-800" onclick={() => appState.navigate('audit')}>View audit timeline</button>
         </div>
       {:else}
-        <form use:form class="space-y-5" aria-label="Reviewer decision form" novalidate>
+        <form class="space-y-5" aria-label="Reviewer decision form" novalidate onsubmit={onSubmit}>
           <fieldset>
             <legend class="mb-2 text-sm font-extrabold">Verdict <span class="text-rose-600">*</span></legend>
             <div class="grid gap-2 sm:grid-cols-2">
-              <label class={`interactive flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 ${$data.verdict === 'confirm-clean' ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/15' : 'border-slate-300 bg-white hover:border-emerald-300'}`}>
-                <input class="size-4 accent-emerald-600" type="radio" name="verdict" value="confirm-clean" bind:group={$data.verdict} aria-describedby="verdict-error" />
+              <label class={`interactive flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border p-3.5 ${verdict === 'confirm-clean' ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/15' : 'border-slate-300 bg-white hover:border-emerald-300'}`}>
+                <input
+                  class="size-4 accent-emerald-600"
+                  type="radio"
+                  name="verdict"
+                  value="confirm-clean"
+                  checked={verdict === 'confirm-clean'}
+                  onchange={() => { verdict = 'confirm-clean'; touched.verdict = true; }}
+                  aria-describedby="verdict-error"
+                />
                 <CheckCircle aria-hidden="true" class="text-emerald-600" size={20} weight="fill" />
                 <span><span class="block text-sm font-extrabold">Confirm clean</span><span class="block text-[11px] text-slate-500">Evidence does not establish a leak.</span></span>
               </label>
-              <label class={`interactive flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 ${$data.verdict === 'confirm-leak' ? 'border-rose-500 bg-rose-50 ring-2 ring-rose-500/15' : 'border-slate-300 bg-white hover:border-rose-300'}`}>
-                <input class="size-4 accent-rose-600" type="radio" name="verdict" value="confirm-leak" bind:group={$data.verdict} aria-describedby="verdict-error" />
+              <label class={`interactive flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border p-3.5 ${verdict === 'confirm-leak' ? 'border-rose-500 bg-rose-50 ring-2 ring-rose-500/15' : 'border-slate-300 bg-white hover:border-rose-300'}`}>
+                <input
+                  class="size-4 accent-rose-600"
+                  type="radio"
+                  name="verdict"
+                  value="confirm-leak"
+                  checked={verdict === 'confirm-leak'}
+                  onchange={() => { verdict = 'confirm-leak'; touched.verdict = true; }}
+                  aria-describedby="verdict-error"
+                />
                 <WarningDiamond aria-hidden="true" class="text-rose-600" size={20} weight="fill" />
                 <span><span class="block text-sm font-extrabold">Confirm leak</span><span class="block text-[11px] text-slate-500">Evidence establishes reference exposure.</span></span>
               </label>
             </div>
-            {#if !$data.verdict}<p id="verdict-error" class="field-error">Verdict is required: choose Confirm clean or Confirm leak.</p>{/if}
+            {#if touched.verdict && validation.errors.verdict}<p id="verdict-error" class="field-error">{validation.errors.verdict}</p>
+            {:else if touched.verdict && !verdict}<p id="verdict-error" class="field-error">Verdict is required: choose Confirm clean or Confirm leak.</p>{/if}
           </fieldset>
 
           <div>
             <div class="mb-2 flex items-center justify-between">
               <label for="rationale" class="text-sm font-extrabold">Rationale <span class="text-rose-600">*</span></label>
-              <span class={`tabular text-[10px] font-bold ${($data.rationale?.length || 0) > 2000 ? 'text-rose-700' : 'text-slate-400'}`}>{$data.rationale?.length || 0} / 2000</span>
+              <span class={`tabular text-[10px] font-bold ${rationale.length > 2000 ? 'text-rose-700' : 'text-slate-500'}`}>{rationale.length} / 2000</span>
             </div>
-            <Textarea
+            <textarea
               id="rationale"
               name="rationale"
               rows="5"
               placeholder="Explain which matched evidence supports this decision…"
               aria-describedby="rationale-help rationale-error"
-              aria-invalid={Boolean($errors.rationale)}
-              class={`!rounded-xl !bg-white !text-sm focus:!border-teal-500 focus:!ring-teal-500 ${$errors.rationale ? '!border-rose-500' : '!border-slate-300'}`}
-            />
+              aria-invalid={touched.rationale && Boolean(validation.errors.rationale)}
+              class={`w-full rounded-xl border bg-white px-3 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 ${touched.rationale && validation.errors.rationale ? 'border-rose-500' : 'border-slate-300'}`}
+              value={rationale}
+              oninput={(event) => { rationale = event.currentTarget.value; touched.rationale = true; }}
+            ></textarea>
             <p id="rationale-help" class="mt-1 text-[11px] text-slate-500">Required trimmed string, 20 to 2000 characters inclusive.</p>
-            {#if $errors.rationale}<p id="rationale-error" class="field-error">{$errors.rationale}</p>{/if}
+            {#if touched.rationale && validation.errors.rationale}<p id="rationale-error" class="field-error">rationale: {validation.errors.rationale}</p>{/if}
           </div>
 
           {#if submitError}<p class="rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-800" role="alert">{submitError}</p>{/if}
 
           <div class="flex flex-col-reverse gap-2 border-t border-line pt-4 sm:flex-row sm:justify-end">
-            <Button type="button" color="alternative" class="interactive !rounded-lg" onclick={() => appState.cancelDecision()}>Cancel</Button>
-            <Button type="submit" color="red" class="interactive !rounded-lg !bg-signal-600 hover:!bg-signal-500" disabled={!$isValid || appState.submitting}>
-              {appState.submitting ? 'Recording decision…' : ($data.verdict === 'confirm-clean' ? 'Confirm clean' : $data.verdict === 'confirm-leak' ? 'Confirm leak' : 'Choose a verdict')}
+            <Button type="button" color="alternative" class="interactive !min-h-11 !rounded-lg" onclick={() => appState.cancelDecision()}>Cancel</Button>
+            <Button type="submit" color="red" class="interactive !min-h-11 !rounded-lg !bg-signal-600 hover:!bg-signal-500" disabled={!validation.ok || appState.submitting}>
+              {appState.submitting ? 'Recording decision…' : (verdict === 'confirm-clean' ? 'Confirm clean' : verdict === 'confirm-leak' ? 'Confirm leak' : 'Choose a verdict')}
             </Button>
           </div>
         </form>

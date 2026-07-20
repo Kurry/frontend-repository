@@ -68,7 +68,7 @@ button, [role="button"], select, input[type="range"], input[type="checkbox"] { t
   contain: inline-size layout paint;
 }
 
-.eyebrow { letter-spacing: .14em; text-transform: uppercase; font-weight: 760; font-size: .7rem; color: #68747a; }
+.eyebrow { letter-spacing: .14em; text-transform: uppercase; font-weight: 760; font-size: .7rem; color: #4b5960; }
 .tabular { font-variant-numeric: tabular-nums; }
 .interactive { transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease, box-shadow 180ms ease, transform 120ms ease, opacity 180ms ease; }
 .interactive:hover { box-shadow: 0 7px 16px rgba(23, 36, 43, .09); }
@@ -90,7 +90,13 @@ button, [role="button"], select, input[type="range"], input[type="checkbox"] { t
 .toast-enter { animation: toast-in 220ms ease-out both; }
 .audit-enter { animation: audit-in 300ms ease-out both; }
 .chip-pop { animation: chip-pop 300ms ease-out both; }
-.row-leave { animation: row-out 260ms ease-in both; }
+.row-leave { animation: row-out 420ms ease-in forwards; overflow: hidden; }
+
+@media (max-width: 767px) {
+  .app-shell.mobile-nav-open main {
+    padding-top: 9.5rem;
+  }
+}
 
 .mutation-toggle input[type="checkbox"] {
   position: absolute !important;
@@ -110,7 +116,10 @@ button, [role="button"], select, input[type="range"], input[type="checkbox"] { t
 @keyframes toast-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes audit-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes chip-pop { 0% { transform: scale(.82); } 65% { transform: scale(1.06); } 100% { transform: scale(1); } }
-@keyframes row-out { to { opacity: 0; transform: translateX(18px); } }
+@keyframes row-out {
+  0% { opacity: 1; transform: translateX(0); max-height: 6rem; }
+  100% { opacity: 0; transform: translateX(24px); max-height: 0; padding-top: 0; padding-bottom: 0; }
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }

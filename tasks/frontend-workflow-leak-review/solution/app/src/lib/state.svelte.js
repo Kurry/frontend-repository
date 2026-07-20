@@ -36,10 +36,16 @@ class ReviewConsoleState {
   get visibleSubmissions() {
     const query = this.searchQuery.trim().toLowerCase();
     return this.sortedSubmissions.filter((submission) => {
-      const isAnimatingFromTriggered = this.reviewFilter === 'review-triggered' && this.leavingSubmissionId === submission.id;
-      const matchesFilter = this.reviewFilter === 'all' || submission.reviewState === this.reviewFilter || isAnimatingFromTriggered;
+      if (this.reviewFilter !== 'all') {
+        const matchesState = submission.reviewState === this.reviewFilter;
+        const leavingFromTriggered =
+          this.reviewFilter === 'review-triggered' &&
+          this.leavingSubmissionId === submission.id &&
+          (submission.reviewState === 'confirmed-clean' || submission.reviewState === 'confirmed-leak');
+        if (!matchesState && !leavingFromTriggered) return false;
+      }
       const matchesSearch = !query || `${submission.task} ${submission.submitter} ${submission.id}`.toLowerCase().includes(query);
-      return matchesFilter && matchesSearch;
+      return matchesSearch;
     });
   }
 
@@ -165,11 +171,13 @@ class ReviewConsoleState {
     if (next < 0.5 || next > 0.95 || Number.isNaN(next)) return false;
     this.threshold = next;
     const confirmedIds = new Set(this.decisions.map((decision) => decision.submissionId));
-    for (const submission of this.submissions) {
-      if (!confirmedIds.has(submission.id)) {
-        submission.reviewState = submission.similarity >= next ? 'review-triggered' : 'unreviewed';
-      }
-    }
+    this.submissions = this.submissions.map((submission) => {
+      if (confirmedIds.has(submission.id)) return submission;
+      return {
+        ...submission,
+        reviewState: submission.similarity >= next ? 'review-triggered' : 'unreviewed'
+      };
+    });
     this.bumpExportTimestamp();
     return true;
   }
@@ -209,6 +217,9 @@ class ReviewConsoleState {
     if (wasFiltered) this.leavingSubmissionId = submission.id;
 
     submission.reviewState = requestBody.verdict === 'confirm-clean' ? 'confirmed-clean' : 'confirmed-leak';
+    this.submissions = this.submissions.map((item) =>
+      item.id === submission.id ? { ...item, reviewState: submission.reviewState } : item
+    );
     this.decisions.push({
       submissionId: submission.id,
       requestBody,
@@ -225,7 +236,7 @@ class ReviewConsoleState {
       const leavingId = submission.id;
       setTimeout(() => {
         if (this.leavingSubmissionId === leavingId) this.leavingSubmissionId = null;
-      }, 270);
+      }, 430);
     }
     this.submitting = false;
     return { ok: true, requestBody };

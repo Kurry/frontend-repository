@@ -1,9 +1,8 @@
 <script>
-  import { onMount } from 'svelte';
   import { Toast } from 'flowbite-svelte';
-  import { CheckCircle, Info, WarningCircle } from 'phosphor-svelte';
+  import { CheckCircle, WarningCircle } from 'phosphor-svelte';
   import { reviewState } from './lib/state.svelte.js';
-  import { registerWebMCP } from './lib/webmcp.js';
+  import { copyExportText } from './lib/actions.js';
   import TopBar from './components/TopBar.svelte';
   import QueueView from './components/QueueView.svelte';
   import EvidenceView from './components/EvidenceView.svelte';
@@ -12,60 +11,46 @@
   import AuditView from './components/AuditView.svelte';
   import ExportPanel from './components/ExportPanel.svelte';
 
-  const state = reviewState;
+  const appState = reviewState;
+  let exportButton = $state(null);
 
   async function copyExport() {
-    if (!state.exportOpen) state.openExport();
-    try {
-      await navigator.clipboard.writeText(state.activeExportText);
-      state.showToast(`${state.exportFormat === 'review-report-json' ? 'Review report JSON' : 'Summary text'} copied to clipboard.`);
-      return true;
-    } catch {
-      state.showToast('Clipboard access was unavailable. Select the preview text to copy it.', 'error');
-      return false;
-    }
+    return copyExportText(appState);
   }
-
-  function openImportPicker() {
-    state.openExport('review-report-json');
-    requestAnimationFrame(() => document.getElementById('report-import')?.click());
-  }
-
-  onMount(() => registerWebMCP(state, { copyExport, openImportPicker }));
 </script>
 
 <svelte:head>
-  <meta name="theme-color" content={state.theme === 'dark' ? '#111a1f' : '#f4f1ea'} />
+  <meta name="theme-color" content={appState.theme === 'dark' ? '#111a1f' : '#f4f1ea'} />
 </svelte:head>
 
-<div class:theme-dark={state.theme === 'dark'} class="app-shell">
-  <TopBar {state} />
+<div class:theme-dark={appState.theme === 'dark'} class:mobile-nav-open={appState.mobileNavOpen} class="app-shell">
+  <TopBar state={appState} bind:exportTrigger={exportButton} />
   <main class="mx-auto max-w-[1500px] px-3 pb-12 pt-24 sm:px-6 lg:px-8">
-    {#if state.activeView === 'queue'}
-      <QueueView {state} />
-    {:else if state.activeView === 'evidence-view'}
-      <EvidenceView {state} />
-    {:else if state.activeView === 'canary'}
-      <CanaryView {state} />
-    {:else if state.activeView === 'mutation'}
-      <MutationView {state} />
-    {:else if state.activeView === 'audit'}
-      <AuditView {state} />
+    {#if appState.activeView === 'queue'}
+      <QueueView state={appState} />
+    {:else if appState.activeView === 'evidence-view'}
+      <EvidenceView state={appState} />
+    {:else if appState.activeView === 'canary'}
+      <CanaryView state={appState} />
+    {:else if appState.activeView === 'mutation'}
+      <MutationView state={appState} />
+    {:else if appState.activeView === 'audit'}
+      <AuditView state={appState} />
     {/if}
   </main>
 
-  <ExportPanel {state} {copyExport} />
+  <ExportPanel state={appState} {copyExport} exportTrigger={exportButton} />
 
-  {#if state.toast}
+  {#if appState.toast}
     <div class="fixed bottom-4 right-4 z-[80] max-w-[calc(100vw-2rem)] toast-enter" role="status" aria-live="polite">
-      <Toast color={state.toast.tone === 'error' ? 'red' : 'green'} class="!rounded-xl !border !border-slate-200 !bg-white !shadow-xl">
-        {#if state.toast.tone === 'error'}<WarningCircle aria-hidden="true" size={19} weight="fill" class="mr-3 text-rose-600" />{:else}<CheckCircle aria-hidden="true" size={19} weight="fill" class="mr-3 text-emerald-600" />{/if}
-        <span class="text-sm font-bold text-ink-900">{state.toast.message}</span>
+      <Toast color={appState.toast.tone === 'error' ? 'red' : 'green'} class="!rounded-xl !border !border-slate-200 !bg-white !shadow-xl">
+        {#if appState.toast.tone === 'error'}<WarningCircle aria-hidden="true" size={19} weight="fill" class="mr-3 text-rose-600" />{:else}<CheckCircle aria-hidden="true" size={19} weight="fill" class="mr-3 text-emerald-600" />{/if}
+        <span class="text-sm font-bold text-ink-900">{appState.toast.message}</span>
       </Toast>
     </div>
   {/if}
 
   <div class="sr-only" aria-live="polite">
-    {state.toast?.message || ''}
+    {appState.toast?.message || ''}
   </div>
 </div>
