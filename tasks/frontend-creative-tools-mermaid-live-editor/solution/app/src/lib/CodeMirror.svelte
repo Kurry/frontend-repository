@@ -16,7 +16,7 @@
     foldKeymap,
     StreamLanguage
   } from '@codemirror/language';
-  import { searchKeymap, highlightSelectionMatches, openSearchPanel } from '@codemirror/search';
+  import { search, searchKeymap, highlightSelectionMatches, openSearchPanel } from '@codemirror/search';
   import { oneDark } from '@codemirror/theme-one-dark';
   import { store } from './state.svelte.js';
 
@@ -91,6 +91,10 @@
       history(),
       foldGutter(),
       highlightSelectionMatches(),
+      // Registers the search-panel state up front (openSearchPanel would
+      // self-enable it on demand, but wiring it explicitly keeps the Find
+      // control and searchKeymap on the documented canonical setup).
+      search(),
       mermaidLanguage,
       syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
       keymap.of([...defaultKeymap, ...historyKeymap, ...foldKeymap, ...searchKeymap]),
