@@ -18,6 +18,38 @@ const TEXT_STYLES: { value: TextStyle; label: string }[] = [
   { value: 'shadow', label: 'Shadow' },
 ];
 
+// Annotation field contract (imported project payloads only — the app's own
+// exports are always well-formed). Mirrors the MarkupFlowProject Annotation
+// rules in instruction.md: closed enums, #RRGGBB color, and per-type geometry.
+const IMPORT_ANNOTATION_TYPES: ToolType[] = ['rectangle', 'oval', 'line', 'arrow', 'text', 'blur', 'pixelate', 'spotlight', 'loupe', 'highlighter'];
+const IMPORT_STROKE_WIDTHS: StrokeWidth[] = ['thin', 'medium', 'thick'];
+const IMPORT_TEXT_STYLES: TextStyle[] = ['plain', 'bold-caption', 'outline', 'highlight-box', 'shadow'];
+const IMPORT_HEX_COLOR_RE = /^#[0-9A-Fa-f]{6}$/;
+
+function validateImportedAnnotation(ann: any, index: number): string | null {
+  if (!ann || typeof ann !== 'object') return `annotations[${index}]: must be an object`;
+  if (typeof ann.id !== 'string' || !ann.id) return `annotations[${index}].id: required non-empty string`;
+  if (!IMPORT_ANNOTATION_TYPES.includes(ann.type)) return `annotations[${index}].type: must be one of ${IMPORT_ANNOTATION_TYPES.join(', ')}`;
+  if (typeof ann.x !== 'number' || typeof ann.y !== 'number') return `annotations[${index}].x/y: required numbers`;
+  if (typeof ann.color !== 'string' || !IMPORT_HEX_COLOR_RE.test(ann.color)) return `annotations[${index}].color: must match #RRGGBB`;
+  if (!IMPORT_STROKE_WIDTHS.includes(ann.strokeWidth)) return `annotations[${index}].strokeWidth: must be one of ${IMPORT_STROKE_WIDTHS.join(', ')}`;
+
+  if (['rectangle', 'oval', 'blur', 'pixelate', 'spotlight', 'highlighter'].includes(ann.type)) {
+    if (typeof ann.x2 !== 'number' || typeof ann.y2 !== 'number' || ann.x2 - ann.x <= 0 || ann.y2 - ann.y <= 0) {
+      return `annotations[${index}].width/height: must be positive`;
+    }
+  } else if (ann.type === 'line' || ann.type === 'arrow') {
+    if (typeof ann.x2 !== 'number' || typeof ann.y2 !== 'number') return `annotations[${index}].x2/y2: required numbers`;
+  } else if (ann.type === 'text') {
+    if (typeof ann.text !== 'string') return `annotations[${index}].text: required string`;
+    if (!IMPORT_TEXT_STYLES.includes(ann.textStyle)) return `annotations[${index}].textStyle: must be one of ${IMPORT_TEXT_STYLES.join(', ')}`;
+    if (typeof ann.fontSize !== 'number' || !Number.isInteger(ann.fontSize) || ann.fontSize < 10 || ann.fontSize > 72) {
+      return `annotations[${index}].fontSize: must be an integer from 10 to 72`;
+    }
+  }
+  return null;
+}
+
 function ToolButton(props: { 
   tool: ToolType; 
   label: string; 
@@ -187,6 +219,7 @@ export default function App() {
   const [textInputValue, setTextInputValue] = createSignal('');
   const [editingTextId, setEditingTextId] = createSignal<string | null>(null);
   const [statusMessage, setStatusMessage] = createSignal('Ready');
+  const [snapshotNameValue, setSnapshotNameValue] = createSignal('');
   const [viewMode, setViewMode] = createSignal<'edit' | 'preview'>('edit');
   const [theme, setTheme] = createSignal<'dark' | 'light'>('dark');
 
@@ -984,6 +1017,7 @@ export default function App() {
               setRemoteContent('');
               setSharedContentMerged('');
               setMergeConflict(null);
+              projectForm.reset();
               announce('Workspace reset');
             }}
             aria-label="Reset workspace"
@@ -1018,10 +1052,23 @@ export default function App() {
                       announce('Import failed: invalid imageDataUrl');
                       return;
                     }
-                    store.setImage(content.imageDataUrl, content.imageWidth, content.imageHeight);
-                    if (Array.isArray(content.annotations)) {
-                      store.setAnnotations(content.annotations);
+                    if (typeof content.imageWidth !== 'number' || content.imageWidth <= 0 || typeof content.imageHeight !== 'number' || content.imageHeight <= 0) {
+                      announce('Import failed: imageWidth/imageHeight must be positive numbers');
+                      return;
                     }
+                    if (!Array.isArray(content.annotations)) {
+                      announce('Import failed: annotations must be an array');
+                      return;
+                    }
+                    for (let i = 0; i < content.annotations.length; i++) {
+                      const geometryError = validateImportedAnnotation(content.annotations[i], i);
+                      if (geometryError) {
+                        announce(`Import failed: ${geometryError}`);
+                        return;
+                      }
+                    }
+                    store.setImage(content.imageDataUrl, content.imageWidth, content.imageHeight);
+                    store.setAnnotations(content.annotations);
                     const img = new Image();
                     img.onload = () => {
                       setLoadedImage(img);
@@ -1070,12 +1117,11 @@ export default function App() {
           <form
             onSubmit={(e) => {
               e.preventDefault();
-              const input = e.currentTarget.querySelector('input');
-              const name = input?.value;
+              const name = snapshotNameValue();
               if (name && name.length <= 80) {
                 if (store.saveSnapshot(name)) {
                   announce(`Snapshot ${name} saved`);
-                  input.value = '';
+                  setSnapshotNameValue('');
                 }
               } else if (!name) {
                 announce('Snapshot name field is required');
@@ -1088,13 +1134,16 @@ export default function App() {
             <input
               name="snapshotName"
               placeholder="Snapshot name"
+              value={snapshotNameValue()}
+              onInput={(e) => setSnapshotNameValue(e.currentTarget.value)}
               class="bg-transparent text-sm text-[var(--color-text-primary)] px-2 py-0.5 w-32 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] rounded"
               aria-label="Snapshot name"
             />
             <button
               type="submit"
               class={`px-2 py-0.5 rounded-md text-xs font-medium transition-all duration-150
-                focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]`}
+                focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] disabled:opacity-50 disabled:cursor-not-allowed`}
+              disabled={snapshotNameValue().trim().length === 0}
               aria-label="Save snapshot"
             >
               Save snapshot

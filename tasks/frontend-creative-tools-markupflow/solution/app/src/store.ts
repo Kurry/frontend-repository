@@ -317,6 +317,7 @@ export function useAppStore() {
       setState('undoStack', []);
       setState('redoStack', []);
       setState('selectedAnnotationId', null);
+      setState('compareMode', false);
       persistState();
     },
 
