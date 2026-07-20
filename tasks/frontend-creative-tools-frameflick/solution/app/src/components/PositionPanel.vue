@@ -12,14 +12,14 @@
 
     <div class="pos-info">Drag the canvas or use the move buttons to reposition</div>
     <div class="move-grid" role="group" aria-label="Move image">
-      <button class="move-btn up" aria-label="Move image up" @click="move(0, -10)">↑</button>
-      <button class="move-btn left" aria-label="Move image left" @click="move(-10, 0)">←</button>
-      <button class="move-btn right" aria-label="Move image right" @click="move(10, 0)">→</button>
-      <button class="move-btn down" aria-label="Move image down" @click="move(0, 10)">↓</button>
+      <button type="button" class="move-btn up" aria-label="Move image up" title="Move image up" @click="move(0, -10)">↑</button>
+      <button type="button" class="move-btn left" aria-label="Move image left" title="Move image left" @click="move(-10, 0)">←</button>
+      <button type="button" class="move-btn right" aria-label="Move image right" title="Move image right" @click="move(10, 0)">→</button>
+      <button type="button" class="move-btn down" aria-label="Move image down" title="Move image down" @click="move(0, 10)">↓</button>
     </div>
 
-    <button class="pill-btn ghost" style="width:100%;margin-top:8px;font-size:11px;" @click="reset">
-      Reset position
+    <button type="button" class="pill-btn ghost" style="width:100%;margin-top:8px;font-size:11px;" @click="reset">
+      <span aria-hidden="true">🎯</span> Reset position
     </button>
   </div>
 </template>
@@ -28,7 +28,7 @@
 import { useCanvasStore } from '../stores/canvas'
 const store = useCanvasStore()
 function move(x: number, y: number) { store.posX += x; store.posY += y }
-function reset() { store.resetPosition(); store.zoom = 100 }
+function reset() { store.resetPosition() }
 </script>
 
 <style scoped>

@@ -4,33 +4,51 @@
     <header class="app-header">
       <div class="header-inner">
         <div class="logo">
-          <span class="logo-icon" aria-hidden="true">🎞</span>
+          <span class="logo-icon" aria-hidden="true">🎞️</span>
           <h1 class="logo-text">FrameFlick</h1>
         </div>
-        <div class="header-actions">
-          <button class="tab-btn" :class="{ active: activeView === 'editor' }" :aria-pressed="activeView === 'editor'" @click="activeView = 'editor'">Editor</button>
-          <button class="tab-btn" :class="{ active: activeView === 'collab' }" :aria-pressed="activeView === 'collab'" @click="activeView = 'collab'">Collaboration</button>
-        </div>
+        <nav class="header-actions" aria-label="Workspace views">
+          <button
+            type="button"
+            class="tab-btn"
+            :class="{ active: activeView === 'editor' }"
+            :aria-pressed="activeView === 'editor'"
+            @click="activeView = 'editor'"
+          ><span aria-hidden="true">🖌️</span> Editor</button>
+          <button
+            type="button"
+            class="tab-btn"
+            :class="{ active: activeView === 'collab' }"
+            :aria-pressed="activeView === 'collab'"
+            @click="activeView = 'collab'"
+          ><span aria-hidden="true">🤝</span> Collaboration</button>
+          <button type="button" class="tab-btn palette-btn" title="Command palette (Ctrl+K)" @click="paletteOpen = true">
+            <span aria-hidden="true">⌘</span> Commands
+          </button>
+        </nav>
       </div>
     </header>
 
     <!-- Editor View -->
     <div v-if="activeView === 'editor'" class="editor-layout">
       <!-- Left Panel -->
-      <aside class="left-panel">
+      <aside class="left-panel" aria-label="Images and saved looks">
         <UploadZone />
         <RecentStrip />
         <PresetsPanel />
+        <SnapshotsPanel />
       </aside>
 
       <!-- Canvas -->
-      <main class="canvas-area">
+      <main class="canvas-area" aria-label="Canvas and export">
+        <HistoryBar />
         <CanvasPreview ref="canvasPreviewRef" />
-        <ExportPanel :canvas-ref="canvasPreviewRef" />
+        <ExportBar />
+        <StyleRecipePanel />
       </main>
 
       <!-- Right Panel -->
-      <aside class="right-panel">
+      <aside class="right-panel" aria-label="Style controls">
         <div class="panel-scroll">
           <BackgroundPanel />
           <StylePanel />
@@ -47,18 +65,24 @@
     <div v-if="activeView === 'collab'" class="collab-view">
       <CollabPanel />
     </div>
+
+    <CommandPalette v-if="paletteOpen" @close="paletteOpen = false" @view="v => { activeView = v; paletteOpen = false }" />
+    <Announcer />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useCanvasStore } from './stores/canvas'
 import { useRecentStore } from './stores/recent'
 import UploadZone from './components/UploadZone.vue'
 import RecentStrip from './components/RecentStrip.vue'
 import PresetsPanel from './components/PresetsPanel.vue'
+import SnapshotsPanel from './components/SnapshotsPanel.vue'
 import CanvasPreview from './components/CanvasPreview.vue'
-import ExportPanel from './components/ExportPanel.vue'
+import HistoryBar from './components/HistoryBar.vue'
+import ExportBar from './components/ExportBar.vue'
+import StyleRecipePanel from './components/StyleRecipePanel.vue'
 import BackgroundPanel from './components/BackgroundPanel.vue'
 import StylePanel from './components/StylePanel.vue'
 import FramePanel from './components/FramePanel.vue'
@@ -67,20 +91,37 @@ import CaptionPanel from './components/CaptionPanel.vue'
 import WatermarkPanel from './components/WatermarkPanel.vue'
 import PositionPanel from './components/PositionPanel.vue'
 import CollabPanel from './components/CollabPanel.vue'
+import CommandPalette from './components/CommandPalette.vue'
+import Announcer from './components/Announcer.vue'
 
 const activeView = ref<'editor' | 'collab'>('editor')
+const paletteOpen = ref(false)
 const canvasPreviewRef = ref<InstanceType<typeof CanvasPreview> | null>(null)
 const canvasStore = useCanvasStore()
 const recentStore = useRecentStore()
 
+// Keep the active Recent entry's saved settings in sync with live edits, so
+// thumbnail switching always restores each image's own last-used look.
 watch(
   () => canvasStore.getSettings(),
   settings => {
-    const active = recentStore.items.find(item => item.dataUrl === canvasStore.imageDataUrl)
-    if (active) recentStore.updateSettings(active.id, settings as Record<string, unknown>)
+    const active = recentStore.items.find(item => item.id === recentStore.activeId)
+    if (active && canvasStore.imageDataUrl === active.dataUrl) {
+      recentStore.updateSettings(active.id, settings)
+    }
   },
-  { deep: true, flush: 'sync' }
+  { deep: true }
 )
+
+function onPaletteShortcut(e: KeyboardEvent) {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault()
+    paletteOpen.value = !paletteOpen.value
+  }
+}
+
+onMounted(() => window.addEventListener('keydown', onPaletteShortcut))
+onBeforeUnmount(() => window.removeEventListener('keydown', onPaletteShortcut))
 </script>
 
 <style>
@@ -94,19 +135,22 @@ watch(
   background: #713F12;
   color: #FDE047;
   padding: 0 24px;
-  height: 52px;
+  min-height: 56px;
   display: flex;
   align-items: center;
   position: sticky;
   top: 0;
   z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 .header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 4px 0;
 }
 .logo { display: flex; align-items: center; gap: 8px; }
 .logo-icon { font-size: 22px; }
@@ -114,17 +158,17 @@ watch(
 .header-actions { display: flex; gap: 8px; }
 .tab-btn {
   padding: 8px 16px;
-  min-height: 48px;
+  min-height: 44px;
   border-radius: 999px;
   border: 2px solid transparent;
   background: transparent;
-  color: rgba(253,224,71,0.7);
+  color: rgba(253, 224, 71, 0.75);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.15s;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
-.tab-btn:hover { color: #FDE047; border-color: rgba(253,224,71,0.3); }
+.tab-btn:hover { color: #FDE047; border-color: rgba(253, 224, 71, 0.4); transform: translateY(-1px); }
 .tab-btn.active { background: #FDE047; color: #713F12; border-color: #FDE047; }
 
 .editor-layout {
@@ -132,7 +176,7 @@ watch(
   grid-template-columns: 280px 1fr 300px;
   gap: 0;
   flex: 1;
-  min-height: calc(100vh - 52px);
+  min-height: calc(100vh - 56px);
   overflow: hidden;
 }
 .left-panel {
@@ -147,9 +191,9 @@ watch(
 .canvas-area {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: flex-start;
-  padding: 24px 16px;
+  padding: 16px;
   overflow-y: auto;
   gap: 16px;
   background: #fef3d0;
@@ -158,11 +202,12 @@ watch(
   background: #fff8ee;
   border-left: 1px solid #f3d89a;
   overflow-y: auto;
+  padding: 16px;
 }
 .panel-scroll {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 16px;
   padding: 0;
 }
 .collab-view {
@@ -173,14 +218,15 @@ watch(
   width: 100%;
 }
 
-/* Shared panel card styles */
+/* Shared panel card styles — 8px radius, 4px spacing scale */
 .panel-card {
   background: #ffffff;
-  border-radius: 0;
-  border-bottom: 1px solid #f3d89a;
+  border-radius: 8px;
+  border: 1px solid #f3d89a;
   padding: 16px;
 }
-.panel-card:last-child { border-bottom: none; }
+.left-panel .panel-card,
+.right-panel .panel-card { box-shadow: 0 1px 4px rgba(113, 63, 18, 0.06); }
 .panel-title {
   font-size: 16px;
   font-weight: 700;
@@ -202,12 +248,16 @@ watch(
   font-size: 13px;
   border: none;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 3px rgba(0,0,0,0.15), 0 0 0 2px rgba(253,224,71,0.3);
-  transition: all 0.15s;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 3px rgba(0, 0, 0, 0.15), 0 0 0 2px rgba(253, 224, 71, 0.3);
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
 }
-.pill-btn:hover { background: #fcd34d; transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 3px 8px rgba(0,0,0,0.2), 0 0 0 2px rgba(253,224,71,0.4); }
+.pill-btn:hover {
+  background: #fcd34d;
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 4px 10px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(253, 224, 71, 0.45);
+}
 .pill-btn:active { transform: translateY(0); }
-.pill-btn.secondary { background: #713F12; color: #FDE047; box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 1px 3px rgba(0,0,0,0.2); }
+.pill-btn.secondary { background: #713F12; color: #FDE047; box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2); }
 .pill-btn.secondary:hover { background: #92400e; }
 .pill-btn.danger { background: #ef4444; color: #fff; box-shadow: none; }
 .pill-btn.danger:hover { background: #dc2626; }
@@ -225,13 +275,13 @@ watch(
   display: flex;
   justify-content: space-between;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: #92400e;
 }
 .slider-value {
-  font-weight: 700;
+  font-weight: 800;
   color: #713F12;
-  min-width: 36px;
+  min-width: 40px;
   text-align: right;
 }
 input[type=range] {
@@ -244,15 +294,16 @@ input[type=range] {
   border: 2px solid #92400e;
   border-radius: 8px;
   padding: 8px 12px;
+  min-height: 44px;
   font-size: 13px;
   color: #713F12;
   background: #fff;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.text-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.28); }
+.text-input:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.28); }
 .text-input::placeholder { color: #92400e; }
-.error-msg { color: #ef4444; font-size: 11px; margin-top: 4px; }
-.success-msg { color: #22c55e; font-size: 11px; margin-top: 4px; }
+.error-msg { color: #b91c1c; font-size: 11px; margin-top: 4px; font-weight: 700; }
+.success-msg { color: #166534; font-size: 11px; margin-top: 4px; font-weight: 700; }
 
 button,
 input,
@@ -263,8 +314,8 @@ textarea {
 
 :where(button, input, select, textarea, [tabindex]):focus-visible {
   outline: 3px solid #2563eb;
-  outline-offset: 3px;
-  box-shadow: 0 0 0 3px rgba(255,255,255,0.9);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9);
 }
 
 .field-label {
@@ -277,27 +328,37 @@ textarea {
 
 .field-hint {
   margin-top: 4px;
-  color: #713F12;
-  font-size: 12px;
+  color: #92400e;
+  font-size: 11px;
+}
+
+@media (max-width: 900px) {
+  .editor-layout {
+    grid-template-columns: 240px 1fr 260px;
+  }
 }
 
 @media (max-width: 600px) {
   .app-header {
     height: auto;
-    min-height: 52px;
+    min-height: 56px;
     padding: 8px 12px;
   }
   .header-inner {
     align-items: flex-start;
+    flex-direction: column;
     gap: 8px;
   }
   .header-actions {
     flex-wrap: wrap;
-    justify-content: flex-end;
+    justify-content: flex-start;
+    width: 100%;
   }
   .tab-btn {
     min-height: 44px;
     padding: 8px 12px;
+    flex: 1 1 auto;
+    text-align: center;
   }
   .editor-layout {
     display: flex;
@@ -313,19 +374,22 @@ textarea {
     overflow: visible;
     border: 0;
   }
-  .left-panel {
-    order: 1;
-  }
+  .left-panel { order: 1; }
   .canvas-area {
     order: 2;
     padding: 16px 12px;
   }
-  .right-panel {
-    order: 3;
-  }
+  .right-panel { order: 3; }
   .collab-view {
     padding: 16px 12px;
     min-width: 0;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tab-btn,
+  .pill-btn { transition: none; }
+  .tab-btn:hover,
+  .pill-btn:hover { transform: none; }
 }
 </style>

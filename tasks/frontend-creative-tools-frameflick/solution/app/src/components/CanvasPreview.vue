@@ -1,23 +1,40 @@
 <template>
   <div class="canvas-wrapper">
-    <div class="canvas-container" ref="containerRef" :class="{ 'is-dragging': dragging }">
+    <div
+      class="canvas-container"
+      :class="{ 'is-dragging': dragging }"
+      @pointerdown="onPointerDown"
+    >
       <canvas
-        ref="canvasEl"
-        class="main-canvas"
-        @mousedown="onMouseDown"
-        @mousemove="onMouseMove"
-        @mouseup="onMouseUp"
-        @mouseleave="cancelDrag"
-        @keydown="onKeyDown"
+        ref="afterCanvas"
+        class="main-canvas layer after-layer"
+        :class="{ faded: store.showingBefore }"
+        tabindex="-1"
+        aria-hidden="true"
+      />
+      <canvas
+        ref="beforeCanvas"
+        class="main-canvas layer before-layer"
+        :class="{ visible: store.showingBefore }"
+        tabindex="-1"
+        aria-hidden="true"
+      />
+      <canvas
+        ref="hitCanvas"
+        class="hit-layer"
         :tabindex="store.imageDataUrl ? 0 : -1"
-        aria-label="Canvas preview. Use arrow keys to reposition the image."
-        :style="{ cursor: dragging ? 'grabbing' : (store.imageDataUrl ? 'grab' : 'default') }"
+        role="img"
+        :aria-label="store.imageDataUrl
+          ? 'Composed canvas preview. Use arrow keys to reposition the screenshot.'
+          : 'Empty canvas. Upload an image to get started.'"
+        @keydown="onKeyDown"
       />
       <div v-if="dragging" class="drag-status" role="status">Moving image</div>
       <div v-if="!store.imageDataUrl" class="canvas-placeholder">
         <div class="placeholder-inner">
-          <div class="placeholder-icon">🖼</div>
+          <div class="placeholder-icon" aria-hidden="true">🖼️</div>
           <div class="placeholder-text">Upload an image to get started</div>
+          <div class="placeholder-sub">Drop a PNG/JPG into the upload panel, or use a sample image.</div>
         </div>
       </div>
     </div>
@@ -25,21 +42,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useCanvasStore } from '../stores/canvas'
+import { useHistoryStore } from '../stores/history'
 import { renderToCanvas } from '../utils/render'
+import type { RenderOptions } from '../utils/render'
 
 const store = useCanvasStore()
-const canvasEl = ref<HTMLCanvasElement | null>(null)
-const containerRef = ref<HTMLDivElement | null>(null)
+const history = useHistoryStore()
+const afterCanvas = ref<HTMLCanvasElement | null>(null)
+const beforeCanvas = ref<HTMLCanvasElement | null>(null)
+const hitCanvas = ref<HTMLCanvasElement | null>(null)
 
-let renderPending = false
-let renderScheduled = false
+let afterScheduled = false
+let beforeScheduled = false
 
-async function doRender() {
-  if (!canvasEl.value) return
-  renderPending = false
-  await renderToCanvas(canvasEl.value, {
+function currentOptions(): RenderOptions {
+  return {
     imageDataUrl: store.imageDataUrl,
     backgroundPreset: store.backgroundPreset,
     customBgColor: store.customBgColor,
@@ -55,74 +74,157 @@ async function doRender() {
     captionColor: store.captionColor,
     watermarkEnabled: store.watermarkEnabled,
     watermarkText: store.watermarkText,
+    watermarkColor: store.watermarkColor,
     watermarkOpacity: store.watermarkOpacity,
     watermarkCorner: store.watermarkCorner,
     zoom: store.zoom,
     posX: store.posX,
     posY: store.posY,
-  }, 1)
+  }
 }
 
-function scheduleRender() {
-  if (renderScheduled) return
-  renderScheduled = true
-  requestAnimationFrame(async () => {
-    renderScheduled = false
-    await doRender()
-  })
+function baselineOptions(): RenderOptions {
+  const b = store.baseline
+  return {
+    imageDataUrl: store.imageDataUrl,
+    backgroundPreset: b.backgroundPreset,
+    customBgColor: b.customBgColor,
+    useCustomBg: b.useCustomBg,
+    padding: b.padding,
+    cornerRadius: b.cornerRadius,
+    shadow: b.shadow,
+    frameStyle: b.frameStyle,
+    canvasSize: b.canvasSize,
+    captionText: b.captionText,
+    captionPosition: b.captionPosition,
+    captionFontSize: b.captionFontSize,
+    captionColor: b.captionColor,
+    watermarkEnabled: b.watermarkEnabled,
+    watermarkText: b.watermarkText,
+    watermarkColor: b.watermarkColor,
+    watermarkOpacity: b.watermarkOpacity,
+    watermarkCorner: b.watermarkCorner,
+    zoom: b.zoom,
+    posX: b.posX,
+    posY: b.posY,
+  }
 }
 
-// Expose for export
-defineExpose({ canvasEl, doRender })
+async function renderAfter() {
+  if (!afterCanvas.value) return
+  afterScheduled = false
+  await renderToCanvas(afterCanvas.value, currentOptions(), 1)
+}
+async function renderBefore() {
+  if (!beforeCanvas.value) return
+  beforeScheduled = false
+  await renderToCanvas(beforeCanvas.value, baselineOptions(), 1)
+}
 
+function scheduleAfter() {
+  if (afterScheduled) return
+  afterScheduled = true
+  requestAnimationFrame(() => void renderAfter())
+}
+function scheduleBefore() {
+  if (beforeScheduled) return
+  beforeScheduled = true
+  requestAnimationFrame(() => void renderBefore())
+}
+
+// Expose for export + WebMCP preview.
+defineExpose({ canvasEl: afterCanvas, doRender: renderAfter })
+
+watch(() => store.getSettings(), scheduleAfter, { deep: true, immediate: true })
 watch(
-  () => [
-    store.imageDataUrl, store.backgroundPreset, store.customBgColor, store.useCustomBg,
-    store.padding, store.cornerRadius, store.shadow, store.frameStyle, store.canvasSize,
-    store.captionText, store.captionPosition, store.captionFontSize, store.captionColor,
-    store.watermarkEnabled, store.watermarkText, store.watermarkOpacity, store.watermarkCorner,
-    store.zoom, store.posX, store.posY,
-  ],
-  scheduleRender,
-  { immediate: true }
+  () => [store.imageDataUrl, store.baseline] as const,
+  scheduleBefore,
+  { deep: true, immediate: true }
 )
 
-// Drag to reposition
+// ---- Drag to reposition (pointer events = mouse + touch + pen) -------------
 const dragging = ref(false)
-let lastX = 0, lastY = 0
-let dragStartX = 0, dragStartY = 0
+let lastX = 0
+let lastY = 0
+let dragStartX = 0
+let dragStartY = 0
 
-function onMouseDown(e: MouseEvent) {
-  if (!store.imageDataUrl) return
+function displayScale(): number {
+  const el = afterCanvas.value
+  if (!el) return 1
+  const rect = el.getBoundingClientRect()
+  return rect.width > 0 ? el.width / rect.width : 1
+}
+
+function onDragEscape(e: KeyboardEvent) {
+  if (e.key === 'Escape' && dragging.value) {
+    e.preventDefault()
+    store.posX = dragStartX
+    store.posY = dragStartY
+    dragging.value = false
+    window.removeEventListener('keydown', onDragEscape)
+  }
+}
+
+function onPointerDown(e: PointerEvent) {
+  if (!store.imageDataUrl || store.showingBefore) return
+  if (e.button !== 0) return
+  const target = e.currentTarget as HTMLElement
   dragging.value = true
+  history.markDiscrete() // a drag commits as one undo entry
   lastX = e.clientX
   lastY = e.clientY
   dragStartX = store.posX
   dragStartY = store.posY
+  try { target.setPointerCapture(e.pointerId) } catch { /* noop */ }
+  target.addEventListener('pointermove', onPointerMove)
+  target.addEventListener('pointerup', onPointerUp)
+  target.addEventListener('pointercancel', onPointerCancel)
+  window.addEventListener('keydown', onDragEscape)
 }
-function onMouseMove(e: MouseEvent) {
+
+function onPointerMove(e: PointerEvent) {
   if (!dragging.value) return
-  const dx = e.clientX - lastX
-  const dy = e.clientY - lastY
+  const s = displayScale()
+  const dx = (e.clientX - lastX) * s
+  const dy = (e.clientY - lastY) * s
   lastX = e.clientX
   lastY = e.clientY
   store.posX += dx
   store.posY += dy
 }
-function onMouseUp() { dragging.value = false }
-function cancelDrag() {
+
+function endDragListeners(e: PointerEvent) {
+  const target = e.currentTarget as HTMLElement
+  target.removeEventListener('pointermove', onPointerMove)
+  target.removeEventListener('pointerup', onPointerUp)
+  target.removeEventListener('pointercancel', onPointerCancel)
+  window.removeEventListener('keydown', onDragEscape)
+  dragging.value = false
+}
+
+function onPointerUp(e: PointerEvent) {
+  if (!dragging.value) return
+  endDragListeners(e) // release commits the position
+}
+
+function onPointerCancel(e: PointerEvent) {
   if (!dragging.value) return
   store.posX = dragStartX
   store.posY = dragStartY
-  dragging.value = false
+  endDragListeners(e)
 }
+
 function onKeyDown(e: KeyboardEvent) {
+  if (!store.imageDataUrl) return
   if (e.key === 'Escape' && dragging.value) {
     e.preventDefault()
-    cancelDrag()
+    store.posX = dragStartX
+    store.posY = dragStartY
+    dragging.value = false
     return
   }
-  if (!store.imageDataUrl || !['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return
+  if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) return
   e.preventDefault()
   const step = e.shiftKey ? 20 : 5
   if (e.key === 'ArrowUp') store.posY -= step
@@ -131,7 +233,10 @@ function onKeyDown(e: KeyboardEvent) {
   if (e.key === 'ArrowRight') store.posX += step
 }
 
-onMounted(scheduleRender)
+onMounted(() => {
+  scheduleAfter()
+  scheduleBefore()
+})
 </script>
 
 <style scoped>
@@ -142,27 +247,64 @@ onMounted(scheduleRender)
 }
 .canvas-container {
   position: relative;
-  border-radius: 12px;
+  border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 8px 32px rgba(113,63,18,0.18);
+  box-shadow: 0 8px 32px rgba(113, 63, 18, 0.18);
   max-width: 100%;
   background: #fde68a;
+  transition: outline-color 0.15s ease, box-shadow 0.15s ease;
+  outline: 4px solid transparent;
+  outline-offset: 4px;
+  cursor: grab;
 }
 .canvas-container.is-dragging {
-  overflow: visible;
-  outline: 4px solid #2563eb;
-  outline-offset: 4px;
-  box-shadow: 0 12px 40px rgba(37,99,235,0.35);
+  cursor: grabbing;
+  outline-color: #2563eb;
+  box-shadow: 0 12px 40px rgba(37, 99, 235, 0.35);
 }
-.main-canvas {
+.layer {
   display: block;
   max-width: 100%;
   max-height: 60vh;
   object-fit: contain;
 }
+.after-layer {
+  position: relative;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.28s ease;
+}
+.after-layer.faded { opacity: 0; }
+.before-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+.before-layer.visible { opacity: 1; }
+.hit-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: inherit;
+}
+.hit-layer:focus-visible {
+  opacity: 1;
+  outline: 3px solid #2563eb;
+  outline-offset: -3px;
+  background: rgba(37, 99, 235, 0.08);
+}
 .canvas-placeholder {
   position: absolute;
   inset: 0;
+  z-index: 4;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -171,14 +313,16 @@ onMounted(scheduleRender)
 .placeholder-inner {
   text-align: center;
   color: #713F12;
+  padding: 16px;
 }
 .placeholder-icon { font-size: 48px; margin-bottom: 12px; }
-.placeholder-text { font-size: 14px; font-weight: 500; }
+.placeholder-text { font-size: 16px; font-weight: 700; }
+.placeholder-sub { font-size: 12px; margin-top: 8px; color: #92400e; }
 .drag-status {
   position: absolute;
   top: 12px;
   left: 50%;
-  z-index: 2;
+  z-index: 5;
   transform: translateX(-50%);
   padding: 8px 12px;
   border-radius: 999px;
@@ -187,5 +331,15 @@ onMounted(scheduleRender)
   font-size: 12px;
   font-weight: 700;
   pointer-events: none;
+  animation: feedback-in 0.18s ease-out;
+}
+@keyframes feedback-in {
+  from { opacity: 0; transform: translate(-50%, -4px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .after-layer,
+  .before-layer { transition: none; }
+  .drag-status { animation: none; }
 }
 </style>
