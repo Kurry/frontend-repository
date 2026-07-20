@@ -157,6 +157,21 @@
     applyChange(lastApplied);
   }
 
+  // The conflict overlay layers above the Collaboration Modal but sits outside
+  // the modal stack, so while it is open it owns Escape: handle it at window
+  // capture (which runs before the Modal's document-level capture handler) and
+  // stop propagation so the dialog underneath stays open.
+  $effect(() => {
+    if (!store.getConflictResolution()) return;
+    function onConflictEscape(event: KeyboardEvent) {
+      if (event.key !== 'Escape') return;
+      event.stopPropagation();
+      store.setConflictResolution(null);
+    }
+    window.addEventListener('keydown', onConflictEscape, true);
+    return () => window.removeEventListener('keydown', onConflictEscape, true);
+  });
+
   const open = $derived(store.getShowCollaboration());
 </script>
 

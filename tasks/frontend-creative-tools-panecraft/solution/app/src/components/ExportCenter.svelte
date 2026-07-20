@@ -15,10 +15,26 @@
   let importError = $state('');
   let importSuccess = $state('');
   let fileInput = $state<HTMLInputElement | undefined>();
+  let importTextarea = $state<HTMLTextAreaElement | undefined>();
 
   function activePreview(): string {
     return center.tab === 'workspace-json' ? workspaceJson : markdownReport;
   }
+
+  // Import mode (header Import control, WebMCP artifact import) emphasizes the
+  // import workflow: once the Modal's own initial focus has landed (two
+  // animation frames), pull focus to the paste area.
+  $effect(() => {
+    if (!(center.open && center.mode === 'import')) return;
+    let second = 0;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => importTextarea?.focus());
+    });
+    return () => {
+      cancelAnimationFrame(first);
+      cancelAnimationFrame(second);
+    };
+  });
 
   function close() {
     store.closeExportCenter();
@@ -183,7 +199,7 @@
       </div>
     </div>
 
-    <div class="border-t border-[var(--color-border)] pt-4">
+    <div class="border-t pt-4 {center.mode === 'import' ? 'border-[var(--color-primary)]' : 'border-[var(--color-border)]'}">
       <h3 class="text-sm font-semibold text-[var(--color-text-primary)] mb-2">Import Workspace JSON</h3>
       <p class="text-xs text-[var(--color-text-secondary)] mb-2">
         Paste a WorkspaceDocument (schemaVersion panecraft-workspace-v1) or pick an exported .json file. Invalid documents are rejected whole — nothing is applied partially.
@@ -192,6 +208,7 @@
         <label for="import-paste" class="sr-only">Paste Workspace JSON</label>
         <textarea
           id="import-paste"
+          bind:this={importTextarea}
           class="flex-1 h-24 p-3 font-mono text-xs border rounded-[var(--radius-base)] bg-white resize-y {importError ? 'input-invalid' : 'border-[var(--color-border)]'}"
           placeholder="Paste Workspace JSON here (schemaVersion panecraft-workspace-v1)"
           bind:value={importText}
