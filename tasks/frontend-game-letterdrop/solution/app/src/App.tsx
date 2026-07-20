@@ -48,6 +48,9 @@ const App: React.FC = () => {
   const redoAction = useGameStore(state => state.redoAction);
   const applyScenarioChange = useGameStore(state => state.applyScenarioChange);
   const selectHistoryNode = useGameStore(state => state.selectHistoryNode);
+  const saveCheckpoint = useGameStore(state => state.saveCheckpoint);
+  const resumeCheckpoint = useGameStore(state => state.resumeCheckpoint);
+  const hasCheckpoint = useGameStore(state => state.checkpoint !== null);
 
   // Responsive sizing
   useEffect(() => {
@@ -201,8 +204,8 @@ const App: React.FC = () => {
     border: 'none',
     borderRadius: '1000px',
     padding: '10px 24px',
-    fontSize: '15px',
-    fontWeight: 600,
+    fontSize: '19px',
+    fontWeight: 700,
     cursor: 'pointer',
     transition: 'background-color 0.15s',
     outline: 'none',
@@ -241,6 +244,7 @@ const App: React.FC = () => {
 
   const canSubmit = gameStarted && !isPaused && selectedWord.length >= 2;
   const canUndo = gameStarted && !isPaused && selectedWord.length > 0;
+  const canSaveProgress = gameStarted && !isGameOver && (useGameStore.getState().score > 0 || useGameStore.getState().tilesCleared > 0);
   const currentHistoryNode = historyNodes.find(node => node.id === currentHistoryNodeId);
   const parentHistoryNode = currentHistoryNode?.parentId
     ? historyNodes.find(node => node.id === currentHistoryNode.parentId)
@@ -380,7 +384,7 @@ const App: React.FC = () => {
                 }}
               >
                 <div style={{ fontSize: '17px', color: '#1D1D1E' }}>
-                  Press &quot;Start game&quot; to begin!
+                  Press Start game to begin!
                 </div>
                 <div style={{ fontSize: '14px', color: '#4F4F55' }}>
                   Tap falling tiles to spell words
@@ -437,6 +441,30 @@ const App: React.FC = () => {
                   </button>
                 )}
               </>
+            )}
+            
+            {/* Added Save Progress, Resume Saved Run, and Export Run features */}
+            {gameStarted && !isGameOver && (
+              <button
+                onClick={() => saveCheckpoint()}
+                disabled={!canSaveProgress}
+                aria-label="Save Progress"
+                className="ld-btn-secondary"
+                style={{ ...secondaryBtn, opacity: canSaveProgress ? 1 : 0.4, cursor: canSaveProgress ? 'pointer' : 'not-allowed', width: '100%', marginTop: '8px' }}
+              >
+                Save Progress
+              </button>
+            )}
+
+            {!gameStarted && !isGameOver && hasCheckpoint && (
+              <button
+                onClick={() => resumeCheckpoint()}
+                aria-label="Resume Saved Run"
+                className="ld-btn-secondary"
+                style={{ ...secondaryBtn, width: '100%', marginTop: '8px' }}
+              >
+                Resume Saved Run
+              </button>
             )}
           </div>
 

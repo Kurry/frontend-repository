@@ -14,6 +14,7 @@ import {
   defaultAchievements,
 } from '../game/types';
 import { isValidWord } from '../game/dictionary';
+import confetti from 'canvas-confetti';
 
 // Safe localStorage helpers
 function loadFromStorage<T>(key: string, fallback: T): T {
@@ -87,6 +88,11 @@ interface GameActions {
   undoAction: () => void;
   redoAction: () => void;
   resetGame: () => void;
+  setPlayerName: (name: string) => void;
+  setStartingTier: (tier: 1 | 2 | 3) => void;
+  saveCheckpoint: () => boolean;
+  resumeCheckpoint: () => void;
+  importHistory: (runs: MatchRecord[]) => void;
   checkAchievements: () => void;
 }
 
@@ -456,6 +462,11 @@ export const useGameStore = create<GameStore>()(
       const newBoardCleared = boardJustCleared;
       if (boardJustCleared) {
         get().addToast('🎉 Board Cleared! 2x bonus on next word!', 'success');
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+        });
       }
 
       set({
@@ -640,6 +651,56 @@ export const useGameStore = create<GameStore>()(
       });
     },
 
+    setPlayerName: (name: string) => {
+      set({ playerName: name });
+      saveToStorage('letterdrop_playerName', name);
+    },
+
+    setStartingTier: (tier: 1 | 2 | 3) => {
+      set({ startingTier: tier });
+      saveToStorage('letterdrop_startingTier', tier);
+    },
+
+    saveCheckpoint: () => {
+      const state = get();
+      if (!state.gameStarted || state.isGameOver || state.score === 0 && state.tilesCleared === 0) {
+        return false;
+      }
+      const snap = captureUndoState(state);
+      set({ checkpoint: snap });
+      saveToStorage('letterdrop_checkpoint', snap);
+      get().addToast('Progress saved', 'success');
+      return true;
+    },
+
+    resumeCheckpoint: () => {
+      const state = get();
+      if (state.checkpoint) {
+        set({
+          ...restoreUndoState(state.checkpoint),
+          isGameOver: false,
+          gameStarted: true,
+          isPaused: true,
+          currentRunWords: [],
+        });
+        get().addToast('Progress restored', 'success');
+      }
+    },
+
+    importHistory: (runs: MatchRecord[]) => {
+      const state = get();
+      const newHistory = [...runs, ...state.matchHistory].slice(0, 50);
+      let newBestScore = state.bestScore;
+      runs.forEach(run => {
+        if (run.score > newBestScore) {
+           newBestScore = run.score;
+        }
+      });
+      set({ matchHistory: newHistory, bestScore: newBestScore });
+      saveToStorage('letterdrop_history', newHistory);
+      saveToStorage('letterdrop_bestScore', newBestScore);
+    },
+
     checkAchievements: () => {
       const state = get();
       const achievements = [...state.achievements];
@@ -654,6 +715,12 @@ export const useGameStore = create<GameStore>()(
           ach.unlockedAt = new Date().toISOString();
           changed = true;
           get().addToast(`🏆 Achievement unlocked: ${ach.name}!`, 'achievement');
+          confetti({
+            particleCount: 150,
+            spread: 90,
+            origin: { y: 0.5 },
+            colors: ['#007AFF', '#FFD60A', '#34C759', '#AF52DE']
+          });
           return true;
         }
         return false;

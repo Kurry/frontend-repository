@@ -69,23 +69,45 @@ const GameOver: React.FC<GameOverProps> = ({ onRestart }) => {
         {minutes}m {seconds}s • {tilesCleared} tiles cleared
       </div>
 
-      <button
-        onClick={onRestart}
-        className="ld-btn-primary"
-        style={{
-          color: '#FEFEFE',
-          border: 'none',
-          borderRadius: '1000px',
-          padding: '12px 32px',
-          fontSize: '17px',
-          fontWeight: 600,
-          cursor: 'pointer',
-          marginTop: '8px',
-          minHeight: '48px',
-        }}
-      >
-        Play again
-      </button>
+      <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+        <button
+          onClick={onRestart}
+          className="ld-btn-primary"
+          style={{
+            color: '#FEFEFE',
+            border: 'none',
+            borderRadius: '1000px',
+            padding: '12px 32px',
+            fontSize: '17px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            minHeight: '48px',
+          }}
+        >
+          Play again
+        </button>
+        <button
+          onClick={() => {
+            useGameStore.getState().setView('history');
+            // We can handle the specific open-preview logic within MatchHistory 
+            // since it's the top entry that represents the last match.
+          }}
+          aria-label="Export Run"
+          className="ld-btn-secondary"
+          style={{
+            color: '#007AFF',
+            border: '1px solid #66798B',
+            borderRadius: '1000px',
+            padding: '12px 20px',
+            fontSize: '15px',
+            fontWeight: 600,
+            cursor: 'pointer',
+            minHeight: '48px',
+          }}
+        >
+          Export Run
+        </button>
+      </div>
     </div>
   );
 };

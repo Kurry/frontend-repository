@@ -80,11 +80,10 @@ function sessionOperate(args: Record<string, unknown>) {
 // destinations: game-board | match-history | achievements — drives the real
 // view tabs (setView), the same function the on-screen tabs call.
 
-const DESTINATION_TO_VIEW: Record<string, "game" | "history" | "achievements" | "settings"> = {
+const DESTINATION_TO_VIEW: Record<string, "game" | "history" | "achievements"> = {
   "game-board": "game",
   "match-history": "history",
   achievements: "achievements",
-  settings: "settings",
 };
 
 function browseOpen(args: Record<string, unknown>) {
@@ -93,30 +92,6 @@ function browseOpen(args: Record<string, unknown>) {
   if (!view) return { ok: false, error: `unknown destination: ${destination}` };
   useGameStore.getState().setView(view);
   return { ok: true, destination, currentView: useGameStore.getState().currentView };
-}
-
-// ---- artifact-transfer-v1 --------------------------------------------------
-// artifact_operations: export | import | copy
-
-const ARTIFACT_OPERATIONS = ["export", "import", "copy"] as const;
-type ArtifactOperation = (typeof ARTIFACT_OPERATIONS)[number];
-
-function artifactOperate(args: Record<string, unknown>) {
-  const operation = String(args.operation ?? args.artifact_operation ?? args.action ?? "") as ArtifactOperation;
-  if (!ARTIFACT_OPERATIONS.includes(operation)) {
-    return { ok: false, error: `unknown artifact operation: ${operation}` };
-  }
-  
-  // Simulate user actions that would normally interact with files or clipboard.
-  // In a test environment, these just return success assuming the mock harness
-  // provides the actual file contents (due to the WebMCP contract preventing raw files).
-  if (operation === "export") {
-    return { ok: true, operation, message: "Export triggered" };
-  } else if (operation === "import") {
-    return { ok: true, operation, message: "Import triggered" };
-  } else if (operation === "copy") {
-    return { ok: true, operation, message: "Copy triggered" };
-  }
 }
 
 // ---- registry --------------------------------------------------------------
@@ -133,14 +108,8 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
   {
     name: "browse-open",
     description:
-      "Switch the visible view via the real tab control. args.destination is one of game-board | match-history | achievements | settings.",
+      "Switch the visible view via the real tab control. args.destination is one of game-board | match-history | achievements.",
     handler: browseOpen,
-  },
-  {
-    name: "artifact-operate",
-    description:
-      "Drive artifact transfer operations. args.operation is one of export | import | copy.",
-    handler: artifactOperate,
   },
 ];
 
@@ -152,7 +121,7 @@ export function initWebMcp() {
   w.__letterdrop_debug_state = () => useGameStore.getState();
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
-    modules: ["command-session-v1", "browse-query-v1", "artifact-transfer-v1"],
+    modules: ["command-session-v1", "browse-query-v1"],
     tools: TOOLS.map((t) => t.name),
   });
   w.webmcp_list_tools = () =>
