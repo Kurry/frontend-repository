@@ -55,9 +55,13 @@ function oklchToHex(L, C, H) {
 }
 
 function parseOklch(str) {
-  const m = String(str).match(/oklch\(\s*([\d.]+)\s*%?\s*[,\s]\s*([\d.]+)\s*[,\s]\s*([\d.]+)/i);
+  const m = String(str).match(/oklch\(\s*([\d.]+)\s*(%)?\s*[,\s]\s*([\d.]+)\s*[,\s]\s*([\d.]+)/i);
   if (!m) return null;
-  return { l: parseFloat(m[1]) / 100, c: parseFloat(m[2]), h: parseFloat(m[3]) };
+  // L is 0–100 with an explicit %, otherwise 0–1 (CSS allows both forms);
+  // a unit-less value above 1 is treated as a bare percentage.
+  const rawL = parseFloat(m[1]);
+  const l = m[2] === "%" || rawL > 1 ? rawL / 100 : rawL;
+  return { l, c: parseFloat(m[3]), h: parseFloat(m[4]) };
 }
 
 function hexToRgb(hex) {
@@ -382,7 +386,18 @@ function mutateActive(patch, { historyKey = "edit" } = {}) {
   pushHistory(historyKey);
   if (state.active.type === "builtin") forkActive();
   for (const [key, value] of Object.entries(patch)) {
-    state.active[key] = key === "name" ? String(value).trim() : value;
+    if (key === "name") {
+      state.active[key] = String(value).trim();
+      continue;
+    }
+    if (key.startsWith("--color-")) {
+      // Keep the all-#RRGGBB storage contract: normalize oklch (or any other
+      // valid color form) to hex exactly like normalizeTheme does on load and
+      // import, so editor swatches, palette, contrast, and hash export agree.
+      state.active[key] = anyColorToHex(value) ?? value;
+      continue;
+    }
+    state.active[key] = value;
   }
   syncCustomsEntry();
   applyThemeVars(previewTokens());
@@ -788,7 +803,12 @@ function copyArtifact(format) {
 
 function downloadExport() {
   const text = document.getElementById("css-output").textContent;
-  const ext = state.exportFormat === "json" ? "json" : "css";
+  const ext =
+    state.exportFormat === "json"
+      ? "json"
+      : state.exportFormat === "theme-extension"
+        ? "theme.css"
+        : "css";
   const blob = new Blob([text], {
     type: state.exportFormat === "json" ? "application/json" : "text/css",
   });

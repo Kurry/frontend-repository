@@ -228,16 +228,27 @@ export function registerWebMCP(api) {
       }
 
       case "entity_update": {
-        const target = findTheme(args) || state.active;
+        const hasTokens =
+          args.tokens != null && typeof args.tokens === "object" && !Array.isArray(args.tokens);
+        const located = findTheme(args);
+        let target = located;
+        if (args.id == null && located && !hasTokens && located.id !== state.active?.id) {
+          // Without an id, `name` doubles as selector and new name. Resolve
+          // deterministically: with no tokens payload, `name` is the new name
+          // for the active theme (same domain command as the visible rename
+          // control) — never a silent selection switch to the matched theme.
+          target = state.active;
+        }
+        if (!target) target = state.active;
         if (!target) return { error: "No theme to update" };
         if (target.id !== state.active?.id) selectTheme(target);
         const patch = {};
-        if (typeof args.name === "string" && findTheme(args)?.name !== args.name) {
+        if (typeof args.name === "string" && target.name !== args.name) {
           const nameError = validateThemeName(args.name);
           if (nameError) return { error: nameError };
           patch.name = args.name.trim();
         }
-        if (args.tokens && typeof args.tokens === "object" && !Array.isArray(args.tokens)) {
+        if (hasTokens) {
           for (const [key, value] of Object.entries(args.tokens)) {
             if (key.startsWith("--") || ["color-scheme", "default", "prefersdark"].includes(key)) {
               patch[key] = value;
