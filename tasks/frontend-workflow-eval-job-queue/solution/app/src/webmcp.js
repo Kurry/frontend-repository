@@ -1,5 +1,6 @@
 import { createJobSchema } from './schemas'
 import { buildSnapshot, useQueueStore } from './store'
+import { flushUi } from './flushBridge'
 
 const tool = (name, description, properties = {}, required = []) => ({
   name,
@@ -49,13 +50,39 @@ const draftFromArgs = (args) => ({
   sweepModel: args['sweep-model'] ?? '',
 })
 
+const previewYaml = (values) => [
+  `dataset: ${values.dataset || 'not-set'}`,
+  `agent: ${values.agent || 'not-set'}`,
+  `model: ${values.model || 'not-set'}`,
+  `trialCount: ${values.trialCount || 'not-set'}`,
+  ...(values.sweepModel ? [`sweepModel: ${values.sweepModel}`] : []),
+].join('\n')
+
 const visibleState = () => {
   const state = useQueueStore.getState()
   return { activeView: state.activeView, selectedJobId: state.selectedJobId, jobs: state.jobs.length }
 }
 
+async function copyAndStage(text) {
+  try {
+    await navigator.clipboard.writeText(text)
+  } catch {
+    const textarea = document.createElement('textarea')
+    textarea.value = text
+    textarea.setAttribute('readonly', '')
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.select()
+    document.execCommand('copy')
+    textarea.remove()
+  }
+  useQueueStore.getState().stageClipboard(text)
+}
+
 function invoke(name, args = {}) {
   const state = useQueueStore.getState()
+  let result
   switch (name) {
     case 'browse_open': {
       if (args.destination === 'jobs' || args.destination === 'provider-lanes') state.setActiveView('jobs')
@@ -66,77 +93,148 @@ function invoke(name, args = {}) {
       else if (args.destination === 'timeline') state.setActiveView('timeline')
       else if (args.destination === 'export-queue') { state.refreshExport(); state.setChrome('exportOpen', true) }
       else if (args.destination === 'import-queue') state.setChrome('importOpen', true)
-      return { success: true, visible: visibleState() }
+      result = { success: true, visible: visibleState() }
+      break
     }
     case 'browse_search': {
       state.setActiveView('jobs')
       const query = String(args.query).toLowerCase()
       const matches = state.jobs.filter((job) => [job.id, job.dataset, job.agent, job.model].some((value) => value.toLowerCase().includes(query)))
       if (matches.length === 1) state.setSelectedJob(matches[0].id)
-      return { success: true, matchCount: matches.length, matches: matches.slice(0, 10).map((job) => job.id), visible: visibleState() }
+      result = { success: true, matchCount: matches.length, matches: matches.slice(0, 10).map((job) => job.id), visible: visibleState() }
+      break
     }
     case 'browse_apply_filter': {
       const key = args.filter === 'timeline-status' ? 'timelineStatus' : args.filter
       state.setFilter(key, args.value)
       if (key === 'timelineStatus') state.setActiveView('timeline'); else state.setActiveView('jobs')
-      return { success: true, filter: args.filter, value: args.value }
+      result = { success: true, filter: args.filter, value: args.value }
+      break
     }
     case 'browse_clear_filter': {
       if (args.filter === 'all') state.clearFilters()
       else state.setFilter(args.filter === 'timeline-status' ? 'timelineStatus' : args.filter, '')
-      return { success: true }
+      result = { success: true }
+      break
     }
-    case 'browse_sort': return { success: true, sort: 'submitted-desc', message: 'Jobs use the fixed queue ordering shown in the table.' }
-    case 'browse_set_locale': return { success: false, message: 'Locale switching is not configured; the visible console remains English.' }
-    case 'browse_set_theme': return { success: false, message: 'Theme switching is not configured; the visible console keeps its operator theme.' }
+    case 'browse_sort':
+      result = { success: true, sort: 'submitted-desc', message: 'Jobs use the fixed queue ordering shown in the table.' }
+      break
+    case 'browse_set_locale':
+      result = { success: false, message: 'Locale switching is not configured; the visible console remains English.' }
+      break
+    case 'browse_set_theme': {
+      if (['dark', 'light'].includes(args.theme)) {
+        state.setTheme(args.theme)
+        result = { success: true, theme: args.theme }
+      } else {
+        result = { success: false, message: 'Supported themes are dark and light.' }
+      }
+      break
+    }
     case 'form_validate': {
-      const result = createJobSchema.safeParse(draftFromArgs(args))
+      const resultParse = createJobSchema.safeParse(draftFromArgs(args))
       state.setFormDraft(draftFromArgs(args)); state.setChrome('submitOpen', true)
-      return result.success ? { success: true, valid: true } : { success: false, valid: false, errors: result.error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message })) }
+      result = resultParse.success ? { success: true, valid: true } : { success: false, valid: false, errors: resultParse.error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message })) }
+      break
     }
     case 'form_submit': {
-      const result = createJobSchema.safeParse(draftFromArgs(args))
+      const resultParse = createJobSchema.safeParse(draftFromArgs(args))
       state.setFormDraft(draftFromArgs(args)); state.setChrome('submitOpen', true)
-      if (!result.success) return { success: false, errors: result.error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message })) }
-      const created = useQueueStore.getState().submitJobs({ ...result.data, sweepModel: result.data.sweepModel || undefined })
-      return { success: true, createdJobIds: created.map((job) => job.id), visible: visibleState() }
+      if (!resultParse.success) {
+        result = { success: false, errors: resultParse.error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message })) }
+        break
+      }
+      const created = useQueueStore.getState().submitJobs({ ...resultParse.data, sweepModel: resultParse.data.sweepModel || undefined })
+      result = { success: true, createdJobIds: created.map((job) => job.id), visible: visibleState() }
+      break
     }
-    case 'form_cancel': state.setChrome('submitOpen', false); return { success: true }
-    case 'form_reset': state.setFormDraft({ dataset: '', agent: '', model: '', trialCount: '4', sweepModel: '' }); state.setChrome('submitOpen', true); return { success: true }
-    case 'form_advance': state.setChrome('submitOpen', true); return { success: true, step: 'create-job' }
-    case 'form_return': state.setChrome('submitOpen', false); state.setActiveView('jobs'); return { success: true }
-    case 'session_start': return { success: true, message: 'The visible live simulation is running.' }
-    case 'session_pause': return { success: state.setProviderPaused(args.providerId, true), providerId: args.providerId, rateLimit: 'paused' }
-    case 'session_resume': return { success: state.setProviderPaused(args.providerId, false), providerId: args.providerId }
-    case 'session_stop': return { success: state.cancelJob(args.jobId), jobId: args.jobId }
-    case 'session_restart': return { success: state.manualRetry(args.jobId, args.trialId), jobId: args.jobId, trialId: args.trialId }
-    case 'session_advance': state.tick(); return { success: true, message: 'One scheduler tick applied; timing behavior remains visible in the UI.' }
-    case 'session_trigger_demo': state.resetQueue(); return { success: true, visible: visibleState() }
-    case 'session_connect': return { success: true, connection: 'local-client-simulation' }
-    case 'session_disconnect': return { success: false, message: 'The in-memory simulation is part of this page session and has no remote connection.' }
-    case 'artifact_import': state.setChrome('importOpen', true); return { success: true, visibleSurface: 'import-queue' }
+    case 'form_cancel':
+      state.setChrome('submitOpen', false)
+      result = { success: true }
+      break
+    case 'form_reset':
+      state.setFormDraft({ dataset: '', agent: '', model: '', trialCount: '4', sweepModel: '' }); state.setChrome('submitOpen', true)
+      result = { success: true }
+      break
+    case 'form_advance':
+      state.setChrome('submitOpen', true)
+      result = { success: true, step: 'create-job' }
+      break
+    case 'form_return':
+      state.setChrome('submitOpen', false); state.setActiveView('jobs')
+      result = { success: true }
+      break
+    case 'session_start':
+      result = { success: true, message: 'The visible live simulation is running.' }
+      break
+    case 'session_pause':
+      result = { success: state.setProviderPaused(args.providerId, true), providerId: args.providerId, rateLimit: 'paused' }
+      break
+    case 'session_resume':
+      result = { success: state.setProviderPaused(args.providerId, false), providerId: args.providerId }
+      break
+    case 'session_stop':
+      result = { success: state.cancelJob(args.jobId), jobId: args.jobId }
+      break
+    case 'session_restart':
+      result = { success: state.manualRetry(args.jobId, args.trialId), jobId: args.jobId, trialId: args.trialId }
+      break
+    case 'session_advance':
+      state.tick()
+      result = { success: true, message: 'One scheduler tick applied; timing behavior remains visible in the UI.' }
+      break
+    case 'session_trigger_demo':
+      state.resetQueue()
+      result = { success: true, visible: visibleState() }
+      break
+    case 'session_connect':
+      result = { success: true, connection: 'local-client-simulation' }
+      break
+    case 'session_disconnect':
+      result = { success: false, message: 'The in-memory simulation is part of this page session and has no remote connection.' }
+      break
+    case 'artifact_import':
+      state.setChrome('importOpen', true)
+      result = { success: true, visibleSurface: 'import-queue' }
+      break
     case 'artifact_export': {
-      if (args.format === 'yaml-config-preview') { state.setChrome('submitOpen', true); return { success: true, visibleSurface: 'submit-job', format: args.format } }
-      state.refreshExport(); state.setChrome('exportOpen', true); return { success: true, visibleSurface: 'export-queue', format: args.format }
+      if (args.format === 'yaml-config-preview') { state.setChrome('submitOpen', true); result = { success: true, visibleSurface: 'submit-job', format: args.format }; break }
+      state.refreshExport(); state.setChrome('exportOpen', true)
+      result = { success: true, visibleSurface: 'export-queue', format: args.format }
+      break
     }
     case 'artifact_copy': {
       if (args.format === 'queue-snapshot-json') {
         const text = state.refreshExport()
-        navigator.clipboard.writeText(text).catch(() => {})
+        copyAndStage(text)
         state.setChrome('exportOpen', true); state.addToast('Queue snapshot copied')
-        return { success: true, format: args.format, message: 'Visible Queue Snapshot preview copied.' }
+        result = { success: true, format: args.format, message: 'Visible Queue Snapshot preview copied.' }
+        break
       }
+      const draft = { ...state.formDraft, ...draftFromArgs(args) }
+      state.setFormDraft(draft)
       state.setChrome('submitOpen', true)
-      return { success: false, format: args.format, message: 'Use the visible Configuration preview Copy control after choosing form values.' }
+      const text = previewYaml(draft)
+      copyAndStage(text)
+      state.addToast('Configuration preview copied')
+      result = { success: true, format: args.format, message: 'Visible configuration preview copied.' }
+      break
     }
-    case 'artifact_print_preview': return { success: false, message: 'Print preview is not configured for this queue.' }
-    case 'artifact_convert': return { success: false, message: 'No artifact conversion modes are configured.' }
-    default: throw new Error(`Unknown WebMCP tool: ${name}`)
+    case 'artifact_print_preview':
+      result = { success: false, message: 'Print preview is not configured for this queue.' }
+      break
+    case 'artifact_convert':
+      result = { success: false, message: 'No artifact conversion modes are configured.' }
+      break
+    default:
+      throw new Error(`Unknown WebMCP tool: ${name}`)
   }
+  flushUi()
+  return result
 }
 
 export function registerWebMcp() {
-  if (window.webmcp_list_tools) return
   window.webmcp_session_info = () => ({
     contractVersion: 'zto-webmcp-v1',
     modules: ['browse-query-v1', 'form-workflow-v1', 'command-session-v1', 'artifact-transfer-v1'],
