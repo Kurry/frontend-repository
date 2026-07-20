@@ -1,0 +1,30 @@
+{
+  "name": "ternwave-automation-studio",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite --host 0.0.0.0 --port 3000",
+    "verify:build": "vite build"
+  },
+  "dependencies": {
+    "@carbon/icons-react": "^11.69.0",
+    "@carbon/react": "^1.94.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@hookform/resolvers": "^5.2.2",
+    "@tailwindcss/vite": "4.3.2",
+    "motion": "^12.23.26",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-hook-form": "^7.71.1",
+    "tailwindcss": "4.3.2",
+    "zod": "^4.3.5",
+    "zustand": "^5.0.9"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.1.2",
+    "vite": "^7.3.1"
+  }
+}
