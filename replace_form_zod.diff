@@ -1,0 +1,160 @@
+<<<<<<< SEARCH
+import { createSignal, onMount, onCleanup, Show, For, createMemo, createEffect } from 'solid-js';
+import { useAppStore, ToolType, Annotation, TextStyle, StrokeWidth } from './store';
+=======
+import { createSignal, onMount, onCleanup, Show, For, createMemo, createEffect } from 'solid-js';
+import { useAppStore, ToolType, Annotation, TextStyle, StrokeWidth } from './store';
+import { z } from 'zod';
+import { createForm } from '@tanstack/solid-form';
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+  const [viewMode, setViewMode] = createSignal<'edit' | 'preview'>('edit');
+  const [projectName, setProjectName] = createSignal('');
+  const [theme, setTheme] = createSignal<'dark' | 'light'>('dark');
+=======
+  const [viewMode, setViewMode] = createSignal<'edit' | 'preview'>('edit');
+  const [theme, setTheme] = createSignal<'dark' | 'light'>('dark');
+
+  const projectForm = createForm(() => ({
+    defaultValues: { name: '' },
+    onSubmit: async ({ value }) => {
+      if (store.saveProject(value.name)) {
+        announce('Project saved');
+        projectForm.reset();
+      } else {
+        announce('Add an image before saving');
+      }
+    },
+    validators: {
+      onSubmit: z.object({
+        name: z.string().min(1, 'Project name is required').max(80, 'Project name must be at most 80 characters'),
+      })
+    }
+  }));
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+          <section class="saved-projects border-t border-[var(--color-border)] p-3 flex-shrink-0" aria-labelledby="saved-projects-heading">
+            <h3 id="saved-projects-heading" class="text-xs font-semibold text-[var(--color-text-secondary)] mb-2">Saved projects</h3>
+            <label class="text-[10px] text-[var(--color-text-secondary)] block mb-1" for="project-name">Project name</label>
+            <div class="flex gap-2 mb-2">
+              <input
+                id="project-name"
+                value={projectName()}
+                onInput={(e) => setProjectName(e.target.value)}
+                class="project-name-input flex-1 min-w-0 bg-[var(--color-bg)] text-[var(--color-text-primary)] text-xs px-2 rounded-md"
+                placeholder="Annotation project"
+              />
+              <button
+                class="project-action bg-[var(--color-primary)] text-white rounded-md px-2 text-xs"
+                onClick={() => {
+                  if (store.saveProject(projectName())) {
+                    announce('Project saved');
+                  } else {
+                    announce('Add a name and image before saving');
+                  }
+                }}
+              >
+                Save project
+              </button>
+            </div>
+=======
+          <section class="saved-projects border-t border-[var(--color-border)] p-3 flex-shrink-0" aria-labelledby="saved-projects-heading">
+            <h3 id="saved-projects-heading" class="text-xs font-semibold text-[var(--color-text-secondary)] mb-2">Saved projects</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                projectForm.handleSubmit();
+              }}
+            >
+              <projectForm.Field
+                name="name"
+                children={(field) => (
+                  <div class="mb-2">
+                    <label class="text-[10px] text-[var(--color-text-secondary)] block mb-1" for={field().name}>Project name</label>
+                    <div class="flex gap-2 mb-1">
+                      <input
+                        id={field().name}
+                        name={field().name}
+                        value={field().state.value}
+                        onInput={(e) => field().handleChange(e.target.value)}
+                        onBlur={field().handleBlur}
+                        class={`project-name-input flex-1 min-w-0 bg-[var(--color-bg)] text-[var(--color-text-primary)] text-xs px-2 rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] ${field().state.meta.errors.length > 0 ? 'border border-red-500' : ''}`}
+                        placeholder="Annotation project"
+                      />
+                      <projectForm.Subscribe
+                        selector={(state) => state.canSubmit}
+                        children={(canSubmit) => (
+                          <button
+                            type="submit"
+                            class="project-action bg-[var(--color-primary)] text-white rounded-md px-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50"
+                            disabled={!canSubmit()}
+                          >
+                            Save project
+                          </button>
+                        )}
+                      />
+                    </div>
+                    <Show when={field().state.meta.errors.length > 0}>
+                      <div class="text-[10px] text-red-500 mt-0.5" role="alert" aria-live="polite">
+                        {field().state.meta.errors[0]?.message}
+                      </div>
+                    </Show>
+                  </div>
+                )}
+              />
+            </form>
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+          <button
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
+              focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)]`}
+            onClick={() => {
+              const name = prompt('Enter snapshot name:');
+              if (name) {
+                if (store.saveSnapshot(name)) {
+                  announce(`Snapshot ${name} saved`);
+                } else {
+                  announce('Snapshot name cannot be empty');
+                }
+              }
+            }}
+            aria-label="Save snapshot"
+          >
+            Save snapshot
+          </button>
+=======
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const input = e.currentTarget.querySelector('input');
+              const name = input?.value;
+              if (name && name.length <= 80) {
+                if (store.saveSnapshot(name)) {
+                  announce(`Snapshot ${name} saved`);
+                  input.value = '';
+                }
+              } else if (!name) {
+                announce('Snapshot name field is required');
+              } else {
+                announce('Snapshot name field must be at most 80 characters');
+              }
+            }}
+            class="flex items-center gap-1 bg-[var(--color-surface)] rounded-lg p-1 border border-[var(--color-border)]"
+          >
+            <input
+              name="snapshotName"
+              placeholder="Snapshot name"
+              class="bg-transparent text-sm text-[var(--color-text-primary)] px-2 py-0.5 w-32 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] rounded"
+              aria-label="Snapshot name"
+            />
+            <button
+              type="submit"
+              class={`px-2 py-0.5 rounded-md text-xs font-medium transition-all duration-150
+                focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]`}
+              aria-label="Save snapshot"
+            >
+              Save snapshot
+            </button>
+          </form>
+>>>>>>> REPLACE

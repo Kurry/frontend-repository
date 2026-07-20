@@ -52,6 +52,19 @@ export interface SavedProject {
   updatedAt: number;
 }
 
+export interface HistoryEntry {
+  id: string;
+  timestamp: number;
+  action: string;
+}
+
+export interface VersionSnapshot {
+  id: string;
+  name: string;
+  timestamp: number;
+  annotations: Annotation[];
+}
+
 export interface AppState {
   imageDataUrl: string | null;
   imageWidth: number;
@@ -62,13 +75,22 @@ export interface AppState {
   activeStrokeWidth: StrokeWidth;
   activeTextStyle: TextStyle;
   activeFontSize: number;
+  copiedStyleBuffer: { color: string; strokeWidth: StrokeWidth } | null;
   undoStack: Annotation[][];
   redoStack: Annotation[][];
+  history: HistoryEntry[];
+  versions: VersionSnapshot[];
   selectedAnnotationId: string | null;
   isOffline: boolean;
   offlineQueue: { action: string; data: any }[];
   collaborationState: 'online' | 'offline' | 'syncing';
   savedProjects: SavedProject[];
+  compareMode: boolean;
+  viewMode: 'edit' | 'preview';
+  sharedContent: string;
+  remoteContent: string;
+  sharedContentMerged: string;
+  mergeConflict: { local: string; remote: string } | null;
 }
 
 const STORAGE_KEY = 'markupflow-state';
@@ -115,13 +137,22 @@ const [state, setState] = createStore<AppState>({
   activeStrokeWidth: 'medium',
   activeTextStyle: 'plain',
   activeFontSize: 16,
+  copiedStyleBuffer: null,
   undoStack: [],
   redoStack: [],
+  history: [],
+  versions: savedState?.versions ?? [],
   selectedAnnotationId: null,
   isOffline: false,
   offlineQueue: [],
   collaborationState: 'online',
   savedProjects: savedState?.savedProjects ?? [],
+  compareMode: false,
+  viewMode: 'edit',
+  sharedContent: savedState?.sharedContent ?? '',
+  remoteContent: savedState?.remoteContent ?? '',
+  sharedContentMerged: savedState?.sharedContentMerged ?? '',
+  mergeConflict: null,
 });
 
 // Save to localStorage whenever relevant state changes
@@ -132,6 +163,10 @@ function persistState() {
     imageHeight: state.imageHeight,
     annotations: state.annotations,
     savedProjects: state.savedProjects,
+    versions: state.versions,
+    sharedContent: state.sharedContent,
+    remoteContent: state.remoteContent,
+    sharedContentMerged: state.sharedContentMerged,
   });
 }
 
@@ -142,6 +177,10 @@ export function useAppStore() {
     generateId,
     persistState,
     
+    pushHistory(action: string) {
+      setState('history', prev => [{ id: generateId(), timestamp: Date.now(), action }, ...prev]);
+    },
+
     setImage(imageDataUrl: string, width: number, height: number) {
       setState('imageDataUrl', imageDataUrl);
       setState('imageWidth', width);
@@ -149,6 +188,7 @@ export function useAppStore() {
       setState('annotations', []);
       setState('undoStack', []);
       setState('redoStack', []);
+      this.pushHistory('Image loaded');
       persistState();
     },
     
@@ -177,6 +217,7 @@ export function useAppStore() {
       setState('undoStack', prev => [...prev, snapshot]);
       setState('redoStack', []);
       setState('annotations', prev => [...prev, annotation]);
+      this.pushHistory(`${annotation.type} annotation added`);
       persistState();
     },
     
@@ -187,17 +228,20 @@ export function useAppStore() {
         setState('redoStack', []);
       }
       setState('annotations', (ann) => ann.map(a => a.id === id ? { ...a, ...updates } : a));
+      if (recordHistory) this.pushHistory('Annotation updated');
       persistState();
     },
     
     deleteAnnotation(id: string) {
       const snapshot = [...state.annotations];
+      const annotation = state.annotations.find(a => a.id === id);
       setState('undoStack', prev => [...prev, snapshot]);
       setState('redoStack', []);
       setState('annotations', prev => prev.filter(a => a.id !== id));
       if (state.selectedAnnotationId === id) {
         setState('selectedAnnotationId', null);
       }
+      if (annotation) this.pushHistory(`${annotation.type} annotation deleted`);
       persistState();
     },
     
@@ -210,6 +254,7 @@ export function useAppStore() {
       const [moved] = newAnnotations.splice(fromIndex, 1);
       newAnnotations.splice(toIndex, 0, moved);
       setState('annotations', newAnnotations);
+      this.pushHistory('Layer order changed');
       persistState();
     },
     
@@ -224,6 +269,7 @@ export function useAppStore() {
       setState('undoStack', prev => prev.slice(0, -1));
       setState('redoStack', prev => [...prev, currentSnapshot]);
       setState('annotations', reconcile(prevSnapshot));
+      this.pushHistory('Undo performed');
       persistState();
     },
     
@@ -234,6 +280,7 @@ export function useAppStore() {
       setState('redoStack', prev => prev.slice(0, -1));
       setState('undoStack', prev => [...prev, currentSnapshot]);
       setState('annotations', reconcile(nextSnapshot));
+      this.pushHistory('Redo performed');
       persistState();
     },
     
@@ -306,5 +353,67 @@ export function useAppStore() {
       setState('savedProjects', projects => projects.filter(project => project.id !== id));
       persistState();
     },
+
+    saveSnapshot(name: string) {
+      if (!name.trim()) return false;
+      const snapshot: VersionSnapshot = {
+        id: generateId(),
+        name: name.trim(),
+        timestamp: Date.now(),
+        annotations: state.annotations.map(a => ({ ...a })),
+      };
+      setState('versions', prev => [...prev, snapshot]);
+      this.pushHistory('Snapshot saved');
+      persistState();
+      return true;
+    },
+
+    restoreSnapshot(id: string) {
+      const snapshot = state.versions.find(v => v.id === id);
+      if (!snapshot) return false;
+
+      const currentSnapshot = [...state.annotations];
+      setState('undoStack', prev => [...prev, currentSnapshot]);
+      setState('redoStack', []);
+
+      setState('annotations', snapshot.annotations.map(a => ({ ...a })));
+      this.pushHistory('Snapshot restored');
+      persistState();
+      return true;
+    },
+
+    deleteSnapshot(id: string) {
+      setState('versions', versions => versions.filter(v => v.id !== id));
+      persistState();
+    },
+
+    setAnnotations(annotations: Annotation[]) {
+      const currentSnapshot = [...state.annotations];
+      setState('undoStack', prev => [...prev, currentSnapshot]);
+      setState('redoStack', []);
+      setState('annotations', annotations);
+      this.pushHistory('Annotations replaced');
+      persistState();
+    },
+
+    copyStyle() {
+      const selected = state.annotations.find(a => a.id === state.selectedAnnotationId);
+      if (selected) {
+        setState('copiedStyleBuffer', {
+          color: selected.color,
+          strokeWidth: selected.strokeWidth
+        });
+      }
+    },
+
+    pasteStyle() {
+      const selected = state.annotations.find(a => a.id === state.selectedAnnotationId);
+      if (selected && state.copiedStyleBuffer) {
+        this.updateAnnotation(selected.id, {
+          color: state.copiedStyleBuffer.color,
+          strokeWidth: state.copiedStyleBuffer.strokeWidth
+        });
+      }
+    }
   };
 }

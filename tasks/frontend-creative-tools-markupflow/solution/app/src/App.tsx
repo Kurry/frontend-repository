@@ -1,5 +1,7 @@
 import { createSignal, onMount, onCleanup, Show, For, createMemo, createEffect } from 'solid-js';
 import { useAppStore, ToolType, Annotation, TextStyle, StrokeWidth } from './store';
+import { z } from 'zod';
+import { createForm } from '@tanstack/solid-form';
 import { drawAnnotation, applyBlurEffect, applyPixelateEffect, applySpotlightEffect } from './canvas';
 import { registerWebMcp } from './webmcp';
 
@@ -147,6 +149,7 @@ function LayerRow(props: {
           focus:outline-none focus:opacity-100 focus:ring-1 focus:ring-red-400"
         onClick={(e) => { e.stopPropagation(); props.onDelete(); }}
         aria-label={`Delete ${typeLabel()}`}
+        title={`Delete ${typeLabel()}`}
       >
         ✕
       </button>
@@ -185,8 +188,24 @@ export default function App() {
   const [editingTextId, setEditingTextId] = createSignal<string | null>(null);
   const [statusMessage, setStatusMessage] = createSignal('Ready');
   const [viewMode, setViewMode] = createSignal<'edit' | 'preview'>('edit');
-  const [projectName, setProjectName] = createSignal('');
   const [theme, setTheme] = createSignal<'dark' | 'light'>('dark');
+
+  const projectForm = createForm(() => ({
+    defaultValues: { name: '' },
+    onSubmit: async ({ value }) => {
+      if (store.saveProject(value.name)) {
+        announce('Project saved');
+        projectForm.reset();
+      } else {
+        announce('Add an image before saving');
+      }
+    },
+    validators: {
+      onSubmit: z.object({
+        name: z.string().min(1, 'Project name is required').max(80, 'Project name must be at most 80 characters'),
+      })
+    }
+  }));
   
   // Layer drag state
   const [dragLayerIndex, setDragLayerIndex] = createSignal<number | null>(null);
@@ -264,31 +283,33 @@ export default function App() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       
-      // Apply destructive effects in order
-      const scaleX = canvas.width / state.imageWidth;
-      const scaleY = canvas.height / state.imageHeight;
-      
-      state.annotations.forEach(ann => {
-        if (ann.type === 'blur') {
-          const bx = (ann.x ?? 0) * scaleX;
-          const by = (ann.y ?? 0) * scaleY;
-          const bw = ((ann.x2 ?? ann.x ?? 0) - (ann.x ?? 0)) * scaleX;
-          const bh = ((ann.y2 ?? ann.y ?? 0) - (ann.y ?? 0)) * scaleY;
-          applyBlurEffect(ctx, bx, by, bw, bh, canvas.width, canvas.height);
-        } else if (ann.type === 'pixelate') {
-          const px = (ann.x ?? 0) * scaleX;
-          const py = (ann.y ?? 0) * scaleY;
-          const pw = ((ann.x2 ?? ann.x ?? 0) - (ann.x ?? 0)) * scaleX;
-          const ph = ((ann.y2 ?? ann.y ?? 0) - (ann.y ?? 0)) * scaleY;
-          applyPixelateEffect(ctx, px, py, pw, ph, canvas.width, canvas.height, ann.pixelSize ?? 8);
-        } else if (ann.type === 'spotlight') {
-          const ecx = ((ann.x ?? 0) + (ann.x2 ?? ann.x ?? 0)) / 2 * scaleX;
-          const ecy = ((ann.y ?? 0) + (ann.y2 ?? ann.y ?? 0)) / 2 * scaleY;
-          const rx = Math.abs((ann.x2 ?? ann.x ?? 0) - (ann.x ?? 0)) / 2 * scaleX;
-          const ry = Math.abs((ann.y2 ?? ann.y ?? 0) - (ann.y ?? 0)) / 2 * scaleY;
-          applySpotlightEffect(ctx, ecx, ecy, rx, ry, canvas.width, canvas.height);
-        }
-      });
+      if (!state.compareMode) {
+        // Apply destructive effects in order
+        const scaleX = canvas.width / state.imageWidth;
+        const scaleY = canvas.height / state.imageHeight;
+
+        state.annotations.forEach(ann => {
+          if (ann.type === 'blur') {
+            const bx = (ann.x ?? 0) * scaleX;
+            const by = (ann.y ?? 0) * scaleY;
+            const bw = ((ann.x2 ?? ann.x ?? 0) - (ann.x ?? 0)) * scaleX;
+            const bh = ((ann.y2 ?? ann.y ?? 0) - (ann.y ?? 0)) * scaleY;
+            applyBlurEffect(ctx, bx, by, bw, bh, canvas.width, canvas.height);
+          } else if (ann.type === 'pixelate') {
+            const px = (ann.x ?? 0) * scaleX;
+            const py = (ann.y ?? 0) * scaleY;
+            const pw = ((ann.x2 ?? ann.x ?? 0) - (ann.x ?? 0)) * scaleX;
+            const ph = ((ann.y2 ?? ann.y ?? 0) - (ann.y ?? 0)) * scaleY;
+            applyPixelateEffect(ctx, px, py, pw, ph, canvas.width, canvas.height, ann.pixelSize ?? 8);
+          } else if (ann.type === 'spotlight') {
+            const ecx = ((ann.x ?? 0) + (ann.x2 ?? ann.x ?? 0)) / 2 * scaleX;
+            const ecy = ((ann.y ?? 0) + (ann.y2 ?? ann.y ?? 0)) / 2 * scaleY;
+            const rx = Math.abs((ann.x2 ?? ann.x ?? 0) - (ann.x ?? 0)) / 2 * scaleX;
+            const ry = Math.abs((ann.y2 ?? ann.y ?? 0) - (ann.y ?? 0)) / 2 * scaleY;
+            applySpotlightEffect(ctx, ecx, ecy, rx, ry, canvas.width, canvas.height);
+          }
+        });
+      }
       
       // Now render overlay annotations
       renderOverlayAnnotations();
@@ -963,9 +984,9 @@ export default function App() {
               setRemoteContent('');
               setSharedContentMerged('');
               setMergeConflict(null);
-              setProjectName('');
               announce('Workspace reset');
             }}
+            aria-label="Reset workspace"
           >
             Reset workspace
           </button>
@@ -976,6 +997,51 @@ export default function App() {
           >
             {theme() === 'dark' ? 'Use light theme' : 'Use dark theme'}
           </button>
+          <button
+            class="px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            onClick={() => {
+              const input = document.createElement('input');
+              input.type = 'file';
+              input.accept = 'application/json';
+              input.onchange = (e) => {
+                const target = e.target as HTMLInputElement;
+                if (!target.files || !target.files[0]) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                  try {
+                    const content = JSON.parse(e.target?.result as string);
+                    if (content.schemaVersion !== 'markupflow-project-v1') {
+                      announce('Import failed: invalid schemaVersion');
+                      return;
+                    }
+                    if (!content.imageDataUrl || !content.imageDataUrl.startsWith('data:image/')) {
+                      announce('Import failed: invalid imageDataUrl');
+                      return;
+                    }
+                    store.setImage(content.imageDataUrl, content.imageWidth, content.imageHeight);
+                    if (Array.isArray(content.annotations)) {
+                      store.setAnnotations(content.annotations);
+                    }
+                    const img = new Image();
+                    img.onload = () => {
+                      setLoadedImage(img);
+                      setTimeout(renderFullCanvas, 200);
+                      announce('Project JSON imported');
+                    };
+                    img.src = content.imageDataUrl;
+                  } catch (err) {
+                    announce('Import failed: invalid JSON');
+                  }
+                };
+                reader.readAsText(target.files[0]);
+              };
+              input.click();
+            }}
+            aria-label="Import project"
+          >
+            Import project
+          </button>
+
           <button
             class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
               focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]
@@ -1000,6 +1066,110 @@ export default function App() {
           >
             ↪ Redo
           </button>
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const input = e.currentTarget.querySelector('input');
+              const name = input?.value;
+              if (name && name.length <= 80) {
+                if (store.saveSnapshot(name)) {
+                  announce(`Snapshot ${name} saved`);
+                  input.value = '';
+                }
+              } else if (!name) {
+                announce('Snapshot name field is required');
+              } else {
+                announce('Snapshot name field must be at most 80 characters');
+              }
+            }}
+            class="flex items-center gap-1 bg-[var(--color-surface)] rounded-lg p-1 border border-[var(--color-border)]"
+          >
+            <input
+              name="snapshotName"
+              placeholder="Snapshot name"
+              class="bg-transparent text-sm text-[var(--color-text-primary)] px-2 py-0.5 w-32 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] rounded"
+              aria-label="Snapshot name"
+            />
+            <button
+              type="submit"
+              class={`px-2 py-0.5 rounded-md text-xs font-medium transition-all duration-150
+                focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]`}
+              aria-label="Save snapshot"
+            >
+              Save snapshot
+            </button>
+          </form>
+          <button
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
+              focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]
+              ${state.compareMode
+                ? 'bg-[var(--color-accent)] text-white shadow-lg'
+                : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)]'}`}
+            onClick={() => { setState('compareMode', !state.compareMode); announce(`Compare ${state.compareMode ? 'active' : 'inactive'}`); }}
+            aria-pressed={state.compareMode}
+            aria-label="Compare"
+          >
+            Compare
+          </button>
+
+          <button
+            class="px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => {
+              if (!state.imageDataUrl) return;
+              const json = JSON.stringify({
+                schemaVersion: 'markupflow-project-v1',
+                imageDataUrl: state.imageDataUrl,
+                imageWidth: state.imageWidth,
+                imageHeight: state.imageHeight,
+                annotations: state.annotations
+              }, null, 2);
+              const blob = new Blob([json], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'markupflow-project.json';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              announce('Export project JSON');
+            }}
+            disabled={!state.imageDataUrl}
+            aria-label="Export project JSON"
+          >
+            Export project JSON
+          </button>
+
+          <button
+            class="px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => {
+              if (!state.imageDataUrl) return;
+              const json = JSON.stringify({
+                schemaVersion: 'markupflow-project-v1',
+                imageDataUrl: state.imageDataUrl,
+                imageWidth: state.imageWidth,
+                imageHeight: state.imageHeight,
+                annotations: state.annotations
+              }, null, 2);
+              navigator.clipboard.writeText(json)
+                .then(() => announce('Project JSON copied to clipboard'))
+                .catch(() => {
+                  const ta = document.createElement('textarea');
+                  ta.value = json;
+                  document.body.appendChild(ta);
+                  ta.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(ta);
+                  announce('Project JSON copied to clipboard');
+                });
+            }}
+            disabled={!state.imageDataUrl}
+            aria-label="Copy project JSON"
+          >
+            Copy project JSON
+          </button>
+
           <button
             class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-[var(--color-primary)] text-white 
               hover:bg-blue-700 transition-all duration-150
@@ -1100,6 +1270,146 @@ export default function App() {
                 </button>
               ))}
             </div>
+
+            {/* Copy / Paste Style */}
+            <div class="flex flex-row lg:flex-col gap-1 mt-1">
+              <button
+                class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+                onClick={() => {
+                  store.copyStyle();
+                  announce('Style copied');
+                }}
+                disabled={!state.selectedAnnotationId}
+                aria-label="Copy style"
+              >
+                Copy style
+              </button>
+              <button
+                class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => {
+                  store.pasteStyle();
+                  announce('Style pasted');
+                  setTimeout(() => renderFullCanvas(), 20);
+                }}
+                disabled={!state.copiedStyleBuffer || !state.selectedAnnotationId}
+                aria-label="Paste style"
+              >
+                Paste style
+              </button>
+            </div>
+          </div>
+
+          {/* Separator */}
+          <div class="hidden lg:block w-full h-px bg-[var(--color-border)] my-1 flex-shrink-0" />
+          <div class="lg:hidden w-px h-10 bg-[var(--color-border)] mx-1 flex-shrink-0" />
+
+          {/* Presets section */}
+          <div class="flex flex-row lg:flex-col gap-1 flex-wrap flex-shrink-0">
+            <h2 class="toolbar-heading hidden lg:block text-[11px] font-semibold text-[var(--color-text-secondary)] tracking-wider px-1 mb-1">Presets</h2>
+
+            <button
+              class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              onClick={() => {
+                if (!state.imageDataUrl) return;
+                const width = state.imageWidth;
+                const height = state.imageHeight;
+                store.addAnnotation({
+                  id: store.generateId(),
+                  type: 'blur',
+                  x: width * 0.3,
+                  y: height * 0.3,
+                  x2: width * 0.7,
+                  y2: height * 0.7,
+                  color: state.activeColor,
+                  strokeWidth: state.activeStrokeWidth,
+                  blurRadius: 8,
+                });
+                announce('Blur redaction applied');
+                setTimeout(() => renderFullCanvas(), 20);
+              }}
+            >
+              Blur redaction
+            </button>
+
+            <button
+              class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              onClick={() => {
+                if (!state.imageDataUrl) return;
+                const width = state.imageWidth;
+                const height = state.imageHeight;
+                store.addAnnotation({
+                  id: store.generateId(),
+                  type: 'arrow',
+                  x: width * 0.4,
+                  y: height * 0.6,
+                  x2: width * 0.6,
+                  y2: height * 0.4,
+                  color: state.activeColor,
+                  strokeWidth: state.activeStrokeWidth,
+                });
+                store.addAnnotation({
+                  id: store.generateId(),
+                  type: 'text',
+                  x: width * 0.65,
+                  y: height * 0.35,
+                  color: state.activeColor,
+                  strokeWidth: state.activeStrokeWidth,
+                  text: 'Callout',
+                  textStyle: 'bold-caption',
+                  fontSize: 24,
+                });
+                announce('Callout arrow applied');
+                setTimeout(() => renderFullCanvas(), 20);
+              }}
+            >
+              Callout arrow
+            </button>
+
+            <button
+              class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              onClick={() => {
+                if (!state.imageDataUrl) return;
+                const width = state.imageWidth;
+                const height = state.imageHeight;
+                store.addAnnotation({
+                  id: store.generateId(),
+                  type: 'highlighter',
+                  x: width * 0.1,
+                  y: height * 0.8,
+                  x2: width * 0.9,
+                  y2: height * 0.85,
+                  color: state.activeColor,
+                  strokeWidth: state.activeStrokeWidth,
+                });
+                announce('Highlight band applied');
+                setTimeout(() => renderFullCanvas(), 20);
+              }}
+            >
+              Highlight band
+            </button>
+
+            <button
+              class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              onClick={() => {
+                if (!state.imageDataUrl) return;
+                const width = state.imageWidth;
+                const height = state.imageHeight;
+                store.addAnnotation({
+                  id: store.generateId(),
+                  type: 'spotlight',
+                  x: width * 0.2,
+                  y: height * 0.2,
+                  x2: width * 0.8,
+                  y2: height * 0.8,
+                  color: state.activeColor,
+                  strokeWidth: state.activeStrokeWidth,
+                });
+                announce('Spotlight focus applied');
+                setTimeout(() => renderFullCanvas(), 20);
+              }}
+            >
+              Spotlight focus
+            </button>
           </div>
         </aside>
 
@@ -1176,7 +1486,7 @@ export default function App() {
               />
               <canvas
                 ref={overlayCanvasRef}
-                class="absolute top-0 left-0 block cursor-crosshair"
+                class={`absolute top-0 left-0 block cursor-crosshair transition-opacity duration-300 ${state.compareMode ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
                 role="application"
                 aria-label="Annotation canvas. Select a tool, then press Enter or Space to place an annotation."
                 tabIndex={0}
@@ -1309,7 +1619,14 @@ export default function App() {
             <h2 class="text-base font-bold text-[var(--color-text-primary)]">Layers</h2>
           </div>
           
-          <div class="flex-1 overflow-y-auto p-2 space-y-1" role="list" aria-label="Annotation layers">
+          <div class="flex-1 overflow-y-auto p-2 space-y-1" role="list" aria-label="Annotation layers" ref={(el) => {
+            // Check prefers-reduced-motion
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+              import('@formkit/auto-animate').then(({ default: autoAnimate }) => {
+                autoAnimate(el);
+              }).catch(() => {});
+            }
+          }}>
             <Show when={state.annotations.length > 0} fallback={
               <div class="flex flex-col items-center justify-center py-8 text-[var(--color-text-secondary)]">
                 <span class="text-2xl mb-2">📋</span>
@@ -1344,31 +1661,108 @@ export default function App() {
             </Show>
           </div>
 
+          {/* History Panel */}
+          <section class="history-panel border-t border-[var(--color-border)] p-3 flex-shrink-0 max-h-40 overflow-y-auto" aria-labelledby="history-heading">
+            <h3 id="history-heading" class="text-xs font-bold text-[var(--color-text-primary)] mb-2">History</h3>
+            <Show when={state.history.length > 0} fallback={
+              <p class="text-[10px] text-[var(--color-text-secondary)] text-center py-2">History is empty. Actions will appear here.</p>
+            }>
+              <ul class="space-y-1">
+                <For each={state.history}>
+                  {(entry) => (
+                    <li class="text-[10px] text-[var(--color-text-secondary)] truncate">
+                      {new Date(entry.timestamp).toLocaleTimeString()} - {entry.action}
+                    </li>
+                  )}
+                </For>
+              </ul>
+            </Show>
+          </section>
+
+          {/* Versions Panel */}
+          <section class="versions-panel border-t border-[var(--color-border)] p-3 flex-shrink-0 max-h-40 overflow-y-auto" aria-labelledby="versions-heading">
+            <h3 id="versions-heading" class="text-xs font-bold text-[var(--color-text-primary)] mb-2">Versions</h3>
+            <Show when={state.versions.length > 0} fallback={
+              <p class="text-[10px] text-[var(--color-text-secondary)] text-center py-2">No versions saved. Save a snapshot to see it here.</p>
+            }>
+              <ul class="space-y-1" ref={(el) => {
+                if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                  import('@formkit/auto-animate').then(({ default: autoAnimate }) => {
+                    autoAnimate(el);
+                  }).catch(() => {});
+                }
+              }}>
+                <For each={state.versions}>
+                  {(snapshot) => (
+                    <li class="flex items-center justify-between text-[10px] text-[var(--color-text-secondary)]">
+                      <span class="truncate max-w-[100px]">{snapshot.name}</span>
+                      <div class="flex gap-1">
+                        <button class="px-1.5 py-0.5 bg-[var(--color-surface)] border border-[var(--color-border)] rounded hover:text-[var(--color-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]" onClick={() => {
+                          store.restoreSnapshot(snapshot.id);
+                          setTimeout(() => renderFullCanvas(), 20);
+                        }}>Restore</button>
+                        <button class="px-1.5 py-0.5 text-red-400 hover:text-red-300 focus:outline-none focus:ring-1 focus:ring-red-400" onClick={() => store.deleteSnapshot(snapshot.id)}>Delete</button>
+                      </div>
+                    </li>
+                  )}
+                </For>
+              </ul>
+            </Show>
+          </section>
+
           <section class="saved-projects border-t border-[var(--color-border)] p-3 flex-shrink-0" aria-labelledby="saved-projects-heading">
             <h3 id="saved-projects-heading" class="text-xs font-semibold text-[var(--color-text-secondary)] mb-2">Saved projects</h3>
-            <label class="text-[10px] text-[var(--color-text-secondary)] block mb-1" for="project-name">Project name</label>
-            <div class="flex gap-2 mb-2">
-              <input
-                id="project-name"
-                value={projectName()}
-                onInput={(e) => setProjectName(e.target.value)}
-                class="project-name-input flex-1 min-w-0 bg-[var(--color-bg)] text-[var(--color-text-primary)] text-xs px-2 rounded-md"
-                placeholder="Annotation project"
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                projectForm.handleSubmit();
+              }}
+            >
+              <projectForm.Field
+                name="name"
+                children={(field) => (
+                  <div class="mb-2">
+                    <label class="text-[10px] text-[var(--color-text-secondary)] block mb-1" for={field().name}>Project name</label>
+                    <div class="flex gap-2 mb-1">
+                      <input
+                        id={field().name}
+                        name={field().name}
+                        value={field().state.value}
+                        onInput={(e) => field().handleChange(e.target.value)}
+                        onBlur={field().handleBlur}
+                        class={`project-name-input flex-1 min-w-0 bg-[var(--color-bg)] text-[var(--color-text-primary)] text-xs px-2 rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] ${field().state.meta.errors.length > 0 ? 'border border-red-500' : ''}`}
+                        placeholder="Annotation project"
+                      />
+                      <projectForm.Subscribe
+                        selector={(state) => state.canSubmit}
+                        children={(canSubmit) => (
+                          <button
+                            type="submit"
+                            class="project-action bg-[var(--color-primary)] text-white rounded-md px-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50"
+                            disabled={!canSubmit()}
+                          >
+                            Save project
+                          </button>
+                        )}
+                      />
+                    </div>
+                    <Show when={field().state.meta.errors.length > 0}>
+                      <div class="text-[10px] text-red-500 mt-0.5" role="alert" aria-live="polite">
+                        {field().state.meta.errors[0]?.message}
+                      </div>
+                    </Show>
+                  </div>
+                )}
               />
-              <button
-                class="project-action bg-[var(--color-primary)] text-white rounded-md px-2 text-xs"
-                onClick={() => {
-                  if (store.saveProject(projectName())) {
-                    announce('Project saved');
-                  } else {
-                    announce('Add a name and image before saving');
-                  }
-                }}
-              >
-                Save project
-              </button>
-            </div>
-            <div class="saved-project-list space-y-1" role="list" aria-label="Saved projects">
+            </form>
+            <div class="saved-project-list space-y-1" role="list" aria-label="Saved projects" ref={(el) => {
+              if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                import('@formkit/auto-animate').then(({ default: autoAnimate }) => {
+                  autoAnimate(el);
+                }).catch(() => {});
+              }
+            }}>
               <For each={state.savedProjects}>
                 {(project) => (
                   <div class="saved-project-row flex items-center gap-1" role="listitem">
@@ -1524,26 +1918,32 @@ export default function App() {
                   <p class="text-[var(--color-text-secondary)]">Remote: {mergeConflict()!.remote || '(empty)'}</p>
                   <div class="flex gap-1 mt-1">
                     <button 
-                      class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] rounded"
+                      class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                       onClick={() => {
                         setSharedContentMerged(mergeConflict()!.local);
                         setMergeConflict(null);
                       }}
+                      tabIndex={0}
+                      aria-label="Keep local"
                     >Keep local</button>
                     <button 
-                      class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] rounded"
+                      class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                       onClick={() => {
                         setSharedContent(mergeConflict()!.remote);
                         setSharedContentMerged(mergeConflict()!.remote);
                         setMergeConflict(null);
                       }}
+                      tabIndex={0}
+                      aria-label="Keep remote"
                     >Keep remote</button>
                     <button 
-                      class="px-2 py-0.5 bg-green-600 text-white text-[10px] rounded"
+                      class="px-2 py-0.5 bg-green-600 text-white text-[10px] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
                       onClick={() => {
                         setSharedContentMerged(combineChanges(mergeConflict()!.local, mergeConflict()!.remote));
                         setMergeConflict(null);
                       }}
+                      tabIndex={0}
+                      aria-label="Merge both"
                     >Merge both</button>
                   </div>
                 </div>

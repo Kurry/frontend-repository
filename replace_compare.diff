@@ -1,0 +1,20 @@
+<<<<<<< SEARCH
+  // Re-render when annotations change
+  createEffect(() => {
+    const _len = state.annotations.length;
+    const _ids = state.annotations.map(a => a.id).join(',');
+    if (state.imageDataUrl) {
+      setTimeout(() => renderFullCanvas(), 20);
+    }
+  });
+=======
+  // Re-render when annotations change
+  createEffect(() => {
+    const _len = state.annotations.length;
+    const _ids = state.annotations.map(a => a.id).join(',');
+    const _compare = state.compareMode;
+    if (state.imageDataUrl) {
+      setTimeout(() => renderFullCanvas(), 20);
+    }
+  });
+>>>>>>> REPLACE

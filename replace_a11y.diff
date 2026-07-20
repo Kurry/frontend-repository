@@ -1,0 +1,107 @@
+<<<<<<< SEARCH
+      <button
+        class="layer-action opacity-70 group-hover:opacity-100 px-2 py-1 text-xs text-red-300
+          hover:text-red-200 rounded transition-all duration-150
+          focus:outline-none focus:opacity-100 focus:ring-1 focus:ring-red-400"
+        onClick={(e) => { e.stopPropagation(); props.onDelete(); }}
+        aria-label={`Delete ${typeLabel()}`}
+      >
+        ✕
+      </button>
+=======
+      <button
+        class="layer-action opacity-70 group-hover:opacity-100 px-2 py-1 text-xs text-red-300
+          hover:text-red-200 rounded transition-all duration-150
+          focus:outline-none focus:opacity-100 focus:ring-1 focus:ring-red-400"
+        onClick={(e) => { e.stopPropagation(); props.onDelete(); }}
+        aria-label={`Delete ${typeLabel()}`}
+        title={`Delete ${typeLabel()}`}
+      >
+        ✕
+      </button>
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+          <button
+            class="header-action"
+            onClick={() => {
+              store.clearState();
+              setLoadedImage(null);
+              setSharedContent('');
+              setRemoteContent('');
+              setSharedContentMerged('');
+              setMergeConflict(null);
+              announce('Workspace reset');
+            }}
+          >
+            Reset workspace
+          </button>
+=======
+          <button
+            class="header-action"
+            onClick={() => {
+              store.clearState();
+              setLoadedImage(null);
+              setSharedContent('');
+              setRemoteContent('');
+              setSharedContentMerged('');
+              setMergeConflict(null);
+              announce('Workspace reset');
+            }}
+            aria-label="Reset workspace"
+          >
+            Reset workspace
+          </button>
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+                    <button
+                      class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] rounded"
+                      onClick={() => {
+                        setSharedContentMerged(mergeConflict()!.local);
+                        setMergeConflict(null);
+                      }}
+                    >Keep local</button>
+                    <button
+                      class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] rounded"
+                      onClick={() => {
+                        setSharedContent(mergeConflict()!.remote);
+                        setSharedContentMerged(mergeConflict()!.remote);
+                        setMergeConflict(null);
+                      }}
+                    >Keep remote</button>
+                    <button
+                      class="px-2 py-0.5 bg-green-600 text-white text-[10px] rounded"
+                      onClick={() => {
+                        setSharedContentMerged(combineChanges(mergeConflict()!.local, mergeConflict()!.remote));
+                        setMergeConflict(null);
+                      }}
+                    >Merge both</button>
+=======
+                    <button
+                      class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      onClick={() => {
+                        setSharedContentMerged(mergeConflict()!.local);
+                        setMergeConflict(null);
+                      }}
+                      tabIndex={0}
+                      aria-label="Keep local"
+                    >Keep local</button>
+                    <button
+                      class="px-2 py-0.5 bg-yellow-600 text-white text-[10px] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      onClick={() => {
+                        setSharedContent(mergeConflict()!.remote);
+                        setSharedContentMerged(mergeConflict()!.remote);
+                        setMergeConflict(null);
+                      }}
+                      tabIndex={0}
+                      aria-label="Keep remote"
+                    >Keep remote</button>
+                    <button
+                      class="px-2 py-0.5 bg-green-600 text-white text-[10px] rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+                      onClick={() => {
+                        setSharedContentMerged(combineChanges(mergeConflict()!.local, mergeConflict()!.remote));
+                        setMergeConflict(null);
+                      }}
+                      tabIndex={0}
+                      aria-label="Merge both"
+                    >Merge both</button>
+>>>>>>> REPLACE

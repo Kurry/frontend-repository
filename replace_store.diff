@@ -1,0 +1,109 @@
+<<<<<<< SEARCH
+export interface AppState {
+  imageDataUrl: string | null;
+  imageWidth: number;
+  imageHeight: number;
+  annotations: Annotation[];
+  activeTool: ToolType;
+  activeColor: string;
+  activeStrokeWidth: StrokeWidth;
+  activeTextStyle: TextStyle;
+  activeFontSize: number;
+  undoStack: Annotation[][];
+  redoStack: Annotation[][];
+  selectedAnnotationId: string | null;
+  isOffline: boolean;
+  offlineQueue: { action: string; data: any }[];
+  collaborationState: 'online' | 'offline' | 'syncing';
+  savedProjects: SavedProject[];
+}
+=======
+export interface HistoryEntry {
+  id: string;
+  timestamp: number;
+  action: string;
+}
+
+export interface VersionSnapshot {
+  id: string;
+  name: string;
+  timestamp: number;
+  annotations: Annotation[];
+}
+
+export interface AppState {
+  imageDataUrl: string | null;
+  imageWidth: number;
+  imageHeight: number;
+  annotations: Annotation[];
+  activeTool: ToolType;
+  activeColor: string;
+  activeStrokeWidth: StrokeWidth;
+  activeTextStyle: TextStyle;
+  activeFontSize: number;
+  copiedStyleBuffer: { color: string; strokeWidth: StrokeWidth } | null;
+  undoStack: Annotation[][];
+  redoStack: Annotation[][];
+  history: HistoryEntry[];
+  versions: VersionSnapshot[];
+  selectedAnnotationId: string | null;
+  isOffline: boolean;
+  offlineQueue: { action: string; data: any }[];
+  collaborationState: 'online' | 'offline' | 'syncing';
+  savedProjects: SavedProject[];
+  compareMode: boolean;
+  viewMode: 'edit' | 'preview';
+  sharedContent: string;
+  remoteContent: string;
+  sharedContentMerged: string;
+  mergeConflict: { local: string; remote: string } | null;
+}
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+const [state, setState] = createStore<AppState>({
+  imageDataUrl: savedState?.imageDataUrl ?? null,
+  imageWidth: savedState?.imageWidth ?? 0,
+  imageHeight: savedState?.imageHeight ?? 0,
+  annotations: savedState?.annotations ?? defaultAnnotations,
+  activeTool: 'rectangle',
+  activeColor: '#FF0000',
+  activeStrokeWidth: 'medium',
+  activeTextStyle: 'plain',
+  activeFontSize: 16,
+  undoStack: [],
+  redoStack: [],
+  selectedAnnotationId: null,
+  isOffline: false,
+  offlineQueue: [],
+  collaborationState: 'online',
+  savedProjects: savedState?.savedProjects ?? [],
+});
+=======
+const [state, setState] = createStore<AppState>({
+  imageDataUrl: savedState?.imageDataUrl ?? null,
+  imageWidth: savedState?.imageWidth ?? 0,
+  imageHeight: savedState?.imageHeight ?? 0,
+  annotations: savedState?.annotations ?? defaultAnnotations,
+  activeTool: 'rectangle',
+  activeColor: '#FF0000',
+  activeStrokeWidth: 'medium',
+  activeTextStyle: 'plain',
+  activeFontSize: 16,
+  copiedStyleBuffer: null,
+  undoStack: [],
+  redoStack: [],
+  history: [],
+  versions: savedState?.versions ?? [],
+  selectedAnnotationId: null,
+  isOffline: false,
+  offlineQueue: [],
+  collaborationState: 'online',
+  savedProjects: savedState?.savedProjects ?? [],
+  compareMode: false,
+  viewMode: 'edit',
+  sharedContent: savedState?.sharedContent ?? '',
+  remoteContent: savedState?.remoteContent ?? '',
+  sharedContentMerged: savedState?.sharedContentMerged ?? '',
+  mergeConflict: null,
+});
+>>>>>>> REPLACE

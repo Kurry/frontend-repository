@@ -1,0 +1,96 @@
+<<<<<<< SEARCH
+          <button
+            class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-[var(--color-primary)] text-white
+              hover:bg-blue-700 transition-all duration-150
+              focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            onClick={handleExportPNG}
+            aria-label="Export PNG"
+          >
+            Export PNG
+          </button>
+        </div>
+      </header>
+=======
+          <button
+            class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
+              focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]
+              ${state.compareMode
+                ? 'bg-[var(--color-accent)] text-white shadow-lg'
+                : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)]'}`}
+            onClick={() => { setState('compareMode', !state.compareMode); announce(`Compare ${state.compareMode ? 'active' : 'inactive'}`); }}
+            aria-pressed={state.compareMode}
+            aria-label="Compare"
+          >
+            Compare
+          </button>
+
+          <button
+            class="px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => {
+              if (!state.imageDataUrl) return;
+              const json = JSON.stringify({
+                schemaVersion: 'markupflow-project-v1',
+                imageDataUrl: state.imageDataUrl,
+                imageWidth: state.imageWidth,
+                imageHeight: state.imageHeight,
+                annotations: state.annotations
+              }, null, 2);
+              const blob = new Blob([json], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'markupflow-project.json';
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              announce('Export project JSON');
+            }}
+            disabled={!state.imageDataUrl}
+            aria-label="Export project JSON"
+          >
+            Export project JSON
+          </button>
+
+          <button
+            class="px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={() => {
+              if (!state.imageDataUrl) return;
+              const json = JSON.stringify({
+                schemaVersion: 'markupflow-project-v1',
+                imageDataUrl: state.imageDataUrl,
+                imageWidth: state.imageWidth,
+                imageHeight: state.imageHeight,
+                annotations: state.annotations
+              }, null, 2);
+              navigator.clipboard.writeText(json)
+                .then(() => announce('Project JSON copied to clipboard'))
+                .catch(() => {
+                  // Fallback
+                  const ta = document.createElement('textarea');
+                  ta.value = json;
+                  document.body.appendChild(ta);
+                  ta.select();
+                  document.execCommand('copy');
+                  document.body.removeChild(ta);
+                  announce('Project JSON copied to clipboard');
+                });
+            }}
+            disabled={!state.imageDataUrl}
+            aria-label="Copy project JSON"
+          >
+            Copy project JSON
+          </button>
+
+          <button
+            class="px-4 py-1.5 rounded-lg text-sm font-semibold bg-[var(--color-primary)] text-white
+              hover:bg-blue-700 transition-all duration-150
+              focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+            onClick={handleExportPNG}
+            aria-label="Export PNG"
+          >
+            Export PNG
+          </button>
+        </div>
+      </header>
+>>>>>>> REPLACE
