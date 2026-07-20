@@ -475,6 +475,7 @@ export class StudioState {
       current.status = 'complete';
       current.completedAt = new Date().toISOString();
       current.error = undefined;
+      this.ariaMessage = `Harvest step ${current.name} complete`;
       this.advanceHarvest(seedId);
     }, delay);
     this.timers.set(seedId, timer);
@@ -575,6 +576,7 @@ export class StudioState {
   }
 
   stampExport(format: string) {
+    if (format === 'package-manifest-json') format = 'manifest';
     if (format === 'manifest' && this.activeSeed) this.activeSeed.timeline.push(event('export', 'Package manifest exported'));
   }
 
