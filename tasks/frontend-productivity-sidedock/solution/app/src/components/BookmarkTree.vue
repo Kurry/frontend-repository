@@ -1,12 +1,13 @@
 <script setup>
 import { computed, ref, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useSidedockStore } from '../stores/sidedock.js'
+import DeleteConfirmDialog from './DeleteConfirmDialog.vue'
 
 const store = useSidedockStore()
 const treeContainer = ref(null)
 const dragItem = ref(null)
 const dropTarget = ref(null)
-const confirmDelete = ref(null)
+const pendingDelete = ref(null)
 
 // Flatten items for virtualization
 function flattenItems(items, depth = 0) {
@@ -163,19 +164,20 @@ function cancelEdit() {
   editingId.value = null
 }
 
-// Delete with confirmation (auto-reset after 5s)
+// Delete with accessible confirmation dialog
 function requestDelete(item) {
-  confirmDelete.value = item.id
-  setTimeout(() => {
-    if (confirmDelete.value === item.id) {
-      confirmDelete.value = null
-    }
-  }, 5000)
+  pendingDelete.value = item
 }
 
-function confirmDeleteItem(item) {
-  store.deleteItem(item.id)
-  confirmDelete.value = null
+function confirmDeleteItem() {
+  if (pendingDelete.value) {
+    store.deleteItem(pendingDelete.value.id)
+    pendingDelete.value = null
+  }
+}
+
+function cancelDelete() {
+  pendingDelete.value = null
 }
 
 // Note editing
@@ -321,6 +323,7 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
     <!-- Virtual list -->
     <div
       v-else
+      v-auto-animate
       role="list"
       aria-label="Bookmarks and folders"
       :style="{ height: totalSize + 'px', position: 'relative', width: '100%' }"
@@ -414,13 +417,7 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
                     <p v-if="moveDestinationsFor(flatItems[vItem.index]).length === 0" class="move-menu-empty">No other folders yet</p>
                   </div>
                 </span>
-                <template v-if="confirmDelete !== flatItems[vItem.index].id">
-                  <button @click.stop="requestDelete(flatItems[vItem.index])" class="icon-action text-red-500" title="Delete" aria-label="Delete folder">🗑</button>
-                </template>
-                <template v-else>
-                  <button @click.stop="confirmDeleteItem(flatItems[vItem.index])" class="confirm-action bg-red-500 text-white" title="Confirm delete">Delete</button>
-                  <button @click.stop="confirmDelete = null" class="confirm-action" title="Cancel delete">Cancel</button>
-                </template>
+                <button @click.stop="requestDelete(flatItems[vItem.index])" class="icon-action text-red-500" title="Delete" aria-label="Delete folder">🗑</button>
               </div>
             </div>
           </template>
@@ -555,13 +552,7 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
                     <p v-if="moveDestinationsFor(flatItems[vItem.index]).length === 0" class="move-menu-empty">No other folders yet</p>
                   </div>
                 </span>
-                <template v-if="confirmDelete !== flatItems[vItem.index].id">
-                  <button @click.stop="requestDelete(flatItems[vItem.index])" class="icon-action text-red-500" title="Delete" aria-label="Delete bookmark">🗑</button>
-                </template>
-                <template v-else>
-                  <button @click.stop="confirmDeleteItem(flatItems[vItem.index])" class="confirm-action bg-red-500 text-white" title="Confirm delete">Delete</button>
-                  <button @click.stop="confirmDelete = null" class="confirm-action" title="Cancel delete">Cancel</button>
-                </template>
+                <button @click.stop="requestDelete(flatItems[vItem.index])" class="icon-action text-red-500" title="Delete" aria-label="Delete bookmark">🗑</button>
               </div>
             </div>
           </template>
@@ -569,6 +560,14 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
       </div>
     </div>
   </div>
+
+  <DeleteConfirmDialog
+    :show="Boolean(pendingDelete)"
+    :item-label="pendingDelete ? (pendingDelete.type === 'folder' ? pendingDelete.name : pendingDelete.title) : ''"
+    :item-type="pendingDelete?.type === 'folder' ? 'folder' : 'bookmark'"
+    @confirm="confirmDeleteItem"
+    @cancel="cancelDelete"
+  />
 </template>
 
 <style scoped>
@@ -630,9 +629,9 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
 }
 .icon-action {
   display: inline-flex;
-  width: 48px;
-  min-width: 48px;
-  height: 48px;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
   align-items: center;
   justify-content: center;
   border: 0;
@@ -640,39 +639,44 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
   background: transparent;
   color: var(--color-text-primary);
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
 }
 .icon-action:hover { background: var(--color-surface); }
+.icon-action:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
 .confirm-action {
   display: inline-flex;
-  min-height: 36px;
+  min-height: 44px;
+  min-width: 44px;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--control-border);
   border-radius: 8px;
-  padding: 4px 8px;
+  padding: 8px 12px;
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
 }
 .item-checkbox { width: 24px; min-width: 24px; height: 24px; accent-color: var(--color-accent); }
-.selection-status { color: var(--color-accent); font-size: 13px; font-weight: 700; }
+.selection-status { color: var(--color-accent); font-size: 14px; font-weight: 700; }
 .drop-target {
   background: color-mix(in srgb, var(--color-accent) 15%, white) !important;
   border-radius: 12px;
   box-shadow: 0 0 0 2px var(--color-accent), 0 2px 8px rgba(229, 70, 16, 0.2);
 }
 @media (max-width: 520px) {
-  .row-actions { opacity: 1; gap: 2px; }
-  .icon-action { width: 26px; min-width: 26px; height: 26px; }
-  .bookmark-row { gap: 4px; }
-  .folder-heading { font-size: 22px; }
+  .row-actions { opacity: 1; gap: 4px; }
+  .bookmark-row { gap: 8px; }
+  .folder-heading { font-size: 24px; }
   .tree-toolbar { flex-wrap: wrap; }
+  .tree-toolbar button { min-height: 44px; }
 }
-:global(.compact-view) .row-actions { opacity: 1; gap: 2px; }
-:global(.compact-view) .icon-action { width: 26px; min-width: 26px; height: 26px; }
-:global(.compact-view) .bookmark-row { gap: 4px; }
+:global(.compact-view) .row-actions { opacity: 1; gap: 4px; }
+:global(.compact-view) .bookmark-row { gap: 8px; }
 :global(.compact-view) .tree-toolbar { flex-wrap: wrap; }
+:global(.compact-view) .tree-toolbar button { min-height: 44px; }
 </style>
 
 .tree-row:hover {

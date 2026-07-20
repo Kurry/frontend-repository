@@ -6,12 +6,13 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 import { NModal, NCard, NButton, NInput } from 'naive-ui'
 
+import { WORKSPACE_COLORS } from '../validation.js'
+
 const store = useSidedockStore()
-const WORKSPACE_COLORS = ['#E54610', '#D97706', '#65A30D', '#059669', '#0891B2', '#2563EB', '#7C3AED', '#DB2777', '#6B7280']
 
 const workspaceSchema = toTypedSchema(z.object({
   name: z.string().min(1, 'Name is required').max(40, 'Name must be 40 characters or fewer'),
-  color: z.enum(WORKSPACE_COLORS, { errorMap: () => ({ message: 'Invalid color selection' }) })
+  color: z.enum(WORKSPACE_COLORS, { errorMap: () => ({ message: 'accentColor is invalid' }) })
 }))
 
 const { handleSubmit, errors, resetForm, setFieldValue } = useForm({
@@ -40,7 +41,7 @@ const onSubmit = handleSubmit((values) => {
       <div>
         <label class="block text-sm font-semibold mb-1" style="color: var(--color-text-primary)">Name</label>
         <NInput v-model:value="name" placeholder="Workspace name" :status="errors.name ? 'error' : undefined" />
-        <p v-if="errors.name" class="text-red-600 text-xs mt-1">{{ errors.name }}</p>
+        <p v-if="errors.name" class="text-red-600 text-xs mt-1" role="alert" aria-live="assertive">{{ errors.name }}</p>
       </div>
       <div>
         <label class="block text-sm font-semibold mb-1" style="color: var(--color-text-primary)">Accent Color</label>
@@ -57,7 +58,7 @@ const onSubmit = handleSubmit((values) => {
             :aria-pressed="color === c"
           ></button>
         </div>
-        <p v-if="errors.color" class="text-red-600 text-xs mt-1">{{ errors.color }}</p>
+        <p v-if="errors.color" class="text-red-600 text-xs mt-1" role="alert" aria-live="assertive">{{ errors.color }}</p>
       </div>
       <div class="flex justify-end gap-2 mt-4">
         <NButton @click="store.showCreateWorkspaceModal = false">Cancel</NButton>

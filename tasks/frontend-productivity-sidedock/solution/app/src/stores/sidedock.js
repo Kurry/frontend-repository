@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
+import { workspaceCreateSchema, normalizeBookmarkUrl } from '../validation.js'
 
 const STORAGE_KEY = 'sidedock-data'
 
@@ -81,6 +82,7 @@ export const useSidedockStore = defineStore('sidedock', () => {
   const toasts = ref([])
   const selectedItemIds = ref([])
   const focusedItemId = ref(null)
+  const isBusy = ref(false)
 
   // Computed
   const activeWorkspace = computed(() => 
@@ -173,10 +175,19 @@ export const useSidedockStore = defineStore('sidedock', () => {
 
   // Workspace operations
   function createWorkspace(name, color) {
+    const parsed = workspaceCreateSchema.safeParse({
+      name: (name || '').trim(),
+      color: color || '#E54610',
+    })
+    if (!parsed.success) {
+      const message = parsed.error.errors[0]?.message || 'Invalid workspace'
+      addToast(message, 'warning')
+      return null
+    }
     const ws = {
       id: generateId(),
-      name: name || 'New workspace',
-      color: color || '#E54610',
+      name: parsed.data.name,
+      color: parsed.data.color,
       items: [],
     }
     workspaces.value.push(ws)
@@ -480,6 +491,7 @@ export const useSidedockStore = defineStore('sidedock', () => {
   // Import Netscape bookmarks
   function importBookmarks(htmlContent) {
     if (!activeWorkspace.value) return 0
+    isBusy.value = true
     
     try {
       const parser = new DOMParser()
@@ -534,6 +546,8 @@ export const useSidedockStore = defineStore('sidedock', () => {
     } catch (e) {
       addToast('Import failed: ' + e.message, 'error')
       return 0
+    } finally {
+      isBusy.value = false
     }
   }
 
@@ -541,6 +555,7 @@ export const useSidedockStore = defineStore('sidedock', () => {
 
   // Import SideDock JSON package
   function importPackage(jsonString) {
+    isBusy.value = true
     try {
       const data = JSON.parse(jsonString)
       if (data.schemaVersion !== 'sidedock-package-v1') {
@@ -621,7 +636,30 @@ export const useSidedockStore = defineStore('sidedock', () => {
     } catch (e) {
       addToast('Import failed: ' + e.message, 'error')
       throw e
+    } finally {
+      isBusy.value = false
     }
+  }
+
+  function serializePackageItems(items) {
+    return (items || []).map((item) => {
+      if (item.type === 'bookmark') {
+        return {
+          type: 'bookmark',
+          id: item.id,
+          url: item.url,
+          title: item.title,
+          note: item.note || '',
+          pinned: isPinned(item.id),
+        }
+      }
+      return {
+        type: 'folder',
+        id: item.id,
+        name: item.name,
+        children: serializePackageItems(item.children || []),
+      }
+    })
   }
 
   function getPackageJson() {
@@ -630,8 +668,11 @@ export const useSidedockStore = defineStore('sidedock', () => {
       sidebarView: compactMode.value,
       activeWorkspaceId: activeWorkspaceId.value,
       pinnedBookmarkIds: pinnedBookmarks.value.map(p => p.id),
-      // Serialize the internal `color` field as the field-contract's `accentColor`.
-      workspaces: workspaces.value.map(({ color, ...rest }) => ({ ...rest, accentColor: color }))
+      workspaces: workspaces.value.map(({ color, items, ...rest }) => ({
+        ...rest,
+        accentColor: color,
+        items: serializePackageItems(items),
+      })),
     }, null, 2)
   }
 
@@ -711,13 +752,10 @@ export const useSidedockStore = defineStore('sidedock', () => {
     if (!activeWorkspace.value) return
     const items = []
     const domains = ['google.com', 'github.com', 'stackoverflow.com', 'reddit.com', 'mdn.dev', 'example.com', 'wikipedia.org', 'amazon.com']
-    const existingIds = new Set(allBookmarks.value.filter(item => item.workspaceId === activeWorkspaceId.value).map(item => item.id))
     for (let i = 0; i < 10000; i++) {
       const domain = domains[i % domains.length]
-      const id = `generated-${i}`
-      if (existingIds.has(id)) continue
       items.push({
-        id,
+        id: `generated-${i}`,
         type: 'bookmark',
         url: `https://${domain}/page/${i}`,
         title: `Virtualized Item ${i + 1}`,
@@ -725,7 +763,12 @@ export const useSidedockStore = defineStore('sidedock', () => {
         createdAt: Date.now() - i * 1000,
       })
     }
-    activeWorkspace.value.items.push(...items)
+    activeWorkspace.value.items = items
+    pinnedBookmarks.value = pinnedBookmarks.value.filter((pin) => {
+      return findItemById(pin.id, activeWorkspace.value.items)
+    })
+    selectedItemIds.value = []
+    focusedItemId.value = null
     addToast('Loaded 10,000 virtualized items', 'success')
   }
 
@@ -747,6 +790,7 @@ export const useSidedockStore = defineStore('sidedock', () => {
     toasts,
     selectedItemIds,
     focusedItemId,
+    isBusy,
     // Computed
     activeWorkspace,
     allBookmarks,

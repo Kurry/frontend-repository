@@ -14,6 +14,8 @@
 //
 // Modules bound here: browse-query-v1, entity-collection-v1, artifact-transfer-v1.
 
+import { workspaceCreateSchema, bookmarkCreateSchema, normalizeBookmarkUrl } from './validation.js'
+
 const CONTRACT_VERSION = 'zto-webmcp-v1'
 const MODULES = ['browse-query-v1', 'entity-collection-v1', 'artifact-transfer-v1']
 
@@ -89,9 +91,18 @@ export function registerWebmcp(store) {
       },
       handler(args) {
         args = args || {}
-        const bm = store.createBookmark(args.url, (args.title || '').trim(), args.folder || null)
-        if (!bm) return { ok: false, error: 'invalid or missing URL, or no active workspace' }
-        return { ok: true, id: bm.id, title: bm.title, url: bm.url, folder: args.folder || null }
+        const parsed = bookmarkCreateSchema.safeParse({
+          url: args.url || '',
+          title: (args.title || '').trim(),
+          folder: args.folder || null,
+        })
+        if (!parsed.success) {
+          return { ok: false, error: parsed.error.errors[0]?.message || 'invalid bookmark payload' }
+        }
+        const fullUrl = normalizeBookmarkUrl(parsed.data.url)
+        const bm = store.createBookmark(fullUrl, parsed.data.title || '', parsed.data.folder || null)
+        if (!bm) return { ok: false, error: 'invalid or missing URL, duplicate, or no active workspace' }
+        return { ok: true, id: bm.id, title: bm.title, url: bm.url, folder: parsed.data.folder || null }
       },
     },
     'entity.select-bookmark': {
@@ -172,7 +183,15 @@ export function registerWebmcp(store) {
       parameters: { name: { type: 'string' }, color: { type: 'string', description: 'hex accent color, e.g. #2563EB' } },
       handler(args) {
         args = args || {}
-        const ws = store.createWorkspace((args.name || '').trim() || 'New workspace', args.color || '#E54610')
+        const parsed = workspaceCreateSchema.safeParse({
+          name: (args.name || '').trim(),
+          color: args.color || '#E54610',
+        })
+        if (!parsed.success) {
+          return { ok: false, error: parsed.error.errors[0]?.message || 'invalid workspace payload' }
+        }
+        const ws = store.createWorkspace(parsed.data.name, parsed.data.color)
+        if (!ws) return { ok: false, error: 'workspace creation rejected by validation' }
         return { ok: true, id: ws.id, name: ws.name, color: ws.color, active: store.activeWorkspaceId === ws.id }
       },
     },
@@ -299,6 +318,20 @@ export function registerWebmcp(store) {
         const scope = args.scope === 'all' ? 'all' : 'current'
         store.exportBookmarks(scope)
         return { ok: true, format: 'netscape-html', scope }
+      },
+    },
+    'artifact.copy': {
+      module: 'artifact-transfer-v1',
+      operation: 'copy',
+      description: 'Copy the current SideDock package JSON to the clipboard (same action as Copy package in the export panel).',
+      parameters: { format: { type: 'string', enum: ['sidedock-json'] } },
+      handler(args) {
+        args = args || {}
+        if (args.format && args.format !== 'sidedock-json') {
+          return { ok: false, error: 'unsupported copy format', allowed: ['sidedock-json'] }
+        }
+        store.copyPackage()
+        return { ok: true, format: 'sidedock-json' }
       },
     },
   }
