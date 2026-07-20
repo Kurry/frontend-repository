@@ -166,7 +166,13 @@ export const DIMENSIONS = ['source', 'page', 'country'];
 const DIM_KEY = { source: 'sources', page: 'pages', country: 'countries' };
 export const DIM_LABEL = { source: 'Source', page: 'Page', country: 'Country' };
 
-function periodById(id) {
+function periodById(id, customRange) {
+  if (id === 'custom' && customRange?.from && customRange?.to) {
+    const from = new Date(`${customRange.from}T00:00:00Z`);
+    const to = new Date(`${customRange.to}T00:00:00Z`);
+    const days = Math.max(1, Math.round((to - from) / 86400000) + 1);
+    return { id: 'custom', label: `${customRange.from} to ${customRange.to}`, factor: days / 30, buckets: Math.min(days, 14) };
+  }
   return PERIODS.find((p) => p.id === id) || PERIODS[1];
 }
 
@@ -215,38 +221,67 @@ export function sortEntries(list, sortId) {
 }
 
 // Core selector: given site, period, and an optional segment filter
-// {dimension,value}, compute the full dashboard model (KPIs + trend + three
+// array of filters [{dimension,value}], compute the full dashboard model (KPIs + trend + three
 // breakdown panels), all derived from the seed.
-export function computeDashboard(siteId, periodId, filter, sortId) {
+export function computeDashboard(siteId, periodId, filters, sortId, compare, addedGoals, customRange) {
   const site = SITES[siteId] || SITES['example.com'];
-  const period = periodById(periodId);
+  if (!site) return null;
+  const period = periodById(periodId, customRange);
   const f = period.factor;
+  const activeFilters = Array.isArray(filters)
+    ? filters.filter((filter) => DIMENSIONS.includes(filter?.dimension) && typeof filter.value === 'string')
+    : [];
 
-  let kpi;
   let fraction = 1;
-  if (filter && filter.dimension && filter.value) {
+  const matchedSegments = [];
+  for (const filter of activeFilters) {
     const list = site[DIM_KEY[filter.dimension]];
     const seg = list.find((e) => e.name === filter.value);
     if (seg) {
-      fraction = seg.visitors / site.visitors;
-      kpi = {
-        visitors: scale(seg.visitors, f),
-        pageviews: scale(seg.pageviews, f),
-        bounceRate: seg.bounceRate,
-        avgDuration: seg.avgDuration,
-      };
+      fraction *= site.visitors > 0 ? seg.visitors / site.visitors : 0;
+      matchedSegments.push(seg);
+    } else {
+      fraction = 0;
     }
   }
-  if (!kpi) {
-    kpi = {
-      visitors: scale(site.visitors, f),
-      pageviews: scale(site.pageviews, f),
-      bounceRate: site.bounceRate,
-      avgDuration: site.avgDuration,
-    };
+  const visitors = scale(Math.round(site.visitors * fraction), f);
+  const pageviews = scale(Math.round(site.pageviews * fraction), f);
+  // With multiple stacked filters, visitors already accounts for every active
+  // segment (product of fractions). Bounce rate / avg duration must likewise
+  // reflect ALL matched segments, not just the last one in the loop — combine
+  // them as a visitor-weighted average so the KPIs stay internally consistent
+  // with the filtered visitor count.
+  let bounceRate = site.bounceRate;
+  let avgDuration = site.avgDuration;
+  if (matchedSegments.length > 0) {
+    const totalWeight = matchedSegments.reduce((sum, s) => sum + s.visitors, 0);
+    if (totalWeight > 0) {
+      bounceRate = Math.round(
+        matchedSegments.reduce((sum, s) => sum + s.bounceRate * s.visitors, 0) / totalWeight
+      );
+      avgDuration = Math.round(
+        matchedSegments.reduce((sum, s) => sum + s.avgDuration * s.visitors, 0) / totalWeight
+      );
+    } else {
+      bounceRate = Math.round(
+        matchedSegments.reduce((sum, s) => sum + s.bounceRate, 0) / matchedSegments.length
+      );
+      avgDuration = Math.round(
+        matchedSegments.reduce((sum, s) => sum + s.avgDuration, 0) / matchedSegments.length
+      );
+    }
   }
+  const kpi = {
+    visitors,
+    pageviews,
+    bounceRate,
+    avgDuration,
+  };
 
-  const trendSeed = `${siteId}|${periodId}|${filter ? filter.dimension + ':' + filter.value : 'all'}`;
+  const filterKey = activeFilters.length
+    ? activeFilters.map((filter) => `${filter.dimension}:${filter.value}`).join('|')
+    : 'all';
+  const trendSeed = `${siteId}|${periodId}|${filterKey}`;
   const trend = buildTrend(kpi.visitors, period, trendSeed);
 
   // Breakdown panels: when a segment filter is active, the OTHER panels recompute
@@ -255,27 +290,93 @@ export function computeDashboard(siteId, periodId, filter, sortId) {
   // only the selected row.
   function panel(dim) {
     const list = site[DIM_KEY[dim]];
-    if (filter && filter.dimension === dim) {
-      const seg = list.find((e) => e.name === filter.value);
+    const dimensionFilter = activeFilters.find((filter) => filter.dimension === dim);
+    if (dimensionFilter) {
+      const seg = list.find((e) => e.name === dimensionFilter.value);
       return seg ? [{ ...seg, visitors: kpi.visitors }] : [];
     }
     return list.map((e) => {
-      if (!filter) return { ...e, visitors: scale(e.visitors, f) };
-      const j = 0.7 + hash(e.name + '|' + filter.value) * 0.7; // 0.7..1.4
+      if (!activeFilters.length) return { ...e, visitors: scale(e.visitors, f) };
+      const j = 0.7 + hash(e.name + '|' + filterKey) * 0.7; // 0.7..1.4
       const v = Math.max(1, scale(Math.round(e.visitors * fraction * j), f));
       return { ...e, visitors: v };
     });
   }
 
+  const seededGoals = [
+    { name: 'Signup', goal_type: 'event', match_key: 'signup' },
+    { name: 'Pricing viewed', goal_type: 'page', match_key: '/pricing' },
+    { name: 'Docs read', goal_type: 'page', match_key: '/docs' },
+  ];
+  const goalRecords = [...seededGoals, ...(Array.isArray(addedGoals) ? addedGoals : [])];
+  const goals = goalRecords.map((goal) => {
+    const rate = 0.04 + hash(`${siteId}|${goal.name}|${filterKey}`) * 0.18;
+    const completions = Math.min(kpi.visitors, Math.round(kpi.visitors * rate));
+    const conversionRate = kpi.visitors > 0 ? Math.round((completions / kpi.visitors) * 1000) / 10 : 0;
+    return { ...goal, completions, conversion_rate: conversionRate };
+  });
+  const pricingCount = goals.find((goal) => goal.name === 'Pricing viewed')?.completions ?? 0;
+  const signupCount = Math.min(pricingCount, goals.find((goal) => goal.name === 'Signup')?.completions ?? 0);
+  const funnelCounts = [kpi.visitors, Math.min(kpi.visitors, pricingCount), signupCount];
+  const funnel = ['Visited', 'Pricing viewed', 'Signup'].map((name, index) => ({
+    name,
+    count: funnelCounts[index],
+    step_conversion: index === 0
+      ? 100
+      : funnelCounts[index - 1] > 0
+        ? Math.round((funnelCounts[index] / funnelCounts[index - 1]) * 1000) / 10
+        : 0,
+  }));
+
+  const sources = sortEntries(panel('source'), sortId);
+  const pages = sortEntries(panel('page'), sortId);
+  const countries = sortEntries(panel('country'), sortId);
+
+  // Compare mode: deterministic previous-period baselines (the immediately
+  // previous period of equal length) derived from the same seed with a
+  // "previous" key, so chip values change whenever the site, date range, or
+  // segment filter stack changes.
+  let previousKpi = null;
+  let previousTrend = null;
+  let previousPanels = null;
+  if (compare) {
+    const prevSeed = `${trendSeed}|previous`;
+    const pj = (key, lo, hi) => lo + hash(`${prevSeed}|${key}`) * (hi - lo);
+    previousKpi = {
+      visitors: Math.max(1, Math.round(kpi.visitors * pj('visitors', 0.72, 1.18))),
+      pageviews: Math.max(1, Math.round(kpi.pageviews * pj('pageviews', 0.72, 1.18))),
+      bounceRate: Math.min(95, Math.max(5, Math.round(kpi.bounceRate * pj('bounce', 0.85, 1.2)))),
+      avgDuration: Math.max(10, Math.round(kpi.avgDuration * pj('duration', 0.8, 1.25))),
+    };
+    previousTrend = buildTrend(previousKpi.visitors, period, prevSeed);
+    previousPanels = { source: {}, page: {}, country: {} };
+    const prevPanel = (dim, list) => {
+      for (const e of list) {
+        const j = hash(`${prevSeed}|${dim}|${e.name}`);
+        // A small deterministic slice of rows is new this period (absent from
+        // the previous one) so the "New" indicator is exercised.
+        previousPanels[dim][e.name] = j < 0.08 ? 0 : Math.max(1, Math.round(e.visitors * (0.72 + j * 0.5)));
+      }
+    };
+    prevPanel('source', sources);
+    prevPanel('page', pages);
+    prevPanel('country', countries);
+  }
+
   return {
     site,
     period,
-    filter: filter || null,
+    filters: activeFilters,
     kpi,
     trend,
-    sources: sortEntries(panel('source'), sortId),
-    pages: sortEntries(panel('page'), sortId),
-    countries: sortEntries(panel('country'), sortId),
+    sources,
+    pages,
+    countries,
+    goals,
+    funnel,
+    previousKpi,
+    previousTrend,
+    previousPanels,
   };
 }
 
@@ -285,4 +386,41 @@ export function formatNumber(n) {
 
 export function formatDuration(seconds) {
   return `${seconds}s`;
+}
+
+// -- Export CSV helpers
+export function generateBreakdownCSV(model) {
+  const lines = ['dimension,name,visitors'];
+  if (!model) return lines.join('\n');
+  const addRows = (dim, list) => {
+    for (const r of list) lines.push(`${dim},${r.name},${r.visitors}`);
+  };
+  addRows('source', model.sources);
+  addRows('page', model.pages);
+  addRows('country', model.countries);
+  return lines.join('\n');
+}
+
+export function generatePanelCSV(type, model) {
+  if (type === 'source' || type === 'page' || type === 'country') {
+    const lines = ['dimension,name,visitors'];
+    if (model) {
+      const list = type === 'source' ? model.sources : type === 'page' ? model.pages : model.countries;
+      for (const r of list) lines.push(`${type},${r.name},${r.visitors}`);
+    }
+    return lines.join('\n');
+  } else if (type === 'goals') {
+    const lines = ['goal,completions,conversion_rate'];
+    if (model && model.goals) {
+      for (const r of model.goals) lines.push(`${r.name},${r.completions},${r.conversion_rate}%`);
+    }
+    return lines.join('\n');
+  } else if (type === 'funnel') {
+    const lines = ['step,count,step_conversion'];
+    if (model && model.funnel) {
+      for (const r of model.funnel) lines.push(`${r.name},${r.count},${r.step_conversion}%`);
+    }
+    return lines.join('\n');
+  }
+  return '';
 }
