@@ -19,7 +19,7 @@ html, body, #root { min-height: 100%; margin: 0; }
 body { overflow-x: hidden; background: var(--color-canvas); color: var(--color-ink); font-family: "IBM Plex Sans", Arial, sans-serif; }
 button, input, select, textarea { font: inherit; }
 button, [role="button"], input, select, textarea { outline-offset: 2px; }
-button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid #0f62fe; }
+button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, [role="gridcell"]:focus-visible, [tabindex="0"]:focus-visible { outline: 2px solid #0f62fe; outline-offset: -2px; }
 
 .app-shell { display: grid; grid-template-columns: 292px minmax(0, 1fr); min-height: 100vh; }
 .sidebar { position: sticky; top: 0; height: 100vh; overflow: auto; background: #101b2e; color: white; border-right: 1px solid #24334d; z-index: 40; }
@@ -37,16 +37,16 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select
 .cell { height: 42px; display: flex; align-items: center; padding: 0 10px; border-right: 1px solid #e5eaf1; border-bottom: 1px solid #e5eaf1; font-size: 13px; overflow: hidden; }
 .cell-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
 .flagged-cell { background: var(--color-warn); box-shadow: inset 3px 0 #f1c21b; }
-.animate-add .cell { animation: add-row .2s ease both; animation-delay: inherit; }
-@keyframes add-row { from { opacity: 0; transform: translateY(8px); } }
+.animate-add { animation: add-row .2s ease both; }
+@keyframes add-row { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .drawer, .side-panel { animation: slide-in .22s ease both; }
-@keyframes slide-in { from { opacity: 0; transform: translateX(18px); } }
+@keyframes slide-in { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: translateX(0); } }
 .modal-card { animation: modal-in .22s ease both; }
-@keyframes modal-in { from { opacity: 0; transform: scale(.98) translateY(6px); } }
+@keyframes modal-in { from { opacity: 0; transform: scale(.98) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 .toast { animation: toast-in .22s ease both; }
-@keyframes toast-in { from { opacity: 0; transform: translateY(-10px); } }
+@keyframes toast-in { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 .bulk-tray { animation: tray-in .22s ease both; }
-@keyframes tray-in { from { opacity: 0; transform: translate(-50%, 18px); } }
+@keyframes tray-in { from { opacity: 0; transform: translate(-50%, 18px); } to { opacity: 1; transform: translate(-50%, 0); } }
 .capacity-fill { transition: width .5s cubic-bezier(.2,.8,.2,1); }
 .error-text { color: #da1e28; font-size: 12px; margin-top: 4px; }
 .field-label { display: block; color: #475569; font-weight: 600; font-size: 12px; margin-bottom: 6px; }
@@ -68,6 +68,9 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select
   .sidebar.open { transform: translateX(0); }
   .grid-scroll { height: calc(100vh - 300px); }
 }
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
+
+@media (max-width: 768px) {
+  button, [role="button"], .cds--btn, .cds--checkbox-label { min-height: 44px !important; min-width: 44px !important; display: inline-flex; align-items: center; justify-content: center; }
+  .cell .cds--checkbox-wrapper { display: flex; align-items: center; min-height: 44px; }
 }

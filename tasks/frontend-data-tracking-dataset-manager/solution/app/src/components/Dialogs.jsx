@@ -13,7 +13,7 @@ function ModalShell({ title, subtitle, children, onClose, wide = false }) {
     const focusable = card.current?.querySelector('input, select, textarea, button, [tabindex]:not([tabindex="-1"])')
     focusable?.focus()
     const key = (e) => {
-      if (e.key === 'Escape') { e.preventDefault(); onClose() }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); onClose() }
       if (e.key === 'Tab') {
         const nodes = [...card.current.querySelectorAll('input, select, textarea, button, [tabindex]:not([tabindex="-1"])')].filter((n) => !n.disabled)
         if (!nodes.length) return
@@ -87,7 +87,7 @@ export function RowDialog({ dataset, mode, rowId }) {
         <Checkbox id="row-verified" labelText="Verified ground truth" {...register('verified')}/>
         <Select id="row-split" labelText="Split (optional)" {...register('split')}><SelectItem value="" text="Unassigned"/><SelectItem value="train" text="Train"/><SelectItem value="validation" text="Validation"/><SelectItem value="test" text="Test"/></Select>
       </div>
-      <footer className="flex justify-end gap-2 border-t border-slate-200 p-4"><Button type="button" kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Button><Button type="submit" disabled={!isValid || isSubmitting}>{mode === 'edit' ? 'Save changes' : 'Add row'}</Button></footer>
+      <footer className="flex justify-end gap-2 border-t border-slate-200 p-4"><Button type="button" kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Button><Button type="submit" disabled={isSubmitting}>{mode === "edit" ? "Save changes" : "Add row"}</Button></footer>
     </form>
   </ModalShell>
 }
@@ -105,7 +105,7 @@ export function AttachDialog({ dataset }) {
   const attachSuite = useStore((s) => s.attachSuite)
   const { register, handleSubmit, formState: { errors, isValid } } = useForm({ resolver: zodResolver(attachSchema), mode: 'onChange', defaultValues: { suiteId: dataset.attachedSuiteId || '' } })
   const submit = ({ suiteId }) => { attachSuite(suiteId); setUi({ modal: null }) }
-  return <ModalShell title="Use in eval suite" subtitle="Attach this dataset to one seeded evaluation suite." onClose={() => setUi({ modal: null })}>
+  return <ModalShell title="Use in eval suite" subtitle="Attach this dataset to a seeded evaluation suite." onClose={() => setUi({ modal: null })}>
     <form onSubmit={handleSubmit(submit)}><div className="p-5"><Select id="suite-select" labelText="Eval suite" invalid={Boolean(errors.suiteId)} invalidText={errors.suiteId?.message} {...register('suiteId')}><SelectItem value="" text="Choose a suite"/>{evalSuites.map((s) => <SelectItem key={s.id} value={s.id} text={s.name}/>)}</Select></div><footer className="flex justify-end gap-2 border-t border-slate-200 p-4"><Button type="button" kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Button><Button type="submit" disabled={!isValid}>Attach dataset</Button></footer></form>
   </ModalShell>
 }

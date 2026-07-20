@@ -24,7 +24,7 @@ function Sidebar({ dataset }) {
   const estimatedKb = Math.round(totalRows * 1.8)
   const capacity = 5000
   return <>
-    {open && <button aria-label="Close sidebar overlay" className="fixed inset-0 z-30 bg-slate-950/40 md:hidden" onClick={() => setUi({ sidebarOpen: false })} />}
+    {open && <button aria-label="Close sidebar overlay" className="fixed inset-0 z-30 bg-slate-950/40 min-[769px]:hidden" onClick={() => setUi({ sidebarOpen: false })} />}
     <aside className={cx('sidebar', open && 'open')} aria-label="Datasets sidebar">
       <div className="border-b border-slate-700 p-5">
         <div className="flex items-center gap-3"><DataBase size={24} className="text-blue-300"/><div><h1 className="text-xl font-semibold tracking-tight">Dataset Workbench</h1><p className="mt-1 text-xs text-slate-300">Evaluation data operations</p></div></div>
@@ -121,7 +121,7 @@ function InlineEditor({ row, field, schemaField }) {
     if (error) return setUi({ inlineEdit: { ...inline, error } })
     updateCell(row.id, field, value); setUi({ inlineEdit: null })
   }
-  const props = { ref, className: 'h-8 w-full border border-blue-600 bg-white px-2 text-xs', value: inline.value, 'aria-invalid': Boolean(inline.error), onChange: (e) => setUi({ inlineEdit: { ...inline, value: e.target.value, error: null } }), onKeyDown: (e) => { if (e.key === 'Enter') { e.preventDefault(); commit() } if (e.key === 'Escape') setUi({ inlineEdit: null }) } }
+  const props = { ref, className: 'h-8 w-full border border-blue-600 bg-white px-2 text-xs', value: inline.value, 'aria-invalid': Boolean(inline.error), onChange: (e) => setUi({ inlineEdit: { ...inline, value: e.target.value, error: null } }), onKeyDown: (e) => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); commit() } if (e.key === 'Escape') { e.stopPropagation(); setUi({ inlineEdit: null }) } } }
   return <div className="w-full">{schemaField?.type === 'category' ? <select {...props}>{schemaField.allowedValues.map((v) => <option key={v}>{v}</option>)}</select> : <input {...props}/>} {inline.error && <span className="absolute z-30 mt-1 block w-64 bg-red-700 p-2 text-xs text-white" role="alert">{inline.error}</span>}</div>
 }
 
@@ -156,13 +156,13 @@ function VirtualGrid({ dataset, visibleRows }) {
         const row = visibleRows[v.index]
         const flagged = flaggedFields(row, dataset)
         const recentIndex = recentRows.ids.indexOf(row.id)
-        return <div key={row.id} className={cx('data-row grid', recentIndex >= 0 && 'animate-add')} style={{ gridTemplateColumns: template, transform: `translateY(${v.start + 42}px)`, animationDelay: recentRows.type === 'import' && recentIndex >= 0 ? `${Math.floor(recentIndex / 10) * 100}ms` : undefined }} role="row" aria-rowindex={v.index + 2}>
+        return <div key={row.id} className={cx("data-row grid", recentIndex >= 0 && "animate-add")} style={{ gridTemplateColumns: template, transform: `translateY(${v.start + 42}px)`, animationDelay: recentRows.type === 'import' && recentIndex >= 0 ? `${Math.floor(recentIndex / 10) * 100}ms` : undefined }} role="row" aria-rowindex={v.index + 2}>
           <div className="cell"><Checkbox id={`select-${row.id}`} hideLabel labelText={`Select row ${v.index + 1}`} checked={selectedRows.includes(row.id)} onChange={() => toggleSelected(row.id)}/></div>
           <div className="cell justify-center">{flagged.length ? <Flag size={16} className="text-amber-700" aria-label="Row flagged"/> : null}</div>
-          {dataset.schema.map((field) => <div key={field.name} tabIndex={0} className={cx('cell relative', field.type === 'number' && 'justify-end tabular-nums', flagged.includes(field.name) && 'flagged-cell')} title={String(row.values[field.name])} onDoubleClick={() => openEditor(row, field.name)} onKeyDown={(e) => { if (e.key === 'Enter') openEditor(row, field.name) }} role="gridcell" aria-label={`${field.name}: ${row.values[field.name]}`}>
-            {inline?.rowId === row.id && inline?.field === field.name ? <InlineEditor row={row} field={field.name} schemaField={field}/> : <span className="cell-text">{row.values[field.name]}</span>}
+          {dataset.schema.map((field) => <div key={field.name} tabIndex={0} className={cx('cell relative', field.type === 'number' && 'justify-end tabular-nums', flagged.includes(field.name) && 'flagged-cell')} title={String(row.values[field.name])} onDoubleClick={() => openEditor(row, field.name)} onKeyDown={(e) => { if (e.key === 'Enter' && e.target === e.currentTarget) { e.preventDefault(); openEditor(row, field.name); } }} role="gridcell" aria-label={`${field.name}: ${row.values[field.name]}`}>
+            {inline?.rowId === row.id && inline?.field === field.name ? <InlineEditor row={row} field={field.name} schemaField={field}/> : <span className={cx("cell-text", field.type === "number" && "text-right")}>{row.values[field.name]}</span>}
           </div>)}
-          <div tabIndex={0} className="cell relative" title={row.expectedOutput} onDoubleClick={() => openEditor(row, 'expectedOutput')} onKeyDown={(e) => { if (e.key === 'Enter') openEditor(row, 'expectedOutput') }} role="gridcell">{inline?.rowId === row.id && inline?.field === 'expectedOutput' ? <InlineEditor row={row} field="expectedOutput"/> : <span className="cell-text">{row.expectedOutput}</span>}</div>
+          <div tabIndex={0} className="cell relative" title={row.expectedOutput} onDoubleClick={() => openEditor(row, 'expectedOutput')} onKeyDown={(e) => { if (e.key === 'Enter' && e.target === e.currentTarget) { e.preventDefault(); openEditor(row, 'expectedOutput'); } }} role="gridcell">{inline?.rowId === row.id && inline?.field === 'expectedOutput' ? <InlineEditor row={row} field="expectedOutput"/> : <span className="cell-text">{row.expectedOutput}</span>}</div>
           <div className="cell"><button className="flex items-center gap-1 text-xs font-semibold" onClick={() => updateCell(row.id, 'verified', !row.verified)} aria-label={`${row.verified ? 'Mark unverified' : 'Mark verified'} row ${v.index + 1}`}>{row.verified ? <><Checkmark size={16} className="text-green-700"/>Yes</> : <><span className="text-slate-500">—</span>No</>}</button></div>
           <div className="cell"><Tag size="sm" type={row.split === 'train' ? 'blue' : row.split === 'validation' ? 'purple' : row.split === 'test' ? 'teal' : 'gray'}>{row.split || '—'}</Tag></div>
           <div className="cell gap-1"><Button hasIconOnly iconDescription="Edit row" size="sm" kind="ghost" renderIcon={Edit} onClick={() => setUi({ modal: { type: 'row', mode: 'edit', rowId: row.id } })}/><Button hasIconOnly iconDescription="Delete row" size="sm" kind="danger--ghost" renderIcon={TrashCan} onClick={() => setUi({ modal: { type: 'delete', ids: [row.id] } })}/></div>
@@ -219,7 +219,7 @@ function BulkTray() {
   const setUi = useStore((s) => s.setUi)
   const [split, setSplit] = useState('train')
   if (!selectedRows.length) return null
-  return <div className="bulk-tray fixed bottom-5 left-1/2 z-50 flex max-w-[calc(100vw-24px)] -translate-x-1/2 items-center gap-1 overflow-x-auto rounded-lg bg-slate-950 p-2 text-white shadow-2xl"><span className="whitespace-nowrap px-3 text-sm font-semibold">{selectedRows.length} selected</span><Button size="sm" kind="ghost" onClick={() => bulk('verified', true)}>Mark verified</Button><Button size="sm" kind="ghost" onClick={() => bulk('verified', false)}>Mark unverified</Button><select className="h-8 bg-slate-800 px-2 text-xs" value={split} onChange={(e) => setSplit(e.target.value)} aria-label="Bulk split"><option>train</option><option>validation</option><option>test</option></select><Button size="sm" kind="ghost" onClick={() => bulk('split', split)}>Assign split</Button><Button size="sm" kind="danger" onClick={() => setUi({ modal: { type: 'delete', ids: selectedRows } })}>Delete</Button></div>
+  return <div className="bulk-tray fixed bottom-5 left-1/2 z-50 flex max-w-[calc(100vw-24px)] w-max flex-wrap justify-center -translate-x-1/2 items-center gap-1 rounded-lg bg-slate-950 p-2 text-white shadow-2xl"><span className="whitespace-nowrap px-3 text-sm font-semibold">{selectedRows.length} selected</span><Button size="sm" kind="ghost" onClick={() => bulk('verified', true)}>Mark verified</Button><Button size="sm" kind="ghost" onClick={() => bulk('verified', false)}>Mark unverified</Button><select className="h-8 bg-slate-800 px-2 text-xs" value={split} onChange={(e) => setSplit(e.target.value)} aria-label="Bulk split"><option>train</option><option>validation</option><option>test</option></select><Button size="sm" kind="ghost" onClick={() => bulk('split', split)}>Assign split</Button><Button size="sm" kind="danger" onClick={() => setUi({ modal: { type: 'delete', ids: selectedRows } })}>Delete</Button></div>
 }
 
 function PanelRouter({ dataset }) {
@@ -261,7 +261,7 @@ export default function App() {
   return <div className="app-shell">
     <Sidebar dataset={dataset}/>
     <main className="main-area">
-      <div className="flex items-center gap-2 border-b border-line bg-slate-950 px-3 py-2 text-white md:hidden"><Button hasIconOnly size="sm" kind="ghost" iconDescription="Open datasets" renderIcon={Menu} onClick={() => setUi({ sidebarOpen: true })}/><span className="truncate text-sm font-semibold">{dataset.name}</span></div>
+      <div className="flex items-center gap-2 border-b border-line bg-slate-950 px-3 py-2 text-white min-[769px]:hidden"><Button hasIconOnly size="sm" kind="ghost" iconDescription="Open datasets" renderIcon={Menu} onClick={() => setUi({ sidebarOpen: true })}/><span className="truncate text-sm font-semibold">{dataset.name}</span></div>
       <DatasetHeader dataset={dataset} stats={stats}/>
       <Toolbar dataset={dataset}/>
       {pivotMode ? <PivotView dataset={dataset} rows={visibleRows}/> : <div className="m-0 border-b border-line sm:m-4 sm:rounded-lg sm:border sm:shadow-sm"><VirtualGrid dataset={dataset} visibleRows={visibleRows}/></div>}
