@@ -50,13 +50,54 @@ def load_done():
     return d
 
 
+def probe_recoverable():
+    """Poll the fleet for sessions that COMPLETED with a changeset but no PR."""
+    from concurrent.futures import ThreadPoolExecutor
+    rows = [json.loads(l) for l in
+            (ROOT / "jobs" / "trial-codex-sol-xhigh-max-50-concurrent" / ".jules-fleet-state.jsonl")
+            .read_text().splitlines() if l.strip()]
+    seen = {r["session_id"]: r["slug"] for r in rows}
+
+    def probe(it):
+        sid, slug = it
+        try:
+            d = json.loads(sh(sys.executable, J, "--json", "get", sid).stdout)
+        except Exception:
+            return None
+        if d.get("state") != "COMPLETED":
+            return None
+        if any(o.get("pullRequest") for o in d.get("outputs", [])):
+            return None
+        try:
+            a = json.loads(sh(sys.executable, J, "--json", "activities", sid).stdout)
+            acts = a if isinstance(a, list) else a.get("activities", [])
+            if any("gitPatch" in json.dumps(x) or "changeSet" in json.dumps(x) or x.get("artifacts") for x in acts):
+                return {"sid": sid, "slug": slug}
+        except Exception:
+            pass
+        return None
+
+    return [r for r in ThreadPoolExecutor(max_workers=16).map(probe, seen.items()) if r]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=None)
     ap.add_argument("--only", default=None)
+    ap.add_argument("--sids", default=None,
+                    help="comma-separated session ids to recover regardless of state (stuck loopers)")
     args = ap.parse_args()
 
-    recov = json.loads(Path("/tmp/comp_recoverable.json").read_text())
+    if args.sids:
+        smap = {r["session_id"]: r["slug"] for r in
+                (json.loads(l) for l in
+                 (ROOT / "jobs" / "trial-codex-sol-xhigh-max-50-concurrent" / ".jules-fleet-state.jsonl")
+                 .read_text().splitlines() if l.strip())}
+        recov = [{"sid": s, "slug": smap[s]} for s in args.sids.split(",") if s in smap]
+        print(f"# recovering {len(recov)} explicit stuck session(s)", file=sys.stderr)
+    else:
+        recov = probe_recoverable()
+        print(f"# {len(recov)} completed-no-PR sessions with a changeset", file=sys.stderr)
     if args.only:
         recov = [r for r in recov if r["slug"] == args.only]
     done = load_done()
@@ -82,8 +123,10 @@ def main():
             print(f"skip {slug}: no patch", file=sys.stderr); skip += 1; continue
         if sh("git", "cat-file", "-e", base).returncode != 0:
             print(f"skip {slug}: base {base[:8]} not in repo", file=sys.stderr); skip += 1; continue
-        # base worktree at the patch's base commit
+        # base worktree at the patch's base commit — robustly clear any leftover
         sh("git", "worktree", "remove", "--force", str(BASE_WT))
+        shutil.rmtree(BASE_WT, ignore_errors=True)
+        sh("git", "worktree", "prune")
         if sh("git", "worktree", "add", "--force", "--detach", str(BASE_WT), base).returncode != 0:
             print(f"skip {slug}: base worktree failed", file=sys.stderr); fail += 1; continue
         pf = SB / f"patch-{slug}.diff"; pf.write_text(patch)
