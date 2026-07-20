@@ -17,9 +17,21 @@ export const useStudioStore = create((set, get) => ({
   importModalOpen: false,
   toast: null,
   sortOrder: 'asc',
+  libraryQuery: '',
+  libraryTechniqueFilter: 'all',
+  theme: 'light',
+  locale: 'en',
+  density: 'comfortable',
   hasSeenOnboarding: false,
+  onboardingStep: 0,
 
   toggleSortOrder: () => set((state) => ({ sortOrder: state.sortOrder === 'asc' ? 'desc' : 'asc' })),
+  setSortOrder: (sortOrder) => set({ sortOrder }),
+  setLibraryQuery: (libraryQuery) => set({ libraryQuery }),
+  setLibraryTechniqueFilter: (libraryTechniqueFilter) => set({ libraryTechniqueFilter }),
+  setTheme: (theme) => set({ theme }),
+  setLocale: (locale) => set({ locale }),
+  setDensity: (density) => set({ density }),
   selectTechnique: (technique) => set({ activeTechnique: technique, activeView: 'forms', assetPickerOpen: false }),
   setView: (activeView) => set({ activeView, assetPickerOpen: false }),
   setChrome: (patch) => set(patch),
@@ -30,9 +42,15 @@ export const useStudioStore = create((set, get) => ({
     const current = get().drafts[technique]
     const nextDraft = { fields: clone(fields), attachments: clone(attachments) }
     if (JSON.stringify(current) === JSON.stringify(nextDraft)) return
+    const hasInput = JSON.stringify(nextDraft) !== JSON.stringify(defaultDrafts[technique])
     set((state) => ({
       drafts: { ...state.drafts, [technique]: nextDraft },
-      statuses: { ...state.statuses, [technique]: 'in-progress' },
+      statuses: {
+        ...state.statuses,
+        [technique]: state.statuses[technique] === 'saved' || state.statuses[technique] === 'generated'
+          ? state.statuses[technique]
+          : (hasInput ? 'in-progress' : 'neutral'),
+      },
     }))
   },
 
@@ -47,6 +65,7 @@ export const useStudioStore = create((set, get) => ({
     prompts: { ...state.prompts, [technique]: undefined },
     statuses: { ...state.statuses, [technique]: 'neutral' },
     hydrationVersion: state.hydrationVersion + 1,
+    assetPickerOpen: false,
   })),
 
   saveCurrent: (title) => {
@@ -84,6 +103,7 @@ export const useStudioStore = create((set, get) => ({
       prompts: { ...state.prompts, [record.technique]: record.promptText },
       statuses: { ...state.statuses, [record.technique]: 'saved' },
       hydrationVersion: state.hydrationVersion + 1,
+      assetPickerOpen: false,
     }))
   },
 
@@ -97,6 +117,26 @@ export const useStudioStore = create((set, get) => ({
       library,
       statuses: { ...state.statuses, [removed.technique]: nextStatus },
     }
+  }),
+
+  updateLibraryEntry: (index, patch) => set((state) => {
+    if (!state.library[index]) return state
+    const library = state.library.map((record, itemIndex) => (
+      itemIndex === index ? { ...record, ...patch, fields: patch.fields ? clone(patch.fields) : record.fields } : record
+    ))
+    return { library }
+  }),
+
+  reorderLibrary: (fromIndex, toIndex) => set((state) => {
+    if (
+      !Number.isInteger(fromIndex) || !Number.isInteger(toIndex)
+      || fromIndex < 0 || toIndex < 0
+      || fromIndex >= state.library.length || toIndex >= state.library.length
+    ) return state
+    const library = [...state.library]
+    const [item] = library.splice(fromIndex, 1)
+    library.splice(toIndex, 0, item)
+    return { library }
   }),
 
   replaceLibrary: (records) => set({ library: clone(records) }),

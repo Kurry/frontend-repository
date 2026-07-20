@@ -16,11 +16,45 @@ const tools = [
     description: 'Open a declared prompting technique or the library using the visible navigation state.',
     inputSchema: { type: 'object', properties: { destination: destinationSchema }, required: ['destination'], additionalProperties: false },
   },
-  ...['search', 'apply_filter', 'clear_filter', 'sort', 'set_locale', 'set_theme'].map((operation) => ({
-    name: `browse_${operation}`,
-    description: `${operation.replaceAll('_', ' ')} for the library-prompts collection when supported.`,
+  {
+    name: 'browse_search',
+    description: 'Search library prompts by title query using the visible library search control.',
+    inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'], additionalProperties: false },
+  },
+  {
+    name: 'browse_apply_filter',
+    description: 'Apply a technique filter to the library-prompts collection.',
+    inputSchema: {
+      type: 'object',
+      properties: { technique: { type: 'string', enum: ['all', ...techniqueIds] } },
+      required: ['technique'],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'browse_clear_filter',
+    description: 'Clear the library technique filter and search query.',
     inputSchema: emptySchema,
-  })),
+  },
+  {
+    name: 'browse_sort',
+    description: 'Toggle or set library sort order using the visible sort control.',
+    inputSchema: {
+      type: 'object',
+      properties: { order: { type: 'string', enum: ['asc', 'desc'] } },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: 'browse_set_locale',
+    description: 'Set the visible product locale preference.',
+    inputSchema: { type: 'object', properties: { locale: { type: 'string', enum: ['en'] } }, required: ['locale'], additionalProperties: false },
+  },
+  {
+    name: 'browse_set_theme',
+    description: 'Set the visible product theme preference.',
+    inputSchema: { type: 'object', properties: { theme: { type: 'string', enum: ['light', 'dark'] } }, required: ['theme'], additionalProperties: false },
+  },
   {
     name: 'entity_create',
     description: 'Create a library-prompt from the current valid generated preview.',
@@ -32,15 +66,46 @@ const tools = [
     inputSchema: { type: 'object', properties: { index: { type: 'integer', minimum: 0 } }, required: ['index'], additionalProperties: false },
   },
   {
+    name: 'entity_update',
+    description: 'Update the title of a library-prompt by visible index.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        index: { type: 'integer', minimum: 0 },
+        title: { type: 'string', minLength: 2, maxLength: 80 },
+      },
+      required: ['index', 'title'],
+      additionalProperties: false,
+    },
+  },
+  {
     name: 'entity_delete',
     description: 'Delete a library-prompt by index; explicit confirmation is required.',
     inputSchema: { type: 'object', properties: { index: { type: 'integer', minimum: 0 }, confirm: { type: 'boolean' } }, required: ['index', 'confirm'], additionalProperties: false },
   },
-  ...['update', 'toggle', 'quantity', 'reorder'].map((operation) => ({
-    name: `entity_${operation}`,
-    description: `${operation} a library-prompt when supported by the visible product.`,
+  {
+    name: 'entity_toggle',
+    description: 'Toggle the library export panel open state for the selected collection.',
     inputSchema: emptySchema,
-  })),
+  },
+  {
+    name: 'entity_quantity',
+    description: 'Report the current library-prompt quantity.',
+    inputSchema: emptySchema,
+  },
+  {
+    name: 'entity_reorder',
+    description: 'Reorder a library-prompt from one visible index to another.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        fromIndex: { type: 'integer', minimum: 0 },
+        toIndex: { type: 'integer', minimum: 0 },
+      },
+      required: ['fromIndex', 'toIndex'],
+      additionalProperties: false,
+    },
+  },
   {
     name: 'artifact_copy',
     description: 'Copy the current visible prompt preview or library export through the product copy handler.',
@@ -56,25 +121,40 @@ const tools = [
     description: 'Export the current visible library JSON or active prompt markdown.',
     inputSchema: { type: 'object', properties: { format: { type: 'string', enum: ['json', 'markdown'] } }, required: ['format'], additionalProperties: false },
   },
-  ...['print_preview', 'convert'].map((operation) => ({
-    name: `artifact_${operation}`,
-    description: `${operation.replaceAll('_', ' ')} when supported by the visible product.`,
+  {
+    name: 'artifact_print_preview',
+    description: 'Open the browser print preview for the current prompt or library export surface.',
     inputSchema: emptySchema,
-  })),
+  },
+  {
+    name: 'artifact_convert',
+    description: 'Convert the active prompt preview into downloadable markdown through the product handler.',
+    inputSchema: emptySchema,
+  },
 ]
 
 function unavailable(operation) {
   return { ok: false, unavailable: `${operation} is not available in this product workflow.` }
 }
 
-function visibleLibraryIndex(state, index) {
-  if (!Number.isInteger(index) || index < 0) return null
-  const visibleLibrary = state.library
+function visibleLibraryEntries(state) {
+  const query = (state.libraryQuery || '').trim().toLowerCase()
+  return state.library
     .map((record, originalIndex) => ({ record, originalIndex }))
+    .filter(({ record }) => {
+      if (state.libraryTechniqueFilter !== 'all' && record.technique !== state.libraryTechniqueFilter) return false
+      if (!query) return true
+      const haystack = `${record.title} ${record.promptText} ${record.technique}`.toLowerCase()
+      return haystack.includes(query)
+    })
     .sort((a, b) => state.sortOrder === 'asc'
       ? a.record.title.localeCompare(b.record.title)
       : b.record.title.localeCompare(a.record.title))
-  return visibleLibrary[index]?.originalIndex ?? null
+}
+
+function visibleLibraryIndex(state, index) {
+  if (!Number.isInteger(index) || index < 0) return null
+  return visibleLibraryEntries(state)[index]?.originalIndex ?? null
 }
 
 async function invoke(name, args = {}) {
@@ -82,6 +162,18 @@ async function invoke(name, args = {}) {
   if (name.startsWith('form_')) {
     const operation = name.slice(5)
     if (window.__templateFormCommand) return window.__templateFormCommand(operation)
+    if (operation === 'return') {
+      state.setView('forms')
+      return { ok: true, returned: true }
+    }
+    if (operation === 'cancel') {
+      state.setChrome({ assetPickerOpen: false, saveModalOpen: false, importModalOpen: false, exportPanelOpen: false })
+      return { ok: true, cancelled: true }
+    }
+    if (operation === 'reset') {
+      state.resetTechnique(state.activeTechnique)
+      return { ok: true, reset: true }
+    }
     return unavailable(operation)
   }
   if (name === 'browse_open') {
@@ -90,11 +182,38 @@ async function invoke(name, args = {}) {
     else throw new Error('Destination is not declared.')
     return { ok: true, destination: args.destination }
   }
-  if (name === 'browse_sort') {
-    state.toggleSortOrder()
-    return { ok: true }
+  if (name === 'browse_search') {
+    state.setView('library')
+    state.setLibraryQuery(String(args.query ?? ''))
+    return { ok: true, query: String(args.query ?? ''), matches: visibleLibraryEntries(studioActions()).length }
   }
-  if (name.startsWith('browse_')) return unavailable(name.slice(7))
+  if (name === 'browse_apply_filter') {
+    const technique = args.technique || 'all'
+    if (technique !== 'all' && !techniqueIds.includes(technique)) throw new Error('Filter technique is not declared.')
+    state.setView('library')
+    state.setLibraryTechniqueFilter(technique)
+    return { ok: true, technique, matches: visibleLibraryEntries(studioActions()).length }
+  }
+  if (name === 'browse_clear_filter') {
+    state.setLibraryTechniqueFilter('all')
+    state.setLibraryQuery('')
+    return { ok: true, cleared: true }
+  }
+  if (name === 'browse_sort') {
+    if (args.order === 'asc' || args.order === 'desc') state.setSortOrder(args.order)
+    else state.toggleSortOrder()
+    return { ok: true, order: studioActions().sortOrder }
+  }
+  if (name === 'browse_set_locale') {
+    if (args.locale !== 'en') throw new Error('Locale is not declared.')
+    state.setLocale(args.locale)
+    return { ok: true, locale: args.locale }
+  }
+  if (name === 'browse_set_theme') {
+    if (args.theme !== 'light' && args.theme !== 'dark') throw new Error('Theme is not declared.')
+    state.setTheme(args.theme)
+    return { ok: true, theme: args.theme }
+  }
 
   if (name === 'entity_create') {
     const current = studioActions()
@@ -121,6 +240,14 @@ async function invoke(name, args = {}) {
     state.openLibraryEntry(originalIndex)
     return { ok: true, index: args.index }
   }
+  if (name === 'entity_update') {
+    const originalIndex = visibleLibraryIndex(state, args.index)
+    if (originalIndex === null) throw new Error('Library prompt index is out of range.')
+    const title = String(args.title || '').trim()
+    if (title.length < 2 || title.length > 80) return { ok: false, validationError: 'Title must be 2–80 characters.' }
+    state.updateLibraryEntry(originalIndex, { title })
+    return { ok: true, index: args.index, title }
+  }
   if (name === 'entity_delete') {
     if (args.confirm !== true) throw new Error('Delete requires confirm=true.')
     const originalIndex = visibleLibraryIndex(state, args.index)
@@ -128,7 +255,22 @@ async function invoke(name, args = {}) {
     state.deleteLibraryEntry(originalIndex)
     return { ok: true, remaining: studioActions().library.length }
   }
-  if (name.startsWith('entity_')) return unavailable(name.slice(7))
+  if (name === 'entity_toggle') {
+    state.setView('library')
+    const current = studioActions()
+    current.setChrome({ exportPanelOpen: !current.exportPanelOpen })
+    return { ok: true, exportPanelOpen: studioActions().exportPanelOpen }
+  }
+  if (name === 'entity_quantity') {
+    return { ok: true, quantity: state.library.length }
+  }
+  if (name === 'entity_reorder') {
+    const fromIndex = visibleLibraryIndex(state, args.fromIndex)
+    const toIndex = visibleLibraryIndex(state, args.toIndex)
+    if (fromIndex === null || toIndex === null) throw new Error('Library prompt index is out of range.')
+    state.reorderLibrary(fromIndex, toIndex)
+    return { ok: true, fromIndex: args.fromIndex, toIndex: args.toIndex }
+  }
 
   if (name === 'artifact_copy') {
     const current = studioActions()
@@ -142,6 +284,7 @@ async function invoke(name, args = {}) {
     return { ok: true, copied: args.target }
   }
   if (name === 'artifact_import') {
+    state.setView('library')
     state.setChrome({ importModalOpen: true })
     return { ok: true, workflow: 'import-modal-open' }
   }
@@ -159,7 +302,18 @@ async function invoke(name, args = {}) {
     } else throw new Error('Export format is not declared.')
     return { ok: true, exported: args.format }
   }
-  if (name.startsWith('artifact_')) return unavailable(name.slice(9))
+  if (name === 'artifact_print_preview') {
+    state.setView(state.activeView)
+    if (typeof window.print === 'function') window.print()
+    return { ok: true, printed: true }
+  }
+  if (name === 'artifact_convert') {
+    const current = studioActions()
+    const text = current.prompts[current.activeTechnique]
+    if (!text) return { ok: false, validationError: 'No active preview is available.' }
+    downloadText(`${current.activeTechnique}-prompt.md`, markdownForPrompt(current.activeTechnique, text), 'text/markdown')
+    return { ok: true, converted: 'markdown' }
+  }
   throw new Error(`Unknown registered tool: ${name}`)
 }
 
