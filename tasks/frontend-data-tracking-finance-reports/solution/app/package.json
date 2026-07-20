@@ -1,11 +1,34 @@
 {
-  "name": "oracle-static",
+  "name": "temp",
   "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "verify:build": "node -e \"require('fs').accessSync('dist/index.html')\"",
+    "start": "npx --yes serve dist -l 3000 -n"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "@formkit/auto-animate": "^0.10.0",
+    "@hookform/resolvers": "^5.4.0",
+    "@iconify/react": "^6.0.2",
+    "@preact/signals": "^2.9.4",
+    "@tanstack/react-form": "^1.33.2",
+    "chart.js": "^4.5.1",
+    "chartjs-chart-sankey": "^0.15.0",
+    "daisyui": "^5.6.18",
+    "focus-trap": "^8.2.2",
+    "focus-trap-react": "^12.0.3",
+    "preact": "^10.29.3",
+    "react-hook-form": "^7.82.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.5",
+    "@tailwindcss/vite": "^4.3.3",
+    "tailwindcss": "^4.3.2",
+    "vite": "^8.1.1"
   }
 }
