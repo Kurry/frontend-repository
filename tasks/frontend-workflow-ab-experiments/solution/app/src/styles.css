@@ -136,7 +136,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .prompt-row h3 { margin: 0 0 5px; font-size: 14px; }
 .prompt-row code { color: var(--muted); font-size: 10px; }
 .prompt-meta { color: var(--muted-2); font-size: 11px; }
-.results-panel { position: fixed; z-index: 50; top: 66px; right: 0; bottom: 0; width: min(790px, calc(100vw - 206px)); overflow-y: auto; background: #0d111c; border-left: 1px solid #343b51; box-shadow: -30px 0 80px rgba(0,0,0,.4); }
+.results-panel { position: fixed; z-index: 50; top: 66px; right: 0; bottom: 0; width: min(790px, calc(100vw - 206px)); overflow-y: auto; background: #0d111c; border-left: 1px solid #343b51; box-shadow: -30px 0 80px rgba(0,0,0,.4); transition: transform 0.25s ease-out; }
 .panel-header { position: relative; padding: 18px 26px 22px; border-bottom: 1px solid var(--border); background: radial-gradient(circle at 100% 0, rgba(124,92,255,.16), transparent 44%), #111522; }
 .panel-topline { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .panel-topline .cds--tag { margin-left: auto; margin-right: 4px; }
@@ -381,4 +381,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+}
+
+.bx--data-table tbody tr:hover {
+  background-color: var(--surface-3);
 }

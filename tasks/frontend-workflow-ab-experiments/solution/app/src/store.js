@@ -15,6 +15,7 @@ const designOf = experiment => ({
 
 const addHistory = state => ({ past: [...state.past.slice(-19), historySnapshot(state)], future: [] })
 const event = (type, text) => ({ id: `${type}-${Date.now()}-${Math.random()}`, type, text, at: new Date().toISOString() })
+let notifyTimer
 
 export const useStudio = create((set, get) => ({
   experiments: clone(seedExperiments),
@@ -27,7 +28,15 @@ export const useStudio = create((set, get) => ({
   toast: null, announcement: '', past: [], future: [], sampleSort: 'desc', copied: false,
 
   setField: (field, value) => set({ [field]: value }),
-  notify: (title, kind = 'success') => { set({ toast: { id: Date.now(), title, kind } }); setTimeout(() => set({ toast: null }), 3800) },
+  notify: (title, kind = 'success', announcement = title) => {
+    clearTimeout(notifyTimer)
+    const id = Date.now()
+    set({ toast: { id, title, kind }, announcement })
+    notifyTimer = setTimeout(() => set(state => ({
+      toast: state.toast?.id === id ? null : state.toast,
+      announcement: state.announcement === announcement ? '' : state.announcement,
+    })), 3800)
+  },
   setSearch: search => set({ search }),
   toggleFilter: status => set(state => ({ filters: state.filters.includes(status) ? state.filters.filter(item => item !== status) : [...state.filters, status] })),
   clearFilters: () => set({ search: '', filters: [], showArchived: false }),
@@ -139,8 +148,8 @@ export const useStudio = create((set, get) => ({
     const experiment = get().experiments.find(item => item.id === experimentId)
     const letters = experiment?.variants.map((_, index) => LETTERS[index]) || []
     if (parsed.data.choice === 'declare-winner' && !letters.includes(parsed.data.winnerVariant)) return { ok: false, error: 'winnerVariant must name a variant present on the experiment' }
-    set(state => ({ experiments: state.experiments.map(item => item.id === experimentId ? { ...item, status: 'decided', decision: { ...parsed.data, winnerVariant: parsed.data.choice === 'declare-winner' ? parsed.data.winnerVariant : null } } : item), decisionFor: null, announcement: 'Decision recorded. The experiment is now locked.' }))
-    get().notify('Decision recorded')
+    set(state => ({ experiments: state.experiments.map(item => item.id === experimentId ? { ...item, status: 'decided', decision: { ...parsed.data, winnerVariant: parsed.data.choice === 'declare-winner' ? parsed.data.winnerVariant : null } } : item), decisionFor: null }))
+    get().notify('Decision recorded', 'success', 'Decision recorded. The experiment is now locked.')
     return { ok: true }
   },
   promoteWinner: experimentId => {
