@@ -102,6 +102,20 @@ import { registerWebMCP } from "./webmcp";
 const cx = (...parts) => parts.filter(Boolean).join(" ");
 const iconSize = 17;
 
+class HighlightBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { failed: false };
+  }
+  static getDerivedStateFromError() {
+    return { failed: true };
+  }
+  render() {
+    if (this.state.failed) return this.props.fallback;
+    return this.props.children;
+  }
+}
+
 async function copyText(text) {
   try {
     await navigator.clipboard.writeText(text);
@@ -569,7 +583,9 @@ function ToolPanel({ tool, panelKey }) {
   );
 }
 
-function ScreenshotFrame({ label = "Inspection screenshot placeholder" }) {
+function ScreenshotFrame({
+  label = "Generated verification preview from the active file",
+}) {
   return (
     <div
       role="img"
@@ -580,7 +596,7 @@ function ScreenshotFrame({ label = "Inspection screenshot placeholder" }) {
         <IconZoomCheck size={24} className="mx-auto mb-2 text-accent" />
         <div className="text-xs font-bold">Captured inspection frame</div>
         <div className="mt-1 text-[11px] text-muted">
-          Visual evidence placeholder · 1280 × 720
+          Visual evidence · 1280 × 720
         </div>
       </div>
     </div>
@@ -654,7 +670,7 @@ function StepDetail({ pane, step, trial }) {
       )}
       {(step.screenshot || pane === "scorer") && (
         <ScreenshotFrame
-          label={`${pane} trajectory step ${step.id + 1} inspection screenshot placeholder`}
+          label={`${pane} trajectory step ${step.id + 1} inspection screenshot frame`}
         />
       )}
     </div>
@@ -786,41 +802,72 @@ function FileBadge({ kind }) {
 
 function CodeBlock({ content, language = "typescript", filePath }) {
   const [copied, setCopied] = useState(false);
+  const safeCode = typeof content === "string" ? content : String(content ?? "");
+  const safeLanguage = [
+    "typescript",
+    "tsx",
+    "javascript",
+    "jsx",
+    "json",
+    "bash",
+    "markup",
+    "css",
+  ].includes(language)
+    ? language
+    : "typescript";
   const copy = async () => {
-    await copyText(content);
+    await copyText(safeCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 1400);
   };
+  const plain = (
+    <pre className="scroll-thin max-h-64 overflow-auto p-3 font-mono text-[11px] leading-5 text-[#d6e5dd]">
+      {safeCode}
+    </pre>
+  );
   return (
     <div className="overflow-hidden rounded-md border border-[#283831] bg-[#17211d]">
       <div className="flex items-center justify-between border-b border-white/10 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-[#a7b9b0]">
         <span>
-          {language} · {filePath}
+          {safeLanguage} · {filePath}
         </span>
         <button
+          type="button"
           className="focus-ring inline-flex items-center gap-1 rounded px-2 py-1 text-[#d8e7df] hover:bg-white/10"
           onClick={copy}
         >
           {copied ? <IconCheck size={13} /> : <IconCopy size={13} />}
-          {copied ? "Copied" : "Copy"}
+          {copied ? "Copied code" : "Copy"}
         </button>
       </div>
-      <Highlight theme={themes.nightOwl} code={content} language={language}>
-        {({ tokens, getLineProps, getTokenProps }) => (
-          <pre className="scroll-thin max-h-64 overflow-auto p-3 font-mono text-[11px] leading-5">
-            {tokens.map((line, i) => (
-              <div key={i} {...getLineProps({ line })}>
-                <span className="mr-4 inline-block w-4 select-none text-right text-white/25">
-                  {i + 1}
-                </span>
-                {line.map((token, key) => (
-                  <span key={key} {...getTokenProps({ token })} />
-                ))}
-              </div>
-            ))}
-          </pre>
-        )}
-      </Highlight>
+      <HighlightBoundary fallback={plain}>
+        <Highlight
+          theme={themes.nightOwl}
+          code={safeCode}
+          language={safeLanguage}
+        >
+          {({ tokens, getLineProps, getTokenProps }) => (
+            <pre className="scroll-thin max-h-64 overflow-auto p-3 font-mono text-[11px] leading-5 text-[#d6e5dd]">
+              {tokens.map((line, i) => {
+                const lineProps = getLineProps({ line });
+                delete lineProps.key;
+                return (
+                  <div key={i} {...lineProps}>
+                    <span className="mr-4 inline-block w-4 select-none text-right text-white/25">
+                      {i + 1}
+                    </span>
+                    {line.map((token, key) => {
+                      const tokenProps = getTokenProps({ token });
+                      delete tokenProps.key;
+                      return <span key={key} {...tokenProps} />;
+                    })}
+                  </div>
+                );
+              })}
+            </pre>
+          )}
+        </Highlight>
+      </HighlightBoundary>
     </div>
   );
 }
@@ -1096,13 +1143,17 @@ function LabelSelect({
   onChange,
   ariaLabel,
   className = "",
+  isInvalid = false,
+  errorMessageId,
 }) {
   return (
     <Select
       aria-label={ariaLabel || label}
-      selectedKey={value}
+      selectedKey={value || null}
       onSelectionChange={(key) => onChange(String(key))}
       className={className}
+      isInvalid={isInvalid}
+      aria-describedby={errorMessageId}
     >
       <Label className="label">{label}</Label>
       <Button className="field focus-ring flex items-center justify-between gap-2 text-left">
@@ -1244,13 +1295,14 @@ function AdjudicationDialog({
   criterion,
   trial,
   ui,
-  triggerClass = "control h-8 min-h-8 px-2 text-xs",
+  triggerClass = "control min-h-11 px-3 text-xs sm:h-8 sm:min-h-8 sm:px-2",
 }) {
   const record = ui.adjudications.find(
     (item) => item.criterionId === criterion.id,
   );
   const recordAdjudications = useReviewStore((s) => s.recordAdjudications);
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef(null);
   const {
     control,
     handleSubmit,
@@ -1302,10 +1354,17 @@ function AdjudicationDialog({
       record ? "Replaced adjudication" : "Recorded adjudication",
     );
     setOpen(false);
+    window.setTimeout(() => triggerRef.current?.focus(), 0);
   });
   return (
-    <DialogTrigger isOpen={open} onOpenChange={setOpen}>
-      <Button className={triggerClass}>
+    <DialogTrigger
+      isOpen={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) window.setTimeout(() => triggerRef.current?.focus(), 0);
+      }}
+    >
+      <Button ref={triggerRef} className={triggerClass}>
         {record ? "Re-adjudicate" : "Adjudicate criterion"}
       </Button>
       <ModalOverlay
@@ -1347,11 +1406,13 @@ function AdjudicationDialog({
                       items={classifications}
                       onChange={field.onChange}
                       ariaLabel="classification"
+                      isInvalid={!!errors.classification}
+                      errorMessageId="classification-error"
                     />
                   )}
                 />
                 {errors.classification && (
-                  <p className="error" role="alert">
+                  <p id="classification-error" className="error" role="alert">
                     classification: {errors.classification.message}
                   </p>
                 )}
@@ -1359,18 +1420,25 @@ function AdjudicationDialog({
                   name="rationale"
                   control={control}
                   render={({ field }) => (
-                    <TextField className="w-full">
+                    <TextField
+                      className="w-full"
+                      isInvalid={!!errors.rationale}
+                    >
                       <Label className="label">Rationale</Label>
                       <TextArea
                         {...field}
                         className="field min-h-32 resize-y py-2"
+                        aria-invalid={!!errors.rationale}
+                        aria-describedby={
+                          errors.rationale ? "rationale-error" : undefined
+                        }
                         placeholder="Explain why this is an agent bug, rubric bug, or scorer error (20–2000 characters)."
                       />
                     </TextField>
                   )}
                 />
                 {errors.rationale && (
-                  <p className="error" role="alert">
+                  <p id="rationale-error" className="error" role="alert">
                     rationale: {errors.rationale.message}
                   </p>
                 )}
@@ -1378,7 +1446,10 @@ function AdjudicationDialog({
                   name="evidenceStepIds"
                   control={control}
                   render={({ field }) => (
-                    <TextField className="w-full">
+                    <TextField
+                      className="w-full"
+                      isInvalid={!!errors.evidenceStepIds}
+                    >
                       <Label className="label">
                         Evidence step ids{" "}
                         <span className="normal-case tracking-normal text-muted">
@@ -1387,6 +1458,12 @@ function AdjudicationDialog({
                       </Label>
                       <Input
                         className="field font-mono"
+                        aria-invalid={!!errors.evidenceStepIds}
+                        aria-describedby={
+                          errors.evidenceStepIds
+                            ? "evidenceStepIds-error"
+                            : undefined
+                        }
                         value={
                           Array.isArray(field.value)
                             ? field.value.join(", ")
@@ -1411,7 +1488,7 @@ function AdjudicationDialog({
                   )}
                 />
                 {errors.evidenceStepIds && (
-                  <p className="error" role="alert">
+                  <p id="evidenceStepIds-error" className="error" role="alert">
                     evidenceStepIds: {errors.evidenceStepIds.message}
                   </p>
                 )}
@@ -1445,12 +1522,32 @@ function CriterionTable({ trial, ui }) {
   const selectCriterion = useReviewStore((s) => s.selectCriterion);
   const jumpEvidence = useReviewStore((s) => s.jumpEvidence);
   const selectFlip = useReviewStore((s) => s.selectFlip);
+  const density = useReviewStore((s) => s.density);
   const flips = flippedCriterionIds(trial, ui.comparedLabels);
-  const visibleCriteria = ui.flipsOnly
-    ? trial.criteria.filter((criterion) => flips.includes(criterion.id))
-    : trial.criteria;
+  const flipKey = flips.join("|");
+  const [exitingIds, setExitingIds] = useState([]);
+  const previousFlipsOnly = useRef(ui.flipsOnly);
+  useEffect(() => {
+    if (previousFlipsOnly.current === ui.flipsOnly) return undefined;
+    previousFlipsOnly.current = ui.flipsOnly;
+    if (ui.flipsOnly) {
+      const flipSet = new Set(flipKey.split("|").filter(Boolean));
+      const leaving = trial.criteria
+        .filter((criterion) => !flipSet.has(criterion.id))
+        .map((criterion) => criterion.id);
+      setExitingIds(leaving);
+      const timer = window.setTimeout(() => setExitingIds([]), 220);
+      return () => window.clearTimeout(timer);
+    }
+    setExitingIds([]);
+    return undefined;
+  }, [ui.flipsOnly, flipKey, trial.criteria]);
+  const visibleCriteria = trial.criteria.filter((criterion) => {
+    if (!ui.flipsOnly) return true;
+    return flips.includes(criterion.id) || exitingIds.includes(criterion.id);
+  });
   const verdicts = trial.results[ui.activeLabel].verdicts;
-  if (!visibleCriteria.length)
+  if (ui.flipsOnly && !flips.length && !exitingIds.length)
     return (
       <div className="grid min-h-52 place-items-center rounded-lg border border-dashed border-line bg-white p-8 text-center">
         <div>
@@ -1470,7 +1567,7 @@ function CriterionTable({ trial, ui }) {
       </div>
     );
   return (
-    <div className="space-y-3">
+    <div className={cx("space-y-3", density === "comfortable" && "space-y-4")}>
       {dimensions.map((dimension) => {
         const criteria = visibleCriteria.filter(
           (c) => c.dimensionId === dimension.id,
@@ -1484,20 +1581,21 @@ function CriterionTable({ trial, ui }) {
             <div className="flex items-center justify-between border-b border-line bg-[#f2f3ef] px-3 py-2">
               <h3 className="text-xs font-extrabold">{dimension.name}</h3>
               <span className="font-mono text-[10px] font-bold text-muted">
-                {criteria.length} criteria
+                {criteria.filter((c) => !exitingIds.includes(c.id)).length}{" "}
+                criteria
               </span>
             </div>
             <div className="overflow-x-auto">
               <table
                 aria-label={`${dimension.name} verdicts`}
-                className="w-full min-w-[920px] table-fixed text-left"
+                className="verdict-table w-full text-left"
               >
                 <thead className="border-b border-line text-[9px] font-bold uppercase tracking-[.1em] text-muted">
                   <tr>
                     <th scope="col" className="w-10 px-2 py-2">
                       Pick
                     </th>
-                    <th scope="col" className="w-56 px-2 py-2">
+                    <th scope="col" className="min-w-[9rem] px-2 py-2 sm:w-56">
                       Criterion
                     </th>
                     <th scope="col" className="w-16 px-2 py-2">
@@ -1506,7 +1604,7 @@ function CriterionTable({ trial, ui }) {
                     <th scope="col" className="w-20 px-2 py-2">
                       Verdict
                     </th>
-                    <th scope="col" className="px-2 py-2">
+                    <th scope="col" className="min-w-[12rem] px-2 py-2">
                       Scorer reasoning
                     </th>
                     <th scope="col" className="w-28 px-2 py-2">
@@ -1526,6 +1624,7 @@ function CriterionTable({ trial, ui }) {
                       (record) => record.criterionId === criterion.id,
                     );
                     const canAdjudicate = flipped || !verdict.yes;
+                    const exiting = exitingIds.includes(criterion.id);
                     return (
                       <tr
                         key={criterion.id}
@@ -1544,9 +1643,15 @@ function CriterionTable({ trial, ui }) {
                           }
                         }}
                         className={cx(
-                          "hover-wash cursor-pointer border-b border-line/70 outline-none last:border-0",
+                          "hover-wash focus-ring cursor-pointer border-b border-line/70 outline-none last:border-0",
+                          density === "comfortable" ? "[&>td]:py-3" : "[&>td]:py-2",
                           selected &&
                             "bg-accent-soft/70 ring-1 ring-inset ring-accent",
+                          exiting
+                            ? "row-exit pointer-events-none"
+                            : ui.flipsOnly && flipped
+                              ? "row-enter"
+                              : null,
                         )}
                       >
                         <td
@@ -1759,6 +1864,7 @@ function BulkBar({ trial, ui }) {
 
 function AdjudicationSummary({ records }) {
   const counts = summaryCounts(records);
+  const activityFeed = useReviewStore((s) => s.activityFeed);
   const styles = {
     "agent-bug": "border-negative/20 bg-negative-soft text-negative",
     "rubric-bug": "border-[#76539f]/20 bg-[#eee7f5] text-[#68458f]",
@@ -1798,6 +1904,33 @@ function AdjudicationSummary({ records }) {
           failed row to classify it as agent-bug, rubric-bug, or scorer-error.
         </p>
       )}
+      <div className="mt-3 border-t border-line pt-3">
+        <div className="mb-2 flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-wider text-muted">
+          <IconClock size={13} />
+          Review activity
+        </div>
+        {activityFeed.length === 0 ? (
+          <p className="text-[11px] text-muted">
+            Mutations appear here with timestamps after you adjudicate, import,
+            undo, or redo.
+          </p>
+        ) : (
+          <ul className="max-h-36 space-y-1.5 overflow-auto">
+            {activityFeed.slice(0, 6).map((item) => (
+              <li
+                key={item.id}
+                className="rounded border border-line bg-white px-2 py-1.5 text-[11px]"
+              >
+                <div className="font-bold">{item.label}</div>
+                <div className="text-muted">{item.detail}</div>
+                <time className="font-mono text-[10px] text-muted">
+                  {new Date(item.at).toLocaleTimeString()}
+                </time>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </section>
   );
 }
@@ -1853,9 +1986,10 @@ function VerdictWorkspace({ trial, ui }) {
                   </div>
                 </div>
                 <ToggleButton
+                  id="coachmark-flips"
                   isSelected={ui.flipsOnly}
                   onChange={toggleFlips}
-                  className="control data-[selected]:border-[#76539f] data-[selected]:bg-[#eee7f5] data-[selected]:text-[#68458f]"
+                  className="control min-h-11 data-[selected]:border-[#76539f] data-[selected]:bg-[#eee7f5] data-[selected]:text-[#68458f] sm:min-h-9"
                 >
                   <IconAdjustments size={16} />
                   Flips only
@@ -1885,6 +2019,9 @@ function WorkspaceChrome({ task, trial, ui }) {
   const undo = useReviewStore((s) => s.undo);
   const redo = useReviewStore((s) => s.redo);
   const openOverlay = useReviewStore((s) => s.openOverlay);
+  const density = useReviewStore((s) => s.density);
+  const setDensity = useReviewStore((s) => s.setDensity);
+  const openCheatsheet = useReviewStore((s) => s.openCheatsheet);
   const badge = trialBadge(trial.id);
   return (
     <div className="border-b border-line bg-paper px-3 py-3 sm:px-5">
@@ -1902,7 +2039,7 @@ function WorkspaceChrome({ task, trial, ui }) {
           />
           <div className="flex flex-wrap gap-2">
             <Button
-              className="control"
+              className="control min-h-11 sm:min-h-9"
               onPress={undo}
               isDisabled={!ui.undo.length}
               aria-label="Undo adjudication mutation"
@@ -1911,7 +2048,7 @@ function WorkspaceChrome({ task, trial, ui }) {
               Undo
             </Button>
             <Button
-              className="control"
+              className="control min-h-11 sm:min-h-9"
               onPress={redo}
               isDisabled={!ui.redo.length}
               aria-label="Redo adjudication mutation"
@@ -1919,12 +2056,33 @@ function WorkspaceChrome({ task, trial, ui }) {
               <IconArrowForwardUp size={iconSize} />
               Redo
             </Button>
-            <Button className="control" onPress={() => openOverlay("import")}>
+            <Button
+              className="control min-h-11 sm:min-h-9"
+              onPress={() =>
+                setDensity(density === "dense" ? "comfortable" : "dense")
+              }
+              aria-label="Toggle verdict and timeline density"
+            >
+              <IconLayoutColumns size={iconSize} />
+              {density === "dense" ? "Comfortable density" : "Dense density"}
+            </Button>
+            <Button
+              className="control min-h-11 sm:min-h-9"
+              onPress={openCheatsheet}
+            >
+              <IconCommand size={iconSize} />
+              Keyboard cheatsheet
+            </Button>
+            <Button
+              className="control min-h-11 sm:min-h-9"
+              onPress={() => openOverlay("import")}
+            >
               <IconUpload size={iconSize} />
               Import review package
             </Button>
             <Button
-              className="control control-primary"
+              id="coachmark-export"
+              className="control control-primary min-h-11 sm:min-h-9"
               onPress={() => openOverlay("export")}
             >
               <IconDownload size={iconSize} />
@@ -2003,7 +2161,9 @@ function ExportDrawer({ trial, ui }) {
   const tab = useReviewStore((s) => s.exportTab);
   const setTab = useReviewStore((s) => s.setExportTab);
   const setAnnouncement = useReviewStore((s) => s.setAnnouncement);
+  const openPrintMemo = useReviewStore((s) => s.openPrintMemo);
   const [copied, setCopied] = useState(false);
+  const [copyNotice, setCopyNotice] = useState("");
   const packageText = useMemo(
     () =>
       JSON.stringify(buildReviewPackage(useReviewStore.getState()), null, 2),
@@ -2026,11 +2186,17 @@ function ExportDrawer({ trial, ui }) {
   const activeText = tab === "json" ? packageText : memoText;
   const copy = async () => {
     await copyText(activeText);
+    const notice =
+      tab === "json"
+        ? "Review package JSON copied to clipboard"
+        : "Review memo Markdown copied to clipboard";
     setCopied(true);
-    setAnnouncement(
-      `${tab === "json" ? "Review Package JSON" : "Review Memo Markdown"} copied`,
-    );
-    setTimeout(() => setCopied(false), 1500);
+    setCopyNotice(notice);
+    setAnnouncement(notice);
+    setTimeout(() => {
+      setCopied(false);
+      setCopyNotice("");
+    }, 1800);
   };
   const download = () => {
     const blob = new Blob([activeText], {
@@ -2050,7 +2216,7 @@ function ExportDrawer({ trial, ui }) {
       isDismissable
       className="fixed inset-0 z-50 flex justify-end bg-[#101814]/45 backdrop-blur-[2px] data-[entering]:animate-in data-[exiting]:animate-out"
     >
-      <Modal className="drawer-panel h-full w-full max-w-2xl overflow-hidden border-l border-line bg-paper shadow-2xl">
+      <Modal className="drawer-panel h-full w-full max-w-2xl overflow-hidden border-l border-line bg-paper shadow-2xl data-[entering]:opacity-100">
         <Dialog
           aria-label="Export review package"
           className="flex h-full flex-col outline-none"
@@ -2067,7 +2233,7 @@ function ExportDrawer({ trial, ui }) {
               </p>
             </div>
             <Button
-              className="control control-quiet size-9 p-0"
+              className="control control-quiet size-11 p-0 sm:size-9"
               onPress={() => close("export")}
               aria-label="Close export drawer"
             >
@@ -2100,7 +2266,7 @@ function ExportDrawer({ trial, ui }) {
               id="json"
               className="scroll-thin min-h-0 flex-1 overflow-auto p-4 outline-none sm:p-5"
             >
-              <pre className="min-h-full whitespace-pre-wrap break-words rounded-lg border border-[#2e3d36] bg-[#15201b] p-4 font-mono text-[11px] leading-5 text-[#dbe9e1]">
+              <pre className="min-h-full whitespace-pre-wrap break-words rounded-lg border border-[#2e3d36] bg-[#15201b] p-4 font-mono text-xs leading-5 text-[#dbe9e1] sm:text-[12px]">
                 {packageText}
               </pre>
             </TabPanel>
@@ -2113,24 +2279,45 @@ function ExportDrawer({ trial, ui }) {
               </div>
             </TabPanel>
           </Tabs>
-          <div className="flex items-center justify-between gap-3 border-t border-line px-4 py-3 sm:px-5">
-            <div className="text-[11px] text-muted">
-              {ui.adjudications.length} adjudication
-              {ui.adjudications.length === 1 ? "" : "s"} included
-            </div>
-            <div className="flex gap-2">
-              <Button className="control" onPress={copy}>
-                {copied ? (
-                  <IconCheck size={iconSize} />
-                ) : (
-                  <IconClipboard size={iconSize} />
-                )}
-                {copied ? "Copied" : "Copy"}
-              </Button>
-              <Button className="control control-primary" onPress={download}>
-                <IconDownload size={iconSize} />
-                Download
-              </Button>
+          <div className="space-y-2 border-t border-line px-4 py-3 sm:px-5">
+            {copyNotice && (
+              <p
+                className="rounded-md border border-positive/30 bg-positive-soft px-3 py-2 text-xs font-bold text-positive"
+                role="status"
+                aria-live="polite"
+              >
+                {copyNotice}
+              </p>
+            )}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-[11px] text-muted">
+                {ui.adjudications.length} adjudication
+                {ui.adjudications.length === 1 ? "" : "s"} included
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Button className="control min-h-11 sm:min-h-9" onPress={copy}>
+                  {copied ? (
+                    <IconCheck size={iconSize} />
+                  ) : (
+                    <IconClipboard size={iconSize} />
+                  )}
+                  {copied ? "Copied review package" : "Copy"}
+                </Button>
+                <Button
+                  className="control min-h-11 sm:min-h-9"
+                  onPress={openPrintMemo}
+                >
+                  <IconFileText size={iconSize} />
+                  Print memo
+                </Button>
+                <Button
+                  className="control control-primary min-h-11 sm:min-h-9"
+                  onPress={download}
+                >
+                  <IconDownload size={iconSize} />
+                  Download
+                </Button>
+              </div>
             </div>
           </div>
         </Dialog>
@@ -2176,7 +2363,7 @@ function ImportSurface({ task, trial }) {
     replace(result.data.adjudications);
     setImportErrors([]);
     setAnnouncement(
-      `Imported ${result.data.adjudications.length} adjudications successfully`,
+      `Imported ${result.data.adjudications.length} adjudications successfully from Review Package JSON`,
     );
     close("import");
   });
@@ -2413,9 +2600,183 @@ function CommandPalette({ task, trial, ui }) {
   );
 }
 
+function CoachmarksTour() {
+  const open = useReviewStore((s) => s.coachmarksOpen);
+  const step = useReviewStore((s) => s.coachmarksStep);
+  const setStep = useReviewStore((s) => s.setCoachmarksStep);
+  const dismiss = useReviewStore((s) => s.dismissCoachmarks);
+  const steps = [
+    {
+      title: "Verdict register",
+      body: "Select criteria, follow evidence links, and adjudicate flipped or failed rows here.",
+      target: "#verdict-table",
+    },
+    {
+      title: "Export review package",
+      body: "Export Review Package JSON or Memo anytime from the chrome Export control.",
+      target: "#coachmark-export",
+    },
+    {
+      title: "Flips only filter",
+      body: "Narrow the register to flipped criteria, then bulk-apply a shared classification.",
+      target: "#coachmark-flips",
+    },
+  ];
+  if (!open) return null;
+  const current = steps[step] || steps[0];
+  return (
+    <div className="pointer-events-none fixed inset-0 z-[60]">
+      <div className="pointer-events-auto absolute bottom-4 left-1/2 w-[min(420px,calc(100%-1.5rem))] -translate-x-1/2 rounded-xl border border-line bg-paper p-4 shadow-2xl">
+        <div className="mb-1 text-[10px] font-extrabold uppercase tracking-wider text-accent">
+          Coachmarks · {step + 1}/{steps.length}
+        </div>
+        <h2 className="text-base font-extrabold">{current.title}</h2>
+        <p className="mt-1 text-sm text-muted">{current.body}</p>
+        <div className="mt-3 flex flex-wrap justify-end gap-2">
+          <Button className="control min-h-11 sm:min-h-9" onPress={dismiss}>
+            Dismiss tour
+          </Button>
+          {step < steps.length - 1 ? (
+            <Button
+              className="control control-primary min-h-11 sm:min-h-9"
+              onPress={() => {
+                setStep(step + 1);
+                document
+                  .querySelector(steps[step + 1].target)
+                  ?.scrollIntoView({ block: "center", behavior: "smooth" });
+              }}
+            >
+              Next tip
+            </Button>
+          ) : (
+            <Button
+              className="control control-primary min-h-11 sm:min-h-9"
+              onPress={dismiss}
+            >
+              Start reviewing
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function KeyboardCheatsheet() {
+  const open = useReviewStore((s) => s.overlays.cheatsheet);
+  const close = useReviewStore((s) => s.closeCheatsheet);
+  return (
+    <ModalOverlay
+      isOpen={open}
+      onOpenChange={(value) => !value && close()}
+      isDismissable
+      className="fixed inset-0 z-50 grid place-items-center bg-[#101814]/45 p-4"
+    >
+      <Modal className="pop-panel w-full max-w-md rounded-xl border border-line bg-paper shadow-2xl">
+        <Dialog aria-label="Keyboard cheatsheet" className="outline-none">
+          <div className="flex items-start justify-between border-b border-line px-4 py-3">
+            <div>
+              <h2 className="text-lg font-extrabold">Keyboard cheatsheet</h2>
+              <p className="text-xs text-muted">
+                Shortcuts for trajectory scrubbing and review mutations.
+              </p>
+            </div>
+            <Button
+              className="control control-quiet size-11 p-0 sm:size-9"
+              onPress={close}
+              aria-label="Close keyboard cheatsheet"
+            >
+              <IconX size={18} />
+            </Button>
+          </div>
+          <ul className="space-y-2 p-4 text-sm">
+            <li>
+              <span className="font-mono text-xs font-bold">↑ ↓ ← →</span> —
+              Scrub the focused trajectory timeline
+            </li>
+            <li>
+              <span className="font-mono text-xs font-bold">Home / End</span> —
+              Jump to first or last step
+            </li>
+            <li>
+              <span className="font-mono text-xs font-bold">Ctrl/Cmd+K</span> —
+              Open the command palette
+            </li>
+            <li>
+              <span className="font-mono text-xs font-bold">Ctrl/Cmd+Z</span> —
+              Undo adjudication mutation
+            </li>
+            <li>
+              <span className="font-mono text-xs font-bold">
+                Ctrl/Cmd+Shift+Z
+              </span>{" "}
+              — Redo adjudication mutation
+            </li>
+            <li>
+              <span className="font-mono text-xs font-bold">Esc</span> — Close
+              overlays and return focus to the opener
+            </li>
+          </ul>
+          <div className="border-t border-line px-4 py-3 text-right">
+            <Button className="control min-h-11 sm:min-h-9" onPress={close}>
+              Dismiss cheatsheet
+            </Button>
+          </div>
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
+  );
+}
+
+function PrintMemoView({ trial }) {
+  const open = useReviewStore((s) => s.overlays.print);
+  const close = useReviewStore((s) => s.closePrintMemo);
+  const memoText = useMemo(
+    () => buildMemo(useReviewStore.getState()),
+    [trial.id, open],
+  );
+  return (
+    <ModalOverlay
+      isOpen={open}
+      onOpenChange={(value) => !value && close()}
+      isDismissable
+      className="fixed inset-0 z-[70] grid place-items-center bg-[#101814]/5 p-4"
+    >
+      <Modal className="pop-panel max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-xl border border-line bg-white shadow-2xl">
+        <Dialog aria-label="Print-friendly review memo" className="outline-none">
+          <div className="flex items-center justify-between border-b border-line px-4 py-3 print:hidden">
+            <h2 className="text-lg font-extrabold">Print-friendly memo</h2>
+            <div className="flex gap-2">
+              <Button
+                className="control control-primary min-h-11 sm:min-h-9"
+                onPress={() => window.print()}
+              >
+                Print
+              </Button>
+              <Button
+                className="control min-h-11 sm:min-h-9"
+                onPress={close}
+                aria-label="Close print memo"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+          <div className="scroll-thin max-h-[75vh] overflow-auto p-6 print:max-h-none print:overflow-visible">
+            <article className="rich-text print-memo mx-auto max-w-[720px] text-[15px] leading-7 text-ink">
+              <ReactMarkdown>{memoText}</ReactMarkdown>
+            </article>
+          </div>
+        </Dialog>
+      </Modal>
+    </ModalOverlay>
+  );
+}
+
 function ReviewWorkspace() {
   const state = useReviewStore();
   const { task, trial, ui } = currentContext(state);
+  const density = useReviewStore((s) => s.density);
   useEffect(() => {
     const handler = (event) => {
       const mod = event.metaKey || event.ctrlKey;
@@ -2432,8 +2793,14 @@ function ReviewWorkspace() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [state.openOverlay, state.undo, state.redo]);
+  if (!task || !trial || !ui) return null;
   return (
-    <main className="min-w-0">
+    <main
+      className={cx(
+        "min-w-0",
+        density === "comfortable" && "density-comfortable",
+      )}
+    >
       <WorkspaceChrome task={task} trial={trial} ui={ui} />
       <PaneSwitcher ui={ui} />
       <div className="mx-auto grid max-w-[1680px] grid-cols-1 border-x border-line min-[1025px]:grid-cols-2">
@@ -2450,10 +2817,15 @@ function ReviewWorkspace() {
           hidden={ui.focusedPane !== "scorer"}
         />
       </div>
-      <VerdictWorkspace trial={trial} ui={ui} />
+      <div id="verdict-table-anchor">
+        <VerdictWorkspace trial={trial} ui={ui} />
+      </div>
       <ExportDrawer trial={trial} ui={ui} />
       <ImportSurface task={task} trial={trial} />
       <CommandPalette task={task} trial={trial} ui={ui} />
+      <KeyboardCheatsheet />
+      <PrintMemoView trial={trial} />
+      <CoachmarksTour />
     </main>
   );
 }

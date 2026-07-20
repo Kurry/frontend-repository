@@ -38,13 +38,29 @@ const cloneRecords = (records) =>
       : undefined,
   }));
 
+function findTrialAcrossTasks(trialId) {
+  for (const task of tasks) {
+    const trial = task.trials.find((item) => item.id === trialId);
+    if (trial) return { task, trial };
+  }
+  return null;
+}
+
+function pushActivity(set, get, entry) {
+  const next = [
+    { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, at: new Date().toISOString(), ...entry },
+    ...get().activityFeed,
+  ].slice(0, 12);
+  set({ activityFeed: next });
+}
+
 export const useReviewStore = create((set, get) => ({
   tasks,
   view: "tasks",
   activeTaskId: tasks[0].id,
   activeTrialId: null,
   trialState: defaultTrialState(),
-  overlays: { export: false, import: false, palette: false },
+  overlays: { export: false, import: false, palette: false, print: false, cheatsheet: false },
   exportTab: "json",
   importDraft: "",
   importErrors: [],
@@ -52,6 +68,10 @@ export const useReviewStore = create((set, get) => ({
   disclosure: {},
   terminalComplete: {},
   fileSelection: {},
+  activityFeed: [],
+  density: "dense",
+  coachmarksOpen: true,
+  coachmarksStep: 0,
 
   selectTask: (taskId) =>
     set({
@@ -61,14 +81,31 @@ export const useReviewStore = create((set, get) => ({
       announcement: `Opened ${getTask(taskId).title}`,
     }),
   backToTasks: () => set({ view: "tasks", activeTrialId: null }),
-  openTrial: (trialId) =>
+  openTrial: (trialId, taskId) => {
+    const found = findTrialAcrossTasks(trialId);
+    if (!found) return false;
+    const resolvedTaskId = taskId || found.task.id;
     set((state) => ({
       view: "review",
+      activeTaskId: resolvedTaskId,
       activeTrialId: trialId,
       overlays: { ...state.overlays, palette: false },
       announcement: `Opened trial ${trialId}`,
-    })),
+    }));
+    return true;
+  },
   backToTask: () => set({ view: "task", activeTrialId: null }),
+  setDensity: (density) => set({ density }),
+  dismissCoachmarks: () => set({ coachmarksOpen: false, coachmarksStep: 0 }),
+  setCoachmarksStep: (coachmarksStep) => set({ coachmarksStep }),
+  openCheatsheet: () =>
+    set((state) => ({ overlays: { ...state.overlays, cheatsheet: true } })),
+  closeCheatsheet: () =>
+    set((state) => ({ overlays: { ...state.overlays, cheatsheet: false } })),
+  openPrintMemo: () =>
+    set((state) => ({ overlays: { ...state.overlays, print: true } })),
+  closePrintMemo: () =>
+    set((state) => ({ overlays: { ...state.overlays, print: false } })),
   patchTrial: (trialId, patch) =>
     set((state) => ({
       trialState: {
@@ -122,28 +159,44 @@ export const useReviewStore = create((set, get) => ({
     const { activeTrialId } = get();
     if (activeTrialId) get().patchTrial(activeTrialId, { selectedFlips: [] });
   },
-  selectCriterion: (criterionId) => {
+  selectCriterion: (criterionId, { toggle = true } = {}) => {
     const state = get();
-    const trial = getTrial(state.activeTaskId, state.activeTrialId);
-    if (!trial) return;
+    const found =
+      (state.activeTrialId &&
+        getTrial(state.activeTaskId, state.activeTrialId) && {
+          trial: getTrial(state.activeTaskId, state.activeTrialId),
+        }) ||
+      findTrialAcrossTasks(state.activeTrialId);
+    const trial = found?.trial;
+    if (!trial) return false;
     const current = state.trialState[trial.id];
-    if (current.selectedCriterion === criterionId) {
+    if (toggle && current.selectedCriterion === criterionId) {
       get().patchTrial(trial.id, { selectedCriterion: null });
-      return;
+      return true;
     }
     const verdict = trial.results[current.activeLabel].verdicts[criterionId];
+    if (!verdict) return false;
     get().patchTrial(trial.id, {
       selectedCriterion: criterionId,
       agentStep: verdict.agentStep,
       scorerStep: verdict.scorerStep,
     });
+    return true;
   },
   jumpEvidence: (criterionId) => {
     const state = get();
-    const trial = getTrial(state.activeTaskId, state.activeTrialId);
+    const found =
+      findTrialAcrossTasks(state.activeTrialId) ||
+      (state.activeTrialId
+        ? {
+            trial: getTrial(state.activeTaskId, state.activeTrialId),
+          }
+        : null);
+    const trial = found?.trial;
     if (!trial) return;
     const current = state.trialState[trial.id];
     const verdict = trial.results[current.activeLabel].verdicts[criterionId];
+    if (!verdict) return;
     get().patchTrial(trial.id, {
       selectedCriterion: criterionId,
       scorerStep: verdict.scorerStep,
@@ -208,6 +261,11 @@ export const useReviewStore = create((set, get) => ({
       redo: [],
       selectedFlips: [],
     });
+    pushActivity(set, get, {
+      label,
+      detail: records.map((record) => `${record.criterionId}:${record.classification}`).join(", "),
+      count: records.length,
+    });
     set({
       announcement: `${records.length} adjudication${records.length === 1 ? "" : "s"} recorded`,
     });
@@ -226,6 +284,11 @@ export const useReviewStore = create((set, get) => ({
       ],
       redo: [],
     });
+    pushActivity(set, get, {
+      label: "Imported review package",
+      detail: `${next.length} adjudications restored`,
+      count: next.length,
+    });
   },
   undo: () => {
     const state = get();
@@ -238,6 +301,11 @@ export const useReviewStore = create((set, get) => ({
       adjudications: cloneRecords(entry.before),
       undo: current.undo.slice(0, -1),
       redo: [...current.redo, entry],
+    });
+    pushActivity(set, get, {
+      label: `Undid: ${entry.label}`,
+      detail: `${entry.before.length} adjudications restored`,
+      count: entry.before.length,
     });
     set({ announcement: `Undid: ${entry.label}` });
   },
@@ -252,6 +320,11 @@ export const useReviewStore = create((set, get) => ({
       adjudications: cloneRecords(entry.after),
       undo: [...current.undo, entry],
       redo: current.redo.slice(0, -1),
+    });
+    pushActivity(set, get, {
+      label: `Redid: ${entry.label}`,
+      detail: `${entry.after.length} adjudications restored`,
+      count: entry.after.length,
     });
     set({ announcement: `Redid: ${entry.label}` });
   },
@@ -269,10 +342,17 @@ export const useReviewStore = create((set, get) => ({
 }));
 
 export function currentContext(state = useReviewStore.getState()) {
-  const task = getTask(state.activeTaskId);
-  const trial = state.activeTrialId
+  let task = getTask(state.activeTaskId);
+  let trial = state.activeTrialId
     ? getTrial(state.activeTaskId, state.activeTrialId)
     : null;
+  if (state.activeTrialId && !trial) {
+    const found = findTrialAcrossTasks(state.activeTrialId);
+    if (found) {
+      task = found.task;
+      trial = found.trial;
+    }
+  }
   const ui = trial ? state.trialState[trial.id] : null;
   return { task, trial, ui };
 }
