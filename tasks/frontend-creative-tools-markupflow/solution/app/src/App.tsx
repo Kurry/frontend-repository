@@ -311,11 +311,11 @@ export default function App() {
   const [importError, setImportError] = createSignal('');
   const [showExportPreview, setShowExportPreview] = createSignal(false);
   const [copyToast, setCopyToast] = createSignal(false);
-  const [exitingLayerId, setExitingLayerId] = createSignal<string | null>(null);
+  const [exitingLayerIds, setExitingLayerIds] = createSignal<Set<string>>(new Set());
   const [theme, setTheme] = createSignal<'dark' | 'light'>('dark');
   let copyToastTimer: ReturnType<typeof setTimeout> | undefined;
   let importErrorTimer: ReturnType<typeof setTimeout> | undefined;
-  let layerDeleteTimer: ReturnType<typeof setTimeout> | undefined;
+  const layerDeleteTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   const projectForm = createForm(() => ({
     defaultValues: { name: '' },
@@ -1227,13 +1227,11 @@ export default function App() {
           <button
             class="header-action"
             onClick={() => {
-              // Cancel any pending animated layer delete so it cannot fire after the reset
+              // Cancel every pending animated layer delete so none can fire after the reset
               // and push a bogus undo snapshot against the emptied workspace.
-              if (layerDeleteTimer) {
-                clearTimeout(layerDeleteTimer);
-                layerDeleteTimer = undefined;
-              }
-              setExitingLayerId(null);
+              for (const timer of layerDeleteTimers.values()) clearTimeout(timer);
+              layerDeleteTimers.clear();
+              setExitingLayerIds(new Set<string>());
               store.clearState();
               setLoadedImage(null);
               setSharedContent('');
@@ -1822,23 +1820,26 @@ export default function App() {
                       const id = ann.id;
                       const kind = ann.type;
                       const remove = () => {
-                        layerDeleteTimer = undefined;
+                        layerDeleteTimers.delete(id);
                         // Bail out if the annotation is already gone (e.g. the workspace was
                         // reset while the exit animation was pending) — otherwise we would push
                         // a bogus undo snapshot and mutate history after the reset.
                         if (!state.annotations.some((a) => a.id === id)) {
-                          setExitingLayerId(null);
+                          setExitingLayerIds(prev => { const next = new Set(prev); next.delete(id); return next; });
                           return;
                         }
                         store.deleteAnnotation(id);
-                        setExitingLayerId(null);
+                        setExitingLayerIds(prev => { const next = new Set(prev); next.delete(id); return next; });
                         announce(`${kind} annotation deleted`);
                         setTimeout(() => renderFullCanvas(), 20);
                       };
                       if (prefersReducedMotion()) { remove(); return; }
-                      setExitingLayerId(id);
-                      if (layerDeleteTimer) clearTimeout(layerDeleteTimer);
-                      layerDeleteTimer = setTimeout(remove, 240);
+                      // Each pending delete is tracked independently so deleting several rows in
+                      // quick succession removes every one of them instead of cancelling the earlier ones.
+                      setExitingLayerIds(prev => new Set(prev).add(id));
+                      const pending = layerDeleteTimers.get(id);
+                      if (pending) clearTimeout(pending);
+                      layerDeleteTimers.set(id, setTimeout(remove, 240));
                     }}
                     onDragStart={handleLayerDragStart}
                     onDragOver={handleLayerDragOver}
@@ -1847,7 +1848,7 @@ export default function App() {
                     onMove={(direction) => moveLayer(i(), direction)}
                     isDragOver={dragOverIndex() === i() && dragLayerIndex() !== null && dragLayerIndex() !== i()}
                     isDragging={dragLayerIndex() === i()}
-                    isExiting={exitingLayerId() === ann.id}
+                    isExiting={exitingLayerIds().has(ann.id)}
                   />
                 )}
               </For>
