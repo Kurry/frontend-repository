@@ -331,6 +331,12 @@ export default function TrialBrief() {
             type="text"
             value={brief.name}
             onChange={e => updateBrief({...brief, name: e.target.value})}
+            onBlur={e => {
+              const trimmed = e.target.value.trim();
+              if (trimmed !== brief.name) {
+                updateBrief({...brief, name: trimmed});
+              }
+            }}
           />
           {errors.name && <ErrorText>{errors.name}</ErrorText>}
         </Field>
@@ -432,7 +438,7 @@ export default function TrialBrief() {
       </PreviewSection>
       <LiveRegion aria-live="polite">
         {Object.values(errors).join(". ")}
-        {successMsg && \`. \${successMsg}\`}
+        {successMsg && `. ${successMsg}`}
       </LiveRegion>
     </Container>
   );
