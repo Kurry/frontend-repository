@@ -147,9 +147,12 @@ function visibleLibraryEntries(state) {
       const haystack = `${record.title} ${record.promptText} ${record.technique}`.toLowerCase()
       return haystack.includes(query)
     })
-    .sort((a, b) => state.sortOrder === 'asc'
-      ? a.record.title.localeCompare(b.record.title)
-      : b.record.title.localeCompare(a.record.title))
+    .sort((a, b) => {
+      if (state.sortOrder === 'manual') return a.originalIndex - b.originalIndex
+      return state.sortOrder === 'asc'
+        ? a.record.title.localeCompare(b.record.title)
+        : b.record.title.localeCompare(a.record.title)
+    })
 }
 
 function visibleLibraryIndex(state, index) {

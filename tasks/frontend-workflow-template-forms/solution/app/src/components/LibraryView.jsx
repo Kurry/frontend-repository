@@ -54,7 +54,10 @@ export default function LibraryView({ importLauncherRef }) {
         if (!query) return true
         return `${item.title} ${item.promptText} ${item.technique}`.toLowerCase().includes(query)
       })
-      .sort((a, b) => (sortOrder === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)))
+      .sort((a, b) => {
+        if (sortOrder === 'manual') return a.originalIndex - b.originalIndex
+        return sortOrder === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+      })
   }, [library, libraryQuery, libraryTechniqueFilter, sortOrder])
 
   function confirmRemove(record, title, event) {
@@ -133,9 +136,9 @@ export default function LibraryView({ importLauncherRef }) {
           className="sort-control"
           renderIcon={(props) => <ArrowsVertical {...props} aria-hidden="true" />}
           onClick={toggleSortOrder}
-          aria-label={sortOrder === 'asc' ? 'Sort prompts descending by title' : 'Sort prompts ascending by title'}
+          aria-label={sortOrder === 'manual' ? 'Sort prompts ascending by title' : sortOrder === 'asc' ? 'Sort prompts descending by title' : 'Restore manual library order'}
         >
-          Sort {sortOrder === 'asc' ? 'A–Z' : 'Z–A'}
+          Sort {sortOrder === 'manual' ? 'Manual' : sortOrder === 'asc' ? 'A–Z' : 'Z–A'}
         </Button>
       </div>
 
@@ -222,6 +225,13 @@ export default function LibraryView({ importLauncherRef }) {
               </article>
             )
           })}
+        </section>
+      ) : library.length > 0 ? (
+        <section className="library-empty">
+          <div className="empty-orbit" aria-hidden="true"><span>0</span></div>
+          <h2>No prompts match the current filters</h2>
+          <p>Adjust search or technique filters to see saved prompts from this session.</p>
+          <Button type="button" kind="secondary" onClick={() => { setLibraryQuery(''); setLibraryTechniqueFilter('all') }}>Clear filters</Button>
         </section>
       ) : (
         <section className="library-empty">

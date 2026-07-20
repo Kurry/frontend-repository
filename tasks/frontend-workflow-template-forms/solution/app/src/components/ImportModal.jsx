@@ -83,7 +83,8 @@ export default function ImportModal({ launcherButtonRef }) {
   async function attemptImport() {
     const valid = await trigger()
     if (!valid) {
-      const message = errors.documentText?.message
+      const fieldError = importSchema.safeParse({ documentText: getValues('documentText') }).error?.issues.find((issue) => issue.path[0] === 'documentText')
+      const message = fieldError?.message
         || (getValues('documentText')?.trim()
           ? 'Library JSON does not match the Template Forms schema.'
           : 'Library JSON is required. Paste JSON or choose a file.')

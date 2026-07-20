@@ -16,7 +16,7 @@ export const useStudioStore = create((set, get) => ({
   exportPanelOpen: false,
   importModalOpen: false,
   toast: null,
-  sortOrder: 'asc',
+  sortOrder: 'manual',
   libraryQuery: '',
   libraryTechniqueFilter: 'all',
   theme: 'light',
@@ -25,7 +25,9 @@ export const useStudioStore = create((set, get) => ({
   hasSeenOnboarding: false,
   onboardingStep: 0,
 
-  toggleSortOrder: () => set((state) => ({ sortOrder: state.sortOrder === 'asc' ? 'desc' : 'asc' })),
+  toggleSortOrder: () => set((state) => ({
+    sortOrder: state.sortOrder === 'manual' ? 'asc' : state.sortOrder === 'asc' ? 'desc' : 'manual',
+  })),
   setSortOrder: (sortOrder) => set({ sortOrder }),
   setLibraryQuery: (libraryQuery) => set({ libraryQuery }),
   setLibraryTechniqueFilter: (libraryTechniqueFilter) => set({ libraryTechniqueFilter }),
@@ -136,7 +138,7 @@ export const useStudioStore = create((set, get) => ({
     const library = [...state.library]
     const [item] = library.splice(fromIndex, 1)
     library.splice(toIndex, 0, item)
-    return { library }
+    return { library, sortOrder: 'manual' }
   }),
 
   replaceLibrary: (records) => set({ library: clone(records) }),
