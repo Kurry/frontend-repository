@@ -22,6 +22,12 @@ install_only: true
 
 environment:
   type: modal
+  kwargs:
+    # Modal replaces the image ENTRYPOINT with its keepalive (harbor
+    # _ModalDirect.start). Route the keepalive THROUGH our entrypoint so the
+    # shared CDP Chrome still starts; without this every trial fails test.sh's
+    # Chrome gate as an infra error.
+    keepalive: ["/opt/verifier/entrypoint.sh", "sh", "-c", "sleep infinity"]
   delete: true
 
 agents:
