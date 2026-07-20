@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AnimatePresence, motion, MotionConfig } from 'motion/react'
-import { useAutoAnimate } from '@formkit/auto-animate/react'
 import {
   Button,
   Checkbox,
@@ -111,6 +110,65 @@ function useEscape(handler: () => void, active: boolean) {
   }, [active, handler])
 }
 
+function useModalFocusTrap(open: boolean, onClose: () => void, selector = '.cds--modal.is-visible .cds--modal-container') {
+  const openerRef = useRef<HTMLElement | null>(null)
+  useEffect(() => {
+    if (!open) return undefined
+    openerRef.current = document.activeElement as HTMLElement
+    let container: Element | null = null
+    let attempts = 0
+    const focusModal = () => {
+      container = document.querySelector(selector)
+      if (!container) {
+        if (attempts < 20) {
+          attempts += 1
+          window.setTimeout(focusModal, 16)
+        }
+        return
+      }
+      const focusable = () => [
+        ...container!.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ]
+      const pathInput = container.querySelector<HTMLElement>('#repository-path')
+      ;(pathInput || focusable()[0])?.focus()
+    }
+    focusModal()
+    const keydown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopPropagation()
+        onClose()
+        return
+      }
+      if (event.key !== 'Tab') return
+      container = container || document.querySelector(selector)
+      if (!container) return
+      const items = [
+        ...container.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ]
+      if (!items.length) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    document.addEventListener('keydown', keydown, true)
+    return () => {
+      document.removeEventListener('keydown', keydown, true)
+      requestAnimationFrame(() => openerRef.current?.focus?.())
+    }
+  }, [open, onClose, selector])
+}
+
 function AddRepositoryModal() {
   const open = useAppStore((state) => state.ui.addOpen)
   const setUi = useAppStore((state) => state.setUi)
@@ -136,6 +194,8 @@ function AddRepositoryModal() {
     setSubmitError('')
     reset()
   }
+
+  useModalFocusTrap(open, close)
 
   const submit = handleSubmit((values) => {
     if (submitting.current) return
@@ -237,6 +297,11 @@ function RepositoryRow({ repository, onRemove }: { repository: Repository; onRem
   const run = useAppStore((state) => state.scanRuns[repository.id])
   const [renaming, setRenaming] = useState(false)
   const scanning = run?.status === 'running' || run?.status === 'paused'
+  const failed = run?.status === 'failed'
+
+  useEffect(() => {
+    setRenaming(false)
+  }, [repository.displayName, repository.path, repository.id])
 
   return (
     <motion.li
@@ -267,7 +332,9 @@ function RepositoryRow({ repository, onRemove }: { repository: Repository; onRem
             <div className="repository-title-line">
               <Folder size={18} />
               <h3>{repositoryLabel(repository)}</h3>
-              {repository.id === 'repo-2' && <Tag size="sm" type="purple">Failure demo</Tag>}
+              {repository.id === 'repo-2' && failed && <Tag size="sm" type="red">Failed</Tag>}
+              {repository.id === 'repo-2' && !failed && scanning && <Tag size="sm" type="blue">Running</Tag>}
+              {repository.id === 'repo-2' && !failed && !scanning && run?.status === 'complete' && <Tag size="sm" type="green">Complete</Tag>}
             </div>
             <p className="repository-path" title={repository.path}>{repository.path}</p>
             <div className="repository-meta">
@@ -281,7 +348,7 @@ function RepositoryRow({ repository, onRemove }: { repository: Repository; onRem
         {scanning ? (
           <InlineLoading description={run.status === 'paused' ? 'Paused' : 'Scanning'} status={run.status === 'paused' ? 'inactive' : 'active'} />
         ) : (
-          <Button size="sm" kind="tertiary" renderIcon={Play} onClick={() => void startScan(repository.id)}>Scan Now</Button>
+          <Button size="sm" kind="tertiary" renderIcon={Play} onClick={() => void startScan(repository.id)}>Scan now</Button>
         )}
         <Button hasIconOnly size="sm" kind="ghost" renderIcon={Edit} iconDescription={`Rename ${repositoryLabel(repository)}`} onClick={() => setRenaming(true)} />
         <Button hasIconOnly size="sm" kind="ghost" renderIcon={TrashCan} iconDescription={`Remove ${repositoryLabel(repository)}`} onClick={() => onRemove(repository)} />
@@ -298,7 +365,6 @@ function RepositoryList() {
   const setUi = useAppStore((state) => state.setUi)
   const removeRepository = useAppStore((state) => state.removeRepository)
   const [removeTarget, setRemoveTarget] = useState<Repository | null>(null)
-  const [parent] = useAutoAnimate<HTMLUListElement>({ duration: 200 })
 
   return (
     <section className="panel repository-panel" aria-labelledby="repositories-heading">
@@ -318,7 +384,7 @@ function RepositoryList() {
         </div>
       )}
       {repositories.length ? (
-        <ul ref={parent} className="repository-list" aria-label="Tracked repositories">
+        <ul className="repository-list" aria-label="Tracked repositories">
           <AnimatePresence initial={false}>
             {repositories.map((repository) => <RepositoryRow key={repository.id} repository={repository} onRemove={setRemoveTarget} />)}
           </AnimatePresence>
@@ -414,7 +480,19 @@ function PatternSettings() {
 
 function StatusTag({ status }: { status: StepStatus }) {
   const Icon = status === 'complete' ? CheckmarkFilled : status === 'failed' ? ErrorFilled : status === 'running' ? InlineLoading : status === 'retrying' ? Renew : Time
-  return <Tag size="sm" type={statusKinds[status]} className={`status-tag status-${status}`} renderIcon={Icon}>{status}</Tag>
+  return (
+    <AnimatePresence mode="wait" initial={false}>
+      <motion.span
+        key={status}
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.92 }}
+        transition={{ duration: 0.18 }}
+      >
+        <Tag size="sm" type={statusKinds[status]} className={`status-tag status-${status}`} renderIcon={Icon}>{status}</Tag>
+      </motion.span>
+    </AnimatePresence>
+  )
 }
 
 function ScanPanel() {
@@ -461,6 +539,7 @@ function ScanPanel() {
         value={percent}
         max={100}
         status={run.status === 'failed' ? 'error' : run.status === 'complete' ? 'finished' : 'active'}
+        className="scan-progress-bar"
       />
       <div className="rollups" aria-label="Scan rollups">
         <div><strong>{complete}/{run.steps.length}</strong><span>steps complete</span></div>
@@ -485,10 +564,14 @@ function ScanPanel() {
                 <div className="step-content">
                   <div className="step-title"><strong>{step.name}</strong><StatusTag status={step.status} /></div>
                   <span className="step-path">{step.document.path}</span>
-                  {step.status === 'retrying' && <p className="retry-text">Waiting {step.countdown}s before retry {Math.min(step.attempts + 1, 3)} of 3</p>}
+                  {step.status === 'retrying' && (
+                    <p className="retry-text" aria-live="polite">
+                      Waiting {step.countdown}s before retry {Math.min(step.attempts + 1, 3)} of 3
+                    </p>
+                  )}
                   {step.output && <p className="step-output">{step.output} · completed {formatDate(step.completedAt || null)}</p>}
                   {step.error && (
-                    <div className="step-error">
+                    <div className="step-error" role="alert" aria-live="assertive">
                       <span>{step.error}</span>
                       <Button size="sm" kind="danger--tertiary" renderIcon={Renew} onClick={() => void retryFailedStep(repository.id, step.id)}>Retry step</Button>
                     </div>
@@ -505,7 +588,7 @@ function ScanPanel() {
             <span>{events.length} events</span>
           </div>
           <div className="timeline-filters" aria-label="Filter timeline by status">
-            {(['running', 'retrying', 'complete', 'failed'] as StepStatus[]).map((status) => (
+            {(['pending', 'running', 'retrying', 'complete', 'failed'] as StepStatus[]).map((status) => (
               <Checkbox
                 key={status}
                 id={`timeline-${status}`}
@@ -546,7 +629,13 @@ function Findings({ document }: { document: ScanDocument }) {
       </button>
       <AnimatePresence initial={false}>
         {expanded && (
-          <motion.ul initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="findings-list">
+          <motion.ul
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="findings-list"
+          >
             {document.findings.map((finding, index) => (
               <li key={`${finding.message}-${index}`} className={`finding-${finding.severity}`}>
                 {finding.severity === 'error' ? <ErrorFilled size={14} /> : finding.severity === 'warning' ? <WarningFilled size={14} /> : <CheckmarkFilled size={14} />}
@@ -634,7 +723,13 @@ function DocumentTree() {
                 </button>
                 <AnimatePresence initial={false}>
                   {open && (
-                    <motion.ul initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="document-list">
+                    <motion.ul
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.2, ease: 'easeOut' }}
+                      className="document-list"
+                    >
                       {groupDocuments.map((document) => <DocumentRow key={document.id} document={document} />)}
                     </motion.ul>
                   )}
@@ -710,6 +805,10 @@ function ExportModal() {
   const [confirmation, setConfirmation] = useState('')
   const activeText = tab === 0 ? json : markdown
   const format = tab === 0 ? 'Scan Index JSON' : 'Inventory Markdown'
+  const close = () => setUi('exportOpen', false)
+
+  useModalFocusTrap(open, close)
+  useEscape(close, open)
 
   const confirm = (message: string) => {
     setConfirmation(message)
@@ -740,7 +839,7 @@ function ExportModal() {
       size="lg"
       aria-modal="true"
       role="dialog"
-      onRequestClose={() => setUi('exportOpen', false)}
+      onRequestClose={close}
     >
       <div className="export-controls">
         <p>Artifacts regenerate from the shared repository index whenever repositories, findings, or patterns change.</p>
@@ -781,6 +880,7 @@ function ImportModal() {
     reset()
     setFeedback('')
   }
+  useModalFocusTrap(open, close)
   const submit = handleSubmit(({ payload: source }) => {
     let parsed: unknown
     try { parsed = JSON.parse(source) } catch { setFeedback('payload: Scan Index JSON contains malformed JSON.'); return }
@@ -865,12 +965,12 @@ function CommandPalette() {
   }, [open])
 
   const actions: PaletteAction[] = [
-    { id: 'add', label: 'Add repository', hint: 'Open repository form', run: () => setUi('addOpen', true) },
-    { id: 'scan', label: 'Scan selected', hint: `${selectedCount} repositories selected`, disabled: !selectedCount, run: () => void scanSelected() },
-    { id: 'export', label: 'Export scan index', hint: 'JSON or Markdown', run: () => setUi('exportOpen', true) },
-    { id: 'import', label: 'Import scan index', hint: 'Replace this session', run: () => setUi('importOpen', true) },
-    { id: 'undo', label: 'Undo', hint: 'Restore previous mutation', disabled: !undoCount, run: undo },
-    { id: 'redo', label: 'Redo', hint: 'Reapply mutation', disabled: !redoCount, run: redo },
+    { id: 'add', label: 'Add repository', hint: 'Open repository form · A', run: () => setUi('addOpen', true) },
+    { id: 'scan', label: 'Scan selected', hint: `${selectedCount} repositories · S`, disabled: !selectedCount, run: () => void scanSelected() },
+    { id: 'export', label: 'Export scan index', hint: 'JSON or Markdown · E', run: () => setUi('exportOpen', true) },
+    { id: 'import', label: 'Import scan index', hint: 'Replace this session · I', run: () => setUi('importOpen', true) },
+    { id: 'undo', label: 'Undo', hint: 'Restore previous mutation · ⌘Z', disabled: !undoCount, run: undo },
+    { id: 'redo', label: 'Redo', hint: 'Reapply mutation · ⇧⌘Z', disabled: !redoCount, run: redo },
     ...repositories.map((repository) => ({
       id: `jump-${repository.id}`,
       label: `Jump to ${repositoryLabel(repository)}`,
@@ -952,6 +1052,30 @@ function CommandPalette() {
   )
 }
 
+function FirstScanCoachmark() {
+  const repositories = useAppStore((state) => state.repositories)
+  const scanRuns = useAppStore((state) => state.scanRuns)
+  const [dismissed, setDismissed] = useState(false)
+  const hasActiveScan = Object.values(scanRuns).some((run) => run.status === 'running' || run.status === 'paused')
+  if (dismissed || hasActiveScan || repositories.length === 0) return null
+  return (
+    <motion.div
+      className="coachmark"
+      initial={{ opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+      role="status"
+      aria-live="polite"
+    >
+      <div>
+        <strong>First scan tip</strong>
+        <p>Select a repository row and choose <em>Scan now</em> to index CLAUDE.md, AGENTS.md, .cursorrules, and README files.</p>
+      </div>
+      <Button size="sm" kind="ghost" renderIcon={Close} iconDescription="Dismiss coachmark" hasIconOnly onClick={() => setDismissed(true)} />
+    </motion.div>
+  )
+}
+
 function Toolbar() {
   const setUi = useAppStore((state) => state.setUi)
   const selectedCount = useAppStore((state) => state.selectedRepositoryIds.length)
@@ -1004,19 +1128,21 @@ function AppContent() {
   const activeView = useAppStore((state) => state.activeView)
   const repositories = useAppStore((state) => state.repositories)
   const documents = useAppStore((state) => state.documents)
+  const ui = useAppStore((state) => state.ui)
+  const overlayOpen = ui.addOpen || ui.exportOpen || ui.importOpen || ui.paletteOpen
   const totalDocuments = repositories.reduce((total, repository) => total + (documents[repository.id]?.length || 0), 0)
   const totalFindings = repositories.reduce((total, repository) => total + (documents[repository.id] || []).reduce((sum, document) => sum + document.findings.length, 0), 0)
 
   return (
     <div className="app-shell">
-      <header className="app-header">
+      <header className="app-header" aria-hidden={overlayOpen}>
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true"><Search size={20} /></div>
           <div><span>Prompt Engineering Platform</span><strong>RepoScan Studio</strong></div>
         </div>
         <div className="session-indicator"><span className="status-dot" />In-memory session</div>
       </header>
-      <main>
+      <main aria-hidden={overlayOpen}>
         <section className="hero">
           <div>
             <p className="eyebrow">Repository intelligence</p>
@@ -1029,6 +1155,7 @@ function AppContent() {
             <div><strong>{totalFindings}</strong><span>findings</span></div>
           </div>
         </section>
+        <FirstScanCoachmark />
         <Toolbar />
         <div className="workspace-grid">
           <div className="left-column">
@@ -1041,7 +1168,7 @@ function AppContent() {
         </div>
         <ScanPanel />
       </main>
-      <footer>
+      <footer aria-hidden={overlayOpen}>
         <span>RepoScan Studio</span>
         <span>State remains in memory and resets on reload.</span>
       </footer>

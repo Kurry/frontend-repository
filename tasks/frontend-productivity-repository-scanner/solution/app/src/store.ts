@@ -144,7 +144,21 @@ function typeForPattern(pattern: PatternKey): DocumentType {
   } as const)[pattern]
 }
 
+function repoFingerprint(repository: Repository): number {
+  return repository.path.split('').reduce((sum, char, index) => sum + char.charCodeAt(0) * (index + 1), 0)
+}
+
+function personalizeContent(repository: Repository, base: string, type: DocumentType): string {
+  const label = repositoryLabel(repository)
+  const variant = repoFingerprint(repository) % 997
+  const header = `# ${type} · ${label}`
+  const scope = `Repository scope: ${repository.path} — scan variant ${variant}`
+  const body = base.replace(/^#[^\n]*\n\n?/, '')
+  return `${header}\n${scope}\n\n${body}`
+}
+
 function makeDocuments(repository: Repository, patterns: Record<PatternKey, boolean>): ScanDocument[] {
+  const label = repositoryLabel(repository)
   const descriptors: Record<DocumentType, Array<{ suffix: string; content: string; findings: Finding[] }>> = {
     'CLAUDE.md': [
       {
@@ -204,8 +218,11 @@ function makeDocuments(repository: Repository, patterns: Record<PatternKey, bool
       repositoryId: repository.id,
       path: `${repository.path.replace(/[\\/]+$/, '')}/${entry.suffix}`,
       type,
-      content: entry.content,
-      findings: clone(entry.findings),
+      content: personalizeContent(repository, entry.content, type),
+      findings: clone(entry.findings).map((finding) => ({
+        ...finding,
+        message: `${finding.message} (${label})`,
+      })),
     }))
   })
 }
