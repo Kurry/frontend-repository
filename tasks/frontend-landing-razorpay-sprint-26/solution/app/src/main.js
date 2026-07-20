@@ -1,3 +1,4 @@
+import { z } from "zod";
 /**
  * Razorpay Sprint 26 — page runtime.
  * Loader lifecycle, GSAP/ScrollTrigger motion, scroll-spy nav, mobile menu,
@@ -496,6 +497,507 @@ function initRiveEmbeds() {
 }
 
 /* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ *
+ * Global State and UI Controllers                                     *
+ * ------------------------------------------------------------------ */
+
+window.appState = {
+  shortlist: [],
+  compare: [],
+  themeFilter: 'All',
+  searchQuery: '',
+  watchLog: [],
+  undoStack: [],
+  redoStack: []
+};
+
+window.appMutations = {
+  pinFeature(name, fromUndo = false) {
+    if (window.appState.shortlist.includes(name)) return;
+
+    if (!fromUndo) {
+      window.appState.undoStack.push({ type: 'pin', name });
+      window.appState.redoStack = [];
+      updateUndoRedoButtons();
+    }
+
+    window.appState.shortlist.push(name);
+    updateShortlistUI();
+  },
+  unpinFeature(name, fromUndo = false) {
+    const index = window.appState.shortlist.indexOf(name);
+    if (index === -1) return;
+
+    if (!fromUndo) {
+      window.appState.undoStack.push({ type: 'unpin', name, index });
+      window.appState.redoStack = [];
+      updateUndoRedoButtons();
+    }
+
+    window.appState.shortlist.splice(index, 1);
+    updateShortlistUI();
+  },
+  addCompare(name) {
+    if (window.appState.compare.includes(name)) return;
+    if (window.appState.compare.length >= 3) {
+      const msg = document.getElementById('compare-full-msg');
+      if (msg) {
+        msg.style.display = 'block';
+        setTimeout(() => msg.style.display = 'none', 3000);
+      }
+      return;
+    }
+    window.appState.compare.push(name);
+    updateCompareUI();
+  },
+  setThemeFilter(theme) {
+    window.appState.themeFilter = theme;
+    applyFilters();
+  },
+  setSearchQuery(query) {
+    window.appState.searchQuery = query;
+    applyFilters();
+  },
+  watchExecutive(name) {
+    if (!window.appState.watchLog.includes(name)) {
+      window.appState.watchLog.push(name);
+    }
+  }
+};
+
+function updateShortlistUI() {
+  const list = document.getElementById('shortlist-items');
+  const count = document.getElementById('shortlist-count');
+  if (!list || !count) return;
+
+  count.textContent = window.appState.shortlist.length;
+
+  if (window.appState.shortlist.length === 0) {
+    list.innerHTML = '<li class="empty-msg" style="color: #888;">No launches pinned yet</li>';
+  } else {
+    list.innerHTML = '';
+    window.appState.shortlist.forEach(name => {
+      const li = document.createElement('li');
+      li.textContent = name;
+      list.appendChild(li);
+    });
+  }
+
+  document.querySelectorAll('article.shortlist-item').forEach(card => {
+    const featureName = card.getAttribute('data-feature');
+    const isPinned = window.appState.shortlist.includes(featureName);
+    const pinBtn = card.querySelector('.btn-pin');
+    const unpinBtn = card.querySelector('.btn-unpin');
+    if (pinBtn && unpinBtn) {
+      pinBtn.style.display = isPinned ? 'none' : 'inline-flex';
+      unpinBtn.style.display = isPinned ? 'inline-flex' : 'none';
+    }
+  });
+
+  if (typeof window.updateBriefPreview === 'function') window.updateBriefPreview();
+}
+
+function updateCompareUI() {
+  const list = document.getElementById('compare-items');
+  const count = document.getElementById('compare-count');
+  if (!list || !count) return;
+
+  count.textContent = window.appState.compare.length;
+  list.innerHTML = '';
+  window.appState.compare.forEach(name => {
+    const li = document.createElement('li');
+    li.textContent = name;
+    list.appendChild(li);
+  });
+
+  if (typeof window.updateBriefPreview === 'function') window.updateBriefPreview();
+}
+
+function updateUndoRedoButtons() {
+  const undoBtn = document.getElementById('btn-undo');
+  const redoBtn = document.getElementById('btn-redo');
+  if (undoBtn) undoBtn.disabled = window.appState.undoStack.length === 0;
+  if (redoBtn) redoBtn.disabled = window.appState.redoStack.length === 0;
+}
+
+function applyFilters() {
+  const theme = window.appState.themeFilter;
+  const q = window.appState.searchQuery.toLowerCase();
+
+  document.querySelectorAll('article.shortlist-item').forEach(card => {
+    const cardTheme = card.getAttribute('data-theme');
+    const cardFeature = card.getAttribute('data-feature').toLowerCase();
+
+    const themeMatch = theme === 'All' || cardTheme === theme;
+    const searchMatch = !q || cardFeature.includes(q);
+
+    card.style.display = (themeMatch && searchMatch) ? '' : 'none';
+  });
+
+  if (typeof window.updateBriefPreview === 'function') window.updateBriefPreview();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.addEventListener('click', e => {
+    if (e.target.classList.contains('btn-pin')) {
+      const feature = e.target.getAttribute('data-feature');
+      window.appMutations.pinFeature(feature);
+    } else if (e.target.classList.contains('btn-unpin')) {
+      const feature = e.target.getAttribute('data-feature');
+      window.appMutations.unpinFeature(feature);
+    } else if (e.target.classList.contains('btn-compare')) {
+      const feature = e.target.getAttribute('data-feature');
+      window.appMutations.addCompare(feature);
+    }
+  });
+
+  const themeSelect = document.getElementById('theme-filter');
+  if (themeSelect) {
+    themeSelect.addEventListener('change', e => {
+      window.appMutations.setThemeFilter(e.target.value);
+    });
+  }
+  const searchInput = document.getElementById('search-query');
+  if (searchInput) {
+    searchInput.addEventListener('input', e => {
+      window.appMutations.setSearchQuery(e.target.value);
+    });
+  }
+
+  const undoBtn = document.getElementById('btn-undo');
+  const redoBtn = document.getElementById('btn-redo');
+  if (undoBtn) {
+    undoBtn.addEventListener('click', () => {
+      const action = window.appState.undoStack.pop();
+      if (!action) return;
+      if (action.type === 'pin') {
+        window.appMutations.unpinFeature(action.name, true);
+      } else if (action.type === 'unpin') {
+        window.appState.shortlist.splice(action.index, 0, action.name);
+        updateShortlistUI();
+      }
+      window.appState.redoStack.push(action);
+      updateUndoRedoButtons();
+    });
+  }
+  if (redoBtn) {
+    redoBtn.addEventListener('click', () => {
+      const action = window.appState.redoStack.pop();
+      if (!action) return;
+      if (action.type === 'pin') {
+        window.appState.shortlist.push(action.name);
+        updateShortlistUI();
+      } else if (action.type === 'unpin') {
+        window.appMutations.unpinFeature(action.name, true);
+      }
+      window.appState.undoStack.push(action);
+      updateUndoRedoButtons();
+    });
+  }
+
+  document.body.addEventListener('click', e => {
+    const playControl = e.target.closest('.leader__play');
+    if (playControl) {
+      const leaderSection = playControl.closest('.leader');
+      if (leaderSection) {
+        const nameEl = leaderSection.querySelector('.leader__name');
+        if (nameEl) {
+           const execName = nameEl.textContent.trim();
+           const formattedName = execName.split(" ").map(n => n[0].toUpperCase() + n.substring(1).toLowerCase()).join(" ");
+           window.appMutations.watchExecutive(formattedName);
+        }
+      }
+    }
+  });
+
+  const cmdPalette = document.getElementById('command-palette');
+  const paletteSearch = document.getElementById('palette-search');
+  const paletteResults = document.getElementById('palette-results');
+
+  if (cmdPalette) {
+    document.addEventListener('keydown', e => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        cmdPalette.style.display = 'flex';
+        void cmdPalette.offsetWidth;
+        cmdPalette.style.opacity = '1';
+        cmdPalette.querySelector('#command-palette-inner').style.transform = 'translateY(0)';
+        paletteSearch.focus();
+        paletteSearch.value = '';
+        renderPaletteResults('');
+      } else if (e.key === 'Escape') {
+          if (cmdPalette.style.display === 'flex') {
+              closePalette();
+          } else {
+              const briefPanel = document.getElementById('brief-panel');
+              if (briefPanel && briefPanel.style.display === 'flex') {
+                  const closeBtn = document.getElementById('close-brief-panel');
+                  if (closeBtn) closeBtn.click();
+              }
+          }
+      }
+    });
+
+    paletteSearch.addEventListener('input', e => {
+      renderPaletteResults(e.target.value.toLowerCase());
+    });
+
+    paletteResults.addEventListener('click', e => {
+       const li = e.target.closest('li');
+       if (!li) return;
+       const action = li.getAttribute('data-action');
+       const target = li.getAttribute('data-target');
+
+       if (action === 'jump') {
+          const navCell = document.querySelector(`a.seg-cell[href="${target}"]`);
+          if (navCell) navCell.click();
+       } else if (action === 'open-brief') {
+          const exportBtn = document.getElementById('btn-export-brief');
+          if (exportBtn) exportBtn.click();
+       }
+       closePalette();
+    });
+
+    function closePalette() {
+       cmdPalette.style.opacity = '0';
+       cmdPalette.querySelector('#command-palette-inner').style.transform = 'translateY(-20px)';
+       setTimeout(() => {
+          cmdPalette.style.display = 'none';
+          const opener = document.querySelector(':focus');
+          if (opener) opener.focus();
+       }, 200);
+    }
+
+    function renderPaletteResults(q) {
+       const commands = [
+         { label: 'Jump to Agentic Stack', action: 'jump', target: '#agentic-stack' },
+         { label: 'Jump to International Payments', action: 'jump', target: '#international' },
+         { label: 'Jump to Payment Gateway', action: 'jump', target: '#payment-gateway' },
+         { label: 'Jump to D2C', action: 'jump', target: '#D2C' },
+         { label: 'Jump to Marketing', action: 'jump', target: '#Marketers' },
+         { label: 'Jump to Business Banking', action: 'jump', target: '#finance' },
+         { label: 'Open sprint brief', action: 'open-brief', target: '' },
+       ];
+
+       const matched = commands.filter(c => c.label.toLowerCase().includes(q));
+       paletteResults.innerHTML = matched.map(c => `
+          <li data-action="${c.action}" data-target="${c.target}" style="padding: 10px 15px; cursor: pointer; border-bottom: 1px solid #333;" tabindex="0" onmouseover="this.style.background='#305eff'" onmouseout="this.style.background=''">
+             ${c.label}
+          </li>
+       `).join('');
+    }
+
+    cmdPalette.addEventListener('click', e => {
+       if (e.target === cmdPalette) closePalette();
+    });
+  }
+});
+
+
+
+const executiveNames = [
+  "Arjun Mehta", "Rohan Iyer", "Nikhil Rao",
+  "Kabir Menon", "Dev Sharma", "Meera Nair"
+];
+
+const themeNames = [
+  "All", "Agentic Stack", "International Payments",
+  "Payment Gateway", "D2C", "Marketing", "Business Banking"
+];
+
+// Gather catalog names on boot
+let catalogFeatures = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+  catalogFeatures = Array.from(document.querySelectorAll('article.shortlist-item')).map(c => c.getAttribute('data-feature'));
+
+  const briefSchema = z.object({
+    brand: z.literal("Novapay"),
+    event: z.literal("Sprint 26"),
+    shortlistedFeatures: z.array(z.string().refine(v => catalogFeatures.includes(v))),
+    compareFeatures: z.array(z.string().refine(v => catalogFeatures.includes(v))).max(3),
+    watchedExecutives: z.array(z.string().refine(v => executiveNames.includes(v))),
+    themeFilter: z.enum(["All", "Agentic Stack", "International Payments", "Payment Gateway", "D2C", "Marketing", "Business Banking"]),
+    searchQuery: z.string().max(120),
+    generatedAt: z.string().endsWith("Z").datetime()
+  });
+
+  const btnExport = document.getElementById("btn-export-brief");
+  const briefPanel = document.getElementById("brief-panel");
+  const briefPanelInner = document.getElementById("brief-panel-inner");
+  const btnClose = document.getElementById("close-brief-panel");
+
+  const tabJson = document.getElementById("tab-json");
+  const tabMarkdown = document.getElementById("tab-markdown");
+  const viewJson = document.getElementById("view-json");
+  const viewMarkdown = document.getElementById("view-markdown");
+
+  const jsonContent = document.getElementById("json-content");
+  const markdownContent = document.getElementById("markdown-content");
+
+  const btnDownload = document.getElementById("btn-download");
+  const btnCopy = document.getElementById("btn-copy");
+  const copyConfirm = document.getElementById("copy-confirm");
+
+  const btnImport = document.getElementById("btn-import");
+  const fileImport = document.getElementById("file-import");
+  const btnLoadSample = document.getElementById("btn-load-sample");
+  const importError = document.getElementById("import-error");
+
+  window.generateBriefData = function() {
+    return {
+      brand: "Novapay",
+      event: "Sprint 26",
+      shortlistedFeatures: window.appState.shortlist,
+      compareFeatures: window.appState.compare,
+      watchedExecutives: window.appState.watchLog,
+      themeFilter: window.appState.themeFilter,
+      searchQuery: window.appState.searchQuery,
+      generatedAt: new Date().toISOString()
+    };
+  };
+
+
+
+  if (btnExport && briefPanel) {
+    btnExport.addEventListener("click", () => {
+      window.updateBriefPreview();
+      briefPanel.style.display = "flex";
+      void briefPanel.offsetWidth;
+      briefPanel.style.opacity = "1";
+      briefPanelInner.style.transform = "translateY(0)";
+      importError.textContent = "";
+
+      const opener = document.activeElement;
+      briefPanel.setAttribute('data-opener-id', opener.id || '');
+      briefPanelInner.setAttribute('tabindex', '-1');
+      briefPanelInner.focus();
+    });
+
+    btnClose.addEventListener("click", () => {
+      briefPanel.style.opacity = "0";
+      briefPanelInner.style.transform = "translateY(20px)";
+      setTimeout(() => {
+        briefPanel.style.display = "none";
+      }, 200);
+    });
+
+    briefPanel.addEventListener("click", e => {
+      if (e.target === briefPanel) btnClose.click();
+    });
+  }
+
+  if (tabJson && tabMarkdown) {
+    tabJson.addEventListener("click", () => {
+      tabJson.style.background = "#305eff";
+      tabMarkdown.style.background = "#2c2c2c";
+      viewJson.style.display = "block";
+      viewMarkdown.style.display = "none";
+    });
+    tabMarkdown.addEventListener("click", () => {
+      tabMarkdown.style.background = "#305eff";
+      tabJson.style.background = "#2c2c2c";
+      viewMarkdown.style.display = "block";
+      viewJson.style.display = "none";
+    });
+  }
+
+  if (btnDownload) {
+    btnDownload.addEventListener("click", () => {
+      const data = window.generateBriefData();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "novapay-sprint-26-brief.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+  }
+
+  if (btnCopy) {
+    btnCopy.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(window.generateBriefData(), null, 2));
+        copyConfirm.style.opacity = "1";
+        setTimeout(() => copyConfirm.style.opacity = "0", 2000);
+      } catch (err) {}
+    });
+  }
+
+  function doImport(data) {
+    try {
+      const parsed = briefSchema.parse(data);
+      window.appState.shortlist = parsed.shortlistedFeatures;
+      window.appState.compare = parsed.compareFeatures;
+      window.appState.themeFilter = parsed.themeFilter;
+      window.appState.searchQuery = parsed.searchQuery;
+      window.appState.watchLog = parsed.watchedExecutives;
+
+      const themeSelect = document.getElementById("theme-filter");
+      if (themeSelect) themeSelect.value = window.appState.themeFilter;
+      const searchInput = document.getElementById("search-query");
+      if (searchInput) searchInput.value = window.appState.searchQuery;
+
+      if (typeof updateShortlistUI === 'function') updateShortlistUI();
+      if (typeof updateCompareUI === 'function') updateCompareUI();
+      if (typeof applyFilters === 'function') applyFilters();
+      if (typeof window.updateBriefPreview === 'function') window.updateBriefPreview();
+
+      importError.textContent = "Import successful!";
+      importError.style.color = "#a5d6a7";
+    } catch (e) {
+      importError.style.color = "#ff4d4d";
+      if (e instanceof z.ZodError) {
+        importError.textContent = "Import Error: " + e.issues.map(i => `${i.path.join(".")}: ${i.message}`).join(", ");
+      } else {
+        importError.textContent = "Import Error: Invalid format.";
+      }
+    }
+  }
+
+  if (btnImport && fileImport) {
+    btnImport.addEventListener("click", () => fileImport.click());
+    fileImport.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          doImport(data);
+        } catch (err) {
+          importError.style.color = "#ff4d4d";
+          importError.textContent = "Import Error: Invalid JSON.";
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = "";
+    });
+  }
+
+  if (btnLoadSample) {
+    btnLoadSample.addEventListener("click", () => {
+      const sample = {
+        brand: "Novapay",
+        event: "Sprint 26",
+        shortlistedFeatures: catalogFeatures.slice(0, 2),
+        compareFeatures: catalogFeatures.slice(2, 4),
+        watchedExecutives: ["Arjun Mehta"],
+        themeFilter: "Agentic Stack",
+        searchQuery: "",
+        generatedAt: new Date().toISOString()
+      };
+      doImport(sample);
+    });
+  }
+
+  window.importBriefData = doImport;
+});
+
 function boot() {
   initLoader();
   initHeroChrome();
@@ -516,3 +1018,21 @@ if (document.readyState === "loading") {
 } else {
   boot();
 }
+
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') {
+    const playBtn = e.target.closest('.leader__play');
+    if (playBtn) {
+      e.preventDefault();
+      playBtn.click();
+      return;
+    }
+    const closeBtn = e.target.closest('.video-close-button');
+    if (closeBtn) {
+      e.preventDefault();
+      closeBtn.click();
+      return;
+    }
+  }
+});

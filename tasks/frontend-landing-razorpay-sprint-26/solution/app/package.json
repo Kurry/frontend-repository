@@ -13,8 +13,9 @@
   "dependencies": {
     "@rive-app/canvas": "2.26.6",
     "gsap": "3.12.5",
+    "serve": "14.2.4",
     "three": "0.160.1",
-    "serve": "14.2.4"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "vite": "^5.4.11"
