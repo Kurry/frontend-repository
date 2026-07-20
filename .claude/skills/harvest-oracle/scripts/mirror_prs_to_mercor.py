@@ -62,6 +62,10 @@ def main() -> None:
     state = load_state(args.state)
     # keep mercor/main current — the PR base
     sh("git", "fetch", args.mercor_remote, "main")
+    # bulk-fetch ALL origin branches up front so every origin/<pr-branch> is
+    # resolvable on the first pass (per-branch fetch had a first-pass race that
+    # made new branches skip until a second run).
+    sh("git", "fetch", args.origin, "+refs/heads/*:refs/remotes/origin/*")
 
     prs = gh_json("pr", "list", "--repo", args.origin, "--state", "open",
                   "--limit", "300", "--json", "number,title,headRefName,body")
