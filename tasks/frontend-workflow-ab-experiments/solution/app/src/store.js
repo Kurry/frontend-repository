@@ -27,7 +27,7 @@ export const useStudio = create((set, get) => ({
   toast: null, announcement: '', past: [], future: [], sampleSort: 'desc', copied: false,
 
   setField: (field, value) => set({ [field]: value }),
-  notify: (title, kind = 'success') => { set({ toast: { id: Date.now(), title, kind } }); setTimeout(() => set({ toast: null }), 3800) },
+  notify: (title, kind = 'success') => { set({ toast: { id: Date.now(), title, kind }, announcement: title }); setTimeout(() => set({ toast: null, announcement: '' }), 3800) },
   setSearch: search => set({ search }),
   toggleFilter: status => set(state => ({ filters: state.filters.includes(status) ? state.filters.filter(item => item !== status) : [...state.filters, status] })),
   clearFilters: () => set({ search: '', filters: [], showArchived: false }),
