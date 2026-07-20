@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 import {
   Button,
   Select,
@@ -61,18 +62,21 @@ function DynamicRow({ index, title, onRemove, children }) {
 function TextAreaField({ name, label, required, register, errors, watch, placeholder, rows = 5 }) {
   const error = errors[name]
   const value = watch(name)
+  const [parent] = useAutoAnimate()
   return (
-    <div className="field-stack">
+    <div className="field-stack" ref={parent}>
       <TextArea
         id={name}
         labelText={<Label required={required}>{label}</Label>}
         placeholder={placeholder}
         rows={rows}
+        required={required}
+        aria-required={required}
         invalid={Boolean(error)}
-        invalidText={error?.message}
         aria-describedby={`${name}-count`}
         {...register(name)}
       />
+      {error && <div className="cds--form-requirement">{error.message}</div>}
       <span id={`${name}-count`}><CharacterCount value={value} /></span>
     </div>
   )
@@ -80,30 +84,40 @@ function TextAreaField({ name, label, required, register, errors, watch, placeho
 
 function TextField({ name, label, required, register, errors, placeholder }) {
   const error = name.split('.').reduce((current, part) => current?.[part], errors)
+  const [parent] = useAutoAnimate()
   return (
-    <TextInput
-      id={name.replaceAll('.', '-')}
-      labelText={<Label required={required}>{label}</Label>}
-      placeholder={placeholder}
-      invalid={Boolean(error)}
-      invalidText={error?.message}
-      {...register(name)}
-    />
+    <div className="field-stack" ref={parent}>
+      <TextInput
+        id={name.replaceAll('.', '-')}
+        labelText={<Label required={required}>{label}</Label>}
+        placeholder={placeholder}
+        required={required}
+        aria-required={required}
+        invalid={Boolean(error)}
+        {...register(name)}
+      />
+      {error && <div className="cds--form-requirement">{error.message}</div>}
+    </div>
   )
 }
 
 function SelectField({ name, label, options, register, errors, required = false }) {
   const error = errors[name]
+  const [parent] = useAutoAnimate()
   return (
-    <Select
-      id={name}
-      labelText={<Label required={required}>{label}</Label>}
-      invalid={Boolean(error)}
-      invalidText={error?.message}
-      {...register(name)}
-    >
-      {options.map(([value, text]) => <SelectItem key={value} value={value} text={text} />)}
-    </Select>
+    <div className="field-stack" ref={parent}>
+      <Select
+        id={name}
+        labelText={<Label required={required}>{label}</Label>}
+        required={required}
+        aria-required={required}
+        invalid={Boolean(error)}
+        {...register(name)}
+      >
+        {options.map(([val, text]) => <SelectItem key={val} value={val} text={text} />)}
+      </Select>
+      {error && <div className="cds--form-requirement">{error.message}</div>}
+    </div>
   )
 }
 
@@ -146,6 +160,7 @@ export default function TechniqueForm({ technique }) {
   const successCriteria = useFieldArray({ control, name: 'successCriteria' })
   const constraints = useFieldArray({ control, name: 'constraints' })
   const values = watch()
+  const [parent] = useAutoAnimate()
 
   useEffect(() => {
     trigger()
@@ -251,7 +266,7 @@ export default function TechniqueForm({ technique }) {
             <TextAreaField name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What pattern should the model learn?" />
           </Section>
           <Section eyebrow="02 · Demonstrations" title="Build an example set">
-            <div className="dynamic-stack">
+            <div className="dynamic-stack" ref={parent}>
               {examples.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Example" onRemove={() => examples.remove(index)}>
                   <div className="field-grid">
@@ -279,7 +294,7 @@ export default function TechniqueForm({ technique }) {
           </Section>
           <Section eyebrow="02 · Reasoning" title="Outline useful steps">
             <p className="section-help">Optional guidance. Blank steps are omitted from the assembled prompt.</p>
-            <div className="dynamic-stack">
+            <div className="dynamic-stack" ref={parent}>
               {reasoningSteps.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Reasoning step" onRemove={() => reasoningSteps.remove(index)}>
                   <TextField name={`reasoningSteps.${index}.step`} label={`Step ${index + 1}`} register={register} errors={errors} placeholder="Describe a reasoning checkpoint" />
@@ -307,7 +322,7 @@ export default function TechniqueForm({ technique }) {
             <TextAreaField name="goal" label="Goal" required register={register} errors={errors} watch={watch} placeholder="Describe the end state you want…" />
           </Section>
           <Section eyebrow="02 · Success" title="Make success measurable">
-            <div className="dynamic-stack">
+            <div className="dynamic-stack" ref={parent}>
               {successCriteria.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Success criterion" onRemove={() => successCriteria.remove(index)}>
                   <TextField name={`successCriteria.${index}.text`} label={`Criterion ${index + 1}`} required register={register} errors={errors} placeholder="What must be true for this to succeed?" />
@@ -348,11 +363,11 @@ export default function TechniqueForm({ technique }) {
             <TextAreaField name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What should the model produce?" />
           </Section>
           <Section eyebrow="02 · Boundaries" title="Set explicit constraints">
-            <div className="dynamic-stack">
+            <div className="dynamic-stack" ref={parent}>
               {constraints.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Constraint" onRemove={() => constraints.remove(index)}>
                   <div className="constraint-grid">
-                    <Select id={`constraints-${index}-type`} labelText={<Label required>Constraint type</Label>} {...register(`constraints.${index}.type`)}>
+                    <Select id={`constraints-${index}-type`} required aria-required labelText={<Label required>Constraint type</Label>} {...register(`constraints.${index}.type`)}>
                       <SelectItem value="length" text="Length" />
                       <SelectItem value="format" text="Format" />
                       <SelectItem value="content" text="Content" />

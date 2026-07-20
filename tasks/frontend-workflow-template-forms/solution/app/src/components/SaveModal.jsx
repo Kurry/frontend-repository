@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Modal, TextInput } from '@carbon/react'
@@ -16,7 +16,7 @@ export default function SaveModal({ launcherButtonRef }) {
   const setChrome = useStudioStore((state) => state.setChrome)
   const saveCurrent = useStudioStore((state) => state.saveCurrent)
   const showToast = useStudioStore((state) => state.showToast)
-  const submitting = useRef(false)
+  const [submitting, setSubmitting] = useState(false)
   const {
     register,
     handleSubmit,
@@ -42,7 +42,7 @@ export default function SaveModal({ launcherButtonRef }) {
   }
 
   function confirm({ title }) {
-    if (submitting.current) return
+    if (submitting) return
     const payload = {
       title: title.trim(),
       technique,
@@ -52,10 +52,10 @@ export default function SaveModal({ launcherButtonRef }) {
     }
     const parsed = savePayloadSchema.safeParse(payload)
     if (!parsed.success || parsed.data.technique !== technique || parsed.data.promptText !== promptText) return
-    submitting.current = true
+    setSubmitting(true)
     const saved = saveCurrent(parsed.data.title)
     if (saved) showToast('success', 'Saved to library', `“${saved.title}” is ready in your library.`)
-    setTimeout(() => { submitting.current = false }, 300)
+    setTimeout(() => { setSubmitting(false) }, 300)
   }
 
   return (
@@ -65,7 +65,7 @@ export default function SaveModal({ launcherButtonRef }) {
       modalLabel={techniqueById[technique].name}
       primaryButtonText="Save prompt"
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid || submitting.current}
+      primaryButtonDisabled={!isValid || submitting}
       onRequestSubmit={handleSubmit(confirm)}
       onRequestClose={close}
       launcherButtonRef={launcherButtonRef}
