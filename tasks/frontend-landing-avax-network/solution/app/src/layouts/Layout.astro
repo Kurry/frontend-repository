@@ -31,14 +31,8 @@ const {
     <link rel="preload" href="/fonts/Aeonik-Black.woff2" as="font" type="font/woff2" crossorigin />
     <title>{title}</title>
     <script is:inline>
-      (() => {
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        const theme = localStorage?.getItem("theme") ?? prefersDark;
-        if (theme === "dark") {
-          document.documentElement.classList.add("dark");
-          localStorage.setItem("theme", "dark");
-        }
-      })();
+      // Theme is in-memory only (PRD: behavioral state resets on reload). The
+      // page always boots in its light default; the toggle flips it at runtime.
       // Live: html.mounted on DOMContentLoaded (drives entrance clip-path / nav slide-in)
       document.addEventListener("DOMContentLoaded", () => {
         document.documentElement.classList.add("mounted");

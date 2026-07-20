@@ -215,13 +215,8 @@ const menus = [
 
   themeToggle?.addEventListener("click", () => {
     const root = document.documentElement;
-    if (root.classList.contains("dark")) {
-      root.classList.remove("dark");
-      localStorage.removeItem("theme");
-    } else {
-      root.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    }
+    // In-memory only — no localStorage (behavioral state resets on reload).
+    root.classList.toggle("dark");
   });
 
   toggle?.addEventListener("click", () => {

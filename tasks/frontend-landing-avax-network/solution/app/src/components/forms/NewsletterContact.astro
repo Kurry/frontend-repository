@@ -136,8 +136,8 @@ const nextShape = {
                 <label for="firstname" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">First Name or Pseudonym*</label>
               </div>
               <div class="relative group/inputWrapper">
-                <input id="lastname" type="text" name="lastname" placeholder="Last Name" class="input peer" autocomplete="family-name" />
-                <label for="lastname" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Last Name</label>
+                <input id="lastname" type="text" name="lastname" placeholder="Last Name" required minlength="2" class="input peer" autocomplete="family-name" />
+                <label for="lastname" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Last Name*</label>
               </div>
               <div class="relative group/inputWrapper">
                 <input id="email" type="email" name="email" placeholder="Email" required class="input peer" autocomplete="email" />
@@ -197,7 +197,7 @@ const nextShape = {
                 <div class="relative z-[2] h-18 lg:h-[clamp(4rem,3.429rem+0.893vw,4.5rem)]">
                   <div id="select-source" data-name="source" class="select group/select relative min-h-18 overflow-hidden bg-white p-0 input dark:group-[.light]/form:bg-dark lg:min-h-[clamp(4rem,3.429rem+0.893vw,4.5rem)]">
                     <button id="select-source-button" type="button" class="relative flex h-18 w-full cursor-pointer flex-row items-center justify-between px-[var(--padding-md)] text-left font-aeonik text-base font-bold text-black lg:h-[clamp(4rem,3.429rem+0.893vw,4.5rem)] dark:group-[.light]/form:text-white">
-                      <span class="pointer-events-none pr-[calc(1rem+var(--padding-lg))]">Where did you hear about Avalanche?</span>
+                      <span class="pointer-events-none pr-[calc(1rem+var(--padding-lg))]">Where did you hear about Avalanche?*</span>
                     </button>
                     <div id="select-source-options" class="flex w-full flex-row flex-wrap items-start justify-start gap-0.5 px-[var(--padding-md)] pt-[var(--padding-xs)] pb-[var(--padding-2base)]">
                       {hearAbout.map((opt) => (
@@ -270,7 +270,8 @@ const nextShape = {
               <span class="pointer-events-none absolute opacity-0 transition-opacity duration-300 ease-out-cubic group-[.done]/form:opacity-100">Success!</span>
             </button>
           </div>
-          <p class="success hidden text-[var(--text-sm)] text-success">Thank you for subscribing</p>
+          <p class="success hidden text-[var(--text-sm)] text-success" role="status" aria-live="polite">Thank you for subscribing</p>
+          <p class="newsletter-error hidden text-[var(--text-sm)] text-red" role="status" aria-live="polite"></p>
         </form>
       </div>
     </div>
@@ -314,7 +315,7 @@ const nextShape = {
           Interested in building your project on Avalanche? Get in touch!
         </h3>
       </div>
-      <form id="contact-us-form" class="group/form light grid place-items-stretch gap-[var(--gap-xs)] sm:grid-cols-2" data-form="contact" onsubmit="return false;">
+      <form id="contact-us-form" novalidate class="group/form light grid place-items-stretch gap-[var(--gap-xs)] sm:grid-cols-2" data-form="contact" onsubmit="return false;">
         <div class="relative group/inputWrapper">
           <input id="contact-firstname" type="text" name="firstname" placeholder="First Name or Pseudonym" required minlength="2" class="input peer h-18" />
           <label for="contact-firstname" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">First Name or Pseudonym*</label>
@@ -415,13 +416,22 @@ const nextShape = {
             Submit
           </button>
         </div>
-        <p class="success hidden col-span-full text-[var(--text-sm)] text-success">Success! We'll be in touch.</p>
+        <p class="success hidden col-span-full text-[var(--text-sm)] text-success" role="status" aria-live="polite">Success! We'll be in touch.</p>
+        <p class="contact-error hidden col-span-full text-[var(--text-sm)] text-red" role="status" aria-live="polite"></p>
       </form>
     </div>
   </div>
 </section>
 
 <script>
+  // Shared: exactly one @ and a dotted domain.
+  const emailValid = (v: string) => {
+    const s = (v || "").trim();
+    const parts = s.split("@");
+    return parts.length === 2 && parts[0].length > 0 && /\.[^.\s]+$/.test(parts[1]);
+  };
+  const leadStore = () => (window as unknown as Record<string, any>).astraLeads;
+
   // Newsletter multi-step
   (() => {
     const form = document.getElementById("general-form") as HTMLFormElement | null;
@@ -446,17 +456,70 @@ const nextShape = {
     };
     go(0);
 
+    const errEl = form.querySelector(".newsletter-error") as HTMLElement | null;
+
+    const gather = () => {
+      const val = (id: string) => ((document.getElementById(id) as HTMLInputElement | null)?.value || "").trim();
+      const chip = (wrapId: string) =>
+        (document.querySelector(`#${wrapId} .option.bg-neutral-100`) as HTMLElement | null)?.dataset.optionValue || "";
+      const checked = (id: string) => (document.getElementById(id) as HTMLInputElement | null)?.checked || false;
+      const named = (n: string) => (form.querySelector(`[name="${n}"]`) as HTMLInputElement | null)?.checked || false;
+      const p: Record<string, unknown> = {};
+      const fn = val("firstname"); if (fn) p.firstname = fn;
+      const ln = val("lastname"); if (ln) p.lastname = ln;
+      const em = val("email"); if (em) p.email = em;
+      const th = val("twitterhandle"); if (th) p.socialhandle = th;
+      const co = val("country"); if (co) p.country = co;
+      const vt = chip("select-vertical-options"); if (vt) p.vertical = vt;
+      p.isDeveloper = checked("developer_check");
+      p.hasWeb3Experience = checked("devexperience_avalanche");
+      p.isStudent = checked("student_check");
+      const src = chip("select-source-options"); if (src) p.source = src;
+      p.gdpr = checked("general-gdpr");
+      p.marketing_consent = named("marketing_consent");
+      p.newsletter = named("newsletter");
+      return p;
+    };
+
     next.addEventListener("click", () => {
+      // A submit is already in flight (async success timeout pending) —
+      // ignore repeat clicks so the lead isn't appended more than once.
+      if (form.classList.contains("loading")) return;
       if (step < total - 1) {
         go(step + 1);
         return;
       }
+      const p = gather();
+      const errors: string[] = [];
+      const fn = String(p.firstname || "");
+      if (fn.length < 2 || fn.length > 60) errors.push("First name");
+      const ln = String(p.lastname || "");
+      if (ln.length < 2 || ln.length > 60) errors.push("Last name");
+      if (!emailValid(String(p.email || ""))) errors.push("Email");
+      if (!String(p.country || "")) errors.push("Country");
+      if (!String(p.vertical || "")) errors.push("Interest");
+      if (!String(p.source || "")) errors.push("How did you hear about Avalanche");
+      if (!p.gdpr) errors.push("Privacy policy consent");
+      if (errors.length) {
+        form.classList.remove("done");
+        form.classList.add("error");
+        if (errEl) {
+          errEl.textContent = `Please complete: ${errors.join(", ")}`;
+          errEl.classList.remove("hidden");
+        }
+        return;
+      }
+      form.classList.remove("error");
+      errEl?.classList.add("hidden");
       form.classList.add("loading");
+      next.disabled = true;
       setTimeout(() => {
         form.classList.remove("loading");
+        next.disabled = false;
         form.classList.add("done");
         const success = form.querySelector(".success");
         success?.classList.remove("hidden");
+        leadStore()?.add("newsletter", p);
       }, 500);
     });
     back.addEventListener("click", () => go(step - 1));
@@ -505,14 +568,79 @@ const nextShape = {
   })();
 
   document.querySelectorAll<HTMLFormElement>("[data-form='contact']").forEach((form) => {
+    const errEl = form.querySelector(".contact-error") as HTMLElement | null;
+    const success = form.querySelector(".success");
+
+    const resetCustomSelect = () => {
+      const sel = document.getElementById("select-project_type");
+      const hidden = document.querySelector<HTMLInputElement>('#select-project_type input[name="project_type"]');
+      const label = document.getElementById("select-project_type-button")?.querySelector("span");
+      const otherWrap = document.getElementById("project_type_other-wrapper");
+      const otherInput = document.getElementById("project_type_other") as HTMLInputElement | null;
+      if (hidden) hidden.value = "";
+      if (label) label.textContent = "What type of project are you working on?*";
+      sel?.classList.remove("selected", "opened");
+      otherWrap?.classList.remove("visible");
+      if (otherInput) { otherInput.value = ""; otherInput.disabled = true; }
+    };
+
     form.addEventListener("submit", (e) => {
       e.preventDefault();
+      // A submit is already in flight (async success timeout pending) —
+      // ignore repeat submits so the lead isn't appended more than once.
+      if (form.classList.contains("loading")) return;
+      const val = (id: string) => ((document.getElementById(id) as HTMLInputElement | null)?.value || "").trim();
+      const project_type =
+        (document.querySelector<HTMLInputElement>('#select-project_type input[name="project_type"]')?.value || "").trim();
+      const isOther = project_type.includes("Other");
+      const otherDetail = val("project_type_other");
+      const message = val("avalanche_contact_message");
+      const firstname = val("contact-firstname");
+      const lastname = val("contact-lastname");
+      const email = val("contact-email");
+      const gdpr = (document.getElementById("contact-us-gdpr") as HTMLInputElement | null)?.checked || false;
+      const marketing_consent = (document.getElementById("contact-us-marketing") as HTMLInputElement | null)?.checked || false;
+
+      const errors: string[] = [];
+      if (firstname.length < 2 || firstname.length > 60) errors.push("First name");
+      if (lastname.length < 2 || lastname.length > 60) errors.push("Last name");
+      if (!emailValid(email)) errors.push("Email");
+      if (!project_type) errors.push("Project type");
+      if (message.length < 10 || message.length > 2000) errors.push("Message (at least 10 characters)");
+      if (isOther && (otherDetail.length < 2 || otherDetail.length > 200)) errors.push("Other detail");
+      if (!gdpr) errors.push("Privacy policy consent");
+
+      if (errors.length) {
+        if (errEl) {
+          errEl.textContent = `Please complete: ${errors.join(", ")}`;
+          errEl.classList.remove("hidden");
+        }
+        success?.classList.add("hidden");
+        return;
+      }
+      errEl?.classList.add("hidden");
+
+      const payload: Record<string, unknown> = {
+        firstname,
+        lastname,
+        email,
+        project_type,
+        astra_contact_message: message,
+        gdpr,
+        marketing_consent,
+      };
+      if (isOther) payload.otherDetail = otherDetail;
+
+      const submitBtn = form.querySelector<HTMLButtonElement>("button[type='submit']");
       form.classList.add("loading");
-      const success = form.querySelector(".success");
+      if (submitBtn) submitBtn.disabled = true;
       setTimeout(() => {
         form.classList.remove("loading");
+        if (submitBtn) submitBtn.disabled = false;
         success?.classList.remove("hidden");
+        leadStore()?.add("contact", payload);
         form.reset();
+        resetCustomSelect();
       }, 600);
     });
   });
