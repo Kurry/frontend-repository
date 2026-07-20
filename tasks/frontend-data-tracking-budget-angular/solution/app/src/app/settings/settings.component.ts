@@ -4,6 +4,8 @@ import { Store } from '@ngrx/store';
 import * as BudgetActions from '../store/budget.actions';
 import { selectCategories, selectDisplayName } from '../store/budget.selectors';
 import { ExpenseCategory } from '../models/models';
+import { ThresholdSchema } from '../models/schemas';
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 @Component({
   selector: 'app-settings',
@@ -19,6 +21,7 @@ export class SettingsComponent {
   editingName = '';
 
   displayNameForm;
+  thresholdForm;
 
   constructor(private store: Store, private fb: FormBuilder) {
     this.categories$ = this.store.select(selectCategories);
@@ -26,11 +29,45 @@ export class SettingsComponent {
     this.displayNameForm = this.fb.group({
       displayName: ['', [Validators.required]],
     });
+    this.thresholdForm = this.fb.group({
+      thresholdPercent: [80, [Validators.required]],
+    }, { validators: this.thresholdValidator() });
+
+    // Assuming we also add a selector for threshold to initialize it properly.
+    // For now we'll rely on store state. We'll add selectThresholdPercent soon.
+
     this.displayName$.subscribe((name) => {
       if (!this.displayNameForm.dirty) {
         this.displayNameForm.patchValue({ displayName: name }, { emitEvent: false });
       }
     });
+  }
+
+  thresholdValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const val = Number(control.value.thresholdPercent);
+      const res = ThresholdSchema.safeParse(val);
+      if (res.success) {
+        return null;
+      }
+      const errs: any = {};
+      res.error.issues.forEach((e: any) => {
+        errs.thresholdPercent = e.message;
+      });
+      return { zod: errs };
+    };
+  }
+
+  saveThreshold(): void {
+    if (this.thresholdForm.invalid) {
+      this.thresholdForm.markAllAsTouched();
+      return;
+    }
+    const val = Number(this.thresholdForm.value.thresholdPercent);
+    const res = ThresholdSchema.safeParse(val);
+    if (res.success) {
+      this.store.dispatch(BudgetActions.setThresholdPercent({ thresholdPercent: res.data }));
+    }
   }
 
   saveDisplayName(): void {

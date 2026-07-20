@@ -13,6 +13,7 @@
       <app-dashboard *ngSwitchCase="'dashboard'"></app-dashboard>
       <app-expenses *ngSwitchCase="'expenses'"></app-expenses>
       <app-settings *ngSwitchCase="'settings'"></app-settings>
+      <app-export *ngSwitchCase="'export'"></app-export>
     </ng-container>
   </main>
 
@@ -28,6 +29,10 @@
     <button class="nav-item" [class.active]="view === 'settings'" (click)="setView('settings')">
       <span class="nav-glyph">&#9881;</span>
       <span>Settings</span>
+    </button>
+    <button class="nav-item" [class.active]="view === 'export'" (click)="setView('export')">
+      <span class="nav-glyph material-symbols-outlined">import_export</span>
+      <span>Export</span>
     </button>
   </nav>
 </div>
