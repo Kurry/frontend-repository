@@ -1,0 +1,10 @@
+--- tasks/frontend-productivity-semantic-search/solution/app/src/store.js
++++ tasks/frontend-productivity-semantic-search/solution/app/src/store.js
+@@ -163,6 +163,7 @@
+     const filters = state.filters.filter((_, i) => i !== index)
+     const raw = `${state.activeQuery} ${filters.map((f) => `${f.kind}:${f.value}`).join(' ')}`.trim()
+     get().runQuery(raw, { parsed: { query: state.activeQuery, filters, invalid: [] }, threshold: state.threshold, record: false })
++    set({ liveMessage: `${get().getVisible().items.length} results` })
+   },
+   clearNarrowing: () => {
+     const state = get()
