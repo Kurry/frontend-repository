@@ -385,7 +385,7 @@ export const useCalibrationStore = defineStore('calibration', {
         if (this.reruns[key]?.runId !== runId) return { ok: false }
         this.reruns[key].progress[index].complete = true
       }
-      this.cells[key].trials = nextTrials
+      this.cells = { ...this.cells, [key]: { ...this.cells[key], trials: nextTrials } }
       const resultMean = cellMean(this.cells[key])
       this.reruns[key].status = 'complete'
       this.timeline.unshift({ timestamp: new Date().toISOString(), model, harness, mean: resultMean })
