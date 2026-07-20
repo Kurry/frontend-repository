@@ -1,0 +1,28 @@
+import { chromium } from '/usr/lib/node_modules/playwright/index.mjs'
+
+const browser = await chromium.connectOverCDP('http://127.0.0.1:9222')
+const context = browser.contexts()[0]
+const page = context.pages()[0] || await context.newPage()
+const errors = []
+page.on('console', (message) => { if (message.type() === 'error' || message.type() === 'warning') errors.push(`${message.type()}: ${message.text()}`) })
+page.on('pageerror', (error) => errors.push(`pageerror: ${error.message}`))
+await page.setViewportSize({ width: 1440, height: 1000 })
+await page.goto('http://127.0.0.1:3000/', { waitUntil: 'networkidle' })
+await page.locator('h1').filter({ hasText: 'Submission queue' }).waitFor()
+const rows = await page.locator('.queue-table tbody tr').count()
+const tools = await page.evaluate(() => window.webmcp_list_tools().map((tool) => tool.name))
+await page.getByText('Score multi-turn evidence reconciliation', { exact: true }).click()
+await page.getByText('Gate failed', { exact: true }).waitFor()
+await page.getByRole('button', { name: /Override/ }).first().click()
+await page.getByPlaceholder('Explain why this exception is appropriate…').fill('Accepted because the reference fixture is being intentionally stress-tested.')
+await page.getByRole('button', { name: 'Confirm override' }).click()
+await page.getByText('Gate passed', { exact: true }).waitFor()
+const overrideVisible = await page.getByText('Override justification', { exact: true }).isVisible()
+await page.getByRole('button', { name: 'Undo last action' }).click()
+await page.getByText('Gate failed', { exact: true }).waitFor()
+await page.getByRole('button', { name: 'Export' }).click()
+await page.getByRole('heading', { name: 'QC package export' }).waitFor()
+const jsonHasSchema = (await page.locator('.code-window pre').innerText()).includes('"schemaVersion": 1')
+await page.screenshot({ path: '/tmp/arcfield-export.png', fullPage: true })
+console.log(JSON.stringify({ rows, toolCount: tools.length, tools, overrideVisible, jsonHasSchema, errors }, null, 2))
+await browser.close()

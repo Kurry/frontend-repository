@@ -1,0 +1,51 @@
+import { chromium } from '/usr/lib/node_modules/playwright/index.mjs'
+const browser = await chromium.connectOverCDP('http://127.0.0.1:9222')
+const page = browser.contexts()[0].pages()[0]
+const errors = []
+page.on('console', m => { if (['error', 'warning'].includes(m.type())) errors.push(`${m.type()}: ${m.text()}`) })
+page.on('pageerror', e => errors.push(`pageerror: ${e.message}`))
+await page.setViewportSize({ width: 1440, height: 1000 })
+await page.goto('http://127.0.0.1:3000/', { waitUntil: 'networkidle' })
+await page.screenshot({ path: '/tmp/arcfield-queue.png', fullPage: true })
+
+const target = page.getByText('Map constraint ambiguity in routing prompts', { exact: true })
+await target.click()
+await page.getByText('Gate passed', { exact: true }).waitFor()
+await page.getByRole('button', { name: 'Move to in-review' }).click()
+await page.getByRole('button', { name: 'Add finding', exact: true }).first().click()
+const dialog = page.getByRole('dialog', { name: 'Add finding' })
+const initialErrors = await dialog.locator('.field-error').allTextContents()
+await dialog.locator('.n-select').nth(0).click()
+await page.getByText('Blocker — gate stopping', { exact: true }).click()
+await dialog.locator('.n-select').nth(1).click()
+await page.getByText('Correctness', { exact: true }).last().click()
+await dialog.getByPlaceholder('Describe the quality issue and its impact…').fill('Expected result omits the required final routing constraint.')
+await dialog.getByPlaceholder('Paste an observed example or trial note…').fill('Trial fixture nine ends before the constraint is evaluated.')
+await dialog.getByRole('button', { name: 'Add finding' }).click()
+await page.getByText('Gate failed', { exact: true }).waitFor()
+const findingsAfterAdd = await page.locator('.finding-card').count()
+await page.getByRole('button', { name: /Override/ }).click()
+await page.getByPlaceholder('Explain why this exception is appropriate…').fill('The fixture intentionally omits this constraint for the stress case.')
+await page.getByRole('button', { name: 'Confirm override' }).click()
+await page.getByText('Gate passed', { exact: true }).waitFor()
+await page.screenshot({ path: '/tmp/arcfield-detail.png', fullPage: true })
+
+await page.getByRole('button', { name: 'Back to queue' }).click()
+for (const name of ['Map constraint ambiguity in routing prompts', 'Normalize regional date instructions']) {
+  const row = page.locator('tr').filter({ hasText: name })
+  await row.getByRole('checkbox').check()
+}
+await page.getByRole('button', { name: 'Hold payout' }).click()
+await page.waitForTimeout(350)
+const heldRows = await page.locator('tr').filter({ hasText: /Map constraint ambiguity|Normalize regional/ }).filter({ hasText: 'HELD' }).count()
+
+await page.getByRole('button', { name: 'Mara Voss' }).first().click()
+const drawerOpen = await page.getByText('Stage history', { exact: true }).isVisible()
+await page.keyboard.press('Escape')
+
+await page.setViewportSize({ width: 375, height: 812 })
+await page.goto('http://127.0.0.1:3000/', { waitUntil: 'networkidle' })
+await page.screenshot({ path: '/tmp/arcfield-mobile.png', fullPage: true })
+const viewportMetrics = await page.evaluate(() => ({ inner: innerWidth, scroll: document.documentElement.scrollWidth, bodyScroll: document.body.scrollWidth }))
+console.log(JSON.stringify({ initialErrors, findingsAfterAdd, heldRows, drawerOpen, viewportMetrics, errors }, null, 2))
+await browser.close()
