@@ -315,12 +315,14 @@ export const useFleetStore = create((set, get) => ({
   tickRuns: () => {
     set((state) => {
       let announcement = state.announcement
+      let changed = false
       const agents = state.agents.map((agent) => {
         if (agent.status !== 'running' || !agent.run || agent.run.status !== 'running') return agent
         const run = agent.run
         const index = run.currentStep
         const current = run.steps[index]
         if (!current) return agent
+        changed = true
         let steps = run.steps.map((step) => ({ ...step }))
         let updatedAgent = agent
         if (current.status === 'pending') {
@@ -367,7 +369,7 @@ export const useFleetStore = create((set, get) => ({
         }
         return { ...updatedAgent, run: { ...run, steps } }
       })
-      return { agents, announcement }
+      return changed ? { agents, announcement } : {}
     })
   },
 

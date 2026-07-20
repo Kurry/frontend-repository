@@ -117,7 +117,7 @@ kbd { border: 1px solid var(--line-strong); background: rgba(255,255,255,.04); c
 .agent-mark.type-boreal { background: linear-gradient(140deg, #1d6f6f, #17333a); }
 .agent-mark.type-cinder { background: linear-gradient(140deg, #79493d, #30262a); }
 .type-label { color: #d8e3eb; }
-.status-tag { min-width: 68px; justify-content: center; transition: background-color .3s ease, color .3s ease, border-color .3s ease; }
+.status-tag { min-width: 68px; justify-content: center; transition: all 300ms ease !important; }
 .error-status-cell { background: linear-gradient(90deg, rgba(218,30,40,.12), rgba(218,30,40,.02)) !important; box-shadow: inset 2px 0 #da1e28; }
 .row-action { min-width: 92px; }
 .error-action { color: #ff8389 !important; }
@@ -296,3 +296,21 @@ button.timeline-label { background: none; border: 0; padding: 0; cursor: pointer
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
 }
+
+.agent-row-exit {
+  animation: row-exit 0.2s ease-in both;
+}
+@keyframes row-exit {
+  from { opacity: 1; }
+  to { opacity: 0; transform: translateY(-5px); }
+}
+
+.detail-panel {
+  width: 320px; flex-shrink: 0; border-left: 1px solid var(--line); background: var(--surface); display: flex; flex-direction: column;
+  animation: slide-in 0.25s ease-out both;
+}
+.detail-panel.is-closing {
+  animation: slide-out 0.25s ease-in both;
+}
+@keyframes slide-in { from { transform: translateX(100%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes slide-out { from { transform: none; opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
