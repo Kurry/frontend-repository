@@ -290,10 +290,10 @@ function initVideoModal() {
   const video = document.getElementById("dynamic-video");
   const close = document.querySelector(".video-close-button");
   if (!modal || !box || !video) return;
-  let opener = null;
+  let lastTrigger = null;
 
   function open(id, trigger) {
-    opener = trigger instanceof HTMLElement ? trigger : document.activeElement;
+    lastTrigger = trigger || document.activeElement;
     video.poster = `/assets/video-thumbs/${id}.jpg`;
     // Prefer VP9 webm (broad codec support incl. headless chromium); fall back
     // to h264 mp4 when webm is unplayable.
@@ -333,8 +333,10 @@ function initVideoModal() {
     video.removeAttribute("src");
     video.removeAttribute("poster");
     document.body.style.overflow = "";
-    if (opener instanceof HTMLElement && opener.isConnected) opener.focus();
-    opener = null;
+    if (lastTrigger && typeof lastTrigger.focus === "function" && document.contains(lastTrigger)) {
+      lastTrigger.focus();
+    }
+    lastTrigger = null;
   }
   document.addEventListener("click", (e) => {
     const trigger = e.target.closest("[data-video]");
@@ -719,15 +721,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const cmdPalette = document.getElementById('command-palette');
   const paletteSearch = document.getElementById('palette-search');
   const paletteResults = document.getElementById('palette-results');
-  let paletteOpener = null;
 
   if (cmdPalette) {
+    let paletteOpener = null;
+
     document.addEventListener('keydown', e => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
-        if (cmdPalette.style.display !== 'flex') {
-          paletteOpener = document.activeElement;
-        }
+        paletteOpener = document.activeElement;
         cmdPalette.style.display = 'flex';
         void cmdPalette.offsetWidth;
         cmdPalette.style.opacity = '1';
@@ -773,8 +774,8 @@ document.addEventListener('DOMContentLoaded', () => {
        cmdPalette.querySelector('#command-palette-inner').style.transform = 'translateY(-20px)';
        setTimeout(() => {
           cmdPalette.style.display = 'none';
-          if (paletteOpener instanceof HTMLElement && paletteOpener.isConnected) {
-            paletteOpener.focus();
+          if (paletteOpener && typeof paletteOpener.focus === 'function' && document.contains(paletteOpener)) {
+             paletteOpener.focus();
           }
           paletteOpener = null;
        }, 200);
@@ -869,38 +870,38 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   };
 
-  window.generateBriefMarkdown = function(data = window.generateBriefData()) {
-    const list = values => values.length ? values.map(value => `- ${value}`).join("\n") : "- None";
+  window.generateBriefMarkdown = function (data) {
+    const list = (items) => (items.length ? items.map((i) => `- ${i}`) : ["- (none)"]);
     return [
-      "# Novapay Sprint 26 launch brief",
-      "",
-      "## Shortlisted launches",
-      list(data.shortlistedFeatures),
-      "",
-      "## Compare set",
-      list(data.compareFeatures),
-      "",
-      "## Theme filter",
-      data.themeFilter,
-      "",
-      "## Search",
-      data.searchQuery || "None",
-      "",
-      "## Watched executives",
-      list(data.watchedExecutives),
+      `# ${data.brand} — ${data.event} Sprint Brief`,
       "",
       `Generated at: ${data.generatedAt}`,
+      "",
+      "## Shortlisted launches",
+      ...list(data.shortlistedFeatures),
+      "",
+      "## Compare set",
+      ...list(data.compareFeatures),
+      "",
+      "## Theme filter",
+      `- ${data.themeFilter}`,
+      "",
+      "## Search",
+      `- ${data.searchQuery || "(none)"}`,
+      "",
+      "## Watched executives",
+      ...list(data.watchedExecutives)
     ].join("\n");
   };
 
-  window.updateBriefPreview = function() {
+  window.updateBriefPreview = function () {
     const data = window.generateBriefData();
-    jsonContent.textContent = JSON.stringify(data, null, 2);
-    markdownContent.textContent = window.generateBriefMarkdown(data);
-    markdownContent.style.whiteSpace = "pre-wrap";
+    if (jsonContent) jsonContent.textContent = JSON.stringify(data, null, 2);
+    if (markdownContent) {
+      markdownContent.style.whiteSpace = "pre-wrap";
+      markdownContent.textContent = window.generateBriefMarkdown(data);
+    }
   };
-
-
 
   if (btnExport && briefPanel) {
     btnExport.addEventListener("click", () => {

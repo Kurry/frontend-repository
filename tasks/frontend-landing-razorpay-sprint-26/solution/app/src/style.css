@@ -871,14 +871,6 @@ a:focus-visible, button:focus-visible { outline: 2px solid #305eff; outline-offs
 }
 
 /* Trays and Panels Styling */
-#trays-ui {
-  max-height: 50vh;
-}
-
-#trays-ui > div {
-  padding: 10px 20px;
-}
-
 #trays-ui button {
   cursor: pointer;
 }
