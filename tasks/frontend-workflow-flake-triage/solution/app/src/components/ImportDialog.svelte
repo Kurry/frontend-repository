@@ -1,12 +1,14 @@
 <script lang="ts">
   import { createForm } from '@tanstack/svelte-form';
   import { IconAlertCircle, IconFileImport, IconX } from '@tabler/icons-svelte';
+  import { fade, scale } from 'svelte/transition';
   import { importTextSchema } from '../lib/schemas';
   import { triage } from '../lib/triage.svelte';
+  import { focusTrap } from '../lib/focusTrap';
+  import { motion } from '../lib/motion.svelte';
 
   let { returnFocus }: { returnFocus?: HTMLElement } = $props();
   let closeButton: HTMLButtonElement;
-  let wasOpen = false;
   let draft = $state(triage.importDraft);
   let fieldError = $state('');
 
@@ -20,13 +22,6 @@
     },
     onSubmit: ({ value }) => triage.importReport(value.json),
   }));
-
-  $effect(() => {
-    const isOpen = triage.importOpen;
-    if (isOpen && !wasOpen) setTimeout(() => closeButton?.focus(), 0);
-    if (!isOpen && wasOpen) setTimeout(() => returnFocus?.focus(), 0);
-    wasOpen = isOpen;
-  });
 
   function validationMessage(value: string): string | undefined {
     if (!value) return undefined;
@@ -51,9 +46,10 @@
 
 <svelte:window onkeydown={(event) => event.key === 'Escape' && triage.importOpen && triage.closeImport()} />
 
-<div class:open={triage.importOpen} class="modal-layer" role="presentation" aria-hidden={!triage.importOpen}>
-  <button class="backdrop" aria-label="Close import triage report" tabindex={triage.importOpen ? 0 : -1} onclick={() => triage.closeImport()}></button>
-  <div class="dialog card-panel" role="dialog" aria-modal={triage.importOpen ? 'true' : undefined} aria-labelledby="import-title">
+{#if triage.importOpen}
+<div class="modal-layer open" role="presentation" transition:fade={{ duration: motion.reduced ? 0 : 220 }}>
+  <button class="backdrop" aria-label="Close import triage report" onclick={() => triage.closeImport()}></button>
+  <div class="dialog card-panel" role="dialog" aria-modal="true" aria-labelledby="import-title" transition:scale={{ start: .97, duration: motion.reduced ? 0 : 220 }} use:focusTrap={{ returnFocus }}>
     <header>
       <div>
         <span class="eyebrow">Replace-suite mode</span>
@@ -96,6 +92,7 @@
     </form>
   </div>
 </div>
+{/if}
 
 <style>
   .modal-layer { position: fixed; z-index: 85; inset: 0; display: grid; visibility: hidden; place-items: center; padding: 16px; opacity: 0; pointer-events: none; transition: opacity 220ms ease, visibility 0s linear 220ms; }

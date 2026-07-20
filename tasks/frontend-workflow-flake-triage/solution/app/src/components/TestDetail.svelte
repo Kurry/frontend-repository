@@ -7,6 +7,8 @@
   import VerdictChip from './VerdictChip.svelte';
   import RerunForm from './RerunForm.svelte';
 
+  let rerunTrigger: HTMLButtonElement;
+
   const conditionValue: Record<string, string> = {
     'CPU quota': '750m → 500m',
     'terminal size': '120×40 → 80×24',
@@ -15,9 +17,10 @@
     'temp-dir length': '18 → 96 chars',
     'parallel execution': '1 → 8 workers',
   };
+
 </script>
 
-<section class="card-panel detail-panel" id="test-detail" aria-labelledby="detail-title">
+<section class="card-panel detail-panel" id="test-detail" aria-labelledby="detail-title" tabindex="-1">
   {#if triage.selectedTest}
     {@const test = triage.selectedTest}
     {@const verdict = verdictFor(test.runs)}
@@ -94,12 +97,17 @@
         </div>
       {/if}
 
-      <RerunForm testId={test.id} open={triage.openRerunTestId === test.id} />
-      {#if triage.openRerunTestId !== test.id}
-        <button class="action-btn primary rerun-action" type="button" onclick={() => triage.openRerun(test.id)} disabled={rerun?.status === 'running'}>
-          <IconRefresh size={15} /> {rerun?.status === 'running' ? 'Re-run in progress' : 'Start re-run'}
-        </button>
-      {/if}
+      <RerunForm testId={test.id} open={triage.openRerunTestId === test.id} returnFocus={rerunTrigger} />
+      <button
+        bind:this={rerunTrigger}
+        class="action-btn primary rerun-action"
+        type="button"
+        onclick={() => triage.openRerun(test.id)}
+        disabled={rerun?.status === 'running'}
+        hidden={triage.openRerunTestId === test.id}
+      >
+        <IconRefresh size={15} /> {rerun?.status === 'running' ? 'Re-run in progress' : 'Start re-run'}
+      </button>
     </div>
   {:else}
     <div class="detail-empty">

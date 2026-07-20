@@ -1,18 +1,18 @@
 <script lang="ts">
   import { IconBraces, IconCheck, IconClipboard, IconDownload, IconFileText, IconX } from '@tabler/icons-svelte';
-  import { onDestroy, onMount } from 'svelte';
+  import { onDestroy } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import { triage } from '../lib/triage.svelte';
+  import { focusTrap } from '../lib/focusTrap';
+  import { motion } from '../lib/motion.svelte';
 
   let { returnFocus }: { returnFocus?: HTMLElement } = $props();
   let closeButton: HTMLButtonElement;
   let copied = $state(false);
   let copyTimer: ReturnType<typeof setTimeout> | undefined;
 
-  onMount(() => setTimeout(() => closeButton?.focus(), 0));
   onDestroy(() => {
     if (copyTimer) clearTimeout(copyTimer);
-    setTimeout(() => returnFocus?.focus(), 0);
   });
 
   async function copy() {
@@ -27,8 +27,8 @@
 <svelte:window onkeydown={(event) => event.key === 'Escape' && triage.closeExport()} />
 
 <div class="modal-layer" role="presentation">
-  <button class="backdrop" aria-label="Close export triage report" onclick={() => triage.closeExport()} transition:fade={{ duration: 200 }}></button>
-  <div class="drawer card-panel" role="dialog" aria-modal="true" aria-labelledby="export-title" transition:fly={{ x: 30, duration: 240 }}>
+  <button class="backdrop" aria-label="Close export triage report" onclick={() => triage.closeExport()} transition:fade={{ duration: motion.reduced ? 0 : 200 }}></button>
+  <div class="drawer card-panel" role="dialog" aria-modal="true" aria-labelledby="export-title" transition:fly={{ x: 30, duration: motion.reduced ? 0 : 240 }} use:focusTrap={{ returnFocus }}>
     <header class="drawer-header">
       <div>
         <span class="eyebrow">Session artifact</span>

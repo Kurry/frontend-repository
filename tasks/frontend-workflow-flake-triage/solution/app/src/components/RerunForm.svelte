@@ -1,11 +1,14 @@
 <script lang="ts">
   import { createForm } from '@tanstack/svelte-form';
   import { IconPlayerPlayFilled, IconX } from '@tabler/icons-svelte';
+  import { scale } from 'svelte/transition';
   import { RUN_COUNTS, type RunCount } from '../lib/types';
   import { rerunRequestSchema } from '../lib/schemas';
   import { triage } from '../lib/triage.svelte';
+  import { focusTrap } from '../lib/focusTrap';
+  import { motion } from '../lib/motion.svelte';
 
-  let { testId, open }: { testId: string; open: boolean } = $props();
+  let { testId, open, returnFocus }: { testId: string; open: boolean; returnFocus?: HTMLElement } = $props();
   let runCountSelect: HTMLSelectElement;
   let wasOpen = false;
   let runCount = $state<number>(0);
@@ -30,7 +33,6 @@
       runCount = 0;
       runCountError = '';
       form.reset({ runCount: 0 });
-      setTimeout(() => runCountSelect?.focus(), 0);
     }
     wasOpen = open;
   });
@@ -54,11 +56,12 @@
   }}
 />
 
+{#if open}
 <form
-  class:open
-  class="rerun-form"
+  class="rerun-form open"
   aria-label={`Re-run ${testId}`}
-  aria-hidden={!open}
+  transition:scale={{ start: .98, duration: motion.reduced ? 0 : 220 }}
+  use:focusTrap={{ returnFocus }}
   onsubmit={(event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -78,6 +81,7 @@
   <select
     bind:this={runCountSelect}
     id={`run-count-${testId}`}
+    data-autofocus
     class:error={!!runCountError}
     class="control"
     value={runCount}
@@ -104,6 +108,7 @@
     Start re-run
   </button>
 </form>
+{/if}
 
 <style>
   .rerun-form {
