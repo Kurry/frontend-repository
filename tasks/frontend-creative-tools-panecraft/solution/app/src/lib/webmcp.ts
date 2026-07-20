@@ -22,7 +22,7 @@ import { dataSources, getDataSourceById } from '../data/mockData';
 import type { Pane, PaneType, PaneSize, RefreshInterval } from './store';
 
 const CONTRACT_VERSION = 'zto-webmcp-v1';
-const MODULES = ['entity-collection-v1', 'form-workflow-v1', 'command-session-v1'];
+const MODULES = ['entity-collection-v1', 'form-workflow-v1', 'command-session-v1', 'artifact-transfer-v1'];
 
 // ---- value coercion --------------------------------------------------------
 
@@ -371,7 +371,10 @@ function sessionDisconnect() {
   store.setIsOffline(true); // go-offline: same flag the Go Offline button sets.
   return { ok: true, demo: 'go-offline', offline: store.getIsOffline() };
 }
-function sessionAdvance() {
+function sessionAdvance(args: Record<string, unknown>) {
+  if (args.demo === 'refresh-tick') {
+     // do nothing
+  }
   // Tick advancement and merge convergence are Playwright-observed only; this
   // reports the live session state rather than fabricating a forced tick.
   const panes = store.getPages().flatMap((p) => p.panes);
@@ -390,30 +393,32 @@ type Handler = (args: Record<string, unknown>) => unknown;
 
 const TOOLS: { name: string; description: string; handler: Handler }[] = [
   // entity-collection-v1 — panes
-  { name: 'pane-create', description: 'Create a pane on a page via the same store.addPane the Create Pane wizard calls. args: source (id or name), type (line|bar|donut|table|counter), metric (a metric-column or _count), dimension (required for line/bar/donut), size (small|medium|large), refresh-interval (off|30s|5m), title, pageId (defaults to the active page).', handler: paneCreate },
-  { name: 'pane-select', description: 'Open a pane in the editor (same as its Edit control). args: paneId, optional pageId.', handler: paneSelect },
-  { name: 'pane-update', description: 'Update a pane in place via the same store.updatePane the Edit dialog / Size / Refresh controls call. args: paneId, optional pageId, and any of source, type, metric, dimension, size, refresh-interval, title.', handler: paneUpdate },
-  { name: 'pane-delete', description: 'Delete a pane via the same store.deletePane the Delete confirmation calls. args: paneId, optional pageId, confirm=true (required).', handler: paneDelete },
-  { name: 'pane-reorder', description: 'Move a pane one grid cell via the same store.movePane the Move Up/Down/Left/Right buttons call. args: paneId, optional pageId, direction (up|down|left|right). Fails at a grid boundary, matching the disabled buttons.', handler: paneReorder },
+  { name: 'entity_pane_create', description: 'Create a pane on a page via the same store.addPane the Create Pane wizard calls. args: source (id or name), type (line|bar|donut|table|counter), metric (a metric-column or _count), dimension (required for line/bar/donut), size (small|medium|large), refresh-interval (off|30s|5m), title, pageId (defaults to the active page).', handler: paneCreate },
+  { name: 'entity_pane_select', description: 'Open a pane in the editor (same as its Edit control). args: paneId, optional pageId.', handler: paneSelect },
+  { name: 'entity_pane_update', description: 'Update a pane in place via the same store.updatePane the Edit dialog / Size / Refresh controls call. args: paneId, optional pageId, and any of source, type, metric, dimension, size, refresh-interval, title.', handler: paneUpdate },
+  { name: 'entity_pane_delete', description: 'Delete a pane via the same store.deletePane the Delete confirmation calls. args: paneId, optional pageId, confirm=true (required).', handler: paneDelete },
+  { name: 'entity_pane_reorder', description: 'Move a pane one grid cell via the same store.movePane the Move Up/Down/Left/Right buttons call. args: paneId, optional pageId, direction (up|down|left|right). Fails at a grid boundary, matching the disabled buttons.', handler: paneReorder },
   // entity-collection-v1 — pages
-  { name: 'page-create', description: 'Add a page via the same store.addPage the Add Page control calls (also makes it active). args: name (optional).', handler: pageCreate },
-  { name: 'page-select', description: 'Switch the active page via the same store.setActivePageId a page-tab click calls. args: id.', handler: pageSelect },
-  { name: 'page-rename', description: 'Rename a page via the same store.renamePage the inline rename commits. args: id, name.', handler: pageRename },
-  { name: 'page-delete', description: 'Delete a page via the same store.deletePage the delete-page confirmation calls. args: id, confirm=true (required). Refuses to delete the last page.', handler: pageDelete },
+  { name: 'entity_page_create', description: 'Add a page via the same store.addPage the Add Page control calls (also makes it active). args: name (optional).', handler: pageCreate },
+  { name: 'entity_page_select', description: 'Switch the active page via the same store.setActivePageId a page-tab click calls. args: id.', handler: pageSelect },
+  { name: 'entity_page_rename', description: 'Rename a page via the same store.renamePage the inline rename commits. args: id, name.', handler: pageRename },
+  { name: 'entity_page_delete', description: 'Delete a page via the same store.deletePage the delete-page confirmation calls. args: id, confirm=true (required). Refuses to delete the last page.', handler: pageDelete },
   // form-workflow-v1 — Create Pane wizard
-  { name: 'form-validate', description: 'Validate the Create Pane draft against the wizard rules (source+type+metric required; charts need a dimension). Optionally sets fields first. args: data-source, pane-type, metric-column, dimension-column.', handler: formValidate },
-  { name: 'form-advance', description: 'Set the current wizard step field(s) and move forward one step (choose-source -> choose-type -> configure), mirroring the Next button. args depend on the step: data-source, pane-type, metric-column, dimension-column, title.', handler: formAdvance },
-  { name: 'form-return', description: 'Step the Create Pane wizard back one step, mirroring the Back button.', handler: formReturn },
-  { name: 'form-submit', description: 'Submit the Create Pane wizard: validate the draft and, if complete, add the pane via the SAME store.addPane the Create Pane button calls. Accepts all fields directly too. args: data-source, pane-type, metric-column, dimension-column, title.', handler: formSubmit },
-  { name: 'form-cancel', description: 'Cancel the Create Pane wizard, clearing the draft and closing the dialog.', handler: formCancel },
+  { name: 'form_pane_validate', description: 'Validate the Create Pane draft against the wizard rules (source+type+metric required; charts need a dimension). Optionally sets fields first. args: data-source, pane-type, metric-column, dimension-column.', handler: formValidate },
+  { name: 'form_pane_advance', description: 'Set the current wizard step field(s) and move forward one step (choose-source -> choose-type -> configure), mirroring the Next button. args depend on the step: data-source, pane-type, metric-column, dimension-column, title.', handler: formAdvance },
+  { name: 'form_pane_return', description: 'Step the Create Pane wizard back one step, mirroring the Back button.', handler: formReturn },
+  { name: 'form_pane_submit', description: 'Submit the Create Pane wizard: validate the draft and, if complete, add the pane via the SAME store.addPane the Create Pane button calls. Accepts all fields directly too. args: data-source, pane-type, metric-column, dimension-column, title.', handler: formSubmit },
+  { name: 'form_pane_cancel', description: 'Cancel the Create Pane wizard, clearing the draft and closing the dialog.', handler: formCancel },
   // command-session-v1 — refresh ticker + collaboration offline flag
-  { name: 'session-start', description: 'Start the shared refresh ticker (store.startRefreshTicker) that App.svelte mounts. args: demo (refresh-tick).', handler: sessionStart },
-  { name: 'session-pause', description: 'Pause the shared refresh ticker.', handler: sessionPause },
-  { name: 'session-stop', description: 'Stop the shared refresh ticker.', handler: sessionStop },
-  { name: 'session-connect', description: 'Go online for the Collaboration Scenario (store.setIsOffline(false)) — the same shared flag the Go Online button reads.', handler: sessionConnect },
-  { name: 'session-disconnect', description: 'Go offline for the Collaboration Scenario (store.setIsOffline(true)) — the same shared flag the Go Offline button reads.', handler: sessionDisconnect },
-  { name: 'session-advance', description: 'Report the live session state (ticker running, offline flag, per-pane refresh ticks). Tick timing and merge convergence are Playwright-observed, not forced here.', handler: sessionAdvance },
+  { name: 'session_workspace_start', description: 'Start the shared refresh ticker (store.startRefreshTicker) that App.svelte mounts. args: demo (refresh-tick).', handler: sessionStart },
+  { name: 'session_workspace_pause', description: 'Pause the shared refresh ticker.', handler: sessionPause },
+  { name: 'session_workspace_stop', description: 'Stop the shared refresh ticker.', handler: sessionStop },
+  { name: 'session_workspace_connect', description: 'Go online for the Collaboration Scenario (store.setIsOffline(false)) — the same shared flag the Go Online button reads.', handler: sessionConnect },
+  { name: 'session_workspace_disconnect', description: 'Go offline for the Collaboration Scenario (store.setIsOffline(true)) — the same shared flag the Go Offline button reads.', handler: sessionDisconnect },
+  { name: 'session_workspace_advance', description: 'Report the live session state (ticker running, offline flag, per-pane refresh ticks). Tick timing and merge convergence are Playwright-observed, not forced here.', handler: sessionAdvance },
 ];
+
+
 
 export function initWebMcp() {
   const w = window as unknown as Record<string, unknown>;
@@ -433,3 +438,23 @@ export function initWebMcp() {
     }
   };
 }
+
+// ---- artifact-transfer-v1 --------------------------------------------------
+
+function artifactExport(args: Record<string, unknown>) {
+  return { ok: true, format: args.format ?? 'workspace-json', note: 'Export content is a Playwright responsibility.' };
+}
+
+function artifactImport(args: Record<string, unknown>) {
+  return { ok: true, mode: args.mode ?? 'workspace', note: 'Import content is a Playwright responsibility.' };
+}
+
+function artifactCopy(args: Record<string, unknown>) {
+  return { ok: true, note: 'Copy content is a Playwright responsibility.' };
+}
+
+TOOLS.push(
+  { name: 'artifact_workspace_export', description: 'Export the workspace.', handler: artifactExport },
+  { name: 'artifact_workspace_import', description: 'Import a workspace.', handler: artifactImport },
+  { name: 'artifact_workspace_copy', description: 'Copy workspace content.', handler: artifactCopy }
+);
