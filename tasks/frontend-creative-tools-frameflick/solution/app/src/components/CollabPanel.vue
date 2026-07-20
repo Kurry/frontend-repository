@@ -205,6 +205,12 @@ function regionsOverlap(a: ConflictRegion, b: ConflictRegion): boolean {
   if (aIsInsert && bIsInsert) {
     return a.start === b.start && a.insert !== b.insert
   }
+  // An insert that lands inside — or exactly on a boundary of — a replace/delete
+  // span is genuinely ambiguous (is the new text inside the edited span or just
+  // outside it?), so surface a conflict instead of silently auto-merging. The
+  // strict `<` interval test below would miss the shared-boundary case.
+  if (aIsInsert) return a.start >= b.start && a.start <= b.end
+  if (bIsInsert) return b.start >= a.start && b.start <= a.end
   return a.start < b.end && b.start < a.end
 }
 
@@ -219,17 +225,22 @@ function applyRegions(content: string, regions: ConflictRegion[]): string {
   let shift = 0
   let prevEnd = -1
   let prevInsert = ''
+  let prevIsInsert = false
   for (const r of sorted) {
     let ins = r.insert
     const start = Math.min(r.start + shift, out.length)
     const end = Math.min(r.end + shift, out.length)
-    if (prevInsert && ins && start === prevEnd && !/\s$/.test(prevInsert) && !/^\s/.test(ins)) {
+    const isInsert = r.end <= r.start
+    // A readable space only joins two adjacent word inserts — never an insert
+    // abutting a replace/delete, which would inject a spurious character.
+    if (prevIsInsert && isInsert && prevInsert && ins && start === prevEnd && !/\s$/.test(prevInsert) && !/^\s/.test(ins)) {
       ins = ' ' + ins
     }
     out = out.slice(0, start) + ins + out.slice(end)
     shift += ins.length - (r.end - r.start)
     prevEnd = start + ins.length
     prevInsert = ins
+    prevIsInsert = isInsert
   }
   return out
 }

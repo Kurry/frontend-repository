@@ -245,6 +245,7 @@ function entitySelect(args: Record<string, unknown>) {
     // Legacy persisted entries may predate the baseline field — fall back to the
     // saved settings instead of throwing on an undefined baseline.
     canvas.baseline = JSON.parse(JSON.stringify(item.baseline ?? item.settings))
+    canvas.showingBefore = false // match the visible Recent thumbnail load
     recent.setActive(item.id)
     return { ok: true, kind, name: item.name }
   }
