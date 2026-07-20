@@ -318,7 +318,10 @@ function previewSwatch(idx) {
 
 function applyShift() {
   shiftError.value = '';
-  const shifted = swatches.value.map((hex, i) =>
+  // Shift from the live draft (not the committed palette) so unsaved hex edits
+  // are honored and the commit matches exactly what the tray previewed.
+  const draft = [...swatches.value];
+  const shifted = draft.map((hex, i) =>
     store.batchSelected.includes(i) && validHex(hex)
       ? shiftHex(hex, store.batchShift.h, store.batchShift.s, store.batchShift.l)
       : hex,
@@ -332,8 +335,12 @@ function applyShift() {
     shiftError.value = 'Swatches must remain valid #RRGGBB values.';
     return;
   }
+  const result = store.applyBatchShift(props.palette.id, store.batchSelected, { ...store.batchShift }, draft);
+  if (!result.ok) {
+    shiftError.value = result.error;
+    return;
+  }
   swatches.value = [...shifted];
-  store.applyBatchShift(props.palette.id, store.batchSelected, { ...store.batchShift });
   store.batchSelected = [];
   store.batchShift = { h: 0, s: 0, l: 0 };
   store.announce(`Applied H/S/L shift to ${props.palette.name}`);

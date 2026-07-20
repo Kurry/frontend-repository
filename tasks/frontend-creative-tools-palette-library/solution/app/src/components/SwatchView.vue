@@ -35,7 +35,9 @@ const store = usePaletteStore();
 
 const colorName = (hex) => oaColorName(hex);
 
-function copy(hex, paletteId, index) {
-  writeClipboard(hex).finally(() => store.copyHex(hex, `${paletteId}-${index}`));
+async function copy(hex, paletteId, index) {
+  const copied = await writeClipboard(hex);
+  if (copied) store.copyHex(hex, `${paletteId}-${index}`);
+  else store.announce('Clipboard unavailable — the hex was not copied.');
 }
 </script>

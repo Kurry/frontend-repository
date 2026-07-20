@@ -75,8 +75,10 @@ import EmptyState from './EmptyState.vue';
 
 const store = usePaletteStore();
 
-function copy(hex, paletteId, idx) {
-  writeClipboard(hex).finally(() => store.copyHex(hex, `${paletteId}-${idx}`));
+async function copy(hex, paletteId, idx) {
+  const copied = await writeClipboard(hex);
+  if (copied) store.copyHex(hex, `${paletteId}-${idx}`);
+  else store.announce('Clipboard unavailable — the hex was not copied.');
 }
 
 function quickAdd(name) {

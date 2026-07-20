@@ -147,12 +147,21 @@ export const usePaletteStore = defineStore('palette', () => {
     });
   }
 
-  /** Batch H/S/L shift for selected swatch indices of one palette. One undoable step. */
-  function applyBatchShift(id, selectedIndices, shift) {
+  /**
+   * Batch H/S/L shift for selected swatch indices of one palette. One undoable step.
+   * `baseSwatches` optionally supplies the shift's starting values for the selected
+   * indices (the Detail editor passes its live draft so unsaved hex edits are honored);
+   * unselected swatches always keep their committed values.
+   */
+  function applyBatchShift(id, selectedIndices, shift, baseSwatches) {
     const palette = palettes.value.find((p) => p.id === id);
     if (!palette) return { ok: false, error: 'Palette not found' };
+    const base =
+      Array.isArray(baseSwatches) && baseSwatches.length === palette.swatches.length
+        ? baseSwatches
+        : palette.swatches;
     const next = palette.swatches.map((hex, i) =>
-      selectedIndices.includes(i) ? shiftHex(hex, shift.h, shift.s, shift.l) : hex,
+      selectedIndices.includes(i) ? shiftHex(base[i], shift.h, shift.s, shift.l) : hex,
     );
     if (new Set(next.map((s) => s.toLowerCase())).size !== next.length) {
       return { ok: false, error: 'Swatches must stay unique — this shift collapses two selected swatches into the same hex. Nothing was changed.' };
@@ -190,7 +199,14 @@ export const usePaletteStore = defineStore('palette', () => {
         swatches: [...p.swatches],
         favorite: p.favorite ?? false,
       }));
+      // Reconcile the cart against the imported library (same undoable step, so
+      // Undo of an import restores the pre-import cart lines too).
+      const names = new Set(palettes.value.map((p) => p.name));
+      cartItems.value = cartItems.value.filter((item) => names.has(item.paletteName));
     });
+    if (cartPrefill.value && !palettes.value.some((p) => p.name === cartPrefill.value)) {
+      cartPrefill.value = '';
+    }
     selectedPaletteId.value = null;
     detailOpen.value = false;
     batchSelected.value = [];

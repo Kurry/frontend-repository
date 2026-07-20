@@ -3,6 +3,15 @@ import { watch, nextTick, onBeforeUnmount } from 'vue';
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+// Stacking state shared by every dialog instance: scroll lock stays applied
+// while ANY dialog is open, and Escape/Tab handling belongs to the topmost
+// dialog only — otherwise closing one of two stacked overlays (e.g. the cart
+// drawer opened from Detail's "Add to Cart") would release the page scroll
+// while the other overlay is still open, and a single Escape would dismiss
+// every overlay at once.
+let openCount = 0;
+const topmostStack = [];
+
 /**
  * Dialog behavior for overlay surfaces: focus moves in on open, Tab stays
  * trapped while open, Escape closes, focus returns to the invoking control,
@@ -11,6 +20,8 @@ const FOCUSABLE =
 export function useDialog(open, rootRef, { onClose } = {}) {
   let lastFocused = null;
   let keydownActive = false;
+  let holdingSlot = false;
+  const stackToken = {};
 
   const resolveRoot = () => {
     const value = rootRef?.value;
@@ -18,6 +29,8 @@ export function useDialog(open, rootRef, { onClose } = {}) {
   };
 
   function onKeydown(event) {
+    // Only the topmost dialog reacts; lower stacked dialogs stay inert.
+    if (topmostStack[topmostStack.length - 1] !== stackToken) return;
     if (event.key === 'Escape') {
       event.stopPropagation();
       onClose?.();
@@ -45,27 +58,44 @@ export function useDialog(open, rootRef, { onClose } = {}) {
     }
   }
 
+  function acquireSlot() {
+    if (holdingSlot) return;
+    holdingSlot = true;
+    openCount += 1;
+    topmostStack.push(stackToken);
+    document.body.style.overflow = 'hidden';
+  }
+
+  function releaseSlot() {
+    if (!holdingSlot) return;
+    holdingSlot = false;
+    const at = topmostStack.indexOf(stackToken);
+    if (at !== -1) topmostStack.splice(at, 1);
+    openCount = Math.max(0, openCount - 1);
+    if (openCount === 0) document.body.style.overflow = '';
+  }
+
   watch(
     open,
     async (isOpen) => {
       if (isOpen) {
         lastFocused = document.activeElement;
-        await nextTick();
+        acquireSlot();
         if (!keydownActive) {
           document.addEventListener('keydown', onKeydown, true);
           keydownActive = true;
         }
-        document.body.style.overflow = 'hidden';
+        await nextTick();
         const root = resolveRoot();
         const target =
           root?.querySelector('[data-autofocus]') || root?.querySelector(FOCUSABLE);
         target?.focus();
       } else {
+        releaseSlot();
         if (keydownActive) {
           document.removeEventListener('keydown', onKeydown, true);
           keydownActive = false;
         }
-        document.body.style.overflow = '';
         if (lastFocused && typeof lastFocused.focus === 'function' && document.contains(lastFocused)) {
           lastFocused.focus();
         }
@@ -76,8 +106,8 @@ export function useDialog(open, rootRef, { onClose } = {}) {
   );
 
   onBeforeUnmount(() => {
+    releaseSlot();
     if (keydownActive) document.removeEventListener('keydown', onKeydown, true);
-    document.body.style.overflow = '';
   });
 }
 

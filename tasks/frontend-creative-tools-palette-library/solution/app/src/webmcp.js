@@ -1,6 +1,6 @@
 import { usePaletteStore } from './stores/palette';
-import { palettePackageSchema, paletteSchema, PALETTE_PERIODS, buildPalettePackage } from './paletteSchema';
-import { slugify } from './colorUtils';
+import { palettePackageSchema, paletteSchema, PALETTE_PERIODS } from './paletteSchema';
+import { artifactText } from './lib/artifacts';
 import { writeClipboard, scrollToId } from './composables/useDialog';
 
 // Exactly the declared operations from the Bindings block — nothing more.
@@ -151,7 +151,7 @@ export function registerWebMCP() {
       }
       store.exportFormat = format;
       store.exportOpen = true;
-      const text = artifactText(store, format);
+      const text = artifactText(store.palettes, format);
       const copied = await writeClipboard(text);
       return ok({ format, copied, visible: true });
     },
@@ -199,33 +199,5 @@ export function registerWebMCP() {
   };
 }
 
-/** Same artifact text the visible export drawer preview shows. */
-function artifactText(store, format) {
-  const palettes = store.palettes;
-  if (format === 'css') {
-    let out = '/* O&A Palette Library — exported CSS custom properties */\n';
-    for (const p of palettes) {
-      out += `\n/* ${p.name} — ${p.period} */\n.palette-${slugify(p.name)} {\n`;
-      p.swatches.forEach((hex, i) => {
-        out += `  --swatch-${i + 1}: ${hex};\n`;
-      });
-      out += '}\n';
-    }
-    return out;
-  }
-  if (format === 'utility-theme') {
-    let out = '// O&A Palette Library — theme.extend.colors\nexport const theme = {\n  extend: {\n    colors: {\n';
-    for (const p of palettes) {
-      out += `      '${slugify(p.name)}': [${p.swatches.map((s) => `'${s}'`).join(', ')}], // ${p.name}\n`;
-    }
-    return `${out}    },\n  },\n};\n`;
-  }
-  if (format === 'scss') {
-    let out = '// O&A Palette Library — $palettes map\n$palettes: (\n';
-    for (const p of palettes) {
-      out += `  '${slugify(p.name)}': (${p.swatches.join(', ')}), // ${p.name}\n`;
-    }
-    return `${out});\n`;
-  }
-  return JSON.stringify(buildPalettePackage(palettes), null, 2);
-}
+// Artifact text comes from the shared generator in src/lib/artifacts.js — the
+// exact same text the visible Export drawer preview shows.

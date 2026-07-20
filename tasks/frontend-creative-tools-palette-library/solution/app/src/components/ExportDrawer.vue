@@ -126,8 +126,8 @@
 <script setup>
 import { ref, computed } from 'vue';
 import { usePaletteStore } from '../stores/palette';
-import { buildPalettePackage, palettePackageSchema } from '../paletteSchema';
-import { slugify } from '../colorUtils';
+import { palettePackageSchema } from '../paletteSchema';
+import { artifactText as buildArtifactText } from '../lib/artifacts';
 import { useDialog, writeClipboard, downloadText } from '../composables/useDialog';
 
 const store = usePaletteStore();
@@ -144,36 +144,10 @@ const formats = [
 
 const activeFormat = computed(() => formats.find((f) => f.id === store.exportFormat) || formats[0]);
 
+/** Preview text for a format tab — delegates to the shared generator so the
+ *  drawer and the WebMCP artifact tools emit byte-identical artifacts. */
 function artifactText(format) {
-  const palettes = store.palettes;
-  if (format === 'css') {
-    let out = '/* O&A Palette Library — exported CSS custom properties */\n';
-    for (const p of palettes) {
-      out += `\n/* ${p.name} — ${p.period} */\n.palette-${slugify(p.name)} {\n`;
-      p.swatches.forEach((hex, i) => {
-        out += `  --swatch-${i + 1}: ${hex};\n`;
-      });
-      out += '}\n';
-    }
-    return out;
-  }
-  if (format === 'utility-theme') {
-    let out = '// O&A Palette Library — theme.extend.colors\nexport const theme = {\n  extend: {\n    colors: {\n';
-    for (const p of palettes) {
-      out += `      '${slugify(p.name)}': [${p.swatches.map((s) => `'${s}'`).join(', ')}], // ${p.name}\n`;
-    }
-    out += '    },\n  },\n};\n';
-    return out;
-  }
-  if (format === 'scss') {
-    let out = '// O&A Palette Library — $palettes map\n$palettes: (\n';
-    for (const p of palettes) {
-      out += `  '${slugify(p.name)}': (${p.swatches.join(', ')}), // ${p.name}\n`;
-    }
-    out += ');\n';
-    return out;
-  }
-  return JSON.stringify(buildPalettePackage(palettes), null, 2);
+  return buildArtifactText(store.palettes, format);
 }
 
 const exportStatus = ref('');
