@@ -80,8 +80,11 @@ export const useStore = create((set, get) => ({
     set((state) => {
       const before = cloneDatasets(state.datasets)
       const next = cloneDatasets(state.datasets)
+      const selectedIndex = next.findIndex((dataset) => dataset.id === state.selectedId)
       mutator(next, state.selectedId)
-      return { datasets: next, history: [...state.history.slice(-39), before], future: [], selectedRows: [], ...(message ? { toast: { message, kind: 'success', id: Date.now() } } : {}) }
+      const activeDataset = next.find((dataset) => dataset.id === state.selectedId) ?? next[selectedIndex]
+      const formulaResult = state.formulaInput && activeDataset ? parseFormula(state.formulaInput, activeDataset) : null;
+      return { datasets: next, formulaResult, history: [...state.history.slice(-39), before], future: [], selectedRows: [], ...(message ? { toast: { message, kind: 'success', id: Date.now() } } : {}) }
     })
     if (message) setTimeout(() => { if (get().toast?.message === message) set({ toast: null }) }, 3400)
   },
@@ -109,9 +112,9 @@ export const useStore = create((set, get) => ({
   attachSuite: (suiteId) => get().commit((datasets, id) => { datasets.find((d) => d.id === id).attachedSuiteId = suiteId }, suiteId ? `Attached to ${evalSuites.find((s) => s.id === suiteId)?.name}` : 'Eval suite detached'),
   runDuplicateScan: () => {
     set({ duplicateScan: { ...get().duplicateScan, status: 'running', stages: ['running','pending','pending'], groups: [] } })
-    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, stages: ['complete','running','pending'] } })), 350)
-    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, stages: ['complete','complete','running'] } })), 700)
-    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, status: 'done', stages: ['complete','complete','complete'], groups: findDuplicateGroups(selected(s), s.duplicateScan.dismissed) } })), 1050)
+    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, stages: ['complete','running','pending'] } })), 1000)
+    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, stages: ['complete','complete','running'] } })), 2000)
+    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, status: 'done', stages: ['complete','complete','complete'], groups: findDuplicateGroups(selected(s), s.duplicateScan.dismissed) } })), 3000)
   },
   dismissDuplicate: (groupId) => set((s) => ({ duplicateScan: { ...s.duplicateScan, groups: s.duplicateScan.groups.filter((g) => g.id !== groupId), dismissed: [...s.duplicateScan.dismissed, groupId] } })),
   mergeDuplicate: (groupId, survivorPatch) => { const group = get().duplicateScan.groups.find((g) => g.id === groupId); if (!group) return; const ids = group.rows.map((r) => r.id); get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); const survivor = ds.rows.find((r) => r.id === ids[0]); survivor.values = { ...survivor.values, ...survivorPatch.values }; survivor.expectedOutput = survivorPatch.expectedOutput; survivor.verified = survivorPatch.verified; if (survivorPatch.split) survivor.split = survivorPatch.split; else delete survivor.split; ds.rows = ds.rows.filter((r) => r.id === ids[0] || !ids.includes(r.id)) }, `${ids.length} duplicates merged`); set((s) => ({ modal: null, duplicateScan: { ...s.duplicateScan, groups: s.duplicateScan.groups.filter((g) => g.id !== groupId) } })) },

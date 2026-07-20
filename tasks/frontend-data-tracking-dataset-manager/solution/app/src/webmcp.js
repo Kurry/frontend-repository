@@ -75,7 +75,7 @@ const tools = [
     execute: async () => { const buttons = [...document.querySelectorAll('button')]; const target = buttons.find((b) => /Back/.test(b.textContent)); if (!target) return failure('No preceding workflow step is available'); target.click(); return result('Returned to the preceding import step') },
   },
   {
-    name: 'session_start_duplicate_scan', description: 'Start the duplicate scan demo with visible staged progress.', inputSchema: { type: 'object', properties: { demo: { const: 'duplicate-scan' } }, required: ['demo'], additionalProperties: false },
+    name: 'session_start', description: 'Start the duplicate scan demo with visible staged progress.', inputSchema: { type: 'object', properties: { demo: { const: 'duplicate-scan' } }, required: ['demo'], additionalProperties: false },
     execute: async () => { store.getState().setUi({ panel: 'duplicates' }); store.getState().runDuplicateScan(); return result('Duplicate scan started; observe staged progress in the panel') },
   },
   {
@@ -97,6 +97,17 @@ const tools = [
 
 function registerAll() {
   window.datasetWorkbenchWebMcpTools = tools
+
+  if (!window.webmcp_list_tools) {
+    window.webmcp_list_tools = () => tools;
+    window.webmcp_invoke_tool = async (name, args) => {
+      const tool = tools.find(t => t.name === name);
+      if (!tool) throw new Error(`Tool ${name} not found`);
+      return await tool.execute(args);
+    };
+    window.webmcp_session_info = () => ({ status: 'ready' });
+  }
+
   const nativeApi = navigator.modelContext
   if (nativeApi?.registerTool && !window.__datasetWorkbenchNativeTools) {
     window.__datasetWorkbenchNativeTools = true
