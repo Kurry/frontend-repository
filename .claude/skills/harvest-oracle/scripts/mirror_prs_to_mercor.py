@@ -48,7 +48,10 @@ def load_state(p: Path) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--origin", default="Kurry/frontend-repository")
+    ap.add_argument("--origin", default="Kurry/frontend-repository",
+                    help="gh repo slug (for gh pr list)")
+    ap.add_argument("--origin-remote", default="origin",
+                    help="git remote NAME for fetches (not the gh slug)")
     ap.add_argument("--target", default="Mercor-Intelligence/frontend-repository")
     ap.add_argument("--mercor-remote", default="mercor")
     ap.add_argument("--state", type=Path,
@@ -65,7 +68,7 @@ def main() -> None:
     # bulk-fetch ALL origin branches up front so every origin/<pr-branch> is
     # resolvable on the first pass (per-branch fetch had a first-pass race that
     # made new branches skip until a second run).
-    sh("git", "fetch", args.origin, "+refs/heads/*:refs/remotes/origin/*")
+    sh("git", "fetch", args.origin_remote, "+refs/heads/*:refs/remotes/origin/*")
 
     prs = gh_json("pr", "list", "--repo", args.origin, "--state", "open",
                   "--limit", "300", "--json", "number,title,headRefName,body")
@@ -90,7 +93,7 @@ def main() -> None:
         # Fetch the Jules branch tip. The branch is based on a stale/divergent
         # main, so replaying its commits is fragile — instead take the FIXED
         # solution/app from its tip and commit it fresh on current mercor/main.
-        sh("git", "fetch", args.origin, br)  # updates refs/remotes/origin/<br>
+        sh("git", "fetch", args.origin_remote, br)  # updates refs/remotes/origin/<br>
         # Resolve to a full SHA in ROOT — a SHA is resolvable from any worktree
         # (shared object store), unlike a fresh remote ref name.
         tip = sh("git", "rev-parse", f"origin/{br}").stdout.strip()
