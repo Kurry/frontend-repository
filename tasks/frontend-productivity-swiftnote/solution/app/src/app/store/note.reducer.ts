@@ -109,6 +109,7 @@ export const noteReducer = createReducer(
       ...state,
       notes: [note, ...state.notes],
       selectedNoteId: id,
+      searchQuery: '',
     };
   }),
 
@@ -148,9 +149,11 @@ export const noteReducer = createReducer(
     if (!source) return state;
     const newId = generateId();
     const duplicate: Note = {
-      ...source,
       id: newId,
       title: source.title ? `${source.title} (duplicate)` : 'Untitled (duplicate)',
+      body: source.body,
+      images: source.images.map(img => ({ ...img })),
+      pinned: false,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
@@ -158,6 +161,7 @@ export const noteReducer = createReducer(
       ...state,
       notes: [duplicate, ...state.notes],
       selectedNoteId: newId,
+      searchQuery: '',
     };
   }),
 

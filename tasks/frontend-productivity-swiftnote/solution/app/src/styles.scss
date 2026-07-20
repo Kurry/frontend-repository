@@ -10,7 +10,7 @@
   --color-surface-2: #1a1a1a;
   --color-surface-3: #222222;
   --color-text-primary: #FFFFFF;
-  --color-text-secondary: rgba(255, 255, 255, 0.65);
+  --color-text-secondary: rgba(255, 255, 255, 0.72);
   --color-link: #F45B68;
   --color-border: #707070;
   --color-hover: rgba(255, 255, 255, 0.08);
@@ -104,7 +104,7 @@ a { color: var(--color-link); text-decoration: none; }
   font-family: var(--font);
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.08s, border-color 0.08s;
   white-space: nowrap;
   min-height: 48px;
 }
@@ -141,7 +141,7 @@ a { color: var(--color-link); text-decoration: none; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.08s, color 0.08s;
   font-size: 20px;
 }
 .btn-icon:hover { background: var(--color-hover); color: var(--color-text-primary); }
@@ -180,6 +180,21 @@ mark {
   flex-direction: column;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+  animation: overlay-in 0.08s ease both;
+}
+
+@keyframes overlay-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.overlay-backdrop {
+  animation: backdrop-in 0.08s ease both;
+}
+
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @media (max-width: 600px) {
@@ -192,6 +207,11 @@ mark {
     max-height: calc(100vh - 32px);
   }
   .btn-icon {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+  .sidebar-toggle {
     width: 44px;
     min-width: 44px;
     height: 44px;

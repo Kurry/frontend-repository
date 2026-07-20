@@ -1,4 +1,4 @@
-import { Component, inject, HostListener } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
@@ -58,7 +58,7 @@ import { WebmcpService } from './webmcp/webmcp.service';
     }
 
     .sidebar-pane {
-      transition: width 0.25s ease, min-width 0.25s ease, opacity 0.25s ease, transform 0.25s ease;
+      transition: width 0.08s ease, min-width 0.08s ease, opacity 0.08s ease, transform 0.08s ease;
     }
 
     .focus-mode .sidebar-pane {
@@ -109,13 +109,22 @@ import { WebmcpService } from './webmcp/webmcp.service';
     }
   `]
 })
-export class AppComponent {
+export class AppComponent implements OnInit, OnDestroy {
   private store = inject(Store);
   private webmcp = inject(WebmcpService);
+  private keydownCapture = (event: KeyboardEvent) => this.onKeydown(event);
 
   constructor() {
     // Register the WebMCP surface on window after the store is initialized.
     this.webmcp.register();
+  }
+
+  ngOnInit(): void {
+    document.addEventListener('keydown', this.keydownCapture, true);
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('keydown', this.keydownCapture, true);
   }
 
   focusMode = toSignal(this.store.select(selectFocusMode), { initialValue: false });
@@ -126,16 +135,17 @@ export class AppComponent {
   workspaceImportOpen = toSignal(this.store.select(selectWorkspaceImportOpen), { initialValue: false });
   txtExportOpen = toSignal(this.store.select(selectTxtExportOpen), { initialValue: false });
 
-  @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent) {
     const isMac = /mac/i.test(navigator.platform);
     const ctrl = isMac ? event.metaKey : event.ctrlKey;
     const target = event.target as HTMLElement;
-    const inInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+    const inInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA'
+      || target.isContentEditable || !!target.closest('[contenteditable="true"]');
 
     // Ctrl+K / Cmd+K → Quick Switcher
     if (ctrl && event.key === 'k') {
       event.preventDefault();
+      event.stopPropagation();
       if (this.quickSwitcherOpen()) {
         this.store.dispatch(NoteActions.closeQuickSwitcher());
       } else {
@@ -147,14 +157,16 @@ export class AppComponent {
     // Alt+N → New Note
     if (event.altKey && !ctrl && event.key === 'n') {
       event.preventDefault();
+      event.stopPropagation();
       this.store.dispatch(NoteActions.createNote());
-      this.store.dispatch(NoteActions.showToast({ message: 'New note created' }));
+      this.store.dispatch(NoteActions.showToast({ message: 'Note created' }));
       return;
     }
 
-    // Ctrl+Shift+F → Toggle Focus Mode
+    // Ctrl+Shift+F → Toggle Focus Mode (case-sensitive F)
     if (ctrl && event.shiftKey && event.key === 'F') {
       event.preventDefault();
+      event.stopPropagation();
       this.store.dispatch(NoteActions.toggleFocusMode());
       return;
     }

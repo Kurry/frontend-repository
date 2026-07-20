@@ -12,12 +12,17 @@ import {
   openTxtExport, openWorkspaceExport, openWorkspaceImport
 } from '../../store/note.actions';
 import { NoteImage } from '../../models/note.model';
+import {
+  ProseBodyEditorComponent, FormatActiveState, htmlToPlain,
+} from '../prose-body-editor/prose-body-editor.component';
+import { DialogFocusService } from '../../services/dialog-focus.service';
 
 const TITLE_MAX = 200;
 
 @Component({
   selector: 'app-note-editor',
   standalone: true,
+  imports: [ProseBodyEditorComponent],
   template: `
     <div class="editor-shell" [class.focus-mode]="focusMode()">
 
@@ -35,31 +40,31 @@ const TITLE_MAX = 200;
             <button class="btn-icon" [class.active]="note()!.pinned" (click)="togglePin()"
                     [title]="note()!.pinned ? 'Unpin note' : 'Pin note'"
                     [attr.aria-label]="note()!.pinned ? 'Unpin note' : 'Pin note'">📌</button>
-            <button class="btn-icon" (click)="duplicate()" title="Duplicate note" aria-label="Duplicate note">⧉</button>
-            <button class="btn-icon" (click)="toggleFocus()" [class.active]="focusMode()"
+            <button class="btn-icon" (mousedown)="rememberOpener($event)" (click)="duplicate()" title="Duplicate note" aria-label="Duplicate note">⧉</button>
+            <button class="btn-icon" (mousedown)="rememberOpener($event)" (click)="toggleFocus()" [class.active]="focusMode()"
                     title="Toggle focus mode" aria-label="Toggle focus mode">⛶</button>
-            <button class="btn-icon" (click)="exportNote()" title="Export as .txt" aria-label="Export as .txt">↓</button>
-            <button class="btn-icon" (click)="exportWorkspace()" title="Export workspace" aria-label="Export workspace">⭳</button>
-            <button class="btn-icon" (click)="importWorkspace()" title="Import workspace" aria-label="Import workspace">⭱</button>
-            <button class="btn-icon" (click)="openShortcutsPanel()" title="Keyboard shortcuts" aria-label="Show shortcuts">⌨</button>
-            <button class="btn-icon danger-btn" (click)="onDeleteClick()" title="Delete note" aria-label="Delete note">🗑</button>
+            <button class="btn-icon" (mousedown)="rememberOpener($event)" (click)="exportNote()" title="Export as .txt" aria-label="Export as .txt">↓</button>
+            <button class="btn-icon" #exportWorkspaceBtn (mousedown)="rememberOpener($event)" (click)="exportWorkspace()" title="Export workspace" aria-label="Export workspace">⭳</button>
+            <button class="btn-icon" #importWorkspaceBtn (mousedown)="rememberOpener($event)" (click)="importWorkspace()" title="Import workspace" aria-label="Import workspace">⭱</button>
+            <button class="btn-icon" (mousedown)="rememberOpener($event)" (click)="openShortcutsPanel()" title="Keyboard shortcuts" aria-label="Show shortcuts">⌨</button>
+            <button class="btn-icon danger-btn" (click)="onDeleteClick($event)" title="Delete note" aria-label="Delete note">🗑</button>
           </div>
         } @else {
           <div class="toolbar-actions">
-            <button class="btn-icon" (click)="exportWorkspace()" title="Export workspace" aria-label="Export workspace">⭳</button>
-            <button class="btn-icon" (click)="importWorkspace()" title="Import workspace" aria-label="Import workspace">⭱</button>
-            <button class="btn-icon" (click)="openShortcutsPanel()" title="Keyboard shortcuts" aria-label="Show shortcuts">⌨</button>
+            <button class="btn-icon" (mousedown)="rememberOpener($event)" (click)="exportWorkspace()" title="Export workspace" aria-label="Export workspace">⭳</button>
+            <button class="btn-icon" (mousedown)="rememberOpener($event)" (click)="importWorkspace()" title="Import workspace" aria-label="Import workspace">⭱</button>
+            <button class="btn-icon" (mousedown)="rememberOpener($event)" (click)="openShortcutsPanel()" title="Keyboard shortcuts" aria-label="Show shortcuts">⌨</button>
           </div>
         }
       </div>
 
       <!-- Delete Confirmation Bar -->
       @if (showDeleteConfirm()) {
-        <div class="delete-confirm-bar" role="alert">
+        <div class="delete-confirm-bar" role="dialog" aria-modal="true" aria-label="Confirm delete note">
           <span>Delete this note permanently?</span>
           <div class="delete-confirm-actions">
             <button class="btn btn-danger" (click)="confirmDelete()">Delete note</button>
-            <button class="btn" (click)="showDeleteConfirm.set(false)">Cancel</button>
+            <button class="btn" (click)="cancelDelete()">Cancel</button>
           </div>
         </div>
       }
@@ -86,15 +91,33 @@ const TITLE_MAX = 200;
             <div id="note-title-error" class="field-error" role="alert" aria-live="polite">{{ titleError() }}</div>
           }
 
+          <!-- Formatting toolbar -->
+          <div class="format-toolbar" role="toolbar" aria-label="Formatting">
+            <button type="button" class="fmt-btn" [class.active]="formatActive().bold"
+                    (click)="toggleBold()" aria-label="Bold" title="Bold">B</button>
+            <button type="button" class="fmt-btn" [class.active]="formatActive().italic"
+                    (click)="toggleItalic()" aria-label="Italic" title="Italic"><em>I</em></button>
+            <button type="button" class="fmt-btn" [class.active]="formatActive().heading"
+                    (click)="toggleHeading()" aria-label="Heading" title="Heading">H</button>
+            <button type="button" class="fmt-btn" [class.active]="formatActive().bulletList"
+                    (click)="toggleBulletList()" aria-label="Bulleted list" title="Bulleted list">•</button>
+            <button type="button" class="fmt-btn" (click)="undoEdit()" aria-label="Undo" title="Undo">↶</button>
+            <button type="button" class="fmt-btn" (click)="redoEdit()" aria-label="Redo" title="Redo">↷</button>
+          </div>
+
           <!-- Body -->
-          <label class="field-label body-label" for="note-body">Note body</label>
-          <textarea
-            id="note-body"
-            class="note-body-input"
-            placeholder="Start writing…"
-            [value]="localBody()"
-            (input)="onBodyInput($event)"
-          ></textarea>
+          <label class="field-label body-label" id="note-body-label" for="note-body">Note body</label>
+          <app-prose-body-editor
+            #proseEditor
+            [noteId]="note()!.id"
+            [content]="localBody()"
+            (contentChange)="onBodyChange($event)"
+            (formatActiveChange)="formatActive.set($event)"
+            (bodyError)="bodyError.set($event)"
+          />
+          @if (bodyError()) {
+            <div class="field-error" role="alert" aria-live="polite">{{ bodyError() }}</div>
+          }
 
           <!-- Images -->
           @if (note()!.images.length > 0) {
@@ -228,6 +251,27 @@ const TITLE_MAX = 200;
     }
 
     .body-label { margin-top: 8px; }
+
+    .format-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding: 6px 0;
+    }
+
+    .fmt-btn {
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.88);
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .fmt-btn:hover { background: rgba(255,255,255,0.12); }
+    .fmt-btn:focus-visible { outline: 2px solid #F45B69; outline-offset: 2px; }
+    .fmt-btn.active { background: rgba(244, 91, 105, 0.25); border-color: #F45B69; color: #fff; }
 
     .field-error {
       color: #ff8a80;
@@ -421,8 +465,10 @@ const TITLE_MAX = 200;
 export class NoteEditorComponent {
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
   @ViewChild('titleInput') titleInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChild('proseEditor') proseEditorRef?: ProseBodyEditorComponent;
 
   private store = inject(Store);
+  private dialogFocus = inject(DialogFocusService);
 
   note = toSignal(this.store.select(selectSelectedNote), { initialValue: null });
   focusMode = toSignal(this.store.select(selectFocusMode), { initialValue: false });
@@ -432,16 +478,19 @@ export class NoteEditorComponent {
   saved = signal(false);
   showDeleteConfirm = signal(false);
   titleError = signal<string | null>(null);
+  bodyError = signal<string | null>(null);
+  formatActive = signal<FormatActiveState>({ bold: false, italic: false, heading: false, bulletList: false });
 
   private savedTimer?: ReturnType<typeof setTimeout>;
   private pendingId: string | null = null;
+  private deleteOpener: HTMLElement | null = null;
 
   wordCount = computed(() => {
-    const text = `${this.localTitle()} ${this.localBody()}`.trim();
+    const text = `${this.localTitle()} ${htmlToPlain(this.localBody())}`.trim();
     return text ? text.split(/\s+/).filter(Boolean).length : 0;
   });
 
-  charCount = computed(() => (this.localTitle() + this.localBody()).length);
+  charCount = computed(() => (this.localTitle() + htmlToPlain(this.localBody())).length);
 
   constructor() {
     // Sync local state when selected note changes
@@ -482,12 +531,22 @@ export class NoteEditorComponent {
     this.flashSaved();
   }
 
-  onBodyInput(event: Event) {
-    const val = (event.target as HTMLTextAreaElement).value;
-    this.localBody.set(val);
+  onBodyChange(html: string) {
+    this.localBody.set(html);
     const id = this.note()?.id;
-    if (id) this.store.dispatch(updateNote({ id, changes: { body: val } }));
+    if (id) this.store.dispatch(updateNote({ id, changes: { body: html } }));
     this.flashSaved();
+  }
+
+  toggleBold() { this.proseEditorRef?.toggleBold(); }
+  toggleItalic() { this.proseEditorRef?.toggleItalic(); }
+  toggleHeading() { this.proseEditorRef?.toggleHeading(); }
+  toggleBulletList() { this.proseEditorRef?.toggleBulletList(); }
+  undoEdit() { this.proseEditorRef?.undo(); this.flashSaved(); }
+  redoEdit() { this.proseEditorRef?.redo(); this.flashSaved(); }
+
+  rememberOpener(event: Event) {
+    this.dialogFocus.remember(event.currentTarget);
   }
 
   private flashSaved() {
@@ -516,10 +575,18 @@ export class NoteEditorComponent {
 
   newNote() {
     this.store.dispatch(createNote());
-    this.store.dispatch(showToast({ message: 'New note created' }));
+    this.store.dispatch(showToast({ message: 'Note created' }));
   }
 
-  onDeleteClick() { this.showDeleteConfirm.set(true); }
+  onDeleteClick(event: Event) {
+    this.deleteOpener = event.currentTarget as HTMLElement;
+    this.showDeleteConfirm.set(true);
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm.set(false);
+    setTimeout(() => this.deleteOpener?.focus(), 0);
+  }
 
   confirmDelete() {
     const id = this.note()?.id;
@@ -529,6 +596,7 @@ export class NoteEditorComponent {
     }
     this.showDeleteConfirm.set(false);
     this.pendingId = null;
+    setTimeout(() => this.deleteOpener?.focus(), 0);
   }
 
   exportNote() {

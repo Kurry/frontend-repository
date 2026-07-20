@@ -195,7 +195,7 @@ import { Note } from '../../models/note.model';
     .note-row {
       box-sizing: border-box;
       border-bottom: 1px solid rgba(255,255,255,0.05);
-      transition: background 0.1s;
+      transition: top 0.22s ease, background 0.12s ease, opacity 0.22s ease;
     }
 
     .note-row:hover { background: rgba(255,255,255,0.05); }
@@ -245,14 +245,14 @@ import { Note } from '../../models/note.model';
 
     .note-time {
       font-size: 11px;
-      color: rgba(255,255,255,0.6);
+      color: rgba(255,255,255,0.72);
       flex-shrink: 0;
       white-space: nowrap;
     }
 
     .note-preview {
       font-size: 12px;
-      color: rgba(255,255,255,0.62);
+      color: rgba(255,255,255,0.72);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -329,12 +329,12 @@ export class SidebarComponent {
 
   newNote() {
     this.store.dispatch(createNote());
-    this.store.dispatch(showToast({ message: 'New note created' }));
+    this.store.dispatch(showToast({ message: 'Note created' }));
   }
 
   select(id: string | undefined) {
     if (!id) return;
-    this.store.dispatch(selectNote({ id: this.selectedNoteId() === id ? null : id }));
+    this.store.dispatch(selectNote({ id }));
     if (window.matchMedia('(max-width: 600px)').matches) {
       this.store.dispatch(toggleSidebar());
     }
@@ -364,7 +364,7 @@ export class SidebarComponent {
   }
 
   getPreview(note: Note): string {
-    const body = note.body.replace(/\s+/g, ' ').trim();
+    const body = note.body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
     return body.length > 80 ? body.slice(0, 80) + '…' : body;
   }
 
