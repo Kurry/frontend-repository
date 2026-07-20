@@ -1,4 +1,4 @@
-import { DOCUMENT_TYPES, type DocumentType } from './schemas'
+import { DOCUMENT_TYPES, repositoryFormSchema, importFormSchema, type DocumentType } from './schemas'
 import { scanSelected, startScan, useAppStore, type StepStatus } from './store'
 
 type JsonSchema = Record<string, unknown>
@@ -37,7 +37,14 @@ const tools: ToolDefinition[] = [
         displayName: { type: 'string', maxLength: 80 },
       },
     },
-    handler: ({ path, displayName }) => useAppStore.getState().addRepository({ path: String(path ?? ''), displayName: displayName === undefined ? '' : String(displayName) }),
+    handler: ({ path, displayName }) => {
+      const values = { path: String(path ?? ''), displayName: displayName === undefined ? '' : String(displayName) }
+      const parsed = repositoryFormSchema.safeParse(values)
+      if (!parsed.success) {
+        return { ok: false, error: parsed.error.issues[0]?.message || 'Invalid parameters' }
+      }
+      return useAppStore.getState().addRepository(parsed.data)
+    },
   },
   {
     name: 'entity_repository_select',
@@ -64,9 +71,14 @@ const tools: ToolDefinition[] = [
         value: { type: 'string', maxLength: 80 },
       },
     },
-    handler: ({ repositoryId, field, value }) => field === 'display-name'
-      ? useAppStore.getState().renameRepository(String(repositoryId), String(value ?? ''))
-      : { ok: false, error: 'field must be display-name' },
+    handler: ({ repositoryId, field, value }) => {
+      if (field !== 'display-name') return { ok: false, error: 'field must be display-name' }
+      const parsed = repositoryFormSchema.pick({ displayName: true }).safeParse({ displayName: String(value ?? '') })
+      if (!parsed.success) {
+        return { ok: false, error: parsed.error.issues[0]?.message || 'Invalid parameters' }
+      }
+      return useAppStore.getState().renameRepository(String(repositoryId), parsed.data.displayName || '')
+    },
   },
   {
     name: 'entity_repository_delete',
@@ -231,7 +243,16 @@ const tools: ToolDefinition[] = [
     handler: ({ mode, source }) => {
       if (mode !== 'scan-index' || source !== 'current-export') return { ok: false, error: 'Only scan-index/current-export is declared' }
       const state = useAppStore.getState()
-      return state.importIndex(JSON.parse(state.artifactJson))
+
+      const payloadString = state.artifactJson
+      const parseResult = importFormSchema.safeParse({ payload: payloadString })
+      if (!parseResult.success) {
+        return { ok: false, error: parseResult.error.issues[0]?.message || 'Invalid payload' }
+      }
+
+      let parsed: unknown
+      try { parsed = JSON.parse(parseResult.data.payload) } catch { return { ok: false, error: 'malformed JSON' } }
+      return state.importIndex(parsed)
     },
   },
   {

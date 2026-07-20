@@ -667,6 +667,7 @@ export function retryFailedStep(repositoryId: string, stepId: string): Promise<b
 
 export async function scanSelected(): Promise<number> {
   const repositoryIds = [...useAppStore.getState().selectedRepositoryIds]
+  if (repositoryIds.length === 0) return 0
   let completed = 0
   for (const repositoryId of repositoryIds) {
     if (await startScan(repositoryId)) completed += 1
