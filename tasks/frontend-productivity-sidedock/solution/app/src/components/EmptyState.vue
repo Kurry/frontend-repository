@@ -16,7 +16,7 @@ const store = useSidedockStore()
   <!-- No workspaces -->
   <div v-if="type === 'no-workspaces'" class="flex-1 flex items-center justify-center p-8">
     <div class="text-center max-w-xs mx-auto">
-      <div aria-hidden="true" class="text-6xl mb-4 opacity-60">🔖</div>
+      <div role="img" aria-label="Bookmark empty state" class="text-6xl mb-4 opacity-60">🔖</div>
       <h2 class="text-xl font-semibold mb-2" style="font-family: 'Cormorant Upright', Georgia, serif;">
         Welcome to SideDock
       </h2>
@@ -24,7 +24,7 @@ const store = useSidedockStore()
         Your personal bookmark manager. Create your first workspace to start organizing your links.
       </p>
       <button
-        @click="store.createWorkspace('My workspace', '#E54610')"
+        @click="store.showCreateWorkspaceModal = true"
         class="btn-primary text-sm"
       >
         Create workspace
@@ -35,7 +35,7 @@ const store = useSidedockStore()
   <!-- Empty workspace -->
   <div v-else-if="type === 'empty-workspace'" class="flex-1 flex items-center justify-center p-8">
     <div class="text-center max-w-xs mx-auto">
-      <div aria-hidden="true" class="text-5xl mb-3 opacity-50">📂</div>
+      <div role="img" aria-label="Folder empty state" class="text-5xl mb-3 opacity-50">📂</div>
       <h3 class="text-base font-semibold mb-2" style="font-family: 'Cormorant Upright', Georgia, serif;">
         This workspace is empty
       </h3>

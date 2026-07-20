@@ -88,7 +88,9 @@ function onDragOver(item, event) {
   event.preventDefault()
   event.dataTransfer.dropEffect = 'move'
   if (item && dragItem.value && item.id !== dragItem.value.id) {
-    dropTarget.value = item.id
+    if (item.type === 'folder') {
+      dropTarget.value = item.id
+    }
   }
 }
 
@@ -289,7 +291,7 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
     </div>
 
     <div class="tree-toolbar px-4 py-2 border-b flex items-center gap-2" style="border-color: var(--color-border);">
-      <button type="button" class="btn-secondary text-xs" @click="store.createFolder(null)">Add folder</button>
+      <button type="button" class="btn-secondary text-xs" @click="store.createFolderParentId = null; store.showCreateFolderModal = true">Add folder</button>
       <button
         v-if="flatItems.length"
         type="button"
@@ -389,7 +391,7 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
               <div class="row-actions flex items-center gap-1 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity pr-2">
                 <button @click.stop="moveUp(flatItems[vItem.index])" :disabled="flatItems[vItem.index].index === 0" class="icon-action" title="Move up" aria-label="Move folder up">↑</button>
                 <button @click.stop="moveDown(flatItems[vItem.index])" :disabled="flatItems[vItem.index].index >= flatItems[vItem.index].siblingCount - 1" class="icon-action" title="Move down" aria-label="Move folder down">↓</button>
-                <button @click.stop="store.createFolder(flatItems[vItem.index].id)" class="icon-action" title="Add subfolder" aria-label="Add subfolder">+</button>
+                <button @click.stop="store.createFolderParentId = flatItems[vItem.index].id; store.showCreateFolderModal = true" class="icon-action" title="Add subfolder" aria-label="Add subfolder">+</button>
                 <button @click.stop="startEdit(flatItems[vItem.index])" class="icon-action" title="Rename" aria-label="Rename folder">✎</button>
                 <span class="move-menu-anchor">
                   <button
@@ -456,6 +458,7 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
               />
               <!-- Monogram icon -->
               <a :href="flatItems[vItem.index].url" target="_blank" rel="noopener" class="flex-shrink-0 mt-2" @click.stop :aria-label="`Open ${flatItems[vItem.index].title}`">
+
                 <div 
                   aria-hidden="true"
                   class="w-8 h-8 rounded-md flex items-center justify-center text-white text-sm font-bold"
@@ -614,6 +617,8 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
   color: var(--secondary-text);
 }
 .tree-row:focus-visible, .selected-row {
+  outline: 2px solid var(--color-accent) !important;
+  outline-offset: -2px;
   background: color-mix(in srgb, var(--color-accent) 11%, var(--control-background)) !important;
 }
 .folder-heading {
@@ -669,3 +674,9 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
 :global(.compact-view) .bookmark-row { gap: 4px; }
 :global(.compact-view) .tree-toolbar { flex-wrap: wrap; }
 </style>
+
+.tree-row:hover {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--control-background));
+}
+
+.tree-row { transition: all 0.2s ease; }

@@ -11,7 +11,7 @@ const showColorPicker = ref(null)
 const WORKSPACE_COLORS = ['#E54610', '#D97706', '#65A30D', '#059669', '#0891B2', '#2563EB', '#7C3AED', '#DB2777', '#6B7280']
 
 function startCreate() {
-  store.createWorkspace('New workspace', WORKSPACE_COLORS[Math.floor(Math.random() * WORKSPACE_COLORS.length)])
+  store.showCreateWorkspaceModal = true
 }
 
 function startRename(ws) {
@@ -164,3 +164,12 @@ function handleDelete(ws) {
 :global(.compact-view) .workspace-actions { opacity: 1; }
 :global(.compact-view) .icon-action { width: 28px; height: 28px; min-width: 28px; }
 </style>
+
+.workspace-tab:hover {
+  background: color-mix(in srgb, var(--color-accent) 5%, var(--control-background)) !important;
+}
+
+.workspace-tab:focus-visible {
+  outline: 2px solid var(--color-accent) !important;
+  outline-offset: -2px;
+}
