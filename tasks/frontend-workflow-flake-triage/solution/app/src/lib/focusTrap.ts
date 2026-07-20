@@ -76,6 +76,10 @@ export function focusTrap(node: HTMLElement, { returnFocus }: { returnFocus?: HT
   function focusInHandler(event: FocusEvent): void {
     const target = event.target;
     if (!(target instanceof Node) || node.contains(target)) return;
+    if (target instanceof Element) {
+      const foreignTrap = target.closest('[data-focus-trap-root]');
+      if (foreignTrap && foreignTrap !== node) return;
+    }
     event.preventDefault();
     event.stopImmediatePropagation();
     redirectFocus();

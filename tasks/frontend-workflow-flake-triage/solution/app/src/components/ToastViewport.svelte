@@ -1,6 +1,6 @@
 <script lang="ts">
   import { IconAlertCircle, IconCheck, IconInfoCircle } from '@tabler/icons-svelte';
-  import { fly } from 'svelte/transition';
+  import { fade, fly } from 'svelte/transition';
   import { triage } from '../lib/triage.svelte';
   import { motion } from '../lib/motion.svelte';
 </script>
@@ -12,7 +12,7 @@
       class:instant={motion.reduced}
       role={toast.tone === 'danger' ? 'alert' : 'status'}
       in:fly={{ x: 28, duration: motion.reduced ? 0 : 280 }}
-      out:fly={{ x: 28, duration: motion.reduced ? 0 : 220 }}
+      out:fade={{ duration: motion.reduced ? 0 : 220 }}
     >
       <span class="toast-icon">
         {#if toast.tone === 'success'}<IconCheck size={16} />

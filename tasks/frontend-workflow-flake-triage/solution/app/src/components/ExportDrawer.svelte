@@ -28,6 +28,7 @@
   <div class="backdrop" aria-hidden="true" role="presentation" onclick={() => triage.closeExport()}></div>
   <div
     class="drawer card-panel"
+    data-focus-trap-root
     role="dialog"
     aria-modal="true"
     aria-labelledby="export-title"

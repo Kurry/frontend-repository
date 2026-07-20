@@ -56,6 +56,7 @@
 {#if open}
 <form
   class="rerun-form open"
+  data-focus-trap-root
   aria-label={`Re-run ${testId}`}
   transition:scale={{ start: 0.98, duration: motion.reduced ? 0 : 240 }}
   use:focusTrap={{ returnFocus: triage.rerunReturnFocus }}
