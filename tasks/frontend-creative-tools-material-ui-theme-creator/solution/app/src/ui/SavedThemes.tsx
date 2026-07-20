@@ -100,8 +100,13 @@ export function NamePanel() {
   const submit = handleSubmit((data) => {
     const name = data.name.trim();
     let res: { ok: boolean; error?: string };
-    if (mode === 'rename' && panel?.themeId) res = renameTheme(panel.themeId, name);
-    else if (mode === 'snapshot') res = saveSnapshot(name);
+    if (mode === 'rename') {
+      // Never fall through to createTheme from rename mode: if the target id
+      // is gone, surface an error instead of silently creating a new theme.
+      res = panel?.themeId
+        ? renameTheme(panel.themeId, name)
+        : { ok: false, error: 'That theme no longer exists' };
+    } else if (mode === 'snapshot') res = saveSnapshot(name);
     else res = createTheme(name);
     if (!res.ok) {
       const msg = res.error ?? 'Invalid name';

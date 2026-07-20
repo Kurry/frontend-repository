@@ -428,8 +428,9 @@ export function optionsToSource(o: ThemeOptions): string {
 }
 
 // Extract the balanced { ... } literal following "themeOptions =" using brace
-// counting (string-aware), so nested closers mid-object are never mistaken for
-// the end of the literal.
+// counting (string- and comment-aware), so nested closers mid-object — or a
+// stray "}" inside a // or /* */ comment — are never mistaken for the end of
+// the literal.
 function extractObjectLiteral(src: string): string | null {
   const anchor = /themeOptions\s*=\s*/.exec(src);
   const from = anchor ? anchor.index + anchor[0].length : 0;
@@ -448,6 +449,19 @@ function extractObjectLiteral(src: string): string | null {
     }
     if (ch === '"' || ch === "'" || ch === '`') {
       inStr = ch;
+      continue;
+    }
+    // Skip line and block comments so braces inside them don't count.
+    if (ch === '/' && src[i + 1] === '/') {
+      const nl = src.indexOf('\n', i + 2);
+      if (nl === -1) break;
+      i = nl;
+      continue;
+    }
+    if (ch === '/' && src[i + 1] === '*') {
+      const end = src.indexOf('*/', i + 2);
+      if (end === -1) break;
+      i = end + 1;
       continue;
     }
     if (ch === '{') depth++;

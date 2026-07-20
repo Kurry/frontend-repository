@@ -50,6 +50,22 @@ interface Result {
 
 const MAX_HISTORY = 60;
 
+// Order-insensitive deep JSON: sibling key order in the editor source must not
+// decide whether parsed options equal the live state (raw JSON.stringify is
+// insertion-order-sensitive, so a reordered-but-identical literal would look
+// "changed" and record a spurious history entry).
+function canonicalJSON(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(canonicalJSON).join(',')}]`;
+  if (v && typeof v === 'object') {
+    const rec = v as Record<string, unknown>;
+    return `{${Object.keys(rec)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${canonicalJSON(rec[k])}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(v);
+}
+
 interface State {
   savedThemes: SavedTheme[];
   activeThemeId: string | null;
@@ -218,7 +234,7 @@ export const useStore = create<State>((set, get) => {
         // to the current state: refresh the text without recording a no-op
         // history entry, so Format Source never adds a spurious undo step or
         // scrubber state.
-        if (JSON.stringify(res.options) === JSON.stringify(get().options)) {
+        if (canonicalJSON(res.options) === canonicalJSON(get().options)) {
           set({ source: src, sourceError: null, saveStatus: 'All changes saved' });
           return;
         }
