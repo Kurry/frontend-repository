@@ -10,6 +10,8 @@ import { Navigation, Keyboard } from "swiper/modules";
 
 import { initPlayers } from "./player.js";
 import { initFlickGroups } from "./flick.js";
+import { z } from "zod";
+import { state, pushUndo, undo, redo, resetStore } from "./store.ts";
 
 gsap.registerPlugin(ScrollTrigger, SplitText, InertiaPlugin);
 
@@ -314,33 +316,43 @@ function initCounters() {
   });
 }
 
+
 /* ------------------------------------------------ services pinned deck */
 function initServices() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const pin = document.querySelector("[data-services-pin]");
   if (!pin) return;
   const items = gsap.utils.toArray(".services-item");
   if (!items.length) return;
-  // DOM order: 03, 02, 01 — the last item (01) sits on top. Scrolling throws
-  // the top card away to reveal the next.
-  const order = items.slice().reverse();
+
+  // They are absolutely positioned. As we scroll, throw the top one away with rotation
+  const order = items.slice().reverse(); // First item in HTML is on top visually? Actually HTML order makes last item visually on top unless z-index applied.
+
+  // Set z-index to ensure correct visual stacking
+  items.forEach((item, i) => {
+      item.style.zIndex = items.length - i;
+  });
+
   const tl = gsap.timeline({
     scrollTrigger: {
       trigger: pin,
       start: "top top",
-      end: "bottom bottom",
+      end: "+=200%",
+      pin: true,
       scrub: true,
     },
   });
-  order.forEach((item, i) => {
-    if (i === order.length - 1) return;
+
+  items.forEach((item, i) => {
+    if (i === items.length - 1) return; // Leave last card alone
     tl.to(item, {
       yPercent: -120,
-      rotation: i % 2 ? 6 : -6,
-      ease: "power1.in",
-      duration: 1,
+      rotation: i % 2 === 0 ? -15 : 15,
+      ease: "none"
     });
   });
 }
+
 
 /* ------------------------------------------------ testimonial rotator */
 function initTestimonials() {
@@ -439,6 +451,12 @@ function initParallax() {
 }
 
 /* ------------------------------------------------ CTA popup + contact form */
+const ContactSchema = z.object({
+  email: z.string().trim().max(254).email(),
+  phone: z.string().max(40).regex(/^[\d\s\+\-\(\)]*$/).optional().nullable().transform(v => v === "" ? null : v),
+  terms: z.literal(true)
+});
+
 function initContact() {
   const popup = document.querySelector("[data-cta-popup]");
   if (popup) {
@@ -458,7 +476,6 @@ function initContact() {
   if (!form) return;
   const loadedAt = Date.now();
   const success = document.querySelector("[data-form-success]");
-  const fail = document.querySelector("[data-form-error]");
 
   form.querySelectorAll(".form-input").forEach((input) => {
     input.addEventListener("input", () => {
@@ -468,24 +485,35 @@ function initContact() {
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    // Anti-spam: silently ignore submissions within 5s of load.
     if (Date.now() - loadedAt < 5000) return;
-    const email = form.querySelector('input[name="E-mail"]');
-    const terms = form.querySelector('input[name="Terms-Conditions"]');
-    let valid = true;
-    if (!email.value || !/.+@.+\..+/.test(email.value)) {
-      email.closest("[data-validate]")?.classList.add("is--error");
-      valid = false;
-    } else {
-      email.closest("[data-validate]")?.classList.remove("is--error");
+
+    const emailInput = form.querySelector('input[name="E-mail"]');
+    const phoneInput = form.querySelector('input[name="Telefoonnummer"]');
+    const termsInput = form.querySelector('input[name="Terms-Conditions"]');
+
+    const payload = {
+      email: emailInput?.value || "",
+      phone: phoneInput?.value || null,
+      terms: termsInput?.checked || false
+    };
+
+    const result = ContactSchema.safeParse(payload);
+
+    form.querySelectorAll("[data-validate]").forEach(el => el.classList.remove("is--error"));
+
+    if (!result.success) {
+      result.error.issues.forEach(issue => {
+        if (issue.path[0] === 'email') {
+          emailInput?.closest("[data-validate]")?.classList.add("is--error");
+        } else if (issue.path[0] === 'terms') {
+          termsInput?.closest("[data-validate]")?.classList.add("is--error");
+        } else if (issue.path[0] === 'phone') {
+          phoneInput?.closest("[data-validate]")?.classList.add("is--error");
+        }
+      });
+      return;
     }
-    if (!terms.checked) {
-      terms.closest("[data-validate]")?.classList.add("is--error");
-      valid = false;
-    } else {
-      terms.closest("[data-validate]")?.classList.remove("is--error");
-    }
-    if (!valid) return;
+
     try {
       const res = await fetch(form.action, {
         method: "POST",
@@ -494,25 +522,39 @@ function initContact() {
       });
       if (res.ok) {
         success?.classList.add("is-visible");
-        fail?.classList.remove("is-visible");
-      } else {
-        fail?.classList.add("is-visible");
+        const s = state.get();
+        state.set({ ...s, contactSubmitted: true, contactEmail: result.data.email });
       }
     } catch (err) {
-      fail?.classList.add("is-visible");
+      // fail silent
     }
   });
 }
 
 /* ------------------------------------------------ cookie flow */
+const CookieSchema = z.object({
+  essential: z.literal(true),
+  marketing: z.boolean(),
+  analytics: z.boolean(),
+  personalization: z.boolean()
+});
+
+function updateCookieState(payload) {
+  pushUndo();
+  const s = state.get();
+  state.set({ ...s, cookieCategories: payload });
+}
+
 function initCookies() {
   const banner = document.querySelector('[data-cookie-banner="zone-1"]');
   const prefs = document.querySelector("[data-cookie-prefs]");
+
   if (banner) {
     requestAnimationFrame(() => banner.classList.add("is-visible"));
     banner.querySelector("[data-cookie-close]")?.addEventListener("click", () => banner.classList.remove("is-visible"));
     banner.querySelector("[data-cookie-accept]")?.addEventListener("click", (e) => {
       e.preventDefault();
+      updateCookieState({ essential: true, marketing: true, analytics: true, personalization: true });
       banner.classList.remove("is-visible");
     });
     banner.querySelector("[data-cookie-prefs-open]")?.addEventListener("click", (e) => {
@@ -520,25 +562,342 @@ function initCookies() {
       prefs?.classList.add("is-visible");
     });
   }
+
   if (prefs) {
     const close = () => prefs.classList.remove("is-visible");
     prefs.querySelector("[data-cookie-prefs-close]")?.addEventListener("click", close);
     prefs.querySelector("[data-cookie-prefs-close-target]")?.addEventListener("click", close);
-    ["[data-cookie-reject]", "[data-cookie-accept-all]", "[data-cookie-accept-selected]"].forEach((sel) => {
-      prefs.querySelector(sel)?.addEventListener("click", (e) => {
-        e.preventDefault();
-        close();
-        banner?.classList.remove("is-visible");
-      });
+
+    prefs.querySelector("[data-cookie-accept-all]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      updateCookieState({ essential: true, marketing: true, analytics: true, personalization: true });
+      close();
+      banner?.classList.remove("is-visible");
     });
+
+    prefs.querySelector("[data-cookie-reject]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+      updateCookieState({ essential: true, marketing: false, analytics: false, personalization: false });
+      close();
+      banner?.classList.remove("is-visible");
+    });
+
+    prefs.querySelector("[data-cookie-accept-selected]")?.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const payload = {
+        essential: prefs.querySelector('input[name="Essential"]')?.checked ?? false,
+        marketing: prefs.querySelector('input[name="Marketing"]')?.checked ?? false,
+        analytics: prefs.querySelector('input[name="Analytics"]')?.checked ?? false,
+        personalization: prefs.querySelector('input[name="Personalization"]')?.checked ?? false
+      };
+
+      const result = CookieSchema.safeParse(payload);
+
+      prefs.querySelectorAll("[data-validate-cookie]").forEach(el => el.classList.remove("is--error"));
+
+      if (!result.success) {
+        result.error.issues.forEach(issue => {
+          const field = issue.path[0];
+          prefs.querySelector(`input[name="${field.charAt(0).toUpperCase() + field.slice(1)}"]`)?.closest("[data-validate-cookie]")?.classList.add("is--error");
+        });
+        return;
+      }
+
+      updateCookieState(result.data);
+      close();
+      banner?.classList.remove("is-visible");
+    });
+
     prefs.querySelectorAll("[data-toggle]").forEach((label) => {
       const input = label.querySelector("input");
-      input?.addEventListener("change", () => label.classList.toggle("is-on", input.checked));
+      // Prevent unchecking essential
+      input?.addEventListener("change", (e) => {
+        if (input.name === "Essential") {
+          input.checked = true;
+        }
+        label.classList.toggle("is-on", input.checked);
+      });
     });
   }
 }
 
 /* ------------------------------------------------ misc */
+
+const DiscoveryBriefSchema = z.object({
+  schemaVersion: z.literal(1),
+  brand: z.literal("Cinder & Bloom"),
+  shortlistedClients: z.array(z.enum(["Loom House", "Second Circle", "New Current", "Roadkind", "Motive Lab"])),
+  activeClient: z.enum(["Loom House", "Second Circle", "New Current", "Roadkind", "Motive Lab"]),
+  flickIndexByClient: z.object({
+    "Loom House": z.number().int().nonnegative(),
+    "Second Circle": z.number().int().nonnegative(),
+    "New Current": z.number().int().nonnegative(),
+    "Roadkind": z.number().int().nonnegative(),
+    "Motive Lab": z.number().int().nonnegative()
+  }),
+  locale: z.enum(["en", "fi"]),
+  cookieCategories: z.object({
+    essential: z.literal(true),
+    marketing: z.boolean(),
+    analytics: z.boolean(),
+    personalization: z.boolean()
+  }),
+  contactSubmitted: z.boolean(),
+  contactEmail: z.string().email().nullable(),
+  activeOrganicViews: z.string(),
+  activeLikes: z.string(),
+  testimonialIndex: z.number().int().nonnegative()
+}).refine(data => {
+  if (data.contactSubmitted && !data.contactEmail) return false;
+  if (!data.contactSubmitted && data.contactEmail !== null) return false;
+  return true;
+}, "contactEmail must be null if contactSubmitted is false, and equal to the lead email if contactSubmitted is true");
+
+function initOverlays() {
+  const cmdPalette = document.getElementById("command-palette");
+  const briefPanel = document.getElementById("discovery-brief");
+  const shortlistPanel = document.getElementById("shortlist-panel");
+
+  // Command Palette
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+      e.preventDefault();
+      cmdPalette.showModal();
+      document.getElementById("cmd-search").focus();
+    }
+  });
+
+  document.getElementById("cmd-export")?.addEventListener("click", () => {
+    cmdPalette.close();
+    generateBrief();
+    briefPanel.showModal();
+  });
+
+  document.getElementById("cmd-jump")?.addEventListener("click", () => {
+    cmdPalette.close();
+    document.querySelector(".section_services")?.scrollIntoView({ behavior: "smooth" });
+  });
+
+  cmdPalette?.addEventListener("click", (e) => {
+    if (e.target === cmdPalette) cmdPalette.close();
+  });
+
+  // Discovery Brief
+  document.getElementById("brief-close")?.addEventListener("click", () => briefPanel.close());
+  briefPanel?.addEventListener("click", (e) => {
+    if (e.target === briefPanel) briefPanel.close();
+  });
+
+  document.getElementById("tab-json")?.addEventListener("click", () => {
+    document.getElementById("brief-json-view").classList.remove("hidden");
+    document.getElementById("brief-md-view").classList.add("hidden");
+    document.getElementById("tab-json").classList.add("font-bold", "underline");
+    document.getElementById("tab-md").classList.remove("font-bold", "underline");
+  });
+
+  document.getElementById("tab-md")?.addEventListener("click", () => {
+    document.getElementById("brief-json-view").classList.add("hidden");
+    document.getElementById("brief-md-view").classList.remove("hidden");
+    document.getElementById("tab-md").classList.add("font-bold", "underline");
+    document.getElementById("tab-json").classList.remove("font-bold", "underline");
+  });
+
+  document.getElementById("brief-copy")?.addEventListener("click", () => {
+    const text = document.getElementById("brief-json-view").classList.contains("hidden")
+      ? document.getElementById("brief-md-content").value
+      : document.getElementById("brief-json-content").value;
+    navigator.clipboard.writeText(text);
+    const confirm = document.getElementById("copy-confirm");
+    confirm.classList.remove("opacity-0");
+    setTimeout(() => confirm.classList.add("opacity-0"), 2000);
+  });
+
+  document.getElementById("brief-download")?.addEventListener("click", () => {
+    const text = document.getElementById("brief-json-content").value;
+    const blob = new Blob([text], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "discovery_brief.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById("brief-import")?.addEventListener("click", () => {
+    const text = document.getElementById("brief-json-content").value;
+    const errEl = document.getElementById("import-error");
+    errEl.classList.add("hidden");
+    try {
+      const data = JSON.parse(text);
+      const result = DiscoveryBriefSchema.safeParse(data);
+      if (!result.success) {
+        errEl.textContent = result.error.errors[0].message;
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      const s = state.get();
+      state.set({
+        ...s,
+        shortlistedClients: result.data.shortlistedClients,
+        locale: result.data.locale,
+        cookieCategories: result.data.cookieCategories,
+        activeClient: result.data.activeClient,
+        flickIndexByClient: result.data.flickIndexByClient
+      });
+
+      // Update DOM to match state
+      updateDOMFromState();
+
+      briefPanel.close();
+    } catch (e) {
+      errEl.textContent = "Malformed JSON";
+      errEl.classList.remove("hidden");
+    }
+  });
+
+  // Shortlist Panel
+  document.getElementById("nav-shortlist-btn")?.addEventListener("click", () => {
+    shortlistPanel.showModal();
+  });
+
+  document.getElementById("shortlist-close")?.addEventListener("click", () => shortlistPanel.close());
+  shortlistPanel?.addEventListener("click", (e) => {
+    if (e.target === shortlistPanel) shortlistPanel.close();
+  });
+
+  // Undo/Redo
+  document.getElementById("nav-undo")?.addEventListener("click", undo);
+  document.getElementById("nav-redo")?.addEventListener("click", redo);
+
+  // Shortlist buttons in client deck
+  document.querySelectorAll(".shortlist-toggle-btn").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      const client = e.target.getAttribute("data-client-title");
+      pushUndo();
+      const s = state.get();
+      let list = [...s.shortlistedClients];
+      if (list.includes(client)) {
+        list = list.filter(c => c !== client);
+      } else {
+        list.push(client);
+      }
+      state.set({ ...s, shortlistedClients: list });
+    });
+  });
+
+  state.subscribe(renderState);
+}
+
+function updateDOMFromState() {
+    const s = state.get();
+
+    // Update locale
+    const root = document.querySelector("[data-locale-root]");
+    if (root) {
+        const current = root.querySelector("[data-locale-current]");
+        if (current) current.textContent = s.locale.toUpperCase();
+    }
+
+    // Update cookie prefs
+    const prefs = document.querySelector("[data-cookie-prefs]");
+    if (prefs) {
+        ['marketing', 'analytics', 'personalization'].forEach(cat => {
+            const el = prefs.querySelector(`input[name="${cat.charAt(0).toUpperCase() + cat.slice(1)}"]`);
+            if (el) {
+                el.checked = s.cookieCategories[cat];
+                el.dispatchEvent(new Event('change'));
+            }
+        });
+    }
+
+    // TODO: Need to sync active carousel and flick indices to DOM here!
+    // For Swiper: window.swiperInstance?.slideTo(index)
+    // For Flick: the flick.js logic might need updating to be state-driven
+}
+
+function generateBrief() {
+  const s = state.get();
+
+  // Try to find the active values from DOM if possible or fallback to state
+  const activeSlide = document.querySelector('.swiper-slide-active .client-deck_title');
+  if (activeSlide) {
+     s.activeClient = activeSlide.textContent.trim();
+  }
+
+  const organicViewsEl = document.querySelector('.swiper-slide-active [data-count="organic-views"]');
+  if (organicViewsEl) s.activeOrganicViews = organicViewsEl.textContent.trim();
+
+  const likesEl = document.querySelector('.swiper-slide-active [data-count="likes"]');
+  if (likesEl) s.activeLikes = likesEl.textContent.trim();
+
+  const json = {
+    schemaVersion: 1,
+    brand: "Cinder & Bloom",
+    shortlistedClients: s.shortlistedClients,
+    activeClient: s.activeClient,
+    flickIndexByClient: s.flickIndexByClient,
+    locale: s.locale,
+    cookieCategories: s.cookieCategories,
+    contactSubmitted: s.contactSubmitted,
+    contactEmail: s.contactEmail,
+    activeOrganicViews: s.activeOrganicViews,
+    activeLikes: s.activeLikes,
+    testimonialIndex: s.testimonialIndex
+  };
+
+  document.getElementById("brief-json-content").value = JSON.stringify(json, null, 2);
+
+  const md = `# Discovery brief — Cinder & Bloom
+
+- **Shortlisted Clients**: ${s.shortlistedClients.join(", ") || "None"}
+- **Active Client**: ${s.activeClient}
+- **Locale**: ${s.locale}
+- **Contact Submitted**: ${s.contactSubmitted} ${s.contactEmail ? `(${s.contactEmail})` : ''}
+`;
+  document.getElementById("brief-md-content").value = md;
+}
+
+function renderState(s) {
+  const countEl = document.getElementById("shortlist-count");
+  if (countEl) countEl.textContent = s.shortlistedClients.length;
+
+  document.querySelectorAll(".shortlist-toggle-btn").forEach(btn => {
+    const client = btn.getAttribute("data-client-title");
+    if (s.shortlistedClients.includes(client)) {
+      btn.textContent = "Shortlisted";
+      btn.classList.replace("variant-secondary", "variant-primary");
+    } else {
+      btn.textContent = "Shortlist";
+      btn.classList.replace("variant-primary", "variant-secondary");
+    }
+  });
+
+  const listEl = document.getElementById("shortlist-list");
+  if (listEl) {
+    listEl.innerHTML = s.shortlistedClients.map(c => `
+      <div class="flex justify-between items-center p-2 border border-gray-200 rounded">
+        <span>${c}</span>
+        <button class="remove-shortlist text-red-500 text-sm" data-client="${c}">Remove</button>
+      </div>
+    `).join("");
+
+    listEl.querySelectorAll(".remove-shortlist").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        pushUndo();
+        const client = e.target.getAttribute("data-client");
+        state.set({ ...s, shortlistedClients: s.shortlistedClients.filter(c => c !== client) });
+      });
+    });
+  }
+
+  // Re-generate brief if open
+  if (document.getElementById("discovery-brief")?.open) {
+      generateBrief();
+  }
+}
+
 function initMisc() {
   const year = String(new Date().getFullYear());
   document.querySelectorAll("[current-year], .current-year").forEach((el) => (el.textContent = year));
@@ -548,6 +907,7 @@ function initMisc() {
 /* ------------------------------------------------ boot */
 function boot() {
   initLenis();
+  initOverlays();
   initMisc();
   initHero();
   initNavDock();

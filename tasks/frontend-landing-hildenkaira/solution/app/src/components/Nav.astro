@@ -44,6 +44,17 @@ const { links, cta } = data.nav;
                 </nav>
               </div>
             </div>
+
+      <button class="nav-shortlist" id="nav-shortlist-btn">
+        <span class="paragraph-s">Shortlist (<span id="shortlist-count">0</span>)</span>
+      </button>
+
+
+      <div class="flex gap-2 mr-4">
+        <button id="nav-undo" class="button variant-secondary" style="padding: 4px 8px;">Undo</button>
+        <button id="nav-redo" class="button variant-secondary" style="padding: 4px 8px;">Redo</button>
+      </div>
+
             <div class="nav-button_wrap">
               <a class="btn-icon-link w-inline-block" href={cta.href}>
                 <div class="btn-icon-content">

@@ -72,7 +72,58 @@ const orgJsonLd = {
       <main class="main-wrapper">
         <slot />
       </main>
+
       <Footer />
+
+      <!-- Command Palette -->
+      <dialog id="command-palette" class="theme-dark-grey p-4 m-auto rounded-lg backdrop:bg-black/50" style="max-width: 480px; width: 100%;">
+        <div class="flex flex-col gap-4">
+          <input type="text" placeholder="Search commands..." id="cmd-search" class="form-input w-full" />
+          <div class="flex flex-col gap-2">
+            <button class="button variant-secondary" id="cmd-export" data-cmd="export">Export brief</button>
+            <button class="button variant-secondary" id="cmd-jump" data-cmd="jump">Jump to services</button>
+          </div>
+        </div>
+      </dialog>
+
+      <!-- Discovery Brief -->
+      <dialog id="discovery-brief" class="theme-white p-8 m-auto rounded-lg backdrop:bg-black/50 overflow-y-auto" style="max-width: 600px; width: 100%; max-height: 90vh;">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="heading-style-h2">Discovery brief — Cinder & Bloom</h2>
+          <button id="brief-close" class="button variant-secondary">Close</button>
+        </div>
+
+        <div class="flex gap-4 mb-4">
+          <button id="tab-json" class="font-bold underline">JSON</button>
+          <button id="tab-md">Markdown</button>
+        </div>
+
+        <div id="brief-json-view" class="mb-4">
+          <textarea id="brief-json-content" class="form-input w-full font-mono text-sm" rows="12"></textarea>
+          <div id="import-error" class="text-red-500 text-sm mt-2 hidden"></div>
+        </div>
+
+        <div id="brief-md-view" class="mb-4 hidden">
+          <textarea id="brief-md-content" class="form-input w-full font-mono text-sm" rows="12" readonly></textarea>
+        </div>
+
+        <div class="flex gap-2">
+          <button id="brief-download" class="button variant-primary">Download</button>
+          <button id="brief-copy" class="button variant-secondary">Copy</button>
+          <button id="brief-import" class="button variant-secondary">Import</button>
+        </div>
+        <div id="copy-confirm" class="text-green-500 text-sm mt-2 opacity-0 transition-opacity">Copied!</div>
+      </dialog>
+
+      <!-- Shortlist Panel -->
+      <dialog id="shortlist-panel" class="theme-white p-6 m-auto rounded-lg backdrop:bg-black/50" style="max-width: 400px; width: 100%;">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="heading-style-h2">Shortlist</h2>
+          <button id="shortlist-close" class="button variant-secondary">Close</button>
+        </div>
+        <div id="shortlist-list" class="flex flex-col gap-2 mb-4"></div>
+      </dialog>
+
     </div>
     <script>
       import "../scripts/main.js";

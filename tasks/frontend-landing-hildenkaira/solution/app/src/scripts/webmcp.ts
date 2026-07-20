@@ -199,6 +199,34 @@ function sessionStop(_args: Record<string, unknown>) {
   return { ok: true, operation: "stop", status: el.getAttribute("data-player-status") };
 }
 
+
+// ---- artifact-transfer-v1 --------------------------------------------------
+
+function artifactExport(args: Record<string, unknown>) {
+  // Command Palette route: Ctrl+K then 'Export brief'
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
+  setTimeout(() => {
+    document.getElementById("cmd-export")?.click();
+  }, 100);
+
+  return { ok: true, operation: "export", format: args.format || "json" };
+}
+
+function artifactCopy(_args: Record<string, unknown>) {
+  const btn = document.getElementById("brief-copy");
+  if (btn) btn.click();
+  return { ok: true, operation: "copy" };
+}
+
+function artifactImport(args: Record<string, unknown>) {
+  const content = document.getElementById("brief-json-content") as HTMLTextAreaElement;
+  if (content && args.payload) {
+    content.value = String(args.payload);
+    document.getElementById("brief-import")?.click();
+  }
+  return { ok: true, operation: "import", mode: "discovery-brief" };
+}
+
 // ---- registry --------------------------------------------------------------
 
 type Handler = (args: Record<string, unknown>) => unknown;
@@ -250,13 +278,28 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
     description: "Stop the active client-deck Bunny player: pause it and return the timeline to the start.",
     handler: sessionStop,
   },
+  {
+    name: "artifact-export",
+    description: "Export the discovery brief.",
+    handler: artifactExport,
+  },
+  {
+    name: "artifact-copy",
+    description: "Copy the discovery brief.",
+    handler: artifactCopy,
+  },
+  {
+    name: "artifact-import",
+    description: "Import a discovery brief payload.",
+    handler: artifactImport,
+  },
 ];
 
 export function initWebMcp() {
   const w = window as unknown as Record<string, unknown>;
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
-    modules: ["browse-query-v1", "form-workflow-v1", "command-session-v1"],
+    modules: ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
     tools: TOOLS.map((t) => t.name),
   });
   w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));

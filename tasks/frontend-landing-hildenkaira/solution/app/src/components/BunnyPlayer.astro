@@ -45,7 +45,7 @@ const { src, poster, caption, pf, likes, class: extra = "" } = Astro.props;
       </div>
     )}
     <div class="bunny-player__interface-bottom">
-      <div class="bunny-player__toggle-playpause" data-player-control="playpause" role="button" aria-label="Play or pause">
+      <div class="bunny-player__toggle-playpause" data-player-control="playpause" aria-label="Play or pause video" role="button" aria-label="Play or pause">
         <svg class="bunny-player__pause-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
         <svg class="bunny-player__play-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none"><path d="M7 4v16l13-8L7 4Z"/></svg>
       </div>
@@ -54,20 +54,20 @@ const { src, poster, caption, pf, likes, class: extra = "" } = Astro.props;
         <p class="bunny-player__text is--transparent" data-split-visible>/</p>
         <p class="bunny-player__text is--transparent" data-player-time-duration data-split-visible>00:00</p>
       </div>
-      <div class="bunny-player__timeline" data-player-timeline>
+      <div class="bunny-player__timeline" data-player-timeline aria-label="Video timeline">
         <div class="bunny-player__timeline-bar">
           <div class="bunny-player__timeline-bg"></div>
           <div class="bunny-player__timeline-buffered" data-player-buffered></div>
           <div class="bunny-player__timeline-progress" data-player-progress></div>
         </div>
-        <div class="bunny-player__timeline-handle" data-player-timeline-handle></div>
+        <div class="bunny-player__timeline-handle" data-player-timeline aria-label="Video timeline"-handle></div>
       </div>
       <div class="bunny-player__interface-btns">
-        <div class="bunny-player__toggle-mute" data-player-control="mute" role="button" aria-label="Mute or unmute">
+        <div class="bunny-player__toggle-mute" data-player-control="mute" aria-label="Mute or unmute video" role="button" aria-label="Mute or unmute">
           <svg class="bunny-player__volume-up-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none"><path d="M4 9v6h4l5 4V5L8 9H4Zm12.5 3a3.5 3.5 0 0 0-2-3.2v6.3a3.5 3.5 0 0 0 2-3.1Z"/></svg>
           <svg class="bunny-player__volume-mute-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Zm12 0 4 6m0-6-4 6" stroke="currentColor" stroke-width="1.8"/></svg>
         </div>
-        <div class="bunny-player__toggle-fullscreen" data-player-control="fullscreen" role="button" aria-label="Toggle fullscreen">
+        <div class="bunny-player__toggle-fullscreen" data-player-control="fullscreen" aria-label="Toggle fullscreen" role="button" aria-label="Toggle fullscreen">
           <svg class="bunny-player__fullscreen-scale-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5m11-5v5h-5"/></svg>
           <svg class="bunny-player__fullscreen-shrink-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:none"><path d="M9 4v5H4m16 0h-5V4M9 20v-5H4m16 0h-5v5"/></svg>
         </div>
@@ -75,7 +75,7 @@ const { src, poster, caption, pf, likes, class: extra = "" } = Astro.props;
     </div>
   </div>
 
-  <div class="bunny-player__playpause" data-player-control="big-playpause">
+  <div class="bunny-player__playpause" data-player-control="big-playpause" aria-label="Play or pause video">
     <div class="bunny-player__big-btn">
       <svg class="bunny-player__play-svg" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M7 4v16l13-8L7 4Z"/></svg>
     </div>
