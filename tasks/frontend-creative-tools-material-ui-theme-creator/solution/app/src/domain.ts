@@ -173,14 +173,19 @@ function hslToHex(h: number, s: number, l: number): string {
   return `#${to(rp)}${to(gp)}${to(bp)}`;
 }
 
-export interface HarmonySuggestion {
-  color: string;
-  note: string;
-}
-export function suggestSecondary(primary: string, secondary: string): HarmonySuggestion | null {
-  if (!HEX.test(primary) || !HEX.test(secondary)) return null;
+// Three-way harmony verdict so the guide never reports "well separated" for a
+// pair that is actually too close: 'good' = distinct enough, 'suggest' = close
+// with a concrete replacement accent, 'close' = close but no candidate accent
+// clears the distinctness threshold (warn, don't reassure).
+export type HarmonyVerdict =
+  | { kind: 'good' }
+  | { kind: 'suggest'; color: string; note: string }
+  | { kind: 'close'; note: string };
+
+export function assessHarmony(primary: string, secondary: string): HarmonyVerdict {
+  if (!HEX.test(primary) || !HEX.test(secondary)) return { kind: 'good' };
   const ratio = contrastRatio(primary, secondary);
-  if (ratio >= 2.2) return null; // already distinct enough
+  if (ratio >= 2.2) return { kind: 'good' }; // already distinct enough
   const p = hexToHsl(primary);
   const s = hexToHsl(secondary);
   // push the secondary's hue away from primary and nudge lightness for tonal separation
@@ -194,10 +199,13 @@ export function suggestSecondary(primary: string, secondary: string): HarmonySug
   for (const c of candidates) {
     const hexC = hslToHex(c.h, c.s, c.l);
     if (HEX.test(hexC) && contrastRatio(primary, hexC) >= 2.2) {
-      return { color: hexC, note: `Try ${c.note}` };
+      return { kind: 'suggest', color: hexC, note: `Try ${c.note}` };
     }
   }
-  return null;
+  return {
+    kind: 'close',
+    note: 'Primary and secondary are tonally close, and no suggested accent clears the distinctness threshold — adjust one of them manually.'
+  };
 }
 
 // ---------------------------------------------------------------------------

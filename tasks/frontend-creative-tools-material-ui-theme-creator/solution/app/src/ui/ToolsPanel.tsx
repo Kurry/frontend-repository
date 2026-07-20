@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useStore, intentList } from '../store';
-import { PRESETS, contrastRatio, contrastMatrix, suggestSecondary, type Intent } from '../domain';
+import { PRESETS, contrastRatio, contrastMatrix, assessHarmony, type Intent } from '../domain';
 import { Icon } from './primitives';
 
 // Swatches stay live with the editor and pulse briefly whenever the color
@@ -135,7 +135,7 @@ function HarmonyGuide() {
   const primary = options.palette.primary.main;
   const secondary = options.palette.secondary.main;
   const ratio = useMemo(() => contrastRatio(primary, secondary), [primary, secondary]);
-  const suggestion = useMemo(() => suggestSecondary(primary, secondary), [primary, secondary]);
+  const verdict = useMemo(() => assessHarmony(primary, secondary), [primary, secondary]);
 
   return (
     <div className="px-3 py-2.5 border-t border-shell-border bg-shell/40" data-testid="harmony-guide">
@@ -144,21 +144,21 @@ function HarmonyGuide() {
         <span className="text-shell-text font-medium">Harmony Guide</span>
         <span className="ml-auto font-mono text-shell-muted">{ratio.toFixed(2)}:1</span>
       </div>
-      {suggestion ? (
+      {verdict.kind === 'suggest' ? (
         <div className="flex items-center gap-2 mt-1.5">
           <span className="flex gap-1">
             <Swatch color={primary} />
             <Swatch color={secondary} />
             <Icon name="arrow_forward" style={{ fontSize: 14 }} className="text-shell-muted self-center" />
-            <Swatch color={suggestion.color} />
+            <Swatch color={verdict.color} />
           </span>
           <span className="text-[11px] text-amber-300 flex-1">
-            Primary and secondary are tonally close. {suggestion.note}.
+            Primary and secondary are tonally close. {verdict.note}.
           </span>
           <button
             type="button"
             onClick={() => {
-              setPaletteColor('secondary.main', suggestion.color);
+              setPaletteColor('secondary.main', verdict.color);
               pushToast('Harmony suggestion applied to secondary.main');
             }}
             className="lift bg-accent hover:bg-accent-strong text-white text-[11px] px-2 py-1 rounded whitespace-nowrap"
@@ -166,6 +166,11 @@ function HarmonyGuide() {
             Apply
           </button>
         </div>
+      ) : verdict.kind === 'close' ? (
+        <p className="flex items-center gap-1.5 mt-1.5 text-[11px] text-amber-300">
+          <Icon name="warning" style={{ fontSize: 14 }} />
+          {verdict.note}
+        </p>
       ) : (
         <p className="flex items-center gap-1.5 mt-1.5 text-[11px] text-green-300">
           <Icon name="check_circle" style={{ fontSize: 14 }} />

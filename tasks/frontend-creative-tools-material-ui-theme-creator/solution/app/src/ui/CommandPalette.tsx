@@ -82,7 +82,8 @@ export function CommandPalette() {
           const list = recents.length > 0 ? [...recents, ...filtered] : filtered;
           if (e.key === 'ArrowDown') {
             e.preventDefault();
-            setCursor((c) => Math.min(c + 1, list.length - 1));
+            // Guard an empty list (no matches): length - 1 is -1 there.
+            setCursor((c) => Math.max(0, Math.min(c + 1, list.length - 1)));
           } else if (e.key === 'ArrowUp') {
             e.preventDefault();
             setCursor((c) => Math.max(c - 1, 0));
