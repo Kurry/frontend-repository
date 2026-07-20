@@ -105,7 +105,7 @@ export const historyStore = atom<HistoryState>({ past: [], future: [] });
 export const filteredScenes = computed([scenesStore, searchFilterStore, statusFilterStore], (scenes, search, status) => {
   return scenes
     .filter(scene => status === 'all' || scene.status === status)
-    .filter(scene => search === '' || [scene.title, scene.body].some(value => value.toLowerCase().includes(search.toLowerCase())));
+    .filter(scene => search === '' || scene.title.toLowerCase().includes(search.toLowerCase()));
 });
 
 function saveHistory(currentScenes: Scene[]) {

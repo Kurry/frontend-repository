@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useStore } from '@nanostores/react';
-import { isAddSceneFormOpenStore, isCommandPaletteOpenStore, isExportDrawerOpenStore } from '@/store/ui';
+import { isCommandPaletteOpenStore, isExportDrawerOpenStore, showToast } from '@/store/ui';
 import { viewModeStore, undo, redo } from '@/store';
 import { clsx } from 'clsx';
 
 const commands = [
-    { id: 'add-scene', label: 'Add Scene', action: () => isAddSceneFormOpenStore.set(true) },
+    { id: 'add-scene', label: 'Add Scene', action: () => showToast('Use Add Scene button on board') },
     { id: 'export', label: 'Export storyboard', action: () => isExportDrawerOpenStore.set(true) },
     { id: 'mode-tile', label: 'Switch to Tile', action: () => viewModeStore.set('tile') },
     { id: 'mode-list', label: 'Switch to List', action: () => viewModeStore.set('list') },

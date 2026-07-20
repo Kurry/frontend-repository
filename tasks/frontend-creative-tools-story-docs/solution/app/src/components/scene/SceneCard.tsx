@@ -96,7 +96,7 @@ export function SceneCard({ scene, index, layout, isActiveSlide }: SceneCardProp
 
         <div className={clsx("relative bg-gray-100", layout === 'list' ? "w-1/3 min-w-[200px]" : "w-full aspect-video")}>
             <img
-                src={`/scenes/scene-${String(((scene.order - 1) % 8) + 1).padStart(2, '0')}.webp`}
+                src={`/assets/scenes/scene-0${(scene.order % 8) + 1}.webp`}
                 alt={scene.title}
                 className="w-full h-full object-cover group-hover:brightness-105 transition-all duration-300"
                 loading="lazy"

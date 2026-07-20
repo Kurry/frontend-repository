@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
-import { filteredScenes, scenesStore, viewModeStore, activeSlideIndexStore, searchFilterStore, statusFilterStore, reorderScenes, setCanvasPosition } from '@/store';
-import { isAddSceneFormOpenStore } from '@/store/ui';
+import { filteredScenes, viewModeStore, activeSlideIndexStore, searchFilterStore, statusFilterStore, reorderScenes, setCanvasPosition } from '@/store';
 import { SceneCard } from './SceneCard';
 import { AddSceneForm } from './AddSceneForm';
 import { clsx } from 'clsx';
@@ -13,7 +12,7 @@ export function SceneGrid() {
   const searchFilter = useStore(searchFilterStore);
   const statusFilter = useStore(statusFilterStore);
 
-  const isAdding = useStore(isAddSceneFormOpenStore);
+  const [isAdding, setIsAdding] = useState(false);
 
   // Drag and Drop State for Tile/List reordering
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -41,11 +40,7 @@ export function SceneGrid() {
   };
   const handleDrop = (e: React.DragEvent, index: number) => {
       if (viewMode === 'canvas' || draggedIndex === null || draggedIndex === index) return;
-      const allScenes = scenesStore.get();
-      const startIndex = allScenes.findIndex(scene => scene.id === scenes[draggedIndex]?.id);
-      const endIndex = allScenes.findIndex(scene => scene.id === scenes[index]?.id);
-      if (startIndex === -1 || endIndex === -1) return;
-      reorderScenes(startIndex, endIndex);
+      reorderScenes(draggedIndex, index);
       setDraggedIndex(null);
   };
 
@@ -94,9 +89,9 @@ export function SceneGrid() {
             <h2 className="text-lg font-semibold text-gray-900 mb-2">It's a blank canvas</h2>
             <p className="text-gray-500 mb-6 max-w-md">Start building your storyboard by adding your first scene.</p>
             {isAdding ? (
-                <div className="w-full max-w-2xl text-left"><AddSceneForm onClose={() => isAddSceneFormOpenStore.set(false)} /></div>
+                <div className="w-full max-w-2xl text-left"><AddSceneForm onClose={() => setIsAdding(false)} /></div>
             ) : (
-                <button className="btn btn-primary bg-yellow-400 hover:bg-yellow-500 text-yellow-950 border-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2" onClick={() => isAddSceneFormOpenStore.set(true)}>
+                <button className="btn btn-primary bg-yellow-400 hover:bg-yellow-500 text-yellow-950 border-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2" onClick={() => setIsAdding(true)}>
                     Add Scene
                 </button>
             )}
@@ -106,7 +101,7 @@ export function SceneGrid() {
 
   return (
     <main className="pb-24" aria-label="Storyboard Main Content">
-      {isAdding && <AddSceneForm onClose={() => isAddSceneFormOpenStore.set(false)} />}
+      {isAdding && <AddSceneForm onClose={() => setIsAdding(false)} />}
 
       {viewMode === 'slide' && scenes.length > 0 && (
           <div className="flex items-center justify-between mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm sticky top-32 z-10" aria-label="Slide Controls">
@@ -153,7 +148,7 @@ export function SceneGrid() {
           <div className="mt-8 flex justify-center">
               <button
                   className="btn btn-ghost border-2 border-dashed border-gray-300 w-full max-w-xs hover:border-yellow-400 hover:text-yellow-600 hover:bg-yellow-50 focus:ring-2 focus:ring-yellow-400"
-                  onClick={() => isAddSceneFormOpenStore.set(true)}
+                  onClick={() => setIsAdding(true)}
               >
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
                   Add Scene
