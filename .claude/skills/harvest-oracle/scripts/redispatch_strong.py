@@ -63,7 +63,9 @@ def subdir_for(slug: str) -> Path | None:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--target", type=int, default=60)
+    ap.add_argument("--target", type=int, default=60, help="max concurrent live sessions")
+    ap.add_argument("--quota", type=int, default=300, help="total session budget to consume")
+    ap.add_argument("--cap-per-task", type=int, default=5, help="max strong attempts per task")
     ap.add_argument("--max-new", type=int, default=None)
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
@@ -93,33 +95,44 @@ def main() -> None:
     # how many strong (v2) sessions each slug already has
     v2_counts = Counter(r["slug"] for r in load_jsonl(V2_STATE))
 
-    # candidates: slugs still below their desired agent count, worst-first
-    cands = []
-    for slug, fails in failcounts.items():
-        want = desired_agents(fails)
-        have = v2_counts.get(slug, 0)
-        if have < want:
-            cands.append((fails, slug, want - have))
-    cands.sort(reverse=True)
-
+    # total sessions used so far (original + strong) — quota is the whole budget
+    total_used = len(all_rows)
+    # fill open concurrency slots, but never exceed the remaining quota
     slots = max(0, args.target - live)
     if args.max_new is not None:
         slots = min(slots, args.max_new)
-    print(f"# live={live} target={args.target} slots={slots} candidates={len(cands)}", file=sys.stderr)
+    slots = min(slots, max(0, args.quota - total_used))
+    print(f"# live={live} target={args.target} total_used={total_used}/{args.quota} "
+          f"slots={slots}", file=sys.stderr)
+
+    # Pick per slot: worst-failing, fewest attempts first (score = fails/(attempts+1)),
+    # capped per task, so the quota spreads with heavy weight on the worst oracles.
+    def pick():
+        best, best_score = None, -1.0
+        for slug, fails in failcounts.items():
+            n = v2_counts.get(slug, 0)
+            if n >= args.cap_per_task:
+                continue
+            score = fails / (n + 1)
+            if score > best_score:
+                best, best_score = slug, score
+        return best
 
     dispatched = 0
-    for fails, slug, need in cands:
-        if dispatched >= slots:
-            break
+    while dispatched < slots:
+        slug = pick()
+        if not slug:
+            break  # every task at cap
         sub = subdir_for(slug)
         if not sub:
-            continue
+            failcounts.pop(slug, None); continue
         prompt = d.build_prompt(slug, sub)
-        for _ in range(min(need, slots - dispatched)):
+        fails = failcounts[slug]
+        if True:
             if args.dry_run:
-                print(f"[dry] would dispatch strong {slug} (fails={fails})", file=sys.stderr)
-                dispatched += 1
-                continue
+                print(f"[dry] would dispatch strong {slug} (fails={fails}, "
+                      f"attempt #{v2_counts.get(slug,0)+1})", file=sys.stderr)
+                v2_counts[slug] += 1; dispatched += 1; continue
             r = subprocess.run([sys.executable, J, "--json", "create", "--source",
                                 "Kurry/frontend-repository", "--prompt", prompt,
                                 "--title", f"oracle 100% fix: {slug}"],
@@ -133,14 +146,17 @@ def main() -> None:
                     print(f"# hit concurrency cap at {dispatched} dispatched", file=sys.stderr)
                     print(json.dumps({"live_before": live, "dispatched": dispatched, "capped": True}))
                     return
+                failcounts.pop(slug, None)  # drop on transient failure; retries next wave
                 continue
             with V2_STATE.open("a") as f:
                 f.write(json.dumps({"slug": slug, "session_id": sid, "fails": fails, "strong": True}) + "\n")
+            v2_counts[slug] += 1
             dispatched += 1
-            print(f"strong-dispatch {slug} (fails={fails}) -> {sid}", file=sys.stderr)
+            print(f"strong-dispatch {slug} (fails={fails}, attempt #{v2_counts[slug]}) -> {sid}", file=sys.stderr)
 
     print(json.dumps({"live_before": live, "dispatched": dispatched,
-                      "remaining_candidates": max(0, len(cands) - dispatched)}))
+                      "total_used": total_used + dispatched, "quota": args.quota,
+                      "quota_remaining": max(0, args.quota - total_used - dispatched)}))
 
 
 if __name__ == "__main__":
