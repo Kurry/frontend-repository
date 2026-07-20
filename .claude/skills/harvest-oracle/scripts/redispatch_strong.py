@@ -50,7 +50,10 @@ def session_state(sid: str) -> str:
             return "COMPLETED"  # deleted/expired session — not holding a slot
         return json.loads(r.stdout).get("state", "IN_PROGRESS")
     except Exception:
-        return "IN_PROGRESS"
+        # Transient poll error (429/timeout): do NOT block dispatch on it —
+        # Jules' server-side concurrency cap rejects over-dispatch with
+        # FAILED_PRECONDITION, which the wave handles by stopping.
+        return "COMPLETED"
 
 
 def subdir_for(slug: str) -> Path | None:
