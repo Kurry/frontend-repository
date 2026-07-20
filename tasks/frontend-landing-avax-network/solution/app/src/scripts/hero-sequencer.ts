@@ -71,11 +71,28 @@ export function initHeroHeights() {
   if (!inner || !left || !right) return;
 
   const measure = () => {
-    inner.style.setProperty("--hero-left-height", `${left.clientHeight}px`);
-    inner.style.setProperty("--hero-right-height", `${right.clientHeight}px`);
+    // Use the content boxes (not the h-[200%] clipped parents) so the sequencer
+    // inset matches the visible settled panels across sm/tablet widths.
+    inner.style.setProperty("--hero-left-height", `${left.offsetHeight}px`);
+    inner.style.setProperty("--hero-right-height", `${right.offsetHeight}px`);
   };
-  measure();
-  window.addEventListener("resize", measure);
+  const measureSoon = () => {
+    requestAnimationFrame(() => {
+      measure();
+      requestAnimationFrame(measure);
+    });
+  };
+  measureSoon();
+  window.addEventListener("resize", measureSoon);
+  document.fonts?.ready?.then(measureSoon);
+  // Remeasure after the clip-path entrance settles (~3s) so mid-width geometry
+  // is not stuck on pre-transition heights.
+  window.setTimeout(measureSoon, 3200);
+  if (typeof ResizeObserver !== "undefined") {
+    const ro = new ResizeObserver(measureSoon);
+    ro.observe(left);
+    ro.observe(right);
+  }
 }
 
 export function mountEntrance() {

@@ -70,6 +70,9 @@
 }
 
 @theme {
+  /* Harvest / instruction contract: desktop chrome begins at 1025px, not Tailwind's 1024. */
+  --breakpoint-lg: 1025px;
+
   --font-sans: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
   --font-aeonik: "aeonik", system-ui, sans-serif;
@@ -221,9 +224,15 @@ html {
   touch-action: pan-y;
   scroll-behavior: smooth;
   font-family: Inter, system-ui, sans-serif;
-  overflow: clip scroll;
+  overflow-x: clip;
+  overflow-y: scroll;
   background: var(--color-neutral-950);
   color: #000;
+  max-width: 100%;
+}
+body {
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 /* Live: disable kerning + optimizeSpeed on text nodes (pixel-critical) */
@@ -407,6 +416,8 @@ html.lenis body {
 .marquee {
   overflow: hidden;
   white-space: nowrap;
+  width: 100%;
+  max-width: 100%;
 }
 .marquee-content {
   display: inline-flex;
@@ -941,6 +952,65 @@ html.dark .btn-cut:not(:has(wm-shape.ready)) {
     background-color 500ms var(--ease-out-cubic),
     translate 2000ms 1000ms var(--ease-in-out-quart),
     z-index 1ms 500ms;
+}
+/* Clip the square hamburger / wm-shape to the nav's rounded shell.
+   Overflow stays on #navigation-inner (not #navigation) so the drawer panel can extend. */
+#navigation-inner {
+  overflow: hidden;
+  border-radius: 1rem;
+}
+/* Keep the hamburger's own square wm-shape from replacing the nav's outer TR curve. */
+#toggle-menu-button {
+  overflow: hidden;
+  border-radius: 0.65rem;
+  max-height: calc(var(--navbar-height) - 1.15rem);
+}
+#toggle-menu-button wm-shape {
+  border-radius: inherit;
+}
+/* Contain harvest lg:w-[200%] / h-[200%] hero geometry so it cannot expand document scrollWidth
+   or paint under the fixed nav as an unclipped border box. */
+#hero,
+#hero-inner {
+  overflow: clip;
+}
+/* sm:mounted:* and lg:mounted:* arbitrary clip-path utilities share equal specificity;
+   depending on emit order the sm rule can win at desktop. Force harvest lg settle geometry. */
+@media (min-width: 1025px) {
+  html.mounted #hero-left {
+    clip-path: inset(var(--navbar-height) 0 0 50% round var(--radius-4xl));
+  }
+  html.mounted #hero-right {
+    clip-path: inset(var(--navbar-height) 50% 0 0 round var(--radius-4xl));
+  }
+  html.mounted #hero-sequencer {
+    clip-path: inset(var(--navbar-height) 1px 0 1px round var(--radius-4xl));
+    width: 200%;
+    height: 100%;
+  }
+  html.mounted #hero-left-inner {
+    clip-path: inset(var(--navbar-height) 0 calc(50% + 1px) 0 round var(--radius-4xl));
+  }
+}
+/* Entrance translates / multi-step form tracks must not expand document scrollWidth. */
+#blog,
+#community,
+#newsletter,
+#contact,
+#solutions,
+#event,
+#companies,
+main,
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+#form-steps-wrapper,
+#general-form,
+#swiper-blog,
+#swiper-feed {
+  overflow-x: clip;
+  max-width: 100%;
 }
 @media (min-width: 1025px) {
   #navigation .nav-link,

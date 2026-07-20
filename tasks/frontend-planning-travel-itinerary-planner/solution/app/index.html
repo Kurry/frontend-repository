@@ -99,7 +99,7 @@
   <aside id="ideas-drawer" class="drawer hidden" aria-label="Ideas bucket"><div class="drawer-head"><div><small>UNASSIGNED</small><h2>Ideas bucket</h2></div><button class="icon-btn drawer-close" aria-label="Close ideas bucket">×</button></div><p>Vote together. An idea with 3 of 4 votes joins Day 5.</p><div id="ideas-list"></div></aside>
   <aside id="activity-drawer" class="drawer hidden" aria-label="Activity log"><div class="drawer-head"><div><small>LIVE SESSION</small><h2>Activity log</h2></div><button class="icon-btn drawer-close" aria-label="Close activity log">×</button></div><div id="activity-list"></div></aside>
 
-  <dialog id="stop-dialog" aria-labelledby="stop-dialog-title">
+  <dialog id="stop-dialog" role="dialog" aria-modal="true" aria-labelledby="stop-dialog-title">
     <form id="stop-form" method="dialog" novalidate>
       <div class="modal-head"><div><small>ITINERARY ACTIVITY</small><h2 id="stop-dialog-title">Add stop</h2></div><button type="button" class="icon-btn modal-close" aria-label="Close stop form">×</button></div>
       <div id="form-errors" class="form-errors" aria-live="polite"></div>
@@ -122,13 +122,13 @@
     </form>
   </dialog>
 
-  <dialog id="conflict-dialog" aria-labelledby="conflict-title">
+  <dialog id="conflict-dialog" role="dialog" aria-modal="true" aria-labelledby="conflict-title">
     <div class="modal-head"><div><small>EDIT CONFLICT</small><h2 id="conflict-title">John edited this stop too</h2></div><button class="icon-btn conflict-close" aria-label="Close conflict dialog">×</button></div>
     <p>Choose the version to keep. Merge preserves your title and adds John's note.</p><div class="compare"><div><small>CURRENT VERSION</small><strong id="conflict-current"></strong><p>Your unsaved itinerary details.</p></div><div><small>INCOMING VERSION</small><strong id="conflict-incoming"></strong><p>John added “Meet by the sea entrance.”</p></div></div>
     <div class="modal-actions"><button class="btn ghost conflict-choice" data-choice="mine">Keep mine</button><button class="btn ghost conflict-choice" data-choice="theirs">Take theirs</button><button class="btn primary conflict-choice" data-choice="merge">Merge</button></div>
   </dialog>
 
-  <dialog id="export-dialog" class="export-dialog" aria-labelledby="export-title">
+  <dialog id="export-dialog" class="export-dialog" role="dialog" aria-modal="true" aria-labelledby="export-title">
     <div class="modal-head"><div><small>PORTABLE TRIP PACKAGE</small><h2 id="export-title">Export canvas</h2></div><button class="icon-btn export-close" aria-label="Close export canvas">×</button></div>
     <div class="export-tabs" role="tablist" aria-label="Export formats"><button role="tab" data-export="markdown" aria-selected="true">Markdown</button><button role="tab" data-export="ics" aria-selected="false">ICS</button><button role="tab" data-export="trip-json" aria-selected="false">Trip JSON</button><button role="tab" data-export="import" aria-selected="false">Import</button></div>
     <section id="export-preview-section"><pre id="export-preview" tabindex="0"></pre><div class="modal-actions"><button id="copy-export" class="btn ghost">Copy <span id="copy-format">markdown</span></button><button id="download-export" class="btn primary">Download <span id="download-format">markdown</span></button><button id="print-preview" class="btn ghost">Print preview</button></div></section>

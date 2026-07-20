@@ -45,6 +45,7 @@
     filters: { category: "", costTier: "", status: "", search: "" }, selectedBulk: new Set(), collapsed: new Set(), detailTab: "About",
     history: [], future: [], activities: [{ actor: "Sarah", text: "prepared the French Riviera itinerary", at: new Date() }], votes: {}, zoomedOut: false,
     exportFormat: "markdown", editingId: null, submitting: false, dragId: null, lastStopFocus: null, sort: "time",
+    voteBusy: null, isochroneOn: false,
   };
 
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -168,21 +169,43 @@
     } else {
       scheduled.forEach((item) => { const p = mapPoint(item); const pin = document.createElement("button"); pin.className = `pin ${state.selectedId === item.id ? "selected" : ""}`; pin.dataset.id = item.id; pin.style.cssText = `left:${p.x}%;top:${p.y}%;--day:${dayOf(item.day).color}`; pin.innerHTML = `<span>${dayNumber(item.day)}</span>`; pin.setAttribute("aria-label", `${item.title}, Day ${dayNumber(item.day)}`); pin.addEventListener("click", () => selectStop(item.id, true)); els.mapPins.append(pin); });
       ideas.forEach((item) => { const p = mapPoint(item); const pin = document.createElement("button"); pin.className = `pin idea-pin ${state.selectedId === item.id ? "selected" : ""}`; pin.dataset.id = item.id; pin.style.cssText = `left:${p.x}%;top:${p.y}%`; pin.innerHTML = "<span>•</span>"; pin.setAttribute("aria-label", `${item.title}, unscheduled idea`); pin.addEventListener("click", () => selectStop(item.id, true)); els.mapPins.append(pin); });
-      DAYS.forEach((day) => { const dayItems = sorted(scheduled.filter((item) => item.day === day.date)); if (dayItems.length < 2) return; const points = dayItems.map(mapPoint); const poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline"); poly.setAttribute("points", points.map((p) => `${p.x},${p.y}`).join(" ")); poly.setAttribute("class", "route-line"); poly.style.setProperty("--route", day.color); els.routes.append(poly); points.slice(0, -1).forEach((p, index) => { const next = points[index + 1]; const text = document.createElementNS("http://www.w3.org/2000/svg", "text"); text.setAttribute("x", (p.x + next.x) / 2); text.setAttribute("y", (p.y + next.y) / 2 - 1); text.setAttribute("class", "distance-label"); const km = Math.max(.8, Math.hypot(next.x - p.x, next.y - p.y) * .34); text.textContent = `${km.toFixed(1)} km`; els.routes.append(text); }); });
+      DAYS.forEach((day) => { const dayItems = sorted(scheduled.filter((item) => item.day === day.date)); if (dayItems.length < 2) return; const points = dayItems.map(mapPoint); const poly = document.createElementNS("http://www.w3.org/2000/svg", "polyline"); poly.setAttribute("points", points.map((p) => `${p.x},${p.y}`).join(" ")); poly.setAttribute("class", "route-line"); poly.dataset.day = day.date; poly.style.setProperty("--route", day.color); els.routes.append(poly); points.slice(0, -1).forEach((p, index) => { const next = points[index + 1]; const text = document.createElementNS("http://www.w3.org/2000/svg", "text"); text.setAttribute("x", (p.x + next.x) / 2); text.setAttribute("y", (p.y + next.y) / 2 - 1); text.setAttribute("class", "distance-label"); const km = Math.max(.8, Math.hypot(next.x - p.x, next.y - p.y) * .34); text.textContent = `${km.toFixed(1)} km`; els.routes.append(text); }); });
     }
     renderDetail();
   }
+  function isNegresco(item) { return Boolean(item && /hotel\s+le\s+negresco/i.test(item.title)); }
+  function positionIsochrone(item) {
+    if (!item || !els.isochroneRing) return;
+    const point = mapPoint(item);
+    els.isochroneRing.style.left = `${point.x}%`;
+    els.isochroneRing.style.top = `${point.y}%`;
+  }
   function renderDetail() {
-    const item = selectedStop(); if (!item) { els.detailCard.classList.add("hidden"); els.isochrone.classList.add("hidden"); els.isochroneRing.classList.add("hidden"); return; }
+    const item = selectedStop(); if (!item) { els.detailCard.classList.add("hidden"); els.isochrone.classList.add("hidden"); els.isochroneRing.classList.add("hidden"); state.isochroneOn = false; return; }
     els.detailTitle.textContent = item.title; els.detailLocation.textContent = item.location; els.detailKicker.textContent = item.day === "unscheduled" ? "Unscheduled idea" : `Day ${dayNumber(item.day)} · Côte d'Azur`;
     const panels = { About: `${item.notes || "A memorable French Riviera stop."} ${item.startTime ? `Planned for ${fmtTime(item.startTime)}${item.endTime ? `–${fmtTime(item.endTime)}` : ""}.` : ""}`, Book: `${item.status === "reserved" ? "Reserved" : "No reservation yet"}. This frontend demo never leaves the planner.`, Reviews: "Sarah recommends this stop · 4.8 simulated rating", Photos: "Photo board ready for your trip memories.", Mentions: `${item.tags.length ? item.tags.map((tag) => `#${tag}`).join(" ") : "No tags yet."}` };
     els.detailPanel.textContent = panels[state.detailTab]; $$("[data-detail-tab]", els.detailCard).forEach((button) => button.setAttribute("aria-selected", String(button.dataset.detailTab === state.detailTab)));
-    els.isochrone.classList.toggle("hidden", item.id !== "negresco"); els.detailCard.classList.remove("hidden");
+    const showIso = isNegresco(item);
+    els.isochrone.classList.toggle("hidden", !showIso);
+    if (showIso) {
+      positionIsochrone(item);
+      els.isochroneRing.classList.toggle("hidden", !state.isochroneOn);
+      els.isochrone.textContent = state.isochroneOn ? "Hide 1.25 km isochrone" : "Show 1.25 km isochrone";
+    } else {
+      els.isochroneRing.classList.add("hidden");
+      state.isochroneOn = false;
+    }
+    els.detailCard.classList.remove("hidden");
     els.editSelected.disabled = !roleCan(); els.conflictOpen.disabled = !roleCan(); els.deleteSelected.disabled = !roleCan("delete");
   }
   function renderIdeas() {
     const ideas = state.stops.filter((item) => item.day === "unscheduled"); els.ideasCount.textContent = ideas.length;
-    els.ideasList.innerHTML = ideas.length ? ideas.map((item) => { const count = state.votes[item.id] || 0; return `<article class="idea-card" data-id="${item.id}"><h3>${esc(item.title)}</h3><p>${esc(item.location)}</p><div class="vote-row"><span class="avatar ${count >= 1 ? "voted" : ""}">YOU</span><span class="avatar ${count >= 2 ? "voted" : ""}">S</span><span class="avatar ${count >= 3 ? "voted" : ""}">J</span><span class="avatar">M</span><button class="btn primary vote-btn mutating" aria-label="Vote for ${esc(item.title)}, ${count} of 4 votes" ${roleCan() ? "" : "disabled"}>Vote · ${count}/4</button></div></article>`; }).join("") : `<div class="empty-state"><h3>Ideas bucket is empty</h3><p>Every winning idea has joined the itinerary.</p></div>`;
+    els.ideasList.innerHTML = ideas.length ? ideas.map((item) => {
+      const count = state.votes[item.id] || 0;
+      const busy = state.voteBusy === item.id;
+      const canVote = roleCan() && !busy && count < 3;
+      return `<article class="idea-card ${busy ? "voting" : ""}" data-id="${item.id}"><h3>${esc(item.title)}</h3><p>${esc(item.location)}</p><div class="vote-row"><span class="avatar ${count >= 1 ? "voted" : ""}">YOU</span><span class="avatar ${count >= 2 ? "voted" : ""}">S</span><span class="avatar ${count >= 3 ? "voted" : ""}">J</span><span class="avatar ${count >= 4 ? "voted" : ""}">M</span><button class="btn primary vote-btn mutating" aria-label="Vote for ${esc(item.title)}, ${count} of 4 votes" ${canVote ? "" : "disabled"}>Vote · ${count}/4</button></div></article>`;
+    }).join("") : `<div class="empty-state"><h3>Ideas bucket is empty</h3><p>Every winning idea has joined the itinerary.</p></div>`;
   }
   function renderActivity() { if (!els.activityList) return; els.activityList.innerHTML = state.activities.map((entry) => `<article class="activity-item"><span class="activity-dot"></span><div><p><strong>${esc(entry.actor)}</strong> ${esc(entry.text)}</p><time>${entry.at.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</time></div></article>`).join(""); }
   function renderRole() { $$(".mutating").forEach((el) => { if (el.closest("#stop-dialog") || el.closest("#conflict-dialog")) return; el.disabled = !roleCan(); }); $$(".owner-only").forEach((el) => { el.disabled = !roleCan("delete"); }); els.roleSelect.value = state.role; }
@@ -264,8 +287,17 @@
     els.roleSelect.addEventListener("change", () => { state.role = els.roleSelect.value; renderAll(); showToast(state.role === "Viewer" ? "Viewer mode — mutating controls are disabled" : `${state.role} permissions active`); });
     els.listMode.addEventListener("click", () => setMode("list")); els.mapMode.addEventListener("click", () => setMode("map")); els.kanbanMode.addEventListener("click", () => setMode("kanban"));
     els.addStop.addEventListener("click", () => openStopDialog()); els.planList.addEventListener("click", handleListClick); els.planList.addEventListener("change", handleListChange);
-    els.planList.addEventListener("mouseover", (event) => { const row = event.target.closest(".stop-row"); if (row) $(`.pin[data-id="${CSS.escape(row.dataset.id)}"]`)?.classList.add("hovered"); });
-    els.planList.addEventListener("mouseout", (event) => { const row = event.target.closest(".stop-row"); if (row) $(`.pin[data-id="${CSS.escape(row.dataset.id)}"]`)?.classList.remove("hovered"); });
+    els.planList.addEventListener("mouseover", (event) => {
+      const row = event.target.closest(".stop-row"); if (!row) return;
+      $(`.pin[data-id="${CSS.escape(row.dataset.id)}"]`)?.classList.add("hovered");
+      const stop = state.stops.find((item) => item.id === row.dataset.id);
+      if (stop?.day && stop.day !== "unscheduled") $$(".route-line", els.routes).forEach((line) => line.classList.toggle("emphasized", line.dataset.day === stop.day));
+    });
+    els.planList.addEventListener("mouseout", (event) => {
+      const row = event.target.closest(".stop-row"); if (!row) return;
+      $(`.pin[data-id="${CSS.escape(row.dataset.id)}"]`)?.classList.remove("hovered");
+      $$(".route-line", els.routes).forEach((line) => line.classList.remove("emphasized"));
+    });
     els.planList.addEventListener("dragstart", (event) => { const row = event.target.closest(".stop-row"); if (!row || !guard()) return event.preventDefault(); state.dragId = row.dataset.id; row.style.opacity = ".55"; event.dataTransfer.effectAllowed = "move"; });
     els.planList.addEventListener("dragend", (event) => { const row = event.target.closest(".stop-row"); if (row) row.style.opacity = ""; });
     els.planList.addEventListener("dragover", (event) => { if (event.target.closest(".day-section")) event.preventDefault(); });
@@ -279,11 +311,31 @@
     els.undo.addEventListener("click", () => { if (!state.history.length) return; state.future.push(snapshot()); state.stops = state.history.pop(); state.selectedId = state.stops.some((item) => item.id === state.selectedId) ? state.selectedId : state.stops[0]?.id || null; log("You", "undid the previous structural change"); renderAll(); });
     els.redo.addEventListener("click", () => { if (!state.future.length) return; state.history.push(snapshot()); state.stops = state.future.pop(); state.selectedId = state.stops.some((item) => item.id === state.selectedId) ? state.selectedId : state.stops[0]?.id || null; log("You", "redid the structural change"); renderAll(); });
     els.ideasOpen.addEventListener("click", () => openDrawer(els.ideasDrawer)); els.activityOpen.addEventListener("click", () => openDrawer(els.activityDrawer)); $$(".drawer-close").forEach((button) => button.addEventListener("click", closeDrawer)); els.scrim.addEventListener("click", closeDrawer);
-    els.ideasList.addEventListener("click", (event) => { const button = event.target.closest(".vote-btn"); if (!button || !guard()) return; const card = button.closest(".idea-card"); const id = card.dataset.id; state.votes[id] = Math.min(3, (state.votes[id] || 0) + 1); if (state.votes[id] >= 3) { checkpoint(); const item = state.stops.find((candidate) => candidate.id === id); item.day = "2025-07-09"; item.category = "activity"; item.startTime = item.startTime || "15:00"; item.endTime = item.endTime || "16:30"; state.selectedId = id; structuralChange("Sarah, John, and you", `promoted ${item.title} to Thu 7/9`); announce(`${item.title} reached 3 of 4 votes and moved to Thursday`); showToast("Winning idea promoted to Day 5"); } else { renderIdeas(); showToast(`Simulated votes arriving · ${state.votes[id]}/4`); } });
-    els.detailClose.addEventListener("click", () => { els.detailCard.classList.add("hidden"); els.isochroneRing.classList.add("hidden"); state.lastStopFocus?.focus(); }); $$("[data-detail-tab]").forEach((button) => button.addEventListener("click", () => { state.detailTab = button.dataset.detailTab; renderDetail(); }));
+    els.ideasList.addEventListener("click", (event) => {
+      const button = event.target.closest(".vote-btn"); if (!button || !guard()) return;
+      const card = button.closest(".idea-card"); const id = card.dataset.id;
+      if (!id || state.voteBusy === id || (state.votes[id] || 0) >= 3) return;
+      startVoteSimulation(id);
+    });
+    els.detailClose.addEventListener("click", () => { els.detailCard.classList.add("hidden"); els.isochroneRing.classList.add("hidden"); state.isochroneOn = false; state.lastStopFocus?.focus(); }); $$("[data-detail-tab]").forEach((button) => button.addEventListener("click", () => { state.detailTab = button.dataset.detailTab; renderDetail(); }));
     els.editSelected.addEventListener("click", () => { const item = selectedStop(); if (item) openStopDialog(item); }); els.deleteSelected.addEventListener("click", () => { const item = selectedStop(); if (item) deleteStop(item.id); });
-    els.isochrone.addEventListener("click", () => { const showing = !els.isochroneRing.classList.contains("hidden"); els.isochroneRing.classList.toggle("hidden", showing); els.isochrone.textContent = showing ? "Show 1.25 km isochrone" : "Hide 1.25 km isochrone"; });
-    els.conflictOpen.addEventListener("click", () => { if (!guard()) return; const item = selectedStop(); if (!item) return; els.conflictCurrent.textContent = item.title; els.conflictIncoming.textContent = `${item.title} — sea entrance`; els.conflictDialog.showModal(); }); $$(".conflict-close").forEach((button) => button.addEventListener("click", () => els.conflictDialog.close())); $$(".conflict-choice").forEach((button) => button.addEventListener("click", () => resolveConflict(button.dataset.choice)));
+    els.isochrone.addEventListener("click", () => {
+      const item = selectedStop(); if (!isNegresco(item)) return;
+      state.isochroneOn = !state.isochroneOn;
+      positionIsochrone(item);
+      els.isochroneRing.classList.toggle("hidden", !state.isochroneOn);
+      els.isochrone.textContent = state.isochroneOn ? "Hide 1.25 km isochrone" : "Show 1.25 km isochrone";
+      showToast(state.isochroneOn ? "1.25 km isochrone drawn around Hotel Le Negresco" : "Isochrone overlay removed");
+    });
+    els.conflictOpen.addEventListener("click", () => { if (!guard()) return; const item = selectedStop(); if (!item) return; state.lastStopFocus = $(`.stop-row[data-id="${CSS.escape(item.id)}"]`) || state.lastStopFocus; els.conflictCurrent.textContent = item.title; els.conflictIncoming.textContent = `${item.title} — sea entrance`; els.conflictDialog.showModal(); setTimeout(() => $$(".conflict-choice", els.conflictDialog)[0]?.focus(), 10); }); $$(".conflict-close").forEach((button) => button.addEventListener("click", () => { els.conflictDialog.close(); state.lastStopFocus?.focus(); })); $$(".conflict-choice").forEach((button) => button.addEventListener("click", () => resolveConflict(button.dataset.choice)));
+    els.conflictDialog.addEventListener("keydown", (event) => {
+      if (event.key !== "Tab" || !els.conflictDialog.open) return;
+      const focusable = $$("button", els.conflictDialog).filter((node) => !node.disabled);
+      if (!focusable.length) return;
+      const first = focusable[0]; const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+    });
     els.stopForm.addEventListener("input", validateVisibleForm); els.stopForm.addEventListener("change", validateVisibleForm); $$(".modal-close").forEach((button) => button.addEventListener("click", () => els.stopDialog.close())); els.stopForm.addEventListener("submit", submitForm);
     els.openExport.addEventListener("click", () => openExport("markdown")); $$("[data-export]").forEach((button) => button.addEventListener("click", () => { state.exportFormat = button.dataset.export; renderExport(); })); $$(".export-close").forEach((button) => button.addEventListener("click", () => els.exportDialog.close())); els.copyExport.addEventListener("click", copyExport); els.downloadExport.addEventListener("click", downloadExport); els.printPreview.addEventListener("click", () => window.print());
     els.importFile.addEventListener("change", async () => { const file = els.importFile.files[0]; if (file) els.importText.value = await file.text(); }); els.importSubmit.addEventListener("click", () => { const before = state.stops.length; const result = importDocumentText(els.importText.value); if (!result.ok) { els.importError.textContent = result.error; showToast(result.error); } else { els.importError.textContent = ""; showToast(`Imported ${result.stops} stops; replaced previous ${before}`); } });
@@ -302,7 +354,48 @@
   }
   function handleListChange(event) { const row = event.target.closest(".stop-row"); if (event.target.matches(".select-stop") && row) { event.target.checked ? state.selectedBulk.add(row.dataset.id) : state.selectedBulk.delete(row.dataset.id); renderBulk(); } if (event.target.matches(".buffer-mode")) { const card = event.target.closest(".travel-card"); const item = state.stops.find((candidate) => candidate.id === card.dataset.after); if (item && guard()) { item.bufferMode = event.target.value; renderList(); } } }
   function submitForm(event) { event.preventDefault(); if (state.submitting) return; const result = validateVisibleForm(); if (!result.valid) { els.formErrors.textContent = "Fix the named fields before saving."; return; } state.submitting = true; els.stopSubmit.disabled = true; const repeat = els.stopForm.elements.repeat.checked; const outcome = state.editingId ? updateStop(state.editingId, result.value) : createStop(result.value, { repeat }); state.submitting = false; if (outcome.ok) { els.stopDialog.close(); showToast(state.editingId ? "Stop updated across list, map, and exports" : repeat ? "Exactly 7 daily blocks created" : "Stop added across list, map, and exports"); } else { els.formErrors.textContent = outcome.error; validateVisibleForm(); } }
-  function resolveConflict(choice) { const item = selectedStop(); if (!item || !guard()) return; checkpoint(); if (choice === "theirs") item.title = `${item.title} — sea entrance`; if (choice === "merge") item.notes = `${item.notes}${item.notes ? " " : ""}Meet by the sea entrance.`; structuralChange("You", `${choice === "merge" ? "merged John's edit into" : choice === "theirs" ? "accepted John's version of" : "kept your version of"} ${item.title}`); els.conflictDialog.close(); showToast(`Conflict resolved: ${choice === "mine" ? "Keep mine" : choice === "theirs" ? "Take theirs" : "Merge"}`); }
+  function startVoteSimulation(id) {
+    const item = state.stops.find((candidate) => candidate.id === id);
+    if (!item || item.day !== "unscheduled" || state.voteBusy) return;
+    state.voteBusy = id;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const stepMs = reduced ? 40 : 320;
+    const paintVotes = (count) => {
+      state.votes[id] = count;
+      renderIdeas();
+      announce(`${item.title}: ${count} of 4 votes`);
+      showToast(`Simulated votes arriving · ${count}/4`);
+    };
+    paintVotes(1);
+    setTimeout(() => {
+      if (state.voteBusy !== id) return;
+      paintVotes(2);
+      setTimeout(() => {
+        if (state.voteBusy !== id) return;
+        paintVotes(3);
+        setTimeout(() => {
+          if (state.voteBusy !== id) return;
+          const card = $(`.idea-card[data-id="${CSS.escape(id)}"]`);
+          card?.classList.add("promoting");
+          const promote = () => {
+            checkpoint();
+            item.day = "2025-07-09";
+            item.category = "activity";
+            item.startTime = item.startTime || "15:00";
+            item.endTime = item.endTime || "16:30";
+            state.selectedId = id;
+            state.selectedDay = "all";
+            state.voteBusy = null;
+            structuralChange("Sarah, John, and you", `promoted ${item.title} to Thu 7/9`);
+            announce(`${item.title} reached 3 of 4 votes and moved to Thursday`);
+            showToast("Winning idea promoted to Day 5");
+          };
+          if (reduced) promote(); else setTimeout(promote, 220);
+        }, stepMs);
+      }, stepMs);
+    }, stepMs);
+  }
+  function resolveConflict(choice) { const item = selectedStop(); if (!item || !guard()) return; checkpoint(); if (choice === "theirs") item.title = `${item.title} — sea entrance`; if (choice === "merge") item.notes = `${item.notes}${item.notes ? " " : ""}Meet by the sea entrance.`; structuralChange("You", `${choice === "merge" ? "merged John's edit into" : choice === "theirs" ? "accepted John's version of" : "kept your version of"} ${item.title}`); els.conflictDialog.close(); state.lastStopFocus?.focus(); showToast(`Conflict resolved: ${choice === "mine" ? "Keep mine" : choice === "theirs" ? "Take theirs" : "Merge"}`); }
   function hideSidebar() { if (innerWidth <= 768) return els.sidebar.classList.remove("open"); document.querySelector(".app-shell").classList.add("sidebar-collapsed"); els.sidebar.classList.add("hidden"); els.sidebarReopen.classList.remove("hidden"); showToast("Sidebar hidden; current day preserved"); }
   function showSidebar() { document.querySelector(".app-shell").classList.remove("sidebar-collapsed"); els.sidebar.classList.remove("hidden"); els.sidebarReopen.classList.add("hidden"); }
   function bindCoachmark() { const steps = [
@@ -319,7 +412,7 @@
       browse_clear_filter: () => { clearFilters(); return { ok: true, visible: visibleStops().length }; },
       browse_sort: (args) => { const sort = String(args.sort || "time"); if (!["time", "title"].includes(sort)) return { ok: false, error: "sort must be time or title" }; state.sort = sort; renderAll(); return { ok: true, sort }; },
       browse_set_locale: () => ({ ok: false, error: "Only the declared English locale is available" }),
-      browse_set_theme: (args) => { const theme = String(args.theme); if (!["light", "dark"].includes(theme)) return { ok: false, error: "theme must be light or dark" }; state.theme = theme; document.documentElement.dataset.theme = theme; renderAll(); return { ok: true, theme }; },
+      browse_set_theme: (args) => { const theme = String(args.theme); if (!["light", "dark"].includes(theme)) return { ok: false, error: "theme must be light or dark" }; state.theme = theme; document.documentElement.dataset.theme = theme; els.themeToggle.textContent = theme === "light" ? "☾" : "☀"; els.themeToggle.setAttribute("aria-label", `Switch to ${theme === "light" ? "dark" : "light"} theme`); renderAll(); return { ok: true, theme }; },
       entity_create: (args) => createStop(args),
       entity_select: (args) => ({ ok: selectStop(String(args.id || "")), id: String(args.id || "") }),
       entity_update: (args) => updateStop(String(args.id || ""), args),

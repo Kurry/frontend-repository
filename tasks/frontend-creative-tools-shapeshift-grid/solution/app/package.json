@@ -1,11 +1,25 @@
 {
-  "name": "oracle-static",
+  "name": "shapeshift-grid-tool",
   "private": true,
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "start": "vite --host 0.0.0.0 --port 3000",
+    "verify:build": "vite build"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "@kobalte/core": "0.13.12",
+    "@tabler/icons-solidjs": "3.34.1",
+    "@tanstack/solid-form": "1.33.2",
+    "@tailwindcss/vite": "4.3.2",
+    "motion": "12.23.12",
+    "qrious": "4.0.2",
+    "solid-js": "1.9.9",
+    "tailwindcss": "4.3.2",
+    "zod": "4.1.12"
+  },
+  "devDependencies": {
+    "vite": "7.1.7",
+    "vite-plugin-solid": "2.11.8"
   }
 }

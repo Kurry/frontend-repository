@@ -24,7 +24,7 @@ const heroFile = "alpha-3";
     <!-- Left column: harvest-exact geometry (justify-self-end + w-[200%]) -->
     <div
       id="hero-left"
-      class="col-span-12 col-start-1 row-start-3 row-end-4 flex h-[200%] w-full items-start justify-end justify-self-end self-start transition-[clip-path] delay-1000 duration-2000 ease-in-out-quart [clip-path:inset(50%_0_0_0_round_var(--radius-4xl))] mounted:[clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] sm:col-span-6 sm:row-start-1 sm:row-end-2 sm:items-end sm:self-end sm:[clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] sm:mounted:[clip-path:inset(calc(50%+var(--navbar-height))_0_0_0_round_var(--radius-4xl))] lg:col-span-3 lg:row-end-3 lg:grid lg:h-auto lg:w-[200%] lg:grid-cols-2 lg:grid-rows-2 lg:items-start lg:justify-start lg:self-auto lg:[clip-path:inset(0_50%_0_0_round_var(--radius-4xl))] lg:mounted:[clip-path:inset(var(--navbar-height)_0_0_50%_round_var(--radius-4xl))]"
+      class="col-span-12 col-start-1 row-start-3 row-end-4 flex h-[200%] w-full items-start justify-end justify-self-end self-start transition-[clip-path] delay-1000 duration-2000 ease-in-out-quart [clip-path:inset(50%_0_0_0_round_var(--radius-4xl))] mounted:[clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] sm:col-span-6 sm:row-start-1 sm:row-end-2 sm:items-end sm:self-end sm:[clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] sm:mounted:[clip-path:inset(50%_0_0_0_round_var(--radius-4xl))] lg:col-span-3 lg:row-end-3 lg:grid lg:h-auto lg:w-[200%] lg:grid-cols-2 lg:grid-rows-2 lg:items-start lg:justify-start lg:self-auto lg:[clip-path:inset(0_50%_0_0_round_var(--radius-4xl))] lg:mounted:[clip-path:inset(var(--navbar-height)_0_0_50%_round_var(--radius-4xl))]"
     >
       <div
         id="hero-left-inner"
@@ -75,7 +75,7 @@ const heroFile = "alpha-3";
     <div class="relative col-span-12 col-start-1 row-start-2 row-end-3 h-full w-full sm:row-start-2 lg:col-span-6 lg:col-start-4 lg:row-start-1">
       <div
         id="hero-sequencer"
-        class="absolute bottom-0 left-1/2 flex h-svh w-full -translate-x-1/2 items-center justify-center rounded-[var(--radius-4xl)] bg-neutral-950 fill-white [clip-path:inset(0_0_0_0_round_var(--radius-4xl))] mounted:w-full mounted:[clip-path:inset(calc(var(--hero-right-height,0px)+var(--navbar-height)+1px)_0_calc(var(--hero-left-height,0px)+1px)_0_round_var(--radius-4xl))] sm:mounted:[clip-path:inset(calc(var(--hero-right-height,0px)+1px)_0_0_0_round_var(--radius-4xl))] lg:h-full lg:w-[200%] lg:mounted:[clip-path:inset(var(--navbar-height)_1px_0_1px_round_var(--radius-4xl))] dark:fill-dark"
+        class="absolute bottom-0 left-1/2 flex h-svh w-full -translate-x-1/2 items-center justify-center overflow-hidden rounded-[var(--radius-4xl)] bg-neutral-950 fill-white [clip-path:inset(0_0_0_0_round_var(--radius-4xl))] mounted:w-full mounted:[clip-path:inset(calc(var(--hero-right-height,0px)+var(--navbar-height)+1px)_0_calc(var(--hero-left-height,0px)+1px)_0_round_var(--radius-4xl))] sm:mounted:[clip-path:inset(calc(var(--hero-right-height,0px)+1px)_0_0_0_round_var(--radius-4xl))] lg:h-full lg:w-[200%] lg:mounted:[clip-path:inset(var(--navbar-height)_1px_0_1px_round_var(--radius-4xl))] dark:fill-dark"
         style="transition: clip-path 2000ms 1000ms var(--ease-in-out-quart), width 2000ms 1000ms var(--ease-in-out-quart), background-color 300ms var(--ease-out-cubic), fill 300ms var(--ease-out-cubic);"
       >
         <wm-shape
@@ -83,9 +83,9 @@ const heroFile = "alpha-3";
           rounded="clamp(1rem, -0.143rem + 1.786vw, 2rem)"
           rounded-mobile="clamp(1rem, 0.421rem + 2.469vw, 2rem)"
           corner-rounded="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
-          corner-rounded-mobile="clamp(0.75rem, -0.107rem + 1.339vw, 1.5rem)"
+          corner-rounded-mobile="clamp(0.5rem, 0.35rem + 0.6vw, 0.75rem)"
           corner-size="clamp(4.5rem, -0.071rem + 7.143vw, 8.5rem)"
-          corner-size-mobile="clamp(3.5rem, 0.606rem + 12.346vw, 8.5rem)"
+          corner-size-mobile="clamp(2.25rem, 1.5rem + 4vw, 3.75rem)"
           stroke-width="1"
           corner="br"
         ></wm-shape>
@@ -136,7 +136,7 @@ const heroFile = "alpha-3";
     <!-- Right column -->
     <div
       id="hero-right"
-      class="col-span-12 col-start-1 row-start-1 row-end-2 flex h-[200%] w-full items-end justify-start justify-self-start self-end transition-[clip-path] delay-1000 duration-2000 ease-in-out-quart [clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] mounted:[clip-path:inset(50%_0_0_0_round_var(--radius-4xl))] sm:col-span-6 sm:col-start-7 sm:row-end-2 sm:[clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] sm:mounted:[clip-path:inset(calc(50%+var(--navbar-height))_0_0_0_round_var(--radius-4xl))] lg:col-span-3 lg:col-start-10 lg:row-end-3 lg:h-auto lg:w-[200%] lg:items-stretch lg:self-auto lg:[clip-path:inset(0_0_0_50%_round_var(--radius-4xl))] lg:mounted:[clip-path:inset(var(--navbar-height)_50%_0_0_round_var(--radius-4xl))]"
+      class="col-span-12 col-start-1 row-start-1 row-end-2 flex h-[200%] w-full items-end justify-start justify-self-start self-end transition-[clip-path] delay-1000 duration-2000 ease-in-out-quart [clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] mounted:[clip-path:inset(50%_0_0_0_round_var(--radius-4xl))] sm:col-span-6 sm:col-start-7 sm:row-end-2 sm:[clip-path:inset(0_0_50%_0_round_var(--radius-4xl))] sm:mounted:[clip-path:inset(50%_0_0_0_round_var(--radius-4xl))] lg:col-span-3 lg:col-start-10 lg:row-end-3 lg:h-auto lg:w-[200%] lg:items-stretch lg:self-auto lg:[clip-path:inset(0_0_0_50%_round_var(--radius-4xl))] lg:mounted:[clip-path:inset(var(--navbar-height)_50%_0_0_round_var(--radius-4xl))]"
     >
       <div
         id="hero-right-inner"
