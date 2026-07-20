@@ -317,6 +317,11 @@ const motionConfig = computed(() => {
       :aria-label="obj.type"
       tabindex="0"
       class="canvas-object-wrapper group transition-[transform] duration-300"
+      :class="{
+        'canvas-object-selected': isSelected,
+        'canvas-object-search-hit': isSearchHighlight,
+        'canvas-object-editing': isEditing,
+      }"
       v-motion="motionConfig"
       :data-canvas-object="true"
       :style="{
@@ -325,10 +330,10 @@ const motionConfig = computed(() => {
         top: `${wrapperPos.y}px`,
         width: `${obj.width}px`,
         height: `${obj.height}px`,
-        zIndex: obj.zIndex,
+        zIndex: isEditing ? 10000 : obj.zIndex,
         boxShadow: isSearchHighlight ? '0 0 0 4px #E0A030' :
                    isConnectSource ? '0 0 0 3px #3F9E6E' :
-                   isSelected ? '0 0 0 3px #6D5BD0' : '0 2px 8px rgba(0,0,0,0.1)',
+                   isSelected ? undefined : '0 2px 8px rgba(0,0,0,0.12)',
         borderRadius: obj.type === 'circle' ? '50%' : '8px',
         backgroundColor: obj.type === 'flashcard' ? '#FFFFFF' : obj.color,
         display: 'flex',
@@ -380,7 +385,7 @@ const motionConfig = computed(() => {
       </div>
 
       <!-- Text Area -->
-      <div v-if="(obj.type === 'note' || obj.type === 'flashcard') && isEditing" class="flex-1 p-2 relative z-10 bg-white/50 overflow-hidden flex flex-col" :style="{ transform: (!prefersReducedMotion && obj.type === 'flashcard' && obj.flipped) ? 'rotateY(180deg)' : 'none' }" @keydown.escape.stop.prevent="finishEditing" @focusout="handleEditorFocusOut">
+      <div v-if="(obj.type === 'note' || obj.type === 'flashcard') && isEditing" data-canvas-text-editor class="flex-1 p-2 relative z-10 bg-white/50 overflow-hidden flex flex-col" :style="{ transform: (!prefersReducedMotion && obj.type === 'flashcard' && obj.flipped) ? 'rotateY(180deg)' : 'none' }" @keydown.escape.stop.prevent="finishEditing" @focusout="handleEditorFocusOut">
          <!-- Format Toolbar -->
          <div class="flex gap-1 mb-1 shrink-0">
             <button type="button" @mousedown.prevent="editor?.chain().focus().toggleBold().run()" class="px-2 py-1 bg-white border rounded text-xs font-bold" :class="{ 'bg-gray-200': editor?.isActive('bold') }">B</button>
@@ -414,6 +419,19 @@ const motionConfig = computed(() => {
 .canvas-object-wrapper {
   outline: none;
   transform-style: preserve-3d;
+  box-shadow: 0 2px 8px rgba(33, 29, 58, 0.12);
+}
+.canvas-object-wrapper.canvas-object-selected {
+  outline: 3px solid #6D5BD0;
+  outline-offset: 2px;
+  box-shadow: 0 2px 8px rgba(33, 29, 58, 0.12), 0 0 0 1px #6D5BD0;
+}
+.canvas-object-wrapper.canvas-object-search-hit {
+  outline: 3px solid #E0A030;
+  outline-offset: 2px;
+}
+.canvas-object-wrapper.canvas-object-editing {
+  z-index: 10000 !important;
 }
 .resize-handle {
   pointer-events: auto;

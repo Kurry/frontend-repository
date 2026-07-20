@@ -22,7 +22,7 @@ const snippet = (text?: string) => {
   <div v-if="store.showArchivePanel" class="fixed right-0 top-0 bottom-0 w-80 bg-white shadow-2xl border-l border-gray-200 z-[70] flex flex-col">
     <div class="px-4 py-3 border-b border-gray-200 flex items-center justify-between bg-gray-50">
        <h3 class="font-bold text-gray-900 m-0">Archive</h3>
-       <button type="button" @click="store.setShowArchivePanel(false)" class="text-gray-400 hover:text-gray-700 outline-none focus:ring-2 focus:ring-[#6D5BD0] rounded p-1">
+       <button type="button" aria-label="Close archive panel" @click="store.setShowArchivePanel(false)" class="text-gray-400 hover:text-gray-700 outline-none focus:ring-2 focus:ring-[#6D5BD0] rounded p-1">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
        </button>
     </div>

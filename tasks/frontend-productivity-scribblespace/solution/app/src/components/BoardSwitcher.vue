@@ -11,12 +11,12 @@ import {
 } from 'reka-ui'
 
 const store = useAppStore()
-const renameState = ref<{ id: string; name: string } | null>(null)
+const renameState = ref<{ id: string; name: string; error?: string } | null>(null)
 
 const boardToDelete = computed(() => store.boards.find(b => b.id === store.boardDeleteId) || null)
 
 const startRename = (board: any) => {
-  renameState.value = { id: board.id, name: board.name }
+  renameState.value = { id: board.id, name: board.name, error: '' }
 }
 
 const confirmRename = () => {
@@ -25,8 +25,8 @@ const confirmRename = () => {
   const trimmed = name.trim()
 
   if (trimmed.length === 0 || trimmed.length > 60) {
-    store.announce('Board name must be 1 to 60 characters')
-    // Reset to current name on fail
+    renameState.value.error = 'board-name field must be 1 to 60 characters'
+    store.announce('board-name field must be 1 to 60 characters')
     const b = store.boards.find(b => b.id === id)
     if (b) renameState.value.name = b.name
     return
@@ -55,15 +55,18 @@ const handleKeyDown = (e: KeyboardEvent) => {
       class="flex items-center min-w-[120px] max-w-[200px] bg-white border border-gray-200 rounded-t-lg overflow-hidden shrink-0"
       :class="{'border-b-0 border-[#6D5BD0] shadow-sm z-10': board.id === store.activeBoardId}"
     >
-      <div v-if="renameState?.id === board.id" class="flex items-center w-full px-2 py-1">
+      <div v-if="renameState?.id === board.id" class="flex flex-col w-full px-2 py-1">
         <input
           v-model="renameState.name"
           type="text"
+          aria-label="Board name"
+          aria-describedby="board-name-error"
           class="w-full text-sm border-b border-[#6D5BD0] outline-none"
           @keydown="handleKeyDown"
           @blur="confirmRename"
           autofocus
         />
+        <span v-if="renameState.error" id="board-name-error" role="alert" class="text-xs text-red-600 mt-1">{{ renameState.error }}</span>
       </div>
       <button
         v-else
@@ -108,7 +111,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
     <DialogRoot :open="!!boardToDelete" @update:open="(open: boolean) => { if (!open) store.requestDeleteBoard(null) }">
       <DialogPortal>
         <DialogOverlay class="fixed inset-0 bg-black/40 z-50" />
-        <DialogContent class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-[400px] z-50">
+        <DialogContent class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-[min(400px,calc(100vw-24px))] z-50" :trap-focus="true">
           <DialogTitle class="text-xl font-bold text-gray-900 mb-2">Delete board {{ boardToDelete?.name }}?</DialogTitle>
           <DialogDescription class="text-gray-600 mb-6">
             This deletes the board with everything on it. Another board opens in its place.
