@@ -15,7 +15,12 @@ import { store } from './store.svelte';
 import type { NoteColor } from './types';
 
 const CONTRACT_VERSION = 'zto-webmcp-v1';
-const MODULES = ['entity-collection-v1', 'browse-query-v1', 'structured-editor-v1'];
+const MODULES = [
+  'entity-collection-v1',
+  'browse-query-v1',
+  'structured-editor-v1',
+  'artifact-transfer-v1',
+];
 
 const COLORS: NoteColor[] = ['', 'red', 'orange', 'yellow', 'green', 'blue', 'purple'];
 
@@ -56,12 +61,17 @@ const TOOLS: ToolDef[] = [
     module: 'browse-query-v1',
     operation: 'open',
     description:
-      'Open a top-level destination view. destination: "all-notes" | "trash".',
+      'Open a top-level destination view. destination: "all-notes" | "trash" | "export-nest".',
     run: (args) => {
       const destination = String(args.destination ?? '');
-      if (destination !== 'all-notes' && destination !== 'trash') {
-        throw new Error('destination must be "all-notes" or "trash"');
+      if (!['all-notes', 'trash', 'export-nest'].includes(destination)) {
+        throw new Error('destination must be "all-notes", "trash", or "export-nest"');
       }
+      if (destination === 'export-nest') {
+        store.exportOpen = true;
+        return { ok: true, destination, exportOpen: true };
+      }
+      store.exportOpen = false;
       store.selectedFolderId = destination === 'trash' ? 'trash' : null;
       store.selectedNoteId = null;
       store.searchQuery = '';
@@ -344,6 +354,68 @@ const TOOLS: ToolDef[] = [
         store.updateChecklistItem(note.id, blockId, item.id, args.text);
       }
       return { ok: true, noteId: note.id, blockId, itemId: item.id };
+    },
+  },
+
+  // -------------------------------------------------------------------------
+  // artifact-transfer-v1 — Nest export / import / copy
+  // -------------------------------------------------------------------------
+  {
+    name: 'artifact_export',
+    module: 'artifact-transfer-v1',
+    operation: 'export',
+    description:
+      'Open the Export Nest drawer on a format tab (same control as "Export Nest"). args: { format: "json" | "markdown" }. Returns metadata only — never the artifact text.',
+    run: (args) => {
+      const format = String(args.format ?? 'json');
+      if (format !== 'json' && format !== 'markdown') {
+        throw new Error('format must be "json" or "markdown"');
+      }
+      store.importOpen = false;
+      store.exportOpen = true;
+      store.exportTab = format;
+      const obj = store.exportObject() as any;
+      return {
+        ok: true,
+        format,
+        schemaVersion: obj.schemaVersion,
+        folderCount: obj.folders.length,
+        noteCount: obj.notes.length,
+        trashCount: obj.trash.length,
+      };
+    },
+  },
+  {
+    name: 'artifact_copy',
+    module: 'artifact-transfer-v1',
+    operation: 'copy',
+    description:
+      'Open the Export Nest drawer on a format tab ready for its Copy control. args: { format: "json" | "markdown" }. Clipboard contents stay a Playwright responsibility.',
+    run: (args) => {
+      const format = String(args.format ?? 'json');
+      if (format !== 'json' && format !== 'markdown') {
+        throw new Error('format must be "json" or "markdown"');
+      }
+      store.importOpen = false;
+      store.exportOpen = true;
+      store.exportTab = format;
+      return { ok: true, format };
+    },
+  },
+  {
+    name: 'artifact_import',
+    module: 'artifact-transfer-v1',
+    operation: 'import',
+    description:
+      'Open the Import Nest dialog in nest-json mode (same control as "Import Nest"). args: { mode: "nest-json" }. The document text is entered through the visible field (a Playwright responsibility), never in WebMCP args.',
+    run: (args) => {
+      const mode = String(args.mode ?? 'nest-json');
+      if (mode !== 'nest-json') {
+        throw new Error('mode must be "nest-json"');
+      }
+      store.exportOpen = false;
+      store.importOpen = true;
+      return { ok: true, mode };
     },
   },
 ];

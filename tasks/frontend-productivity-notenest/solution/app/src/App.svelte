@@ -7,6 +7,10 @@
   import NoteEditor from './components/NoteEditor.svelte';
   import Toast from './components/Toast.svelte';
   import VirtualizedList from './components/VirtualizedList.svelte';
+  import ExportDrawer from './components/ExportDrawer.svelte';
+  import ImportDialog from './components/ImportDialog.svelte';
+  import CommandPalette from './components/CommandPalette.svelte';
+  import BatchTray from './components/BatchTray.svelte';
 
   let showVirtualized: boolean = $state(false);
   let virtualizedItems: { id: string; text: string }[] = $state([]);
@@ -96,11 +100,47 @@
   function toggleSidebar() {
     store.sidebarOpen = !store.sidebarOpen;
   }
+
+  // Global keyboard shortcuts: command palette + session undo/redo.
+  function onGlobalKeydown(e: KeyboardEvent) {
+    const key = e.key.toLowerCase();
+    if ((e.metaKey || e.ctrlKey) && key === 'k') {
+      e.preventDefault();
+      store.paletteOpen = !store.paletteOpen;
+      return;
+    }
+    // Session undo/redo only when the note body editor is not capturing them.
+    const target = e.target as HTMLElement | null;
+    const inBodyEditor = !!target?.closest?.('[contenteditable="true"]');
+    if (!inBodyEditor && (e.metaKey || e.ctrlKey) && key === 'z') {
+      const isRedo = e.shiftKey;
+      // Only hijack the shortcut when there is session history to apply;
+      // otherwise let the browser's native undo run in the focused field
+      // (title input, search bar, Import Nest textarea, command palette, ...).
+      if (isRedo ? store.canRedo : store.canUndo) {
+        e.preventDefault();
+        if (isRedo) store.redo();
+        else store.undo();
+      }
+    }
+  }
+
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+    window.addEventListener('keydown', onGlobalKeydown);
+    return () => window.removeEventListener('keydown', onGlobalKeydown);
+  });
 </script>
 
 <div class="h-screen w-screen flex flex-col bg-white overflow-hidden">
   <!-- Toast notifications -->
   <Toast />
+
+  <!-- Overlays -->
+  <ExportDrawer />
+  <ImportDialog />
+  <CommandPalette />
+  <BatchTray />
 
   <!-- Main layout -->
   <div class="flex flex-1 overflow-hidden">
@@ -144,6 +184,52 @@
         <div class="flex-1 max-w-sm">
           <SearchBar />
         </div>
+
+        <!-- Session Undo / Redo -->
+        <button
+          class="px-2 py-2 text-slate-500 hover:bg-slate-100 rounded-lg transition flex-shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          onclick={() => store.undo()}
+          disabled={!store.canUndo}
+          aria-label="Undo"
+          title="Undo (Ctrl+Z)"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a5 5 0 015 5v1M3 10l4-4M3 10l4 4"/></svg>
+        </button>
+        <button
+          class="px-2 py-2 text-slate-500 hover:bg-slate-100 rounded-lg transition flex-shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+          onclick={() => store.redo()}
+          disabled={!store.canRedo}
+          aria-label="Redo"
+          title="Redo (Ctrl+Shift+Z)"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10H11a5 5 0 00-5 5v1M21 10l-4-4M21 10l-4 4"/></svg>
+        </button>
+
+        <!-- Command Palette -->
+        <button
+          class="px-2 py-2 text-slate-500 hover:bg-slate-100 rounded-lg transition flex-shrink-0 cursor-pointer"
+          onclick={() => store.paletteOpen = true}
+          aria-label="Command Palette"
+          title="Command Palette (Ctrl+K)"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M4 5h16a1 1 0 011 1v12a1 1 0 01-1 1H4a1 1 0 01-1-1V6a1 1 0 011-1z"/></svg>
+        </button>
+
+        <!-- Export / Import Nest -->
+        <button
+          class="hidden sm:flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium rounded-lg transition flex-shrink-0 cursor-pointer"
+          onclick={() => store.exportOpen = true}
+          title="Export Nest"
+        >
+          Export Nest
+        </button>
+        <button
+          class="hidden sm:flex items-center gap-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm font-medium rounded-lg transition flex-shrink-0 cursor-pointer"
+          onclick={() => store.importOpen = true}
+          title="Import Nest"
+        >
+          Import Nest
+        </button>
 
         <!-- New Note button -->
         <button

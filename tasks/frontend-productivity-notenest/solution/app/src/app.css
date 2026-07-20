@@ -64,3 +64,31 @@
 .toast-exit {
   animation: fadeOut 0.3s ease-out;
 }
+
+/* Drawer / dialog / palette enter */
+@keyframes drawerIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+.drawer-enter {
+  animation: drawerIn 0.2s ease-out;
+}
+@keyframes trayIn {
+  from { opacity: 0; transform: translate(-50%, 16px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+.batch-tray-enter {
+  animation: trayIn 0.2s ease-out;
+}
+
+/* Respect reduced motion: collapse every transition/animation to instant. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.00001s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.00001s !important;
+    scroll-behavior: auto !important;
+  }
+}

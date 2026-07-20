@@ -1,4 +1,8 @@
-const STORAGE_KEY = 'notenest_data';
+// NoteNest is an in-memory workspace by contract: shared state lives only in
+// Svelte runes for the session. A page reload returns the app to its seeded
+// baseline. Session work survives exclusively through the downloadable Nest
+// JSON / Markdown vault artifacts and the WebMCP export surface — never through
+// localStorage, sessionStorage, IndexedDB, or any other browser persistence.
 
 export interface StoredData {
   folders: any[];
@@ -10,22 +14,12 @@ export interface StoredData {
   lastImageId: number;
 }
 
+// No browser storage is read: the workspace always starts from its baseline.
 export function loadData(): StoredData | null {
-  try {
-    if (typeof localStorage === 'undefined') return null;
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    return JSON.parse(raw);
-  } catch {
-    return null;
-  }
+  return null;
 }
 
-export function saveData(data: StoredData): void {
-  try {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-  } catch {
-    // storage full or unavailable
-  }
+// No-op: state is intentionally never written to any browser persistence store.
+export function saveData(_data: StoredData): void {
+  /* intentionally in-memory only */
 }

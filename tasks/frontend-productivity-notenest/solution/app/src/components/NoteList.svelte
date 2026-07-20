@@ -68,7 +68,19 @@
       >
         <!-- Color bar -->
         <div class="w-1 flex-shrink-0 {getColorBarClass(note.color)}"></div>
-        
+
+        <!-- Selection checkbox -->
+        <div class="flex items-center pl-3">
+          <input
+            type="checkbox"
+            checked={store.isSelected(note.id)}
+            class="h-4 w-4 rounded border-slate-300 text-indigo-500 focus:ring-indigo-500 cursor-pointer"
+            onclick={(e) => { e.stopPropagation(); store.toggleSelect(note.id); }}
+            onkeydown={(e) => e.stopPropagation()}
+            aria-label={`Select ${note.title || 'Untitled'}`}
+          />
+        </div>
+
         <!-- Content -->
         <div class="flex-1 min-w-0 px-4 py-3">
           <div class="flex items-start justify-between gap-2">
