@@ -2,10 +2,27 @@
   "name": "oracle-static",
   "private": true,
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
+    "verify:build": "esbuild src/index.tsx --bundle --outfile=app.js && node -e \"require('fs').accessSync('index.html')\"",
     "start": "npx --yes serve -l 3000 -n"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "@heroicons/react": "^2.2.0",
+    "@hookform/resolvers": "^3.10.0",
+    "@reduxjs/toolkit": "^2.5.1",
+    "@tanstack/react-table": "^8.21.2",
+    "@weblogin/trendchart-elements": "^1.1.0",
+    "motion": "^12.4.2",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.54.2",
+    "react-redux": "^9.2.0",
+    "serve": "14.2.4",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "esbuild": "^0.25.12",
+    "typescript": "^5.7.3"
   }
 }
