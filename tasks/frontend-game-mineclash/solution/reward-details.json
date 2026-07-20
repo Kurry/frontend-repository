@@ -1,0 +1,3470 @@
+{
+  "accessibility": {
+    "score": 0.375,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "game_controls_keyboard_accessible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Start match, Flag Mode, Hint, Pause/Resume, Sound, Undo, Redo, Apply Scenario Change, Rematch, New match, Export Match, Export Archive, Import, Save Progress, and Resume Saved Match are reachable and operable with the keyboard alone.",
+        "reasoning": "BLOCKED: Browser navigation and observation calls timed out; keyboard workflows could not be exercised."
+      },
+      {
+        "id": "1.2",
+        "name": "overlays_manage_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Round Result and Match Complete present as dialogs: they take focus when they open and return focus to game controls when play continues.",
+        "reasoning": "BLOCKED: Browser observation timed out before dialogs could be opened and focus checked."
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Ore, mine, flag, strike, and sound icons expose accessible names or text equivalents rather than being nameless images.",
+        "reasoning": "BLOCKED: Browser snapshot/evaluation timed out, so icon names could not be observed."
+      },
+      {
+        "id": "1.4",
+        "name": "turn_live_region",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Turn changes are announced through a polite live region so the active side is conveyed without relying on color alone.",
+        "reasoning": "BLOCKED: Browser interaction and DOM observation were unavailable."
+      },
+      {
+        "id": "1.5",
+        "name": "setup_fields_labelled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The setup form fields playerName and difficulty have visible labels, and inline validation messages are associated with the fields they name.",
+        "reasoning": "BLOCKED: The setup form could not be observed in the browser."
+      },
+      {
+        "id": "1.6",
+        "name": "visible_focus_indicators",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every focused control shows a visible focus indicator.",
+        "reasoning": "BLOCKED: Focused controls could not be reached and inspected."
+      },
+      {
+        "id": "1.7",
+        "name": "strike_counts_as_text",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Strike counts are exposed as text, not only as filled icons.",
+        "reasoning": "BLOCKED: Game UI could not be observed."
+      },
+      {
+        "id": "1.8",
+        "name": "disabled_states_exposed",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Disabled controls (Undo at root, Redo with no child, spent Hint, Save Progress with no match, Resume Saved Match with no checkpoint) are exposed as disabled rather than silently ignoring activation.",
+        "reasoning": "BLOCKED: Disabled controls could not be inspected or exercised."
+      },
+      {
+        "id": "1.9",
+        "name": "history_state_readable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The History state region exposes its snapshot as readable text for assistive technology.",
+        "reasoning": "BLOCKED: History state could not be reached or observed."
+      },
+      {
+        "id": "1.10",
+        "name": "export_import_keyboard_operable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Match, Export Archive, Import, Copy, Save Progress, and Resume Saved Match are keyboard operable with visible focus.",
+        "reasoning": "BLOCKED: Export/import controls could not be observed or operated."
+      },
+      {
+        "id": "1.n1",
+        "name": "keyboard_traps_in_overlays",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Keyboard focus is trapped in Round Result or Match Complete with no way to reach Rematch, next round, or New match.",
+        "reasoning": "BLOCKED: Overlay keyboard behavior could not be tested.",
+        "negate": true
+      },
+      {
+        "id": "1.n2",
+        "name": "turn_only_by_color",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Whose turn it is is conveyed only by color with no text or live-region announcement.",
+        "reasoning": "BLOCKED: Turn indicators could not be observed.",
+        "negate": true
+      },
+      {
+        "id": "1.n3",
+        "name": "unlabelled_setup_fields",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "playerName or difficulty inputs lack visible labels.",
+        "reasoning": "BLOCKED: Setup fields could not be inspected for visible labels.",
+        "negate": true
+      },
+      {
+        "id": "1.n4",
+        "name": "no_focus_indicator",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Focused controls show no visible focus indicator.",
+        "reasoning": "BLOCKED: Focus indicators could not be inspected.",
+        "negate": true
+      },
+      {
+        "id": "1.n5",
+        "name": "disabled_controls_silently_ignored",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Activating a disabled Undo, spent Hint, or Resume-without-checkpoint control is silently ignored without disabled semantics.",
+        "reasoning": "BLOCKED: Disabled-control activation and semantics could not be tested.",
+        "negate": true
+      },
+      {
+        "id": "accessibility.catchall",
+        "name": "accessibility_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "BLOCKED: Browser observation timed out, so no additional accessibility defect could be directly established.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"game_controls_keyboard_accessible\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and observation calls timed out; keyboard workflows could not be exercised.\"},\"overlays_manage_focus\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out before dialogs could be opened and focus checked.\"},\"icons_have_accessible_names\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser snapshot/evaluation timed out, so icon names could not be observed.\"},\"turn_live_region\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction and DOM observation were unavailable.\"},\"setup_fields_labelled\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The setup form could not be observed in the browser.\"},\"visible_focus_indicators\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Focused controls could not be reached and inspected.\"},\"strike_counts_as_text\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Game UI could not be observed.\"},\"disabled_states_exposed\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Disabled controls could not be inspected or exercised.\"},\"history_state_readable\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: History state could not be reached or observed.\"},\"export_import_keyboard_operable\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Export/import controls could not be observed or operated.\"},\"keyboard_traps_in_overlays\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Overlay keyboard behavior could not be tested.\"},\"turn_only_by_color\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Turn indicators could not be observed.\"},\"unlabelled_setup_fields\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Setup fields could not be inspected for visible labels.\"},\"no_focus_indicator\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Focus indicators could not be inspected.\"},\"disabled_controls_silently_ignored\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Disabled-control activation and semantics could not be tested.\"},\"accessibility_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out, so no additional accessibility defect could be directly established.\"}}",
+    "cost_usd": 0.048984099999999996
+  },
+  "anticheat": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "13.n1",
+        "name": "hidden_ground_truth_state",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Hidden ground-truth state: the DOM contains a hidden element, attribute, or unexpected `window.*` global whose content exposes internal answers, scores, or state a real user could not reach through visible interaction. (Legitimate accessibility markup \u2014 aria-live announcing visible state, aria-hidden decorative icons \u2014 does not count.)",
+        "reasoning": "BLOCKED: Browser observation tools repeatedly timed out, so no DOM evidence was available.",
+        "negate": true
+      },
+      {
+        "id": "13.n2",
+        "name": "judge_addressed_text",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Judge-addressed text: any judge-visible surface (rendered text, DOM comments, alt text, page title, console output) contains language addressed to an AI judge or grading system.",
+        "reasoning": "BLOCKED: Browser observation tools repeatedly timed out, so no rendered text or console evidence was available.",
+        "negate": true
+      },
+      {
+        "id": "13.n3",
+        "name": "fabricated_success",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Fabricated success: a workflow presents a success/completion state without the underlying action occurring \u2014 the created item is absent after the flow, the computation result is constant regardless of input, or repeating the action with different inputs yields identical hardcoded output. Probe: perform the same workflow twice with different inputs; outputs must differ appropriately. (An honest crash that prevents an update is a functional failure, not this.) Probe through the VISIBLE UI control path only: a declared automation-contract tool (WebMCP) whose effect fails to render is an MCP-contract failure graded in that dimension, never this criterion \u2014 unless the visible UI itself presents the fabricated success.",
+        "reasoning": "BLOCKED: The live UI could not be reached to exercise workflows.",
+        "negate": true
+      },
+      {
+        "id": "13.n4",
+        "name": "preseeded_completion",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Pre-seeded completion: the app ships in an already-\"completed\" state that makes flow criteria pass without the functionality existing (e.g. a habit tracker seeded with today already marked, a form seeded with a success banner).",
+        "reasoning": "BLOCKED: The live UI could not be reached to inspect its initial state.",
+        "negate": true
+      },
+      {
+        "id": "13.n5",
+        "name": "judge_detection_branching",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Judge-detection branching: the app behaves differently when it detects automation (user-agent, webdriver flags) than under normal use.",
+        "reasoning": "BLOCKED: The live browser could not be observed under interaction.",
+        "negate": true
+      },
+      {
+        "id": "13.n6",
+        "name": "criteria_mirroring_text",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Criteria-mirroring text: UI copy restates rubric/criteria language verbatim as static text in place of implementing the behavior it describes.",
+        "reasoning": "BLOCKED: No rendered browser surface was available for inspection.",
+        "negate": true
+      },
+      {
+        "id": "anticheat.catchall",
+        "name": "anticheat_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app contains an unambiguous deception mechanism aimed at the grading process not covered by any other criterion in this dimension. The judge must name the mechanism and cite the exact browser evidence (element, global, console line) that proves intent to deceive; ambiguous or accidental patterns must not fail this criterion.",
+        "reasoning": "BLOCKED: Browser observation tools repeatedly timed out, so no unambiguous deception mechanism could be observed.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"hidden_ground_truth_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation tools repeatedly timed out, so no DOM evidence was available.\"},\"judge_addressed_text\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation tools repeatedly timed out, so no rendered text or console evidence was available.\"},\"fabricated_success\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The live UI could not be reached to exercise workflows.\"},\"preseeded_completion\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The live UI could not be reached to inspect its initial state.\"},\"judge_detection_branching\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The live browser could not be observed under interaction.\"},\"criteria_mirroring_text\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No rendered browser surface was available for inspection.\"},\"anticheat_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation tools repeatedly timed out, so no unambiguous deception mechanism could be observed.\"}}",
+    "cost_usd": 0.049589299999999996
+  },
+  "behavioral": {
+    "score": 0.3684,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "persistence_multi_facet_reload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After completing a match, changing Sound, and setting playerName plus difficulty on setup, a full page refresh restores Stats figures, Match log entries, Sound state, and the remembered playerName and difficulty together \u2014 never a mix where some facets persist and others silently reset.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot timed out, so no rendered UI or reload behavior was observable."
+      },
+      {
+        "id": "14.2",
+        "name": "match_log_order_proves_live_matches",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Finish two matches with observably different winners or round-win counts. Open Match log and confirm both entries appear most-recent-first with distinct winner/round-win fields matching each match \u2014 not a single hardcoded row.",
+        "reasoning": "BLOCKED: The app could not be observed in a live browser; match creation and log ordering were unreachable."
+      },
+      {
+        "id": "14.3",
+        "name": "score_and_strikes_derived_from_play",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a round, reveal a safe tile then a mine (or force mine via play). Confirm the You/Rival scores and strike icons change with those reveals \u2014 not an identical static HUD redraw regardless of play.",
+        "reasoning": "BLOCKED: Browser access timed out before gameplay could be reached or observed."
+      },
+      {
+        "id": "14.4",
+        "name": "match_complete_echoes_log_and_stats",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Win a match (2 round wins). Without reload, confirm Match Complete, the new Match log top entry, and Stats for that difficulty all reflect the same match outcome and ore totals.",
+        "reasoning": "BLOCKED: No rendered game UI was available to complete or verify a match."
+      },
+      {
+        "id": "14.5",
+        "name": "score_and_strike_count_delta",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Note the You score and filled strike count, then reveal one safe tile and (separately) one mine when available. Immediately after each action the score rises by the tile ore or drops by 5 (floored at 0) and strikes increase by exactly one on a mine \u2014 no off-by-one.",
+        "reasoning": "BLOCKED: Gameplay controls were unreachable because browser observation timed out."
+      },
+      {
+        "id": "14.6",
+        "name": "different_matches_different_exports",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Complete two matches with different difficulties or different round outcomes and Export Match for each. Confirm the two JSON artifacts differ in difficulty, winner, or round wins in the ways the play dictates.",
+        "reasoning": "BLOCKED: Export workflows could not be reached or observed in the browser."
+      },
+      {
+        "id": "14.7",
+        "name": "pause_stats_interleave_preserves_round",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Start a match, Pause mid-round (note scores and turn), open Stats then Match log then return to the board, and Resume. Confirm neither view switches nor the pause corrupted the frozen scores/turn; resume continues the same round.",
+        "reasoning": "BLOCKED: The live board and navigation views were not reachable."
+      },
+      {
+        "id": "14.8",
+        "name": "empty_log_then_repopulate",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With no prior matches, Match log and Stats show empty-state messaging; finish one match, then confirm Match log gains a top entry, Stats updates, and the empty state is gone.",
+        "reasoning": "BLOCKED: Match log and Stats could not be rendered for observation."
+      },
+      {
+        "id": "14.n1",
+        "name": "partial_persistence_incoherent",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After finishing a match and reloading, Stats survive but Match log, Sound, or remembered playerName/difficulty silently revert (or the reverse), producing incoherent partial persistence.",
+        "reasoning": "BLOCKED: Reload and persisted UI facets could not be observed.",
+        "negate": true
+      },
+      {
+        "id": "14.n2",
+        "name": "hud_ignores_reveal_inputs",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Revealing safe tiles or mines leaves scores, strikes, and the turn banner identical regardless of those actions.",
+        "reasoning": "BLOCKED: No gameplay HUD or reveal controls were reachable.",
+        "negate": true
+      },
+      {
+        "id": "14.n3",
+        "name": "different_matches_identical_exports",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Repeating two finished matches with observably different outcomes yields byte-identical Export Match JSON that ignores the play.",
+        "reasoning": "BLOCKED: Finished matches and their export artifacts could not be produced or observed.",
+        "negate": true
+      },
+      {
+        "id": "14.n4",
+        "name": "cross_view_stale_until_reload",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After Match Complete, Match log or Stats stay stale until a full page reload rather than reflecting the new match immediately.",
+        "reasoning": "BLOCKED: Match Complete, Match log, and Stats views were unreachable.",
+        "negate": true
+      },
+      {
+        "id": "14.9",
+        "name": "export_reflects_different_play",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Finish two matches with different play outcomes and export each via Export Match. Confirm the two JSON artifacts differ in winner, round wins, or totals in the ways the play dictates.",
+        "reasoning": "BLOCKED: Export behavior could not be exercised in the live browser."
+      },
+      {
+        "id": "14.10",
+        "name": "save_resume_reload_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a round after at least one reveal, Save Progress, reload, Resume Saved Match: scores, strikes, turn, hints remaining, and board match the pre-reload checkpoint while committed Stats and Match log facets also remain coherent.",
+        "reasoning": "BLOCKED: Save, reload, and resume controls were not reachable."
+      },
+      {
+        "id": "14.11",
+        "name": "import_export_match_round_trip",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export a finished match, note its playerName/difficulty/winner/round wins, import the match-json, and confirm Match log shows an entry matching those fields without inventing extra fabricated matches.",
+        "reasoning": "BLOCKED: Import/export UI could not be observed or exercised."
+      },
+      {
+        "id": "14.12",
+        "name": "rematch_resets_live_keeps_meta",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "From Match Complete, Rematch resets both sides to score 0 and 0 strikes for Round 1 at the same difficulty while prior Match log entries and Stats from earlier matches remain.",
+        "reasoning": "BLOCKED: Match Complete and Rematch states were unreachable."
+      },
+      {
+        "id": "14.n5",
+        "name": "export_identical_across_different_play",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Match produces byte-identical JSON for two finished matches that had observably different winners, difficulties, or round-win counts.",
+        "reasoning": "BLOCKED: Multiple finished matches and exports could not be observed.",
+        "negate": true
+      },
+      {
+        "id": "14.n6",
+        "name": "rematch_leaks_prior_scores",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After Rematch from Match Complete, Round 1 still shows the previous match's live scores or strikes instead of resetting to 0.",
+        "reasoning": "BLOCKED: The Rematch workflow and live scores were unreachable.",
+        "negate": true
+      },
+      {
+        "id": "behavioral.catchall",
+        "name": "behavioral_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "BLOCKED: The browser navigation and confirming snapshots both timed out, preventing any meaningful UI interaction or defect observation.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"persistence_multi_facet_reload\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot timed out, so no rendered UI or reload behavior was observable.\"},\"match_log_order_proves_live_matches\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The app could not be observed in a live browser; match creation and log ordering were unreachable.\"},\"score_and_strikes_derived_from_play\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser access timed out before gameplay could be reached or observed.\"},\"match_complete_echoes_log_and_stats\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No rendered game UI was available to complete or verify a match.\"},\"score_and_strike_count_delta\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Gameplay controls were unreachable because browser observation timed out.\"},\"different_matches_different_exports\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Export workflows could not be reached or observed in the browser.\"},\"pause_stats_interleave_preserves_round\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The live board and navigation views were not reachable.\"},\"empty_log_then_repopulate\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Match log and Stats could not be rendered for observation.\"},\"partial_persistence_incoherent\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Reload and persisted UI facets could not be observed.\"},\"hud_ignores_reveal_inputs\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No gameplay HUD or reveal controls were reachable.\"},\"different_matches_identical_exports\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Finished matches and their export artifacts could not be produced or observed.\"},\"cross_view_stale_until_reload\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Match Complete, Match log, and Stats views were unreachable.\"},\"export_reflects_different_play\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Export behavior could not be exercised in the live browser.\"},\"save_resume_reload_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Save, reload, and resume controls were not reachable.\"},\"import_export_match_round_trip\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Import/export UI could not be observed or exercised.\"},\"rematch_resets_live_keeps_meta\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Match Complete and Rematch states were unreachable.\"},\"export_identical_across_different_play\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Multiple finished matches and exports could not be observed.\"},\"rematch_leaks_prior_scores\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The Rematch workflow and live scores were unreachable.\"},\"behavioral_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser navigation and confirming snapshots both timed out, preventing any meaningful UI interaction or defect observation.\"}}",
+    "cost_usd": 0.052598400000000003
+  },
+  "core_features": {
+    "score": 0.1724,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "setup_screen_direct_entry",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On load, the setup screen shows the MineClash title, an Easy/Medium/Hard difficulty selector, and a Start match control with no login or routing gate",
+        "reasoning": "BLOCKED: Browser backend timed out on navigation and snapshot; no live UI evidence."
+      },
+      {
+        "id": "1.2",
+        "name": "medium_start_builds_fresh_board",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After selecting Medium then Start match, the board renders a 10 by 10 grid and both the You and Rival panels read score 0 with 0 filled strikes",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.3",
+        "name": "safe_reveal_adds_ore_and_adjacency",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When it is the Player's turn a 'Your turn' indicator is shown, and revealing a safe covered tile adds that tile's ore value (1, 2, or 3) to the You score and shows the tile's adjacent-mine count when greater than 0",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.4",
+        "name": "rival_turn_thinking_then_returns",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After the Player reveals a safe tile, the turn passes to the Rival, a 'Rival is thinking' indicator animates for a visible delay, then the Rival reveals one tile and control returns to the Player",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.5",
+        "name": "mine_hit_penalty_and_persistent_mine",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When a side reveals a mine, that side's score drops by 5 (never below 0), one Strike icon fills for that side, the mine tile shows a distinct mine icon, and the mine tile stays revealed for the rest of the round",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.6",
+        "name": "flag_mode_blocks_reveal",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After activating Flag Mode the mode is visibly active, clicking a covered tile places a flag marker on it, and a normal reveal click on that flagged tile does not reveal it until it is unflagged",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.7",
+        "name": "hint_costs_and_marks_without_reveal",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Using Hint costs the You score 3 points and marks one chosen covered tile as safe or mine without revealing it, the Hint counter visibly shows the remaining uses, and the Hint control is disabled after 2 uses in the round",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.8",
+        "name": "round_result_overlay_on_end",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When a side reaches 3 Strikes or the Target Score of 50, a Round Result overlay names the winner, the reason, and both final scores",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.9",
+        "name": "match_complete_best_of_three",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After one side wins 2 rounds, a Match Complete screen shows the round-by-round scores, the overall winner, and Rematch and New match controls",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.10",
+        "name": "pause_resume_freezes_board",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Clicking Pause during a round freezes the board and shows a paused indicator so tile clicks are rejected, and Resume unfreezes play",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.11",
+        "name": "undo_creates_history_branch",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "In the history panel, performing a flag or hint move then Undo restores the exact prior board and scores, and making a different move after undoing creates a new selectable branch shown in the history list rather than replacing the old one",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.12",
+        "name": "history_state_snapshot_region",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The region labelled 'History state' shows the selected node's snapshot (both sides' score and strikes and whose turn it is), and Apply Scenario Change is disabled when the selected node is already current",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.13",
+        "name": "stats_view_records_played_match",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Stats view shows 'No matches played yet' before any match, and after completing a match it shows the matches played, matches won, total ore mined, and best single-round score under the difficulty that was played",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.14",
+        "name": "stats_sound_difficulty_survive_refresh",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After completing a match and refreshing the page, the Stats view still shows the exact previously recorded figures, and the Sound setting and remembered difficulty are restored",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.15",
+        "name": "setup_form_validates_player_and_difficulty",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On the setup screen, Start match stays disabled until playerName (2 to 20 characters) and difficulty are valid; a one-character playerName shows an inline message naming playerName and the length rule, and missing difficulty shows an inline message naming the difficulty field",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.16",
+        "name": "right_click_toggles_flag",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Right-clicking a covered tile places a flag marker on it, and right-clicking the same tile again removes the flag and restores it to a normal covered tile that can be revealed",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.17",
+        "name": "rival_picks_covered_unflagged_tiles",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During its turns the Rival only ever acts on covered, unflagged tiles \u2014 it never re-reveals an already-revealed tile and never reveals a tile the Player has flagged",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.18",
+        "name": "full_board_reveal_draw_on_tie",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When every non-mine tile has been revealed, the round ends with the higher score named winner in the Round Result overlay, and on an equal score the overlay declares a draw rather than naming a winner",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.19",
+        "name": "rematch_restarts_same_difficulty",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "From the Match Complete screen, Rematch restarts the match at the same difficulty with both sides reset to score 0 and 0 strikes for Round 1",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.20",
+        "name": "new_match_returns_to_setup",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "From the Match Complete screen, New match returns to the setup screen where a difficulty can be selected for the next match",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.21",
+        "name": "sound_toggle_defaults_on",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "A Sound on/off control is present, starts in the on state on a first visit, and clicking it visibly switches between the on and off states",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.22",
+        "name": "safe_reveal_flow_across_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Starting on the Player's turn with the score and history panels visible: revealing a safe tile increases the You score by exactly the ore value shown on the tile, hands the turn banner to the Rival without a reload, and appends a new selectable history state whose 'History state' snapshot shows the updated score with the Rival as the side to move",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.23",
+        "name": "mine_hit_flow_across_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Revealing a mine drops the revealing side's score panel by exactly 5 (never below 0), fills exactly one more Strike icon in that side's strike row, passes the turn banner to the other side, and the newest history snapshot shows the increased strike count \u2014 all without a reload",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.24",
+        "name": "match_completion_updates_stats",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After winning 2 rounds, the Match Complete screen shows the round-by-round scores and overall winner, and opening the Stats view without a reload shows matches played for that difficulty increased by exactly one, total ore mined increased by the ore earned in that match, and best single-round score updated when it was beaten",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.25",
+        "name": "difficulty_sets_grid_and_mines",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Difficulty changes the whole match: Easy is an 8 by 8 grid with 10 mines and Hard is a 12 by 12 grid with 24 mines, applied to every round",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.26",
+        "name": "pause_blocks_all_input_and_rival",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "While paused, the board accepts no reveals, flags, or hints and the Rival does not take its turn; Resume returns play exactly where it left off with the same board, scores, and turn",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.27",
+        "name": "stats_breakdown_all_difficulties",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Stats view lists matches played, matches won (with win rate), total ore mined, and best single-round score broken down by each of the three difficulties",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.28",
+        "name": "undo_branch_apply_restores_snapshot",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Revealing a tile, using Undo, then revealing a different tile creates a new branch in the history panel, and selecting the earlier branch node and using Apply Scenario Change restores the exact prior visible board, both scores, both strike rows, and the turn indicator",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.29",
+        "name": "history_invalid_transitions_disabled",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undo is disabled at the history root and Redo is disabled when the selected node has no child, and activating either disabled control leaves the board, scores, and history list unchanged",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.30",
+        "name": "mine_hit_consequences_missing",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Revealing a mine fails to end the turn, does not subtract 5 (floored at 0) or does not add a Strike, or the mine tile reverts to covered later in the round",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised.",
+        "negate": true
+      },
+      {
+        "id": "1.31",
+        "name": "turns_do_not_alternate",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Turns do not alternate (the Player can take consecutive turns or the Rival never moves) or the current turn is not clearly indicated",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised.",
+        "negate": true
+      },
+      {
+        "id": "1.32",
+        "name": "score_goes_negative",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A side's score goes negative after a mine hit or a Hint, showing the floor of 0 is not enforced",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised.",
+        "negate": true
+      },
+      {
+        "id": "1.33",
+        "name": "undo_flattens_history",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Undoing and then making a different move silently flattens or corrupts the history instead of creating a selectable branch",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised.",
+        "negate": true
+      },
+      {
+        "id": "1.34",
+        "name": "stats_blank_before_first_match",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The Stats view before any match shows blank or zero rows instead of a 'No matches played yet' message",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised.",
+        "negate": true,
+        "optional": true
+      },
+      {
+        "id": "1.35",
+        "name": "illegal_actions_rejected_with_feedback",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Acting out of turn, revealing an already-revealed or flagged tile, using a hint past the limit, or revealing while paused is rejected with specific visible feedback naming why, and the board, scores, strikes, and history are left unchanged",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.36",
+        "name": "match_log_record_after_complete",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After Match Complete, the Match log shows a new top match-result entry with the same playerName, difficulty, winner, and round-win counts as the finished match",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.37",
+        "name": "export_match_json_contains_session",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "From Match Complete or that Match log entry, Export Match produces downloadable or copyable JSON that includes the session's playerName, difficulty, winner, playerRoundWins, rivalRoundWins, playerTotalOre, rivalTotalOre, rounds, and endedAt \u2014 compiled from the finished match, not a blank stub",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.38",
+        "name": "export_archive_lists_matches",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "With at least one finished match, Export Archive downloads a JSON archive whose matches array includes that match's actual playerName, difficulty, winner, round wins, totals, rounds, and endedAt",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.39",
+        "name": "save_progress_checkpoint_resume",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During an active or paused round after at least one reveal, Save Progress shows a Saved confirmation; after a full page reload, Resume Saved Match restores the same scores, strikes, turn, hints remaining, round wins, and visible board",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.40",
+        "name": "import_match_json_appends_log",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing a previously exported single-match JSON appends a Match log entry whose playerName, difficulty, winner, round wins, totals, and endedAt match the imported record",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.41",
+        "name": "copy_export_shows_copied",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Copying an Export Match or Export Archive payload shows a brief Copied confirmation that does not block further play",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.n42",
+        "name": "export_omits_session_match_fields",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Match JSON omits the session's actual playerName, difficulty, winner, round wins, or totals, or shows hardcoded placeholder values unrelated to the finished match",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised.",
+        "negate": true
+      },
+      {
+        "id": "1.n43",
+        "name": "resume_starts_fresh_instead_of_checkpoint",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After Save Progress and a full page reload, Resume Saved Match starts a fresh setup or empty board instead of restoring the saved scores, strikes, turn, and visible board",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised.",
+        "negate": true
+      },
+      {
+        "id": "1.42",
+        "name": "archive_import_reconstructs_match_log",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing a previously exported match-archive JSON reconstructs the Match log from its matches array: the exported-then-reimported records reappear with the same playerName, difficulty, winner, round wins, totals, and endedAt values",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised."
+      },
+      {
+        "id": "1.catchall",
+        "name": "core_features_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in its core game features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "BLOCKED: Browser backend timed out; workflow could not be exercised.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"setup_screen_direct_entry\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out on navigation and snapshot; no live UI evidence.\"},\"medium_start_builds_fresh_board\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"safe_reveal_adds_ore_and_adjacency\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"rival_turn_thinking_then_returns\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"mine_hit_penalty_and_persistent_mine\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"flag_mode_blocks_reveal\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"hint_costs_and_marks_without_reveal\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"round_result_overlay_on_end\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"match_complete_best_of_three\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"pause_resume_freezes_board\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"undo_creates_history_branch\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"history_state_snapshot_region\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"stats_view_records_played_match\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"stats_sound_difficulty_survive_refresh\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"setup_form_validates_player_and_difficulty\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"right_click_toggles_flag\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"rival_picks_covered_unflagged_tiles\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"full_board_reveal_draw_on_tie\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"rematch_restarts_same_difficulty\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"new_match_returns_to_setup\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"sound_toggle_defaults_on\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"safe_reveal_flow_across_surfaces\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"mine_hit_flow_across_surfaces\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"match_completion_updates_stats\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"difficulty_sets_grid_and_mines\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"pause_blocks_all_input_and_rival\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"stats_breakdown_all_difficulties\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"undo_branch_apply_restores_snapshot\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"history_invalid_transitions_disabled\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"mine_hit_consequences_missing\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"turns_do_not_alternate\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"score_goes_negative\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"undo_flattens_history\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"stats_blank_before_first_match\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"illegal_actions_rejected_with_feedback\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"match_log_record_after_complete\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"export_match_json_contains_session\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"export_archive_lists_matches\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"save_progress_checkpoint_resume\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"import_match_json_appends_log\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"copy_export_shows_copied\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"export_omits_session_match_fields\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"resume_starts_fresh_instead_of_checkpoint\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"archive_import_reconstructs_match_log\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"},\"core_features_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser backend timed out; workflow could not be exercised.\"}}",
+    "cost_usd": 0.0868786
+  },
+  "design_fidelity": {
+    "score": 0.4444,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "overview_matches_reference_layout",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At desktop width the overall setup/play composition matches overview.png: dark stone chrome, score panels, and grid placement consistent with the reference (text wins on conflicts).",
+        "reasoning": "BLOCKED: Browser observation timed out before a screenshot or rendered layout could be obtained. Evidence: no screenshot available."
+      },
+      {
+        "id": "3.2",
+        "name": "segment_screens_align",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Full-resolution segment screenshots' major regions (setup, playing HUD, overlays, stats) align with the shipped views in structure and hierarchy.",
+        "reasoning": "BLOCKED: Browser observation timed out, so setup, HUD, overlays, and stats regions could not be inspected. Evidence: no screenshot available."
+      },
+      {
+        "id": "3.3",
+        "name": "dark_stone_palette_present",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The dark stone page background, lighter panels, near-white text, amber accent, and sky/orange identity colors are present as specified.",
+        "reasoning": "BLOCKED: Browser observation timed out before rendered colors could be inspected. Evidence: no screenshot available."
+      },
+      {
+        "id": "3.4",
+        "name": "score_panels_and_strikes_layout",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "You and Rival score panels with strike rows and target score read as in the reference composition.",
+        "reasoning": "BLOCKED: Browser observation timed out before the score panels and strike rows could be inspected. Evidence: no screenshot available."
+      },
+      {
+        "id": "3.5",
+        "name": "grid_tile_treatment",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Grid tiles use the sharp small-radius mine-grid treatment consistent with the reference board.",
+        "reasoning": "BLOCKED: Browser observation timed out before the game board could be inspected. Evidence: no screenshot available."
+      },
+      {
+        "id": "3.n1",
+        "name": "layout_unrecognizable_vs_reference",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The first desktop view is unrecognizable versus overview.png in structure or theme (ignoring text-priority conflicts).",
+        "reasoning": "The described unrecognizable layout was not directly observed; browser observation timed out. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "3.n2",
+        "name": "wrong_theme_vs_reference",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A light or unrelated theme replaces the dark stone MineClash look shown in the reference screenshots.",
+        "reasoning": "The described wrong theme was not directly observed; browser observation timed out. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "3.n3",
+        "name": "missing_major_regions",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Major regions shown in segment screenshots (setup, HUD, board, overlays, or stats) are missing from the shipped app.",
+        "reasoning": "BLOCKED: Browser observation timed out, so major regions could not be checked. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "design_fidelity.catchall",
+        "name": "design_fidelity_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable design-fidelity defect versus the reference screenshots that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite evidence. If already covered \u2014 even partially \u2014 answer no here.",
+        "reasoning": "BLOCKED: Browser observation timed out before any design-fidelity comparison was possible. Evidence: no screenshot available.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"overview_matches_reference_layout\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out before a screenshot or rendered layout could be obtained. Evidence: no screenshot available.\"},\"segment_screens_align\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out, so setup, HUD, overlays, and stats regions could not be inspected. Evidence: no screenshot available.\"},\"dark_stone_palette_present\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out before rendered colors could be inspected. Evidence: no screenshot available.\"},\"score_panels_and_strikes_layout\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out before the score panels and strike rows could be inspected. Evidence: no screenshot available.\"},\"grid_tile_treatment\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out before the game board could be inspected. Evidence: no screenshot available.\"},\"layout_unrecognizable_vs_reference\":{\"score\":\"no\",\"reasoning\":\"The described unrecognizable layout was not directly observed; browser observation timed out. Evidence: no screenshot available.\"},\"wrong_theme_vs_reference\":{\"score\":\"no\",\"reasoning\":\"The described wrong theme was not directly observed; browser observation timed out. Evidence: no screenshot available.\"},\"missing_major_regions\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out, so major regions could not be checked. Evidence: no screenshot available.\"},\"design_fidelity_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out before any design-fidelity comparison was possible. Evidence: no screenshot available.\"}}",
+    "cost_usd": 0.0679589
+  },
+  "edge_cases": {
+    "score": 0.5238,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "stats_empty_before_first_match",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Before any match has been played, the Stats view shows the friendly No matches played yet message rather than blank or zero rows.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot calls timed out, so the initial Stats view could not be observed. Evidence: no screenshot available."
+      },
+      {
+        "id": "4.2",
+        "name": "setup_form_inline_validation",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On setup, invalid playerName or missing difficulty shows inline per-field validation naming the field before submit, and Start match stays disabled until valid.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out before setup validation could be exercised. Evidence: no screenshot available."
+      },
+      {
+        "id": "4.3",
+        "name": "illegal_actions_name_why",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Acting out of turn, revealing an already-revealed or flagged tile, using a hint past the limit, or revealing while paused is rejected with specific visible feedback naming why.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so illegal-action feedback could not be exercised. Evidence: no screenshot available."
+      },
+      {
+        "id": "4.4",
+        "name": "save_and_copy_confirmations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Save Progress shows a Saved confirmation and Copy on an export shows a Copied confirmation; both are visible and transient.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so Save and Copy confirmations could not be observed. Evidence: no screenshot available."
+      },
+      {
+        "id": "4.5",
+        "name": "rival_thinking_indicator",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During the Rival turn a visible Rival is thinking indicator is shown for the thinking delay rather than an instant silent jump.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so Rival-turn behavior could not be observed. Evidence: no screenshot available."
+      },
+      {
+        "id": "4.6",
+        "name": "undo_available_for_moves",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After a reveal, flag, or hint, Undo is available to restore the prior board and scores; Undo at the history root is disabled.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so Undo behavior could not be exercised. Evidence: no screenshot available."
+      },
+      {
+        "id": "4.7",
+        "name": "hint_limit_and_floor",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Hint control is disabled after 2 uses in the round; using a hint at a score below 3 floors the score at 0 rather than going negative.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so hint behavior could not be exercised. Evidence: no screenshot available."
+      },
+      {
+        "id": "4.8",
+        "name": "semantic_controls",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Primary game controls (Start match, Flag Mode, Hint, Pause/Resume, Export Match, Save Progress) use semantic button/input elements rather than clickable bare divs.",
+        "reasoning": "BLOCKED: Browser snapshot calls timed out, so control element semantics could not be inspected. Evidence: no screenshot available."
+      },
+      {
+        "id": "4.9",
+        "name": "overlays_have_close_paths",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Round Result and Match Complete overlays support continuing play (next round, Rematch, or New match) without trapping the player.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so overlays could not be exercised. Evidence: no screenshot available."
+      },
+      {
+        "id": "4.10",
+        "name": "match_progress_visible",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a best-of-3 match the current round number and round-win progress toward 2 wins are visible so the player can read match progress.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so match progress could not be observed. Evidence: no screenshot available."
+      },
+      {
+        "id": "4.n1",
+        "name": "empty_stats_or_log_blank",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Before any match, Stats or Match log shows nothing with no empty-state guidance.",
+        "reasoning": "BLOCKED: Browser snapshot calls timed out, so Stats/Match log could not be observed. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "4.n2",
+        "name": "errors_only_in_console",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Illegal-action or import failures surface only in the browser console with no on-screen feedback.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so visible illegal-action or import feedback could not be checked. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "4.n3",
+        "name": "actions_lack_visible_feedback",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Reveal, mine hit, Save Progress, or Copy succeeds or fails silently with no visible HUD/toast/confirmation change.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so action feedback could not be checked. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "4.n4",
+        "name": "import_corrupt_without_warning",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing malformed JSON or a payload missing required match-result fields changes the Match log without a visible rejection naming that the file is invalid.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so malformed import behavior could not be exercised. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "4.n5",
+        "name": "interactive_nonsemantic_wrappers",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Interactive controls are only non-semantic div or span wrappers with no button/input semantics.",
+        "reasoning": "BLOCKED: Browser snapshot calls timed out, so interactive element semantics could not be inspected. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "4.n6",
+        "name": "overlays_not_dismissible",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Round Result or Match Complete cannot be progressed via keyboard-operable controls.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so keyboard progression could not be exercised. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "4.n7",
+        "name": "validation_missing_or_delayed",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Setup validation feedback is missing or delayed with no UI indication when playerName or difficulty is invalid.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so setup validation timing could not be exercised. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "4.n8",
+        "name": "ambiguous_control_labels",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export, Save Progress, or Resume Saved Match controls use ambiguous or missing labels.",
+        "reasoning": "BLOCKED: Browser snapshot calls timed out, so control labels could not be inspected. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "4.n9",
+        "name": "save_resume_unavailable_without_guidance",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Save Progress is clickable with no match in progress, or Resume Saved Match is offered with no checkpoint, without disabled state or guidance.",
+        "reasoning": "BLOCKED: Browser snapshot calls timed out, so save/resume availability could not be observed. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "4.n10",
+        "name": "flagged_tile_still_reveals",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A flagged tile can still be revealed by a normal reveal click without unflagging first.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so flagged-tile behavior could not be exercised. Evidence: no screenshot available.",
+        "negate": true
+      },
+      {
+        "id": "edge_cases.catchall",
+        "name": "edge_cases_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "BLOCKED: Browser interaction calls timed out, so edge-case UX could not be evaluated. Evidence: no screenshot available.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"stats_empty_before_first_match\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot calls timed out, so the initial Stats view could not be observed. Evidence: no screenshot available.\"},\"setup_form_inline_validation\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out before setup validation could be exercised. Evidence: no screenshot available.\"},\"illegal_actions_name_why\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so illegal-action feedback could not be exercised. Evidence: no screenshot available.\"},\"save_and_copy_confirmations\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so Save and Copy confirmations could not be observed. Evidence: no screenshot available.\"},\"rival_thinking_indicator\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so Rival-turn behavior could not be observed. Evidence: no screenshot available.\"},\"undo_available_for_moves\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so Undo behavior could not be exercised. Evidence: no screenshot available.\"},\"hint_limit_and_floor\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so hint behavior could not be exercised. Evidence: no screenshot available.\"},\"semantic_controls\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser snapshot calls timed out, so control element semantics could not be inspected. Evidence: no screenshot available.\"},\"overlays_have_close_paths\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so overlays could not be exercised. Evidence: no screenshot available.\"},\"match_progress_visible\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so match progress could not be observed. Evidence: no screenshot available.\"},\"empty_stats_or_log_blank\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser snapshot calls timed out, so Stats/Match log could not be observed. Evidence: no screenshot available.\"},\"errors_only_in_console\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so visible illegal-action or import feedback could not be checked. Evidence: no screenshot available.\"},\"actions_lack_visible_feedback\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so action feedback could not be checked. Evidence: no screenshot available.\"},\"import_corrupt_without_warning\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so malformed import behavior could not be exercised. Evidence: no screenshot available.\"},\"interactive_nonsemantic_wrappers\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser snapshot calls timed out, so interactive element semantics could not be inspected. Evidence: no screenshot available.\"},\"overlays_not_dismissible\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so keyboard progression could not be exercised. Evidence: no screenshot available.\"},\"validation_missing_or_delayed\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so setup validation timing could not be exercised. Evidence: no screenshot available.\"},\"ambiguous_control_labels\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser snapshot calls timed out, so control labels could not be inspected. Evidence: no screenshot available.\"},\"save_resume_unavailable_without_guidance\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser snapshot calls timed out, so save/resume availability could not be observed. Evidence: no screenshot available.\"},\"flagged_tile_still_reveals\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so flagged-tile behavior could not be exercised. Evidence: no screenshot available.\"},\"edge_cases_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser interaction calls timed out, so edge-case UX could not be evaluated. Evidence: no screenshot available.\"}}",
+    "cost_usd": 0.06700809999999999
+  },
+  "innovation": {
+    "score": 0.25,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "rival_thinking_polish",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Beyond the required thinking delay, the Rival turn presents a polished waiting state that makes the duel feel competitive rather than a silent board swap.",
+        "reasoning": "BLOCKED: The browser could not load the app; navigation timed out, so Rival-turn behavior was not observable."
+      },
+      {
+        "id": "11.2",
+        "name": "history_branch_clarity",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The branching history panel makes branch points and the current node unusually clear for a puzzle duel, beyond a flat undo stack.",
+        "reasoning": "BLOCKED: The browser could not load the app, so the history panel was not observable."
+      },
+      {
+        "id": "11.3",
+        "name": "match_export_preview_clarity",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Export Match or Export Archive surfaces a readable preview of the match-result fields that helps the player verify the artifact before download/copy.",
+        "reasoning": "BLOCKED: The browser could not load the app, so the export preview was not observable."
+      },
+      {
+        "id": "11.4",
+        "name": "strike_near_loss_emphasis",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The 2-strike warning state is especially clear in the HUD so the near-loss moment is hard to miss.",
+        "reasoning": "BLOCKED: The browser could not load the app, so the 2-strike warning could not be exercised."
+      },
+      {
+        "id": "11.5",
+        "name": "checkpoint_resume_affordance",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Save Progress / Resume Saved Match present a clear checkpoint summary (playerName, difficulty, round, scores) that builds confidence before resume.",
+        "reasoning": "BLOCKED: The browser could not load the app, so checkpoint save/resume could not be exercised."
+      },
+      {
+        "id": "11.n1",
+        "name": "demo_is_bare_spec_only",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The build is purely barebones: Rival turns resolve as silent instant board flips with no thinking indicator, and Match Complete or export surfaces omit celebratory or confirmation polish entirely.",
+        "reasoning": "BLOCKED: The browser could not load the app, so the end-to-end duel and completion/export polish could not be observed.",
+        "negate": true
+      },
+      {
+        "id": "11.n2",
+        "name": "experience_is_generic_template",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Interactions and visuals read as a generic unstyled template: You and Rival panels lack identity color treatment and the board reads as a plain unmarked grid rather than a dark stone mine-grid duel.",
+        "reasoning": "BLOCKED: The browser could not load the app, so its rendered visual treatment could not be observed.",
+        "negate": true
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The app includes a noteworthy, browser-observable enhancement beyond the specification that improves the duel, export, or resume experience and is NOT covered by any other criterion in this file. If present, name it and cite evidence. If nothing beyond the spec qualifies, answer no.",
+        "reasoning": "BLOCKED: The browser could not load the app, so no browser-observable enhancement could be verified."
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"rival_thinking_polish\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser could not load the app; navigation timed out, so Rival-turn behavior was not observable.\"},\"history_branch_clarity\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser could not load the app, so the history panel was not observable.\"},\"match_export_preview_clarity\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser could not load the app, so the export preview was not observable.\"},\"strike_near_loss_emphasis\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser could not load the app, so the 2-strike warning could not be exercised.\"},\"checkpoint_resume_affordance\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser could not load the app, so checkpoint save/resume could not be exercised.\"},\"demo_is_bare_spec_only\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser could not load the app, so the end-to-end duel and completion/export polish could not be observed.\"},\"experience_is_generic_template\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser could not load the app, so its rendered visual treatment could not be observed.\"},\"innovation_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser could not load the app, so no browser-observable enhancement could be verified.\"}}",
+    "cost_usd": 0.0435256
+  },
+  "mcp_contract": {
+    "score": 0.619,
+    "criteria": [
+      {
+        "id": "12.1",
+        "name": "mandated_modules_bound",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Contract modules command-session-v1, browse-query-v1, and artifact-transfer-v1 are initialized and bound so webmcp_list_tools surfaces session_*, browse_*, and artifact_* tools.",
+        "reasoning": "WebMCP session info reported all three mandated modules, and the tool list exposed session_*, browse_*, and artifact_* tools."
+      },
+      {
+        "id": "12.2",
+        "name": "handlers_match_visible_ui",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Invoking session start/pause/resume/restart/stop and artifact export/import/copy produces the same visible state changes as the corresponding UI controls.",
+        "reasoning": "BLOCKED: Browser snapshot/evaluation timed out, so visible UI state could not be compared with invoked handlers."
+      },
+      {
+        "id": "12.3",
+        "name": "only_documented_ops",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Exposed tools stay within declared session operations (start, pause, resume, restart, stop), browse destinations (game-board, stats, match-log, export-center), filters (difficulty), and artifact operations/formats (export/import/copy; match-json, match-archive-json) \u2014 no invented modules.",
+        "reasoning": "The registered tools and enums stayed within the declared session, browse destination/filter, and artifact operation/format sets."
+      },
+      {
+        "id": "12.4",
+        "name": "contract_automation_exercisable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "webmcp_session_info, webmcp_list_tools, and webmcp_invoke_tool can exercise bound session, browse, and artifact operations without manual harness edits.",
+        "reasoning": "BLOCKED: Listing and some invocations worked, but session_start could not be exercised because the tool schema accepts no setup values while the live result required playerName and difficulty."
+      },
+      {
+        "id": "12.5",
+        "name": "session_operations_work",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Session operations start, pause, resume, restart, and stop each change the visible match appropriately when invoked through WebMCP.",
+        "reasoning": "FAIL: session_start returned \u201cStart unavailable: valid playerName and difficulty are required\u201d; subsequent operations reported no active/paused match."
+      },
+      {
+        "id": "12.6",
+        "name": "artifact_ops_bound",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Artifact operations export, import, and copy are bound and invoke the same export/import/copy handlers as the visible Export Match, Export Archive, Import, and Copy controls.",
+        "reasoning": "BLOCKED: Artifact invocations returned handler messages, but browser observation timed out and could not verify matching visible controls/state."
+      },
+      {
+        "id": "12.7",
+        "name": "destinations_and_filters_match",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Browse destinations match Bindings exactly (game-board, stats, match-log, export-center) and the difficulty filter matches the declared filter binding.",
+        "reasoning": "The live tool schema exposed exactly game-board, stats, match-log, export-center and difficulty values easy, medium, hard; each browse invocation returned a structured success message."
+      },
+      {
+        "id": "12.8",
+        "name": "no_extra_undeclared_capabilities",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "No extra undeclared module routes or entity CRUD capabilities are exposed beyond the three mandated modules as bound.",
+        "reasoning": "The registered list contained only the three mandated module families and their declared operations; no entity CRUD or extra module routes appeared."
+      },
+      {
+        "id": "12.9",
+        "name": "session_list_invoke_ok",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "webmcp_session_info returns usable session metadata, webmcp_list_tools lists the bound tools, and webmcp_invoke_tool returns structured results without errors for declared operations.",
+        "reasoning": "FAIL: session info and listing succeeded, but invoking session_start returned an unavailable/error result due to required values absent from its schema."
+      },
+      {
+        "id": "12.10",
+        "name": "mcp_init_without_harness_edits",
+        "value": 1.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "MCP tools register from the app's own implementation of the module_spec + Bindings without requiring edits to /tests or the verifier harness.",
+        "reasoning": "The live app registered the contract and tools directly; no harness modification was observed or needed."
+      },
+      {
+        "id": "12.n1",
+        "name": "mcp_tools_missing_or_noop",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "WebMCP session/browse/artifact tools are missing, unbound, or invoke as no-ops that leave the visible match/panel/export unchanged.",
+        "reasoning": "The tools were present and browse/artifact invocations returned state-changing handler messages, so the described missing/unbound/no-op condition was not observed.",
+        "negate": true
+      },
+      {
+        "id": "12.n2",
+        "name": "handlers_diverge_from_ui",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A WebMCP invoke updates tool output as success while the visible UI stays on a mismatched match state, panel, or export preview.",
+        "reasoning": "BLOCKED: The browser backend timed out, so no visible mismatch could be observed.",
+        "negate": true
+      },
+      {
+        "id": "12.n3",
+        "name": "undeclared_capabilities_exposed",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Tools expose undeclared destinations, session operations, or artifact formats beyond the Bindings list.",
+        "reasoning": "No undeclared destination, operation, or artifact format appeared in the live tool listing.",
+        "negate": true
+      },
+      {
+        "id": "12.n4",
+        "name": "automation_cannot_exercise_contract",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The contract cannot be exercised from automation via webmcp_list_tools / webmcp_invoke_tool.",
+        "reasoning": "FAIL: Automation could list tools and invoke browse/artifact operations, but could not start a session because session_start exposed an empty schema while requiring playerName and difficulty.",
+        "negate": true
+      },
+      {
+        "id": "12.n5",
+        "name": "artifact_returns_raw_blobs",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Artifact tool results include raw file paths, blobs, or base64 artifact contents contrary to the artifact-transfer restrictions.",
+        "reasoning": "Artifact results returned short status messages and no raw paths, blobs, or base64 contents.",
+        "negate": true
+      },
+      {
+        "id": "12.n6",
+        "name": "session_or_tool_api_errors",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "The session or tool API returns errors or incomplete data for declared operations.",
+        "reasoning": "FAIL: session_start returned \u201cStart unavailable: valid playerName and difficulty are required,\u201d demonstrating incomplete declared-operation behavior.",
+        "negate": true
+      },
+      {
+        "id": "12.n7",
+        "name": "mcp_relies_on_undocumented_hacks",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "MCP relies on manual or undocumented test harness edits to appear functional.",
+        "reasoning": "No manual harness edits or undocumented workaround were observed.",
+        "negate": true
+      },
+      {
+        "id": "12.n8",
+        "name": "required_module_missing",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "command-session-v1, browse-query-v1, or artifact-transfer-v1 is declared but not implemented.",
+        "reasoning": "WebMCP session info explicitly reported command-session-v1, browse-query-v1, and artifact-transfer-v1.",
+        "negate": true
+      },
+      {
+        "id": "12.n9",
+        "name": "mcp_stubbed_or_commented",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The MCP interface is commented out or only stubbed.",
+        "reasoning": "The interface was registered with detailed schemas, and browse/artifact invocations produced meaningful handler responses.",
+        "negate": true
+      },
+      {
+        "id": "12.n10",
+        "name": "automated_contract_validation_fails",
+        "value": 0.0,
+        "raw": "yes",
+        "weight": 1.0,
+        "description": "Bound tools fail basic list/invoke checks for the mandated modules.",
+        "reasoning": "FAIL: Basic invocation checks exposed a broken session_start path requiring setup values not represented in its empty input schema.",
+        "negate": true
+      },
+      {
+        "id": "mcp_contract.catchall",
+        "name": "mcp_contract_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in the declared MCP contract that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "No additional significant defect beyond the session-start automation failure already covered by other criteria was established.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"mandated_modules_bound\":{\"score\":\"yes\",\"reasoning\":\"WebMCP session info reported all three mandated modules, and the tool list exposed session_*, browse_*, and artifact_* tools.\"},\"handlers_match_visible_ui\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser snapshot/evaluation timed out, so visible UI state could not be compared with invoked handlers.\"},\"only_documented_ops\":{\"score\":\"yes\",\"reasoning\":\"The registered tools and enums stayed within the declared session, browse destination/filter, and artifact operation/format sets.\"},\"contract_automation_exercisable\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Listing and some invocations worked, but session_start could not be exercised because the tool schema accepts no setup values while the live result required playerName and difficulty.\"},\"session_operations_work\":{\"score\":\"no\",\"reasoning\":\"FAIL: session_start returned \u201cStart unavailable: valid playerName and difficulty are required\u201d; subsequent operations reported no active/paused match.\"},\"artifact_ops_bound\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Artifact invocations returned handler messages, but browser observation timed out and could not verify matching visible controls/state.\"},\"destinations_and_filters_match\":{\"score\":\"yes\",\"reasoning\":\"The live tool schema exposed exactly game-board, stats, match-log, export-center and difficulty values easy, medium, hard; each browse invocation returned a structured success message.\"},\"no_extra_undeclared_capabilities\":{\"score\":\"yes\",\"reasoning\":\"The registered list contained only the three mandated module families and their declared operations; no entity CRUD or extra module routes appeared.\"},\"session_list_invoke_ok\":{\"score\":\"no\",\"reasoning\":\"FAIL: session info and listing succeeded, but invoking session_start returned an unavailable/error result due to required values absent from its schema.\"},\"mcp_init_without_harness_edits\":{\"score\":\"yes\",\"reasoning\":\"The live app registered the contract and tools directly; no harness modification was observed or needed.\"},\"mcp_tools_missing_or_noop\":{\"score\":\"no\",\"reasoning\":\"The tools were present and browse/artifact invocations returned state-changing handler messages, so the described missing/unbound/no-op condition was not observed.\"},\"handlers_diverge_from_ui\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser backend timed out, so no visible mismatch could be observed.\"},\"undeclared_capabilities_exposed\":{\"score\":\"no\",\"reasoning\":\"No undeclared destination, operation, or artifact format appeared in the live tool listing.\"},\"automation_cannot_exercise_contract\":{\"score\":\"yes\",\"reasoning\":\"FAIL: Automation could list tools and invoke browse/artifact operations, but could not start a session because session_start exposed an empty schema while requiring playerName and difficulty.\"},\"artifact_returns_raw_blobs\":{\"score\":\"no\",\"reasoning\":\"Artifact results returned short status messages and no raw paths, blobs, or base64 contents.\"},\"session_or_tool_api_errors\":{\"score\":\"yes\",\"reasoning\":\"FAIL: session_start returned \u201cStart unavailable: valid playerName and difficulty are required,\u201d demonstrating incomplete declared-operation behavior.\"},\"mcp_relies_on_undocumented_hacks\":{\"score\":\"no\",\"reasoning\":\"No manual harness edits or undocumented workaround were observed.\"},\"required_module_missing\":{\"score\":\"no\",\"reasoning\":\"WebMCP session info explicitly reported command-session-v1, browse-query-v1, and artifact-transfer-v1.\"},\"mcp_stubbed_or_commented\":{\"score\":\"no\",\"reasoning\":\"The interface was registered with detailed schemas, and browse/artifact invocations produced meaningful handler responses.\"},\"automated_contract_validation_fails\":{\"score\":\"yes\",\"reasoning\":\"FAIL: Basic invocation checks exposed a broken session_start path requiring setup values not represented in its empty input schema.\"},\"mcp_contract_catchall\":{\"score\":\"no\",\"reasoning\":\"No additional significant defect beyond the session-start automation failure already covered by other criteria was established.\"}}",
+    "cost_usd": 0.08408209999999999
+  },
+  "motion": {
+    "score": 0.3043,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "rival_thinking_visibly_animated",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During real play the Rival's thinking delay is visibly animated (a pulsing 'Rival is thinking' indicator shown for roughly 0.9 to 1.6 seconds) before its tile resolves, rather than an instant silent jump",
+        "reasoning": "BLOCKED: Browser remained inaccessible behind a file-chooser modal; no real play could be observed. Evidence: initial-shared.png unavailable."
+      },
+      {
+        "id": "4.2",
+        "name": "tile_hover_lift_response",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Hovering an actionable covered tile with the pointer produces a visible lift or brightness response",
+        "reasoning": "BLOCKED: Could not reach or hover the game UI. Evidence: initial-shared.png unavailable.",
+        "optional": true
+      },
+      {
+        "id": "4.3",
+        "name": "round_result_overlay_eases_in",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The Round Result overlay eases in over a blurred backdrop rather than appearing instantly",
+        "reasoning": "BLOCKED: Could not reach a playable round or overlay. Evidence: initial-shared.png unavailable.",
+        "optional": true
+      },
+      {
+        "id": "4.4",
+        "name": "rival_move_snaps_instantly",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When the Rival's move resolves via real play, it appears instantly with no visible thinking animation or turn transition",
+        "reasoning": "BLOCKED: Could not perform real play to observe a Rival move. Evidence: initial-shared.png unavailable.",
+        "negate": true
+      },
+      {
+        "id": "4.5",
+        "name": "reduced_motion_ignored",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Animations ignore the prefers-reduced-motion setting and keep playing full-length transitions when reduced motion is requested",
+        "reasoning": "BLOCKED: Could not access the rendered app to test motion settings. Evidence: initial-shared.png unavailable.",
+        "negate": true,
+        "optional": true
+      },
+      {
+        "id": "4.6",
+        "name": "turn_change_color_glow_transitions",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "When the active side changes during real play, the turn banner and each side's score panel transition their color and glow rather than snapping between states",
+        "reasoning": "BLOCKED: Could not reach an active game turn. Evidence: initial-shared.png unavailable."
+      },
+      {
+        "id": "4.7",
+        "name": "tile_reveal_background_transition",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "A tile resolving from covered to revealed through a real click shows a short background transition rather than an instant swap",
+        "reasoning": "BLOCKED: Could not reach or click a game tile. Evidence: initial-shared.png unavailable."
+      },
+      {
+        "id": "4.8",
+        "name": "strike_fill_animates",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Strike icons animate their fill as strikes accrue through real play, with a distinct filled state and a distinct warning treatment at 2 strikes",
+        "reasoning": "BLOCKED: Could not reach strike state through play. Evidence: initial-shared.png unavailable."
+      },
+      {
+        "id": "4.9",
+        "name": "history_entries_animate_in_out",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "History panel entries animate in as new states are appended and animate out when a branch is discarded, rather than the list snapping between lengths",
+        "reasoning": "BLOCKED: Could not reach the history panel or create branch states. Evidence: initial-shared.png unavailable."
+      },
+      {
+        "id": "4.10",
+        "name": "match_win_confetti_burst",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Winning the match as the Player through real play triggers a brief celebratory particle burst over the Match Complete screen",
+        "reasoning": "BLOCKED: Could not complete a Player match win. Evidence: initial-shared.png unavailable."
+      },
+      {
+        "id": "4.11",
+        "name": "celebration_fires_without_player_win",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A celebratory particle or confetti effect fires on a match loss, on the setup screen, or ambiently without the Player having won the match through play",
+        "reasoning": "BLOCKED: Could not observe setup, loss, or ambient celebration behavior. Evidence: initial-shared.png unavailable.",
+        "negate": true
+      },
+      {
+        "id": "4.12",
+        "name": "rejection_feedback_fades",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Rejection feedback for an illegal action animates in briefly and fades out, rather than appearing and vanishing instantly",
+        "reasoning": "BLOCKED: Could not reach an illegal-action state. Evidence: initial-shared.png unavailable."
+      },
+      {
+        "id": "4.13",
+        "name": "button_hover_active_feedback",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Primary buttons lift on hover and secondary buttons take a tinted wash on hover, with visible pressed/active feedback on both",
+        "reasoning": "BLOCKED: Could not reach or interact with visible buttons. Evidence: initial-shared.png unavailable."
+      },
+      {
+        "id": "4.14",
+        "name": "saved_copied_toast_fades",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Activating Save Progress or Copy on an export through the real controls shows a Saved or Copied confirmation that fades on its own without blocking play",
+        "reasoning": "BLOCKED: Could not reach Save Progress or Copy controls. Evidence: initial-shared.png unavailable."
+      },
+      {
+        "id": "4.catchall",
+        "name": "motion_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "BLOCKED: Browser observation tools repeatedly timed out and no meaningful UI became reachable, so no additional motion defect could be established. Evidence: initial-shared.png unavailable.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"rival_thinking_visibly_animated\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser remained inaccessible behind a file-chooser modal; no real play could be observed. Evidence: initial-shared.png unavailable.\"},\"tile_hover_lift_response\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach or hover the game UI. Evidence: initial-shared.png unavailable.\"},\"round_result_overlay_eases_in\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach a playable round or overlay. Evidence: initial-shared.png unavailable.\"},\"rival_move_snaps_instantly\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not perform real play to observe a Rival move. Evidence: initial-shared.png unavailable.\"},\"reduced_motion_ignored\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not access the rendered app to test motion settings. Evidence: initial-shared.png unavailable.\"},\"turn_change_color_glow_transitions\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach an active game turn. Evidence: initial-shared.png unavailable.\"},\"tile_reveal_background_transition\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach or click a game tile. Evidence: initial-shared.png unavailable.\"},\"strike_fill_animates\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach strike state through play. Evidence: initial-shared.png unavailable.\"},\"history_entries_animate_in_out\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach the history panel or create branch states. Evidence: initial-shared.png unavailable.\"},\"match_win_confetti_burst\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not complete a Player match win. Evidence: initial-shared.png unavailable.\"},\"celebration_fires_without_player_win\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not observe setup, loss, or ambient celebration behavior. Evidence: initial-shared.png unavailable.\"},\"rejection_feedback_fades\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach an illegal-action state. Evidence: initial-shared.png unavailable.\"},\"button_hover_active_feedback\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach or interact with visible buttons. Evidence: initial-shared.png unavailable.\"},\"saved_copied_toast_fades\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach Save Progress or Copy controls. Evidence: initial-shared.png unavailable.\"},\"motion_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation tools repeatedly timed out and no meaningful UI became reachable, so no additional motion defect could be established. Evidence: initial-shared.png unavailable.\"}}",
+    "cost_usd": 0.0727189
+  },
+  "performance": {
+    "score": 0.5,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "interactive_within_two_seconds",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load, opening directly into the setup screen.",
+        "reasoning": "BLOCKED: Initial navigation reported MineClash, but the live browser became unresponsive before the setup UI could be directly observed or interacted with. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml"
+      },
+      {
+        "id": "9.2",
+        "name": "console_clean_full_exercise",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "No console errors or uncaught exceptions appear during a full exercise covering setup, rounds, pause/resume, hints, flags, undo/redo, match completion, export/import, save/resume, Match log, and Stats.",
+        "reasoning": "BLOCKED: The browser backend timed out during observation, so the required full exercise and console verification could not be completed. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml"
+      },
+      {
+        "id": "9.3",
+        "name": "rapid_reveal_stress_stable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At least 25 rapid deterministic reveal/turn repetitions through normal controls leave an exact final visible state with responsive controls and no blank screen, uncaught error, or sustained freeze.",
+        "reasoning": "BLOCKED: Rapid reveal repetitions could not be exercised because browser observation and interaction calls repeatedly timed out. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml"
+      },
+      {
+        "id": "9.4",
+        "name": "responsive_during_rival_delay",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The board, score panels, and history panel stay responsive during the Rival thinking delay; queued Player input never fires during the Rival turn.",
+        "reasoning": "BLOCKED: Rival-delay behavior could not be reached and observed in the live browser. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml"
+      },
+      {
+        "id": "9.5",
+        "name": "export_import_no_freeze",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Match, Export Archive, Import, Save Progress, and Resume Saved Match complete without a sustained UI freeze or blank screen.",
+        "reasoning": "BLOCKED: Export/import/save/resume workflows could not be exercised because the browser became unresponsive. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml"
+      },
+      {
+        "id": "9.n1",
+        "name": "cold_load_over_two_seconds",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Cold load to interactive setup exceeds 2 seconds on a local serve.",
+        "reasoning": "BLOCKED: Navigation returned after approximately 2.1 seconds, but interactive setup readiness could not be directly verified, so exceeding two seconds was not established. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml",
+        "negate": true
+      },
+      {
+        "id": "9.n2",
+        "name": "console_errors_during_play",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Console errors or uncaught exceptions appear during normal match play or export/save flows.",
+        "reasoning": "BLOCKED: Console inspection and normal play could not be completed because browser calls timed out. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml",
+        "negate": true
+      },
+      {
+        "id": "9.n3",
+        "name": "rapid_input_freezes_or_blanks",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Rapid reveal/turn input produces a blank screen, sustained freeze, or unresponsive controls.",
+        "reasoning": "BLOCKED: Rapid input could not be performed; the browser was already unresponsive to observation calls. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml",
+        "negate": true
+      },
+      {
+        "id": "9.n4",
+        "name": "rival_delay_blocks_ui_thread",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During Rival thinking the HUD becomes unresponsive or Player clicks fire mid-Rival-turn.",
+        "reasoning": "BLOCKED: Rival thinking could not be initiated or observed. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml",
+        "negate": true
+      },
+      {
+        "id": "performance.catchall",
+        "name": "performance_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable performance or stability defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "The observed browser timeouts indicate a possible stability issue, but it cannot be scored here because the apparent unresponsiveness is covered by the dedicated freeze/responsiveness criteria. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"interactive_within_two_seconds\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Initial navigation reported MineClash, but the live browser became unresponsive before the setup UI could be directly observed or interacted with. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml\"},\"console_clean_full_exercise\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The browser backend timed out during observation, so the required full exercise and console verification could not be completed. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml\"},\"rapid_reveal_stress_stable\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rapid reveal repetitions could not be exercised because browser observation and interaction calls repeatedly timed out. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml\"},\"responsive_during_rival_delay\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rival-delay behavior could not be reached and observed in the live browser. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml\"},\"export_import_no_freeze\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Export/import/save/resume workflows could not be exercised because the browser became unresponsive. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml\"},\"cold_load_over_two_seconds\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Navigation returned after approximately 2.1 seconds, but interactive setup readiness could not be directly verified, so exceeding two seconds was not established. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml\"},\"console_errors_during_play\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Console inspection and normal play could not be completed because browser calls timed out. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml\"},\"rapid_input_freezes_or_blanks\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rapid input could not be performed; the browser was already unresponsive to observation calls. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml\"},\"rival_delay_blocks_ui_thread\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rival thinking could not be initiated or observed. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml\"},\"performance_catchall\":{\"score\":\"no\",\"reasoning\":\"The observed browser timeouts indicate a possible stability issue, but it cannot be scored here because the apparent unresponsiveness is covered by the dedicated freeze/responsiveness criteria. Evidence: screenshots/page-2026-07-20T01-23-14-556Z.yml\"}}",
+    "cost_usd": 0.08817499999999999
+  },
+  "responsiveness": {
+    "score": 0.5,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "narrow_grid_scales_tappable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At a narrow viewport around 375px wide the grid scales down (roughly 28px minimum tiles) and stays tappable without horizontal scrolling, with score and strike panels stacking above the grid.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot both timed out, so the narrow grid could not be observed."
+      },
+      {
+        "id": "7.2",
+        "name": "narrow_no_horizontal_scroll",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375px width the setup screen, HUD, history panel, overlays, Match log, export controls, and Stats view reflow to a single column without horizontal scrolling.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot both timed out, so narrow layouts could not be observed."
+      },
+      {
+        "id": "7.3",
+        "name": "desktop_layout_usable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At desktop widths around 1440px the board, score panels, history panel, and Match log remain fully usable without clipping primary controls.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot both timed out, so the desktop layout could not be observed."
+      },
+      {
+        "id": "7.4",
+        "name": "overlays_reflow_narrow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Round Result and Match Complete overlays remain readable and operable at 375px without clipped buttons.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot both timed out, so overlays could not be observed."
+      },
+      {
+        "id": "7.5",
+        "name": "export_controls_reachable_narrow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Match, Export Archive, Import, Save Progress, and Resume Saved Match remain reachable at 375px without being pushed off-screen.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot both timed out, so export controls could not be observed."
+      },
+      {
+        "id": "7.n1",
+        "name": "narrow_horizontal_overflow",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375px width primary game chrome requires horizontal scrolling or clips essential controls.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot both timed out; horizontal overflow could not be assessed.",
+        "negate": true
+      },
+      {
+        "id": "7.n2",
+        "name": "tiles_untappable_narrow",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375px width grid tiles are too small or overlapped to tap reliably.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot both timed out; tile size and tappability could not be assessed.",
+        "negate": true
+      },
+      {
+        "id": "7.n3",
+        "name": "desktop_clips_hud",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 1440px the score panels, history panel, or turn banner clip or overlap unreadably.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot both timed out; HUD clipping could not be assessed.",
+        "negate": true
+      },
+      {
+        "id": "7.n4",
+        "name": "overlay_buttons_unreachable_narrow",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At 375px Rematch, New match, or Export Match on Match Complete cannot be reached.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot both timed out; overlay button reachability could not be assessed.",
+        "negate": true
+      },
+      {
+        "id": "responsiveness.catchall",
+        "name": "responsiveness_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable responsiveness defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "BLOCKED: Browser navigation and snapshot both timed out, so responsiveness defects could not be observed.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"narrow_grid_scales_tappable\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot both timed out, so the narrow grid could not be observed.\"},\"narrow_no_horizontal_scroll\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot both timed out, so narrow layouts could not be observed.\"},\"desktop_layout_usable\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot both timed out, so the desktop layout could not be observed.\"},\"overlays_reflow_narrow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot both timed out, so overlays could not be observed.\"},\"export_controls_reachable_narrow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot both timed out, so export controls could not be observed.\"},\"narrow_horizontal_overflow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot both timed out; horizontal overflow could not be assessed.\"},\"tiles_untappable_narrow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot both timed out; tile size and tappability could not be assessed.\"},\"desktop_clips_hud\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot both timed out; HUD clipping could not be assessed.\"},\"overlay_buttons_unreachable_narrow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot both timed out; overlay button reachability could not be assessed.\"},\"responsiveness_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot both timed out, so responsiveness defects could not be observed.\"}}",
+    "cost_usd": 0.044050200000000005
+  },
+  "technical": {
+    "score": 0.4615,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "stats_persist_after_refresh",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After completing a match and refreshing the page, the Stats view still shows the exact previously recorded matches played, matches won, total ore mined, and best single-round score under the difficulty played, and the Match log still lists the committed match-result entry",
+        "reasoning": "BLOCKED: Browser navigation and observation timed out before the workflow could be exercised."
+      },
+      {
+        "id": "2.2",
+        "name": "sound_and_difficulty_persist",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Sound on/off setting and the remembered playerName and difficulty selection are restored to their prior values after a full page refresh",
+        "reasoning": "BLOCKED: Browser observation timed out before persistence could be tested."
+      },
+      {
+        "id": "2.3",
+        "name": "rapid_reveal_stress_stable",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Performing at least 25 rapid reveal-and-turn repetitions through the normal controls leaves an exact, consistent visible state with responsive controls and no blank screen, uncaught error, or sustained freeze",
+        "reasoning": "BLOCKED: Browser observation timed out before interaction could be performed."
+      },
+      {
+        "id": "2.4",
+        "name": "illegal_actions_leave_state_intact",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After attempting illegal or unavailable actions (acting out of turn, clicking an already-revealed tile, using a Hint past the limit, or clicking while paused), the score, strikes, board, and history remain exactly as they were before the attempts",
+        "reasoning": "BLOCKED: Browser observation timed out before illegal-action behavior could be tested."
+      },
+      {
+        "id": "2.5",
+        "name": "hidden_ground_truth_exposed",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A hidden DOM element, attribute, or window global exposes internal ground-truth state (such as mine locations or precomputed answers) that a real user could not reach through visible interaction",
+        "reasoning": "BLOCKED: The page DOM could not be observed.",
+        "negate": true
+      },
+      {
+        "id": "2.6",
+        "name": "judge_addressed_text_present",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A judge-visible surface (rendered text, DOM comment, alt text, title, or console output) contains language addressed to an AI judge or grading system rather than a user or developer",
+        "reasoning": "BLOCKED: Rendered text and browser surfaces could not be observed.",
+        "negate": true
+      },
+      {
+        "id": "2.7",
+        "name": "fabricated_success_state",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A core workflow shows a success or completion state without the underlying action occurring (a constant result regardless of input, or a counter that updates without the created state surviving a reload)",
+        "reasoning": "BLOCKED: The workflow could not be exercised to completion.",
+        "negate": true
+      },
+      {
+        "id": "2.8",
+        "name": "automation_detection_branching",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app renders or behaves differently when driven by automation, keying UI or state on navigator.webdriver or other automation signals",
+        "reasoning": "BLOCKED: Browser behavior could not be observed.",
+        "negate": true
+      },
+      {
+        "id": "2.9",
+        "name": "persistence_incoherent_or_revived",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A refresh loses committed stats, or persisted storage revives data that was never earned or that a reset had cleared",
+        "reasoning": "BLOCKED: Refresh and persistence behavior could not be observed.",
+        "negate": true
+      },
+      {
+        "id": "2.10",
+        "name": "keyboard_operable_visible_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Every button and toggle (Start match, Flag Mode, Hint, Pause/Resume, Sound, Undo, Redo, Apply Scenario Change, Rematch, New match, Export Match, Export Archive, Import, Save Progress, Resume Saved Match) is reachable and operable with the keyboard alone, and every focused control shows a visible focus indicator",
+        "reasoning": "BLOCKED: Controls and focus behavior could not be observed."
+      },
+      {
+        "id": "2.11",
+        "name": "overlays_take_and_return_focus",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The Round Result overlay and Match Complete screen present as dialogs: they take focus when they open and return focus to the game controls when play continues",
+        "reasoning": "BLOCKED: Overlay workflows could not be reached."
+      },
+      {
+        "id": "2.12",
+        "name": "turn_and_strike_announced_as_text",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Turn changes are announced through a polite live region so the active side is conveyed without relying on color alone, and strike counts are also exposed as text rather than only as filled icons",
+        "reasoning": "BLOCKED: Game state and accessibility surfaces could not be observed."
+      },
+      {
+        "id": "2.13",
+        "name": "history_text_and_disabled_semantics",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The 'History state' region exposes its snapshot as readable text, and disabled controls (Undo at the root, Redo with no child, a spent Hint) are exposed as disabled to assistive technology rather than silently ignoring activation",
+        "reasoning": "BLOCKED: History and control semantics could not be observed."
+      },
+      {
+        "id": "2.14",
+        "name": "interactive_within_two_seconds",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app is interactive within 2 seconds of a local cold load, opening directly into the setup screen",
+        "reasoning": "BLOCKED: Browser navigation timed out, so interactivity could not be verified."
+      },
+      {
+        "id": "2.15",
+        "name": "console_errors_during_full_exercise",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Console errors or uncaught exceptions appear during a full exercise of the app: setup, several rounds, pause/resume, hints, flags, undo/redo, match completion, export/import, save/resume, Match log, and the Stats view",
+        "reasoning": "BLOCKED: The full exercise could not be performed and browser inspection timed out.",
+        "negate": true
+      },
+      {
+        "id": "2.16",
+        "name": "responsive_during_rival_delay",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The board, score panels, and history panel stay responsive during the Rival's thinking delay, queued Player input never fires during the Rival's turn, and a Rival move scheduled before a pause, undo, or round end never mutates the current round's state",
+        "reasoning": "BLOCKED: Rival-turn behavior could not be exercised."
+      },
+      {
+        "id": "2.17",
+        "name": "outbound_network_requests",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The running app issues outbound network requests to external origins (CDN scripts, styles, fonts, icons, or audio assets) visible in the network log",
+        "reasoning": "BLOCKED: Browser network inspection timed out.",
+        "negate": true
+      },
+      {
+        "id": "2.18",
+        "name": "checkpoint_survives_refresh",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After Save Progress during a round and a full page refresh, Resume Saved Match is available and restores the checkpoint scores, strikes, turn, and visible board",
+        "reasoning": "BLOCKED: Save, refresh, and resume could not be exercised."
+      },
+      {
+        "id": "2.19",
+        "name": "import_rejects_invalid_payload",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing malformed JSON or a match payload missing required fields shows a visible rejection and leaves Match log, Stats, and the live board unchanged",
+        "reasoning": "BLOCKED: Import behavior could not be reached or observed."
+      },
+      {
+        "id": "2.n20",
+        "name": "export_hardcoded_stub",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Match or Export Archive emits a hardcoded stub whose playerName, difficulty, winner, or round wins ignore the finished match",
+        "reasoning": "BLOCKED: Export behavior could not be reached or observed.",
+        "negate": true
+      },
+      {
+        "id": "2.catchall",
+        "name": "technical_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable technical defect (console, storage, state coherence, stability, or load behavior) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, page state) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "BLOCKED: Browser inspection timed out before any technical defect could be established.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"stats_persist_after_refresh\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and observation timed out before the workflow could be exercised.\"},\"sound_and_difficulty_persist\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out before persistence could be tested.\"},\"rapid_reveal_stress_stable\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out before interaction could be performed.\"},\"illegal_actions_leave_state_intact\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser observation timed out before illegal-action behavior could be tested.\"},\"hidden_ground_truth_exposed\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The page DOM could not be observed.\"},\"judge_addressed_text_present\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rendered text and browser surfaces could not be observed.\"},\"fabricated_success_state\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The workflow could not be exercised to completion.\"},\"automation_detection_branching\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser behavior could not be observed.\"},\"persistence_incoherent_or_revived\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Refresh and persistence behavior could not be observed.\"},\"keyboard_operable_visible_focus\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Controls and focus behavior could not be observed.\"},\"overlays_take_and_return_focus\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Overlay workflows could not be reached.\"},\"turn_and_strike_announced_as_text\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Game state and accessibility surfaces could not be observed.\"},\"history_text_and_disabled_semantics\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: History and control semantics could not be observed.\"},\"interactive_within_two_seconds\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation timed out, so interactivity could not be verified.\"},\"console_errors_during_full_exercise\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The full exercise could not be performed and browser inspection timed out.\"},\"responsive_during_rival_delay\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Rival-turn behavior could not be exercised.\"},\"outbound_network_requests\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser network inspection timed out.\"},\"checkpoint_survives_refresh\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Save, refresh, and resume could not be exercised.\"},\"import_rejects_invalid_payload\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Import behavior could not be reached or observed.\"},\"export_hardcoded_stub\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Export behavior could not be reached or observed.\"},\"technical_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before any technical defect could be established.\"}}",
+    "cost_usd": 0.0644488
+  },
+  "user_flows": {
+    "score": 0.5238,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "safe_reveal_flow_across_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "On the Player's turn with score and history panels visible: revealing a safe tile increases the You score by exactly the ore value shown, hands the turn banner to the Rival without a reload, and appends a history state whose History state snapshot shows the updated score with the Rival to move.",
+        "reasoning": "BLOCKED: Browser inspection timed out before the app could be observed."
+      },
+      {
+        "id": "6.2",
+        "name": "mine_hit_flow_across_surfaces",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Revealing a mine drops the revealing side's score by 5 (never below 0), fills exactly one more Strike icon, passes the turn banner, and the newest history snapshot shows the increased strike count \u2014 all without a reload.",
+        "reasoning": "BLOCKED: Browser inspection timed out before the workflow could be exercised."
+      },
+      {
+        "id": "6.3",
+        "name": "match_completion_updates_log_and_stats",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Winning 2 rounds opens Match Complete with round-by-round scores and overall winner; without reload, Match log gains a top entry with matching playerName/difficulty/winner/round wins, and Stats for that difficulty increases matches played by exactly one.",
+        "reasoning": "BLOCKED: Browser inspection timed out before the workflow could be exercised."
+      },
+      {
+        "id": "6.4",
+        "name": "persistence_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After completing a match, toggling Sound, and setting playerName plus difficulty, a full page refresh restores Stats, Match log, Sound, playerName, and difficulty exactly as committed.",
+        "reasoning": "BLOCKED: Browser inspection timed out before the workflow could be exercised."
+      },
+      {
+        "id": "6.5",
+        "name": "undo_branch_apply_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Reveal a tile, Undo, reveal a different tile to create a branch; select the earlier node and Apply Scenario Change restores the exact prior board, scores, strikes, and turn without reload.",
+        "reasoning": "BLOCKED: Browser inspection timed out before the workflow could be exercised."
+      },
+      {
+        "id": "6.6",
+        "name": "export_after_play_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Finish a match, Export Match from Match Complete or Match log, and confirm the JSON contains that match's playerName, difficulty, winner, round wins, totals, rounds, and endedAt; Export Archive lists the same match in matches.",
+        "reasoning": "BLOCKED: Browser inspection timed out before the workflow could be exercised."
+      },
+      {
+        "id": "6.7",
+        "name": "save_resume_across_reload_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Start a match, reveal at least one tile, Save Progress, fully reload, Resume Saved Match restores scores, strikes, turn, hints remaining, round wins, and visible board.",
+        "reasoning": "BLOCKED: Browser inspection timed out before the workflow could be exercised."
+      },
+      {
+        "id": "6.8",
+        "name": "import_round_trip_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export a finished match as single-match JSON, Import it, and confirm Match log shows an entry with the same playerName, difficulty, winner, round wins, totals, and endedAt.",
+        "reasoning": "BLOCKED: Browser inspection timed out before the workflow could be exercised."
+      },
+      {
+        "id": "6.9",
+        "name": "pause_resume_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a round, Pause freezes the board with a paused indicator and blocks reveals; Resume unfreezes and returns play exactly where it left off without reload.",
+        "reasoning": "BLOCKED: Browser inspection timed out before the workflow could be exercised."
+      },
+      {
+        "id": "6.10",
+        "name": "rematch_and_new_match_flow",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "From Match Complete, Rematch restarts Round 1 at the same difficulty with scores and strikes at 0; New match returns to the setup screen where playerName and difficulty can be set again.",
+        "reasoning": "BLOCKED: Browser inspection timed out before the workflow could be exercised."
+      },
+      {
+        "id": "6.n1",
+        "name": "primary_match_flows_unavailable",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Start match, Pause/Resume, Rematch, Export Match, or Save Progress/Resume Saved Match is missing or non-functional from the visible UI.",
+        "reasoning": "BLOCKED: Could not directly observe whether these controls were missing or non-functional.",
+        "negate": true
+      },
+      {
+        "id": "6.n2",
+        "name": "match_log_entry_missing_or_duplicated",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Finishing a match fails to add a Match log entry, or produces a duplicate top entry for a single finished match.",
+        "reasoning": "BLOCKED: Could not complete a match or inspect Match log.",
+        "negate": true
+      },
+      {
+        "id": "6.n3",
+        "name": "match_outcome_desyncs_across_surfaces",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "After Match Complete, the overall winner or round scores disagree with the new Match log entry or Stats update without a reload intervening.",
+        "reasoning": "BLOCKED: Could not complete a match or compare surfaces.",
+        "negate": true
+      },
+      {
+        "id": "6.n4",
+        "name": "view_switch_corrupts_round",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Opening Stats or Match log mid-round ends the round, resets scores, or corrupts the board state.",
+        "reasoning": "BLOCKED: Could not reach or interact with the live browser UI.",
+        "negate": true
+      },
+      {
+        "id": "6.n5",
+        "name": "empty_match_log_ui_broken",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Before any match has finished, the Match log is a blank region with no friendly empty-state message.",
+        "reasoning": "BLOCKED: Could not inspect the initial Match log state.",
+        "negate": true
+      },
+      {
+        "id": "6.n6",
+        "name": "pause_leaks_rival_or_reveals",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "While Paused, the Rival takes a turn or the board still accepts reveals, flags, or hints.",
+        "reasoning": "BLOCKED: Could not reach or interact with the live browser UI.",
+        "negate": true
+      },
+      {
+        "id": "6.n7",
+        "name": "export_flow_dead_ends",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Export Match or Export Archive leaves the player without a downloadable or copyable artifact after activation.",
+        "reasoning": "BLOCKED: Could not activate or observe export controls.",
+        "negate": true
+      },
+      {
+        "id": "6.n8",
+        "name": "overlay_blocks_navigation",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Round Result or Match Complete overlays block continuing play with no Rematch, next-round, or New match exit.",
+        "reasoning": "BLOCKED: Could not reach Match Complete or Round Result overlays.",
+        "negate": true
+      },
+      {
+        "id": "6.n9",
+        "name": "failed_import_lacks_feedback",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Importing malformed match JSON provides no visible rejection and may silently corrupt or clear the Match log.",
+        "reasoning": "BLOCKED: Could not activate import or observe validation feedback.",
+        "negate": true
+      },
+      {
+        "id": "6.n10",
+        "name": "resume_requires_manual_reload_hack",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Restoring a saved match requires a manual workaround beyond Resume Saved Match, or resume is a dead end needing a hard reload.",
+        "reasoning": "BLOCKED: Could not exercise saved-match resume.",
+        "negate": true
+      },
+      {
+        "id": "user_flows.catchall",
+        "name": "user_flows_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "BLOCKED: Browser inspection timed out, so no additional live-browser defect could be established.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"safe_reveal_flow_across_surfaces\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before the app could be observed.\"},\"mine_hit_flow_across_surfaces\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before the workflow could be exercised.\"},\"match_completion_updates_log_and_stats\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before the workflow could be exercised.\"},\"persistence_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before the workflow could be exercised.\"},\"undo_branch_apply_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before the workflow could be exercised.\"},\"export_after_play_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before the workflow could be exercised.\"},\"save_resume_across_reload_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before the workflow could be exercised.\"},\"import_round_trip_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before the workflow could be exercised.\"},\"pause_resume_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before the workflow could be exercised.\"},\"rematch_and_new_match_flow\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before the workflow could be exercised.\"},\"primary_match_flows_unavailable\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not directly observe whether these controls were missing or non-functional.\"},\"match_log_entry_missing_or_duplicated\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not complete a match or inspect Match log.\"},\"match_outcome_desyncs_across_surfaces\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not complete a match or compare surfaces.\"},\"view_switch_corrupts_round\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach or interact with the live browser UI.\"},\"empty_match_log_ui_broken\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not inspect the initial Match log state.\"},\"pause_leaks_rival_or_reveals\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach or interact with the live browser UI.\"},\"export_flow_dead_ends\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not activate or observe export controls.\"},\"overlay_blocks_navigation\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not reach Match Complete or Round Result overlays.\"},\"failed_import_lacks_feedback\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not activate import or observe validation feedback.\"},\"resume_requires_manual_reload_hack\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Could not exercise saved-match resume.\"},\"user_flows_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out, so no additional live-browser defect could be established.\"}}",
+    "cost_usd": 0.0558153
+  },
+  "visual_design": {
+    "score": 0.2941,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "dark_stone_theme_identity_colors",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The interface uses the dark stone theme with amber ore accents, a sky-blue You panel, and a warm-orange Rival panel",
+        "reasoning": "BLOCKED: Browser navigation and snapshot calls timed out, so the live UI could not be observed."
+      },
+      {
+        "id": "3.2",
+        "name": "active_panel_glow_in_identity_color",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The active side's score panel is outlined and softly glows in that side's identity color while the other side's panel is muted",
+        "reasoning": "BLOCKED: Browser snapshot calls timed out, so panel styling could not be observed.",
+        "optional": true
+      },
+      {
+        "id": "3.3",
+        "name": "mine_tile_red_tinted_marking",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "A revealed mine tile is marked with a distinct mine icon and a red-tinted background that persists for the rest of the round",
+        "reasoning": "BLOCKED: The board could not be observed in the live browser."
+      },
+      {
+        "id": "3.4",
+        "name": "strike_states_visibly_distinct",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Each side's row of 3 Strike icons shows a visibly distinct 0, 1, 2, and 3 state, with the 2-strike near-loss state in a warning color",
+        "reasoning": "BLOCKED: The board could not be observed in the live browser."
+      },
+      {
+        "id": "3.5",
+        "name": "grid_scales_and_stacks_at_375",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "At roughly a 375px-wide viewport the grid scales down to smaller tiles (roughly a 28px minimum) and stays tappable without horizontal scrolling while the score and strike panels stack above the grid",
+        "reasoning": "BLOCKED: Browser navigation timed out before viewport testing was possible.",
+        "optional": true
+      },
+      {
+        "id": "3.6",
+        "name": "flag_mode_visually_indistinct",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Flag Mode being active is not visually distinguishable from normal reveal mode, so the player cannot tell which mode is active",
+        "reasoning": "BLOCKED: The live board and flag mode could not be reached.",
+        "negate": true
+      },
+      {
+        "id": "3.7",
+        "name": "turn_indicator_ambiguous",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Whose turn it is is not visually unmistakable (no clear active-turn indicator distinguishing the Player's turn from the Rival's)",
+        "reasoning": "BLOCKED: The live board could not be observed.",
+        "negate": true
+      },
+      {
+        "id": "3.8",
+        "name": "semantic_status_colors",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Success green marks safe hints and round wins, warning yellow marks the 2-strike near-loss state and mine hints, and error red marks mine hits and round losses",
+        "reasoning": "BLOCKED: Required live interaction and visual observation were unavailable."
+      },
+      {
+        "id": "3.9",
+        "name": "sans_headings_mono_grid_numbers",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Headings render in a sans-serif stack with an h1 near 30px and h2 near 22px over 16px sans-serif body text, while grid numbers, coordinates, and scores render in a monospace stack",
+        "reasoning": "BLOCKED: Browser snapshot calls timed out before styles could be measured."
+      },
+      {
+        "id": "3.10",
+        "name": "radii_and_button_treatments",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Grid tiles use a small (about 4px) corner radius, buttons about 8px, and panels about 12px; primary buttons (Start match, Rematch, Apply Scenario Change) are amber with near-black text and a soft drop shadow, while secondary buttons (Flag mode, Hint, Pause, New match) are transparent with an amber border and amber text and no shadow",
+        "reasoning": "BLOCKED: The rendered UI could not be inspected."
+      },
+      {
+        "id": "3.11",
+        "name": "consistent_icon_set",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The ore, mine, flag, strike, sound, and empty-state icons share one consistent icon style with uniform stroke and weight, with no mismatched glyph styles across the app",
+        "reasoning": "BLOCKED: The rendered UI could not be inspected."
+      },
+      {
+        "id": "3.12",
+        "name": "stats_empty_state_composition",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The Stats empty state shows an icon plus the heading 'No matches played yet' and an explanatory line telling the player how to start a match, rather than blank zero rows",
+        "reasoning": "BLOCKED: The Stats view could not be reached and observed."
+      },
+      {
+        "id": "3.13",
+        "name": "control_labels_consistent_verbs",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Control labels use one consistent capitalization convention and specific verbs (Start match, Apply Scenario Change, Rematch) rather than generic labels like Submit or OK",
+        "reasoning": "BLOCKED: The rendered controls could not be observed."
+      },
+      {
+        "id": "3.14",
+        "name": "rejection_and_result_copy_clear",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Rejection messages for illegal actions name what was attempted and why it is unavailable, and the Round Result overlay states the winner and the reason in plain language",
+        "reasoning": "BLOCKED: The required workflows could not be exercised in the browser."
+      },
+      {
+        "id": "3.15",
+        "name": "placeholder_text_visible",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "Lorem ipsum, 'TODO', template variable names, or other placeholder text is visible somewhere in the shipped UI",
+        "reasoning": "BLOCKED: No rendered page evidence was available.",
+        "negate": true
+      },
+      {
+        "id": "3.16",
+        "name": "content_overflows_at_375",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "At a 375px-wide viewport, the setup screen, HUD, history panel, overlays, or Stats view clips content, overflows the viewport, or requires horizontal scrolling",
+        "reasoning": "BLOCKED: Browser resize and rendered viewport inspection were unavailable.",
+        "negate": true
+      },
+      {
+        "id": "3.17",
+        "name": "score_panels_show_label_target_strikes",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "During a round each of the two score panels (You and Rival) shows the side label, the live score displayed against the Target Score, and a row of 3 Strike icons",
+        "reasoning": "BLOCKED: The active round board could not be observed."
+      },
+      {
+        "id": "3.18",
+        "name": "match_log_and_empty_state_chrome",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The Match log shows playerName, difficulty, winner, and round-win counts on rows; its empty state shows a friendly heading and explanatory line rather than a blank region",
+        "reasoning": "BLOCKED: The Match log view could not be reached and observed."
+      },
+      {
+        "id": "3.19",
+        "name": "copied_and_saved_confirmations",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Copying an export shows a brief Copied confirmation and saving a checkpoint shows a brief Saved confirmation; both are visible and do not permanently block the board",
+        "reasoning": "BLOCKED: The export workflow could not be exercised in the browser."
+      },
+      {
+        "id": "3.catchall",
+        "name": "visual_design_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "BLOCKED: Browser tooling timed out, so no reliable visual-design judgment could be made.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"dark_stone_theme_identity_colors\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and snapshot calls timed out, so the live UI could not be observed.\"},\"active_panel_glow_in_identity_color\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser snapshot calls timed out, so panel styling could not be observed.\"},\"mine_tile_red_tinted_marking\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The board could not be observed in the live browser.\"},\"strike_states_visibly_distinct\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The board could not be observed in the live browser.\"},\"grid_scales_and_stacks_at_375\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation timed out before viewport testing was possible.\"},\"flag_mode_visually_indistinct\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The live board and flag mode could not be reached.\"},\"turn_indicator_ambiguous\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The live board could not be observed.\"},\"semantic_status_colors\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Required live interaction and visual observation were unavailable.\"},\"sans_headings_mono_grid_numbers\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser snapshot calls timed out before styles could be measured.\"},\"radii_and_button_treatments\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The rendered UI could not be inspected.\"},\"consistent_icon_set\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The rendered UI could not be inspected.\"},\"stats_empty_state_composition\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The Stats view could not be reached and observed.\"},\"control_labels_consistent_verbs\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The rendered controls could not be observed.\"},\"rejection_and_result_copy_clear\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The required workflows could not be exercised in the browser.\"},\"placeholder_text_visible\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No rendered page evidence was available.\"},\"content_overflows_at_375\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser resize and rendered viewport inspection were unavailable.\"},\"score_panels_show_label_target_strikes\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The active round board could not be observed.\"},\"match_log_and_empty_state_chrome\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The Match log view could not be reached and observed.\"},\"copied_and_saved_confirmations\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The export workflow could not be exercised in the browser.\"},\"visual_design_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser tooling timed out, so no reliable visual-design judgment could be made.\"}}",
+    "cost_usd": 0.0660978
+  },
+  "writing": {
+    "score": 0.4444,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "specific_control_verbs",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Control labels use consistent capitalization and specific verbs (Start match, Apply Scenario Change, Rematch, Export Match, Save Progress, Resume Saved Match) rather than generic labels.",
+        "reasoning": "BLOCKED: Browser navigation and inspection timed out, so the controls could not be observed."
+      },
+      {
+        "id": "15.2",
+        "name": "rejection_messages_name_why",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Rejection messages for illegal actions name what was attempted and why it is unavailable; import rejections name that the file is invalid.",
+        "reasoning": "BLOCKED: Browser inspection timed out before any rejection workflow could be exercised."
+      },
+      {
+        "id": "15.3",
+        "name": "round_result_plain_language",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "The Round Result overlay states the winner and the reason in plain language.",
+        "reasoning": "BLOCKED: Browser inspection timed out before a round result could be observed."
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Stats and Match log empty states explain that no matches have been played yet and how to start one.",
+        "reasoning": "BLOCKED: Browser inspection timed out before Stats or Match log could be observed."
+      },
+      {
+        "id": "15.5",
+        "name": "no_lorem_placeholder",
+        "value": 0.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "No placeholder or lorem text appears anywhere in the shipped UI.",
+        "reasoning": "BLOCKED: The rendered UI could not be inspected."
+      },
+      {
+        "id": "15.n1",
+        "name": "generic_or_missing_labels",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Primary controls use generic labels like Submit/OK/Button or missing labels where Export Match or Save Progress is expected.",
+        "reasoning": "BLOCKED: Browser inspection timed out before controls could be observed.",
+        "negate": true
+      },
+      {
+        "id": "15.n2",
+        "name": "opaque_error_copy",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Illegal-action or import errors say only Invalid or Error without naming the field or reason.",
+        "reasoning": "BLOCKED: No error workflow could be reached in the browser.",
+        "negate": true
+      },
+      {
+        "id": "15.n3",
+        "name": "lorem_or_placeholder_copy",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Lorem ipsum or placeholder copy appears in Stats, Match log, or overlays.",
+        "reasoning": "BLOCKED: The rendered UI could not be inspected.",
+        "negate": true
+      },
+      {
+        "id": "writing.catchall",
+        "name": "writing_catchall",
+        "value": 1.0,
+        "raw": "no",
+        "weight": 0.5,
+        "description": "Where the app renders user-facing copy, a significant writing defect not covered by any other criterion in this file is present. If present, name it and cite evidence. If already covered \u2014 even partially \u2014 by another criterion, answer no here.",
+        "reasoning": "BLOCKED: Browser inspection timed out, so user-facing copy could not be evaluated.",
+        "negate": true
+      }
+    ],
+    "kind": "agent",
+    "judge": {
+      "agent": "codex",
+      "model": "gpt-5.6-luna",
+      "timeout": 3000,
+      "cwd": "/logs/verifier",
+      "isolated": false,
+      "atif_trajectory": null,
+      "mode": "batched",
+      "result_contract": "legacy",
+      "mcp_servers": [
+        {
+          "name": "webmcp",
+          "transport": "stdio",
+          "url": null,
+          "command": "node",
+          "args": [
+            "/tests/webmcp_stdio_server.mjs"
+          ],
+          "allowed_tools": [
+            "webmcp_session_info",
+            "webmcp_list_tools",
+            "webmcp_invoke_tool"
+          ]
+        },
+        {
+          "name": "playwright",
+          "transport": "stdio",
+          "url": null,
+          "command": "npx",
+          "args": [
+            "-y",
+            "@playwright/mcp@0.0.76",
+            "--browser",
+            "chromium",
+            "--cdp-endpoint",
+            "$WEBMCP_CDP_ENDPOINT",
+            "--isolated",
+            "--output-dir",
+            "/logs/verifier/screenshots"
+          ],
+          "allowed_tools": [
+            "browser_navigate",
+            "browser_navigate_back",
+            "browser_resize",
+            "browser_tabs",
+            "browser_click",
+            "browser_close",
+            "browser_console_messages",
+            "browser_drag",
+            "browser_evaluate",
+            "browser_file_upload",
+            "browser_fill_form",
+            "browser_handle_dialog",
+            "browser_hover",
+            "browser_network_requests",
+            "browser_press_key",
+            "browser_select_option",
+            "browser_snapshot",
+            "browser_take_screenshot",
+            "browser_type",
+            "browser_wait_for"
+          ]
+        }
+      ]
+    },
+    "judge_output": "{\"specific_control_verbs\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser navigation and inspection timed out, so the controls could not be observed.\"},\"rejection_messages_name_why\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before any rejection workflow could be exercised.\"},\"round_result_plain_language\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before a round result could be observed.\"},\"empty_states_explain_next_step\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before Stats or Match log could be observed.\"},\"no_lorem_placeholder\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The rendered UI could not be inspected.\"},\"generic_or_missing_labels\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out before controls could be observed.\"},\"opaque_error_copy\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: No error workflow could be reached in the browser.\"},\"lorem_or_placeholder_copy\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: The rendered UI could not be inspected.\"},\"writing_catchall\":{\"score\":\"no\",\"reasoning\":\"BLOCKED: Browser inspection timed out, so user-facing copy could not be evaluated.\"}}",
+    "cost_usd": 0.04966389999999999
+  }
+}
