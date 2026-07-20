@@ -1,4 +1,4 @@
-import { component$, useStore, useVisibleTask$, $ } from "@builder.io/qwik";
+import { component$, useStore, useVisibleTask$, useSignal, $ } from "@builder.io/qwik";
 import {
   AppState,
   loadState,
@@ -6,6 +6,10 @@ import {
   getTodayStr,
   getTodayFocusSteps,
   countTodayFocus,
+  MAX_FOCUS_STEPS,
+  isTargetDateInRange,
+  MIN_TARGET_DATE,
+  MAX_TARGET_DATE,
   createGoal,
   createMilestone,
   createStep,
@@ -15,6 +19,10 @@ import {
   getActiveMilestoneIndex,
   setStepCompleted,
   ACCENT_COLORS,
+  ACCENT_VALUES,
+  buildPathPackJson,
+  buildMarkdownReport,
+  validatePathPack,
 } from "../store";
 import type { Goal, Milestone, ActionStep } from "../store";
 
@@ -47,6 +55,18 @@ export const App = component$(() => {
     showGoalForm: boolean;
     goalFormData: { title: string; targetDate: string; accentColor: string; motivation: string };
     goalFormError: string;
+    undoStack: string[];
+    redoStack: string[];
+    _lastSnap: string;
+    _timeTravel: boolean;
+    showExport: boolean;
+    exportTab: "json" | "markdown";
+    copyConfirm: boolean;
+    showImport: boolean;
+    importError: string;
+    showPalette: boolean;
+    paletteQuery: string;
+    scrollMilestoneId: string;
   }>({
     goals: [],
     focusDate: "",
@@ -56,6 +76,18 @@ export const App = component$(() => {
     showGoalForm: false,
     goalFormData: { title: "", targetDate: "", accentColor: ACCENT_COLORS[0].value, motivation: "" },
     goalFormError: "",
+    undoStack: [],
+    redoStack: [],
+    _lastSnap: "",
+    _timeTravel: false,
+    showExport: false,
+    exportTab: "json",
+    copyConfirm: false,
+    showImport: false,
+    importError: "",
+    showPalette: false,
+    paletteQuery: "",
+    scrollMilestoneId: "",
   });
 
   // Load from localStorage on mount
@@ -78,10 +110,183 @@ export const App = component$(() => {
       state.focusDate = saved.focusDate;
     }
     saveState(state);
+    // Re-baseline the undo tracker to the just-loaded state and drop any
+    // entries it may have queued while this task's mutations were still in
+    // flight. useVisibleTask$ execution order between this task and the undo
+    // tracker below isn't guaranteed, so without this the tracker can adopt a
+    // pre-load snapshot as its baseline and then record THIS load (e.g. the
+    // focusDate "" -> today hydration) as if it were a user edit, leaving
+    // Undo enabled before any real interaction.
+    state._lastSnap = JSON.stringify({ goals: state.goals, focusDate: state.focusDate, showCompleted: state.showCompleted });
+    state.undoStack = [];
+    state.redoStack = [];
   });
 
   const persist = $(() => {
     saveState(state);
+  });
+
+  // ── Undo / Redo history ──
+  // A single tracked task captures every mutation to goals / focusDate /
+  // completed-visibility as a serialized snapshot. Any observable change (from
+  // a visible control OR a WebMCP command, since both mutate the same store)
+  // pushes the PREVIOUS snapshot onto the undo stack and clears redo — so undo
+  // restores the exact prior visible state. _timeTravel suppresses re-capture
+  // while an undo/redo is itself being applied.
+  useVisibleTask$(({ track }) => {
+    const snap = track(() =>
+      JSON.stringify({ goals: state.goals, focusDate: state.focusDate, showCompleted: state.showCompleted })
+    );
+    if (state._timeTravel) {
+      state._timeTravel = false;
+      state._lastSnap = snap;
+      return;
+    }
+    if (state._lastSnap === "") {
+      state._lastSnap = snap;
+      return;
+    }
+    if (snap === state._lastSnap) return;
+    state.undoStack.push(state._lastSnap);
+    if (state.undoStack.length > 200) state.undoStack.shift();
+    state.redoStack = [];
+    state._lastSnap = snap;
+  });
+
+  const applySnap = $((snapStr: string) => {
+    try {
+      const parsed = JSON.parse(snapStr) as { goals: Goal[]; focusDate: string; showCompleted: boolean };
+      state.goals = parsed.goals;
+      state.focusDate = parsed.focusDate;
+      state.showCompleted = parsed.showCompleted;
+      if (state.activeGoalId && !state.goals.some((g) => g.id === state.activeGoalId)) {
+        state.view = "overview";
+        state.activeGoalId = "";
+      }
+    } catch {
+      /* ignore malformed snapshot */
+    }
+  });
+
+  const undo = $(async () => {
+    if (state.undoStack.length === 0) return;
+    const prev = state.undoStack.pop()!;
+    state.redoStack.push(state._lastSnap);
+    state._timeTravel = true;
+    await applySnap(prev);
+  });
+
+  const redo = $(async () => {
+    if (state.redoStack.length === 0) return;
+    const next = state.redoStack.pop()!;
+    state.undoStack.push(state._lastSnap);
+    state._timeTravel = true;
+    await applySnap(next);
+  });
+
+  // ── Export / Import / Command palette ──
+  const openExport = $(() => {
+    state.exportTab = "json";
+    state.copyConfirm = false;
+    state.showExport = true;
+  });
+
+  const applyImport = $((text: string): boolean => {
+    const result = validatePathPack(text);
+    if (!result.ok) {
+      state.importError = result.error ?? "Import failed validation";
+      return false;
+    }
+    state.goals = result.goals ?? [];
+    state.focusDate = result.focusDate ?? "";
+    state.view = "overview";
+    state.activeGoalId = "";
+    state.showImport = false;
+    state.importError = "";
+    return true;
+  });
+
+  const openPalette = $(() => {
+    state.paletteQuery = "";
+    state.showPalette = true;
+  });
+
+  const jumpToPalette = $((goalId: string, milestoneId: string) => {
+    state.activeGoalId = goalId;
+    state.view = "detail";
+    state.scrollMilestoneId = milestoneId;
+    state.showPalette = false;
+  });
+
+  // ── Global keyboard shortcuts (Undo/Redo, palette, Escape) ──
+  useVisibleTask$(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const mod = e.ctrlKey || e.metaKey;
+      if (mod && (e.key === "k" || e.key === "K")) {
+        e.preventDefault();
+        state.paletteQuery = "";
+        state.showPalette = true;
+        return;
+      }
+      if (mod && (e.key === "z" || e.key === "Z")) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          void redo();
+        } else {
+          void undo();
+        }
+        return;
+      }
+      if (mod && (e.key === "y" || e.key === "Y")) {
+        e.preventDefault();
+        void redo();
+        return;
+      }
+      if (e.key === "Escape") {
+        if (state.showPalette) state.showPalette = false;
+        else if (state.showExport) state.showExport = false;
+        else if (state.showImport) { state.showImport = false; state.importError = ""; }
+        else if (state.showGoalForm) state.showGoalForm = false;
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
+  // Expose undo/redo/export/import/palette to the WebMCP bridge.
+  useVisibleTask$(() => {
+    const w = window as unknown as Record<string, unknown>;
+    w.__focuspath_ui = {
+      undo,
+      redo,
+      openExport: () => { state.exportTab = "json"; state.copyConfirm = false; state.showExport = true; return { ok: true }; },
+      setExportTab: (tab: string) => { state.exportTab = tab === "markdown" ? "markdown" : "json"; state.showExport = true; return { ok: true, tab: state.exportTab }; },
+      copyExport: async () => {
+        // Mirror the visible Copy button exactly: write the tab's current
+        // rendered text to the clipboard before flipping the confirmation,
+        // so a WebMCP-driven copy leaves the clipboard in the same state a
+        // real click would.
+        const text = state.exportTab === "json" ? buildPathPackJson(state) : buildMarkdownReport(state);
+        try { await navigator.clipboard.writeText(text); } catch { /* clipboard blocked */ }
+        state.copyConfirm = true;
+        state.showExport = true;
+        setTimeout(() => { state.copyConfirm = false; }, 1800);
+        return { ok: true };
+      },
+      openImport: () => { state.showImport = true; state.importError = ""; return { ok: true }; },
+      importPack: (text: string) => {
+        const result = validatePathPack(text);
+        if (!result.ok) { state.importError = result.error ?? "invalid"; return { ok: false, error: result.error }; }
+        state.goals = result.goals ?? [];
+        state.focusDate = result.focusDate ?? "";
+        state.view = "overview";
+        state.activeGoalId = "";
+        state.showImport = false;
+        state.importError = "";
+        return { ok: true, goals: state.goals.length };
+      },
+      openPalette: () => { state.paletteQuery = ""; state.showPalette = true; return { ok: true }; },
+    };
   });
 
   // ──────────────────────────────────────────────────────────
@@ -295,8 +500,8 @@ export const App = component$(() => {
           saveState(state);
           return { ok: true, stepId, focusToday: false, focusCount: countTodayFocus(state.goals, state.focusDate) };
         }
-        if (countTodayFocus(state.goals, state.focusDate) >= 3) {
-          return { ok: false, error: "You already have 3 focus steps today. Complete or unfocus one to add another.", focusCount: 3 };
+        if (countTodayFocus(state.goals, state.focusDate) >= MAX_FOCUS_STEPS) {
+          return { ok: false, error: "You already have 3 focus steps today. Complete or unfocus one to add another.", focusCount: MAX_FOCUS_STEPS };
         }
         s.focusToday = true;
         saveState(state);
@@ -346,20 +551,24 @@ export const App = component$(() => {
   });
 
   const submitGoalForm = $(() => {
-    if (!state.goalFormData.title.trim()) {
-      state.goalFormError = "Goal title is required.";
-      return;
-    }
+    const d = state.goalFormData;
+    const title = d.title.trim();
+    if (!title) { state.goalFormError = "Goal title is required."; return; }
+    if (title.length > 80) { state.goalFormError = "Title must be at most 80 characters."; return; }
+    if (d.targetDate && !/^\d{4}-\d{2}-\d{2}$/.test(d.targetDate)) { state.goalFormError = "Target date must be YYYY-MM-DD."; return; }
+    if (d.targetDate && !isTargetDateInRange(d.targetDate)) { state.goalFormError = `Target date must be between ${MIN_TARGET_DATE} and ${MAX_TARGET_DATE}.`; return; }
+    if (d.motivation.length > 280) { state.goalFormError = "Motivation must be at most 280 characters."; return; }
+    if (!ACCENT_VALUES.includes(d.accentColor)) { state.goalFormError = "Accent color must be one of the 8 palette swatches."; return; }
     const g = createGoal({
       id: uid(),
-      title: state.goalFormData.title.trim(),
-      targetDate: state.goalFormData.targetDate,
-      accentColor: state.goalFormData.accentColor,
-      motivation: state.goalFormData.motivation.trim(),
+      title,
+      targetDate: d.targetDate,
+      accentColor: d.accentColor,
+      motivation: d.motivation.trim(),
     });
     state.goals.push(g);
     state.showGoalForm = false;
-    persist();
+    state.goalFormError = "";
   });
 
   const cancelGoalForm = $(() => {
@@ -408,24 +617,70 @@ export const App = component$(() => {
     <div class="min-h-screen" style="background-color:var(--color-background)">
       {/* Header */}
       <header style="background:var(--color-surface);border-bottom:1px solid #e5e7eb;" class="sticky top-0 z-10">
-        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
-          <button
-            class="font-bold text-xl cursor-pointer bg-transparent border-none"
-            style="font-family:'Fraunces','Georgia',serif;color:var(--color-primary)"
-            onClick$={() => { state.view = "overview"; state.activeGoalId = ""; }}
-          >
-            FocusPath
-          </button>
-          {state.view === "overview" && (
-            <button class="btn-primary" onClick$={openGoalForm}>+ New Goal</button>
-          )}
-          {state.view === "detail" && (
-            <button class="btn-secondary" onClick$={() => { state.view = "overview"; state.activeGoalId = ""; }}>
-              ← Back
+        <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-2">
+            <button
+              class="font-bold text-xl cursor-pointer bg-transparent border-none"
+              style="font-family:'Fraunces','Georgia',serif;color:var(--color-primary)"
+              onClick$={() => { state.view = "overview"; state.activeGoalId = ""; }}
+            >
+              FocusPath
             </button>
-          )}
+            {state.view === "detail" && (
+              <button class="btn-secondary" aria-label="Back to overview" onClick$={() => { state.view = "overview"; state.activeGoalId = ""; }}>
+                ← Back
+              </button>
+            )}
+          </div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <button class="btn-primary" onClick$={openGoalForm}>+ New Goal</button>
+            <button
+              class="btn-secondary"
+              aria-label="Undo"
+              aria-disabled={state.undoStack.length === 0 ? "true" : "false"}
+              disabled={state.undoStack.length === 0}
+              style={state.undoStack.length === 0 ? "opacity:0.4" : ""}
+              title="Undo (Ctrl+Z)"
+              onClick$={undo}
+            >
+              ↶ Undo
+            </button>
+            <button
+              class="btn-secondary"
+              aria-label="Redo"
+              aria-disabled={state.redoStack.length === 0 ? "true" : "false"}
+              disabled={state.redoStack.length === 0}
+              style={state.redoStack.length === 0 ? "opacity:0.4" : ""}
+              title="Redo (Ctrl+Shift+Z)"
+              onClick$={redo}
+            >
+              ↷ Redo
+            </button>
+            <button class="btn-secondary" aria-label="Export" onClick$={openExport}>Export</button>
+            <button class="btn-secondary" aria-label="Import" onClick$={() => { state.showImport = true; state.importError = ""; }}>Import</button>
+            <button class="btn-secondary" aria-label="Open command palette" title="Command palette (Ctrl+K)" onClick$={openPalette}>⌘ Search</button>
+          </div>
         </div>
       </header>
+
+      {/* Export drawer */}
+      {state.showExport && (
+        <ExportDrawer state={state} onClose$={() => { state.showExport = false; }} />
+      )}
+
+      {/* Import modal */}
+      {state.showImport && (
+        <ImportModal
+          error={state.importError}
+          onValidate$={(text: string) => { applyImport(text); }}
+          onCancel$={() => { state.showImport = false; state.importError = ""; }}
+        />
+      )}
+
+      {/* Command palette */}
+      {state.showPalette && (
+        <CommandPalette state={state} onJump$={jumpToPalette} onClose$={() => { state.showPalette = false; }} />
+      )}
 
       <main class="max-w-5xl mx-auto px-4 py-6">
         {/* Goal Form Modal */}
@@ -471,58 +726,89 @@ const GoalForm = component$<{
   onSubmit$: () => void;
   onCancel$: () => void;
 }>((props) => {
+  const { data } = props;
+  const title = data.title.trim();
+  const titleErr = title.length === 0 ? "Goal title is required" : title.length > 80 ? "Title must be at most 80 characters" : "";
+  const dateErr = data.targetDate && !/^\d{4}-\d{2}-\d{2}$/.test(data.targetDate)
+    ? "Target date must be YYYY-MM-DD"
+    : data.targetDate && !isTargetDateInRange(data.targetDate)
+    ? `Target date must be between ${MIN_TARGET_DATE} and ${MAX_TARGET_DATE}`
+    : "";
+  const motErr = data.motivation.length > 280 ? "Motivation must be at most 280 characters" : "";
+  const valid = titleErr === "" && dateErr === "" && motErr === "";
+
   return (
-    <div class="fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.35)">
+    <div class="fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.35)" role="dialog" aria-modal="true" aria-label="New goal">
       <div class="card p-6 w-full max-w-md mx-4 slide-in">
         <h2 style="font-size:1.3rem;margin-bottom:1rem;color:var(--color-text-primary)">New goal</h2>
-        {props.error && (
-          <p class="mb-3 text-sm" style="color:var(--color-error)">{props.error}</p>
-        )}
         <div class="flex flex-col gap-4">
           <div>
-            <label class="block text-sm mb-1" style="color:var(--color-text-secondary)">Title *</label>
+            <label class="block text-sm mb-1" for="goal-title" style="color:var(--color-text-secondary)">Title *</label>
             <input
+              id="goal-title"
               type="text"
-              value={props.data.title}
+              maxLength={80}
+              value={data.title}
+              aria-invalid={titleErr ? "true" : "false"}
               placeholder="e.g. Launch my podcast"
-              onInput$={(e) => { props.data.title = (e.target as HTMLInputElement).value; }}
+              onInput$={(e) => { data.title = (e.target as HTMLInputElement).value; }}
             />
+            {(titleErr || props.error) && (
+              <p class="mt-1 text-xs" role="alert" style="color:var(--color-error)">{props.error || titleErr}</p>
+            )}
           </div>
           <div>
-            <label class="block text-sm mb-1" style="color:var(--color-text-secondary)">Target date</label>
+            <label class="block text-sm mb-1" for="goal-date" style="color:var(--color-text-secondary)">Target date</label>
             <input
+              id="goal-date"
               type="date"
-              value={props.data.targetDate}
-              onInput$={(e) => { props.data.targetDate = (e.target as HTMLInputElement).value; }}
+              min={MIN_TARGET_DATE}
+              max={MAX_TARGET_DATE}
+              value={data.targetDate}
+              onInput$={(e) => { data.targetDate = (e.target as HTMLInputElement).value; }}
             />
+            {dateErr && <p class="mt-1 text-xs" role="alert" style="color:var(--color-error)">{dateErr}</p>}
           </div>
           <div>
             <label class="block text-sm mb-1" style="color:var(--color-text-secondary)">Accent color</label>
-            <div class="flex gap-2 flex-wrap">
+            <div class="flex gap-2 flex-wrap" role="radiogroup" aria-label="Accent color">
               {ACCENT_COLORS.map((c) => (
                 <button
                   key={c.value}
                   title={c.label}
+                  aria-label={c.label}
+                  aria-pressed={data.accentColor === c.value ? "true" : "false"}
                   class="w-7 h-7 rounded-full border-2 transition-all"
-                  style={`background:${c.value};border-color:${props.data.accentColor === c.value ? '#232823' : 'transparent'}`}
-                  onClick$={() => { props.data.accentColor = c.value; }}
+                  style={`background:${c.value};border-color:${data.accentColor === c.value ? '#232823' : 'transparent'}`}
+                  onClick$={() => { data.accentColor = c.value; }}
                 />
               ))}
             </div>
           </div>
           <div>
-            <label class="block text-sm mb-1" style="color:var(--color-text-secondary)">Why this matters</label>
+            <label class="block text-sm mb-1" for="goal-motivation" style="color:var(--color-text-secondary)">Why this matters</label>
             <textarea
+              id="goal-motivation"
               rows={2}
+              maxLength={280}
               placeholder="Your motivation..."
               style="resize:vertical"
-              value={props.data.motivation}
-              onInput$={(e) => { props.data.motivation = (e.target as HTMLTextAreaElement).value; }}
+              value={data.motivation}
+              onInput$={(e) => { data.motivation = (e.target as HTMLTextAreaElement).value; }}
             />
+            {motErr && <p class="mt-1 text-xs" role="alert" style="color:var(--color-error)">{motErr}</p>}
           </div>
           <div class="flex gap-2 justify-end">
             <button class="btn-secondary" onClick$={props.onCancel$}>Cancel</button>
-            <button class="btn-primary" onClick$={props.onSubmit$}>Create Goal</button>
+            <button
+              class="btn-primary"
+              disabled={!valid}
+              aria-disabled={!valid ? "true" : "false"}
+              style={!valid ? "opacity:0.5;cursor:not-allowed" : ""}
+              onClick$={props.onSubmit$}
+            >
+              Create Goal
+            </button>
           </div>
         </div>
       </div>
@@ -633,11 +919,18 @@ const TodayFocusPanel = component$<{
 
   if (todaySteps.length === 0) return null;
 
+  const completedToday = todaySteps.filter((s) => s.completed).length;
+
   return (
     <div class="card p-4 mb-2 fade-in" style="border-left:4px solid var(--color-accent)">
-      <h3 class="font-semibold mb-3" style="color:#92400e;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em">
-        Today's Focus
-      </h3>
+      <div class="flex items-center justify-between mb-3 gap-2 flex-wrap">
+        <h3 class="font-semibold" style="color:#92400e;font-size:0.9rem;text-transform:uppercase;letter-spacing:0.05em">
+          Today's Focus
+        </h3>
+        <span class="text-xs font-semibold" aria-label="Daily velocity" style="color:#92400e">
+          Daily Velocity: {completedToday} of 3
+        </span>
+      </div>
       <div class="flex flex-col gap-2">
         {todaySteps.map((item) => (
           <div key={item.stepId} class="flex items-center gap-2 p-2 rounded-lg" style="background:#fef9f0">
@@ -986,7 +1279,7 @@ const CompletedGoalCard = component$<{
 // ──────────────────────────────────────────────────────────
 
 const DetailView = component$<{
-  state: AppState & { goals: Goal[]; focusDate: string };
+  state: AppState & { goals: Goal[]; focusDate: string; scrollMilestoneId: string };
   goal: Goal;
   persist$: () => void;
   toggleFocusStep$: (goalId: string, milestoneId: string, stepId: string) => void;
@@ -1012,6 +1305,15 @@ const DetailView = component$<{
 
   const todaySteps = getTodayFocusSteps(props.state.goals, props.state.focusDate);
   const focusCount = todaySteps.length;
+
+  // Scroll a milestone into view after a command-palette jump.
+  useVisibleTask$(({ track }) => {
+    const target = track(() => props.state.scrollMilestoneId);
+    if (!target) return;
+    const el = document.getElementById(`milestone-${target}`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+    props.state.scrollMilestoneId = "";
+  });
 
   return (
     <div class="slide-in">
@@ -1048,11 +1350,14 @@ const DetailView = component$<{
               <div class="flex gap-2 items-center mt-1">
                 <input
                   type="date"
+                  min={MIN_TARGET_DATE}
+                  max={MAX_TARGET_DATE}
                   value={editStore.dateDraft}
                   onInput$={(e) => { editStore.dateDraft = (e.target as HTMLInputElement).value; }}
                   style="width:auto"
                 />
                 <button class="btn-primary text-sm" onClick$={() => {
+                  if (editStore.dateDraft && !isTargetDateInRange(editStore.dateDraft)) return;
                   goal.targetDate = editStore.dateDraft;
                   editStore.editingDate = false;
                   props.persist$();
@@ -1198,6 +1503,8 @@ const DetailView = component$<{
                 <input
                   id="new-milestone-date"
                   type="date"
+                  min={MIN_TARGET_DATE}
+                  max={MAX_TARGET_DATE}
                   value={editStore.newMilestoneDate}
                   onInput$={(e) => { editStore.newMilestoneDate = (e.target as HTMLInputElement).value; }}
                 />
@@ -1206,6 +1513,10 @@ const DetailView = component$<{
                 <button class="btn-primary" onClick$={() => {
                   if (!editStore.newMilestoneTitle.trim()) {
                     editStore.milestoneError = "Title is required.";
+                    return;
+                  }
+                  if (editStore.newMilestoneDate && !isTargetDateInRange(editStore.newMilestoneDate)) {
+                    editStore.milestoneError = `Target date must be between ${MIN_TARGET_DATE} and ${MAX_TARGET_DATE}.`;
                     return;
                   }
                   const m = createMilestone({
@@ -1266,7 +1577,7 @@ const MilestonePath = component$<{
         const canReorder = !milestone.completed && (idx === 0 || !goal.milestones[idx - 1].completed);
 
         return (
-          <div key={milestone.id} class="flex gap-4">
+          <div key={milestone.id} id={`milestone-${milestone.id}`} class="flex gap-4" style="scroll-margin-top:5rem">
             {/* Node + connector column */}
             <div class="flex flex-col items-center flex-shrink-0" style="width:2.25rem">
               <div
@@ -1379,11 +1690,14 @@ const MilestoneCard = component$<{
             <div class="flex gap-2 items-center mt-1">
               <input
                 type="date"
+                min={MIN_TARGET_DATE}
+                max={MAX_TARGET_DATE}
                 value={local.dateDraft}
                 onInput$={(e) => { local.dateDraft = (e.target as HTMLInputElement).value; }}
                 style="width:auto"
               />
               <button class="btn-primary text-xs" onClick$={() => {
+                if (local.dateDraft && !isTargetDateInRange(local.dateDraft)) return;
                 milestone.targetDate = local.dateDraft;
                 local.editingDate = false;
                 props.persist$();
@@ -1622,7 +1936,7 @@ const StepRow = component$<{
         <button
           class={`focus-toggle ${step.focusToday ? "active" : ""}`}
           onClick$={() => {
-            if (!step.focusToday && focusCount >= 3) {
+            if (!step.focusToday && focusCount >= MAX_FOCUS_STEPS) {
               props.onFocusLimit$();
               return;
             }
@@ -1657,6 +1971,245 @@ const StepRow = component$<{
           )}
         </>
       )}
+    </div>
+  );
+});
+
+// ──────────────────────────────────────────────────────────
+// Export Drawer (Path Pack JSON / Markdown report)
+// ──────────────────────────────────────────────────────────
+
+const ExportDrawer = component$<{
+  state: AppState & { exportTab: "json" | "markdown"; copyConfirm: boolean };
+  onClose$: () => void;
+}>((props) => {
+  const { state } = props;
+  const closeRef = useSignal<HTMLButtonElement>();
+  const text = state.exportTab === "json" ? buildPathPackJson(state) : buildMarkdownReport(state);
+  const filename = state.exportTab === "json" ? "path-pack.json" : "progress.md";
+  const mime = state.exportTab === "json" ? "application/json" : "text/markdown";
+
+  useVisibleTask$(() => { closeRef.value?.focus(); });
+
+  return (
+    <div class="fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.35)" role="dialog" aria-modal="true" aria-label="Export Path Pack">
+      <div class="card w-full max-w-2xl mx-4 slide-in" style="max-height:85vh;display:flex;flex-direction:column">
+        <div class="flex items-center justify-between p-4" style="border-bottom:1px solid #e5e7eb">
+          <h2 style="font-size:1.2rem;color:var(--color-text-primary)">Export Path Pack</h2>
+          <button ref={closeRef} class="btn-secondary" aria-label="Close export" onClick$={props.onClose$}>✕ Close</button>
+        </div>
+        <div class="flex gap-2 px-4 pt-3">
+          <button
+            class={state.exportTab === "json" ? "btn-primary" : "btn-secondary"}
+            aria-pressed={state.exportTab === "json" ? "true" : "false"}
+            onClick$={() => { state.exportTab = "json"; state.copyConfirm = false; }}
+          >
+            Path Pack JSON
+          </button>
+          <button
+            class={state.exportTab === "markdown" ? "btn-primary" : "btn-secondary"}
+            aria-pressed={state.exportTab === "markdown" ? "true" : "false"}
+            onClick$={() => { state.exportTab = "markdown"; state.copyConfirm = false; }}
+          >
+            Markdown report
+          </button>
+        </div>
+        <p class="px-4 pt-2 text-xs" style="color:var(--color-text-secondary)">
+          Regenerated live from your current goals, milestones, steps, and Today's Focus.
+        </p>
+        <pre
+          class="mx-4 my-3 p-3 rounded-md text-xs"
+          aria-label="Export preview"
+          style="background:#f6f5f0;overflow:auto;flex:1;white-space:pre-wrap;font-family:'SFMono-Regular',monospace;color:var(--color-text-primary)"
+        >{text}</pre>
+        <div class="flex items-center gap-2 p-4" style="border-top:1px solid #e5e7eb">
+          <button
+            class="btn-secondary"
+            onClick$={async () => {
+              try { await navigator.clipboard.writeText(text); } catch { /* clipboard blocked */ }
+              state.copyConfirm = true;
+              setTimeout(() => { state.copyConfirm = false; }, 1800);
+            }}
+          >
+            Copy
+          </button>
+          <button
+            class="btn-primary"
+            onClick$={() => {
+              const blob = new Blob([text], { type: mime });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = filename;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              setTimeout(() => URL.revokeObjectURL(url), 1000);
+            }}
+          >
+            Download
+          </button>
+          {state.copyConfirm && (
+            <span class="text-sm" role="status" aria-live="polite" style="color:var(--color-success)">Copied to clipboard</span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// ──────────────────────────────────────────────────────────
+// Import Modal (Path Pack JSON)
+// ──────────────────────────────────────────────────────────
+
+const ImportModal = component$<{
+  error: string;
+  onValidate$: (text: string) => void;
+  onCancel$: () => void;
+}>((props) => {
+  const local = useStore({ text: "", pendingConfirm: false, fileName: "" });
+
+  return (
+    <div class="fixed inset-0 z-50 flex items-center justify-center" style="background:rgba(0,0,0,0.35)" role="dialog" aria-modal="true" aria-label="Import Path Pack">
+      <div class="card w-full max-w-lg mx-4 slide-in p-5">
+        <h2 style="font-size:1.2rem;margin-bottom:0.75rem;color:var(--color-text-primary)">Import Path Pack</h2>
+        <p class="text-xs mb-3" style="color:var(--color-text-secondary)">
+          Load a Path Pack JSON file (format focuspath-path-pack-v1). Importing replaces your current session.
+        </p>
+        <label class="block text-sm mb-1" for="import-file" style="color:var(--color-text-secondary)">Path Pack file</label>
+        <input
+          id="import-file"
+          type="file"
+          accept="application/json,.json"
+          class="mb-3 text-sm"
+          onChange$={async (e) => {
+            const f = (e.target as HTMLInputElement).files?.[0];
+            if (!f) return;
+            local.fileName = f.name;
+            local.text = await f.text();
+            local.pendingConfirm = false;
+          }}
+        />
+        <label class="block text-sm mb-1" for="import-json" style="color:var(--color-text-secondary)">…or paste Path Pack JSON</label>
+        <textarea
+          id="import-json"
+          rows={6}
+          class="mb-2"
+          style="font-family:'SFMono-Regular',monospace;font-size:0.75rem;resize:vertical"
+          value={local.text}
+          onInput$={(e) => { local.text = (e.target as HTMLTextAreaElement).value; local.pendingConfirm = false; }}
+        />
+        {props.error && (
+          <p class="mb-2 text-sm" role="alert" style="color:var(--color-error)">{props.error}</p>
+        )}
+        {local.pendingConfirm && (
+          <div class="mb-3 p-2 rounded-md text-sm" style="background:#fef3c7;color:#92400e;border:1px solid var(--color-warning)">
+            This will replace your current session. Confirm to continue.
+          </div>
+        )}
+        <div class="flex gap-2 justify-end">
+          <button class="btn-secondary" onClick$={props.onCancel$}>Cancel</button>
+          {local.pendingConfirm ? (
+            <button class="btn-primary" onClick$={() => props.onValidate$(local.text)}>Confirm Replace</button>
+          ) : (
+            <button class="btn-primary" onClick$={() => { local.pendingConfirm = true; }}>Import</button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+// ──────────────────────────────────────────────────────────
+// Command Palette (fuzzy goal / milestone jump)
+// ──────────────────────────────────────────────────────────
+
+// Subsequence fuzzy match: every character of `query` must appear in `target`
+// in order, but not necessarily contiguously (e.g. "lnch pdcst" matches
+// "Launch my podcast"). Returns a score where lower is better — tighter,
+// earlier matches rank first — or null when the query isn't a subsequence.
+function fuzzyScore(query: string, target: string): number | null {
+  const q = query.toLowerCase();
+  const t = target.toLowerCase();
+  if (!q) return 0;
+  let qi = 0;
+  let score = 0;
+  let lastMatch = -1;
+  for (let ti = 0; ti < t.length && qi < q.length; ti++) {
+    if (t[ti] === q[qi]) {
+      score += lastMatch === -1 ? ti : ti - lastMatch - 1;
+      lastMatch = ti;
+      qi++;
+    }
+  }
+  return qi === q.length ? score : null;
+}
+
+const CommandPalette = component$<{
+  state: AppState & { paletteQuery: string; goals: Goal[] };
+  onJump$: (goalId: string, milestoneId: string) => void;
+  onClose$: () => void;
+}>((props) => {
+  const { state } = props;
+  const inputRef = useSignal<HTMLInputElement>();
+  useVisibleTask$(() => { inputRef.value?.focus(); });
+
+  const q = state.paletteQuery.trim();
+  type Row = { goalId: string; milestoneId: string; label: string; sub: string; score: number };
+  const rows: Row[] = [];
+  for (const g of state.goals) {
+    if (g.completed) continue;
+    const goalScore = fuzzyScore(q, g.title);
+    if (goalScore !== null) {
+      rows.push({ goalId: g.id, milestoneId: "", label: g.title, sub: "Goal", score: goalScore });
+    }
+    for (const m of g.milestones) {
+      const milestoneScore = fuzzyScore(q, m.title);
+      if (milestoneScore !== null) {
+        rows.push({ goalId: g.id, milestoneId: m.id, label: m.title, sub: `Milestone · ${g.title}`, score: milestoneScore });
+      }
+    }
+  }
+  rows.sort((a, b) => a.score - b.score);
+  const shown = rows.slice(0, 20);
+
+  return (
+    <div
+      class="fixed inset-0 z-50 flex items-start justify-center"
+      style="background:rgba(0,0,0,0.35);padding-top:10vh"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Command palette"
+      onClick$={(e) => { if (e.target === e.currentTarget) props.onClose$(); }}
+    >
+      <div class="card w-full max-w-lg mx-4 slide-in" style="display:flex;flex-direction:column;max-height:70vh">
+        <input
+          ref={inputRef}
+          type="text"
+          aria-label="Search goals and milestones"
+          placeholder="Jump to a goal or milestone…"
+          class="m-3"
+          value={state.paletteQuery}
+          onInput$={(e) => { state.paletteQuery = (e.target as HTMLInputElement).value; }}
+        />
+        <div style="overflow:auto" class="px-3 pb-3">
+          {shown.length === 0 ? (
+            <p class="text-sm p-2" style="color:var(--color-text-secondary)">No matching goals or milestones.</p>
+          ) : (
+            shown.map((r) => (
+              <button
+                key={`${r.goalId}-${r.milestoneId}`}
+                class="w-full text-left p-2 rounded-md transition-colors"
+                style="background:none;border:none;cursor:pointer"
+                onClick$={() => props.onJump$(r.goalId, r.milestoneId)}
+              >
+                <span class="text-sm block" style="color:var(--color-text-primary)">{r.label}</span>
+                <span class="text-xs block" style="color:var(--color-text-secondary)">{r.sub}</span>
+              </button>
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 });

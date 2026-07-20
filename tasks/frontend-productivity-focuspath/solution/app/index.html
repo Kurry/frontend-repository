@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FocusPath</title>
+    <!-- Inline empty icon so a static build never triggers a /favicon.ico 404
+         (which would surface as a console error under the no-console-errors bar). -->
+    <link rel="icon" href="data:," />
+    <meta name="color-scheme" content="light" />
     <!--
       No external font network dependency: a render-blocking cross-origin
       stylesheet link here would stall this module script's execution until

@@ -13,10 +13,24 @@
 
 const CONTRACT_VERSION = "zto-webmcp-v1";
 
-const MODULES = ["entity-collection-v1", "browse-query-v1", "command-session-v1"];
+const MODULES = ["entity-collection-v1", "browse-query-v1", "command-session-v1", "artifact-transfer-v1"];
 
-const DESTINATIONS = ["goals-overview", "goal-detail", "completed-goals"];
+const DESTINATIONS = ["goals-overview", "goal-detail", "completed-goals", "export-drawer", "command-palette"];
 const ENTITY_TYPES = ["goal", "milestone", "step"];
+const EXPORT_FORMATS = ["path-pack-json", "markdown-report"];
+
+interface FocusPathUi {
+  openExport: () => unknown;
+  setExportTab: (tab: string) => unknown;
+  copyExport: () => unknown | Promise<unknown>;
+  openImport: () => unknown;
+  openPalette: () => unknown;
+}
+
+function ui(): FocusPathUi | null {
+  const bridge = (window as unknown as Record<string, unknown>).__focuspath_ui;
+  return (bridge as FocusPathUi) ?? null;
+}
 
 interface FocusPathApi {
   snapshot: () => unknown;
@@ -138,7 +152,55 @@ function browseOpen(args: Record<string, unknown>) {
   if (!a) return { ok: false, error: "bridge not ready" };
   const destination = str(args.destination);
   if (!DESTINATIONS.includes(destination)) return { ok: false, error: `unknown destination: ${destination}` };
+  if (destination === "export-drawer") {
+    const u = ui();
+    return u ? { ok: true, destination, ...(u.openExport() as object) } : { ok: false, error: "ui bridge not ready" };
+  }
+  if (destination === "command-palette") {
+    const u = ui();
+    return u ? { ok: true, destination, ...(u.openPalette() as object) } : { ok: false, error: "ui bridge not ready" };
+  }
   return a.open(destination, str(args.goal_id) || undefined);
+}
+
+// ---- artifact-transfer-v1 --------------------------------------------------
+// No raw file/blob/base64/contents cross this surface (mechanics exclusion):
+// export opens the live-derived drawer, import opens the confirm-gated picker.
+// copy triggers the visible Copy affordance's full behavior — including the
+// actual navigator.clipboard.writeText — so it leaves the clipboard in the
+// same state a real click would. File picking/downloads stay with Playwright.
+
+function artifactExport(args: Record<string, unknown>) {
+  const u = ui();
+  if (!u) return { ok: false, error: "ui bridge not ready" };
+  const format = str(args.format, "path-pack-json");
+  if (!EXPORT_FORMATS.includes(format)) return { ok: false, error: `unknown format: ${format}` };
+  u.openExport();
+  u.setExportTab(format === "markdown-report" ? "markdown" : "json");
+  return { ok: true, operation: "export", format };
+}
+
+function artifactImport(args: Record<string, unknown>) {
+  const u = ui();
+  if (!u) return { ok: false, error: "ui bridge not ready" };
+  const mode = str(args.mode, "path-pack");
+  if (mode !== "path-pack") return { ok: false, error: `unknown import mode: ${mode}` };
+  u.openImport();
+  return { ok: true, operation: "import", mode };
+}
+
+async function artifactCopy(args: Record<string, unknown>) {
+  const u = ui();
+  if (!u) return { ok: false, error: "ui bridge not ready" };
+  const format = str(args.format, "path-pack-json");
+  if (!EXPORT_FORMATS.includes(format)) return { ok: false, error: `unknown format: ${format}` };
+  u.openExport();
+  u.setExportTab(format === "markdown-report" ? "markdown" : "json");
+  // Await so the clipboard write (now performed by copyExport) has landed
+  // before this tool call resolves — otherwise a caller reading the
+  // clipboard right after invoke_tool returns could race the write.
+  await u.copyExport();
+  return { ok: true, operation: "copy", format };
 }
 
 // ---- command-session-v1 ----------------------------------------------------
@@ -240,6 +302,24 @@ const TOOLS: { name: string; description: string; handler: Handler }[] = [
     name: "session-trigger_demo",
     description: 'Click the "Deliver Out of Order" control. args.demo defaults to "Deliver Out of Order".',
     handler: sessionTriggerDemo,
+  },
+  {
+    name: "artifact-export",
+    description:
+      "Open the live Export drawer for a format. args.format is path-pack-json | markdown-report. Opens the same drawer the header Export button opens; file contents stay with Playwright.",
+    handler: artifactExport,
+  },
+  {
+    name: "artifact-import",
+    description:
+      "Open the Path Pack import flow. args.mode is path-pack. Opens the same confirm-gated importer the header Import button opens; file picking stays with Playwright.",
+    handler: artifactImport,
+  },
+  {
+    name: "artifact-copy",
+    description:
+      "Trigger the Export drawer's Copy affordance for a format, writing the current export text to the clipboard exactly like the visible Copy button. args.format is path-pack-json | markdown-report.",
+    handler: artifactCopy,
   },
 ];
 
