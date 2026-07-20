@@ -871,7 +871,9 @@ function seedFromPayload(decoded) {
   const valid = validateThemeDocument(decoded);
   const match = allThemes().find((t) => t.name === valid.name);
   if (match && match.type === "builtin") {
-    return { ...cloneTheme(match), ...valid };
+    // Same all-#RRGGBB contract as the custom/import paths: payload colors may
+    // be oklch(...) and must be normalized before seeding the active clone.
+    return normalizeTheme({ ...cloneTheme(match), ...valid });
   }
   if (match) {
     Object.assign(match, normalizeTheme({ ...match, ...valid }));
@@ -964,12 +966,16 @@ function makeRow(theme, enterId) {
   }
   if (theme.id === enterId) btn.classList.add("row-enter");
 
+  // The active row must swatch the live tokens (a hash payload can seed a
+  // merged clone of a built-in while the catalog entry stays pristine — the
+  // list and the preview/editor have to agree on first paint).
+  const swatchSource = isActive && state.active ? state.active : theme;
   const swatches = document.createElement("span");
   swatches.className = "swatches";
   swatches.setAttribute("aria-hidden", "true");
   for (const token of ["--color-primary", "--color-secondary", "--color-accent", "--color-neutral"]) {
     const i = document.createElement("i");
-    i.style.background = sanitizeCssValue(theme[token]);
+    i.style.background = sanitizeCssValue(swatchSource[token]);
     swatches.appendChild(i);
   }
 
