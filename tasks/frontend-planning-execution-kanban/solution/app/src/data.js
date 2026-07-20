@@ -146,6 +146,6 @@ export const seededOrder = columns.reduce((acc, column) => {
 }, {})
 
 export const failurePlans = {
-  'card-support-triage': { taskId: 'card-support-triage-task-2', failAttempts: 2, maxAttempts: 3 },
+  'card-support-triage': { taskId: 'card-support-triage-task-2', failAttempts: 2, maxAttempts: 2 },
 }
 

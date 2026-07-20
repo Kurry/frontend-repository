@@ -55,6 +55,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { columns } from './data.js'
+import { compileJSON, compileMarkdown } from './exporters.js'
 import { commentSchema, createCardSchema, detailCardSchema, importFormSchema } from './schemas.js'
 import { registerWebMCP } from './webmcp.js'
 import { useBoardStore } from './store.js'
@@ -255,7 +256,7 @@ function BoardColumn({ column, visibleIds, dropHint }) {
   const dropPosition = dropHint?.column === column.id ? dropHint.position : -1
 
   return (
-    <section className={`board-column column-${column.id} ${breach ? 'wip-breach' : ''} ${isOver ? 'column-over' : ''}`} aria-labelledby={`column-title-${column.id}`}>
+    <section ref={setNodeRef} className={`board-column column-${column.id} ${breach ? 'wip-breach' : ''} ${isOver ? 'column-over' : ''}`} aria-labelledby={`column-title-${column.id}`}>
       <header className="column-header">
         <div>
           <div className="column-title-row">
@@ -277,7 +278,7 @@ function BoardColumn({ column, visibleIds, dropHint }) {
         />
       </header>
 
-      <div className="column-list" ref={setNodeRef} data-column={column.id}>
+      <div className="column-list" data-column={column.id}>
         <SortableContext items={visibleIds} strategy={columnSortStrategy}>
           {visibleIds.map((cardId, index) => {
             const card = state.cards[cardId]
@@ -328,7 +329,7 @@ function CreateCardModal() {
   const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
     mode: 'onChange',
-    defaultValues: { title: '', description: '', attached_prompt: '', assignee: '', column: target, position: 0 },
+    defaultValues: { title: '', description: '', attached_prompt: '', assignee: '', column: target || 'backlog', position: 0 },
   })
   const submitLock = useRef(false)
   const title = watch('title') || ''
@@ -338,7 +339,7 @@ function CreateCardModal() {
       setValue('position', 0)
     }
   }, [target, setValue])
-  if (!target) return null
+  // removed if (!target) return null
 
   const submit = handleSubmit((payload) => {
     if (submitLock.current) return
@@ -348,8 +349,10 @@ function CreateCardModal() {
   })
 
   return (
-    <ComposedModal open onClose={() => state.setCreateColumn(null)} selectorPrimaryFocus="#create-title" preventCloseOnClickOutside size="sm">
-      <ModalHeader label={columnNames[target]} title="Add a prompt execution card" closeModal={() => state.setCreateColumn(null)} />
+    <ComposedModal open={Boolean(target)} onClose={() => state.setCreateColumn(null)} selectorPrimaryFocus="#create-title" preventCloseOnClickOutside size="sm">
+      <ModalHeader label={target ? columnNames[target] : ''} title="Add a prompt execution card" closeModal={() => state.setCreateColumn(null)} />
+      {target && (
+        <>
       <ModalBody hasForm>
         <form id="create-card-form" onSubmit={submit} className="modal-form" noValidate>
           <input type="hidden" {...register('column')} />
@@ -371,6 +374,8 @@ function CreateCardModal() {
         <Button kind="secondary" onClick={() => state.setCreateColumn(null)}>Cancel</Button>
         <Button type="submit" form="create-card-form" disabled={!title.trim() || isSubmitting} onClick={submit}>Add Card</Button>
       </ModalFooter>
+        </>
+      )}
     </ComposedModal>
   )
 }
@@ -384,10 +389,10 @@ function CardDetailModal() {
     values: card ? { title: card.title, description: card.description, assignee: card.assignee || '' } : { title: '', description: '', assignee: '' },
   })
   const commentForm = useForm({ resolver: zodResolver(commentSchema), defaultValues: { comment: '' } })
-  if (!card) return null
-  const prompt = state.prompts.find((item) => item.id === card.attached_prompt)
-  const complete = card.tasks.filter((task) => task.status === 'complete').length
-  const isBusy = card.status === 'running' || card.status === 'retrying'
+  // removed if (!card) return null
+  const prompt = card ? state.prompts.find((item) => item.id === card.attached_prompt) : null
+  const complete = card ? card.tasks.filter((task) => task.status === 'complete').length : 0
+  const isBusy = card ? (card.status === 'running' || card.status === 'retrying') : false
 
   const save = handleSubmit((payload) => {
     state.updateCard(card.id, payload)
@@ -399,8 +404,10 @@ function CardDetailModal() {
   })
 
   return (
-    <ComposedModal open onClose={() => state.setDetailId(null)} selectorPrimaryFocus="#detail-title" preventCloseOnClickOutside size="lg">
-      <ModalHeader label={`${columnNames[card.column]} · ${complete} of ${card.tasks.length} complete`} title="Card detail" closeModal={() => state.setDetailId(null)} />
+    <ComposedModal open={Boolean(card)} onClose={() => state.setDetailId(null)} selectorPrimaryFocus="#detail-title" preventCloseOnClickOutside size="lg">
+      <ModalHeader label={card ? `${columnNames[card.column]} · ${complete} of ${card.tasks.length} complete` : ''} title="Card detail" closeModal={() => state.setDetailId(null)} />
+      {card && (
+        <>
       <ModalBody className="detail-modal-body">
         <div className="detail-status-row">
           <StatusTag status={card.status} />
@@ -458,29 +465,34 @@ function CardDetailModal() {
         <Button kind="secondary" onClick={() => state.setDetailId(null)}>Cancel</Button>
         <Button type="submit" form="detail-edit-form" onClick={save}>Save</Button>
       </ModalFooter>
+        </>
+      )}
     </ComposedModal>
   )
 }
 
 function useFocusTrap(open, onClose) {
   const ref = useRef(null)
+  const onCloseRef = useRef(onClose)
+  useEffect(() => { onCloseRef.current = onClose }, [onClose])
+
   useEffect(() => {
     if (!open) return undefined
     const origin = document.activeElement
     const container = ref.current
-    const focusable = () => [...container.querySelectorAll('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+    const focusable = () => container ? [...container.querySelectorAll('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])')] : []
     requestAnimationFrame(() => focusable()[0]?.focus())
     const keydown = (event) => {
-      if (event.key === 'Escape') { event.preventDefault(); onClose(); return }
+      if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); onCloseRef.current?.(); return }
       if (event.key !== 'Tab') return
       const items = focusable(); if (!items.length) return
       const first = items[0]; const last = items.at(-1)
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
     }
-    document.addEventListener('keydown', keydown)
-    return () => { document.removeEventListener('keydown', keydown); origin?.focus?.() }
-  }, [open, onClose])
+    document.addEventListener('keydown', keydown, { capture: true })
+    return () => { document.removeEventListener('keydown', keydown, { capture: true }); origin?.focus?.() }
+  }, [open])
   return ref
 }
 
@@ -527,6 +539,8 @@ function ExportDrawer() {
   const close = () => state.setExportOpen(false)
   const drawerRef = useFocusTrap(state.exportOpen, close)
   const importForm = useForm({ resolver: zodResolver(importFormSchema), defaultValues: { import: state.importDraft } })
+  const jsonText = useMemo(() => state.exportOpen ? compileJSON(state) : '', [state, state.exportOpen])
+  const markdownText = useMemo(() => state.exportOpen ? compileMarkdown(state) : '', [state, state.exportOpen])
   if (!state.exportOpen) return null
   const selectedIndex = state.exportFormat === 'json' ? 0 : 1
   const importReg = importForm.register('import')
@@ -565,8 +579,8 @@ function ExportDrawer() {
               <Tab>Markdown digest</Tab>
             </TabList>
             <TabPanels>
-              <TabPanel><ExportPreview text={state.exportDraft.json} format="json" onCopy={copy} onDownload={download} /></TabPanel>
-              <TabPanel><ExportPreview text={state.exportDraft.markdown} format="markdown" onCopy={copy} onDownload={download} /></TabPanel>
+              <TabPanel><ExportPreview text={jsonText} format="json" onCopy={copy} onDownload={download} /></TabPanel>
+              <TabPanel><ExportPreview text={markdownText} format="markdown" onCopy={copy} onDownload={download} /></TabPanel>
             </TabPanels>
           </Tabs>
           <div className="import-divider" />
@@ -623,7 +637,6 @@ function App() {
   }, [state.cards, state.order, state.filterAssignee, state.search])
 
   useEffect(() => registerWebMCP(), [])
-  useEffect(() => state.syncExportDraft(), [state.board, state.cards, state.order, state.prompts, state.assignees, state.wipLimits])
   useEffect(() => {
     if (!state.toast) return undefined
     const timer = setTimeout(state.clearToast, 3800)
