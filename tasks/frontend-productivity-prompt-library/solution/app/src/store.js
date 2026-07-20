@@ -46,12 +46,15 @@ export const useLibraryStore = create((set, get) => ({
   exportFormat: 'json',
   mobileActionsOpen: false,
   newPromptId: null,
+  sortColumn: 'created',
+  sortDirection: 'desc',
 
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setTechniqueFilter: (techniqueFilter) => set({ techniqueFilter }),
   clearFilters: () => set({ searchQuery: '', techniqueFilter: 'all' }),
   setExportFormat: (exportFormat) => set({ exportFormat }),
   setMobileActionsOpen: (mobileActionsOpen) => set({ mobileActionsOpen }),
+  setSort: (col) => set((state) => ({ sortColumn: col, sortDirection: state.sortColumn === col && state.sortDirection === 'asc' ? 'desc' : 'asc' })),
 
   toggleSelected: (id) => set((state) => ({
     selectedIds: state.selectedIds.includes(id)
@@ -154,37 +157,44 @@ export const useLibraryStore = create((set, get) => ({
     });
   },
 
-  importLibrary: (rawPayload) => {
-    const document = librarySchema.parse(typeof rawPayload === 'string' ? JSON.parse(rawPayload) : rawPayload);
-    const prompts = document.prompts.map((item) => {
-      const data = promptRequestSchema.parse(item);
-      return {
-        id: item.id,
-        ...data,
-        created: item.created,
-        version: item.version,
-        sources: item.sources,
-        attachments: item.attachments.map(attachmentFromFilename),
-        versions: [{
-          id: `${item.id}-v${item.version}-imported`,
+  isLoading: false,
+  importLibrary: async (rawPayload) => {
+    set({ isLoading: true });
+    try {
+      await new Promise(r => setTimeout(r, 500));
+      const document = librarySchema.parse(typeof rawPayload === 'string' ? JSON.parse(rawPayload) : rawPayload);
+      const prompts = document.prompts.map((item) => {
+        const data = promptRequestSchema.parse(item);
+        return {
+          id: item.id,
+          ...data,
+          created: item.created,
           version: item.version,
-          timestamp: document.generatedAt,
-          summary: 'Imported library snapshot',
-          data,
-        }],
-      };
-    });
-    set({
-      prompts,
-      selectedIds: [],
-      searchQuery: '',
-      techniqueFilter: 'all',
-      activeModal: null,
-      detailPromptId: null,
-      historyPromptId: null,
-    });
-    showTimedToast(set, { kind: 'success', title: 'Library imported', subtitle: `${prompts.length} prompts restored from JSON.` });
-    return prompts;
+          sources: item.sources,
+          attachments: item.attachments.map(attachmentFromFilename),
+          versions: [{
+            id: `${item.id}-v${item.version}-imported`,
+            version: item.version,
+            timestamp: document.generatedAt,
+            summary: 'Imported library snapshot',
+            data,
+          }],
+        };
+      });
+      set({
+        prompts,
+        selectedIds: [],
+        searchQuery: '',
+        techniqueFilter: 'all',
+        activeModal: null,
+        detailPromptId: null,
+        historyPromptId: null,
+      });
+      showTimedToast(set, { kind: 'success', title: 'Library imported', subtitle: `${prompts.length} prompts restored from JSON.` });
+      return prompts;
+    } finally {
+      set({ isLoading: false });
+    }
   },
 }));
 
@@ -196,6 +206,11 @@ export function selectVisiblePrompts(state) {
       || prompt.body.toLocaleLowerCase().includes(query);
     const matchesTechnique = state.techniqueFilter === 'all' || prompt.technique === state.techniqueFilter;
     return matchesQuery && matchesTechnique;
+  }).sort((a, b) => {
+    const valA = state.sortColumn === 'attachments' ? a.attachments.length : (a[state.sortColumn] || '');
+    const valB = state.sortColumn === 'attachments' ? b.attachments.length : (b[state.sortColumn] || '');
+    const factor = state.sortDirection === 'asc' ? 1 : -1;
+    return valA > valB ? factor : (valA < valB ? -factor : 0);
   });
 }
 
