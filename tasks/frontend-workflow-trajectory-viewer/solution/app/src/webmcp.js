@@ -125,6 +125,7 @@ export function useWebMcp() {
     })
     register('form_submit', 'Submit a note and/or failure classification using the same commands as the visible forms.', formProperties, [], async (args) => {
       if (args.note_text === undefined && !hasClassification(args)) fail('Provide note_text and/or classification fields')
+      if (hasClassification(args)) validateFailure(args)
       let annotation_count
       if (args.note_text !== undefined) {
         const note = validateNote(args)

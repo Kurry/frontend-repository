@@ -93,8 +93,10 @@ function fileIcon(type) {
 function CodeRenderer({ file }) {
   const [copied, setCopied] = useState(false)
   const copy = async () => {
+    let copied = false
     try {
       await navigator.clipboard.writeText(file.content)
+      copied = true
     } catch {
       const area = document.createElement('textarea')
       area.value = file.content
@@ -103,9 +105,10 @@ function CodeRenderer({ file }) {
       area.style.left = '-9999px'
       document.body.appendChild(area)
       area.select()
-      document.execCommand('copy')
+      copied = document.execCommand('copy')
       area.remove()
     }
+    if (!copied) return
     setCopied(true)
     window.setTimeout(() => setCopied(false), 1500)
   }
@@ -149,7 +152,7 @@ function TerminalPanel({ step, trialId }) {
     if (position === 0) setTerminalState(key, { text: '', status: 'streaming', follow: stream?.follow ?? true })
     const timer = window.setInterval(() => {
       position = Math.min(output.length, position + 1)
-      setTerminalState(key, { text: output.slice(0, position), status: position >= output.length ? 'complete' : 'streaming', follow: stream?.follow ?? true })
+      setTerminalState(key, { text: output.slice(0, position), status: position >= output.length ? 'complete' : 'streaming' })
       if (position >= output.length) window.clearInterval(timer)
     }, 18)
     return () => window.clearInterval(timer)
@@ -250,8 +253,10 @@ function ExportDialog() {
   const [copied, setCopied] = useState(false)
   const text = preview.format === 'json' ? preview.json : preview.markdown
   const copy = async () => {
+    let copied = false
     try {
       await navigator.clipboard.writeText(text)
+      copied = true
     } catch {
       const area = document.createElement('textarea')
       area.value = text
@@ -260,9 +265,10 @@ function ExportDialog() {
       area.style.left = '-9999px'
       document.body.appendChild(area)
       area.select()
-      document.execCommand('copy')
+      copied = document.execCommand('copy')
       area.remove()
     }
+    if (!copied) return
     setCopied(true)
     window.setTimeout(() => setCopied(false), 1600)
   }
