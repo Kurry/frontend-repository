@@ -1,0 +1,129 @@
+import { create } from 'zustand'
+import { computeStats, findDuplicateGroups, makePackage, parseFormula, rowsCsv, validatePackage } from './domain'
+
+const now = '2026-07-01T09:00:00.000Z'
+let sequence = 20000
+export const uid = (prefix = 'id') => `${prefix}-${++sequence}`
+
+const flagshipSchema = [
+  { name: 'prompt', type: 'text', allowedValues: [] },
+  { name: 'score', type: 'number', allowedValues: [] },
+  { name: 'category', type: 'category', allowedValues: ['Reasoning', 'Safety', 'Writing'] },
+]
+
+function flagshipRows() {
+  const rows = Array.from({ length: 520 }, (_, i) => ({
+    id: `row-${i + 1}`,
+    values: { prompt: `Evaluate response ${i + 1}: ${['clarity', 'factuality', 'helpfulness'][i % 3]}`, score: Number(((i * 17) % 101 / 10).toFixed(1)), category: ['Reasoning', 'Safety', 'Writing'][i % 3] },
+    expectedOutput: `Reference answer ${i + 1}`,
+    verified: i % 2 === 0,
+    split: i % 10 === 0 ? 'test' : i % 10 === 1 ? 'validation' : 'train',
+  }))
+  rows[1].values = { ...rows[0].values }; rows[1].expectedOutput = 'Alternate first reference'; rows[1].verified = false
+  rows[11].values = { ...rows[10].values }; rows[11].expectedOutput = 'Alternate duplicate reference'; rows[11].verified = true
+  return rows
+}
+
+const initialFlagshipRows = flagshipRows()
+export const seedDatasets = [
+  {
+    id: 'ds-eval-prompts', name: 'Eval prompts — flagship', description: 'Balanced prompt-response evaluation corpus.', createdAt: now, schema: flagshipSchema, rows: initialFlagshipRows,
+    thresholdRules: [{ id: 'rule-1', column: 'score', comparator: 'below', cap: 3 }],
+    snapshots: [{ name: 'Seed baseline', createdAt: now, rows: initialFlagshipRows.map((r) => ({ ...r, values: { ...r.values } })) }],
+    splitPercentages: { train: 80, validation: 10, test: 10 }, attachedSuiteId: null,
+  },
+  {
+    id: 'ds-support', name: 'Support intents', description: 'Customer support intent classification.', createdAt: '2026-07-16T12:00:00.000Z',
+    schema: [{ name: 'utterance', type: 'text', allowedValues: [] }, { name: 'confidence', type: 'number', allowedValues: [] }, { name: 'intent', type: 'category', allowedValues: ['Billing', 'Technical', 'Account'] }],
+    rows: Array.from({ length: 36 }, (_, i) => ({ id: `support-${i}`, values: { utterance: `Support request ${i + 1}`, confidence: .5 + (i % 5) / 10, intent: ['Billing', 'Technical', 'Account'][i % 3] }, expectedOutput: `route_${i % 3}`, verified: i % 2 === 0, split: 'train' })),
+    thresholdRules: [], snapshots: [], splitPercentages: { train: 80, validation: 10, test: 10 }, attachedSuiteId: null,
+  },
+  {
+    id: 'ds-rubric', name: 'Rubric calibration', description: 'Human scoring calibration set.', createdAt: '2026-07-12T16:20:00.000Z',
+    schema: [{ name: 'response', type: 'text', allowedValues: [] }, { name: 'rating', type: 'number', allowedValues: [] }, { name: 'band', type: 'category', allowedValues: ['Strong', 'Mixed', 'Weak'] }],
+    rows: Array.from({ length: 28 }, (_, i) => ({ id: `rubric-${i}`, values: { response: `Candidate response ${i + 1}`, rating: (i % 5) + 1, band: ['Strong', 'Mixed', 'Weak'][i % 3] }, expectedOutput: `${(i % 5) + 1}`, verified: i % 2 === 1, split: i % 5 ? 'train' : 'test' })),
+    thresholdRules: [], snapshots: [], splitPercentages: { train: 80, validation: 10, test: 10 }, attachedSuiteId: null,
+  },
+]
+
+export const evalSuites = [
+  { id: 'suite-quality', name: 'Core quality regression' },
+  { id: 'suite-safety', name: 'Safety release gate' },
+  { id: 'suite-weekly', name: 'Weekly model comparison' },
+]
+
+export const sampleCsvs = [
+  { id: 'sample-clean', name: 'Clean evaluation batch', text: 'prompt,score,category,expectedOutput\nImported reasoning prompt,8.6,Reasoning,Strong answer\nImported safety prompt,9.1,Safety,Safe answer\nImported writing prompt,7.4,Writing,Clear answer' },
+  { id: 'sample-issues', name: 'Batch with diagnostics', text: 'prompt,score,category,expectedOutput\nNeeds score repair,not-a-number,Reasoning,Repair me\nNeeds category repair,6.5,Unknown,Repair category\nValid import row,7.8,Writing,Ready\nExclude this row,,Safety,Missing score' },
+]
+
+export const newImportState = (open = false) => ({ open, step: 'source', sourceTab: 'samples', paste: '', sourceError: null, dragging: false, committing: false, sourceText: '', headers: [], rawRows: [], mapping: {}, diagnostic: [] })
+
+const cloneDatasets = (sets) => structuredClone(sets)
+const selected = (state) => state.datasets.find((d) => d.id === state.selectedId)
+
+export const useStore = create((set, get) => ({
+  datasets: cloneDatasets(seedDatasets), selectedId: 'ds-eval-prompts', selectedRows: [], unverifiedOnly: false,
+  history: [], future: [], formulaInput: '=AVERAGE(score)', formulaResult: null,
+  pivotMode: false, pivot: { rows: [], columns: [], value: null, aggregation: 'count' },
+  panel: null, modal: null, toast: null, sidebarOpen: false, inlineEdit: null,
+  duplicateScan: { status: 'idle', stages: ['pending', 'pending', 'pending'], groups: [], dismissed: [] },
+  importState: newImportState(false),
+  exportTab: 'json', exportGeneratedAt: null,
+  snapshotSelection: [],
+  recentRows: { ids: [], type: null },
+
+  selectDataset: (id) => set({ selectedId: id, selectedRows: [], unverifiedOnly: false, formulaResult: null, sidebarOpen: false, duplicateScan: { status: 'idle', stages: ['pending','pending','pending'], groups: [], dismissed: [] } }),
+  setUi: (patch) => set(patch),
+  notify: (message, kind = 'success') => { set({ toast: { message, kind, id: Date.now() } }); setTimeout(() => { if (get().toast?.message === message) set({ toast: null }) }, 3400) },
+  commit: (mutator, message) => {
+    set((state) => {
+      const before = cloneDatasets(state.datasets)
+      const next = cloneDatasets(state.datasets)
+      mutator(next, state.selectedId)
+      return { datasets: next, history: [...state.history.slice(-39), before], future: [], selectedRows: [], ...(message ? { toast: { message, kind: 'success', id: Date.now() } } : {}) }
+    })
+    if (message) setTimeout(() => { if (get().toast?.message === message) set({ toast: null }) }, 3400)
+  },
+  createDataset: (payload) => {
+    const id = uid('dataset')
+    get().commit((datasets) => datasets.push({ id, ...payload, createdAt: new Date().toISOString(), rows: [], thresholdRules: [], snapshots: [], splitPercentages: { train: 80, validation: 10, test: 10 }, attachedSuiteId: null }), 'Dataset created')
+    set({ selectedId: id, modal: null })
+    return id
+  },
+  addRow: (row) => { const item = { id: uid('row'), ...row }; get().commit((datasets, id) => datasets.find((d) => d.id === id).rows.push(item), '1 row added'); set({ recentRows: { ids: [item.id], type: 'single' } }); setTimeout(() => set({ recentRows: { ids: [], type: null } }), 1800) },
+  updateRow: (rowId, row) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); const at = ds.rows.findIndex((r) => r.id === rowId); ds.rows[at] = { id: rowId, ...row } }, 'Row updated'),
+  updateCell: (rowId, field, value) => get().commit((datasets, id) => { const row = datasets.find((d) => d.id === id).rows.find((r) => r.id === rowId); if (field === 'expectedOutput') row.expectedOutput = value; else if (field === 'verified') row.verified = value; else if (field === 'split') value ? row.split = value : delete row.split; else row.values[field] = value }, 'Cell updated'),
+  deleteRows: (ids) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); ds.rows = ds.rows.filter((r) => !ids.includes(r.id)) }, `${ids.length} row${ids.length === 1 ? '' : 's'} deleted`),
+  appendRows: (rows) => { const items = rows.map((r) => ({ id: uid('row'), ...r })); get().commit((datasets, id) => datasets.find((d) => d.id === id).rows.push(...items), `${rows.length} rows imported`); set({ recentRows: { ids: items.map((r) => r.id), type: 'import' } }); setTimeout(() => set({ recentRows: { ids: [], type: null } }), Math.max(1800, Math.ceil(items.length / 10) * 100 + 500)) },
+  bulk: (action, value) => { const ids = get().selectedRows; get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); if (action === 'delete') ds.rows = ds.rows.filter((r) => !ids.includes(r.id)); else ds.rows.forEach((r) => { if (ids.includes(r.id)) { if (action === 'verified') r.verified = value; if (action === 'split') r.split = value } }) }, `${ids.length} rows updated`) },
+  toggleSelected: (id) => set((s) => ({ selectedRows: s.selectedRows.includes(id) ? s.selectedRows.filter((v) => v !== id) : [...s.selectedRows, id] })),
+  selectAll: (ids, checked) => set({ selectedRows: checked ? ids : [] }),
+  undo: () => set((s) => s.history.length ? ({ datasets: s.history.at(-1), history: s.history.slice(0,-1), future: [cloneDatasets(s.datasets), ...s.future].slice(0,40), selectedRows: [], toast: { message: 'Change undone', kind: 'info', id: Date.now() } }) : {}),
+  redo: () => set((s) => s.future.length ? ({ datasets: s.future[0], future: s.future.slice(1), history: [...s.history, cloneDatasets(s.datasets)], selectedRows: [], toast: { message: 'Change restored', kind: 'info', id: Date.now() } }) : {}),
+  evaluateFormula: (input = get().formulaInput) => { const result = parseFormula(input, selected(get())); set({ formulaInput: input, formulaResult: result }) },
+  addThreshold: (rule) => get().commit((datasets, id) => datasets.find((d) => d.id === id).thresholdRules.push({ id: uid('rule'), ...rule }), 'Threshold rule added'),
+  deleteThreshold: (ruleId) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); ds.thresholdRules = ds.thresholdRules.filter((r) => r.id !== ruleId) }, 'Threshold rule deleted'),
+  applySplits: (percentages) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); ds.splitPercentages = percentages; const trainEnd = Math.round(ds.rows.length * percentages.train / 100); const validationEnd = trainEnd + Math.round(ds.rows.length * percentages.validation / 100); ds.rows.forEach((r, i) => { r.split = i < trainEnd ? 'train' : i < validationEnd ? 'validation' : 'test' }) }, 'Split assignments applied'),
+  saveSnapshot: (name) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); ds.snapshots.push({ name, createdAt: new Date().toISOString(), rows: structuredClone(ds.rows) }) }, 'Snapshot saved'),
+  attachSuite: (suiteId) => get().commit((datasets, id) => { datasets.find((d) => d.id === id).attachedSuiteId = suiteId }, suiteId ? `Attached to ${evalSuites.find((s) => s.id === suiteId)?.name}` : 'Eval suite detached'),
+  runDuplicateScan: () => {
+    set({ duplicateScan: { ...get().duplicateScan, status: 'running', stages: ['running','pending','pending'], groups: [] } })
+    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, stages: ['complete','running','pending'] } })), 350)
+    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, stages: ['complete','complete','running'] } })), 700)
+    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, status: 'done', stages: ['complete','complete','complete'], groups: findDuplicateGroups(selected(s), s.duplicateScan.dismissed) } })), 1050)
+  },
+  dismissDuplicate: (groupId) => set((s) => ({ duplicateScan: { ...s.duplicateScan, groups: s.duplicateScan.groups.filter((g) => g.id !== groupId), dismissed: [...s.duplicateScan.dismissed, groupId] } })),
+  mergeDuplicate: (groupId, survivorPatch) => { const group = get().duplicateScan.groups.find((g) => g.id === groupId); if (!group) return; const ids = group.rows.map((r) => r.id); get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); const survivor = ds.rows.find((r) => r.id === ids[0]); survivor.values = { ...survivor.values, ...survivorPatch.values }; survivor.expectedOutput = survivorPatch.expectedOutput; survivor.verified = survivorPatch.verified; if (survivorPatch.split) survivor.split = survivorPatch.split; else delete survivor.split; ds.rows = ds.rows.filter((r) => r.id === ids[0] || !ids.includes(r.id)) }, `${ids.length} duplicates merged`); set((s) => ({ modal: null, duplicateScan: { ...s.duplicateScan, groups: s.duplicateScan.groups.filter((g) => g.id !== groupId) } })) },
+  importPackage: (text) => {
+    let parsed; try { parsed = JSON.parse(text) } catch { return { error: 'Package JSON is malformed' } }
+    const checked = validatePackage(parsed); if (checked.error) return checked
+    const d = parsed.dataset
+    get().commit((datasets, id) => { const at = datasets.findIndex((v) => v.id === id); datasets[at] = { id: d.id || id, name: d.name, description: d.description, createdAt: d.createdAt, schema: d.schema, rows: d.rows.map((r) => ({ id: uid('row'), ...r })), thresholdRules: d.thresholdRules.map((r) => ({ id: uid('rule'), ...r })), snapshots: d.snapshots.map((s) => ({ ...s, rows: s.rows.map((r) => ({ id: uid('snaprow'), ...r })) })), splitPercentages: d.splitPercentages, attachedSuiteId: d.attachedSuiteId } }, 'Dataset package imported')
+    set({ selectedId: d.id })
+    return { success: true }
+  },
+  getExport: () => { const state = get(), ds = selected(state), visible = state.unverifiedOnly ? ds.rows.filter((r) => !r.verified) : ds.rows; return { json: JSON.stringify(makePackage(ds), null, 2), csv: rowsCsv(ds, visible), stats: computeStats(ds) } },
+}))
+
+export const store = useStore
