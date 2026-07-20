@@ -15,6 +15,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip as ChartTooltip, XAxis, YAxis } from 'recharts';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
+import { useReducedMotion } from '@mantine/hooks';
 import { baseModels } from './seed';
 import { BENCHMARKS, CLUSTERS, JOB_TYPES, makeJobConfigSchema, sanitizeJobConfig } from './schemas';
 import { buildExportText, getEligibleCheckpoints, getEligibleDatasets, usePipelineStore } from './store';
@@ -88,6 +89,7 @@ function PhaseCard({ runId, phase, highlighted = false, detailed = false }) {
   const pausePhase = usePipelineStore((s) => s.pausePhase);
   const resumePhase = usePipelineStore((s) => s.resumePhase);
   const retryPhase = usePipelineStore((s) => s.retryPhase);
+  const reducedMotion = useReducedMotion();
   const isRunning = phase.status === 'Running';
   const taskTarget = phase.count * 100;
   const runningMean = mean(phase.scores);
@@ -103,7 +105,7 @@ function PhaseCard({ runId, phase, highlighted = false, detailed = false }) {
       {isRunning && (
         <div className="live-panel">
           {phase.key === 'data' && <><div className="metric-row"><span>Tasks generated</span><strong>{phase.current.toLocaleString()} <small>/ {taskTarget.toLocaleString()}</small></strong></div><ProgressBar value={phase.current} max={taskTarget} /></>}
-          {phase.key === 'fineTune' && <><div className="metric-row"><span>Training progress</span><strong>epoch {phase.current} of {phase.count}</strong></div><div className="micro-chart" aria-label="Live loss curve"><ResponsiveContainer width="100%" height="100%"><AreaChart data={phase.loss}><defs><linearGradient id={`loss-${runId}`} x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6d5dfc" stopOpacity={.3}/><stop offset="95%" stopColor="#6d5dfc" stopOpacity={0}/></linearGradient></defs><Area type="monotone" dataKey="loss" stroke="#6d5dfc" strokeWidth={2} fill={`url(#loss-${runId})`} isAnimationActive={false}/></AreaChart></ResponsiveContainer></div></>}
+          {phase.key === 'fineTune' && <><div className="metric-row"><span>Training progress</span><strong>epoch {phase.current} of {phase.count}</strong></div><div className="micro-chart" aria-label="Live loss curve"><ResponsiveContainer width="100%" height="100%"><AreaChart data={phase.loss}><defs><linearGradient id={`loss-${runId}`} x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="#6d5dfc" stopOpacity={.3}/><stop offset="95%" stopColor="#6d5dfc" stopOpacity={0}/></linearGradient></defs><Area type="monotone" dataKey="loss" stroke="#6d5dfc" strokeWidth={2} fill={`url(#loss-${runId})`} isAnimationActive={!reducedMotion}/></AreaChart></ResponsiveContainer></div></>}
           {phase.key === 'evaluation' && <><div className="metric-row"><span>Evaluation progress</span><strong>trial {phase.current} of {phase.count}</strong></div><ProgressBar value={phase.current} max={phase.count} /><div className="running-mean"><span>Running mean</span><b>{phase.scores.length ? runningMean.toFixed(3) : '—'}</b></div></>}
           <Button className="phase-action" variant="subtle" size="compact-xs" leftSection={phase.paused ? <IconPlayerPlay size={14}/> : <IconPlayerPause size={14}/>} onClick={(e) => { e.stopPropagation(); phase.paused ? resumePhase(runId, phase.key) : pausePhase(runId, phase.key); }}>
             {phase.paused ? 'Resume' : 'Pause'}
@@ -143,7 +145,9 @@ function Board() {
   const setDatasetFilter = usePipelineStore((s) => s.setDatasetFilter);
   const openSubmission = usePipelineStore((s) => s.openSubmission);
   const pushAlert = usePipelineStore((s) => s.pushAlert);
-  const [parent] = useAutoAnimate({ duration: 220 });
+  const reducedMotion = useReducedMotion();
+  const [parent, enableAnimations] = useAutoAnimate({ duration: 220 });
+  useEffect(() => enableAnimations(!reducedMotion), [enableAnimations, reducedMotion]);
   const visible = datasetFilter ? runs.filter((r) => r.phases.some((p) => p.dataset === datasetFilter)) : runs;
   const downloadExport = () => {
     const text = buildExportText();
@@ -168,12 +172,13 @@ function EmptyState({ title, body, action, onAction }) {
 
 function DatasetCard({ dataset }) {
   const setDatasetFilter = usePipelineStore((s) => s.setDatasetFilter);
+  const reducedMotion = useReducedMotion();
   const runName = usePipelineStore((s) => s.runs.find((r)=>r.id===dataset.runId)?.label ?? 'Archived generation study');
   return (
-    <article className="dataset-card" onClick={() => setDatasetFilter(dataset.name)} tabIndex={0} role="button" onKeyDown={(e) => { if (e.key === 'Enter') setDatasetFilter(dataset.name); }} aria-label={`Filter runs by ${dataset.name}`}>
+    <article className="dataset-card" onClick={() => setDatasetFilter(dataset.name)} tabIndex={0} role="button" onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setDatasetFilter(dataset.name); } }} aria-label={`Filter runs by ${dataset.name}`}>
       <div className="dataset-top"><span className="dataset-icon"><IconDatabase size={19}/></span><Badge variant="light" color="gray">Ready</Badge></div>
       <h2>{dataset.name}</h2><p className="dataset-size">{dataset.tasks.toLocaleString()} <span>tasks</span></p>
-      <div className="distribution" aria-label={`Task type distribution for ${dataset.name}`}><ResponsiveContainer width="100%" height="100%"><BarChart data={dataset.distribution} barCategoryGap={5}><Bar dataKey="value" fill="#6d5dfc" radius={[4,4,0,0]} isAnimationActive={false}/><XAxis dataKey="type" axisLine={false} tickLine={false} tick={{fontSize:10,fill:'#7c8493'}}/></BarChart></ResponsiveContainer></div>
+      <div className="distribution" aria-label={`Task type distribution for ${dataset.name}`}><ResponsiveContainer width="100%" height="100%"><BarChart data={dataset.distribution} barCategoryGap={5}><Bar dataKey="value" fill="#6d5dfc" radius={[4,4,0,0]} isAnimationActive={!reducedMotion}/><XAxis dataKey="type" axisLine={false} tickLine={false} tick={{fontSize:10,fill:'#7c8493'}}/></BarChart></ResponsiveContainer></div>
       <div className="provenance"><span>Generation provenance</span><strong>{runName}</strong><small>{dataset.runId}</small><p>{dataset.config}</p></div>
       <div className="dataset-action">Trace on pipeline <IconChevronRight size={14}/></div>
     </article>
@@ -183,11 +188,14 @@ function DatasetCard({ dataset }) {
 function DatasetsView() {
   const datasets = usePipelineStore((s) => s.datasets);
   const [query, setQuery] = useState('');
+  const reducedMotion = useReducedMotion();
+  const [datasetGridRef, enableAnimations] = useAutoAnimate({ duration: 220 });
+  useEffect(() => enableAnimations(!reducedMotion), [enableAnimations, reducedMotion]);
   const filtered = datasets.filter((d) => d.name.toLowerCase().includes(query.toLowerCase()));
   return (
     <div className="view"><div className="view-heading"><div><p className="eyebrow">Training inventory</p><h1>Datasets</h1><p>Trace generated task sets back to the run and recipe that produced them.</p></div><TextInput value={query} onChange={(e) => setQuery(e.currentTarget.value)} leftSection={<IconSearch size={16}/>} placeholder="Search datasets" aria-label="Search datasets" className="search-input"/></div>
       <div className="catalog-summary"><strong>{datasets.reduce((s,d)=>s+d.tasks,0).toLocaleString()}</strong><span>curated tasks across {datasets.length} datasets</span><div>{['Plan','Tool','Verify'].map((x,i)=><span key={x}><i style={{background:['#6d5dfc','#15a8a0','#e49744'][i]}}/>{x}</span>)}</div></div>
-      <div className="dataset-grid">{filtered.map((d)=><DatasetCard dataset={d} key={d.id}/>)}</div>
+      <div className="dataset-grid" ref={datasetGridRef}>{filtered.map((d)=><DatasetCard dataset={d} key={d.id}/>)}</div>
       {!filtered.length && <EmptyState title={`No datasets match “${query}”`} body="Try a different dataset name." action="Clear search" onAction={() => setQuery('')}/>} 
     </div>
   );
@@ -221,7 +229,9 @@ function ResultsView() {
   const sort = usePipelineStore((s) => s.resultSort);
   const setResultSort = usePipelineStore((s) => s.setResultSort);
   const setSort = ({key,dir}) => setResultSort(key,dir);
-  const [tableBody] = useAutoAnimate({duration:220});
+  const reducedMotion = useReducedMotion();
+  const [tableBody, enableAnimations] = useAutoAnimate({duration:220});
+  useEffect(() => enableAnimations(!reducedMotion), [enableAnimations, reducedMotion]);
   const rows = useMemo(() => {
     const raw = getResultRows(trialData);
     return raw.sort((a,b) => (sort.dir === 'desc' ? b[sort.key]-a[sort.key] : a[sort.key]-b[sort.key]) || a.model.localeCompare(b.model));
@@ -238,7 +248,7 @@ function ResultsView() {
         <div className="table-scroll"><Table className="leaderboard" highlightOnHover><Table.Thead><Table.Tr><Table.Th>Model checkpoint</Table.Th>{BENCHMARKS.map(b=><Table.Th key={b}>{b}</Table.Th>)}<Table.Th><SortHeader label="Mean" sortKey="mean" sort={sort} setSort={setSort}/></Table.Th><Table.Th><SortHeader label="Spread" sortKey="spread" sort={sort} setSort={setSort}/></Table.Th><Table.Th><SortHeader label="Cost" sortKey="cost" sort={sort} setSort={setSort}/></Table.Th><Table.Th><SortHeader label="Trials" sortKey="trials" sort={sort} setSort={setSort}/></Table.Th></Table.Tr></Table.Thead><Table.Tbody ref={tableBody}>{rows.map((row,index)=><Table.Tr key={row.model} style={{'--row-index':index}}><Table.Td><div className="model-name"><span>{row.model.slice(0,2).toUpperCase()}</span><div><strong>{row.model}</strong><small>checkpoint</small></div></div></Table.Td>{BENCHMARKS.map(b=><Table.Td key={b}><ResultCell model={row.model} benchmark={b} trials={row.cells[b]}/></Table.Td>)}<Table.Td className="aggregate"><strong>{row.mean.toFixed(3)}</strong></Table.Td><Table.Td className="aggregate"><strong>± {row.spread.toFixed(2)}</strong></Table.Td><Table.Td className="aggregate"><strong>${row.cost.toFixed(2)}</strong></Table.Td><Table.Td className="aggregate"><strong>{row.trials}</strong></Table.Td></Table.Tr>)}</Table.Tbody></Table></div>
       </section>
       <section className="comparison-panel"><div className="panel-heading"><div><h2>Head-to-head comparison</h2><p>Paired benchmark means from the same trial data</p></div><div className="comparison-pickers"><Select aria-label="First comparison model" value={comparison[0]} onChange={(v)=>v&&setComparison(0,v)} data={modelNames.filter(x=>x!==comparison[1])}/><span>vs</span><Select aria-label="Second comparison model" value={comparison[1]} onChange={(v)=>v&&setComparison(1,v)} data={modelNames.filter(x=>x!==comparison[0])}/></div></div>
-        <div className="comparison-content"><div className="comparison-chart" aria-label="Model score comparison chart"><ResponsiveContainer width="100%" height="100%"><BarChart data={comparisonData} margin={{top:10,right:12,left:-15,bottom:0}}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eceef3"/><XAxis dataKey="benchmark" tick={{fontSize:11,fill:'#737b8b'}} axisLine={false} tickLine={false}/><YAxis domain={[0,1]} tick={{fontSize:10,fill:'#9399a6'}} axisLine={false} tickLine={false}/><ChartTooltip formatter={(v)=>Number(v).toFixed(3)}/><Bar name={comparison[0]} dataKey="a" fill="#6d5dfc" radius={[5,5,0,0]}/><Bar name={comparison[1]} dataKey="b" fill="#16aaa1" radius={[5,5,0,0]}/></BarChart></ResponsiveContainer></div><div className="delta-strip"><span className="delta-title">Difference <small>{comparison[0]} − {comparison[1]}</small></span>{comparisonData.map(d=>{const delta=d.a-d.b;return <div key={d.benchmark}><span>{d.benchmark}</span><strong className={delta>=0?'positive':'negative'}>{delta>=0?'+':''}{delta.toFixed(3)}</strong></div>})}</div></div>
+        <div className="comparison-content"><div className="comparison-chart" aria-label="Model score comparison chart"><ResponsiveContainer width="100%" height="100%"><BarChart data={comparisonData} margin={{top:10,right:12,left:-15,bottom:0}}><CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#eceef3"/><XAxis dataKey="benchmark" tick={{fontSize:11,fill:'#737b8b'}} axisLine={false} tickLine={false}/><YAxis domain={[0,1]} tick={{fontSize:10,fill:'#9399a6'}} axisLine={false} tickLine={false}/><ChartTooltip formatter={(v)=>Number(v).toFixed(3)}/><Bar name={comparison[0]} dataKey="a" fill="#6d5dfc" radius={[5,5,0,0]} isAnimationActive={!reducedMotion}/><Bar name={comparison[1]} dataKey="b" fill="#16aaa1" radius={[5,5,0,0]} isAnimationActive={!reducedMotion}/></BarChart></ResponsiveContainer></div><div className="delta-strip"><span className="delta-title">Difference <small>{comparison[0]} − {comparison[1]}</small></span>{comparisonData.map(d=>{const delta=d.a-d.b;return <div key={d.benchmark}><span>{d.benchmark}</span><strong className={delta>=0?'positive':'negative'}>{delta>=0?'+':''}{delta.toFixed(3)}</strong></div>})}</div></div>
       </section>
     </div>
   );
@@ -263,7 +273,7 @@ function TrialDrilldown() {
   const [completedTraces,setCompletedTraces] = useState(()=>new Set());
   const entry = drilldown ? trialData.find((x)=>x.model===drilldown.model&&x.benchmark===drilldown.benchmark) : null;
   useEffect(()=>{setExpandedTrial(null);setCompletedTraces(new Set())},[drilldown?.model,drilldown?.benchmark]);
-  return <Drawer opened={Boolean(drilldown)} onClose={()=>setDrilldown(null)} position="right" size="md" title={<div className="drawer-title"><span className="eyebrow">Trial drill-down</span><strong>{drilldown?.benchmark}</strong><small>{drilldown?.model}</small></div>} overlayProps={{backgroundOpacity:.25,blur:2}}>
+  return <Drawer opened={Boolean(drilldown)} onClose={()=>setDrilldown(null)} position="right" size="md" title={<div className="drawer-title"><span className="eyebrow">Trial drill-down</span><strong>{drilldown?.benchmark}</strong><small>{drilldown?.model}</small></div>} overlayProps={{backgroundOpacity:.25,blur:2}} closeOnEscape onKeyDown={(e) => { if (e.key === 'Escape') setDrilldown(null); }}>
     {entry && <><div className="drill-summary"><div><span>Mean score</span><strong>{mean(entry.trials.map(t=>t.score)).toFixed(3)}</strong></div><div><span>Spread</span><strong>± {spread(entry.trials.map(t=>t.score)).toFixed(2)}</strong></div><div><span>Trials</span><strong>{entry.trials.length}</strong></div></div><Accordion value={expandedTrial} onChange={setExpandedTrial} variant="separated" className="trial-list">{entry.trials.map((trial)=><Accordion.Item value={trial.id} key={trial.id}><Accordion.Control><div className="trial-row"><strong>{trial.id}</strong><span>score <b>{trial.score.toFixed(3)}</b></span><span>{trial.duration}s</span></div></Accordion.Control><Accordion.Panel>{expandedTrial===trial.id&&<TraceExcerpt trial={trial} instant={completedTraces.has(trial.id)} onComplete={()=>setCompletedTraces((seen)=>{if(seen.has(trial.id))return seen;const next=new Set(seen);next.add(trial.id);return next})}/>}</Accordion.Panel></Accordion.Item>)}</Accordion></>}
   </Drawer>;
 }
@@ -278,12 +288,13 @@ function RunDetail() {
   const setTimelinePhase = usePipelineStore((s)=>s.setTimelinePhase);
   const setTimelineStatus = usePipelineStore((s)=>s.setTimelineStatus);
   const setHighlightedPhase = usePipelineStore((s)=>s.setHighlightedPhase);
+  const [timelineListRef] = useAutoAnimate({duration:220});
   const run = runs.find((r)=>r.id===selectedRunId);
   const filtered = run?.events.filter((e)=>(timelinePhase==='all'||e.phase===timelinePhase)&&(timelineStatus==='all'||e.status===timelineStatus)) ?? [];
-  return <Drawer opened={Boolean(run)} onClose={()=>selectRun(null)} position="right" size="xl" title={run ? <div className="drawer-title"><span className="eyebrow">Run detail</span><strong>{run.id} · {run.label}</strong><small>Submitted {fmtTime(run.createdAt)}</small></div> : ''} overlayProps={{backgroundOpacity:.2,blur:2}} classNames={{body:'run-drawer-body'}}>
+  return <Drawer opened={Boolean(run)} onClose={()=>selectRun(null)} position="right" size="xl" title={run ? <div className="drawer-title"><span className="eyebrow">Run detail</span><strong>{run.id} · {run.label}</strong><small>Submitted {fmtTime(run.createdAt)}</small></div> : ''} overlayProps={{backgroundOpacity:.2,blur:2}} classNames={{body:'run-drawer-body'}} closeOnEscape onKeyDown={(e) => { if (e.key === 'Escape') selectRun(null); }}>
     {run && <div className="run-detail"><section><div className="detail-section-title"><h2>Phase outputs</h2><span>Click a timeline event to locate its phase</span></div><div className="detail-phases">{run.phases.map((p)=><div key={p.key}><PhaseCard runId={run.id} phase={p} detailed highlighted={highlightedPhase===p.key}/><dl className="output-meta"><div><dt>Started</dt><dd>{fmtTime(p.startedAt)}</dd></div><div><dt>Completed</dt><dd>{fmtTime(p.completedAt)}</dd></div><div><dt>Output</dt><dd>{p.output ?? 'Not available yet'}</dd></div></dl></div>)}</div></section>
       <section className="timeline-section"><div className="detail-section-title"><h2>Event timeline</h2><span>{run.events.length} recorded transitions</span></div><div className="timeline-filters"><Select aria-label="Filter timeline by phase" value={timelinePhase} onChange={setTimelinePhase} data={[{value:'all',label:'All phases'},...Object.entries(phaseLabel).map(([value,label])=>({value,label}))]}/><Select aria-label="Filter timeline by status" value={timelineStatus} onChange={setTimelineStatus} data={['all','Pending','Running','Complete','Failed','Skipped'].map((x)=>({value:x,label:x==='all'?'All statuses':x}))}/>{(timelinePhase!=='all'||timelineStatus!=='all')&&<Button variant="subtle" leftSection={<IconX size={14}/>} onClick={()=>{setTimelinePhase('all');setTimelineStatus('all')}}>Clear</Button>}</div>
-        <div className="timeline-list">{filtered.map((e)=><button key={e.id} className={`timeline-entry ${highlightedPhase===e.phase?'selected':''}`} onClick={()=>setHighlightedPhase(e.phase)}><span className="timeline-marker" style={{background:statusDot[e.status]}}/><div><span>{phaseLabel[e.phase]}</span><strong>{e.message}</strong><time>{fmtTime(e.timestamp)}</time></div><StatusChip status={e.status}/></button>)}{!filtered.length&&<EmptyState title="No timeline events match" body={`No events match the selected ${timelinePhase} / ${timelineStatus} filters.`} action="Clear timeline filters" onAction={()=>{setTimelinePhase('all');setTimelineStatus('all')}}/>}</div>
+        <div className="timeline-list" ref={timelineListRef}>{filtered.map((e)=><button key={e.id} className={`timeline-entry ${highlightedPhase===e.phase?'selected':''}`} onClick={()=>setHighlightedPhase(e.phase)}><span className="timeline-marker" style={{background:statusDot[e.status]}}/><div><span>{phaseLabel[e.phase]}</span><strong>{e.message}</strong><time>{fmtTime(e.timestamp)}</time></div><StatusChip status={e.status}/></button>)}{!filtered.length&&<EmptyState title="No timeline events match" body={`No events match the selected ${timelinePhase} / ${timelineStatus} filters.`} action="Clear timeline filters" onAction={()=>{setTimelinePhase('all');setTimelineStatus('all')}}/>}</div>
       </section></div>}
   </Drawer>;
 }
@@ -337,7 +348,7 @@ function SubmissionDrawer() {
     submitJob(exact);
   };
   const copy = async()=>{await navigator.clipboard.writeText(preview);pushAlert('Exact job config copied to clipboard','green')};
-  return <Drawer opened={opened} onClose={close} position="right" size="min(960px, 94vw)" title={<div className="drawer-title"><span className="eyebrow">New pipeline work</span><strong>Submit a research job</strong><small>Configure one phase; Relay preserves the downstream chain.</small></div>} overlayProps={{backgroundOpacity:.28,blur:3}} transitionProps={{transition:'slide-left',duration:240}} closeButtonProps={{'aria-label':'Close submission panel'}}>
+  return <Drawer opened={opened} onClose={close} position="right" size="min(960px, 94vw)" title={<div className="drawer-title"><span className="eyebrow">New pipeline work</span><strong>Submit a research job</strong><small>Configure one phase; Relay preserves the downstream chain.</small></div>} overlayProps={{backgroundOpacity:.28,blur:3}} transitionProps={{transition:'slide-left',duration:240}} closeButtonProps={{'aria-label':'Close submission panel'}} closeOnEscape onKeyDown={(e) => { if (e.key === 'Escape') close(); }}>
     <div className="suggestions"><span><IconSparkles size={14}/>Quick configurations</span><div>{suggestions.map((s)=><button type="button" key={s.label} onClick={()=>applySuggestion(s)}>{s.label}</button>)}</div></div>
     <form className="submission-layout" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div className="job-form">
