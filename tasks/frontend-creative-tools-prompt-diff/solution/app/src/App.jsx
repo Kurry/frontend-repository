@@ -75,11 +75,15 @@ function useDialogControls(open, onClose, { containerRef, openerRef } = {}) {
     if (open) return undefined;
     const target = openerRef?.current;
     if (!target) return undefined;
-    openerRef.current = null;
     // Defer so a dialog opening in the same commit (e.g. merge confirmation
-    // replacing the merge flow) can claim focus before we restore it.
+    // replacing the merge flow) can claim focus before we restore it. Clear the
+    // remembered opener only once focus actually returns: while a hand-off
+    // dialog owns the stack, keep the opener so it can restore focus to the
+    // originating control when it closes.
     const timer = window.setTimeout(() => {
-      if (dialogStack.length === 0 && target.isConnected) target.focus();
+      if (dialogStack.length !== 0) return;
+      openerRef.current = null;
+      if (target.isConnected) target.focus();
     }, 40);
     return () => window.clearTimeout(timer);
   }, [open, openerRef]);
@@ -439,7 +443,7 @@ function ThreadPanel({ annotations }) {
     <div className={`thread-body ${collapsed ? 'is-collapsed' : ''}`}>
       <div className="thread-body-inner">
         <div className="thread-message"><div className="thread-author"><strong>{annotation.author}</strong><span>{stampLabel(annotation.timestamp, state.prefs.stampMode)}</span></div><MarkdownView markdown={annotation.bodyMarkdown} /></div>
-        {annotation.replies.map((reply, index) => <div className="thread-message reply" key={index}><div className="thread-author"><strong>{reply.author}</strong><span>Reply {index + 1} · {stampLabel(annotation.timestamp, state.prefs.stampMode)}</span></div><MarkdownView markdown={reply.bodyMarkdown} /></div>)}
+        {annotation.replies.map((reply, index) => <div className="thread-message reply" key={index}><div className="thread-author"><strong>{reply.author}</strong><span>Reply {index + 1}</span></div><MarkdownView markdown={reply.bodyMarkdown} /></div>)}
         {annotation.resolved ? <p className="resolved-copy"><Checkmark size={16} /> This thread is resolved. Reopen it to add replies.</p> : <ReplyForm annotationId={annotation.annotationId} />}
         <Button size="sm" kind={annotation.resolved ? 'tertiary' : 'ghost'} onClick={() => state.toggleAnnotationResolved(annotation.annotationId)}>{annotation.resolved ? 'Reopen thread' : 'Resolve thread'}</Button>
       </div>
@@ -489,7 +493,7 @@ function MergeFlowModal({ prompt, session, resolved, total, left, right, openerR
   const confirmRef = useRef(null);
   const [pending, setPending] = useState(false);
   useDialogControls(state.mergeFlowOpen && !state.mergeConfirmOpen, () => state.setMergeFlowOpen(false), { openerRef });
-  useDialogControls(state.mergeConfirmOpen, () => state.setMergeConfirmOpen(false), { containerRef: confirmRef });
+  useDialogControls(state.mergeConfirmOpen, () => state.setMergeConfirmOpen(false), { containerRef: confirmRef, openerRef });
   useEffect(() => {
     if (!state.mergeConfirmOpen) return;
     const first = confirmRef.current?.querySelector('button');
@@ -566,10 +570,13 @@ function BlameView({ prompt, compare, annotations }) {
   const openIntroducing = (line) => {
     const sorted = [...prompt.versions].sort((a, b) => a.versionNumber - b.versionNumber);
     const previous = [...sorted].reverse().find((version) => version.versionNumber < line.version.versionNumber);
+    // A line introduced in the first version has no predecessor, so compare the
+    // introducer against itself; otherwise compare predecessor to introducer.
+    const baseVersion = previous || line.version;
     state.setCompareVersion(line.version.versionId);
-    if (previous) state.setBaseVersion(previous.versionId);
+    state.setBaseVersion(baseVersion.versionId);
     state.setActiveMode('diff');
-    state.announce(`Comparing v${previous?.versionNumber ?? line.version.versionNumber} to v${line.version.versionNumber}, which introduced line ${line.number}.`);
+    state.announce(`Comparing v${baseVersion.versionNumber} to v${line.version.versionNumber}, which introduced line ${line.number}.`);
   };
   return <div className="blame-wrap" onMouseUp={() => handleRangeSelection(state.setSelectedRange)}><div className="blame-head"><div><span className="eyebrow">Line provenance</span><h2>Blame · v{compare?.versionNumber}</h2></div><p>Click an attribution to load the version that introduced that line into the compare picker. Gutter heat shows how recently each line changed.</p></div><div className="blame-code">
     {lines.map((line) => {
@@ -778,13 +785,28 @@ function ToastStack() {
   const toasts = useStudioStore((slice) => slice.toasts);
   const dismiss = useStudioStore((slice) => slice.dismissToast);
   const markLeaving = useStudioStore((slice) => slice.markToastLeaving);
+  // Track timers per toast id so a newly arriving toast never resets the
+  // auto-dismiss countdown of ones already on screen.
+  const timers = useRef({});
   useEffect(() => {
-    const timers = toasts.filter((item) => !item.leaving).flatMap((item) => [
-      window.setTimeout(() => markLeaving(item.id), 4000),
-      window.setTimeout(() => dismiss(item.id), 4450),
-    ]);
-    return () => timers.forEach(window.clearTimeout);
+    toasts.forEach((item) => {
+      if (item.leaving || timers.current[item.id]) return;
+      timers.current[item.id] = [
+        window.setTimeout(() => markLeaving(item.id), 4000),
+        window.setTimeout(() => dismiss(item.id), 4450),
+      ];
+    });
+    Object.keys(timers.current).forEach((id) => {
+      if (!toasts.some((item) => item.id === id)) {
+        timers.current[id].forEach(window.clearTimeout);
+        delete timers.current[id];
+      }
+    });
   }, [toasts, dismiss, markLeaving]);
+  useEffect(() => () => {
+    Object.values(timers.current).forEach((pair) => pair.forEach(window.clearTimeout));
+    timers.current = {};
+  }, []);
   return <div className="toast-stack">{toasts.slice(-3).map((item) => <div key={item.id} className={`toast kind-${item.kind} ${item.leaving ? 'leaving' : ''}`} role="status">
     <span className="toast-icon" aria-hidden="true">{item.kind === 'info' ? <Renew size={16} /> : <Checkmark size={16} />}</span>
     <span className="toast-message">{item.message}</span>

@@ -16,7 +16,7 @@ const snapshot = (state) => clone({
   newNodeId: state.newNodeId,
 });
 
-const restoreSnapshot = (saved) => ({ ...clone(saved), selectedRange: null, annotationComposerOpen: false, mergeConfirmOpen: false });
+const restoreSnapshot = (saved) => ({ ...clone(saved), selectedRange: null, annotationComposerOpen: false, mergeConfirmOpen: false, threadOpenId: null, threadCollapsed: false });
 
 function toast(message, kind = 'success') {
   return { id: `${Date.now()}-${Math.random()}`, message, kind, leaving: false };
