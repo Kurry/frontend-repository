@@ -1,0 +1,25 @@
+--- tasks/frontend-productivity-tagnote/solution/app/src/components/Composer.tsx
++++ tasks/frontend-productivity-tagnote/solution/app/src/components/Composer.tsx
+@@ -28,7 +28,7 @@
+   const handleSubmit = $(() => {
+     const trimmed = local.text.trim();
+     if (!trimmed) {
+-      local.error = 'Please enter a note before sending.';
++      local.error = 'text: Please enter a note before sending.';
+       local.shake = true;
+       setTimeout(() => {
+         local.shake = false;
+@@ -36,6 +36,14 @@
+       return;
+     }
++    if (trimmed.length > 2000) {
++      local.error = 'text: Note text must be at most 2000 characters.';
++      local.shake = true;
++      setTimeout(() => {
++        local.shake = false;
++      }, 300);
++      return;
++    }
+     onSubmit(trimmed, local.attachedFile ?? undefined);
+     local.text = '';
+     local.error = '';

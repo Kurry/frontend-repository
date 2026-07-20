@@ -1,0 +1,87 @@
+--- tasks/frontend-productivity-tagnote/solution/app/src/root.tsx
++++ tasks/frontend-productivity-tagnote/solution/app/src/root.tsx
+@@ -43,6 +43,7 @@
+   const editText = useSignal<{ id: string; text: string } | null>(null);
+   const confirmDelete = useSignal(false);
+   const deleteTargetId = useSignal<string | null>(null);
++  const selectedIds = useStore<{ ids: string[] }>({ ids: [] });
+
+   const syncHistory = $((next: HistoryState) => {
+     historyState.past = next.past;
+@@ -102,6 +103,14 @@
+
+   const handleDeleteConfirm = $(() => {
+     if (deleteTargetId.value === 'bulk') {
++      const ns = bulkDelete(historyState.present, selectedIds.ids);
++      applyState(ns, 'Bulk delete');
++      selectedIds.ids = [];
++      deleteTargetId.value = null;
++      confirmDelete.value = false;
++      showToast('Notes deleted');
++      return;
++    }
+     if (deleteTargetId.value) {
+       applyState(deleteNote(historyState.present, deleteTargetId.value), 'Deleted note');
+       selectedIds.ids = selectedIds.ids.filter(id => id !== deleteTargetId.value);
+@@ -131,6 +140,36 @@
+     const ns = attachFileToNote(historyState.present, id, file);
+     applyState(ns, 'Attached file');
+   });
++
++  const handleToggleSelect = $((id: string) => {
++    if (selectedIds.ids.includes(id)) {
++      selectedIds.ids = selectedIds.ids.filter(x => x !== id);
++    } else {
++      selectedIds.ids = [...selectedIds.ids, id];
++    }
++  });
++
++  const handleBulkArchive = $(() => {
++    if (selectedIds.ids.length === 0) return;
++    const ns = bulkArchive(historyState.present, selectedIds.ids);
++    applyState(ns, 'Bulk archive');
++    selectedIds.ids = [];
++    showToast('Notes archived');
++  });
++
++  const handleBulkPin = $(() => {
++    if (selectedIds.ids.length === 0) return;
++    const ns = bulkPin(historyState.present, selectedIds.ids);
++    applyState(ns, 'Bulk pin');
++    selectedIds.ids = [];
++    showToast('Notes pinned');
++  });
++
++  const handleBulkDeleteRequest = $(() => {
++    if (selectedIds.ids.length === 0) return;
++    deleteTargetId.value = 'bulk';
++    confirmDelete.value = true;
++  });
+
+   const handleToggleTodoTag = $((tag: string) => {
+     const ns = toggleTodoTag(historyState.present, tag);
+@@ -342,6 +381,26 @@
+           />
+         )}
+
++        {selectedIds.ids.length > 0 && (
++          <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 rounded-full bg-white px-6 py-3 shadow-lg border border-gray-200" style={{ transform: 'translateX(-50%)' }}>
++            <span class="text-sm font-semibold text-gray-700">{selectedIds.ids.length} selected</span>
++            <button onClick$={handleBulkArchive} class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]">
++              Archive selected
++            </button>
++            <button onClick$={handleBulkPin} class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]">
++              Pin selected
++            </button>
++            <button onClick$={handleBulkDeleteRequest} class="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100">
++              Delete selected
++            </button>
++            <button onClick$={() => selectedIds.ids = []} class="ml-2 text-gray-400 hover:text-gray-600">
++              ✕
++            </button>
++          </div>
++        )}
++
+         <div class="flex-1 overflow-y-auto px-4 py-4">
+           {showCalendar.value && !showArchived.value && (
+             <div class="mb-4">
