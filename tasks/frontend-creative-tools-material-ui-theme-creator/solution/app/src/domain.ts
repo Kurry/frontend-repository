@@ -427,20 +427,60 @@ export function optionsToSource(o: ThemeOptions): string {
   return `import { createTheme } from '@mui/material/styles';\n\nexport const themeOptions = ${JSON.stringify(o, null, 2)};\n\nexport default createTheme(themeOptions);\n`;
 }
 
-// Extract the balanced { ... } literal following "themeOptions =" using brace
-// counting (string- and comment-aware), so nested closers mid-object — or a
-// stray "}" inside a // or /* */ comment — are never mistaken for the end of
-// the literal.
-function extractObjectLiteral(src: string): string | null {
-  const anchor = /themeOptions\s*=\s*/.exec(src);
+// Replace // line and /* */ block comments with index-preserving whitespace
+// (string-aware, so "//" or "}" inside a string value survives). Callers then
+// anchor-match and brace-count on the stripped copy: neither a commented-out
+// "themeOptions = …" nor a stray "}" inside a comment can mislead extraction.
+function stripComments(src: string): string {
+  let out = '';
+  let inStr: string | null = null;
+  let esc = false;
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i];
+    if (inStr) {
+      out += ch;
+      if (esc) esc = false;
+      else if (ch === '\\') esc = true;
+      else if (ch === inStr) inStr = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      inStr = ch;
+      out += ch;
+      continue;
+    }
+    if (ch === '/' && src[i + 1] === '/') {
+      const nl = src.indexOf('\n', i + 2);
+      const end = nl === -1 ? src.length : nl;
+      out += ' '.repeat(end - i);
+      i = end - 1;
+      continue;
+    }
+    if (ch === '/' && src[i + 1] === '*') {
+      const end = src.indexOf('*/', i + 2);
+      const stop = end === -1 ? src.length : end + 2;
+      for (let j = i; j < stop; j++) out += src[j] === '\n' ? '\n' : ' ';
+      i = stop - 1;
+      continue;
+    }
+    out += ch;
+  }
+  return out;
+}
+
+// Extract the balanced { ... } literal following "themeOptions =" from a
+// comment-stripped source using string-aware brace counting, so nested closers
+// mid-object are never mistaken for the end of the literal.
+function extractObjectLiteral(clean: string): string | null {
+  const anchor = /themeOptions\s*=\s*/.exec(clean);
   const from = anchor ? anchor.index + anchor[0].length : 0;
-  const start = src.indexOf('{', from);
+  const start = clean.indexOf('{', from);
   if (start === -1) return null;
   let depth = 0;
   let inStr: string | null = null;
   let esc = false;
-  for (let i = start; i < src.length; i++) {
-    const ch = src[i];
+  for (let i = start; i < clean.length; i++) {
+    const ch = clean[i];
     if (inStr) {
       if (esc) esc = false;
       else if (ch === '\\') esc = true;
@@ -451,23 +491,10 @@ function extractObjectLiteral(src: string): string | null {
       inStr = ch;
       continue;
     }
-    // Skip line and block comments so braces inside them don't count.
-    if (ch === '/' && src[i + 1] === '/') {
-      const nl = src.indexOf('\n', i + 2);
-      if (nl === -1) break;
-      i = nl;
-      continue;
-    }
-    if (ch === '/' && src[i + 1] === '*') {
-      const end = src.indexOf('*/', i + 2);
-      if (end === -1) break;
-      i = end + 1;
-      continue;
-    }
     if (ch === '{') depth++;
     else if (ch === '}') {
       depth--;
-      if (depth === 0) return src.slice(start, i + 1);
+      if (depth === 0) return clean.slice(start, i + 1);
     }
   }
   return null;
@@ -477,12 +504,15 @@ function extractObjectLiteral(src: string): string | null {
 // wrapper and of comments/extra statements around the literal.
 export function sourceToOptions(src: string): { ok: true; options: ThemeOptions } | { ok: false; error: string } {
   try {
-    let jsonLike = extractObjectLiteral(src);
+    // Work on a comment-stripped copy so commented-out assignments and braces
+    // inside comments can't mislead the anchor match or the brace counter.
+    const clean = stripComments(src);
+    let jsonLike = extractObjectLiteral(clean);
     if (!jsonLike) {
-      const start = src.indexOf('{');
-      const end = src.lastIndexOf('}');
+      const start = clean.indexOf('{');
+      const end = clean.lastIndexOf('}');
       if (start === -1 || end === -1 || end <= start) return { ok: false, error: 'No theme options object found' };
-      jsonLike = src.slice(start, end + 1);
+      jsonLike = clean.slice(start, end + 1);
     }
     // eslint-disable-next-line no-new-func
     const obj = Function(`"use strict";return (${jsonLike});`)();
