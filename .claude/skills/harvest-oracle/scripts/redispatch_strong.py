@@ -46,6 +46,8 @@ def session_state(sid: str) -> str:
     try:
         r = subprocess.run([sys.executable, J, "--json", "get", sid],
                            capture_output=True, text=True, timeout=25)
+        if r.returncode != 0 and "404" in (r.stderr or ""):
+            return "COMPLETED"  # deleted/expired session — not holding a slot
         return json.loads(r.stdout).get("state", "IN_PROGRESS")
     except Exception:
         return "IN_PROGRESS"
