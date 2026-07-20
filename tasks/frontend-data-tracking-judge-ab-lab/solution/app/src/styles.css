@@ -171,7 +171,7 @@ button.summary-metric:hover { background: var(--surface-soft); }
 .card-heading > span { color: var(--muted); font-size: 10px; }
 .chart-area { height: 280px; margin-top: 8px; }
 .axis-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: 9px; }
-.chart-tooltip { min-width: 150px; display: grid; gap: 4px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-raised); box-shadow: var(--shadow); font-size: 10px; }
+.chart-tooltip { pointer-events: none; min-width: 150px; display: grid; gap: 4px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-raised); box-shadow: var(--shadow); font-size: 10px; }
 .chart-tooltip > span { color: var(--muted); }
 .chart-tooltip div { display: flex; align-items: center; gap: 6px; }
 .chart-tooltip div b { margin-left: auto; }
@@ -357,19 +357,26 @@ button.summary-metric:hover { background: var(--surface-soft); }
   .config-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 850px) {
+  .mantine-ActionIcon-root { min-height: 44px; min-width: 44px; }
+  .mantine-Button-root { min-height: 44px; }
+  .mantine-Select-input, .mantine-NumberInput-input, .mantine-TextInput-input, .mantine-MultiSelect-input { min-height: 44px; }
+  .chip { min-height: 44px; padding: 10px 16px; font-size: 13px; }
+  .header-actions { gap: 6px; }
+  .table-scroll { max-width: calc(100vw - 24px); overflow-x: auto; }
+
   .app-header { height: 60px; padding: 0 14px; gap: 8px; }
   .brand { min-width: 0; }
   .brand div { display: none; }
   .desktop-nav, .header-rescore, .header-export { display: none; }
   .mobile-menu { display: inline-flex; }
-  .page-shell { width: calc(100% - 24px); padding-top: 22px; }
+  .page-shell { width: 100%; padding: 22px 12px; box-sizing: border-box; }
   .section-title { align-items: flex-start; margin-bottom: 20px; }
   .section-actions { align-self: flex-end; }
   .section-title p { font-size: 12px; }
   .collection-stat { display: none; }
-  .filter-bar { display: flex; overflow-x: auto; align-items: flex-end; }
-  .filter-bar > * { min-width: 155px; flex: 0 0 auto; }
+  .filter-bar { display: grid; grid-template-columns: 1fr; gap: 12px; align-items: stretch; overflow-x: hidden; }
+  .filter-bar > * { min-width: 0; flex: none; }
   .filter-bar .mantine-Button-root { min-width: 90px; }
   .table-toolbar { align-items: flex-start; flex-direction: column; gap: 12px; }
   .table-toolbar .mantine-MultiSelect-root { width: 100%; }
@@ -377,7 +384,8 @@ button.summary-metric:hover { background: var(--surface-soft); }
   .pair-picker > div:not(.pair-context) { width: 100%; }
   .pair-arrow { display: none; }
   .pair-context { margin: 0; text-align: left; }
-  .summary-strip { grid-template-columns: repeat(5, minmax(135px, 1fr)); overflow-x: auto; }
+  .summary-strip { grid-template-columns: 1fr 1fr; gap: 10px; overflow-x: hidden; }
+  .summary-strip > * { min-width: 0; }
   .compare-grid { grid-template-columns: 1fr; }
   .compare-chart { overflow: hidden; }
   .chart-area { height: 250px; }
@@ -408,4 +416,9 @@ button.summary-metric:hover { background: var(--surface-soft); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+.recharts-tooltip-wrapper { pointer-events: none !important; }
+.page-shell { animation: fadeIn 0.25s ease-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+body, .app-root, .page-shell, .mantine-Paper-root, .mantine-Modal-content, .mantine-Modal-header {
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }

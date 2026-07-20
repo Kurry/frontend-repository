@@ -77,8 +77,8 @@ export function compileLabResults(state, generatedAt = new Date().toISOString())
     }])),
   }))
   const document = {
-    schemaVersion: 'rescore-ab-lab-v1', labels, trials, attributions: state.attributions,
-    compareSummary: deriveCompareSummary(state), savedPairs: state.savedPairs, generatedAt,
+    schemaVersion: 'rescore-ab-lab-v1', labels, trials, attributions: state.attributions.filter(a => state.trials.some(t => t.id === a.trialId) && state.labels.some(l => l.name === a.labelA) && state.labels.some(l => l.name === a.labelB)),
+    compareSummary: deriveCompareSummary(state), savedPairs: state.savedPairs.filter(p => state.labels.some(l => l.name === p.labelA) && state.labels.some(l => l.name === p.labelB)), generatedAt,
   }
   return labResultsSchema.parse(document)
 }
@@ -98,6 +98,7 @@ export const useLabStore = create((set, get) => ({
   sort: { type: 'task-name', direction: 'asc', label: 'Baseline' },
   activeChip: null,
   openedTrialId: null,
+  attributionContext: null,
   highlightedTrialId: null,
   attributions: [],
   undoStack: [],
@@ -106,14 +107,16 @@ export const useLabStore = create((set, get) => ({
   run: initialRun,
   toast: null,
   liveMessage: '',
+  compareError: null,
   setView: (activeView) => set({ activeView }),
   setTheme: (theme) => set({ theme }),
   toggleTheme: () => set((state) => ({ theme: state.theme === 'light' ? 'dark' : 'light' })),
   setCompare: (side, label) => set((state) => {
-    if ((side === 'A' && label === state.compareB) || (side === 'B' && label === state.compareA)) return { liveMessage: `${side === 'A' ? 'labelA' : 'labelB'}: choose a different label` }
+    if ((side === 'A' && label === state.compareB) || (side === 'B' && label === state.compareA)) return { compareError: `${side === 'A' ? 'labelA' : 'labelB'} must differ from the other label` }
+    if (!label) return { compareError: null, compareA: side === 'A' ? null : state.compareA, compareB: side === 'B' ? null : state.compareB }
     const compareA = side === 'A' ? label : state.compareA
     const compareB = side === 'B' ? label : state.compareB
-    return { compareA, compareB, deltaPair: compareA && compareB ? [compareA, compareB] : state.deltaPair, openedTrialId: null, highlightedTrialId: null }
+    return { compareA, compareB, compareError: null, deltaPair: compareA && compareB ? [compareA, compareB] : state.deltaPair, openedTrialId: null, highlightedTrialId: null }
   }),
   setShownLabels: (names) => set((state) => ({ shownLabels: names, deltaPair: names.length >= 2 ? names.slice(-2) : state.deltaPair })),
   setFilter: (key, value) => set((state) => ({ filters: { ...state.filters, [key]: value }, sort: key === 'passLabel' ? { ...state.sort, label: value } : state.sort, activeChip: null })),
@@ -126,6 +129,7 @@ export const useLabStore = create((set, get) => ({
   }),
   setSort: (type, label) => set((state) => ({ sort: { type, label: label || state.sort.label, direction: state.sort.type === type ? (state.sort.direction === 'asc' ? 'desc' : 'asc') : 'desc' } })),
   openTrial: (id) => set({ openedTrialId: id }),
+  setAttributionContext: (ctx) => set({ attributionContext: ctx }),
   closeTrial: () => set({ openedTrialId: null }),
   highlightTrial: (id) => set({ highlightedTrialId: id, openedTrialId: null }),
   saveAttribution: (record) => set((state) => {
@@ -172,6 +176,8 @@ export const useLabStore = create((set, get) => ({
     }))
   },
   startRescore: async (payload) => {
+    if (get().run.active || window.__isRescoring) return false;
+    window.__isRescoring = true;
     if (get().run.active) return false
     const steps = get().trials.map((trial) => ({ trialId: trial.id, taskName: trial.taskName, status: 'pending', attempt: 1 }))
     set({ run: { active: true, label: payload, steps, events: [{ id: `${Date.now()}-start`, trialId: null, status: 'started', time: nowTime(), text: `Run started for ${payload.labelName}` }], startedAt: Date.now(), elapsed: 0, failures: 0, completed: false, selectedStep: null } })
@@ -205,6 +211,7 @@ export const useLabStore = create((set, get) => ({
       run: { ...state.run, active: false, completed: true, elapsed: Date.now() - state.run.startedAt, events: [...state.run.events, { id: `${Date.now()}-done`, trialId: null, status: 'complete', time: nowTime(), text: `${label.name} completed` }] },
       toast: { id: Date.now(), message: `${label.name} completed and added to the lab` }, liveMessage: `Rescore complete. ${label.name} is available in all views.`,
     }))
+      window.__isRescoring = false;
     return true
   },
   selectRunStep: (trialId) => set((state) => ({ run: { ...state.run, selectedStep: trialId } })),

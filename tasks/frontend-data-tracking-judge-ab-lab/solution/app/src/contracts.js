@@ -6,7 +6,7 @@ export const DIMENSIONS = ['correctness', 'visual', 'motion', 'technical']
 
 export const attributionInputSchema = z.object({
   cause: z.enum(CAUSES, { error: 'cause: choose scorer noise, rubric change effect, or harness change effect' }),
-  note: z.string().max(200, 'note: use 200 characters or fewer'),
+  note: z.string().max(200, 'note: use 200 characters or fewer').optional().catch(''),
 })
 
 export const attributionSchema = attributionInputSchema.extend({
@@ -19,7 +19,7 @@ export const attributionSchema = attributionInputSchema.extend({
 export const rescoreBaseSchema = z.object({
   labelName: z.string().trim().min(1, 'labelName: enter a non-empty label name'),
   scorerModel: z.enum(SCORER_MODELS, { error: 'scorerModel: choose a scorer model' }),
-  configNote: z.string().max(120, 'configNote: use 120 characters or fewer'),
+  configNote: z.string().max(120, 'configNote: use 120 characters or fewer').optional().catch(''),
 })
 
 export const createRescoreSchema = (labels) => rescoreBaseSchema.superRefine((value, ctx) => {
