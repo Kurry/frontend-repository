@@ -103,7 +103,7 @@ function Toolbar({ editorRef, variableSelectionRef }) {
       <span className="toolbar-spacer" />
       {streamingRunId
         ? <Button size="sm" kind="danger" renderIcon={StopFilledAlt} onClick={stopRun}>Stop</Button>
-        : <Button size="sm" kind="primary" renderIcon={PlayFilledAlt} onClick={startRun} disabled={!draft.trim()}>Run</Button>}
+        : <Button size="sm" kind="primary" renderIcon={PlayFilledAlt} onClick={startRun} disabled={!draft.trim() || !!streamingRunId}>Run</Button>}
     </div>
   )
 }
@@ -281,7 +281,7 @@ function ResponsePanel() {
   const handleScroll = () => {
     const element = bodyRef.current
     if (!element || !isStreaming) return
-    setFollow(element.scrollHeight - element.scrollTop - element.clientHeight < 36)
+    setFollow(element.scrollHeight - element.scrollTop - element.clientHeight < 4)
   }
   const jump = () => { setFollow(true); requestAnimationFrame(() => { if (bodyRef.current) bodyRef.current.scrollTop = bodyRef.current.scrollHeight }) }
   return (
@@ -366,8 +366,9 @@ function VariablePopover({ editorRef, variableSelectionRef }) {
     <div className="popover variable-popover" role="dialog" aria-modal="true" aria-labelledby="variable-popover-title" ref={dialogRef}>
       <div className="popover-arrow" />
       <div className="popover-head"><div><p className="eyebrow">Placeholder</p><h2 id="variable-popover-title">Insert variable</h2></div><Button size="sm" kind="ghost" renderIcon={Close} onClick={close} {...iconOnly('Close variable popover')} /></div>
-      <form onSubmit={handleSubmit(confirm)}>
-        <TextInput id="variable-name" labelText="Name" placeholder="customer_name" invalid={!!errors.name} invalidText={errors.name?.message} {...register('name')} />
+      <form onSubmit={handleSubmit(confirm)} autoComplete="off">
+        <TextInput id="variable-name" labelText="Name" placeholder="customer_name" invalid={!!errors.name} invalidText={errors.name?.message} aria-describedby={errors.name ? "variable-name-error" : undefined} autoComplete="off" {...register('name')} />
+        <div id="variable-name-error" className="sr-only" aria-live="polite">{errors.name?.message}</div>
         <p className="helper">Letters, digits, and underscores; 1–64 characters.</p>
         <div className="popover-actions"><Button type="button" kind="secondary" size="sm" onClick={close}>Cancel</Button><Button type="submit" kind="primary" size="sm" disabled={!isValid}>Insert Variable</Button></div>
       </form>
@@ -444,7 +445,7 @@ function LibraryView() {
           {TECHNIQUES.map((technique) => <SelectItem key={technique} value={technique} text={technique} />)}
         </Select>
       </div>
-      {filtered.length ? <div className="library-list" aria-label="Saved prompts">{filtered.map((item) => (
+      {filtered.length > 0 ? <div className="library-list" aria-label="Saved prompts" ref={parent}>{filtered.map((item) => (
         <Tile key={item.id} className="library-row">
           <div className="library-check"><Checkbox id={`select-${item.id}`} labelText={`Select ${item.title}`} hideLabel checked={selected.includes(item.id)} onChange={() => toggle(item.id)} /></div>
           <button className="library-open" onClick={() => load(item.id)}>
@@ -492,9 +493,11 @@ function SaveModal() {
       <ModalHeader title="Save to library" label="LibraryPrompt create" closeModal={close} />
       <ModalBody>
         <p className="modal-copy">Create a reusable prompt record from the current workbench state.</p>
-        <form id="save-library-form" onSubmit={handleSubmit(submit)} className="modal-form">
-          <TextInput id="save-title" labelText="Title" placeholder="Quarterly launch brief" invalid={!!errors.title} invalidText={errors.title?.message} {...register('title')} />
-          <Select id="save-technique" labelText="Technique" invalid={!!errors.technique} invalidText={errors.technique?.message} {...register('technique')}>
+        <form id="save-library-form" onSubmit={handleSubmit(submit)} className="modal-form" autoComplete="off">
+          <TextInput id="save-title" labelText="Title" placeholder="Quarterly launch brief" invalid={!!errors.title} invalidText={errors.title?.message} aria-describedby={errors.title ? "save-title-error" : undefined} autoComplete="off" {...register('title')} />
+          <div id="save-title-error" className="sr-only" aria-live="polite">{errors.title?.message}</div>
+          <Select id="save-technique" labelText="Technique" invalid={!!errors.technique} invalidText={errors.technique?.message} aria-describedby={errors.technique ? "save-technique-error" : undefined} autoComplete="off" {...register('technique')}>
+            <div id="save-technique-error" className="sr-only" aria-live="polite">{errors.technique?.message}</div>
             <SelectItem value="" text="Choose a technique" />
             {TECHNIQUES.map((technique) => <SelectItem key={technique} value={technique} text={technique} />)}
           </Select>
@@ -566,8 +569,9 @@ function ImportModal() {
     <ComposedModal open={open} onClose={close} onKeyDown={(event) => { if (event.key === 'Escape') close() }} size="sm" preventCloseOnClickOutside>
       <ModalHeader title="Import JSON package" label="PromptPackage v1" closeModal={close} />
       <ModalBody>
-        <form id="import-form" onSubmit={handleSubmit(submit)} className="modal-form">
-          <Controller name="json" control={control} render={({ field }) => <TextArea {...field} id="import-json" labelText="JSON package" rows={12} invalid={!!errors.json} invalidText={errors.json?.message} placeholder={'{\n  "schemaVersion": "prompt-package-v1",\n  ...\n}'} />} />
+        <form id="import-form" onSubmit={handleSubmit(submit)} className="modal-form" autoComplete="off">
+          <Controller name="json" control={control} render={({ field }) => <TextArea {...field} id="import-json" labelText="JSON package" rows={12} invalid={!!errors.json} invalidText={errors.json?.message} aria-describedby={errors.json ? "import-json-error" : undefined} autoComplete="off" placeholder={'{\n  "schemaVersion": "prompt-package-v1",\n  ...\n}'} />} />
+          <div id="import-json-error" className="sr-only" aria-live="polite">{errors.json?.message}</div>
           <label className="file-input"><Upload size={16} /><span>Load JSON file</span><input type="file" accept="application/json,.json" onChange={loadFile} /></label>
           <p className="helper">Import validates schemaVersion, messages, model, bindings, attachments, persona, and technique before changing the workbench.</p>
         </form>

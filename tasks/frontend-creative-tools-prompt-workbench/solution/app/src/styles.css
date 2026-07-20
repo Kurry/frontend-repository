@@ -350,3 +350,5 @@ kbd { border: 1px solid #cdd4df; border-bottom-width: 2px; border-radius: 4px; b
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
   .stream-cursor { animation: none; }
 }
+
+.response-main { position: relative; }
