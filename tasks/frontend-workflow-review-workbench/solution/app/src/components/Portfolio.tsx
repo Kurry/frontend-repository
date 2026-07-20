@@ -47,25 +47,33 @@ export default function Portfolio() {
     <main className="portfolio-shell" id="portfolio-view">
       <div className="view-heading">
         <div>
-          <Text className="eyebrow">Certification queue</Text>
+          <Text className="eyebrow">Certification Queue</Text>
           <Title order={1}>Task Bundle Portfolio</Title>
           <Text c="dimmed" mt={5}>Twelve evidence-backed tasks awaiting benchmark certification.</Text>
         </div>
-        <Badge variant="outline" size="lg" leftSection={<IconSparkles size={15} />}>Sable-4 calibration active</Badge>
+        <Badge variant="outline" size="lg" leftSection={<IconSparkles size={15} />}>Sable-4 Calibration Active</Badge>
       </div>
 
       <section className="rollup-grid" aria-label="Live portfolio rollup">
-        <Paper className="rollup-card rollup-total"><Text size="xs">TOTAL BUNDLES</Text><Text className="rollup-value">{rollup.totalBundles}</Text></Paper>
-        <Paper className="rollup-card rollup-ready"><Text size="xs">READY</Text><Text className="rollup-value">{rollup.readyCount}</Text></Paper>
-        <Paper className="rollup-card rollup-fixable"><Text size="xs">FIXABLE</Text><Text className="rollup-value">{rollup.notReadyCount}</Text></Paper>
-        <Paper className="rollup-card rollup-risk"><Text size="xs">AT RISK</Text><Text className="rollup-value">{rollup.atRiskCount}</Text></Paper>
-        <Paper className="rollup-card rollup-stop"><Text size="xs">STOP-EARLY</Text><Text className="rollup-value">{rollup.stopEarlyCount}</Text></Paper>
+        <Paper className="rollup-card rollup-total"><Text size="xs">Total Bundles</Text><Text className="rollup-value">{rollup.totalBundles}</Text></Paper>
+        <Paper className="rollup-card rollup-ready"><Text size="xs">Ready</Text><Text className="rollup-value">{rollup.readyCount}</Text></Paper>
+        <Paper className="rollup-card rollup-fixable"><Text size="xs">Fixable</Text><Text className="rollup-value">{rollup.notReadyCount}</Text></Paper>
+        <Paper className="rollup-card rollup-risk"><Text size="xs">At Risk</Text><Text className="rollup-value">{rollup.atRiskCount}</Text></Paper>
+        <Paper className="rollup-card rollup-stop"><Text size="xs">Stop-Early</Text><Text className="rollup-value">{rollup.stopEarlyCount}</Text></Paper>
       </section>
 
       <Paper className="calibration-strip" component="section" aria-labelledby="calibration-title">
         <div className="calibration-heading">
           <div><Text id="calibration-title" fw={750}>Sable-4 Trial Validity</Text><Text size="xs" c="dimmed">Valid trials / total trials by bundle</Text></div>
-          <div className="calibration-overall"><span>{rollup.sable4ValidityPercent.toFixed(1)}%</span><Text size="xs">overall validity</Text></div>
+          <div className="calibration-overall">
+            <span>{rollup.sable4ValidityPercent.toFixed(1)}%</span>
+            <Text size="xs">overall validity</Text>
+            <div className="calibration-markers" aria-label="Calibration threshold markers">
+              <span>Difficulty bar <strong>0.80</strong></span>
+              <span>Oracle bar <strong>0.90</strong></span>
+              <span>Minimum <strong>3 valid trials</strong></span>
+            </div>
+          </div>
         </div>
         <div className="calibration-cells">
           {bundles.map((bundle) => {

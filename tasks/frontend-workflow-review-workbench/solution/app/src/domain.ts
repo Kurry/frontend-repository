@@ -75,3 +75,15 @@ export function formatPercent(value: number) {
 export function safeId(prefix = 'event') {
   return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
+
+/** Deterministic ids for repeated publishes of the same gate (byte-identical re-run output). */
+export function deterministicRerunId(slug: string, gateName: string) {
+  const token = `${slug}:${gateName}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return `rerun-${token}-publish`;
+}
+
+export function deterministicTimestamp(slug: string, gateName: string, stepIndex: number) {
+  const seed = [...`${slug}|${gateName}|${stepIndex}`].reduce((sum, char) => sum + char.charCodeAt(0), 0);
+  const seconds = (seed % 50) + 10;
+  return `2026-03-15T14:22:${String(seconds).padStart(2, '0')}.000Z`;
+}
