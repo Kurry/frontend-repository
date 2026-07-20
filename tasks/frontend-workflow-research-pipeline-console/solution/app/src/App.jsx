@@ -229,8 +229,8 @@ function ResultsView() {
   const sort = usePipelineStore((s) => s.resultSort);
   const setResultSort = usePipelineStore((s) => s.setResultSort);
   const setSort = ({key,dir}) => setResultSort(key,dir);
-  const reducedMotion = useReducedMotion();
   const [tableBody, enableAnimations] = useAutoAnimate({duration:220});
+  const reducedMotion = useReducedMotion();
   useEffect(() => enableAnimations(!reducedMotion), [enableAnimations, reducedMotion]);
   const rows = useMemo(() => {
     const raw = getResultRows(trialData);
