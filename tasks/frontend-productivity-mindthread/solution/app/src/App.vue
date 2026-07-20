@@ -23,7 +23,23 @@
           >
             {{ view.label }}
           </button>
+
+          <button
+            type="button"
+            class="rounded-md px-3 py-2 text-[0.9rem] font-medium transition-colors focus-ring text-inksoft hover:bg-hoverwash hover:text-ink"
+            @click="isExportOpen = true"
+          >
+            Export
+          </button>
+          <button
+            type="button"
+            class="rounded-md px-3 py-2 text-[0.9rem] font-medium transition-colors focus-ring text-inksoft hover:bg-hoverwash hover:text-ink"
+            @click="isImportOpen = true"
+          >
+            Import
+          </button>
         </nav>
+
       </div>
     </header>
 
@@ -33,7 +49,12 @@
       <ArchivedView v-else />
     </main>
 
+
     <ToastContainer />
+    <ExportDrawer v-model:open="isExportOpen" />
+    <ImportDialog v-model:open="isImportOpen" />
+    <CommandPalette @open-export="isExportOpen = true" @open-import="isImportOpen = true" />
+
   </div>
 </template>
 
@@ -42,6 +63,17 @@ import { storeToRefs } from 'pinia'
 import ArchivedView from './components/ArchivedView.vue'
 import HomeView from './components/HomeView.vue'
 import ToastContainer from './components/ToastContainer.vue'
+
+import { ref } from 'vue'
+import ExportDrawer from './components/ExportDrawer.vue'
+import ImportDialog from './components/ImportDialog.vue'
+
+import CommandPalette from './components/CommandPalette.vue'
+
+
+const isExportOpen = ref(false)
+const isImportOpen = ref(false)
+
 import TodayView from './components/TodayView.vue'
 import { useUiStore } from './stores/uiStore'
 import type { ViewId } from './stores/uiStore'

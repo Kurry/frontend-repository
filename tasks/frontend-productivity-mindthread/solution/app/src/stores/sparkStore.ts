@@ -42,7 +42,62 @@ export interface SearchMatches {
   threads: Thread[]
 }
 
-const STORAGE_KEY = 'mindthread_data'
+
+export const SparkUpsertSchema = z.object({
+  text: z.string().trim().min(1, 'Enter a thought to add a spark').max(2000, 'text must be 1 to 2000 characters')
+})
+
+export const ThreadUpsertSchema = z.object({
+  title: z.string().trim().min(1, 'Enter a title to create a thread').max(80, 'title must be at most 80 characters')
+})
+
+export const ReflectionUpsertSchema = z.object({
+  content: z.string().trim().min(1, 'Enter some text to save the reflection')
+})
+
+export const TagAddSchema = z.string().trim().min(1).max(32, 'tag must be at most 32 characters').regex(/^[^\s\p{P}]+$/u, 'tag must omit spaces and punctuation')
+
+export const WorkspaceJSONSchema = z.object({
+  schemaVersion: z.literal('mindthread-workspace-v1', { errorMap: () => ({ message: 'schemaVersion must be mindthread-workspace-v1' }) }),
+  exportedAt: z.string().datetime(),
+  sparks: z.array(z.object({
+    id: z.string().min(1),
+    text: z.string().min(1).max(2000),
+    tags: z.array(TagAddSchema),
+    threadId: z.string().nullable(),
+    createdAt: z.number()
+  })),
+  threads: z.array(z.object({
+    id: z.string().min(1),
+    title: z.string().min(1).max(80),
+    status: z.enum(['active', 'dormant', 'resolved']),
+    pinned: z.boolean(),
+    archived: z.boolean(),
+    pinnedAt: z.number().nullable(),
+    createdAt: z.number(),
+    updatedAt: z.number()
+  })),
+  reflections: z.array(z.object({
+    id: z.string().min(1),
+    sparkId: z.string().min(1),
+    content: z.string().min(1),
+    createdAt: z.number()
+  }))
+}).refine(data => {
+  const threadIds = new Set(data.threads.map(t => t.id))
+  for (const spark of data.sparks) {
+    if (spark.threadId && !threadIds.has(spark.threadId)) return false
+  }
+  return true
+}, { message: "unresolved threadId" })
+.refine(data => {
+  const sparkIds = new Set(data.sparks.map(s => s.id))
+  for (const reflection of data.reflections) {
+    if (!sparkIds.has(reflection.sparkId)) return false
+  }
+  return true
+}, { message: "unresolved sparkId" })
+
 const STATUSES: ThreadStatus[] = ['active', 'dormant', 'resolved']
 
 let idCounter = 0
@@ -154,44 +209,9 @@ export const useSparkStore = defineStore('mindthread', () => {
   const threads = ref<Thread[]>([])
   const reflections = ref<Reflection[]>([])
 
-  function loadState() {
-    let data: unknown = null
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY)
-      if (raw) data = JSON.parse(raw)
-    } catch {
-      data = null
-    }
-    if (data && typeof data === 'object') {
-      const parsed = data as Record<string, unknown>
-      const loadedThreads = normalizeThreads(parsed.threads)
-      const threadIds = new Set(loadedThreads.map(thread => thread.id))
-      const loadedSparks = normalizeSparks(parsed.sparks, threadIds)
-      const sparkIds = new Set(loadedSparks.map(spark => spark.id))
-      threads.value = loadedThreads
-      sparks.value = loadedSparks
-      reflections.value = normalizeReflections(parsed.reflections, sparkIds)
-    }
-  }
 
-  function saveState() {
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          sparks: sparks.value,
-          threads: threads.value,
-          reflections: reflections.value,
-        }),
-      )
-    } catch {
-      // Persistence is best effort; the in-memory state stays authoritative.
-    }
-  }
 
-  loadState()
 
-  watch([sparks, threads, reflections], saveState, { deep: true })
 
   // --- Sparks ---
 
@@ -434,6 +454,13 @@ export const useSparkStore = defineStore('mindthread', () => {
         .filter(thread => thread.title.toLowerCase().includes(q))
         .sort((a, b) => b.createdAt - a.createdAt),
     }
+  }
+
+
+  function setWorkspace(data: any) {
+    sparks.value = data.sparks
+    threads.value = data.threads
+    reflections.value = data.reflections.map((r: any) => ({ ...r, text: r.content })) // map content back to text if needed based on our models
   }
 
   return {

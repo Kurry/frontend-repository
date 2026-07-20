@@ -219,7 +219,15 @@
         </template>
       </div>
     </div>
+
+    <MergeDialog
+      :isOpen="isMergeOpen"
+      :sourceId="threadId"
+      @update:open="isMergeOpen = $event"
+      @merged="handleMerged"
+    />
   </section>
+
 </template>
 
 <script setup lang="ts">
@@ -232,6 +240,18 @@ import { showToast } from '../utils/toast'
 import EmptyState from './EmptyState.vue'
 import SparkTagEditor from './SparkTagEditor.vue'
 import StatusBadge from './StatusBadge.vue'
+import MergeDialog from './MergeDialog.vue'
+
+import { ReflectionUpsertSchema } from '../stores/sparkStore'
+
+
+const isMergeOpen = ref(false)
+
+function handleMerged() {
+  showToast('Threads merged', 'success')
+  emit('close')
+}
+
 
 const props = defineProps<{
   threadId: string
@@ -294,9 +314,11 @@ function archiveThread() {
 
 // --- Reflections ---
 
+
 const reflectionSparkId = ref<string | null>(null)
 const reflectionText = ref('')
-const reflectionError = ref(false)
+const reflectionError = ref('')
+
 const reflectionArea = ref<HTMLTextAreaElement[] | HTMLTextAreaElement | null>(null)
 
 function openReflectionForm(sparkId: string) {
@@ -326,7 +348,7 @@ function saveReflection(sparkId: string) {
 function cancelReflection() {
   reflectionSparkId.value = null
   reflectionText.value = ''
-  reflectionError.value = false
+  reflectionError.value = ''
 }
 
 // --- Merge ---

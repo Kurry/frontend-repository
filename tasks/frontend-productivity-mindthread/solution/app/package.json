@@ -10,12 +10,22 @@
     "verify:build": "vite build"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.10.0",
+    "@phosphor-icons/vue": "^2.2.1",
     "@tanstack/vue-virtual": "3.13.31",
+    "@tiptap/starter-kit": "^3.28.0",
+    "@tiptap/vue-3": "^3.28.0",
+    "@vueuse/motion": "^3.0.3",
     "pinia": "3.0.4",
-    "vue": "3.5.39"
+    "reka-ui": "^2.10.1",
+    "vee-validate": "^4.15.1",
+    "vue": "3.5.39",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "@vitejs/plugin-vue": "6.0.7",
+    "playwright": "^1.61.1",
     "typescript": "6.0.3",
     "unocss": "66.7.5",
     "vite": "8.1.4",
