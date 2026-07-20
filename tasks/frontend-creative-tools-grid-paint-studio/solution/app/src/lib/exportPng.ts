@@ -43,6 +43,12 @@ export function renderBrandedCanvas(cells: CellValue[][], cellPx: number): HTMLC
   return merged;
 }
 
+// A lightweight data URL of the board artwork only (no footer) for the live
+// Export center PNG preview. Cheap enough to regenerate on store changes.
+export function renderBoardDataUrl(cells: CellValue[][], cellPx: number): string {
+  return renderBoardCanvas(cells, cellPx).toDataURL('image/png');
+}
+
 export function brandedPngBlob(cells: CellValue[][], cellPx: number): Promise<Blob | null> {
   return new Promise(resolve => renderBrandedCanvas(cells, cellPx).toBlob(resolve, 'image/png'));
 }

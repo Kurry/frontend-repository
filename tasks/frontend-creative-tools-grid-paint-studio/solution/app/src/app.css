@@ -4,20 +4,120 @@
   --color-primary: #0000FF;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   overflow: hidden;
+  overflow-x: hidden;
+}
+
+/* A strong, always-visible keyboard focus indicator on every interactive
+   control — wins over any per-element `focus:outline-none` so nothing in the
+   tab order is left without a discernible focus ring (accessibility 1.1/1.n2). */
+:where(button, a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid #93c5fd !important;
+  outline-offset: 2px !important;
+  border-radius: 4px;
 }
 
 .typewriter {
+  display: inline-block;
   overflow: hidden;
   white-space: nowrap;
-  animation: typing 2s steps(40, end);
+  animation: typing 2s steps(24, end);
 }
 
 @keyframes typing {
-  from { width: 0 }
-  to { width: 100% }
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+/* Gallery card entrance (motion 8.6 enter). The exit is handled by list
+   reflow; a CSS entrance avoids putting a Svelte transition on the keyed
+   each-item root, which interferes with the cards' interactive controls. */
+.gp-card {
+  animation: gpCardIn 240ms ease both;
+}
+@keyframes gpCardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Camera capture overlay fade in / out (motion 8.5). */
+.gp-fade-in {
+  animation: gpFadeIn 200ms ease both;
+}
+.gp-fade-out {
+  animation: gpFadeOut 200ms ease both;
+}
+@keyframes gpFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes gpFadeOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.97); }
+}
+
+/* Narrow / touch viewports: dock the toolbar as a fixed, internally-scrollable
+   top panel; let the page scroll vertically so every control is reachable and
+   nothing clips horizontally; keep the histogram in flow; hide the versions
+   rail (desktop-only iteration surface). */
+@media (max-width: 768px) {
+  body {
+    overflow-y: auto;
+  }
+  .gp-app {
+    height: auto;
+    min-height: 100vh;
+  }
+  .gp-toolbar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    max-height: 46vh;
+    overflow-y: auto;
+    border-radius: 0;
+    z-index: 60;
+  }
+  .gp-app > header {
+    padding-top: calc(46vh + 0.75rem);
+  }
+  .gp-stage-wrap {
+    flex-direction: column;
+    overflow: visible;
+  }
+  .gp-histogram {
+    position: static;
+    width: calc(100% - 1rem);
+    margin: 0.5rem;
+    height: 8rem;
+  }
+  .gp-versions {
+    display: none;
+  }
+}
+
+/* Respect reduced motion: drop enter/exit, histogram easing, and the
+   typewriter sweep so state changes apply instantly (motion 8.11). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .typewriter {
+    width: 100%;
+  }
 }

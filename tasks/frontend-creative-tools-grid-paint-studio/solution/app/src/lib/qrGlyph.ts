@@ -57,11 +57,16 @@ export function qrGlyphColors(swatch: string): { fg: string; bg: string } {
   };
 }
 
-export function drawQrCell(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, swatch: string) {
+// Cache a fully-composited glyph canvas per (fg, bg, width, height) so a
+// pointer-drag stroke that redraws the whole board only does a cheap
+// drawImage per QR cell instead of re-allocating + re-compositing each one.
+const glyphCache = new Map<string, HTMLCanvasElement>();
+
+function getGlyph(fg: string, bg: string, w: number, h: number): HTMLCanvasElement {
+  const key = `${fg}|${bg}|${w}|${h}`;
+  const hit = glyphCache.get(key);
+  if (hit) return hit;
   const mask = getQrMask();
-  const { fg, bg } = qrGlyphColors(swatch);
-  const w = Math.max(1, Math.round(size));
-  const h = Math.max(1, Math.round(size));
   const tmp = document.createElement('canvas');
   tmp.width = w;
   tmp.height = h;
@@ -74,7 +79,19 @@ export function drawQrCell(ctx: CanvasRenderingContext2D, x: number, y: number, 
   t.globalCompositeOperation = 'destination-over';
   t.fillStyle = bg;
   t.fillRect(0, 0, w, h);
-  ctx.drawImage(tmp, x, y);
+  glyphCache.set(key, tmp);
+  if (glyphCache.size > 512) {
+    const first = glyphCache.keys().next().value;
+    if (first) glyphCache.delete(first);
+  }
+  return tmp;
+}
+
+export function drawQrCell(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, swatch: string) {
+  const { fg, bg } = qrGlyphColors(swatch);
+  const w = Math.max(1, Math.round(size));
+  const h = Math.max(1, Math.round(size));
+  ctx.drawImage(getGlyph(fg, bg, w, h), x, y);
 }
 
 export function drawCell(ctx: CanvasRenderingContext2D, cell: CellValue, x: number, y: number, size: number) {
