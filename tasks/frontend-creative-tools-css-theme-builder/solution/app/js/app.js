@@ -443,7 +443,13 @@ function createTheme(rawName) {
 function removeThemeById(id, { animate = true } = {}) {
   const target = state.customs.find((t) => t.id === id);
   if (!target) {
-    toast("Built-in themes can't be removed — duplicate one to customize it.");
+    // Distinguish "that's a built-in" from "that id doesn't exist (already
+    // removed or stale)" — the two need different explanations.
+    if (state.builtins.some((t) => t.id === id)) {
+      toast("Built-in themes can't be removed — duplicate one to customize it.");
+    } else {
+      toast("Theme not found — it may have already been removed.");
+    }
     return;
   }
   pushHistory("remove");
@@ -888,7 +894,10 @@ function seedFromPayload(decoded) {
     default: false,
     prefersdark: false,
   });
-  theme.baseline = { ...valid };
+  // Baseline must be the normalized record (all-#RRGGBB) — not the raw
+  // payload, whose colors may still be oklch(...) — or Reset would re-apply
+  // non-hex colors and break the storage contract.
+  theme.baseline = serializeTheme(theme);
   state.customs.unshift(theme);
   return theme;
 }
