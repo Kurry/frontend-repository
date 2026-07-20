@@ -68,9 +68,11 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
         label: theme.name,
         group: 'Saved themes',
         keywords: `${theme.name} saved theme load`,
-        run: closeAfter(() => {
-          // Mirror the Saved Themes card guard: reloading the already-active
-          // theme while it has unsaved edits would silently discard them.
+        // Mirror the Saved Themes card guard: reloading the already-active
+        // theme while it has unsaved edits would silently discard them. When
+        // the guard fires, keep the palette open (no onClose) so focus stays
+        // put for another choice instead of Enter looking like a no-op.
+        run: () => {
           if (theme.id === activeId && dirty) {
             dispatch(announce(`${theme.name} is already loaded — save or undo your unsaved changes first`));
             return;
@@ -78,7 +80,8 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
           dispatch(loadTheme(theme.id));
           dispatch(setTab('preview'));
           dispatch(announce(`Theme ${theme.name} loaded`));
-        }),
+          onClose();
+        },
       })),
       ...[
         ['instructions', 'Instructions'],
