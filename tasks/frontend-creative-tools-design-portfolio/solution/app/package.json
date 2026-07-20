@@ -2,8 +2,8 @@
   "name": "oracle-static",
   "private": true,
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "start": "npx --yes serve -l 3000 -n",
+    "verify:build": "node -e \"require('fs').accessSync('index.html')\""
   },
   "dependencies": {
     "serve": "14.2.4"

@@ -411,6 +411,25 @@
   ];
 
   async function runBoot() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      terminal.classList.remove("booting");
+      asciiNameEl.textContent = ASCII_NAME;
+      scalePixelRocket();
+      cmdInput.focus();
+      resetIdleTimer();
+
+      const routeCmd = document.body.dataset.route;
+      if (routeCmd) executeCommand(routeCmd);
+
+      if (!window.memory_cookie_consent) showConsentBanner();
+
+      const autoCmd = window.memory_autoCommand;
+      if (autoCmd) {
+        window.memory_autoCommand = null;
+        executeCommand(autoCmd);
+      }
+      return;
+    }
     // Check if we're on a deep-link route (e.g. /about, /work)
     const routeCmd = document.body.dataset.route;
     const isDeepLink = routeCmd && routeCmd.length > 0;
@@ -468,15 +487,15 @@
     resetIdleTimer();
 
     // Show cookie consent banner if not yet decided
-    if (!localStorage.getItem('cookie_consent')) {
+    if (!window.memory_cookie_consent) {
       await sleep(600);
       showConsentBanner();
     }
 
     // Auto-run command from 404 redirect
-    const autoCmd = sessionStorage.getItem('autoCommand');
+    const autoCmd = window.memory_autoCommand;
     if (autoCmd) {
-      sessionStorage.removeItem('autoCommand');
+      window.memory_autoCommand = null;
       await sleep(400);
       executeCommand(autoCmd);
     }
@@ -510,7 +529,7 @@
 
     document.getElementById('consentAccept').addEventListener('click', (e) => {
       e.preventDefault();
-      localStorage.setItem('cookie_consent', 'granted');
+      window.memory_cookie_consent = 'granted';
       // No GA/GTM in this static demo — guard so Accept never throws.
       if (typeof gtag === 'function') {
         gtag('consent', 'update', { analytics_storage: 'granted' });
@@ -521,7 +540,7 @@
 
     document.getElementById('consentDecline').addEventListener('click', (e) => {
       e.preventDefault();
-      localStorage.setItem('cookie_consent', 'denied');
+      window.memory_cookie_consent = 'denied';
       banner.innerHTML = '<div class="output-line dim" style="font-style:italic">  <span class="accent" style="opacity:0.7">[system]</span> Analytics cookies declined. No tracking cookies will be used.</div>';
       setTimeout(() => banner.remove(), 3000);
     });
@@ -1187,7 +1206,7 @@
   }
 
   function cmdPrivacy() {
-    const consent = localStorage.getItem('cookie_consent');
+    const consent = window.memory_cookie_consent;
     const status = consent === 'granted' ? 'accepted' : consent === 'denied' ? 'declined' : 'not set';
     return [
       { text: 'Privacy Policy', cls: 'heading' },
@@ -1420,9 +1439,9 @@
     `;
     // Animate progress bar
     setTimeout(() => {
-      const bar = document.getElementById('hireProgress');
-      const done = document.getElementById('hireDone');
-      const hint = document.getElementById('hireHint');
+      const bar = container.querySelector('#hireProgress');
+      const done = container.querySelector('#hireDone');
+      const hint = container.querySelector('#hireHint');
       if (!bar) return;
       let pct = 0;
       const iv = setInterval(() => {
@@ -1643,6 +1662,7 @@
   // ============ MATRIX RAIN ============
 
   function runMatrixRain() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
     const canvas = document.getElementById('matrixCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -1689,6 +1709,7 @@
   // ============ CONFETTI ============
 
   function runConfetti() {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
     const canvas = document.getElementById('confettiCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -1795,6 +1816,7 @@
   // ============ COMMAND EXECUTION ============
 
   function applyStaggerAnimation(container) {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { return; }
     const selectors = '.output-line, .project-card, .client-item, .skill-bar';
     const children = container.querySelectorAll(selectors);
     let index = 0;
