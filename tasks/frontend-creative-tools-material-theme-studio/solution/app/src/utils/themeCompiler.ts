@@ -100,13 +100,27 @@ export function parseEditorSource(src: string, defaultThemeOptions: ThemeOptions
 
   if (typeMatch) o.palette.type = typeMatch[1] as 'light'|'dark';
 
-  const paletteIntents = ['primary', 'secondary', 'error', 'warning', 'info', 'success'] as const;
-  const colorChannels = ['main', 'light', 'dark', 'contrastText'] as const;
-  for (const intent of paletteIntents) {
-    const block = decl.match(new RegExp(`${intent}:\\s*\\{([^}]*)\\}`))?.[1];
+  // Static literal patterns (never built from interpolated strings) for the
+  // fixed intent/channel vocabulary.
+  const intentBlockPatterns = {
+    primary: /primary:\s*\{([^}]*)\}/,
+    secondary: /secondary:\s*\{([^}]*)\}/,
+    error: /error:\s*\{([^}]*)\}/,
+    warning: /warning:\s*\{([^}]*)\}/,
+    info: /info:\s*\{([^}]*)\}/,
+    success: /success:\s*\{([^}]*)\}/,
+  } as const;
+  const channelPatterns = {
+    main: /main:\s*['"]([^'"]+)['"]/,
+    light: /light:\s*['"]([^'"]+)['"]/,
+    dark: /dark:\s*['"]([^'"]+)['"]/,
+    contrastText: /contrastText:\s*['"]([^'"]+)['"]/,
+  } as const;
+  for (const intent of Object.keys(intentBlockPatterns) as (keyof typeof intentBlockPatterns)[]) {
+    const block = decl.match(intentBlockPatterns[intent])?.[1];
     if (!block) throw new Error(`palette.${intent} is required`);
-    for (const channel of colorChannels) {
-      const value = block.match(new RegExp(`${channel}:\\s*['\"]([^'\"]+)['\"]`))?.[1];
+    for (const channel of Object.keys(channelPatterns) as (keyof typeof channelPatterns)[]) {
+      const value = block.match(channelPatterns[channel])?.[1];
       if (!value || !/^#[0-9a-fA-F]{6}$/.test(value)) {
         throw new Error(`palette.${intent}.${channel} must be #RRGGBB`);
       }
