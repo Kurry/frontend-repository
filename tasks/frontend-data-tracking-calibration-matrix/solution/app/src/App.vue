@@ -15,6 +15,9 @@ useECharts([CanvasRenderer, BarChart, GridComponent, TooltipComponent])
 
 const store = useCalibrationStore()
 const lastCellTrigger = ref(null)
+const lastOverlayTrigger = ref(null)
+const exportTrigger = ref(null)
+const paletteTrigger = ref(null)
 const drawerRef = ref(null)
 const paletteQuery = ref('')
 const copied = ref(false)
@@ -34,6 +37,7 @@ const {
   meta: triageMeta,
   resetForm: resetTriageForm,
   validate: validateTriage,
+  setFieldError: setTriageFieldError,
 } = useForm({ validationSchema: toTypedSchema(classificationSchema), initialValues: { task: '', classification: '', rationale: '' } })
 
 const [taskField, taskAttrs] = defineTriageField('task', { validateOnModelUpdate: true })
@@ -60,7 +64,7 @@ const navItems = [
 
 const commands = computed(() => [
   ...navItems.map((item) => ({ ...item, hint: 'Go to view', run: () => store.goTo(item.value) })),
-  { value: 'export', label: 'Export calibration pack', icon: 'mdi-export-variant', hint: 'Open JSON and CSV', run: () => store.openExport() },
+  { value: 'export', label: 'Export calibration pack', icon: 'mdi-export-variant', hint: 'Open JSON and CSV', run: () => openExport() },
   { value: 'clear-filters', label: 'Clear all filters', icon: 'mdi-filter-off-outline', hint: 'Restore full dataset', run: () => store.clearFilters() },
   { value: 'pin-baseline', label: 'Pin baseline', icon: 'mdi-pin-outline', hint: 'Snapshot live cell means', run: () => store.pinBaseline() },
 ])
@@ -183,7 +187,13 @@ async function submitTriage() {
   const result = triageMode.value === 'bulk'
     ? store.bulkClassify([...store.selectedVarianceTasks], values.classification, values.rationale)
     : store.classify(values)
-  if (result.ok) triageOpen.value = false
+  if (result.ok) {
+    triageOpen.value = false
+  } else {
+    const msg = result.message || (result.error && result.error.issues ? result.error.issues[0].message : 'Classification failed');
+    const field = result.field || (result.error && result.error.issues ? result.error.issues[0].path[0] : 'task');
+    setTriageFieldError(field, msg);
+  }
 }
 
 function closeTriage() {
@@ -198,6 +208,34 @@ function finishThreshold() {
   if (thresholdCommitTimer) window.clearTimeout(thresholdCommitTimer)
   thresholdCommitTimer = null
   store.finishThresholdEdit()
+}
+
+function triggerElement(candidate) {
+  const element = candidate?.$el || candidate
+  if (!(element instanceof HTMLElement) || element === document.body || element === document.documentElement || element.closest('.palette-dialog')) return null
+  return element
+}
+
+function rememberOverlayTrigger(event, fallback) {
+  lastOverlayTrigger.value = triggerElement(event?.currentTarget) || triggerElement(document.activeElement) || triggerElement(fallback)
+}
+
+function openExport(event) {
+  rememberOverlayTrigger(event, exportTrigger.value)
+  store.openExport()
+}
+
+function openPalette(event) {
+  rememberOverlayTrigger(event, paletteTrigger.value)
+  store.ui.paletteOpen = true
+}
+
+function closeOverlay(kind) {
+  if (kind === 'palette') store.ui.paletteOpen = false
+  else store.ui.exportOpen = false
+  const trigger = lastOverlayTrigger.value
+  lastOverlayTrigger.value = null
+  nextTick(() => trigger?.focus?.())
 }
 
 function onThresholdUpdate(value) {
@@ -309,7 +347,11 @@ async function submitImport() {
 function onGlobalKeydown(event) {
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
     event.preventDefault()
-    store.ui.paletteOpen = true
+    openPalette(event)
+    return
+  }
+  if ((store.ui.exportOpen || store.ui.paletteOpen) && ['Escape', 'Tab'].includes(event.key)) {
+    trapDrawerFocus(event)
     return
   }
   if (event.key === 'Escape') {
@@ -329,13 +371,27 @@ function onGlobalKeydown(event) {
 }
 
 function trapDrawerFocus(event) {
-  if (event.key !== 'Tab' || !store.ui.cellDrawerOpen) return
-  const root = drawerRef.value?.$el || drawerRef.value
-  const focusable = root?.querySelectorAll?.('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
-  if (!focusable?.length) return
+  if (event.key === 'Escape') {
+    event.preventDefault()
+    if (store.ui.paletteOpen) closeOverlay('palette')
+    else if (store.ui.exportOpen) closeOverlay('export')
+    else if (store.ui.cellDrawerOpen) closeCell()
+    return
+  }
+  if (event.key !== 'Tab') return
+  let root = null
+  if (store.ui.paletteOpen) root = document.querySelector('.palette-dialog')
+  else if (store.ui.exportOpen) root = document.querySelector('.export-drawer')
+  else if (store.ui.cellDrawerOpen) root = drawerRef.value?.$el || drawerRef.value
+  if (!root) return
+  const focusable = root.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')
+  if (!focusable.length) return
   const first = focusable[0]
   const last = focusable[focusable.length - 1]
-  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+  if (!root.contains(document.activeElement)) {
+    event.preventDefault()
+    ;(event.shiftKey ? last : first).focus()
+  } else if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
   else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
 }
 
@@ -379,8 +435,8 @@ onBeforeUnmount(() => {
           <template #activator="{ props }"><v-btn v-bind="props" icon="mdi-redo-variant" variant="text" size="small" :disabled="!store.canRedo" aria-label="Redo" @click="store.redo" /></template>
         </v-tooltip>
         <v-btn class="toolbar-button" prepend-icon="mdi-import" variant="tonal" size="small" @click="openImport">Import</v-btn>
-        <v-btn class="toolbar-button" prepend-icon="mdi-export-variant" color="primary" size="small" @click="store.openExport()">Export</v-btn>
-        <button class="command-key" aria-label="Open command palette" @click="store.ui.paletteOpen = true"><v-icon icon="mdi-magnify" size="17" /> <span>⌘ K</span></button>
+        <v-btn ref="exportTrigger" class="toolbar-button" prepend-icon="mdi-export-variant" color="primary" size="small" @click="openExport">Export</v-btn>
+        <button ref="paletteTrigger" class="command-key" aria-label="Open command palette" @click="openPalette"><v-icon icon="mdi-magnify" size="17" /> <span>⌘ K</span></button>
       </div>
     </header>
 
@@ -525,7 +581,7 @@ onBeforeUnmount(() => {
 
         <article class="panel-card variance-card">
           <div class="panel-heading"><div><p class="section-label">TASK AGREEMENT</p><h3>Per-task variance</h3></div><span class="subtle-note">CV across {{ store.activeHarnesses.length }} harnesses</span></div>
-          <div v-if="store.varianceRows.length && store.activeHarnesses.length" class="variance-table-scroll">
+          <div v-if="store.varianceRows.length && store.activeHarnesses.length && store.activeModels.length" class="variance-table-scroll">
             <table class="variance-table">
               <thead><tr><th class="check-col"><span class="sr-only">Select</span></th><th>Task</th><th>Category</th><th v-for="harness in store.activeHarnesses" :key="harness">{{ harness }}</th><th>CV</th><th>Status</th><th>Triage</th><th></th></tr></thead>
               <tbody>
@@ -542,6 +598,7 @@ onBeforeUnmount(() => {
               </tbody>
             </table>
           </div>
+          <div v-else-if="store.varianceRows.length && !store.activeModels.length" class="empty-state"><v-icon icon="mdi-database-search-outline" size="38" /><h4>No models match the current filters</h4><p>Tasks remain available, but the selected model filter has no matches.</p><v-btn color="primary" @click="store.clearFilters">Clear filters</v-btn></div>
           <div v-else class="empty-state"><v-icon icon="mdi-chart-bell-curve-cumulative" size="38" /><h4>No variance rows to calculate</h4><p>No tasks or harnesses match the current filter set.</p><v-btn color="primary" @click="store.clearFilters">Clear filters</v-btn></div>
         </article>
 
@@ -596,8 +653,10 @@ onBeforeUnmount(() => {
           <section class="drawer-section"><div class="drawer-section-title"><h3>Reward distribution</h3><span>0–1 scale</span></div><div class="distribution-chart"><VChart autoresize :option="distributionOption" /></div></section>
           <section v-if="selectedRun && ['queued', 'running'].includes(selectedRun.status)" class="run-progress">
             <div class="drawer-section-title"><h3>Re-run progress</h3><span class="run-status">{{ selectedRun.status }}</span></div>
-            <div v-if="selectedRun.status === 'queued'" class="queue-message"><v-progress-circular indeterminate size="18" width="2" />Preparing trial workers…</div>
-            <div v-else class="progress-list"><div v-for="item in selectedRun.progress" :key="item.id" :class="{ done: item.complete }"><v-icon :icon="item.complete ? 'mdi-check-circle' : 'mdi-circle-outline'" size="17" /><span>{{ item.id }}</span><b>{{ item.complete ? 'complete' : 'running' }}</b></div></div>
+            <transition name="fade" mode="out-in">
+              <div v-if="selectedRun.status === 'queued'" class="queue-message"><v-progress-circular indeterminate size="18" width="2" />Preparing trial workers…</div>
+              <div v-else class="progress-list"><div v-for="item in selectedRun.progress" :key="item.id" :class="{ done: item.complete }"><v-icon :icon="item.complete ? 'mdi-check-circle' : 'mdi-circle-outline'" size="17" /><span>{{ item.id }}</span><b>{{ item.complete ? 'complete' : 'running' }}</b></div></div>
+            </transition>
           </section>
           <section class="drawer-section"><div class="drawer-section-title"><h3>Trial ledger</h3><span>{{ store.selectedCell.trials.length }} records</span></div>
             <div class="trial-table-wrap"><table class="trial-table"><thead><tr><th>Trial id</th><th>Reward</th><th>Runtime</th><th>Cost</th></tr></thead><tbody><tr v-for="trial in store.selectedCell.trials" :key="trial.id"><td>{{ trial.id }}</td><td>{{ trial.reward.toFixed(3) }}</td><td>{{ trial.runtime.toFixed(2) }}s</td><td>${{ trial.cost.toFixed(4) }}</td></tr></tbody></table></div>
@@ -607,8 +666,8 @@ onBeforeUnmount(() => {
       </template>
     </v-navigation-drawer>
 
-    <v-navigation-drawer :model-value="store.ui.exportOpen" temporary location="end" width="700" class="export-drawer" @update:model-value="$event ? null : store.ui.exportOpen = false">
-      <div class="drawer-head export-head"><div><p class="section-label">SESSION ARTIFACT</p><h2>Export calibration pack</h2><span>Live, schema-validated session state</span></div><div class="export-head-tools"><span class="schema-badge">schemaVersion 1</span><v-btn icon="mdi-close" variant="text" aria-label="Close export drawer" @click="store.ui.exportOpen = false" /></div></div>
+    <v-navigation-drawer :model-value="store.ui.exportOpen" temporary location="end" width="700" class="export-drawer" @update:model-value="$event ? null : closeOverlay('export')">
+      <div class="drawer-head export-head"><div><p class="section-label">SESSION ARTIFACT</p><h2>Export calibration pack</h2><span>Live, schema-validated session state</span></div><div class="export-head-tools"><span class="schema-badge">schemaVersion 1</span><v-btn icon="mdi-close" variant="text" aria-label="Close export drawer" @click="closeOverlay('export')" /></div></div>
       <div class="export-summary"><div><span>Cells</span><strong>{{ store.calibrationPack.cells.length }}</strong></div><div><span>Divergent</span><strong>{{ store.divergentCount }}</strong></div><div><span>Classified</span><strong>{{ store.calibrationPack.triage.length }}</strong></div><div><span>Events</span><strong>{{ store.timeline.length }}</strong></div></div>
       <v-tabs v-model="store.ui.exportTab" color="primary" grow><v-tab value="json">JSON</v-tab><v-tab value="csv">CSV</v-tab></v-tabs>
       <div class="export-preview">
@@ -617,7 +676,7 @@ onBeforeUnmount(() => {
       </div>
       <div class="export-footer">
         <span class="live-compiled"><i></i> Compiled live from Pinia</span>
-        <div><v-btn variant="text" :prepend-icon="copied ? 'mdi-check' : 'mdi-content-copy'" @click="copyActive">{{ copied ? 'Copied' : 'Copy' }}</v-btn><v-btn color="primary" prepend-icon="mdi-download" @click="downloadActive">Download {{ store.ui.exportTab.toUpperCase() }}</v-btn></div>
+        <div><v-btn variant="text" :prepend-icon="copied ? 'mdi-check' : 'mdi-content-copy'" @click="copyActive">{{ copied ? `Copied ${store.ui.exportTab.toUpperCase()}` : 'Copy' }}</v-btn><v-btn color="primary" prepend-icon="mdi-download" @click="downloadActive">Download {{ store.ui.exportTab.toUpperCase() }}</v-btn></div>
       </div>
     </v-navigation-drawer>
 
@@ -653,7 +712,7 @@ onBeforeUnmount(() => {
       </form>
     </v-dialog>
 
-    <v-dialog :model-value="store.ui.paletteOpen" max-width="620" class="palette-dialog" @update:model-value="store.ui.paletteOpen = $event">
+    <v-dialog :model-value="store.ui.paletteOpen" max-width="620" class="palette-dialog" @update:model-value="$event ? null : closeOverlay('palette')">
       <div class="palette-card">
         <div class="palette-search"><v-icon icon="mdi-magnify" /><input v-model="paletteQuery" autofocus placeholder="Type a command…" aria-label="Search commands"><kbd>Esc</kbd></div>
         <div class="command-list">
