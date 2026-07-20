@@ -42,7 +42,7 @@ body { min-width: 320px; overflow-x: hidden; background: radial-gradient(circle 
 button, input, textarea { font: inherit; }
 button { color: inherit; }
 button, a, [tabindex] { -webkit-tap-highlight-color: transparent; }
-button:focus-visible, input:focus-visible, textarea:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--mint); outline-offset: 2px; }
 
 .app-shell { min-height: 100vh; }
 .app-header {
@@ -214,7 +214,7 @@ h1, h2, h3, p { margin-top: 0; }
 .modal-card > .n-card__content { padding: 0 !important; }
 .modal-heading { display: flex; gap: 14px; padding: 20px 22px; border-bottom: 1px solid var(--line); }.modal-heading .eyebrow { margin-bottom: 4px; }.modal-heading h2 { margin: 0 0 5px; font-size: 21px; }.modal-heading p:last-child { color: var(--muted); margin: 0; font-size: 10px; }
 .modal-icon { flex: 0 0 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; }.modal-icon svg { width: 18px; }.blocker-icon { color: var(--coral); background: rgba(255,120,111,.12); }.revision-icon { color: var(--amber); background: rgba(245,184,93,.12); }.override-icon { color: var(--purple); background: rgba(173,142,244,.12); }
-.review-form { padding: 20px 22px; display: grid; gap: 8px; }.form-field { display: grid; gap: 7px; }.form-field > span { display: flex; justify-content: space-between; color: #a6b3ad; font-size: 10px; font-weight: 650; }.form-field b, .form-field i { color: #68766f; font-size: 8px; font-style: normal; text-transform: uppercase; letter-spacing: .06em; }.form-field.invalid > span { color: #ff918a; }.form-field.invalid .n-input, .form-field.invalid .n-base-selection { box-shadow: 0 0 0 1px rgba(255,120,111,.7); }.field-error { color: #ff918a; margin: 0 0 5px; font-size: 9px; }.modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 12px; padding-top: 16px; border-top: 1px solid var(--line-soft); }
+.review-form { padding: 20px 22px; display: grid; gap: 8px; }.form-field { display: grid; gap: 7px; }.form-field > span, .form-field > label { display: flex; justify-content: space-between; color: #a6b3ad; font-size: 10px; font-weight: 650; }.form-field b, .form-field i { color: #68766f; font-size: 8px; font-style: normal; text-transform: uppercase; letter-spacing: .06em; }.form-field.invalid > span, .form-field.invalid > label { color: #ff918a; }.form-field.invalid .n-input, .form-field.invalid .n-base-selection, .form-field.invalid .filter-select { box-shadow: 0 0 0 1px rgba(255,120,111,.7); }.field-error { color: #ff918a; margin: 0 0 5px; font-size: 9px; }.modal-actions { display: flex; justify-content: flex-end; gap: 9px; margin-top: 12px; padding-top: 16px; border-top: 1px solid var(--line-soft); }
 
 /* Drawer */
 .contributor-drawer .n-drawer-header__main { width: 100%; }.drawer-kicker { color: #84938c; text-transform: uppercase; letter-spacing: .13em; font-size: 9px; }
@@ -290,4 +290,101 @@ h1, h2, h3, p { margin-top: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
+
+/* Animations & Transitions */
+.gate-banner {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.bar-fill {
+  transition: width 0.3s ease;
+}
+
+.finding-list-enter-active,
+.finding-list-leave-active {
+  transition: all 0.3s ease;
+}
+.finding-list-enter-from,
+.finding-list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.bulk-reveal-enter-active,
+.bulk-reveal-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+.bulk-reveal-enter-from,
+.bulk-reveal-leave-to {
+  height: 0;
+  opacity: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+.bulk-reveal-enter-to,
+.bulk-reveal-leave-from {
+  /* Height is driven by the Transition's JS hooks (see QueueView.vue), which
+     measure the bar's actual scrollHeight so the reveal doesn't clip or jump
+     when the bar stacks taller on narrow viewports. */
+  opacity: 1;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.finding-evidence svg {
+  transition: transform 0.2s ease;
+}
+.finding-evidence[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.disclosure-enter-active,
+.disclosure-leave-active {
+  transition: max-height 0.3s ease, opacity 0.3s ease, margin 0.3s ease;
+  overflow: hidden;
+}
+.disclosure-enter-from,
+.disclosure-leave-to {
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+}
+.disclosure-enter-to,
+.disclosure-leave-from {
+  max-height: 150px;
+  opacity: 1;
+  margin-top: 8px; /* Original margin-top */
+}
+
+@media (max-width: 768px) {
+  .global-undo button,
+  .primary-controls button,
+  .bulk-actions button,
+  .modal-actions button,
+  .palette-results button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+.filter-select {
+  background-color: var(--n-color);
+  color: var(--n-text-color);
+  border: 1px solid var(--n-border-color);
+  border-radius: var(--n-border-radius);
+  padding: 4px 8px;
+  font-size: 14px;
 }

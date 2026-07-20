@@ -38,6 +38,9 @@ yarn-error.log*
 start.log
 start_output.log
 
+# Local dev server output (e.g. `vite --host` startup logs)
+server*.log
+
 # OS / editor
 .DS_Store
 .cursor/*
