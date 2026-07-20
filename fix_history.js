@@ -1,0 +1,8 @@
+const fs = require('fs');
+let code = fs.readFileSync('tasks/frontend-productivity-semantic-search/solution/app/src/App.jsx', 'utf8');
+
+code = code.replace(/<Button hasIconOnly size="sm" kind="ghost" renderIcon=\{TrashCan\} iconDescription=\{`Delete \$\{selected\} selected`\} onClick=\{confirmDelete\} \/><Button hasIconOnly size="sm" kind="ghost" renderIcon=\{Close\} iconDescription="Clear selection" onClick=\{\(\) => useAppStore\.setState\(\{ selectedHistory: \[\] \}\)\} \/>/, '<Button size="sm" kind="ghost" renderIcon={TrashCan} onClick={confirmDelete}>Delete selected</Button><Button size="sm" kind="ghost" renderIcon={Close} onClick={() => useAppStore.setState({ selectedHistory: [] })}>Clear selection</Button>');
+
+code = code.replace(/<Button hasIconOnly size="sm" kind="ghost" renderIcon=\{WarningAlt\} iconDescription="Mark selected stale" onClick=\{\(\) => state\.markStale\(state\.selectedDocuments\)\} \/><Button hasIconOnly size="sm" kind="ghost" renderIcon=\{TrashCan\} iconDescription=\{`Delete \$\{selected\} selected documents`\} onClick=\{\(\) => window\.confirm\(`Delete \$\{selected\} selected document\$\{selected === 1 \? '' : 's'\}\?`\) && state\.deleteDocuments\(state\.selectedDocuments\)\} \/>/, '<Button size="sm" kind="ghost" renderIcon={WarningAlt} onClick={() => state.markStale(state.selectedDocuments)}>Mark stale</Button><Button size="sm" kind="ghost" renderIcon={TrashCan} onClick={() => window.confirm(`Delete ${selected} selected document${selected === 1 ? \'\' : \'s\'}?`) && state.deleteDocuments(state.selectedDocuments)}>Delete selected</Button>');
+
+fs.writeFileSync('tasks/frontend-productivity-semantic-search/solution/app/src/App.jsx', code);

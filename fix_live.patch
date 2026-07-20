@@ -1,0 +1,10 @@
+--- tasks/frontend-productivity-semantic-search/solution/app/src/App.jsx
++++ tasks/frontend-productivity-semantic-search/solution/app/src/App.jsx
+@@ -310,7 +310,7 @@
+       if(args.kind==='similarity-threshold'){const value=Number(args.value);if(value<0||value>1||!Number.isInteger(value*20))throw new Error('similarity-threshold must be 0.0-1.0 in 0.05 increments');state.setThreshold(value)}
+       else if(args.kind==='group-by-topic')state.setGrouped(!!args.value)
+       else if(args.kind==='timeline-status')useAppStore.setState({timelineFilter:args.value})
+       else if(['tag','type','before'].includes(args.kind))state.runQuery(`${state.activeQuery} ${state.filters.map((f)=>`${f.kind}:${f.value}`).join(' ')} ${args.kind}:${args.value}`)
+-      return {resultCount:state.getVisible().items.length}
++      return {resultCount:useAppStore.getState().getVisible().items.length}
+     }

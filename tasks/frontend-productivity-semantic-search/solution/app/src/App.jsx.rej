@@ -1,0 +1,8 @@
+--- App.jsx
++++ App.jsx
+@@ -71,7 +71,7 @@
+   return <>
+     <div className="panel-heading"><div><div className="eyebrow">Session timeline</div><h2>Query history</h2></div><span className="fine">{state.history.length}</span></div>
+-    {selected > 0 && <div className="context-bar"><span>{selected} selected</span><Button hasIconOnly size="sm" kind="ghost" renderIcon={TrashCan} iconDescription={`Delete ${selected} selected`} onClick={confirmDelete} /><Button hasIconOnly size="sm" kind="ghost" renderIcon={Close} iconDescription="Clear selection" onClick={() => useAppStore.setState({ selectedHistory: [] })} /></div>}
++    {selected > 0 && <div className="context-bar"><span>{selected} selected</span><Button size="sm" kind="ghost" renderIcon={TrashCan} onClick={confirmDelete}>Delete selected</Button><Button size="sm" kind="ghost" renderIcon={Close} onClick={() => useAppStore.setState({ selectedHistory: [] })}>Clear selection</Button></div>}
+     {!state.history.length ? <RailEmpty icon={Time} text="Executed queries appear here, newest first." /> : <div className="history-list">

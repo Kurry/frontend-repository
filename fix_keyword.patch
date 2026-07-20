@@ -1,0 +1,11 @@
+--- tasks/frontend-productivity-semantic-search/solution/app/src/App.jsx
++++ tasks/frontend-productivity-semantic-search/solution/app/src/App.jsx
+@@ -177,7 +177,7 @@
+       </div>
+       <div className="control-actions"><Button kind="ghost" size="sm" renderIcon={Save} onClick={() => useAppStore.setState({ saveOpen: true })}>Save search</Button><Toggle size="sm" id="group-toggle" labelText="Group by topic" toggled={state.grouped} onToggle={(val) => state.setGrouped(val)} /></div>
+     </div>
+-    <div className="result-summary"><div><div className="eyebrow">Ranked retrieval</div><h2>{visible.mode === 'keyword' ? 'Keyword results' : 'Semantic results'}</h2>{visible.mode === 'keyword' && <span className="fallback-label">No semantic matches above threshold</span>}</div><div role="status" aria-live="polite"><strong>{visible.items.length}</strong> <span className="muted">matching results</span></div></div>
++    <div className="result-summary"><div><div className="eyebrow">Ranked retrieval</div><h2>{visible.mode === 'keyword' ? 'Keyword results (no semantic matches above threshold)' : 'Semantic results'}</h2>{visible.mode === 'keyword' && <span className="fallback-label">No semantic matches above threshold</span>}</div><div role="status" aria-live="polite"><strong>{visible.items.length}</strong> <span className="muted">matching results</span></div></div>
+     {state.grouped ? <div className="results-list" role="list">{Object.entries(selectTopicGroups(visible.items)).sort(([a], [b]) => a.localeCompare(b)).map(([topic, items]) => <div key={topic} className="cluster"><button className="cluster-header" onClick={() => state.toggleGroup(topic)}><span>{topic} · {items.length} results</span><ChevronDown className="transition-transform" style={{ transform: state.collapsedGroups[topic] ? 'rotate(-90deg)' : 'none' }} /></button>{!state.collapsedGroups[topic] && <div className="cluster-body">{items.map((item, index) => <ResultCard key={item.id} item={item} index={index} />)}</div>}</div>)}</div> : <div className="results-list" role="list">{visible.items.map((item, index) => <ResultCard key={item.id} item={item} index={index} />)}</div>}
+   </main>
+ }
