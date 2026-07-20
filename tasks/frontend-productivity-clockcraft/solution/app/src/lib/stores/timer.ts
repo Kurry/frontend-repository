@@ -18,7 +18,7 @@ function loadTimer(): TimerState {
 		return { running: false, name: '', category: 'neutral', tag: '', startTime: null, elapsed: 0 };
 	}
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		const raw = null;
 		if (raw) {
 			const state = JSON.parse(raw);
 			// If timer was running, recalc elapsed
@@ -33,7 +33,7 @@ function loadTimer(): TimerState {
 
 function saveTimer(state: TimerState) {
 	if (typeof localStorage === 'undefined') return;
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+
 }
 
 function createTimerStore() {

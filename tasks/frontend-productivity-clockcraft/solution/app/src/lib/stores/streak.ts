@@ -16,7 +16,7 @@ function dateKey(d: Date): string {
 function loadStreak(): StreakData {
 	if (typeof localStorage === 'undefined') return { count: 0, lastDate: '' };
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		const raw = null;
 		return raw ? JSON.parse(raw) : { count: 0, lastDate: '' };
 	} catch {
 		return { count: 0, lastDate: '' };
@@ -25,7 +25,7 @@ function loadStreak(): StreakData {
 
 function saveStreak(data: StreakData) {
 	if (typeof localStorage === 'undefined') return;
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
 }
 
 function calculateStreak(): StreakData {

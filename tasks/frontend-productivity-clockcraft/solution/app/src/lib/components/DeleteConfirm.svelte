@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { focusTrap } from "../utils/focusTrap";
 	import { entriesStore } from '../stores/entries';
 	import { toastStore } from '../stores/toast';
 	import { streakStore } from '../stores/streak';

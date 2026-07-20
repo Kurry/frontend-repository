@@ -22,7 +22,7 @@ const STORAGE_KEY = 'clockcraft_entries';
 function loadEntries(): TimeEntry[] {
 	if (typeof localStorage === 'undefined') return [];
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		const raw = null;
 		return raw ? JSON.parse(raw) : [];
 	} catch {
 		return [];
@@ -31,7 +31,7 @@ function loadEntries(): TimeEntry[] {
 
 function saveEntries(entries: TimeEntry[]) {
 	if (typeof localStorage === 'undefined') return;
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+
 }
 
 function createEntriesStore() {

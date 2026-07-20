@@ -22,7 +22,7 @@ function loadHistory(): HistoryState {
 		return { snapshots: [], currentIndex: -1, branches: [] };
 	}
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		const raw = null;
 		return raw ? JSON.parse(raw) : { snapshots: [], currentIndex: -1, branches: [] };
 	} catch {
 		return { snapshots: [], currentIndex: -1, branches: [] };
@@ -39,7 +39,7 @@ function saveHistory(state: HistoryState) {
 		currentIndex: state.currentIndex < 0 ? -1 : Math.max(0, state.currentIndex - removedSnapshots),
 		branches: state.branches.slice(-20)
 	};
-	localStorage.setItem(STORAGE_KEY, JSON.stringify(trimmed));
+
 }
 
 function createHistoryStore() {
