@@ -125,7 +125,7 @@ export interface GateRecord {
   state: GateState;
   evidence: string;
   description: string;
-  notes: GateNote[];
+  notes: (GateNote & { createdAt?: string })[];
 }
 
 export interface Certificate {

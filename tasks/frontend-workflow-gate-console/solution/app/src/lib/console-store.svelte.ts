@@ -263,7 +263,7 @@ export class ConsoleStore {
     if (!parsed.success) return false;
     const gate = this.selectedStage.gates.find((candidate) => candidate.id === gateId);
     if (!gate) return false;
-    gate.notes.push({ text: parsed.data.text, category: parsed.data.category });
+    gate.notes.push({ text: parsed.data.text, category: parsed.data.category, createdAt: now() });
     this.selectedRun.timeline.push(issue(this.selectedRun.id, 'note', `Note added to ${gate.id}: ${parsed.data.category}`));
     this.noteFormGateId = null;
     this.touchExport();
@@ -309,8 +309,6 @@ export class ConsoleStore {
     this.touchExport();
 
     const finalStates: GateState[] = stage.gates.map((gate) => {
-      if (gate.severity === 'S1') return 'pass';
-      if (stage.aggregationMode === 'all-pass') return 'pass';
       return gate.state;
     });
 
@@ -343,6 +341,7 @@ export class ConsoleStore {
       const failures = stage.gates.filter((gate) => gate.state === 'fail').map((gate) => gate.id).join(', ');
       run.timeline.push(issue(run.id, 'rejection', `${stageName} re-run rejected by ${failures}`));
     }
+    run.timeline = [...run.timeline];
     this.rerun.active = false;
     this.touchExport();
     this.showToast(passed ? `${stageName} re-run passed` : `${stageName} re-run rejected`);
@@ -390,9 +389,7 @@ export class ConsoleStore {
     }
     const payload = parsed.data;
     const target = this.selectedRun;
-    target.id = payload.runId;
-    target.submittedAt = payload.submittedAt;
-    target.stages = payload.stages.map((stage) => ({
+    const newStages = payload.stages.map((stage) => ({
       name: stage.name,
       status: stage.status,
       aggregationMode: stage.aggregationMode,
@@ -402,13 +399,23 @@ export class ConsoleStore {
         severity: gate.severity,
         state: gate.state,
         evidence: gate.evidence,
-        notes: gate.notes.map(({ text: noteText, category }) => ({ text: noteText, category })),
+        notes: gate.notes.map((note) => ({ text: note.text, category: note.category, createdAt: note.createdAt })),
         description: GATE_REGISTRY.find((definition) => definition.id === gate.id)?.description ?? 'Imported gate evidence record.'
       })),
       certificate: stage.certificate ? { ...stage.certificate } : null
     }));
-    target.timeline = payload.timeline.map((entry, index) => ({ ...entry, id: `import-${index}-${Date.now()}` }));
-    this.selectedRunId = target.id;
+
+    const index = this.runs.findIndex((r) => r.id === target.id);
+    if (index !== -1) {
+      this.runs[index] = {
+        ...target,
+        id: payload.runId,
+        submittedAt: payload.submittedAt,
+        stages: newStages,
+        timeline: payload.timeline.map((entry, i) => ({ ...entry, id: `import-${i}-${Date.now()}` }))
+      };
+    }
+    this.selectedRunId = payload.runId;
     this.selectedStageName = target.stages[0].name;
     this.importDraft = text;
     this.importError = '';

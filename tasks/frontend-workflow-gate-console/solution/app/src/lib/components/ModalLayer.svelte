@@ -40,8 +40,25 @@
     consoleStore.closeModal();
   }
 
-  function escape(event: KeyboardEvent) {
+  function handleKeydown(event: KeyboardEvent) {
     if (event.key === 'Escape') close();
+    if (event.key === 'Tab') {
+      const container = document.querySelector<HTMLElement>('[data-modal-card]');
+      if (!container) return;
+      const focusable = Array.from(container.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      ));
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
   }
 
   async function writeClipboard(value: string, key: string) {
@@ -75,7 +92,7 @@
   }
 </script>
 
-<svelte:window onkeydown={escape} />
+<svelte:window onkeydown={handleKeydown} />
 
 <div class="modal-backdrop" role="presentation" onclick={(event) => event.target === event.currentTarget && close()}>
   <div
@@ -154,7 +171,7 @@
         <div>
           <span class="eyebrow">Stage acceptance certificate</span>
           <h2 id="modal-title">{certificateStage.name}</h2>
-          <p>Issued {new Date(certificateStage.certificate.issuedAt).toLocaleString()}</p>
+          <p>Issued {new Intl.DateTimeFormat('en', { month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'UTC' }).format(new Date(certificateStage.certificate.issuedAt))} UTC</p>
         </div>
         <button type="button" class="close-button" aria-label="Close certificate" onclick={close}><X size={19} weight="bold" /></button>
       </header>
