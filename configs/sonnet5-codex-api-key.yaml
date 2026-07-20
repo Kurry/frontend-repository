@@ -1,0 +1,28 @@
+# Full corpus run: claude-code builder on Sonnet 5 (Anthropic API key),
+# codex judge on OpenAI API key (REWARDKIT_JUDGE=codex).
+# Usage:
+#   export ANTHROPIC_API_KEY=sk-ant-...
+#   export OPENAI_API_KEY=sk-...
+#   harbor run -y -c configs/sonnet5-codex-api-key.yaml
+jobs_dir: jobs
+n_attempts: 1
+n_concurrent_trials: 4
+
+environment:
+  type: docker
+  delete: true
+
+agents:
+  - name: claude-code
+    model_name: anthropic/claude-sonnet-5
+    env:
+      ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY}"
+
+verifier:
+  env:
+    OPENAI_API_KEY: "${OPENAI_API_KEY}"
+    REWARDKIT_JUDGE: codex
+    REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}" # unset -> toml default gpt-5.6-sol
+
+datasets:
+  - path: ./tasks

@@ -1,0 +1,55 @@
+# Modal real-agent trial sweep for all tasks/ using Kimi K3 served through
+# OpenRouter (kimi-cli with the openrouter/ provider prefix), and Codex as the
+# rewardkit judge (OpenAI API key).
+#
+# kimi-cli parses model_name as <provider>/<model>: "openrouter/..." routes to
+# https://openrouter.ai/api/v1 authenticated with OPENROUTER_API_KEY. Verify
+# the model slug against https://openrouter.ai/models before a full sweep.
+#
+# Setup:
+#   export OPENROUTER_API_KEY=sk-or-...
+#   export OPENAI_API_KEY=sk-...
+#   unset CODEX_AUTH_JSON CODEX_AUTH_JSON_PATH CODEX_ACCESS_TOKEN
+#
+# Run (sweeps every task dir under tasks/ that has a task.toml):
+#   uv run harbor run -c configs/trial-kimi3-openrouter.yaml --yes
+#
+# Optional one-task smoke first with -i/--include-task-name, e.g.:
+#   uv run harbor run -c configs/trial-kimi3-openrouter.yaml \
+#     -i frontend-landing-avax-network \
+#     --job-name smoke-kimi3-openrouter --yes
+
+job_name: trial-kimi3-openrouter-max-50-concurrent
+jobs_dir: jobs
+n_attempts: 1
+n_concurrent_trials: 50
+
+environment:
+  type: modal
+  kwargs:
+    # Modal replaces the image ENTRYPOINT with its keepalive (harbor
+    # _ModalDirect.start). Route the keepalive THROUGH our entrypoint so the
+    # shared CDP Chrome still starts; without this every trial fails test.sh's
+    # Chrome gate as an infra error.
+    keepalive: ["/opt/verifier/entrypoint.sh", "sh", "-c", "sleep infinity"]
+
+retry:
+  max_retries: 2
+
+agents:
+  - name: kimi-cli
+    model_name: openrouter/moonshotai/kimi-k3
+    env:
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
+    # Agent-specific runtime host: OpenRouter gateway.
+    extra_allowed_hosts:
+      - openrouter.ai
+
+verifier:
+  env:
+    OPENAI_API_KEY: "${OPENAI_API_KEY}"
+    REWARDKIT_JUDGE: codex
+    REWARDKIT_MODEL: "${REWARDKIT_MODEL:-}"
+
+datasets:
+  - path: tasks
