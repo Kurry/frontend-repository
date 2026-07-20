@@ -138,11 +138,11 @@ export const useAppStore = create((set, get) => ({
       ? state.compareSelected.filter((item) => item !== name)
       : [...state.compareSelected, name],
   })),
-  toggleLegend: (name) => set((state) => ({
-    hiddenChartModels: state.hiddenChartModels.includes(name)
-      ? state.hiddenChartModels.filter((item) => item !== name)
-      : [...state.hiddenChartModels, name],
-  })),
+  toggleLegend: (name) => set((state) => {
+    const isHidden = state.hiddenChartModels.includes(name);
+    const nextHidden = isHidden ? state.hiddenChartModels.filter((item) => item !== name) : [...state.hiddenChartModels, name];
+    return { hiddenChartModels: nextHidden };
+  }),
   toggleDisclosure: (name) => set((state) => ({ disclosureOpen: { ...state.disclosureOpen, [name]: !state.disclosureOpen[name] } })),
   highlightCatalogModel: (name) => set({ highlightedModel: name, navTarget: { destination: 'model-catalog', token: Date.now() }, mobileCostsOpen: false }),
   clearHighlight: () => set({ highlightedModel: null }),
