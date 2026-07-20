@@ -1,9 +1,5 @@
-// Flick-card deck: elastic reshuffle on prev/next.
-// Position table relative to the active index:
-//   0: x 0,  y 0, rot 0,  scale 1, opacity 1, z 5 (active)
-//  ±1: x ±25, y 1, rot ±10, scale .9, opacity 1, z 4
-//  ±2: x ±45, y 5, rot ±15, scale .8, opacity 1, z 3
-//  else: x ±55, y 5, rot ±20, scale .6, opacity 0, z 2 (hidden)
+import { state } from "./store.ts";
+
 const POSITIONS = (rel) => {
   const abs = Math.abs(rel);
   const sign = Math.sign(rel) || 1;
@@ -19,6 +15,10 @@ export function initFlickGroups(gsap) {
     if (!items.length) return;
     let active = 0;
     let busy = false;
+
+    // Find client title for this deck
+    const clientTitleEl = group.closest('.client-deck_card')?.querySelector('.client-deck_title');
+    const clientTitle = clientTitleEl ? clientTitleEl.textContent.trim() : null;
 
     const relFor = (i) => {
       let rel = i - active;
@@ -45,10 +45,16 @@ export function initFlickGroups(gsap) {
         } else {
           gsap.set(item, vars);
         }
-        // Only the active card's player is interactive.
         const player = item.querySelector(".bunny-player");
-        if (player) player.style.pointerEvents = p.status === "active" ? "auto" : "none";
-        // Caption chips slide in for the active card.
+        if (player) {
+           player.style.pointerEvents = p.status === "active" ? "auto" : "none";
+           if (p.status !== "active") {
+               const video = player.querySelector("video");
+               if (video && !video.paused) {
+                   video.pause();
+               }
+           }
+        }
         const chips = item.querySelectorAll(".flick-card_data");
         if (p.status === "active") {
           chips.forEach((chip, ci) => {
@@ -62,6 +68,18 @@ export function initFlickGroups(gsap) {
           gsap.set(chips, { yPercent: 110 });
         }
       });
+
+      // Update global state
+      if (clientTitle) {
+          const s = state.get();
+          state.set({
+              ...s,
+              flickIndexByClient: {
+                  ...s.flickIndexByClient,
+                  [clientTitle]: active
+              }
+          });
+      }
     };
 
     const step = (dir) => {
@@ -79,6 +97,14 @@ export function initFlickGroups(gsap) {
       item.addEventListener("click", () => {
         if (i !== active && Math.abs(relFor(i)) <= 2) step(relFor(i) > 0 ? 1 : -1);
       });
+    });
+
+    // Subscribe to state to update if imported
+    state.subscribe(s => {
+        if (clientTitle && s.flickIndexByClient[clientTitle] !== active) {
+            active = s.flickIndexByClient[clientTitle];
+            layout(true);
+        }
     });
   });
 }
