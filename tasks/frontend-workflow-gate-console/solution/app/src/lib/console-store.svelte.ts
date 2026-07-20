@@ -209,7 +209,7 @@ export class ConsoleStore {
   resetTransientStageState() {
     this.revertWhatIf();
     this.expandedGates.clear();
-    this.noteFormGateId = null;
+    this.closeNoteForm();
   }
 
   toggleGateExpanded(gateId: string) {
@@ -280,7 +280,7 @@ export class ConsoleStore {
     if (!gate) return false;
     gate.notes = [...gate.notes, { text: parsed.data.text, category: parsed.data.category }];
     this.appendTimeline(run, issue(run.id, 'note', `Note added to ${gate.id}: ${parsed.data.category}`));
-    this.noteFormGateId = null;
+    this.closeNoteForm();
     this.touchRuns();
     this.touchExport();
     this.showToast(`Note added to ${gate.id}`);
@@ -334,7 +334,7 @@ export class ConsoleStore {
     const stage = run.stages.find((candidate) => candidate.name === stageName);
     if (!stage) return false;
     this.revertWhatIf();
-    this.noteFormGateId = null;
+    this.closeNoteForm();
     const gateStatuses: Record<string, RerunGateStatus> = {};
     stage.gates.forEach((gate) => { gateStatuses[gate.id] = 'pending'; });
     this.rerun = { active: true, runId: run.id, stageName, progress: 0, gateStatuses: { ...gateStatuses } };
