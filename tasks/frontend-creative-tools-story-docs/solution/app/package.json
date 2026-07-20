@@ -1,11 +1,35 @@
 {
   "name": "oracle-static",
   "private": true,
+  "type": "module",
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "dev": "astro dev",
+    "start": "npx --yes serve dist -l 3000 -n",
+    "build": "astro build",
+    "preview": "astro preview",
+    "verify:build": "npm run build && node -e \"require('fs').accessSync('dist/index.html')\""
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "@astrojs/react": "^3.6.0",
+    "@astrojs/tailwind": "^5.1.0",
+    "@nanostores/react": "^1.1.0",
+    "@hookform/resolvers": "^3.9.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "astro": "^4.11.3",
+    "clsx": "^2.1.1",
+    "daisyui": "^4.12.10",
+    "gsap": "^3.12.5",
+    "lucide-react": "^0.400.0",
+    "nanostores": "^1.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.52.1",
+    "tailwind-merge": "^2.4.0",
+    "tailwindcss": "3.4.4",
+    "zod": "^3.23.8",
+    "marked": "^13.0.2",
+    "astro-icon": "^1.1.0",
+    "@iconify-json/ri": "^1.1.20"
   }
 }
