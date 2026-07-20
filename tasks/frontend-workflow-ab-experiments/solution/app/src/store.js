@@ -16,6 +16,8 @@ const designOf = experiment => ({
 const addHistory = state => ({ past: [...state.past.slice(-19), historySnapshot(state)], future: [] })
 const event = (type, text) => ({ id: `${type}-${Date.now()}-${Math.random()}`, type, text, at: new Date().toISOString() })
 let notifyTimer
+const runStarts = new Set()
+const submitLocks = new Set()
 
 export const useStudio = create((set, get) => ({
   experiments: clone(seedExperiments),
@@ -46,17 +48,33 @@ export const useStudio = create((set, get) => ({
   closePanel: () => set({ activeExperimentId: null }),
   openDesigner: id => set({ designer: id || 'new', previewOpen: false }),
   closeDesigner: () => set({ designer: null, previewOpen: false }),
-  saveExperiment: payload => {
+  saveExperiment: (payload, editId = null) => {
     const parsed = experimentSchema.safeParse(payload)
     if (!parsed.success) return { ok: false, error: zodErrorMessage(parsed.error) }
     const state = get()
     if (!state.criteria.some(criterion => criterion.name === parsed.data.successMetric)) return { ok: false, error: 'successMetric must name an existing scoring criterion' }
     if (parsed.data.variants.some(variant => !state.prompts.some(prompt => prompt.id === variant.promptId))) return { ok: false, error: 'variant.promptId must name a seeded prompt' }
-    if (state.designer !== 'new') {
-      set(current => ({ ...addHistory(current), experiments: current.experiments.map(experiment => experiment.id === current.designer ? { ...experiment, ...clone(parsed.data) } : experiment), designer: null }))
+    const targetId = editId || (state.designer && state.designer !== 'new' ? state.designer : null)
+    if (targetId) {
+      const existing = state.experiments.find(item => item.id === targetId)
+      if (!existing || existing.status !== 'pending') return { ok: false, error: 'Only pending experiments can be edited' }
+      set(current => ({
+        ...addHistory(current),
+        experiments: current.experiments.map(experiment => experiment.id === targetId ? {
+          ...experiment,
+          ...clone(parsed.data),
+          samples: Object.fromEntries(parsed.data.variants.map((_, index) => [LETTERS[index], experiment.samples[LETTERS[index]] || []])),
+          progress: Object.fromEntries(parsed.data.variants.map((_, index) => [LETTERS[index], experiment.progress[LETTERS[index]] || 0])),
+        } : experiment),
+        designer: null,
+      }))
       get().notify('Experiment updated')
-      return { ok: true }
+      return { ok: true, id: targetId }
     }
+    const lockKey = JSON.stringify(parsed.data.name)
+    if (submitLocks.has(lockKey)) return { ok: false, error: 'Submit already in progress' }
+    submitLocks.add(lockKey)
+    setTimeout(() => submitLocks.delete(lockKey), 600)
     const id = `exp-${Date.now()}`
     const experiment = {
       id, ...clone(parsed.data), status: 'pending', previousStatus: null, startedAt: null, createdAt: new Date().toISOString(),
@@ -88,7 +106,8 @@ export const useStudio = create((set, get) => ({
     set(state => ({ ...addHistory(state), experiments: state.experiments.filter(experiment => !ids.includes(experiment.id)), selectedIds: [], activeExperimentId: ids.includes(state.activeExperimentId) ? null : state.activeExperimentId }))
     get().notify(`${ids.length} experiment${ids.length === 1 ? '' : 's'} deleted`)
   },
-  archiveOne: id => { set({ selectedIds: [id] }); get().archiveSelected() },
+  archiveOne: id => set({ confirm: { type: 'archive-one', experimentId: id } }),
+  archiveOneDirect: id => { set({ selectedIds: [id] }); get().archiveSelected() },
   unarchive: id => { set(state => ({ ...addHistory(state), experiments: state.experiments.map(experiment => experiment.id === id ? { ...experiment, status: experiment.previousStatus || 'pending', previousStatus: null } : experiment) })); get().notify('Experiment restored') },
   undo: () => set(state => {
     if (!state.past.length) return state
@@ -108,7 +127,24 @@ export const useStudio = create((set, get) => ({
     })
     return { ...next, experiments, past: [...state.past, historySnapshot(state)], future: state.future.slice(1) }
   }),
-  startRun: id => set(state => ({ experiments: state.experiments.map(experiment => experiment.id === id && experiment.status === 'pending' ? { ...experiment, status: 'running', startedAt: new Date().toISOString(), timeline: [event('started', 'Run started')] } : experiment), announcement: 'Experiment run started' })),
+  startRun: id => {
+    if (runStarts.has(id)) return
+    const experiment = get().experiments.find(item => item.id === id)
+    if (!experiment || experiment.status !== 'pending') return
+    runStarts.add(id)
+    set(state => ({
+      experiments: state.experiments.map(item => item.id === id ? {
+        ...item,
+        status: 'running',
+        startedAt: new Date().toISOString(),
+        timeline: [event('started', 'Run started')],
+        samples: Object.fromEntries(item.variants.map((_, index) => [LETTERS[index], []])),
+        progress: Object.fromEntries(item.variants.map((_, index) => [LETTERS[index], 0])),
+      } : item),
+      activeExperimentId: id,
+      announcement: 'Experiment run started',
+    }))
+  },
   pauseRun: id => set(state => ({ experiments: state.experiments.map(experiment => experiment.id === id && experiment.status === 'running' ? { ...experiment, status: 'paused', timeline: [...experiment.timeline, event('paused', 'Run paused')] } : experiment) })),
   resumeRun: id => set(state => ({ experiments: state.experiments.map(experiment => experiment.id === id && experiment.status === 'paused' ? { ...experiment, status: 'running', timeline: [...experiment.timeline, event('resumed', 'Run resumed')] } : experiment) })),
   tickRuns: () => set(state => ({ experiments: state.experiments.map(experiment => {
@@ -121,9 +157,8 @@ export const useStudio = create((set, get) => ({
     experiment.variants.forEach((_, index) => {
       const letter = LETTERS[index]
       if ((nextProgress[letter] || 0) < target) {
-        const step = Math.max(1, Math.ceil(target / 40));
         const currentCount = nextProgress[letter] || 0;
-        const addCount = Math.min(step, target - currentCount);
+        const addCount = Math.min(1, target - currentCount);
         
         const newSamples = makeSamples(experiment.id, experiment.variants, addCount, currentCount)[letter];
         nextSamples[letter] = [...(nextSamples[letter] || []), ...newSamples];
@@ -134,7 +169,10 @@ export const useStudio = create((set, get) => ({
     })
     const complete = experiment.variants.every((_, index) => nextProgress[LETTERS[index]] >= target)
     const nextTimeline = milestone ? [...experiment.timeline, event('milestone', `${Math.min(...Object.values(nextProgress))} samples collected per variant`)] : experiment.timeline
-    if (complete) setTimeout(() => { get().notify('Run completed'); set({ announcement: 'Experiment run completed. Results are ready.' }) }, 0)
+    if (complete) {
+      runStarts.delete(experiment.id)
+      setTimeout(() => { get().notify('Run completed'); set({ announcement: 'Experiment run completed. Results are ready.' }) }, 0)
+    }
     return { ...experiment, samples: nextSamples, progress: nextProgress, status: complete ? 'completed' : 'running', timeline: complete ? [...nextTimeline, event('completed', 'All variants completed')] : nextTimeline }
   }) })),
   runPreview: () => {
@@ -154,7 +192,15 @@ export const useStudio = create((set, get) => ({
     const experiment = get().experiments.find(item => item.id === experimentId)
     const letters = experiment?.variants.map((_, index) => LETTERS[index]) || []
     if (parsed.data.choice === 'declare-winner' && !letters.includes(parsed.data.winnerVariant)) return { ok: false, error: 'winnerVariant must name a variant present on the experiment' }
-    set(state => ({ experiments: state.experiments.map(item => item.id === experimentId ? { ...item, status: 'decided', decision: { ...parsed.data, winnerVariant: parsed.data.choice === 'declare-winner' ? parsed.data.winnerVariant : null } } : item), decisionFor: null }))
+    set(state => ({
+      experiments: state.experiments.map(item => item.id === experimentId ? {
+        ...item,
+        status: 'decided',
+        decision: { ...parsed.data, winnerVariant: parsed.data.choice === 'declare-winner' ? parsed.data.winnerVariant : null },
+      } : item),
+      decisionFor: null,
+      announcement: 'Decision recorded. The experiment is now locked.',
+    }))
     get().notify('Decision recorded', 'success', 'Decision recorded. The experiment is now locked.')
     return { ok: true }
   },
