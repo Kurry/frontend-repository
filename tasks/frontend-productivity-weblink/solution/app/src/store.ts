@@ -214,11 +214,24 @@ export function toggleTheme() {
 // Simulated transfers map to hold interval references
 const transferIntervals = new Map<string, ReturnType<typeof setInterval>>();
 
+export function clearAllTransferIntervals() {
+  for (const interval of transferIntervals.values()) {
+    clearInterval(interval);
+  }
+  transferIntervals.clear();
+}
+
 export function startTransfer(id: string) {
   const index = state.files.queue.findIndex(f => f.id === id);
   if (index === -1) return;
   const file = state.files.queue[index];
   if (file.status !== "not-started" && file.status !== "paused") return;
+
+  const existingInterval = transferIntervals.get(id);
+  if (existingInterval) {
+    clearInterval(existingInterval);
+    transferIntervals.delete(id);
+  }
 
   setState("files", "queue", index, "status", "transferring");
   logEvent(file.name, file.status === "not-started" ? "started" : "resumed");

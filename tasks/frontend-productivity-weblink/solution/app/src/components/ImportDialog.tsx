@@ -1,6 +1,6 @@
 import { createSignal, Show } from "solid-js";
 import { Dialog } from "@kobalte/core/dialog";
-import { state, setState, persist } from "../store";
+import { state, setState, persist, clearAllTransferIntervals } from "../store";
 import { SessionPackSchema } from "../schemas";
 
 export default function ImportDialog() {
@@ -49,6 +49,7 @@ export default function ImportDialog() {
       }));
       setState("chat", "messages", mappedMessages);
 
+      clearAllTransferIntervals();
       setState("files", "queue", pack.fileQueue);
       setState("transferLog", pack.transferLog);
 
