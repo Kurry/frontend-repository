@@ -203,7 +203,7 @@ export const useEvalStore = create((set, get) => ({
     const parsed = exportDocumentSchema.parse(document);
     const selectedId = get().selectedSuiteId;
     if (!selectedId) throw new Error('Import requires a selected suite');
-    const importedResults = parsed.run.results.map((row, index) => ({ ...row, rowId: `import-${parsed.run.id}-${index}` }));
+    const importedResults = parsed.results.map((row, index) => ({ ...row, rowId: `import-${parsed.run.id}-${index}` }));
     const run = { ...parsed.run, results: importedResults };
     set((state) => ({ suites: state.suites.map((suite) => {
       if (suite.id !== selectedId) return suite;
@@ -227,21 +227,18 @@ export function compileExportDocument(state = useEvalStore.getState()) {
   if (!suite) return null;
   const latest = getLatestRun(suite);
   const emptyDate = '1970-01-01T00:00:00.000Z';
-  return {
-    version: 1,
-    suite: { name: suite.name, promptCount: suite.promptIds.length, nightMode: suite.nightMode },
-    run: latest ? {
-      id: latest.id,
-      startedAt: latest.startedAt,
-      finishedAt: latest.finishedAt,
-      averageScore: latest.averageScore,
-      passCount: latest.passCount,
-      failCount: latest.failCount,
-      totalLatencyMs: latest.totalLatencyMs,
-      totalTokens: latest.totalTokens,
-      results: latest.results.map(({ rowId, ...row }) => row),
-    } : { id: 'not-run', startedAt: emptyDate, finishedAt: emptyDate, averageScore: 0, passCount: 0, failCount: 0, totalLatencyMs: 0, totalTokens: 0, results: [] },
-  };
+  const run = latest ? {
+    id: latest.id,
+    startedAt: latest.startedAt,
+    finishedAt: latest.finishedAt,
+    averageScore: latest.averageScore,
+    passCount: latest.passCount,
+    failCount: latest.failCount,
+    totalLatencyMs: latest.totalLatencyMs,
+    totalTokens: latest.totalTokens,
+  } : { id: 'not-run', startedAt: emptyDate, finishedAt: emptyDate, averageScore: 0, passCount: 0, failCount: 0, totalLatencyMs: 0, totalTokens: 0 };
+  const results = latest ? latest.results.map(({ rowId, ...row }) => row) : [];
+  return { version: 1, suite: { name: suite.name, promptCount: suite.promptIds.length, nightMode: suite.nightMode }, run, results };
 }
 
 const csvCell = (value) => {
@@ -253,7 +250,7 @@ export function compileCsv(state = useEvalStore.getState()) {
   const document = compileExportDocument(state);
   const header = 'promptTitle,model,score,latencyMs,tokens,passFail';
   if (!document) return header;
-  return [header, ...document.run.results.map((row) => [row.promptTitle, row.model, row.score, row.latencyMs, row.tokens, row.passFail].map(csvCell).join(','))].join('\n');
+  return [header, ...document.results.map((row) => [row.promptTitle, row.model, row.score, row.latencyMs, row.tokens, row.passFail].map(csvCell).join(','))].join('\n');
 }
 
 const sleep = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));

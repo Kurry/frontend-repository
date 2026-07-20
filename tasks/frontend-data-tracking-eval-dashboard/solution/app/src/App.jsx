@@ -85,6 +85,8 @@ import { copyActiveArtifact, downloadArtifact } from './artifacts';
 const formatDateTime = (value) => value ? new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(value)) : 'Not run yet';
 const formatTime = (value) => new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit', second: '2-digit' }).format(new Date(value));
 const formatDuration = (ms) => `${Math.floor(ms / 60000)}:${String(Math.floor((ms % 60000) / 1000)).padStart(2, '0')}`;
+const pluralize = (count, noun) => `${count} ${noun}${count === 1 ? '' : 's'}`;
+const truncateTitle = (value, max = 60) => value && value.length > max ? `${value.slice(0, max).trimEnd()}…` : value;
 
 function scoreTone(score) {
   if (score >= 80) return 'green';
@@ -158,7 +160,7 @@ function Header() {
           <p>Prompt quality operations</p>
         </div>
         <div className="header-context" aria-live="polite">
-          {selected ? <><span>{selected.name}</span><i /> <span>{selected.promptIds.length} prompts</span></> : <span>No suite selected</span>}
+          {selected ? <><span>{selected.name}</span><i /> <span>{pluralize(selected.promptIds.length, 'prompt')}</span></> : <span>No suite selected</span>}
         </div>
       </div>
       <div className="toolbar" role="toolbar" aria-label="Evaluation actions">
@@ -181,6 +183,28 @@ function Header() {
   );
 }
 
+function PassRateSparkline({ runs }) {
+  const points = runs.slice(-7).map((run) => {
+    const total = (run.passCount || 0) + (run.failCount || 0);
+    return total ? (run.passCount / total) * 100 : 0;
+  });
+  if (points.length < 2) return null;
+  const w = 62;
+  const h = 18;
+  const step = w / (points.length - 1);
+  const coords = points.map((value, index) => `${(index * step).toFixed(1)},${(h - (value / 100) * h).toFixed(1)}`);
+  const latest = Math.round(points.at(-1));
+  return (
+    <span className="suite-sparkline" title={`Pass-rate trend across last ${points.length} runs, now ${latest}%`} aria-label={`Pass-rate trend, currently ${latest} percent`}>
+      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
+        <polyline points={coords.join(' ')} fill="none" stroke="#5b5bd6" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+        <circle cx={(w).toFixed(1)} cy={(h - (points.at(-1) / 100) * h).toFixed(1)} r="2" fill="#5b5bd6" />
+      </svg>
+      <em>{latest}% pass</em>
+    </span>
+  );
+}
+
 function SuiteCard({ suite }) {
   const state = useEvalStore();
   const selected = suite.id === state.selectedSuiteId;
@@ -191,8 +215,9 @@ function SuiteCard({ suite }) {
           <strong>{suite.name}</strong>
           {suite.nightMode && <motion.span initial={{ opacity: 0, scale: 0.5, rotate: -20 }} animate={{ opacity: 1, scale: 1, rotate: 0 }} className="moon-badge" title="Scheduled for night mode"><Moon size={14} /></motion.span>}
         </span>
-        <span className="suite-meta"><span>{suite.promptIds.length} prompts</span><span>Last run {formatDateTime(suite.lastRunAt)}</span></span>
+        <span className="suite-meta"><span>{pluralize(suite.promptIds.length, 'prompt')}</span><span>Last run {formatDateTime(suite.lastRunAt)}</span></span>
         <span className="suite-score-row"><span>Average score</span><ScoreBadge score={suite.averageScore} /></span>
+        {suite.runs.length > 1 && <span className="suite-spark-row"><PassRateSparkline runs={suite.runs} /></span>}
       </button>
       <div className="suite-actions">
         <div className="night-toggle-wrap" title={state.nightWindow ? `Run during ${state.nightWindow.startTime}–${state.nightWindow.endTime}` : 'Configure Night Window in the toolbar'}>
@@ -242,6 +267,11 @@ function SuiteModal() {
     defaultValues: { name: suite?.name || '', promptIds: suite?.promptIds || [] },
   });
   useEffect(() => { form.trigger(); }, []);
+  useEffect(() => {
+    const onKey = (event) => { if (event.key === 'Escape') useEvalStore.getState().closeSuiteModal(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
   const submit = form.handleSubmit((value) => modal.mode === 'edit' ? state.updateSuite(modal.suiteId, value) : state.createSuite(value));
   return (
     <Modal
@@ -259,7 +289,7 @@ function SuiteModal() {
     >
       <p className="modal-intro">Group prompts that should run and score together.</p>
       <form onSubmit={submit} className="modal-form">
-        <TextInput id="suite-name" labelText="Suite name" placeholder="e.g. Release candidate guardrail" maxLength={81} {...form.register('name')} invalid={Boolean(form.formState.errors.name)} invalidText={form.formState.errors.name?.message} />
+        <TextInput id="suite-name" labelText="Suite name" placeholder="e.g. Release candidate guardrail" maxLength={81} {...form.register('name')} invalid={Boolean(form.formState.errors.name)} invalidText={form.formState.errors.name?.message} aria-describedby={form.formState.errors.name ? 'suite-name-error-msg' : undefined} />
         <Controller
           name="promptIds"
           control={form.control}
@@ -285,6 +315,12 @@ function SuiteModal() {
 function DeleteModal() {
   const state = useEvalStore();
   const suite = state.suites.find((item) => item.id === state.deleteModal.suiteId);
+  useEffect(() => {
+    if (!state.deleteModal.open) return undefined;
+    const onKey = (event) => { if (event.key === 'Escape') useEvalStore.getState().closeDelete(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [state.deleteModal.open]);
   return (
     <Modal open={state.deleteModal.open} danger modalHeading="Delete evaluation suite?" primaryButtonText="Delete Suite" secondaryButtonText="Cancel" onRequestClose={state.closeDelete} onSecondarySubmit={state.closeDelete} onRequestSubmit={() => state.deleteSuite(state.deleteModal.suiteId)} size="xs">
       <p>This removes <strong>{suite?.name}</strong> and its run history from this session. You can restore it with Undo.</p>
@@ -295,13 +331,18 @@ function DeleteModal() {
 function NightWindowModal() {
   const state = useEvalStore();
   const form = useForm({ resolver: zodResolver(nightWindowSchema), mode: 'onChange', defaultValues: state.nightWindow || { startTime: '22:00', endTime: '23:30' } });
+  useEffect(() => {
+    const onKey = (event) => { if (event.key === 'Escape') useEvalStore.getState().closeNightModal(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
   const submit = form.handleSubmit(state.saveNightWindow);
   return (
     <Modal open={state.nightModalOpen} modalHeading="Configure Night Window" modalLabel="Automation schedule" primaryButtonText="Save Window" secondaryButtonText="Cancel" primaryButtonDisabled={!form.formState.isValid} onRequestClose={state.closeNightModal} onSecondarySubmit={state.closeNightModal} onRequestSubmit={submit} size="xs">
       <p className="modal-intro">Scheduled suites run within a same-day UTC window.</p>
       <form onSubmit={submit} className="time-form">
-        <TextInput id="night-start" labelText="Night start time" type="time" {...form.register('startTime')} invalid={Boolean(form.formState.errors.startTime)} invalidText={form.formState.errors.startTime?.message} />
-        <TextInput id="night-end" labelText="Night end time" type="time" {...form.register('endTime')} invalid={Boolean(form.formState.errors.endTime)} invalidText={form.formState.errors.endTime?.message} />
+        <TextInput id="night-start" labelText="Night start time" type="time" {...form.register('startTime')} invalid={Boolean(form.formState.errors.startTime)} invalidText={form.formState.errors.startTime?.message} aria-describedby={form.formState.errors.startTime ? 'night-start-error-msg' : undefined} />
+        <TextInput id="night-end" labelText="Night end time" type="time" {...form.register('endTime')} invalid={Boolean(form.formState.errors.endTime)} invalidText={form.formState.errors.endTime?.message} aria-describedby={form.formState.errors.endTime ? 'night-end-error-msg' : undefined} />
       </form>
     </Modal>
   );
@@ -350,12 +391,12 @@ function Charts({ suite, results }) {
         <div className="chart-box">
           <span className="axis-label">Average score</span>
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={averages} margin={{ top: 10, right: 10, left: 0, bottom: 2 }}>
+            <BarChart key={latest?.id || 'bar'} className="grow-bars" data={averages} margin={{ top: 10, right: 10, left: 0, bottom: 2 }}>
               <CartesianGrid stroke="#e7e5df" vertical={false} />
               <XAxis dataKey="model" tick={{ fontSize: 11, fill: '#625f59' }} axisLine={false} tickLine={false} />
               <YAxis width={42} domain={[0, 100]} tick={{ fontSize: 11, fill: '#77736c' }} axisLine={false} tickLine={false} />
               <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(91,91,214,.07)' }} />
-              <Bar dataKey="score" radius={[5, 5, 0, 0]} isAnimationActive animationDuration={420} />
+              <Bar dataKey="score" radius={[5, 5, 0, 0]} isAnimationActive={false} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -365,7 +406,7 @@ function Charts({ suite, results }) {
         <div className="chart-box">
           <span className="axis-label">Average score</span>
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={trend} margin={{ top: 10, right: 16, left: 0, bottom: 2 }}>
+            <LineChart key={latest?.id || 'line'} data={trend} margin={{ top: 10, right: 16, left: 0, bottom: 2 }}>
               <CartesianGrid stroke="#e7e5df" vertical={false} />
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#625f59' }} axisLine={false} tickLine={false} />
               <YAxis width={42} domain={[0, 100]} tick={{ fontSize: 11, fill: '#77736c' }} axisLine={false} tickLine={false} />
@@ -441,7 +482,7 @@ function ResultsTable({ suite, results, live }) {
           <TableBody>
             {rows.map((row, index) => (
               <TableRow key={row.rowId} className="result-row" style={{ '--row-delay': live ? `${(index % MODELS.length) * 80}ms` : '0ms' }} onClick={() => state.selectResult(row.rowId)} tabIndex={0} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); state.selectResult(row.rowId); } }} aria-label={`Open details for ${row.promptTitle}, ${row.model}, score ${row.score}`}>
-                <TableCell><span className="prompt-cell" title={row.promptTitle}>{row.promptTitle}</span></TableCell>
+                <TableCell><span className="prompt-cell" title={row.promptTitle}>{truncateTitle(row.promptTitle)}</span></TableCell>
                 <TableCell><span className="model-dot" style={{ background: MODEL_COLORS[row.model] }} />{row.model}</TableCell>
                 <TableCell><strong className="table-score">{row.score}</strong></TableCell>
                 <TableCell>{row.latencyMs.toLocaleString()}</TableCell>
@@ -498,7 +539,7 @@ function RunInspector({ run }) {
               <div className="step-index">{index + 1}</div>
               <div className="step-content">
                 <strong>{step.title}</strong>
-                <div className="step-state"><StatusPill status={step.status} />{step.attempts > 0 && <span>Attempt {step.attempts} of 3</span>}</div>
+                <div className="step-state"><StatusPill key={step.status} status={step.status} />{step.attempts > 0 && <span>Attempt {step.attempts} of 3</span>}</div>
                 {step.status === 'retrying' && <p className="retry-copy">Waiting {step.retryIn}s before retry {step.attempts + 1} of 3</p>}
                 {step.error && <div className="step-error"><p>{step.error}</p><Button size="sm" kind="danger--tertiary" renderIcon={Restart} onClick={() => retryStepCommand(index)}>Retry</Button></div>}
                 {step.status === 'running' && <div className="inline-loader"><span /><span /><span /></div>}
@@ -527,7 +568,7 @@ function DetailPanel({ row }) {
   const state = useEvalStore();
   const open = Boolean(state.disclosureOpen[row.rowId]);
   return (
-    <motion.aside className="detail-panel" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ duration: 0.24, ease: 'easeOut' }} aria-label="Result detail">
+    <motion.aside className="detail-panel" initial={{ x: '100%', opacity: 0.5 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0.5 }} transition={{ duration: 0.32, ease: 'easeOut' }} aria-label="Result detail">
       <div className="detail-top"><div><span className="eyebrow">Result detail</span><h2>{row.promptTitle}</h2></div><IconButton label="Close result detail" kind="ghost" onClick={state.closeDetail}><Close /></IconButton></div>
       <div className="detail-metrics"><div><span>Model</span><strong><i className="model-dot" style={{ background: MODEL_COLORS[row.model] }} />{row.model}</strong></div><div><span>Score</span><strong>{row.score}/100</strong></div><div><span>Outcome</span><PassBadge value={row.passFail} /></div></div>
       <div className="detail-section"><h3>Full prompt</h3><p>{row.promptText}</p></div>
@@ -553,12 +594,12 @@ function ExportDrawer() {
     <AnimatePresence>
       {state.exportOpen && <motion.div className="drawer-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={state.closeExport}>
         <motion.aside ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="export-title" className="drawer" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ duration: 0.26, ease: 'easeOut' }} onMouseDown={(event) => event.stopPropagation()}>
-          <div className="drawer-header"><div><span className="eyebrow">Live session artifact</span><h2 id="export-title">Export results</h2><p>{document?.suite.name} · {document?.run.results.length || 0} result records</p></div><IconButton label="Close export results" kind="ghost" onClick={state.closeExport}><Close /></IconButton></div>
+          <div className="drawer-header"><div><span className="eyebrow">Live session artifact</span><h2 id="export-title">Export results</h2><p>{document?.suite.name} · {document?.results.length || 0} result records</p></div><IconButton label="Close export results" kind="ghost" onClick={state.closeExport}><Close /></IconButton></div>
           <div className="drawer-body">
             <Tabs selectedIndex={state.exportTab === 'json' ? 0 : 1} onChange={({ selectedIndex }) => state.setExportTab(selectedIndex === 0 ? 'json' : 'csv')}>
               <TabList aria-label="Export formats" contained><Tab>JSON</Tab><Tab>CSV</Tab></TabList>
             </Tabs>
-            {!document?.run.results.length && <InlineNotification lowContrast hideCloseButton kind="info" title="No run results yet" subtitle="The JSON artifact contains version 1 metadata and an empty results array; the CSV artifact contains its header line." />}
+            {!document?.results.length && <InlineNotification lowContrast hideCloseButton kind="info" title="No run results yet" subtitle="The JSON artifact contains version 1 metadata and an empty results array; the CSV artifact contains its header line." />}
             <div className="artifact-preview"><div className="preview-bar"><span>{state.exportTab === 'json' ? 'eval-run-results.json' : 'eval-run-results.csv'}</span><span>{state.exportTab === 'json' ? json.split('\n').length : csv.split('\n').length} lines</span></div><pre>{state.exportTab === 'json' ? json : csv}</pre></div>
           </div>
           <div className="drawer-footer">
@@ -627,7 +668,7 @@ function Workspace() {
   return (
     <main className="main-content">
       <div className="workspace-title">
-        <div><span className="eyebrow">Evaluation overview</span><h2>{suite.name}</h2><p>{suite.promptIds.length} prompts · Latest run {formatDateTime(suite.lastRunAt)}</p></div>
+        <div><span className="eyebrow">Evaluation overview</span><h2>{suite.name}</h2><p>{pluralize(suite.promptIds.length, 'prompt')} · Latest run {formatDateTime(suite.lastRunAt)}</p></div>
         <div className="overview-metrics"><Metric label="Average" value={suite.averageScore ?? '—'} accent /><Metric label="Pass rate" value={latest?.results.length ? `${Math.round((latest.passCount / latest.results.length) * 100)}%` : '—'} /><Metric label="Total tokens" value={latest?.totalTokens?.toLocaleString() || '—'} /></div>
       </div>
       <Charts suite={suite} results={latest?.results || []} />

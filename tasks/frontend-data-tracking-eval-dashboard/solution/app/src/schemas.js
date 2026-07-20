@@ -53,8 +53,8 @@ export const exportDocumentSchema = z.object({
     failCount: z.number().int().nonnegative(),
     totalLatencyMs: z.number().int().nonnegative(),
     totalTokens: z.number().int().nonnegative(),
-    results: z.array(evalResultSchema),
   }),
+  results: z.array(evalResultSchema),
 });
 
 export const importSchema = z.object({
