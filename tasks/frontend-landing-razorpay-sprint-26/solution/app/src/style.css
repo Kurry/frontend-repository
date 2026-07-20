@@ -869,3 +869,37 @@ a:focus-visible, button:focus-visible { outline: 2px solid #305eff; outline-offs
   .footer__copyright, .footer__social-link { font-size: 0.8rem; }
   .footer__logo { letter-spacing: -3px; font-size: 20vw; }
 }
+
+/* Trays and Panels Styling */
+#trays-ui button {
+  cursor: pointer;
+}
+
+#brief-panel button {
+  cursor: pointer;
+}
+
+#command-palette input {
+  font-family: inherit;
+}
+
+#command-palette li:hover,
+#command-palette li:focus {
+  background: #305eff !important;
+  outline: none;
+}
+
+/* Ensure focus trapping outlines on modal inner wrappers */
+#brief-panel-inner:focus,
+#command-palette-inner:focus {
+  outline: 2px solid #305eff;
+}
+
+@media (max-width: 375px) {
+  #trays-ui {
+    max-height: 70vh;
+  }
+  #trays-ui > div {
+    padding: 10px;
+  }
+}
