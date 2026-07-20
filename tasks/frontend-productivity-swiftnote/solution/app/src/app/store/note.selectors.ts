@@ -11,6 +11,9 @@ export const selectQuickSwitcherOpen = createSelector(selectAppState, s => s.qui
 export const selectShortcutsOpen = createSelector(selectAppState, s => s.shortcutsOpen);
 export const selectToastMessage = createSelector(selectAppState, s => s.toastMessage);
 export const selectSidebarCollapsed = createSelector(selectAppState, s => s.sidebarCollapsed);
+export const selectWorkspaceExportOpen = createSelector(selectAppState, s => s.workspaceExportOpen);
+export const selectWorkspaceImportOpen = createSelector(selectAppState, s => s.workspaceImportOpen);
+export const selectTxtExportOpen = createSelector(selectAppState, s => s.txtExportOpen);
 
 export const selectSelectedNote = createSelector(
   selectNotes,

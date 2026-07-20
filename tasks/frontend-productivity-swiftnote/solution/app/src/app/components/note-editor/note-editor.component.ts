@@ -8,9 +8,12 @@ import {
 } from '../../store/note.selectors';
 import {
   updateNote, deleteNote, pinNote, duplicateNote,
-  toggleFocusMode, showToast, openShortcuts, toggleSidebar, createNote
+  toggleFocusMode, showToast, openShortcuts, toggleSidebar, createNote,
+  openTxtExport, openWorkspaceExport, openWorkspaceImport
 } from '../../store/note.actions';
 import { NoteImage } from '../../models/note.model';
+
+const TITLE_MAX = 200;
 
 @Component({
   selector: 'app-note-editor',
@@ -36,11 +39,15 @@ import { NoteImage } from '../../models/note.model';
             <button class="btn-icon" (click)="toggleFocus()" [class.active]="focusMode()"
                     title="Toggle focus mode" aria-label="Toggle focus mode">⛶</button>
             <button class="btn-icon" (click)="exportNote()" title="Export as .txt" aria-label="Export as .txt">↓</button>
+            <button class="btn-icon" (click)="exportWorkspace()" title="Export workspace" aria-label="Export workspace">⭳</button>
+            <button class="btn-icon" (click)="importWorkspace()" title="Import workspace" aria-label="Import workspace">⭱</button>
             <button class="btn-icon" (click)="openShortcutsPanel()" title="Keyboard shortcuts" aria-label="Show shortcuts">⌨</button>
             <button class="btn-icon danger-btn" (click)="onDeleteClick()" title="Delete note" aria-label="Delete note">🗑</button>
           </div>
         } @else {
           <div class="toolbar-actions">
+            <button class="btn-icon" (click)="exportWorkspace()" title="Export workspace" aria-label="Export workspace">⭳</button>
+            <button class="btn-icon" (click)="importWorkspace()" title="Import workspace" aria-label="Import workspace">⭱</button>
             <button class="btn-icon" (click)="openShortcutsPanel()" title="Keyboard shortcuts" aria-label="Show shortcuts">⌨</button>
           </div>
         }
@@ -72,8 +79,12 @@ import { NoteImage } from '../../models/note.model';
             placeholder="Untitled"
             [value]="localTitle()"
             (input)="onTitleInput($event)"
-            maxlength="200"
+            [attr.aria-invalid]="titleError() ? 'true' : null"
+            aria-describedby="note-title-error"
           />
+          @if (titleError()) {
+            <div id="note-title-error" class="field-error" role="alert" aria-live="polite">{{ titleError() }}</div>
+          }
 
           <!-- Body -->
           <label class="field-label body-label" for="note-body">Note body</label>
@@ -218,6 +229,12 @@ import { NoteImage } from '../../models/note.model';
 
     .body-label { margin-top: 8px; }
 
+    .field-error {
+      color: #ff8a80;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
     .note-title-input {
       background: transparent;
       border: none;
@@ -265,7 +282,7 @@ import { NoteImage } from '../../models/note.model';
 
     .images-header {
       font-size: 12px;
-      color: rgba(255,255,255,0.4);
+      color: rgba(255,255,255,0.6);
       letter-spacing: 0.06em;
       margin-bottom: 10px;
     }
@@ -310,7 +327,7 @@ import { NoteImage } from '../../models/note.model';
 
     .image-name {
       font-size: 11px;
-      color: rgba(255,255,255,0.4);
+      color: rgba(255,255,255,0.6);
       max-width: 100px;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -333,7 +350,7 @@ import { NoteImage } from '../../models/note.model';
       flex-wrap: wrap;
     }
 
-    .drop-hint { font-size: 12px; color: rgba(255,255,255,0.3); font-style: italic; }
+    .drop-hint { font-size: 12px; color: rgba(255,255,255,0.58); font-style: italic; }
 
     .saved-indicator {
       font-size: 12px;
@@ -353,7 +370,7 @@ import { NoteImage } from '../../models/note.model';
       display: flex;
       gap: 20px;
       font-size: 12px;
-      color: rgba(255,255,255,0.35);
+      color: rgba(255,255,255,0.6);
       padding-top: 8px;
       border-top: 1px solid rgba(255,255,255,0.06);
       flex-shrink: 0;
@@ -368,7 +385,7 @@ import { NoteImage } from '../../models/note.model';
       align-items: center;
       justify-content: center;
       gap: 16px;
-      color: rgba(255,255,255,0.4);
+      color: rgba(255,255,255,0.62);
     }
 
     .no-note-icon { font-size: 48px; }
@@ -414,6 +431,7 @@ export class NoteEditorComponent {
   localBody = signal('');
   saved = signal(false);
   showDeleteConfirm = signal(false);
+  titleError = signal<string | null>(null);
 
   private savedTimer?: ReturnType<typeof setTimeout>;
   private pendingId: string | null = null;
@@ -434,6 +452,7 @@ export class NoteEditorComponent {
         this.localTitle.set(n.title);
         this.localBody.set(n.body);
         this.showDeleteConfirm.set(false);
+        this.titleError.set(null);
         if (!n.title) {
           setTimeout(() => this.titleInputRef?.nativeElement.focus(), 50);
         }
@@ -447,7 +466,16 @@ export class NoteEditorComponent {
   }
 
   onTitleInput(event: Event) {
-    const val = (event.target as HTMLInputElement).value;
+    const input = event.target as HTMLInputElement;
+    const val = input.value;
+    // Reject over-length titles: show an inline error naming the field and do
+    // not keep the over-length value (revert the input to the last valid value).
+    if (val.trim().length > TITLE_MAX) {
+      this.titleError.set(`Title must be ${TITLE_MAX} characters or fewer.`);
+      input.value = this.localTitle();
+      return;
+    }
+    this.titleError.set(null);
     this.localTitle.set(val);
     const id = this.note()?.id;
     if (id) this.store.dispatch(updateNote({ id, changes: { title: val } }));
@@ -504,24 +532,12 @@ export class NoteEditorComponent {
   }
 
   exportNote() {
-    const n = this.note();
-    if (!n) return;
-    const placeholders = n.images.map(img => `[Image: ${img.filename}]`).join('\n');
-    const content = [
-      n.title || 'Untitled',
-      '─'.repeat(40),
-      n.body,
-      placeholders ? '\n' + placeholders : '',
-    ].filter(Boolean).join('\n');
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${(n.title || 'note').replace(/[^a-z0-9]/gi, '_')}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    this.store.dispatch(showToast({ message: 'Note exported' }));
+    if (!this.note()) return;
+    this.store.dispatch(openTxtExport());
   }
+
+  exportWorkspace() { this.store.dispatch(openWorkspaceExport()); }
+  importWorkspace() { this.store.dispatch(openWorkspaceImport()); }
 
   triggerImagePicker() { this.fileInputRef?.nativeElement.click(); }
 

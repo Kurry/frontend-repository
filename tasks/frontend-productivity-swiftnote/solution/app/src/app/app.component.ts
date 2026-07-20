@@ -6,9 +6,11 @@ import { NoteEditorComponent } from './components/note-editor/note-editor.compon
 import { QuickSwitcherComponent } from './components/quick-switcher/quick-switcher.component';
 import { ShortcutsDialogComponent } from './components/shortcuts-dialog/shortcuts-dialog.component';
 import { ToastComponent } from './components/toast/toast.component';
+import { WorkspaceDialogComponent } from './components/workspace-dialog/workspace-dialog.component';
 import * as NoteActions from './store/note.actions';
 import {
-  selectFocusMode, selectQuickSwitcherOpen, selectShortcutsOpen, selectSidebarCollapsed
+  selectFocusMode, selectQuickSwitcherOpen, selectShortcutsOpen, selectSidebarCollapsed,
+  selectWorkspaceExportOpen, selectWorkspaceImportOpen, selectTxtExportOpen,
 } from './store/note.selectors';
 import { WebmcpService } from './webmcp/webmcp.service';
 
@@ -21,6 +23,7 @@ import { WebmcpService } from './webmcp/webmcp.service';
     QuickSwitcherComponent,
     ShortcutsDialogComponent,
     ToastComponent,
+    WorkspaceDialogComponent,
   ],
   template: `
     <div class="app-shell"
@@ -36,6 +39,7 @@ import { WebmcpService } from './webmcp/webmcp.service';
     @if (shortcutsOpen()) {
       <app-shortcuts-dialog />
     }
+    <app-workspace-dialog />
     <app-toast />
   `,
   styles: [`
@@ -118,6 +122,9 @@ export class AppComponent {
   quickSwitcherOpen = toSignal(this.store.select(selectQuickSwitcherOpen), { initialValue: false });
   shortcutsOpen = toSignal(this.store.select(selectShortcutsOpen), { initialValue: false });
   sidebarCollapsed = toSignal(this.store.select(selectSidebarCollapsed), { initialValue: false });
+  workspaceExportOpen = toSignal(this.store.select(selectWorkspaceExportOpen), { initialValue: false });
+  workspaceImportOpen = toSignal(this.store.select(selectWorkspaceImportOpen), { initialValue: false });
+  txtExportOpen = toSignal(this.store.select(selectTxtExportOpen), { initialValue: false });
 
   @HostListener('document:keydown', ['$event'])
   onKeydown(event: KeyboardEvent) {
@@ -161,7 +168,13 @@ export class AppComponent {
 
     // Escape → close overlays / exit focus mode
     if (event.key === 'Escape') {
-      if (this.quickSwitcherOpen()) {
+      if (this.workspaceExportOpen()) {
+        this.store.dispatch(NoteActions.closeWorkspaceExport());
+      } else if (this.workspaceImportOpen()) {
+        this.store.dispatch(NoteActions.closeWorkspaceImport());
+      } else if (this.txtExportOpen()) {
+        this.store.dispatch(NoteActions.closeTxtExport());
+      } else if (this.quickSwitcherOpen()) {
         this.store.dispatch(NoteActions.closeQuickSwitcher());
       } else if (this.shortcutsOpen()) {
         this.store.dispatch(NoteActions.closeShortcuts());

@@ -197,3 +197,16 @@ mark {
     height: 44px;
   }
 }
+
+/* Respect the user's reduced-motion preference across the whole app:
+   collapse every transition/animation to an instant, non-moving change. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

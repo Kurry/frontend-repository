@@ -12,6 +12,9 @@ export interface AppState {
   shortcutsOpen: boolean;
   toastMessage: string | null;
   sidebarCollapsed: boolean;
+  workspaceExportOpen: boolean;
+  workspaceImportOpen: boolean;
+  txtExportOpen: boolean;
 }
 
 function createInitialState(): AppState {
@@ -24,6 +27,9 @@ function createInitialState(): AppState {
     shortcutsOpen: false,
     toastMessage: null,
     sidebarCollapsed: false,
+    workspaceExportOpen: false,
+    workspaceImportOpen: false,
+    txtExportOpen: false,
   };
 
   try {
@@ -207,6 +213,42 @@ export const noteReducer = createReducer(
   on(NoteActions.toggleSidebar, (state) => ({
     ...state,
     sidebarCollapsed: !state.sidebarCollapsed,
+  })),
+
+  on(NoteActions.openWorkspaceExport, (state) => ({
+    ...state,
+    workspaceExportOpen: true,
+    workspaceImportOpen: false,
+    txtExportOpen: false,
+    quickSwitcherOpen: false,
+    shortcutsOpen: false,
+  })),
+  on(NoteActions.closeWorkspaceExport, (state) => ({ ...state, workspaceExportOpen: false })),
+  on(NoteActions.openWorkspaceImport, (state) => ({
+    ...state,
+    workspaceImportOpen: true,
+    workspaceExportOpen: false,
+    txtExportOpen: false,
+    quickSwitcherOpen: false,
+    shortcutsOpen: false,
+  })),
+  on(NoteActions.closeWorkspaceImport, (state) => ({ ...state, workspaceImportOpen: false })),
+  on(NoteActions.openTxtExport, (state) => ({
+    ...state,
+    txtExportOpen: true,
+    workspaceExportOpen: false,
+    workspaceImportOpen: false,
+    quickSwitcherOpen: false,
+    shortcutsOpen: false,
+  })),
+  on(NoteActions.closeTxtExport, (state) => ({ ...state, txtExportOpen: false })),
+
+  on(NoteActions.importWorkspace, (state, { notes, selectedNoteId }) => ({
+    ...state,
+    notes,
+    selectedNoteId: notes.some(n => n.id === selectedNoteId) ? selectedNoteId : (notes[0]?.id ?? null),
+    searchQuery: '',
+    workspaceImportOpen: false,
   })),
 );
 

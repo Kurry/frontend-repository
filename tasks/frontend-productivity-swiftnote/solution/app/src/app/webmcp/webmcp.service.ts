@@ -1,10 +1,10 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, NgZone } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { AppState } from '../store/note.reducer';
 import { Note } from '../models/note.model';
 import {
   selectNotes, selectSelectedNoteId, selectFilteredNotes,
   selectFocusMode, selectQuickSwitcherOpen, selectShortcutsOpen,
+  selectWorkspaceExportOpen, selectWorkspaceImportOpen, selectTxtExportOpen,
 } from '../store/note.selectors';
 import * as NoteActions from '../store/note.actions';
 
@@ -25,11 +25,15 @@ import * as NoteActions from '../store/note.actions';
  *   browse-query-v1      (prefix "browse") — open, search
  */
 
-const ENTITY_FIELDS = ['title', 'body'] as const;
+const ENTITY_FIELDS = ['title', 'body', 'pinned'] as const;
 type EntityField = (typeof ENTITY_FIELDS)[number];
 
-const DESTINATIONS = ['editor', 'quick-switcher', 'shortcuts', 'focus-mode'] as const;
+const DESTINATIONS = ['editor', 'quick-switcher', 'shortcuts', 'focus-mode', 'workspace-export', 'workspace-import'] as const;
 type Destination = (typeof DESTINATIONS)[number];
+
+const ARTIFACT_OPERATIONS = ['export', 'import', 'copy'] as const;
+const EXPORT_FORMATS = ['workspace-json', 'txt'] as const;
+const IMPORT_MODES = ['workspace-json'] as const;
 
 const TITLE_MAX = 200;
 const BODY_MAX = 20000;
@@ -50,6 +54,7 @@ declare global {
 @Injectable({ providedIn: 'root' })
 export class WebmcpService {
   private store = inject(Store);
+  private zone = inject(NgZone);
 
   // Latest store snapshot, kept current by the subscription below.
   private notes: Note[] = [];
@@ -58,6 +63,9 @@ export class WebmcpService {
   private focusMode = false;
   private quickSwitcherOpen = false;
   private shortcutsOpen = false;
+  private workspaceExportOpen = false;
+  private workspaceImportOpen = false;
+  private txtExportOpen = false;
 
   register(): void {
     if (typeof window === 'undefined') return;
@@ -68,26 +76,35 @@ export class WebmcpService {
     this.store.select(selectFocusMode).subscribe(v => (this.focusMode = v));
     this.store.select(selectQuickSwitcherOpen).subscribe(v => (this.quickSwitcherOpen = v));
     this.store.select(selectShortcutsOpen).subscribe(v => (this.shortcutsOpen = v));
+    this.store.select(selectWorkspaceExportOpen).subscribe(v => (this.workspaceExportOpen = v));
+    this.store.select(selectWorkspaceImportOpen).subscribe(v => (this.workspaceImportOpen = v));
+    this.store.select(selectTxtExportOpen).subscribe(v => (this.txtExportOpen = v));
 
     const tools = this.buildTools();
 
     window.webmcp_session_info = () => ({
       contract_version: 'zto-webmcp-v1',
       app: 'swiftnote',
-      modules: ['entity-collection-v1', 'browse-query-v1'],
+      modules: ['entity-collection-v1', 'browse-query-v1', 'artifact-transfer-v1'],
       entity: 'note',
       entity_operations: ['create', 'select', 'update', 'delete', 'toggle'],
       entity_fields: [...ENTITY_FIELDS],
       browsable_entity: 'notes',
       destinations: [...DESTINATIONS],
+      artifact_operations: [...ARTIFACT_OPERATIONS],
+      export_formats: [...EXPORT_FORMATS],
+      import_modes: [...IMPORT_MODES],
       tool_count: Object.keys(tools).length,
     });
     window.webmcp_list_tools = () =>
       Object.keys(tools).map(name => ({ name, description: tools[name].description }));
+    // Every invocation runs inside Angular's zone so the visible UI (sidebar,
+    // editor, overlays, counts) re-renders synchronously with the store change —
+    // the same code path a human control triggers.
     window.webmcp_invoke_tool = (name: string, args?: Record<string, unknown>) => {
       const tool = tools[name];
       if (!tool) throw new Error('Unknown WebMCP tool: ' + name);
-      return tool.handler(args || {});
+      return this.zone.run(() => tool.handler(args || {}));
     };
 
     // Optional-additional: navigator.modelContext registration (same handlers).
@@ -100,7 +117,7 @@ export class WebmcpService {
           nav.modelContext.registerTool({
             name,
             description: tools[name].description,
-            execute: (args: Record<string, unknown>) => tools[name].handler(args || {}),
+            execute: (args: Record<string, unknown>) => this.zone.run(() => tools[name].handler(args || {})),
           });
         }
       }
@@ -138,9 +155,10 @@ export class WebmcpService {
       },
       entity_update: {
         description:
-          'Update a note field. field must be one of: title, body. value is a bounded ' +
-          'string (title ≤ 200 chars, body ≤ 20000). Dispatches the same edit ' +
-          'command the editor inputs use; no generic patch object is accepted.',
+          'Update a note field. field must be one of: title, body, pinned. For title/body ' +
+          'value is a bounded string (title ≤ 200 chars, body ≤ 20000); for pinned value is ' +
+          'a boolean. Dispatches the same edit command the editor/pin controls use; no ' +
+          'generic patch object is accepted.',
         handler: (args) => {
           const note = findNote(args['id']);
           if (!note) return { ok: false, error: 'Unknown note id' };
@@ -149,11 +167,23 @@ export class WebmcpService {
             return { ok: false, error: 'field must be one of: ' + ENTITY_FIELDS.join(', ') };
           }
           const value = args['value'];
+          if (field === 'pinned') {
+            if (typeof value !== 'boolean') {
+              return { ok: false, error: 'pinned value must be a boolean' };
+            }
+            if (note.pinned !== value) {
+              this.store.dispatch(NoteActions.pinNote({ id: note.id }));
+            }
+            return { ok: true, id: note.id, field, value };
+          }
           if (typeof value !== 'string') {
             return { ok: false, error: 'value must be a string' };
           }
           const max = field === 'title' ? TITLE_MAX : BODY_MAX;
-          if (value.length > max) {
+          // Title is bounded by its *trimmed* length (matches the editor's
+          // guard and the note field contract); body is bounded as typed.
+          const length = field === 'title' ? value.trim().length : value.length;
+          if (length > max) {
             return { ok: false, error: `value exceeds ${max} characters` };
           }
           const changes: Partial<Note> = { [field]: value } as Partial<Note>;
@@ -192,8 +222,8 @@ export class WebmcpService {
       // ---- browse-query-v1 ---------------------------------------------
       browse_open: {
         description:
-          'Open an app view/mode. destination must be one of: editor, quick-switcher, ' +
-          'shortcuts, focus-mode. Dispatches the same command the matching control uses.',
+          'Open an app view/mode. destination must be one of: ' + DESTINATIONS.join(', ') +
+          '. Dispatches the same command the matching control uses.',
         handler: (args) => {
           const dest = args['destination'];
           if (typeof dest !== 'string' || !DESTINATIONS.includes(dest as Destination)) {
@@ -209,9 +239,18 @@ export class WebmcpService {
             case 'focus-mode':
               if (!this.focusMode) this.store.dispatch(NoteActions.toggleFocusMode());
               break;
+            case 'workspace-export':
+              if (!this.workspaceExportOpen) this.store.dispatch(NoteActions.openWorkspaceExport());
+              break;
+            case 'workspace-import':
+              if (!this.workspaceImportOpen) this.store.dispatch(NoteActions.openWorkspaceImport());
+              break;
             case 'editor':
               if (this.quickSwitcherOpen) this.store.dispatch(NoteActions.closeQuickSwitcher());
               if (this.shortcutsOpen) this.store.dispatch(NoteActions.closeShortcuts());
+              if (this.workspaceExportOpen) this.store.dispatch(NoteActions.closeWorkspaceExport());
+              if (this.workspaceImportOpen) this.store.dispatch(NoteActions.closeWorkspaceImport());
+              if (this.txtExportOpen) this.store.dispatch(NoteActions.closeTxtExport());
               if (this.focusMode) this.store.dispatch(NoteActions.toggleFocusMode());
               break;
           }
@@ -221,6 +260,8 @@ export class WebmcpService {
             focusMode: this.focusMode,
             quickSwitcherOpen: this.quickSwitcherOpen,
             shortcutsOpen: this.shortcutsOpen,
+            workspaceExportOpen: this.workspaceExportOpen,
+            workspaceImportOpen: this.workspaceImportOpen,
           };
         },
       },
@@ -239,6 +280,62 @@ export class WebmcpService {
           }
           this.store.dispatch(NoteActions.setSearchQuery({ query }));
           return { ok: true, query, matches: this.filtered.length };
+        },
+      },
+
+      // ---- artifact-transfer-v1 ----------------------------------------
+      // No raw file bytes, blobs, or artifact contents cross this boundary — the
+      // tools open the same Export Workspace / Import Workspace / Export as .txt
+      // surfaces the UI uses; download bytes and clipboard remain Playwright's job.
+      artifact_export: {
+        description:
+          'Open an export surface. format must be one of: workspace-json, txt. ' +
+          'workspace-json opens Export Workspace (live Workspace JSON preview); ' +
+          'txt opens Export as .txt (filename dialog). Same surfaces as the UI ' +
+          'controls; no file contents are returned.',
+        handler: (args) => {
+          const format = args['format'];
+          if (typeof format !== 'string' || !EXPORT_FORMATS.includes(format as (typeof EXPORT_FORMATS)[number])) {
+            return { ok: false, error: 'format must be one of: ' + EXPORT_FORMATS.join(', ') };
+          }
+          if (format === 'txt') {
+            if (!this.selectedNoteId) return { ok: false, error: 'no note is open to export' };
+            this.store.dispatch(NoteActions.openTxtExport());
+          } else {
+            this.store.dispatch(NoteActions.openWorkspaceExport());
+          }
+          return { ok: true, format, opened: true };
+        },
+      },
+      artifact_copy: {
+        description:
+          'Open Export Workspace so the visible Copy button can be used. format ' +
+          'must be workspace-json. This tool does not itself write to the ' +
+          'clipboard — per the artifact-transfer contract, actually clicking ' +
+          'Copy (and verifying clipboard contents) remains a Playwright ' +
+          'responsibility.',
+        handler: (args) => {
+          const format = args['format'];
+          if (format !== 'workspace-json') {
+            return { ok: false, error: 'format must be workspace-json' };
+          }
+          this.store.dispatch(NoteActions.openWorkspaceExport());
+          return { ok: true, format, opened: true };
+        },
+      },
+      artifact_import: {
+        description:
+          'Open Import Workspace so a workspace-json payload can be pasted and ' +
+          'confirmed (same surface as the Import Workspace control). mode must be ' +
+          'workspace-json. Per the artifact-transfer contract, file contents are ' +
+          'never passed through WebMCP arguments — paste + confirm is Playwright-driven.',
+        handler: (args) => {
+          const mode = args['mode'];
+          if (mode !== undefined && mode !== 'workspace-json') {
+            return { ok: false, error: 'mode must be workspace-json' };
+          }
+          this.store.dispatch(NoteActions.openWorkspaceImport());
+          return { ok: true, mode: 'workspace-json', opened: true };
         },
       },
     };

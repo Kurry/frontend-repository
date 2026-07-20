@@ -179,7 +179,7 @@ import { Note } from '../../models/note.model';
 
     .empty-hint {
       font-size: 13px;
-      color: rgba(255,255,255,0.4);
+      color: rgba(255,255,255,0.62);
       line-height: 1.5;
     }
 
@@ -199,7 +199,8 @@ import { Note } from '../../models/note.model';
     }
 
     .note-row:hover { background: rgba(255,255,255,0.05); }
-    .note-row.selected { background: rgba(244, 91, 105, 0.12); border-left: 3px solid #F45B69; }
+    .note-row.selected { background: rgba(244, 91, 105, 0.16); border-left: 3px solid #F45B69; }
+    .note-row.selected .note-row-button { background: rgba(244, 91, 105, 0.16); }
 
     .note-row-button {
       width: 100%;
@@ -244,14 +245,14 @@ import { Note } from '../../models/note.model';
 
     .note-time {
       font-size: 11px;
-      color: rgba(255,255,255,0.35);
+      color: rgba(255,255,255,0.6);
       flex-shrink: 0;
       white-space: nowrap;
     }
 
     .note-preview {
       font-size: 12px;
-      color: rgba(255,255,255,0.5);
+      color: rgba(255,255,255,0.62);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -280,7 +281,7 @@ import { Note } from '../../models/note.model';
 
     .stat-label {
       font-size: 10px;
-      color: rgba(255,255,255,0.35);
+      color: rgba(255,255,255,0.6);
       letter-spacing: 0.05em;
     }
 

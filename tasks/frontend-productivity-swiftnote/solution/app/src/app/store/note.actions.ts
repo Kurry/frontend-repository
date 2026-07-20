@@ -19,3 +19,15 @@ export const closeShortcuts = createAction('[UI] Close Shortcuts');
 export const showToast = createAction('[UI] Show Toast', props<{ message: string }>());
 export const clearToast = createAction('[UI] Clear Toast');
 export const toggleSidebar = createAction('[UI] Toggle Sidebar');
+
+export const openWorkspaceExport = createAction('[UI] Open Workspace Export');
+export const closeWorkspaceExport = createAction('[UI] Close Workspace Export');
+export const openWorkspaceImport = createAction('[UI] Open Workspace Import');
+export const closeWorkspaceImport = createAction('[UI] Close Workspace Import');
+export const openTxtExport = createAction('[UI] Open Txt Export');
+export const closeTxtExport = createAction('[UI] Close Txt Export');
+
+export const importWorkspace = createAction(
+  '[Note] Import Workspace',
+  props<{ notes: Note[]; selectedNoteId: string | null }>()
+);
