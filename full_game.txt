@@ -35,14 +35,7 @@
     onStreamStart: () => void;
     onStreamPause: () => void;
     onStreamReconnect: () => void;
-
     onStreamDeliverOutOfOrder: () => void;
-    onExportJSON: () => void;
-    onCopyJSON: () => void;
-    onSaveProgress: () => void;
-    winner: string | null;
-    turnLogLength: number;
-
   }
 
   let {
@@ -70,14 +63,7 @@
     onStreamStart,
     onStreamPause,
     onStreamReconnect,
-
     onStreamDeliverOutOfOrder,
-    onExportJSON,
-    onCopyJSON,
-    onSaveProgress,
-    winner,
-    turnLogLength,
-
   }: Props = $props();
 
   let showScoreboard = $state(false);
@@ -134,46 +120,11 @@
     </div>
   </div>
 
-
-  <!-- Session Controls -->
-  <div class="flex flex-wrap items-center justify-center gap-2 mb-4 max-w-lg mx-auto w-full">
-    <button
-      class="px-4 py-2 rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
-      style="background-color: #222; color: white;"
-      onclick={onSaveProgress}
-      disabled={turnLogLength === 0 || winner !== null}
-    >
-      Save Progress
-    </button>
-    <button
-      class="px-4 py-2 rounded-full font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-md"
-      style="background-color: #222; color: white;"
-      onclick={onExportJSON}
-    >
-      Export Session
-    </button>
-    <button
-      class="px-4 py-2 rounded-full bg-white text-sm font-medium border-2 border-black hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-      onclick={onCopyJSON}
-    >
-      Copy Session JSON
-    </button>
+  <!-- Current Player -->
+  <div class="text-center mb-4 max-w-lg mx-auto w-full">
+    <p class="text-black text-sm mb-1">Current turn</p>
+    <h2 class="text-2xl font-bold" style="color: var(--color-accent);">{currentPlayer}'s turn</h2>
   </div>
-
-
-  <!-- Current Player / Winner -->
-  <div class="text-center mb-4 max-w-lg mx-auto w-full" aria-live="polite">
-    {#if winner}
-      <div class="bg-yellow-200 border-2 border-yellow-500 rounded-xl p-4 mb-2 shadow-lg">
-        <h2 class="text-3xl font-bold text-yellow-900 mb-1">🎉 Winner! 🎉</h2>
-        <p class="text-xl font-bold text-yellow-800">{winner} reached 10 points!</p>
-      </div>
-    {:else}
-      <p class="text-black text-sm mb-1">Current turn</p>
-      <h2 class="text-2xl font-bold" style="color: var(--color-accent);">{currentPlayer}'s turn</h2>
-    {/if}
-  </div>
-
 
   <!-- Reshuffle Message -->
   {#if reshuffleMessage}
@@ -227,7 +178,6 @@
         <button
           class="flex-1 px-6 py-4 rounded-full font-bold text-black text-base bg-white border-2 border-black transition-all shadow-md hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
           onclick={onSkip}
-          disabled={winner !== null}
         >
           Skip
         </button>
@@ -235,7 +185,6 @@
           class="flex-1 px-6 py-4 rounded-full font-bold text-white text-base transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
           style="background-color: var(--color-accent);"
           onclick={onDone}
-          disabled={winner !== null}
         >
           Done
         </button>
@@ -251,7 +200,6 @@
           class="px-10 py-4 rounded-full font-bold text-white text-lg transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
           style="background-color: var(--color-accent);"
           onclick={onDrawCard}
-          disabled={winner !== null}
         >
           Draw card
         </button>
@@ -261,7 +209,7 @@
 
   <!-- Undo Button -->
   <div class="text-center pb-4 max-w-lg mx-auto w-full">
-    {#if canUndo && winner === null}
+    {#if canUndo}
       <button
         class="px-6 py-2 rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
         style="background-color: white; color: black; border: 2px solid black;"

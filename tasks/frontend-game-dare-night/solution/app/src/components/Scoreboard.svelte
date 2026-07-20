@@ -10,11 +10,13 @@
   }
 
   let { sortedScores }: Props = $props();
+  import { flip } from 'svelte/animate';
+  import { fade } from 'svelte/transition';
 </script>
 
 <div class="space-y-2">
-  {#each sortedScores as entry, index}
-    <div class="flex items-center gap-3 p-3 rounded-lg {index === 0 ? 'bg-yellow-50' : 'bg-gray-50'}">
+  {#each sortedScores as entry, index (entry.name)}
+    <div class="flex items-center gap-3 p-3 rounded-lg {index === 0 ? 'bg-yellow-50 border-2 border-yellow-500' : 'bg-gray-50'}" in:fade={{ duration: 400 }} animate:flip={{ duration: 400 }}>
       {#if index === 0}
         <span class="text-xl" aria-hidden="true">🥇</span>
         <span class="sr-only">1st place</span>

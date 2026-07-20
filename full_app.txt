@@ -5,7 +5,6 @@
   import SetupScreen from './SetupScreen.svelte';
   import GameScreen from './GameScreen.svelte';
   import Toast from './Toast.svelte';
-  import confetti from 'canvas-confetti';
 
   // Storage helpers that are safe during SSR
   function safeLocalStorageGet<T>(key: string, fallback: T): T {
@@ -40,26 +39,18 @@
   let deck = $state<Card[]>([]);
   let drawnCards = $state<Card[]>([]);
   let currentCard = $state<Card | null>(null);
-
   let lastDrawnCardId = $state<string | null>(null);
   let reshuffleMessage = $state(false);
-  let winner = $state<string | null>(null);
-  let turnLog = $state<{playerName: string; outcome: 'done' | 'skip' | 'timeout'; cardPrompt: string; category: string; intensity: string;}[]>([]);
-
   let timerEnabled = $state(false);
   let timeLeft = $state(15);
   let timerInterval = $state<ReturnType<typeof setInterval> | null>(null);
   let canUndo = $state(false);
-
   let undoData = $state<{
     playerIndex: number;
     scores: Record<string, { points: number; forfeits: number }>;
     card: Card | null;
     lastDrawnCardId: string | null;
-    turnLogLength: number;
-    winner: string | null;
   } | null>(null);
-
   let toasts = $state<{ id: number; message: string; type: 'success' | 'error' | 'info' }[]>([]);
   let toastCounter = $state(0);
   let showNewGameConfirm = $state(false);
@@ -221,7 +212,6 @@
   }
 
   // ============ GAME ============
-
   function startGame(playerNames: string[]) {
     players = [...playerNames];
     currentPlayerIndex = 0;
@@ -234,8 +224,6 @@
     drawnCards = [];
     currentCard = null;
     lastDrawnCardId = null;
-    winner = null;
-    turnLog = [];
     canUndo = false;
     undoData = null;
     phase = 'playing';
@@ -245,11 +233,7 @@
     saveCustomCards();
   }
 
-
-
   function drawCard(): Card | undefined {
-    if (winner !== null) return undefined;
-
     if (deck.length === 0) {
       deck = buildDeck();
       drawnCards = [];
@@ -280,7 +264,6 @@
     return card;
   }
 
-
   function startTimer() {
     stopTimer();
     if (!timerEnabled) return;
@@ -301,80 +284,65 @@
     }
   }
 
-
   function saveUndoState() {
     undoData = {
       playerIndex: currentPlayerIndex,
       scores: JSON.parse(JSON.stringify(scores)),
       card: currentCard,
       lastDrawnCardId: lastDrawnCardId,
-      turnLogLength: turnLog.length,
-      winner: winner,
     };
   }
 
-
+  function handleTimerForfeit() {
+    const playerName = players[currentPlayerIndex];
+    if (playerName && scores[playerName]) {
+      saveUndoState();
+      scores = { ...scores, [playerName]: { ...scores[playerName], forfeits: scores[playerName].forfeits + 1 } };
+      canUndo = true;
+      showToast(`${playerName}: time's up! Forfeit recorded.`, 'error');
+      advanceTurn();
+      persistGameState();
+    }
+  }
 
   function handleDone() {
-    if (winner !== null) return;
     stopTimer();
     const playerName = players[currentPlayerIndex];
     if (playerName && scores[playerName]) {
       saveUndoState();
       scores = { ...scores, [playerName]: { ...scores[playerName], points: scores[playerName].points + 1 } };
       canUndo = true;
-      if (currentCard) {
-        turnLog = [...turnLog, { playerName, outcome: 'done', cardPrompt: currentCard.prompt, category: currentCard.category, intensity: currentCard.intensity }];
-      }
       showToast(`${playerName} scored! +1 point`, 'success');
-      updateBestRecord(playerName);
-
-      if (scores[playerName].points >= 10) {
-        winner = playerName;
-        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-           confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-        }
-      }
-
+      updateBestRecord();
       advanceTurn();
       persistGameState();
     }
   }
 
-
-
   function handleSkip() {
-    if (winner !== null) return;
     stopTimer();
     const playerName = players[currentPlayerIndex];
     if (playerName && scores[playerName]) {
       saveUndoState();
       scores = { ...scores, [playerName]: { ...scores[playerName], forfeits: scores[playerName].forfeits + 1 } };
       canUndo = true;
-      if (currentCard) {
-        turnLog = [...turnLog, { playerName, outcome: 'skip', cardPrompt: currentCard.prompt, category: currentCard.category, intensity: currentCard.intensity }];
-      }
       showToast(`${playerName} skipped. Forfeit recorded.`, 'info');
       advanceTurn();
       persistGameState();
     }
   }
 
-
   function advanceTurn() {
     currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
     currentCard = null;
   }
 
-
   function undoLastTurn() {
-    if (!canUndo || !undoData || winner !== null) return;
+    if (!canUndo || !undoData) return;
     currentPlayerIndex = undoData.playerIndex;
     scores = JSON.parse(JSON.stringify(undoData.scores));
     currentCard = undoData.card;
     lastDrawnCardId = undoData.lastDrawnCardId;
-    turnLog = turnLog.slice(0, undoData.turnLogLength);
-    winner = undoData.winner;
     if (drawnCards.length > 0) {
       drawnCards = drawnCards.slice(0, -1);
     }
@@ -385,20 +353,15 @@
     persistGameState();
   }
 
-
-
-  function updateBestRecord(playerName: string) {
-    const pts = scores[playerName]?.points ?? 0;
-    if (!bestRecord || pts > bestRecord.points) {
-      if (bestRecord && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          confetti({ particleCount: 100, spread: 60, origin: { y: 0.8 }, colors: ['#ff0000', '#00ff00', '#0000ff'] });
+  function updateBestRecord() {
+    for (const playerName of players) {
+      const pts = scores[playerName]?.points ?? 0;
+      if (!bestRecord || pts > bestRecord.points) {
+        bestRecord = { name: playerName, points: pts };
+        safeLocalStorageSet('dare-night-best-record', bestRecord);
       }
-      bestRecord = { name: playerName, points: pts };
-      safeLocalStorageSet('dare-night-best-record', bestRecord);
     }
   }
-
-
 
   function newGame() {
     showNewGameConfirm = false;
@@ -410,8 +373,6 @@
     drawnCards = [];
     currentCard = null;
     lastDrawnCardId = null;
-    winner = null;
-    turnLog = [];
     canUndo = false;
     undoData = null;
     reshuffleMessage = false;
@@ -429,12 +390,11 @@
     clearGameState();
   }
 
-
   // ============ CUSTOM CARDS ============
   function addCustomCard(prompt: string, category: Category, intensity: Intensity): ToolResult {
     const text = (prompt ?? '').trim();
-    if (text.length < 8) {
-      return { ok: false, message: 'prompt must be at least 8 characters' };
+    if (text.length < 5) {
+      return { ok: false, message: 'Enter at least 5 characters for the card prompt' };
     }
     const id = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
     const card: Card = { id, prompt: text, category, intensity, isCustom: true };
@@ -565,7 +525,6 @@
   }
 
   // ============ PERSISTENCE ============
-
   function persistGameState() {
     const gameState = {
       phase,
@@ -580,12 +539,9 @@
       lastDrawnCardId,
       bestRecord,
       timerEnabled,
-      winner,
-      turnLog,
     };
     safeLocalStorageSet('dare-night-game', gameState);
   }
-
 
   function clearGameState() {
     try {
@@ -595,36 +551,11 @@
     } catch { /* ignore */ }
   }
 
-
   function handleGlobalKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      if (showNewGameConfirm) showNewGameConfirm = false;
-      if (showDeleteConfirm) showDeleteConfirm = null;
-    }
-
-    // Simple focus trap logic for dialogs
-    if (event.key === 'Tab' && (showNewGameConfirm || showDeleteConfirm)) {
-      const dialog = document.querySelector('[role="dialog"]');
-      if (!dialog) return;
-      const focusableElements = dialog.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
-      const firstElement = focusableElements[0] as HTMLElement;
-      const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
-
-      if (event.shiftKey) {
-        if (document.activeElement === firstElement) {
-          lastElement.focus();
-          event.preventDefault();
-        }
-      } else {
-        if (document.activeElement === lastElement) {
-          firstElement.focus();
-          event.preventDefault();
-        }
-      }
+    if (event.key === 'Escape' && showNewGameConfirm) {
+      showNewGameConfirm = false;
     }
   }
-
-
 
   // Initialize from localStorage — runs once
   function initFromStorage() {
@@ -655,8 +586,6 @@
       lastDrawnCardId = saved.lastDrawnCardId ?? null;
       bestRecord = saved.bestRecord ?? bestRecord;
       timerEnabled = saved.timerEnabled ?? false;
-      winner = saved.winner ?? null;
-      turnLog = saved.turnLog ?? [];
       canUndo = false;
       undoData = null;
       // Live stream is ephemeral; initialize a fresh source for the restored roster.
@@ -669,7 +598,6 @@
     isInitialized = true;
   }
 
-
   initFromStorage();
 
   // Persist game state when it changes during play
@@ -678,134 +606,6 @@
       persistGameState();
     }
   });
-
-
-
-  function exportSessionData() {
-    const data = {
-      schemaVersion: 'dare-night-session-v1',
-      status: winner ? 'finished' : (phase === 'playing' ? 'playing' : 'setup'),
-      players: players.map((name) => ({ name, points: scores[name]?.points ?? 0, forfeits: scores[name]?.forfeits ?? 0 })),
-      categories: selectedCategories,
-      intensity: selectedIntensity,
-      roundTimer: timerEnabled,
-      currentTurnIndex: currentPlayerIndex,
-      winTarget: 10,
-      winner: winner,
-      customCards: customCards.map(c => ({ prompt: c.prompt, category: c.category, intensity: c.intensity })),
-      record: bestRecord ? { holder: bestRecord.name, points: bestRecord.points } : null,
-      turnLog: turnLog,
-      exportedAt: new Date().toISOString()
-    };
-    return data;
-  }
-
-  function handleExportJSON() {
-    const data = exportSessionData();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `dare-night-session-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showToast('Session exported!', 'success');
-  }
-
-  function handleCopyJSON() {
-    const data = exportSessionData();
-    navigator.clipboard.writeText(JSON.stringify(data, null, 2)).then(() => {
-      showToast('Copied to clipboard!', 'success');
-    }).catch(() => {
-      document.execCommand('copy');
-      showToast('Copied to clipboard!', 'success');
-    });
-  }
-
-  function handleImportJSON(data: any) {
-    if (!data || data.schemaVersion !== 'dare-night-session-v1' || !data.players || !data.categories || !data.intensity || typeof data.winTarget !== 'number') {
-      showToast('Invalid session JSON file', 'error');
-      return;
-    }
-
-    // restore state
-    players = data.players.map((p: any) => p.name);
-    setupPlayerNames = [...players];
-    const newScores: Record<string, { points: number; forfeits: number }> = {};
-    for (const p of data.players) {
-      newScores[p.name] = { points: p.points, forfeits: p.forfeits };
-    }
-    scores = newScores;
-    selectedCategories = data.categories;
-    selectedIntensity = data.intensity;
-    timerEnabled = data.roundTimer ?? false;
-    currentPlayerIndex = data.currentTurnIndex ?? 0;
-    winner = data.winner ?? null;
-
-    // map custom cards correctly
-    const restoredCards: Card[] = [];
-    if (data.customCards) {
-      data.customCards.forEach((c: any) => {
-         const id = 'custom-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
-         restoredCards.push({ id, prompt: c.prompt, category: c.category, intensity: c.intensity, isCustom: true });
-      });
-    }
-    customCards = restoredCards;
-
-    turnLog = data.turnLog ?? [];
-    if (data.record) {
-       bestRecord = { name: data.record.holder, points: data.record.points };
-       safeLocalStorageSet('dare-night-best-record', bestRecord);
-    }
-
-    phase = data.status === 'setup' ? 'setup' : 'playing';
-
-    if (phase === 'playing') {
-      deck = buildDeck(); // we can't fully restore deck order but we rebuild
-      currentCard = null;
-      lastDrawnCardId = null;
-      drawnCards = [];
-      initStream();
-    }
-
-    saveCustomCards();
-    persistGameState();
-    showToast('Session imported successfully!', 'success');
-  }
-
-  function handleResumeSession() {
-     const saved = safeLocalStorageGet<any>('dare-night-game', null);
-     if (saved && saved.phase === 'playing' && saved.players && saved.players.length >= 2) {
-       phase = 'playing';
-       players = saved.players;
-       currentPlayerIndex = saved.currentPlayerIndex ?? 0;
-       scores = saved.scores ?? {};
-       selectedCategories = saved.selectedCategories ?? ['Icebreaker', 'Truth', 'Dare', 'Wild'];
-       selectedIntensity = saved.selectedIntensity ?? 'Mild';
-       deck = saved.deck ?? [];
-       const allAvailable = [...BUILT_IN_CARDS, ...customCards];
-       drawnCards = (saved.drawnCardIds ?? []).map((id: string) => allAvailable.find(c => c.id === id)).filter(Boolean) as Card[];
-       currentCard = saved.currentCard ?? null;
-       lastDrawnCardId = saved.lastDrawnCardId ?? null;
-       timerEnabled = saved.timerEnabled ?? false;
-       winner = saved.winner ?? null;
-       turnLog = saved.turnLog ?? [];
-       canUndo = false;
-       undoData = null;
-       eventSource = buildEventSource(players);
-       appliedEvents = [];
-       duplicatesIgnored = 0;
-       streamStatus = 'idle';
-       showToast('Session resumed', 'success');
-     } else {
-       showToast('No saved session found', 'error');
-     }
-  }
-
-  function handleSaveProgress() {
-    persistGameState();
-    showToast('Progress Saved', 'success');
-  }
 
   // ============ WEBMCP registration (runs once on the client) ============
   let webmcpReady = $state(false);
@@ -857,7 +657,7 @@
         const form = String(a.form ?? 'setup');
         if (form === 'custom-card') {
           const text = String(a.prompt ?? '').trim();
-          if (text.length < 8) return { ok: false, message: 'prompt must be at least 8 characters' };
+          if (text.length < 5) return { ok: false, message: 'Enter at least 5 characters for the card prompt' };
           return { ok: true, message: 'Custom card is valid' };
         }
         return validateSetup();
@@ -913,11 +713,6 @@
       onAddCustomCard={(data) => { addCustomCard(data.prompt, data.category, data.intensity); }}
       onDeleteCustomCard={(id) => { deleteCustomCard(id); }}
       onShowDeleteConfirm={(id) => { showDeleteConfirm = id; }}
-      onExportJSON={handleExportJSON}
-      onImportJSON={handleImportJSON}
-      onResumeSession={handleResumeSession}
-      hasSavedSession={safeLocalStorageGet('dare-night-game', null)?.phase === 'playing'}
-
     />
   {:else}
     <GameScreen
@@ -946,12 +741,6 @@
       onStreamPause={() => { streamPause(); }}
       onStreamReconnect={() => { streamReconnect(); }}
       onStreamDeliverOutOfOrder={() => { streamDeliverOutOfOrder(); }}
-      onExportJSON={handleExportJSON}
-      onCopyJSON={handleCopyJSON}
-      onSaveProgress={handleSaveProgress}
-      winner={winner}
-      turnLogLength={turnLog.length}
-
     />
   {/if}
 
@@ -981,7 +770,7 @@
   {/if}
 
   <!-- Toast Container -->
-  <div aria-live="polite" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center pointer-events-none">
+  <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2 items-center pointer-events-none">
     {#each toasts as toast (toast.id)}
       <Toast {toast} />
     {/each}
