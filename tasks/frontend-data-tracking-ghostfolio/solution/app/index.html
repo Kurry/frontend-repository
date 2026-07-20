@@ -11,15 +11,27 @@
     <div id="app" class="app-shell">
       <header class="topbar">
         <div class="brand">
-          <span class="brand-mark" aria-hidden="true"></span>
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm1 15.9V19a1 1 0 0 1-2 0v-1.05a4 4 0 0 1-3-3.45 1 1 0 0 1 2-.2 2 2 0 0 0 2 1.7c1.1 0 2-.6 2-1.45 0-.8-.6-1.2-2.2-1.6-1.7-.44-3.6-1-3.6-3.2a3.3 3.3 0 0 1 2.8-3.16V5a1 1 0 0 1 2 0v1.03a3.6 3.6 0 0 1 2.7 2.4 1 1 0 0 1-1.9.62A1.7 1.7 0 0 0 12 8.35c-1 0-1.8.53-1.8 1.3 0 .7.6 1 2.1 1.4 1.7.45 3.7 1 3.7 3.4A3.5 3.5 0 0 1 13 17.9Z"/></svg>
+          </span>
           <span class="brand-text">
             <span class="brand-name">Ghostfolio</span>
             <span class="brand-sub">Portfolio overview</span>
           </span>
         </div>
-        <div class="filter-wrap">
-          <label class="sr-only" for="class-filter">Filter by asset class</label>
-          <select id="class-filter" class="class-filter" aria-label="Filter by asset class"></select>
+        <div class="topbar-actions">
+          <div class="filter-wrap">
+            <label class="sr-only" for="class-filter">Filter by asset class</label>
+            <select id="class-filter" class="class-filter" aria-label="Filter by asset class"></select>
+          </div>
+          <button id="undo-btn" type="button" class="btn btn-ghost" disabled aria-label="Undo last action">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/></svg>
+            <span>Undo</span>
+          </button>
+          <button id="export-btn" type="button" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            <span>Export portfolio</span>
+          </button>
         </div>
       </header>
 
@@ -35,6 +47,25 @@
         </div>
       </section>
 
+      <section class="perf-card" aria-labelledby="perf-title">
+        <div class="perf-head">
+          <p id="perf-title" class="eyebrow">Performance summary</p>
+        </div>
+        <div id="perf-figures" class="perf-figures"></div>
+      </section>
+
+      <section class="chart-card" aria-labelledby="chart-title">
+        <div class="chart-head">
+          <p id="chart-title" class="eyebrow">Portfolio value over time</p>
+          <label class="toggle">
+            <input id="benchmark-toggle" type="checkbox" role="switch" aria-checked="false" />
+            <span>Benchmark compare</span>
+          </label>
+        </div>
+        <div id="chart-legend" class="chart-legend" hidden></div>
+        <div id="chart-wrap" class="chart-wrap"></div>
+      </section>
+
       <div class="grid">
         <section class="holdings-card" aria-labelledby="holdings-title">
           <div class="holdings-head">
@@ -45,66 +76,272 @@
           <form id="holding-form" class="holding-form" novalidate>
             <div class="field">
               <label class="field-label" for="f-name">Name</label>
-              <input id="f-name" name="name" class="input" type="text" placeholder="Name" autocomplete="off" />
+              <input id="f-name" name="name" class="input" type="text" autocomplete="off" aria-describedby="e-name" />
+              <p id="e-name" class="field-error" role="alert" hidden></p>
             </div>
             <div class="field">
               <label class="field-label" for="f-symbol">Symbol</label>
-              <input id="f-symbol" name="symbol" class="input" type="text" placeholder="Symbol" autocomplete="off" />
+              <input id="f-symbol" name="symbol" class="input" type="text" autocomplete="off" aria-describedby="e-symbol" />
+              <p id="e-symbol" class="field-error" role="alert" hidden></p>
             </div>
             <div class="field">
-              <label class="field-label" for="f-class">Class</label>
-              <select id="f-class" name="assetClass" class="input"></select>
+              <label class="field-label" for="f-class">Asset class</label>
+              <select id="f-class" name="assetClass" class="input" aria-describedby="e-class"></select>
+              <p id="e-class" class="field-error" role="alert" hidden></p>
             </div>
-            <div class="field field-row">
-              <div class="field-col">
-                <label class="field-label" for="f-qty">Qty</label>
-                <input id="f-qty" name="quantity" class="input" type="number" step="any" min="0" placeholder="Qty" inputmode="decimal" />
+            <div class="field-row">
+              <div class="field field-col">
+                <label class="field-label" for="f-qty">Quantity</label>
+                <input id="f-qty" name="quantity" class="input" type="number" step="any" min="0" inputmode="decimal" aria-describedby="e-qty" />
+                <p id="e-qty" class="field-error" role="alert" hidden></p>
               </div>
-              <div class="field-col">
+              <div class="field field-col">
                 <label class="field-label" for="f-price">Unit price</label>
-                <input id="f-price" name="unitPrice" class="input" type="number" step="any" min="0" placeholder="Unit price" inputmode="decimal" />
+                <input id="f-price" name="unitPrice" class="input" type="number" step="any" min="0" inputmode="decimal" aria-describedby="e-price" />
+                <p id="e-price" class="field-error" role="alert" hidden></p>
               </div>
             </div>
+            <div class="field-row">
+              <div class="field field-col">
+                <label class="field-label" for="f-currency">Currency</label>
+                <select id="f-currency" name="currency" class="input" aria-describedby="e-currency"></select>
+                <p id="e-currency" class="field-error" role="alert" hidden></p>
+              </div>
+              <div class="field field-col">
+                <label class="field-label" for="f-source">Data source</label>
+                <select id="f-source" name="dataSource" class="input" aria-describedby="e-source"></select>
+                <p id="e-source" class="field-error" role="alert" hidden></p>
+              </div>
+            </div>
+            <p class="market-readout">Market value: <span id="f-market" class="num">$0</span></p>
             <p id="form-error" class="form-error" role="alert" hidden></p>
-            <button id="save-holding-btn" type="submit" class="btn btn-primary btn-block">Save holding</button>
+            <button id="save-holding-btn" type="submit" class="btn btn-primary btn-block" disabled>Save holding</button>
           </form>
+
+          <div id="holdings-tray" class="batch-tray" hidden role="region" aria-label="Holdings bulk actions">
+            <span id="holdings-tray-count" class="tray-count" aria-live="polite"></span>
+            <div class="tray-actions">
+              <label class="tray-inline">Set class
+                <select id="bulk-class" class="input input-sm"></select>
+              </label>
+              <label class="tray-inline">Set source
+                <select id="bulk-source" class="input input-sm"></select>
+              </label>
+              <button id="bulk-edit-holdings" type="button" class="btn btn-secondary btn-sm">Apply bulk edit</button>
+              <button id="bulk-delete-holdings" type="button" class="btn btn-danger btn-sm">Delete selected</button>
+            </div>
+          </div>
 
           <div class="table-scroll">
           <table class="holdings-table">
             <thead>
               <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Symbol</th>
-                <th scope="col">Class</th>
-                <th scope="col" class="num">Qty</th>
-                <th scope="col" class="num">Value</th>
+                <th scope="col" class="col-check"><input id="holdings-select-all" type="checkbox" aria-label="Select all holdings" /></th>
+                <th scope="col"><button type="button" class="sort-btn" data-sort="name">Name <span class="sort-ind" aria-hidden="true"></span></button></th>
+                <th scope="col"><button type="button" class="sort-btn" data-sort="symbol">Symbol <span class="sort-ind" aria-hidden="true"></span></button></th>
+                <th scope="col"><button type="button" class="sort-btn" data-sort="assetClass">Class <span class="sort-ind" aria-hidden="true"></span></button></th>
+                <th scope="col" class="num"><button type="button" class="sort-btn" data-sort="quantity">Qty <span class="sort-ind" aria-hidden="true"></span></button></th>
+                <th scope="col">Currency</th>
+                <th scope="col" class="num"><button type="button" class="sort-btn" data-sort="marketValue">Value <span class="sort-ind" aria-hidden="true"></span></button></th>
               </tr>
             </thead>
             <tbody id="holdings-body"></tbody>
           </table>
           </div>
-          <p id="empty-state" class="empty-state" hidden>No holdings in this class yet. Add one to get started.</p>
+          <p id="empty-state" class="empty-state" hidden>No holdings in this class yet. Use Add holding to create one.</p>
         </section>
 
         <aside class="detail-card" aria-labelledby="detail-name">
-          <p class="eyebrow">Selected</p>
+          <p class="eyebrow">Selected holding</p>
           <h2 id="detail-name" class="detail-name">No holding selected</h2>
           <dl id="detail-list" class="detail-list" hidden>
             <div class="detail-row"><dt>Symbol</dt><dd id="d-symbol"></dd></div>
-            <div class="detail-row"><dt>Class</dt><dd id="d-class"></dd></div>
+            <div class="detail-row"><dt>Asset class</dt><dd id="d-class"></dd></div>
             <div class="detail-row"><dt>Quantity</dt><dd id="d-qty" class="num"></dd></div>
             <div class="detail-row"><dt>Unit price</dt><dd id="d-price" class="num"></dd></div>
+            <div class="detail-row"><dt>Currency</dt><dd id="d-currency"></dd></div>
+            <div class="detail-row"><dt>Data source</dt><dd id="d-source"></dd></div>
             <div class="detail-row"><dt>Market value</dt><dd id="d-value" class="num"></dd></div>
+            <div class="detail-row"><dt>Average unit cost</dt><dd id="d-avgcost" class="num"></dd></div>
+            <div class="detail-row"><dt>Cost basis</dt><dd id="d-costbasis" class="num"></dd></div>
+            <div class="detail-row"><dt>Unrealized gain</dt><dd id="d-unrealized" class="num"></dd></div>
+            <div class="detail-row"><dt>Realized gain</dt><dd id="d-realized" class="num"></dd></div>
           </dl>
           <p id="detail-empty" class="detail-empty">Select a holding to see its details, edit it, or remove it.</p>
           <div id="detail-actions" class="detail-actions" hidden>
+            <button id="edit-holding-btn" type="button" class="btn btn-secondary">Edit holding</button>
             <button id="delete-holding-btn" type="button" class="btn btn-danger">Delete holding</button>
           </div>
         </aside>
       </div>
 
+      <section class="ledger-card" aria-labelledby="ledger-title">
+        <div class="holdings-head">
+          <h2 id="ledger-title" class="card-title">Transactions</h2>
+          <div class="ledger-head-actions">
+            <div class="filter-wrap">
+              <label class="sr-only" for="activity-filter">Filter by activity type</label>
+              <select id="activity-filter" class="class-filter" aria-label="Filter by activity type"></select>
+            </div>
+            <button id="add-activity-btn" type="button" class="btn btn-secondary">Add activity</button>
+          </div>
+        </div>
+
+        <form id="activity-form" class="holding-form activity-form" novalidate hidden>
+          <div class="field-row">
+            <div class="field field-col">
+              <label class="field-label" for="a-type">Type</label>
+              <select id="a-type" name="type" class="input" aria-describedby="ae-type"></select>
+              <p id="ae-type" class="field-error" role="alert" hidden></p>
+            </div>
+            <div class="field field-col">
+              <label class="field-label" for="a-symbol">Symbol</label>
+              <input id="a-symbol" name="symbol" class="input" type="text" autocomplete="off" aria-describedby="ae-symbol" />
+              <p id="ae-symbol" class="field-error" role="alert" hidden></p>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field field-col">
+              <label class="field-label" for="a-qty">Quantity</label>
+              <input id="a-qty" name="quantity" class="input" type="number" step="any" min="0" inputmode="decimal" aria-describedby="ae-qty" />
+              <p id="ae-qty" class="field-error" role="alert" hidden></p>
+            </div>
+            <div class="field field-col">
+              <label class="field-label" for="a-price">Unit price</label>
+              <input id="a-price" name="unitPrice" class="input" type="number" step="any" min="0" inputmode="decimal" aria-describedby="ae-price" />
+              <p id="ae-price" class="field-error" role="alert" hidden></p>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field field-col">
+              <label class="field-label" for="a-fee">Fee</label>
+              <input id="a-fee" name="fee" class="input" type="number" step="any" min="0" inputmode="decimal" aria-describedby="ae-fee" />
+              <p id="ae-fee" class="field-error" role="alert" hidden></p>
+            </div>
+            <div class="field field-col">
+              <label class="field-label" for="a-currency">Currency</label>
+              <select id="a-currency" name="currency" class="input" aria-describedby="ae-currency"></select>
+              <p id="ae-currency" class="field-error" role="alert" hidden></p>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field field-col">
+              <label class="field-label" for="a-source">Data source</label>
+              <select id="a-source" name="dataSource" class="input" aria-describedby="ae-source"></select>
+              <p id="ae-source" class="field-error" role="alert" hidden></p>
+            </div>
+            <div class="field field-col">
+              <label class="field-label" for="a-date">Date</label>
+              <input id="a-date" name="date" class="input" type="date" aria-describedby="ae-date" />
+              <p id="ae-date" class="field-error" role="alert" hidden></p>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label" for="a-comment">Comment (optional)</label>
+            <input id="a-comment" name="comment" class="input" type="text" autocomplete="off" aria-describedby="ae-comment" />
+            <p id="ae-comment" class="field-error" role="alert" hidden></p>
+          </div>
+          <p id="activity-error" class="form-error" role="alert" hidden></p>
+          <div class="form-actions">
+            <button id="save-activity-btn" type="submit" class="btn btn-primary" disabled>Save activity</button>
+            <button id="cancel-activity-btn" type="button" class="btn btn-ghost">Cancel</button>
+          </div>
+        </form>
+
+        <div id="activities-tray" class="batch-tray" hidden role="region" aria-label="Activities bulk actions">
+          <span id="activities-tray-count" class="tray-count" aria-live="polite"></span>
+          <div class="tray-actions">
+            <label class="tray-inline">Set source
+              <select id="bulk-act-source" class="input input-sm"></select>
+            </label>
+            <button id="bulk-edit-activities" type="button" class="btn btn-secondary btn-sm">Apply bulk edit</button>
+            <button id="bulk-delete-activities" type="button" class="btn btn-danger btn-sm">Delete selected</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table class="holdings-table ledger-table">
+            <thead>
+              <tr>
+                <th scope="col" class="col-check"><input id="activities-select-all" type="checkbox" aria-label="Select all activities" /></th>
+                <th scope="col">Date</th>
+                <th scope="col">Type</th>
+                <th scope="col">Symbol</th>
+                <th scope="col" class="num">Qty</th>
+                <th scope="col" class="num">Unit price</th>
+                <th scope="col" class="num">Fee</th>
+                <th scope="col">Currency</th>
+              </tr>
+            </thead>
+            <tbody id="activities-body"></tbody>
+          </table>
+        </div>
+        <p id="ledger-empty" class="empty-state" hidden>No activities recorded. Use Add activity to log a transaction.</p>
+      </section>
+
       <div id="live-region" class="sr-only" aria-live="polite" role="status"></div>
+      <div id="toast-container" class="toast-container" aria-live="polite"></div>
     </div>
+
+    <!-- Export drawer -->
+    <div id="drawer-overlay" class="drawer-overlay" hidden></div>
+    <aside id="export-drawer" class="export-drawer" hidden role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+      <div class="drawer-head">
+        <h2 id="drawer-title" class="card-title">Export portfolio</h2>
+        <button id="drawer-close" type="button" class="btn btn-ghost btn-icon" aria-label="Close export drawer">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <div id="export-summary" class="export-summary"></div>
+      <div class="drawer-tabs" role="tablist" aria-label="Export formats">
+        <button type="button" class="drawer-tab" role="tab" data-tab="json">Portfolio JSON</button>
+        <button type="button" class="drawer-tab" role="tab" data-tab="holdings-csv">Holdings CSV</button>
+        <button type="button" class="drawer-tab" role="tab" data-tab="activities-csv">Activities CSV</button>
+        <button type="button" class="drawer-tab" role="tab" data-tab="performance">Performance report</button>
+      </div>
+      <pre id="export-preview" class="export-preview" tabindex="0" aria-label="Export preview"></pre>
+      <div class="drawer-actions">
+        <button id="copy-btn" type="button" class="btn btn-secondary">Copy</button>
+        <button id="download-btn" type="button" class="btn btn-secondary">Download</button>
+        <span id="copy-confirm" class="copy-confirm" hidden>Copied to clipboard</span>
+      </div>
+      <div class="drawer-import">
+        <p class="eyebrow">Import</p>
+        <p class="import-help">Import a previously exported Portfolio JSON, Holdings CSV, or Activities CSV.</p>
+        <label class="btn btn-secondary btn-block import-label">
+          Choose file to import
+          <input id="import-file" type="file" accept=".json,.csv,text/csv,application/json" class="sr-only" />
+        </label>
+        <p id="import-error" class="form-error" role="alert" hidden></p>
+      </div>
+    </aside>
+
+    <!-- Import diagnostics screen -->
+    <div id="diag-overlay" class="drawer-overlay" hidden></div>
+    <div id="diag-screen" class="diag-screen" hidden role="dialog" aria-modal="true" aria-labelledby="diag-title">
+      <div class="drawer-head">
+        <h2 id="diag-title" class="card-title">Activities import diagnostics</h2>
+        <button id="diag-cancel-x" type="button" class="btn btn-ghost btn-icon" aria-label="Cancel import">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </button>
+      </div>
+      <p id="diag-summary" class="diag-summary"></p>
+      <div class="diag-mapping">
+        <p class="eyebrow">Column mapping</p>
+        <div id="diag-mapping-grid" class="mapping-grid"></div>
+      </div>
+      <div class="table-scroll diag-table-scroll">
+        <table class="holdings-table diag-table">
+          <thead id="diag-thead"></thead>
+          <tbody id="diag-body"></tbody>
+        </table>
+      </div>
+      <div class="drawer-actions">
+        <button id="diag-commit" type="button" class="btn btn-primary">Commit import</button>
+        <button id="diag-cancel" type="button" class="btn btn-ghost">Cancel</button>
+      </div>
+    </div>
+
     <script type="module" src="/src/app.js"></script>
   </body>
 </html>
