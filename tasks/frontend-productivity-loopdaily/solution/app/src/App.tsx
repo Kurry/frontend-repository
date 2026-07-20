@@ -1,14 +1,16 @@
 import { useState, useCallback } from "react";
 import { useAtom } from "jotai";
-import { habitsAtom, activeFilterAtom, reorderHabitsAtom, addToastAtom } from "./store";
+import { habitsAtom, activeFilterAtom, reorderHabitsAtom } from "./store";
 import HabitCard from "./components/HabitCard";
 import HabitForm from "./components/HabitForm";
 import CategoryFilter from "./components/CategoryFilter";
 import HeatmapView from "./components/HeatmapView";
 import StatsView from "./components/StatsView";
 import ImportExport from "./components/ImportExport";
-import Toast from "./components/Toast";
 import RecoveryBanner from "./components/RecoveryBanner";
+import { Toaster, toast } from "sonner";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 
 type ViewMode = "habits" | "stats" | "heatmap" | "import";
 
@@ -16,12 +18,13 @@ export default function App() {
   const [habits] = useAtom(habitsAtom);
   const [activeFilter] = useAtom(activeFilterAtom);
   const [, reorder] = useAtom(reorderHabitsAtom);
-  const [, addToast] = useAtom(addToastAtom);
   const [view, setView] = useState<ViewMode>("habits");
   const [heatmapHabitId, setHeatmapHabitId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [dragId, setDragId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
+  const [listRef] = useAutoAnimate<HTMLDivElement>();
+  const [pausedListRef] = useAutoAnimate<HTMLDivElement>();
 
   // Filtered habits sorted by order
   const sortedHabits = [...habits].sort((a, b) => a.order - b.order);
@@ -68,13 +71,13 @@ export default function App() {
 
       if (fromIndex >= 0 && toIndex >= 0) {
         reorder(fromIndex, toIndex);
-        addToast("Habits reordered", "info");
+        toast.info("Habits reordered");
       }
 
       setDragId(null);
       setDragOverId(null);
     },
-    [dragId, sortedHabits, reorder, addToast]
+    [dragId, sortedHabits, reorder]
   );
 
   const openHeatmap = useCallback((id: string) => {
@@ -120,35 +123,34 @@ export default function App() {
             </h1>
 
             {/* Navigation tabs */}
-            <nav className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={goHome}
-                aria-current={view === "habits" ? "page" : undefined}
-                className={`btn-nav ${view === "habits" ? "btn-nav-active" : ""}`}
-                data-nav="habits"
-              >
-                Habits
-              </button>
-              <button
-                type="button"
-                onClick={() => setView("stats")}
-                aria-current={view === "stats" ? "page" : undefined}
-                className={`btn-nav ${view === "stats" ? "btn-nav-active" : ""}`}
-                data-nav="stats"
-              >
-                Stats
-              </button>
-              <button
-                type="button"
-                onClick={() => setView("import")}
-                aria-current={view === "import" ? "page" : undefined}
-                className={`btn-nav ${view === "import" ? "btn-nav-active" : ""}`}
-                data-nav="import"
-              >
-                Data
-              </button>
-            </nav>
+            <Tabs value={view} onValueChange={(v) => {
+              setView(v as ViewMode);
+              if (v !== "heatmap") setHeatmapHabitId(null);
+            }}>
+              <TabsList className="bg-transparent border-none gap-1">
+                <TabsTrigger
+                  value="habits"
+                  data-nav="habits"
+                  className="data-[state=active]:bg-[#0F9D74] data-[state=active]:text-white text-[#475569] bg-transparent hover:bg-[#F4F7F6]"
+                >
+                  Habits
+                </TabsTrigger>
+                <TabsTrigger
+                  value="stats"
+                  data-nav="stats"
+                  className="data-[state=active]:bg-[#0F9D74] data-[state=active]:text-white text-[#475569] bg-transparent hover:bg-[#F4F7F6]"
+                >
+                  Stats
+                </TabsTrigger>
+                <TabsTrigger
+                  value="import"
+                  data-nav="import"
+                  className="data-[state=active]:bg-[#0F9D74] data-[state=active]:text-white text-[#475569] bg-transparent hover:bg-[#F4F7F6]"
+                >
+                  Data
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </div>
       </header>
@@ -164,7 +166,7 @@ export default function App() {
             <CategoryFilter />
 
             {/* Habit cards */}
-            {activeHabits.length === 0 && pausedHabits.length === 0 ? (
+            {habits.length === 0 ? (
               showForm ? (
                 <HabitForm onClose={() => setShowForm(false)} />
               ) : (
@@ -173,7 +175,7 @@ export default function App() {
             ) : (
               <>
                 {/* Active habits */}
-                <div className="space-y-2">
+                <div className="space-y-2" ref={listRef}>
                   {activeHabits.map((habit) => (
                     <div
                       key={habit.id}
@@ -198,7 +200,7 @@ export default function App() {
                     <h3 className="text-sm font-semibold text-[#64748B] mb-2 px-1">
                       Paused Habits ({pausedHabits.length})
                     </h3>
-                    <div className="space-y-2">
+                    <div className="space-y-2" ref={pausedListRef}>
                       {pausedHabits.map((habit) => (
                         <div
                           key={habit.id}
@@ -255,8 +257,7 @@ export default function App() {
         {view === "import" && <ImportExport />}
       </main>
 
-      {/* Toast notifications */}
-      <Toast />
+      <Toaster position="bottom-center" />
     </div>
   );
 }

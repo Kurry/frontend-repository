@@ -3,15 +3,25 @@ import { useAtom } from "jotai";
 import {
   appStateAtom,
   importDataAtom,
-  addToastAtom,
+  importMalformedDataAtom,
   malformedSample,
   recoveryAtom,
 } from "../store";
+import { toast } from "sonner";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function ImportExport() {
   const [state] = useAtom(appStateAtom);
   const [, importData] = useAtom(importDataAtom);
-  const [, addToast] = useAtom(addToastAtom);
+  const [, importMalformedData] = useAtom(importMalformedDataAtom);
   const [, setRecovery] = useAtom(recoveryAtom);
   const fileRef = useRef<HTMLInputElement>(null);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -20,8 +30,11 @@ export default function ImportExport() {
 
   const handleExport = () => {
     const data = {
+      schemaVersion: "loopdaily.workspace.v1",
+      exportedAt: new Date().toISOString(),
       habits: state.habits,
       categories: state.categories,
+      activeCategoryFilter: state.activeCategoryFilter,
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -32,7 +45,7 @@ export default function ImportExport() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    addToast("Data exported successfully!", "success");
+    toast.success("Data exported successfully!");
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +60,7 @@ export default function ImportExport() {
         setShowConfirm(true);
         setImportResult(null);
       } catch {
-        addToast("Invalid JSON file. Please check the format.", "error");
+        toast.error("Invalid JSON file. Please check the format.");
         setImportResult("Invalid JSON file. Import failed.");
       }
     };
@@ -58,20 +71,20 @@ export default function ImportExport() {
   const handleConfirmImport = () => {
     const result = importData(pendingData);
     if (result.success) {
-      addToast(`Imported ${result.habitCount} habits and ${result.categoryCount} categories!`, "success");
+      toast.success(`Imported ${result.habitCount} habits and ${result.categoryCount} categories!`);
       setImportResult(
         `Successfully imported ${result.habitCount} habits and ${result.categoryCount} categories.`
       );
     } else {
-      addToast("Import failed — invalid data format.", "error");
-      setImportResult("Import failed — no valid habits found in the file.");
+      toast.error(`Import failed — invalid data format: ${result.error}`);
+      setImportResult(`Import failed — invalid data format: ${result.error}`);
     }
     setShowConfirm(false);
     setPendingData(null);
   };
 
   const handleLoadMalformed = () => {
-    const result = importData(malformedSample);
+    const result = importMalformedData(malformedSample);
     if (result.success) {
       const message = `Recovery import: imported ${result.habitCount} valid habits and ${result.categoryCount} valid categories. Invalid entries were skipped.`;
       setImportResult(message);
@@ -80,7 +93,7 @@ export default function ImportExport() {
         message:
           "Malformed sample loaded. Some entries were skipped during recovery. Use Retry to restore your previous snapshot or Reset to clear all data.",
       });
-      addToast(`Malformed sample loaded. ${result.habitCount} valid habits recovered.`, "info");
+      toast.info(`Malformed sample loaded. ${result.habitCount} valid habits recovered.`);
     } else {
       setImportResult("Recovery import: no valid data could be recovered from the malformed sample.");
       setRecovery({
@@ -140,43 +153,37 @@ export default function ImportExport() {
         </div>
       )}
 
-      {showConfirm && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop"
-          onClick={() => setShowConfirm(false)}
-        >
-          <div
-            className="bg-white rounded-lg p-6 max-w-md mx-4 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-lg font-bold text-[#1B2430] mb-2">Confirm import</h3>
-            <p className="text-sm text-[#475569] mb-4">
+      <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm import</DialogTitle>
+            <DialogDescription>
               This will replace all your current habits and categories with the imported data. Are you sure?
-            </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowConfirm(false);
-                  setPendingData(null);
-                }}
-                className="btn-secondary px-4 py-2 text-sm"
-                data-action="cancel-import"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleConfirmImport}
-                className="btn-primary px-4 py-2 text-sm font-medium"
-                data-action="confirm-import"
-              >
-                Import & replace
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => {
+                setShowConfirm(false);
+                setPendingData(null);
+              }}
+              className="btn-secondary px-4 py-2 text-sm"
+              data-action="cancel-import"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={handleConfirmImport}
+              className="btn-primary px-4 py-2 text-sm font-medium"
+              data-action="confirm-import"
+            >
+              Import & replace
+            </button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,10 +1,18 @@
 import { useState } from "react";
 import { useAtom } from "jotai";
+import { updateHabitAtom, toggleCompletionAtom, stepCompletionAtom, deleteHabitAtom } from "../store";
 import type { Habit } from "../types";
-import { updateHabitAtom, toggleCompletionAtom, stepCompletionAtom, deleteHabitAtom, addToastAtom } from "../store";
-import { todayKey, getDayCount, isDayComplete, calcStreak } from "../utils/helpers";
-import FlameIcon from "./FlameIcon";
+import { getDayCount, isDayComplete, calcStreak, todayKey } from "../utils/helpers";
 import WeeklyGrid from "./WeeklyGrid";
+import FlameIcon from "./FlameIcon";
+import { toast } from "sonner";
+import confetti from "canvas-confetti";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface HabitCardProps {
   habit: Habit;
@@ -14,26 +22,76 @@ interface HabitCardProps {
   onOpenHeatmap?: (id: string) => void;
 }
 
-export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, onOpenHeatmap }: HabitCardProps) {
+const fireConfetti = (element: HTMLElement | null) => {
+  if (!element) return;
+  const rect = element.getBoundingClientRect();
+  const x = (rect.left + rect.width / 2) / window.innerWidth;
+  const y = (rect.top + rect.height / 2) / window.innerHeight;
+
+  const duration = 2000;
+  const end = Date.now() + duration;
+
+  (function frame() {
+    confetti({
+      particleCount: 5,
+      angle: 60,
+      spread: 55,
+      origin: { x, y },
+      colors: ["#FFB020", "#0F9D74", "#FF8C42"],
+      disableForReducedMotion: true,
+    });
+    confetti({
+      particleCount: 5,
+      angle: 120,
+      spread: 55,
+      origin: { x, y },
+      colors: ["#FFB020", "#0F9D74", "#FF8C42"],
+      disableForReducedMotion: true,
+    });
+
+    if (Date.now() < end) {
+      requestAnimationFrame(frame);
+    }
+  })();
+};
+
+export default function HabitCard({
+  habit,
+  onDragStart,
+  onDragOver,
+  onDragEnd,
+  onOpenHeatmap,
+}: HabitCardProps) {
   const [, updateHabit] = useAtom(updateHabitAtom);
   const [, toggleComplete] = useAtom(toggleCompletionAtom);
   const [, stepComplete] = useAtom(stepCompletionAtom);
   const [, deleteHabit] = useAtom(deleteHabitAtom);
-  const [, addToast] = useAtom(addToastAtom);
-  const [showMenu, setShowMenu] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(habit.name);
   const [editReminder, setEditReminder] = useState(habit.reminder);
+  const [cardRef, setCardRef] = useState<HTMLDivElement | null>(null);
 
   const today = todayKey();
   const count = getDayCount(habit, today);
   const done = isDayComplete(habit, today);
-  const streak = calcStreak(habit);
+  const currentStreak = calcStreak(habit);
+
+  const handleMilestone = (newStreak: number) => {
+    if (newStreak === 7 || newStreak === 30) {
+       fireConfetti(cardRef);
+    }
+  };
 
   const handleToggle = () => {
     if (habit.targetType === "once") {
       toggleComplete(habit.id, today);
-      if (!done) addToast("✓ Checked in!", "success");
+      if (!done) {
+        toast.success("✓ Checked in!");
+
+        // Calculate new streak hypothetically
+        const tempHabit = { ...habit, completions: { ...habit.completions, [today]: 1 } };
+        handleMilestone(calcStreak(tempHabit));
+      }
     }
   };
 
@@ -41,26 +99,27 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
     stepComplete(habit.id, today, delta);
     const newCount = Math.max(0, Math.min(habit.targetCount, count + delta));
     if (newCount >= habit.targetCount && count < habit.targetCount) {
-      addToast("🎯 Daily target reached!", "success");
+      toast.success("🎯 Daily target reached!");
+
+      const tempHabit = { ...habit, completions: { ...habit.completions, [today]: newCount } };
+      handleMilestone(calcStreak(tempHabit));
     }
   };
 
   const handlePause = () => {
     updateHabit(habit.id, { paused: !habit.paused });
-    addToast(habit.paused ? "Habit resumed" : "Habit paused", "info");
-    setShowMenu(false);
+    toast.info(habit.paused ? "Habit resumed" : "Habit paused");
   };
 
   const handleDelete = () => {
     deleteHabit(habit.id);
-    addToast("Habit deleted", "info");
-    setShowMenu(false);
+    toast.info("Habit deleted");
   };
 
   const handleSaveEdit = () => {
     if (editName.trim()) {
       updateHabit(habit.id, { name: editName.trim(), reminder: editReminder.trim() });
-      addToast("Habit updated", "success");
+      toast.success("Habit updated");
     }
     setEditing(false);
   };
@@ -71,6 +130,7 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
 
   return (
     <div
+      ref={setCardRef}
       className={cardClass}
       draggable={!editing}
       onDragStart={(e) => onDragStart?.(e, habit.id)}
@@ -85,7 +145,7 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
         <div className="flex items-center gap-2">
           {/* Drag handle */}
           <div
-            className="cursor-grab text-[#94A3B8] hover:text-[#64748B] p-1"
+            className="cursor-grab text-[#94A3B8] hover:text-[#64748B] p-1 transition-colors duration-150"
             aria-label="Drag to reorder"
             title="Drag to reorder"
           >
@@ -100,7 +160,7 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
           </div>
 
           {/* Icon */}
-          <span className="text-xl">{habit.icon}</span>
+          <span className="text-xl" aria-hidden="true">{habit.icon}</span>
 
           {/* Name */}
           {editing ? (
@@ -111,6 +171,7 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
               className="flex-1 px-2 py-1 rounded border border-[#0F9D74] text-sm font-semibold text-[#1B2430] outline-none"
               autoFocus
               data-field="edit-name"
+              aria-label="Edit habit name"
             />
           ) : (
             <span className="flex-1 text-sm font-semibold text-[#1B2430] truncate">
@@ -127,60 +188,43 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
           <FlameIcon habit={habit} />
 
           {/* Menu button */}
-          <div className="relative">
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="p-1 text-[#94A3B8] hover:text-[#1B2430] rounded transition-colors"
-              aria-label="Habit options"
-              data-action="menu-toggle"
-            >
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor">
-                <circle cx="9" cy="4" r="1.5" />
-                <circle cx="9" cy="9" r="1.5" />
-                <circle cx="9" cy="14" r="1.5" />
-              </svg>
-            </button>
-            {showMenu && (
-              <div className="absolute right-0 top-full mt-1 bg-white rounded-lg shadow-lg border border-[#E2E8F0] py-1 z-20 min-w-[140px]">
-                <button
-                  onClick={() => { setShowMenu(false); setEditing(true); }}
-                  className="w-full text-left px-3 py-2 text-sm text-[#1B2430] hover:bg-[#F4F7F6] transition-colors"
-                  data-action="edit"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={handlePause}
-                  className="w-full text-left px-3 py-2 text-sm text-[#1B2430] hover:bg-[#F4F7F6] transition-colors"
-                  data-action="pause-resume"
-                >
-                  {habit.paused ? "Resume" : "Pause"}
-                </button>
-                {onOpenHeatmap && (
-                  <button
-                    onClick={() => { onOpenHeatmap(habit.id); setShowMenu(false); }}
-                    className="w-full text-left px-3 py-2 text-sm text-[#1B2430] hover:bg-[#F4F7F6] transition-colors"
-                    data-action="view-heatmap"
-                  >
-                    View Heatmap
-                  </button>
-                )}
-                <button
-                  onClick={handleDelete}
-                  className="w-full text-left px-3 py-2 text-sm text-[#EF4444] hover:bg-red-50 transition-colors"
-                  data-action="delete"
-                >
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="p-1 text-[#94A3B8] hover:text-[#1B2430] rounded transition-colors"
+                aria-label="Habit options"
+                data-action="menu-toggle"
+              >
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true">
+                  <circle cx="9" cy="4" r="1.5" />
+                  <circle cx="9" cy="9" r="1.5" />
+                  <circle cx="9" cy="14" r="1.5" />
+                </svg>
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[140px]">
+              <DropdownMenuItem onClick={() => setEditing(true)} data-action="edit">
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handlePause} data-action="pause-resume">
+                {habit.paused ? "Resume" : "Pause"}
+              </DropdownMenuItem>
+              {onOpenHeatmap && (
+                <DropdownMenuItem onClick={() => onOpenHeatmap(habit.id)} data-action="view-heatmap">
+                  View Heatmap
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem onClick={handleDelete} className="text-[#EF4444] focus:bg-red-50" data-action="delete">
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Reminder note */}
         {habit.reminder && !editing && (
           <p className="text-xs text-[#64748B] mt-1 ml-8">
-            ⏰ {habit.reminder}
+            <span aria-hidden="true">⏰</span> {habit.reminder}
           </p>
         )}
 
@@ -194,6 +238,7 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
               placeholder="Remind me at (e.g. 7:00 AM)"
               className="w-full px-2 py-1 rounded border border-[#E2E8F0] text-xs text-[#1B2430] outline-none focus:border-[#0F9D74]"
               data-field="edit-reminder"
+              aria-label="Edit reminder"
             />
           </div>
         )}
@@ -252,13 +297,13 @@ export default function HabitCard({ habit, onDragStart, onDragOver, onDragEnd, o
                   −
                 </button>
                 <div className="flex flex-col items-center min-w-[52px]">
-                  <span className={`text-sm font-bold ${done ? "text-[#0F9D74]" : "text-[#1B2430]"}`}>
+                  <span className={`text-sm font-bold transition-colors ${done ? "text-[#0F9D74]" : "text-[#1B2430]"}`}>
                     {count}/{habit.targetCount}
                   </span>
                   {/* Mini progress bar */}
                   <div className="w-12 h-1 rounded-full bg-[#E2E8F0] mt-0.5 overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all ${
+                      className={`h-full rounded-full transition-all duration-300 ease-out ${
                         done ? "bg-[#0F9D74]" : "bg-[#0F9D74]/50"
                       }`}
                       style={{ width: `${Math.min(100, (count / habit.targetCount) * 100)}%` }}

@@ -1,88 +1,109 @@
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { useAtom } from "jotai";
-import { addHabitAtom, categoriesAtom, addToastAtom } from "../store";
+import { addHabitAtom, categoriesAtom } from "../store";
 import { EMOJI_PALETTE } from "../types";
+import { toast } from "sonner";
+import { z } from "zod";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const habitSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(80, "Name must be 80 characters or fewer"),
+  icon: z.string().refine((val) => EMOJI_PALETTE.includes(val as any), {
+    message: "Invalid icon",
+  }),
+  targetType: z.enum(["once", "count"]),
+  targetCount: z.number().int().min(1).max(100),
+  categoryId: z.string().nullable().optional(),
+  reminder: z.string().trim().max(40, "Reminder must be 40 characters or fewer").optional().default(""),
+}).refine(data => {
+  if (data.targetType === "once" && data.targetCount !== 1) return false;
+  return true;
+}, {
+  message: "Target count must be 1 when target is once",
+  path: ["targetCount"],
+});
+
+type HabitFormValues = z.infer<typeof habitSchema>;
 
 interface HabitFormProps {
   onClose?: () => void;
 }
 
 export default function HabitForm({ onClose }: HabitFormProps) {
-  const [name, setName] = useState("");
-  const [icon, setIcon] = useState("🎯");
-  const [targetType, setTargetType] = useState<"once" | "count">("once");
-  const [targetCount, setTargetCount] = useState(1);
-  const [categoryId, setCategoryId] = useState<string>("");
-  const [reminder, setReminder] = useState("");
-  const [nameError, setNameError] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
 
   const [, addHabit] = useAtom(addHabitAtom);
   const [categories] = useAtom(categoriesAtom);
-  const [, addToast] = useAtom(addToastAtom);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    setValue,
+    reset,
+    formState: { errors },
+  } = useForm<HabitFormValues>({
+    resolver: zodResolver(habitSchema),
+    defaultValues: {
+      name: "",
+      icon: "🎯",
+      targetType: "once",
+      targetCount: 1,
+      categoryId: "",
+      reminder: "",
+    },
+  });
 
-    const trimmed = name.trim();
-    if (!trimmed) {
-      setNameError(true);
-      formRef.current?.classList.add("shake");
-      setTimeout(() => formRef.current?.classList.remove("shake"), 500);
-      return;
-    }
+  const targetType = watch("targetType");
+  const icon = watch("icon");
 
+  const onSubmit = (data: HabitFormValues) => {
     addHabit({
-      name: trimmed,
-      icon,
-      targetType,
-      targetCount: targetType === "count" ? Math.max(1, targetCount) : 1,
-      categoryId: categoryId || null,
-      reminder: reminder.trim(),
+      name: data.name,
+      icon: data.icon,
+      targetType: data.targetType,
+      targetCount: data.targetType === "count" ? data.targetCount : 1,
+      categoryId: data.categoryId || null,
+      reminder: data.reminder || "",
       paused: false,
     });
 
-    addToast(`"${trimmed}" added!`, "success");
+    toast.success(`"${data.name}" added!`);
 
-    // Reset form
-    setName("");
-    setIcon("🎯");
-    setTargetType("once");
-    setTargetCount(1);
-    setCategoryId("");
-    setReminder("");
-    setNameError(false);
-
+    reset();
     if (onClose) onClose();
+  };
+
+  const onError = () => {
+    formRef.current?.classList.add("shake");
+    setTimeout(() => formRef.current?.classList.remove("shake"), 500);
   };
 
   return (
     <div ref={formRef} className="bg-[#FFFFFF] rounded-lg p-4 md:p-6" data-habit-form>
       <h2 className="text-lg font-bold text-[#1B2430] mb-4">New Habit</h2>
-      <form onSubmit={handleSubmit} className="space-y-4" data-habit-form-el>
+      <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4" data-habit-form-el>
         {/* Name */}
         <div>
           <label className="block text-sm font-medium text-[#64748B] mb-1">Habit Name</label>
           <input
             type="text"
-            value={name}
-            onChange={(e) => {
-              setName(e.target.value);
-              if (nameError && e.target.value.trim()) setNameError(false);
-            }}
+            {...register("name")}
             placeholder="e.g. Morning Run"
             className={`w-full px-3 py-2 rounded-lg border text-sm transition-colors ${
-              nameError
+              errors.name
                 ? "border-[#EF4444] bg-red-50"
                 : "border-[#E2E8F0] focus:border-[#0F9D74]"
             } text-[#1B2430] placeholder:text-[#94A3B8] outline-none`}
             aria-label="Habit name"
-            aria-invalid={nameError}
+            aria-invalid={!!errors.name}
             data-field="name"
           />
-          {nameError && (
+          {errors.name && (
             <p className="text-[#EF4444] text-xs mt-1" role="alert">
-              Please enter a habit name.
+              {errors.name.message}
             </p>
           )}
         </div>
@@ -95,7 +116,7 @@ export default function HabitForm({ onClose }: HabitFormProps) {
               <button
                 key={e}
                 type="button"
-                onClick={() => setIcon(e)}
+                onClick={() => setValue("icon", e)}
                 className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-all ${
                   icon === e
                     ? "bg-[#0F9D74] ring-2 ring-[#0F9D74] scale-110"
@@ -109,6 +130,11 @@ export default function HabitForm({ onClose }: HabitFormProps) {
               </button>
             ))}
           </div>
+          {errors.icon && (
+            <p className="text-[#EF4444] text-xs mt-1" role="alert">
+              {errors.icon.message}
+            </p>
+          )}
         </div>
 
         {/* Target type */}
@@ -118,10 +144,12 @@ export default function HabitForm({ onClose }: HabitFormProps) {
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
-                name="targetType"
                 value="once"
-                checked={targetType === "once"}
-                onChange={() => setTargetType("once")}
+                {...register("targetType")}
+                onChange={() => {
+                  setValue("targetType", "once");
+                  setValue("targetCount", 1);
+                }}
                 className="accent-[#0F9D74]"
                 data-field="target-type"
                 data-value="once"
@@ -131,10 +159,8 @@ export default function HabitForm({ onClose }: HabitFormProps) {
             <label className="flex items-center gap-2 cursor-center">
               <input
                 type="radio"
-                name="targetType"
                 value="count"
-                checked={targetType === "count"}
-                onChange={() => setTargetType("count")}
+                {...register("targetType")}
                 className="accent-[#0F9D74]"
                 data-field="target-type"
                 data-value="count"
@@ -145,8 +171,7 @@ export default function HabitForm({ onClose }: HabitFormProps) {
                   type="number"
                   min="1"
                   max="100"
-                  value={targetCount}
-                  onChange={(e) => setTargetCount(parseInt(e.target.value, 10) || 1)}
+                  {...register("targetCount", { valueAsNumber: true })}
                   className="w-16 px-2 py-1 rounded-lg border border-[#E2E8F0] text-sm text-[#1B2430] outline-none focus:border-[#0F9D74]"
                   aria-label="Daily target count"
                   data-field="target-count"
@@ -154,14 +179,18 @@ export default function HabitForm({ onClose }: HabitFormProps) {
               )}
             </label>
           </div>
+          {errors.targetCount && (
+            <p className="text-[#EF4444] text-xs mt-1" role="alert">
+              {errors.targetCount.message}
+            </p>
+          )}
         </div>
 
         {/* Category */}
         <div>
           <label className="block text-sm font-medium text-[#64748B] mb-1">Category</label>
           <select
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
+            {...register("categoryId")}
             className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#1B2430] outline-none focus:border-[#0F9D74] bg-white"
             aria-label="Category"
             data-field="category"
@@ -178,13 +207,17 @@ export default function HabitForm({ onClose }: HabitFormProps) {
           <label className="block text-sm font-medium text-[#64748B] mb-1">Remind me at (optional)</label>
           <input
             type="text"
-            value={reminder}
-            onChange={(e) => setReminder(e.target.value)}
+            {...register("reminder")}
             placeholder="e.g. 7:00 AM"
             className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#1B2430] placeholder:text-[#94A3B8] outline-none focus:border-[#0F9D74]"
             aria-label="Reminder time"
             data-field="reminder"
           />
+          {errors.reminder && (
+            <p className="text-[#EF4444] text-xs mt-1" role="alert">
+              {errors.reminder.message}
+            </p>
+          )}
         </div>
 
         {/* Submit */}
@@ -199,7 +232,7 @@ export default function HabitForm({ onClose }: HabitFormProps) {
           {onClose && (
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => { reset(); onClose(); }}
               className="btn-secondary px-4 font-medium text-sm"
               data-action="cancel-habit"
             >

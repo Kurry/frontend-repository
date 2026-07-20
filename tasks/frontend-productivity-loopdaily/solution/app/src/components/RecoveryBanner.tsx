@@ -1,25 +1,26 @@
 import { useAtom } from "jotai";
-import { recoveryAtom, retryRecoveryAtom, resetAppAtom, addToastAtom } from "../store";
+import { recoveryAtom, retryRecoveryAtom, resetAppAtom } from "../store";
+import { toast } from "sonner";
 
 export default function RecoveryBanner() {
   const [recovery] = useAtom(recoveryAtom);
   const [, retry] = useAtom(retryRecoveryAtom);
   const [, reset] = useAtom(resetAppAtom);
-  const [, addToast] = useAtom(addToastAtom);
 
   if (!recovery.active || !recovery.message) return null;
 
   const handleRetry = () => {
     const restored = retry();
-    addToast(
-      restored ? "Last valid snapshot restored." : "No backup snapshot available.",
-      restored ? "success" : "info"
-    );
+    if (restored) {
+        toast.success("Last valid snapshot restored.");
+    } else {
+        toast.info("No backup snapshot available.");
+    }
   };
 
   const handleReset = () => {
     reset();
-    addToast("All data reset to a clean state.", "info");
+    toast.info("All data reset to a clean state.");
   };
 
   return (
