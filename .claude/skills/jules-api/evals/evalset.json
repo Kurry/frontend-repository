@@ -1,0 +1,202 @@
+{
+  "eval_set_id": "jules-api-evals",
+  "name": "jules-api Evaluations",
+  "description": "Read-only live evals \u2014 none create/modify Jules sessions. Exercise source discovery, session listing/state lookup, and activity-stream interpretation against the live v1alpha API using JULES_API_KEY from .env.",
+  "eval_cases": [
+    {
+      "eval_id": "0-discover-connected-sources",
+      "conversation": [
+        {
+          "user_content": {
+            "parts": [
+              {
+                "text": "Which of my GitHub repos are connected to Jules? Use the Jules API to find out and just give me the list of repo names."
+              }
+            ]
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "A list of connected source repos pulled live from GET /sources (e.g. Kurry/AgentHub, Kurry/benchmark-template). No session is created."
+              }
+            ]
+          },
+          "intermediate_data": {
+            "invocation_events": [
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "sources"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "create"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "wait"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "merge"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "eval_id": "1-list-and-identify-session",
+      "conversation": [
+        {
+          "user_content": {
+            "parts": [
+              {
+                "text": "I've got some Jules sessions running. Pull up my in-progress sessions and tell me which one is the gap-tree / mb-tree task and exactly what state it's in right now."
+              }
+            ]
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Lists IN_PROGRESS sessions via the API and identifies session 6840665600150558115 ('[jules] gap-tree-junk-filtered') with its current state. Read-only."
+              }
+            ]
+          },
+          "intermediate_data": {
+            "invocation_events": [
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "sources"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "create"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "wait"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "merge"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "eval_id": "2-interpret-activity-stream",
+      "conversation": [
+        {
+          "user_content": {
+            "parts": [
+              {
+                "text": "Check on Jules session 6840665600150558115 for me \u2014 what's it done so far, and does it need anything from me (a plan approval or an answer to a question)?"
+              }
+            ]
+          },
+          "final_response": {
+            "parts": [
+              {
+                "text": "Fetches session state + activities, summarizes progress, and correctly states whether it needs human action (approve plan / answer feedback) based on state, without inventing a PR URL. Read-only."
+              }
+            ]
+          },
+          "intermediate_data": {
+            "invocation_events": [
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "sources"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "create"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "wait"
+                    }
+                  ]
+                }
+              },
+              {
+                "author": "system",
+                "content": {
+                  "parts": [
+                    {
+                      "text": "merge"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jules Fleet Sequencing"
+  short_description: "Sequence Jules fleets without false parallelism."
+  default_prompt: "Use $jules-fleet-sequencing to classify this Jules backlog, keep serial blockers local, and dispatch merge-order-free parallel work."

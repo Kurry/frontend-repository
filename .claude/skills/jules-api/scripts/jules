@@ -1,0 +1,529 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: NONE
+"""Thin CLI wrapper for the Jules v1alpha REST API.
+
+Stdlib only (urllib) so it runs anywhere with python3 — no pip install.
+Auth: reads JULES_API_KEY from the environment; if absent, falls back to a
+.env file in the current dir or any parent (KEY=VALUE lines).
+
+Every subcommand prints human-readable text by default and machine-readable
+JSON with --json, so it composes into both interactive use and scripts.
+Non-2xx responses print the API error JSON to stderr and exit 1; 429 is
+retried with exponential backoff (the API is rate-limited and transient
+429s are common during polling).
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from datetime import datetime, timezone
+
+BASE = "https://jules.googleapis.com/v1alpha"
+
+# ── spend-ledger integration (mercor-orchestration PR #80) ───────────────────
+#
+# Every `jules create` appends one row to the canonical spend ledger so that
+# `mercor jules spend` (from mercor-orchestration) can report on Jules usage.
+# This integration is **additive and never blocking**: any failure to write
+# the ledger is logged as a warning to stderr and swallowed — session creation
+# always succeeds regardless. Two write paths are supported:
+#
+# 1. `mercor jules spend --append-from-jules-api ...` when mercor-orchestration
+#    is installed (cleanest — uses the orchestration API directly).
+# 2. Direct atomic-append to the JSONL ledger when it is NOT installed. The
+#    ledger schema is documented + stable, so this fallback has no runtime
+#    dependency on mercor-orchestration.
+#
+# Canonical ledger path: ~/.mercor/jules-spend-ledger.jsonl, override with
+# MERCOR_JULES_LEDGER_PATH.
+
+DEFAULT_LEDGER_PATH = "~/.mercor/jules-spend-ledger.jsonl"
+
+
+def _ledger_path() -> str:
+    """Resolve the spend-ledger file path (env-overridable)."""
+    return os.path.expanduser(
+        os.environ.get("MERCOR_JULES_LEDGER_PATH", DEFAULT_LEDGER_PATH)
+    )
+
+
+def _has_mercor_orchestration_spend() -> bool:
+    """True iff `mercor jules spend` is available on PATH.
+
+    Detection is two-step (matches the design): (1) `mercor` is on PATH,
+    (2) `mercor jules --help` mentions `spend`. Both are needed because an
+    older `mercor jules` build may exist without the spend subcommand.
+    """
+    import shutil
+    import subprocess
+
+    if not shutil.which("mercor"):
+        return False
+    try:
+        out = subprocess.run(
+            ["mercor", "jules", "--help"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (subprocess.SubprocessError, OSError):
+        return False
+    blob = (out.stdout or "") + (out.stderr or "")
+    return "spend" in blob
+
+
+def _record_spend_via_orchestration(
+    session_id: str,
+    source_repo: str,
+    prompt_length: int,
+    expected_completion_minutes: int,
+    dispatched_by: str,
+) -> bool:
+    """Try to record the dispatch via `mercor jules spend --append-from-jules-api`.
+
+    Returns True on success, False otherwise (so the caller can fall through
+    to the direct-write path). Never raises.
+    """
+    import subprocess
+
+    cmd = [
+        "mercor", "jules", "spend", "--append-from-jules-api",
+        "--session-id", session_id,
+        "--source-repo", source_repo,
+        "--prompt-length", str(prompt_length),
+        "--expected-completion-minutes", str(expected_completion_minutes),
+        "--dispatched-by", dispatched_by,
+    ]
+    try:
+        r = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+    except (subprocess.SubprocessError, OSError):
+        return False
+    return r.returncode == 0
+
+
+def _record_spend_direct_write(
+    session_id: str,
+    source_repo: str,
+    prompt_length: int,
+    expected_completion_minutes: int,
+    dispatched_by: str,
+) -> None:
+    """Atomic-append one ledger row directly to the JSONL file.
+
+    Schema mirrors mercor-orchestration's `spend_ledger.append_entry()` so
+    `mercor jules spend` reads both producer paths uniformly. Raises on I/O
+    error — the caller wraps this in try/except.
+    """
+    entry = {
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "session_id": session_id,
+        "source_repo": source_repo,
+        "prompt_length": prompt_length,
+        "expected_completion_minutes": expected_completion_minutes,
+        "dispatched_by": dispatched_by,
+    }
+    path = _ledger_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    # `a` is atomic for a single small write on POSIX (PIPE_BUF >= 512 bytes
+    # and our JSON line is well under that), so concurrent jules-api callers
+    # interleave cleanly without locking.
+    with open(path, "a", encoding="utf-8") as fh:
+        fh.write(json.dumps(entry) + "\n")
+
+
+def _record_spend(
+    session_id: str,
+    source_repo: str,
+    prompt_length: int,
+    expected_completion_minutes: int = 30,
+    dispatched_by: str = "jules-api",
+) -> None:
+    """Best-effort: record a dispatch on the spend ledger.
+
+    NEVER raises. Failures emit a single warning line to stderr and return.
+    Prefers the orchestration API when available; falls back to a direct
+    JSONL append otherwise.
+    """
+    try:
+        if _has_mercor_orchestration_spend():
+            if _record_spend_via_orchestration(
+                session_id=session_id,
+                source_repo=source_repo,
+                prompt_length=prompt_length,
+                expected_completion_minutes=expected_completion_minutes,
+                dispatched_by=dispatched_by,
+            ):
+                return
+            # If the orchestration call failed for any reason, fall through
+            # to the direct write so the ledger still records the dispatch.
+        _record_spend_direct_write(
+            session_id=session_id,
+            source_repo=source_repo,
+            prompt_length=prompt_length,
+            expected_completion_minutes=expected_completion_minutes,
+            dispatched_by=dispatched_by,
+        )
+    except Exception as e:  # noqa: BLE001 — ledger write must never abort create
+        sys.stderr.write(
+            f"warning: failed to record jules dispatch on spend ledger: {e}\n"
+        )
+
+
+def _load_key() -> str:
+    key = os.environ.get("JULES_API_KEY")
+    if key:
+        return key.strip()
+    # Walk up from CWD looking for a .env with JULES_API_KEY.
+    d = os.getcwd()
+    while True:
+        envp = os.path.join(d, ".env")
+        if os.path.isfile(envp):
+            with open(envp) as fh:
+                for line in fh:
+                    line = line.strip()
+                    if line.startswith("JULES_API_KEY="):
+                        return line.split("=", 1)[1].strip().strip("'\"")
+        parent = os.path.dirname(d)
+        if parent == d:
+            break
+        d = parent
+    sys.exit("error: JULES_API_KEY not set (env or .env)")
+
+
+def _req(method: str, path: str, body: dict | None = None, params: dict | None = None) -> dict:
+    url = path if path.startswith("http") else f"{BASE}/{path.lstrip('/')}"
+    if params:
+        url += "?" + urllib.parse.urlencode({k: v for k, v in params.items() if v is not None})
+    data = json.dumps(body).encode() if body is not None else None
+    headers = {"x-goog-api-key": _load_key()}
+    if data is not None:
+        headers["Content-Type"] = "application/json"
+
+    backoff = 2.0
+    for attempt in range(5):
+        r = urllib.request.Request(url, data=data, headers=headers, method=method)
+        try:
+            with urllib.request.urlopen(r) as resp:
+                raw = resp.read().decode()
+                return json.loads(raw) if raw.strip() else {}
+        except urllib.error.HTTPError as e:
+            payload = e.read().decode()
+            if e.code == 429 and attempt < 4:
+                time.sleep(backoff)
+                backoff *= 2
+                continue
+            sys.stderr.write(f"HTTP {e.code} {method} {url}\n{payload}\n")
+            sys.exit(1)
+        except urllib.error.URLError as e:
+            sys.exit(f"network error: {e}")
+    sys.exit("error: exhausted retries (rate limited)")
+
+
+def _paginate(path: str, key: str, params: dict, fetch_all: bool) -> list:
+    items: list = []
+    token = None
+    while True:
+        p = dict(params)
+        if token:
+            p["pageToken"] = token
+        resp = _req("GET", path, params=p)
+        items.extend(resp.get(key, []))
+        token = resp.get("nextPageToken")
+        if not token or not fetch_all:
+            break
+    return items
+
+
+def _resolve_source(spec: str) -> str:
+    """Accept a full `sources/...` name, `owner/repo`, or bare `repo`."""
+    if spec.startswith("sources/"):
+        return spec
+    srcs = _paginate("sources", "sources", {"pageSize": 100}, True)
+    matches = []
+    for s in srcs:
+        gh = s.get("githubRepo", {})
+        full = f"{gh.get('owner')}/{gh.get('repo')}"
+        if spec == full or spec == gh.get("repo"):
+            matches.append(s["name"])
+    if not matches:
+        sys.exit(f"error: no connected source matches '{spec}'. Run `jules sources` to list.")
+    if len(matches) > 1:
+        sys.exit(f"error: '{spec}' is ambiguous: {matches}. Pass the full sources/... name.")
+    return matches[0]
+
+
+def _out(obj, as_json: bool, render=None):
+    if as_json:
+        print(json.dumps(obj, indent=2))
+    elif render:
+        render(obj)
+    else:
+        print(json.dumps(obj, indent=2))
+
+
+# ── subcommands ──────────────────────────────────────────────────────────────
+
+def cmd_sources(a):
+    srcs = _paginate("sources", "sources", {"pageSize": 100}, a.all)
+    def r(items):
+        for s in items:
+            gh = s.get("githubRepo", {})
+            priv = "private" if gh.get("isPrivate") else "public"
+            print(f"{s['name']}\t({priv}, default={gh.get('defaultBranch',{}).get('displayName')})")
+    _out(srcs, a.json, r)
+
+
+def cmd_create(a):
+    source = _resolve_source(a.source)
+    ctx = {"source": source, "githubRepoContext": {"startingBranch": a.branch}}
+    body = {"prompt": a.prompt, "sourceContext": ctx}
+    if a.title:
+        body["title"] = a.title
+    if a.require_plan_approval:
+        body["requirePlanApproval"] = True
+    # Auto-PR is the default: the point of delegating to Jules is to get a
+    # mergeable PR back. Opt out only when you explicitly just want the patch.
+    body["automationMode"] = "AUTOMATION_MODE_UNSPECIFIED" if a.no_pr else "AUTO_CREATE_PR"
+    s = _req("POST", "sessions", body=body)
+
+    # Best-effort: append to the mercor-orchestration spend ledger. This is
+    # ADDITIVE — a failure here must never abort or corrupt the create call.
+    # `_record_spend` already swallows errors internally; the belt-and-braces
+    # try/except here is a hard guarantee against any future refactor that
+    # might let an exception escape.
+    if not a.no_spend_ledger:
+        try:
+            session_name = s.get("name") or ""
+            session_id = session_name.split("/")[-1] if session_name else ""
+            # The source-repo we record is the resolved sources/... name (stable
+            # identifier from Jules) so that `mercor jules spend` reports group
+            # consistently regardless of whether the user passed `repo` or
+            # `owner/repo`.
+            _record_spend(
+                session_id=session_id,
+                source_repo=source,
+                prompt_length=len(a.prompt or ""),
+                expected_completion_minutes=a.expected_completion_minutes,
+                dispatched_by=a.dispatched_by,
+            )
+        except Exception as e:  # noqa: BLE001 — ledger MUST NOT abort create
+            sys.stderr.write(
+                f"warning: spend-ledger integration failed (session created OK): {e}\n"
+            )
+
+    def r(o):
+        print(f"created {o['name']}  state={o.get('state')}")
+        print(o.get("url", ""))
+    _out(s, a.json, r)
+
+
+def _pr_urls(session: dict) -> list[str]:
+    """Extract created-PR URLs from Session.outputs[].pullRequest.url."""
+    return [o["pullRequest"]["url"]
+            for o in session.get("outputs", [])
+            if isinstance(o, dict) and o.get("pullRequest", {}).get("url")]
+
+
+def cmd_get(a):
+    s = _req("GET", f"sessions/{a.session.split('/')[-1]}")
+    def r(o):
+        print(f"{o['name']}  state={o.get('state')}  title={o.get('title')}")
+        print(f"web UI: {o.get('url', '')}")
+        for u in _pr_urls(o):
+            print(f"PR:     {u}")
+    _out(s, a.json, r)
+
+
+def cmd_delete(a):
+    sid = a.session.split("/")[-1]
+    _req("DELETE", f"sessions/{sid}")
+    print(f"deleted sessions/{sid}")
+
+
+def cmd_merge(a):
+    """Merge the PR Jules opened for a session.
+
+    Jules has no merge endpoint — the API stops at opening the PR. Getting it
+    *merged* (the actual goal of delegating a task) is a GitHub operation, so
+    this reads outputs[].pullRequest.url and hands off to `gh pr merge`.
+    """
+    import shutil
+    import subprocess
+
+    if not shutil.which("gh"):
+        sys.exit("error: `gh` (GitHub CLI) not found — needed to merge the PR")
+    sid = a.session.split("/")[-1]
+    s = _req("GET", f"sessions/{sid}")
+    urls = _pr_urls(s)
+    if not urls:
+        sys.exit(f"error: no PR on sessions/{sid} yet (state={s.get('state')}). "
+                 "Was it created with --auto-pr? Has it COMPLETED? Try `jules wait` first.")
+    url = urls[0]
+    # Jules opens its PRs as **drafts**; gh refuses to merge a draft. Mark it
+    # ready first (idempotent — harmless if it's already ready).
+    is_draft = subprocess.run(
+        ["gh", "pr", "view", url, "--json", "isDraft", "-q", ".isDraft"],
+        capture_output=True, text=True).stdout.strip()
+    if is_draft == "true":
+        print(f"PR is a draft — marking ready: gh pr ready {url}")
+        subprocess.run(["gh", "pr", "ready", url], check=False)
+    cmd = ["gh", "pr", "merge", url, f"--{a.method}", "--delete-branch"]
+    if a.admin:
+        cmd.append("--admin")
+    print(f"merging {url} via: {' '.join(cmd)}")
+    r = subprocess.run(cmd)
+    sys.exit(r.returncode)
+
+
+def cmd_list(a):
+    sess = _paginate("sessions", "sessions", {"pageSize": 100}, a.all)
+    if a.state:
+        sess = [s for s in sess if s.get("state") == a.state]
+    def r(items):
+        for s in items:
+            print(f"{s['id']}\t{s.get('state'):<22}\t{s.get('title','')[:70]}")
+    _out(sess, a.json, r)
+
+
+def cmd_activities(a):
+    sid = a.session.split("/")[-1]
+    params = {"pageSize": 100}
+    if getattr(a, "since", None):
+        params["createTime"] = a.since
+    acts = _paginate(f"sessions/{sid}/activities", "activities", params, a.all)
+    def r(items):
+        for act in items:
+            kind = next((k for k in (
+                "agentMessaged", "userMessaged", "planGenerated", "planApproved",
+                "progressUpdated", "sessionCompleted", "sessionFailed") if k in act), "activity")
+            desc = act.get("description") or act.get(kind, {})
+            print(f"[{act.get('createTime','')}] {kind}: {json.dumps(desc)[:200]}")
+    _out(acts, a.json, r)
+
+
+def cmd_message(a):
+    sid = a.session.split("/")[-1]
+    _req("POST", f"sessions/{sid}:sendMessage", body={"prompt": a.text})
+    print(f"sent message to sessions/{sid}")
+
+
+def cmd_approve(a):
+    sid = a.session.split("/")[-1]
+    _req("POST", f"sessions/{sid}:approvePlan", body={})
+    print(f"approved plan for sessions/{sid}")
+
+
+TERMINAL = {"COMPLETED", "FAILED"}
+PAUSE = {"AWAITING_PLAN_APPROVAL", "AWAITING_USER_FEEDBACK", "PAUSED"}
+
+
+def cmd_wait(a):
+    """Poll until the session reaches a terminal or human-needed state.
+
+    Exit 0 = COMPLETED, 2 = needs human (approval/feedback/paused),
+    1 = FAILED or timeout. This makes `wait` usable as a CI gate.
+    """
+    sid = a.session.split("/")[-1]
+    seen: set[str] = set()
+    deadline = time.time() + a.timeout
+    while time.time() < deadline:
+        s = _req("GET", f"sessions/{sid}")
+        state = s.get("state")
+        for act in _paginate(f"sessions/{sid}/activities", "activities", {"pageSize": 100}, True):
+            aid = act.get("id") or act.get("name")
+            if aid in seen:
+                continue
+            seen.add(aid)
+            kind = next((k for k in (
+                "agentMessaged", "userMessaged", "planGenerated", "planApproved",
+                "progressUpdated", "sessionCompleted", "sessionFailed") if k in act), "activity")
+            print(f"  · {kind}: {json.dumps(act.get(kind, act.get('description','')))[:160]}")
+        print(f"state={state}")
+        if state in TERMINAL:
+            if state == "COMPLETED":
+                for u in _pr_urls(s):
+                    print(f"PR: {u}")
+                sys.exit(0)
+            sys.exit(1)
+        if state in PAUSE:
+            print(f"session needs human action ({state})")
+            sys.exit(2)
+        time.sleep(a.interval)
+    sys.exit(f"timeout after {a.timeout}s (last state={state})")
+
+
+def main():
+    p = argparse.ArgumentParser(prog="jules", description="Jules v1alpha REST API CLI")
+    p.add_argument("--json", action="store_true", help="machine-readable JSON output")
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    s = sub.add_parser("sources", help="list connected GitHub repos")
+    s.add_argument("--all", action="store_true", help="follow pagination")
+    s.set_defaults(fn=cmd_sources)
+
+    s = sub.add_parser("create", help="create a coding session")
+    s.add_argument("--source", required=True, help="sources/... name, owner/repo, or repo")
+    s.add_argument("--prompt", required=True)
+    s.add_argument("--branch", default="main", help="starting branch (default: main)")
+    s.add_argument("--title")
+    s.add_argument("--require-plan-approval", action="store_true",
+                   help="hold for approvePlan before execution")
+    s.add_argument("--no-pr", action="store_true",
+                   help="opt OUT of auto-PR (default is automationMode=AUTO_CREATE_PR)")
+    s.add_argument("--no-spend-ledger", action="store_true",
+                   help="skip appending to the mercor-orchestration spend ledger "
+                        "(~/.mercor/jules-spend-ledger.jsonl); the write is "
+                        "best-effort and additive so this is rarely needed")
+    s.add_argument("--expected-completion-minutes", type=int, default=30,
+                   help="estimate recorded on the spend-ledger row (default: 30)")
+    s.add_argument("--dispatched-by", default="jules-api",
+                   help="caller identifier stamped on the ledger row "
+                        "(default: jules-api; override for nested dispatchers)")
+    s.set_defaults(fn=cmd_create)
+
+    s = sub.add_parser("get", help="get one session"); s.add_argument("session"); s.set_defaults(fn=cmd_get)
+
+    s = sub.add_parser("list", help="list sessions")
+    s.add_argument("--all", action="store_true")
+    s.add_argument("--state", help="filter by state (e.g. IN_PROGRESS)")
+    s.set_defaults(fn=cmd_list)
+
+    s = sub.add_parser("activities", help="list a session's activities")
+    s.add_argument("session"); s.add_argument("--all", action="store_true")
+    s.add_argument("--since", help="only activities at/after this RFC3339 createTime")
+    s.set_defaults(fn=cmd_activities)
+
+    s = sub.add_parser("delete", help="delete a session")
+    s.add_argument("session"); s.set_defaults(fn=cmd_delete)
+
+    s = sub.add_parser("merge", help="merge the PR Jules opened (via gh)")
+    s.add_argument("session")
+    s.add_argument("--method", choices=["squash", "merge", "rebase"], default="squash")
+    s.add_argument("--admin", action="store_true",
+                   help="use gh --admin to bypass branch protection / pending checks")
+    s.set_defaults(fn=cmd_merge)
+
+    s = sub.add_parser("message", help="send a message/feedback to a session")
+    s.add_argument("session"); s.add_argument("text"); s.set_defaults(fn=cmd_message)
+
+    s = sub.add_parser("approve", help="approve the pending plan")
+    s.add_argument("session"); s.set_defaults(fn=cmd_approve)
+
+    s = sub.add_parser("wait", help="poll until terminal/human-needed state")
+    s.add_argument("session")
+    s.add_argument("--timeout", type=int, default=1800)
+    s.add_argument("--interval", type=int, default=10)
+    s.set_defaults(fn=cmd_wait)
+
+    a = p.parse_args()
+    a.fn(a)
+
+
+if __name__ == "__main__":
+    main()
