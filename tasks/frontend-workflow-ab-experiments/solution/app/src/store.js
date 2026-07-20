@@ -117,13 +117,19 @@ export const useStudio = create((set, get) => ({
     const nextSamples = { ...experiment.samples }
     const nextProgress = { ...experiment.progress }
     let milestone = false
+    
     experiment.variants.forEach((_, index) => {
       const letter = LETTERS[index]
       if ((nextProgress[letter] || 0) < target) {
-        const sample = makeSamples(experiment.id, experiment.variants, 1, nextProgress[letter])[letter][0]
-        nextSamples[letter] = [...(nextSamples[letter] || []), sample]
-        nextProgress[letter] = (nextProgress[letter] || 0) + 1
-        if ([0.25, 0.5, 0.75].some(mark => nextProgress[letter] === Math.ceil(target * mark))) milestone = true
+        const step = Math.max(1, Math.ceil(target / 40));
+        const currentCount = nextProgress[letter] || 0;
+        const addCount = Math.min(step, target - currentCount);
+        
+        const newSamples = makeSamples(experiment.id, experiment.variants, addCount, currentCount)[letter];
+        nextSamples[letter] = [...(nextSamples[letter] || []), ...newSamples];
+        nextProgress[letter] = currentCount + addCount;
+        
+        if ([0.25, 0.5, 0.75].some(mark => nextProgress[letter] >= Math.ceil(target * mark) && currentCount < Math.ceil(target * mark))) milestone = true
       }
     })
     const complete = experiment.variants.every((_, index) => nextProgress[LETTERS[index]] >= target)

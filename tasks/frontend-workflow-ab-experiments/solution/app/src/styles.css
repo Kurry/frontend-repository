@@ -383,6 +383,38 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
 }
 
+
+.results-panel {
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.38, 0.9), opacity 0.25s ease;
+}
+
+.recharts-bar-rectangle path,
+.recharts-bar-rectangles rect {
+  transition: height 0.4s ease, y 0.4s ease;
+}
+
+.toast-wrap {
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.criteria-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.library-main {
+  overflow-x: auto;
+}
+.experiment-table {
+  min-width: 800px; /* Force scroll on mobile */
+}
+
+@media (max-width: 768px) {
+  .results-panel {
+    width: 100vw;
+  }
+}
+
 .bx--data-table tbody tr:hover {
   background-color: var(--surface-3);
 }
