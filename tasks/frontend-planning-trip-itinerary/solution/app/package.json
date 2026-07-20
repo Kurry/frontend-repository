@@ -9,7 +9,7 @@
     "start": "npx --yes serve -l 3000 -n .output/public"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "serve": "14.2.6"
   },
   "devDependencies": {
     "@pinia/nuxt": "^1.0.1",
