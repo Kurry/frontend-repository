@@ -1,0 +1,29 @@
+{
+  "name": "relay-research-console",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite --host 0.0.0.0 --port 3000",
+    "verify:build": "vite build"
+  },
+  "dependencies": {
+    "@mantine/core": "^8.2.1",
+    "@mantine/hooks": "^8.2.1",
+    "@mantine/notifications": "^8.2.1",
+    "@tabler/icons-react": "^3.34.1",
+    "@tailwindcss/vite": "4.1.11",
+    "@formkit/auto-animate": "^0.9.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "vite": "^7.3.6",
+    "tailwindcss": "4.1.11",
+    "zustand": "^5.0.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.60.0",
+    "@hookform/resolvers": "^5.1.1",
+    "zod": "^4.0.5",
+    "recharts": "^3.1.0"
+  },
+  "devDependencies": {}
+}
