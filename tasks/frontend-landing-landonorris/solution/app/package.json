@@ -1,13 +1,10 @@
 {
-  "name": "lando-norris-homepage-oracle",
+  "name": "avery-vale-homepage-oracle",
   "version": "1.0.0",
   "private": true,
-  "description": "Static offline reconstruction of the Lando Norris F1 driver homepage (reference oracle).",
+  "description": "Fully fictional Avery Vale / Nova Racing driver homepage (reference oracle).",
   "scripts": {
     "start": "node server.js",
-    "verify:build": "node -e \"require('fs').accessSync('index.html'); require('fs').accessSync('app.js'); require('fs').accessSync('app.css'); console.log('build ok')\""
-  },
-  "dependencies": {
-    "serve": "14.2.4"
+    "verify:build": "node -e \"['index.html','app.js','app.css','server.js','assets/fonts/MonaSans-VariableFont.woff2','assets/video/avery-loop.webm'].forEach(function(f){require('fs').accessSync(f)}); console.log('build ok')\""
   }
 }

@@ -1,10 +1,8 @@
 'use strict';
-// Dependency-free static server for the Lando Norris homepage oracle.
+// Dependency-free static server for the fictional Avery Vale homepage oracle.
 // Serves the app fully offline on port 3000. All asset URLs are same-origin.
-// Canonical top-level asset prefixes (/fonts, /vendor, /assets.itsoffbrand.io,
-// /cdn.prod.website-files.com, /videos, /rive, /gl, /images, /d3e54v103j8qbb...)
-// are aliased into the ./assets subdirectory so the page can reference the
-// exact local paths the PRD's asset-path table mandates.
+// Top-level asset prefixes (/images, /fonts, /video, /marks, /helmets,
+// /menu, /editorial) are aliased into the ./assets subdirectory.
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -92,5 +90,5 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Lando Norris oracle serving on http://localhost:${PORT}`);
+  console.log(`Avery Vale oracle serving on http://localhost:${PORT}`);
 });
