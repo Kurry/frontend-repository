@@ -116,8 +116,18 @@ export function registerWebMCP() {
         }
         if (objectType === 'annotation-anchor') {
           const annotations = state.annotations[state.selectedPromptId] || [];
-          const thread = annotations.find((item) => item.lineStart === lineStart) || annotations[0];
-          if (!thread) return { ok: false, error: 'No annotation thread exists on the selected prompt to preview.' };
+          const wanted = Number.isInteger(lineStart) ? Number(lineStart) : null;
+          // With a lineStart, resolve the thread anchored at that line (or covering
+          // it) and fail honestly if none exists — never silently open an unrelated
+          // thread. Without a lineStart, open the first thread as a convenience.
+          const thread = wanted === null
+            ? annotations[0]
+            : (annotations.find((item) => item.lineStart === wanted) || annotations.find((item) => wanted >= item.lineStart && wanted <= item.lineEnd));
+          if (!thread) {
+            return { ok: false, error: wanted === null
+              ? 'No annotation thread exists on the selected prompt to preview.'
+              : `No annotation thread covers line ${wanted} on the selected prompt. Pass a lineStart within an existing thread's line range, or omit lineStart to open the first thread.` };
+          }
           actions.setThreadOpen(thread.annotationId);
           return { objectType, visible: true, surface: 'thread-panel', annotationId: thread.annotationId, lineStart: thread.lineStart, lineEnd: thread.lineEnd };
         }

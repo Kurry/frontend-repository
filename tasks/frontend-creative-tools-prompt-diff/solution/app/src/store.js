@@ -330,7 +330,9 @@ export const useStudioStore = create((set, get) => ({
 
   importPackage: (packageData) => set((state) => {
     const index = state.prompts.findIndex((prompt) => prompt.id === state.selectedPromptId);
-    if (index < 0) return {};
+    // Defensive: if the selected prompt vanished, clear the busy flag the import
+    // form set so the UI never sticks on "Validating…" with a disabled submit.
+    if (index < 0) return { importBusy: false, importError: 'Import aborted: the selected prompt is missing from the library. Reload the studio and retry.' };
     const previous = state.prompts[index];
     const imported = {
       id: packageData.promptId, title: packageData.promptTitle,
