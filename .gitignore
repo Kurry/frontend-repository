@@ -36,6 +36,7 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 start.log
+start_output.log
 
 # OS / editor
 .DS_Store
