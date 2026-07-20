@@ -16,7 +16,7 @@
     <button class="interactive flex shrink-0 items-center gap-3 rounded-lg p-1 text-left" onclick={() => state.navigate('queue')} aria-label="Signal Trace queue home">
       <span class="relative grid size-9 place-items-center overflow-hidden rounded-lg bg-signal-500 shadow-inner">
         <span class="absolute h-8 w-px rotate-45 bg-white/40"></span>
-        <ClipboardText size={19} weight="bold" />
+        <ClipboardText aria-hidden="true" size={19} weight="bold" />
       </span>
       <span>
         <span class="block text-[10px] font-bold uppercase tracking-[.17em] text-slate-400">Signal Trace</span>
@@ -41,14 +41,14 @@
 
     <div class="ml-auto flex items-center gap-2">
       <button class="interactive grid size-9 place-items-center rounded-lg border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white" onclick={() => state.setTheme(state.theme === 'light' ? 'dark' : 'light')} aria-label={`Switch to ${state.theme === 'light' ? 'dark' : 'light'} theme`}>
-        {#if state.theme === 'light'}<Moon size={17} />{:else}<Sun size={18} />{/if}
+        {#if state.theme === 'light'}<Moon aria-hidden="true" size={17} />{:else}<Sun aria-hidden="true" size={18} />{/if}
       </button>
       <Button color="alternative" class="interactive !border-white/15 !bg-white/10 !px-3 !py-2 !text-white hover:!bg-white/20" onclick={() => state.openExport()} aria-label="Export">
-        <Export size={16} weight="bold" class="mr-2" />
+        <Export aria-hidden="true" size={16} weight="bold" class="mr-2" />
         <span class="hidden sm:inline">Export</span>
       </Button>
       <button class="interactive grid size-9 place-items-center rounded-lg border border-white/10 md:hidden" onclick={() => state.mobileNavOpen = !state.mobileNavOpen} aria-label="Toggle navigation" aria-expanded={state.mobileNavOpen}>
-        {#if state.mobileNavOpen}<X size={20} />{:else}<List size={20} />{/if}
+        {#if state.mobileNavOpen}<X aria-hidden="true" size={20} />{:else}<List aria-hidden="true" size={20} />{/if}
       </button>
     </div>
   </div>

@@ -59,7 +59,7 @@
   {#if state.toast}
     <div class="fixed bottom-4 right-4 z-[80] max-w-[calc(100vw-2rem)] toast-enter" role="status" aria-live="polite">
       <Toast color={state.toast.tone === 'error' ? 'red' : 'green'} class="!rounded-xl !border !border-slate-200 !bg-white !shadow-xl">
-        {#if state.toast.tone === 'error'}<WarningCircle size={19} weight="fill" class="mr-3 text-rose-600" />{:else}<CheckCircle size={19} weight="fill" class="mr-3 text-emerald-600" />{/if}
+        {#if state.toast.tone === 'error'}<WarningCircle aria-hidden="true" size={19} weight="fill" class="mr-3 text-rose-600" />{:else}<CheckCircle aria-hidden="true" size={19} weight="fill" class="mr-3 text-emerald-600" />{/if}
         <span class="text-sm font-bold text-ink-900">{state.toast.message}</span>
       </Toast>
     </div>

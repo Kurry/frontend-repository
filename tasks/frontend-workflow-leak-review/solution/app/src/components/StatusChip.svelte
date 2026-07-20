@@ -15,10 +15,10 @@
 
 <Badge border class={`inline-flex whitespace-nowrap !rounded-md !px-2.5 !py-1 text-[11px] font-bold ${classes[state]} ${animate ? 'chip-pop' : ''}`}>
   <span class="mr-1.5 inline-flex" aria-hidden="true">
-    {#if state === 'unreviewed'}<Circle size={12} weight="fill" />
-    {:else if state === 'review-triggered'}<WarningDiamond size={12} weight="fill" />
-    {:else if state === 'confirmed-clean'}<CheckCircle size={12} weight="fill" />
-    {:else}<XCircle size={12} weight="fill" />{/if}
+    {#if state === 'unreviewed'}<Circle aria-hidden="true" size={12} weight="fill" />
+    {:else if state === 'review-triggered'}<WarningDiamond aria-hidden="true" size={12} weight="fill" />
+    {:else if state === 'confirmed-clean'}<CheckCircle aria-hidden="true" size={12} weight="fill" />
+    {:else}<XCircle aria-hidden="true" size={12} weight="fill" />{/if}
   </span>
   {reviewStateLabels[state]}
 </Badge>

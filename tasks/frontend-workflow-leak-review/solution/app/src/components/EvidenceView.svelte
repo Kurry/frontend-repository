@@ -51,7 +51,7 @@
     <section class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <button class="interactive mb-3 inline-flex items-center gap-1 rounded-md text-xs font-bold text-teal-700 hover:text-teal-900" onclick={() => appState.navigate('queue')}>
-          <ArrowLeft size={14} /> Back to queue
+          <ArrowLeft aria-hidden="true" size={14} /> Back to queue
         </button>
         <p class="eyebrow">Evidence review · {submission.id}</p>
         <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-ink-950 sm:text-3xl">{submission.task}</h1>
@@ -63,7 +63,7 @@
     <section class="panel overflow-hidden rounded-xl" aria-labelledby="matched-evidence-heading">
       <div class="flex flex-col gap-4 border-b border-line px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
         <div>
-          <p class="eyebrow"><BracketsCurly size={13} class="mr-1 inline" />Matched evidence</p>
+          <p class="eyebrow"><BracketsCurly aria-hidden="true" size={13} class="mr-1 inline" />Matched evidence</p>
           <h2 id="matched-evidence-heading" class="mt-1 text-base font-extrabold">{submission.matches.length} matched snippet pairs</h2>
         </div>
         <div class="flex items-center justify-between gap-3 sm:justify-end">
@@ -72,10 +72,10 @@
             <p class="tabular text-[10px] font-bold uppercase tracking-wide text-slate-500">Pair similarity {currentMatch.similarity.toFixed(2)}</p>
           </div>
           <Button color="alternative" size="sm" class="interactive !rounded-lg" disabled={appState.evidenceFocusIndex === 0} onclick={() => step(-1)} aria-label="Previous matched pair">
-            <ArrowLeft size={15} class="mr-1" /> Previous
+            <ArrowLeft aria-hidden="true" size={15} class="mr-1" /> Previous
           </Button>
           <Button color="alternative" size="sm" class="interactive !rounded-lg" disabled={appState.evidenceFocusIndex === submission.matches.length - 1} onclick={() => step(1)} aria-label="Next matched pair">
-            Next <ArrowRight size={15} class="ml-1" />
+            Next <ArrowRight aria-hidden="true" size={15} class="ml-1" />
           </Button>
         </div>
       </div>
@@ -124,7 +124,7 @@
 
       {#if existingDecision}
         <div class="rounded-xl border border-emerald-300 bg-emerald-50 p-4">
-          <div class="flex items-center gap-2 font-extrabold text-emerald-900"><CheckCircle size={19} weight="fill" /> Decision recorded</div>
+          <div class="flex items-center gap-2 font-extrabold text-emerald-900"><CheckCircle aria-hidden="true" size={19} weight="fill" /> Decision recorded</div>
           <p class="mt-2 text-sm text-emerald-950">{existingDecision.requestBody.rationale}</p>
           <button class="interactive mt-4 rounded-lg border border-emerald-300 bg-white px-3 py-2 text-xs font-bold text-emerald-800" onclick={() => appState.navigate('audit')}>View audit timeline</button>
         </div>
@@ -134,13 +134,13 @@
             <legend class="mb-2 text-sm font-extrabold">Verdict <span class="text-rose-600">*</span></legend>
             <div class="grid gap-2 sm:grid-cols-2">
               <label class={`interactive flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 ${$data.verdict === 'confirm-clean' ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/15' : 'border-slate-300 bg-white hover:border-emerald-300'}`}>
-                <input class="size-4 accent-emerald-600" type="radio" name="verdict" value="confirm-clean" aria-describedby="verdict-error" />
-                <CheckCircle class="text-emerald-600" size={20} weight="fill" />
+                <input class="size-4 accent-emerald-600" type="radio" name="verdict" value="confirm-clean" bind:group={$data.verdict} aria-describedby="verdict-error" />
+                <CheckCircle aria-hidden="true" class="text-emerald-600" size={20} weight="fill" />
                 <span><span class="block text-sm font-extrabold">Confirm clean</span><span class="block text-[11px] text-slate-500">Evidence does not establish a leak.</span></span>
               </label>
               <label class={`interactive flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 ${$data.verdict === 'confirm-leak' ? 'border-rose-500 bg-rose-50 ring-2 ring-rose-500/15' : 'border-slate-300 bg-white hover:border-rose-300'}`}>
-                <input class="size-4 accent-rose-600" type="radio" name="verdict" value="confirm-leak" aria-describedby="verdict-error" />
-                <WarningDiamond class="text-rose-600" size={20} weight="fill" />
+                <input class="size-4 accent-rose-600" type="radio" name="verdict" value="confirm-leak" bind:group={$data.verdict} aria-describedby="verdict-error" />
+                <WarningDiamond aria-hidden="true" class="text-rose-600" size={20} weight="fill" />
                 <span><span class="block text-sm font-extrabold">Confirm leak</span><span class="block text-[11px] text-slate-500">Evidence establishes reference exposure.</span></span>
               </label>
             </div>

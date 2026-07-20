@@ -47,7 +47,7 @@
   }
 </script>
 
-<Modal bind:open={appState.exportOpen} size="5xl" title="Export review artifact" class="!bg-paper-50" classes={{ body: '!p-0' }}>
+<Modal bind:open={appState.exportOpen} size="5xl" title="Export review artifact" autoclose={false} outsideclose={false} focustrap class="!bg-paper-50" classes={{ body: '!p-0' }}>
   <div class="grid min-h-[35rem] lg:grid-cols-[17rem_1fr]">
     <aside class="border-b border-line bg-ink-950 p-4 text-white lg:border-b-0 lg:border-r lg:p-5">
       <p class="text-[10px] font-bold uppercase tracking-[.15em] text-slate-400">Artifact format</p>
@@ -58,7 +58,7 @@
           role="radio"
           aria-checked={appState.exportFormat === 'review-report-json'}
         >
-          <FileCode size={20} class="mt-0.5 shrink-0" />
+          <FileCode aria-hidden="true" size={20} class="mt-0.5 shrink-0" />
           <span><span class="block text-xs font-extrabold">Review report JSON</span><span class="mt-1 block text-[10px] leading-4 text-slate-400">API-shaped, validated and round-trippable</span></span>
         </button>
         <button
@@ -67,7 +67,7 @@
           role="radio"
           aria-checked={appState.exportFormat === 'summary-text'}
         >
-          <TextAlignLeft size={20} class="mt-0.5 shrink-0" />
+          <TextAlignLeft aria-hidden="true" size={20} class="mt-0.5 shrink-0" />
           <span><span class="block text-xs font-extrabold">Summary text</span><span class="mt-1 block text-[10px] leading-4 text-slate-400">Live counts and per-task decisions</span></span>
         </button>
       </div>
@@ -76,7 +76,7 @@
         <p class="text-[10px] font-bold uppercase tracking-[.15em] text-slate-400">Round-trip import</p>
         <form use:importForm class="mt-3 space-y-2" aria-label="Import Review report JSON">
           <label for="report-import" class="interactive flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-white/25 bg-white/5 px-3 py-2.5 text-xs font-bold text-slate-200 hover:border-signal-500 hover:bg-white/10">
-            <FileArrowUp size={17} />
+            <FileArrowUp aria-hidden="true" size={17} />
             <span class="truncate">{selectedFileName || 'Choose .json file'}</span>
           </label>
           <input
@@ -103,14 +103,14 @@
           <p class="text-[10px] text-slate-500">Updates with threshold, decisions, and include toggles.</p>
         </div>
         <div class="flex items-center gap-2">
-          <Button color="alternative" size="sm" class="interactive !rounded-lg" onclick={copyExport}><Clipboard size={15} class="mr-1.5" />Copy</Button>
+          <Button color="alternative" size="sm" class="interactive !rounded-lg" onclick={copyExport}><Clipboard aria-hidden="true" size={15} class="mr-1.5" />Copy</Button>
           {#if appState.exportFormat === 'review-report-json'}
-            <Button size="sm" class="interactive !rounded-lg !bg-signal-600 hover:!bg-signal-500" onclick={downloadJson}><DownloadSimple size={15} class="mr-1.5" />Download .json</Button>
+            <Button size="sm" class="interactive !rounded-lg !bg-signal-600 hover:!bg-signal-500" onclick={downloadJson}><DownloadSimple aria-hidden="true" size={15} class="mr-1.5" />Download .json</Button>
           {/if}
         </div>
       </div>
       <div class="relative min-h-0 flex-1 p-3 sm:p-4">
-        <div class="absolute right-6 top-6 z-10 inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-1 text-[9px] font-extrabold uppercase text-emerald-800 shadow-sm"><Check size={11} weight="bold" />Live</div>
+        <div class="absolute right-6 top-6 z-10 inline-flex items-center gap-1 rounded-md bg-emerald-100 px-2 py-1 text-[9px] font-extrabold uppercase text-emerald-800 shadow-sm"><Check aria-hidden="true" size={11} weight="bold" />Live</div>
         <pre data-testid="export-preview" class="h-[28rem] overflow-auto whitespace-pre-wrap rounded-xl border border-slate-700 bg-ink-950 p-4 pr-16 font-mono text-[11px] leading-5 text-slate-200 shadow-inner sm:text-xs">{appState.activeExportText}</pre>
       </div>
     </section>

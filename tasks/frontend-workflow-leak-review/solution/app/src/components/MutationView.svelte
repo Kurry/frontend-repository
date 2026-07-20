@@ -16,14 +16,14 @@
       <article class="panel overflow-hidden rounded-xl">
         <div class="flex flex-col gap-3 border-b border-line px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
           <div class="flex items-center gap-3">
-            <span class="grid size-10 place-items-center rounded-lg bg-violet-100 text-violet-700"><Dna size={21} weight="fill" /></span>
+            <span class="grid size-10 place-items-center rounded-lg bg-violet-100 text-violet-700"><Dna aria-hidden="true" size={21} weight="fill" /></span>
             <div>
               <h2 class="text-base font-extrabold">{suite.task}</h2>
               <p class="mt-0.5 text-[11px] text-slate-500">{suite.mutant} · {suite.tests.filter((test) => test.included).length} of {suite.tests.length} tests included</p>
             </div>
           </div>
           <div class="flex items-center gap-2 rounded-lg border border-violet-200 bg-violet-50 px-3 py-2">
-            <ArrowsLeftRight size={17} class="text-violet-700" weight="bold" />
+            <ArrowsLeftRight aria-hidden="true" size={17} class="text-violet-700" weight="bold" />
             <span class="text-[10px] font-bold uppercase tracking-wide text-violet-700">Included flips</span>
             <span class="tabular text-xl font-black text-violet-900" aria-label={`${state.mutationFlipCount(suite)} included flips`}>{state.mutationFlipCount(suite)}</span>
           </div>
@@ -51,10 +51,10 @@
                     <div class="flex items-center gap-2"><span class="text-sm font-bold text-ink-900">{test.name}</span>{#if flipped}<Badge border class="!rounded !border-violet-300 !bg-violet-100 !px-1.5 !py-0.5 !text-[9px] !font-extrabold !text-violet-800">FLIP</Badge>{/if}</div>
                     <span class="font-mono text-[9px] text-slate-400">{test.id}</span>
                   </td>
-                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1 text-xs font-extrabold text-emerald-700"><CheckCircle size={14} weight="fill" />Pass</span></td>
+                  <td class="px-4 py-3"><span class="inline-flex items-center gap-1 text-xs font-extrabold text-emerald-700"><CheckCircle aria-hidden="true" size={14} weight="fill" />Pass</span></td>
                   <td class="px-4 py-3">
-                    {#if test.mutant === 'pass'}<span class="inline-flex items-center gap-1 text-xs font-extrabold text-emerald-700"><CheckCircle size={14} weight="fill" />Pass</span>
-                    {:else}<span class="inline-flex items-center gap-1 text-xs font-extrabold text-rose-700"><XCircle size={14} weight="fill" />Fail</span>{/if}
+                    {#if test.mutant === 'pass'}<span class="inline-flex items-center gap-1 text-xs font-extrabold text-emerald-700"><CheckCircle aria-hidden="true" size={14} weight="fill" />Pass</span>
+                    {:else}<span class="inline-flex items-center gap-1 text-xs font-extrabold text-rose-700"><XCircle aria-hidden="true" size={14} weight="fill" />Fail</span>{/if}
                   </td>
                 </tr>
               {/each}

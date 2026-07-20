@@ -26,9 +26,10 @@
       <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-ink-950 sm:text-3xl">Audit timeline</h1>
       <p class="mt-1 max-w-2xl text-sm text-slate-600">Decision events are ordered newest first and compile from the same API-shaped records as export.</p>
     </div>
-    <form use:auditFilterForm class="flex items-center gap-2" aria-label="Filter audit timeline by verdict">
-      <Funnel size={16} class="text-slate-500" />
-      <Select name="verdict" items={options} value={state.auditFilter} onchange={(event) => state.setAuditFilter(event.currentTarget.value)} classes={{ select: '!rounded-lg !border-slate-300 !bg-white !py-2 !text-sm' }} aria-label="Audit verdict" />
+    <form use:auditFilterForm class="flex items-center gap-2" >
+      <Funnel aria-hidden="true" size={16} class="text-slate-500" />
+      <label for="verdict" class="sr-only">Audit verdict</label>
+      <Select id="verdict" name="verdict" items={options} value={state.auditFilter} onchange={(event) => state.setAuditFilter(event.currentTarget.value)} classes={{ select: '!rounded-lg !border-slate-300 !bg-white !py-2 !text-sm' }}  />
     </form>
   </section>
 
@@ -38,7 +39,7 @@
         {#each state.auditEntries as entry (entry.submissionId)}
           <li class={`group relative ml-6 pb-7 last:pb-0 ${state.newestAuditSubmissionId === entry.submissionId ? 'audit-enter' : ''}`}>
             <span class={`absolute -left-[2.15rem] top-0 grid size-6 place-items-center rounded-full border-4 border-paper-50 ${entry.requestBody.verdict === 'confirm-clean' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
-              {#if entry.requestBody.verdict === 'confirm-clean'}<CheckCircle size={13} weight="bold" />{:else}<WarningDiamond size={13} weight="bold" />{/if}
+              {#if entry.requestBody.verdict === 'confirm-clean'}<CheckCircle aria-hidden="true" size={13} weight="bold" />{:else}<WarningDiamond aria-hidden="true" size={13} weight="bold" />{/if}
             </span>
             <article class="interactive rounded-xl border border-line bg-white/70 p-4 group-hover:border-teal-200 group-hover:bg-teal-50/55 sm:p-5">
               <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
@@ -47,7 +48,7 @@
                   <h2 class="mt-2 text-sm font-extrabold text-ink-900">{entry.task}</h2>
                   <p class="mt-0.5 text-xs text-slate-500">Submitted by {entry.submitter} · {entry.submissionId}</p>
                 </div>
-                <time datetime={entry.decidedAt} class="tabular flex items-center gap-1 text-[10px] font-bold text-slate-400"><ClockCounterClockwise size={13} />{new Date(entry.decidedAt).toLocaleString()}</time>
+                <time datetime={entry.decidedAt} class="tabular flex items-center gap-1 text-[10px] font-bold text-slate-400"><ClockCounterClockwise aria-hidden="true" size={13} />{new Date(entry.decidedAt).toLocaleString()}</time>
               </div>
               <p class="mt-3 border-l-2 border-slate-200 pl-3 text-sm leading-6 text-slate-700">{entry.requestBody.rationale}</p>
             </article>
@@ -56,7 +57,7 @@
       </ol>
     {:else}
       <div class="py-12 text-center">
-        <span class="mx-auto grid size-12 place-items-center rounded-full bg-slate-100 text-slate-400"><ClockCounterClockwise size={23} /></span>
+        <span class="mx-auto grid size-12 place-items-center rounded-full bg-slate-100 text-slate-400"><ClockCounterClockwise aria-hidden="true" size={23} /></span>
         <h2 class="mt-4 text-base font-extrabold text-ink-900">
           {state.decisions.length === 0 ? 'No decisions recorded yet' : `No ${verdictLabels[state.auditFilter]} decisions`}
         </h2>

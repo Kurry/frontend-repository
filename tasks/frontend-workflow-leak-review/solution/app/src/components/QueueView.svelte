@@ -57,11 +57,12 @@
       <div>
         <div class="mb-3 flex items-center justify-between gap-4">
           <div>
-            <p class="eyebrow"><SlidersHorizontal size={13} class="mr-1 inline" />Live sensitivity</p>
+            <p class="eyebrow"><SlidersHorizontal aria-hidden="true" size={13} class="mr-1 inline" />Live sensitivity</p>
             <h2 id="threshold-heading" class="mt-1 text-base font-extrabold">Review threshold</h2>
           </div>
           <output for="threshold" class="tabular rounded-lg border border-signal-500/25 bg-signal-500/10 px-3 py-1.5 text-lg font-black text-signal-600">{state.threshold.toFixed(2)}</output>
         </div>
+        <label for="threshold" class="sr-only">Review threshold</label>
         <Range
           id="threshold"
           min="0.50"
@@ -69,14 +70,14 @@
           step="0.01"
           value={state.threshold}
           oninput={(event) => state.setThreshold(event.currentTarget.value)}
-          aria-label={`Review threshold ${state.threshold.toFixed(2)}`}
+          
           class="accent-signal-500"
         />
         <div class="mt-1 flex justify-between text-[10px] font-bold text-slate-500"><span>0.50 broader</span><span>0.95 stricter</span></div>
       </div>
 
       <Alert color="warning" class="!mb-0 !rounded-xl !border !border-amber-300 !bg-amber-50 !text-amber-950">
-        <Info size={20} weight="fill" class="mr-3 mt-0.5 shrink-0 text-amber-700" />
+        <Info aria-hidden="true" size={20} weight="fill" class="mr-3 mt-0.5 shrink-0 text-amber-700" />
         <div>
           <p class="text-sm font-extrabold">A flag is not a finding</p>
           <p class="mt-0.5 text-xs leading-5">This threshold only flags submissions for review. A human reviewer makes every Confirm clean or Confirm leak decision.</p>
@@ -92,25 +93,26 @@
         <p class="text-xs text-slate-500">Score band colors rebase against the live threshold.</p>
       </div>
       <div class="flex flex-col gap-2 min-[500px]:flex-row">
-        <label class="relative block">
-          <span class="sr-only">Search submissions</span>
-          <MagnifyingGlass class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-          <input
+        <div class="relative block">
+          <label for="search" class="sr-only">Search submissions</label>
+          <MagnifyingGlass aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+          <input id="search"
             class="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 min-[500px]:w-56"
             type="search"
             value={state.searchQuery}
             oninput={(event) => state.searchQuery = event.currentTarget.value}
             placeholder="Search task or submitter"
           />
-        </label>
-        <form use:filterForm aria-label="Filter queue by review state">
-          <Select
+        </div>
+        <form use:filterForm >
+          <label for="reviewState" class="sr-only">Review state</label>
+          <Select id="reviewState"
             name="reviewState"
             items={filterOptions}
             value={state.reviewFilter}
             onchange={(event) => state.setReviewFilter(event.currentTarget.value)}
             classes={{ select: '!rounded-lg !border-slate-300 !bg-white !py-2 !text-sm focus:!border-teal-500 focus:!ring-teal-500' }}
-            aria-label="Review state"
+            
           />
         </form>
       </div>
@@ -148,12 +150,12 @@
               </td>
               <td class="px-4 py-3.5 text-sm text-slate-600">{submission.submitter}</td>
               <td class="px-4 py-3.5"><StatusChip state={submission.reviewState} animate={state.lastChangedSubmissionId === submission.id} /></td>
-              <td class="px-4 py-3.5"><ArrowRight size={17} class="text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-teal-600" /></td>
+              <td class="px-4 py-3.5"><ArrowRight aria-hidden="true" size={17} class="text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-teal-600" /></td>
             </tr>
           {:else}
             <tr>
               <td colspan="5" class="px-5 py-14 text-center">
-                <div class="mx-auto grid size-11 place-items-center rounded-full bg-slate-100 text-slate-400"><MagnifyingGlass size={20} /></div>
+                <div class="mx-auto grid size-11 place-items-center rounded-full bg-slate-100 text-slate-400"><MagnifyingGlass aria-hidden="true" size={20} /></div>
                 <p class="mt-3 font-extrabold text-ink-900">
                   {state.reviewFilter === 'review-triggered' ? 'Nothing currently needs review' : 'No submissions match this view'}
                 </p>
