@@ -178,41 +178,44 @@ export const useLabStore = create((set, get) => ({
   startRescore: async (payload) => {
     if (get().run.active || window.__isRescoring) return false;
     window.__isRescoring = true;
-    if (get().run.active) return false
-    const steps = get().trials.map((trial) => ({ trialId: trial.id, taskName: trial.taskName, status: 'pending', attempt: 1 }))
-    set({ run: { active: true, label: payload, steps, events: [{ id: `${Date.now()}-start`, trialId: null, status: 'started', time: nowTime(), text: `Run started for ${payload.labelName}` }], startedAt: Date.now(), elapsed: 0, failures: 0, completed: false, selectedStep: null } })
-    const update = (trialId, status, attempt = 1, text) => set((state) => ({ run: {
-      ...state.run,
-      steps: state.run.steps.map((step) => step.trialId === trialId ? { ...step, status, attempt } : step),
-      events: [...state.run.events, { id: `${Date.now()}-${trialId}-${status}`, trialId, status, time: nowTime(), text: text || `${trialId} ${status}` }],
-      elapsed: Date.now() - state.run.startedAt,
-    } }))
-    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-    for (let index = 0; index < steps.length; index += 1) {
-      const step = steps[index]
-      update(step.trialId, 'running', 1)
-      await delay(260)
-      if (index === 4) {
-        set((state) => ({ run: { ...state.run, failures: 1 } }))
-        update(step.trialId, 'retrying', 2, `${step.trialId} failed attempt 1 · retry 2 of 3`)
-        await delay(680)
-        update(step.trialId, 'running', 2, `${step.trialId} running attempt 2`)
-        await delay(240)
+    try {
+      if (get().run.active) return false
+      const steps = get().trials.map((trial) => ({ trialId: trial.id, taskName: trial.taskName, status: 'pending', attempt: 1 }))
+      set({ run: { active: true, label: payload, steps, events: [{ id: `${Date.now()}-start`, trialId: null, status: 'started', time: nowTime(), text: `Run started for ${payload.labelName}` }], startedAt: Date.now(), elapsed: 0, failures: 0, completed: false, selectedStep: null } })
+      const update = (trialId, status, attempt = 1, text) => set((state) => ({ run: {
+        ...state.run,
+        steps: state.run.steps.map((step) => step.trialId === trialId ? { ...step, status, attempt } : step),
+        events: [...state.run.events, { id: `${Date.now()}-${trialId}-${status}`, trialId, status, time: nowTime(), text: text || `${trialId} ${status}` }],
+        elapsed: Date.now() - state.run.startedAt,
+      } }))
+      const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+      for (let index = 0; index < steps.length; index += 1) {
+        const step = steps[index]
+        update(step.trialId, 'running', 1)
+        await delay(260)
+        if (index === 4) {
+          set((state) => ({ run: { ...state.run, failures: 1 } }))
+          update(step.trialId, 'retrying', 2, `${step.trialId} failed attempt 1 · retry 2 of 3`)
+          await delay(680)
+          update(step.trialId, 'running', 2, `${step.trialId} running attempt 2`)
+          await delay(240)
+        }
+        update(step.trialId, 'complete', index === 4 ? 2 : 1)
+        await delay(80)
       }
-      update(step.trialId, 'complete', index === 4 ? 2 : 1)
-      await delay(80)
-    }
-    const label = { name: payload.labelName.trim(), scorerModel: payload.scorerModel, configNote: payload.configNote }
-    set((state) => ({
-      labels: [...state.labels, label],
-      trials: state.trials.map((trial, index) => ({ ...trial, results: { ...trial.results, [label.name]: makeNewLabelResult(index, label) } })),
-      shownLabels: [...state.shownLabels.slice(-2), label.name],
-      deltaPair: [state.shownLabels.at(-1) ?? 'Baseline', label.name],
-      run: { ...state.run, active: false, completed: true, elapsed: Date.now() - state.run.startedAt, events: [...state.run.events, { id: `${Date.now()}-done`, trialId: null, status: 'complete', time: nowTime(), text: `${label.name} completed` }] },
-      toast: { id: Date.now(), message: `${label.name} completed and added to the lab` }, liveMessage: `Rescore complete. ${label.name} is available in all views.`,
-    }))
+      const label = { name: payload.labelName.trim(), scorerModel: payload.scorerModel, configNote: payload.configNote }
+      set((state) => ({
+        labels: [...state.labels, label],
+        trials: state.trials.map((trial, index) => ({ ...trial, results: { ...trial.results, [label.name]: makeNewLabelResult(index, label) } })),
+        shownLabels: [...state.shownLabels.slice(-2), label.name],
+        deltaPair: [state.shownLabels.at(-1) ?? 'Baseline', label.name],
+        run: { ...state.run, active: false, completed: true, elapsed: Date.now() - state.run.startedAt, events: [...state.run.events, { id: `${Date.now()}-done`, trialId: null, status: 'complete', time: nowTime(), text: `${label.name} completed` }] },
+        toast: { id: Date.now(), message: `${label.name} completed and added to the lab` }, liveMessage: `Rescore complete. ${label.name} is available in all views.`,
+      }))
+      return true
+    } finally {
       window.__isRescoring = false;
-    return true
+    }
   },
   selectRunStep: (trialId) => set((state) => ({ run: { ...state.run, selectedStep: trialId } })),
 }))

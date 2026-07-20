@@ -439,6 +439,10 @@ function AppInner() {
         if (b.getAttribute('tabindex') === '-1' && !b.hasAttribute('disabled')) {
           b.setAttribute('tabindex', '0');
         }
+        if (b.classList.contains('mantine-Pill-remove') && !b.hasAttribute('aria-label')) {
+          const labelText = b.closest('.mantine-Pill-root')?.querySelector('.mantine-Pill-label')?.textContent?.trim();
+          if (labelText) b.setAttribute('aria-label', `Remove ${labelText}`);
+        }
       });
     }, 500);
     return () => clearInterval(interval);
