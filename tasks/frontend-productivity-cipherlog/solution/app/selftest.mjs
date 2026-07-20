@@ -2,7 +2,7 @@
 // Uses the repo-installed Playwright (NOT the shared playwright MCP).
 // Serves the built app on :3101, exercises core workflows + WebMCP tools,
 // asserts persistence across reload, and requires zero console/page errors.
-import { chromium } from '/Users/kurrytran/frontend-repository/node_modules/playwright/index.mjs';
+import { chromium } from 'playwright/index.mjs';
 
 const URL = 'http://localhost:3101';
 const consoleErrors = [];
@@ -28,7 +28,7 @@ try {
   const info = await page.evaluate(() => window.webmcp_session_info && window.webmcp_session_info());
   check('webmcp_session_info exposed', info && info.contract_version === 'zto-webmcp-v1', JSON.stringify(info));
   const tools = await page.evaluate(() => window.webmcp_list_tools && window.webmcp_list_tools());
-  check('webmcp_list_tools returns 9 tools', Array.isArray(tools) && tools.length === 9, `count=${tools && tools.length}`);
+  check('webmcp_list_tools returns 12 tools', Array.isArray(tools) && tools.length === 12, `count=${tools && tools.length}`);
 
   // --- Create a channel via UI, then create a memo via WebMCP into it ---
   await page.getByRole('button', { name: 'Add New Channel' }).first().click();

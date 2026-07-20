@@ -1,3 +1,19 @@
+import { z } from 'zod';
+export const transmissionSchema = z.object({
+  title: z.string().min(1, 'Title is blank. Enter a title of at least one character to save this transmission.').max(120, 'Title too long'),
+  body: z.string().optional(),
+  priority: z.enum(['high', 'standard', 'low']),
+  channelId: z.string().min(1, 'Channel is required')
+});
+export const channelSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(50, 'Name too long')
+});
+export const passcodeSchema = z.object({
+  passcode: z.string().length(4, 'Enter exactly four characters.')
+});
+export const sessionArchiveSchema = z.object({
+  payload: z.string().min(1, 'Payload is required')
+});
 import { writable, derived, get } from 'svelte/store';
 
 function loadFromStorage(key, fallback) {
@@ -52,10 +68,14 @@ decommissioned.subscribe((v) => saveToStorage('cipherlog-decommissioned', stripR
 // so a full page refresh always returns locked memos to their hidden state.
 export const revealedIds = writable(new Set());
 
-export const activeChannel = writable(null);
-export const searchQuery = writable('');
-export const activeMemoId = writable(null);
-export const showDecommissioned = writable(false);
+export const activeChannel = writable(loadFromStorage('cipherlog-active-channel', null));
+activeChannel.subscribe((v) => saveToStorage('cipherlog-active-channel', v));
+export const searchQuery = writable(loadFromStorage('cipherlog-search-query', ''));
+searchQuery.subscribe((v) => saveToStorage('cipherlog-search-query', v));
+export const activeMemoId = writable(loadFromStorage('cipherlog-active-memo-id', null));
+activeMemoId.subscribe((v) => saveToStorage('cipherlog-active-memo-id', v));
+export const showDecommissioned = writable(loadFromStorage('cipherlog-show-decommissioned', false));
+showDecommissioned.subscribe((v) => saveToStorage('cipherlog-show-decommissioned', v));
 
 export const toasts = writable([]);
 
