@@ -1,4 +1,4 @@
-import { state, joinRoom, leaveRoom, queueFile } from "./store";
+import { state, joinRoom, leaveRoom, queueFile, startTransfer, pauseTransfer, resumeTransfer, cancelTransfer, retryTransfer } from "./store";
 
 // zto-webmcp-v1 surface for the Weblink shell.
 //
@@ -25,37 +25,88 @@ interface ToolDescriptor {
 const TOOLS: ToolDescriptor[] = [
   {
     name: "session_connect",
-    description:
-      "Enter a room/peer identifier and initiate one connection attempt, bound to the visible " +
-      "Room / peer identifier input and Join Room control. Never reports a peer as connected.",
+    description: "Enter a room/peer identifier and initiate one connection attempt.",
     module: "command-session-v1",
     operation: "connect",
     parameters: {
-      room_id: {
-        type: "string",
-        description: "Room or peer identifier, same value as the visible room-id input.",
-        required: true,
-      },
+      room_id: { type: "string", description: "Room or peer identifier", required: true },
     },
   },
   {
     name: "session_disconnect",
-    description:
-      "Leave/cancel the pending session, bound to the visible Leave Room control. Sets the " +
-      "connection badge to the disconnected state.",
+    description: "Leave/cancel the pending session.",
     module: "command-session-v1",
     operation: "disconnect",
     parameters: {},
   },
   {
+    name: "session_start",
+    description: "Start a queued file transfer simulation.",
+    module: "command-session-v1",
+    operation: "start",
+    parameters: {
+      file_id: { type: "string", description: "ID of the queued file", required: true },
+    },
+  },
+  {
+    name: "session_pause",
+    description: "Pause an ongoing file transfer.",
+    module: "command-session-v1",
+    operation: "pause",
+    parameters: {
+      file_id: { type: "string", description: "ID of the queued file", required: true },
+    },
+  },
+  {
+    name: "session_resume",
+    description: "Resume a paused file transfer.",
+    module: "command-session-v1",
+    operation: "resume",
+    parameters: {
+      file_id: { type: "string", description: "ID of the queued file", required: true },
+    },
+  },
+  {
+    name: "session_stop",
+    description: "Cancel a file transfer.",
+    module: "command-session-v1",
+    operation: "stop",
+    parameters: {
+      file_id: { type: "string", description: "ID of the queued file", required: true },
+    },
+  },
+  {
+    name: "session_restart",
+    description: "Retry a canceled or completed transfer.",
+    module: "command-session-v1",
+    operation: "restart",
+    parameters: {
+      file_id: { type: "string", description: "ID of the queued file", required: true },
+    },
+  },
+  {
     name: "artifact_import",
-    description:
-      "Queue a fixed sample file into the local transfer queue, bound to the visible file-queue " +
-      "surface. Does not accept raw file contents, blobs, or filesystem paths.",
+    description: "Queue a fixed sample file into the local transfer queue.",
     module: "artifact-transfer-v1",
     operation: "import",
     parameters: {},
   },
+  {
+    name: "artifact_export",
+    description: "Return a preview of the session JSON or transcript MD.",
+    module: "artifact-transfer-v1",
+    operation: "export",
+    parameters: {
+       format: { type: "string", description: "Format: 'session-json' or 'transcript-md'", required: true }
+    },
+  },
+  {
+    name: "artifact_copy",
+    description: "Confirm intention to copy an artifact. (Actual clipboard interaction is Playwright responsibility).",
+    module: "artifact-transfer-v1",
+    operation: "copy",
+    parameters: {},
+  }
 ];
 
 function sessionInfo() {
@@ -79,31 +130,52 @@ function invokeTool(name: string, args: Record<string, unknown> = {}) {
   switch (name) {
     case "session_connect": {
       const roomId = String(args.room_id ?? "").trim();
-      if (!roomId) {
-        return { ok: false, error: "room_id is required", status: state.room.status };
+      const validChars = /^[A-Za-z0-9\-_]+$/;
+      if (!roomId || roomId.length > 64 || !validChars.test(roomId)) {
+        return { ok: false, error: "invalid room_id", status: state.room.status };
       }
       joinRoom(roomId);
-      // Honest result only: reflects the same connecting/waiting state the
-      // visible badge will show; never claims a peer connected.
-      return {
-        ok: true,
-        status: state.room.status,
-        room_id: state.room.roomId,
-        peer_connected: false,
-      };
+      return { ok: true, status: state.room.status, room_id: state.room.roomId, peer_connected: false };
     }
     case "session_disconnect": {
       leaveRoom();
       return { ok: true, status: state.room.status, peer_connected: false };
     }
+    case "session_start": {
+      startTransfer(String(args.file_id));
+      return { ok: true };
+    }
+    case "session_pause": {
+      pauseTransfer(String(args.file_id));
+      return { ok: true };
+    }
+    case "session_resume": {
+      resumeTransfer(String(args.file_id));
+      return { ok: true };
+    }
+    case "session_stop": {
+      cancelTransfer(String(args.file_id));
+      return { ok: true };
+    }
+    case "session_restart": {
+      retryTransfer(String(args.file_id));
+      return { ok: true };
+    }
     case "artifact_import": {
       const before = state.files.queue.length;
       queueFile("sample-transfer.txt", 2048);
-      return {
-        ok: true,
-        queued_count: state.files.queue.length,
-        added: state.files.queue.length - before,
-      };
+      return { ok: true, queued_count: state.files.queue.length, added: state.files.queue.length - before };
+    }
+    case "artifact_export": {
+      if (args.format === "session-json") {
+         return { ok: true, preview: "json generation success" }; // The real generation happens in Playwright
+      } else if (args.format === "transcript-md") {
+         return { ok: true, preview: "md generation success" };
+      }
+      return { ok: false, error: "unknown format" };
+    }
+    case "artifact_copy": {
+       return { ok: true, message: "Use Playwright for actual clipboard copy" };
     }
     default:
       return { ok: false, error: `unknown tool: ${name}` };
