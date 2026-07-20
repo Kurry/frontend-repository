@@ -10,14 +10,22 @@
     "verify:build": "vite build"
   },
   "dependencies": {
-    "solid-js": "^1.9.9"
+    "@kobalte/core": "^0.13.12",
+    "@motionone/solid": "^10.16.4",
+    "@tabler/icons-solidjs": "^3.45.0",
+    "@tanstack/solid-form": "^1.33.2",
+    "@tanstack/zod-form-adapter": "^0.42.1",
+    "motion": "^12.42.2",
+    "solid-js": "^1.9.9",
+    "solid-motion": "^1.0.0-alpha.8",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.13",
     "http-server": "^14.1.1",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.6.3",
-    "vite": "^8.1.5",
+    "vite": "^5.4.19",
     "vite-plugin-solid": "^2.11.8"
   }
 }
