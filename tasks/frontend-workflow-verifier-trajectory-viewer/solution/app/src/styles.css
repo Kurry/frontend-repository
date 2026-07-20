@@ -58,13 +58,22 @@ button:disabled { cursor: not-allowed; }
 .count-pop { animation: count-pop .28s ease-out; }
 @keyframes count-pop { 50% { transform: scale(1.14); } }
 .trajectory-pane { animation: pane-in .2s ease-out; }
-.verdict-crossfade, .react-aria-TableBody tr { animation: row-in .22s ease-out; }
+.verdict-crossfade { animation: row-in .24s ease-out; }
+.verdict-crossfade tbody tr { animation: row-in .22s ease-out; }
 @keyframes pane-in { from { opacity: .55; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes row-in { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
 [data-entering].fixed { animation: overlay-in .18s ease-out; }
 [data-exiting].fixed { animation: overlay-out .15s ease-in; }
 @keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
 @keyframes overlay-out { from { opacity: 1; } to { opacity: 0; } }
+.drawer-panel[data-entering] { animation: drawer-in .26s cubic-bezier(.2,.8,.2,1); }
+.drawer-panel[data-exiting] { animation: drawer-out .18s ease-in; }
+@keyframes drawer-in { from { transform: translateX(28px); opacity: .3; } to { transform: translateX(0); opacity: 1; } }
+@keyframes drawer-out { from { transform: translateX(0); opacity: 1; } to { transform: translateX(28px); opacity: 0; } }
+.pop-panel[data-entering] { animation: pop-in .2s ease-out; }
+.pop-panel[data-exiting] { animation: pop-out .15s ease-in; }
+@keyframes pop-in { from { transform: scale(.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes pop-out { from { transform: scale(1); opacity: 1; } to { transform: scale(.97); opacity: 0; } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }

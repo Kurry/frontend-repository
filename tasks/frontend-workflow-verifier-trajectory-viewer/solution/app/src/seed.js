@@ -227,11 +227,11 @@ function buildResults(labelNames, variant = 0) {
     const verdicts = {};
     criteria.forEach((criterion, index) => {
       const baselineFail = (index + variant) % 5 === 0 || index === 7;
+      // Only the second label diverges from the primary pass; the optional third
+      // label ("Strict rescore") agrees with the primary, so its comparison pair
+      // has zero flips and reaches the designed no-flips empty state.
       const flipped =
-        labelIndex > 0 &&
-        (index === (variant % 3) + 1 ||
-          index === 7 ||
-          (labelIndex === 2 && index === 10));
+        labelIndex === 1 && (index === (variant % 3) + 1 || index === 7);
       const yes = flipped ? baselineFail : !baselineFail;
       verdicts[criterion.id] = {
         yes,

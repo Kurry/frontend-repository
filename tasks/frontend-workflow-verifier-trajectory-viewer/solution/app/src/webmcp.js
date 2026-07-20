@@ -29,10 +29,6 @@ function result(value) {
   return { content: [{ type: "text", text: JSON.stringify(value) }] };
 }
 
-function unavailable(operation, reason) {
-  return result({ ok: false, operation, unavailable: true, reason });
-}
-
 function active() {
   return currentContext(useReviewStore.getState());
 }
@@ -291,47 +287,6 @@ const definitions = [
     },
     execute: ({ filter }) => result(clearFilter(filter)),
   },
-  {
-    name: "browse_sort",
-    description: "Report sort availability for this fixed benchmark register.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable("sort", "No sort binding is declared for this product."),
-  },
-  {
-    name: "browse_set_locale",
-    description:
-      "Report locale availability for this single-locale review surface.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable(
-        "set_locale",
-        "No locale binding is declared for this product.",
-      ),
-  },
-  {
-    name: "browse_set_theme",
-    description:
-      "Report theme availability for the fixed review instrument theme.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable(
-        "set_theme",
-        "No theme binding is declared for this product.",
-      ),
-  },
 
   {
     name: "entity_create",
@@ -378,60 +333,6 @@ const definitions = [
       });
     },
   },
-  {
-    name: "entity_delete",
-    description: "Report adjudication deletion availability.",
-    inputSchema: {
-      type: "object",
-      properties: { confirm: { type: "boolean" } },
-      required: ["confirm"],
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable(
-        "delete",
-        "Delete is not a declared adjudication operation; use Undo for session mutations.",
-      ),
-  },
-  {
-    name: "entity_toggle",
-    description: "Report entity toggle availability.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable("toggle", "Toggle is not a declared adjudication operation."),
-  },
-  {
-    name: "entity_quantity",
-    description: "Report entity quantity availability.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable(
-        "quantity",
-        "Quantity is not a declared adjudication operation.",
-      ),
-  },
-  {
-    name: "entity_reorder",
-    description: "Report entity reorder availability.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable(
-        "reorder",
-        "Reorder is not a declared adjudication operation.",
-      ),
-  },
 
   {
     name: "form_validate",
@@ -466,58 +367,6 @@ const definitions = [
       "Submit a single adjudication through the same domain command as the visible form.",
     inputSchema: adjudicationInputSchema(),
     execute: (args) => result(recordOne(args, "create")),
-  },
-  {
-    name: "form_cancel",
-    description: "Cancel the currently open import or export workflow.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () => {
-      const store = useReviewStore.getState();
-      store.closeOverlay("import");
-      store.closeOverlay("export");
-      return result({ ok: true, cancelled: true, visible: true });
-    },
-  },
-  {
-    name: "form_reset",
-    description: "Reset the review package import draft and visible errors.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () => {
-      const store = useReviewStore.getState();
-      store.setImportDraft("");
-      store.setImportErrors([]);
-      return result({ ok: true, reset: true });
-    },
-  },
-  {
-    name: "form_advance",
-    description: "Report multi-step form availability.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable("advance", "No multi-step form binding is declared."),
-  },
-  {
-    name: "form_return",
-    description: "Report multi-step form return availability.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable("return", "No multi-step form binding is declared."),
   },
 
   {
@@ -595,34 +444,6 @@ const definitions = [
         clipboardActionRequired: true,
       });
     },
-  },
-  {
-    name: "artifact_print_preview",
-    description: "Report print preview availability.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable(
-        "print_preview",
-        "Print preview is not a declared artifact operation.",
-      ),
-  },
-  {
-    name: "artifact_convert",
-    description: "Report conversion availability.",
-    inputSchema: {
-      type: "object",
-      properties: {},
-      additionalProperties: false,
-    },
-    execute: () =>
-      unavailable(
-        "convert",
-        "Conversion is not a declared artifact operation.",
-      ),
   },
 ];
 

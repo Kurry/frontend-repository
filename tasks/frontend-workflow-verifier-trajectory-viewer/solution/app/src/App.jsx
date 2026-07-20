@@ -243,18 +243,19 @@ function TaskList() {
         </div>
       </div>
 
-      <GridList
+      <ul
         aria-label="Benchmark tasks"
-        items={tasks}
-        className="grid gap-4 lg:grid-cols-3"
+        className="grid list-none gap-4 lg:grid-cols-3"
       >
-        {(task) => (
-          <GridListItem
-            textValue={task.title}
-            className="focus-ring group panel hover-wash cursor-pointer overflow-hidden outline-none transition hover:-translate-y-0.5 hover:shadow-md"
-            onAction={() => selectTask(task.id)}
-          >
-            <div className="h-1.5" style={{ background: task.accent }} />
+        {tasks.map((task) => (
+          <li key={task.id} className="contents">
+            <button
+              type="button"
+              aria-label={`Open task ${task.title}`}
+              className="focus-ring group panel hover-wash w-full cursor-pointer overflow-hidden text-left outline-none transition hover:-translate-y-0.5 hover:shadow-md"
+              onClick={() => selectTask(task.id)}
+            >
+              <div className="h-1.5" style={{ background: task.accent }} />
             <div className="p-5">
               <div className="mb-5 flex items-start justify-between gap-4">
                 <div className="grid size-10 place-items-center rounded-lg border border-line bg-white">
@@ -290,9 +291,10 @@ function TaskList() {
                 </span>
               </div>
             </div>
-          </GridListItem>
-        )}
-      </GridList>
+            </button>
+          </li>
+        ))}
+      </ul>
     </main>
   );
 }
@@ -312,42 +314,66 @@ function TrialTable({ task }) {
         <StatusPill tone="accent">3 trials</StatusPill>
       </div>
       <div className="overflow-x-auto">
-        <Table
+        <table
           aria-label={`Trials for ${task.title}`}
           className="min-w-[800px] w-full text-left text-sm"
         >
-          <TableHeader className="border-b border-line bg-black/[.018] text-[10px] uppercase tracking-[.1em] text-muted">
-            <Column isRowHeader className="px-4 py-2.5">
-              Model
-            </Column>
-            <Column className="px-3 py-2.5">Reward</Column>
-            <Column className="px-3 py-2.5">Outcome</Column>
-            <Column className="px-3 py-2.5">Duration</Column>
-            <Column className="px-3 py-2.5">Steps</Column>
-            <Column className="px-3 py-2.5">Adjudication</Column>
-            <Column className="px-4 py-2.5 text-right">Open</Column>
-          </TableHeader>
-          <TableBody items={task.trials}>
-            {(trial) => {
+          <thead className="border-b border-line bg-black/[.018] text-[10px] uppercase tracking-[.1em] text-muted">
+            <tr>
+              <th scope="col" className="px-4 py-2.5 font-bold">
+                Model
+              </th>
+              <th scope="col" className="px-3 py-2.5 font-bold">
+                Reward
+              </th>
+              <th scope="col" className="px-3 py-2.5 font-bold">
+                Outcome
+              </th>
+              <th scope="col" className="px-3 py-2.5 font-bold">
+                Duration
+              </th>
+              <th scope="col" className="px-3 py-2.5 font-bold">
+                Steps
+              </th>
+              <th scope="col" className="px-3 py-2.5 font-bold">
+                Adjudication
+              </th>
+              <th scope="col" className="px-4 py-2.5 text-right font-bold">
+                Open
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {task.trials.map((trial) => {
               const badge = trialBadge(trial.id, {
                 ...useReviewStore.getState(),
                 trialState,
               });
               return (
-                <Row
-                  onAction={() => openTrial(trial.id)}
+                <tr
+                  key={trial.id}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Open review workspace for trial ${trial.model}`}
+                  onClick={() => openTrial(trial.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openTrial(trial.id);
+                    }
+                  }}
                   className="focus-ring hover-wash cursor-pointer border-b border-line/80 outline-none last:border-0"
                 >
-                  <Cell className="px-4 py-3">
+                  <td className="px-4 py-3">
                     <div className="font-bold">{trial.model}</div>
                     <div className="mt-0.5 text-xs text-muted">
                       {trial.scorer}
                     </div>
-                  </Cell>
-                  <Cell className="px-3 py-3 font-mono font-bold">
+                  </td>
+                  <td className="px-3 py-3 font-mono font-bold">
                     {trial.reward}
-                  </Cell>
-                  <Cell className="px-3 py-3">
+                  </td>
+                  <td className="px-3 py-3">
                     <StatusPill
                       tone={trial.outcome === "Pass" ? "positive" : "negative"}
                     >
@@ -358,24 +384,24 @@ function TrialTable({ task }) {
                       )}
                       {trial.outcome}
                     </StatusPill>
-                  </Cell>
-                  <Cell className="px-3 py-3 text-muted">{trial.duration}</Cell>
-                  <Cell className="px-3 py-3 font-mono text-muted">
+                  </td>
+                  <td className="px-3 py-3 text-muted">{trial.duration}</td>
+                  <td className="px-3 py-3 font-mono text-muted">
                     {trial.steps}
-                  </Cell>
-                  <Cell className="px-3 py-3">
+                  </td>
+                  <td className="px-3 py-3">
                     <StatusPill tone={badge.tone}>{badge.text}</StatusPill>
-                  </Cell>
-                  <Cell className="px-4 py-3 text-right">
+                  </td>
+                  <td className="px-4 py-3 text-right">
                     <span className="inline-flex items-center gap-1 font-bold text-accent">
                       Review <IconChevronRight size={15} />
                     </span>
-                  </Cell>
-                </Row>
+                  </td>
+                </tr>
               );
-            }}
-          </TableBody>
-        </Table>
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -626,9 +652,9 @@ function StepDetail({ pane, step, trial }) {
           <p className="text-xs leading-5">{step.observations}</p>
         </div>
       )}
-      {step.screenshot && (
+      {(step.screenshot || pane === "scorer") && (
         <ScreenshotFrame
-          label={`${pane} trajectory step ${step.id + 1} screenshot placeholder`}
+          label={`${pane} trajectory step ${step.id + 1} inspection screenshot placeholder`}
         />
       )}
     </div>
@@ -780,9 +806,9 @@ function CodeBlock({ content, language = "typescript", filePath }) {
         </button>
       </div>
       <Highlight theme={themes.nightOwl} code={content} language={language}>
-        <pre className="scroll-thin max-h-64 overflow-auto p-3 font-mono text-[11px] leading-5">
-          {({ tokens, getLineProps, getTokenProps }) =>
-            tokens.map((line, i) => (
+        {({ tokens, getLineProps, getTokenProps }) => (
+          <pre className="scroll-thin max-h-64 overflow-auto p-3 font-mono text-[11px] leading-5">
+            {tokens.map((line, i) => (
               <div key={i} {...getLineProps({ line })}>
                 <span className="mr-4 inline-block w-4 select-none text-right text-white/25">
                   {i + 1}
@@ -791,9 +817,9 @@ function CodeBlock({ content, language = "typescript", filePath }) {
                   <span key={key} {...getTokenProps({ token })} />
                 ))}
               </div>
-            ))
-          }
-        </pre>
+            ))}
+          </pre>
+        )}
       </Highlight>
     </div>
   );
@@ -874,10 +900,18 @@ function FileRenderer({ file }) {
         />
       </div>
     );
+  const codeLanguage =
+    ext === "ts" || ext === "tsx"
+      ? "typescript"
+      : ext === "js" || ext === "jsx"
+        ? "jsx"
+        : ext === "json"
+          ? "json"
+          : "typescript";
   return (
     <CodeBlock
       content={file.content}
-      language={ext === "ts" ? "typescript" : "text"}
+      language={codeLanguage}
       filePath={file.path}
     />
   );
@@ -939,29 +973,34 @@ function AgentFiles({ trial, stepIndex }) {
 
 function TerminalStream({ trial, step }) {
   const key = `${trial.id}-${step.id}`;
-  const complete = useReviewStore((s) => !!s.terminalComplete[key]);
-  const markComplete = useReviewStore((s) => s.markTerminalComplete);
-  const [visible, setVisible] = useState(complete ? step.terminal.length : 0);
+  const length = step.terminal ? step.terminal.length : 0;
+  const [visible, setVisible] = useState(0);
+  const [complete, setComplete] = useState(false);
   useEffect(() => {
-    if (complete || !step.terminal) {
-      setVisible(step.terminal.length);
-      return;
+    if (!step.terminal) return undefined;
+    const reduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    if (reduced) {
+      setVisible(length);
+      setComplete(true);
+      return undefined;
     }
     setVisible(0);
-    const timer = setInterval(
-      () =>
-        setVisible((value) => {
-          const next = Math.min(step.terminal.length, value + 3);
-          if (next >= step.terminal.length) {
-            clearInterval(timer);
-            markComplete(key);
-          }
-          return next;
-        }),
-      55,
-    );
+    setComplete(false);
+    const timer = setInterval(() => {
+      setVisible((value) => {
+        const next = Math.min(length, value + 2);
+        if (next >= length) {
+          clearInterval(timer);
+          setComplete(true);
+        }
+        return next;
+      });
+    }, 45);
     return () => clearInterval(timer);
-  }, [key, step.terminal, complete, markComplete]);
+    // Re-stream whenever the active terminal step changes.
+  }, [key, step.terminal, length]);
   if (!step.terminal) return null;
   return (
     <section className="border-t border-line bg-[#121b17] text-[#d6e6dd]">
@@ -1015,8 +1054,8 @@ function TrajectoryPane({ pane, trial, ui, hidden }) {
       >
         <div className="flex items-center gap-2">
           {pane === "agent" ? <IconRobot size={18} /> : <IconScale size={18} />}
-          <h2 className="text-sm font-extrabold capitalize">
-            {pane} trajectory
+          <h2 className="text-sm font-extrabold">
+            {pane === "agent" ? "Agent trajectory" : "Scorer trajectory"}
           </h2>
           {focused && <StatusPill tone="accent">Focused</StatusPill>}
         </div>
@@ -1039,7 +1078,11 @@ function TrajectoryPane({ pane, trial, ui, hidden }) {
       {pane === "agent" && (
         <>
           <AgentFiles trial={trial} stepIndex={activeIndex} />
-          <TerminalStream trial={trial} step={active} />
+          <TerminalStream
+            key={`${trial.id}-${active.id}`}
+            trial={trial}
+            step={active}
+          />
         </>
       )}
     </section>
@@ -1269,7 +1312,7 @@ function AdjudicationDialog({
         isDismissable
         className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-[#101814]/50 p-4 backdrop-blur-[2px] data-[entering]:animate-in data-[exiting]:animate-out"
       >
-        <Modal className="w-full max-w-xl rounded-xl border border-line bg-paper shadow-2xl">
+        <Modal className="pop-panel w-full max-w-xl rounded-xl border border-line bg-paper shadow-2xl">
           <Dialog
             aria-label={`Adjudicate ${criterion.id}`}
             className="outline-none"
@@ -1445,33 +1488,37 @@ function CriterionTable({ trial, ui }) {
               </span>
             </div>
             <div className="overflow-x-auto">
-              <Table
+              <table
                 aria-label={`${dimension.name} verdicts`}
                 className="w-full min-w-[920px] table-fixed text-left"
               >
-                <TableHeader className="border-b border-line text-[9px] font-bold uppercase tracking-[.1em] text-muted">
-                  <Column className="w-10 px-2 py-2">Pick</Column>
-                  <Column isRowHeader className="w-56 px-2 py-2">
-                    Criterion
-                  </Column>
-                  <Column className="w-16 px-2 py-2">Weight</Column>
-                  <Column className="w-20 px-2 py-2">Verdict</Column>
-                  <Column className="px-2 py-2">Scorer reasoning</Column>
-                  <Column className="w-28 px-2 py-2">Evidence</Column>
-                  <Column className="w-40 px-2 py-2">Review</Column>
-                </TableHeader>
-                <TableBody
-                  items={criteria}
-                  dependencies={[
-                    ui.activeLabel,
-                    ui.flipsOnly,
-                    ui.selectedCriterion,
-                    ui.selectedFlips.join('|'),
-                    ui.comparedLabels.join('|'),
-                    JSON.stringify(ui.adjudications),
-                  ]}
-                >
-                  {(criterion) => {
+                <thead className="border-b border-line text-[9px] font-bold uppercase tracking-[.1em] text-muted">
+                  <tr>
+                    <th scope="col" className="w-10 px-2 py-2">
+                      Pick
+                    </th>
+                    <th scope="col" className="w-56 px-2 py-2">
+                      Criterion
+                    </th>
+                    <th scope="col" className="w-16 px-2 py-2">
+                      Weight
+                    </th>
+                    <th scope="col" className="w-20 px-2 py-2">
+                      Verdict
+                    </th>
+                    <th scope="col" className="px-2 py-2">
+                      Scorer reasoning
+                    </th>
+                    <th scope="col" className="w-28 px-2 py-2">
+                      Evidence
+                    </th>
+                    <th scope="col" className="w-40 px-2 py-2">
+                      Review
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {criteria.map((criterion) => {
                     const verdict = verdicts[criterion.id];
                     const flipped = flips.includes(criterion.id);
                     const selected = ui.selectedCriterion === criterion.id;
@@ -1480,15 +1527,29 @@ function CriterionTable({ trial, ui }) {
                     );
                     const canAdjudicate = flipped || !verdict.yes;
                     return (
-                      <Row
-                        onAction={() => selectCriterion(criterion.id)}
+                      <tr
+                        key={criterion.id}
+                        tabIndex={0}
+                        role="button"
+                        aria-pressed={selected}
+                        aria-label={`Select criterion ${criterion.id} ${criterion.title}`}
+                        onClick={() => selectCriterion(criterion.id)}
+                        onKeyDown={(event) => {
+                          if (
+                            (event.key === "Enter" || event.key === " ") &&
+                            event.target === event.currentTarget
+                          ) {
+                            event.preventDefault();
+                            selectCriterion(criterion.id);
+                          }
+                        }}
                         className={cx(
                           "hover-wash cursor-pointer border-b border-line/70 outline-none last:border-0",
                           selected &&
                             "bg-accent-soft/70 ring-1 ring-inset ring-accent",
                         )}
                       >
-                        <Cell
+                        <td
                           className="px-2 py-2"
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -1496,17 +1557,15 @@ function CriterionTable({ trial, ui }) {
                             <input
                               type="checkbox"
                               aria-label={`Select ${criterion.id} for bulk adjudication`}
-                              checked={ui.selectedFlips.includes(
-                                criterion.id,
-                              )}
+                              checked={ui.selectedFlips.includes(criterion.id)}
                               onChange={() => selectFlip(criterion.id)}
                               className="focus-ring size-4 rounded accent-accent"
                             />
                           ) : (
                             <span className="block size-5" />
                           )}
-                        </Cell>
-                        <Cell className="px-2 py-2">
+                        </td>
+                        <td className="px-2 py-2">
                           <div className="flex items-center gap-2">
                             <span className="font-mono text-[10px] font-bold text-muted">
                               {criterion.id}
@@ -1518,11 +1577,11 @@ function CriterionTable({ trial, ui }) {
                           <div className="mt-0.5 truncate text-xs font-bold">
                             {criterion.title}
                           </div>
-                        </Cell>
-                        <Cell className="px-2 py-2 font-mono text-xs">
+                        </td>
+                        <td className="px-2 py-2 font-mono text-xs">
                           {criterion.weight}
-                        </Cell>
-                        <Cell className="px-2 py-2">
+                        </td>
+                        <td className="px-2 py-2">
                           <StatusPill
                             tone={verdict.yes ? "positive" : "negative"}
                           >
@@ -1533,8 +1592,8 @@ function CriterionTable({ trial, ui }) {
                             )}
                             {verdict.yes ? "Yes" : "No"}
                           </StatusPill>
-                        </Cell>
-                        <Cell className="px-2 py-2">
+                        </td>
+                        <td className="px-2 py-2">
                           <p
                             className={cx(
                               "text-xs leading-5 text-[#4b554f]",
@@ -1544,8 +1603,8 @@ function CriterionTable({ trial, ui }) {
                           >
                             {verdict.reasoning}
                           </p>
-                        </Cell>
-                        <Cell
+                        </td>
+                        <td
                           className="px-2 py-2"
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -1556,8 +1615,8 @@ function CriterionTable({ trial, ui }) {
                             Scorer {verdict.scorerStep + 1}
                             <IconChevronRight size={13} />
                           </Button>
-                        </Cell>
-                        <Cell
+                        </td>
+                        <td
                           className="px-2 py-2"
                           onClick={(e) => e.stopPropagation()}
                         >
@@ -1595,12 +1654,12 @@ function CriterionTable({ trial, ui }) {
                               Not required
                             </span>
                           )}
-                        </Cell>
-                      </Row>
+                        </td>
+                      </tr>
                     );
-                  }}
-                </TableBody>
-              </Table>
+                  })}
+                </tbody>
+              </table>
             </div>
           </section>
         );
@@ -1733,6 +1792,12 @@ function AdjudicationSummary({ records }) {
           </div>
         ))}
       </div>
+      {records.length === 0 && (
+        <p className="mt-3 text-[11px] leading-5 text-muted">
+          No adjudications recorded yet. Open Adjudicate criterion on a flipped or
+          failed row to classify it as agent-bug, rubric-bug, or scorer-error.
+        </p>
+      )}
     </section>
   );
 }
@@ -1985,7 +2050,7 @@ function ExportDrawer({ trial, ui }) {
       isDismissable
       className="fixed inset-0 z-50 flex justify-end bg-[#101814]/45 backdrop-blur-[2px] data-[entering]:animate-in data-[exiting]:animate-out"
     >
-      <Modal className="h-full w-full max-w-2xl overflow-hidden border-l border-line bg-paper shadow-2xl">
+      <Modal className="drawer-panel h-full w-full max-w-2xl overflow-hidden border-l border-line bg-paper shadow-2xl">
         <Dialog
           aria-label="Export review package"
           className="flex h-full flex-col outline-none"
@@ -2122,7 +2187,7 @@ function ImportSurface({ task, trial }) {
       isDismissable
       className="fixed inset-0 z-50 grid place-items-center overflow-y-auto bg-[#101814]/50 p-3 backdrop-blur-[2px]"
     >
-      <Modal className="w-full max-w-3xl rounded-xl border border-line bg-paper shadow-2xl">
+      <Modal className="pop-panel w-full max-w-3xl rounded-xl border border-line bg-paper shadow-2xl">
         <Dialog aria-label="Import review package" className="outline-none">
           <form onSubmit={submit}>
             <div className="flex items-start justify-between border-b border-line px-4 py-4 sm:px-5">
@@ -2284,7 +2349,7 @@ function CommandPalette({ task, trial, ui }) {
       isDismissable
       className="fixed inset-0 z-[70] flex items-start justify-center bg-[#101814]/55 px-3 pt-[10vh] backdrop-blur-[3px]"
     >
-      <Modal className="w-full max-w-xl overflow-hidden rounded-xl border border-line bg-paper shadow-2xl">
+      <Modal className="pop-panel w-full max-w-xl overflow-hidden rounded-xl border border-line bg-paper shadow-2xl">
         <Dialog aria-label="Command palette" className="outline-none">
           <div className="flex items-center gap-3 border-b border-line px-4">
             <IconSearch size={20} className="text-muted" />
