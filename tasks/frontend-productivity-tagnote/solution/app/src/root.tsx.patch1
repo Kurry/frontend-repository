@@ -1,0 +1,26 @@
+--- tasks/frontend-productivity-tagnote/solution/app/src/root.tsx
++++ tasks/frontend-productivity-tagnote/solution/app/src/root.tsx
+@@ -102,6 +106,14 @@
+
+   const handleDeleteConfirm = $(() => {
+     if (!deleteTargetId.value) return;
++    if (deleteTargetId.value === 'bulk') {
++      const ns = bulkDelete(historyState.present, selectedIds.ids);
++      applyState(ns, 'Bulk delete');
++      selectedIds.ids = [];
++      deleteTargetId.value = null;
++      confirmDelete.value = false;
++      showToast('Notes deleted');
++      return;
++    }
+     const ns = deleteNote(historyState.present, deleteTargetId.value);
+     applyState(ns, 'Deleted note');
+     deleteTargetId.value = null;
+@@ -430,7 +450,7 @@
+       <Toast message={toastMessage} />
+       <ConfirmDialog
+-        message="Are you sure you want to permanently delete this note?"
++        message={deleteTargetId.value === 'bulk' ? `Are you sure you want to permanently delete ${selectedIds.ids.length} notes?` : "Are you sure you want to permanently delete this note?"}
+         open={confirmDelete}
+         onConfirm={handleDeleteConfirm}
+         onCancel={handleDeleteCancel}

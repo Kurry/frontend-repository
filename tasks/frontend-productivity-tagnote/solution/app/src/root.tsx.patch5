@@ -1,0 +1,78 @@
+--- tasks/frontend-productivity-tagnote/solution/app/src/root.tsx
++++ tasks/frontend-productivity-tagnote/solution/app/src/root.tsx
+@@ -32,6 +32,8 @@
+ import { Toast } from './components/Toast';
+ import { HistoryPanel } from './components/HistoryPanel';
+ import { NoteItem } from './components/NoteItem';
++import { ExportPanel } from './components/ExportPanel';
++import { ImportPanel } from './components/ImportPanel';
+ import { formatDate } from './utils';
+
+ export const Root = component$(() => {
+@@ -42,6 +44,8 @@
+   const searchQuery = useSignal('');
+   const showArchived = useSignal(false);
+   const showCalendar = useSignal(false);
++  const showExport = useSignal(false);
++  const showImport = useSignal(false);
+   const showHistory = useSignal(false);
+   const toastMessage = useSignal('');
+   const editText = useSignal<{ id: string; text: string } | null>(null);
+@@ -308,6 +312,23 @@
+           activeDateFilter.value = null;
+           return { cleared: true };
+         },
++      },
++      artifact_export: {
++        description: 'Open the export panel.',
++        input_schema: { type: 'object', properties: {} },
++        run: () => {
++          showExport.value = true;
++          return { success: true };
++        }
++      },
++      artifact_import: {
++        description: 'Open the import panel.',
++        input_schema: { type: 'object', properties: {} },
++        run: () => {
++          showImport.value = true;
++          return { success: true };
++        }
+       },
+     };
+
+@@ -361,6 +382,24 @@
+               Archived
+             </button>
+             <button
++              onClick$={() => {
++                showExport.value = true;
++              }}
++              class={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
++                showExport.value
++                  ? 'bg-[var(--color-accent)] text-white'
++                  : 'bg-[var(--color-primary)] text-[var(--color-accent)] hover:bg-[#D4E0F0]'
++              }`}
++            >
++              Export
++            </button>
++            <button
++              onClick$={() => {
++                showImport.value = true;
++              }}
++              class="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]"
++            >
++              Import
++            </button>
++            <button
+               onClick$={() => {
+                 showHistory.value = true;
+@@ -717,6 +756,8 @@
+         canRedo={historyState.future.length > 0}
+         open={showHistory}
+       />
++      {showExport.value && <ExportPanel state={historyState.present} onClose={$(() => showExport.value = false)} />}
++      {showImport.value && <ImportPanel onImport={$((ns) => { applyState(ns, 'Imported Session JSON'); showImport.value = false; showToast('State imported'); })} onClose={$(() => showImport.value = false)} />}
+     </div>
+   );
+ });

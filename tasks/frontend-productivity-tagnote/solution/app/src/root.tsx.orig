@@ -171,7 +171,7 @@ export const Root = component$(() => {
     if (activeDateFilter.value) visibleNotes = filterByDate(visibleNotes, activeDateFilter.value);
   }
   if (searchQuery.value.trim()) {
-    visibleNotes = filterBySearch(visibleNotes, searchQuery.value, todoTags);
+    visibleNotes = filterBySearch(visibleNotes, searchQuery.value);
   }
 
   const tagEntries = Array.from(getTagMap(allNotes.filter((n) => !n.archived)).entries()).sort(
@@ -427,29 +427,6 @@ export const Root = component$(() => {
           return { cleared: true };
         },
       },
-      artifact_export: {
-        description: 'Open the export panel.',
-        input_schema: { type: 'object', properties: {} },
-        run: () => {
-          showExport.value = true;
-          return { success: true };
-        }
-      },
-      artifact_import: {
-        description: 'Open the import panel.',
-        input_schema: { type: 'object', properties: {} },
-        run: () => {
-          showImport.value = true;
-          return { success: true };
-        }
-      },
-      artifact_copy: {
-        description: 'Copy the current active export to clipboard. This will no-op in a headless environment, Playwright checks the visual confirmation instead.',
-        input_schema: { type: 'object', properties: {} },
-        run: () => {
-           return { copied: true };
-        }
-      },
     };
 
     const listing = Object.entries(tools).map(([name, def]) => ({
@@ -462,7 +439,7 @@ export const Root = component$(() => {
     w.webmcp_session_info = () => ({
       contract: 'zto-webmcp-v1',
       app: 'TagNote',
-      modules: ['entity-collection-v1', 'browse-query-v1', 'artifact-transfer-v1'],
+      modules: ['entity-collection-v1', 'browse-query-v1'],
       tool_count: listing.length,
     });
     w.webmcp_list_tools = () => listing;
@@ -530,26 +507,6 @@ export const Root = component$(() => {
             </button>
             <button
               onClick$={() => {
-                showExport.value = true;
-              }}
-              class={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                showExport.value
-                  ? 'bg-[var(--color-accent)] text-white'
-                  : 'bg-[var(--color-primary)] text-[var(--color-accent)] hover:bg-[#D4E0F0]'
-              }`}
-            >
-              Export
-            </button>
-            <button
-              onClick$={() => {
-                showImport.value = true;
-              }}
-              class="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]"
-            >
-              Import
-            </button>
-            <button
-              onClick$={() => {
                 showHistory.value = true;
               }}
               class="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]"
@@ -607,24 +564,6 @@ export const Root = component$(() => {
           />
         )}
 
-        {selectedIds.ids.length > 0 && (
-          <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 rounded-full bg-white px-6 py-3 shadow-lg border border-gray-200" style={{ transform: 'translateX(-50%)' }}>
-            <span class="text-sm font-semibold text-gray-700">{selectedIds.ids.length} selected</span>
-            <button onClick$={handleBulkArchive} class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]">
-              Archive selected
-            </button>
-            <button onClick$={handleBulkPin} class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]">
-              Pin selected
-            </button>
-            <button onClick$={handleBulkDeleteRequest} class="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100">
-              Delete selected
-            </button>
-            <button onClick$={() => selectedIds.ids = []} class="ml-2 text-gray-400 hover:text-gray-600">
-              ✕
-            </button>
-          </div>
-        )}
-
         <div class="flex-1 overflow-y-auto px-4 py-4">
           {showCalendar.value && !showArchived.value && (
             <div class="mb-4">
@@ -662,8 +601,6 @@ export const Root = component$(() => {
                   onEdit={handleEdit}
                   onDelete={handleDeleteRequest}
                   onAttachFile={handleAttachFile}
-                  selectedIds={new Set(selectedIds.ids)}
-                  onToggleSelect={handleToggleSelect}
                 />
               )}
             </div>
@@ -686,8 +623,6 @@ export const Root = component$(() => {
                     onEdit={handleEdit}
                     onDelete={handleDeleteRequest}
                     onAttachFile={handleAttachFile}
-                    selectedIds={new Set(selectedIds.ids)}
-                    onToggleSelect={handleToggleSelect}
                   />
                 )}
               </div>
@@ -708,8 +643,6 @@ export const Root = component$(() => {
                     onEdit={handleEdit}
                     onDelete={handleDeleteRequest}
                     onAttachFile={handleAttachFile}
-                    selectedIds={new Set(selectedIds.ids)}
-                    onToggleSelect={handleToggleSelect}
                   />
                 )}
               </div>
@@ -730,8 +663,6 @@ export const Root = component$(() => {
                     onEdit={handleEdit}
                     onDelete={handleDeleteRequest}
                     onAttachFile={handleAttachFile}
-                    selectedIds={new Set(selectedIds.ids)}
-                    onToggleSelect={handleToggleSelect}
                   />
                 </div>
               )}
@@ -755,8 +686,6 @@ export const Root = component$(() => {
                     onEdit={handleEdit}
                     onDelete={handleDeleteRequest}
                     onAttachFile={handleAttachFile}
-                    selectedIds={new Set(selectedIds.ids)}
-                    onToggleSelect={handleToggleSelect}
                   />
                 )}
               </div>
@@ -790,8 +719,6 @@ export const Root = component$(() => {
         canRedo={historyState.future.length > 0}
         open={showHistory}
       />
-      {showExport.value && <ExportPanel state={historyState.present} onClose={$(() => showExport.value = false)} />}
-      {showImport.value && <ImportPanel onImport={$((ns) => { applyState(ns, 'Imported Session JSON'); showImport.value = false; showToast('State imported'); })} onClose={$(() => showImport.value = false)} />}
     </div>
   );
 });

@@ -1,0 +1,36 @@
+--- tasks/frontend-productivity-tagnote/solution/app/src/components/SearchBar.tsx
++++ tasks/frontend-productivity-tagnote/solution/app/src/components/SearchBar.tsx
+@@ -4,11 +4,11 @@
+ interface SearchBarProps {
+   query: Signal<string>;
+   placeholder?: string;
+ }
+
+ export const SearchBar = component$<SearchBarProps>(({ query, placeholder }) => {
+   return (
+-    <div class="relative px-4 py-2">
++    <div class="relative px-4 py-3 bg-white border-b border-gray-200">
+       <div class="relative">
+         <svg
+           class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
+@@ -35,6 +35,27 @@
+           </button>
+         )}
+       </div>
++      <div class="scrollbar-hide mt-3 flex gap-2 overflow-x-auto pb-1">
++        <button onClick$={() => query.value = 'tag:family'} class="flex-shrink-0 rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] hover:bg-[#D4E0F0]">
++          tag:family
++        </button>
++        <button onClick$={() => query.value = 'tag:todo'} class="flex-shrink-0 rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] hover:bg-[#D4E0F0]">
++          tag:todo
++        </button>
++        <button onClick$={() => query.value = 'done:open'} class="flex-shrink-0 rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] hover:bg-[#D4E0F0]">
++          done:open
++        </button>
++        <button onClick$={() => query.value = 'done:done'} class="flex-shrink-0 rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] hover:bg-[#D4E0F0]">
++          done:done
++        </button>
++      </div>
+     </div>
+   );
+ });

@@ -1,0 +1,27 @@
+--- tasks/frontend-productivity-tagnote/solution/app/src/root.tsx
++++ tasks/frontend-productivity-tagnote/solution/app/src/root.tsx
+@@ -406,6 +406,26 @@
+           />
+         )}
+
++        {selectedIds.ids.length > 0 && (
++          <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 rounded-full bg-white px-6 py-3 shadow-lg border border-gray-200" style={{ transform: 'translateX(-50%)' }}>
++            <span class="text-sm font-semibold text-gray-700">{selectedIds.ids.length} selected</span>
++            <button onClick$={handleBulkArchive} class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]">
++              Archive selected
++            </button>
++            <button onClick$={handleBulkPin} class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]">
++              Pin selected
++            </button>
++            <button onClick$={handleBulkDeleteRequest} class="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100">
++              Delete selected
++            </button>
++            <button onClick$={() => selectedIds.ids = []} class="ml-2 text-gray-400 hover:text-gray-600">
++              ✕
++            </button>
++          </div>
++        )}
++
+         <div class="flex-1 overflow-y-auto px-4 py-4">
+           {showCalendar.value && !showArchived.value && (
+             <div class="mb-4">

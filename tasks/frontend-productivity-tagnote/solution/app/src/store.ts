@@ -332,13 +332,27 @@ export function filterByTag(notes: Note[], tag: string): Note[] {
   return notes.filter((n) => n.tags.includes(t));
 }
 
-export function filterBySearch(notes: Note[], query: string): Note[] {
+export function filterBySearch(notes: Note[], query: string, todoTags: string[] = []): Note[] {
   if (!query.trim()) return notes;
-  const q = query.toLowerCase();
-  return notes.filter(
-    (n) =>
-      n.text.toLowerCase().includes(q) || n.tags.some((t) => t.includes(q))
-  );
+  const q = query.toLowerCase().trim();
+  const tokens = q.split(' ');
+
+  return notes.filter((n) => {
+    let match = true;
+    for (const token of tokens) {
+       if (token.startsWith('tag:')) {
+           const t = token.slice(4);
+           if (!n.tags.includes(t)) match = false;
+       } else if (token === 'done:open') {
+           if (n.done || !n.tags.some((t) => todoTags.includes(t))) match = false;
+       } else if (token === 'done:done') {
+           if (!n.done || !n.tags.some((t) => todoTags.includes(t))) match = false;
+       } else {
+           if (!n.text.toLowerCase().includes(token) && !n.tags.some((t) => t.includes(token))) match = false;
+       }
+    }
+    return match;
+  });
 }
 
 export function filterByDate(notes: Note[], dateKey: string): Note[] {
@@ -347,4 +361,28 @@ export function filterByDate(notes: Note[], dateKey: string): Note[] {
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     return key === dateKey;
   });
+}
+
+export function bulkArchive(state: AppState, noteIds: string[]): AppState {
+  const ids = new Set(noteIds);
+  return {
+    ...state,
+    notes: state.notes.map(n => ids.has(n.id) ? { ...n, archived: true } : n)
+  };
+}
+
+export function bulkPin(state: AppState, noteIds: string[]): AppState {
+  const ids = new Set(noteIds);
+  return {
+    ...state,
+    notes: state.notes.map(n => ids.has(n.id) ? { ...n, pinned: true } : n)
+  };
+}
+
+export function bulkDelete(state: AppState, noteIds: string[]): AppState {
+  const ids = new Set(noteIds);
+  return {
+    ...state,
+    notes: state.notes.filter(n => !ids.has(n.id))
+  };
 }

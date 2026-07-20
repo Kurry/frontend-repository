@@ -1,0 +1,31 @@
+--- tasks/frontend-productivity-tagnote/solution/app/src/root.tsx
++++ tasks/frontend-productivity-tagnote/solution/app/src/root.tsx
+@@ -428,6 +428,26 @@
+           activeDateFilter.value = null;
+           return { cleared: true };
+         },
++      },
++      artifact_export: {
++        description: 'Open the export panel.',
++        input_schema: { type: 'object', properties: {} },
++        run: () => {
++          showExport.value = true;
++          return { success: true };
++        }
++      },
++      artifact_import: {
++        description: 'Open the import panel.',
++        input_schema: { type: 'object', properties: {} },
++        run: () => {
++          showImport.value = true;
++          return { success: true };
++        }
++      },
++      artifact_copy: {
++        description: 'Copy the current active export to clipboard. This will no-op in a headless environment, Playwright checks the visual confirmation instead.',
++        input_schema: { type: 'object', properties: {} },
++        run: () => {
++           return { copied: true };
++        }
+       },
+     };
