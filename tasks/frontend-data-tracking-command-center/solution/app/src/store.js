@@ -175,13 +175,23 @@ export const useCommandStore = create((set, get) => ({
   importError: '',
   announcement: '',
 
-  setView: (activeView) => set({ activeView }),
+  setView: (activeView, options = {}) => {
+    const allowed = ['dashboard', 'total-prompts-detail', 'active-agents-detail', 'evaluations-run-detail', 'cost-this-month-detail']
+    if (!allowed.includes(activeView)) return false
+    if (!options.fromHistory && typeof window !== 'undefined' && get().activeView !== activeView) {
+      const url = activeView === 'dashboard' ? `${window.location.pathname}${window.location.search}` : `#${activeView}`
+      window.history.pushState({ promptOpsView: activeView }, '', url)
+    }
+    set({ activeView })
+    return true
+  },
   setConnectOpen: (connectOpen) => set({ connectOpen }),
   setExportOpen: (exportOpen) => set({ exportOpen, importError: exportOpen ? get().importError : '' }),
   setExportFormat: (exportFormat) => set({ exportFormat }),
   setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
   setNightOpen: (nightOpen) => set({ nightOpen }),
   announce: (announcement) => set({ announcement }),
+  markArtifactAction: (lastAction, announcement) => set({ lastAction, announcement }),
 
   connectAgent: (input) => {
     const parsed = agentInputSchema.safeParse(input)
@@ -268,14 +278,27 @@ export const useCommandStore = create((set, get) => ({
     return true
   },
 
+  runAgent: (id) => {
+    const target = get().agents.find((agent) => agent.id === id)
+    if (!target || target.state !== 'idle') return false
+    domainMutation(set, `Started ${target.name}`, (state) => ({
+      agents: state.agents.map((agent) => agent.id === id ? { ...agent, state: 'running', lastActive: new Date().toISOString(), steps: makeSteps(['running', 'pending', 'pending']) } : agent),
+      events: appendEvent(state.events, makeEvent({ type: 'agent', description: `${target.name} started a new run`, status: 'info', resourceId: id, relatedName: target.name })),
+      announcement: `Agent ${target.name} started and is now running.`,
+    }))
+    return true
+  },
+
   toggleExpanded: (id, force) => set((state) => ({ agents: state.agents.map((agent) => agent.id === id ? { ...agent, expanded: typeof force === 'boolean' ? force : !agent.expanded } : agent) })),
   toggleSelected: (id, force) => set((state) => ({ agents: state.agents.map((agent) => agent.id === id ? { ...agent, selected: typeof force === 'boolean' ? force : !agent.selected } : agent) })),
   clearSelection: () => set((state) => ({ agents: state.agents.map((agent) => ({ ...agent, selected: false })) })),
 
-  openAgentFromEvent: (id, relatedName) => set((state) => ({
-    activeView: 'dashboard',
-    agents: state.agents.map((agent) => agent.id === id || (!id && agent.name === relatedName) ? { ...agent, expanded: true } : agent),
-  })),
+  openAgentFromEvent: (id, relatedName) => {
+    get().setView('dashboard')
+    set((state) => ({
+      agents: state.agents.map((agent) => agent.id === id || (!id && agent.name === relatedName) ? { ...agent, expanded: true } : agent),
+    }))
+  },
 
   advanceAgentSteps: () => set((state) => ({
     agents: state.agents.map((agent) => {
@@ -330,7 +353,12 @@ export const useCommandStore = create((set, get) => ({
     const hh = String(current.getHours()).padStart(2, '0')
     const mm = String(current.getMinutes()).padStart(2, '0')
     const schedule = theme === 'night' ? { enable: true, startTime: `${hh}:${mm}`, endTime: `${hh}:${mm}` } : { enable: false, startTime: get().nightSchedule.startTime, endTime: get().nightSchedule.endTime }
-    domainMutation(set, `Set ${theme} theme`, () => ({ theme, nightSchedule: schedule }))
+    domainMutation(set, `Set ${theme} theme`, () => ({
+      theme,
+      nightSchedule: schedule,
+      nightOpen: false,
+      announcement: theme === 'night' ? 'Night theme is active.' : 'Light theme is active and night mode is disabled.',
+    }))
     return true
   },
 
@@ -360,8 +388,9 @@ export const useCommandStore = create((set, get) => ({
     }))
     const idByName = Object.fromEntries(agents.map((agent) => [agent.name, agent.id]))
     const events = data.events.map((event) => ({ ...event, id: uid('event'), resourceId: event.relatedName ? idByName[event.relatedName] : undefined, isNew: false }))
+    get().setView(data.activeView)
     domainMutation(set, 'Imported session', () => ({
-      agents, events, kpis: data.kpis.map((kpi) => ({ ...kpi, format: kpi.key === 'cost-this-month' ? 'currency' : 'number' })), nightSchedule: data.nightSchedule, theme: data.theme, activeView: data.activeView, feedFilters: data.feedFilters, feedSearch: '', importError: '', announcement: 'Session JSON import completed.',
+      agents, events, kpis: data.kpis.map((kpi) => ({ ...kpi, format: kpi.key === 'cost-this-month' ? 'currency' : 'number' })), nightSchedule: data.nightSchedule, theme: data.theme, feedFilters: data.feedFilters, feedSearch: '', importError: '', announcement: 'Session JSON import completed.',
     }))
     return { ok: true }
   },

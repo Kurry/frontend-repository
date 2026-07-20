@@ -17,6 +17,14 @@ const normalizeNightForm = (values = {}) => ({
   endTime: values['night-end-time'] ?? values.endTime ?? '',
 })
 
+const resolveAgent = ({ id, name } = {}) => {
+  const agents = useCommandStore.getState().agents
+  const byId = id ? agents.find((agent) => agent.id === id) : undefined
+  const byName = name ? agents.find((agent) => agent.name === name) : undefined
+  if (id && name) return byId && byName && byId.id === byName.id ? byId : undefined
+  return byId || byName
+}
+
 const handlers = {
   browse_open: ({ destination }) => {
     const destinations = ['dashboard', 'total-prompts-detail', 'active-agents-detail', 'evaluations-run-detail', 'cost-this-month-detail', 'export-drawer']
@@ -35,7 +43,7 @@ const handlers = {
     if (filter !== 'event-type' || !['prompt', 'evaluation', 'agent', 'error'].includes(value)) return result('Filter value is not allowed.', { ok: false })
     const state = useCommandStore.getState()
     state.setFilters([...state.feedFilters.filter((item) => item !== value), value])
-    return result(`Activity filter ${value} applied.`, { ok: true })
+    return result(`Activity filter ${value} applied to the visible feed.`, { ok: true, feedFilters: useCommandStore.getState().feedFilters })
   },
   browse_clear_filter: () => {
     useCommandStore.getState().clearFilters()
@@ -45,27 +53,34 @@ const handlers = {
   browse_set_locale: () => result('No locale binding is declared for this dashboard.', { ok: false, unavailable: true }),
   browse_set_theme: ({ theme }) => {
     const ok = useCommandStore.getState().setThemeFromBrowse(theme)
-    return result(ok ? `Theme set to ${theme}.` : 'Theme is not allowed.', { ok })
+    return result(ok ? `Theme set to ${theme} in the visible app.` : 'Theme is not allowed.', { ok, theme: useCommandStore.getState().theme })
   },
   entity_create: (input) => {
     const parsed = agentInputSchema.safeParse(input)
     if (!parsed.success) return result(parsed.error.issues[0]?.message || 'Agent is invalid.', { ok: false })
     const outcome = useCommandStore.getState().connectAgent(parsed.data)
-    return result(outcome.ok ? `Agent ${parsed.data.name} created.` : outcome.error, outcome)
+    const agent = outcome.ok ? useCommandStore.getState().agents.find((item) => item.id === outcome.id) : null
+    return result(outcome.ok ? `Agent ${parsed.data.name} created and visible in the agent panel.` : outcome.error, { ...outcome, agent })
   },
-  entity_select: ({ id, selected = true }) => {
-    if (!useCommandStore.getState().agents.some((agent) => agent.id === id)) return result('Agent was not found.', { ok: false })
-    useCommandStore.getState().toggleSelected(id, Boolean(selected))
-    return result('Agent selection updated.', { ok: true, id, selected: Boolean(selected) })
+  entity_select: ({ id, name, selected = true }) => {
+    const agent = resolveAgent({ id, name })
+    if (!agent) return result('Agent was not found.', { ok: false })
+    useCommandStore.getState().toggleSelected(agent.id, Boolean(selected))
+    return result('Agent selection updated in the visible panel.', { ok: true, id: agent.id, name: agent.name, selected: Boolean(selected) })
   },
-  entity_update: ({ id, field, value }) => {
-    const outcome = useCommandStore.getState().updateAgent(id, field, value)
-    return result(outcome.ok ? 'Agent updated.' : outcome.error, outcome)
+  entity_update: ({ id, name, field, value }) => {
+    const agent = resolveAgent({ id, name })
+    if (!agent) return result('Agent was not found.', { ok: false })
+    const outcome = useCommandStore.getState().updateAgent(agent.id, field, value)
+    const updated = useCommandStore.getState().agents.find((item) => item.id === agent.id)
+    return result(outcome.ok ? 'Agent updated in the visible panel.' : outcome.error, { ...outcome, agent: updated })
   },
-  entity_delete: ({ id, confirm }) => {
+  entity_delete: ({ id, name, confirm }) => {
     if (confirm !== true) return result('Agent deletion requires confirm=true.', { ok: false })
-    const ok = useCommandStore.getState().disconnectAgent(id)
-    return result(ok ? 'Agent disconnected.' : 'Agent was not found.', { ok })
+    const agent = resolveAgent({ id, name })
+    if (!agent) return result('Agent was not found.', { ok: false })
+    const ok = useCommandStore.getState().disconnectAgent(agent.id)
+    return result(ok ? 'Agent disconnected from the visible panel.' : 'Agent was not found.', { ok, id: agent.id, name: agent.name })
   },
   form_validate: ({ form, values = {} }) => {
     const schema = form === 'agent' ? agentInputSchema : form === 'night-schedule' ? nightScheduleSchema : null
@@ -120,9 +135,9 @@ const schemas = {
   browse_set_locale: { type: 'object', properties: {}, additionalProperties: false },
   browse_set_theme: { type: 'object', properties: { theme: { type: 'string', enum: ['light', 'night'] } }, required: ['theme'], additionalProperties: false },
   entity_create: { type: 'object', properties: { name: { type: 'string', minLength: 1, maxLength: 80 }, model: { type: 'string', enum: ['gpt-4.1', 'claude-sonnet-4', 'o3-mini', 'gemini-2.5-pro'] }, description: { type: 'string', maxLength: 280 } }, required: ['name', 'model'], additionalProperties: false },
-  entity_select: { type: 'object', properties: { id: { type: 'string' }, selected: { type: 'boolean' } }, required: ['id'], additionalProperties: false },
-  entity_update: { type: 'object', properties: { id: { type: 'string' }, field: { type: 'string', enum: ['name', 'model', 'description', 'state'] }, value: { type: 'string', maxLength: 280 } }, required: ['id', 'field', 'value'], additionalProperties: false },
-  entity_delete: { type: 'object', properties: { id: { type: 'string' }, confirm: { const: true } }, required: ['id', 'confirm'], additionalProperties: false },
+  entity_select: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string', minLength: 1, maxLength: 80 }, selected: { type: 'boolean' } }, anyOf: [{ required: ['id'] }, { required: ['name'] }], additionalProperties: false },
+  entity_update: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string', minLength: 1, maxLength: 80 }, field: { type: 'string', enum: ['name', 'model', 'description', 'state'] }, value: { type: 'string', maxLength: 280 } }, required: ['field', 'value'], anyOf: [{ required: ['id'] }, { required: ['name'] }], additionalProperties: false },
+  entity_delete: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string', minLength: 1, maxLength: 80 }, confirm: { const: true } }, required: ['confirm'], anyOf: [{ required: ['id'] }, { required: ['name'] }], additionalProperties: false },
   form_validate: { type: 'object', properties: { form: { type: 'string', enum: ['agent', 'night-schedule'] }, values: { type: 'object' } }, required: ['form', 'values'], additionalProperties: false },
   form_submit: { type: 'object', properties: { form: { type: 'string', enum: ['agent', 'night-schedule'] }, values: { type: 'object' } }, required: ['form', 'values'], additionalProperties: false },
   form_cancel: { type: 'object', properties: { form: { type: 'string', enum: ['agent', 'night-schedule'] } }, required: ['form'], additionalProperties: false },
@@ -141,7 +156,13 @@ let registered = false
 export function registerWebMCPTools() {
   if (registered) return
   registered = true
-  window.webmcp_session_info = () => ({ contractVersion: 'zto-webmcp-v1', app: 'PromptOps command center' })
+  window.webmcp_session_info = () => ({
+    contractVersion: 'zto-webmcp-v1',
+    app: 'PromptOps command center',
+    modules: ['browse-query-v1', 'entity-collection-v1', 'form-workflow-v1', 'artifact-transfer-v1'],
+    toolNames: definitions.map((definition) => definition.name),
+    tools: definitions,
+  })
   window.webmcp_list_tools = () => definitions
   window.webmcp_invoke_tool = async (name, args = {}) => {
     if (!handlers[name]) throw new Error(`Unknown WebMCP tool: ${name}`)

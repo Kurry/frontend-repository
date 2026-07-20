@@ -120,10 +120,10 @@ function useFocusTrap(open, onClose, returnFocusRef) {
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
     }
-    document.addEventListener('keydown', onKey)
+    window.addEventListener('keydown', onKey, true)
     return () => {
       clearTimeout(timer)
-      document.removeEventListener('keydown', onKey)
+      window.removeEventListener('keydown', onKey, true)
       setTimeout(() => previousRef.current?.focus?.(), 0)
     }
   }, [open, returnFocusRef])
@@ -143,6 +143,7 @@ function MetricTooltip({ active, payload, label, format = 'number' }) {
 }
 
 function KpiCard({ kpi, onOpen }) {
+  const [hoveredPoint, setHoveredPoint] = useState(null)
   const initialValue = useRef(kpi.current).current
   const initialCount = useCountUp(initialValue)
   const counted = kpi.current === initialValue ? initialCount : kpi.current
@@ -158,13 +159,25 @@ function KpiCard({ kpi, onOpen }) {
             {positive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}{Math.abs(kpi.trend)}%
           </span>
         </div>
-        <div className="sparkline" aria-label={`${kpi.label} seven day trend chart`}>
+        <div
+          className="sparkline"
+          aria-label={`${kpi.label} seven day trend chart`}
+          onPointerMove={(event) => {
+            const bounds = event.currentTarget.getBoundingClientRect()
+            const chartLeft = bounds.left + 3
+            const chartWidth = Math.max(bounds.width - 6, 1)
+            const ratio = Math.max(0, Math.min(0.999, (event.clientX - chartLeft) / chartWidth))
+            setHoveredPoint(Math.floor(ratio * kpi.series.length))
+          }}
+          onPointerLeave={() => setHoveredPoint(null)}
+        >
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={kpi.series} margin={{ top: 8, right: 3, bottom: 3, left: 3 }}>
               <ChartTooltip content={<MetricTooltip format={kpi.format} />} cursor={{ stroke: 'var(--border-strong)', strokeDasharray: '3 3' }} />
-              <Line type="monotone" dataKey="value" stroke="var(--brand)" strokeWidth={2} dot={{ r: 2.5, fill: 'var(--surface)', strokeWidth: 2 }} activeDot={{ r: 5 }} isAnimationActive={false} />
+              <Line type="monotone" dataKey="value" stroke="var(--brand)" strokeWidth={2} dot={{ r: 2.5, fill: 'var(--app-surface)', strokeWidth: 2 }} activeDot={{ r: 5 }} isAnimationActive={false} />
             </LineChart>
           </ResponsiveContainer>
+          {hoveredPoint !== null && <div className="spark-tooltip" role="tooltip"><span>{kpi.series[hoveredPoint].label}</span><strong>{formatKpi(kpi, kpi.series[hoveredPoint].value)}</strong></div>}
         </div>
       </button>
     </Tile>
@@ -197,6 +210,7 @@ function AgentRow({ agent, onRequestDisconnect }) {
   const toggleExpanded = useCommandStore((state) => state.toggleExpanded)
   const toggleSelected = useCommandStore((state) => state.toggleSelected)
   const retryAgent = useCommandStore((state) => state.retryAgent)
+  const runAgent = useCommandStore((state) => state.runAgent)
   const renameAgent = useCommandStore((state) => state.renameAgent)
   const [renaming, setRenaming] = useState(false)
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(renameSchema), mode: 'onChange', defaultValues: { name: agent.name } })
@@ -211,7 +225,7 @@ function AgentRow({ agent, onRequestDisconnect }) {
     <article className={cx('agent-row', agent.state === 'error' && 'agent-error', agent.isNew && 'row-enter')} data-agent-id={agent.id}>
       <div className="agent-summary">
         <div className="agent-select" onClick={(event) => event.stopPropagation()}>
-          <Checkbox id={`select-${agent.id}`} labelText={`Select ${agent.name}`} hideLabel checked={agent.selected} onChange={(_, data) => toggleSelected(agent.id, Boolean(data.checked))} />
+          <Checkbox id={`select-${agent.id}`} labelText={`Select ${agent.name}`} hideLabel checked={agent.selected} onChange={(_, data) => toggleSelected(agent.id, Boolean(data?.checked))} />
         </div>
         <button className="agent-main-button" type="button" onClick={() => toggleExpanded(agent.id)} aria-expanded={agent.expanded} aria-controls={`agent-detail-${agent.id}`}>
           <span className={cx('agent-avatar', `avatar-${agent.state}`)}>{agent.name.slice(0, 2).toUpperCase()}</span>
@@ -226,6 +240,7 @@ function AgentRow({ agent, onRequestDisconnect }) {
           <ChevronDown className={cx('row-chevron', agent.expanded && 'rotated')} size={18} />
         </button>
         <div className="agent-actions">
+          {agent.state === 'idle' && <Button size="sm" kind="tertiary" renderIcon={Play} onClick={() => runAgent(agent.id)}>Run</Button>}
           {agent.state === 'error' && <Button size="sm" kind="danger--tertiary" renderIcon={Renew} onClick={() => retryAgent(agent.id)}>Retry</Button>}
           <IconButton size="sm" kind="ghost" label={`Rename ${agent.name}`} onClick={() => setRenaming(true)}><Edit /></IconButton>
           <IconButton size="sm" kind="ghost" label={`Disconnect ${agent.name}`} onClick={() => onRequestDisconnect(agent)}><TrashCan /></IconButton>
@@ -367,7 +382,7 @@ function NightSchedule({ badgeRef }) {
   const theme = useCommandStore((state) => state.theme)
   const save = useCommandStore((state) => state.saveNightSchedule)
   const popoverRef = useFocusTrap(open, () => setOpen(false), badgeRef)
-  const { register, control, handleSubmit, reset, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(nightScheduleSchema), mode: 'onChange', defaultValues: schedule })
+  const { register, control, handleSubmit, reset, trigger, watch, formState: { errors } } = useForm({ resolver: zodResolver(nightScheduleSchema), mode: 'onChange', defaultValues: schedule })
   useEffect(() => { if (open) reset(schedule) }, [open, reset, schedule])
   const enabled = watch('enable')
   const state = theme === 'night' ? 'active' : schedule.enable ? 'scheduled' : 'disabled'
@@ -377,9 +392,14 @@ function NightSchedule({ badgeRef }) {
       {open && <section ref={popoverRef} className="night-popover" role="dialog" aria-labelledby="night-title">
         <div className="modal-heading compact"><div><p className="eyebrow">Appearance schedule</p><h2 id="night-title">Night mode</h2></div><IconButton size="sm" kind="ghost" label="Close night mode schedule" onClick={() => setOpen(false)}><Close /></IconButton></div>
         <form className="form-stack" onSubmit={handleSubmit(save)} noValidate>
-          <Controller name="enable" control={control} render={({ field }) => <Toggle id="night-enable" labelText="Enable schedule" labelA="Disabled" labelB="Enabled" toggled={field.value} onToggle={(value) => field.onChange(value)} />} />
-          <div className="time-grid"><TextInput id="night-start" type="time" labelText="Start time" disabled={!enabled} invalid={!!errors.startTime} invalidText={errors.startTime?.message} {...register('startTime')} /><TextInput id="night-end" type="time" labelText="End time" disabled={!enabled} invalid={!!errors.endTime} invalidText={errors.endTime?.message} {...register('endTime')} /></div>
-          <Button size="sm" type="submit" disabled={!isValid}>Save schedule</Button>
+          <Controller name="enable" control={control} render={({ field }) => <Toggle id="night-enable" labelText="Enable schedule" labelA="Disabled" labelB="Enabled" toggled={field.value} onToggle={(value) => { field.onChange(Boolean(value)); setTimeout(() => trigger(['startTime', 'endTime']), 0) }} />} />
+          <div className="time-grid">
+            <TextInput id="night-start" type="time" labelText="Start time" disabled={!enabled} invalid={!!errors.startTime} invalidText={errors.startTime?.message} aria-describedby="night-start-validation" {...register('startTime')} />
+            <TextInput id="night-end" type="time" labelText="End time" disabled={!enabled} invalid={!!errors.endTime} invalidText={errors.endTime?.message} aria-describedby="night-end-validation" {...register('endTime')} />
+          </div>
+          <span id="night-start-validation" className="sr-only">{errors.startTime?.message || 'Start time must use 24-hour HH:MM format when the schedule is enabled.'}</span>
+          <span id="night-end-validation" className="sr-only">{errors.endTime?.message || 'End time must use 24-hour HH:MM format when the schedule is enabled.'}</span>
+          <Button size="sm" type="submit">Save schedule</Button>
         </form>
       </section>}
     </div>
@@ -404,7 +424,12 @@ function ExportDrawer({ openerRef }) {
   const { register, handleSubmit, reset, formState: { errors } } = useForm({ resolver: zodResolver(importFormSchema), defaultValues: { sessionJson: '' } })
   useEffect(() => { if (open) { setCopied(false); setImported(false); reset({ sessionJson: '' }) } }, [open, reset])
   const copy = async () => {
-    try { await navigator.clipboard.writeText(preview); setCopied(true); useCommandStore.getState().announce(`${format === 'json' ? 'Session JSON' : 'Agents CSV'} copied.`); setTimeout(() => setCopied(false), 1800) } catch { useCommandStore.getState().announce('Clipboard copy was unavailable.') }
+    try {
+      await navigator.clipboard.writeText(preview)
+      setCopied(true)
+      useCommandStore.getState().markArtifactAction(`Copied ${format === 'json' ? 'Session JSON' : 'Agents CSV'}`, `${format === 'json' ? 'Session JSON' : 'Agents CSV'} copied.`)
+      setTimeout(() => setCopied(false), 1800)
+    } catch { useCommandStore.getState().announce('Clipboard copy was unavailable.') }
   }
   const download = () => {
     const blob = new Blob([preview], { type: format === 'json' ? 'application/json' : 'text/csv' })
@@ -414,6 +439,7 @@ function ExportDrawer({ openerRef }) {
     link.download = format === 'json' ? 'promptops-session.json' : 'promptops-agents.csv'
     link.click()
     URL.revokeObjectURL(url)
+    useCommandStore.getState().markArtifactAction(`Downloaded ${format === 'json' ? 'Session JSON' : 'Agents CSV'}`, `${format === 'json' ? 'Session JSON' : 'Agents CSV'} downloaded.`)
   }
   if (!open) return null
   return (
@@ -430,7 +456,7 @@ function ExportDrawer({ openerRef }) {
         <div className="drawer-actions"><Button kind="secondary" renderIcon={Copy} onClick={copy}>{copied ? 'Copied' : 'Copy'}</Button><Button renderIcon={Download} onClick={download}>Download</Button></div>
         {copied && <div className="copied-note" role="status"><CheckmarkFilled size={16} />Preview copied to clipboard.</div>}
         <div className="import-section">
-          <div className="section-divider"><Upload size={17} /><h3>Import Session JSON</h3></div>
+          <div className="section-divider"><Upload size={17} /><h3>Import session JSON</h3></div>
           <form onSubmit={handleSubmit(({ sessionJson }) => { const outcome = importSession(sessionJson); setImported(outcome.ok); if (outcome.ok) reset({ sessionJson: '' }) })}>
             <TextArea id="session-import" labelText="Session JSON import field" rows={5} invalid={!!errors.sessionJson || !!importError} invalidText={errors.sessionJson?.message || importError} {...register('sessionJson')} />
             {importError && <InlineNotification lowContrast hideCloseButton kind="error" title="Import failed" subtitle={importError} />}
@@ -486,7 +512,10 @@ function MetricDetail() {
   if (!kpi) return null
   return (
     <main className="detail-view">
-      <button className="back-button" type="button" onClick={() => state.setView('dashboard')}><ArrowLeft size={18} />Back to dashboard</button>
+      <button className="back-button" type="button" onClick={() => {
+        if (window.history.state?.promptOpsView === state.activeView) window.history.back()
+        else state.setView('dashboard')
+      }}><ArrowLeft size={18} />Back to dashboard</button>
       <section className="detail-hero"><div><p className="eyebrow">KPI investigation</p><h1>{kpi.label}</h1><p>Seven-day operational trend with the same live series used on the dashboard.</p></div><div className="detail-current"><span>Current value</span><strong>{formatKpi(kpi, kpi.current)}</strong><span className={cx('trend', kpi.trend >= 0 ? 'trend-up' : 'trend-down')}>{kpi.trend >= 0 ? <ArrowUp size={14} /> : <ArrowDown size={14} />}{Math.abs(kpi.trend)}%</span></div></section>
       <section className="panel detail-chart-panel"><header className="panel-header"><div><p className="eyebrow">Recent trajectory</p><h2>{kpi.label} trend</h2></div></header><div className="detail-chart"><ResponsiveContainer width="100%" height="100%"><AreaChart data={kpi.series} margin={{ top: 16, right: 24, bottom: 8, left: 8 }}><defs><linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stopColor="var(--brand)" stopOpacity={0.35}/><stop offset="95%" stopColor="var(--brand)" stopOpacity={0}/></linearGradient></defs><CartesianGrid stroke="var(--border)" strokeDasharray="4 4" vertical={false} /><XAxis dataKey="label" stroke="var(--text-muted)" tickLine={false} axisLine={false} /><YAxis stroke="var(--text-muted)" tickLine={false} axisLine={false} width={60} /><ChartTooltip content={<MetricTooltip format={kpi.format} />} /><Area type="monotone" dataKey="value" stroke="var(--brand)" strokeWidth={3} fill="url(#area-gradient)" activeDot={{ r: 6 }} /></AreaChart></ResponsiveContainer></div></section>
       <section className="panel breakdown-panel"><header className="panel-header"><div><p className="eyebrow">Daily breakdown</p><h2>Series values</h2><p>{kpi.series.length} reporting periods</p></div></header><div className="breakdown-table-wrap"><table className="breakdown-table"><thead><tr><th>Period</th><th>Value</th><th>Change</th><th>Signal</th></tr></thead><tbody>{kpi.series.map((point, index) => { const prior = kpi.series[Math.max(0, index - 1)].value; const change = index ? point.value - prior : 0; return <tr key={point.label}><td>{point.label}</td><td>{formatKpi(kpi, point.value)}</td><td className={change >= 0 ? 'positive' : 'negative'}>{change >= 0 ? '+' : ''}{formatKpi(kpi, change)}</td><td><StatusChip status={change >= 0 ? 'success' : 'error'}>{change >= 0 ? 'On track' : 'Watch'}</StatusChip></td></tr> })}</tbody></table></div></section>
@@ -520,6 +549,12 @@ function App() {
   const exportRef = useRef(null)
   const nightRef = useRef(null)
   useEffect(registerWebMCPTools, [])
+  useEffect(() => {
+    window.history.replaceState({ ...(window.history.state || {}), promptOpsView: 'dashboard' }, '', `${window.location.pathname}${window.location.search}`)
+    const onPopState = (event) => useCommandStore.getState().setView(event.state?.promptOpsView || 'dashboard', { fromHistory: true })
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
   useEffect(() => {
     const interval = setInterval(() => useCommandStore.getState().advanceAgentSteps(), 1700)
     return () => clearInterval(interval)
