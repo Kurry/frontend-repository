@@ -126,11 +126,78 @@ export const themePackageSchema = themeOptionsSchema
       })
   : (null as never);
 
-// First zod error rendered as "field: message"
+// First zod error, naming the offending field path without stuttering it
 export function firstError(err: z.ZodError): { path: string; message: string } {
   const issue = err.issues[0];
   const path = issue.path.join('.');
-  return { path, message: path ? `${path}: ${issue.message}` : issue.message };
+  const raw = issue.message;
+  const message = path && !raw.toLowerCase().includes(path.toLowerCase()) ? `${path}: ${raw}` : raw;
+  return { path, message };
+}
+
+// ---------------------------------------------------------------------------
+// Harmony guidance — suggests a more distinct secondary when primary and
+// secondary are tonally close (linked primary/secondary suggestion).
+// ---------------------------------------------------------------------------
+function hexToHsl(hex: string): { h: number; s: number; l: number } {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  let h = 0;
+  let s = 0;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) * 60;
+    else if (max === g) h = ((b - r) / d + 2) * 60;
+    else h = ((r - g) / d + 4) * 60;
+  }
+  return { h, s, l };
+}
+function hslToHex(h: number, s: number, l: number): string {
+  h = ((h % 360) + 360) % 360;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  let rp = 0, gp = 0, bp = 0;
+  if (h < 60) [rp, gp, bp] = [c, x, 0];
+  else if (h < 120) [rp, gp, bp] = [x, c, 0];
+  else if (h < 180) [rp, gp, bp] = [0, c, x];
+  else if (h < 240) [rp, gp, bp] = [0, x, c];
+  else if (h < 300) [rp, gp, bp] = [x, 0, c];
+  else [rp, gp, bp] = [c, 0, x];
+  const to = (v: number) => Math.round((v + m) * 255).toString(16).padStart(2, '0');
+  return `#${to(rp)}${to(gp)}${to(bp)}`;
+}
+
+export interface HarmonySuggestion {
+  color: string;
+  note: string;
+}
+export function suggestSecondary(primary: string, secondary: string): HarmonySuggestion | null {
+  if (!HEX.test(primary) || !HEX.test(secondary)) return null;
+  const ratio = contrastRatio(primary, secondary);
+  if (ratio >= 2.2) return null; // already distinct enough
+  const p = hexToHsl(primary);
+  const s = hexToHsl(secondary);
+  // push the secondary's hue away from primary and nudge lightness for tonal separation
+  const hueShift = s.h - p.h;
+  const dir = Math.abs(hueShift) > 180 ? (hueShift < 0 ? 1 : -1) : hueShift >= 0 ? 1 : -1;
+  const candidates: Array<{ h: number; s: number; l: number; note: string }> = [
+    { h: p.h + 150 * dir, s: Math.max(0.45, s.s), l: p.l > 0.5 ? 0.35 : 0.68, note: 'a hue-shifted accent away from primary' },
+    { h: p.h + 30 * dir, s: Math.max(0.5, s.s), l: p.l > 0.5 ? 0.3 : 0.72, note: 'an adjacent-tone accent with tonal contrast' },
+    { h: s.h, s: s.s, l: p.l > 0.5 ? 0.28 : 0.75, note: 'a tonal step away from primary' }
+  ];
+  for (const c of candidates) {
+    const hexC = hslToHex(c.h, c.s, c.l);
+    if (HEX.test(hexC) && contrastRatio(primary, hexC) >= 2.2) {
+      return { color: hexC, note: `Try ${c.note}` };
+    }
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -360,18 +427,47 @@ export function optionsToSource(o: ThemeOptions): string {
   return `import { createTheme } from '@mui/material/styles';\n\nexport const themeOptions = ${JSON.stringify(o, null, 2)};\n\nexport default createTheme(themeOptions);\n`;
 }
 
+// Extract the balanced { ... } literal following "themeOptions =" using brace
+// counting (string-aware), so nested closers mid-object are never mistaken for
+// the end of the literal.
+function extractObjectLiteral(src: string): string | null {
+  const anchor = /themeOptions\s*=\s*/.exec(src);
+  const from = anchor ? anchor.index + anchor[0].length : 0;
+  const start = src.indexOf('{', from);
+  if (start === -1) return null;
+  let depth = 0;
+  let inStr: string | null = null;
+  let esc = false;
+  for (let i = start; i < src.length; i++) {
+    const ch = src[i];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === '\\') esc = true;
+      else if (ch === inStr) inStr = null;
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === '`') {
+      inStr = ch;
+      continue;
+    }
+    if (ch === '{') depth++;
+    else if (ch === '}') {
+      depth--;
+      if (depth === 0) return src.slice(start, i + 1);
+    }
+  }
+  return null;
+}
+
 // Parse the source pane back into ThemeOptions. Tolerant of the createTheme
-// wrapper: extracts the object literal after "themeOptions =".
+// wrapper and of comments/extra statements around the literal.
 export function sourceToOptions(src: string): { ok: true; options: ThemeOptions } | { ok: false; error: string } {
   try {
-    const m = src.match(/themeOptions\s*=\s*(\{[\s\S]*?\})\s*;?\s*(?:\n|$)/);
-    let jsonLike: string;
-    if (m) {
-      jsonLike = m[1];
-    } else {
+    let jsonLike = extractObjectLiteral(src);
+    if (!jsonLike) {
       const start = src.indexOf('{');
       const end = src.lastIndexOf('}');
-      if (start === -1 || end === -1) return { ok: false, error: 'No theme options object found' };
+      if (start === -1 || end === -1 || end <= start) return { ok: false, error: 'No theme options object found' };
       jsonLike = src.slice(start, end + 1);
     }
     // eslint-disable-next-line no-new-func

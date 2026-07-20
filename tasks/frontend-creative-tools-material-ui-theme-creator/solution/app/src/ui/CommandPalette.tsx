@@ -23,6 +23,8 @@ export function CommandPalette() {
   const setExportOpen = useStore((s) => s.setExportOpen);
   const loadTheme = useStore((s) => s.loadTheme);
   const savedThemes = useStore((s) => s.savedThemes);
+  const recentCommands = useStore((s) => s.recentCommands);
+  const pushRecentCommand = useStore((s) => s.pushRecentCommand);
   const [cursor, setCursor] = useState(0);
 
   const commands: Cmd[] = useMemo(() => {
@@ -42,6 +44,15 @@ export function CommandPalette() {
     return c;
   }, [savedThemes, setTab, setExportOpen, loadTheme]);
 
+  // Session-only personalization: the palette remembers the last commands you
+  // ran and pins them at the top while the query is empty.
+  const recents: Cmd[] = useMemo(() => {
+    if (query.trim()) return [];
+    return recentCommands
+      .map((r) => commands.find((c) => c.id === r.id))
+      .filter((c): c is Cmd => Boolean(c));
+  }, [recentCommands, commands, query]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return commands;
@@ -55,9 +66,10 @@ export function CommandPalette() {
 
   React.useEffect(() => setCursor(0), [query, open]);
 
-  const runAt = (i: number) => {
-    const cmd = filtered[i];
+  const runAt = (i: number, list: Cmd[]) => {
+    const cmd = list[i];
     if (!cmd) return;
+    pushRecentCommand(cmd.id, cmd.label);
     cmd.run();
     setOpen(false);
   };
@@ -67,15 +79,16 @@ export function CommandPalette() {
       <div
         className="p-2"
         onKeyDown={(e) => {
+          const list = recents.length > 0 ? [...recents, ...filtered] : filtered;
           if (e.key === 'ArrowDown') {
             e.preventDefault();
-            setCursor((c) => Math.min(c + 1, filtered.length - 1));
+            setCursor((c) => Math.min(c + 1, list.length - 1));
           } else if (e.key === 'ArrowUp') {
             e.preventDefault();
             setCursor((c) => Math.max(c - 1, 0));
           } else if (e.key === 'Enter') {
             e.preventDefault();
-            runAt(cursor);
+            runAt(cursor, list);
           }
         }}
       >
@@ -89,25 +102,50 @@ export function CommandPalette() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             aria-label="Command palette query"
-            placeholder="Search tabs, tools, themes, and components"
             className="bg-transparent text-sm text-shell-text outline-none flex-1"
           />
           <kbd className="text-[10px] text-shell-muted border border-shell-border rounded px-1">Esc</kbd>
         </div>
-        <ul className="max-h-80 overflow-auto scrollbar-thin py-1" role="listbox" aria-label="Commands">
-          {filtered.map((c, i) => (
-            <li key={c.id} role="option" aria-selected={i === cursor}>
-              <button
-                type="button"
-                onMouseEnter={() => setCursor(i)}
-                onClick={() => runAt(i)}
-                className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between ${i === cursor ? 'bg-accent text-white' : 'text-shell-text'}`}
-              >
-                {c.label}
-                <span className={`text-[11px] ${i === cursor ? 'text-white/80' : 'text-shell-muted'}`}>{c.group}</span>
-              </button>
+        {recents.length > 0 && (
+          <ul className="py-1 border-b border-shell-border" role="listbox" aria-label="Recently used commands">
+            <li aria-hidden="true" className="px-3 pt-1 pb-0.5 text-[10px] text-shell-muted">
+              Recently Used
             </li>
-          ))}
+            {recents.map((c, i) => (
+              <li key={`recent-${c.id}`} role="option" aria-selected={i === cursor}>
+                <button
+                  type="button"
+                  onMouseEnter={() => setCursor(i)}
+                  onClick={() => runAt(i, recents)}
+                  className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between ${i === cursor ? 'bg-accent text-white' : 'text-shell-text'}`}
+                >
+                  <span className="flex items-center gap-2">
+                    <Icon name="history" style={{ fontSize: 14 }} className={i === cursor ? 'text-white/80' : 'text-shell-muted'} />
+                    {c.label}
+                  </span>
+                  <span className={`text-[11px] ${i === cursor ? 'text-white/80' : 'text-shell-muted'}`}>{c.group}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <ul className="max-h-80 overflow-auto scrollbar-thin py-1" role="listbox" aria-label="Commands">
+          {filtered.map((c, i) => {
+            const globalIndex = recents.length > 0 ? recents.length + i : i;
+            return (
+              <li key={c.id} role="option" aria-selected={globalIndex === cursor}>
+                <button
+                  type="button"
+                  onMouseEnter={() => setCursor(globalIndex)}
+                  onClick={() => runAt(globalIndex, [...recents, ...filtered])}
+                  className={`w-full text-left px-3 py-2 rounded-md text-sm flex items-center justify-between ${globalIndex === cursor ? 'bg-accent text-white' : 'text-shell-text'}`}
+                >
+                  {c.label}
+                  <span className={`text-[11px] ${globalIndex === cursor ? 'text-white/80' : 'text-shell-muted'}`}>{c.group}</span>
+                </button>
+              </li>
+            );
+          })}
           {filtered.length === 0 && <li className="px-3 py-6 text-center text-sm text-shell-muted">No commands match “{query}”.</li>}
         </ul>
       </div>

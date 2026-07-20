@@ -1,16 +1,25 @@
 import React, { useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useStore, intentList } from '../store';
-import { PRESETS, contrastRatio, contrastMatrix, type Intent } from '../domain';
+import { PRESETS, contrastRatio, contrastMatrix, suggestSecondary, type Intent } from '../domain';
 import { Icon } from './primitives';
 
+// Swatches stay live with the editor and pulse briefly whenever the color
+// changes (preset application re-keys every swatch, so the whole row settles).
 function Swatch({ color }: { color: string }) {
   return (
     <motion.span
       key={color}
       initial={{ scale: 0.55 }}
-      animate={{ scale: 1 }}
-      transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+      animate={{
+        scale: 1,
+        boxShadow: [
+          '0 0 0 0 rgba(124,140,255,0.55)',
+          '0 0 0 7px rgba(124,140,255,0)',
+          '0 0 0 0 rgba(124,140,255,0)'
+        ]
+      }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
       className="inline-block w-5 h-5 rounded-full border border-shell-border shrink-0"
       style={{ backgroundColor: color }}
       data-testid="palette-swatch"
@@ -93,7 +102,7 @@ function AccordionRow({
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.22, ease: 'easeInOut' }}
+            transition={{ duration: 0.24, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
             <div className="px-3 pb-3">{children}</div>
@@ -116,11 +125,61 @@ function ToolCard({ id, title, icon, children }: { id: string; title: string; ic
   );
 }
 
+// Linked primary/secondary harmony guide — an interactive graphic beyond the
+// contrast matrix: it watches the live pair, explains the tonal relationship,
+// and offers a one-click suggested secondary when the pair is too close.
+function HarmonyGuide() {
+  const options = useStore((s) => s.options);
+  const setPaletteColor = useStore((s) => s.setPaletteColor);
+  const pushToast = useStore((s) => s.pushToast);
+  const primary = options.palette.primary.main;
+  const secondary = options.palette.secondary.main;
+  const ratio = useMemo(() => contrastRatio(primary, secondary), [primary, secondary]);
+  const suggestion = useMemo(() => suggestSecondary(primary, secondary), [primary, secondary]);
+
+  return (
+    <div className="px-3 py-2.5 border-t border-shell-border bg-shell/40" data-testid="harmony-guide">
+      <div className="flex items-center gap-2 text-xs">
+        <Icon name="tonality" style={{ fontSize: 15 }} className="text-accent" />
+        <span className="text-shell-text font-medium">Harmony Guide</span>
+        <span className="ml-auto font-mono text-shell-muted">{ratio.toFixed(2)}:1</span>
+      </div>
+      {suggestion ? (
+        <div className="flex items-center gap-2 mt-1.5">
+          <span className="flex gap-1">
+            <Swatch color={primary} />
+            <Swatch color={secondary} />
+            <Icon name="arrow_forward" style={{ fontSize: 14 }} className="text-shell-muted self-center" />
+            <Swatch color={suggestion.color} />
+          </span>
+          <span className="text-[11px] text-amber-300 flex-1">
+            Primary and secondary are tonally close. {suggestion.note}.
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setPaletteColor('secondary.main', suggestion.color);
+              pushToast('Harmony suggestion applied to secondary.main');
+            }}
+            className="lift bg-accent hover:bg-accent-strong text-white text-[11px] px-2 py-1 rounded whitespace-nowrap"
+          >
+            Apply
+          </button>
+        </div>
+      ) : (
+        <p className="flex items-center gap-1.5 mt-1.5 text-[11px] text-green-300">
+          <Icon name="check_circle" style={{ fontSize: 14 }} />
+          Primary and secondary are well separated — accents will read distinctly.
+        </p>
+      )}
+    </div>
+  );
+}
+
 export function PaletteTool() {
   const options = useStore((s) => s.options);
   const setPaletteType = useStore((s) => s.setPaletteType);
   const p = options.palette;
-  const harmony = contrastRatio(p.primary.main, p.secondary.main);
   return (
     <ToolCard id="tool-palette" title="Palette" icon="palette">
       {/* Type row / Light-Dark toggle */}
@@ -132,7 +191,7 @@ export function PaletteTool() {
               type="button"
               onClick={() => setPaletteType(t)}
               aria-pressed={p.type === t}
-              className={`lift flex-1 py-1.5 rounded-md text-sm capitalize ${p.type === t ? 'bg-accent text-white' : 'bg-shell-2 text-shell-muted'}`}
+              className={`lift flex-1 py-1.5 rounded-md text-sm ${p.type === t ? 'bg-accent hover:bg-accent-strong text-white' : 'bg-shell-2 hover:bg-shell-3 text-shell-muted'}`}
             >
               <Icon name={t === 'light' ? 'light_mode' : 'dark_mode'} style={{ fontSize: 16 }} className="align-middle mr-1" />
               {t === 'light' ? 'Light' : 'Dark'}
@@ -149,20 +208,14 @@ export function PaletteTool() {
         <ColorField label="Secondary" path="text.secondary" value={p.text.secondary} />
       </AccordionRow>
       {intentList().map((intent: Intent) => (
-        <AccordionRow key={intent} id={intent} title={intent} swatches={[p[intent].main]}>
+        <AccordionRow key={intent} id={intent} title={intent.charAt(0).toUpperCase() + intent.slice(1)} swatches={[p[intent].main]}>
           <ColorField label={`${intent}.main`} path={`${intent}.main`} value={p[intent].main} />
         </AccordionRow>
       ))}
       <AccordionRow id="divider" title="Divider" swatches={[p.divider]}>
         <ColorField label="Divider" path="divider" value={p.divider} />
       </AccordionRow>
-      {harmony < 1.4 && (
-        <div className="px-3 py-2 text-xs text-amber-300 flex items-start gap-1.5" role="note">
-          <Icon name="tips_and_updates" style={{ fontSize: 15 }} />
-          Harmony tip: primary and secondary are tonally close (ratio {harmony.toFixed(2)}). Consider a more distinct
-          secondary for stronger accents.
-        </div>
-      )}
+      <HarmonyGuide />
     </ToolCard>
   );
 }
@@ -177,7 +230,7 @@ export function PresetsStrip() {
             key={preset.id}
             type="button"
             onClick={() => applyPresetById(preset.id)}
-            className="lift bg-shell-2 rounded-lg p-2.5 text-left border border-shell-border"
+            className="lift bg-shell-2 hover:bg-shell-3 rounded-lg p-2.5 text-left border border-shell-border"
           >
             <div className="flex gap-1 mb-1.5">
               {(['primary', 'secondary', 'error', 'success'] as const).map((k) => (
@@ -230,7 +283,7 @@ export function FontsTypographyShape() {
               onChange={(e) => setNewFont(e.target.value)}
               className="flex-1 bg-shell-2 text-shell-text text-xs px-2 py-1.5 rounded border border-shell-border"
             >
-              <option value="">Choose a font to add</option>
+              <option value="">Choose a Font to Add</option>
               {AVAILABLE_FONTS.filter((f) => !fonts.includes(f)).map((f) => (
                 <option key={f} value={f}>
                   {f}
@@ -244,7 +297,7 @@ export function FontsTypographyShape() {
                 addFont(newFont);
                 setNewFont('');
               }}
-              className="lift bg-accent text-white px-3 py-1.5 rounded text-xs disabled:opacity-40"
+              className="lift bg-accent hover:bg-accent-strong text-white px-3 py-1.5 rounded text-xs disabled:opacity-40 disabled:hover:bg-accent"
             >
               Add
             </button>
@@ -261,8 +314,11 @@ export function FontsTypographyShape() {
 
       <ToolCard id="tool-typography" title="Typography" icon="text_fields">
         <div className="p-3 flex flex-col gap-2">
-          <label className="text-xs text-shell-muted">Font Family</label>
+          <label className="text-xs text-shell-muted" htmlFor="font-family-select">
+            Font Family
+          </label>
           <select
+            id="font-family-select"
             aria-label="Font family"
             value={options.typography.fontFamily}
             onChange={(e) => setFontFamily(e.target.value)}
@@ -274,8 +330,11 @@ export function FontsTypographyShape() {
               </option>
             ))}
           </select>
-          <label className="text-xs text-shell-muted mt-1">Base Font Size (10–24)</label>
+          <label className="text-xs text-shell-muted mt-1" htmlFor="font-size-input">
+            Base Font Size (10–24)
+          </label>
           <input
+            id="font-size-input"
             type="number"
             aria-label="fontSize"
             value={sizeVal}
@@ -298,7 +357,9 @@ export function FontsTypographyShape() {
 
       <ToolCard id="tool-shape" title="Shape" icon="rounded_corner">
         <div className="p-3 flex flex-col gap-2">
-          <label className="text-xs text-shell-muted">Border Radius (0–24)</label>
+          <label className="text-xs text-shell-muted" htmlFor="border-radius-input">
+            Border Radius (0–24)
+          </label>
           <div className="flex items-center gap-2">
             <input
               type="range"
@@ -314,6 +375,7 @@ export function FontsTypographyShape() {
               className="flex-1 accent-[var(--color-accent)]"
             />
             <input
+              id="border-radius-input"
               type="number"
               aria-label="borderRadius"
               value={radiusVal}
@@ -342,7 +404,12 @@ export function FontsTypographyShape() {
             { id: 'square', label: 'Square Corners' },
             { id: 'dense', label: 'Dense Typography' }
           ].map((s) => (
-            <button key={s.id} type="button" onClick={() => applySnippet(s.id)} className="lift bg-shell-2 text-xs px-3 py-1.5 rounded border border-shell-border">
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => applySnippet(s.id)}
+              className="lift bg-shell-2 hover:bg-shell-3 text-xs px-3 py-1.5 rounded border border-shell-border"
+            >
               {s.label}
             </button>
           ))}
@@ -392,6 +459,7 @@ export function ContrastMatrix() {
 export function ToolsPanel() {
   return (
     <div className="flex flex-col gap-3">
+      <h2 className="sr-only">Theme Tools</h2>
       <PaletteTool />
       <PresetsStrip />
       <ContrastMatrix />

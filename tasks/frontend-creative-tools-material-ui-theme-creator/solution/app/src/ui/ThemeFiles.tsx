@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useStore } from '../store';
 import { Icon, Modal } from './primitives';
 
@@ -18,26 +18,53 @@ function ArtifactPane({ label, text, mime, filename }: { label: string; text: st
   const copyText = useStore((s) => s.copyText);
   const pushToast = useStore((s) => s.pushToast);
   const announce = useStore((s) => s.announce);
+  const [copied, setCopied] = useState(false);
+  const [downloaded, setDownloaded] = useState(false);
+  const copyTimer = useRef<number | null>(null);
+  const dlTimer = useRef<number | null>(null);
+
+  const onCopy = async () => {
+    await copyText(text, label);
+    setCopied(true);
+    if (copyTimer.current) window.clearTimeout(copyTimer.current);
+    copyTimer.current = window.setTimeout(() => setCopied(false), 1800);
+  };
+
+  const onDownload = () => {
+    download(filename, text, mime);
+    pushToast(`${label} downloaded`);
+    announce(`${label} file downloaded`);
+    setDownloaded(true);
+    if (dlTimer.current) window.clearTimeout(dlTimer.current);
+    dlTimer.current = window.setTimeout(() => setDownloaded(false), 1800);
+  };
+
   return (
     <div className="flex flex-col min-h-0 flex-1">
       <div className="flex items-center gap-2 mb-1.5">
         <h3 className="text-sm font-medium">{label}</h3>
         <div className="ml-auto flex gap-1.5">
-          <button type="button" onClick={() => copyText(text, label)} className="lift bg-shell-2 text-shell-text text-xs px-2.5 py-1 rounded flex items-center gap-1">
-            <Icon name="content_copy" style={{ fontSize: 14 }} />
-            Copy
+          <button
+            type="button"
+            onClick={onCopy}
+            aria-label={copied ? `${label} copied` : `Copy ${label}`}
+            className={`lift text-xs px-2.5 py-1 rounded flex items-center gap-1 ${
+              copied ? 'bg-green-800 text-green-100' : 'bg-shell-2 hover:bg-shell-3 text-shell-text'
+            }`}
+          >
+            <Icon name={copied ? 'check' : 'content_copy'} style={{ fontSize: 14 }} />
+            {copied ? 'Copied' : 'Copy'}
           </button>
           <button
             type="button"
-            onClick={() => {
-              download(filename, text, mime);
-              pushToast(`${label} downloaded`);
-              announce(`${label} file downloaded`);
-            }}
-            className="lift bg-shell-2 text-shell-text text-xs px-2.5 py-1 rounded flex items-center gap-1"
+            onClick={onDownload}
+            aria-label={downloaded ? `${label} downloaded` : `Download ${label}`}
+            className={`lift text-xs px-2.5 py-1 rounded flex items-center gap-1 ${
+              downloaded ? 'bg-green-800 text-green-100' : 'bg-shell-2 hover:bg-shell-3 text-shell-text'
+            }`}
           >
-            <Icon name="download" style={{ fontSize: 14 }} />
-            Download
+            <Icon name={downloaded ? 'check' : 'download'} style={{ fontSize: 14 }} />
+            {downloaded ? 'Downloaded' : 'Download'}
           </button>
         </div>
       </div>
@@ -66,7 +93,12 @@ export function ThemeFilesDrawer() {
           <h2 id="theme-files-title" className="text-lg font-semibold">
             Theme Files
           </h2>
-          <button type="button" onClick={() => setOpen(false)} aria-label="Close Theme Files" className="lift ml-auto bg-shell-2 rounded p-1.5">
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            aria-label="Close Theme Files"
+            className="lift ml-auto bg-shell-2 hover:bg-shell-3 rounded p-1.5"
+          >
             <Icon name="close" style={{ fontSize: 18 }} />
           </button>
         </div>
@@ -112,20 +144,23 @@ export function ImportDialog() {
           Import Theme Package
         </h2>
         <p className="text-xs text-shell-muted mb-3">
-          Paste or choose a declared-theme JSON package. It must conform to the name / paletteType / themeOptions field
-          contract (palette.type equal to paletteType, #RRGGBB mains, fontSize 10–24 when present, shape.borderRadius
-          0–24).
+          Paste or choose a declared-theme JSON package. It must conform to the name / paletteType / themeOptions
+          field contract (palette.type equal to paletteType, #RRGGBB mains, fontSize 10–24 when present,
+          shape.borderRadius 0–24).
         </p>
         <input type="file" accept="application/json,.json" onChange={onFile} aria-label="Choose theme JSON file" className="text-xs mb-2 block" />
+        <label htmlFor="import-json" className="text-xs text-shell-muted">
+          Theme Package JSON
+        </label>
         <textarea
+          id="import-json"
           value={text}
           onChange={(e) => setText(e.target.value)}
           aria-label="Theme package JSON"
-          placeholder='{ "name": "My Theme", "paletteType": "light", "themeOptions": { ... } }'
           rows={8}
-          className="w-full bg-shell-2 text-shell-text text-xs font-mono px-3 py-2 rounded-md border border-shell-border"
+          className="w-full mt-1 bg-shell-2 text-shell-text text-xs font-mono px-3 py-2 rounded-md border border-shell-border"
         />
-        <div className="min-h-[20px] mt-1" aria-live="polite">
+        <div className="min-h-[20px] mt-1">
           {error && (
             <span className="text-xs text-red-300" role="alert">
               {error}
@@ -133,10 +168,19 @@ export function ImportDialog() {
           )}
         </div>
         <div className="flex justify-end gap-2 mt-3">
-          <button type="button" onClick={() => setOpen(false)} className="lift bg-shell-2 text-shell-text px-4 py-2 rounded-md text-sm">
+          <button
+            type="button"
+            onClick={() => setOpen(false)}
+            className="lift bg-shell-2 hover:bg-shell-3 text-shell-text px-4 py-2 rounded-md text-sm"
+          >
             Cancel
           </button>
-          <button type="button" onClick={submit} disabled={!text.trim()} className="lift bg-accent text-white px-4 py-2 rounded-md text-sm disabled:opacity-40">
+          <button
+            type="button"
+            onClick={submit}
+            disabled={!text.trim()}
+            className="lift bg-accent hover:bg-accent-strong text-white px-4 py-2 rounded-md text-sm disabled:opacity-40 disabled:hover:bg-accent"
+          >
             Import Theme
           </button>
         </div>

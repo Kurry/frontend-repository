@@ -74,7 +74,7 @@ export function Modal({
     return () => document.removeEventListener('keydown', onKey, true);
   }, [open, onClose]);
 
-  const panelInit = variant === 'drawer' ? { opacity: 0, x: 40 } : { opacity: 0, scale: 0.96, y: 8 };
+  const panelInit = variant === 'drawer' ? { opacity: 0, x: 64 } : { opacity: 0, scale: 0.94, y: 14 };
   const panelAnim = variant === 'drawer' ? { opacity: 1, x: 0 } : { opacity: 1, scale: 1, y: 0 };
 
   return (
@@ -86,7 +86,7 @@ export function Modal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
+          transition={{ duration: 0.24, ease: 'easeOut' }}
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) onClose();
           }}
@@ -108,7 +108,7 @@ export function Modal({
             initial={panelInit}
             animate={panelAnim}
             exit={panelInit}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ duration: 0.28, ease: 'easeOut' }}
           >
             {children}
           </motion.div>

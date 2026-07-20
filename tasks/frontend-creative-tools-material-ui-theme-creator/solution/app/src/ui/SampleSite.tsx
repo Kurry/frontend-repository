@@ -23,13 +23,16 @@ import type { Template } from '../store';
 
 // A themed sample site whose active template renders MUI components using the
 // live theme. It never leaves the page. `deviceWidth` lets narrow frames wrap.
+// Heading levels stay coherent inside the frame: one h2 per template, h3 for
+// subsections — MUI Typography `component` keeps visual variants decoupled
+// from document outline levels.
 export function SampleSite({ template, deviceWidth }: { template: Template; deviceWidth: number }) {
   const compact = deviceWidth < 480;
   return (
     <Box sx={{ minHeight: '100%', pb: 4 }}>
       <AppBar position="static" color="primary" enableColorOnDark>
         <Toolbar sx={{ gap: 1, minHeight: compact ? 52 : 64, px: compact ? 1 : 2 }}>
-          <Typography variant={compact ? 'subtitle1' : 'h6'} sx={{ flexGrow: 1, fontWeight: 600 }} noWrap>
+          <Typography variant={compact ? 'subtitle1' : 'h6'} component="span" sx={{ flexGrow: 1, fontWeight: 600 }} noWrap>
             Acme Studio
           </Typography>
           {!compact && (
@@ -37,7 +40,7 @@ export function SampleSite({ template, deviceWidth }: { template: Template; devi
               Sign In
             </Button>
           )}
-          <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main', flexShrink: 0 }}>A</Avatar>
+          <Avatar sx={{ width: compact ? 28 : 32, height: compact ? 28 : 32, bgcolor: 'secondary.main', flexShrink: 0 }}>A</Avatar>
         </Toolbar>
       </AppBar>
       <Box sx={{ p: compact ? 1.5 : 3 }}>
@@ -55,7 +58,7 @@ export function SampleSite({ template, deviceWidth }: { template: Template; devi
 function Instructions() {
   return (
     <Stack spacing={2}>
-      <Typography variant="h5" fontWeight={600}>
+      <Typography variant="h5" component="h2" fontWeight={600}>
         Live Theme Preview
       </Typography>
       <Typography color="text.secondary">
@@ -84,7 +87,7 @@ function SignUp() {
     <Card sx={{ maxWidth: 420, mx: 'auto' }}>
       <CardContent>
         <Stack spacing={2}>
-          <Typography variant="h5" fontWeight={600}>
+          <Typography variant="h5" component="h2" fontWeight={600}>
             Create Your Account
           </Typography>
           <TextField label="Full Name" size="small" fullWidth />
@@ -107,17 +110,17 @@ function Dashboard({ compact }: { compact: boolean }) {
   ];
   return (
     <Stack spacing={2}>
-      <Typography variant="h5" fontWeight={600}>
+      <Typography variant="h5" component="h2" fontWeight={600}>
         Overview
       </Typography>
       <Box sx={{ display: 'grid', gridTemplateColumns: compact ? '1fr' : 'repeat(3, 1fr)', gap: 1.5 }}>
         {stats.map((s) => (
           <Card key={s.label}>
             <CardContent>
-              <Typography variant="overline" color="text.secondary">
+              <Typography variant="overline" component="p" color="text.secondary">
                 {s.label}
               </Typography>
-              <Typography variant="h5" sx={{ color: s.color, fontWeight: 700 }}>
+              <Typography variant="h5" component="p" sx={{ color: s.color, fontWeight: 700 }}>
                 {s.value}
               </Typography>
             </CardContent>
@@ -125,28 +128,30 @@ function Dashboard({ compact }: { compact: boolean }) {
         ))}
       </Box>
       <Card>
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell>Order</TableCell>
-              <TableCell>Customer</TableCell>
-              <TableCell align="right">Total</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {[
-              ['#1042', 'Jordan Lee', '$120'],
-              ['#1043', 'Sam Rivera', '$54'],
-              ['#1044', 'Ari Chen', '$220']
-            ].map((r) => (
-              <TableRow key={r[0]}>
-                <TableCell>{r[0]}</TableCell>
-                <TableCell>{r[1]}</TableCell>
-                <TableCell align="right">{r[2]}</TableCell>
+        <Box sx={{ display: 'block', overflowX: 'auto' }}>
+          <Table size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>Order</TableCell>
+                <TableCell>Customer</TableCell>
+                <TableCell align="right">Total</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {[
+                ['#1042', 'Jordan Lee', '$120'],
+                ['#1043', 'Sam Rivera', '$54'],
+                ['#1044', 'Ari Chen', '$220']
+              ].map((r) => (
+                <TableRow key={r[0]}>
+                  <TableCell>{r[0]}</TableCell>
+                  <TableCell>{r[1]}</TableCell>
+                  <TableCell align="right">{r[2]}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Box>
       </Card>
     </Stack>
   );
@@ -155,10 +160,10 @@ function Dashboard({ compact }: { compact: boolean }) {
 function Blog() {
   return (
     <Stack spacing={2} sx={{ maxWidth: 640, mx: 'auto' }}>
-      <Typography variant="h4" fontWeight={700}>
+      <Typography variant="h4" component="h2" fontWeight={700}>
         Designing With Tokens
       </Typography>
-      <Typography variant="subtitle2" color="text.secondary">
+      <Typography variant="subtitle2" component="p" color="text.secondary">
         Published by the Acme Design Team
       </Typography>
       <Divider />
@@ -186,8 +191,8 @@ function Pricing({ compact }: { compact: boolean }) {
         <Card key={t.name}>
           <CardContent>
             <Stack spacing={1.5} alignItems="center">
-              <Typography variant="h6">{t.name}</Typography>
-              <Typography variant="h4" color="primary" fontWeight={700}>
+              <Typography variant="h6" component="h3">{t.name}</Typography>
+              <Typography variant="h4" component="p" color="primary" fontWeight={700}>
                 {t.price}
               </Typography>
               <Button variant={t.variant} color="primary" fullWidth>
@@ -206,16 +211,16 @@ function Checkout() {
     <Card sx={{ maxWidth: 460, mx: 'auto' }}>
       <CardContent>
         <Stack spacing={2}>
-          <Typography variant="h5" fontWeight={600}>
+          <Typography variant="h5" component="h2" fontWeight={600}>
             Checkout
           </Typography>
           <List dense>
-            <ListItem secondaryAction={<Typography>$29.00</Typography>}>
+            <ListItem secondaryAction={<Typography component="span">$29.00</Typography>}>
               <ListItemText primary="Team Plan" secondary="Monthly" />
             </ListItem>
             <Divider component="li" />
-            <ListItem secondaryAction={<Typography>$2.90</Typography>}>
-              <ListItemText primary="Tax" />
+            <ListItem secondaryAction={<Typography component="span">$2.90</Typography>}>
+              <ListItemText primary="Tax" secondary="Sales tax" />
             </ListItem>
           </List>
           <TextField label="Card Number" size="small" fullWidth />

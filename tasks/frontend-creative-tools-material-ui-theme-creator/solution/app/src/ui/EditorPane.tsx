@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { useStore } from '../store';
+import { optionsToSource } from '../domain';
 import { Icon, Modal } from './primitives';
 
 function ToolbarButton({
@@ -23,7 +24,7 @@ function ToolbarButton({
       disabled={disabled}
       aria-label={label}
       title={label}
-      className="lift flex items-center gap-1 px-2 py-1.5 rounded-md bg-shell-2 text-shell-text text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+      className="lift flex items-center gap-1 px-2 py-1.5 rounded-md bg-shell-2 hover:bg-shell-3 text-shell-text text-xs disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-shell-2"
     >
       <Icon name={icon} style={{ fontSize: 16 }} />
       {text && <span className="hidden md:inline">{text}</span>}
@@ -51,10 +52,33 @@ export function EditorPane() {
   const [wordWrap, setWordWrap] = useState<'on' | 'off'>('on');
   const [minimap, setMinimap] = useState(false);
 
+  const formatSource = () => {
+    const s = useStore.getState();
+    s.setSource(optionsToSource(s.options));
+    s.pushToast('Theme source formatted');
+  };
+
   return (
-    <section className="flex flex-col bg-shell-1 rounded-xl border border-shell-border overflow-hidden" aria-label="Theme source editor">
+    <section
+      className="flex flex-col bg-shell-1 rounded-xl border border-shell-border overflow-hidden"
+      aria-label="Theme source editor"
+      onKeyDown={(e) => {
+        // Keyboard undo/redo for theme history when focus is on the toolbar or
+        // timeline (inside the Monaco surface, the same shortcuts are bound to
+        // the same store commands via addCommand).
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+          e.preventDefault();
+          undo();
+        } else if (((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z' && e.shiftKey) || ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y')) {
+          e.preventDefault();
+          redo();
+        }
+      }}
+    >
       <div className="flex flex-wrap items-center gap-1.5 px-3 py-2 border-b border-shell-border">
-        <h3 className="text-sm font-medium text-shell-text mr-1">Theme Source</h3>
+        <h2 className="text-sm font-medium text-shell-text mr-1">Theme Source</h2>
         <ToolbarButton label="Editor Settings" icon="settings" onClick={() => setSettingsOpen(true)} />
         <ToolbarButton
           label="Copy Theme Code"
@@ -62,6 +86,7 @@ export function EditorPane() {
           text="Copy"
           onClick={() => copyText(source, 'Theme code')}
         />
+        <ToolbarButton label="Format Source" icon="format_align_left" text="Format" onClick={formatSource} />
         <ToolbarButton label="Undo" icon="undo" onClick={undo} disabled={!canUndo} />
         <ToolbarButton label="Redo" icon="redo" onClick={redo} disabled={!canRedo} />
         <ToolbarButton
@@ -97,16 +122,26 @@ export function EditorPane() {
         <Editor
           height="320px"
           defaultLanguage="typescript"
+          language="typescript"
           theme="vs-dark"
           value={source}
           onChange={(v) => setSource(v ?? '')}
+          onMount={(editor, monacoNs) => {
+            // Bind the studio's keyboard undo/redo + format shortcuts inside the
+            // editor surface to the shared theme history.
+            editor.addCommand(monacoNs.KeyMod.CtrlCmd | monacoNs.KeyCode.KeyZ, () => useStore.getState().undo());
+            editor.addCommand(monacoNs.KeyMod.CtrlCmd | monacoNs.KeyMod.Shift | monacoNs.KeyCode.KeyZ, () => useStore.getState().redo());
+            editor.addCommand(monacoNs.KeyMod.CtrlCmd | monacoNs.KeyCode.KeyY, () => useStore.getState().redo());
+            editor.addCommand(monacoNs.KeyMod.CtrlCmd | monacoNs.KeyMod.Shift | monacoNs.KeyCode.KeyF, () => formatSource());
+          }}
           options={{
             wordWrap,
             minimap: { enabled: minimap },
             fontSize: 13,
             scrollBeyondLastLine: false,
             automaticLayout: true,
-            tabSize: 2
+            tabSize: 2,
+            readOnly: false
           }}
         />
       </div>
@@ -135,7 +170,11 @@ export function EditorPane() {
             <input type="checkbox" checked={minimap} onChange={(e) => setMinimap(e.target.checked)} />
           </label>
           <div className="mt-4 flex justify-end">
-            <button type="button" className="lift bg-accent text-white px-4 py-2 rounded-md text-sm" onClick={() => setSettingsOpen(false)}>
+            <button
+              type="button"
+              className="lift bg-accent hover:bg-accent-strong text-white px-4 py-2 rounded-md text-sm"
+              onClick={() => setSettingsOpen(false)}
+            >
               Done
             </button>
           </div>
