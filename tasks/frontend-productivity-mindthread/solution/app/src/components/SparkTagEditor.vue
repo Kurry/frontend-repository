@@ -35,7 +35,7 @@
         v-model="draft"
         type="text"
         class="input-field max-w-44 px-3 py-1 text-[0.8rem]"
-        placeholder="New tag"
+        placeholder="Add Tag"
         autocomplete="off"
         :aria-invalid="tagError ? 'true' : undefined"
         :aria-describedby="tagError ? inputId + '-error' : undefined"

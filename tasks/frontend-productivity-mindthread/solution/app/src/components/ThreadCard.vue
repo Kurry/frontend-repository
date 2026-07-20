@@ -16,9 +16,7 @@
       </button>
       <StatusBadge :status="thread.status" />
     </div>
-    <p class="mt-2 meta-mono">
-      {{ sparkCountLabel }} · updated {{ relativeUpdated }}
-    </p>
+    <p class="mt-2 meta-mono">{{ sparkCountLabel }} · {{ relativeUpdated }}</p>
     <div class="mt-3 flex flex-wrap gap-2">
       <button
         type="button"
@@ -37,7 +35,7 @@
 import { computed } from 'vue'
 import { useSparkStore } from '../stores/sparkStore'
 import type { Thread } from '../stores/sparkStore'
-import { formatRelative, now } from '../utils/time'
+import { formatUpdatedRelative, now } from '../utils/time'
 import HighlightText from './HighlightText.vue'
 import StatusBadge from './StatusBadge.vue'
 
@@ -60,6 +58,6 @@ const sparkCountLabel = computed(() => {
 })
 
 const relativeUpdated = computed(() =>
-  formatRelative(store.threadLastActivity(props.thread.id), now.value),
+  formatUpdatedRelative(store.threadLastActivity(props.thread.id), now.value),
 )
 </script>

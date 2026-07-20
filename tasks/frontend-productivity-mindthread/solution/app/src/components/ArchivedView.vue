@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto max-w-3xl space-y-6">
     <header>
-      <h2 class="font-heading text-[1.35rem] font-semibold text-ink">Archived</h2>
+      <h1 class="font-heading text-[1.35rem] font-semibold text-ink">Archived</h1>
       <p class="mt-1 text-[0.9rem] text-inksoft">
         Threads you archive move here. Restore one with Unarchive.
       </p>
