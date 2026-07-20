@@ -71,7 +71,7 @@ function HistoryPanel() {
   }
   return <>
     <div className="panel-heading"><div><div className="eyebrow">Session timeline</div><h2>Query history</h2></div><span className="fine">{state.history.length}</span></div>
-    {selected > 0 && <div className="context-bar"><span>{selected} selected</span><Button hasIconOnly size="sm" kind="ghost" renderIcon={TrashCan} iconDescription={`Delete ${selected} selected`} onClick={confirmDelete} /><Button hasIconOnly size="sm" kind="ghost" renderIcon={Close} iconDescription="Clear selection" onClick={() => useAppStore.setState({ selectedHistory: [] })} /></div>}
+    {selected > 0 && <div className="context-bar"><span>{selected} selected</span><Button size="sm" kind="ghost" renderIcon={TrashCan} onClick={confirmDelete}>Delete selected</Button><Button size="sm" kind="ghost" renderIcon={Close} onClick={() => useAppStore.setState({ selectedHistory: [] })}>Clear selection</Button></div>}
     {!state.history.length ? <RailEmpty icon={Time} text="Executed queries appear here, newest first." /> : <div className="history-list">
       {state.history.map((item) => <div key={item.id} className="history-item" role="button" tabIndex={0} onClick={() => state.rerunCaptured(item)} onKeyDown={(event) => event.key === 'Enter' && state.rerunCaptured(item)}>
         <div className="history-line" onClick={(e) => e.stopPropagation()}><Checkbox id={`history-${item.id}`} hideLabel labelText={`Select ${item.raw || 'all documents'}`} checked={state.selectedHistory.includes(item.id)} onChange={() => state.toggleHistory(item.id)} /><div className="min-w-0 flex-1" onClick={() => state.rerunCaptured(item)}><div className="history-query">{item.raw || 'All documents'}</div><div className="fine">{formatTime(item.timestamp)} · {item.count} results</div></div></div>
@@ -123,7 +123,7 @@ function ComparePanel() {
 }
 
 function CompareCard({ item, overlap }) {
-  return <div className="compare-card"><span className={`marker ${overlap ? 'overlap' : 'unique'}`}>{overlap ? 'Overlap' : 'Unique'}</span><div>{item.title}</div><div className="fine">{item.score.toFixed(2)}</div></div>
+  return <div className="compare-card"><span className={`marker ${overlap ? 'overlap' : 'unique'}`}><Tag size="sm" type={overlap ? 'green' : 'magenta'}>{overlap ? 'Overlap' : 'Unique'}</Tag></span><div>{item.title}</div><div className="fine">{item.score.toFixed(2)}</div></div>
 }
 
 function IndexPanel() {
@@ -140,9 +140,9 @@ function IndexPanel() {
     <div className="stat-grid"><div className="stat"><span className="fine">Documents</span><strong>{stats.total}</strong></div><div className={`stat ${stats.stale ? 'warn' : ''}`}><span className="fine">Stale</span><strong>{stats.stale}</strong></div><div className="stat"><span className="fine">Distinct terms</span><strong>{stats.distinctTerms}</strong></div><div className="stat"><span className="fine">Last build</span><strong className="!text-xs !mt-2">{formatTime(state.indexBuiltAt)}</strong></div></div>
     <div className={`status-strip ${run?.status === 'running' ? '' : stats.stale ? 'warning' : 'success'}`}>{run?.status === 'running' ? <><span className="status-dot" /> Indexing {complete}/{run.steps.length}</> : run?.status === 'paused' ? <><Pause size={16} /> Paused at {run.current + 1}/{run.steps.length}</> : stats.stale ? <><WarningAlt size={16} /> {stats.stale} documents need indexing</> : <><CheckmarkFilled size={16} /> Index current · {stats.total} documents</>}</div>
     <div className="index-actions"><Button size="sm" renderIcon={Play} disabled={run?.status === 'running' || run?.status === 'paused'} onClick={state.startIndex}>Index now</Button>{run?.status === 'running' && <Button size="sm" kind="tertiary" renderIcon={Pause} onClick={state.pauseIndex}>Pause</Button>}{run?.status === 'paused' && <Button size="sm" kind="tertiary" renderIcon={Play} onClick={state.resumeIndex}>Resume</Button>}</div>
-    {run && <div className="run-box"><div className="run-rollup"><span><strong>{complete}/{run.steps.length}</strong>ingested</span><span><strong>{Math.round(((run.elapsed || Date.now() - run.startedAt) / 1000) * 10) / 10}s</strong>elapsed</span><span><strong>{failed}</strong>failed</span></div><div className="steps">{run.steps.map((step) => <div className={`step ${step.status}`} key={step.id}><span className="status-dot" /><span className="doc-row-title">{step.title}<br /><span className="fine">{step.status === 'retrying' ? `waiting ${step.retryIn}s · retry ${step.attempts + 1} of 3` : step.error || `${step.status}${step.attempts ? ` · attempt ${step.attempts}` : ''}`}</span></span>{step.status === 'failed' && <Button hasIconOnly size="sm" kind="ghost" renderIcon={Restart} iconDescription={`Retry ${step.title}`} onClick={state.retryStep} />}</div>)}</div><div className="p-2"><Select size="sm" id="timeline-filter" labelText="Timeline status" value={state.timelineFilter} onChange={(e) => useAppStore.setState({ timelineFilter: e.target.value })}><SelectItem value="all" text="All events" />{['running','retrying','failed','complete'].map((status) => <SelectItem key={status} value={status} text={status} />)}</Select></div><div className="timeline">{filteredEvents.slice().reverse().map((event) => <div key={event.id} className="event">{formatTime(event.time)} · {event.text}</div>)}</div></div>}
-    {selected > 0 && <div className="context-bar"><span>{selected} selected</span><Button hasIconOnly size="sm" kind="ghost" renderIcon={WarningAlt} iconDescription="Mark selected stale" onClick={() => state.markStale(state.selectedDocuments)} /><Button hasIconOnly size="sm" kind="ghost" renderIcon={TrashCan} iconDescription={`Delete ${selected} selected documents`} onClick={() => window.confirm(`Delete ${selected} selected document${selected === 1 ? '' : 's'}?`) && state.deleteDocuments(state.selectedDocuments)} /></div>}
-    <div className="document-list" aria-label="Indexed documents">{state.documents.map((doc) => <div className="doc-row" key={doc.id}><Checkbox id={`select-${doc.id}`} hideLabel labelText={`Select ${doc.title}`} checked={state.selectedDocuments.includes(doc.id)} onChange={() => state.toggleDocument(doc.id)} /><span className="doc-row-title" title={doc.title}>{doc.title}</span>{!state.indexedIds.includes(doc.id) && <span className="stale-dot" title="Stale" />}</div>)}</div>
+    {run && <div className="run-box"><div className="run-rollup"><span><strong>{complete}/{run.steps.length}</strong>ingested</span><span><strong>{Math.round(((run.elapsed || Date.now() - run.startedAt) / 1000) * 10) / 10}s</strong>elapsed</span><span><strong>{failed}</strong>failed</span></div><div className="steps">{run.steps.map((step) => <div className={`step ${step.status}`} key={step.id}><span className="status-dot" /><span className="doc-row-title">{step.title}<br /><span className="fine">{step.status === 'retrying' ? `waiting ${step.retryIn}s · retry ${step.attempts + 1} of 3` : step.error || `${step.status}${step.attempts ? ` · attempt ${step.attempts}` : ''}`}</span></span>{step.status === 'failed' && <Button size="sm" kind="ghost" renderIcon={Restart} onClick={state.retryStep}>Retry</Button>}</div>)}</div><div className="p-2"><Select size="sm" id="timeline-filter" labelText="Timeline status" value={state.timelineFilter} onChange={(e) => useAppStore.setState({ timelineFilter: e.target.value })}><SelectItem value="all" text="All events" />{['running','retrying','failed','complete'].map((status) => <SelectItem key={status} value={status} text={status} />)}</Select></div><div className="timeline">{filteredEvents.slice().reverse().map((event) => <div key={event.id} className="event">{formatTime(event.time)} · {event.text}</div>)}</div></div>}
+    {selected > 0 && <div className="context-bar"><span>{selected} selected</span><Button size="sm" kind="ghost" renderIcon={WarningAlt} onClick={() => state.markStale(state.selectedDocuments)}>Mark stale</Button><Button size="sm" kind="ghost" renderIcon={TrashCan} onClick={() => window.confirm(`Delete ${selected} selected document${selected === 1 ? '' : 's'}?`) && state.deleteDocuments(state.selectedDocuments)}>Delete selected</Button></div>}
+    {!state.documents.length ? <RailEmpty icon={DataBase} text="No documents in collection." /> : <div className="document-list" role="list" aria-label="Indexed documents">{state.documents.map((doc) => <div className="doc-row" role="listitem" key={doc.id}><Checkbox id={`select-${doc.id}`} hideLabel labelText={`Select ${doc.title}`} checked={state.selectedDocuments.includes(doc.id)} onChange={() => state.toggleDocument(doc.id)} /><span className="doc-row-title" title={doc.title}>{doc.title}</span>{!state.indexedIds.includes(doc.id) && <span className="stale-dot" title="Stale" />}</div>)}</div>}
   </>
 }
 
@@ -177,7 +177,7 @@ function ResultControls({ visible }) {
   return <div className="result-tools">
     {(state.filters.length > 0 || state.invalidFilters.length > 0) && <div className="chips-row" aria-label="Active search filters">{state.filters.map((filter, index) => <span className="filter-chip" key={`${filter.kind}-${filter.value}`}><Filter size={13} />{filter.kind}:{filter.value}<button aria-label={`Remove ${filter.kind} ${filter.value}`} onClick={() => state.removeFilter(index)}><Close size={12} /></button></span>)}{state.invalidFilters.map((filter) => <span className="unmatched" key={`${filter.kind}-${filter.value}`}><WarningAlt size={14} /> No matching {filter.kind}: “{filter.value}”</span>)}</div>}
     <div className="controls-line"><div className="slider-wrap"><label id="threshold-label">Minimum score</label><Slider ariaLabelInput="Minimum similarity score" min={0} max={1} step={0.05} value={state.threshold} hideTextInput onChange={({ value }) => state.setThreshold(value)} /><output className="slider-value">{state.threshold.toFixed(2)}</output></div><div className="control-actions"><Toggle id="group-topic" size="sm" labelText="Group by topic" labelA="Off" labelB="On" toggled={state.grouped} onToggle={state.setGrouped} /><Button size="sm" kind="ghost" renderIcon={Reset} disabled={!Object.keys(state.feedbackByQuery[`${state.activeQuery.toLowerCase()}|${state.filters.map((f) => `${f.kind}:${f.value.toLowerCase()}`).sort().join('|')}`] || {}).length} onClick={state.resetFeedback}>Reset feedback</Button><Button size="sm" kind="tertiary" renderIcon={Save} onClick={() => useAppStore.setState({ saveOpen: true })}>Save search</Button></div></div>
-    <div className="result-summary"><div><div className="eyebrow">Ranked retrieval</div><h2>{visible.mode === 'keyword' ? 'Keyword results' : 'Semantic results'}</h2>{visible.mode === 'keyword' && <span className="fallback-label">No semantic matches above threshold</span>}</div><div role="status" aria-live="polite"><strong>{visible.items.length}</strong> <span className="muted">matching results</span></div></div>
+    <div className="result-summary"><div><div className="eyebrow">Ranked retrieval</div><h2>{visible.mode === 'keyword' ? 'Keyword results (no semantic matches above threshold)' : 'Semantic results'}</h2>{visible.mode === 'keyword' && <span className="fallback-label">No semantic matches above threshold</span>}</div><div role="status" aria-live="polite"><strong>{visible.items.length}</strong> <span className="muted">matching results</span></div></div>
   </div>
 }
 
@@ -200,7 +200,7 @@ function ResultCard({ item, index }) {
   return <article className={`result-card ${state.selectedResult === index ? 'selected' : ''}`} style={{ '--accent-opacity': Math.max(.15, item.score), animationDelay: `${Math.min(index, 12) * 40}ms`, viewTransitionName: `result-${item.id}` }} data-result-id={item.id}>
     <div className="card-main" role="button" tabIndex={0} onClick={() => state.openDetail(item.id)} onKeyDown={(e) => e.key === 'Enter' && state.openDetail(item.id)} aria-label={`Open ${item.title}`}><div className="card-top"><div className="card-copy"><h3 className="card-title" title={item.title}>{item.title}</h3><div className="meta-row"><Tag size="sm" type="cool-gray">{item.type}</Tag>{item.tags.slice(0,3).map((tag) => <Tag className="topic-tag" size="sm" key={tag}>{tag}</Tag>)}{item.feedback !== 'none' && <span className="feedback-chip">Feedback: {item.feedback}</span>}</div></div><span className="score-badge" aria-label={`Similarity ${item.score.toFixed(2)}`}>{item.score.toFixed(2)}</span></div><p className="snippet"><HighlightedText text={item.snippet} term={item.highlight} /></p></div>
     <div className="card-actions"><button className={`why-button ${open ? 'open' : ''}`} aria-expanded={!!open} onClick={() => state.toggleDisclosure(item.id)}><ChevronDown size={15} /> Why this ranks</button><div className="feedback-actions"><button className={`icon-control ${item.feedback === 'up' ? 'active' : ''}`} aria-label={`Mark ${item.title} relevant`} onClick={() => state.setFeedback(item.id, item.feedback === 'up' ? 'none' : 'up')}><ThumbsUp size={16} /></button><button className={`icon-control ${item.feedback === 'down' ? 'active' : ''}`} aria-label={`Mark ${item.title} not relevant`} onClick={() => state.setFeedback(item.id, item.feedback === 'down' ? 'none' : 'down')}><ThumbsDown size={16} /></button></div></div>
-    {open && <div className="explanation"><div className="fine">Matched terms and weighted contribution</div>{item.contributions.length ? item.contributions.map((term) => <div className="term-row" key={term.term}><span>{term.term}</span><span className="term-track"><span className="term-fill" style={{ width: `${term.normalized * 100}%` }} /></span><span className="font-mono">{term.value.toFixed(2)}</span></div>) : <p className="fine">No direct term contribution.</p>}<div className="fine mt-3">Feedback adjustment: {item.adjustment > 0 ? '+' : ''}{item.adjustment.toFixed(2)}</div></div>}
+    {open && <div className="explanation"><div className="fine">Matched terms and weighted contribution</div>{item.contributions.length ? item.contributions.map((term) => <div className="term-row" key={term.term}><span>{term.term}</span><span className="term-track"><span className="term-fill" style={{ width: `${Math.max(2, term.normalized * 100)}%` }} /></span><span className="font-mono">{term.value.toFixed(2)}</span></div>) : <p className="fine">No direct term contribution.</p>}<div className="fine mt-3">Feedback adjustment: {item.adjustment > 0 ? '+' : ''}{item.adjustment.toFixed(2)}</div></div>}
   </article>
 }
 
@@ -209,11 +209,32 @@ function DetailPanel() {
   const doc = state.documents.find((item) => item.id === state.detailId)
   const related = useMemo(() => doc ? rankDocuments({ documents: state.documents.filter((item) => item.id !== doc.id), indexedIds: state.documents.filter((item) => item.id !== doc.id).map((item) => item.id), query: `${doc.title} ${doc.tags.join(' ')}`, filters: [], threshold: 0, feedback: {} }).items.slice(0,3) : [], [doc, state.documents])
   if (!doc) return null
-  return <aside className="detail-panel" aria-label="Document detail"><div className="detail-head"><div className="detail-topline"><span className="eyebrow !text-green-100">Document detail</span><button className="icon-control" onClick={state.closeDetail} aria-label="Close document detail"><Close /></button></div><div className="breadcrumbs">{state.breadcrumbs.map((id, index) => { const item = state.documents.find((d) => d.id === id); return <React.Fragment key={`${id}-${index}`}><button className="breadcrumb" onClick={() => state.goBreadcrumb(index)}>{item?.title.slice(0,22)}</button>{index < state.breadcrumbs.length - 1 && <ChevronRight size={12} />}</React.Fragment> })}</div><h2>{doc.title}</h2></div><div className="detail-body"><div className="meta-row"><Tag type="green">{doc.type}</Tag>{doc.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}</div><p className="full-body">{doc.body}</p><section className="related-list"><div className="eyebrow">Continue exploring</div><h3>Related documents</h3>{related.map((item) => <button className="related-row" key={item.id} onClick={() => state.openDetail(item.id)}><span><strong>{item.title}</strong><br/><span className="fine">{item.type} · {item.tags.slice(0,2).join(', ')}</span></span><span className="related-score">{item.score.toFixed(2)}</span></button>)}</section></div></aside>
+  return <aside className="detail-panel" aria-label="Document detail"><div className="detail-head"><div className="detail-topline"><span className="eyebrow !text-green-100">Document detail</span><button className="icon-control" onClick={state.closeDetail} aria-label="Close document detail"><Close /></button></div><div className="breadcrumbs">{state.breadcrumbs.map((id, index) => { const item = state.documents.find((d) => d.id === id); return <React.Fragment key={`${id}-${index}`}><button className="breadcrumb" onClick={() => state.goBreadcrumb(index)}>{item?.title.slice(0,22)}</button>{index < state.breadcrumbs.length - 1 && <ChevronRight size={12} />}</React.Fragment> })}</div><h2>{doc.title}</h2></div><div className="detail-body"><div className="meta-row"><Tag type="green">{doc.type}</Tag>{doc.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}<Button hasIconOnly size="sm" kind="ghost" renderIcon={TrashCan} iconDescription="Delete document" onClick={() => { if (window.confirm('Delete document?')) { state.deleteDocuments([doc.id]); state.closeDetail() } }} className="ml-auto" /></div><p className="full-body">{doc.body}</p><section className="related-list"><div className="eyebrow">Continue exploring</div><h3>Related documents</h3>{related.map((item) => <button className="related-row" key={item.id} onClick={() => state.openDetail(item.id)}><span><strong>{item.title}</strong><br/><span className="fine">{item.type} · {item.tags.slice(0,2).join(', ')}</span></span><span className="related-score">{item.score.toFixed(2)}</span></button>)}</section></div></aside>
 }
 
+
+function useFocusRestorer(isOpen, blocked = false) {
+  const previous = useRef(null)
+  const wasOpen = useRef(false)
+  const blockedRef = useRef(blocked)
+  blockedRef.current = blocked
+  // Captured during render (before commit/effects) so it runs ahead of Carbon's
+  // Modal child effect, which moves focus into the dialog once it mounts open.
+  // Capturing this in a useEffect here would fire after that child effect and
+  // record a node inside the modal instead of the control that opened it.
+  if (isOpen && !wasOpen.current) previous.current = document.activeElement
+  wasOpen.current = isOpen
+  useEffect(() => {
+    // Only the isOpen transition should trigger a restore attempt - `blocked` is
+    // read fresh (via ref, not as a dependency) at that moment. `blocked` cycling
+    // back to false later (e.g. Import closing) must NOT re-fire this effect and
+    // replay a stale restore against whatever opened Export in an earlier session.
+    if (!isOpen && previous.current && !blockedRef.current) { const el = previous.current; setTimeout(() => el.focus(), 10) }
+  }, [isOpen])
+}
 function SaveSearchModal() {
   const state = useAppStore()
+  useFocusRestorer(state.saveOpen)
   const schema = SavedSearchSchema.superRefine((value, ctx) => { if (state.savedSearches.some((item) => item.name.toLowerCase() === value.name.toLowerCase())) ctx.addIssue({ code:'custom', path:['name'], message:'name must be unique' }) })
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(schema), mode:'onChange', defaultValues:{ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold } })
   useEffect(() => { if (state.saveOpen) reset({ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold }) }, [state.saveOpen, state.activeQuery, state.filters, state.threshold, reset])
@@ -222,6 +243,7 @@ function SaveSearchModal() {
 
 function AddDocumentModal() {
   const state = useAppStore()
+  useFocusRestorer(state.addOpen)
   const { register, control, handleSubmit, reset, formState:{ errors, isValid } } = useForm({ resolver:zodResolver(DocumentSchema), mode:'onChange', defaultValues:{ title:'', body:'', type:'guide', tags:[] } })
   useEffect(() => { if (state.addOpen) reset({ title:'', body:'', type:'guide', tags:[] }) }, [state.addOpen, reset])
   return <Modal open={state.addOpen} modalHeading="Add document" primaryButtonText="Add document" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => useAppStore.setState({ addOpen:false })} onRequestSubmit={handleSubmit(state.addDocument)}><div className="modal-copy"><TextInput id="doc-title" labelText="Title" {...register('title')} invalid={!!errors.title} invalidText={errors.title?.message} /><TextArea id="doc-body" labelText="Body" rows={6} {...register('body')} invalid={!!errors.body} invalidText={errors.body?.message} /><div className="form-row"><Select id="doc-type" labelText="Type" {...register('type')} invalid={!!errors.type} invalidText={errors.type?.message}>{['guide','reference','prompt','checklist','paper','note'].map((type) => <SelectItem value={type} text={type} key={type} />)}</Select><Controller control={control} name="tags" render={({ field }) => <TextInput id="doc-tags" labelText="Tags, comma separated" value={field.value.join(', ')} onChange={(e) => field.onChange(e.target.value.split(',').map((tag) => tag.trim()).filter(Boolean))} onBlur={field.onBlur} invalid={!!errors.tags} invalidText={errors.tags?.message || errors.tags?.root?.message} />} /></div></div></Modal>
@@ -230,6 +252,7 @@ function AddDocumentModal() {
 const ImportFormSchema = z.object({ packageText: z.string().trim().min(1, 'package is required') })
 function ImportModal() {
   const state = useAppStore()
+  useFocusRestorer(state.importOpen)
   const [serverError, setServerError] = React.useState('')
   const { register, handleSubmit, setValue, reset, formState:{ errors, isValid } } = useForm({ resolver:zodResolver(ImportFormSchema), mode:'onChange', defaultValues:{ packageText:'' } })
   useEffect(() => { if (state.importOpen) { reset({ packageText:'' }); setServerError('') } }, [state.importOpen, reset])
@@ -240,6 +263,7 @@ function ImportModal() {
 
 function ExportModal() {
   const state = useAppStore()
+  useFocusRestorer(state.exportOpen, state.importOpen)
   const value = state.exportTab === 'report' ? state.getReport() : state.getPackage()
   const text = stringifyArtifact(value)
   const copy = async () => { await navigator.clipboard.writeText(text); state.notify(`${state.exportTab === 'report' ? 'Search report' : 'Library package'} copied`) }
@@ -273,7 +297,18 @@ function CommandPalette() {
     ]
     return [...commands,...saved,...docs].filter((entry) => fuzzyMatch(entry.label)).slice(0,40)
   }, [state.documents, state.savedSearches, needle])
-  useEffect(() => { const previous = document.activeElement; input.current?.focus(); return () => previous?.focus?.() }, [])
+  useEffect(() => {
+    const previous = document.activeElement
+    setTimeout(() => input.current?.focus(), 10)
+    return () => setTimeout(() => {
+      // Palette commands (Add document, Export search report) can close the
+      // palette and open a modal in the same update. Re-check live state here
+      // rather than closing over it, so a modal that opened in the meantime
+      // keeps focus instead of having it yanked back to the pre-palette element.
+      const s = useAppStore.getState()
+      if (!s.exportOpen && !s.saveOpen && !s.addOpen && !s.importOpen) previous?.focus?.()
+    }, 10)
+  }, [])
   const key = (event) => { if (event.key === 'Escape') state.setPalette(false); if (event.key === 'ArrowDown') { event.preventDefault(); useAppStore.setState({ paletteIndex:Math.min(state.paletteIndex+1,entries.length-1) }) } if(event.key==='ArrowUp'){event.preventDefault();useAppStore.setState({paletteIndex:Math.max(state.paletteIndex-1,0)})} if(event.key==='Enter'){event.preventDefault();entries[state.paletteIndex]?.action()} if(event.key==='Tab'){ const focusables=event.currentTarget.querySelectorAll('input,button'); if(!focusables.length)return; const first=focusables[0],last=focusables[focusables.length-1]; if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()} } }
   return <div className="palette-backdrop" role="presentation" onMouseDown={(e) => e.target===e.currentTarget && state.setPalette(false)}><div className="palette" role="dialog" aria-modal="true" aria-label="Command palette" onKeyDown={key}><input ref={input} className="palette-input" aria-label="Search commands, documents, and saved searches" value={state.paletteQuery} onChange={(e) => useAppStore.setState({ paletteQuery:e.target.value, paletteIndex:0 })} /><div className="palette-list" role="listbox">{entries.map((entry,index) => { const Icon=entry.icon; return <button key={entry.id} role="option" aria-selected={index===state.paletteIndex} className={`palette-item ${index===state.paletteIndex?'active':''}`} onMouseEnter={() => useAppStore.setState({paletteIndex:index})} onClick={entry.action}><Icon size={17}/><span>{entry.label}</span><span className="palette-kind">{entry.kind}</span></button>})}</div><div className="palette-footer"><span>↑↓ Navigate</span><span>↵ Open</span><span>Esc Close</span></div></div></div>
 }
@@ -300,14 +335,14 @@ function registerWebMCP() {
   window.__atlasWebMCPRegistered = true
   const invoke = async (name,args={}) => {
     const state=useAppStore.getState()
-    if(name==='browse_search'){state.runQuery(args.query||'');return {resultCount:state.getVisible().items.length}}
+    if(name==='browse_search'){state.runQuery(args.query||'');return {resultCount:useAppStore.getState().getVisible().items.length}}
     if(name==='browse_open'){const views={history:'history','saved-searches':'saved',compare:'compare','index-panel':'index'};if(args.destination==='results'){state.closeDetail()}else if(args.destination==='document-detail'&&args.id)state.openDetail(args.id);else if(args.destination==='export-report')state.openExport('report');else if(views[args.destination])state.setRailView(views[args.destination]);return {destination:args.destination}}
     if(name==='browse_apply_filter'){
       if(args.kind==='similarity-threshold'){const value=Number(args.value);if(value<0||value>1||!Number.isInteger(value*20))throw new Error('similarity-threshold must be 0.0-1.0 in 0.05 increments');state.setThreshold(value)}
       else if(args.kind==='group-by-topic')state.setGrouped(!!args.value)
       else if(args.kind==='timeline-status')useAppStore.setState({timelineFilter:args.value})
       else if(['tag','type','before'].includes(args.kind))state.runQuery(`${state.activeQuery} ${state.filters.map((f)=>`${f.kind}:${f.value}`).join(' ')} ${args.kind}:${args.value}`)
-      return {resultCount:state.getVisible().items.length}
+      return {resultCount:useAppStore.getState().getVisible().items.length}
     }
     if(name==='browse_clear_filter'){
       if(args.kind==='similarity-threshold')state.setThreshold(0)
@@ -356,5 +391,5 @@ export default function App() {
   const state = useAppStore()
   useKeyboardNavigation()
   useEffect(registerWebMCP, [])
-  return <div className="app-shell"><Header /><div className={`workspace ${state.detailId ? 'has-detail' : ''}`}><Rail /><SearchWorkspace />{state.detailId && <DetailPanel />}</div><SaveSearchModal /><AddDocumentModal /><ImportModal /><ExportModal />{state.paletteOpen && <CommandPalette />}{state.toast && <div className="toast-wrap"><ToastNotification kind={state.toast.kind} title={state.toast.message} timeout={0} onCloseButtonClick={() => useAppStore.setState({toast:null})} /></div>}<div className="sr-only" aria-live="polite">{state.liveMessage}</div></div>
+  return <div className="app-shell"><Header /><div className={`workspace ${state.detailId ? 'has-detail' : ''}`}><Rail /><SearchWorkspace />{state.detailId ? <DetailPanel /> : <div />}</div><SaveSearchModal /><AddDocumentModal /><ImportModal /><ExportModal />{state.paletteOpen && <CommandPalette />}{state.toast && <div className="toast-wrap"><ToastNotification kind={state.toast.kind} title={state.toast.message} timeout={0} onCloseButtonClick={() => useAppStore.setState({toast:null})} /></div>}<div className="sr-only" aria-live="polite">{state.liveMessage}</div></div>
 }

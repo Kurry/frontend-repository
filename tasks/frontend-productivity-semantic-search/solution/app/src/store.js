@@ -166,6 +166,7 @@ export const useAppStore = create((set, get) => ({
     const filters = state.filters.filter((_, i) => i !== index)
     const raw = `${state.activeQuery} ${filters.map((f) => `${f.kind}:${f.value}`).join(' ')}`.trim()
     get().runQuery(raw, { parsed: { query: state.activeQuery, filters, invalid: [] }, threshold: state.threshold, record: false })
+    set({ liveMessage: `${get().getVisible().items.length} results` })
   },
   clearNarrowing: () => {
     const state = get()
@@ -187,10 +188,10 @@ export const useAppStore = create((set, get) => ({
   toggleDisclosure: (id) => set((state) => ({ disclosures: { ...state.disclosures, [id]: !state.disclosures[id] } })),
   setGrouped: (grouped) => set({ grouped }),
   toggleGroup: (name) => set((state) => ({ collapsedGroups: { ...state.collapsedGroups, [name]: !state.collapsedGroups[name] } })),
-  openDetail: (id, push = true) => set((state) => ({ detailId: id, breadcrumbs: push ? [...state.breadcrumbs, id] : state.breadcrumbs, railOpen: false })),
+  openDetail: (id, push = true) => set((state) => ({ detailId: id, breadcrumbs: push && state.detailId && state.detailId !== id ? [...state.breadcrumbs, state.detailId] : push && !state.detailId ? [] : state.breadcrumbs, railOpen: false })),
   closeDetail: () => set({ detailId: null, breadcrumbs: [] }),
-  goBreadcrumb: (index) => set((state) => ({ detailId: state.breadcrumbs[index], breadcrumbs: state.breadcrumbs.slice(0, index + 1) })),
-  setRailView: (railView) => set({ railView, railOpen: false }),
+  goBreadcrumb: (index) => set((state) => ({ detailId: state.breadcrumbs[index], breadcrumbs: state.breadcrumbs.slice(0, index) })),
+  setRailView: (railView) => set({ railView, railOpen: true }),
   saveSearch: (payload) => {
     get().pushUndo('Save search')
     set((state) => ({ savedSearches: [...state.savedSearches, payload], saveOpen: false, exportGeneratedAt: now() }))
