@@ -9,11 +9,13 @@ import {
 	store,
 	addSample,
 	selectFile,
+	toggleSelection,
 	setTarget,
 	removeFile,
 	convertAll,
 	cancelConversion,
 	download,
+	compileSession
 } from "./store.svelte.js";
 import { TARGET_FORMATS } from "./formats.js";
 
@@ -64,20 +66,50 @@ const TOOLS = [
 	{
 		name: "artifact_export",
 		description:
-			"Download the converted result of a queued file by its zero-based index. The file must already be converted.",
+			"Download the converted result of a queued file by index, or export session-json or conversion-report.",
 		parameters: {
 			type: "object",
-			properties: { index: { type: "number", minimum: 0 } },
-			required: ["index"],
+			properties: {
+				index: { type: "number", minimum: 0 },
+				format: { type: "string", enum: ["png", "jpeg", "jpg", "webp", "session-json", "conversion-report"] }
+			},
 			additionalProperties: false,
 		},
-		handler: ({ index }) => {
-			const f = fileByIndex(index);
-			if (!f) return { ok: false, error: "no file at index" };
-			if (f.status !== "done") return { ok: false, error: "file not converted yet" };
-			const ok = download(f.id);
-			return { ok, exported: ok ? f.resultName : null, export_formats: TARGET_FORMATS.map((t) => t.slice(1)) };
+		handler: ({ index, format }) => {
+			if (format === "session-json" || format === "conversion-report") {
+				return { ok: true, format, preview: compileSession() };
+			}
+
+			if (index !== undefined) {
+				const f = fileByIndex(index);
+				if (!f) return { ok: false, error: "no file at index" };
+				if (f.status !== "done") return { ok: false, error: "file not converted yet" };
+				const ok = download(f.id);
+				return { ok, exported: ok ? f.resultName : null, export_formats: ["png", "jpeg", "jpg", "webp", "session-json", "conversion-report"] };
+			}
+
+			return { ok: false, error: "index required for file export" };
 		},
+	},
+	{
+		name: "artifact_copy",
+		description: "Copy session JSON to clipboard.",
+		parameters: {
+			type: "object",
+			properties: { format: { type: "string", enum: ["session-json"] } },
+			required: ["format"],
+			additionalProperties: false,
+		},
+		handler: ({ format }) => {
+			if (format === "session-json") {
+				const doc = compileSession();
+				if (navigator.clipboard) {
+					navigator.clipboard.writeText(JSON.stringify(doc, null, 2));
+				}
+				return { ok: true, copied: true };
+			}
+			return { ok: false };
+		}
 	},
 	{
 		name: "entity_create",
@@ -109,6 +141,22 @@ const TOOLS = [
 			if (!f) return { ok: false, error: "no file at index" };
 			selectFile(f.id);
 			return { ok: true, selected: f.name };
+		},
+	},
+	{
+		name: "entity_toggle",
+		description: "Toggle selection of a queued file entity by its zero-based index for batch operations.",
+		parameters: {
+			type: "object",
+			properties: { index: { type: "number", minimum: 0 } },
+			required: ["index"],
+			additionalProperties: false,
+		},
+		handler: ({ index }) => {
+			const f = fileByIndex(index);
+			if (!f) return { ok: false, error: "no file at index" };
+			toggleSelection(f.id);
+			return { ok: true, toggled: f.name, selected: store.selection.has(f.id) };
 		},
 	},
 	{

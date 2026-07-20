@@ -1,8 +1,9 @@
-import { defineConfig } from "vite";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-	plugins: [svelte()],
+	plugins: [tailwindcss(), sveltekit()],
 	server: { port: 3000, host: true },
 	preview: { port: 3000, host: true, strictPort: true },
 });
