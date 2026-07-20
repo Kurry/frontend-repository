@@ -347,8 +347,6 @@ kbd { border: 1px solid #cdd4df; border-bottom-width: 2px; border-radius: 4px; b
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
-  .stream-cursor { animation: none; }
+  *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+  .stream-cursor { animation: none !important; opacity: 1 !important; }
 }
-
-.response-main { position: relative; }
