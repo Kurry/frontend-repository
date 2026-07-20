@@ -35,17 +35,17 @@ function responseVariants(state) {
   return [
     {
       label: 'Balanced',
-      response: `Here is a focused response based on your prompt:\n\n${subject}\n\n### Recommended approach\n1. Clarify the desired outcome and audience.\n2. Structure the answer around the strongest evidence.\n3. End with a concrete next action.\n\n\`\`\`javascript\nconst nextStep = "Turn the recommendation into a measurable experiment";\nconsole.log(nextStep);\n\`\`\``,
-      reasoning: 'I identified the central request, preserved the supplied context, and organized the response into an actionable progression.',
+      response: `Here is a focused response based on your prompt:\n\n${subject}\n\n### Recommended approach\n1. Clarify the desired outcome and the audience that will act on it.\n2. Structure the answer around the strongest available evidence, and say what is missing.\n3. End with a concrete next action that has an owner and a deadline.\n\n### Why this works\nA balanced response keeps the reader oriented: the summary states the claim, the middle section defends it, and the close converts it into a decision. Each paragraph earns its place by changing what the reader would do next.\n\n### Guardrails\n- Keep every claim traceable to a source or an explicit assumption.\n- Prefer one strong argument over three weak ones.\n- Name the counter-argument before the reader finds it.\n\n\`\`\`javascript\nconst nextStep = "Turn the recommendation into a measurable experiment";\nconsole.log(nextStep);\n\`\`\`\n\n### Follow-up\nIf the decision slips, revisit the assumptions in the second section first — that is where stale context hides. A short re-check of the audience, the success measure, and the evidence base usually restores confidence without a full rewrite.`,
+      reasoning: 'I identified the central request, preserved the supplied context, and organized the response into an actionable progression with explicit guardrails.',
     },
     {
       label: 'Concise',
-      response: `A concise take:\n\n${subject}\n\nFocus on one clear audience, one defensible insight, and one measurable next step. Remove details that do not change the decision.`,
+      response: `A concise take:\n\n${subject}\n\nFocus on one clear audience, one defensible insight, and one measurable next step. Remove details that do not change the decision.\n\n### The short version\nLead with the recommendation. Support it with the single strongest piece of evidence. Close with the next action and its owner.\n\n### What to cut\nAnything a reader could remove without changing their decision goes. Background, caveats, and secondary findings can move to an appendix or a follow-up note.\n\n### What to keep\nThe claim, the evidence that would survive a skeptical review, the cost of being wrong, and the next step. Everything else is noise.\n\n### Delivery note\nSend the short version first. Offer the detailed analysis as an attachment so the reader can verify without wading through it on the first pass.`,
       reasoning: 'I optimized for scanability by retaining the core request and reducing the answer to its decision-critical elements.',
     },
     {
       label: 'Detailed',
-      response: `A more detailed response to your prompt:\n\n${subject}\n\n### Context\nStart by confirming constraints and the success measure.\n\n### Development\nBuild from evidence, make assumptions explicit, and address the most likely objection.\n\n### Delivery\nUse a short summary, supporting detail, and an owner with a deadline for the next action.`,
+      response: `A more detailed response to your prompt:\n\n${subject}\n\n### Context\nStart by confirming the constraints and the success measure. A response that answers the wrong question precisely is still wrong, so restate the request in one sentence and flag any ambiguity before proceeding.\n\n### Development\nBuild from evidence, make assumptions explicit, and address the most likely objection. Structure the argument so each section answers one question: what do we know, what do we assume, and what follows from both.\n\n1. Evidence — the observed facts, with sources.\n2. Assumptions — the unstated premises that connect facts to conclusions.\n3. Inference — the conclusions that survive if the assumptions hold.\n4. Risk — what breaks first if an assumption fails.\n\n### Delivery\nUse a short summary up front, supporting detail in the body, and an owner with a deadline for the next action. The summary should stand alone: a reader who only reads the first paragraph should still get the decision and its rationale.\n\n### Appendix\nKeep raw data, full citations, and worked examples here so the main argument stays readable while remaining fully verifiable on demand.`,
       reasoning: 'I expanded the response into context, development, and delivery stages so each recommendation has a clear rationale and execution path.',
     },
   ]
@@ -168,9 +168,9 @@ export const useWorkbench = create((set, get) => ({
       reasoningDuration: null,
       request: makeRequest(state),
       steps: [
-        { id: 'prepare', name: 'Prepare context', status: 'running', output: 'Validating prompt, bindings, and persona.' },
-        { id: 'draft', name: 'Generate draft', status: 'pending', output: '' },
-        { id: 'finalize', name: 'Finalize response', status: 'pending', output: '' },
+        { id: 'prepare', name: 'Prepare Context', status: 'running', output: 'Validating prompt, bindings, and persona.' },
+        { id: 'draft', name: 'Generate Draft', status: 'pending', output: '' },
+        { id: 'finalize', name: 'Finalize Response', status: 'pending', output: '' },
       ],
     }
     set({ runs: [run, ...state.runs], activeRunId: id, streamingRunId: id, followScroll: true, liveMessage: `Streaming started with ${model.name}.` })
@@ -193,7 +193,7 @@ export const useWorkbench = create((set, get) => ({
     const run = get().runs.find((entry) => entry.id === id)
     if (!run || run.status !== 'streaming') return false
     const target = run.variants[0].response
-    const next = target.slice(run.accumulatedText.length, run.accumulatedText.length + 12)
+    const next = target.slice(run.accumulatedText.length, run.accumulatedText.length + 22)
     if (!next) { get().completeRun(id); return false }
     get().appendRunText(id, next, (run.accumulatedText.length + next.length) / target.length)
     return true
@@ -242,7 +242,8 @@ export const useWorkbench = create((set, get) => ({
   addToast: (message, kind = 'success') => {
     const id = toastId()
     set((state) => ({ toasts: [...state.toasts, { id, message, kind }], liveMessage: message }))
-    window.setTimeout(() => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })), 3500)
+    window.setTimeout(() => set((state) => ({ toasts: state.toasts.map((toast) => toast.id === id ? { ...toast, leaving: true } : toast) })), 3300)
+    window.setTimeout(() => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })), 3650)
   },
   removeToast: (id) => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })),
 }))
