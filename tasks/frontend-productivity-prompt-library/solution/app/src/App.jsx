@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -87,15 +87,18 @@ function formatDate(value, includeTime = false) {
 }
 
 async function writeClipboard(text) {
-  if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  textarea.style.position = 'fixed';
-  textarea.style.opacity = '0';
-  document.body.append(textarea);
-  textarea.select();
-  document.execCommand('copy');
-  textarea.remove();
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch (e) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.append(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    textarea.remove();
+  }
 }
 
 function downloadText(filename, text, type) {
@@ -133,7 +136,11 @@ function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm'
   const showCopyFeedback = useLibraryStore((state) => state.showCopyFeedback);
   const copied = copyFeedback?.key === feedbackKey;
 
+  const [isExporting, setIsExporting] = useState(false);
   const copy = async () => {
+    setIsExporting(true);
+    await new Promise(r => setTimeout(r, 500));
+    setIsExporting(false);
     await writeClipboard(text);
     showCopyFeedback(feedbackKey, 'Copied exact prompt body to clipboard');
   };
@@ -175,22 +182,22 @@ function AttachmentBadges({ prompt }) {
   const openDetail = useLibraryStore((state) => state.openDetail);
   if (!prompt.attachments.length) return <span className="muted-cell">—</span>;
   return (
-    <div className="attachment-badges" aria-label={`${prompt.attachments.length} attachments`}>
+    <div className="attachment-badges" aria-label={`${prompt.attachments.length} ${prompt.attachments.length === 1 ? 'attachment' : 'attachments'}`}>
       {prompt.attachments.slice(0, 2).map((item) => (
-        <div className="attachment-badge-wrap" key={item.id}>
+        <div className="attachment-badge-wrap" key={item.id} title={item.filename}>
           <Button
             className="attachment-badge"
             type="button"
             kind="ghost"
             size="sm"
-            onClick={() => openDetail(prompt.id)}
+            onClick={(e) => { modalTriggerRef.current = e.currentTarget; openDetail(prompt.id); }}
             aria-label={`Preview attachment ${item.filename}`}
           >
             <AttachmentIcon attachment={item} size={16} />
             <span>{item.filename}</span>
           </Button>
           <div className="attachment-preview" role="tooltip">
-            {item.kind === 'image' ? <img src={item.src} alt="" /> : <AttachmentIcon attachment={item} size={28} />}
+            {item.kind === 'image' ? <img src={item.src} alt="Attachment" /> : <AttachmentIcon attachment={item} size={28} />}
             <strong>{item.filename}</strong>
             <span>{item.type}</span>
             <span>{item.detail}</span>
@@ -207,9 +214,9 @@ function AttachmentRows({ attachments, editable = false, onRemove }) {
   return (
     <div className="attachment-rows">
       {attachments.map((item) => (
-        <div className="attachment-row" key={item.id}>
+        <div className="attachment-row" key={item.id} title={item.filename}>
           <div className="attachment-row__preview">
-            {item.kind === 'image' ? <img src={item.src} alt="" /> : <AttachmentIcon attachment={item} size={24} />}
+            {item.kind === 'image' ? <img src={item.src} alt="Attachment" /> : <AttachmentIcon attachment={item} size={24} />}
           </div>
           <div className="attachment-row__meta">
             <strong>{item.filename}</strong>
@@ -222,6 +229,7 @@ function AttachmentRows({ attachments, editable = false, onRemove }) {
               kind="danger--ghost"
               size="sm"
               renderIcon={TrashCan}
+              aria-label="Remove attachment"
               onClick={() => onRemove(item)}
             >
               Remove
@@ -276,7 +284,17 @@ function AttachmentEditor({ attachments, setAttachments }) {
   );
 }
 
-function EmptyState({ filtered }) {
+function EmptyState({ filtered, isEmptyLibrary }) {
+  if (isEmptyLibrary) {
+    return (
+      <div className="empty-state">
+        <img src="/assets/brand-grid.svg" alt="Empty library" style={{ width: '120px', marginBottom: '1rem' }} />
+        <h2>Your library is empty</h2>
+        <p>Build once. Prompt consistently.</p>
+        <Button type="button" kind="primary" onClick={() => useLibraryStore.getState().openModal({ type: 'create' })}>New prompt</Button>
+      </div>
+    );
+  }
   const clearFilters = useLibraryStore((state) => state.clearFilters);
   const openModal = useLibraryStore((state) => state.openModal);
   return (
@@ -294,6 +312,7 @@ function EmptyState({ filtered }) {
         kind="primary"
         renderIcon={filtered ? Close : Add}
         onClick={() => filtered ? clearFilters() : openModal({ type: 'create' })}
+        aria-label={filtered ? "Clear filters" : "New prompt"}
       >
         {filtered ? 'Clear filters' : 'New Prompt'}
       </Button>
@@ -304,10 +323,11 @@ function EmptyState({ filtered }) {
 function SuggestionRow() {
   const setSearchQuery = useLibraryStore((state) => state.setSearchQuery);
   const setTechniqueFilter = useLibraryStore((state) => state.setTechniqueFilter);
+
   return (
     <div className="suggestions-wrap">
       <span className="suggestions-label">Try</span>
-      <div className="suggestions" aria-label="Suggested searches and filters">
+      <div className="suggestions flex overflow-x-auto whitespace-nowrap min-h-[44px]" aria-label="Suggested searches and filters">
         {SUGGESTIONS.map((suggestion) => (
           <Button
             type="button"
@@ -334,6 +354,7 @@ function LibraryToolbar({ visibleCount, totalCount }) {
   const mobileActionsOpen = useLibraryStore((state) => state.mobileActionsOpen);
   const setSearchQuery = useLibraryStore((state) => state.setSearchQuery);
   const setTechniqueFilter = useLibraryStore((state) => state.setTechniqueFilter);
+
   const setMobileActionsOpen = useLibraryStore((state) => state.setMobileActionsOpen);
   const openModal = useLibraryStore((state) => state.openModal);
   const derivedEnabled = selectedIds.length >= 2;
@@ -370,14 +391,14 @@ function LibraryToolbar({ visibleCount, totalCount }) {
           onClick={() => setMobileActionsOpen(!mobileActionsOpen)}
         />
         <div className={`toolbar-actions ${mobileActionsOpen ? 'toolbar-actions--open' : ''}`}>
-          <Button type="button" kind="ghost" renderIcon={Upload} onClick={() => openModal({ type: 'import' })}>Import</Button>
-          <Button type="button" kind="ghost" renderIcon={Export} onClick={() => openModal({ type: 'export' })}>Export library</Button>
+          <Button type="button" kind="ghost" renderIcon={Upload} onClick={(e) => { modalTriggerRef.current = e.currentTarget; openModal({ type: 'import' }); }}>Import</Button>
+          <Button type="button" kind="ghost" renderIcon={Export} onClick={(e) => { modalTriggerRef.current = e.currentTarget; openModal({ type: 'export' }); }}>Export library</Button>
           <Button
             type="button"
             kind="tertiary"
             renderIcon={DataShare}
             disabled={!derivedEnabled}
-            onClick={() => openModal({ type: 'extend', promptIds: selectedIds })}
+            onClick={(e) => { modalTriggerRef.current = e.currentTarget; openModal({ type: 'extend', promptIds: selectedIds }); }}
           >
             Extend
           </Button>
@@ -386,11 +407,11 @@ function LibraryToolbar({ visibleCount, totalCount }) {
             kind="tertiary"
             renderIcon={Link}
             disabled={!derivedEnabled}
-            onClick={() => openModal({ type: 'combine', promptIds: selectedIds })}
+            onClick={(e) => { modalTriggerRef.current = e.currentTarget; openModal({ type: 'combine', promptIds: selectedIds }); }}
           >
             Combine
           </Button>
-          <Button type="button" kind="primary" renderIcon={Add} onClick={() => openModal({ type: 'create' })}>New Prompt</Button>
+          <Button type="button" kind="primary" renderIcon={Add} onClick={(e) => { modalTriggerRef.current = e.currentTarget; openModal({ type: 'create' }); }}>New Prompt</Button>
         </div>
       </div>
     </div>
@@ -398,6 +419,10 @@ function LibraryToolbar({ visibleCount, totalCount }) {
 }
 
 function LibraryTable({ prompts }) {
+  const setSort = useLibraryStore((state) => state.setSort);
+  const sortColumn = useLibraryStore((state) => state.sortColumn);
+  const sortDirection = useLibraryStore((state) => state.sortDirection);
+
   const selectedIds = useLibraryStore((state) => state.selectedIds);
   const newPromptId = useLibraryStore((state) => state.newPromptId);
   const toggleSelected = useLibraryStore((state) => state.toggleSelected);
@@ -444,7 +469,7 @@ function LibraryTable({ prompts }) {
                 {headers.map((header) => {
                   const headerProps = getHeaderProps({ header });
                   const { key, ...rest } = headerProps;
-                  return <TableHeader key={key} {...rest}>{header.header}</TableHeader>;
+                  return <TableHeader key={key} {...rest}><button type="button" className="sortable-header" onClick={() => setSort(header.key)}>{header.header} {sortColumn === header.key ? (sortDirection === 'asc' ? '↑' : '↓') : ''}</button></TableHeader>;
                 })}
               </TableRow>
             </TableHead>
@@ -471,7 +496,7 @@ function LibraryTable({ prompts }) {
                       />
                     </TableCell>
                     <TableCell className="title-cell">
-                      <Button className="title-link" type="button" kind="ghost" size="sm" onClick={() => openDetail(prompt.id)}>
+                      <Button className="title-link" type="button" kind="ghost" size="sm" onClick={(e) => { modalTriggerRef.current = e.currentTarget; openDetail(prompt.id); }}>
                         <span className="title-truncate" title={prompt.title}>{prompt.title}</span>
                         <span className="body-preview">{prompt.body}</span>
                       </Button>
@@ -486,14 +511,14 @@ function LibraryTable({ prompts }) {
                     <TableCell><AttachmentBadges prompt={prompt} /></TableCell>
                     <TableCell className="actions-cell">
                       {prompt.sources.length > 0 && (
-                        <Button className="sources-button" type="button" kind="ghost" size="sm" renderIcon={Link} onClick={() => openSources(prompt.id)}>
+                        <Button className="sources-button" type="button" kind="ghost" size="sm" renderIcon={Link} onClick={(e) => { modalTriggerRef.current = e.currentTarget; openSources(prompt.id); }}>
                           {prompt.sources.length} source{prompt.sources.length === 1 ? '' : 's'}
                         </Button>
                       )}
                       <div className="row-actions">
-                        <Button type="button" hasIconOnly kind="ghost" size="sm" renderIcon={View} iconDescription={`View ${prompt.title}`} onClick={() => openDetail(prompt.id)} />
-                        <Button type="button" hasIconOnly kind="ghost" size="sm" renderIcon={Edit} iconDescription={`Edit ${prompt.title}`} onClick={() => openModal({ type: 'edit', promptId: prompt.id })} />
-                        <Button type="button" hasIconOnly kind="danger--ghost" size="sm" renderIcon={TrashCan} iconDescription={`Delete ${prompt.title}`} onClick={() => openModal({ type: 'delete', promptId: prompt.id })} />
+                        <Button type="button" hasIconOnly kind="ghost" size="sm" renderIcon={View} iconDescription={`View ${prompt.title}`} onClick={(e) => { modalTriggerRef.current = e.currentTarget; openDetail(prompt.id); }} />
+                        <Button type="button" hasIconOnly kind="ghost" size="sm" renderIcon={Edit} iconDescription={`Edit ${prompt.title}`} onClick={(e) => { modalTriggerRef.current = e.currentTarget; openModal({ type: 'edit', promptId: prompt.id }); }} />
+                        <Button type="button" hasIconOnly kind="danger--ghost" size="sm" renderIcon={TrashCan} iconDescription={`Delete ${prompt.title}`} onClick={(e) => { modalTriggerRef.current = e.currentTarget; openModal({ type: 'delete', promptId: prompt.id }); }} />
                       </div>
                     </TableCell>
                   </TableRow>
@@ -509,7 +534,7 @@ function LibraryTable({ prompts }) {
 
 function PromptFormModal({ modal }) {
   const prompts = useLibraryStore((state) => state.prompts);
-  const closeModal = useLibraryStore((state) => state.closeModal);
+  const closeModal = () => { useLibraryStore.getState().closeModal(); modalTriggerRef.current?.focus(); };
   const createPrompt = useLibraryStore((state) => state.createPrompt);
   const updatePrompt = useLibraryStore((state) => state.updatePrompt);
   const existing = modal.type === 'edit' ? prompts.find((prompt) => prompt.id === modal.promptId) : null;
@@ -543,7 +568,7 @@ function PromptFormModal({ modal }) {
       modalLabel={existing ? `Version ${existing.version}` : 'Prompt Library'}
       primaryButtonText={existing ? 'Save new version' : 'Create prompt'}
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid || submitLock.current}
+      primaryButtonDisabled={submitLock.current}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit(submit)}
@@ -569,6 +594,7 @@ function PromptFormModal({ modal }) {
           {...register('title')}
         />
         <Select
+          className="min-h-[44px]"
           id="prompt-technique"
           labelText="Technique tag"
           invalid={!!errors.technique}
@@ -613,7 +639,7 @@ function PromptFormModal({ modal }) {
 
 function DeleteModal({ promptId }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
-  const closeModal = useLibraryStore((state) => state.closeModal);
+  const closeModal = () => { useLibraryStore.getState().closeModal(); modalTriggerRef.current?.focus(); };
   const deletePrompt = useLibraryStore((state) => state.deletePrompt);
   if (!prompt) return null;
   return (
@@ -636,7 +662,7 @@ function DeleteModal({ promptId }) {
 
 function ExtendModal({ promptIds }) {
   const prompts = useLibraryStore((state) => state.prompts);
-  const closeModal = useLibraryStore((state) => state.closeModal);
+  const closeModal = () => { useLibraryStore.getState().closeModal(); modalTriggerRef.current?.focus(); };
   const createPrompt = useLibraryStore((state) => state.createPrompt);
   const base = prompts.find((prompt) => prompt.id === promptIds[0]);
   const submitLock = useRef(false);
@@ -677,7 +703,7 @@ function ExtendModal({ promptIds }) {
       modalLabel={`Source · ${base.title}`}
       primaryButtonText="Create extension"
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid || submitLock.current}
+      primaryButtonDisabled={submitLock.current}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit(submit)}
@@ -686,7 +712,7 @@ function ExtendModal({ promptIds }) {
       <input type="hidden" {...register('body')} />
       <div className="form-grid">
         <TextInput id="extend-title" labelText="Title" maxLength={60} invalid={!!errors.title} invalidText={errors.title?.message} {...register('title')} />
-        <Select id="extend-technique" labelText="Technique tag" invalid={!!errors.technique} invalidText={errors.technique?.message} {...register('technique')}>
+        <Select className="min-h-[44px]" id="extend-technique" labelText="Technique tag" invalid={!!errors.technique} invalidText={errors.technique?.message} {...register('technique')}>
           <SelectItem value="" text="Select a technique" />
           {TECHNIQUES.map((technique) => <SelectItem key={technique} value={technique} text={technique} />)}
         </Select>
@@ -712,7 +738,7 @@ function ExtendModal({ promptIds }) {
 
 function CombineModal({ promptIds }) {
   const prompts = useLibraryStore((state) => state.prompts);
-  const closeModal = useLibraryStore((state) => state.closeModal);
+  const closeModal = () => { useLibraryStore.getState().closeModal(); modalTriggerRef.current?.focus(); };
   const createPrompt = useLibraryStore((state) => state.createPrompt);
   const selected = promptIds.map((id) => prompts.find((prompt) => prompt.id === id)).filter(Boolean);
   const composite = selected.map((prompt) => prompt.body).join('\n\n---\n\n');
@@ -751,7 +777,7 @@ function CombineModal({ promptIds }) {
       modalLabel={`${selected.length} linked sources`}
       primaryButtonText="Create combined prompt"
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid || submitLock.current}
+      primaryButtonDisabled={submitLock.current}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
       onRequestSubmit={handleSubmit(submit)}
@@ -762,7 +788,7 @@ function CombineModal({ promptIds }) {
       <input type="hidden" {...register('body')} />
       <div className="form-grid">
         <TextInput id="combine-title" labelText="Title" maxLength={60} invalid={!!errors.title} invalidText={errors.title?.message} {...register('title')} />
-        <Select id="combine-technique" labelText="Technique tag" invalid={!!errors.technique} invalidText={errors.technique?.message} {...register('technique')}>
+        <Select className="min-h-[44px]" id="combine-technique" labelText="Technique tag" invalid={!!errors.technique} invalidText={errors.technique?.message} {...register('technique')}>
           <SelectItem value="" text="Select a technique" />
           {TECHNIQUES.map((technique) => <SelectItem key={technique} value={technique} text={technique} />)}
         </Select>
@@ -786,7 +812,7 @@ function CombineModal({ promptIds }) {
 function ExportModal() {
   const prompts = useLibraryStore((state) => state.prompts);
   const exportFormat = useLibraryStore((state) => state.exportFormat);
-  const closeModal = useLibraryStore((state) => state.closeModal);
+  const closeModal = () => { useLibraryStore.getState().closeModal(); modalTriggerRef.current?.focus(); };
   const setExportFormat = useLibraryStore((state) => state.setExportFormat);
   const showCopyFeedback = useLibraryStore((state) => state.showCopyFeedback);
   const copyFeedback = useLibraryStore((state) => state.copyFeedback);
@@ -796,13 +822,17 @@ function ExportModal() {
   const filename = exportFormat === 'json' ? 'prompt-library.json' : 'prompt-library.md';
   const copied = copyFeedback?.key === 'export';
 
+  const [isExporting, setIsExporting] = useState(false);
   const copy = async () => {
+    setIsExporting(true);
+    await new Promise(r => setTimeout(r, 500));
+    setIsExporting(false);
     await writeClipboard(visible);
     showCopyFeedback('export', `${filename} copied to clipboard`);
   };
 
   return (
-    <Modal open passiveModal size="lg" modalHeading="Export library" modalLabel={`${prompts.length} live prompts`} onRequestClose={closeModal}>
+    <Modal passiveModal={false} open size="lg" modalHeading="Export library" modalLabel={isExporting ? 'Exporting...' : `${prompts.length} live prompts`} onRequestClose={closeModal}>
       <p className="modal-intro">Both artifacts are compiled from the current in-memory collection. Create, edit, delete, Extend, and Combine changes are included immediately.</p>
       <div className="format-switch" role="group" aria-label="Export format">
         <Button type="button" kind={exportFormat === 'json' ? 'primary' : 'secondary'} size="sm" onClick={() => setExportFormat('json')}>JSON</Button>
@@ -811,7 +841,7 @@ function ExportModal() {
       <div className="export-filebar">
         <div><Document size={20} /><span><strong>{filename}</strong><small>{visible.length.toLocaleString()} characters</small></span></div>
         <div>
-          <Button type="button" kind="ghost" size="sm" renderIcon={copied ? Checkmark : Copy} onClick={copy}>{copied ? 'Copied' : 'Copy'}</Button>
+          <Button type="button" kind="ghost" size="sm" renderIcon={copied ? Checkmark : Copy} onClick={copy}>{isExporting ? 'Loading...' : (copied ? 'Copied' : 'Copy')}</Button>
           <Button
             type="button"
             kind="primary"
@@ -829,8 +859,9 @@ function ExportModal() {
 }
 
 function ImportModal() {
-  const closeModal = useLibraryStore((state) => state.closeModal);
+  const closeModal = () => { useLibraryStore.getState().closeModal(); modalTriggerRef.current?.focus(); };
   const importLibrary = useLibraryStore((state) => state.importLibrary);
+  const isLoading = useLibraryStore((state) => state.isLoading);
   const [fileName, setFileName] = useState('');
   const {
     register, handleSubmit, setValue, trigger,
@@ -851,13 +882,13 @@ function ImportModal() {
       open
       size="lg"
       modalHeading="Import library JSON"
-      modalLabel="Replace the current session collection"
+      modalLabel={isLoading ? 'Importing library...' : 'Replace the current session collection'}
       primaryButtonText="Import and replace"
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid}
+      primaryButtonDisabled={false}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
-      onRequestSubmit={handleSubmit((data) => importLibrary(data.payload))}
+      onRequestSubmit={handleSubmit(async (data) => await importLibrary(data.payload))}
     >
       <InlineNotification
         lowContrast
@@ -887,13 +918,13 @@ function ImportModal() {
 
 function DetailModal({ promptId }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
-  const closeDetail = useLibraryStore((state) => state.closeDetail);
+  const closeDetail = () => { useLibraryStore.getState().closeDetail(); modalTriggerRef.current?.focus(); };
   const openModal = useLibraryStore((state) => state.openModal);
   const openHistory = useLibraryStore((state) => state.openHistory);
   const openSources = useLibraryStore((state) => state.openSources);
   if (!prompt) return null;
   return (
-    <Modal open passiveModal size="lg" modalHeading={prompt.title} modalLabel="Prompt detail" onRequestClose={closeDetail}>
+    <Modal passiveModal={false} open size="lg" modalHeading={prompt.title} modalLabel="Prompt detail" onRequestClose={closeDetail}>
       <div className="detail-meta">
         <TechniqueTag technique={prompt.technique} />
         <span>Created {formatDate(prompt.created)}</span>
@@ -902,9 +933,9 @@ function DetailModal({ promptId }) {
       {prompt.description && <p className="detail-description">{prompt.description}</p>}
       <CodeBlock body={prompt.body} feedbackKey={`detail-${prompt.id}`} />
       <div className="detail-actionbar">
-        <Button type="button" kind="tertiary" size="sm" renderIcon={Edit} onClick={() => { closeDetail(); openModal({ type: 'edit', promptId: prompt.id }); }}>Edit prompt</Button>
-        <Button type="button" kind="ghost" size="sm" renderIcon={Time} onClick={() => { closeDetail(); openHistory(prompt.id); }}>View history</Button>
-        {prompt.sources.length > 0 && <Button type="button" kind="ghost" size="sm" renderIcon={Link} onClick={() => openSources(prompt.id)}>{prompt.sources.length} sources</Button>}
+        <Button type="button" kind="tertiary" size="sm" renderIcon={Edit} onClick={(e) => { modalTriggerRef.current = e.currentTarget; closeDetail(); openModal({ type: 'edit', promptId: prompt.id }); }}>Edit prompt</Button>
+        <Button type="button" kind="ghost" size="sm" renderIcon={Time} onClick={(e) => { modalTriggerRef.current = e.currentTarget; closeDetail(); openHistory(prompt.id); }}>View history</Button>
+        {prompt.sources.length > 0 && <Button type="button" kind="ghost" size="sm" renderIcon={Link} onClick={(e) => { modalTriggerRef.current = e.currentTarget; openSources(prompt.id); }}>{prompt.sources.length} sources</Button>}
       </div>
       <section className="detail-attachments" aria-labelledby="detail-attachments-title">
         <div className="section-heading-row">
@@ -922,7 +953,7 @@ function DetailModal({ promptId }) {
 
 function HistoryPanel({ promptId }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
-  const closeHistory = useLibraryStore((state) => state.closeHistory);
+  const closeHistory = () => { useLibraryStore.getState().closeHistory(); modalTriggerRef.current?.focus(); };
   const restoreVersionToEdit = useLibraryStore((state) => state.restoreVersionToEdit);
   useEscape(closeHistory);
   if (!prompt) return null;
@@ -962,7 +993,7 @@ function HistoryPanel({ promptId }) {
 function SourcesPanel({ promptId }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
   const prompts = useLibraryStore((state) => state.prompts);
-  const closeSources = useLibraryStore((state) => state.closeSources);
+  const closeSources = () => { useLibraryStore.getState().closeSources(); modalTriggerRef.current?.focus(); };
   const openDetail = useLibraryStore((state) => state.openDetail);
   useEscape(closeSources);
   if (!prompt) return null;
@@ -1238,7 +1269,12 @@ function registerWebMCPTools() {
   };
 }
 
-export default function App() {
+
+
+
+export const modalTriggerRef = createRef();
+function App() {
+
   const prompts = useLibraryStore((state) => state.prompts);
   const searchQuery = useLibraryStore((state) => state.searchQuery);
   const techniqueFilter = useLibraryStore((state) => state.techniqueFilter);
@@ -1262,7 +1298,7 @@ export default function App() {
       <header className="app-header">
         <div className="brand-lockup">
           <div className="brand-mark" aria-hidden="true"><span /><span /><span /></div>
-          <div><span className="product-suite">Prompt engineering workspace</span><h1>Prompt Library</h1></div>
+          <div><span className="product-suite">Prompt engineering workspace</span><h1>Prompt library</h1></div>
         </div>
         <div className="header-status"><span className="status-dot" /> Session workspace</div>
       </header>
@@ -1282,7 +1318,7 @@ export default function App() {
           <LibraryToolbar visibleCount={visiblePrompts.length} totalCount={prompts.length} />
           <SuggestionRow />
           <div className="table-region">
-            {visiblePrompts.length > 0 ? <LibraryTable prompts={visiblePrompts} /> : <EmptyState filtered={filtered} />}
+            {visiblePrompts.length > 0 ? <LibraryTable prompts={visiblePrompts} /> : <EmptyState filtered={filtered} isEmptyLibrary={prompts.length === 0} />}
           </div>
         </section>
       </main>
@@ -1302,3 +1338,7 @@ export default function App() {
     </div>
   );
 }
+
+
+
+export default App;
