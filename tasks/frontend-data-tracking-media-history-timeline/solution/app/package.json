@@ -2,10 +2,33 @@
   "name": "oracle-static",
   "private": true,
   "scripts": {
-    "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "build": "vite build",
+    "verify:build": "vite build && node -e \"require('fs').accessSync('dist/index.html')\"",
+    "start": "vite --host 0.0.0.0 --port 3000 --strictPort"
   },
   "dependencies": {
-    "serve": "14.2.4"
+    "@fontsource-variable/fraunces": "5.3.0",
+    "@fontsource-variable/sora": "5.3.0",
+    "@hookform/resolvers": "^5.4.0",
+    "@mantine/core": "^9.4.1",
+    "@mantine/hooks": "^9.4.1",
+    "@tabler/icons-react": "^3.45.0",
+    "@tanstack/react-virtual": "^3.14.6",
+    "jotai": "^2.20.2",
+    "motion": "^12.42.2",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-hook-form": "^7.82.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.3.2",
+    "@vitejs/plugin-react": "^6.0.3",
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.5.20",
+    "postcss-preset-mantine": "^1.18.0",
+    "postcss-simple-vars": "^7.0.1",
+    "tailwindcss": "4.3.2",
+    "vite": "^8.1.5"
   }
 }

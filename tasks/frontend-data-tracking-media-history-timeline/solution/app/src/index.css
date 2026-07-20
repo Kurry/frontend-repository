@@ -1,0 +1,95 @@
+@import "@mantine/core/styles.css";
+@import "tailwindcss";
+
+:root {
+  --c-paper: #f0f4f5;
+  --c-paper-dark: #e6ecef;
+  --c-ink: #2b3a40;
+  --c-ink-light: #52666d;
+  --c-ink-faint: #a6b8c0;
+  --c-brand: #0d7c8f;
+  --c-error: #c92a2a;
+  --c-error-bg: #fff0f0;
+  --c-focus: #1a71e8;
+  --c-overlay: rgba(22, 33, 38, 0.6);
+  --c-stage: #e3ebed;
+  --c-stage-fade: #f5f8f9;
+
+  --h-header: 64px;
+  --h-scrubber: 80px;
+
+  --z-base: 0;
+  --z-rail: 5;
+  --z-events: 10;
+  --z-detail: 20;
+  --z-header: 30;
+  --z-scrubber: 30;
+  --z-drawer: 40;
+  --z-modal: 50;
+
+  --ease-settle: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-ui: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--c-paper);
+  color: var(--c-ink);
+  font-family: "Sora Variable", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow: hidden;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Fraunces Variable", serif;
+  font-weight: 600;
+  margin: 0 0 0.5em 0;
+  line-height: 1.2;
+}
+
+a {
+  color: var(--c-brand);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: calc(var(--z-modal) + 1);
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.375rem;
+  background: white;
+  color: var(--c-ink);
+  font-weight: 600;
+  transform: translateY(-200%);
+  transition: transform 120ms ease-out;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--c-focus);
+  outline-offset: 2px;
+}
