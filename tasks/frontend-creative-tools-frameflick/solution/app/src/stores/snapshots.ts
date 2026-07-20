@@ -25,7 +25,9 @@ function save(key: string, val: unknown) {
 export function validateSnapshotName(raw: string, existing: Snapshot[]): string | null {
   const trimmed = raw.trim()
   if (!trimmed) return 'Give the snapshot a name in the name field.'
-  if (raw.length > MAX_NAME) return `Snapshot name must be ${MAX_NAME} characters or fewer.`
+  // The length cap applies to the trimmed name (which is what gets persisted),
+  // so leading/trailing whitespace can't block an otherwise-valid name.
+  if (trimmed.length > MAX_NAME) return `Snapshot name must be ${MAX_NAME} characters or fewer.`
   if (existing.some(s => s.name === trimmed)) return `Snapshot "${trimmed}" already exists.`
   return null
 }

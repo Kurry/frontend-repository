@@ -215,7 +215,9 @@ export function parseRecipe(text: string, base: RenderSettings): RecipeParseResu
 export function validatePresetName(raw: string, existingNames: string[]): string | null {
   const trimmed = raw.trim()
   if (!trimmed) return 'Give the preset a name in the name field.'
-  if (raw.length > 40) return 'Preset name must be 40 characters or fewer.'
+  // The 40-char cap applies to the trimmed name (which is what gets persisted),
+  // so leading/trailing whitespace can't block an otherwise-valid name.
+  if (trimmed.length > 40) return 'Preset name must be 40 characters or fewer.'
   if (existingNames.includes(trimmed)) return `Preset "${trimmed}" already exists.`
   return null
 }
