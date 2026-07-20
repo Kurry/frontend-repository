@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { AnimatePresence, motion } from 'motion/react';
 import { useStore, type NamePanelState } from '../store';
-import { Icon } from './primitives';
+import { Icon, hasOpenModalOverlay } from './primitives';
 
 function makeNameSchema(existing: string[]) {
   return z.object({
@@ -68,19 +68,27 @@ export function NamePanel() {
   }, [panel, reset, setFocus, renameTarget?.name]);
 
   // Announce validation feedback through the assertive live region as soon as
-  // it appears visually.
+  // it appears visually — except when a failed store action (createTheme,
+  // renameTheme, saveSnapshot) already announced this exact message, so
+  // assistive tech hears each failure once, not twice.
   const errorMessage = errors.name?.message;
+  const storeAnnouncedError = useRef<string | null>(null);
   useEffect(() => {
-    if (errorMessage) announce(errorMessage);
+    if (!errorMessage) return;
+    const duplicate = storeAnnouncedError.current === errorMessage;
+    storeAnnouncedError.current = null;
+    if (!duplicate) announce(errorMessage);
   }, [errorMessage, announce]);
 
   useEffect(() => {
     if (!panel) return;
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        e.stopPropagation();
-        setPanel(null);
-      }
+      if (e.key !== 'Escape') return;
+      // The panel sits below the modal layer (z-40 vs z-50): while a modal is
+      // open, Escape belongs to the topmost modal, not to this panel.
+      if (hasOpenModalOverlay()) return;
+      e.stopPropagation();
+      setPanel(null);
     }
     document.addEventListener('keydown', onKey, true);
     return () => document.removeEventListener('keydown', onKey, true);
@@ -96,7 +104,9 @@ export function NamePanel() {
     else if (mode === 'snapshot') res = saveSnapshot(name);
     else res = createTheme(name);
     if (!res.ok) {
-      setError('name', { message: res.error ?? 'Invalid name' });
+      const msg = res.error ?? 'Invalid name';
+      storeAnnouncedError.current = msg;
+      setError('name', { message: msg });
       return;
     }
     setPanel(null);

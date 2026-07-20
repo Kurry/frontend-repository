@@ -81,7 +81,6 @@ interface State {
   copyMessage: string;
   namePanel: NamePanelState | null;
   recentCommands: RecentCommand[];
-  palettePulse: number;
 
   // derived
   contrast: () => ContrastRow[];
@@ -180,7 +179,6 @@ export const useStore = create<State>((set, get) => {
     copyMessage: '',
     namePanel: null,
     recentCommands: [],
-    palettePulse: 0,
 
     contrast: () => contrastMatrix(get().options),
     jsonArtifact: () => exportJSON(get().themeName, get().options),
@@ -216,6 +214,14 @@ export const useStore = create<State>((set, get) => {
     setSource: (src) => {
       const res = sourceToOptions(src);
       if (res.ok) {
+        // Formatting (or whitespace-only typing) parses back to options equal
+        // to the current state: refresh the text without recording a no-op
+        // history entry, so Format Source never adds a spurious undo step or
+        // scrubber state.
+        if (JSON.stringify(res.options) === JSON.stringify(get().options)) {
+          set({ source: src, sourceError: null, saveStatus: 'All changes saved' });
+          return;
+        }
         set({ source: src, sourceError: null });
         get().applyOptions(res.options, { record: true, regenSource: false });
       } else {
@@ -233,7 +239,6 @@ export const useStore = create<State>((set, get) => {
       for (let i = 0; i < parts.length - 1; i++) cur = cur[parts[i]] ?? (cur[parts[i]] = {});
       cur[parts[parts.length - 1]] = value;
       get().applyOptions(next);
-      set((s) => ({ palettePulse: s.palettePulse + 1 }));
       return { ok: true };
     },
 
@@ -254,7 +259,6 @@ export const useStore = create<State>((set, get) => {
       if (!preset) return;
       const next = applyPreset(get().options, preset);
       get().applyOptions(next);
-      set((s) => ({ palettePulse: s.palettePulse + 1 }));
       get().pushToast(`${preset.name} preset applied`);
     },
 
