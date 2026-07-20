@@ -1527,7 +1527,14 @@ function CriterionTable({ trial, ui }) {
   const flipKey = flips.join("|");
   const [exitingIds, setExitingIds] = useState([]);
   const previousFlipsOnly = useRef(ui.flipsOnly);
+  const previousTrialId = useRef(trial.id);
   useEffect(() => {
+    if (previousTrialId.current !== trial.id) {
+      previousTrialId.current = trial.id;
+      setExitingIds([]);
+      previousFlipsOnly.current = ui.flipsOnly;
+      return undefined;
+    }
     if (previousFlipsOnly.current === ui.flipsOnly) return undefined;
     previousFlipsOnly.current = ui.flipsOnly;
     if (ui.flipsOnly) {
@@ -2301,7 +2308,7 @@ function ExportDrawer({ trial, ui }) {
                   ) : (
                     <IconClipboard size={iconSize} />
                   )}
-                  {copied ? "Copied review package" : "Copy"}
+                  {copied ? (tab === "json" ? "Copied review package" : "Copied review memo") : "Copy"}
                 </Button>
                 <Button
                   className="control min-h-11 sm:min-h-9"
