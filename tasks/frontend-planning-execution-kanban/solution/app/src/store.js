@@ -267,6 +267,9 @@ export const useBoardStore = create((set, get) => ({
 
         const plan = failurePlans[cardId]
         if (plan?.taskId === currentTask.id && attempt <= plan.failAttempts) {
+          if (attempt >= plan.maxAttempts) {
+            throw new Error(`Task failed after ${plan.maxAttempts} attempts`)
+          }
           for (let seconds = 2; seconds >= 1; seconds -= 1) {
             set((state) => ({
               cards: updateCardRecord(state.cards, cardId, (value) => ({ ...value, status: 'retrying', tasks: value.tasks.map((item, taskIndex) => taskIndex === index ? { ...item, status: 'retrying' } : item) })),
