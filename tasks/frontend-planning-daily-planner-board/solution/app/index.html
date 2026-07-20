@@ -46,7 +46,23 @@
     <header class="board-head">
       <button class="btn today-btn" type="button" data-chrome="Go to date: Today" aria-label="Go to date: Today">Today</button>
       <div class="board-head-spacer"></div>
-      <button class="btn" type="button" data-chrome="Filter" aria-label="Filter tasks">Filter</button>
+
+      <button class="btn" type="button" id="rollover-btn" data-act="rollover" aria-label="Rollover incomplete">Rollover incomplete</button>
+      <button class="btn" type="button" id="export-btn" data-act="open-export" aria-label="Export">Export</button>
+      <button class="btn" type="button" id="undo-btn" data-act="undo" aria-label="Undo">Undo</button>
+      <button class="btn" type="button" id="redo-btn" data-act="redo" aria-label="Redo">Redo</button>
+
+      <div class="filter-bar" id="filter-bar" hidden>
+        <button class="btn ghost sm active" data-act="filter-chan" data-chan="all">All</button>
+        <button class="btn ghost sm" data-act="filter-chan" data-chan="work">work</button>
+        <button class="btn ghost sm" data-act="filter-chan" data-chan="personal">personal</button>
+        <button class="btn ghost sm" data-act="filter-chan" data-chan="health">health</button>
+        <button class="btn ghost sm" data-act="filter-chan" data-chan="focus">focus</button>
+        <input type="text" id="search-input" placeholder="Search tasks..." style="font-size: 12px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px;">
+        <button class="btn ghost sm" id="clear-filter" data-act="clear-filter" hidden>Clear</button>
+      </div>
+
+      <button class="btn" type="button" id="toggle-filter" data-act="toggle-filter" aria-label="Filter tasks">Filter</button>
       <button class="btn" type="button" data-chrome="Board" aria-label="View: Board">Board</button>
     </header>
     <div class="columns" id="columns"></div>
@@ -73,11 +89,14 @@
   <div class="modal" role="dialog" aria-modal="true" aria-label="Edit task">
     <div class="modal-title">Edit task</div>
     <form id="edit-form">
-      <label class="fld"><span>Title</span><input type="text" id="edit-title" name="title" autocomplete="off"></label>
-      <div class="fld-err" id="edit-error" hidden>Title is required</div>
-      <label class="fld"><span>Channel</span><input type="text" id="edit-channel" name="channel" placeholder="work" autocomplete="off"></label>
-      <label class="fld"><span>Planned time (H:MM)</span><input type="text" id="edit-planned" name="planned" placeholder="0:00" autocomplete="off"></label>
-      <label class="fld"><span>Scheduled start</span><input type="text" id="edit-start" name="start" placeholder="9:00 am" autocomplete="off"></label>
+      <label class="fld"><span>Title</span><input type="text" id="edit-title" name="title" autocomplete="off" aria-describedby="edit-title-err"></label>
+      <div class="fld-err" id="edit-title-err" hidden>Title is required</div>
+      <label class="fld"><span>Channel</span><input type="text" id="edit-channel" name="channel" placeholder="work" autocomplete="off" aria-describedby="edit-channel-err"></label>
+      <div class="fld-err" id="edit-channel-err" hidden>Invalid channel</div>
+      <label class="fld"><span>Planned time (H:MM)</span><input type="text" id="edit-planned" name="planned" placeholder="0:00" autocomplete="off" aria-describedby="edit-planned-err"></label>
+      <div class="fld-err" id="edit-planned-err" hidden>Invalid planned time</div>
+      <label class="fld"><span>Scheduled start</span><input type="text" id="edit-start" name="start" placeholder="9:00 am" autocomplete="off" aria-describedby="edit-start-err"></label>
+      <div class="fld-err" id="edit-start-err" hidden>Invalid start time</div>
       <div class="modal-actions">
         <button type="button" class="btn" id="edit-cancel">Cancel</button>
         <button type="submit" class="btn primary">Save</button>
@@ -90,5 +109,92 @@
 <button class="help-btn" type="button" data-chrome="Open chat" aria-label="Open chat" title="Open chat">?</button>
 
 <script src="app.js"></script>
+
+<!-- Export / Import Modal -->
+<div class="modal-overlay" id="export-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Export and Import" style="width: 600px; max-width: 90vw;">
+    <div class="modal-title">Export / Import Planner</div>
+
+    <div style="margin-bottom: 12px; display: flex; gap: 8px;">
+      <button class="btn active" id="tab-ics" data-act="tab-ics">ICS</button>
+      <button class="btn" id="tab-json" data-act="tab-json">Planner JSON</button>
+    </div>
+
+    <div id="pane-ics">
+      <textarea id="out-ics" readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 11px;"></textarea>
+      <div class="modal-actions">
+        <button class="btn" id="copy-ics" data-act="copy-ics">Copy</button>
+        <button class="btn primary" id="dl-ics" data-act="dl-ics">Download ICS</button>
+      </div>
+    </div>
+
+    <div id="pane-json" hidden>
+      <textarea id="out-json" readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 11px;"></textarea>
+      <div class="modal-actions">
+        <button class="btn" id="copy-json" data-act="copy-json">Copy</button>
+        <button class="btn primary" id="dl-json" data-act="dl-json">Download planner JSON</button>
+      </div>
+
+      <hr style="margin: 16px 0;">
+
+      <div class="modal-title">Import Planner JSON</div>
+      <textarea id="in-json" placeholder="Paste Planner JSON here..." style="width: 100%; height: 80px; font-family: monospace; font-size: 11px;"></textarea>
+      <div class="fld-err" id="import-err" hidden>Invalid JSON</div>
+      <div class="modal-actions">
+        <button class="btn primary" id="import-json" data-act="import-json">Import planner JSON</button>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="margin-top: 16px;">
+      <button type="button" class="btn" id="export-close" data-act="close-export">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Bulk action tray -->
+<div class="bulk-tray" id="bulk-tray" hidden >
+  <span id="bulk-count" style="font-weight: 600; font-size: 14px;">0 selected</span>
+  <button class="btn ghost sm" id="bulk-complete" data-act="bulk-complete" >Complete selected</button>
+  <button class="btn ghost sm" id="bulk-move" data-act="bulk-move" >Move to day</button>
+  <button class="btn ghost sm" id="bulk-delete" data-act="bulk-delete" >Delete selected</button>
+</div>
+
+<!-- Move to day popover -->
+<div class="modal-overlay" id="move-overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Move to day">
+    <div class="modal-title">Move <span id="move-count"></span> tasks</div>
+    <label class="fld">
+      <span>Destination Day</span>
+      <select id="move-day-select" class="form-select">
+        <option value="6">July 6</option>
+        <option value="7">July 7</option>
+        <option value="8">July 8</option>
+        <option value="9">July 9</option>
+        <option value="10">July 10</option>
+        <option value="11">July 11</option>
+        <option value="12">July 12</option>
+        <option value="13">July 13</option>
+        <option value="14">July 14</option>
+        <option value="15">July 15</option>
+        <option value="16">July 16</option>
+        <option value="17">July 17</option>
+        <option value="18" selected>July 18</option>
+        <option value="19">July 19</option>
+        <option value="20">July 20</option>
+        <option value="21">July 21</option>
+        <option value="22">July 22</option>
+        <option value="23">July 23</option>
+        <option value="24">July 24</option>
+        <option value="25">July 25</option>
+        <option value="26">July 26</option>
+      </select>
+    </label>
+    <div id="move-preview" style="font-size: 12px; color: var(--muted); margin-bottom: 12px;"></div>
+    <div class="modal-actions">
+      <button type="button" class="btn" id="move-cancel" data-act="close-move">Cancel</button>
+      <button type="button" class="btn primary" id="move-confirm" data-act="confirm-move">Confirm</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
