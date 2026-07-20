@@ -81,16 +81,30 @@ export interface DraftEntry {
   density: DensityMode;
 }
 
+/**
+ * A history snapshot captures every user-visible facet of the builder —
+ * content AND layout (section order, visibility, theme, density) — so Undo,
+ * Redo, and branch restore reproduce the exact visible state.
+ */
 export interface HistorySnapshot {
   content: ContentState;
+  sectionOrder: SectionKey[];
+  sectionVisibility: SectionVisibility;
+  theme: ThemeName;
+  density: DensityMode;
   timestamp: number;
   label: string;
 }
 
-export interface UndoRedoState {
-  past: HistorySnapshot[];
-  future: HistorySnapshot[];
-  current: HistorySnapshot;
+/**
+ * An abandoned redo timeline preserved as a selectable branch when a new
+ * change is made after Undo, instead of being silently discarded.
+ */
+export interface HistoryBranch {
+  id: string;
+  label: string;
+  createdAt: number;
+  chain: HistorySnapshot[]; // chain[0] is nearest to the fork point; last is the branch tip
 }
 
 export const SECTION_LABELS: Record<SectionKey, string> = {
