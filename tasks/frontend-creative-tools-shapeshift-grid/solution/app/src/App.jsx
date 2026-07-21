@@ -415,6 +415,7 @@ export default function App() {
   }
 
   function resizeGrid(nextCellSize) {
+    if (state.sliderLocked) return;
     const size = Math.max(16, Math.min(64, Math.round(nextCellSize)));
     if (size === state.cellSize) return;
     const source = dimensions();
@@ -478,7 +479,7 @@ export default function App() {
     return { ok: true, board: parsed.data };
   }
 
-  function removeBoard(name, animate = true) {
+  function removeBoard(name, animate = false) {
     const exists = state.boards.some((board) => board.name === name);
     if (!exists) return false;
     const complete = () => batch(() => {
@@ -1245,9 +1246,10 @@ export default function App() {
               <form onSubmit={(event) => { event.preventDefault(); setAttempted(true); form.handleSubmit(); }} novalidate>
                 <form.Field name="name">
                   {(field) => (
-                    <label class="form-field">
+                    <label class="form-field" for="save-board-name">
                       <span>Name <em>required · max 40</em></span>
                       <input
+                        id="save-board-name"
                         name={field().name}
                         value={field().state.value}
                         onInput={(event) => field().handleChange(event.currentTarget.value)}
@@ -1255,16 +1257,17 @@ export default function App() {
                         aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && nameIssue())}
                       />
                       <Show when={(attempted() || field().state.meta.isTouched) && nameIssue()}>
-                        {(issue) => <small class="field-error" role="alert">{issue()}</small>}
+                        {(issue) => <small class="field-error" role="alert" aria-live="assertive">{issue()}</small>}
                       </Show>
                     </label>
                   )}
                 </form.Field>
                 <form.Field name="tag">
                   {(field) => (
-                    <label class="form-field">
+                    <label class="form-field" for="save-board-tag">
                       <span>Tag <em>required · max 24</em></span>
                       <input
+                        id="save-board-tag"
                         name={field().name}
                         value={field().state.value}
                         onInput={(event) => field().handleChange(event.currentTarget.value)}
@@ -1272,7 +1275,7 @@ export default function App() {
                         aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && tagIssue())}
                       />
                       <Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}>
-                        {(issue) => <small class="field-error" role="alert">{issue()}</small>}
+                        {(issue) => <small class="field-error" role="alert" aria-live="assertive">{issue()}</small>}
                       </Show>
                     </label>
                   )}
@@ -1280,7 +1283,7 @@ export default function App() {
                 <Show when={formError()}>{(message) => <div class="form-alert" role="alert">{message()}</div>}</Show>
                 <div class="dialog-actions">
                   <Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton>
-                  <button class="primary-button" type="submit" disabled={!valid()}>Save board <IconArrowRight size={17} /></button>
+                  <button class="primary-button" type="submit">Save board <IconArrowRight size={17} /></button>
                 </div>
               </form>
               <Dialog.CloseButton class="icon-close" aria-label="Close Save board dialog"><IconX size={19} /></Dialog.CloseButton>
@@ -1482,12 +1485,12 @@ export default function App() {
               <Dialog.Description>The same record is updated; its cell snapshot and favorite state stay intact.</Dialog.Description>
               <form onSubmit={(event) => { event.preventDefault(); setAttempted(true); form.handleSubmit(); }} novalidate>
                 <form.Field name="name">
-                  {(field) => <label class="form-field"><span>Name <em>required · max 40</em></span><input value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && nameIssue())} />
-                    <Show when={(attempted() || field().state.meta.isTouched) && nameIssue()}>{(issue) => <small class="field-error" role="alert">{issue()}</small>}</Show></label>}
+                  {(field) => <label class="form-field" for={`rename-board-name-${props.board.id}`}><span>Name <em>required · max 40</em></span><input id={`rename-board-name-${props.board.id}`} value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && nameIssue())} />
+                    <Show when={(attempted() || field().state.meta.isTouched) && nameIssue()}>{(issue) => <small class="field-error" role="alert" aria-live="assertive">{issue()}</small>}</Show></label>}
                 </form.Field>
                 <form.Field name="tag">
-                  {(field) => <label class="form-field"><span>Tag <em>required · max 24</em></span><input value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && tagIssue())} />
-                    <Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}>{(issue) => <small class="field-error" role="alert">{issue()}</small>}</Show></label>}
+                  {(field) => <label class="form-field" for={`rename-board-tag-${props.board.id}`}><span>Tag <em>required · max 24</em></span><input id={`rename-board-tag-${props.board.id}`} value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && tagIssue())} />
+                    <Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}>{(issue) => <small class="field-error" role="alert" aria-live="assertive">{issue()}</small>}</Show></label>}
                 </form.Field>
                 <Show when={formError()}>{(message) => <div class="form-alert" role="alert">{message()}</div>}</Show>
                 <div class="dialog-actions"><Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton><button class="primary-button" type="submit" disabled={Boolean(nameIssue() || tagIssue())}>Update board</button></div>
@@ -1522,8 +1525,9 @@ export default function App() {
               step={1}
               class="cell-slider"
               aria-label="Cell size"
+              disabled={state.sliderLocked}
             >
-              <Slider.Track><Slider.Fill /><Slider.Thumb aria-label="Cell size"><Slider.Input /></Slider.Thumb></Slider.Track>
+              <Slider.Track><Slider.Fill /><Slider.Thumb aria-label="Cell size" aria-disabled={state.sliderLocked} tabIndex={state.sliderLocked ? -1 : 0}><Slider.Input /></Slider.Thumb></Slider.Track>
             </Slider.Root>
             <span class="lock-note">{state.sliderLocked ? "Locked after paint · resizing resamples art · Clear resets" : `${dimensions().cols} × ${dimensions().rows} cells`}</span>
           </div>
