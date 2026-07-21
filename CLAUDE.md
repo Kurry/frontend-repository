@@ -39,13 +39,13 @@ uv run corpuscheck screenshots install [slug ...]   # install into task envs
 
 ```
 
-Dimension tomls (`tests/<dim>/<dim>.toml`) are the single source of truth for criteria and are edited directly (see `docs/rubrics.md` for criterion conventions; the `rubric-align` skill does the alignment work). Outcome / user-flow lists are authored as criteria in a dimension toml — the `behavioral` dimension covers them when a task ships it; until then they live in `core_features`. There is no separate outcomes file.
+Dimension tomls (`tests/<dim>/<dim>.toml`) are the single source of truth for criteria and are edited directly (see `docs/rubrics.md` for criterion conventions; the `rubrics` skill does the alignment work). Outcome / user-flow lists are authored as criteria in a dimension toml — the `behavioral` dimension covers them when a task ships it; until then they live in `core_features`. There is no separate outcomes file.
 
 ## Non-negotiable invariants (hard-won; see AGENTS.md for the full list)
 
 Every one of these is a corpus defect if violated, and each has a guard:
 - **Consistency is scripted**: after any canonical edit run `uv run corpuscheck propagate` (`--check` = zero drift). Never hand-copy shared files.
-- **13 tag-aligned dimensions** per task (`uv run corpuscheck scaffold` baselines them; `create-rubrics` specializes; `rubric-align` aligns).
+- **13 tag-aligned dimensions** per task (`uv run corpuscheck scaffold` baselines them; the `rubrics` skill specializes and aligns).
 - **Judge integrity** (canonical `system_prompt.md`, cwd `/logs/verifier`): observer never repairer, never reads app source, `browser_evaluate` read-only, `BLOCKED:`/`FAIL:` prefixes.
 - **Criteria are LLM-judge only, never code checks**; every PRD promise must be tested by a criterion a violating build would FAIL; negatives carry `negate=true` and state the defect as present; only ADD criteria, never renumber/delete (ids are provenance).
 - **API-shaped schemas** and a **useful downloadable end state** are authoring mandates, not extras.
@@ -74,4 +74,4 @@ The judge gets two MCP servers attached to that same Chrome: **playwright** (`@p
 
 ### Rubric conventions (see `docs/rubrics.md`)
 
-Criteria are authored directly as `[[criterion]]` entries in the dimension tomls (id stable, descriptive snake_case `name`, `type`/`weight`/`negate` per `docs/rubrics.md`). Rules that matter: every dimension keeps ≥1 positive criterion; negatives (`negate=true`) are allowed but never required, and only `innovation` carries a catch-all (positive). When a negative is used it is phrased as the bad condition being present; titles must be browser-observable — internal-implementation claims ("uses Redux Toolkit") are banned because judges cannot verify them; criteria that grade an animation/gesture must require the real UI control path (a WebMCP state shortcut would snap the state and falsely show no animation); `nice to have` maps to weight 0.5, `must have` to 1.0. Keep instruction and rubrics mutually consistent in both directions (the `rubric-align` skill enforces this).
+Criteria are authored directly as `[[criterion]]` entries in the dimension tomls (id stable, descriptive snake_case `name`, `type`/`weight`/`negate` per `docs/rubrics.md`). Rules that matter: every dimension keeps ≥1 positive criterion; negatives (`negate=true`) are allowed but never required, and only `innovation` carries a catch-all (positive). When a negative is used it is phrased as the bad condition being present; titles must be browser-observable — internal-implementation claims ("uses Redux Toolkit") are banned because judges cannot verify them; criteria that grade an animation/gesture must require the real UI control path (a WebMCP state shortcut would snap the state and falsely show no animation); `nice to have` maps to weight 0.5, `must have` to 1.0. Keep instruction and rubrics mutually consistent in both directions (the `rubrics` skill enforces this).

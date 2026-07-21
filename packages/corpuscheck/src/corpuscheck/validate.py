@@ -124,11 +124,11 @@ def repository_sources() -> tuple[ModuleType, ModuleType, ModuleType, ModuleType
 
     migration = _load_module(
         "corpuscheck_validate_migration",
-        str(root / ".claude/skills/instruction-migrate/scripts/validate_migration.py"),
+        str(root / ".claude/skills/task-authoring/scripts/validate_migration.py"),
     )
     rubric = _load_module(
         "corpuscheck_validate_rubric",
-        str(root / ".claude/skills/rubric-align/scripts/validate_rubric.py"),
+        str(root / ".claude/skills/rubrics/scripts/validate_rubric.py"),
     )
     return webmcp, package, migration, rubric
 
@@ -399,7 +399,7 @@ def validate_eval_validity(task_dir: Path) -> CheckResult:
     # Only flag a framework name in an IDENTITY context (a browser judge can't
     # verify the stack). A bare name is not enough: "solid" (border style), "react"
     # (English verb) etc. collide with ordinary criterion prose, so the name must
-    # follow an identity verb. Mirrors rubric-align's IMPL_PHRASES gating.
+    # follow an identity verb. Mirrors the rubrics skill's IMPL_PHRASES gating.
     stack_pattern = re.compile(
         r"\b(?:uses|using|implemented with|built with|powered by|via)\s+(?:"
         + "|".join(re.escape(name) for name in STACK_NAMES)
