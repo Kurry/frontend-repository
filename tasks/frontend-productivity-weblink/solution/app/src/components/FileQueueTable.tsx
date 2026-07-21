@@ -48,6 +48,12 @@ export default function FileQueueTable() {
   const isAllSelected = () => state.files.queue.length > 0 && selectedIds().size === state.files.queue.length;
 
   const handleRemoveSelected = () => {
+    const count = selectedIds().size;
+    if (count === 0) return;
+    const confirmed = window.confirm(
+      `Remove ${count} selected file${count === 1 ? "" : "s"} from the queue? This cannot be undone.`,
+    );
+    if (!confirmed) return;
     removeSelectedFiles(Array.from(selectedIds()));
     setSelectedIds(new Set());
   };
@@ -56,15 +62,15 @@ export default function FileQueueTable() {
     retrySelectedFiles(Array.from(selectedIds()));
   };
 
-  let dragSourceIndex: number | null = null;
+  let dragSourceId: string | null = null;
+  const [draggingId, setDraggingId] = createSignal<string | null>(null);
 
-  const handleDragStart = (e: DragEvent, index: number) => {
-    dragSourceIndex = index;
+  const handleDragStart = (e: DragEvent, fileId: string) => {
+    dragSourceId = fileId;
+    setDraggingId(fileId);
     if (e.dataTransfer) {
       e.dataTransfer.effectAllowed = "move";
-      const target = e.target as HTMLElement;
-      // Add a slight lift effect
-      target.classList.add("opacity-50", "scale-[1.02]", "shadow-lg");
+      e.dataTransfer.setData("text/plain", fileId);
     }
   };
 
@@ -73,12 +79,18 @@ export default function FileQueueTable() {
     if (e.dataTransfer) e.dataTransfer.dropEffect = "move";
   };
 
-  const handleDrop = (e: DragEvent, index: number) => {
+  const handleDrop = (e: DragEvent, targetId: string) => {
     e.preventDefault();
-    if (dragSourceIndex !== null && dragSourceIndex !== index) {
-      reorderFiles(dragSourceIndex, index);
+    const sourceId = dragSourceId ?? e.dataTransfer?.getData("text/plain") ?? null;
+    if (sourceId && sourceId !== targetId) {
+      const fromIndex = state.files.queue.findIndex((f) => f.id === sourceId);
+      const toIndex = state.files.queue.findIndex((f) => f.id === targetId);
+      if (fromIndex !== -1 && toIndex !== -1) {
+        reorderFiles(fromIndex, toIndex);
+      }
     }
-    dragSourceIndex = null;
+    dragSourceId = null;
+    setDraggingId(null);
     const target = e.target as HTMLElement;
     target.closest("tr")?.classList.remove("border-sky-400", "border-b-2");
   };
@@ -95,17 +107,19 @@ export default function FileQueueTable() {
     if (tr) tr.classList.remove("border-sky-400", "border-b-2");
   };
 
-  const handleDragEnd = (e: DragEvent) => {
-    const target = e.target as HTMLElement;
-    target.classList.remove("opacity-50", "scale-[1.02]", "shadow-lg");
+  const handleDragEnd = () => {
+    dragSourceId = null;
+    setDraggingId(null);
   };
 
-  const moveUp = (index: number) => {
+  const moveUp = (fileId: string) => {
+    const index = state.files.queue.findIndex((f) => f.id === fileId);
     if (index > 0) reorderFiles(index, index - 1);
   };
 
-  const moveDown = (index: number) => {
-    if (index < state.files.queue.length - 1) reorderFiles(index, index + 1);
+  const moveDown = (fileId: string) => {
+    const index = state.files.queue.findIndex((f) => f.id === fileId);
+    if (index !== -1 && index < state.files.queue.length - 1) reorderFiles(index, index + 1);
   };
 
   return (
@@ -167,11 +181,11 @@ export default function FileQueueTable() {
                 <Motion.tr
                   initial={reducedMotion() ? false : { opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  class="group border-b border-slate-100 transition hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900/40 relative"
+                  class={`group border-b border-slate-100 transition hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-900/40 relative ${draggingId() === f.id ? "dragging-row" : ""}`}
                   draggable={true}
-                  onDragStart={(e: DragEvent) => handleDragStart(e, idx())}
+                  onDragStart={(e: DragEvent) => handleDragStart(e, f.id)}
                   onDragOver={handleDragOver}
-                  onDrop={(e: DragEvent) => handleDrop(e, idx())}
+                  onDrop={(e: DragEvent) => handleDrop(e, f.id)}
                   onDragEnter={handleDragEnter}
                   onDragLeave={handleDragLeave}
                   onDragEnd={handleDragEnd}
@@ -186,19 +200,26 @@ export default function FileQueueTable() {
                         aria-label={`Select ${f.name}`}
                      />
                   </td>
-                  <td class="py-2 text-center align-middle text-slate-300 cursor-grab active:cursor-grabbing hover:text-slate-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                      <circle cx="9" cy="5" r="1"></circle>
-                      <circle cx="9" cy="12" r="1"></circle>
-                      <circle cx="9" cy="19" r="1"></circle>
-                      <circle cx="15" cy="5" r="1"></circle>
-                      <circle cx="15" cy="12" r="1"></circle>
-                      <circle cx="15" cy="19" r="1"></circle>
-                    </svg>
-                    <div class="sr-only flex flex-col">
-                      <button type="button" onClick={() => moveUp(idx())} disabled={idx() === 0}>Move up</button>
-                      <button type="button" onClick={() => moveDown(idx())} disabled={idx() === state.files.queue.length - 1}>Move down</button>
+                  <td class="py-2 text-center align-middle text-slate-400">
+                    <button
+                      type="button"
+                      class="cursor-grab rounded p-1 active:cursor-grabbing hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-sky-500 dark:hover:bg-slate-800"
+                      aria-label={`Drag to reorder ${f.name}`}
+                      onMouseDown={(e) => e.stopPropagation()}
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                        <circle cx="9" cy="5" r="1"></circle>
+                        <circle cx="9" cy="12" r="1"></circle>
+                        <circle cx="9" cy="19" r="1"></circle>
+                        <circle cx="15" cy="5" r="1"></circle>
+                        <circle cx="15" cy="12" r="1"></circle>
+                        <circle cx="15" cy="19" r="1"></circle>
+                      </svg>
+                    </button>
+                    <div class="sr-only flex flex-col gap-0.5">
+                      <button type="button" class="touch-target rounded px-1 text-[10px] text-sky-700 disabled:opacity-40" onClick={() => moveUp(f.id)} disabled={idx() === 0}>Move Up</button>
+                      <button type="button" class="touch-target rounded px-1 text-[10px] text-sky-700 disabled:opacity-40" onClick={() => moveDown(f.id)} disabled={idx() === state.files.queue.length - 1}>Move Down</button>
                     </div>
                   </td>
                   <td class="max-w-[120px] truncate py-2 align-middle font-medium text-slate-700 dark:text-slate-200" data-testid="file-queue-name">

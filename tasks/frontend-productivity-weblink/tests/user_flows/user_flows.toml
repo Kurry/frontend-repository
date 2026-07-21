@@ -143,7 +143,7 @@ weight = 1.0
 [[criterion]]
 id = "6.8"
 name = "export_import_session_pack_flow"
-description = "Artifact end-state flow: after distinctive name/room/chat/file mutations, Export Session preview shows weblink-session-v1 field-contract keys with those values; Download then Import Session reconstructs the same visible state with the badge at rest."
+description = "Artifact end-state flow: after distinctive name/room/chat/file mutations, Export Session preview shows weblink-session-v2 field-contract keys with those values; Download then Import Session reconstructs the same visible state with the badge at rest."
 type = "binary"
 weight = 1.0
 
