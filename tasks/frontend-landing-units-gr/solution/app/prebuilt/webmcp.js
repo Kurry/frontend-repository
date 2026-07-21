@@ -149,6 +149,9 @@
   }
   function lockScroll() {
     savedScrollY = window.scrollY || window.pageYOffset || 0;
+    if (window.lenis && typeof window.lenis.scrollTo === "function") {
+      try { window.lenis.scrollTo(savedScrollY, { immediate: true, duration: 0 }); } catch (e) {}
+    }
     document.documentElement.classList.add("menu-locked");
     if (window.lenis && typeof window.lenis.stop === "function") { try { window.lenis.stop(); } catch (e) {} }
     lockHandlers = function (e) { e.preventDefault(); };
@@ -212,6 +215,17 @@
     return true;
   }
   function restoreFocus() { if (lastOpener && lastOpener.focus && document.body.contains(lastOpener)) { try { lastOpener.focus(); } catch (e) {} } }
+
+  function trapDialogFocus(e) {
+    if (e.key !== "Tab" || !dialog.open) return;
+    var focusable = $$('button:not([disabled]):not([hidden]),a[href],input:not([disabled]):not([type="hidden"]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])', dialog)
+      .filter(function (el) { return !el.hidden && el.getClientRects().length > 0; });
+    if (!focusable.length) { e.preventDefault(); dialog.focus(); return; }
+    var first = focusable[0], last = focusable[focusable.length - 1], active = document.activeElement;
+    if (!dialog.contains(active) || (e.shiftKey && active === first) || (!e.shiftKey && active === last)) {
+      e.preventDefault(); (e.shiftKey ? last : first).focus();
+    }
+  }
 
   function readForm() {
     return {
@@ -410,6 +424,7 @@
       scrollToSel(sel); return;
     }
     if (actEl) { e.preventDefault(); dispatch(actEl.getAttribute("data-action"), actEl); return; }
+    if (anchor && (anchor.hasAttribute("download") || (anchor.getAttribute("href") || "").indexOf("blob:") === 0)) return;
     if (anchor) {
       e.preventDefault(); e.stopImmediatePropagation();   // homepage-only: never navigate
       var href = anchor.getAttribute("href") || "";
@@ -494,17 +509,9 @@
   /* ---------------- dialog close/escape + focus restore ---------------- */
   function bootDialog() {
     if (!dialog) return;
+    dialog.addEventListener("keydown", trapDialogFocus);
     dialog.addEventListener("close", restoreFocus);
     dialog.addEventListener("cancel", function () { setTimeout(restoreFocus, 0); });
-    dialog.addEventListener("keydown", function (event) {
-      if (event.key !== "Tab" || !dialog.open) return;
-      var focusable = $$('button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])', dialog)
-        .filter(function (el) { return !el.hidden && el.getClientRects().length > 0; });
-      if (!focusable.length) { event.preventDefault(); dialog.focus(); return; }
-      var first = focusable[0], last = focusable[focusable.length - 1];
-      if (event.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) { event.preventDefault(); last.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-    });
     form.addEventListener("submit", function (e) { e.preventDefault(); submitInquiry(); });
     form.addEventListener("input", function (event) {
       if (event.target === pasteBox || event.target === importFile) return;
@@ -652,9 +659,9 @@
 
   /* ---------------- boot ---------------- */
   function boot() {
+    var consentDismissed = false;
     document.addEventListener("click", onDocClick, true);  // capture: neutralize + delegate
     $(".hamburger") && $(".hamburger").addEventListener("click", function (e) { e.preventDefault(); document.body.classList.contains("menu-open") ? closeMenu() : openMenu(); });
-    var consentDismissed = false;
     var consent = $("#cky-consent-container");
     if (consent) {
       consent.classList.add("is-visible");
