@@ -8,6 +8,7 @@
     "verify:build": "vite build"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.10.0",
     "@hookform/resolvers": "latest",
     "@radix-ui/react-dialog": "latest",
     "@radix-ui/react-select": "latest",
