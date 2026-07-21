@@ -1324,6 +1324,8 @@ button:active:not(:disabled),
 }
 
 .app-shell--dark {
+  --cds-text-primary: #f4f4f4;
+  --cds-text-secondary: #c6c6c6;
   color: #f4f4f4;
   background: #161616;
 }
@@ -1485,4 +1487,21 @@ button:active:not(:disabled),
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.app-shell--dark .header-actions button {
+  color: #f4f4f4 !important;
+}
+
+.app-shell--dark .header-actions label {
+  color: #f4f4f4 !important;
+}
+
+
+.onboarding-card {
+  color: #161616;
+}
+
+.cds--modal-content {
+  color: #161616;
 }

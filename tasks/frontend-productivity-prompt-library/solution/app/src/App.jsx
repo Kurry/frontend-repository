@@ -170,18 +170,21 @@ function TechniqueTag({ technique }) {
 }
 
 function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm' }) {
+  const [copiedKey, setCopiedKey] = useState(null);
   const copyFeedback = useLibraryStore((state) => state.copyFeedback);
   const showCopyFeedback = useLibraryStore((state) => state.showCopyFeedback);
-  const copied = copyFeedback?.key === feedbackKey;
+  const copied = copyFeedback?.key === feedbackKey || copiedKey === feedbackKey;
 
   const [isExporting, setIsExporting] = useState(false);
   const copy = async () => {
     if (isExporting) return;
     setIsExporting(true);
     try {
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(r => setTimeout(r, 50));
       await writeClipboard(text);
       showCopyFeedback(feedbackKey, 'Copied exact prompt body to clipboard');
+      setCopiedKey(feedbackKey);
+      setTimeout(() => setCopiedKey(null), 1800);
     } finally {
       setIsExporting(false);
     }
@@ -198,6 +201,7 @@ function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm'
         disabled={isExporting}
         aria-label={isExporting ? 'Copying prompt body' : (copied ? 'Copied' : label)}
         data-clipboard-body={copied ? text : undefined}
+        className={copied ? 'copy-animated' : ''}
       >
         {isExporting ? 'Copying…' : (copied ? 'Copied' : 'Copy')}
       </Button>
@@ -544,7 +548,7 @@ function LibraryTable({ prompts }) {
                   <TableRow
                     key={key}
                     {...rest}
-                    className={`${selected ? 'row-selected' : ''} ${newPromptId === prompt.id ? 'row-created' : ''}`}
+                    className={`${selected ? 'row-selected' : ''} ${newPromptId === prompt.id ? 'row-created' : ''}`} data-id={prompt.id}
                   >
                     <TableCell className="select-column">
                       <Checkbox
@@ -725,7 +729,11 @@ function DeleteModal({ promptId }) {
       launcherButtonRef={modalTriggerRef}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
-      onRequestSubmit={() => { deletePrompt(prompt.id); closeModalWithFocus(); }}
+      onRequestSubmit={() => {
+        const row = document.querySelector(`tr[data-id="${prompt.id}"]`);
+        if (row) row.classList.add("row-deleting");
+        setTimeout(() => { deletePrompt(prompt.id); closeModalWithFocus(); }, 150);
+      }}
     >
       <p className="delete-copy">You’re about to remove <strong>“{prompt.title}”</strong> and its version history from this session.</p>
     </Modal>
@@ -745,7 +753,7 @@ function ExtendModal({ promptIds }) {
     resolver: zodResolver(extendFormSchema),
     mode: 'all',
     defaultValues: {
-      title: base ? `${base.title} — extended`.slice(0, 60) : '',
+      title: base ? `${base.title} — extended`.slice(0, 150) : '',
       body: base?.body || '',
       technique: base?.technique || '',
       description: base ? `Extended from ${base.title}`.slice(0, 280) : '',
@@ -962,7 +970,7 @@ function ImportModal() {
   const isLoading = useLibraryStore((state) => state.isLoading);
   const [fileName, setFileName] = useState('');
   const {
-    register, handleSubmit, setValue, trigger,
+    register, handleSubmit, setValue, trigger, setError, clearErrors,
     formState: { errors, isValid },
   } = useForm({ resolver: zodResolver(importFormSchema), mode: 'all', defaultValues: { payload: '' } });
   useEffect(() => { trigger(); }, [trigger]);
@@ -1522,7 +1530,7 @@ function OnboardingTour() {
   if (complete || step >= ONBOARDING_STEPS.length) return null;
   const current = ONBOARDING_STEPS[step];
   return (
-    <div className="onboarding-layer" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+    <div className="onboarding-layer" role="dialog" aria-modal="true" aria-labelledby="onboarding-title" onClick={(e) => { if (e.target === e.currentTarget) completeOnboarding(); }}>
       <button type="button" className="onboarding-backdrop" aria-label="Skip onboarding" onClick={completeOnboarding} />
       <div className="onboarding-card">
         <h2 id="onboarding-title">{current.title}</h2>
@@ -1559,6 +1567,17 @@ function App() {
 
   useEffect(() => registerWebMCPTools(), []);
   useModalFocusTrap(Boolean(activeModal) || Boolean(detailPromptId) || Boolean(historyPromptId));
+  useEffect(() => {
+    const onClick = (e) => {
+      if (e.target.classList.contains('cds--modal') && e.target.classList.contains('is-visible')) {
+        const state = useLibraryStore.getState();
+        if (state.activeModal) state.closeModal();
+        if (state.detailPromptId) state.closeDetail();
+      }
+    };
+    window.addEventListener('mousedown', onClick);
+    return () => window.removeEventListener('mousedown', onClick);
+  }, []);
   useEffect(() => {
     const onScroll = () => {
       document.documentElement.style.setProperty('--scroll-parallax', `${window.scrollY}px`);

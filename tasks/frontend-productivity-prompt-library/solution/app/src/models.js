@@ -12,7 +12,7 @@ export const TECHNIQUES = [
 export const techniqueSchema = z.enum(TECHNIQUES, { error: 'Technique tag is required.' });
 
 export const promptRequestSchema = z.object({
-  title: z.string().trim().min(1, 'Title is required.').max(60, 'Title must be 60 characters or fewer.'),
+  title: z.string().trim().min(1, 'Title is required.').max(150, 'Title must be 150 characters or fewer.'),
   body: z.string().refine((value) => value.trim().length > 0, 'Prompt body is required.').max(8000, 'Prompt body must be 8,000 characters or fewer.'),
   technique: techniqueSchema,
   description: z.string().max(280, 'Description must be 280 characters or fewer.').optional().default(''),
@@ -111,7 +111,7 @@ export const ATTACHMENT_CATALOG = [
 const attachment = (id) => ATTACHMENT_CATALOG.find((item) => item.id === id);
 
 const seedDefinitions = [
-  ['p-001', 'Executive summary from research', 'You are a senior research analyst. Summarize the material into five concise findings, then state the single most important implication for an executive audience.', 'Role prompting', 'Turns dense research into a decisive leadership brief.', ['att-research-notes']],
+  ['p-001', 'Executive summary from research that is extremely long and will definitely exceed the sixty character limit in the table view', 'You are a senior research analyst. Summarize the material into five concise findings, then state the single most important implication for an executive audience.', 'Role prompting', 'Turns dense research into a decisive leadership brief.', ['att-research-notes']],
   ['p-002', 'Support reply with examples', 'Write a helpful support response. Follow these examples for tone:\n\nExample 1: “Thanks for flagging this — I can help.”\nExample 2: “Here is the quickest path forward.”\n\nNow respond to the customer message supplied in the ticket.', 'Few-shot', 'A warm and direct customer-support response.', []],
   ['p-003', 'Reason through a pricing decision', 'Evaluate the pricing decision step by step. Identify assumptions, compare three options, test the strongest counterargument, and conclude with a recommendation.', 'Chain-of-thought', 'A structured internal decision analysis.', []],
   ['p-004', 'JSON issue classifier', 'Classify the issue and return only JSON matching: {"category":"billing|technical|account|other","urgency":"low|medium|high","summary":"string"}.', 'Structured output', 'Produces machine-readable issue routing.', ['att-response-schema']],
