@@ -78,7 +78,7 @@ export function RowDialog({ dataset, mode, rowId }) {
   return (
     <ModalShell title={mode === 'edit' ? 'Edit row' : 'Add row'} subtitle={`Values are validated against ${dataset.name}’s record contract.`}
       onClose={() => setUi({ modal: null })}
-      footer={<><Btn kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Btn><Btn type="submit" form="row-form" disabled={isSubmitting}>{mode === 'edit' ? 'Save changes' : 'Add row'}</Btn></>}>
+      footer={<><Btn kind="secondary" onClick={() => setUi({ modal: null })}>Cancel</Btn><Btn type="submit" form="row-form" disabled={isSubmitting || lock.current}>{mode === 'edit' ? 'Save changes' : 'Add row'}</Btn></>}>
       <form id="row-form" onSubmit={handleSubmit(submit, () => {})} noValidate>
         <div className="grid gap-5 p-5 sm:grid-cols-2">
           {dataset.schema.map((field) => (

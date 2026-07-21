@@ -63,7 +63,7 @@ export function SplitPanel({ dataset }) {
           Percentages total: {total}%{total !== 100 && ' — must total exactly 100%'}
         </p>
         {errors.root && <p className="error-text" role="alert">{errors.root.message}</p>}
-        <Btn className="mt-4" type="submit" size="sm">Apply split</Btn>
+        <Btn className="mt-4" type="submit" size="sm" disabled={total !== 100}>Apply split</Btn>
       </form>
       <div className="p-5">
         <h3 className="text-sm font-bold t-primary">Actual assigned distribution</h3>

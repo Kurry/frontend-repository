@@ -230,7 +230,7 @@ function WizardInner({ dataset }) {
             </div>
             <footer className="mt-5 flex justify-between">
               <Btn kind="secondary" icon={ArrowLeft} onClick={() => update({ step: 'mapping' })}>Back to mapping</Btn>
-              <Btn disabled={Boolean(issues) || !included.length || state.committing} onClick={commit}>{state.committing ? 'Committing…' : `Commit ${included.length} row${included.length === 1 ? '' : 's'}`}</Btn>
+              <Btn disabled={Boolean(issues) || !included.length || state.committing || commitLock.current} onClick={commit}>{state.committing ? 'Committing…' : `Commit ${included.length} row${included.length === 1 ? '' : 's'}`}</Btn>
             </footer>
           </div>
         )}
