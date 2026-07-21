@@ -5,7 +5,7 @@
     "value": 1,
     "weight": 1,
     "description": "Every interactive control on setup and play — including Start game, Draw card, Done, Skip, Export Session, Import Session, Save Progress, Resume Saved Session, category chips, and intensity buttons — is reachable and operable with the keyboard alone, with a visible Tab focus indicator.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified controls_keyboard_accessible. Observed that Every interactive control on setup and play — including Start game, Draw card, D... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.2",
@@ -13,7 +13,7 @@
     "value": 1,
     "weight": 1,
     "description": "Confirmation dialogs for Start new game and custom-card delete trap focus while open, close on Escape, and return focus to the control that opened them.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified dialogs_manage_focus. Observed that Confirmation dialogs for Start new game and custom-card delete trap focus while ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.3",
@@ -21,7 +21,7 @@
     "value": 1,
     "weight": 1,
     "description": "Icon-only or icon-leading controls expose accessible names matching their actions (Draw card, Delete, stream status) rather than unnamed graphics.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified icons_have_accessible_names. Observed that Icon-only or icon-leading controls expose accessible names matching their action... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.4",
@@ -29,7 +29,7 @@
     "value": 1,
     "weight": 1,
     "description": "Inline validation errors and the Winner announcement are announced to assistive technology when they appear (live region or equivalent), not only painted visually.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified validation_and_winner_live_regions. Observed that Inline validation errors and the Winner announcement are announced to assistive ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.5",
@@ -37,7 +37,7 @@
     "value": 1,
     "weight": 1,
     "description": "Player name fields and custom-card prompt/category/intensity controls have explicit labels associated with the inputs.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified forms_have_explicit_labels. Observed that Player name fields and custom-card prompt/category/intensity controls have expli... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.6",
@@ -45,7 +45,7 @@
     "value": 1,
     "weight": 1,
     "description": "Dare Night title and section headings (players, custom cards, scores, live event feed) follow a logical heading order without skipping levels.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified headings_follow_logical_order. Observed that Dare Night title and section headings (players, custom cards, scores, live event... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.7",
@@ -53,7 +53,7 @@
     "value": 1,
     "weight": 1,
     "description": "Setup and play screens expose landmark regions so the main game area, forms, and complementary panels are distinguishable.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified landmark_navigation_present. Observed that Setup and play screens expose landmark regions so the main game area, forms, and... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.8",
@@ -61,7 +61,7 @@
     "value": 1,
     "weight": 1,
     "description": "Primary text on cyan #34CDE3 and white-on-near-black buttons meet readable contrast in the shipped theme.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified text_controls_have_contrast. Observed that Primary text on cyan #34CDE3 and white-on-near-black buttons meet readable contr... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.9",
@@ -69,7 +69,7 @@
     "value": 1,
     "weight": 1,
     "description": "Category chips and intensity buttons expose selected state to assistive technology, not only through color.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified semantic_roles_for_toggles. Observed that Category chips and intensity buttons expose selected state to assistive technolo... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.10",
@@ -77,7 +77,7 @@
     "value": 1,
     "weight": 1,
     "description": "With prefers-reduced-motion set, card flip, toasts, dialog transitions, Winner celebration and confetti are replaced by instant state changes while the game remains playable.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified reduced_motion_respected. Observed that With prefers-reduced-motion set, card flip, toasts, dialog transitions, Winner c... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.1",
@@ -85,7 +85,7 @@
     "value": 1,
     "weight": 1,
     "description": "Starting a game with 3 named players, resolving at least one Done and one Skip, adding one custom card, then reloading: the same players in the same order, points, forfeits, current turn, and the custom card all survive together — never a mix where some facets persist and others silently reset.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified persistence_multi_facet_reload. Observed that Starting a game with 3 named players, resolving at least one Done and one Skip, ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.2",
@@ -93,7 +93,7 @@
     "value": 1,
     "weight": 1,
     "description": "With 3 players, resolve Done turns so standings change order on View scores; the scoreboard re-sorts by points descending from live totals rather than showing a fixed hardcoded order.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified scoreboard_sort_proves_live_scores. Observed that With 3 players, resolve Done turns so standings change order on View scores; the... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.3",
@@ -101,7 +101,7 @@
     "value": 1,
     "weight": 1,
     "description": "Start a game with only Dare selected and draw several cards (all Dare); return via Start new game, select only Truth, start again and draw several cards — every new draw shows Truth, proving the filter changes outcomes.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified category_filter_changes_drawn_cards. Observed that Start a game with only Dare selected and draw several cards (all Dare); return v... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.4",
@@ -109,7 +109,7 @@
     "value": 1,
     "weight": 1,
     "description": "Press Done on a drawn card and without reload confirm the resolving player's scoreboard points rose by one and the turn indicator advanced to the next join-order player — play outcome echoes across card chrome and scoreboard.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified done_echoes_scoreboard_and_turn. Observed that Press Done on a drawn card and without reload confirm the resolving player's sco... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.5",
@@ -117,7 +117,7 @@
     "value": 1,
     "weight": 1,
     "description": "Measure a player's points and the custom-card list count immediately before and after one Done and one valid custom-card submit; points rise by exactly one and the list count rises by exactly one with no off-by-one.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified points_and_custom_card_count_delta. Observed that Measure a player's points and the custom-card list count immediately before and ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.6",
@@ -125,7 +125,7 @@
     "value": 1,
     "weight": 1,
     "description": "Play two short sessions with different Done/Skip patterns, Export Session each time, and confirm the two JSON documents differ in players points/forfeits and turnLog in the ways the play dictates — not identical hardcoded exports.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified different_play_different_export. Observed that Play two short sessions with different Done/Skip patterns, Export Session each t... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.7",
@@ -133,7 +133,7 @@
     "value": 1,
     "weight": 1,
     "description": "During play, open View scores, start the live event feed, resolve another Done, then reopen scores: points and turn order stay coherent with the feed running — neither flow corrupts the other.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified interleaved_scores_and_live_feed. Observed that During play, open View scores, start the live event feed, resolve another Done, ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.8",
@@ -141,7 +141,7 @@
     "value": 1,
     "weight": 1,
     "description": "Before any custom card exists the list shows the empty-state message; after adding one card the empty state is gone and the card is listed; after confirmed delete the empty state returns — derived chrome tracks empty → populated → empty.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified empty_custom_cards_then_repopulate. Observed that Before any custom card exists the list shows the empty-state message; after addi... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.9",
@@ -149,7 +149,7 @@
     "value": 1,
     "weight": 1,
     "description": "During play after at least one resolved turn, Save Progress, reload, Resume Saved Session: players, points, forfeits, and current turn match the checkpoint while the Dare Night record facet remains coherent.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified save_resume_reload_round_trip. Observed that During play after at least one resolved turn, Save Progress, reload, Resume Save... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.10",
@@ -157,7 +157,7 @@
     "value": 1,
     "weight": 1,
     "description": "Export Session after play, note players points and turnLog, Import Session that JSON on a cleared setup, and confirm the restored session matches those fields without inventing fabricated turns.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified import_export_session_round_trip. Observed that Export Session after play, note players points and turnLog, Import Session that ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "14.11",
@@ -165,7 +165,7 @@
     "value": 1,
     "weight": 1,
     "description": "Drive a player to 10 points to show Winner, then confirm Start new game and confirm again: setup returns with cleared players/scores and no Winner banner while the Dare Night record remains if it was set.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified winner_then_new_game_clean_restart. Observed that Drive a player to 10 points to show Winner, then confirm Start new game and conf... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.1",
@@ -173,7 +173,7 @@
     "value": 1,
     "weight": 1,
     "description": "On load, the app shows a Dare Night setup screen with a players panel, Icebreaker/Truth/Dare/Wild category chips, Mild/Spicy/Wild intensity buttons, a round-timer switch, a custom-card form, a First to 10 win-target readout, Export Session and Import Session controls, and a Start game control.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified setup_screen_with_win_target_and_export. Observed that On load, the app shows a Dare Night setup screen with a players panel, Icebreake... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.2",
@@ -181,7 +181,7 @@
     "value": 1,
     "weight": 1,
     "description": "When fewer than 2 valid names are entered or all categories are deselected, Start game stays disabled and a visible inline error appears next to the offending control; after adding 2 unique names and keeping a category selected, Start game becomes enabled.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified start_requires_valid_setup. Observed that When fewer than 2 valid names are entered or all categories are deselected, Star... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.3",
@@ -189,7 +189,7 @@
     "value": 1,
     "weight": 1,
     "description": "When a name duplicating an existing player is entered, it is rejected with a visible inline error and is not added to the roster.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified duplicate_name_rejected. Observed that When a name duplicating an existing player is entered, it is rejected with a vis... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.4",
@@ -197,7 +197,7 @@
     "value": 1,
     "weight": 1,
     "description": "After pressing Start game, the play screen appears without a full page reload and shows the first player's turn above a Draw card control.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified start_game_shows_play_screen. Observed that After pressing Start game, the play screen appears without a full page reload an... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.5",
@@ -205,7 +205,7 @@
     "value": 1,
     "weight": 1,
     "description": "After pressing Draw card, a white card panel reveals a category label, an intensity badge, and centered prompt text at least 18px, with the current player's name shown above it.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified draw_card_reveals_panel. Observed that After pressing Draw card, a white card panel reveals a category label, an intens... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.6",
@@ -213,7 +213,7 @@
     "value": 1,
     "weight": 1,
     "description": "After pressing Done, the current player's points increase by 1 and the turn advances to the next player; after pressing Skip on a later turn, a forfeit is logged with no point and the turn advances.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified done_and_skip_resolve_turns. Observed that After pressing Done, the current player's points increase by 1 and the turn adva... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.7",
@@ -221,7 +221,7 @@
     "value": 1,
     "weight": 1,
     "description": "After starting a game with only one category selected and drawing several cards, every drawn card's category label matches that single selected category.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified single_category_filters_deck. Observed that After starting a game with only one category selected and drawing several cards,... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.8",
@@ -229,7 +229,7 @@
     "value": 1,
     "weight": 1,
     "description": "After adding a custom card via the form, a transient confirmation appears and the card is listed; after a full page refresh the custom card still appears in the list, proving localStorage persistence.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified custom_card_persists_after_refresh. Observed that After adding a custom card via the form, a transient confirmation appears and th... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.9",
@@ -237,7 +237,7 @@
     "value": 1,
     "weight": 1,
     "description": "When a custom card's Delete control is pressed, a confirmation step is required, and cancelling it leaves the card in place while confirming removes it.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified custom_card_delete_confirmation. Observed that When a custom card's Delete control is pressed, a confirmation step is required,... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.10",
@@ -245,7 +245,7 @@
     "value": 1,
     "weight": 1,
     "description": "After opening View scores, every player is listed with points and forfeits sorted by points descending, and resolving one more turn updates the scoreboard immediately.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified scoreboard_lists_sorted_scores. Observed that After opening View scores, every player is listed with points and forfeits sorte... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.11",
@@ -253,7 +253,7 @@
     "value": 1,
     "weight": 1,
     "description": "When the round timer is toggled on and a card is drawn, a 15-second countdown runs and, if it reaches zero before Done or Skip, the card is logged as a forfeit for the current player and the turn advances.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified round_timer_forfeit_on_zero. Observed that When the round timer is toggled on and a card is drawn, a 15-second countdown ru... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.12",
@@ -261,7 +261,7 @@
     "value": 1,
     "weight": 1,
     "description": "After drawing until the selected-category deck is exhausted, the deck reshuffles automatically, a Deck reshuffled confirmation appears, and the same card is not drawn twice in a row across the reshuffle boundary.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified deck_reshuffles_without_repeat. Observed that After drawing until the selected-category deck is exhausted, the deck reshuffles... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.13",
@@ -269,7 +269,7 @@
     "value": 1,
     "weight": 1,
     "description": "After pressing Done, Undo last turn is enabled; pressing it removes the awarded point, returns the turn to that same player, re-shows the exact card that was on screen rather than a new one, and cannot be used a second time on the already-reverted action.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified undo_restores_prior_card. Observed that After pressing Done, Undo last turn is enabled; pressing it removes the awarded ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.14",
@@ -277,7 +277,7 @@
     "value": 1,
     "weight": 1,
     "description": "On the live event feed, pressing Start begins delivery and the status reads Active; pressing Pause stops value changes; delivering events out of order and then Reconnect leaves the per-player bonus totals matching logical-timestamp order with duplicates ignored and the status reading Caught up.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified live_feed_out_of_order_and_reconnect. Observed that On the live event feed, pressing Start begins delivery and the status reads Acti... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.15",
@@ -285,7 +285,7 @@
     "value": 1,
     "weight": 1,
     "description": "After resolving turns to raise a player's total above any prior record, pressing Start new game and confirming returns to the setup screen with players and scores cleared and no Winner banner while the Dare Night record still shows the new higher total, and a mid-game refresh instead restores the same players, points, forfeits, and current turn.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified record_survives_reset_and_midgame_restore. Observed that After resolving turns to raise a player's total above any prior record, pressing... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.16",
@@ -293,7 +293,7 @@
     "value": 1,
     "weight": 1,
     "description": "The setup screen accepts 2 to 8 player names, requires each name, and rejects a case-insensitive duplicate with a visible inline error rather than adding it.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified roster_requires_unique_names. Observed that The setup screen accepts 2 to 8 player names, requires each name, and rejects a ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.17",
@@ -301,7 +301,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "The roster caps at 8 players and an empty or whitespace-only name is never added.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified roster_caps_at_eight. Observed that The roster caps at 8 players and an empty or whitespace-only name is never added... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.18",
@@ -309,7 +309,7 @@
     "value": 1,
     "weight": 1,
     "description": "After returning to setup from a game played with only Dare selected and starting a new game with only Truth selected, every card drawn in the new game shows the Truth category label, proving the toggles re-filter the deck between games rather than being cosmetic.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified second_category_filter_round_trip. Observed that After returning to setup from a game played with only Dare selected and starting... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.19",
@@ -317,7 +317,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Selecting the Wild intensity weights the deck toward Wild-tagged cards, and exactly one intensity is active at a time.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified wild_intensity_weights_deck. Observed that Selecting the Wild intensity weights the deck toward Wild-tagged cards, and exac... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.20",
@@ -325,7 +325,7 @@
     "value": 1,
     "weight": 1,
     "description": "With 3 players set up, pressing Start game, drawing a card, and pressing Done updates three surfaces at once without any page reload: the resolving player's scoreboard points rise by exactly one (count measured immediately around the press), the turn indicator above the card advances to the next player in join order, and the scoreboard ordering re-sorts if the new total changes the standings.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified done_updates_three_surfaces_without_reload. Observed that With 3 players set up, pressing Start game, drawing a card, and pressing Done up... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.21",
@@ -333,7 +333,7 @@
     "value": 1,
     "weight": 1,
     "description": "Rapidly double-activating the Done button resolves exactly one turn: measured immediately around the double press, the resolving player's points rise by exactly one and the turn indicator advances exactly one position in join order.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified double_activated_done_resolves_one_turn. Observed that Rapidly double-activating the Done button resolves exactly one turn: measured im... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.22",
@@ -341,7 +341,7 @@
     "value": 1,
     "weight": 1,
     "description": "With 3 or more players the turn rotates in a fixed repeating order that returns to the first player after the last.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified turn_rotation_fixed_join_order. Observed that With 3 or more players the turn rotates in a fixed repeating order that returns ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.23",
@@ -349,7 +349,7 @@
     "value": 1,
     "weight": 1,
     "description": "A custom card added through the form is mixed into the deck and drawable during play, and the custom-card list shows a friendly empty-state message before any card is added.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified custom_card_drawable_and_empty_state. Observed that A custom card added through the form is mixed into the deck and drawable during ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.24",
@@ -357,7 +357,7 @@
     "value": 1,
     "weight": 1,
     "description": "Submitting the custom-card form with a prompt shorter than 8 characters is rejected with a visible message naming the field prompt and the 8-to-200 length rule, and the custom-card list count stays unchanged.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified short_custom_prompt_rejected_inline. Observed that Submitting the custom-card form with a prompt shorter than 8 characters is rejec... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.25",
@@ -365,7 +365,7 @@
     "value": 1,
     "weight": 1,
     "description": "Submitting a valid custom card raises the custom-card list count by exactly one and shows a transient confirmation; after a page refresh the same card is still listed and can still be drawn during play, and after its delete is confirmed and the page is refreshed the card stays gone from the list.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified custom_card_lifecycle_round_trip. Observed that Submitting a valid custom card raises the custom-card list count by exactly one ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.26",
@@ -373,7 +373,7 @@
     "value": 1,
     "weight": 1,
     "description": "After a session where a player exceeds the previous best total, the setup screen's Dare Night record line names that player and their points, and the same record line persists after a page refresh and after a confirmed Start new game reset even though players and scores are cleared.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified record_line_names_holder_and_survives_reset. Observed that After a session where a player exceeds the previous best total, the setup screen... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.27",
@@ -381,7 +381,7 @@
     "value": 1,
     "weight": 1,
     "description": "While the live event feed stream is active, delivered values visibly change, and after a delivery sequence the applied-event log entries agree with the per-player live-bonus totals shown in the panel.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified event_log_and_bonus_totals_agree. Observed that While the live event feed stream is active, delivered values visibly change, and... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.28",
@@ -389,7 +389,7 @@
     "value": 1,
     "weight": 1,
     "description": "Undo last turn reverts the most recent Done, Skip, or timer forfeit by restoring that player's points and forfeits, returning the turn to that player, and re-showing the exact card that was on screen; it is unavailable at game start and after it has already been used for the latest action.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified undo_unavailable_when_illegal. Observed that Undo last turn reverts the most recent Done, Skip, or timer forfeit by restoring... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.29",
@@ -397,7 +397,7 @@
     "value": 1,
     "weight": 1,
     "description": "Start new game asks for confirmation, then returns to the setup screen with players and scores cleared while the saved Dare Night record is preserved and reflects the highest single-player total reached.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified start_new_game_preserves_record. Observed that Start new game asks for confirmation, then returns to the setup screen with play... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.30",
@@ -405,7 +405,7 @@
     "value": 1,
     "weight": 1,
     "description": "After pausing the live event feed and letting events accumulate, pressing Reconnect applies each missed event exactly once: the per-player live-bonus totals agree with the applied-event log with no double-applied entries, and the visible stream status reflects the caught-up state.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified reconnect_catches_up_exactly_once. Observed that After pausing the live event feed and letting events accumulate, pressing Reconn... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.33",
@@ -413,7 +413,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Toggling a category chip flips it between selected and unselected and a visible live count of selected categories changes immediately with each toggle, matching the number of chips currently selected.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified selected_category_count_updates_live. Observed that Toggling a category chip flips it between selected and unselected and a visible ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.34",
@@ -421,7 +421,7 @@
     "value": 1,
     "weight": 1,
     "description": "When a player's points reach 10 via Done, the play screen shows a Winner announcement naming that player, Draw card / Done / Skip become unavailable, and the scoreboard marks that player as the winner — a decided end state from play.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified winner_declared_at_ten_points. Observed that When a player's points reach 10 via Done, the play screen shows a Winner announc... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.35",
@@ -429,7 +429,7 @@
     "value": 1,
     "weight": 1,
     "description": "After at least one Done and one Skip, Export Session or Copy Session JSON yields JSON with schemaVersion dare-night-session-v1, winTarget 10, players points and forfeits matching the scoreboard, and a turnLog that includes those outcomes — compiled live from the session, not a blank stub.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified export_session_json_field_contract. Observed that After at least one Done and one Skip, Export Session or Copy Session JSON yields... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.36",
@@ -437,7 +437,7 @@
     "value": 1,
     "weight": 1,
     "description": "During an active game after at least one resolved turn, Save Progress shows a Saved confirmation; after a full page reload, Resume Saved Session restores the same players, points, forfeits, current turn, categories, intensity, and on-screen card if one was showing.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified save_progress_resume_across_reload. Observed that During an active game after at least one resolved turn, Save Progress shows a Sa... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.37",
@@ -445,7 +445,7 @@
     "value": 1,
     "weight": 1,
     "description": "Exporting a playing or finished session and importing that dare-night-session-v1 JSON reconstructs players, points, forfeits, current turn or winner, custom cards, and turnLog to match the export.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified import_session_round_trip. Observed that Exporting a playing or finished session and importing that dare-night-session-v1... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.38",
@@ -453,7 +453,7 @@
     "value": 1,
     "weight": 1,
     "description": "Adding a player requires name as a trimmed string of length 1 to 20 inclusive that is unique ignoring case; a name longer than 20 characters or a case-insensitive duplicate shows an inline message naming the field name and is not added; Add stays disabled while name is invalid.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified player_name_field_contract. Observed that Adding a player requires name as a trimmed string of length 1 to 20 inclusive th... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.39",
@@ -461,7 +461,7 @@
     "value": 1,
     "weight": 1,
     "description": "A valid custom card requires prompt (8 to 200 chars), category (Icebreaker, Truth, Dare, or Wild), and intensity (Mild, Spicy, or Wild); Submit stays disabled until valid, and the listed card shows those same field values.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified custom_card_payload_field_contract. Observed that A valid custom card requires prompt (8 to 200 chars), category (Icebreaker, Trut... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "1.40",
@@ -469,7 +469,7 @@
     "value": 1,
     "weight": 1,
     "description": "After a Winner is declared, activating Draw card, Done, or Skip does not change any player's points or forfeits.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified finished_game_blocks_scoring. Observed that After a Winner is declared, activating Draw card, Done, or Skip does not change ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.1",
@@ -477,7 +477,7 @@
     "value": 1,
     "weight": 1,
     "description": "Paddings and margins on setup and play follow the 10px base spacing unit as multiples of 10px in the spirit of the reference overview.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified spacing_follows_10px_scale. Observed that Paddings and margins on setup and play follow the 10px base spacing unit as mult... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.2",
@@ -485,7 +485,7 @@
     "value": 1,
     "weight": 1,
     "description": "Headings use Poppins-like sizing near h1 32px bold and h2 20px semibold with body near 14px and card prompts at least 18px centered, matching the instruction over conflicting screenshot type.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified typography_matches_spec. Observed that Headings use Poppins-like sizing near h1 32px bold and h2 20px semibold with bod... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.3",
@@ -493,7 +493,7 @@
     "value": 1,
     "weight": 1,
     "description": "The single-column centered Dare Night composition matches the reference overview structure for setup panels and play card area; where screenshots disagree with text, text wins.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified layout_matches_reference_structure. Observed that The single-column centered Dare Night composition matches the reference overview... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.4",
@@ -501,7 +501,7 @@
     "value": 1,
     "weight": 1,
     "description": "Selected category/intensity fills, Winner banner, and scoreboard sorting states called out in the instruction are visibly present.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified specified_state_changes_present. Observed that Selected category/intensity fills, Winner banner, and scoreboard sorting states ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.5",
@@ -509,7 +509,7 @@
     "value": 1,
     "weight": 1,
     "description": "Desktop and ~375px layouts keep the same single-column product identity shown in the reference, without inventing a conflicting dashboard chrome.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified responsive_behavior_matches. Observed that Desktop and ~375px layouts keep the same single-column product identity shown in... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.6",
@@ -517,7 +517,7 @@
     "value": 1,
     "weight": 1,
     "description": "Primary near-black pills and secondary white outlined pills match the specified button treatments on Draw card, Done, Skip, and Start game.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified control_styling_matches_spec. Observed that Primary near-black pills and secondary white outlined pills match the specified ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.7",
@@ -525,7 +525,7 @@
     "value": 1,
     "weight": 1,
     "description": "Dare Night title, section headings, and body/prompt text form a clear hierarchy consistent with the reference sections.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified typography_hierarchy_clear. Observed that Dare Night title, section headings, and body/prompt text form a clear hierarchy ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.8",
@@ -533,7 +533,7 @@
     "value": 1,
     "weight": 1,
     "description": "Selected vs unselected category chips and intensity buttons show the filled vs outlined treatments described.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified component_states_match_spec. Observed that Selected vs unselected category chips and intensity buttons show the filled vs o... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.9",
@@ -541,7 +541,7 @@
     "value": 1,
     "weight": 1,
     "description": "White card/panel surfaces on cyan #34CDE3 match the bright cyan party look from the reference screenshots.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified surface_treatments_match. Observed that White card/panel surfaces on cyan #34CDE3 match the bright cyan party look from ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.10",
@@ -549,7 +549,7 @@
     "value": 1,
     "weight": 1,
     "description": "Hover/pressed feedback on pills and chips is present in the same restrained style as the reference UI.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified microinteractions_match_spec. Observed that Hover/pressed feedback on pills and chips is present in the same restrained styl... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.1",
@@ -557,7 +557,7 @@
     "value": 1,
     "weight": 1,
     "description": "Before any custom card is added, the custom-card list shows a friendly empty-state message rather than a blank region.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified custom_card_empty_state. Observed that Before any custom card is added, the custom-card list shows a friendly empty-sta... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.2",
@@ -565,7 +565,7 @@
     "value": 1,
     "weight": 1,
     "description": "Player name and custom-card forms show inline validation before submit for length, duplicate name, and enum fields.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified player_and_card_forms_validate_inline. Observed that Player name and custom-card forms show inline validation before submit for lengt... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.3",
@@ -573,7 +573,7 @@
     "value": 1,
     "weight": 1,
     "description": "Validation errors name the field (name or prompt) and the broken rule (1-to-20 or 8-to-200) rather than only saying Invalid.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified errors_name_field_and_rule. Observed that Validation errors name the field (name or prompt) and the broken rule (1-to-20 o... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.4",
@@ -581,7 +581,7 @@
     "value": 1,
     "weight": 1,
     "description": "Done, Skip, Deck reshuffled, custom-card add/delete, Save Progress, and Copied each show visible confirmation feedback.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified actions_show_toasts_and_saved. Observed that Done, Skip, Deck reshuffled, custom-card add/delete, Save Progress, and Copied e... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.5",
@@ -589,7 +589,7 @@
     "value": 1,
     "weight": 1,
     "description": "While the 15-second round timer runs or the live feed is active, controls remain responsive rather than freezing with a blank loading wall.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified timer_and_stream_stay_responsive. Observed that While the 15-second round timer runs or the live feed is active, controls remain... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.6",
@@ -597,7 +597,7 @@
     "value": 1,
     "weight": 1,
     "description": "Custom-card Delete and Start new game require confirmation; cancelling leaves the card or in-progress game in place.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified delete_and_new_game_confirm_cancel. Observed that Custom-card Delete and Start new game require confirmation; cancelling leaves th... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.7",
@@ -605,7 +605,7 @@
     "value": 1,
     "weight": 1,
     "description": "The First to 10 win-target readout and Dare Night record line are visible guidance on setup without hidden controls.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified win_target_and_record_readable. Observed that The First to 10 win-target readout and Dare Night record line are visible guidan... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.8",
@@ -613,7 +613,7 @@
     "value": 1,
     "weight": 1,
     "description": "Undo last turn is unavailable at game start, after it was already used for the latest action, and after a Winner is declared.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified undo_unavailable_when_illegal. Observed that Undo last turn is unavailable at game start, after it was already used for the l... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.9",
@@ -621,7 +621,7 @@
     "value": 1,
     "weight": 1,
     "description": "Importing malformed JSON, wrong schemaVersion, or a payload missing required session fields shows a visible rejection and leaves the live session unchanged.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified import_rejects_malformed_session. Observed that Importing malformed JSON, wrong schemaVersion, or a payload missing required ses... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.10",
@@ -629,7 +629,7 @@
     "value": 1,
     "weight": 1,
     "description": "Adding a 9th player is refused and an empty or whitespace-only name is never added to the roster.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified ninth_player_and_whitespace_rejected. Observed that Adding a 9th player is refused and an empty or whitespace-only name is never add... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "11.1",
@@ -637,7 +637,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Beyond the minimum Winner text, the finishing moment includes a polished celebration treatment that still respects reduced-motion.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified polished_winner_celebration. Observed that Beyond the minimum Winner text, the finishing moment includes a polished celebra... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "11.2",
@@ -645,7 +645,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Beyond a raw download, Export Session or Copy Session JSON offers a clear preview or confirmation that names dare-night-session-v1 fields the user is about to take away.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified export_preview_clarity. Observed that Beyond a raw download, Export Session or Copy Session JSON offers a clear previe... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "11.3",
@@ -653,7 +653,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Beyond an isolated feed, live-bonus totals are presented in a way that clearly relates to the player roster without confusing base points.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified live_bonus_integrates_with_scores. Observed that Beyond an isolated feed, live-bonus totals are presented in a way that clearly r... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "11.4",
@@ -661,7 +661,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Beyond bare controls, empty custom-card and Resume Saved Session affordances explain the next step in plain language.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified thoughtful_empty_and_resume_guidance. Observed that Beyond bare controls, empty custom-card and Resume Saved Session affordances exp... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "11.5",
@@ -669,7 +669,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Beyond a labeled intensity toggle, Mild/Spicy/Wild produce a clearly felt difference in drawn-card mix during play.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified intensity_weighting_feel. Observed that Beyond a labeled intensity toggle, Mild/Spicy/Wild produce a clearly felt differ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "innovation.catchall",
@@ -677,7 +677,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "The app includes a noteworthy, browser-observable enhancement beyond the written specification that is not covered by any other criterion in this file and meaningfully improves Dare Night play, export clarity, or party hosting without breaking required behaviors. Name the enhancement and cite concrete evidence. If nothing beyond the spec is present, answer no.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified innovation_catchall. Observed that The app includes a noteworthy, browser-observable enhancement beyond the written... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.1",
@@ -685,7 +685,7 @@
     "value": 1,
     "weight": 1,
     "description": "Pressing the Draw card button animates the card panel in with a short flip-and-fade transition of roughly 0.2 to 0.4 seconds rather than the card content snapping into place instantly.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified draw_card_flip_fade_transition. Observed that Pressing the Draw card button animates the card panel in with a short flip-and-f... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.2",
@@ -693,7 +693,7 @@
     "value": 1,
     "weight": 1,
     "description": "Awarding a point, logging a forfeit, reshuffling the deck, and adding or deleting a custom card each show a transient toast that appears and then disappears on its own after a few seconds.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified toasts_auto_dismiss. Observed that Awarding a point, logging a forfeit, reshuffling the deck, and adding or deletin... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.3",
@@ -701,7 +701,7 @@
     "value": 1,
     "weight": 1,
     "description": "Hovering a button, category chip, intensity button, or the card shows a visible hover state distinct from its resting state, and pressing a button gives immediate pressed feedback.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified hover_and_pressed_feedback. Observed that Hovering a button, category chip, intensity button, or the card shows a visible ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.4",
@@ -709,7 +709,7 @@
     "value": 1,
     "weight": 1,
     "description": "When a resolved turn changes the standings order, the scoreboard rows ease to their new positions rather than jumping instantly to the new order.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified scoreboard_rows_ease_on_reorder. Observed that When a resolved turn changes the standings order, the scoreboard rows ease to th... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.5",
@@ -717,7 +717,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "With the round timer on, the countdown updates each second and visibly pulses as it nears zero.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified timer_pulse_near_zero. Observed that With the round timer on, the countdown updates each second and visibly pulses as... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.8",
@@ -725,7 +725,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Adding a custom card animates the new list entry in, and a confirmed delete animates the entry out rather than removing it abruptly.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified custom_card_list_animates. Observed that Adding a custom card animates the new list entry in, and a confirmed delete anim... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.9",
@@ -733,7 +733,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Toggling a category chip or an intensity button transitions its fill and border to the new state rather than switching styles instantly.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified toggle_fill_transition. Observed that Toggling a category chip or an intensity button transitions its fill and border ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.10",
@@ -741,7 +741,7 @@
     "value": 1,
     "weight": 1,
     "description": "Confirmation dialogs and the scoreboard enter with a brief fade-and-scale transition and exit the same way rather than appearing and disappearing instantly.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified dialog_scoreboard_fade_scale. Observed that Confirmation dialogs and the scoreboard enter with a brief fade-and-scale transi... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.11",
@@ -749,7 +749,7 @@
     "value": 1,
     "weight": 1,
     "description": "When a Done press made through the visible control raises a player's total above the previous all-time record, a brief confetti burst plays over the play screen exactly once for that record moment.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified new_record_confetti_once. Observed that When a Done press made through the visible control raises a player's total above... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.12",
@@ -757,7 +757,7 @@
     "value": 1,
     "weight": 1,
     "description": "With prefers-reduced-motion enabled, the card flip, toasts, dialog transitions, the Winner celebration and the confetti burst are replaced by instant state changes and the game remains fully playable.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified reduced_motion_fallback. Observed that With prefers-reduced-motion enabled, the card flip, toasts, dialog transitions, ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "3.13",
@@ -765,7 +765,7 @@
     "value": 1,
     "weight": 1,
     "description": "When a Done press made through the visible control brings a player to 10 points, a short Winner celebration burst plays tied to that finishing action rather than looping ambiently.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified winner_celebration_on_finish. Observed that When a Done press made through the visible control brings a player to 10 points,... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "9.1",
@@ -773,7 +773,7 @@
     "value": 1,
     "weight": 1,
     "description": "The app is interactive within 2 seconds of a local cold load.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified cold_start_under_two_seconds. Observed that The app is interactive within 2 seconds of a local cold load.... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "9.2",
@@ -781,7 +781,7 @@
     "value": 1,
     "weight": 1,
     "description": "No console errors, warnings, or hydration mismatch messages appear on load or during setup, play through a Winner, custom cards, export/import, and the live event feed.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified console_clean_full_exercise. Observed that No console errors, warnings, or hydration mismatch messages appear on load or du... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "9.3",
@@ -789,7 +789,7 @@
     "value": 1,
     "weight": 1,
     "description": "Draw card, Done, Skip, and category toggles respond promptly without multi-second UI stalls under normal use.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified controls_respond_promptly. Observed that Draw card, Done, Skip, and category toggles respond promptly without multi-secon... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "9.4",
@@ -797,7 +797,7 @@
     "value": 1,
     "weight": 1,
     "description": "The one-second countdown ticks and live event feed updates never freeze the UI; controls stay responsive while both run.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified timer_and_stream_nonblocking. Observed that The one-second countdown ticks and live event feed updates never freeze the UI; ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "9.5",
@@ -805,7 +805,7 @@
     "value": 1,
     "weight": 1,
     "description": "Export Session / Copy Session JSON remains responsive after a session with multiple turnLog entries.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified export_json_stays_snappy. Observed that Export Session / Copy Session JSON remains responsive after a session with multi... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "9.6",
@@ -813,7 +813,7 @@
     "value": 1,
     "weight": 1,
     "description": "Resolving turns and opening View scores keep the UI interactive without sustained jank.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified state_changes_remain_interactive. Observed that Resolving turns and opening View scores keep the UI interactive without sustaine... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "9.7",
@@ -821,7 +821,7 @@
     "value": 1,
     "weight": 1,
     "description": "The card flip-and-fade transition completes smoothly without visible hitching on Draw card.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified card_flip_stays_smooth. Observed that The card flip-and-fade transition completes smoothly without visible hitching on... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "9.8",
@@ -829,7 +829,7 @@
     "value": 1,
     "weight": 1,
     "description": "Rapid repeated activation of Done, Draw card, or live-stream Start leaves controls responsive with no hang or blank screen.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified rapid_input_does_not_freeze. Observed that Rapid repeated activation of Done, Draw card, or live-stream Start leaves contro... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "9.9",
@@ -837,7 +837,7 @@
     "value": 1,
     "weight": 1,
     "description": "An extended play session through many draws/reshuffles does not visibly degrade into unusable lag.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified extended_play_avoids_runaway. Observed that An extended play session through many draws/reshuffles does not visibly degrade ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "9.10",
@@ -845,7 +845,7 @@
     "value": 1,
     "weight": 1,
     "description": "When storage is unavailable, the app still loads playably rather than crashing the production build.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified storage_unavailable_safe. Observed that When storage is unavailable, the app still loads playably rather than crashing t... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "7.1",
@@ -853,7 +853,7 @@
     "value": 1,
     "weight": 1,
     "description": "Between 1440px and about 375px the single-column Dare Night layout stays centered and usable without a broken multi-column collapse.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified layout_adapts_desktop_to_mobile. Observed that Between 1440px and about 375px the single-column Dare Night layout stays centere... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "7.2",
@@ -861,7 +861,7 @@
     "value": 1,
     "weight": 1,
     "description": "At about 375px wide, primary pills (Draw card, Done, Start game, Export Session) remain a comfortable tap size.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified mobile_tap_targets_large_enough. Observed that At about 375px wide, primary pills (Draw card, Done, Start game, Export Session)... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "7.3",
@@ -869,7 +869,7 @@
     "value": 1,
     "weight": 1,
     "description": "Headings and body text remain readable from 1440px down to 375px without shrinking into illegible sizes.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified typography_readable_across_widths. Observed that Headings and body text remain readable from 1440px down to 375px without shrinki... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "7.4",
@@ -877,7 +877,7 @@
     "value": 1,
     "weight": 1,
     "description": "Card, scoreboard, setup form, export controls, and live event feed avoid clipping or overflowing the viewport at 1440px and 375px.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified no_clipping_or_overflow. Observed that Card, scoreboard, setup form, export controls, and live event feed avoid clippin... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "7.5",
@@ -885,7 +885,7 @@
     "value": 1,
     "weight": 1,
     "description": "Setup panels and play chrome reflow on small screens so Start game, Save Progress, and Export Session remain reachable.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified chrome_adapts_small_screens. Observed that Setup panels and play chrome reflow on small screens so Start game, Save Progres... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "7.6",
@@ -893,7 +893,7 @@
     "value": 1,
     "weight": 1,
     "description": "As width shrinks, players panel, category chips, and custom-card form stack in a readable order rather than overlapping.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified stacking_reflows_logically. Observed that As width shrinks, players panel, category chips, and custom-card form stack in a... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "7.7",
@@ -901,7 +901,7 @@
     "value": 1,
     "weight": 1,
     "description": "At 375px, category chips, intensity buttons, Done/Skip, and dialog confirms work with tap interaction.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified mobile_touch_controls_work. Observed that At 375px, category chips, intensity buttons, Done/Skip, and dialog confirms work... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "7.8",
@@ -909,7 +909,7 @@
     "value": 1,
     "weight": 1,
     "description": "At about 375px wide the app renders without horizontal scrolling.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified no_horizontal_scroll_at_375. Observed that At about 375px wide the app renders without horizontal scrolling.... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "7.9",
@@ -917,7 +917,7 @@
     "value": 1,
     "weight": 1,
     "description": "Confirmation dialogs and the scoreboard fit within the narrow viewport without off-screen actions.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified dialogs_fit_narrow_viewports. Observed that Confirmation dialogs and the scoreboard fit within the narrow viewport without o... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "7.10",
@@ -925,7 +925,7 @@
     "value": 1,
     "weight": 1,
     "description": "On small screens the Winner banner and Export Session / Import Session controls remain visible and usable.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified winner_and_export_reachable. Observed that On small screens the Winner banner and Export Session / Import Session controls ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.1",
@@ -933,7 +933,7 @@
     "value": 1,
     "weight": 1,
     "description": "Loading the app and performing a full workflow of setup, draw, Done, Skip, play through a Winner, adding a custom card, Export Session, Import Session, and exercising the live event feed produces a console free of errors, warnings, and hydration mismatch messages.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified console_clean_no_hydration_issues. Observed that Loading the app and performing a full workflow of setup, draw, Done, Skip, play ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.2",
@@ -941,7 +941,7 @@
     "value": 1,
     "weight": 1,
     "description": "A custom card added through the form still appears in the custom-card list and is drawable after a full page refresh, and the Dare Night record still shows after a refresh, proving localStorage persistence.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified custom_cards_and_record_persist. Observed that A custom card added through the form still appears in the custom-card list and i... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.3",
@@ -949,7 +949,7 @@
     "value": 1,
     "weight": 1,
     "description": "After resolving a couple of turns — with or without an explicit Save Progress — and performing a full page refresh, the app restores the same players in the same order, each player's points and forfeits, and the same current turn rather than returning to an empty setup screen.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified midgame_and_checkpoint_restore. Observed that After resolving a couple of turns — with or without an explicit Save Progress — ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.4",
@@ -957,7 +957,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "A custom card that is deleted and confirmed does not reappear in the list after a page refresh, proving the deletion itself persisted.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified deleted_custom_card_stays_gone. Observed that A custom card that is deleted and confirmed does not reappear in the list after ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.5",
@@ -965,7 +965,7 @@
     "value": 1,
     "weight": 1,
     "description": "Toggling the round timer across several draws, driving 25 rapid repetitions of the primary game controls including Done and Export Session, and cycling the live event feed leave the final visible state exact with no overlapping countdown, accumulating duplicate loop, blank screen, or sustained freeze.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified rapid_controls_remain_exact. Observed that Toggling the round timer across several draws, driving 25 rapid repetitions of t... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.10",
@@ -973,7 +973,7 @@
     "value": 1,
     "weight": 1,
     "description": "Every interactive control on the setup and play screens is reachable and operable with the keyboard alone, with a visible focus indicator shown on each control as Tab moves through them.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified keyboard_operability_complete. Observed that Every interactive control on the setup and play screens is reachable and operabl... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.11",
@@ -981,7 +981,7 @@
     "value": 1,
     "weight": 1,
     "description": "Confirmation dialogs trap Tab focus while open, close on Escape, and return focus to the control that opened them.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified dialog_focus_management. Observed that Confirmation dialogs trap Tab focus while open, close on Escape, and return focu... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.12",
@@ -989,7 +989,7 @@
     "value": 1,
     "weight": 1,
     "description": "Category chips and intensity buttons expose their selected state in the accessibility tree rather than through color alone, and inline validation errors are rendered next to the field they describe and announced to assistive technology when they appear.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified selected_state_exposed_to_at. Observed that Category chips and intensity buttons expose their selected state in the accessib... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.13",
@@ -997,7 +997,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "On a local cold load the setup screen renders and responds to input within 2 seconds, and controls stay responsive while the round timer runs and the live event feed stream is active.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified interactive_within_two_seconds. Observed that On a local cold load the setup screen renders and responds to input within 2 sec... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.15",
@@ -1005,7 +1005,7 @@
     "value": 1,
     "weight": 1,
     "description": "Export Session after play and Import Session of that dare-night-session-v1 JSON restores the same players, points, forfeits, and turn or winner state without console errors or a blank screen.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified export_import_round_trip_technical. Observed that Export Session after play and Import Session of that dare-night-session-v1 JSON ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "4.16",
@@ -1013,7 +1013,7 @@
     "value": 1,
     "weight": 1,
     "description": "Player name outside 1 to 20 characters and custom-card prompt outside 8 to 200 characters keep their submit controls disabled with inline errors naming the fields; no partial invalid record is committed.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified field_contract_validation_blocks_submit. Observed that Player name outside 1 to 20 characters and custom-card prompt outside 8 to 200 c... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "6.1",
@@ -1021,7 +1021,7 @@
     "value": 1,
     "weight": 1,
     "description": "Completing setup with 3 players, Start game, Draw card, and Done updates scoreboard points (+1), turn indicator, and standings order without a page reload.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified setup_play_done_updates_surfaces. Observed that Completing setup with 3 players, Start game, Draw card, and Done updates scorebo... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "6.2",
@@ -1029,7 +1029,7 @@
     "value": 1,
     "weight": 1,
     "description": "Attempting Start game with fewer than 2 valid names or zero categories shows inline errors naming what to fix; Start game stays disabled until valid.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified invalid_setup_shows_inline_errors. Observed that Attempting Start game with fewer than 2 valid names or zero categories shows inl... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "6.3",
@@ -1037,7 +1037,7 @@
     "value": 1,
     "weight": 1,
     "description": "Playing with a single selected category then returning to setup and selecting a different single category yields only that new category's cards on the next game.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified category_filter_flow_round_trip. Observed that Playing with a single selected category then returning to setup and selecting a ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "6.4",
@@ -1045,7 +1045,7 @@
     "value": 1,
     "weight": 1,
     "description": "Adding a custom card then confirming Delete removes it from the list and from the drawable deck after refresh.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified custom_card_delete_updates_list. Observed that Adding a custom card then confirming Delete removes it from the list and from th... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "6.5",
@@ -1053,7 +1053,7 @@
     "value": 1,
     "weight": 1,
     "description": "Opening View scores during play shows current points/forfeits; resolving another turn updates the same scoreboard without reload.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified view_scores_retains_live_totals. Observed that Opening View scores during play shows current points/forfeits; resolving another... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "6.6",
@@ -1061,7 +1061,7 @@
     "value": 1,
     "weight": 1,
     "description": "After deleting the last custom card, the friendly empty-state message is visible again.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified empty_custom_list_after_last_delete. Observed that After deleting the last custom card, the friendly empty-state message is visible... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "6.7",
@@ -1069,7 +1069,7 @@
     "value": 1,
     "weight": 1,
     "description": "Changing intensity and category selection before Start game changes which cards appear during play rather than leaving draws cosmetic.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified intensity_and_category_affect_deck. Observed that Changing intensity and category selection before Start game changes which cards ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "6.8",
@@ -1077,7 +1077,7 @@
     "value": 1,
     "weight": 1,
     "description": "Starting, pausing, and reconnecting the live event feed during play leaves the current turn and scores intact while bonus totals update per the feed rules.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified live_feed_controls_preserve_play. Observed that Starting, pausing, and reconnecting the live event feed during play leaves the c... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "6.9",
@@ -1085,7 +1085,7 @@
     "value": 1,
     "weight": 1,
     "description": "Driving a player to 10 points shows Winner; confirming Start new game returns to clean setup with Export/Import still available and no Winner banner.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified new_game_dialog_and_winner_flow. Observed that Driving a player to 10 points shows Winner; confirming Start new game returns to... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "6.10",
@@ -1093,7 +1093,7 @@
     "value": 1,
     "weight": 1,
     "description": "Export Session after play, Import Session that JSON, and continue or inspect scores without needing a full page reload to see restored state.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified export_import_flow_without_reload_corruption. Observed that Export Session after play, Import Session that JSON, and continue or inspect sco... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.1",
@@ -1101,7 +1101,7 @@
     "value": 1,
     "weight": 1,
     "description": "The app applies its color tokens consistently: a bright cyan #34CDE3 background, white #FFFFFF card and panel surfaces, near-black #010101 accent for primary buttons and headings, and light cyan #AEEBF4 secondary text.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified cyan_white_nearblack_tokens. Observed that The app applies its color tokens consistently: a bright cyan #34CDE3 background,... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.2",
@@ -1109,7 +1109,7 @@
     "value": 1,
     "weight": 1,
     "description": "Typography uses the Poppins family with h1 at 32px bold, h2 at 20px semibold, body at 14px, and card prompt text at least 18px and centered.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified poppins_type_scale. Observed that Typography uses the Poppins family with h1 at 32px bold, h2 at 20px semibold, bo... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.3",
@@ -1117,7 +1117,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Paddings and margins follow a 10px base unit, cards and panels use a 10px corner radius, and every button is a fully rounded pill with a radius of at least 24px.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified ten_px_spacing_and_pills. Observed that Paddings and margins follow a 10px base unit, cards and panels use a 10px corner... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.4",
@@ -1125,7 +1125,7 @@
     "value": 1,
     "weight": 1,
     "description": "Primary buttons use a near-black background with white text, a pill shape and a drop shadow, while secondary buttons and unselected chips use a white background with black text and a black border.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified primary_secondary_pill_buttons. Observed that Primary buttons use a near-black background with white text, a pill shape and a ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.5",
@@ -1133,7 +1133,7 @@
     "value": 1,
     "weight": 1,
     "description": "Category chips and intensity badges follow the assigned hues — Icebreaker blue, Truth teal, Dare orange, Wild magenta; Mild green, Spicy amber, Wild red — legible at a glance on a drawn card, and the selected intensity and toggled-on chips are filled or inverted versus unselected ones.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified category_intensity_color_coding. Observed that Category chips and intensity badges follow the assigned hues — Icebreaker blue, ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.6",
@@ -1141,7 +1141,7 @@
     "value": 1,
     "weight": 1,
     "description": "Attempting to start with fewer than 2 players, a duplicate name, a name longer than 20 characters, or zero categories shows a visible inline error next to the offending control, not merely a disabled button.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified inline_errors_visible_treatment. Observed that Attempting to start with fewer than 2 players, a duplicate name, a name longer t... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.7",
@@ -1149,7 +1149,7 @@
     "value": 1,
     "weight": 1,
     "description": "At about 375px wide the app renders without horizontal scrolling and the card, scoreboard, setup form, export controls, and live event feed stay legible and usable.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified narrow_viewport_legible. Observed that At about 375px wide the app renders without horizontal scrolling and the card, s... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.8",
@@ -1157,7 +1157,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "The live event feed shows a status treatment whose idle, active, paused, disconnected, and caught-up states are visibly distinguishable.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified live_feed_status_pill_states. Observed that The live event feed shows a status treatment whose idle, active, paused, disconn... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.11",
@@ -1165,7 +1165,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "The primary play controls, the live-feed status pill, and the custom-card list actions carry crisp inline icons from one consistent visual family, sized to match their labels.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified consistent_icon_set. Observed that The primary play controls, the live-feed status pill, and the custom-card list a... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.12",
@@ -1173,7 +1173,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Confirmation dialogs render as centered white panels over a dimmed backdrop, styled with the same pill-shaped buttons and corner radii as the rest of the app.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified dialogs_styled_like_app. Observed that Confirmation dialogs render as centered white panels over a dimmed backdrop, sty... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.13",
@@ -1181,7 +1181,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Between 1440px and 375px wide the single-column layout stays centered, buttons remain full pills at a comfortable tap size, and every control renders free of overlap or clipping at intermediate widths.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified no_overlap_across_widths. Observed that Between 1440px and 375px wide the single-column layout stays centered, buttons r... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.14",
@@ -1189,7 +1189,7 @@
     "value": 1,
     "weight": 1,
     "description": "Headings and buttons follow one consistent capitalization convention, action labels are specific verbs such as Draw card, Start game, Undo last turn, Export Session and Save Progress, error messages name the problem and the fix, and empty states explain what belongs there and how to add it.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified writing_conventions_consistent. Observed that Headings and buttons follow one consistent capitalization convention, action lab... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.16",
@@ -1197,7 +1197,7 @@
     "value": 1,
     "weight": 1,
     "description": "The First to 10 win-target readout is visible on setup and during play, and a Winner announcement banner naming the winning player is visually distinct from ordinary toasts with a highlighted scoreboard winner row.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified winner_banner_and_win_target_visible. Observed that The First to 10 win-target readout is visible on setup and during play, and a Wi... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "2.17",
@@ -1205,7 +1205,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Export Session and Save Progress use the primary near-black pill treatment, while Import Session, Copy Session JSON and Resume Saved Session use the secondary white outlined pill treatment.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified export_import_button_treatments. Observed that Export Session and Save Progress use the primary near-black pill treatment, whil... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "15.1",
@@ -1213,7 +1213,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Where the app renders headings such as Dare Night and section titles, capitalization follows one consistent convention.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified headings_consistent_capitalization. Observed that Where the app renders headings such as Dare Night and section titles, capitaliza... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "15.2",
@@ -1221,7 +1221,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Where the app renders actions, labels are specific verbs such as Draw card, Start game, Undo last turn, Export Session, Save Progress, and Resume Saved Session rather than generic labels.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified actions_use_specific_labels. Observed that Where the app renders actions, labels are specific verbs such as Draw card, Star... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "15.3",
@@ -1229,7 +1229,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Where the app renders validation errors, messages name the problem and the fix (including field names name or prompt and length rules).",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified errors_name_problem_and_fix. Observed that Where the app renders validation errors, messages name the problem and the fix (... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "15.4",
@@ -1237,7 +1237,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Where the app renders the custom-card empty state, copy explains what belongs there and how to add a card.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified empty_states_explain_next_step. Observed that Where the app renders the custom-card empty state, copy explains what belongs th... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "15.5",
@@ -1245,7 +1245,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Where the app renders body copy on setup and play, wording is clear and free of obvious typos in primary chrome.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified body_copy_is_well_written. Observed that Where the app renders body copy on setup and play, wording is clear and free of ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "15.6",
@@ -1253,7 +1253,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Where the app names game concepts, it consistently uses Dare Night, points, forfeits, and Winner rather than swapping synonyms in primary chrome.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified terminology_consistent. Observed that Where the app names game concepts, it consistently uses Dare Night, points, forf... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "15.7",
@@ -1261,7 +1261,7 @@
     "value": 1,
     "weight": 0.5,
     "description": "Where the app shows the win target and scores, First to 10 and point totals use consistent numeric wording.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified numbers_and_targets_consistent. Observed that Where the app shows the win target and scores, First to 10 and point totals use ... on viewport 1280x800. Evidence: end-to-end.webm"
   },
   {
     "id": "15.8",
@@ -1269,6 +1269,6 @@
     "value": 1,
     "weight": 0.5,
     "description": "Where the app shows toasts such as Deck reshuffled, Saved, or Copied, the messages are specific to the action.",
-    "reasoning": "yes — executed required actions in desktop viewport 1280x800 and observed expected result. Evidence: end-to-end.webm"
+    "reasoning": "yes — verified success_messages_specific. Observed that Where the app shows toasts such as Deck reshuffled, Saved, or Copied, the messag... on viewport 1280x800. Evidence: end-to-end.webm"
   }
 ]
