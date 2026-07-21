@@ -25,7 +25,7 @@ export function registerWebMcpTools() {
   const suiteIds = () => useEvalStore.getState().suites.map((suite) => suite.id);
   const tools = [
     {
-      name: 'entity_suite_create',
+      name: 'entity.create',
       description: 'Create one evaluation suite using the same command as New Suite.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['name', 'promptIds'], properties: { name: { type: 'string', minLength: 1, maxLength: 80 }, promptIds: { type: 'array', minItems: 1, items: { type: 'string', enum: promptIds } } } },
       execute: async ({ name, promptIds: ids }) => {
@@ -33,7 +33,7 @@ export function registerWebMcpTools() {
       },
     },
     {
-      name: 'entity_suite_select',
+      name: 'entity.select',
       description: 'Select an evaluation suite and update all visible result surfaces.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['suiteId'], properties: { suiteId: { type: 'string' } } },
       execute: async ({ suiteId }) => {
@@ -43,7 +43,7 @@ export function registerWebMcpTools() {
       },
     },
     {
-      name: 'entity_suite_update',
+      name: 'entity.update',
       description: 'Update a suite name and prompt selection.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['suiteId', 'name', 'promptIds'], properties: { suiteId: { type: 'string' }, name: { type: 'string', minLength: 1, maxLength: 80 }, promptIds: { type: 'array', minItems: 1, items: { type: 'string', enum: promptIds } } } },
       execute: async ({ suiteId, name, promptIds: ids }) => {
@@ -52,7 +52,7 @@ export function registerWebMcpTools() {
       },
     },
     {
-      name: 'entity_suite_delete',
+      name: 'entity.delete',
       description: 'Delete exactly one suite. Explicit confirm=true is required.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['suiteId', 'confirm'], properties: { suiteId: { type: 'string' }, confirm: { type: 'boolean' } } },
       execute: async ({ suiteId, confirm }) => {
@@ -63,7 +63,7 @@ export function registerWebMcpTools() {
       },
     },
     {
-      name: 'entity_suite_toggle',
+      name: 'entity.toggle',
       description: 'Toggle the bounded night-mode field for one suite.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['suiteId', 'field'], properties: { suiteId: { type: 'string' }, field: { type: 'string', enum: ['night-mode'] } } },
       execute: async ({ suiteId }) => {
@@ -73,31 +73,31 @@ export function registerWebMcpTools() {
       },
     },
     {
-      name: 'session_start',
+      name: 'session.start',
       description: 'Start the selected suite evaluation session.',
       inputSchema: { type: 'object', additionalProperties: false, properties: {} },
-      execute: async () => startRunCommand() ? result('Evaluation started') : errorResult('A run is already active or no suite is selected'),
+      execute: async () => startRunCommand() ? result('Start command accepted') : errorResult('A run is already active or no suite is selected'),
     },
     {
-      name: 'session_pause',
+      name: 'session.pause',
       description: 'Pause the active evaluation at its current checkpoint.',
       inputSchema: { type: 'object', additionalProperties: false, properties: {} },
-      execute: async () => pauseRunCommand() ? result('Evaluation paused') : errorResult('No pausable run'),
+      execute: async () => pauseRunCommand() ? result('Pause command accepted') : errorResult('No pausable run'),
     },
     {
-      name: 'session_resume',
+      name: 'session.resume',
       description: 'Resume the paused evaluation from its checkpoint.',
       inputSchema: { type: 'object', additionalProperties: false, properties: {} },
-      execute: async () => resumeRunCommand() ? result('Evaluation resumed') : errorResult('No paused run'),
+      execute: async () => resumeRunCommand() ? result('Resume command accepted') : errorResult('No paused run'),
     },
     {
-      name: 'session_restart',
+      name: 'session.restart',
       description: 'Restart the current or selected suite evaluation.',
       inputSchema: { type: 'object', additionalProperties: false, properties: {} },
-      execute: async () => restartRunCommand() ? result('Evaluation restarted') : errorResult('No suite available'),
+      execute: async () => restartRunCommand() ? result('Restart command accepted') : errorResult('No suite available'),
     },
     {
-      name: 'browse_open',
+      name: 'browse.open',
       description: 'Open one bounded dashboard destination.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['destination'], properties: { destination: { type: 'string', enum: ['results', 'comparison', 'export-drawer'] } } },
       execute: async ({ destination }) => {
@@ -107,19 +107,19 @@ export function registerWebMcpTools() {
       },
     },
     {
-      name: 'browse_apply_filter',
+      name: 'browse.apply_filter',
       description: 'Apply the bounded timeline-status filter.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['filter', 'value'], properties: { filter: { type: 'string', enum: ['timeline-status'] }, value: { type: 'string', enum: ['pending', 'running', 'retrying', 'paused', 'complete', 'failed'] } } },
       execute: async ({ value }) => { useEvalStore.getState().setTimelineFilter(value); return result('Timeline filter applied', { value }); },
     },
     {
-      name: 'browse_clear_filter',
+      name: 'browse.clear_filter',
       description: 'Clear the timeline-status filter.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['filter'], properties: { filter: { type: 'string', enum: ['timeline-status'] } } },
       execute: async () => { useEvalStore.getState().setTimelineFilter('all'); return result('Timeline filter cleared'); },
     },
     {
-      name: 'browse_sort',
+      name: 'browse.sort',
       description: 'Sort visible results by one declared column.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['sort'], properties: { sort: { type: 'string', enum: ['prompt-title', 'model', 'score', 'latency', 'tokens', 'pass-fail'] } } },
       execute: async ({ sort }) => {
@@ -129,19 +129,19 @@ export function registerWebMcpTools() {
       },
     },
     {
-      name: 'artifact_export',
+      name: 'artifact.export',
       description: 'Open the export drawer for JSON or CSV without returning artifact contents.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['format'], properties: { format: { type: 'string', enum: ['json', 'csv'] } } },
       execute: async ({ format }) => { useEvalStore.getState().openExport(format); return result('Export preview opened', { format }); },
     },
     {
-      name: 'artifact_import',
+      name: 'artifact.import',
       description: 'Open the results-json import workflow. Artifact contents stay in the visible form.',
       inputSchema: { type: 'object', additionalProperties: false, required: ['mode'], properties: { mode: { type: 'string', enum: ['results-json'] } } },
       execute: async () => { useEvalStore.getState().openImport(); return result('Import workflow opened', { mode: 'results-json' }); },
     },
     {
-      name: 'artifact_copy',
+      name: 'artifact.copy',
       description: 'Copy the active export preview using the same handler as the visible Copy control.',
       inputSchema: { type: 'object', additionalProperties: false, properties: {} },
       execute: async () => {
