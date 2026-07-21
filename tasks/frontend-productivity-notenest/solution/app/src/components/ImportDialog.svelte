@@ -59,6 +59,7 @@
       role="dialog"
       aria-modal="true"
       aria-label="Import Nest"
+      tabindex="-1"
       onkeydown={onKeydown}
     >
       <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200">
@@ -78,11 +79,10 @@
           aria-describedby={errorMessage ? 'import-error' : undefined}
         ></textarea>
         {#if errorMessage}
-          <p id="import-error" class="text-sm text-red-600 mt-2" role="alert">
+          <p id="import-error" class="text-sm text-red-600 mt-2" role="alert" aria-live="assertive">
             <span class="font-semibold">{errorField}:</span> {errorMessage}
           </p>
         {/if}
-        <div class="sr-only" role="status" aria-live="polite">{errorMessage ? `Import failed at ${errorField}: ${errorMessage}` : ''}</div>
       </div>
       <div class="flex items-center gap-2 px-4 py-3 border-t border-slate-200">
         <button class="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition cursor-pointer" onclick={submit}>

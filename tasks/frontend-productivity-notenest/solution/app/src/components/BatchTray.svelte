@@ -41,14 +41,13 @@
 </script>
 
 {#if count > 0}
-  <div class="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 w-[calc(100vw-1.5rem)] max-w-md">
-    <div class="bg-slate-900 text-white rounded-xl shadow-2xl px-3 py-2 flex items-center flex-wrap gap-2 batch-tray-enter" role="region" aria-label="Selection actions">
-      <span class="text-sm font-medium whitespace-nowrap">{count} selected</span>
-      <div class="flex-1 min-w-0"></div>
+  <div class="fixed bottom-3 inset-x-3 z-40 flex justify-center pointer-events-none">
+    <div class="bg-slate-900 text-white rounded-xl shadow-2xl px-2 py-2 sm:px-3 flex items-center gap-1.5 sm:gap-2 batch-tray-enter pointer-events-auto max-w-full overflow-x-auto" role="region" aria-label="Selection actions">
+      <span class="text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0">{count} selected</span>
 
-      <div class="relative">
-        <button class="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-slate-700 hover:bg-slate-600 transition cursor-pointer" onclick={() => { showMove = !showMove; showColor = false; }}>
-          Batch Move
+      <div class="relative flex-shrink-0">
+        <button class="px-2 py-1.5 text-xs font-medium rounded-lg bg-slate-700 hover:bg-slate-600 transition cursor-pointer whitespace-nowrap" onclick={() => { showMove = !showMove; showColor = false; }}>
+          Move
         </button>
         {#if showMove}
           <div class="absolute bottom-full mb-1 right-0 bg-white text-slate-800 rounded-lg shadow-xl min-w-44 max-h-56 overflow-y-auto py-1">
@@ -59,9 +58,9 @@
         {/if}
       </div>
 
-      <div class="relative">
-        <button class="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-slate-700 hover:bg-slate-600 transition cursor-pointer" onclick={() => { showColor = !showColor; showMove = false; }}>
-          Batch Color
+      <div class="relative flex-shrink-0">
+        <button class="px-2 py-1.5 text-xs font-medium rounded-lg bg-slate-700 hover:bg-slate-600 transition cursor-pointer whitespace-nowrap" onclick={() => { showColor = !showColor; showMove = false; }}>
+          Color
         </button>
         {#if showColor}
           <div class="absolute bottom-full mb-1 right-0 bg-white rounded-lg shadow-xl p-2 flex gap-1.5">
@@ -72,10 +71,10 @@
         {/if}
       </div>
 
-      <button class="px-2.5 py-1.5 text-xs font-medium rounded-lg bg-red-500 hover:bg-red-600 transition cursor-pointer" onclick={doTrash}>
-        Batch Trash
+      <button class="px-2 py-1.5 text-xs font-medium rounded-lg bg-red-500 hover:bg-red-600 transition cursor-pointer whitespace-nowrap flex-shrink-0" onclick={doTrash}>
+        Trash
       </button>
-      <button class="px-2 py-1.5 text-xs rounded-lg hover:bg-slate-700 transition cursor-pointer" onclick={() => store.clearSelection()} aria-label="Clear selection">
+      <button class="px-2 py-1.5 text-xs rounded-lg hover:bg-slate-700 transition cursor-pointer flex-shrink-0" onclick={() => store.clearSelection()} aria-label="Clear selection">
         Clear
       </button>
     </div>
