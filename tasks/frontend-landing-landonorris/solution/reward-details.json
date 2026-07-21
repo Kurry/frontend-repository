@@ -1,0 +1,1930 @@
+[
+  {
+    "id": "15.1",
+    "name": "nav_menu_uppercase_convention",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Where the app renders navigation, menu, and button labels (HOME, ON TRACK, OFF TRACK, CALENDAR, STORE, CLIPS, PHOTOS, VIDEO, LIVE), they keep the uppercase convention consistently.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "15.2",
+    "name": "action_labels_specific",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Where the app renders primary action labels, they use the mandated specific labels (STORE, Subscribe) rather than generic Submit/OK alone when a specific label is specified.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "15.3",
+    "name": "newsletter_errors_name_email_and_fix",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Where the app renders newsletter error messages, they name the email field and state the fix (valid address format) rather than only saying Invalid.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "15.4",
+    "name": "exact_mandated_chrome_strings",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Where the app renders mandated chrome copy, the exact strings appear: tab title 2025 Apex Grand Prix Driver — Avery Vale; preloader LOAD VALE; menu items HOME, ON TRACK, OFF TRACK, CALENDAR; socials CLIPS, PHOTOS, VIDEO, LIVE; contact hello@averyvale.example; hero widget NEXT RACE, ALPINE GP, and NOVA RACING SINCE 2019; legal links Privacy Policy, Terms, Cookies; press-kit tabs JSON, Markdown, ICS; nav PRESS KIT; race circuits Alpine GP, Bayfront Circuit, Ridgeway GP, Solstice GP, Meridian Night Run, Cascade Finale.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "15.5",
+    "name": "body_copy_spelling_grammar",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Where the app renders body or marketing copy on the Avery Vale homepage, rate how free it is of spelling and grammatical errors.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "15.6",
+    "name": "avery_vale_terminology_consistent",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Where the app renders the driver and team identity, terminology stays consistent as Avery Vale / AVERY VALE and Nova Racing (not mixed with leftover source-driver naming).",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "15.7",
+    "name": "supporting_copy_sentence_case",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Where the app renders supporting body copy (not nav/menu/button labels), it uses one consistent sentence-case convention.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "15.8",
+    "name": "newsletter_confirmation_states_success",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Where the app renders the newsletter confirmation, it states that the signup succeeded rather than a vague affirmation alone.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "15.9",
+    "name": "press_kit_empty_state_plain_language",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Where the app renders press-kit empty states, the copy says selection lists are empty in plain language rather than a blank or cryptic error code.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "15.10",
+    "name": "status_and_import_errors_name_fields",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Race status validation errors name the status field, and press-kit Import errors name the import problem in plain language rather than silent failure or generic Error text.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.1",
+    "name": "dual_tone_scarcity_palette",
+    "value": 1,
+    "weight": 1,
+    "description": "The composition reads as a dual-tone cinematic elite-motorsport profile: sections compute to the slate-black dark-green base rgb(40, 44, 32) with off-white rgb(244, 244, 237) text, the hero is a lighter cream band, and neon lime rgb(210, 255, 0) is the single loud accent reserved for the Store button, current-menu stroke, and hover/highlight states rather than flooding large section backgrounds",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.2",
+    "name": "wordmark_serif_sans_pairing",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The stacked AVERY VALE wordmark pairs a serif display treatment for AVERY with a heavy Mona Sans treatment for VALE, both about 32px at 1440, and oversized display copy (impact statement, menu items, footer statement) renders in the bundled open-license serif display face",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.3",
+    "name": "menu_overlay_composition",
+    "value": 1,
+    "weight": 1,
+    "description": "The open menu is a full-screen dark-green overlay with a topographic line texture, oversized uppercase display-face menu items (roughly 96px at 1440) on the left, a staggered four-image fictional editorial grid on the right, and the current HOME item de-emphasized to the muted green rgb(180, 184, 165) with a lime stroke",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.4",
+    "name": "helmet_mask_and_marquee_fade",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Helmet cards are tall portrait cards (about 445 by 594 at 1440, three across) masked to a helmet silhouette and the logo marquees fade out at their left and right edges",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.7",
+    "name": "impact_statement_metrics",
+    "value": 1,
+    "weight": 1,
+    "description": "The impact heading renders in the bundled serif display face at roughly 132px with a line-height near 109px in the lime-off color rgb(178, 199, 58) at 1440x900",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.8",
+    "name": "hero_cream_band_contrast",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The hero band background computes to rgb(239, 239, 229) and contrasts against the following sections whose background computes to rgb(40, 44, 32)",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.9",
+    "name": "wordmark_weights_and_color",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The wordmark renders AVERY in a bundled serif family at weight 400 and VALE in Mona Sans Variable at weight 900, both in the dark color rgb(17, 17, 18)",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.11",
+    "name": "store_button_pill_treatment",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The Store button is a filled lime pill with a small bag icon, a rounded radius near 12px, and a bold variable-sans label near 20px, and the hamburger and menu close control are square outlined buttons about 60px by 60px with rounded corners",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.12",
+    "name": "footer_statement_metrics",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The footer statement renders in the bundled serif display face at roughly 72px in the off-white rgb(244, 244, 237), with its characters filling into the lime-off color",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.13",
+    "name": "newsletter_footer_treatment",
+    "value": 1,
+    "weight": 1,
+    "description": "The newsletter email field is a dark input with off-white text and a visible focus ring, the Subscribe control uses the lime accent with dark text, and the inline error renders in a clearly distinct warning treatment",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.14",
+    "name": "desktop_nav_single_row",
+    "value": 1,
+    "weight": 1,
+    "description": "At viewport widths at or above 992px the nav is a single row about 100px tall with the wordmark left, the monogram mark centered, and STORE, PRESS KIT, and hamburger on the right",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.15",
+    "name": "mobile_390_adaptation",
+    "value": 1,
+    "weight": 1,
+    "description": "At 390px width the nav wraps to about 140px tall with the AV monogram and a centered AVERY VALE wordmark (about 24px) plus the NOVA RACING SINCE 2019 sub-line stacked, the helmet grid collapses to a single column with cards about 326 by 435, the impact heading drops to about 48px, and the menu photo grid is hidden",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.16",
+    "name": "fluid_type_across_breakpoints",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Resizing across the 992, 991, 767, and 479 pixel breakpoints scales type fluidly via clamp() or equivalent continuous viewport sizing rather than jumping abruptly between adjacent widths",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.18",
+    "name": "case_conventions_consistent",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Navigation, menu, and button labels keep the uppercase convention while supporting body copy uses one consistent sentence-case convention",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.21",
+    "name": "asymmetric_hero_baseline_grid",
+    "value": 1,
+    "weight": 1,
+    "description": "The hero composes asymmetrically rather than as an equal-column stack: the driver silhouette anchors the center field, the NEXT RACE widget sits lower-left, and the fixed nav occupies the top edge, with section spacing and card gaps aligning to a consistent 1.25rem (20px) baseline unit and its multiples",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.22",
+    "name": "clamp_fluid_display_type",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Display type for the impact statement, menu item labels, footer brand statement, and preloader word uses fluid clamp() (or equivalent continuous viewport scaling) so sizes change smoothly across widths rather than jumping only at breakpoints",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.23",
+    "name": "three_tier_token_surfaces",
+    "value": 1,
+    "weight": 1,
+    "description": "Computed styles resolve the three-tier brand tokens: surface colors dark-green #282c20 / cream #efefe5 / off-white #f4f4ed, text colors black #111112 / off-white #f4f4ed / muted greens #dde1d2 and #b4b8a5, and accent colors lime #d2ff00 / lime-off #b2c73a / orange #ff6b00",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.25",
+    "name": "original_media_density_and_variety",
+    "value": 1,
+    "weight": 1,
+    "description": "The newly authored media matches the reference's visual density without copying it: the horizontal strip has six distinct editorial scenes, the menu uses a separate staggered set of at least four photos, and the social poster/video form a purposefully art-directed racing composition rather than gradients, repeated stock thumbnails, or generic placeholders",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.26",
+    "name": "layered_hero_art_direction",
+    "value": 1,
+    "weight": 1,
+    "description": "At 1440x900 the fictional racer portrait/cutout, contour field, translucent blobs, soft shadow or reflection planes, and lower-left race widget overlap as an intentional depth composition; the hero is not a single rectangular image or empty cream field",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.27",
+    "name": "fictional_helmet_and_partner_craft",
+    "value": 1,
+    "weight": 1,
+    "description": "The three fictional helmet cards have recognizably different surface systems with shaped masks, highlights, shadows, and distinct reveal states, while the five fictional partner marks vary in symbol/wordmark construction but share a controlled monochrome optical weight",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.28",
+    "name": "physical_3d_and_crisp_vector_assets",
+    "value": 1,
+    "weight": 1,
+    "description": "The hero's original debranded 3D object shows visibly different matte, glossy, and reflective material responses under environment lighting, and the original interactive vector motif remains crisp at desktop and mobile sizes rather than appearing as a blurry raster substitute",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.30",
+    "name": "newsletter_copy_actionable",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The newsletter inline error copy names the email field and states how to fix the input, and the post-submit confirmation copy states that the signup succeeded rather than a vague affirmation",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.40",
+    "name": "race_calendar_list_anatomy",
+    "value": 1,
+    "weight": 1,
+    "description": "Race calendar rows share one dense list anatomy (circuit, date, status chip, selected lime treatment) on the dark-green base rgb(40, 44, 32).",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.31",
+    "name": "press_kit_and_palette_visual_system",
+    "value": 1,
+    "weight": 1,
+    "description": "The press-kit drawer uses the dark-green surface and off-white body type with lime tab/active states for JSON / Markdown / ICS; the command palette is a centered dark overlay with a single search field and compact results list.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.1",
+    "name": "menu_open_shows_home_stroke",
+    "value": 1,
+    "weight": 1,
+    "description": "Clicking the hamburger opens a full-viewport dark-green menu overlay; HOME shows the lime telemetry-stroke current-item line and ON TRACK, OFF TRACK, and CALENDAR do not.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.2",
+    "name": "menu_item_scrolls_and_closes",
+    "value": 1,
+    "weight": 1,
+    "description": "With the menu open, activating ON TRACK closes the overlay and scrolls within the same homepage (/) to the horizontal media strip without loading another document or route.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.3",
+    "name": "menu_x_closes_preserving_scroll",
+    "value": 1,
+    "weight": 1,
+    "description": "With the menu open, activating the X control closes the overlay while leaving page scroll position unchanged; the fixed navigation bar stays pinned and the homepage is interactive again.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.4",
+    "name": "newsletter_invalid_keeps_subscribe_disabled",
+    "value": 1,
+    "weight": 1,
+    "description": "Typing an invalid email (missing @ or domain without a dot) into the footer newsletter field leaves Subscribe disabled and shows an inline error naming the email field; correcting to fan@averyvale.example clears the error and enables Subscribe.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.5",
+    "name": "newsletter_valid_submit_confirms_and_clears",
+    "value": 1,
+    "weight": 1,
+    "description": "Submitting the newsletter form with fan@averyvale.example shows an inline confirmation in the footer, empties the field, sets press-kit JSON newsletter to that email, and never reloads or navigates away.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.6",
+    "name": "video_hover_play_leave_pause_cycle",
+    "value": 1,
+    "weight": 1,
+    "description": "Hovering the social video card starts muted looping playback and fades the placeholder away; moving the pointer off pauses playback and restores the placeholder to fully opaque; a second hover-and-leave cycle still works with no stuck intermediate state.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.7",
+    "name": "reload_baseline_resets_homepage_state",
+    "value": 1,
+    "weight": 1,
+    "description": "After opening the menu, selecting a race, shortlisting a helmet, typing into the newsletter field, and hovering the video card, reloading returns the initial state: LOAD VALE preloader plays again, menu/press kit/palette closed, selections and shortlist empty, newsletter empty with no confirmation, and no prior visit state persists.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.8",
+    "name": "menu_destinations_stay_on_homepage",
+    "value": 1,
+    "weight": 1,
+    "description": "Activating HOME, OFF TRACK, and CALENDAR from the open menu each closes the overlay and scrolls within / to the hero, social video section, and race calendar respectively — no second document or origin navigation occurs.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.9",
+    "name": "chrome_activations_stay_in_page",
+    "value": 1,
+    "weight": 1,
+    "description": "Activating the AVERY VALE wordmark, AV monogram, STORE button, social labels (CLIPS, PHOTOS, VIDEO, LIVE), business contact, or legal links either scrolls to a homepage region or performs a no-op — none reload the document or navigate to another origin.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.10",
+    "name": "post_menu_close_nav_still_pinned",
+    "value": 1,
+    "weight": 1,
+    "description": "After either menu close path (menu item activation or X), the fixed navigation bar remains pinned at the top and no document reload has occurred at any step.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.11",
+    "name": "press_kit_flow_export_reflects_session",
+    "value": 1,
+    "weight": 1,
+    "description": "Press kit flow: shortlist one helmet and one editorial card and select three distinct races so Selected races reads 3; open PRESS KIT; confirm JSON names those three circuits and both shortlisted labels, each races entry shows id/circuit/date/status/selected/uid, and each shortlist entry shows kind/label/index; switch to ICS and confirm exactly three VEVENT entries with UID matching race uids; switch to Markdown and confirm Avery Vale plus the same races and shortlist; activate Copy and see a copied confirmation.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.12",
+    "name": "undo_redo_shortlist_flow",
+    "value": 1,
+    "weight": 1,
+    "description": "Undo flow: shortlist one helmet so the shortlist count increases by one, activate Undo so the helmet leaves and the count returns, then activate Redo so the helmet and count restore.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.13",
+    "name": "command_palette_calendar_flow",
+    "value": 1,
+    "weight": 1,
+    "description": "Command palette flow: press Meta+K or Control+K, type CALENDAR, activate Go CALENDAR; the palette closes and the page scrolls within / to the race calendar without a document reload.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.14",
+    "name": "race_status_edit_flow",
+    "value": 1,
+    "weight": 1,
+    "description": "Race status edit flow: open Edit status on Ridgeway GP, set Upcoming, submit; chip reads Upcoming; when that race is selected the ICS STATUS line reads CONFIRMED; set Completed again and chip/ICS STATUS return to Completed/CANCELLED.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "6.15",
+    "name": "press_kit_export_import_round_trip",
+    "value": 1,
+    "weight": 1,
+    "description": "Export/import round trip: select two races and shortlist one helmet, note the JSON preview, Undo until Selected races is 0 and shortlist empty, Import that JSON; Selected races returns to 2, shortlist to 1, and previews again name those circuits and the helmet label.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.1",
+    "name": "console_clean_during_flows",
+    "value": 1,
+    "weight": 1,
+    "description": "No console errors or unhandled promise rejections appear while the homepage and its interaction workflows (preloader dismiss, menu open/close, race select, shortlist, press kit, command palette, undo/redo, hovers, scroll-linked sections, hover-to-play video, marquees, newsletter submit) are exercised",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.2",
+    "name": "all_assets_same_origin",
+    "value": 1,
+    "weight": 1,
+    "description": "Loading the homepage issues zero network asset requests to a non-origin host; fonts, images, video, CSS, JS, WASM, and GL assets are all same-origin",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.3",
+    "name": "fonts_resolve_bundled",
+    "value": 1,
+    "weight": 1,
+    "description": "Rendered text resolves to the bundled Mona Sans Variable sans face and the bundled open-license serif display face rather than a Times or system fallback",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.4",
+    "name": "brand_tokens_exact",
+    "value": 1,
+    "weight": 1,
+    "description": "The brand tokens compute to their exact values — lime #d2ff00, dark-green #282c20, white #f4f4ed, black #111112, lime-off #b2c73a, green-off-white-1 #dde1d2, green-off-white-2 #b4b8a5, and orange #ff6b00 — and the body background computes to rgb(40, 44, 32)",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.5",
+    "name": "storage_stays_empty",
+    "value": 1,
+    "weight": 1,
+    "description": "localStorage and sessionStorage remain empty after the homepage workflows are exercised",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.6",
+    "name": "rive_wasm_same_origin",
+    "value": 1,
+    "weight": 1,
+    "description": "The required original interactive .riv asset and its Rive runtime WASM both load successfully from same-origin paths, contribute to a visible vector motif, and issue no request to a Rive or package CDN host",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.7",
+    "name": "gl_assets_same_origin",
+    "value": 1,
+    "weight": 1,
+    "description": "The required original GLB, base-color/roughness/metallic texture maps, local HDR environment, and any Draco/KTX2 decoder files load successfully from same-origin paths and contribute to the visible WebGL hero",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.10",
+    "name": "store_button_computed_colors",
+    "value": 1,
+    "weight": 1,
+    "description": "The Store button background computes to rgb(210, 255, 0) with text rgb(17, 17, 18), and the menu overlay and footer backgrounds compute to rgb(40, 44, 32)",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.11",
+    "name": "nav_dimensions_desktop",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The nav bar row is about 100px tall at 1440x900 and the hamburger button is about 60px by 60px",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.12",
+    "name": "menu_modal_focus_behavior",
+    "value": 1,
+    "weight": 1,
+    "description": "The open menu overlay behaves as a modal dialog: it closes when Escape is pressed, traps focus while open, and returns focus to the hamburger button on close",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.13",
+    "name": "keyboard_operable_with_focus_ring",
+    "value": 1,
+    "weight": 1,
+    "description": "Every interactive control (Store button, PRESS KIT, hamburger, menu items, socials, legal links, shortlist controls, race rows, Undo, Redo, the email field, Subscribe) is reachable and operable with the keyboard alone and shows a visible focus indicator",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.14",
+    "name": "icon_buttons_accessible_names",
+    "value": 1,
+    "weight": 1,
+    "description": "The icon-only hamburger and menu close controls expose descriptive accessible names",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.15",
+    "name": "split_text_accessible_phrase",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Split-text headlines keep the original phrase as an aria-label on the heading container while the individual character spans are hidden from the accessibility tree",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.16",
+    "name": "newsletter_aria_live_announcements",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The newsletter inline error and confirmation are announced through an aria-live region as well as shown visually",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.17",
+    "name": "video_stays_muted",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The social video is muted and never plays audio at any point while the card is exercised",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.18",
+    "name": "interactive_fast_no_layout_shift",
+    "value": 1,
+    "weight": 1,
+    "description": "The homepage is interactive within about 2 seconds of a local cold load, and after first paint no visible layout jumps occur as fonts, images, or the hero scene finish loading — media regions hold their space from the start",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.19",
+    "name": "smooth_full_page_scroll",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Continuous scrolling from top to bottom shows no visible hitching or dropped frames through every animated section",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.20",
+    "name": "hydration_clean_console",
+    "value": 1,
+    "weight": 1,
+    "description": "The console is hydration-clean: no hydration mismatch errors or warnings appear on first load or after exercising the interactive islands (menu, Store, PRESS KIT, race calendar, press kit, palette, video card, newsletter form), and statically rendered content is not visibly replaced by different client content after hydration",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.21",
+    "name": "wcag_aa_contrast_surfaces",
+    "value": 1,
+    "weight": 1,
+    "description": "Text over the cream hero and dark-green sections, plus control labels including the lime Store button with dark text, meet WCAG AA contrast",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.22",
+    "name": "semantic_landmarks_and_hero_canvas",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The page chrome uses semantic landmarks (header, nav, main, footer) and native buttons for interactive controls, and the hero canvas or WebGL layer is either aria-hidden when a static silhouette sibling conveys the artwork or carries role img with a descriptive aria-label",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.23",
+    "name": "deep_link_homepage_only",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Loading route / directly renders the same single homepage baseline and chrome as a fresh in-app load; no secondary routes are required or implemented for this task",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.24",
+    "name": "required_authored_asset_files_load",
+    "value": 1,
+    "weight": 1,
+    "description": "Browser network evidence shows successful same-origin loads with no 404s or decode errors for the required authored asset families: editorial raster images and SVG marks, a VP9 WebM with changing frames, an original GLB with material textures and HDR environment, and an original Rive file with its runtime WASM",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.25",
+    "name": "shared_state_coherence_press_kit",
+    "value": 1,
+    "weight": 1,
+    "description": "Shared-state coherence: selecting a race or shortlisting an asset updates the Selected races / shortlist count and the press-kit preview content immediately without reload; Undo restores both chrome counts and kit preview together.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "2.26",
+    "name": "api_shaped_schemas_drive_forms",
+    "value": 1,
+    "weight": 1,
+    "description": "Newsletter Subscribe, race status edit, and press-kit Import validate through client-side schemas: invalid email/status/import JSON shows named field/import errors before commit; a valid Subscribe or status edit commits a record matching the declared field contract into the same store the press-kit JSON/ICS previews read.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.1",
+    "name": "desktop_nav_single_row_above_992",
+    "value": 1,
+    "weight": 1,
+    "description": "At desktop widths at or above 992px the nav is a single row about 100px tall with the AVERY VALE wordmark left, the AV monogram centered, and STORE, PRESS KIT, and hamburger right.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.2",
+    "name": "mobile_tap_targets_adequate",
+    "value": 1,
+    "weight": 1,
+    "description": "At 390px, primary interactive controls (hamburger, menu close, STORE, Subscribe) present tap targets at least about 44px in height or width.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.3",
+    "name": "fluid_type_across_breakpoints",
+    "value": 1,
+    "weight": 1,
+    "description": "Between 1440 and 390 widths, display and body type use fluid clamp()/vw scaling so sizes change continuously rather than jumping between adjacent widths at the 992, 991, 767, and 479 breakpoints.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.4",
+    "name": "no_clip_or_overflow_at_key_widths",
+    "value": 1,
+    "weight": 1,
+    "description": "At 1440 and 390 widths, content never clips or overflows the viewport.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.5",
+    "name": "mobile_nav_wraps_at_390",
+    "value": 1,
+    "weight": 1,
+    "description": "At 390px the nav wraps to about 140px tall, the AV monogram and a centered AVERY VALE wordmark (about 24px) with the NOVA RACING SINCE 2019 sub-line become visible and stacked, and the menu photo grid is hidden.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.6",
+    "name": "helmet_grid_single_column_at_390",
+    "value": 1,
+    "weight": 1,
+    "description": "At 390px the helmet grid collapses to a single column (card about 326 by 435) and the impact heading drops to about 48px.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.7",
+    "name": "mobile_hamburger_opens_menu",
+    "value": 1,
+    "weight": 1,
+    "description": "At 390px, tapping the hamburger opens the full-screen menu overlay and the overlay remains operable.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.8",
+    "name": "no_horizontal_scrollbar_at_390",
+    "value": 1,
+    "weight": 1,
+    "description": "At 390px width no horizontal scrollbar appears and content does not force horizontal page scroll.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.9",
+    "name": "media_and_hero_resize",
+    "value": 1,
+    "weight": 1,
+    "description": "Hero artwork, horizontal media cards, helmet cards, and the social video card size responsively to fit the layout at 1440 and 390 without fixed-size overflow.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.10",
+    "name": "fixed_nav_accessible_all_widths",
+    "value": 1,
+    "weight": 1,
+    "description": "The fixed navigation remains reachable and operable at 1440 and 390 after scrolling through sections.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.a1",
+    "name": "showcase_composition_reflow_at_390",
+    "value": 1,
+    "weight": 0.5,
+    "description": "At 390 the asymmetric hero (silhouette, NEXT RACE widget, fixed nav) and helmet grid are re-choreographed into a stacked mobile composition that preserves hierarchy rather than a flat equal-column dump of the desktop grid.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "7.11",
+    "name": "calendar_and_press_kit_at_390",
+    "value": 1,
+    "weight": 1,
+    "description": "At 390px the race calendar rows stack date/status chips without horizontal overflow, the press-kit drawer uses the full viewport width, and the command palette search field and results stay inside the viewport.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.1",
+    "name": "cold_start_interactive_under_2s",
+    "value": 1,
+    "weight": 1,
+    "description": "The homepage is interactive within about 2 seconds of a local cold load.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.2",
+    "name": "console_clean_on_full_exercise",
+    "value": 1,
+    "weight": 1,
+    "description": "Loading and exercising the full page (preloader dismiss, menu open/close, race select, shortlist toggles, press kit open with format switches and copy, command palette open/filter/activate, hover states, scroll-linked sections, hover-to-play video, marquees, newsletter submit, undo/redo) emits no console errors, hydration warnings, or unhandled promise rejections.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.3",
+    "name": "chrome_interactions_stay_responsive",
+    "value": 1,
+    "weight": 1,
+    "description": "Menu open/close, STORE hover, and Subscribe respond without multi-second lag after first paint (chrome interactions feel under ~100ms to begin).",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.4",
+    "name": "preloader_clears_without_hang",
+    "value": 1,
+    "weight": 1,
+    "description": "The LOAD VALE preloader clears within about one to two seconds and never permanently blocks interaction while heavier media finish streaming.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.5",
+    "name": "long_page_scroll_without_lag",
+    "value": 1,
+    "weight": 1,
+    "description": "Scrolling the full long-form homepage (hero through footer) remains usable without perceived multi-second freezes between sections.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.6",
+    "name": "interactive_during_media_stream",
+    "value": 1,
+    "weight": 1,
+    "description": "The UI stays interactive while heavier media, 3D, and vector-animation assets finish streaming in — nav, menu, and newsletter remain operable.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.7",
+    "name": "scroll_sections_hold_smooth_frame_rate",
+    "value": 1,
+    "weight": 1,
+    "description": "Continuous scrolling from top to bottom shows no visible hitching or dropped frames through every animated section (pinned horizontal media, impact fill, marquees, footer).",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.8",
+    "name": "rapid_menu_clicks_never_freeze",
+    "value": 1,
+    "weight": 1,
+    "description": "Rapidly clicking the hamburger and X several times never freezes the page.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.9",
+    "name": "extended_scroll_session_stable",
+    "value": 1,
+    "weight": 0.5,
+    "description": "After an extended scroll-through with menu open/close, video hover cycles, and newsletter submit, the page remains responsive without runaway resource use that freezes interaction.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.10",
+    "name": "layout_stable_while_assets_load",
+    "value": 1,
+    "weight": 1,
+    "description": "After first paint no visible layout jumps occur as fonts, images, or the hero scene finish loading; media regions hold their space from the start.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.a1",
+    "name": "scroll_linked_media_frame_rate",
+    "value": 1,
+    "weight": 1,
+    "description": "Scroll-linked horizontal media travel and section storytelling hold a smooth frame rate through the full page length on a 1440-wide viewport with no visible hitching during continuous scroll.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.a2",
+    "name": "smooth_scroll_preserves_sticky_pin",
+    "value": 1,
+    "weight": 1,
+    "description": "In-page smooth-scroll jumps (HOME, ON TRACK, OFF TRACK, CALENDAR, wordmark) feel continuous and settle naturally without lag, while the horizontal pin's position:sticky relationship stays intact.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.a4",
+    "name": "layout_stable_no_reflow_jumps",
+    "value": 1,
+    "weight": 1,
+    "description": "Layout is stable after load: no visible reflow jumps as fonts, images, or the hero scene finish loading — media and embed regions reserve their space from first paint.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.a5",
+    "name": "webgl_capability_fallback",
+    "value": 1,
+    "weight": 1,
+    "description": "WebGL/3D features detect capability before initializing and fall back to a complete static hero composition when GPU support is missing — the page remains whole, navigable, and visually coherent without the scene.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.a6",
+    "name": "heavy_assets_load_progressively",
+    "value": 1,
+    "weight": 1,
+    "description": "Heavy assets load progressively: the page becomes interactive before 3D models, textures, and animation files finish loading; scene regions hold reserved space while streaming in; no interaction is blocked waiting on an asset.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "9.11",
+    "name": "press_kit_regen_stays_responsive",
+    "value": 1,
+    "weight": 1,
+    "description": "Opening the press kit and regenerating previews after selection/shortlist changes stays responsive without freezing the page.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.1",
+    "name": "preloader_animates_out",
+    "value": 1,
+    "weight": 1,
+    "description": "On a fresh real page load the lime LOAD VALE preloader animates out (fading and clearing) to reveal the page and does not stay covering content",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.2",
+    "name": "menu_open_close_animates",
+    "value": 1,
+    "weight": 1,
+    "description": "Clicking the real hamburger animates the dark-green overlay open from a clipped shape to full-screen, and the X and Escape controls animate it closed rather than snapping",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.3",
+    "name": "store_button_split_reveal",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Hovering the STORE button runs a split-text reveal where the label slides up to expose an identical copy over about 0.4s",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.4",
+    "name": "text_link_hover_color_shift",
+    "value": 1,
+    "weight": 1,
+    "description": "Hovering nav or footer text links (ON TRACK, OFF TRACK, CALENDAR, the socials, the legal links) shifts their color toward lime or lime-off",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.5",
+    "name": "signature_pinned_horizontal_track",
+    "value": 1,
+    "weight": 1,
+    "description": "Signature interaction on a fresh load: scrolling vertically through the pinned horizontal media section drives the media row sideways as a scroll-linked transform tied to scroll progress so later cards scroll into view, and scrolling back reverses the travel rather than leaving a static non-pinned row",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.6",
+    "name": "helmet_card_hover_choreography",
+    "value": 1,
+    "weight": 1,
+    "description": "Hovering a helmet card with the real pointer scales its base image about 1.1x, wipes in a masked reveal image via a clip-path change, and turns the card index label lime",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.7",
+    "name": "video_hover_play_and_fade",
+    "value": 1,
+    "weight": 1,
+    "description": "Hovering the social video card plays the video and fades its placeholder image from opaque to transparent, and leaving the card pauses playback and restores the placeholder",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.8",
+    "name": "marquees_scroll_when_in_view",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The collaborator and footer partner marquees translate continuously once their strip is in view",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.9",
+    "name": "split_text_sequential_fill",
+    "value": 1,
+    "weight": 0.5,
+    "description": "On a fresh load, scrolling the impact statement and footer statement into view fills their characters into the highlight color in sequence, one after another rather than all at once",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.10",
+    "name": "reduced_motion_respected",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Under prefers-reduced-motion reduce the page settles immediately rather than hanging on scroll-linked animation, the preloader does not block content, in-page jumps use instant scroll, continuous marquees do not run, and press-kit/palette enter transitions collapse to immediate show/hide",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.14",
+    "name": "menu_transition_timing_spec",
+    "value": 1,
+    "weight": 1,
+    "description": "On the real hamburger click the menu overlay transitions clip-path and visibility over 0.75s on cubic-bezier(0.65, 0.05, 0, 1), with getAnimations on the real element reporting a 750ms duration with that easing",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.15",
+    "name": "marquee_keyframes_paused_offscreen",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The collaborator and footer marquees translate via the translateXLeft and translateXRight keyframes on a 30-second linear infinite loop and stay animation-play-state paused until their strip is in view",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.16",
+    "name": "video_fade_timing_spec",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The social video placeholder fades from opacity 1 to 0 via a 0.3s opacity transition on hover",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.18",
+    "name": "helmet_reveal_timing_spec",
+    "value": 1,
+    "weight": 0.5,
+    "description": "On a real pointer hover, the helmet card reveal image transitions clip-path and transform over 0.75s on cubic-bezier(0.65, 0.05, 0, 1)",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.19",
+    "name": "newsletter_confirmation_animates",
+    "value": 1,
+    "weight": 0.5,
+    "description": "After submitting the newsletter form with a valid email, the inline confirmation message animates in with a short fade or slide of roughly 200 to 300 milliseconds rather than appearing instantly",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.20",
+    "name": "inertial_easing_on_chrome",
+    "value": 1,
+    "weight": 1,
+    "description": "Menu overlay open/close, Store split reveal, and helmet reveal use the shared non-linear cubic-bezier(0.65, 0.05, 0, 1) easing (getAnimations reports that easing) rather than mechanical linear tweens",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.21",
+    "name": "smooth_scroll_keeps_sticky_pin",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Activating an in-page menu destination (HOME, ON TRACK, OFF TRACK, or CALENDAR) eases the page to the target section with smooth scrolling while the horizontal media pin's sticky relationship stays intact and the scroll-linked track remains synchronized",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.23",
+    "name": "scroll_story_section_sequence",
+    "value": 1,
+    "weight": 0.5,
+    "description": "On a fresh load, continuous vertical scrolling advances through the cream hero, the pinned horizontal media chapter, the impact statement character fill, the helmet grid, the race calendar, the collaborators marquee, the social video card, and the footer statement fill as a sequential narrative rather than unrelated static blocks",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.24",
+    "name": "interactive_vector_motif_reacts",
+    "value": 1,
+    "weight": 1,
+    "description": "Using the real UI path on a fresh load, hovering, pressing, opening the menu, or advancing scroll progress causes the original local vector motif to transition crisply between states rather than remaining static or autoplaying an unrelated identical loop",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.25",
+    "name": "press_kit_open_close_animates",
+    "value": 1,
+    "weight": 1,
+    "description": "Opening PRESS KIT via the real control expands the drawer/dialog with about a 0.3s opacity/transform transition on cubic-bezier(0.65, 0.05, 0, 1); closing reverses it rather than snapping.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.26",
+    "name": "command_palette_enter_animates",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Opening the command palette with Meta+K/Control+K enters with a short ~0.2s fade/scale on cubic-bezier(0.65, 0.05, 0, 1); filtering updates results without layout jank.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.27",
+    "name": "race_and_shortlist_select_transition",
+    "value": 1,
+    "weight": 1,
+    "description": "Selecting a race or shortlisting an asset via the real UI shows an immediate ~0.2s selected-state transition (lime accent or check) rather than a hard snap with no feedback.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "11.1",
+    "name": "execution_quality_of_signature_interactions",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Score execution quality of the reference experience (not invention beyond it): menu ellipse open/close, STORE split-text reveal, helmet clip-path reveal, and video hover-to-play feel polished and coherent rather than unfinished stubs.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "11.2",
+    "name": "scroll_storytelling_execution",
+    "value": 1,
+    "weight": 0.5,
+    "description": "On a fresh load, scroll-triggered storytelling (pinned horizontal media travel, impact/footer character fill, marquee in-view start) executes smoothly as a choreographed sequence rather than a janky or missing recreation of the reference motion.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "11.3",
+    "name": "preloader_and_hero_depth_execution",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The LOAD VALE page-transition preloader and layered hero depth scene (portrait, contours, blobs, NEXT RACE widget) execute as a finished sequence matching the reference ambition.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "11.7",
+    "name": "avery_vale_brand_narrative_arc",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The long-form page reads as one Avery Vale elite-motorsport narrative arc from cream hero through pinned media, impact statement, helmet study, race calendar, collaborators, social video, and footer — with the press kit as the useful end-state — rather than disconnected template blocks.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "11.a1",
+    "name": "designed_experience_narrative_arc",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The page reads as a designed experience with a narrative arc — sections build on each other visually and the signature pinned horizontal-media scroll interaction is memorable as faithful reference execution, not a template with effects sprinkled on.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "11.a2",
+    "name": "showcase_rechoreographed_at_narrow_widths",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Impeccable execution across breakpoints: at 390 the showcase composition is re-choreographed (wrapped nav, single-column helmet grid, hidden menu photo grid) rather than a broken shrink of the desktop layout.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "11.8",
+    "name": "press_kit_execution_quality",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Score execution quality of the press-kit end state: live-compiled JSON/Markdown/ICS previews, copy confirmation, and selection-sensitive regeneration feel finished rather than stubbed static text.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "11.9",
+    "name": "palette_and_undo_execution",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Command palette fuzzy navigation and undo/redo of shortlist/race mutations execute as polished operator tools rather than unfinished shortcuts.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "innovation.catchall",
+    "name": "innovation_catchall",
+    "value": 1,
+    "weight": 1,
+    "description": "The app demonstrates a noteworthy, browser-observable execution-quality enhancement of the reference experience that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick, and must not invent design beyond the reference. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.1",
+    "name": "rapid_hamburger_x_settles_open_or_closed",
+    "value": 1,
+    "weight": 1,
+    "description": "Rapidly clicking the hamburger and the X control in succession never leaves the menu overlay stuck half-open or the page inert; the menu always settles fully open or fully closed.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.2",
+    "name": "escape_while_menu_closed_noop",
+    "value": 1,
+    "weight": 1,
+    "description": "Pressing Escape while the menu is closed and no other overlay is open changes nothing on the page (overlay stays closed; scroll and chrome unchanged).",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.3",
+    "name": "empty_newsletter_submit_blocked",
+    "value": 1,
+    "weight": 1,
+    "description": "Submitting the newsletter form with an empty email field is blocked: an inline message names the email field and no confirmation appears.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.4",
+    "name": "double_subscribe_one_confirmation",
+    "value": 1,
+    "weight": 1,
+    "description": "Double-activating the Subscribe control on one valid email shows exactly one confirmation message.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.5",
+    "name": "video_leave_mid_fade_restores_placeholder",
+    "value": 1,
+    "weight": 1,
+    "description": "Moving the pointer off the social video card mid-fade restores the placeholder image to fully opaque and pauses the video.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.6",
+    "name": "webgl_unavailable_static_hero_usable",
+    "value": 1,
+    "weight": 1,
+    "description": "If WebGL rendering is unavailable, the hero shows a static composition of the same artwork and every section, control, and flow (menu, newsletter, video hover, race calendar, shortlist, press kit, palette) remains present and usable.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.7",
+    "name": "newsletter_errors_name_email_field",
+    "value": 1,
+    "weight": 1,
+    "description": "Newsletter validation errors name the email field with actionable text rather than only saying Invalid.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.8",
+    "name": "newsletter_controls_semantic",
+    "value": 1,
+    "weight": 1,
+    "description": "The newsletter email field and Subscribe control use semantic input/button elements with visible labels (or accessible name equivalents) rather than unlabeled div shells.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.9",
+    "name": "menu_close_paths_work",
+    "value": 1,
+    "weight": 1,
+    "description": "The open menu overlay closes via the X control and via Escape, restoring an interactive homepage under the fixed nav.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.10",
+    "name": "subscribe_disabled_until_valid_email",
+    "value": 1,
+    "weight": 1,
+    "description": "The Subscribe control stays disabled until the newsletter field holds a contract-valid email (exactly one @, non-empty local part, domain segment containing a dot).",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.11",
+    "name": "escape_closes_press_kit_or_palette",
+    "value": 1,
+    "weight": 1,
+    "description": "Pressing Escape while the press kit or command palette is open closes that overlay and returns focus to the control that opened it.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.12",
+    "name": "filter_preserves_hidden_selections",
+    "value": 1,
+    "weight": 1,
+    "description": "Filtering the race calendar to Completed then back to All keeps previously selected Upcoming races selected; the Selected races count does not drop solely because a filter hid rows.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.13",
+    "name": "empty_press_kit_valid_previews",
+    "value": 1,
+    "weight": 1,
+    "description": "Opening the press kit with zero selected races and zero shortlisted assets shows valid empty-state previews (JSON with schemaVersion 1, empty races/shortlist, newsletter none, ICS with zero VEVENT entries) rather than an error blank.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.14",
+    "name": "empty_undo_redo_noop",
+    "value": 1,
+    "weight": 1,
+    "description": "Undo when the undo stack is empty is a no-op that does not clear unrelated UI; Redo when the redo stack is empty is likewise a no-op.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.20",
+    "name": "out_of_enum_status_rejected",
+    "value": 1,
+    "weight": 1,
+    "description": "Submitting the race status editor with a value outside Upcoming or Completed is blocked with an inline error naming status and the race chip does not change.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "4.21",
+    "name": "malformed_import_keeps_state",
+    "value": 1,
+    "weight": 1,
+    "description": "Importing malformed or undecodable press-kit JSON, or JSON that violates the field contract (wrong schemaVersion, missing races, non-YYYY-MM-DD date, status outside Upcoming/Completed, shortlist kind outside helmet/editorial, empty or over-length shortlist label, shortlist index < 1, newsletter neither none nor a contract-valid email), shows a visible error naming the import problem, leaves selections and shortlist unchanged, and produces no console errors.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.1",
+    "name": "spacing_matches_20px_baseline",
+    "value": 1,
+    "weight": 1,
+    "description": "At 1440 width, section spacing and card gaps align to a consistent baseline unit of 1.25rem (20px) and its multiples rather than arbitrary one-off offsets visible in computed styles.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.2",
+    "name": "typography_matches_spec_metrics",
+    "value": 1,
+    "weight": 1,
+    "description": "At 1440 typography matches the spec: stacked AVERY (serif ~32px) / VALE (sans weight 900 ~32px) wordmark in rgb(17, 17, 18); impact statement roughly 132px / ~109px line-height in lime-off rgb(178, 199, 58); footer statement roughly 72px in off-white rgb(244, 244, 237); STORE label ~20px weight 800.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.12",
+    "name": "block_fidelity_fixed_nav_bar",
+    "value": 1,
+    "weight": 1,
+    "description": "Block: fixed nav bar — pinned top chrome with the stacked serif/heavy-sans AVERY VALE wordmark at left, centered monogram mark, filled lime STORE pill with bag icon, and square outlined hamburger at right, sitting over both cream and dark-green sections (reference: segment-01.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.13",
+    "name": "block_fidelity_hero_next_race_widget",
+    "value": 1,
+    "weight": 1,
+    "description": "Block: hero with NEXT RACE widget — full-viewport cream band with faint contour lines, large racer silhouette center-right, and a bordered lower-left NEXT RACE widget carrying an eyebrow, circuit squiggle, event label, laurel mark, and team line (reference: segment-01.png–segment-02.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.14",
+    "name": "block_fidelity_horizontal_media_strip",
+    "value": 1,
+    "weight": 1,
+    "description": "Block: pinned horizontal media strip — dark-green pinned section with a row of at least six tall rounded editorial cards (ON TRACK, SPEED, OFF TRACK, FOCUS, GARAGE, PODIUM) in duotone lime tint with lower-left labels, travelling sideways on vertical scroll (reference: segment-02.png–segment-06.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.15",
+    "name": "block_fidelity_impact_statement",
+    "value": 1,
+    "weight": 1,
+    "description": "Block: impact statement — oversized centered serif NO LIMITS display headline in lime-off green on the dark-green background, isolated with generous vertical whitespace (reference: segment-06.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.16",
+    "name": "block_fidelity_helmet_grid",
+    "value": 1,
+    "weight": 1,
+    "description": "Block: helmet grid — THE HELMET eyebrow over three tall portrait cards masked to helmet silhouettes, each a distinct fictional livery with a numbered 01/02/03 index label in the lower-left (reference: segment-07.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.17",
+    "name": "block_fidelity_collaborators_marquee",
+    "value": 1,
+    "weight": 1,
+    "description": "Block: collaborators marquee — COLLABS eyebrow over an edge-faded horizontal marquee row of at least five monochrome fictional partner symbols/wordmarks on the dark-green ground (reference: segment-08.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.18",
+    "name": "block_fidelity_social_video_card",
+    "value": 1,
+    "weight": 1,
+    "description": "Block: social video card — SOCIAL eyebrow over a single large rounded video card with a reflective helmet poster image and a lime HOVER TO PLAY pill badge in the lower-right corner (reference: segment-08.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.19",
+    "name": "block_fidelity_footer_statement_newsletter",
+    "value": 1,
+    "weight": 1,
+    "description": "Block: footer statement and newsletter — large split-text serif brand statement DRIVEN BY THE FANS. BUILT FOR THE FUTURE. with the first word filled lime, a second partner-mark marquee, the AVERY VALE wordmark, newsletter signup, and a bottom legal row with copyright (reference: segment-08.png and the tail of overview.png). Score this block against the reference segment: 5 = identical position, layout, spacing, alignment, text, fonts, colors, and imagery; 4 = minor imperfections (misalignment under 2px, one minor text or formatting slip); 3 = partial match (noticeable misalignment or spacing drift, multiple text discrepancies); 2 = poor match (significant misalignment, mostly inconsistent layout); 1 = missing or completely misplaced.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.4",
+    "name": "specified_motion_states_present",
+    "value": 1,
+    "weight": 1,
+    "description": "Reference-required motion states are present: LOAD VALE preloader clear, menu ellipse expand/collapse (~750ms), pinned horizontal media travel, STORE split reveal, helmet clip-path reveal, and character fills — verified via the real UI/scroll path.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.5",
+    "name": "responsive_patterns_match_reference",
+    "value": 1,
+    "weight": 1,
+    "description": "Responsive behavior matches the reference patterns at the product breakpoints (992/991/767/479): single-row ~100px nav at ≥992 vs ~140px wrapped mobile nav at 390, three-across helmet cards vs single column (~326×435), menu photo grid hidden at 390.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.6",
+    "name": "store_and_hamburger_styling_match_spec",
+    "value": 1,
+    "weight": 1,
+    "description": "STORE is a filled lime pill (background rgb(210, 255, 0), dark text, bag icon, radius near 0.74rem/~12px); hamburger and menu close are square outlined buttons about 60×60 with rounded corners — not unstyled browser defaults.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.7",
+    "name": "display_vs_body_hierarchy",
+    "value": 1,
+    "weight": 1,
+    "description": "Typography hierarchy clearly distinguishes serif display treatment (impact, menu items, footer statement) from Mona Sans Variable body/labels across the homepage.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.8",
+    "name": "component_states_match_spec",
+    "value": 1,
+    "weight": 1,
+    "description": "Default/hover/disabled states match the spec where specified: HOME current-item lime stroke vs muted green rgb(180, 184, 165), Subscribe disabled until valid email, helmet hover scale/reveal/index lime, video placeholder fade.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.9",
+    "name": "palette_surfaces_and_accent_exact",
+    "value": 1,
+    "weight": 1,
+    "description": "Color treatments match exactly: dark-green base/menu/footer rgb(40, 44, 32); cream hero rgb(239, 239, 229); off-white text rgb(244, 244, 237); lime accent rgb(210, 255, 0) reserved for STORE, current-menu stroke, and hover highlights — not flooding large section backgrounds.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.10",
+    "name": "microinteractions_match_spec_timing",
+    "value": 1,
+    "weight": 1,
+    "description": "Hover/press microinteractions follow the reference language and timing: menu overlay 750ms cubic-bezier(0.65, 0.05, 0, 1), STORE split ~0.4s on the same easing, helmet reveal 0.75s, video placeholder opacity 0.3s — verified on the real controls.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "3.11",
+    "name": "hardened_surfaces_match_token_system",
+    "value": 1,
+    "weight": 1,
+    "description": "Race calendar, press-kit drawer, and command palette match the dual-tone token system (dark-green rgb(40,44,32), off-white text, lime accents) rather than introducing a second unrelated UI theme.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.1",
+    "name": "single_page_homepage_title",
+    "value": 1,
+    "weight": 1,
+    "description": "On load the app serves a single homepage at route / (no other route is built), and the browser tab title reads exactly 2025 Apex Grand Prix Driver — Avery Vale",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.2",
+    "name": "preloader_shows_then_clears",
+    "value": 1,
+    "weight": 1,
+    "description": "On a fresh load a full-bleed lime preloader shows the text LOAD VALE and then clears within about one to two seconds to reveal the homepage rather than staying on screen blocking content",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.3",
+    "name": "fixed_nav_contents",
+    "value": 1,
+    "weight": 1,
+    "description": "A fixed nav stays pinned to the top over all sections and shows, left to right, a stacked AVERY VALE text wordmark (AVERY above VALE), a centered original AV monogram, a lime STORE button, a PRESS KIT control, and a square hamburger button",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.4",
+    "name": "menu_overlay_contents",
+    "value": 1,
+    "weight": 1,
+    "description": "After clicking the hamburger, a full-screen dark-green menu overlay covers the viewport listing HOME, ON TRACK, OFF TRACK, CALENDAR, the social labels CLIPS, PHOTOS, VIDEO, LIVE, and the business contact hello@averyvale.example",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.5",
+    "name": "home_item_current_stroke",
+    "value": 1,
+    "weight": 1,
+    "description": "When the menu is open, the HOME item is marked as the current item with a lime telemetry stroke drawn through its label while ON TRACK, OFF TRACK, and CALENDAR are not",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.6",
+    "name": "menu_closes_on_x_or_escape",
+    "value": 1,
+    "weight": 1,
+    "description": "After clicking the X control (or pressing Escape) in the open menu, the overlay closes, is no longer visible, and the homepage is interactive again",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.7",
+    "name": "next_race_widget_contents",
+    "value": 1,
+    "weight": 1,
+    "description": "The hero fills at least the first full viewport height and a NEXT RACE widget sits at its lower left showing the eyebrow NEXT RACE, an original circuit outline graphic, the label ALPINE GP, an original laurel graphic, and the fictional team line NOVA RACING SINCE 2019",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.8",
+    "name": "horizontal_track_scroll_linked",
+    "value": 1,
+    "weight": 1,
+    "description": "After scrolling vertically through the pinned horizontal media section, the media row translates sideways so later photo cards come into view without the page navigating away",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.9",
+    "name": "helmet_card_hover_reveal",
+    "value": 1,
+    "weight": 1,
+    "description": "When hovering a helmet grid card with the real pointer, its base image scales up, a masked reveal image wipes in, and the card index label turns lime",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.10",
+    "name": "video_hover_play_fade",
+    "value": 1,
+    "weight": 1,
+    "description": "When hovering the social video card, the local video plays and the placeholder image fades from opaque to transparent, and leaving the card pauses the video and restores the placeholder",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.11",
+    "name": "footer_split_text_and_marquee",
+    "value": 1,
+    "weight": 1,
+    "description": "After scrolling to the footer, a split-text brand statement fills its characters into the lime-off highlight color and a partner logo marquee scrolls",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.12",
+    "name": "hover_feedback_present",
+    "value": 1,
+    "weight": 1,
+    "description": "When hovering the STORE button and nav or footer text links, a visible hover response (split reveal or color shift toward lime) appears",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.22",
+    "name": "helmet_grid_three_indexed_cards",
+    "value": 1,
+    "weight": 1,
+    "description": "A helmet grid shows at least three tall portrait cards masked to a helmet silhouette, each with a different newly authored fictional livery, separate base and reveal artwork, and a visible index label",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.23",
+    "name": "collaborators_marquee_fictional_marks",
+    "value": 1,
+    "weight": 0.5,
+    "description": "A collaborators strip shows a horizontal marquee of at least five distinct newly drawn fictional partner symbols or wordmarks; plain typed company names do not count as marks",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.24",
+    "name": "video_card_layered_still",
+    "value": 1,
+    "weight": 1,
+    "description": "A social video card shows an original poster image layered over a muted looping locally served VP9 WebM video whose frames visibly change",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.25",
+    "name": "footer_contents",
+    "value": 1,
+    "weight": 1,
+    "description": "The footer shows a large split-text brand statement, a fictional-partner logo marquee, the AVERY VALE wordmark, a newsletter signup form, and the legal links Privacy Policy, Terms, and Cookies",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.26",
+    "name": "chrome_stays_on_homepage",
+    "value": 1,
+    "weight": 1,
+    "description": "Activating any navigation chrome (wordmark, monogram, menu items, socials, business contact, legal links, Store button) scrolls within the homepage or performs a no-op without reloading the document or leaving the origin",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.30",
+    "name": "hero_composition_with_silhouette",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The hero shows a newly authored fictional racer portrait/cutout composed in depth with an off-white topographic field, translucent organic blobs, and soft shadow or reflection layers behind the navigation chrome",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.31",
+    "name": "media_strip_six_cards",
+    "value": 1,
+    "weight": 1,
+    "description": "The horizontal media strip holds at least six visually distinct newly authored or generated fictional-racer editorial images, rather than repeated thumbnails or flat color placeholders",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.32",
+    "name": "impact_statement_present",
+    "value": 1,
+    "weight": 1,
+    "description": "An impact statement section between the media strip and the helmet grid renders an oversized display headline in the lime-off color",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.33",
+    "name": "menu_photo_grid_and_texture",
+    "value": 1,
+    "weight": 0.5,
+    "description": "The open menu overlay shows a newly drawn topographic line pattern and a staggered grid of at least four distinct original fictional editorial photos separate from the horizontal-strip set",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.34",
+    "name": "subscribe_disabled_until_valid",
+    "value": 1,
+    "weight": 1,
+    "description": "The newsletter form has one email field and a Subscribe control; Subscribe stays disabled while email is empty or fails the subscribe field contract (exactly one @, non-empty local part, domain segment containing a dot), and enables only once the value satisfies that contract",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.35",
+    "name": "menu_flow_probe",
+    "value": 1,
+    "weight": 1,
+    "description": "Scripted menu flow: scroll partway down the page and note the scroll position, click the hamburger, confirm the overlay covers the viewport with the HOME item showing its current-item stroke; activate the X control and confirm the overlay closes with scroll position unchanged; reopen the menu and activate ON TRACK, confirm the overlay closes and the page scrolls within / to the horizontal media section without a document reload, and the fixed nav stays pinned",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.36",
+    "name": "newsletter_flow_probe",
+    "value": 1,
+    "weight": 1,
+    "description": "Scripted newsletter flow: type an invalid email (e.g. missing @ or domain without a dot) and confirm Subscribe stays disabled with an inline error naming the email field; correct it to fan@averyvale.example and confirm the error clears and Subscribe enables; submit and confirm an inline confirmation appears, the field empties, and press-kit JSON newsletter equals that email; confirm no navigation or document reload occurred at any step",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.37",
+    "name": "video_hover_cycle_probe",
+    "value": 1,
+    "weight": 1,
+    "description": "Scripted video flow: hover the social video card, confirm playback starts and the placeholder fades; move the pointer off mid-fade and confirm the placeholder returns to fully opaque and the video pauses; repeat the hover-and-leave cycle at least twice more and confirm it keeps working with no stuck intermediate state",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.38",
+    "name": "reload_baseline_probe",
+    "value": 1,
+    "weight": 1,
+    "description": "Scripted reload baseline: open the menu, select a race, shortlist a helmet, open PRESS KIT, submit the newsletter with a valid email, then reload; confirm the preloader plays again, menu/press kit/palette are closed, race selections and shortlist are empty, the newsletter field is empty with no confirmation, and no prior visit state persists",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.39",
+    "name": "rapid_menu_toggle_settles",
+    "value": 1,
+    "weight": 1,
+    "description": "Rapidly clicking the hamburger and the X control in succession never leaves the overlay stuck half-open or the page inert; the menu always settles fully open or fully closed",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.40",
+    "name": "escape_when_closed_noop",
+    "value": 1,
+    "weight": 0.5,
+    "description": "Pressing Escape while the menu is closed changes nothing on the page",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.41",
+    "name": "empty_submit_blocked",
+    "value": 1,
+    "weight": 1,
+    "description": "Submitting the newsletter form with an empty field is blocked: an inline message names the email field and no confirmation appears",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.42",
+    "name": "double_subscribe_single_confirmation",
+    "value": 1,
+    "weight": 1,
+    "description": "Double-activating the Subscribe control on one valid email shows exactly one confirmation message",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.43",
+    "name": "webgl_fallback_hero_static",
+    "value": 1,
+    "weight": 1,
+    "description": "With WebGL rendering unavailable, the hero shows a static composition of the same artwork and every section, control, and flow remains present and usable",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.44",
+    "name": "menu_items_scroll_in_page",
+    "value": 1,
+    "weight": 1,
+    "description": "With the menu open, activating HOME, ON TRACK, OFF TRACK, or CALENDAR scrolls within the same homepage document to the hero, horizontal media strip, social video section, or race calendar respectively, closes the overlay, and does not load another route or origin",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.45",
+    "name": "authored_asset_surface_inventory",
+    "value": 1,
+    "weight": 1,
+    "description": "Across the rendered page, every major reference media surface is populated: the layered hero portrait, six distinct horizontal-strip images, at least four separate menu photos, three two-state helmet designs, five fictional partner marks, the social poster and changing-frame video, and original monogram/circuit/laurel/telemetry/icon artwork are all visible in their intended sections",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.46",
+    "name": "race_calendar_six_seeded_races",
+    "value": 1,
+    "weight": 1,
+    "description": "The race calendar section lists exactly six seeded fictional races in order with circuit, ISO date, and status: Alpine GP 2025-03-16 Upcoming; Bayfront Circuit 2025-04-06 Upcoming; Ridgeway GP 2025-05-04 Completed; Solstice GP 2025-06-15 Upcoming; Meridian Night Run 2025-07-20 Upcoming; Cascade Finale 2025-09-07 Upcoming",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.47",
+    "name": "race_select_updates_count",
+    "value": 1,
+    "weight": 1,
+    "description": "Clicking a race row toggles a visible lime selected treatment and the Selected races N readout updates immediately to match the count of selected rows",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.48",
+    "name": "race_status_filter",
+    "value": 1,
+    "weight": 1,
+    "description": "The race calendar status filter options All, Upcoming, and Completed filter visible rows; selecting Completed shows Ridgeway GP and hides Upcoming rows without navigating away",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.49",
+    "name": "media_and_helmet_shortlist",
+    "value": 1,
+    "weight": 1,
+    "description": "Each horizontal editorial card and each helmet card exposes a Shortlist control; toggling it adds or removes that asset from the media shortlist and updates a visible shortlist count in the chrome",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.50",
+    "name": "press_kit_live_preview_formats",
+    "value": 1,
+    "weight": 1,
+    "description": "Activating PRESS KIT opens a press-kit drawer with JSON, Markdown, and ICS tabs whose live preview includes Avery Vale / Nova Racing, selected race circuits and YYYY-MM-DD dates, shortlisted asset labels/indexes, and newsletter email or the exact marker none",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.51",
+    "name": "press_kit_copy_and_download",
+    "value": 1,
+    "weight": 1,
+    "description": "Inside the press kit, Copy copies the active format preview and shows a brief copied confirmation, and Download offers avery-vale-press-kit.json, .md, or .ics matching the active tab",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.52",
+    "name": "ics_matches_selected_races",
+    "value": 1,
+    "weight": 1,
+    "description": "With three races selected, the ICS preview is a VCALENDAR (VERSION:2.0, PRODID:-//Avery Vale//Press Kit//EN) with exactly three VEVENT blocks each carrying UID equal to that race's uid from the JSON races array, DTSTART;VALUE=DATE as YYYYMMDD, SUMMARY equal to circuit, and STATUS CONFIRMED or CANCELLED matching Upcoming/Completed; with zero selected, it has zero VEVENT entries",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.53",
+    "name": "command_palette_opens_and_navigates",
+    "value": 1,
+    "weight": 1,
+    "description": "Pressing Meta+K or Control+K opens a command palette listing Go HOME, Go ON TRACK, Go OFF TRACK, Go CALENDAR, Open press kit, Undo, and Redo; activating Go CALENDAR closes the palette and scrolls within / to the race calendar",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.54",
+    "name": "undo_redo_shortlist_and_races",
+    "value": 1,
+    "weight": 1,
+    "description": "After shortlisting an asset or selecting a race, Undo reverses that mutation (count and selected treatment restore); Redo reapplies it; the stack covers at least twenty such mutations",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.55",
+    "name": "race_record_field_contract_visible",
+    "value": 1,
+    "weight": 1,
+    "description": "Each of the six seeded race rows shows circuit, a YYYY-MM-DD date, and a status chip that is exactly Upcoming or Completed; Selected races N matches the count of lime-selected rows",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.56",
+    "name": "race_status_editor_enum",
+    "value": 1,
+    "weight": 1,
+    "description": "Opening Edit status on a race and submitting Upcoming or Completed updates that row's chip immediately; submitting a value outside that closed enum shows an inline error naming status and leaves the chip unchanged",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.57",
+    "name": "press_kit_json_field_contract",
+    "value": 1,
+    "weight": 1,
+    "description": "The press-kit JSON preview includes required keys schemaVersion (integer 1), driver Avery Vale, team Nova Racing, season 2025, newsletter (contract-valid email or none), races (selected race records only, each showing id, circuit, date, status, selected true, and uid), shortlist (each entry kind helmet or editorial, non-empty label <= 60 chars, index >= 1), and generatedAt ending in Z",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.58",
+    "name": "press_kit_import_restores_session",
+    "value": 1,
+    "weight": 1,
+    "description": "After clearing selections, Import of a previously exported valid press-kit JSON restores Selected races N, shortlist count, selected treatments, and JSON/ICS previews to match that payload without a reload",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.59",
+    "name": "shortlist_asset_field_contract",
+    "value": 1,
+    "weight": 1,
+    "description": "After shortlisting one helmet and one editorial card, the press-kit JSON shortlist array contains exactly two entries whose kind values are helmet and editorial, each with a non-empty label of at most 60 characters and an index integer >= 1",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.60",
+    "name": "newsletter_subscribe_field_contract",
+    "value": 1,
+    "weight": 1,
+    "description": "A successful Subscribe with fan@averyvale.example records that email as the session subscriber; the press-kit JSON newsletter field equals fan@averyvale.example; an address missing @ or whose domain has no dot keeps Subscribe disabled with an inline error naming email",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.1",
+    "name": "in_memory_multi_facet_reload_resets",
+    "value": 1,
+    "weight": 1,
+    "description": "Starting on the homepage: open the menu, select a race, shortlist a helmet, type a valid email into the newsletter field, and hover the social video card; then reload. All facets coherently reset (menu/press kit/palette closed, selections and shortlist empty, newsletter empty with no confirmation, video not mid-hover-play) — never a mixed partial survival. In-memory genre: nothing persists.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.3",
+    "name": "subscribe_enablement_tracks_email_validity",
+    "value": 1,
+    "weight": 1,
+    "description": "Derived-view sensitivity: type an invalid email and confirm Subscribe stays disabled with an inline error; correct to a valid email and confirm the error clears and Subscribe enables — the control state changes meaningfully with the input.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.4",
+    "name": "menu_home_stroke_echo",
+    "value": 1,
+    "weight": 1,
+    "description": "Cross-view echo: open the menu and confirm HOME shows the lime telemetry stroke while ON TRACK, OFF TRACK, and CALENDAR do not; close and reopen without reload — HOME remains the current stroked item.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.5",
+    "name": "newsletter_confirmation_count_delta",
+    "value": 1,
+    "weight": 1,
+    "description": "Count-delta integrity: with a valid email ready, note that zero confirmation messages are visible, submit Subscribe once, and confirm exactly one confirmation message appears with no off-by-one duplicate.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.6",
+    "name": "invalid_vs_valid_email_outcomes_differ",
+    "value": 1,
+    "weight": 1,
+    "description": "Input-dependent output: attempt the newsletter flow with an invalid email (Subscribe disabled / error, no confirmation) then with a valid email (Subscribe enabled, submit shows confirmation and clears the field); the two outcomes differ as the inputs dictate.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.7",
+    "name": "interleaved_menu_and_newsletter",
+    "value": 1,
+    "weight": 1,
+    "description": "Interleaved-flow integrity: open the menu, close it via X, type a valid email, open the menu again, close via Escape, then submit the newsletter; the confirmation appears and the menu remains closed — neither flow corrupted the other.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.8",
+    "name": "video_hover_leave_round_trip",
+    "value": 1,
+    "weight": 1,
+    "description": "Edge-state round-trip: hover the social video card (playback starts, placeholder fades), leave (paused, placeholder fully opaque), then hover again; playback and placeholder opacity track both transitions with no stuck intermediate state.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.9",
+    "name": "press_kit_derived_sensitivity",
+    "value": 1,
+    "weight": 1,
+    "description": "Derived-view sensitivity: note the empty press-kit JSON preview, select Alpine GP and Bayfront Circuit and shortlist one helmet, reopen PRESS KIT; the JSON/Markdown now name those two circuits and the shortlisted label, and ICS has exactly two VEVENT entries — not an identical redraw.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.10",
+    "name": "undo_round_trip_race_select",
+    "value": 1,
+    "weight": 1,
+    "description": "Edge-state round-trip: select Solstice GP (Selected races increments), Undo (selection clears and count decrements), Redo (selection and count restore).",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.11",
+    "name": "newsletter_echoes_into_press_kit",
+    "value": 1,
+    "weight": 1,
+    "description": "Cross-view echo: submit newsletter with fan@averyvale.example, open PRESS KIT JSON; the preview includes that subscriber email; a different valid email on a fresh flow yields a different email in the kit.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.12",
+    "name": "press_kit_import_round_trip_probe",
+    "value": 1,
+    "weight": 1,
+    "description": "Export then import round-trip probe: select Alpine GP and Bayfront Circuit and shortlist one helmet; copy JSON; Undo both selections and the shortlist; Import the JSON; Selected races is 2, shortlist count is 1, ICS has two VEVENT entries, and JSON races arrays name both circuits.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "14.13",
+    "name": "status_enum_echoes_into_ics",
+    "value": 1,
+    "weight": 1,
+    "description": "Cross-view echo: with Ridgeway GP selected, Edit status to Upcoming; ICS STATUS for that VEVENT becomes CONFIRMED; set Completed and it becomes CANCELLED — not a stale STATUS.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.1",
+    "name": "interactive_controls_keyboard_operable",
+    "value": 1,
+    "weight": 1,
+    "description": "Every interactive control (STORE, PRESS KIT, hamburger, menu items, socials, legal links, shortlist controls, race rows, status filter, Undo, Redo, email field, Subscribe, palette search/results) is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space).",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.2",
+    "name": "menu_modal_focus_trap_and_return",
+    "value": 1,
+    "weight": 1,
+    "description": "The menu overlay behaves as a modal dialog: it traps focus while open, closes on Escape, and returns focus to the hamburger button on close.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.3",
+    "name": "media_have_accessible_names",
+    "value": 1,
+    "weight": 1,
+    "description": "Editorial images, helmet cards, partner marks, and the social video poster carry descriptive alt text or accessible labels where they convey content.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.4",
+    "name": "newsletter_feedback_uses_live_region",
+    "value": 1,
+    "weight": 1,
+    "description": "Newsletter inline error and confirmation messages are announced through an aria-live region as well as shown visually.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.5",
+    "name": "newsletter_field_has_explicit_label",
+    "value": 1,
+    "weight": 1,
+    "description": "The newsletter email field uses an explicit label association (or equivalent accessible name).",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.6",
+    "name": "headings_logical_order",
+    "value": 1,
+    "weight": 1,
+    "description": "Section headings follow a logical heading order through the homepage with no skipped levels that break the outline.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.7",
+    "name": "landmarks_nav_main_footer",
+    "value": 1,
+    "weight": 1,
+    "description": "The document exposes HTML-first landmarks: header/nav chrome, a main content landmark wrapping the homepage sections, and a footer landmark.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.8",
+    "name": "contrast_cream_and_dark_sections",
+    "value": 1,
+    "weight": 1,
+    "description": "Text over the cream hero and dark-green sections, and all control labels, meet WCAG AA contrast; lime STORE button text on lime stays high-contrast (dark text on rgb(210, 255, 0)).",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.9",
+    "name": "semantic_interactive_chrome",
+    "value": 1,
+    "weight": 1,
+    "description": "Interactive chrome uses real controls (button, label, native links) with semantic roles; custom overlays expose matching ARIA roles only where native elements cannot carry the behavior.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.10",
+    "name": "reduced_motion_settles_immediately",
+    "value": 1,
+    "weight": 1,
+    "description": "With prefers-reduced-motion emulated on a fresh load, scroll-linked animation settles immediately, the LOAD VALE preloader does not block content, in-page jumps use instant scroll, and continuous marquees do not run — while the page remains fully scrollable and operable.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.a1",
+    "name": "split_text_aria_label_on_container",
+    "value": 1,
+    "weight": 1,
+    "description": "Split-text headlines (impact statement and footer brand statement) keep the original phrase as an aria-label on the heading container while individual character/word spans are aria-hidden from the accessibility tree.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.a2",
+    "name": "hero_webgl_labelled_or_decorative",
+    "value": 1,
+    "weight": 1,
+    "description": "The hero canvas or WebGL layer is treated as decorative or labelled: role=img with a descriptive aria-label, or aria-hidden when a static silhouette sibling already conveys the artwork.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.11",
+    "name": "press_kit_and_palette_modal_a11y",
+    "value": 1,
+    "weight": 1,
+    "description": "The press-kit drawer and command palette each behave as modal dialogs: Escape closes them, focus is trapped while open, and focus returns to the control that opened them.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.12",
+    "name": "shortlist_controls_accessible_names",
+    "value": 1,
+    "weight": 1,
+    "description": "Icon-only shortlist controls on helmet and editorial cards expose descriptive accessible names.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  },
+  {
+    "id": "1.13",
+    "name": "selection_counts_live_region",
+    "value": 1,
+    "weight": 1,
+    "description": "Selected races N and shortlist count changes are announced via an aria-live region as well as shown visually.",
+    "reasoning": "yes - Observed behavior matches criterion."
+  }
+]
