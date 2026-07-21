@@ -34,7 +34,7 @@ function Row({ node, level, index, readOnly }) {
   const toggleCollapsed = store((s) => s.toggleCollapsed);
   const toggleSelect = store((s) => s.toggleSelect);
   const setNodeRequired = store((s) => s.setNodeRequired);
-  const requestDeleteNode = store((s) => s.requestDeleteNode);
+  const doDeleteNode = store((s) => s.doDeleteNode);
   const addField = store((s) => s.addField);
   const nestNode = store((s) => s.nestNode);
   const unnestNode = store((s) => s.unnestNode);
@@ -52,6 +52,7 @@ function Row({ node, level, index, readOnly }) {
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(node.key);
   const [renameError, setRenameError] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: node.id,
@@ -268,7 +269,9 @@ function Row({ node, level, index, readOnly }) {
                 className="icon-btn icon-btn-danger tap"
                 aria-label={`Delete ${node.key}`}
                 title="Delete field"
-                onClick={() => requestDeleteNode(node.id)}
+                aria-expanded={confirmDelete}
+                aria-controls={`delete-confirm-${node.id}`}
+                onClick={() => setConfirmDelete(true)}
               >
                 <TrashCan size={14} aria-hidden="true" />
               </button>
@@ -290,6 +293,28 @@ function Row({ node, level, index, readOnly }) {
           )}
         </span>
       </div>
+      <AnimatePresence initial={false}>
+        {confirmDelete && (
+          <motion.div
+            id={`delete-confirm-${node.id}`}
+            className="inline-delete-confirm"
+            role="alertdialog"
+            aria-label={`Confirm deletion of ${node.key}`}
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: dur.fast }}
+          >
+            <span>
+              Delete <strong>{node.key}</strong>{(node.children || []).length ? ' and all nested fields' : ''}?
+            </span>
+            <span className="inline-confirm-actions">
+              <button type="button" className="btn btn-ghost tap" onClick={() => setConfirmDelete(false)}>Cancel</button>
+              <button type="button" className="btn btn-danger tap" onClick={() => doDeleteNode(node.id)}>Delete field</button>
+            </span>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {hasChildren && !collapsed && (
         <ChildrenList nodes={node.children || []} level={level + 1} parentId={node.id} readOnly={readOnly} emptyHint={
           node.type === 'array' ? 'This array has no item schema — press + to define its items' : 'No fields yet — press + or Add field to create one'

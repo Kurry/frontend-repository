@@ -38,7 +38,7 @@ export default function OutputPanes() {
         tabs={[
           { id: 'schema', label: 'Schema text' },
           { id: 'example', label: 'Example' },
-          { id: 'format', label: 'Format Prompt' },
+          { id: 'format', label: 'Format prompt' },
         ]}
       />
       <div className="relative min-h-0 flex-1">

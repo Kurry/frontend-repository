@@ -7,7 +7,7 @@ import {
   reorderChildren, uniqueKey, uniqueSchemaName, countFields,
   compileSchema, generateExample, formatInstruction, nodeToFieldDef, fieldDefToNode,
   validateFieldPayload, validateSchemaPackage, inferFields, inferredToNode,
-  versionNameSchema, KEY_PATTERN,
+  versionNameSchema, KEY_PATTERN, jsonParseError,
 } from './lib.js';
 import { buildSeeds, SEED_METADATA_FIELDS } from './seeds.js';
 
@@ -825,7 +825,7 @@ export const useStore = create((set, get) => {
       try {
         payload = JSON.parse(text);
       } catch (e) {
-        const msg = `Invalid JSON payload — ${e.message}`;
+        const msg = jsonParseError(text, e, 'Invalid JSON payload');
         set({ payloadError: msg });
         return { ok: false, error: msg };
       }
@@ -934,7 +934,7 @@ export const useStore = create((set, get) => {
       try {
         obj = JSON.parse(text);
       } catch (e) {
-        const msg = `Invalid JSON — ${e.message}`;
+        const msg = jsonParseError(text, e, 'Invalid example JSON');
         set({ importDraftError: msg });
         return { ok: false, error: msg };
       }

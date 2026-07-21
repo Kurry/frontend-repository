@@ -179,14 +179,15 @@ export function Field({ label, htmlFor, error, hint, children }) {
   );
 }
 
-export function Switch({ checked, onChange, label, id }) {
+export function Switch({ checked, onChange, label, labelledBy, id }) {
   return (
     <button
       type="button"
       id={id}
       role="switch"
       aria-checked={checked}
-      aria-label={label}
+      aria-label={labelledBy ? undefined : label}
+      aria-labelledby={labelledBy}
       className={`switch tap ${checked ? 'switch-on' : ''}`}
       onClick={onChange}
     >
