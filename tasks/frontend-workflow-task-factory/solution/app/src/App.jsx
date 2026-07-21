@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -633,6 +633,7 @@ function CreateTaskDialog() {
   }
   const cancel = () => setOpen(false)
   const prValue = watch('pullRequestNumber')
+  const returnFocusRef = useRef(null)
   const [portalMounted, setPortalMounted] = useState(open)
   useEffect(() => {
     if (open) {
@@ -643,7 +644,7 @@ function CreateTaskDialog() {
     return () => window.clearTimeout(timer)
   }, [open])
   return (
-    <Dialog.Root open={open} modal={false} onOpenChange={(next) => setOpen(next)}>
+    <Dialog.Root open={open} modal onOpenChange={(next) => setOpen(next)}>
       {portalMounted ? <Dialog.Portal forceMount>
         <Dialog.Overlay
           className="dialog-overlay"
@@ -655,8 +656,12 @@ function CreateTaskDialog() {
           forceMount
           data-state={open ? 'open' : 'closed'}
           aria-describedby="create-task-description"
-          onPointerDownOutside={(event) => event.preventDefault()}
-          onInteractOutside={(event) => event.preventDefault()}
+          onOpenAutoFocus={() => { returnFocusRef.current = document.activeElement }}
+          onCloseAutoFocus={(event) => {
+            if (!returnFocusRef.current) return
+            event.preventDefault()
+            returnFocusRef.current.focus()
+          }}
           onEscapeKeyDown={() => setOpen(false)}
           onKeyDown={(event) => {
             if (event.key !== 'Tab') return
