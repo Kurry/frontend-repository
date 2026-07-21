@@ -1,24 +1,29 @@
 import { For, Show } from "solid-js";
 import { STEPS } from "../store";
+import { Check } from "./Icon";
+
+// Four-stage progress bar: completed stages show a check mark, the active
+// stage carries its full label plus aria-current="step", upcoming stages show
+// a muted number — so the current step reaches assistive tech, not just colour.
 
 export default function Progress(props: { current: number }) {
   return (
-    <div
-      class="flex items-center gap-2.5 overflow-hidden p-2.5 rounded-lg bg-scope-bg2/50"
-      role="list"
-      aria-label="Patcher steps"
+    <ol
+      class="flex items-center gap-2 overflow-hidden rounded-lg bg-scope-bg2/50 p-2.5"
+      aria-label="Patching wizard progress"
     >
       <For each={STEPS}>
         {(stage, index) => {
           const complete = () => index() < props.current;
           const active = () => index() === props.current;
           return (
-            <>
+            <li
+              aria-current={active() ? "step" : undefined}
+              class="flex min-w-0 items-center gap-2"
+            >
               <div
-                role="listitem"
-                aria-current={active() ? "step" : undefined}
                 classList={{
-                  "flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full text-sm font-medium transition-colors duration-200":
+                  "flex h-[30px] w-[30px] shrink-0 items-center justify-center rounded-full text-sm font-medium transition-colors duration-300":
                     true,
                   "bg-scope-accent text-white": active(),
                   "bg-scope-accent2 text-white": complete(),
@@ -26,25 +31,33 @@ export default function Progress(props: { current: number }) {
                 }}
               >
                 <Show when={complete()} fallback={<span>{index() + 1}</span>}>
-                  <span aria-hidden="true">&#10003;</span>
+                  <Check size={14} />
+                  <span class="sr-only">done</span>
                 </Show>
               </div>
 
               <Show
                 when={active()}
-                fallback={<div class="h-px w-6 shrink bg-scope-bg3 last:hidden" />}
+                fallback={
+                  <div
+                    classList={{
+                      "h-px w-5 shrink-0 bg-scope-bg3": true,
+                      hidden: index() === STEPS.length - 1,
+                    }}
+                  />
+                }
               >
-                <div class="flex min-w-0 grow items-center gap-2.5">
+                <div class="flex min-w-0 grow items-center gap-2">
                   <h1 class="truncate text-base font-semibold text-scope-accent">
                     {stage}
                   </h1>
-                  <div class="h-px grow bg-scope-bg3 last:hidden" />
+                  <div class="h-px grow bg-scope-bg3" />
                 </div>
               </Show>
-            </>
+            </li>
           );
         }}
       </For>
-    </div>
+    </ol>
   );
 }

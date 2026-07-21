@@ -1,17 +1,21 @@
 import { For, Show, createSignal } from "solid-js";
 import Alert from "../components/Alert";
 import Button from "../components/Button";
-import { ArrowLeft, ArrowRight, Reset, Swap } from "../components/Icon";
+import { ArrowLeft, ArrowRight, Dropdown, Reset, Swap } from "../components/Icon";
 import { BITMAPS, ICON_SET_LABELS, type Bitmap, type IconSet } from "../data/bitmaps";
 import { css } from "../data/themes";
 import {
+  batchKeepOriginal,
   bitmapReplaced,
+  clearSelection,
   goBack,
   goNext,
   replacedCount,
   selectIconSet,
+  selectedTileCount,
+  setKeepOriginal,
   state,
-  toggleKeepOriginal,
+  toggleTileSelected,
 } from "../store";
 
 function Tile(props: { bm: Bitmap; replaced: boolean }) {
@@ -19,7 +23,7 @@ function Tile(props: { bm: Bitmap; replaced: boolean }) {
   const fg = () => css(state.swatches[5]);
   return (
     <div
-      class="flex h-14 w-14 items-center justify-center rounded-md border border-scope-bg3"
+      class="flex h-14 w-14 shrink-0 items-center justify-center rounded-md border border-scope-bg3 transition-colors duration-150"
       style={
         props.replaced
           ? { background: bg(), color: "#ffffff" }
@@ -61,15 +65,20 @@ export default function StepBitmaps() {
 
       <div class="flex flex-col gap-2.5 rounded-lg border border-scope-bg3 bg-white p-4">
         <h2 class="text-base font-medium text-scope-fg1">Base icon set</h2>
-        <select
-          aria-label="Base icon set"
-          class="h-[28px] w-[190px] cursor-pointer rounded-md border-2 border-scope-bg2 bg-scope-bg2 px-2 text-sm hover:border-scope-bg3 focus:border-scope-accent focus:outline-none"
-          value={state.iconSet}
-          onInput={(e) => selectIconSet(e.currentTarget.value as IconSet)}
-        >
-          <option value="none">{ICON_SET_LABELS.none}</option>
-          <option value="vector">{ICON_SET_LABELS.vector}</option>
-        </select>
+        <span class="relative inline-flex">
+          <select
+            aria-label="Base icon set"
+            class="h-[46px] w-[210px] cursor-pointer appearance-none rounded-md border-2 border-scope-bg2 bg-scope-bg2 pl-3 pr-9 text-sm font-medium text-scope-fg1 transition-[border-color,box-shadow] duration-150 hover:border-scope-bg3 hover:shadow-sm focus:border-scope-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-scope-accent focus-visible:ring-offset-1"
+            value={state.iconSet}
+            onChange={(e) => selectIconSet(e.currentTarget.value as IconSet)}
+          >
+            <option value="none">{ICON_SET_LABELS.none}</option>
+            <option value="vector">{ICON_SET_LABELS.vector}</option>
+          </select>
+          <span class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-scope-fg2">
+            <Dropdown size={16} />
+          </span>
+        </span>
         <p class="text-sm text-scope-fg2" aria-live="polite">
           <Show
             when={state.iconSet === "vector"}
@@ -81,60 +90,122 @@ export default function StepBitmaps() {
       </div>
 
       <div class="flex flex-col gap-2.5 rounded-lg border border-scope-bg3 bg-white p-4">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-2">
           <h2 class="text-base font-medium text-scope-fg1">Preview</h2>
-          <Show when={!advanced()}>
-            <Button variant="ghost" onClick={() => setAdvanced(true)}>
-              <span>Show advanced options</span>
-            </Button>
-          </Show>
+          <Button
+            variant="ghost"
+            small
+            aria-expanded={advanced()}
+            onClick={() => setAdvanced(!advanced())}
+          >
+            <span>
+              {advanced() ? "Hide advanced options" : "Show advanced options"}
+            </span>
+          </Button>
         </div>
 
-        <Show
-          when={advanced()}
-          fallback={
-            <div class="scope-scroll flex flex-wrap gap-2.5">
+        <div class="flex flex-wrap gap-2.5">
+          <For each={BITMAPS}>
+            {(bm) => <Tile bm={bm} replaced={bitmapReplaced(bm.id)} />}
+          </For>
+        </div>
+
+        {/* animated height expand for the per-bitmap list */}
+        <div
+          class="grid transition-[grid-template-rows] duration-300 ease-out"
+          style={{ "grid-template-rows": advanced() ? "1fr" : "0fr" }}
+        >
+          <div class="min-h-0 overflow-hidden">
+            <div class="flex flex-col gap-2 pt-1">
+              <div class="flex flex-wrap items-center gap-2 rounded-md bg-scope-bg2/60 px-2.5 py-2">
+                <span class="text-xs font-medium text-scope-fg2" aria-live="polite">
+                  {selectedTileCount()} of {BITMAPS.length} selected
+                </span>
+                <span class="grow" />
+                <Button
+                  small
+                  variant="ghost"
+                  disabled={selectedTileCount() === 0 || state.iconSet !== "vector"}
+                  onClick={() => batchKeepOriginal(true)}
+                >
+                  <Reset size={13} />
+                  <span>Keep original selected</span>
+                </Button>
+                <Button
+                  small
+                  variant="ghost"
+                  disabled={selectedTileCount() === 0 || state.iconSet !== "vector"}
+                  onClick={() => batchKeepOriginal(false)}
+                >
+                  <Swap size={13} />
+                  <span>Use Vector selected</span>
+                </Button>
+                <Show when={selectedTileCount() > 0}>
+                  <Button small variant="ghost" onClick={() => clearSelection()}>
+                    Clear
+                  </Button>
+                </Show>
+              </div>
+
               <For each={BITMAPS}>
-                {(bm) => <Tile bm={bm} replaced={bitmapReplaced(bm.id)} />}
+                {(bm) => {
+                  const key = () => String(bm.id);
+                  return (
+                    <div
+                      classList={{
+                        "flex items-center gap-3 rounded-md border p-2 transition-colors duration-100":
+                          true,
+                        "border-scope-accent/50 bg-scope-info": state.selection[key()],
+                        "border-scope-bg3 hover:bg-scope-bg2/60": !state.selection[key()],
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        aria-label={`Select bitmap ${bm.id}`}
+                        class="h-[18px] w-[18px] shrink-0 cursor-pointer accent-scope-accent"
+                        checked={Boolean(state.selection[key()])}
+                        onChange={() => toggleTileSelected(bm.id)}
+                      />
+                      <Tile bm={bm} replaced={bitmapReplaced(bm.id)} />
+                      <div class="min-w-0 grow">
+                        <h3 class="text-sm font-medium text-scope-fg1">
+                          Bitmap {bm.id}
+                        </h3>
+                        <p class="text-xs text-scope-fg2">
+                          {bm.width}&#215;{bm.height} @ {bm.bpp}bpp &middot;{" "}
+                          {bitmapReplaced(bm.id) ? "Vector" : "Original"}
+                        </p>
+                      </div>
+                      <Show when={state.iconSet === "vector"}>
+                        <Button
+                          small
+                          variant="ghost"
+                          aria-pressed={Boolean(state.keepOriginal[key()])}
+                          onClick={() =>
+                            setKeepOriginal(bm.id, !state.keepOriginal[key()])
+                          }
+                        >
+                          <Show
+                            when={state.keepOriginal[key()]}
+                            fallback={
+                              <>
+                                <Reset size={13} />
+                                <span>Keep original</span>
+                              </>
+                            }
+                          >
+                            <Swap size={13} />
+                            <span>Use Vector</span>
+                          </Show>
+                        </Button>
+                      </Show>
+                    </div>
+                  );
+                }}
               </For>
             </div>
-          }
-        >
-          <div class="flex flex-col gap-2">
-            <For each={BITMAPS}>
-              {(bm) => (
-                <div class="flex items-center gap-3 rounded-md border border-scope-bg3 p-2 transition-colors hover:bg-scope-bg2/50">
-                  <Tile bm={bm} replaced={bitmapReplaced(bm.id)} />
-                  <div class="grow">
-                    <h3 class="text-sm font-medium text-scope-fg1">
-                      Bitmap {bm.id}
-                    </h3>
-                    <p class="text-xs text-scope-fg2">
-                      {bm.width}&#215;{bm.height} @ {bm.bpp}bpp &middot;{" "}
-                      {bitmapReplaced(bm.id) ? "Vector" : "Original"}
-                    </p>
-                  </div>
-                  <Show when={state.iconSet === "vector"}>
-                    <Button variant="ghost" onClick={() => toggleKeepOriginal(bm.id)}>
-                      <Show
-                        when={state.keepOriginal[String(bm.id)]}
-                        fallback={
-                          <>
-                            <Reset />
-                            <span>Keep original</span>
-                          </>
-                        }
-                      >
-                        <Swap />
-                        <span>Use vector</span>
-                      </Show>
-                    </Button>
-                  </Show>
-                </div>
-              )}
-            </For>
           </div>
-        </Show>
+        </div>
       </div>
 
       <div class="flex justify-between">
