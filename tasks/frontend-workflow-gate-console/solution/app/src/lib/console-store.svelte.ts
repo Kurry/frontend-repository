@@ -330,9 +330,13 @@ export class ConsoleStore {
 
   async startRerun(stageName: StageName = this.selectedStage.name): Promise<boolean> {
     if (this.rerun.active) return false;
+    this.rerun.active = true;
     const run = this.selectedRun;
     const stage = run.stages.find((candidate) => candidate.name === stageName);
-    if (!stage) return false;
+    if (!stage) {
+      this.rerun.active = false;
+      return false;
+    }
     this.revertWhatIf();
     this.closeNoteForm();
     const gateStatuses: Record<string, RerunGateStatus> = {};
@@ -465,17 +469,17 @@ export class ConsoleStore {
         })),
         certificate: stage.certificate ? { ...stage.certificate } : null
       })),
-      timeline: payload.timeline.map((entry, index) => ({ ...entry, id: `import-${index}-${Date.now()}` }))
+      timeline: payload.timeline.map((entry) => ({ ...entry }))
     };
     const nextRuns = [...this.runs];
     nextRuns[targetIndex] = nextRun;
-    this.runs = nextRuns;
+    this.runs = [...nextRuns];
     this.selectedRunId = nextRun.id;
     this.selectedStageName = nextRun.stages[0].name;
     this.importDraft = text;
     this.importError = '';
+    this.exportedAt = payload.exportedAt;
     this.resetTransientStageState();
-    this.touchExport();
     this.closeModal();
     this.showToast(`Acceptance package imported for ${nextRun.id}`);
     return { ok: true };

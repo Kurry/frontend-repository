@@ -37,7 +37,7 @@
 
 <style>
   .stage-strip { width:100%; min-width:0; display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:.35rem; }
-  .stage-segment { position:relative; display:flex; align-items:center; gap:.38rem; min-height:2.8rem; min-width:0; padding:.5rem .45rem; color:var(--status); background:var(--status-bg); border:1px solid var(--status-border); border-radius:.55rem; font-size:.62rem; font-weight:800; cursor:pointer; transition:transform .15s ease, filter .18s ease, box-shadow .18s ease; }
+  .stage-segment { position:relative; display:flex; align-items:center; gap:.38rem; min-height:2.8rem; min-width:0; padding:.5rem .45rem; color:var(--status); background:var(--status-bg); border:1px solid var(--status-border); border-radius:.55rem; font-size:.62rem; font-weight:800; cursor:pointer; transition:transform .15s ease, filter .09s ease, box-shadow .09s ease; }
   .stage-segment > span:last-child { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .stage-segment:not(:disabled):hover { filter:brightness(.98); box-shadow:0 4px 12px rgba(30,45,70,.1); transform:translateY(-1px); }
   .stage-segment.selected::after { content:""; position:absolute; left:.55rem; right:.55rem; bottom:.2rem; height:2px; border-radius:2px; background:var(--status); }
