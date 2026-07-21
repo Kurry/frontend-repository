@@ -3,10 +3,12 @@ import { Add, Close, DocumentAttachment } from '@carbon/icons-react'
 import { REFERENCE_ASSETS } from '../domain'
 import { useStudioStore } from '../store'
 
-export default function AttachmentsField({ selected, onChange }) {
+export default function AttachmentsField({ selected, onChange, idPrefix = 'attachments' }) {
   const open = useStudioStore((state) => state.assetPickerOpen)
   const setChrome = useStudioStore((state) => state.setChrome)
   const available = REFERENCE_ASSETS.filter((asset) => !selected.includes(asset.name))
+  const labelId = `${idPrefix}-reference-documents-label`
+  const pickerId = `${idPrefix}-asset-picker`
 
   function add(name) {
     onChange([...selected, name])
@@ -17,7 +19,7 @@ export default function AttachmentsField({ selected, onChange }) {
     <div className="field-stack attachment-field">
       <div className="field-heading">
         <div>
-          <p className="field-label" id="reference-documents-label">Reference documents</p>
+          <p className="field-label" id={labelId}>Reference documents</p>
           <p className="field-help">Optional · Ground the prompt in a source asset.</p>
         </div>
         <Button
@@ -25,16 +27,20 @@ export default function AttachmentsField({ selected, onChange }) {
           kind="tertiary"
           size="sm"
           renderIcon={(props) => <Add {...props} aria-hidden="true" />}
-          onClick={() => setChrome({ assetPickerOpen: !open })}
+          onClick={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            setChrome({ assetPickerOpen: !open })
+          }}
           aria-expanded={open}
-          aria-controls="asset-picker"
+          aria-controls={pickerId}
         >
           Add document
         </Button>
       </div>
 
       {selected.length > 0 ? (
-        <div className="attachment-list" aria-labelledby="reference-documents-label">
+        <div className="attachment-list" aria-labelledby={labelId}>
           {selected.map((name) => {
             const asset = REFERENCE_ASSETS.find((item) => item.name === name)
             return (
@@ -61,13 +67,13 @@ export default function AttachmentsField({ selected, onChange }) {
       )}
 
       {open && (
-        <div className="asset-picker" id="asset-picker" role="listbox" aria-label="Choose a reference document">
+        <div className="asset-picker" id={pickerId} role="listbox" aria-label="Choose a reference document">
           <div className="asset-picker__top">
             <div>
               <strong>Reference library</strong>
               <span>Choose one of 6 seeded assets</span>
             </div>
-            <Button type="button" kind="ghost" size="sm" hasIconOnly renderIcon={(props) => <Close {...props} aria-hidden="true" />} iconDescription="Close document picker" onClick={() => setChrome({ assetPickerOpen: false })} />
+            <Button type="button" kind="ghost" size="sm" hasIconOnly renderIcon={(props) => <Close {...props} aria-hidden="true" />} iconDescription="Close document picker" aria-label="Close document picker" onClick={() => setChrome({ assetPickerOpen: false })} />
           </div>
           <div className="asset-grid">
             {REFERENCE_ASSETS.map((asset) => {

@@ -88,7 +88,7 @@ export default function PreviewPanel({ saveButtonRef }) {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ duration: 0.15 }}
+                transition={{ duration: 0.09 }}
                 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
               >
                 {copied ? 'Copied' : 'Copy'}

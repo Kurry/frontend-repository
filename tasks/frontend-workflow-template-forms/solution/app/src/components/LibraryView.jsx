@@ -1,7 +1,8 @@
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { useMemo, useState, useRef } from 'react'
-import { Button, Tag, Toggle, Modal } from '@carbon/react'
+import { Button, Tag, Modal, Search, Select, SelectItem } from '@carbon/react'
 import {
+  ArrowsVertical,
   ArrowLeft,
   Copy,
   DocumentExport,
@@ -10,9 +11,15 @@ import {
   Launch,
   TrashCan,
 } from '@carbon/icons-react'
-import { makeLibraryDocument, techniqueById } from '../domain'
+import { makeLibraryDocument, TECHNIQUES, techniqueById } from '../domain'
 import { useStudioStore } from '../store'
 import { copyText, downloadText } from './PreviewPanel'
+
+function truncateSummary(text, limit = 96) {
+  const value = String(text || '').replace(/\s+/g, ' ').trim()
+  if (value.length <= limit) return value
+  return `${value.slice(0, limit - 1)}…`
+}
 
 export default function LibraryView({ importLauncherRef }) {
   const library = useStudioStore((state) => state.library)
@@ -25,6 +32,10 @@ export default function LibraryView({ importLauncherRef }) {
   const [deleting, setDeleting] = useState(null)
   const sortOrder = useStudioStore((state) => state.sortOrder)
   const toggleSortOrder = useStudioStore((state) => state.toggleSortOrder)
+  const libraryQuery = useStudioStore((state) => state.libraryQuery)
+  const setLibraryQuery = useStudioStore((state) => state.setLibraryQuery)
+  const libraryTechniqueFilter = useStudioStore((state) => state.libraryTechniqueFilter)
+  const setLibraryTechniqueFilter = useStudioStore((state) => state.setLibraryTechniqueFilter)
   const document = useMemo(() => makeLibraryDocument(library), [library])
   const jsonText = useMemo(() => JSON.stringify(document, null, 2), [document])
   const [parent] = useAutoAnimate()
@@ -35,10 +46,19 @@ export default function LibraryView({ importLauncherRef }) {
   const rowOpenButtons = useRef(new Map())
 
   const sortedLibrary = useMemo(() => {
-    return [...library].map((item, originalIndex) => ({ ...item, originalIndex, sourceRecord: item })).sort((a, b) => {
-      return sortOrder === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
-    })
-  }, [library, sortOrder])
+    const query = libraryQuery.trim().toLowerCase()
+    return [...library]
+      .map((item, originalIndex) => ({ ...item, originalIndex, sourceRecord: item }))
+      .filter((item) => {
+        if (libraryTechniqueFilter !== 'all' && item.technique !== libraryTechniqueFilter) return false
+        if (!query) return true
+        return `${item.title} ${item.promptText} ${item.technique}`.toLowerCase().includes(query)
+      })
+      .sort((a, b) => {
+        if (sortOrder === 'manual') return a.originalIndex - b.originalIndex
+        return sortOrder === 'asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
+      })
+  }, [library, libraryQuery, libraryTechniqueFilter, sortOrder])
 
   function confirmRemove(record, title, event) {
     deleteLauncher.current = event.currentTarget
@@ -76,7 +96,7 @@ export default function LibraryView({ importLauncherRef }) {
 
   async function copyExport() {
     await copyText(jsonText)
-    showToast('success', 'Library JSON copied', `${library.length} entries copied from the current session.`)
+    showToast('success', 'Library JSON copied', `${library.length} prompts copied from the current session.`)
   }
 
   return (
@@ -85,10 +105,21 @@ export default function LibraryView({ importLauncherRef }) {
         <div>
           <span className="eyebrow">Reusable prompt collection</span>
           <h1>Prompt library</h1>
-          <p>Every saved template keeps its exact fields, references, and assembled prompt together.</p>
+          <p>Every saved prompt keeps its exact fields, references, and assembled prompt text together.</p>
         </div>
         <div className="library-actions">
-          <Button ref={importLauncherRef || libraryActionFallback} type="button" kind="tertiary" renderIcon={(props) => <DocumentImport {...props} aria-hidden="true" />} onClick={() => setChrome({ importModalOpen: true })}>Import JSON</Button>
+          <Button
+            ref={(node) => {
+              if (importLauncherRef) importLauncherRef.current = node
+              libraryActionFallback.current = node
+            }}
+            type="button"
+            kind="tertiary"
+            renderIcon={(props) => <DocumentImport {...props} aria-hidden="true" />}
+            onClick={() => setChrome({ importModalOpen: true })}
+          >
+            Import JSON
+          </Button>
           <Button type="button" kind="primary" renderIcon={(props) => <DocumentExport {...props} aria-hidden="true" />} onClick={() => setChrome({ exportPanelOpen: !exportOpen })}>Export library</Button>
         </div>
       </div>
@@ -96,9 +127,41 @@ export default function LibraryView({ importLauncherRef }) {
       <div className="library-summary">
         <div><strong>{library.length}</strong><span>saved {library.length === 1 ? 'prompt' : 'prompts'}</span></div>
         <div className="summary-rule" />
-        <p>Stored in memory for this session · Reload to restore the 5 seeded templates.</p>
+        <p>Stored in memory for this session · Reload to restore the 5 seeded prompts.</p>
         <div className="summary-rule" />
-        <Toggle size="sm" id="sort-toggle" labelA="Ascending" labelB="Descending" toggled={sortOrder === 'desc'} onToggle={toggleSortOrder} />
+        <Button
+          type="button"
+          kind="tertiary"
+          size="sm"
+          className="sort-control"
+          renderIcon={(props) => <ArrowsVertical {...props} aria-hidden="true" />}
+          onClick={toggleSortOrder}
+          aria-label={sortOrder === 'manual' ? 'Sort prompts ascending by title' : sortOrder === 'asc' ? 'Sort prompts descending by title' : 'Restore manual library order'}
+        >
+          Sort {sortOrder === 'manual' ? 'Manual' : sortOrder === 'asc' ? 'A–Z' : 'Z–A'}
+        </Button>
+      </div>
+
+      <div className="library-toolbar">
+        <Search
+          id="library-search"
+          labelText="Search prompts"
+          placeholder="Search prompts by title"
+          value={libraryQuery}
+          onChange={(event) => setLibraryQuery(event.target?.value ?? event.value ?? '')}
+          size="md"
+        />
+        <Select
+          id="library-technique-filter"
+          labelText="Filter by technique"
+          value={libraryTechniqueFilter}
+          onChange={(event) => setLibraryTechniqueFilter(event.target.value)}
+        >
+          <SelectItem value="all" text="All techniques" />
+          {TECHNIQUES.map((technique) => (
+            <SelectItem key={technique.id} value={technique.id} text={technique.name} />
+          ))}
+        </Select>
       </div>
 
       {exportOpen && (
@@ -119,7 +182,7 @@ export default function LibraryView({ importLauncherRef }) {
           <div className="list-head"><span>Prompt</span><span>Technique</span><span>Saved</span><span>Actions</span></div>
           {sortedLibrary.map((record) => {
             const index = record.originalIndex
-            const summary = record.fields.taskDescription || record.fields.goal || `A ${techniqueById[record.technique].name} template`
+            const summary = truncateSummary(record.fields.taskDescription || record.fields.goal || `A ${techniqueById[record.technique].name} prompt`)
             return (
               <article className={`library-row ${deleting === index ? 'is-deleting' : ''}`} key={`${record.title}-${index}`}>
                 <button
@@ -132,24 +195,49 @@ export default function LibraryView({ importLauncherRef }) {
                   onClick={() => openLibraryEntry(index)}
                   aria-label={`Open ${record.title}`}
                 >
-                  <span className="row-icon">{techniqueById[record.technique].short}</span>
+                  <span className="row-icon" aria-hidden="true">{techniqueById[record.technique].short}</span>
                   <span className="row-copy"><strong>{record.title}</strong><small>{summary}</small></span>
                 </button>
                 <div className="row-technique"><Tag type="cool-gray">{techniqueById[record.technique].name}</Tag></div>
                 <div className="row-time"><strong>Saved</strong><span>this session</span></div>
                 <div className="row-actions">
-                  <Button type="button" kind="ghost" size="sm" hasIconOnly renderIcon={(props) => <Launch {...props} aria-hidden="true" />} iconDescription={`Open ${record.title}`} onClick={() => openLibraryEntry(index)} />
-                  <Button type="button" kind="danger--ghost" size="sm" hasIconOnly renderIcon={(props) => <TrashCan {...props} aria-hidden="true" />} iconDescription={`Delete ${record.title}`} onClick={(e) => confirmRemove(record.sourceRecord, record.title, e)} />
+                  <Button
+                    type="button"
+                    kind="ghost"
+                    size="md"
+                    hasIconOnly
+                    renderIcon={(props) => <Launch {...props} aria-hidden="true" focusable="false" />}
+                    iconDescription={`Open ${record.title}`}
+                    aria-label={`Open ${record.title}`}
+                    onClick={() => openLibraryEntry(index)}
+                  />
+                  <Button
+                    type="button"
+                    kind="danger--ghost"
+                    size="md"
+                    hasIconOnly
+                    renderIcon={(props) => <TrashCan {...props} aria-hidden="true" focusable="false" />}
+                    iconDescription={`Delete ${record.title}`}
+                    aria-label={`Delete ${record.title}`}
+                    onClick={(e) => confirmRemove(record.sourceRecord, record.title, e)}
+                  />
                 </div>
               </article>
             )
           })}
         </section>
+      ) : library.length > 0 ? (
+        <section className="library-empty">
+          <div className="empty-orbit" aria-hidden="true"><span>0</span></div>
+          <h2>No prompts match the current filters</h2>
+          <p>Adjust search or technique filters to see saved prompts from this session.</p>
+          <Button type="button" kind="secondary" onClick={() => { setLibraryQuery(''); setLibraryTechniqueFilter('all') }}>Clear filters</Button>
+        </section>
       ) : (
         <section className="library-empty">
-          <div className="empty-orbit"><span>0</span></div>
+          <div className="empty-orbit" aria-hidden="true"><span>0</span></div>
           <h2>Your library is ready for its first prompt</h2>
-          <p>Build and generate a template, then save it here for future use.</p>
+          <p>Build and generate a prompt, then save it here for future use.</p>
           <Button type="button" kind="primary" renderIcon={(props) => <ArrowLeft {...props} aria-hidden="true" />} onClick={() => setView('forms')}>Return to forms</Button>
         </section>
       )}
@@ -158,7 +246,7 @@ export default function LibraryView({ importLauncherRef }) {
         open={Boolean(confirmDelete)}
         danger
         modalHeading="Delete prompt"
-        primaryButtonText="Delete"
+        primaryButtonText="Delete prompt"
         secondaryButtonText="Cancel"
         onRequestSubmit={commitRemove}
         onRequestClose={() => {
@@ -166,7 +254,7 @@ export default function LibraryView({ importLauncherRef }) {
           setConfirmDelete(null)
           requestAnimationFrame(() => deleteLauncher.current?.focus())
         }}
-        focusTrap={true}
+        focusTrap
       >
         <p className="modal-copy">Are you sure you want to delete this prompt? This action cannot be undone.</p>
       </Modal>
