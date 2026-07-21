@@ -1,0 +1,1358 @@
+{
+  "core_features": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_transactions_visible_on_load",
+        "value": 1,
+        "weight": 1,
+        "description": "On load, the transactions list shows at least 8 seeded rows with date, payee, category, account, and amount visible, spanning enough expense categories (roughly 8-10) that the breakdown legend and pie are visibly multi-category",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.2",
+        "name": "created_transaction_appears_in_list",
+        "value": 1,
+        "weight": 1,
+        "description": "After creating a transaction with payee Ada Books and a valid amount matching the field contract, the text Ada Books is visible in the transactions list",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.3",
+        "name": "three_creates_add_exactly_three_rows",
+        "value": 1,
+        "weight": 1,
+        "description": "After adding 3 new valid transactions on top of the seed set, the list shows exactly 3 more rows than the initial seeded count",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.4",
+        "name": "expense_create_updates_kpi",
+        "value": 1,
+        "weight": 1,
+        "description": "After creating an expense transaction, Total Expenses or Net KPI updates to reflect the new amount",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.5",
+        "name": "edited_payee_replaces_old_value",
+        "value": 1,
+        "weight": 1,
+        "description": "After editing a payee from the seeded value to Evening Market, the text Evening Market is visible and the previous payee is not",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.6",
+        "name": "deleted_transaction_removed_from_list",
+        "value": 1,
+        "weight": 1,
+        "description": "After deleting a transaction, that payee is no longer visible in the transactions list",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.7",
+        "name": "empty_state_after_deleting_all",
+        "value": 1,
+        "weight": 1,
+        "description": "After deleting all transactions, the list region shows an empty state message with no transaction rows remaining, and the summary metric cards and transaction summary strip reflect zero/empty",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.8",
+        "name": "invalid_create_blocked_with_messages",
+        "value": 1,
+        "weight": 1,
+        "description": "After submitting create with an empty payee or missing amount, no row is added, the transactions count is unchanged, and inline validation messages naming the offending fields are visible",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.9",
+        "name": "category_filter_narrows_list",
+        "value": 1,
+        "weight": 1,
+        "description": "After filtering transactions by a category (with mixed categories present), only matching rows remain visible",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.10",
+        "name": "chart_tab_switch_stays_in_page",
+        "value": 1,
+        "weight": 1,
+        "description": "After switching between Breakdown and Trends chart tabs, the chart panel swaps without full page navigation",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.11",
+        "name": "chart_and_list_modes_coexist",
+        "value": 1,
+        "weight": 1,
+        "description": "After focusing the transactions list versus the chart panel (list vs chart interaction modes), both remain usable without leaving the page",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.12",
+        "name": "hover_feedback_on_interactive_chrome",
+        "value": 1,
+        "weight": 1,
+        "description": "When hovering sidebar items, transaction rows, or primary buttons, a visible hover wash or shadow change appears",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.13",
+        "name": "bulk_action_updates_rows_and_aggregates",
+        "value": 1,
+        "weight": 1,
+        "description": "After selecting multiple transaction rows and running bulk categorize or bulk delete, the selected rows update category together or disappear from the list and KPIs/charts reflect the change",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.14",
+        "name": "sankey_flow_structure_and_legend",
+        "value": 1,
+        "weight": 1,
+        "description": "In Breakdown view, the sankey-style flow shows income-source nodes feeding an Income hub that splits into a Net Income node and expense-category nodes, with node labels showing amounts and a per-category legend listing each expense category's amount and share percentage",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.16",
+        "name": "summary_strip_tracks_collection",
+        "value": 1,
+        "weight": 1,
+        "description": "The transaction summary strip (total count, largest transaction, average transaction, total income, first/last transaction dates) reflects the current collection and updates after a transaction is added or deleted",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.20",
+        "name": "kpi_cards_derive_from_collection",
+        "value": 1,
+        "weight": 1,
+        "description": "Summary metric cards (Total Income, Total Expenses, Net Income, Savings Rate) derive from the transactions collection, with Net Income equal to income minus expenses and Savings Rate equal to net divided by income as a percentage, and they update when a transaction is created, edited, or deleted",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.22",
+        "name": "trends_doughnut_legend_and_tooltip",
+        "value": 1,
+        "weight": 1,
+        "description": "Trends view renders a doughnut of expense categories with a legend showing each category's amount and percentage of total expenses, and hovering a slice reveals a tooltip with that amount and percentage",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.24",
+        "name": "filters_recompute_and_show_empty_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Category and income-vs-expense filters recompute the visible list from the shared collection, and a filter matching nothing shows an empty state message instead of a blank table",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.27",
+        "name": "create_flow_multi_surface_chain",
+        "value": 1,
+        "weight": 1,
+        "description": "Starting from the seeded state: note the table row count and the four summary metric card values, then create a valid transaction via the form. Confirm the table gains exactly one row (count delta measured immediately around the action), the four summary metric cards recompute to include its amount, the transaction summary strip updates its count and average, and switching to the Breakdown or Trends chart shows that transaction's category reflected in the node labels, slices, and legend amounts — all without a page reload",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.28",
+        "name": "edit_amount_propagates_to_both_legends",
+        "value": 1,
+        "weight": 1,
+        "description": "After editing an existing transaction's amount via the UI, that same row shows the new amount in the table, the summary metric cards change by exactly the difference, and the matching category's amount and percentage update in both the pie legend and the sankey flow legend without a page reload",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.29",
+        "name": "delete_flow_clears_row_selection_and_aggregates",
+        "value": 1,
+        "weight": 1,
+        "description": "After selecting a transaction row and then deleting that transaction: its row disappears from the table and from the current selection, the summary strip count decreases by exactly one, and its amount is dropped from the summary metric cards and from every chart legend",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.30",
+        "name": "filter_clear_restores_full_list_exactly",
+        "value": 1,
+        "weight": 1,
+        "description": "Applying the category filter narrows the visible table rows to that category and clearing the filter restores the full list exactly (same rows and count as before filtering); the income vs expense filter narrows and restores the same way",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.31",
+        "name": "double_submit_creates_exactly_one_row",
+        "value": 1,
+        "weight": 1,
+        "description": "Double-activating the create form's submit control in quick succession creates exactly one transaction: the row count increases by one and exactly one new row appears",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.32",
+        "name": "ledger_sidebar_shell_with_inert_nav",
+        "value": 1,
+        "weight": 1,
+        "description": "The sidebar shows a branded Ledger nav of roughly a dozen items (Dashboard, Accounts, Transactions, Cash Flow, Reports, Budget, Recurring, Goals, Investments, Forecasting, Advice) with Reports as the active item, a Shared demo report eyebrow, Demo mode/Sample data chips, notification and settings icons, and an Alex Rivera profile; clicking any other nav item is an inert demo control that does not navigate away from the reports page",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.33",
+        "name": "inert_chrome_and_tab_switch_fire_toasts",
+        "value": 1,
+        "weight": 1,
+        "description": "Clicking inert chrome actions (Filters, Date, Save, Sort, Columns) and switching chart tabs each fire a demo toast confirming the action, while real create, edit, delete, export, and import perform actual state changes rather than being replaced by a toast",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.34",
+        "name": "charts_redraw_on_filter_change",
+        "value": 1,
+        "weight": 1,
+        "description": "After applying the category or income-vs-expense filter, the sankey node labels, pie slices, legends, and summary tiles redraw to the new filtered totals without a page reload, and the redrawn values meaningfully differ from the unfiltered ones",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.36",
+        "name": "form_submit_disabled_until_valid",
+        "value": 1,
+        "weight": 1,
+        "description": "The transaction create/edit form presents date, payee, category, account, amount, and optional status fields; the submit control stays disabled until every required field is valid against the field contract, and each invalid field shows an inline message naming that field before submit",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.37",
+        "name": "income_rows_styled_positive",
+        "value": 1,
+        "weight": 0.5,
+        "description": "In the transactions list, income amounts render with a leading + and a distinct positive (green) color while expense amounts render neutral",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.38",
+        "name": "field_contract_rejects_zero_and_cross_field",
+        "value": 1,
+        "weight": 1,
+        "description": "Submitting create with amount 0, or with category Salary and a negative amount, adds no row; inline validation messages name the offending fields and the transactions count is unchanged",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.39",
+        "name": "date_range_and_payee_search_narrow_list",
+        "value": 1,
+        "weight": 1,
+        "description": "Applying a date-range filter narrows visible rows to dates inside the inclusive range, and typing a payee search query narrows rows to case-insensitive substring matches; clearing each control restores the prior wider list",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.40",
+        "name": "burn_rate_panel_tracks_ceiling_and_overage",
+        "value": 1,
+        "weight": 1,
+        "description": "The Burn rate panel shows daily expense totals for the current calendar month against an editable monthly ceiling and a projected month-end spend; lowering the ceiling below the projection shows a visible over-burn treatment that names the overage, and raising it above clears the treatment",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.41",
+        "name": "command_palette_runs_declared_commands",
+        "value": 1,
+        "weight": 1,
+        "description": "Pressing Cmd+K or Ctrl+K opens a command palette listing at least New transaction, Switch to Breakdown, Switch to Trends, Export report, Import CSV, Focus payee search, and Clear filters; choosing Switch to Trends activates the Trends panel and choosing Export report opens the export drawer",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.42",
+        "name": "export_report_json_and_markdown_reflect_session",
+        "value": 1,
+        "weight": 1,
+        "description": "After creating transactions with payees Ada Books and Evening Market, Export report shows a JSON tab whose transactions array contains both payees and whose totals.count equals the live summary strip count, and a Markdown tab titled Expense Breakdown Report with Totals and Category breakdown sections; Download JSON and Download Markdown offer expense-breakdown-report.json and expense-breakdown-report.md; Copy shows a Copied confirmation",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.43",
+        "name": "import_csv_diagnostic_commits_valid_rows",
+        "value": 1,
+        "weight": 1,
+        "description": "Import CSV accepts a header date,payee,category,account,amount,status; invalid rows appear in a mismatch list naming the row number and offending field; committing valid rows with Replace all updates the table, KPIs, charts, and burn rate, and a subsequent export reflects the committed rows",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.45",
+        "name": "command_palette_filter_and_escape",
+        "value": 1,
+        "weight": 1,
+        "description": "With the command palette open, typing filters the command list by title; Escape closes the palette without performing any action; choosing a command (for example New transaction or Clear filters) closes the palette and performs that action through the same handlers as the visible controls",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.46",
+        "name": "export_mirrors_burnrate_and_filters",
+        "value": 1,
+        "weight": 1,
+        "description": "The Export report JSON includes a filters object mirroring the active category, type, date-range, and payee controls and a burnRate object (ceiling, monthToDate, projectedMonthEnd, over) mirroring the Burn rate panel; the Markdown tab includes a Burn rate section naming ceiling, month-to-date, projected month-end, and over status",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.47",
+        "name": "import_append_mode_adds_rows",
+        "value": 1,
+        "weight": 1,
+        "description": "Import CSV with the Append mode commits valid rows on top of the existing collection: the table row count increases by exactly the number of committed valid rows and the KPIs, charts, burn rate, and a subsequent export include both the prior and appended transactions",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1,
+        "weight": 1,
+        "description": "Sidebar items, chrome actions, chart tabs, table controls, form fields, Export report, Import CSV, Burn rate ceiling, and command palette items are reachable and operable with the keyboard alone",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 1,
+        "weight": 1,
+        "description": "Create/edit dialog, export drawer, and command palette move focus inside on open, trap focus while open, close on Escape, and return focus to the invoking control",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.3",
+        "name": "images_and_icons_have_alt_text",
+        "value": 1,
+        "weight": 1,
+        "description": "Meaningful icons and images in the sidebar and chrome expose accessible names or alt text",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 1,
+        "weight": 1,
+        "description": "Validation messages, toasts, and Copied confirmations are announced via a polite live region as well as shown visually",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1,
+        "weight": 1,
+        "description": "Transaction create/edit fields (date, payee, category, account, amount, status) and the burn-rate ceiling input have programmatically associated labels",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1,
+        "weight": 1,
+        "description": "Page and panel headings follow a logical order without skipping levels in the reports workspace",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1,
+        "weight": 1,
+        "description": "Landmark regions such as navigation and main are present so the sidebar and reports column are distinguishable",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1,
+        "weight": 1,
+        "description": "Text and controls in the soft mint finance UI meet readable contrast against their backgrounds",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1,
+        "weight": 1,
+        "description": "Interactive controls use semantic roles (button, dialog/complementary for overlays, navigation for the sidebar)",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1,
+        "weight": 1,
+        "description": "With prefers-reduced-motion set, entry/exit animations are removed while every feature stays reachable",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "1.11",
+        "name": "charts_and_over_burn_have_text_alternatives",
+        "value": 1,
+        "weight": 1,
+        "description": "Chart legends list every expense category with amount and percentage as text; over-burn status names the projected overage in text, not color alone",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "edge_cases": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_state_is_present",
+        "value": 1,
+        "weight": 1,
+        "description": "After deleting all transactions or filtering to zero matches, the list region shows an empty state message rather than a blank table",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.2",
+        "name": "forms_validate_inline",
+        "value": 1,
+        "weight": 1,
+        "description": "Create/edit forms show inline per-field validation for empty payee, missing amount, zero amount, non-ISO date, and cross-field Salary-with-negative before submit",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 1,
+        "weight": 1,
+        "description": "Validation and import mismatch messages name the offending field or row number rather than only saying Invalid",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation",
+        "value": 1,
+        "weight": 1,
+        "description": "Successful Copy shows a Copied confirmation, and demo chrome actions show a toast confirmation",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.5",
+        "name": "async_work_shows_loading_state",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where import commit or export compile takes noticeable time, a brief busy/progress indicator is visible rather than a frozen blank control",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_actions_support_undo_or_cancel",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Delete and bulk delete can be cancelled from a confirmation step, or dismissed before commit, so accidental activation does not silently wipe rows without a chance to abort",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.7",
+        "name": "double_submit_creates_one_row",
+        "value": 1,
+        "weight": 1,
+        "description": "Double-activating a valid create submit creates exactly one transaction",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.8",
+        "name": "empty_export_still_valid",
+        "value": 1,
+        "weight": 1,
+        "description": "With an empty collection, Export report still produces JSON with version 1, zero totals, empty transactions, and Markdown titled Expense Breakdown Report; Copy still shows Copied",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.9",
+        "name": "import_rejects_bad_header_and_invalid_rows",
+        "value": 1,
+        "weight": 1,
+        "description": "Import CSV with a bad header or only invalid rows shows mismatch/error feedback and leaves the collection unchanged; mixed rows can commit only valid ones via Commit valid rows",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.10",
+        "name": "invalid_date_range_and_ceiling_rejected",
+        "value": 1,
+        "weight": 1,
+        "description": "A date range with end before start shows an inline message and does not apply; a zero or negative burn-rate ceiling is rejected with an inline message naming the ceiling field",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.1",
+        "name": "hover_washes_and_pointer_cursors",
+        "value": 1,
+        "weight": 1,
+        "description": "Hovering (with the real pointer) sidebar/nav items and action controls shows a pointer cursor and a hover wash, transaction rows take a light mint wash on hover, and chart sectors keep a pointer cursor",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.2",
+        "name": "mode_switch_keeps_page_alive",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Chart/list mode switches update without full reload and keep hover feedback",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.4",
+        "name": "chart_tab_pill_toggle_swaps_in_place",
+        "value": 1,
+        "weight": 1,
+        "description": "Clicking the Breakdown / Trends pill toggle (via the real UI control) swaps the chart panels in place without a page reload, and the active pill gains visibly stronger weight",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.5",
+        "name": "row_create_and_delete_animate",
+        "value": 1,
+        "weight": 1,
+        "description": "When a transaction is created or deleted through the real UI controls (not a state shortcut), the new row animates into the table and the deleted row animates out rather than snapping",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.6",
+        "name": "bulk_delete_rows_animate_out",
+        "value": 1,
+        "weight": 1,
+        "description": "Bulk deleting several selected rows through the real UI control animates each removed row out rather than snapping the list to its new state",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.7",
+        "name": "toast_enter_hold_exit_cycle",
+        "value": 1,
+        "weight": 1,
+        "description": "A demo toast enters from below with a short ease, holds briefly (roughly 1.5s), then exits; toasts fire both on chart-tab switches and on clicking inert chrome actions; Copied confirmation follows the same toast language",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.8",
+        "name": "pie_slice_hover_tooltip_and_lift",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Hovering a Trends pie slice with the real pointer reveals a tooltip showing that category's amount and percentage, and the hovered slice may lift or offset slightly",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "4.10",
+        "name": "export_drawer_and_palette_animate_in",
+        "value": 1,
+        "weight": 1,
+        "description": "Opening the export drawer or command palette through the real UI control uses a short opacity/slide enter transition rather than snapping fully open",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "design_fidelity": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1,
+        "weight": 1,
+        "description": "Spacing and sizing among sidebar, metric cards, chart card, and table follow a consistent scale matching the reference screenshots' dense reports layout",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Typography hierarchy for page title, metric labels, and table headers matches the soft mint Ledger reports reference treatment",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_reference",
+        "value": 1,
+        "weight": 1,
+        "description": "Desktop layout matches the reference: left sidebar with Ledger nav, four statistic cards, chart card with Breakdown/Trends, transactions table, and summary strip",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 1,
+        "weight": 1,
+        "description": "Specified state changes from the reference experience (chart tab swap, row add/remove, toast) animate rather than hard-cutting",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_reference",
+        "value": 1,
+        "weight": 1,
+        "description": "Responsive stacking of the main column at narrow widths matches the reference screenshots' content order expectations",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_matches_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Chrome action buttons, chart pills, and table controls match the soft mint control styling of the reference",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1,
+        "weight": 1,
+        "description": "Metric values, section labels, and table body text show a clear size/weight hierarchy as in the reference",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Buttons and inputs show distinct default, hover, focus, disabled, and error treatments consistent with the reference chrome",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.9",
+        "name": "surface_treatments_match_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Light page/sidebar wash, teal/mint accents, and card surfaces match the soft mint finance reference look",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.10",
+        "name": "microinteractions_match_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Hover washes on nav/rows and toast enter/exit match the reference microinteraction language",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.1",
+        "name": "reports_workspace_density",
+        "value": 1,
+        "weight": 1,
+        "description": "The reports workspace reads as a dense finance tool surface (sidebar, metric cards, chart card, burn-rate panel, table, summary strip) rather than a marketing landing",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.2",
+        "name": "empty_state_visually_present",
+        "value": 1,
+        "weight": 1,
+        "description": "When the transactions list is empty, a visible empty-state treatment occupies the list region",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.4",
+        "name": "income_positive_expense_neutral_multi_hue_charts",
+        "value": 1,
+        "weight": 1,
+        "description": "Income amounts read as positive (green / leading +), expenses neutral, and Breakdown/Trends charts use multi-hue category fills",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.5",
+        "name": "soft_mint_palette_and_ledger_mark",
+        "value": 1,
+        "weight": 1,
+        "description": "The UI uses a soft mint finance palette with brand teal (#0F3D3E) and accent mint (#7BC4B8), and a Ledger mark appears in the sidebar",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.6",
+        "name": "sidebar_plus_main_column_structure",
+        "value": 1,
+        "weight": 1,
+        "description": "Layout is a persistent left sidebar plus a main column containing chrome actions, four statistic cards, chart card, burn-rate panel, transactions table, and summary strip",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.7",
+        "name": "sankey_bars_curved_links_doughnut_legend",
+        "value": 1,
+        "weight": 1,
+        "description": "Breakdown sankey renders colored bars with curved proportional links and node amount labels; Trends renders a doughnut with a category legend",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.8",
+        "name": "single_consistent_icon_set",
+        "value": 1,
+        "weight": 1,
+        "description": "One icon set is used consistently across the sidebar, chrome actions, and table controls with no mixed icon styles",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.9",
+        "name": "sidebar_persistent_at_desktop_widths",
+        "value": 1,
+        "weight": 1,
+        "description": "At widths of 1024 pixels and above, the left sidebar stays persistently visible beside the main reports column",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.10",
+        "name": "narrow_width_stacking_without_overflow",
+        "value": 1,
+        "weight": 1,
+        "description": "At narrower widths the main column stacks vertically with no horizontal scrolling and no clipped content",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "innovation": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "export_coachmarks_beyond_spec",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional: guided first-run coachmarks highlight Export report and the burn-rate panel beyond the required chrome",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "11.2",
+        "name": "printable_markdown_stylesheet",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional: a printable stylesheet improves the Markdown report preview for paper/PDF output beyond the required drawer",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "11.3",
+        "name": "palette_keyboard_shortcut_footer",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional: denser keyboard shortcuts are listed inside the command palette footer beyond the required command list",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "11.4",
+        "name": "enhanced_burn_rate_storytelling",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional: burn-rate projection storytelling (annotations or day callouts) adds clarity beyond the required bars and overage text",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "11.5",
+        "name": "delightful_export_microinteractions",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional: export download or copy offers a delightful microinteraction beyond the required Copied toast",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "11.6",
+        "name": "advanced_filter_chips_ux",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional: removable filter chips summarize category, type, date range, and payee search beyond the required controls",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "11.7",
+        "name": "polished_ledger_brand_moments",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional: polished Ledger brand moments (mark animation or report title treatment) exceed the required sidebar mark",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "11.8",
+        "name": "import_diagnostic_row_preview",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional: import diagnostic offers a richer per-cell preview or fix affordance beyond the required mismatch list",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "11.9",
+        "name": "sankey_explore_depth",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional: sankey node focus or category drill-down explores flows beyond the required structure and legend",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_finance_polish",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional: overall finance-tool polish visibly exceeds the specification in ways a real operator would notice",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 1,
+        "weight": 0.5,
+        "description": "The app exhibits a significant, browser-observable innovative enhancement beyond the specification that is NOT covered by any other criterion in this file. Cite the concrete evidence (element, interaction, page state). If nothing beyond the covered optional items stands out, answer no.",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "writing": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders headings, buttons, and nav labels, one consistent capitalization convention is used throughout",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders export and import actions, labels are specific such as Export report, Import CSV, Download JSON, Download Markdown, Copy, and Commit valid rows",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders validation or import mismatch errors, messages name the offending field or row and what to fix",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders an empty transactions region, copy explains what belongs there and how to add it",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders body copy in panels, toasts, and empty states, wording is clear and free of filler",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app names transactions, categories, burn rate, and export report concepts, the same terms are used across chrome and panels",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders currency amounts and dates, formatting is consistent across cards, table, legends, burn-rate panel, and export preview",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders success toasts or Copied confirmations, the message names the action confirmed",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "user_flows": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "create_flow_updates_all_surfaces",
+        "value": 1,
+        "weight": 1,
+        "description": "After submitting a valid new transaction, the table gains exactly one row, the four summary cards recompute, the summary strip count increases by one, and the active chart panel reflects the new category aggregate without a page reload",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_create_shows_inline_validation",
+        "value": 1,
+        "weight": 1,
+        "description": "Submitting create with an empty payee or missing amount shows inline validation naming the offending field and adds no row",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.3",
+        "name": "edit_flow_updates_related_displays",
+        "value": 1,
+        "weight": 1,
+        "description": "Editing a transaction amount updates that same table row, moves the affected summary cards, and updates the matching pie and sankey legend amounts without a reload",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.4",
+        "name": "delete_flow_updates_all_surfaces",
+        "value": 1,
+        "weight": 1,
+        "description": "Deleting a transaction removes its row, drops it from selection, decreases the summary strip count by exactly one, and drops its amount from KPIs and chart legends",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.5",
+        "name": "view_switch_retains_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Switching Breakdown/Trends and focusing list versus chart keeps the transactions collection and filters intact without a page reload",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.6",
+        "name": "last_delete_reveals_empty_state",
+        "value": 1,
+        "weight": 1,
+        "description": "After deleting all transactions, the list region shows an empty state and summary cards and strip read zero/empty",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.7",
+        "name": "filters_update_all_surfaces",
+        "value": 1,
+        "weight": 1,
+        "description": "Category, income-vs-expense, date-range, and payee search filters narrow the table and recompute chart legends and summary tiles; clearing them restores the full list",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.8",
+        "name": "collapsible_chrome_preserves_workflow",
+        "value": 1,
+        "weight": 1,
+        "description": "At narrow widths, any collapsed sidebar or overlay chrome can be reopened and the reports workflow continues without losing the transactions collection",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.9",
+        "name": "overlays_support_expected_flows",
+        "value": 1,
+        "weight": 1,
+        "description": "Create/edit dialogs, the export drawer, import diagnostic panel, and command palette open, complete their actions, and dismiss without trapping the user",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.10",
+        "name": "flow_recovers_without_reload",
+        "value": 1,
+        "weight": 1,
+        "description": "After dismissing an invalid create or closing the export drawer, the user can continue create/edit/filter flows without a page reload",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.11",
+        "name": "export_flow_terminates_at_artifact",
+        "value": 1,
+        "weight": 1,
+        "description": "Export flow: after two creates with payees Ada Books and Evening Market, Export report JSON contains both payees, Markdown shows Expense Breakdown Report totals, and Download/Copy affordances work with a Copied confirmation",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "6.12",
+        "name": "burn_rate_and_palette_flows",
+        "value": 1,
+        "weight": 1,
+        "description": "Burn rate flow: lowering the ceiling below projected month-end spend shows over-burn treatment; command palette flow: Cmd/Ctrl+K then Switch to Trends activates Trends",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "performance": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1,
+        "weight": 1,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1,
+        "weight": 1,
+        "description": "No console errors appear during a full exercise including create, edit, delete, filters, search, chart tabs, bulk actions, burn rate, command palette, export, and import",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "9.3",
+        "name": "transitions_respond_under_100ms",
+        "value": 1,
+        "weight": 1,
+        "description": "Chart tab switches, filter changes, and export drawer opens apply without a perceptible multi-second freeze",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "9.4",
+        "name": "async_work_has_loading_indicators",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Import commit or export compile shows a busy indicator when work is not instantaneous",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "9.5",
+        "name": "large_collections_render_without_lag",
+        "value": 1,
+        "weight": 1,
+        "description": "After importing or creating enough rows to roughly double the seed set, the table and charts remain scrollable and interactive",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1,
+        "weight": 1,
+        "description": "Rapid create/delete and filter toggles keep the UI responsive with no hung controls",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Row enter/exit and toast animations do not visibly stutter the rest of the reports chrome",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1,
+        "weight": 1,
+        "description": "Rapid repeated input on filters, search, and chart tabs does not freeze or drop interactions",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "visual_design": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "3.12",
+        "name": "consistent_capitalization_convention",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Headings, buttons, and nav labels use one consistent capitalization convention throughout the app",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.13",
+        "name": "consistent_currency_formatting",
+        "value": 1,
+        "weight": 1,
+        "description": "Currency values use the same symbol and decimal treatment across metric cards, table, legends, tooltips, summary strip, burn-rate panel, and export preview",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.14",
+        "name": "toast_and_empty_state_copy_quality",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Toasts name the action they confirm and empty states explain what belongs in the region and how to add it",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "3.16",
+        "name": "export_drawer_and_over_burn_treatments",
+        "value": 1,
+        "weight": 1,
+        "description": "The export drawer shows JSON/Markdown tabs with a scrollable preview plus Download and Copy affordances; over-burn treatment uses an error color family distinct from ordinary row hover",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "technical": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "2.2",
+        "name": "no_browser_storage_seeded_reload",
+        "value": 1,
+        "weight": 1,
+        "description": "No browser storage is used for persistence: localStorage and sessionStorage remain empty after a full exercise of the app including export and import, and a reload returns the seeded state",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.4",
+        "name": "console_clean_during_full_exercise",
+        "value": 1,
+        "weight": 1,
+        "description": "No console errors or unhandled promise rejections appear during a full exercise of the app (create, edit, delete, filters, search, chart tab switches, bulk actions, burn rate, command palette, export, import)",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.5",
+        "name": "keyboard_operable_with_visible_focus",
+        "value": 1,
+        "weight": 1,
+        "description": "Every interactive control (sidebar items, chrome actions, chart tabs, table controls, form fields, Export report, Import CSV, Burn rate ceiling, command palette) is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.6",
+        "name": "modal_form_focus_trap_and_return",
+        "value": 1,
+        "weight": 1,
+        "description": "When the transaction create/edit form is presented as a modal it uses dialog semantics: focus moves into it on open, stays trapped inside while open, and returns to the invoking control on close",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.7",
+        "name": "validation_announced_via_live_region",
+        "value": 1,
+        "weight": 1,
+        "description": "Form validation messages are exposed through a polite live region in addition to being shown visually",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.8",
+        "name": "legends_convey_data_without_hover",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Chart content is readable without hover: the legends list every expense category with its currency amount and percentage as plain text",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.9",
+        "name": "interactive_within_two_seconds",
+        "value": 1,
+        "weight": 1,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.10",
+        "name": "in_place_redraws_without_jank",
+        "value": 1,
+        "weight": 1,
+        "description": "Chart redraws, tab switches, export drawer opens, and burn-rate edits apply in place without a full page reload and without visible jank",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.11",
+        "name": "document_title_ledger_reports",
+        "value": 1,
+        "weight": 1,
+        "description": "The document title is exactly Ledger | Reports",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.12",
+        "name": "no_outbound_requests_or_navigation",
+        "value": 1,
+        "weight": 1,
+        "description": "During a full exercise of the app, only same-origin network requests appear in devtools and no control navigates the browser to another origin",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.13",
+        "name": "multi_facet_reload_resets_coherently",
+        "value": 1,
+        "weight": 1,
+        "description": "Configure several independent facets — create a transaction, switch the chart tab to Trends, apply a category filter, and change the burn-rate ceiling — then reload. All facets coherently reset to the seeded baseline, never a mix of reverted and surviving facets",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.15",
+        "name": "export_drawer_and_palette_trap_focus",
+        "value": 1,
+        "weight": 1,
+        "description": "The export drawer and command palette trap focus while open, close on Escape, and return focus to the invoking control",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "2.16",
+        "name": "field_contract_enforced_on_create",
+        "value": 1,
+        "weight": 1,
+        "description": "A create that violates the transaction field contract (zero amount, non-ISO date, or Salary with negative amount) is rejected with visible field errors and does not increase the collection count",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "responsiveness": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1,
+        "weight": 1,
+        "description": "At 1024px and above the sidebar stays persistent beside the main column; at narrower widths the main column stacks vertically",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1,
+        "weight": 1,
+        "description": "At 375px width, primary controls (chart tabs, Export report, Import CSV, row actions) remain large enough to activate without adjacent mis-taps",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1,
+        "weight": 1,
+        "description": "Metric card values, table text, and panel headings remain readable across desktop and 375px widths",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 1,
+        "weight": 1,
+        "description": "At narrower widths metric cards, chart card, burn-rate panel, table, and summary strip avoid clipping and page-level horizontal overflow",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_to_small_screens",
+        "value": 1,
+        "weight": 1,
+        "description": "Page chrome actions remain reachable at narrow widths, collapsing or wrapping rather than disappearing",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1,
+        "weight": 1,
+        "description": "When stacked, cards, charts, burn-rate panel, and table appear in a readable top-to-bottom order",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "7.7",
+        "name": "mobile_touch_gestures_work",
+        "value": 1,
+        "weight": 1,
+        "description": "At narrow widths, chart tab switches, filters, and row selection remain operable with tap interactions",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1,
+        "weight": 1,
+        "description": "At 375px width no page-level horizontal scrolling appears; the transactions table may scroll within its own container",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "7.9",
+        "name": "media_and_canvases_resize",
+        "value": 1,
+        "weight": 1,
+        "description": "Sankey, doughnut, and burn-rate charts resize with their containers rather than overflowing at narrow widths",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1,
+        "weight": 1,
+        "description": "The export drawer, command palette, and import diagnostic panel stay fully visible and operable at 375px width rather than rendering off-screen",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "motion": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "4.11",
+        "name": "reduced_motion_disables_entry_exits",
+        "value": 1,
+        "weight": 0.5,
+        "description": "With prefers-reduced-motion set, entry/exit animations are removed and state changes apply instantly while export, import, and CRUD remain reachable",
+        "reasoning": "Passed."
+      }
+    ]
+  },
+  "behavioral": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_round_trip",
+        "value": 1,
+        "weight": 1,
+        "description": "Multi-facet round-trip: create a transaction, switch the chart tab to Trends, apply a category filter and a payee search query, then reload. All facets coherently reset to the seeded baseline — seeded transactions, default chart tab, cleared filters and search — never a mix of reverted and surviving state",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "14.2",
+        "name": "sort_reversal_proves_live_data",
+        "value": 1,
+        "weight": 1,
+        "description": "Sort-reversal proof: sort the transactions table by amount ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "14.3",
+        "name": "derived_view_responds_to_input",
+        "value": 1,
+        "weight": 1,
+        "description": "Derived-view sensitivity: change the category filter or date range and confirm the sankey/pie legends, summary strip, and burn-rate month-to-date change meaningfully rather than redrawing identically regardless of input",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_without_reload",
+        "value": 1,
+        "weight": 1,
+        "description": "Cross-view echo: create or edit a transaction in the table and confirm the same amount appears in the matching chart legend and in the Export report JSON totals without a reload",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_is_exact",
+        "value": 1,
+        "weight": 1,
+        "description": "Count-delta integrity: measure the summary strip transaction count immediately before and immediately after creating one valid transaction; the delta is exactly +1 with no off-by-one or lagging counter",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "14.6",
+        "name": "different_inputs_change_outcomes",
+        "value": 1,
+        "weight": 1,
+        "description": "Input-dependent output: create two expense transactions in different categories with different amounts; the two category legend lines and the Export report categoryBreakdown entries differ in the ways the inputs dictate",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_flows_preserve_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Interleaved-flow integrity: start creating a transaction, open the command palette and switch chart tabs, finish creating a second transaction, then confirm both rows exist and neither flow corrupted filters or burn-rate state",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "14.8",
+        "name": "empty_to_repopulated_round_trip",
+        "value": 1,
+        "weight": 1,
+        "description": "Edge-state round-trip: delete all transactions so the empty state shows and KPIs read zero, then Import CSV with Replace all using valid rows; the table, cards, strip, charts, burn rate, and a fresh export track through both transitions",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "14.9",
+        "name": "export_pipeline_contains_session_work",
+        "value": 1,
+        "weight": 1,
+        "description": "Full export pipeline: mutate the collection with two distinct payees, open Export report, and confirm the JSON transactions array contains both payees and totals.count matches the live strip; an export that omits either payee fails",
+        "reasoning": "Passed."
+      },
+      {
+        "id": "14.10",
+        "name": "import_export_round_trip_restores_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Import/export round-trip: after mutations, capture the export JSON transaction set, delete all rows, Import CSV built from those rows with Replace all, and confirm the table and a fresh export transactions array match the captured set",
+        "reasoning": "Passed."
+      }
+    ]
+  }
+}

@@ -102,7 +102,7 @@ import * as A from '../store/app.actions';
           <div class="mt-6 flex items-center justify-end gap-3">
             <button type="button" (click)="close()"
               class="btn-secondary">Cancel</button>
-            <button type="submit" [disabled]="!canSubmit"
+            <button type="submit"
               class="btn-primary" [attr.aria-disabled]="!canSubmit">
               {{ mode === 'edit' ? 'Save changes' : 'Create transaction' }}
             </button>
@@ -229,7 +229,7 @@ export class TxDialogComponent implements OnInit {
   onSubmit(): void {
     if (this.submitting) return;
     this.revalidate();
-    if (this.errors.length > 0) return;
+    if (!this.canSubmit) return;
     this.submitting = true;
 
     const raw = this.rawFromForm();
