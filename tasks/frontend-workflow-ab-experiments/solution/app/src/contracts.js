@@ -32,7 +32,7 @@ export const criterionSchema = z.object({
 export const decisionSchema = z.object({
   choice: z.enum(['declare-winner', 'inconclusive', 'stop-early'], { error: 'Decision choice is required' }),
   winnerVariant: z.preprocess(value => value === '' ? null : value, z.enum(LETTERS).nullable().optional()),
-  rationale: z.string().trim().min(1, 'Decision rationale is required').max(1000, 'Decision rationale must be 1,000 characters or fewer')
+  rationale: z.string({ error: 'Decision rationale is required' }).trim().min(1, 'Decision rationale is required').max(1000, 'Decision rationale must be 1,000 characters or fewer')
 }).superRefine((value, context) => {
   if (value.choice === 'declare-winner' && !value.winnerVariant) context.addIssue({ code: 'custom', path: ['winnerVariant'], message: 'Winner variant is required when declaring a winner' })
   if (value.choice !== 'declare-winner' && value.winnerVariant) context.addIssue({ code: 'custom', path: ['winnerVariant'], message: 'Winner variant must be empty for this decision choice' })
@@ -47,7 +47,7 @@ const statisticsSchema = z.object({
 })
 
 export const reportSchema = z.object({
-  schemaVersion: z.literal('ab-experiment-report-v1', { error: 'schemaVersion must be ab-experiment-report-v1' }),
+  schemaVersion: z.literal('ab-experiment-report-v1', { errorMap: () => ({ message: 'schemaVersion must be ab-experiment-report-v1' }) }),
   experimentId: z.string().min(1, 'experimentId is required'),
   design: experimentSchema,
   status: z.enum(['completed', 'decided'], { error: 'status must be completed or decided' }),
@@ -72,5 +72,8 @@ export const zodErrorMessage = error => {
   const issue = error?.issues?.[0]
   if (!issue) return 'The payload is invalid'
   const path = issue.path?.length ? `${issue.path.join('.')}: ` : ''
+  if (issue.path?.length === 1 && issue.path[0] === 'schemaVersion') return 'schemaVersion must be ab-experiment-report-v1'
+  if (issue.path?.length === 1 && issue.path[0] === 'variants' && issue.message.includes('Traffic allocation')) return 'Traffic allocation must sum to exactly 100%'
+  if (issue.path?.length === 1 && issue.path[0] === 'rationale') return issue.message
   return `${path}${issue.message}`
 }
