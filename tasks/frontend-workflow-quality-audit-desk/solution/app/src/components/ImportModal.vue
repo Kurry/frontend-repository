@@ -13,7 +13,7 @@ function submit(values,actions){const result=store.importPackage(values.packageJ
 function filePicked(ev,setValue){fileError.value='';const file=ev.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>setValue(String(reader.result));reader.onerror=()=>fileError.value='Audit Package JSON file could not be read';reader.readAsText(file)}
 </script>
 <template>
-  <NModal v-model:show="store.importOpen" preset="card" title="Import package" :style="{width:'min(680px,calc(100vw - 24px))'}" :mask-closable="false">
+  <NModal v-model:show="store.importOpen" preset="card" title="Import package" class="desk-modal" :style="{width:'min(680px,calc(100vw - 24px))'}" :mask-closable="false" :close-on-esc="true">
     <p class="mb-4 text-sm text-muted">Paste or pick a contract-valid Audit Package JSON file. Invalid input leaves the desk unchanged.</p>
     <Form v-slot="{meta,setFieldValue}" :validation-schema="toTypedSchema(textSchema)" :initial-values="{packageJson:''}" @submit="submit">
       <label class="field-label" for="package-file">Pick JSON file</label><input id="package-file" class="mb-3 block w-full rounded-lg border border-line p-2 text-sm" type="file" accept="application/json,.json" @change="filePicked($event,v=>setFieldValue('packageJson',v,true))"/><p v-if="fileError" class="error-text">{{ fileError }}</p>
