@@ -224,7 +224,7 @@ export default function App() {
   const [deletingBoard, setDeletingBoard] = createSignal("");
   const [pngPreviewUrl, setPngPreviewUrl] = createSignal("");
   const [toolbarPosition, setToolbarPosition] = createSignal({ x: 0, y: 78 });
-  const [typedCount, setTypedCount] = createSignal(prefersReducedMotion() ? INTRO_LINE.length : 0);
+  const [typedCount, setTypedCount] = createSignal(0);
   const [coachMark, setCoachMark] = createSignal(false);
   const [confirmClear, setConfirmClear] = createSignal(false);
   let toolbarRef;
@@ -257,12 +257,20 @@ export default function App() {
       mirrorMode: state.mirrorMode,
       fillStats: { ...state.fillStats },
       cells: cloneCells(state.cells),
-      boards: state.boards.map((board) => ({
-        name: board.name,
-        tag: board.tag,
-        favorite: board.favorite,
-        cells: cloneCells(board.cells),
-      })),
+      boards: state.boards.map((board) => {
+        const source = inferDimensions(board.cells);
+        const nextSize = state.cellSize;
+        const nextDimensions = gridDimensions(nextSize);
+        const cells = source.rows === nextDimensions.rows && source.cols === nextDimensions.cols
+          ? cloneCells(board.cells)
+          : resampleCells(board.cells, nextSize, source);
+        return {
+          name: board.name,
+          tag: board.tag,
+          favorite: board.favorite,
+          cells,
+        };
+      }),
     };
   }
 
@@ -478,20 +486,14 @@ export default function App() {
     return { ok: true, board: parsed.data };
   }
 
-  function removeBoard(name, animate = true) {
+  function removeBoard(name) {
     const exists = state.boards.some((board) => board.name === name);
     if (!exists) return false;
-    const complete = () => batch(() => {
+    batch(() => {
       setState("boards", (boards) => boards.filter((board) => board.name !== name));
       if (state.selectedBoard === name) setState("selectedBoard", null);
       setDeletingBoard("");
     });
-    if (animate && !prefersReducedMotion()) {
-      setDeletingBoard(name);
-      setTimeout(complete, 300);
-    } else {
-      complete();
-    }
     return true;
   }
 
@@ -686,7 +688,7 @@ export default function App() {
     const leftText = "/MADE WITH SHAPESHIFT GRID TOOL";
     const rightText = "<SHAPESHIFTFESTIVAL.COM>";
     let fontSize = 30;
-    context.font = `800 ${fontSize}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+    context.font = `800 ${fontSize}px ui-monospace, SFMono-Regular, Menlo, monospace, sans-serif`;
     const gap = 40;
     const pad = 28;
     while (
@@ -694,9 +696,10 @@ export default function App() {
       context.measureText(leftText).width + context.measureText(rightText).width > artSize - pad * 2 - gap
     ) {
       fontSize -= 2;
-      context.font = `800 ${fontSize}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+      context.font = `800 ${fontSize}px ui-monospace, SFMono-Regular, Menlo, monospace, sans-serif`;
     }
     const midY = artSize + footerHeight / 2;
+    context.textBaseline = "middle";
     context.fillText(leftText, pad, midY);
     const rightWidth = context.measureText(rightText).width;
     context.fillText(rightText, artSize - pad - rightWidth, midY);
@@ -1032,7 +1035,7 @@ export default function App() {
       },
       entity_select: async (raw = {}) => {
         const args = pickArgs(raw);
-        const name = args.name || args.id;
+        const name = String(args.name || args.id || "").trim();
         if (!name || !loadBoard(name)) throw new Error("board was not found");
         await waitForUi();
         return resultText({ entity: "board", board: name, mode: "paint", visible: true });
@@ -1054,7 +1057,7 @@ export default function App() {
         const args = pickArgs(raw);
         const name = args.name || args.id;
         if (!(args.confirm === true || args.confirm === "true")) throw new Error("confirm=true is required");
-        if (!name || !removeBoard(name, false)) throw new Error("confirmed board was not found");
+        if (!name || !removeBoard(name)) throw new Error("confirmed board was not found");
         setState("activeMode", "gallery");
         await waitForUi();
         return resultText({
@@ -1151,7 +1154,9 @@ export default function App() {
 
   onMount(() => {
     registerWebMcpTools();
-    if (!prefersReducedMotion() && typedCount() === 0) {
+    if (prefersReducedMotion()) {
+      setTypedCount(INTRO_LINE.length);
+    } else if (typedCount() === 0) {
       const typer = setInterval(() => {
         setTypedCount((count) => {
           if (count >= INTRO_LINE.length) { clearInterval(typer); return count; }
@@ -1211,10 +1216,10 @@ export default function App() {
     const [attempted, setAttempted] = createSignal(false);
     const [formError, setFormError] = createSignal("");
     const form = createForm(() => ({
-      defaultValues: { name: "", tag: "", favorite: false, cells: cloneCells(state.cells) },
+      defaultValues: { name: "", tag: "", favorite: false },
       onSubmit: async ({ value }) => {
         setAttempted(true);
-        const result = saveBoard({ ...value, cells: state.cells });
+        const result = saveBoard({ ...value, cells: cloneCells(state.cells) });
         if (!result.ok) { setFormError(result.error); return; }
         form.reset();
         setAttempted(false);
@@ -1245,35 +1250,41 @@ export default function App() {
               <form onSubmit={(event) => { event.preventDefault(); setAttempted(true); form.handleSubmit(); }} novalidate>
                 <form.Field name="name">
                   {(field) => (
-                    <label class="form-field">
+                    <label class="form-field" for={`save-${field().name}`}>
                       <span>Name <em>required · max 40</em></span>
                       <input
+                        id={`save-${field().name}`}
                         name={field().name}
                         value={field().state.value}
                         onInput={(event) => field().handleChange(event.currentTarget.value)}
                         onBlur={field().handleBlur}
                         aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && nameIssue())}
                       />
-                      <Show when={(attempted() || field().state.meta.isTouched) && nameIssue()}>
-                        {(issue) => <small class="field-error" role="alert">{issue()}</small>}
-                      </Show>
+                      <div aria-live="polite">
+                        <Show when={(attempted() || field().state.meta.isTouched) && nameIssue()}>
+                          {(issue) => <small class="field-error" role="alert">{issue()}</small>}
+                        </Show>
+                      </div>
                     </label>
                   )}
                 </form.Field>
                 <form.Field name="tag">
                   {(field) => (
-                    <label class="form-field">
+                    <label class="form-field" for={`save-${field().name}`}>
                       <span>Tag <em>required · max 24</em></span>
                       <input
+                        id={`save-${field().name}`}
                         name={field().name}
                         value={field().state.value}
                         onInput={(event) => field().handleChange(event.currentTarget.value)}
                         onBlur={field().handleBlur}
                         aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && tagIssue())}
                       />
-                      <Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}>
-                        {(issue) => <small class="field-error" role="alert">{issue()}</small>}
-                      </Show>
+                      <div aria-live="polite">
+                        <Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}>
+                          {(issue) => <small class="field-error" role="alert">{issue()}</small>}
+                        </Show>
+                      </div>
                     </label>
                   )}
                 </form.Field>
@@ -1482,12 +1493,12 @@ export default function App() {
               <Dialog.Description>The same record is updated; its cell snapshot and favorite state stay intact.</Dialog.Description>
               <form onSubmit={(event) => { event.preventDefault(); setAttempted(true); form.handleSubmit(); }} novalidate>
                 <form.Field name="name">
-                  {(field) => <label class="form-field"><span>Name <em>required · max 40</em></span><input value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && nameIssue())} />
-                    <Show when={(attempted() || field().state.meta.isTouched) && nameIssue()}>{(issue) => <small class="field-error" role="alert">{issue()}</small>}</Show></label>}
+                  {(field) => <label class="form-field" for={`rename-${field().name}`}><span>Name <em>required · max 40</em></span><input id={`rename-${field().name}`} value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && nameIssue())} />
+                    <div aria-live="polite"><Show when={(attempted() || field().state.meta.isTouched) && nameIssue()}>{(issue) => <small class="field-error" role="alert">{issue()}</small>}</Show></div></label>}
                 </form.Field>
                 <form.Field name="tag">
-                  {(field) => <label class="form-field"><span>Tag <em>required · max 24</em></span><input value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && tagIssue())} />
-                    <Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}>{(issue) => <small class="field-error" role="alert">{issue()}</small>}</Show></label>}
+                  {(field) => <label class="form-field" for={`rename-${field().name}`}><span>Tag <em>required · max 24</em></span><input id={`rename-${field().name}`} value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && tagIssue())} />
+                    <div aria-live="polite"><Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}>{(issue) => <small class="field-error" role="alert">{issue()}</small>}</Show></div></label>}
                 </form.Field>
                 <Show when={formError()}>{(message) => <div class="form-alert" role="alert">{message()}</div>}</Show>
                 <div class="dialog-actions"><Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton><button class="primary-button" type="submit" disabled={Boolean(nameIssue() || tagIssue())}>Update board</button></div>
@@ -1520,6 +1531,7 @@ export default function App() {
               minValue={16}
               maxValue={64}
               step={1}
+              disabled={state.sliderLocked}
               class="cell-slider"
               aria-label="Cell size"
             >
@@ -1677,7 +1689,15 @@ export default function App() {
     createEffect(() => drawThumbnail(thumb, props.board.cells));
     const stats = createMemo(() => calculateStats(props.board.cells));
     const armDelete = () => {
-      if (confirming()) { removeBoard(props.board.name); return; }
+      if (confirming()) {
+        if (!prefersReducedMotion()) {
+          setDeletingBoard(props.board.name);
+          setTimeout(() => removeBoard(props.board.name), 300);
+        } else {
+          removeBoard(props.board.name);
+        }
+        return;
+      }
       setConfirming(true);
       clearTimeout(confirmTimer);
       confirmTimer = setTimeout(() => setConfirming(false), 2600);
