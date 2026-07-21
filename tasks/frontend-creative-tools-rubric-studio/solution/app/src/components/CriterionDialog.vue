@@ -128,7 +128,7 @@ const submit = handleSubmit((values) => emit('submitted', CriterionSchema.parse(
 
       <div class="dialog-actions">
         <Button type="button" label="Cancel" severity="secondary" text @click="emit('close')" />
-        <Button type="submit" :label="mode === 'add' ? 'Add criterion' : 'Continue to version'" :disabled="!canSubmit" />
+        <Button type="submit" :label="mode === 'add' ? 'Add criterion' : 'Continue to version'" :disabled="mode === 'add' ? false : !canSubmit" />
       </div>
     </form>
   </Dialog>

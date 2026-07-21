@@ -289,19 +289,19 @@ kbd { font-family: var(--font-mono); }
 .diff-card { animation: diff-in .35s cubic-bezier(.2,.75,.25,1) both; }
 @keyframes diff-in { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: none; } }
 .diff-field { animation: field-in .4s ease both; }
-@keyframes field-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
-.before-after > div { overflow: hidden; animation: pane-wipe .45s ease both; }
+@keyframes field-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.before-after > div { overflow: hidden; animation: pane-wipe .6s cubic-bezier(.2,.8,.2,1) both; }
 @keyframes pane-wipe { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
 .removed-copy h3, .removed-copy code, .removed-copy p { animation: strike-draw .55s ease .15s both; }
 @keyframes strike-draw { from { text-decoration-color: transparent; } to { text-decoration-color: #c0404c; } }
 
 /* The criterion form dialog is non-modal and docks bottom-right so the
    canvas (view switcher, Tune cases) stays clickable while it is open. */
-.p-dialog-mask:has(.form-dialog) { pointer-events: none; }
+.non-modal-mask { pointer-events: none !important; }
+.non-modal-mask > .p-dialog { pointer-events: auto !important; max-height: calc(100vh - 20px); }
 /* Auto margins beat the theme's centered flex alignment, docking the
    non-modal form bottom-right so the canvas stays clickable beside it. */
 .form-dialog { margin: auto 10px 10px auto !important; }
-.p-dialog-mask:has(.form-dialog) .p-dialog { pointer-events: auto; max-height: calc(100vh - 20px); }
 .form-dialog .p-dialog-content { overflow-y: auto; }
 
 /* Local display face for headings and brand surfaces. */
@@ -390,5 +390,30 @@ h1, h2, .rail-brand strong, .view-switcher button, .section-kicker, .bump-callou
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .001ms !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Accessibility enhancements: Visible focus outlines */
+.p-toggleswitch:focus-within .p-toggleswitch-slider,
+.p-select:focus-within,
+.p-button:focus-visible {
+  outline: 2px solid var(--p-primary-color, #3b82f6) !important;
+  outline-offset: 2px !important;
+}
+
+/* Component states */
+.p-button:disabled, button:disabled { opacity: 0.5 !important; cursor: not-allowed !important; }
+.save-gate-row:has(:disabled) .save-hint { opacity: 0.7; }
+
+/* Additional Hover and Motion Polish */
+.p-button:not(:disabled):hover, button:not(:disabled):hover {
+  filter: brightness(0.95);
+  transform: translateY(-1px);
+}
+.criterion-panel:hover {
+  background-color: #f8fafc;
 }
