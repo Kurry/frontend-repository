@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "vite --host 0.0.0.0 --port 3000",
+    "test:e2e": "playwright test",
     "verify:build": "vite build"
   },
   "dependencies": {
@@ -22,6 +23,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@playwright/test": "1.61.1",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.0.4",
