@@ -85,6 +85,16 @@ body.drawer-open .shortlist-drawer{transform:none}
 .shortlist-foot .ur button{flex:1 1 0;background:#fff;border:1px solid #000;border-radius:100px;padding:9px;font:700 13px/1 Aeonik Pro,arial;cursor:pointer}
 .shortlist-foot .ur button:disabled{opacity:.4;cursor:default}
 
+/* Keep the cookie decision reachable above the fixed shortlist affordance. */
+#cky-consent-container{z-index:900}
+#cky-consent-container.is-visible + .shortlist-opener{bottom:250px}
+
+/* Deterministic carousel status and explicit state feedback for controls whose
+   decorative GSAP layers otherwise leave computed hover styling unchanged. */
+.living-slide-status{align-self:center;margin-left:auto;font:700 13px/1.2 Aeonik Pro,arial}
+.main-menu a,.sidebar-book,.cta,.band-cta,.open-modal-btn{transition:filter .18s ease,box-shadow .18s ease}
+.main-menu a:hover,.main-menu a:focus-visible,.sidebar-book:hover,.cta:hover,.band-cta:hover,.open-modal-btn:hover{filter:brightness(.88);box-shadow:0 5px 0 #0003}
+
 /* ---------- shortlist toggle buttons in pricing list ---------- */
 section.typical_unit .pricing-list li{flex-wrap:wrap;gap:8px 12px}
 .add-to-shortlist-btn{border:1px solid #000;background:#fff;color:#000;border-radius:100px;padding:7px 14px;
@@ -140,6 +150,10 @@ footer.footer .fbtn:hover{text-decoration:underline}
   *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
   .marquee .marquee-track{transform:none!important}
   .block-cursor{display:none!important}
+}
+@media (max-width:480px){
+  #cky-consent-container{right:10px;left:10px;bottom:10px;max-width:none}
+  #cky-consent-container.is-visible + .shortlist-opener{bottom:245px}
 }
 html.forced-reduced-motion *,html.forced-reduced-motion *::before,html.forced-reduced-motion *::after{
   animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
