@@ -392,6 +392,25 @@ structure the Bug with this template:
 5. Never accept aria-* sprinkling as a fix for structural issues — say what the
    structural fix is (native element, label association, heading order).
 
+## E2E-suite audit procedure (PRs adding/changing solution/app e2e tests)
+
+1. **Skip-stub detection**: count `test.fixme(`, `test.skip(`, and `.fixme(true`
+   occurrences vs `test(` definitions. Criterion-named tests that are fixme'd/skipped
+   or whose only assertion is page-level trivia (title non-empty, body exists) are
+   NOT coverage — observed live: 83 of 89 "criterion tests" were `test.fixme(true)`
+   no-ops presented as passes. A PR whose pass-count narrative includes skipped tests
+   is a BLOCKING misrepresentation.
+2. **Assertion audit**: for each criterion-named test, verify the assertions actually
+   exercise the criterion's named observable (a real locator interaction + a specific
+   expectation). Navigation-without-assertion and guard-wrapped assertions
+   (`if (await x.isVisible()) expect(...)`) are vacuous — flag each by test name.
+3. **Canonical-region integrity**: the region above the END-CANONICAL marker must be
+   byte-identical to the canonical source — hand-approximated regions with self-mocked
+   `listTools`/`invokeTool` helpers or invented instructions are flagged; the real
+   canonical exports enforce console-error collection that mocks silently drop.
+4. **Run-output honesty**: if the PR body quotes playwright output, verify the
+   passed/skipped/failed split matches the suite's actual test dispositions.
+
 ## Motion procedure
 
 1. For each animation the diff adds or claims to fix, identify its trigger path (hover,
