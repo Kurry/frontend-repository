@@ -1,7 +1,7 @@
 # Oracle validation sweep over every task under tasks/ (no slug enumeration).
 # Discovers each immediate child that has a task.toml. Runs the oracle agent
 # (solution/solve.sh) then the rewardkit verifier with the Codex agent judge
-# (API key auth) on gpt-5.6-luna-pro — cheap all-corpus check that reference
+# (API key auth) on gpt-5.6-luna — cheap all-corpus check that reference
 # solutions still pass. Rubric tomls already set judge = "codex"; this config
 # re-asserts REWARDKIT_JUDGE and pins the cheap model override.
 #
@@ -42,7 +42,7 @@ verifier:
   env:
     OPENAI_API_KEY: "${OPENAI_API_KEY}"
     REWARDKIT_JUDGE: codex
-    REWARDKIT_MODEL: gpt-5.6-luna-pro
+    REWARDKIT_MODEL: gpt-5.6-luna
 
 datasets:
   - path: ./tasks
