@@ -32,13 +32,13 @@ export default function ThemeFormPanel() {
   const editingTheme = form?.mode === 'rename' ? themes.find(theme => theme.id === form.themeId) : undefined;
   const initialName = editingTheme?.name ?? '';
   const otherNames = useMemo(
-    () => themes.filter(theme => theme.id !== editingTheme?.id).map(theme => theme.name),
+    () => themes.filter(theme => theme.id !== editingTheme?.id).map(theme => theme.name.trim().toLocaleLowerCase()),
     [themes, editingTheme?.id]
   );
 
   const schema = useMemo(
     () =>
-      baseSchema.refine(data => !otherNames.includes(data.name), {
+      baseSchema.refine(data => !otherNames.includes(data.name.trim().toLocaleLowerCase()), {
         path: ['name'],
         message: 'Theme name must be unique — choose a different name',
       }),
@@ -49,6 +49,7 @@ export default function ThemeFormPanel() {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors, isValid },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -57,13 +58,15 @@ export default function ThemeFormPanel() {
     reValidateMode: 'onChange',
   });
 
+  const nameValue = watch('name') ?? '';
+
   // Re-seed the field whenever the form opens for a different target.
   useEffect(() => {
     if (open) reset({ name: initialName });
   }, [open, initialName, reset]);
 
   // Announce inline validation problems to the polite live region.
-  const errorMessage = errors.name?.message ?? '';
+  const errorMessage = errors.name?.message ?? (!nameValue.trim() ? 'Theme name is required — enter a name for the theme' : '');
   useEffect(() => {
     if (errorMessage) dispatch(announce(errorMessage));
   }, [errorMessage, dispatch]);
@@ -114,8 +117,8 @@ export default function ThemeFormPanel() {
           <TextField
             label="Theme name"
             {...register('name')}
-            error={!!errors.name}
-            helperText={errors.name?.message}
+            error={!!errorMessage}
+            helperText={errorMessage}
             fullWidth
             autoFocus
             inputProps={{ maxLength: 80, 'aria-label': 'Theme name' }}

@@ -1,0 +1,138 @@
+import { expect, test, type Download } from '@playwright/test';
+
+async function downloadText(downloadPromise: Promise<Download>) {
+  const download = await downloadPromise;
+  const stream = await download.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+  return Buffer.concat(chunks).toString('utf8');
+}
+
+test.beforeEach(async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { name: 'Material-UI Theme Creator' })).toBeVisible();
+});
+
+test('exported JSON round-trips, regenerates CSS, rejects incomplete palettes, and downloads exact artifacts', async ({ page }) => {
+  await page.getByRole('tab', { name: 'Export' }).click();
+  const preview = page.locator('[data-export-preview]');
+  const payload = JSON.parse(await preview.innerText());
+  payload.palette.type = 'dark';
+  payload.palette.primary.main = '#123456';
+  payload.typography.fontSize = 19;
+  payload.shape.borderRadius = 13;
+
+  const importBox = page.getByLabel('Import ThemeOptions JSON');
+  await importBox.fill(JSON.stringify(payload));
+  await page.getByRole('button', { name: 'Import ThemeOptions' }).click();
+  await expect(page.getByText('ThemeOptions imported', { exact: true })).toBeVisible();
+  await expect(preview).toContainText('"main": "#123456"');
+  await expect(preview).toContainText('"fontSize": 19');
+
+  await page.getByRole('tab', { name: 'CSS' }).click();
+  await expect(preview).toContainText('--primary: #123456');
+  await expect(preview).toContainText('--font-size: 19px');
+  await expect(preview).toContainText('--border-radius: 13px');
+
+  const cssText = await preview.innerText();
+  const cssDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download CSS' }).click();
+  expect(await downloadText(cssDownload)).toBe(cssText);
+
+  await page.getByRole('tab', { name: 'JSON' }).click();
+  const jsonText = await preview.innerText();
+  const jsonDownload = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download JSON' }).click();
+  expect(await downloadText(jsonDownload)).toBe(jsonText);
+
+  const invalid = JSON.parse(jsonText);
+  delete invalid.palette.primary.light;
+  await importBox.fill(JSON.stringify(invalid));
+  await page.getByRole('button', { name: 'Import ThemeOptions' }).click();
+  await expect(page.getByText('palette.primary.light: Required', { exact: true })).toBeVisible();
+  await expect(preview).toContainText('"main": "#123456"');
+});
+
+test('copy is deduplicated and emits one visible confirmation', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.getByRole('tab', { name: 'Export' }).click();
+  await page.getByRole('button', { name: 'Copy export' }).dblclick();
+  await expect(page.getByText('Export copied', { exact: true })).toHaveCount(1);
+  await expect(page.locator('[data-announcer]')).not.toContainText('export copied');
+});
+
+test('Monaco source synchronizes into tools and invalid source preserves the last valid theme', async ({ page }) => {
+  const source = `import { ThemeOptions } from '@material-ui/core/styles';
+export const themeOptions: ThemeOptions = {
+  palette: {
+    type: 'dark',
+    primary: { main: '#112233', light: '#223344', dark: '#001122', contrastText: '#ffffff' },
+    secondary: { main: '#445566', light: '#556677', dark: '#334455', contrastText: '#ffffff' },
+    error: { main: '#aa0000', light: '#bb1111', dark: '#990000', contrastText: '#ffffff' },
+    warning: { main: '#aa6600', light: '#bb7711', dark: '#995500', contrastText: '#ffffff' },
+    info: { main: '#0066aa', light: '#1177bb', dark: '#005599', contrastText: '#ffffff' },
+    success: { main: '#008844', light: '#119955', dark: '#007733', contrastText: '#ffffff' },
+    background: { default: '#121212', paper: '#1e1e1e' },
+    text: { primary: '#ffffff', secondary: '#bbbbbb' },
+    divider: '#424242',
+  },
+  typography: { fontFamily: 'Roboto', fontSize: 20 },
+  spacing: 8,
+  shape: { borderRadius: 11 },
+};`;
+
+  const editor = page.locator('.monaco-editor');
+  await expect(editor).toBeVisible();
+  await editor.locator('.view-lines').click({ position: { x: 240, y: 40 }, force: true });
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText(source);
+  await expect(page.getByText('Synced from editor', { exact: true })).toBeVisible({ timeout: 8_000 });
+
+  await page.keyboard.press('ControlOrMeta+A');
+  await page.keyboard.insertText('not a ThemeOptions declaration');
+  await expect(page.getByRole('main').getByText(/Invalid ThemeOptions — nothing applied/)).toBeVisible({ timeout: 8_000 });
+
+  await page.getByRole('tab', { name: 'Typography' }).click();
+  await expect(page.getByLabel('Base Font Size (8–24px)')).toHaveValue('20');
+  await expect(page.getByLabel('Border Radius (0–24px)')).toHaveValue('11');
+});
+
+test('Escape closes each overlay, restores its opener, and empty names explain disabled create', async ({ page }) => {
+  const tutorial = page.getByRole('button', { name: 'Tutorial' });
+  await tutorial.click();
+  await expect(page.getByRole('dialog', { name: 'Studio tour' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Studio tour' })).toBeHidden();
+  await expect(tutorial).toBeFocused();
+
+  await page.getByRole('tab', { name: 'Saved Themes' }).click();
+  const newTheme = page.getByRole('button', { name: 'New Theme' }).first();
+  await newTheme.click();
+  const formDialog = page.getByRole('dialog', { name: 'New Theme' });
+  await expect(formDialog.getByText('Theme name is required — enter a name for the theme')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Create Theme' })).toBeDisabled();
+  await page.getByLabel('Theme name').fill(' default theme ');
+  await expect(formDialog.getByText('Theme name must be unique — choose a different name')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'New Theme' })).toBeHidden();
+  await expect(newTheme).toBeFocused();
+
+  const commands = page.getByRole('button', { name: /Commands/ });
+  await commands.click();
+  await page.getByLabel('Search commands').fill('zzzzzz');
+  await expect(page.getByText(/No commands match/)).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: 'Command palette' })).toBeHidden();
+  await expect(commands).toBeFocused();
+});
+
+test('component gallery exposes roughly two dozen demos and search filters sections', async ({ page }) => {
+  await page.getByRole('tab', { name: 'Components' }).click();
+  await expect(page.locator('[data-gallery-count]')).toContainText('25 themed component demos');
+  expect(await page.locator('[data-component-demo]').count()).toBeGreaterThanOrEqual(24);
+
+  await page.getByLabel('Search components').fill('Buttons');
+  await expect(page.locator('#comp-buttons')).toBeVisible();
+  await expect(page.locator('#comp-cards')).toBeHidden();
+  expect(await page.locator('[data-component-demo]').evaluateAll(elements => elements.filter(element => (element as HTMLElement).offsetParent !== null).length)).toBe(5);
+});

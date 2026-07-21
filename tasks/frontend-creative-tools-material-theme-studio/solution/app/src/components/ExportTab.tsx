@@ -38,7 +38,6 @@ export default function ExportTab() {
             .writeText(textToExport)
             .then(() => {
                 show('Export copied');
-                dispatch(announce(`${format.toUpperCase()} export copied to clipboard`));
             })
             .catch(() => show('Copy failed — clipboard unavailable'))
             .finally(() => {
@@ -62,10 +61,11 @@ export default function ExportTab() {
         const a = document.createElement('a');
         a.href = url;
         a.download = `${themeName.toLowerCase().replace(/\s+/g, '-')}-theme.${downloadFormat}`;
+        document.body.appendChild(a);
         a.click();
-        URL.revokeObjectURL(url);
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 0);
         show(`Downloading ${downloadFormat.toUpperCase()} file`);
-        dispatch(announce(`Theme ${downloadFormat.toUpperCase()} file download started`));
     };
 
     const handleImport = () => {
