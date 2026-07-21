@@ -63,23 +63,29 @@ export function toEditorSource(options: ThemeOptions): string {
 
 export function parseEditorSource(src: string, defaultThemeOptions: ThemeOptions): ThemeOptions {
   if (!src || typeof src !== 'string') throw new Error('empty');
-  if (!/(?:export\s+)?const\s+themeOptions\s*:\s*ThemeOptions\s*=\s*\{/.test(src) || !/\};\s*$/.test(src)) {
+  const declStart = src.match(/(?:export\s+)?const\s+themeOptions\s*:\s*ThemeOptions\s*=\s*\{/);
+  const declEnd = src.indexOf('};');
+  if (!declStart || declEnd < declStart.index!) {
     throw new Error('invalid ThemeOptions declaration');
   }
+  // Field extraction runs against the declaration region only, so trailing
+  // content after `};` (comments are intentionally tolerated) can never
+  // contribute stray tokens to the parsed options.
+  const decl = src.slice(declStart.index!, declEnd + 2);
 
-  const typeMatch = src.match(/type:\s*['"](light|dark)['"]/);
-  const bgDefault = src.match(/background:\s*\{[\s\S]*?default:\s*['"]([^'"]+)['"]/);
-  const bgPaper = src.match(/background:\s*\{[\s\S]*?paper:\s*['"]([^'"]+)['"]/);
-  const textPrimary = src.match(/text:\s*\{[\s\S]*?primary:\s*['"]([^'"]+)['"]/);
-  const textSecondary = src.match(/text:\s*\{[\s\S]*?secondary:\s*['"]([^'"]+)['"]/);
-  const textDisabled = src.match(/text:\s*\{[\s\S]*?disabled:\s*['"]([^'"]+)['"]/);
-  const textHint = src.match(/text:\s*\{[\s\S]*?hint:\s*['"]([^'"]+)['"]/);
-  const divider = src.match(/divider:\s*['"]([^'"]+)['"]/);
-  const fontFamily = src.match(/fontFamily:\s*['"]([^'"]+)['"]/);
-  const fontSize = src.match(/fontSize:\s*(\d+)/);
-  const buttonTransform = src.match(/button:\s*\{[\s\S]*?textTransform:\s*['"]([^'"]+)['"]/);
-  const spacing = src.match(/\bspacing:\s*(\d+)/);
-  const borderRadius = src.match(/shape:\s*\{[\s\S]*?borderRadius:\s*(\d+)/);
+  const typeMatch = decl.match(/type:\s*['"](light|dark)['"]/);
+  const bgDefault = decl.match(/background:\s*\{[\s\S]*?default:\s*['"]([^'"]+)['"]/);
+  const bgPaper = decl.match(/background:\s*\{[\s\S]*?paper:\s*['"]([^'"]+)['"]/);
+  const textPrimary = decl.match(/text:\s*\{[\s\S]*?primary:\s*['"]([^'"]+)['"]/);
+  const textSecondary = decl.match(/text:\s*\{[\s\S]*?secondary:\s*['"]([^'"]+)['"]/);
+  const textDisabled = decl.match(/text:\s*\{[\s\S]*?disabled:\s*['"]([^'"]+)['"]/);
+  const textHint = decl.match(/text:\s*\{[\s\S]*?hint:\s*['"]([^'"]+)['"]/);
+  const divider = decl.match(/divider:\s*['"]([^'"]+)['"]/);
+  const fontFamily = decl.match(/fontFamily:\s*['"]([^'"]+)['"]/);
+  const fontSize = decl.match(/fontSize:\s*(\d+)/);
+  const buttonTransform = decl.match(/button:\s*\{[\s\S]*?textTransform:\s*['"]([^'"]+)['"]/);
+  const spacing = decl.match(/\bspacing:\s*(\d+)/);
+  const borderRadius = decl.match(/shape:\s*\{[\s\S]*?borderRadius:\s*(\d+)/);
 
   if (!typeMatch) throw new Error('palette.type is required');
   if (!fontFamily) throw new Error('typography.fontFamily is required');
@@ -94,13 +100,27 @@ export function parseEditorSource(src: string, defaultThemeOptions: ThemeOptions
 
   if (typeMatch) o.palette.type = typeMatch[1] as 'light'|'dark';
 
-  const paletteIntents = ['primary', 'secondary', 'error', 'warning', 'info', 'success'] as const;
-  const colorChannels = ['main', 'light', 'dark', 'contrastText'] as const;
-  for (const intent of paletteIntents) {
-    const block = src.match(new RegExp(`${intent}:\\s*\\{([^}]*)\\}`))?.[1];
+  // Static literal patterns (never built from interpolated strings) for the
+  // fixed intent/channel vocabulary.
+  const intentBlockPatterns = {
+    primary: /primary:\s*\{([^}]*)\}/,
+    secondary: /secondary:\s*\{([^}]*)\}/,
+    error: /error:\s*\{([^}]*)\}/,
+    warning: /warning:\s*\{([^}]*)\}/,
+    info: /info:\s*\{([^}]*)\}/,
+    success: /success:\s*\{([^}]*)\}/,
+  } as const;
+  const channelPatterns = {
+    main: /main:\s*['"]([^'"]+)['"]/,
+    light: /light:\s*['"]([^'"]+)['"]/,
+    dark: /dark:\s*['"]([^'"]+)['"]/,
+    contrastText: /contrastText:\s*['"]([^'"]+)['"]/,
+  } as const;
+  for (const intent of Object.keys(intentBlockPatterns) as (keyof typeof intentBlockPatterns)[]) {
+    const block = decl.match(intentBlockPatterns[intent])?.[1];
     if (!block) throw new Error(`palette.${intent} is required`);
-    for (const channel of colorChannels) {
-      const value = block.match(new RegExp(`${channel}:\\s*['\"]([^'\"]+)['\"]`))?.[1];
+    for (const channel of Object.keys(channelPatterns) as (keyof typeof channelPatterns)[]) {
+      const value = block.match(channelPatterns[channel])?.[1];
       if (!value || !/^#[0-9a-fA-F]{6}$/.test(value)) {
         throw new Error(`palette.${intent}.${channel} must be #RRGGBB`);
       }

@@ -40,6 +40,11 @@ export interface SavedTheme {
   versions?: { name: string; options: ThemeOptions; createdAt: number }[];
 }
 
+export type ThemeFormState =
+  | { mode: 'create' }
+  | { mode: 'rename'; themeId: string }
+  | null;
+
 export interface AppState {
   themes: SavedTheme[];
   activeId: string;
@@ -55,6 +60,10 @@ export interface AppState {
   redoStack: ThemeOptions[];
   dirty: boolean;
   searchQuery: string;
+  themeForm: ThemeFormState;
+  announcement: string;
+  announceSeq: number;
+  previewFlash: number;
 }
 
 export const defaultPaletteColor = (hex: string): PaletteColor => ({
@@ -109,6 +118,10 @@ const initialState: AppState = {
   redoStack: [],
   dirty: false,
   searchQuery: '',
+  themeForm: null,
+  announcement: '',
+  announceSeq: 0,
+  previewFlash: 0,
 };
 
 function syncDirtyState(state: AppState) {
@@ -218,8 +231,20 @@ export const themeSlice = createSlice({
         }
       }
     },
+    openThemeForm: (state, action: PayloadAction<Exclude<ThemeFormState, null>>) => {
+      state.themeForm = action.payload;
+    },
+    closeThemeForm: (state) => {
+      state.themeForm = null;
+    },
+    announce: (state, action: PayloadAction<string>) => {
+      state.announceSeq += 1;
+      state.announcement = action.payload;
+    },
+    flashPreview: (state) => {
+      state.previewFlash = Date.now();
+    },
     deleteTheme: (state, action: PayloadAction<string>) => {
-      if (state.themes.length <= 1) return;
       state.themes = state.themes.filter(t => t.id !== action.payload);
       if (state.activeId === action.payload) {
           state.activeId = '';
@@ -282,7 +307,7 @@ export const {
   setTab, setDevice, setSample, setTool, setColorBlindness, setCompareMode, setSearchQuery,
   loadTheme, updateActiveOptions, undo, redo, saveTheme,
   createTheme, updateTheme, deleteTheme, addVersion, restoreVersion, importTheme,
-  addFont, removeFont, applySnippet
+  addFont, removeFont, applySnippet, openThemeForm, closeThemeForm, announce, flashPreview
 } = themeSlice.actions;
 
 export default themeSlice.reducer;
