@@ -496,7 +496,7 @@ export default function TechniqueForm({ technique, active }) {
             Reset form
           </Button>
           <span
-            className={`submit-proxy ${isValid ? '' : 'is-blocked'}`}
+            className="submit-proxy"
             onClick={() => {
               if (isValid) return
               setSubmitAttempted(true)
@@ -509,7 +509,6 @@ export default function TechniqueForm({ technique, active }) {
               kind="primary"
               size="md"
               renderIcon={(props) => <ArrowRight {...props} aria-hidden="true" />}
-              disabled={!isValid}
             >
               Generate prompt
             </Button>

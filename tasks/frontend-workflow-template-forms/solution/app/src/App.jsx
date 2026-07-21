@@ -329,7 +329,7 @@ function OnboardingCoach() {
     <aside className="onboarding-coach" aria-label="Guided onboarding">
       <div className="onboarding-coach__body">
         <span className="eyebrow">Studio tour · {onboardingStep + 1}/3</span>
-        <h2>{step.heading}</h2>
+        <p className="onboarding-coach__heading">{step.heading}</p>
         <p>{step.copy}</p>
         <ContentSwitcher
           size="sm"

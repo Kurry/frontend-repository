@@ -53,9 +53,9 @@ export const useStudioStore = create((set, get) => ({
     const hasInput = JSON.stringify(nextDraft) !== JSON.stringify(defaultDrafts[technique])
     set((state) => {
       const priorStatus = state.statuses[technique]
-      const nextStatus = priorStatus === 'saved' || priorStatus === 'generated'
-        ? priorStatus
-        : (hasInput ? 'in-progress' : 'neutral')
+      const nextStatus = hasInput
+        ? 'in-progress'
+        : (priorStatus === 'generated' || priorStatus === 'saved' ? priorStatus : 'neutral')
       return {
         drafts: { ...state.drafts, [technique]: nextDraft },
         statuses: { ...state.statuses, [technique]: nextStatus },
