@@ -36,6 +36,7 @@ function buildSite(cfg) {
   return {
     id: cfg.id,
     label: cfg.label,
+    timezone: cfg.timezone || 'UTC',
     visitors: cfg.visitors,
     pageviews: cfg.pageviews,
     bounceRate: cfg.bounceRate,
@@ -51,6 +52,7 @@ export const SITES = {
   'example.com': buildSite({
     id: 'example.com',
     label: 'example.com',
+    timezone: 'America/New_York',
     visitors: 16840,
     pageviews: 47220,
     bounceRate: 44,
@@ -87,6 +89,7 @@ export const SITES = {
   'blog.example.com': buildSite({
     id: 'blog.example.com',
     label: 'blog.example.com',
+    timezone: 'Europe/London',
     visitors: 9240,
     pageviews: 21980,
     bounceRate: 51,
@@ -117,6 +120,7 @@ export const SITES = {
   'shop.example.com': buildSite({
     id: 'shop.example.com',
     label: 'shop.example.com',
+    timezone: 'Asia/Tokyo',
     visitors: 23110,
     pageviews: 82640,
     bounceRate: 38,
@@ -328,9 +332,18 @@ export function computeDashboard(siteId, periodId, filters, sortId, compare, add
         : 0,
   }));
 
-  const sources = sortEntries(panel('source'), sortId);
-  const pages = sortEntries(panel('page'), sortId);
-  const countries = sortEntries(panel('country'), sortId);
+  // Each panel shows the top 4 rows; the active sort reorders those same four
+  // rows (so most->fewest is a true visual reversal of the same rows, and
+  // most->name-az->most round-trips exactly), rather than swapping in a
+  // different set of rows from the long tail.
+  const displayed = (list) => {
+    if (list.length <= 4) return sortEntries(list, sortId);
+    const top4 = list.slice().sort((a, b) => b.visitors - a.visitors).slice(0, 4);
+    return sortEntries(top4, sortId);
+  };
+  const sources = displayed(panel('source'));
+  const pages = displayed(panel('page'));
+  const countries = displayed(panel('country'));
 
   // Compare mode: deterministic previous-period baselines (the immediately
   // previous period of equal length) derived from the same seed with a
