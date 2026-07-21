@@ -78,7 +78,6 @@ type UiState = {
   editingJobId: string | null
   scheduleOpen: boolean
   exportOpen: boolean
-  exportTimestamp: string
   exportPreviewText: string
   importOpen: boolean
   importDraft: string
@@ -318,7 +317,6 @@ export const useBatchStore = create<Store>()((set, get) => ({
     editingJobId: null,
     scheduleOpen: false,
     exportOpen: false,
-    exportTimestamp: nowIso(),
     exportPreviewText: '',
     importOpen: false,
     importDraft: '',
@@ -562,7 +560,7 @@ export const useBatchStore = create<Store>()((set, get) => ({
       timeline: deepClone(report.run.timeline),
       frozenEta: active ? report.run.rollups.estimatedRemainingMs : 0,
       ordinal: 1,
-      updatedAt: Date.now(),
+      updatedAt: new Date(report.exportedAt).getTime(),
     }
     const job: Job = {
       ...deepClone(report.job),
@@ -690,7 +688,7 @@ export function selectedEntities(state = useBatchStore.getState()) {
   return { job, run }
 }
 
-export function compileRunReport(job: Job, run: Run, exportedAt = nowIso()): RunReport {
+export function compileRunReport(job: Job, run: Run, exportedAt = new Date(run.updatedAt).toISOString()): RunReport {
   const rollups = deriveRollups(run, job.concurrency)
   return {
     schemaVersion: 'batch-run-v1',
