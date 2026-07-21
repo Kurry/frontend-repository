@@ -183,7 +183,7 @@ function Sidebar() {
       <div className={`mobile-overlay ${sidebarOpen ? 'open' : ''}`} onClick={() => dispatch(setSidebarOpen(false))} aria-hidden="true" />
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`} aria-label="Primary navigation">
         <div className="sidebar-brand"><span className="brand-mark">PT</span> Pineapple Tech</div>
-        <div className="sidebar-scroll">
+        <nav className="sidebar-scroll" aria-label="Administration sections">
           <button className={`nav-top ${activeView === 'operations-overview' ? 'active' : ''}`} onClick={() => go('operations-overview')}>
             <HomeIcon className="icon-md" /> Dashboard
           </button>
@@ -204,7 +204,7 @@ function Sidebar() {
               </div>
             );
           })}
-        </div>
+        </nav>
         <div className="account-footer">
           <div className="pop-anchor">
             <button ref={acctRef} className="account-btn" aria-haspopup="menu" aria-expanded={acct} onClick={() => setAcct((v) => !v)}>
@@ -702,12 +702,19 @@ function ExportDrawer() {
   // open/close effects: focus trap + restore + escape
   useEffect(() => {
     if (exportOpen) { lastFocus.current = document.activeElement as HTMLElement; }
-    else { setImportMode(false); setDraft(''); setMsg(null); lastFocus.current?.focus?.(); }
+    else {
+      setImportMode(false); setDraft(''); setMsg(null);
+      const opener = lastFocus.current;
+      window.setTimeout(() => { if (opener && document.contains(opener)) opener.focus(); }, 0);
+    }
   }, [exportOpen]);
+  useEffect(() => {
+    if (exportOpen) setMsg({ kind: 'success', text: `${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} preview ready for ${users.length} users` });
+  }, [exportOpen, exportTab, users.length]);
   useEffect(() => {
     if (!exportOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { dispatch(setExportOpen(false)); return; }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); dispatch(setExportOpen(false)); return; }
       if (e.key === 'Tab' && drawerRef.current) {
         const f = drawerRef.current.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
         if (!f.length) return; const first = f[0], last = f[f.length - 1];
@@ -716,8 +723,8 @@ function ExportDrawer() {
       }
     };
     document.addEventListener('keydown', onKey);
-    setTimeout(() => drawerRef.current?.querySelector<HTMLElement>('button')?.focus(), 60);
-    return () => document.removeEventListener('keydown', onKey);
+    const focusTimer = window.setTimeout(() => drawerRef.current?.querySelector<HTMLElement>('button')?.focus(), 60);
+    return () => { document.removeEventListener('keydown', onKey); window.clearTimeout(focusTimer); };
   }, [exportOpen, dispatch]);
 
   const copy = async () => {
@@ -889,10 +896,11 @@ function WebMCPBinder() {
           case 'browse_open': {
             const d = (args.destinations && args.destinations[0]) || args.destination;
             if (!VIEW_DESTS.includes(d)) return { error: `destination must be one of ${VIEW_DESTS.join(', ')}` };
-            if (d === 'export-drawer') dispatch(setExportOpen(true)); else dispatch(setActiveView(d));
+            if (d === 'export-drawer') dispatch(setExportOpen(true));
+            else { dispatch(setExportOpen(false)); dispatch(setSidebarOpen(false)); dispatch(setActiveView(d)); }
             return { result: `opened ${d}` };
           }
-          case 'browse_search': dispatch(setActiveView('all-users')); dispatch(setSearch(String(args.query ?? ''))); return { result: 'search applied' };
+          case 'browse_search': dispatch(setExportOpen(false)); dispatch(setActiveView('all-users')); dispatch(setSearch(String(args.query ?? ''))); return { result: 'search applied' };
           case 'browse_apply_filter':
             if (args.filters) { if (args.filters.role !== undefined) dispatch(setFilterRole(args.filters.role)); if (args.filters.status !== undefined) dispatch(setFilterStatus(args.filters.status)); }
             return { result: 'filters applied' };
@@ -904,9 +912,11 @@ function WebMCPBinder() {
             const f = args.entity_fields || {};
             const parsed = userCreateSchema.safeParse({ ...f, temporaryPassword: f.temporaryPassword || 'password1', accountSegment: f.accountSegment || 'Internal', status: f.status || 'Active', role: f.role || 'Member' });
             if (!parsed.success) return { error: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ') };
-            dispatch(addUser(makeUserFromCreate(parsed.data)));
+            const user = makeUserFromCreate(parsed.data);
+            dispatch(addUser(user));
             dispatch(pushToast({ kind: 'success', title: 'User added', body: `${parsed.data.firstName} ${parsed.data.lastName} (via MCP)` }));
-            return { result: `created user ${parsed.data.firstName} ${parsed.data.lastName}` };
+            dispatch(setLastMutation(`Created ${parsed.data.firstName} ${parsed.data.lastName}`));
+            return { result: `created user ${user.id}`, userId: user.id, userCount: store.getState().users.data.length };
           }
           case 'entity_select': {
             const ids = args.target_ids || (args.target_id ? [args.target_id] : []);
@@ -923,12 +933,12 @@ function WebMCPBinder() {
             if (f.status !== undefined) { if (!STATUSES.includes(f.status)) return { error: 'invalid status' }; patch.status = f.status; }
             if (f.payments !== undefined) patch.payments = Number(f.payments); if (f.products !== undefined) patch.products = Number(f.products);
             if (f['last-active'] !== undefined || f.lastActive !== undefined) patch.lastActive = f['last-active'] || f.lastActive;
-            dispatch(patchUsers({ ids: [id], patch })); return { result: `updated user ${id}` };
+            dispatch(patchUsers({ ids: [id], patch })); dispatch(setLastMutation(`Updated user ${id}`)); return { result: `updated user ${id}` };
           }
           case 'entity_delete': {
             const id = args.target_id; if (!id || !st.users.data.some((u) => u.id === id)) return { error: 'target_id not found' };
             if (args.confirm !== true) return { error: 'delete requires confirm=true' };
-            dispatch(deleteUser(id)); dispatch(pushToast({ kind: 'success', title: 'User deleted', body: 'Removed via MCP' })); return { result: `deleted user ${id}` };
+            dispatch(deleteUser(id)); dispatch(pushToast({ kind: 'success', title: 'User deleted', body: 'Removed via MCP' })); dispatch(setLastMutation(`Deleted user ${id}`)); return { result: `deleted user ${id}`, userCount: store.getState().users.data.length };
           }
           case 'artifact_export': {
             const fmt = (args.export_formats && args.export_formats[0]) || args.format || 'json';
@@ -994,10 +1004,10 @@ export default function App() {
       <TooltipPortal />
       <div className="shell">
         <Sidebar />
-        <div className="main-canvas">
+        <main className="main-canvas">
           <Header />
           <div className="grid12">{view()}</div>
-        </div>
+        </main>
       </div>
       <button className="fab" aria-label="Open export drawer" onClick={() => dispatch(setExportOpen(true))}><ArrowDownTrayIcon className="icon-md" /></button>
       <ExportDrawer />

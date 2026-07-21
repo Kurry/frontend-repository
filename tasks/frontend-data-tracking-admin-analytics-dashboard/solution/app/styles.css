@@ -121,6 +121,7 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--ff-display); letter-spacing: .01e
   .span-8 { grid-column: span 8; }
   .span-6 { grid-column: span 6; }
   .span-4 { grid-column: span 4; }
+  .mobile-overlay { display: none; }
 }
 
 /* -------------------------------------------------------------- sidebar */
@@ -434,6 +435,7 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
   .kpi:nth-child(4) { border-top: var(--hairline); }
   .icon-btn, .hamburger { width: 2.75rem; height: 2.75rem; }   /* >=44px tap target */
   .btn-circle { width: 2.75rem; height: 2.75rem; }
+  .row-act .btn { min-width: 2.75rem; min-height: 2.75rem; padding: .65rem; }
   .search input { width: 9rem; }
 }
 @media (max-width: 480px) {
