@@ -41,6 +41,20 @@ export const useStore = defineStore('lab', () => {
   const helpOpen = ref(false)
   const beforeHold = ref(false)
 
+  // Session chrome (in-memory only, resets on reload like everything else):
+  // a running flag the WebMCP command-session surface toggles (with a visible
+  // banner when stopped), the currently editor-selected object, and a shared
+  // toast so any surface (UI or WebMCP) can confirm an action.
+  const sessionRunning = ref(true)
+  const editorSelected = ref(null)
+  const toastMessage = ref('')
+  let toastTimer = null
+  function toast(message) {
+    toastMessage.value = message
+    if (toastTimer) clearTimeout(toastTimer)
+    toastTimer = setTimeout(() => { toastMessage.value = '' }, 2200)
+  }
+
   const light = reactive({ ...defaultLight })
   const effects = reactive({ ...defaultEffects })
   const activeLook = ref(null)
@@ -212,6 +226,7 @@ export const useStore = defineStore('lab', () => {
     light, effects, activeLook,
     presets, snapshots,
     activeMode, helpOpen, beforeHold,
+    sessionRunning, editorSelected, toastMessage, toast,
     undoStack, redoStack, settingsClipboard,
     ev, displayEV, displayLightExposure, labPackageJson, currentLabState,
     mutate, commitPending, undo, redo, loadLabPackage, resetToSeed
