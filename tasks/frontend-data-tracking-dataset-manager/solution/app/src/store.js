@@ -47,14 +47,23 @@ export const seedDatasets = [
 ]
 
 export const evalSuites = [
-  { id: 'suite-quality', name: 'Core quality regression' },
-  { id: 'suite-safety', name: 'Safety release gate' },
-  { id: 'suite-weekly', name: 'Weekly model comparison' },
+  { id: 'suite-quality', name: 'Core quality regression', detail: 'Nightly regression across flagship behaviors' },
+  { id: 'suite-safety', name: 'Safety release gate', detail: 'Blocking gate for release candidates' },
+  { id: 'suite-weekly', name: 'Weekly model comparison', detail: 'Side-by-side weekly model tracking' },
 ]
 
 export const sampleCsvs = [
-  { id: 'sample-clean', name: 'Clean evaluation batch', text: 'prompt,score,category,expectedOutput\nImported reasoning prompt,8.6,Reasoning,Strong answer\nImported safety prompt,9.1,Safety,Safe answer\nImported writing prompt,7.4,Writing,Clear answer' },
-  { id: 'sample-issues', name: 'Batch with diagnostics', text: 'prompt,score,category,expectedOutput\nNeeds score repair,not-a-number,Reasoning,Repair me\nNeeds category repair,6.5,Unknown,Repair category\nValid import row,7.8,Writing,Ready\nExclude this row,,Safety,Missing score' },
+  {
+    id: 'sample-clean', name: 'Clean evaluation batch',
+    text: [
+      'prompt,score,category,expectedOutput',
+      ...Array.from({ length: 12 }, (_, i) => `Imported prompt ${i + 1}: ${['reasoning depth', 'safety margin', 'writing flow', 'factuality check'][i % 4]},${(6 + (i % 4)) + i / 10},${['Reasoning', 'Safety', 'Writing'][i % 3]},Reference answer ${i + 1}`),
+    ].join('\n'),
+  },
+  {
+    id: 'sample-issues', name: 'Batch with diagnostics',
+    text: 'prompt,score,category,expectedOutput\nNeeds score repair,not-a-number,Reasoning,Repair me\nNeeds category repair,6.5,Unknown,Repair category\nValid import row,7.8,Writing,Ready\nExclude this row,,Safety,Missing score',
+  },
 ]
 
 export const newImportState = (open = false) => ({ open, step: 'source', sourceTab: 'samples', paste: '', sourceError: null, dragging: false, committing: false, sourceText: '', headers: [], rawRows: [], mapping: {}, diagnostic: [] })
@@ -62,20 +71,40 @@ export const newImportState = (open = false) => ({ open, step: 'source', sourceT
 const cloneDatasets = (sets) => structuredClone(sets)
 const selected = (state) => state.datasets.find((d) => d.id === state.selectedId)
 
+let scanTimers = []
+let toastTimer = null
+
 export const useStore = create((set, get) => ({
   datasets: cloneDatasets(seedDatasets), selectedId: 'ds-eval-prompts', selectedRows: [], unverifiedOnly: false,
   history: [], future: [], formulaInput: '=AVERAGE(score)', formulaResult: null,
   pivotMode: false, pivot: { rows: [], columns: [], value: null, aggregation: 'count' },
-  panel: null, modal: null, toast: null, sidebarOpen: false, inlineEdit: null,
-  duplicateScan: { status: 'idle', stages: ['pending', 'pending', 'pending'], groups: [], dismissed: [] },
+  panel: null, modal: null, toast: null, sidebarOpen: false, sidebarDesktopOpen: true, inlineEdit: null,
+  duplicateScan: { status: 'idle', stages: ['pending', 'pending', 'pending'], groups: [], dismissed: [], announce: '' },
   importState: newImportState(false),
   exportTab: 'json', exportGeneratedAt: null,
   snapshotSelection: [],
   recentRows: { ids: [], type: null },
+  sort: { field: null, dir: null },
+  settings: { theme: 'light', density: 'comfortable', reduceMotion: false, hiddenColumns: [] },
+  tour: { active: false, step: 0, seen: false },
+  paletteOpen: false, shortcutsOpen: false, settingsOpen: false,
+  liveMessage: '',
 
-  selectDataset: (id) => set({ selectedId: id, selectedRows: [], unverifiedOnly: false, formulaResult: null, sidebarOpen: false, duplicateScan: { status: 'idle', stages: ['pending','pending','pending'], groups: [], dismissed: [] } }),
+  selectDataset: (id) => set({ selectedId: id, selectedRows: [], unverifiedOnly: false, formulaResult: null, sidebarOpen: false, sort: { field: null, dir: null }, duplicateScan: { status: 'idle', stages: ['pending', 'pending', 'pending'], groups: [], dismissed: [], announce: '' } }),
   setUi: (patch) => set(patch),
-  notify: (message, kind = 'success') => { set({ toast: { message, kind, id: Date.now() } }); setTimeout(() => { if (get().toast?.message === message) set({ toast: null }) }, 3400) },
+  setSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
+  announce: (message) => set({ liveMessage: `${message} (${Date.now()})` }),
+  notify: (message, kind = 'success') => {
+    set({ toast: { message, kind, id: Date.now(), leaving: false } })
+    if (toastTimer) clearTimeout(toastTimer)
+    toastTimer = setTimeout(() => {
+      const t = get().toast
+      if (t?.message === message) {
+        set({ toast: { ...t, leaving: true } })
+        setTimeout(() => { if (get().toast?.message === message) set({ toast: null }) }, 320)
+      }
+    }, 3400)
+  },
   commit: (mutator, message) => {
     set((state) => {
       const before = cloneDatasets(state.datasets)
@@ -83,10 +112,13 @@ export const useStore = create((set, get) => ({
       const selectedIndex = next.findIndex((dataset) => dataset.id === state.selectedId)
       mutator(next, state.selectedId)
       const activeDataset = next.find((dataset) => dataset.id === state.selectedId) ?? next[selectedIndex]
-      const formulaResult = state.formulaInput && activeDataset ? parseFormula(state.formulaInput, activeDataset) : null;
-      return { datasets: next, formulaResult, history: [...state.history.slice(-39), before], future: [], selectedRows: [], ...(message ? { toast: { message, kind: 'success', id: Date.now() } } : {}) }
+      const formulaResult = state.formulaInput && activeDataset ? parseFormula(state.formulaInput, activeDataset) : null
+      return { datasets: next, formulaResult, history: [...state.history.slice(-39), before], future: [], selectedRows: [], ...(message ? { toast: { message, kind: 'success', id: Date.now(), leaving: false } } : {}) }
     })
-    if (message) setTimeout(() => { if (get().toast?.message === message) set({ toast: null }) }, 3400)
+    if (message) {
+      if (toastTimer) clearTimeout(toastTimer)
+      toastTimer = setTimeout(() => { if (get().toast?.message === message) set({ toast: null }) }, 3400)
+    }
   },
   createDataset: (payload) => {
     const id = uid('dataset')
@@ -95,35 +127,69 @@ export const useStore = create((set, get) => ({
     return id
   },
   addRow: (row) => { const item = { id: uid('row'), ...row }; get().commit((datasets, id) => datasets.find((d) => d.id === id).rows.push(item), '1 row added'); set({ recentRows: { ids: [item.id], type: 'single' } }); setTimeout(() => set({ recentRows: { ids: [], type: null } }), 1800) },
-  updateRow: (rowId, row) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); const at = ds.rows.findIndex((r) => r.id === rowId); ds.rows[at] = { id: rowId, ...row } }, 'Row updated'),
-  updateCell: (rowId, field, value) => get().commit((datasets, id) => { const row = datasets.find((d) => d.id === id).rows.find((r) => r.id === rowId); if (field === 'expectedOutput') row.expectedOutput = value; else if (field === 'verified') row.verified = value; else if (field === 'split') value ? row.split = value : delete row.split; else row.values[field] = value }, 'Cell updated'),
+  updateRow: (rowId, row) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); const at = ds.rows.findIndex((r) => r.id === rowId); if (at >= 0) ds.rows[at] = { id: rowId, ...ds.rows[at], ...row } }, 'Row updated'),
+  updateCell: (rowId, field, value) => get().commit((datasets, id) => { const row = datasets.find((d) => d.id === id).rows.find((r) => r.id === rowId); if (!row) return; if (field === 'expectedOutput') row.expectedOutput = value; else if (field === 'verified') row.verified = value; else if (field === 'split') value ? row.split = value : delete row.split; else row.values[field] = value }, 'Cell updated'),
   deleteRows: (ids) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); ds.rows = ds.rows.filter((r) => !ids.includes(r.id)) }, `${ids.length} row${ids.length === 1 ? '' : 's'} deleted`),
-  appendRows: (rows) => { const items = rows.map((r) => ({ id: uid('row'), ...r })); get().commit((datasets, id) => datasets.find((d) => d.id === id).rows.push(...items), `${rows.length} rows imported`); set({ recentRows: { ids: items.map((r) => r.id), type: 'import' } }); setTimeout(() => set({ recentRows: { ids: [], type: null } }), Math.max(1800, Math.ceil(items.length / 10) * 100 + 500)) },
-  bulk: (action, value) => { const ids = get().selectedRows; get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); if (action === 'delete') ds.rows = ds.rows.filter((r) => !ids.includes(r.id)); else ds.rows.forEach((r) => { if (ids.includes(r.id)) { if (action === 'verified') r.verified = value; if (action === 'split') r.split = value } }) }, `${ids.length} rows updated`) },
+  appendRows: (rows) => { const items = rows.map((r) => ({ id: uid('row'), ...r })); get().commit((datasets, id) => datasets.find((d) => d.id === id).rows.push(...items), `${rows.length} rows imported`); set({ recentRows: { ids: items.map((r) => r.id), type: 'import' } }); setTimeout(() => set({ recentRows: { ids: [], type: null } }), Math.max(1800, Math.ceil(items.length / 10) * 100 + 700)) },
+  bulk: (action, value) => { const ids = get().selectedRows; if (!ids.length) return; get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); if (action === 'delete') ds.rows = ds.rows.filter((r) => !ids.includes(r.id)); else ds.rows.forEach((r) => { if (ids.includes(r.id)) { if (action === 'verified') r.verified = value; if (action === 'split') r.split = value } }) }, `${ids.length} rows updated`); get().announce(`Bulk ${action === 'delete' ? 'delete' : action + ' ' + value} applied to ${ids.length} rows`) },
   toggleSelected: (id) => set((s) => ({ selectedRows: s.selectedRows.includes(id) ? s.selectedRows.filter((v) => v !== id) : [...s.selectedRows, id] })),
   selectAll: (ids, checked) => set({ selectedRows: checked ? ids : [] }),
-  undo: () => set((s) => s.history.length ? ({ datasets: s.history.at(-1), history: s.history.slice(0,-1), future: [cloneDatasets(s.datasets), ...s.future].slice(0,40), selectedRows: [], toast: { message: 'Change undone', kind: 'info', id: Date.now() } }) : {}),
-  redo: () => set((s) => s.future.length ? ({ datasets: s.future[0], future: s.future.slice(1), history: [...s.history, cloneDatasets(s.datasets)], selectedRows: [], toast: { message: 'Change restored', kind: 'info', id: Date.now() } }) : {}),
+  undo: () => set((s) => s.history.length ? ({ datasets: s.history.at(-1), history: s.history.slice(0, -1), future: [cloneDatasets(s.datasets), ...s.future].slice(0, 40), selectedRows: [], toast: { message: 'Change undone', kind: 'info', id: Date.now(), leaving: false } }) : {}),
+  redo: () => set((s) => s.future.length ? ({ datasets: s.future[0], future: s.future.slice(1), history: [...s.history, cloneDatasets(s.datasets)], selectedRows: [], toast: { message: 'Change restored', kind: 'info', id: Date.now(), leaving: false } }) : {}),
   evaluateFormula: (input = get().formulaInput) => { const result = parseFormula(input, selected(get())); set({ formulaInput: input, formulaResult: result }) },
   addThreshold: (rule) => get().commit((datasets, id) => datasets.find((d) => d.id === id).thresholdRules.push({ id: uid('rule'), ...rule }), 'Threshold rule added'),
   deleteThreshold: (ruleId) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); ds.thresholdRules = ds.thresholdRules.filter((r) => r.id !== ruleId) }, 'Threshold rule deleted'),
   applySplits: (percentages) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); ds.splitPercentages = percentages; const trainEnd = Math.round(ds.rows.length * percentages.train / 100); const validationEnd = trainEnd + Math.round(ds.rows.length * percentages.validation / 100); ds.rows.forEach((r, i) => { r.split = i < trainEnd ? 'train' : i < validationEnd ? 'validation' : 'test' }) }, 'Split assignments applied'),
-  saveSnapshot: (name) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); ds.snapshots.push({ name, createdAt: new Date().toISOString(), rows: structuredClone(ds.rows) }) }, 'Snapshot saved'),
+  saveSnapshot: (name) => get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); ds.snapshots.push({ name, createdAt: new Date().toISOString(), rows: structuredClone(ds.rows) }) }, `Snapshot “${name}” saved`),
   attachSuite: (suiteId) => get().commit((datasets, id) => { datasets.find((d) => d.id === id).attachedSuiteId = suiteId }, suiteId ? `Attached to ${evalSuites.find((s) => s.id === suiteId)?.name}` : 'Eval suite detached'),
   runDuplicateScan: () => {
-    set({ duplicateScan: { ...get().duplicateScan, status: 'running', stages: ['running','pending','pending'], groups: [] } })
-    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, stages: ['complete','running','pending'] } })), 1000)
-    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, stages: ['complete','complete','running'] } })), 2000)
-    setTimeout(() => set((s) => ({ duplicateScan: { ...s.duplicateScan, status: 'done', stages: ['complete','complete','complete'], groups: findDuplicateGroups(selected(s), s.duplicateScan.dismissed) } })), 3000)
+    scanTimers.forEach(clearTimeout)
+    scanTimers = []
+    const advance = (stages, status, extra = {}) => set((s) => ({ duplicateScan: { ...s.duplicateScan, stages, status, ...extra } }))
+    advance(['running', 'pending', 'pending'], 'running')
+    set((s) => ({ duplicateScan: { ...s.duplicateScan, announce: 'Stage 1 of 3: scanning rows' } }))
+    scanTimers.push(setTimeout(() => { advance(['complete', 'running', 'pending'], 'running'); set((s) => ({ duplicateScan: { ...s.duplicateScan, announce: 'Stage 2 of 3: grouping matches' } })) }, 1100))
+    scanTimers.push(setTimeout(() => { advance(['complete', 'complete', 'running'], 'running'); set((s) => ({ duplicateScan: { ...s.duplicateScan, announce: 'Stage 3 of 3: finishing' } })) }, 2200))
+    scanTimers.push(setTimeout(() => {
+      const s = get()
+      const groups = findDuplicateGroups(selected(s), s.duplicateScan.dismissed)
+      set({ duplicateScan: { ...s.duplicateScan, status: 'done', stages: ['complete', 'complete', 'complete'], groups, announce: `Scan complete: ${groups.length} duplicate group${groups.length === 1 ? '' : 's'} found` } })
+    }, 3300))
   },
-  dismissDuplicate: (groupId) => set((s) => ({ duplicateScan: { ...s.duplicateScan, groups: s.duplicateScan.groups.filter((g) => g.id !== groupId), dismissed: [...s.duplicateScan.dismissed, groupId] } })),
-  mergeDuplicate: (groupId, survivorPatch) => { const group = get().duplicateScan.groups.find((g) => g.id === groupId); if (!group) return; const ids = group.rows.map((r) => r.id); get().commit((datasets, id) => { const ds = datasets.find((d) => d.id === id); const survivor = ds.rows.find((r) => r.id === ids[0]); survivor.values = { ...survivor.values, ...survivorPatch.values }; survivor.expectedOutput = survivorPatch.expectedOutput; survivor.verified = survivorPatch.verified; if (survivorPatch.split) survivor.split = survivorPatch.split; else delete survivor.split; ds.rows = ds.rows.filter((r) => r.id === ids[0] || !ids.includes(r.id)) }, `${ids.length} duplicates merged`); set((s) => ({ modal: null, duplicateScan: { ...s.duplicateScan, groups: s.duplicateScan.groups.filter((g) => g.id !== groupId) } })) },
+  dismissDuplicate: (groupId) => set((s) => ({ duplicateScan: { ...s.duplicateScan, groups: s.duplicateScan.groups.filter((g) => g.id !== groupId), dismissed: [...s.duplicateScan.dismissed, groupId], announce: 'Group dismissed as not duplicates' } })),
+  mergeDuplicate: (groupId, survivorPatch) => {
+    const group = get().duplicateScan.groups.find((g) => g.id === groupId) || findDuplicateGroups(selected(get())).find((g) => g.id === groupId)
+    if (!group) return false
+    const ids = group.rows.map((r) => r.id)
+    get().commit((datasets, id) => {
+      const ds = datasets.find((d) => d.id === id)
+      const survivor = ds.rows.find((r) => r.id === ids[0])
+      if (!survivor) return
+      survivor.values = { ...survivor.values, ...survivorPatch.values }
+      survivor.expectedOutput = survivorPatch.expectedOutput
+      survivor.verified = survivorPatch.verified
+      if (survivorPatch.split) survivor.split = survivorPatch.split; else delete survivor.split
+      ds.rows = ds.rows.filter((r) => r.id === ids[0] || !ids.includes(r.id))
+    }, `${ids.length} duplicates merged into 1 row`)
+    get().announce(`Merged ${ids.length} duplicate rows into 1 row`)
+    set((s) => ({ modal: null, duplicateScan: { ...s.duplicateScan, groups: s.duplicateScan.groups.filter((g) => g.id !== groupId) } }))
+    return true
+  },
   importPackage: (text) => {
     let parsed; try { parsed = JSON.parse(text) } catch { return { error: 'Package JSON is malformed' } }
     const checked = validatePackage(parsed); if (checked.error) return checked
     const d = parsed.dataset
-    get().commit((datasets, id) => { const at = datasets.findIndex((v) => v.id === id); datasets[at] = { id: d.id || id, name: d.name, description: d.description, createdAt: d.createdAt, schema: d.schema, rows: d.rows.map((r) => ({ id: uid('row'), ...r })), thresholdRules: d.thresholdRules.map((r) => ({ id: uid('rule'), ...r })), snapshots: d.snapshots.map((s) => ({ ...s, rows: s.rows.map((r) => ({ id: uid('snaprow'), ...r })) })), splitPercentages: d.splitPercentages, attachedSuiteId: d.attachedSuiteId } }, 'Dataset package imported')
-    set({ selectedId: d.id })
+    get().commit((datasets, id) => {
+      const at = datasets.findIndex((v) => v.id === id)
+      datasets[at] = {
+        id: d.id || id, name: d.name, description: d.description, createdAt: d.createdAt, schema: structuredClone(d.schema),
+        rows: d.rows.map((r) => ({ id: uid('row'), values: { ...r.values }, expectedOutput: r.expectedOutput, verified: r.verified, ...(r.split ? { split: r.split } : {}) })),
+        thresholdRules: d.thresholdRules.map((r) => ({ id: uid('rule'), column: r.column, comparator: r.comparator, cap: r.cap })),
+        snapshots: d.snapshots.map((sn) => ({ name: sn.name, createdAt: sn.createdAt, rows: sn.rows.map((r) => ({ id: uid('snaprow'), values: { ...r.values }, expectedOutput: r.expectedOutput, verified: r.verified, ...(r.split ? { split: r.split } : {}) })) })),
+        splitPercentages: { ...d.splitPercentages }, attachedSuiteId: d.attachedSuiteId ?? null,
+      }
+    }, 'Dataset package imported')
+    set({ selectedId: d.id || get().selectedId, selectedRows: [], unverifiedOnly: false })
     return { success: true }
   },
   getExport: () => { const state = get(), ds = selected(state), visible = state.unverifiedOnly ? ds.rows.filter((r) => !r.verified) : ds.rows; return { json: JSON.stringify(makePackage(ds), null, 2), csv: rowsCsv(ds, visible), stats: computeStats(ds) } },
