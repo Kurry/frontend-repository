@@ -9,15 +9,16 @@ export default {
   data() {
     return { display: this.value, frame: null }
   },
-  computed: {
-    reducedMotion() {
+
+  methods: {
+    isRM() {
       return typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    },
+    }
   },
   watch: {
     value(next, previous) {
       if (this.frame) cancelAnimationFrame(this.frame)
-      if (next === previous || this.reducedMotion) {
+      if (next === previous || this.isRM()) {
         this.display = next
         return
       }

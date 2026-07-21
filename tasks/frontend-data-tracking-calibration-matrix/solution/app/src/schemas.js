@@ -58,6 +58,5 @@ export const importPackSchema = z.union([calibrationPackSchema, triagePackSchema
 export function zodIssueMessage(error) {
   const issue = error?.issues?.[0]
   if (!issue) return 'payload does not match a supported pack'
-  const field = issue.path?.length ? issue.path.join('.') : 'payload'
-  return `${field}: ${issue.message}`
+  return issue.message
 }

@@ -427,7 +427,7 @@ export const useCalibrationStore = defineStore('calibration', {
         this.ui.validation = { ok: true, message: `CalibrationPack v${result.data.schemaVersion} schema valid — ${result.data.cells.length} cells, ${result.data.varianceRows.length} variance rows` }
       } else {
         const issue = result.error.issues[0]
-        this.ui.validation = { ok: false, message: `${issue.path.join('.') || 'payload'}: ${issue.message}` }
+        this.ui.validation = { ok: false, message: issue.message }
       }
       return this.ui.validation
     },
