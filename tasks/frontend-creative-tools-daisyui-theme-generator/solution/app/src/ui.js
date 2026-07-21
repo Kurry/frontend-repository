@@ -766,8 +766,11 @@ function wireEditor() {
   });
   document.addEventListener('change', (e) => {
     const el = e.target.closest?.('[data-color]');
-    if (el && colorPending) {
-      pushExternalHistory(colorPending);
+    if (el) {
+      // Some browsers emit only change for native color controls. Apply the
+      // final value here as well so the forked theme cannot snap back.
+      setColor(el.dataset.color, el.value);
+      if (colorPending) pushExternalHistory(colorPending);
       colorPending = null;
     }
   });
@@ -797,11 +800,12 @@ function wireEditor() {
   });
 
   function applySeg(seg, data) {
-    pushExternalHistory(snapshotState());
+    const before = snapshotState();
     if (seg.dataset.seg === 'radius') setRadius(seg.dataset.group, data.val);
     else if (seg.dataset.seg === 'size') setSize(seg.dataset.group, data.val);
     else if (seg.dataset.seg === 'border') setBorder(data.val);
     else if (seg.dataset.seg === 'font') setFontFamily(data.font);
+    pushExternalHistory(before);
     els.undoBtn.disabled = false;
   }
 
@@ -810,10 +814,11 @@ function wireEditor() {
     if (sw) {
       const key = sw.dataset.switch;
       const next = sw.getAttribute('aria-checked') !== 'true';
-      pushExternalHistory(snapshotState());
+      const before = snapshotState();
       if (key === 'depth') setEffect('depth', next);
       else if (key === 'noise') setEffect('noise', next);
       else setOption(key, next);
+      pushExternalHistory(before);
       return;
     }
     if (e.target.closest('#btn-undo')) { undo(); return; }
