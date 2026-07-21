@@ -31,13 +31,13 @@ export default function PersonaCard({ persona, index = 0 }) {
       style={{ animationDelay: `${index * 0.04}s` }}
       aria-label={`${persona.name}, ${persona.role}${persona.archived ? ', archived' : ''}`}
       tabIndex={0}
-      onClick={flip}
+      onClick={!flipped ? flip : undefined}
       onKeyDown={(event) => {
-        if ((event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) { event.preventDefault(); toggleFlip(persona.id) }
+        if (!flipped && (event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) { event.preventDefault(); toggleFlip(persona.id) }
       }}
     >
       <div className={`persona-card ${flipped ? 'is-flipped' : ''}`}>
-        <div className="card-face card-front">
+        <div className="card-face card-front" aria-hidden={flipped}>
           <div className="card-select" onClick={(e) => e.stopPropagation()}>
             <Checkbox id={`select-${persona.id}`} labelText={`Select ${persona.name}`} hideLabel checked={selected} onChange={(_, data) => toggleSelected(persona.id, data?.checked)} />
           </div>
@@ -62,7 +62,15 @@ export default function PersonaCard({ persona, index = 0 }) {
             <Button kind="ghost" size="sm" hasIconOnly renderIcon={Scale} tooltipAlignment="center" tooltipPosition="bottom" iconDescription={`Add ${persona.name} to comparison`} onClick={() => addToComparison(persona.id)} />
           </div>
         </div>
-        <div className="card-face card-back" aria-hidden={!flipped}>
+        <div
+          className="card-face card-back"
+          aria-hidden={!flipped}
+          onClick={flipped ? flip : undefined}
+          onKeyDown={(event) => {
+            if (flipped && (event.key === 'Enter' || event.key === ' ') && event.target === event.currentTarget) { event.preventDefault(); toggleFlip(persona.id) }
+          }}
+          tabIndex={flipped ? 0 : -1}
+        >
           <div className="card-back-heading"><div><span>System prompt</span><strong>{persona.name}</strong></div><Button kind="ghost" size="sm" hasIconOnly renderIcon={Copy} tooltipAlignment="center" tooltipPosition="bottom" iconDescription="Copy system prompt" onClick={(e) => { e.stopPropagation(); navigator.clipboard?.writeText(prompt); toast('System prompt copied') }} /></div>
           <pre>{prompt}</pre>
           <p>Click the card or press Enter to flip back.</p>

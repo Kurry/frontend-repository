@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Button, Select, SelectItem, Tag } from '@carbon/react'
 import { ArrowDown, Close, Chemistry, Play, StopFilled, UserFollow } from '@carbon/icons-react'
+import { restoreFocus, captureFocus } from '../focus'
 import { SCENARIOS, generateResponse, useAppStore } from '../store'
 
 function AttacherDrawer() {
@@ -16,7 +17,7 @@ function AttacherDrawer() {
     previousFocus.current = document.activeElement
     closeRef.current?.focus()
     const key = (e) => {
-      if (e.key === 'Escape') setUI({ attacherOpen: false })
+      if (e.key === 'Escape') { setUI({ attacherOpen: false }); restoreFocus(); }
       if (e.key === 'Tab' && drawerRef.current) {
         const focusable = [...drawerRef.current.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter((node) => !node.disabled)
         if (!focusable.length) return
@@ -24,8 +25,8 @@ function AttacherDrawer() {
         else if (!e.shiftKey && document.activeElement === focusable.at(-1)) { e.preventDefault(); focusable[0].focus() }
       }
     }
-    document.addEventListener('keydown', key)
-    return () => { document.removeEventListener('keydown', key); previousFocus.current?.focus?.() }
+    document.addEventListener('keydown', key, true)
+    return () => { document.removeEventListener('keydown', key, true); previousFocus.current?.focus?.() }
   }, [open])
   if (!open) return null
   return (
@@ -102,7 +103,7 @@ export default function TestBenchView() {
             >
               <span className="slot-icon"><Chemistry /></span>
               {persona ? <div><small>ATTACHED PERSONA</small><strong>{persona.name}</strong><span>{persona.role} · formality {persona.traits.formality} · verbosity {persona.traits.verbosity}</span></div> : <div><small>PERSONA SLOT</small><strong>Drop or choose a persona</strong><span>The slot highlights while a persona is dragged over it.</span></div>}
-              <Button size="sm" kind="tertiary" onClick={() => setUI({ attacherOpen: true })}>{persona ? 'Change' : 'Choose'}</Button>
+              <Button size="sm" kind="tertiary" onClick={() => { captureFocus(); setUI({ attacherOpen: true }) }}>{persona ? 'Change' : 'Choose'}</Button>
             </div>
             <div className="scenario-control"><Select id="scenario-select" labelText="Scenario" value={bench.scenarioId} onChange={(e) => setScenario(e.target.value)}>{SCENARIOS.map((item) => <SelectItem key={item.id} value={item.id} text={item.name} />)}</Select><p>{scenario?.prompt}</p></div>
             {['waiting', 'streaming'].includes(bench.status) ? <Button kind="danger" renderIcon={StopFilled} onClick={() => finishRun(true)}>Stop</Button> : <Button renderIcon={Play} disabled={!persona} onClick={run}>Run scenario</Button>}
@@ -113,7 +114,7 @@ export default function TestBenchView() {
             <div
               className="transcript-pane"
               ref={transcriptRef}
-              onScroll={(e) => { const node = e.currentTarget; const atBottom = node.scrollHeight - node.scrollTop - node.clientHeight < 48; if (!atBottom && bench.status === 'streaming') setFollow(false) }}
+              onScroll={(e) => { const node = e.currentTarget; const atBottom = node.scrollHeight - node.scrollTop - node.clientHeight < 48; if (!atBottom && bench.status === 'streaming') setFollow(false); else if (atBottom && bench.status === 'streaming') setFollow(true); }}
             >
               {bench.transcript ? <p>{bench.transcript}<span className={bench.status === 'streaming' ? 'stream-caret' : ''} /></p> : <div className="transcript-empty"><Chemistry /><strong>Your transcript will appear here</strong><span>Choose a persona and run the selected scenario.</span></div>}
             </div>

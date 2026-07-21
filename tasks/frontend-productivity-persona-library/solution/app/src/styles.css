@@ -182,5 +182,21 @@ button { -webkit-tap-highlight-color: transparent; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
-  .persona-card { transform: none !important; }.persona-card.is-flipped .card-front { display: none; }.persona-card.is-flipped .card-back { display: flex; transform: none; }.card-back { display: none; transform: none; }
+  .persona-card { transform: none !important; transition: none !important; }.persona-card.is-flipped .card-front { display: none; }.persona-card.is-flipped .card-back { display: flex; transform: none; }.card-back { display: none; transform: none; }
+}
+
+
+@keyframes persona-enter {
+  0% { opacity: 0; transform: translateY(20px) scale(0.95); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.persona-card {
+  animation: persona-enter 0.4s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .persona-card {
+    animation: none !important;
+  }
 }

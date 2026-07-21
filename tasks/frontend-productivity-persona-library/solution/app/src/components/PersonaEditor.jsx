@@ -18,10 +18,27 @@ function RichEditor({ value, onChange, onReady }) {
     extensions: [StarterKit, Placeholder.configure({ placeholder: 'Write the system prompt…' })],
     content: value,
     onUpdate: ({ editor: nextEditor }) => onChange(nextEditor.getHTML()),
-    editorProps: { attributes: { class: 'prompt-editor', 'aria-label': 'System prompt body' } },
+    editorProps: {
+      attributes: { class: 'prompt-editor', 'aria-label': 'System prompt body' },
+      handleKeyDown: (view, event) => {
+        if (event.key === 'Escape') {
+          // Allow Modal to handle Escape by triggering close manually or letting it bubble
+          // In Carbon Modal, usually Escape on any element inside closes it.
+          // If TipTap stops propagation, it breaks. Returning false lets TipTap ignore it, bubbling it up.
+          return false;
+        }
+        return false;
+      }
+    },
   })
 
   useEffect(() => { if (editor && onReady) onReady(editor) }, [editor, onReady])
+
+  useEffect(() => {
+    if (editor && editor.getHTML() !== value) {
+      editor.commands.setContent(value)
+    }
+  }, [editor, value])
 
   return (
     <div className="rich-editor">
@@ -123,8 +140,17 @@ export default function PersonaEditor() {
       modalLabel="Persona editor"
       primaryButtonText={persona ? 'Save changes' : 'Create persona'}
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={saving.current || !isValid || Object.keys(traitInputErrors).length > 0}
-      onRequestSubmit={() => { syncActiveVariant(); trigger().then((ok) => ok && save()) }}
+      primaryButtonDisabled={saving.current || Object.keys(traitInputErrors).length > 0}
+      onRequestSubmit={() => {
+        syncActiveVariant()
+        trigger().then((ok) => {
+          if (ok) save()
+          else {
+            const firstError = document.querySelector('.persona-form [aria-invalid="true"], .persona-form .error')
+            if (firstError) firstError.focus()
+          }
+        })
+      }}
       onRequestClose={requestClose}
       size="lg"
       selectorPrimaryFocus="#persona-name"
@@ -211,7 +237,7 @@ export default function PersonaEditor() {
                 const displayValue = traitDrafts[trait] ?? traits?.[trait] ?? ''
                 return (
                   <div className="trait-control" key={trait}>
-                    <div className="trait-label-row"><label htmlFor={`trait-${trait}`} id={`trait-${trait}-label`}>{pretty(trait)}</label><input id={`trait-${trait}-number`} aria-labelledby={`trait-${trait}-label`} aria-label={`${pretty(trait)} numeric value`} className={error || inputError ? 'trait-number error' : 'trait-number'} type="text" inputMode="numeric" value={displayValue} onChange={(e) => {
+                    <div className="trait-label-row"><label htmlFor={`trait-${trait}`} id={`trait-${trait}-label`}>{pretty(trait)}</label><input id={`trait-${trait}-number`} aria-describedby={(inputError || error) ? `trait-${trait}-error` : undefined} aria-labelledby={`trait-${trait}-label`} aria-label={`${pretty(trait)} numeric value`} className={error || inputError ? 'trait-number error' : 'trait-number'} aria-invalid={Boolean(error || inputError)} type="text" inputMode="numeric" value={displayValue} onChange={(e) => {
                       const raw = e.target.value
                       setTraitDrafts((current) => ({ ...current, [trait]: raw }))
                       let message = ''
@@ -221,12 +247,12 @@ export default function PersonaEditor() {
                       setTraitInputErrors((current) => { const next = { ...current }; if (message) next[trait] = message; else delete next[trait]; return next })
                       if (!message) setValue(`traits.${trait}`, Number(raw), { shouldValidate: true, shouldDirty: true })
                     }} /></div>
-                    <Slider id={`trait-${trait}`} labelText={pretty(trait)} aria-labelledby={`trait-${trait}-label`} hideTextInput min={0} max={100} step={1} value={value} onChange={({ value: next }) => {
+                    <Slider id={`trait-${trait}`} labelText={pretty(trait)} aria-labelledby={`trait-${trait}-label`} aria-describedby={(inputError || error) ? `trait-${trait}-error` : undefined} hideTextInput min={0} max={100} step={1} value={value} onChange={({ value: next }) => {
                       setTraitDrafts((current) => ({ ...current, [trait]: String(next) }))
                       setTraitInputErrors((current) => { const updated = { ...current }; delete updated[trait]; return updated })
                       setValue(`traits.${trait}`, Number(next), { shouldValidate: true, shouldDirty: true })
                     }} />
-                    {(inputError || error) && <p className="field-error" role="alert">{pretty(trait)}: {inputError || error.message}</p>}
+                    {(inputError || error) && <p id={`trait-${trait}-error`} className="field-error" role="alert">{pretty(trait)}: {inputError || error.message}</p>}
                   </div>
                 )
               })}

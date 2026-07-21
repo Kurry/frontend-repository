@@ -1,1 +1,0 @@
-import{v as a}from"./core.min-DGtNB905.js";import"./preloader-Bns9QiKi.js";const l=e=>{const[r]=a(),t=e.target.value;(t.length<2||t.length>20)&&(r.value="playerName must be 2 to 20 characters")};export{l as s_S2CSE0Gzo4k};
