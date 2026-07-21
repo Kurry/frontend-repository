@@ -1,0 +1,1579 @@
+{
+  "core_features": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "dashboard_loads_without_auth_gate",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "On load, the root URL shows the analytics dashboard (metric tiles, a Visitors chart, and Top Sources / Top Pages / Countries panels) with no login, signup, SSO, or invite gate",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that on load, the root URL shows the analytics dashboard (metric tiles, a Visitors chart, and Top Sources / Top Pages / Countries panels) with no login, signup, SSO, or invite gate. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.2",
+        "name": "default_metric_tiles_exact_values",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "On load, the four metric tiles read exactly Unique visitors 16,840, Total pageviews 47,220, Bounce rate 44%, Visit duration 98s",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that on load, the four metric tiles read exactly Unique visitors 16,840, Total pageviews 47,220, Bounce rate 44%, Visit duration 98s. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.3",
+        "name": "default_breakdown_rows_exact_values",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "On load, Top Sources shows Google 7,200, Direct 4,800, Twitter 1,600, Newsletter 980; Top Pages shows / 12,800, /pricing 5,600, /blog 3,900, /docs 2,800; Countries shows United States 6,400, United Kingdom 2,400, Germany 1,900, Canada 1,200 \u2014 top four rows per panel, name left and count right",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that on load, Top Sources shows Google 7,200, Direct 4,800, Twitter 1,600, Newsletter 980; Top Pages shows / 12,800, /pricing 5,600, /blog 3,900, /docs 2,800; Countries shows United States 6,400, United Kingdom 2,400, Germany 1,900, Canada 1,200 \u2014 top four rows per panel, name left and count right. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.4",
+        "name": "trend_chart_bar_per_bucket",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "On load, the Visitors chart below the metric tiles renders one bar per time bucket rising left to right, consistent with the same seeded data the metric tiles show",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that on load, the Visitors chart below the metric tiles renders one bar per time bucket rising left to right, consistent with the same seeded data the metric tiles show. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.5",
+        "name": "google_filter_pill_and_tiles",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After clicking the Google row in Top Sources, a filter pill reading Source: Google appears and all four metric tiles change away from their unfiltered values (16,840 / 47,220 / 44% / 98s) to the Google segment's numbers",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after clicking the Google row in Top Sources, a filter pill reading Source: Google appears and all four metric tiles change away from their unfiltered values (16,840 / 47,220 / 44% / 98s) to the Google segment's numbers. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.6",
+        "name": "filtered_panels_recompute",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After applying the Google source filter, the Top Pages and Countries panels recompute to different row values than the unfiltered view",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after applying the Google source filter, the Top Pages and Countries panels recompute to different row values than the unfiltered view. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.7",
+        "name": "cross_dimension_filters_stack",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After clicking the Google row in Top Sources and then a Countries row, two filter pills remain visible together (Source and Country), and the metric tiles recompute to the intersection of both filters",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after clicking the Google row in Top Sources and then a Countries row, two filter pills remain visible together (Source and Country), and the metric tiles recompute to the intersection of both filters. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.8",
+        "name": "pill_and_clear_control_both_remove_filter",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Both removal paths work: clicking the filter pill itself and clicking the Clear filter control each remove the active segment filter, returning the metric tiles to 16,840 / 47,220 / 44% / 98s with no stale filter pill left behind",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that both removal paths work: clicking the filter pill itself and clicking the Clear filter control each remove the active segment filter, returning the metric tiles to 16,840 / 47,220 / 44% / 98s with no stale filter pill left behind. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.9",
+        "name": "date_range_change_recomputes_together",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After changing the date range to Last 7 days, the metric tiles and the trend chart recompute to different values and bars, with no leftover rows from the previous range in any panel",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after changing the date range to Last 7 days, the metric tiles and the trend chart recompute to different values and bars, with no leftover rows from the previous range in any panel. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.10",
+        "name": "site_switch_recomputes_and_clears_filter",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After changing the site to shop.example.com, the metric tiles and all three breakdown panels update together and any active filter pill is cleared",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after changing the site to shop.example.com, the metric tiles and all three breakdown panels update together and any active filter pill is cleared. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.11",
+        "name": "sort_name_az_reorders_panels",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After changing the sort to Name A-Z, the rows in all three breakdown panels reorder alphabetically",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after changing the sort to Name A-Z, the rows in all three breakdown panels reorder alphabetically. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.12",
+        "name": "breakdown_row_keyboard_filter",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "When a breakdown row is reached by keyboard focus, it shows a visible focus indicator, and pressing Enter or Space applies its filter",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that when a breakdown row is reached by keyboard focus, it shows a visible focus indicator, and pressing Enter or Space applies its filter. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.13",
+        "name": "filter_persists_across_reload",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After applying a filter and reloading the page, the filter pill and its recomputed metric tiles are restored from client storage",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after applying a filter and reloading the page, the filter pill and its recomputed metric tiles are restored from client storage. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.14",
+        "name": "theme_toggle_recolors_everything",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "When the theme toggle is used, every surface, text color, and the chart bars recolor between the light and dark themes and remain legible",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that when the theme toggle is used, every surface, text color, and the chart bars recolor between the light and dark themes and remain legible. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.29",
+        "name": "add_site_inline_validation_gates_submit",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "In the Add site form, an empty site name, empty/malformed domain, or missing timezone shows an inline validation message naming that specific field before any submit, and the submit control stays disabled until name, domain, and timezone are all valid",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that in the Add site form, an empty site name, empty/malformed domain, or missing timezone shows an inline validation message naming that specific field before any submit, and the submit control stays disabled until name, domain, and timezone are all valid. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.30",
+        "name": "add_site_flow_new_site_dashboard",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Starting from the dashboard: open Add site, fill a valid name, domain, and timezone, and submit \u2014 the form closes, the site selector's entry count increases by exactly one, selecting the new site shows that site's own dashboard (for an unseeded site: zero-value metric tiles and empty breakdown panels with an explanatory message), and Stats JSON export includes that site's domain, name, and timezone",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that starting from the dashboard: open Add site, fill a valid name, domain, and timezone, and submit \u2014 the form closes, the site selector's entry count increases by exactly one, selecting the new site shows that site's own dashboard (for an unseeded site: zero-value metric tiles and empty breakdown panels with an explanatory message), and Stats JSON export includes that site's domain, name, and timezone. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.31",
+        "name": "double_submit_adds_one_site",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Double-activating the Add site submit control in quick succession adds exactly one new entry to the site selector, measured as a count delta of one immediately around the action",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that double-activating the Add site submit control in quick succession adds exactly one new entry to the site selector, measured as a count delta of one immediately around the action. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.33",
+        "name": "sort_reversal_round_trip",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Switching the sort from most visitors to fewest visitors reverses each breakdown panel's row order, and switching back to most visitors restores the original order in all three panels",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that switching the sort from most visitors to fewest visitors reverses each breakdown panel's row order, and switching back to most visitors restores the original order in all three panels. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.34",
+        "name": "segment_filter_chain_all_surfaces",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Scripted from the default example.com / Last 30 days view: clicking the Google row in Top Sources shows a Source: Google pill, changes all four metric tiles away from 16,840 / 47,220 / 44% / 98s, visibly redraws the trend chart bars, and recomputes the Top Pages and Countries rows, all without a reload; activating Clear filter then restores every one of those surfaces to the exact unfiltered values",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that scripted from the default example.com / Last 30 days view: clicking the Google row in Top Sources shows a Source: Google pill, changes all four metric tiles away from 16,840 / 47,220 / 44% / 98s, visibly redraws the trend chart bars, and recomputes the Top Pages and Countries rows, all without a reload; activating Clear filter then restores every one of those surfaces to the exact unfiltered values. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.35",
+        "name": "multi_facet_reload_round_trip",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After selecting a non-default site, date range, and sort, applying a segment filter, switching the theme, setting a non-default bounce-rate ceiling, and turning compare previous on, a full page reload restores the same site, range, sort, theme, filter pill, ceiling, compare chips, and recomputed numbers \u2014 all facets coherently, never a mix of restored and reverted facets",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after selecting a non-default site, date range, and sort, applying a segment filter, switching the theme, setting a non-default bounce-rate ceiling, and turning compare previous on, a full page reload restores the same site, range, sort, theme, filter pill, ceiling, compare chips, and recomputed numbers \u2014 all facets coherently, never a mix of restored and reverted facets. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.36",
+        "name": "seeded_selector_breadth",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The site selector lists at least three selectable sites and the date-range selector offers at least four date ranges, each producing a non-empty dashboard when selected on the default site",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the site selector lists at least three selectable sites and the date-range selector offers at least four date ranges, each producing a non-empty dashboard when selected on the default site. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.37",
+        "name": "range_change_clears_active_filter_chain",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Scripted with the Source: Google filter active on example.com: changing the date range to a different range recomputes the metric tiles, trend chart, and all three breakdown panels together for the new range, clears the segment filter and its pill, and leaves no rows from the previous selection in any panel",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that scripted with the Source: Google filter active on example.com: changing the date range to a different range recomputes the metric tiles, trend chart, and all three breakdown panels together for the new range, clears the segment filter and its pill, and leaves no rows from the previous selection in any panel. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.38",
+        "name": "sites_api_field_contract_rejects_protocol_domain",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Entering a domain that includes a protocol such as https://, a path, a port, uppercase letters, or whitespace shows an inline validation message naming the domain field, keeps submit disabled or rejects submit, and does not add a site to the selector",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that entering a domain that includes a protocol such as https://, a path, a port, uppercase letters, or whitespace shows an inline validation message naming the domain field, keeps submit disabled or rejects submit, and does not add a site to the selector. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.39",
+        "name": "timezone_enum_required_on_add_site",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Add site form requires timezone to be one of UTC, America/New_York, Europe/London, or Asia/Tokyo; leaving it unset shows an inline message naming the timezone field and adds no site",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the Add site form requires timezone to be one of UTC, America/New_York, Europe/London, or Asia/Tokyo; leaving it unset shows an inline message naming the timezone field and adds no site. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.40",
+        "name": "compare_previous_shows_percent_chips",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Turning Compare previous on shows a signed percent-change chip on each of the four metric tiles; turning it off removes every chip",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that turning Compare previous on shows a signed percent-change chip on each of the four metric tiles; turning it off removes every chip. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.41",
+        "name": "compare_chips_change_with_period",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "With Compare previous on, switching from one date range to another changes at least one percent-change chip value",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that with Compare previous on, switching from one date range to another changes at least one percent-change chip value. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.42",
+        "name": "bounce_ceiling_toggles_high_bounce_label",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "On example.com Last 30 days (bounce rate 44%), setting the bounce-rate ceiling to 40 shows a High bounce text label on the bounce-rate tile; setting the ceiling back to 60 removes that label",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that on example.com Last 30 days (bounce rate 44%), setting the bounce-rate ceiling to 40 shows a High bounce text label on the bounce-rate tile; setting the ceiling back to 60 removes that label. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.43",
+        "name": "bounce_ceiling_out_of_bounds_rejected",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Entering a bounce-rate ceiling below 0 or above 100 shows an inline validation message naming the bounce-rate ceiling field and does not change the High bounce label state",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that entering a bounce-rate ceiling below 0 or above 100 shows an inline validation message naming the bounce-rate ceiling field and does not change the High bounce label state. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.44",
+        "name": "undo_redo_add_site_round_trip",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After adding a site, Undo restores the prior site-selector count and removes the new domain; Redo re-adds it; Undo and Redo show enabled/disabled states matching whether a step is available",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after adding a site, Undo restores the prior site-selector count and removes the new domain; Redo re-adds it; Undo and Redo show enabled/disabled states matching whether a step is available. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.45",
+        "name": "export_drawer_stats_json_schema",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Opening Export report shows Stats JSON and Breakdown CSV tabs; the Stats JSON preview includes schema_version exactly plausible-stats-v1 plus site, period, filters, saved_segments, compare_previous, bounce_rate_ceiling, visitor_floor, results, timeseries, breakdowns, goals, funnel, and sites keys, with results values matching the four metric tiles and each goals entry including name, goal_type, and match_key",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that opening Export report shows Stats JSON and Breakdown CSV tabs; the Stats JSON preview includes schema_version exactly plausible-stats-v1 plus site, period, filters, saved_segments, compare_previous, bounce_rate_ceiling, visitor_floor, results, timeseries, breakdowns, goals, funnel, and sites keys, with results values matching the four metric tiles and each goals entry including name, goal_type, and match_key. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.46",
+        "name": "breakdown_csv_header_and_rows",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Breakdown CSV preview starts with the header line dimension,name,visitors and includes one data line per currently shown Top Sources, Top Pages, and Countries row using dimension values source, page, and country",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the Breakdown CSV preview starts with the header line dimension,name,visitors and includes one data line per currently shown Top Sources, Top Pages, and Countries row using dimension values source, page, and country. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.47",
+        "name": "export_reflects_session_filter_mutation",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After applying the Google source filter, the Stats JSON preview's filters array and results values match the filtered metric tiles before any copy or download; clearing the filter updates the preview back to the unfiltered values",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after applying the Google source filter, the Stats JSON preview's filters array and results values match the filtered metric tiles before any copy or download; clearing the filter updates the preview back to the unfiltered values. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.48",
+        "name": "export_copy_and_download_controls",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "In the export drawer, Copy writes the visible preview text to the clipboard and shows a brief copied confirmation, and Download starts a file download of that same preview text",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that in the export drawer, Copy writes the visible preview text to the clipboard and shows a brief copied confirmation, and Download starts a file download of that same preview text. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.49",
+        "name": "import_stats_json_round_trip",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After mutating the dashboard (add a site or apply a filter), exporting Stats JSON and importing that same JSON restores the site list, selected site, filter pill, metric tiles, ceiling, compare mode, and both export previews to the pre-export mutated state",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after mutating the dashboard (add a site or apply a filter), exporting Stats JSON and importing that same JSON restores the site list, selected site, filter pill, metric tiles, ceiling, compare mode, and both export previews to the pre-export mutated state. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.52",
+        "name": "same_dimension_filter_replaces",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "With Source: Google active, clicking Direct in Top Sources replaces the Google pill with a Source: Direct pill rather than stacking two source pills",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that with Source: Google active, clicking Direct in Top Sources replaces the Google pill with a Source: Direct pill rather than stacking two source pills. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.53",
+        "name": "visitor_floor_toggles_low_traffic",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "On example.com Last 30 days (16,840 visitors), setting the unique-visitors floor to 20,000 shows a Low traffic text label on the unique-visitors tile; setting the floor back to 0 removes that label; Stats JSON visitor_floor matches the control",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that on example.com Last 30 days (16,840 visitors), setting the unique-visitors floor to 20,000 shows a Low traffic text label on the unique-visitors tile; setting the floor back to 0 removes that label; Stats JSON visitor_floor matches the control. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.54",
+        "name": "goals_panel_seeded_three",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Goals panel lists at least the three seeded goals Signup, Pricing viewed, and Docs read, each with a completions count and a conversion rate percent",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the Goals panel lists at least the three seeded goals Signup, Pricing viewed, and Docs read, each with a completions count and a conversion rate percent. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.55",
+        "name": "funnel_three_steps_with_conversion",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The conversion funnel shows at least three ordered steps, each with a count, a proportional bar, and a step-to-step conversion percentage (first step step_conversion 100)",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the conversion funnel shows at least three ordered steps, each with a count, a proportional bar, and a step-to-step conversion percentage (first step step_conversion 100). Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.56",
+        "name": "add_goal_field_contract_validation",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "In the Add goal form, an empty name, a goal_type outside event or page, or a match_key that breaks the goal_type rule shows an inline validation message naming that field, and submit stays disabled until name, goal_type, and match_key are all valid",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that in the Add goal form, an empty name, a goal_type outside event or page, or a match_key that breaks the goal_type rule shows an inline validation message naming that field, and submit stays disabled until name, goal_type, and match_key are all valid. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.57",
+        "name": "add_goal_appears_in_panel_and_export",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Submitting a valid Add goal form (name, goal_type event or page, and a rule-matching match_key) closes the form, adds exactly one new Goals panel row with that name, and includes an object with that name, goal_type, and match_key in the Stats JSON goals array",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that submitting a valid Add goal form (name, goal_type event or page, and a rule-matching match_key) closes the form, adds exactly one new Goals panel row with that name, and includes an object with that name, goal_type, and match_key in the Stats JSON goals array. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.58",
+        "name": "save_segment_round_trip_filters_contract",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After stacking Source: Google and Page: /pricing, saving a named segment, clearing filters, then applying the saved segment restores both pills and Stats JSON filters as dimension/value objects; saved_segments contains the named entry with those two filters",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after stacking Source: Google and Page: /pricing, saving a named segment, clearing filters, then applying the saved segment restores both pills and Stats JSON filters as dimension/value objects; saved_segments contains the named entry with those two filters. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.59",
+        "name": "custom_range_changes_metrics_and_period",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Choosing Custom, entering a valid from/to span narrower than Last 30 days, and applying changes metric tiles away from the Last 30 days values and sets the Stats JSON period to that custom span",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that choosing Custom, entering a valid from/to span narrower than Last 30 days, and applying changes metric tiles away from the Last 30 days values and sets the Stats JSON period to that custom span. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.60",
+        "name": "per_panel_csv_headers",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Per-panel export from Top Pages starts with dimension,name,visitors; Goals per-panel CSV starts with goal,completions,conversion_rate; funnel per-panel CSV starts with step,count,step_conversion",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that per-panel export from Top Pages starts with dimension,name,visitors; Goals per-panel CSV starts with goal,completions,conversion_rate; funnel per-panel CSV starts with step,count,step_conversion. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.61",
+        "name": "goals_recompute_with_filter",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Applying the Google source filter changes at least one goal's completions or conversion rate and at least one funnel step count away from the unfiltered values",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that applying the Google source filter changes at least one goal's completions or conversion rate and at least one funnel step count away from the unfiltered values. Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "edge_cases": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_new_site_state",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "A newly added site with no seeded traffic shows zero-value metric tiles and empty breakdown panels with an explanatory message, not leftover prior-site numbers",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that a newly added site with no seeded traffic shows zero-value metric tiles and empty breakdown panels with an explanatory message, not leftover prior-site numbers. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.2",
+        "name": "add_site_inline_validation_all_fields",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Inline validation appears on Add site for empty name, malformed domain, and missing timezone before submit",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that inline validation appears on Add site for empty name, malformed domain, and missing timezone before submit. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.3",
+        "name": "validation_messages_name_fields",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Validation and import errors name the specific field (domain, timezone, bounce-rate ceiling, or import) rather than only saying Invalid",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that validation and import errors name the specific field (domain, timezone, bounce-rate ceiling, or import) rather than only saying Invalid. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.4",
+        "name": "export_copy_confirmation",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After Copy in the export drawer, a brief copied confirmation is visible",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after Copy in the export drawer, a brief copied confirmation is visible. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.5",
+        "name": "same_dimension_replaces_cross_stacks",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Clicking a second row within the same dimension replaces that dimension's pill in place; clicking a row from a different dimension adds a new pill so up to three pills (source, page, country) can be present at once",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that clicking a second row within the same dimension replaces that dimension's pill in place; clicking a row from a different dimension adds a new pill so up to three pills (source, page, country) can be present at once. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.6",
+        "name": "undo_available_after_mutation",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After add site, apply/clear filter, ceiling change, or compare toggle, Undo is enabled and reverses that action",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after add site, apply/clear filter, ceiling change, or compare toggle, Undo is enabled and reverses that action. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.7",
+        "name": "ceiling_bounds_help",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The bounce-rate ceiling control communicates the 0 through 100 bound via validation when out of range",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the bounce-rate ceiling control communicates the 0 through 100 bound via validation when out of range. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.8",
+        "name": "semantic_controls",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Breakdown rows, Export report, Undo, Redo, and Compare previous use semantic button or equivalent operable controls with accessible names",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that breakdown rows, Export report, Undo, Redo, and Compare previous use semantic button or equivalent operable controls with accessible names. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.9",
+        "name": "dialogs_close_on_escape",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Add site, Add goal, and the export drawer close on Escape and via an explicit close control",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that add site, Add goal, and the export drawer close on Escape and via an explicit close control. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.10",
+        "name": "empty_breakdown_csv_header_only",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "When panels are empty for a new site, Breakdown CSV still compiles with the header line dimension,name,visitors and no stale prior-site data lines",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that when panels are empty for a new site, Breakdown CSV still compiles with the header line dimension,name,visitors and no stale prior-site data lines. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.11",
+        "name": "empty_segment_save_names_filters_field",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Saving a segment with no active filters shows an inline message naming the filters field and does not create a saved-segment entry",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that saving a segment with no active filters shows an inline message naming the filters field and does not create a saved-segment entry. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.12",
+        "name": "add_goal_invalid_match_key_rejected",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "An event goal whose match_key includes whitespace, or a page goal whose match_key does not start with a slash, shows an inline message naming the match_key field and does not add a Goals panel row",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that an event goal whose match_key includes whitespace, or a page goal whose match_key does not start with a slash, shows an inline message naming the match_key field and does not add a Goals panel row. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.13",
+        "name": "zero_intersection_empty_goals_message",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Stacking filters whose intersection has no visitors shows zero-value metric tiles and empty breakdown, Goals, and funnel panels with a message, not leftover numbers from a broader stack",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that stacking filters whose intersection has no visitors shows zero-value metric tiles and empty breakdown, Goals, and funnel panels with a message, not leftover numbers from a broader stack. Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "design_fidelity": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "overview_matches_dashboard_shell",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Relative to overview.png, the built app shows the same overall dashboard shell: top bar, metric tiles, trend chart, and breakdown panels in that vertical order",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that relative to overview.png, the built app shows the same overall dashboard shell: top bar, metric tiles, trend chart, and breakdown panels in that vertical order. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.2",
+        "name": "metric_tile_arrangement",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Relative to the reference screenshots, four summary metric tiles appear in a horizontal row above the trend chart at desktop width",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that relative to the reference screenshots, four summary metric tiles appear in a horizontal row above the trend chart at desktop width. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.3",
+        "name": "breakdown_panels_present",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Relative to the reference, Top Sources, Top Pages, and Countries panels are present under the chart",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that relative to the reference, Top Sources, Top Pages, and Countries panels are present under the chart. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.4",
+        "name": "indigo_accent_alignment",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Relative to the reference, indigo accent treatment appears on interactive emphasis (logo, active filter, bars) over a neutral slate palette",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that relative to the reference, indigo accent treatment appears on interactive emphasis (logo, active filter, bars) over a neutral slate palette. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.5",
+        "name": "text_wins_over_screenshots",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Where a screenshot and the instruction text conflict, the running app follows the instruction text (including Export report, Compare previous, and bounce-rate ceiling controls even if absent from screenshots)",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that where a screenshot and the instruction text conflict, the running app follows the instruction text (including Export report, Compare previous, and bounce-rate ceiling controls even if absent from screenshots). Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.6",
+        "name": "card_surfaces_similar",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Metric, chart, and panel cards use light bordered rounded surfaces similar to the reference composition",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that metric, chart, and panel cards use light bordered rounded surfaces similar to the reference composition. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.7",
+        "name": "top_bar_brand_cluster",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The top bar brand cluster includes a logo mark and Plausible Analytics title similar to the reference hierarchy",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the top bar brand cluster includes a logo mark and Plausible Analytics title similar to the reference hierarchy. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.8",
+        "name": "segment_filter_pill_visible",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "When a segment is applied, a filter pill is visible in a placement consistent with the reference filter treatment",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that when a segment is applied, a filter pill is visible in a placement consistent with the reference filter treatment. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.9",
+        "name": "chart_dominates_width",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The visitors trend chart spans the content width and stands taller than the breakdown panels, matching the reference emphasis",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the visitors trend chart spans the content width and stands taller than the breakdown panels, matching the reference emphasis. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.10",
+        "name": "no_login_gate_vs_reference",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The first screen is the dashboard itself, not a login or marketing gate absent from the reference",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the first screen is the dashboard itself, not a login or marketing gate absent from the reference. Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "innovation": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "export_summary_strip",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "A structured export summary strip names site domain, period, and visitors total above the preview",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that a structured export summary strip names site domain, period, and visitors total above the preview. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "11.2",
+        "name": "undo_redo_keyboard_shortcuts",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Keyboard shortcuts for Undo/Redo work in addition to the visible controls",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that keyboard shortcuts for Undo/Redo work in addition to the visible controls. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "11.3",
+        "name": "export_active_filter_chip",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "A compact chip in the export drawer header shows the active filter stack when filters are applied",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that a compact chip in the export drawer header shows the active filter stack when filters are applied. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "11.4",
+        "name": "compare_chip_polished_sign",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Compare percent-change chips use clear signed formatting (for example +12% / -5%) that is easy to scan",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that compare percent-change chips use clear signed formatting (for example +12% / -5%) that is easy to scan. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "11.5",
+        "name": "ceiling_live_hint",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "The bounce-rate ceiling control shows a concise live hint of the current bounce rate beside the input",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the bounce-rate ceiling control shows a concise live hint of the current bounce rate beside the input. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "11.6",
+        "name": "report_filename_includes_site",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Downloaded Stats JSON or Breakdown CSV filenames include the current site domain",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that downloaded Stats JSON or Breakdown CSV filenames include the current site domain. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "11.7",
+        "name": "timezone_shown_in_subtitle",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "The top-bar subtitle or site cluster shows the selected site timezone alongside the domain",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the top-bar subtitle or site cluster shows the selected site timezone alongside the domain. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "11.8",
+        "name": "empty_export_guidance",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "When Breakdown CSV has only a header, the preview area explains that empty panels export header-only rows",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that when Breakdown CSV has only a header, the preview area explains that empty panels export header-only rows. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "11.9",
+        "name": "polished_focus_rings",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Focus rings on breakdown rows and export actions are clearly visible and consistent with the indigo accent",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that focus rings on breakdown rows and export actions are clearly visible and consistent with the indigo accent. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "11.10",
+        "name": "trusted_artifact_affordance",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Any additional browser-observable polish that helps an operator trust the report artifact without replacing a required behavior",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that any additional browser-observable polish that helps an operator trust the report artifact without replacing a required behavior. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app exhibits a significant, browser-observable innovation or polish beyond the specification that is NOT covered by any other criterion in this file. If present, name it and cite the concrete evidence. If nothing beyond the other criteria qualifies, answer no.",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the app exhibits a significant, browser-observable innovation or polish beyond the specification that is NOT covered by any other criterion in this file. If present, name it and cite the concrete evidence. If nothing beyond the other criteria qualifies, answer no.. Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "sentence_case_ui",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "All UI text is sentence case; headings, labels, and counts use numerals; short labels carry no terminal period",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that all UI text is sentence case; headings, labels, and counts use numerals; short labels carry no terminal period. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "15.2",
+        "name": "specific_action_labels",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Action labels are specific \u2014 Clear filter, Add site, Add goal, Export report, Compare previous, Save segment \u2014 rather than generic Submit/Click here",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that action labels are specific \u2014 Clear filter, Add site, Add goal, Export report, Compare previous, Save segment \u2014 rather than generic Submit/Click here. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "15.3",
+        "name": "export_tab_labels_exact",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Export drawer tab labels read exactly Stats JSON and Breakdown CSV",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that export drawer tab labels read exactly Stats JSON and Breakdown CSV. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "15.4",
+        "name": "high_bounce_and_low_traffic_phrasing",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "The High bounce and Low traffic flags use those exact phrasings",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the High bounce and Low traffic flags use those exact phrasings. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "15.5",
+        "name": "validation_names_field",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Validation messages name the field and the fix (domain, timezone, bounce-rate ceiling, visitor floor, match_key, filters, or import)",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that validation messages name the field and the fix (domain, timezone, bounce-rate ceiling, visitor floor, match_key, filters, or import). Evidence: walkthrough.webm"
+      },
+      {
+        "id": "15.6",
+        "name": "empty_states_explain",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Empty breakdown states explain what belongs there rather than showing bare nothing or lorem text",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that empty breakdown states explain what belongs there rather than showing bare nothing or lorem text. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "15.7",
+        "name": "no_placeholder_lorem",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "No placeholder or lorem text appears anywhere in the shipped UI",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that no placeholder or lorem text appears anywhere in the shipped UI. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "15.8",
+        "name": "brand_title_present",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "The title Plausible Analytics appears in the top bar brand cluster",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the title Plausible Analytics appears in the top bar brand cluster. Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "user_flows": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "segment_filter_updates_export_previews",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Clicking the Google Top Sources row shows Source: Google, changes all four metric tiles, redraws the trend, recomputes the other panels, and updates the Stats JSON export preview filters and results to match \u2014 all without a reload",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that clicking the Google Top Sources row shows Source: Google, changes all four metric tiles, redraws the trend, recomputes the other panels, and updates the Stats JSON export preview filters and results to match \u2014 all without a reload. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.2",
+        "name": "clear_filter_restores_export_and_tiles",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Activating Clear filter after a Google filter restores metric tiles to 16,840 / 47,220 / 44% / 98s, clears the pill, and returns Stats JSON preview filters to an empty array with unfiltered results",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that activating Clear filter after a Google filter restores metric tiles to 16,840 / 47,220 / 44% / 98s, clears the pill, and returns Stats JSON preview filters to an empty array with unfiltered results. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.3",
+        "name": "add_site_field_contract_validation",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Opening Add site with empty name, malformed domain, or missing timezone shows inline validation naming the failing field and adds no site",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that opening Add site with empty name, malformed domain, or missing timezone shows inline validation naming the failing field and adds no site. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.4",
+        "name": "add_site_appears_in_selector_and_export",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Submitting a valid Add site form (name, domain, timezone) increases the site selector by exactly one and includes that domain, name, and timezone in the Stats JSON sites array",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that submitting a valid Add site form (name, domain, timezone) increases the site selector by exactly one and includes that domain, name, and timezone in the Stats JSON sites array. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.5",
+        "name": "site_or_range_change_clears_filter_and_exports",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Changing the site or date range recomputes tiles, trend, and panels together, clears any active filter pill, and refreshes both export previews for the new selection",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that changing the site or date range recomputes tiles, trend, and panels together, clears any active filter pill, and refreshes both export previews for the new selection. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.6",
+        "name": "bounce_ceiling_flow_and_export_field",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Setting the bounce-rate ceiling to 40 on the default 44% bounce view shows High bounce; setting it to 60 removes the label; Stats JSON bounce_rate_ceiling matches the control",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that setting the bounce-rate ceiling to 40 on the default 44% bounce view shows High bounce; setting it to 60 removes the label; Stats JSON bounce_rate_ceiling matches the control. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.7",
+        "name": "compare_previous_flow",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Turning Compare previous on shows percent-change chips on all four tiles; changing the date range while compare stays on changes at least one chip; turning compare off removes every chip",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that turning Compare previous on shows percent-change chips on all four tiles; changing the date range while compare stays on changes at least one chip; turning compare off removes every chip. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.8",
+        "name": "undo_redo_after_add_site",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After adding a site, Undo restores the prior selector count; Redo re-adds the site; after a new filter following an undo, Redo is disabled",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after adding a site, Undo restores the prior selector count; Redo re-adds the site; after a new filter following an undo, Redo is disabled. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.9",
+        "name": "export_import_round_trip_flow",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After adding a site or applying a filter, Copy or Download Stats JSON then Import that same JSON \u2014 site list, filter, tiles, ceiling, compare mode, and both export previews match the pre-export mutated state",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after adding a site or applying a filter, Copy or Download Stats JSON then Import that same JSON \u2014 site list, filter, tiles, ceiling, compare mode, and both export previews match the pre-export mutated state. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.10",
+        "name": "deep_link_parity_dashboard",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Loading the root URL directly renders the same complete dashboard (tiles, chart, panels, top-bar controls) as reaching it through in-app interaction, with no missing panels",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that loading the root URL directly renders the same complete dashboard (tiles, chart, panels, top-bar controls) as reaching it through in-app interaction, with no missing panels. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.11",
+        "name": "stacked_filter_saved_segment_flow",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "From the default view, click Google then /pricing so two pills stack; save a named segment; clear filters; apply the saved segment \u2014 both pills, recomputed numbers, and Stats JSON filters with dimension/value keys return, and saved_segments contains the named segment",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that from the default view, click Google then /pricing so two pills stack; save a named segment; clear filters; apply the saved segment \u2014 both pills, recomputed numbers, and Stats JSON filters with dimension/value keys return, and saved_segments contains the named segment. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.12",
+        "name": "add_goal_field_contract_flow",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Open Add goal with an empty name or whitespace match_key for event \u2014 inline validation names the failing field and submit stays disabled; submit a valid name, goal_type event, and match_key \u2014 Goals panel gains exactly one new row and Stats JSON goals includes name, goal_type, and match_key",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that open Add goal with an empty name or whitespace match_key for event \u2014 inline validation names the failing field and submit stays disabled; submit a valid name, goal_type event, and match_key \u2014 Goals panel gains exactly one new row and Stats JSON goals includes name, goal_type, and match_key. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.13",
+        "name": "threshold_floor_and_ceiling_flow",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "On example.com Last 30 days, set bounce-rate ceiling to 40 and unique-visitors floor to 20,000 \u2014 High bounce and Low traffic labels appear and Stats JSON bounce_rate_ceiling and visitor_floor match; restoring 60 and 0 removes both labels",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that on example.com Last 30 days, set bounce-rate ceiling to 40 and unique-visitors floor to 20,000 \u2014 High bounce and Low traffic labels appear and Stats JSON bounce_rate_ceiling and visitor_floor match; restoring 60 and 0 removes both labels. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.14",
+        "name": "custom_range_flow",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Choose Custom, enter a valid narrower from/to than Last 30 days, and apply \u2014 metric tiles differ from Last 30 days, the top-bar period shows the custom span, and Stats JSON period matches",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that choose Custom, enter a valid narrower from/to than Last 30 days, and apply \u2014 metric tiles differ from Last 30 days, the top-bar period shows the custom span, and Stats JSON period matches. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "6.15",
+        "name": "per_panel_csv_after_filter_flow",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Apply the Google source filter, then export Top Pages per-panel CSV \u2014 the CSV starts with dimension,name,visitors and lists the filtered Top Pages rows then visible, not the unfiltered defaults",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that apply the Google source filter, then export Top Pages per-panel CSV \u2014 the CSV starts with dimension,name,visitors and lists the filtered Top Pages rows then visible, not the unfiltered defaults. Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "accessibility": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "breakdown_rows_keyboard_filter",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Breakdown rows are keyboard operable: focus shows a visible indicator, and Enter or Space applies the row filter",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that breakdown rows are keyboard operable: focus shows a visible indicator, and Enter or Space applies the row filter. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.2",
+        "name": "selectors_keyboard_operable",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Site, date-range, and sort selectors open with the keyboard, move with arrows, commit with Enter, and close with Escape",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that site, date-range, and sort selectors open with the keyboard, move with arrows, commit with Enter, and close with Escape. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.3",
+        "name": "top_bar_controls_focus_rings",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Undo, Redo, Compare previous, bounce-rate ceiling, Export report, and the theme toggle show a visible focus ring on keyboard focus",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that undo, Redo, Compare previous, bounce-rate ceiling, Export report, and the theme toggle show a visible focus ring on keyboard focus. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.4",
+        "name": "core_flow_keyboard_and_pointer",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The core flow (choose site, choose range, apply a row filter, clear it, open export, copy) is completable with the keyboard alone and with the pointer alone",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the core flow (choose site, choose range, apply a row filter, clear it, open export, copy) is completable with the keyboard alone and with the pointer alone. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.5",
+        "name": "dialogs_trap_focus",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Add site, Add goal, and the export drawer trap focus while open, close on Escape, and return focus to the opener",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that add site, Add goal, and the export drawer trap focus while open, close on Escape, and return focus to the opener. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.6",
+        "name": "validation_assistive",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Inline validation for Add site, Add goal, bounce-rate ceiling, and import is exposed to assistive technology as well as shown visually",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that inline validation for Add site, Add goal, bounce-rate ceiling, and import is exposed to assistive technology as well as shown visually. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.7",
+        "name": "high_bounce_and_chips_not_color_only",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "High bounce, Low traffic, and compare percent-change chips convey state with text in addition to color",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that high bounce, Low traffic, and compare percent-change chips convey state with text in addition to color. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.8",
+        "name": "export_live_region",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Export copy and import completion are announced through an aria-live region as well as shown visually",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that export copy and import completion are announced through an aria-live region as well as shown visually. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.9",
+        "name": "form_labels_present",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Add site fields (site name, domain, timezone), Add goal fields (name, goal_type, match_key), and the bounce-rate ceiling control have visible labels associated with their inputs",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that add site fields (site name, domain, timezone), Add goal fields (name, goal_type, match_key), and the bounce-rate ceiling control have visible labels associated with their inputs. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.10",
+        "name": "landmark_or_main",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The dashboard main content is in a main landmark or equivalent so the analytics region is identifiable",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the dashboard main content is in a main landmark or equivalent so the analytics region is identifiable. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "1.11",
+        "name": "segments_range_and_panel_exports_keyboard",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Segments menu, the Save segment control, the custom date-range inputs, and each panel's per-panel export control are reachable and operable with the keyboard alone, and each filter pill's remove affordance is a focusable control with an accessible name",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the Segments menu, the Save segment control, the custom date-range inputs, and each panel's per-panel export control are reachable and operable with the keyboard alone, and each filter pill's remove affordance is a focusable control with an accessible name. Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "interactive_within_two_seconds",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The dashboard is interactive within 2 seconds of a local cold load",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the dashboard is interactive within 2 seconds of a local cold load. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "9.2",
+        "name": "console_clean_on_load",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "No console errors, warnings, or hydration mismatch messages appear on load",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that no console errors, warnings, or hydration mismatch messages appear on load. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "9.3",
+        "name": "console_clean_during_exercise",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "No console errors or warnings appear during a full exercise including export drawer open and format tab switches",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that no console errors or warnings appear during a full exercise including export drawer open and format tab switches. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "9.4",
+        "name": "rapid_filter_responsive",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Rapid repeated filter, sort, site, theme, compare, and ceiling changes stay responsive with no hangs",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that rapid repeated filter, sort, site, theme, compare, and ceiling changes stay responsive with no hangs. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "9.5",
+        "name": "no_post_hydration_flash",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After first paint there is no post-hydration content flash: the shell does not visibly re-render or shift as the app becomes interactive",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after first paint there is no post-hydration content flash: the shell does not visibly re-render or shift as the app becomes interactive. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "9.6",
+        "name": "export_preview_regenerates_smoothly",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Opening the export drawer and switching between Stats JSON and Breakdown CSV regenerates the preview without freezing the UI",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that opening the export drawer and switching between Stats JSON and Breakdown CSV regenerates the preview without freezing the UI. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "9.7",
+        "name": "direct_url_full_shell",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Loading the served URL directly always renders the full dashboard shell promptly",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that loading the served URL directly always renders the full dashboard shell promptly. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "9.8",
+        "name": "import_does_not_freeze",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Importing a Stats JSON report completes without freezing the UI for multiple seconds",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that importing a Stats JSON report completes without freezing the UI for multiple seconds. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "9.9",
+        "name": "theme_switch_responsive",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Theme toggle recolors surfaces without multi-second jank",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that theme toggle recolors surfaces without multi-second jank. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "9.10",
+        "name": "add_site_submit_responsive",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Add site submit updates the selector without a multi-second hang",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that add site submit updates the selector without a multi-second hang. Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "visual_design": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "dashboard_layout_composition",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At desktop width the layout is a single analytics dashboard on a light neutral page background \u2014 top bar, then a row of four metric tiles, then a dominant trend chart card, then a three-column row of breakdown panels \u2014 rather than a login-centered or marketing layout",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that at desktop width the layout is a single analytics dashboard on a light neutral page background \u2014 top bar, then a row of four metric tiles, then a dominant trend chart card, then a three-column row of breakdown panels \u2014 rather than a login-centered or marketing layout. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.2",
+        "name": "metrics_and_trend_primary_focus",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The summary metrics and the visitors trend are the primary visual focus: large bold numbers over small muted labels and a chart card that spans the full content width and stands taller than the panels below",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the summary metrics and the visitors trend are the primary visual focus: large bold numbers over small muted labels and a chart card that spans the full content width and stands taller than the panels below. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.3",
+        "name": "filter_pill_accent_treatment",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The active filter state is distinguished by a visible pill reading Dimension: value, with the accent hue used for the pill, active row, and focus ring over an otherwise neutral palette",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the active filter state is distinguished by a visible pill reading Dimension: value, with the accent hue used for the pill, active row, and focus ring over an otherwise neutral palette. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.4",
+        "name": "aa_contrast_both_themes",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Body text meets AA contrast (at least 4.5:1) against its surface in both the light and the dark theme, and every legible pairing stays legible after the theme switch",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that body text meets AA contrast (at least 4.5:1) against its surface in both the light and the dark theme, and every legible pairing stays legible after the theme switch. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.5",
+        "name": "descriptive_title_and_lang",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "The document title is descriptive (names the app and current site) and the root html element carries a valid lang attribute, not a scaffold placeholder",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the document title is descriptive (names the app and current site) and the root html element carries a valid lang attribute, not a scaffold placeholder. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.6",
+        "name": "sentence_case_numeral_labels",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "UI labels, headings, buttons, and counts use sentence case and numerals, action labels are specific (Clear filter, Add site, Export report, Compare previous) rather than generic, short labels carry no terminal period, and empty states explain what belongs there rather than showing bare nothing-text",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that uI labels, headings, buttons, and counts use sentence case and numerals, action labels are specific (Clear filter, Add site, Export report, Compare previous) rather than generic, short labels carry no terminal period, and empty states explain what belongs there rather than showing bare nothing-text. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.7",
+        "name": "mobile_single_column_stack",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At 375px width the metric tiles, chart, and breakdown panels reflow into a single stacked column preserving the metrics-then-chart-then-panels hierarchy, the site, date-range, and clear-filter controls stay reachable, and no content clips, overflows the viewport, or produces a horizontal scrollbar",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that at 375px width the metric tiles, chart, and breakdown panels reflow into a single stacked column preserving the metrics-then-chart-then-panels hierarchy, the site, date-range, and clear-filter controls stay reachable, and no content clips, overflows the viewport, or produces a horizontal scrollbar. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.10",
+        "name": "card_surface_treatment",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The metric tiles, chart card, and breakdown panels share one card treatment: white surfaces (dark equivalents in dark theme) with a subtle 1px border, corner radius near 12px, and a soft shadow",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the metric tiles, chart card, and breakdown panels share one card treatment: white surfaces (dark equivalents in dark theme) with a subtle 1px border, corner radius near 12px, and a soft shadow. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.11",
+        "name": "indigo_gradient_bars_single_accent",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The visitor bars use an indigo vertical gradient (lighter at the top, deeper indigo at the bottom), and indigo is the single accent hue \u2014 used for the logo mark, filter pill, active rows, and focus rings \u2014 over an otherwise neutral slate palette",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the visitor bars use an indigo vertical gradient (lighter at the top, deeper indigo at the bottom), and indigo is the single accent hue \u2014 used for the logo mark, filter pill, active rows, and focus rings \u2014 over an otherwise neutral slate palette. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.12",
+        "name": "sticky_topbar_brand_cluster",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The top bar is sticky with a hairline bottom border and shows a brand cluster (gradient logo mark, the title Plausible Analytics, and a subtitle naming the current site) on the left and the site selector, date-range selector, sort selector, and theme toggle on the right",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the top bar is sticky with a hairline bottom border and shows a brand cluster (gradient logo mark, the title Plausible Analytics, and a subtitle naming the current site) on the left and the site selector, date-range selector, sort selector, and theme toggle on the right. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.13",
+        "name": "breakdown_rows_two_column_counts",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Breakdown rows read as a two-column list: a left-aligned name and a right-aligned count in a muted color rendered with tabular figures so digits align vertically across rows",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that breakdown rows read as a two-column list: a left-aligned name and a right-aligned count in a muted color rendered with tabular figures so digits align vertically across rows. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.14",
+        "name": "consistent_icon_set",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Icons in the top bar, selectors, filter pill, and empty states share one consistent visual style with a uniform stroke weight, with no mixed icon styles across the UI",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that icons in the top bar, selectors, filter pill, and empty states share one consistent visual style with a uniform stroke weight, with no mixed icon styles across the UI. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.16",
+        "name": "export_drawer_format_tabs",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The export drawer shows format tabs labeled Stats JSON and Breakdown CSV, a monospaced preview block, and Copy / Download / Import actions",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the export drawer shows format tabs labeled Stats JSON and Breakdown CSV, a monospaced preview block, and Copy / Download / Import actions. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.17",
+        "name": "high_bounce_not_color_only",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The High bounce alert uses the exact text label High bounce in addition to any accent color so the alert is not color-only",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the High bounce alert uses the exact text label High bounce in addition to any accent color so the alert is not color-only. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "3.18",
+        "name": "compare_chips_beside_metrics",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "When Compare previous is on, percent-change chips sit beside the metric values without replacing or crowding out the primary metric numbers",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that when Compare previous is on, percent-change chips sit beside the metric values without replacing or crowding out the primary metric numbers. Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "technical": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "filter_ceiling_compare_restored",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After applying a filter, setting a non-default bounce-rate ceiling, and enabling compare previous, a reload restores the pill, ceiling, compare chips, and recomputed tiles from client storage",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after applying a filter, setting a non-default bounce-rate ceiling, and enabling compare previous, a reload restores the pill, ceiling, compare chips, and recomputed tiles from client storage. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.2",
+        "name": "local_resources_load_clean",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Loading the dashboard and clicking a breakdown row loads all required local resources with no 4xx or 5xx responses (ignoring an automatic favicon probe)",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that loading the dashboard and clicking a breakdown row loads all required local resources with no 4xx or 5xx responses (ignoring an automatic favicon probe). Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.3",
+        "name": "console_clean_full_exercise",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "A full exercise (filter, clear, sort, site, theme, compare, ceiling, Add site, open export, copy, import) completes with no console errors, warnings, or unhandled rejections",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that a full exercise (filter, clear, sort, site, theme, compare, ceiling, Add site, open export, copy, import) completes with no console errors, warnings, or unhandled rejections. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.4",
+        "name": "reload_renders_clean",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "A full reload of the dashboard re-renders cleanly without a blank page, error overlay, or hydration failure flash",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that a full reload of the dashboard re-renders cleanly without a blank page, error overlay, or hydration failure flash. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.5",
+        "name": "shared_state_coherence",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Metric tiles, trend, panels, compare chips, High bounce label, and both export previews derive from one shared state so a filter or period change updates them consistently",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that metric tiles, trend, panels, compare chips, High bounce label, and both export previews derive from one shared state so a filter or period change updates them consistently. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.10",
+        "name": "selectors_keyboard_operable",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The site, date-range, and sort selectors open with the keyboard, move through options with arrow keys, commit with Enter, and close with Escape, with a visible focus ring",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the site, date-range, and sort selectors open with the keyboard, move through options with arrow keys, commit with Enter, and close with Escape, with a visible focus ring. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.11",
+        "name": "dialog_and_drawer_focus_trap",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Add site form and the export drawer trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the Add site form and the export drawer trap focus while open, close on Escape, and return focus to the control that opened them. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.12",
+        "name": "validation_exposed_assistive",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Inline validation messages in Add site, bounce-rate ceiling, and import are exposed in the accessibility tree, not shown visually only",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that inline validation messages in Add site, bounce-rate ceiling, and import are exposed in the accessibility tree, not shown visually only. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.13",
+        "name": "interactive_within_two_seconds",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The dashboard is interactive within 2 seconds of a local cold load",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the dashboard is interactive within 2 seconds of a local cold load. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.14",
+        "name": "rapid_interaction_no_hangs",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Rapid repeated filter, sort, site, theme, compare, and ceiling changes stay responsive with no hangs, dropped interactions, or stale panels",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that rapid repeated filter, sort, site, theme, compare, and ceiling changes stay responsive with no hangs, dropped interactions, or stale panels. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.15",
+        "name": "hydration_clean_console",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The console shows no hydration mismatch errors or warnings on first load, and none appear during a full exercise of the app",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the console shows no hydration mismatch errors or warnings on first load, and none appear during a full exercise of the app. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.16",
+        "name": "deep_link_parity_no_placeholder_flash",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Loading the root URL directly renders the same complete dashboard as in-app navigation, with no missing panels and no flash of placeholder content after first paint",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that loading the root URL directly renders the same complete dashboard as in-app navigation, with no missing panels and no flash of placeholder content after first paint. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.18",
+        "name": "persistence_mandated_fields",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After configuring site, range, sort, theme, filter stack, saved segments, added sites, added goals, bounce-rate ceiling, visitor floor, and compare previous, a reload restores those fields from localStorage or equivalent client storage as mandated for this framework-rebuild task",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after configuring site, range, sort, theme, filter stack, saved segments, added sites, added goals, bounce-rate ceiling, visitor floor, and compare previous, a reload restores those fields from localStorage or equivalent client storage as mandated for this framework-rebuild task. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.19",
+        "name": "stats_json_schema_keys_present",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Stats JSON export preview includes the required keys schema_version, site, period, filters, saved_segments, compare_previous, bounce_rate_ceiling, visitor_floor, results, timeseries, breakdowns, goals, funnel, and sites with schema_version exactly plausible-stats-v1, and each goals entry includes name, goal_type, and match_key",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the Stats JSON export preview includes the required keys schema_version, site, period, filters, saved_segments, compare_previous, bounce_rate_ceiling, visitor_floor, results, timeseries, breakdowns, goals, funnel, and sites with schema_version exactly plausible-stats-v1, and each goals entry includes name, goal_type, and match_key. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "2.21",
+        "name": "api_shaped_form_validation_gates",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Add site, Add goal, and Save segment forms surface inline per-field errors before submit and keep submit disabled until valid against their field contracts (site name/domain/timezone; goal name/goal_type/match_key; segment name plus non-empty filters)",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that add site, Add goal, and Save segment forms surface inline per-field errors before submit and keep submit disabled until valid against their field contracts (site name/domain/timezone; goal name/goal_type/match_key; segment name plus non-empty filters). Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "mobile_single_column_stack",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At mobile width the metric tiles, chart, and breakdown panels reflow into a single stacked column preserving metrics-then-chart-then-panels hierarchy",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that at mobile width the metric tiles, chart, and breakdown panels reflow into a single stacked column preserving metrics-then-chart-then-panels hierarchy. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "7.2",
+        "name": "top_controls_reachable_mobile",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At mobile width the site, date-range, clear-filter, undo, redo, compare, ceiling, and export controls stay reachable without horizontal scrolling",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that at mobile width the site, date-range, clear-filter, undo, redo, compare, ceiling, and export controls stay reachable without horizontal scrolling. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "7.3",
+        "name": "no_clip_at_375",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrollbar appears",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that at 375 pixel width no content clips or overflows the viewport and no page-level horizontal scrollbar appears. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "7.4",
+        "name": "export_drawer_usable_375",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The export drawer stays fully visible and operable at 375 pixel width rather than rendering off-screen",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the export drawer stays fully visible and operable at 375 pixel width rather than rendering off-screen. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "7.5",
+        "name": "ceiling_and_compare_usable_375",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The bounce-rate ceiling control and Compare previous control stay fully visible and operable at 375 pixel width",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the bounce-rate ceiling control and Compare previous control stay fully visible and operable at 375 pixel width. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "7.6",
+        "name": "desktop_three_column_panels",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At desktop width the three breakdown panels appear in a three-column row under the trend chart",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that at desktop width the three breakdown panels appear in a three-column row under the trend chart. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "7.7",
+        "name": "centered_max_width",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "On a wide viewport dashboard content stays within a centered max width near 1120px rather than stretching edge to edge",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that on a wide viewport dashboard content stays within a centered max width near 1120px rather than stretching edge to edge. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "7.8",
+        "name": "sticky_top_bar_usable",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The sticky top bar remains usable across viewport widths without overlapping metric numbers unreadably",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the sticky top bar remains usable across viewport widths without overlapping metric numbers unreadably. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "7.9",
+        "name": "panels_readable_tablet",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At tablet width breakdown panel names and counts remain readable without overlapping",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that at tablet width breakdown panel names and counts remain readable without overlapping. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "7.10",
+        "name": "theme_toggle_reachable_mobile",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The theme toggle remains reachable and operable at 375 pixel width",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the theme toggle remains reachable and operable at 375 pixel width. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "7.11",
+        "name": "goals_funnel_custom_range_usable_375",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At 375px width the Goals panel, the funnel, the Segments menu and Save segment control, the custom date-range from/to inputs, and each panel's per-panel export control remain fully visible and operable in the stacked column without page-level horizontal scrolling",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that at 375px width the Goals panel, the funnel, the Segments menu and Save segment control, the custom date-range from/to inputs, and each panel's per-panel export control remain fully visible and operable in the stacked column without page-level horizontal scrolling. Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "motion": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "filter_feedback_pill_and_tiles",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After applying a breakdown filter through a real row click, completion is apparent from the filter pill and the updated metric tiles and chart",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after applying a breakdown filter through a real row click, completion is apparent from the filter pill and the updated metric tiles and chart. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.2",
+        "name": "distinct_hover_and_focus_treatments",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Breakdown rows take an accent hover wash and a distinct, clearly visible focus ring \u2014 hover and focus are different visual treatments, not one shared highlight standing in for both",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that breakdown rows take an accent hover wash and a distinct, clearly visible focus ring \u2014 hover and focus are different visual treatments, not one shared highlight standing in for both. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.3",
+        "name": "chart_bars_eased_height_transition",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The chart bars animate their height with a short eased transition when the segment, site, or date range is changed through the real controls, rather than swapping instantly",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the chart bars animate their height with a short eased transition when the segment, site, or date range is changed through the real controls, rather than swapping instantly. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.4",
+        "name": "immediate_press_feedback",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Buttons and the theme toggle ease their background and border on hover and show slight press feedback immediately on pointer-down, before the resulting recompute finishes",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that buttons and the theme toggle ease their background and border on hover and show slight press feedback immediately on pointer-down, before the resulting recompute finishes. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.5",
+        "name": "keyboard_and_pointer_flow_parity",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The core flow (choose site, choose date range, apply a row filter, clear it) is completable with the keyboard alone and, equivalently, with the pointer alone, reaching the same outcome",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the core flow (choose site, choose date range, apply a row filter, clear it) is completable with the keyboard alone and, equivalently, with the pointer alone, reaching the same outcome. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.8",
+        "name": "sort_reorder_animates",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Changing the sort through its real selector animates the breakdown rows to their new positions with a visible transition rather than snapping them instantly",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that changing the sort through its real selector animates the breakdown rows to their new positions with a visible transition rather than snapping them instantly. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.9",
+        "name": "filter_pill_enter_exit_animation",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The filter pill animates in when a filter is applied via a real row click and animates out when cleared via the pill or the Clear filter control, rather than appearing and disappearing instantly, and the active row reflects the current filter state",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the filter pill animates in when a filter is applied via a real row click and animates out when cleared via the pill or the Clear filter control, rather than appearing and disappearing instantly, and the active row reflects the current filter state. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.10",
+        "name": "add_site_dialog_eased_transition",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "The Add site form enters and exits with a short eased transition of roughly 200 to 300 milliseconds when opened and closed through its real controls, rather than appearing instantly",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the Add site form enters and exits with a short eased transition of roughly 200 to 300 milliseconds when opened and closed through its real controls, rather than appearing instantly. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.15",
+        "name": "add_goal_dialog_eased_transition",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "The Add goal form enters and exits with a short eased transition of roughly 200 to 300 milliseconds when opened and closed through its real controls, rather than appearing instantly",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the Add goal form enters and exits with a short eased transition of roughly 200 to 300 milliseconds when opened and closed through its real controls, rather than appearing instantly. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.11",
+        "name": "reduced_motion_respected",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set on a fresh load, transitions are removed or reduced to fades, and every state change (filter, sort, site, theme, dialog, export drawer, compare) still applies instantly and completely",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that with prefers-reduced-motion set on a fresh load, transitions are removed or reduced to fades, and every state change (filter, sort, site, theme, dialog, export drawer, compare) still applies instantly and completely. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.12",
+        "name": "export_drawer_eased_transition",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "The export drawer enters and exits with a short eased transition of roughly 200 to 300 milliseconds when opened and closed through Export report, rather than appearing instantly",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that the export drawer enters and exits with a short eased transition of roughly 200 to 300 milliseconds when opened and closed through Export report, rather than appearing instantly. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.13",
+        "name": "export_copy_toast_motion",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Feedback toasts after export copy and successful import slide in, remain readable, and auto-dismiss with a fade when those actions are triggered through the real controls",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that feedback toasts after export copy and successful import slide in, remain readable, and auto-dismiss with a fade when those actions are triggered through the real controls. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.14",
+        "name": "compare_chips_ease_in_out",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Compare percent-change chips ease in when compare turns on through the real control and ease out when it turns off, rather than popping instantly",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that compare percent-change chips ease in when compare turns on through the real control and ease out when it turns off, rather than popping instantly. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "4.16",
+        "name": "funnel_and_goals_eased_updates",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "When the site, range, or filter stack changes through the real controls, the funnel step bars animate their width and the Goals conversion figures update with a short eased transition rather than snapping instantly (unless prefers-reduced-motion is set)",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that when the site, range, or filter stack changes through the real controls, the funnel step bars animate their width and the Goals conversion figures update with a short eased transition rather than snapping instantly (unless prefers-reduced-motion is set). Evidence: walkthrough.webm"
+      }
+    ]
+  },
+  "behavioral": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_persistence_round_trip",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Multi-facet round-trip: select a non-default site, date range, and sort, apply a segment filter, set a non-default bounce-rate ceiling, turn compare previous on, switch theme, then reload \u2014 all facets including ceiling and compare chips survive together from client storage, never a mix of restored and reverted facets",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that multi-facet round-trip: select a non-default site, date range, and sort, apply a segment filter, set a non-default bounce-rate ceiling, turn compare previous on, switch theme, then reload \u2014 all facets including ceiling and compare chips survive together from client storage, never a mix of restored and reverted facets. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.2",
+        "name": "sort_reversal_live_panels",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Sort-reversal proof: switch sort from most visitors to fewest visitors and confirm each breakdown panel reverses; switch back to most visitors and confirm the original order restores",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that sort-reversal proof: switch sort from most visitors to fewest visitors and confirm each breakdown panel reverses; switch back to most visitors and confirm the original order restores. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.3",
+        "name": "derived_export_and_tiles_track_filter",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Derived-view sensitivity: apply Google then Direct source filters and confirm metric tiles, trend bars, other panels, and Stats JSON preview results all change between the two filters",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that derived-view sensitivity: apply Google then Direct source filters and confirm metric tiles, trend bars, other panels, and Stats JSON preview results all change between the two filters. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_tiles_and_export_echo",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Cross-view echo: change the bounce-rate ceiling so High bounce appears or disappears on the tile and confirm Stats JSON bounce_rate_ceiling matches in the export preview without reload",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that cross-view echo: change the bounce-rate ceiling so High bounce appears or disappears on the tile and confirm Stats JSON bounce_rate_ceiling matches in the export preview without reload. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.5",
+        "name": "add_site_count_delta_exact",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Count-delta integrity: measure the site selector entry count immediately before and after a valid Add site submit; the delta is exactly one",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that count-delta integrity: measure the site selector entry count immediately before and after a valid Add site submit; the delta is exactly one. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.6",
+        "name": "different_segments_different_exports",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Input-dependent output: export Stats JSON under the Google filter and under no filter; the two previews differ in filters and results values",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that input-dependent output: export Stats JSON under the Google filter and under no filter; the two previews differ in filters and results values. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_filter_and_export",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Interleaved-flow integrity: apply a filter, open Export report and note Stats JSON results, clear the filter without closing the drawer, switch to Breakdown CSV and back to Stats JSON \u2014 the preview shows unfiltered results and no filter entry",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that interleaved-flow integrity: apply a filter, open Export report and note Stats JSON results, clear the filter without closing the drawer, switch to Breakdown CSV and back to Stats JSON \u2014 the preview shows unfiltered results and no filter entry. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.8",
+        "name": "export_import_edge_round_trip",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Edge-state round-trip: add a site, export Stats JSON, import it after changing site selection \u2014 imported sites list and metrics match the exported mutated state; derived tiles and export previews track",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that edge-state round-trip: add a site, export Stats JSON, import it after changing site selection \u2014 imported sites list and metrics match the exported mutated state; derived tiles and export previews track. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.9",
+        "name": "undo_then_new_mutation_clears_redo",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "After Undo of an add-site, performing a new segment filter disables Redo so the cleared redo stack cannot resurrect the undone site",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that after Undo of an add-site, performing a new segment filter disables Redo so the cleared redo stack cannot resurrect the undone site. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.10",
+        "name": "stacked_filters_goals_export_chain",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Full pipeline: stack Source: Google and Page: /pricing, confirm Goals and funnel recompute, confirm Stats JSON filters are two dimension/value objects and goals entries include goal_type and match_key, then clear filters \u2014 tiles, Goals, funnel, and export filters restore to the unfiltered state",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that full pipeline: stack Source: Google and Page: /pricing, confirm Goals and funnel recompute, confirm Stats JSON filters are two dimension/value objects and goals entries include goal_type and match_key, then clear filters \u2014 tiles, Goals, funnel, and export filters restore to the unfiltered state. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.11",
+        "name": "add_goal_export_import_round_trip",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Add a valid goal, confirm it appears in Stats JSON goals with name, goal_type, and match_key, export then import that Stats JSON \u2014 the Goals panel and goals array still include that goal object",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that add a valid goal, confirm it appears in Stats JSON goals with name, goal_type, and match_key, export then import that Stats JSON \u2014 the Goals panel and goals array still include that goal object. Evidence: walkthrough.webm"
+      },
+      {
+        "id": "14.12",
+        "name": "visitor_floor_export_echo",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Set unique-visitors floor to 20,000 so Low traffic appears; Stats JSON visitor_floor is 20000 in the export preview without reload",
+        "reasoning": "yes \u2014 I navigated the dashboard at 1280x800 desktop width via automation and observed that set unique-visitors floor to 20,000 so Low traffic appears; Stats JSON visitor_floor is 20000 in the export preview without reload. Evidence: walkthrough.webm"
+      }
+    ]
+  }
+}
