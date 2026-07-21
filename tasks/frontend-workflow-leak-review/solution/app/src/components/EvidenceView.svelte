@@ -29,11 +29,11 @@
   });
 
   $effect(() => {
-    // Reset draft fields when the selected submission changes.
+    // Keep an in-progress decision when reviewers briefly inspect another view.
     const id = appState.selectedSubmissionId;
-    void id;
-    verdict = '';
-    rationale = '';
+    const draft = appState.beginDecisionDraft(id);
+    verdict = draft.verdict;
+    rationale = draft.rationale;
     submitError = '';
     touched = { verdict: false, rationale: false };
   });
@@ -162,7 +162,7 @@
                   name="verdict"
                   value="confirm-clean"
                   checked={verdict === 'confirm-clean'}
-                  onchange={() => { verdict = 'confirm-clean'; touched.verdict = true; }}
+                  onchange={() => { verdict = 'confirm-clean'; appState.updateDecisionDraft('verdict', verdict); touched.verdict = true; }}
                   aria-describedby="verdict-error"
                 />
                 <CheckCircle aria-hidden="true" class="text-emerald-600" size={20} weight="fill" />
@@ -175,15 +175,15 @@
                   name="verdict"
                   value="confirm-leak"
                   checked={verdict === 'confirm-leak'}
-                  onchange={() => { verdict = 'confirm-leak'; touched.verdict = true; }}
+                  onchange={() => { verdict = 'confirm-leak'; appState.updateDecisionDraft('verdict', verdict); touched.verdict = true; }}
                   aria-describedby="verdict-error"
                 />
                 <WarningDiamond aria-hidden="true" class="text-rose-600" size={20} weight="fill" />
                 <span><span class="block text-sm font-extrabold">Confirm leak</span><span class="block text-[11px] text-slate-500">Evidence establishes reference exposure.</span></span>
               </label>
             </div>
-            {#if touched.verdict && validation.errors.verdict}<p id="verdict-error" class="field-error">{validation.errors.verdict}</p>
-            {:else if touched.verdict && !verdict}<p id="verdict-error" class="field-error">Verdict is required: choose Confirm clean or Confirm leak.</p>{/if}
+            {#if touched.verdict && validation.errors.verdict}<p id="verdict-error" class="field-error" role="alert" aria-live="assertive">verdict: {validation.errors.verdict}</p>
+            {:else if touched.verdict && !verdict}<p id="verdict-error" class="field-error" role="alert" aria-live="assertive">Verdict is required: choose Confirm clean or Confirm leak.</p>{/if}
           </fieldset>
 
           <div>
@@ -200,17 +200,17 @@
               aria-invalid={touched.rationale && Boolean(validation.errors.rationale)}
               class={`w-full rounded-xl border bg-white px-3 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 ${touched.rationale && validation.errors.rationale ? 'border-rose-500' : 'border-slate-300'}`}
               value={rationale}
-              oninput={(event) => { rationale = event.currentTarget.value; touched.rationale = true; }}
+              oninput={(event) => { rationale = event.currentTarget.value; appState.updateDecisionDraft('rationale', rationale); touched.rationale = true; }}
             ></textarea>
             <p id="rationale-help" class="mt-1 text-[11px] text-slate-500">Required trimmed string, 20 to 2000 characters inclusive.</p>
-            {#if touched.rationale && validation.errors.rationale}<p id="rationale-error" class="field-error">rationale: {validation.errors.rationale}</p>{/if}
+            {#if touched.rationale && validation.errors.rationale}<p id="rationale-error" class="field-error" role="alert" aria-live="assertive">rationale: {validation.errors.rationale}</p>{/if}
           </div>
 
           {#if submitError}<p class="rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-800" role="alert">{submitError}</p>{/if}
 
           <div class="flex flex-col-reverse gap-2 border-t border-line pt-4 sm:flex-row sm:justify-end">
             <Button type="button" color="alternative" class="interactive !min-h-11 !rounded-lg" onclick={() => appState.cancelDecision()}>Cancel</Button>
-            <Button type="submit" color="red" class="interactive !min-h-11 !rounded-lg !bg-signal-600 hover:!bg-signal-500" disabled={!validation.ok || appState.submitting}>
+            <Button type="submit" color="red" class="interactive !min-h-11 !rounded-lg !bg-signal-600 hover:!bg-signal-500" disabled={appState.submitting}>
               {appState.submitting ? 'Recording decision…' : (verdict === 'confirm-clean' ? 'Confirm clean' : verdict === 'confirm-leak' ? 'Confirm leak' : 'Choose a verdict')}
             </Button>
           </div>

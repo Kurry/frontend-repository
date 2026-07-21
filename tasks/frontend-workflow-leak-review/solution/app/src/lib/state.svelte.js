@@ -26,6 +26,7 @@ class ReviewConsoleState {
   newestAuditSubmissionId = $state(null);
   exportTimestamp = $state(isoNow());
   submitting = $state(false);
+  decisionDraft = $state({ submissionId: null, verdict: '', rationale: '' });
   theme = $state('light');
   locale = $state('en-US');
 
@@ -200,6 +201,23 @@ class ReviewConsoleState {
     return decisionSchema.safeParse(payload);
   }
 
+  beginDecisionDraft(submissionId) {
+    if (this.decisionDraft.submissionId !== submissionId) {
+      this.decisionDraft = { submissionId, verdict: '', rationale: '' };
+    }
+    return this.decisionDraft;
+  }
+
+  updateDecisionDraft(field, value) {
+    if (!['verdict', 'rationale'].includes(field)) return false;
+    this.decisionDraft = { ...this.decisionDraft, [field]: value };
+    return true;
+  }
+
+  clearDecisionDraft() {
+    this.decisionDraft = { submissionId: null, verdict: '', rationale: '' };
+  }
+
   async submitDecision(payload) {
     if (this.submitting) return { ok: false, error: 'A decision is already being submitted.' };
     const parsed = decisionSchema.safeParse(payload);
@@ -231,6 +249,7 @@ class ReviewConsoleState {
     this.newestAuditSubmissionId = submission.id;
     this.bumpExportTimestamp();
     this.showToast(`${reviewStateLabels[submission.reviewState]} recorded for ${submission.task}.`);
+    this.clearDecisionDraft();
 
     if (wasFiltered) {
       const leavingId = submission.id;
@@ -243,6 +262,7 @@ class ReviewConsoleState {
   }
 
   cancelDecision() {
+    this.clearDecisionDraft();
     this.activeView = 'queue';
     this.evidenceFocusIndex = 0;
     return true;
