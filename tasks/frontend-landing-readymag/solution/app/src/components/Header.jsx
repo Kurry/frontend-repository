@@ -102,6 +102,11 @@ const Cta = styled.a`
     background: ${colors.orange};
     transform: translateY(-1px);
   }
+  @media (max-width: 768px) {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 18px;
+  }
 `
 
 const MenuButton = styled.button`
@@ -119,6 +124,10 @@ const MenuButton = styled.button`
   cursor: pointer;
   @media (max-width: 768px) {
     display: inline-flex;
+    min-height: 44px;
+    min-width: 44px;
+    align-items: center;
+    padding: 12px 18px;
   }
 `
 
@@ -203,14 +212,20 @@ function SolutionsMenu() {
   const buttonRef = useRef(null)
 
   // WebMCP session_trigger_demo (solutions-menu) opens the SAME menu the
-  // Solutions trigger opens.
+  // Solutions trigger opens. The command palette uses closeSolutions to dismiss
+  // this menu before it opens (PRD: opening the palette closes Solutions first).
   useEffect(() => {
     webmcpBus.openSolutions = () => {
       setOpen(true)
       return { ok: true, expanded: true }
     }
+    webmcpBus.closeSolutions = () => {
+      setOpen(false)
+      return { ok: true, expanded: false }
+    }
     return () => {
-      if (webmcpBus.openSolutions) webmcpBus.openSolutions = null
+      webmcpBus.openSolutions = null
+      webmcpBus.closeSolutions = null
     }
   }, [])
 
@@ -273,8 +288,8 @@ export default function Header() {
 
   return (
     <Bar className="rm-header">
-      <Brand href="/" aria-label="Readymag home">
-        <img className="base" src="/media/logo/logo.png" srcSet="/media/logo/logo@2x.png 2x" alt="Readymag" />
+      <Brand href="/" aria-label="Canvasly home">
+        <img className="base" src="/media/logo/logo.png" srcSet="/media/logo/logo@2x.png 2x" alt="Canvasly" />
         <img
           className="hover"
           src="/media/logo/logo-hover.png"

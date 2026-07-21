@@ -1,11 +1,12 @@
 const CONTRACT = 'zto-webmcp-v1'
 const DESTINATIONS = ['hero', 'workflow', 'teams', 'support', 'closing', 'trial-brief']
-const SESSION_OPERATIONS = ['advance', 'trigger_demo']
+const SESSION_OPERATIONS = ['advance']
 const DEMOS = ['solutions-menu']
 
 export const webmcpBus = {
   advanceSlideshow: null,
   openSolutions: null,
+  closeSolutions: null,
   validateBrief: null,
   submitBrief: null,
   resetBrief: null,
@@ -22,7 +23,7 @@ function scrollToSection(dest) {
 }
 
 const tools = {
-  browse_open: {
+  'browse.open': {
     module: 'browse-query-v1',
     description: 'Open section',
     handler: (args) => {
@@ -33,7 +34,16 @@ const tools = {
       return scrollToSection(dest)
     },
   },
-  session_advance: {
+  'browse.search': {
+    module: 'browse-query-v1',
+    description: 'Search declared destinations',
+    handler: (args) => {
+      const query = String((args || {}).query || '').trim().toLowerCase()
+      if (!query || query.length > 200) return { ok: false, error: 'query must be 1-200 characters' }
+      return { ok: true, matches: DESTINATIONS.filter((destination) => destination.includes(query)) }
+    },
+  },
+  'session.advance': {
     module: 'command-session-v1',
     description: 'Advance slideshow',
     handler: () => {
@@ -41,17 +51,7 @@ const tools = {
       return webmcpBus.advanceSlideshow()
     },
   },
-  session_trigger_demo: {
-    module: 'command-session-v1',
-    description: 'Trigger demo',
-    handler: (args) => {
-      const demo = (args || {}).demo
-      if (demo !== 'solutions-menu') return { ok: false, error: 'demo must be solutions-menu' }
-      if (typeof webmcpBus.openSolutions !== 'function') return { ok: false, error: 'not ready' }
-      return webmcpBus.openSolutions()
-    },
-  },
-  form_validate: {
+  'form.validate': {
     module: 'form-workflow-v1',
     description: 'Validate form',
     handler: () => {
@@ -59,7 +59,7 @@ const tools = {
       return webmcpBus.validateBrief()
     }
   },
-  form_submit: {
+  'form.submit': {
     module: 'form-workflow-v1',
     description: 'Submit form',
     handler: () => {
@@ -67,7 +67,7 @@ const tools = {
       return webmcpBus.submitBrief()
     }
   },
-  form_reset: {
+  'form.reset': {
     module: 'form-workflow-v1',
     description: 'Reset form',
     handler: () => {
@@ -75,7 +75,7 @@ const tools = {
       return webmcpBus.resetBrief()
     }
   },
-  artifact_export: {
+  'artifact.export': {
     module: 'artifact-transfer-v1',
     description: 'Export JSON',
     handler: (args) => {
@@ -83,7 +83,7 @@ const tools = {
       return webmcpBus.exportBrief(args.format)
     }
   },
-  artifact_copy: {
+  'artifact.copy': {
     module: 'artifact-transfer-v1',
     description: 'Copy JSON',
     handler: () => {
@@ -91,7 +91,7 @@ const tools = {
       return webmcpBus.copyBrief()
     }
   },
-  artifact_import: {
+  'artifact.import': {
     module: 'artifact-transfer-v1',
     description: 'Import JSON',
     handler: (args) => {

@@ -100,8 +100,8 @@ export default function Footer() {
         </Col>
       </Grid>
       <Bottom>
-        <span>© 2026 Readymag Inc.</span>
-        <span>support@readymag.com</span>
+        <span>© 2026 Canvasly Studio</span>
+        <span>support@canvasly.example</span>
       </Bottom>
     </Wrap>
   )

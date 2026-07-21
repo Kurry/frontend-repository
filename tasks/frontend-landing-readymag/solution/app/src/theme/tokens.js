@@ -1,4 +1,4 @@
-/** Design tokens for the Readymag recreation (PRD color/typography/layout values). */
+/** Design tokens for the Canvasly recreation (PRD color/typography/layout values). */
 export const colors = {
   black: 'rgba(0, 0, 0, 1)',
   black31: 'rgba(0, 0, 0, 0.31)',
@@ -7,11 +7,15 @@ export const colors = {
   gray: 'rgba(128, 128, 128, 1)',
   gray24: 'rgba(128, 128, 128, 0.24)',
   grayA2: '#A2A2A2',
-  gray8C: '#8C8C8C',
+  gray8C: '#6E6E6E',
   grayAAA: '#AAAAAA',
   grayB8: '#B8B8B8',
   grayF4: '#F4F4F4',
   grayF4_96: 'rgba(244, 244, 244, 0.96)',
+  // Accessible body/support text on the white canvas (>= WCAG AA 4.5:1).
+  // The reference's rgba(0,0,0,.392) (#9b9b9b, ~2.8:1) is kept only as a
+  // decorative token; real copy uses this AA-compliant value.
+  textBodyOnWhite: 'rgba(0, 0, 0, 0.62)',
   white: '#FFFFFF',
   white52: '#FFFFFF52',
   orange: '#EC520B',
@@ -32,8 +36,10 @@ export const colors = {
   cookieBg: '#444444',
   cookiePopup: '#4f4f4f',
   textPrimary: '#282828',
-  textSecondary: '#8C8C8C',
-  textAlpha64: 'rgba(0, 0, 0, 0.392)',
+  textSecondary: '#6E6E6E',
+  // Decorative reference value (low contrast) — NOT used for real body copy.
+  textAlpha64Ref: 'rgba(0, 0, 0, 0.392)',
+  textAlpha64: 'rgba(0, 0, 0, 0.62)',
   tagPortfolio: '#FF88BA',
   tagLanding: '#FFCB00',
   tagEditorial: '#008BFF',
@@ -108,7 +114,7 @@ export const exampleTags = [
   { slug: 'editorial', title: 'Editorials', color: colors.tagEditorial, textColor: '#fff' },
   { slug: 'business-website', title: 'Company websites', color: colors.tagBusiness, textColor: '#fff' },
   { slug: 'design-studio', title: 'Design studios', color: colors.tagStudio, textColor: '#fff' },
-  { slug: 'by-readymag-team', title: 'by Readymag team', color: colors.tagByTeam, textColor: '#fff' },
+  { slug: 'by-canvasly-team', title: 'by Canvasly team', color: colors.tagByTeam, textColor: '#fff' },
 ]
 
 /** Pricing plan structure (names, blurbs, features). Live amounts come from a billing API. */
@@ -118,14 +124,14 @@ export const pricingPlans = [
     name: 'Free',
     cta: 'Try for free',
     blurb: 'always free',
-    features: ['Free Readymag hosting', 'Publish with Readymag subdomain', 'Core widgets'],
+    features: ['Free Canvasly hosting', 'Publish with a Canvasly subdomain', 'Core widgets'],
   },
   {
     id: 'personal',
     name: 'Personal',
     cta: 'Subscribe',
     blurb: 'For individual designers',
-    features: ['Custom domains', 'Remove Readymag branding', 'Forms & analytics', 'Free fonts (Adobe / type.today)'],
+    features: ['Custom domains', 'Remove Canvasly branding', 'Forms & analytics', 'Bundled open-license fonts'],
   },
   {
     id: 'freelancer',

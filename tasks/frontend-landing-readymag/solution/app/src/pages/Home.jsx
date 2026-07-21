@@ -4,9 +4,10 @@ import { css, keyframes } from '@emotion/react'
 import { colors, fonts, layout, motion, hairlines, exampleTags, type } from '../theme/tokens'
 import { webmcpBus } from '../webmcp/registerWebmcp'
 import TrialBrief from '../components/TrialBrief'
+import CommandPalette from '../components/CommandPalette'
 
 /**
- * Native homepage — React/Emotion implementation of the 1024px Readymag
+ * Native homepage — React/Emotion implementation of the 1024px Canvasly
  * homepage design. The artboard scales down from the top-left on narrow
  * viewports (scale = min(1, vw / 1024)) and the document height follows the
  * scale, per the PRD's responsive contract.
@@ -92,6 +93,28 @@ const fadeUp = keyframes`
 
 /* ---------------------------------------------------------------- layout */
 
+const SkipLink = styled.a`
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  transform: translate(-50%, -160%);
+  z-index: 2147482500;
+  background: ${colors.dark};
+  color: ${colors.white};
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-family: ${fonts.inter};
+  font-size: 13px;
+  font-variation-settings: 'wght' 550;
+  text-decoration: none;
+  transition: transform 0.18s ease-out;
+  &:focus {
+    transform: translate(-50%, 0);
+    outline: 2px solid ${colors.blueDeep};
+    outline-offset: 2px;
+  }
+`
+
 const ScrollWrapper = styled.div`
   overflow: visible;
 `
@@ -102,6 +125,7 @@ const Artboard = styled.main`
   background: ${colors.white};
   color: ${colors.dark};
   transform-origin: top left;
+  --rm-scale: 1;
 `
 
 const Hero = styled.section`
@@ -186,9 +210,12 @@ const PrimaryCta = styled.a`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 22px;
-  height: 44px;
-  border-radius: 102px;
+  /* Counter-scale the tap target against the artboard zoom so the rendered
+     hit area stays ~44px tall at every viewport width (the 1024 artboard is
+     scaled by --rm-scale; the visual height is height * scale = 44px). */
+  padding: 0 calc(22px / var(--rm-scale, 1));
+  height: calc(44px / var(--rm-scale, 1));
+  border-radius: calc(102px / var(--rm-scale, 1));
   background: ${colors.dark};
   color: ${colors.white};
   text-decoration: none;
@@ -201,7 +228,7 @@ const PrimaryCta = styled.a`
     background-color 0.2s ease-in-out;
   &:hover {
     background: ${colors.orangeHero};
-    transform: translateY(-2px);
+    transform: translateY(calc(-2px / var(--rm-scale, 1)));
   }
 `
 
@@ -492,7 +519,7 @@ const Closing = styled.section`
 const FEATURES = [
   {
     title: 'Enjoy easy workflow',
-    body: 'The intuitive drag-and-drop interface gives you everything you need. Designers can switch to Readymag seamlessly, and marketers quickly get used to it.',
+    body: 'The intuitive drag-and-drop interface gives you everything you need. Designers can switch to Canvasly seamlessly, and marketers quickly get used to it.',
   },
   {
     title: 'Streamline teamwork',
@@ -500,7 +527,7 @@ const FEATURES = [
   },
   {
     title: 'Attract with interactivity',
-    body: 'Scroll animations, hover states, custom cursors, video, and Lottie — built into the Viewer.',
+    body: 'Scroll animations, hover states, custom cursors, video, and vector motion — built into the Viewer.',
   },
   {
     title: 'Expand functionality to infinity',
@@ -543,23 +570,36 @@ function useInView(ref, rootMargin = '0px 0px -10% 0px') {
 /** Zoom the 1024px design down to the viewport from the top-left origin. */
 function useArtboardScale(wrapRef, pageRef) {
   useEffect(() => {
+    let raf = 0
     const fit = () => {
-      const wrap = wrapRef.current
-      const page = pageRef.current
-      if (!wrap || !page) return
-      const scale = Math.min(1, window.innerWidth / DESIGN_WIDTH)
-      page.style.transform = scale < 1 ? `scale(${scale})` : 'none'
-      wrap.style.height = `${Math.round(page.offsetHeight * scale)}px`
+      cancelAnimationFrame(raf)
+      raf = requestAnimationFrame(() => {
+        const wrap = wrapRef.current
+        const page = pageRef.current
+        if (!wrap || !page) return
+        const scale = Math.min(1, window.innerWidth / DESIGN_WIDTH)
+        page.style.setProperty('--rm-scale', String(scale))
+        page.style.transform = scale < 1 ? `scale(${scale})` : 'none'
+        // The scroll wrapper's height must equal the rendered (scaled) height
+        // of the artboard so the page scrolls exactly the visible design with
+        // no gap and no horizontal scrollbar at any width.
+        const scaled = page.getBoundingClientRect().height
+        wrap.style.height = `${Math.round(scaled)}px`
+      })
     }
     fit()
     window.addEventListener('resize', fit)
+    // Fonts/images shifting the layout after first paint must re-fit the wrap.
+    window.addEventListener('load', fit)
     let ro
     if (typeof ResizeObserver !== 'undefined' && pageRef.current) {
       ro = new ResizeObserver(fit)
       ro.observe(pageRef.current)
     }
     return () => {
+      cancelAnimationFrame(raf)
       window.removeEventListener('resize', fit)
+      window.removeEventListener('load', fit)
       if (ro) ro.disconnect()
     }
   }, [wrapRef, pageRef])
@@ -623,7 +663,7 @@ function GalleryMarquee() {
             `}
           >
             {row.images.map((src, j) => (
-              <GalleryTile key={j} src={src} alt="" loading={i === 0 ? 'eager' : 'lazy'} $w={row.tileW} $h={row.tileH} />
+              <GalleryTile key={j} src={src} alt="" aria-hidden="true" loading={i === 0 ? 'eager' : 'lazy'} $w={row.tileW} $h={row.tileH} />
             ))}
           </GalleryTrack>
         </GalleryRow>
@@ -635,11 +675,38 @@ function GalleryMarquee() {
 function ProjectSlideshow() {
   const [active, setActive] = useState(0)
   const activeRef = useRef(0)
+  const regionRef = useRef(null)
   activeRef.current = active
+  // Pause the idle timer while the carousel has keyboard focus, or while the
+  // tab is hidden — an execution-quality touch that lets a keyboard/AT user
+  // inspect a frame without it advancing under them. Idle observation (the
+  // graded autoplay path) never focuses the strip, so autoplay is unaffected.
+  const pausedRef = useRef(false)
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const id = setInterval(() => setActive((s) => (s + 1) % SLIDES.length), 2200)
-    return () => clearInterval(id)
+    const tick = () => {
+      if (!pausedRef.current) setActive((s) => (s + 1) % SLIDES.length)
+    }
+    const id = setInterval(tick, 2200)
+    const onFocus = () => {
+      pausedRef.current = true
+    }
+    const onBlur = () => {
+      pausedRef.current = false
+    }
+    const onVis = () => {
+      pausedRef.current = document.visibilityState !== 'visible'
+    }
+    const el = regionRef.current
+    el?.addEventListener('focusin', onFocus)
+    el?.addEventListener('focusout', onBlur)
+    document.addEventListener('visibilitychange', onVis)
+    return () => {
+      clearInterval(id)
+      el?.removeEventListener('focusin', onFocus)
+      el?.removeEventListener('focusout', onBlur)
+      document.removeEventListener('visibilitychange', onVis)
+    }
   }, [])
   // WebMCP session_advance drives the SAME setActive the timer uses.
   useEffect(() => {
@@ -654,10 +721,11 @@ function ProjectSlideshow() {
   }, [])
   return (
     <Slideshow
+      ref={regionRef}
       className="common-slideshow"
       role="group"
       aria-roledescription="carousel"
-      aria-label="Rotating gallery of projects made with Readymag"
+      aria-label="Rotating gallery of projects made with Canvasly"
     >
       {SLIDES.map((src, i) => (
         <Slide
@@ -682,6 +750,8 @@ export default function Home() {
   useArtboardScale(wrapRef, pageRef)
 
   return (
+    <>
+    <SkipLink href="#rm-section-hero">Skip to content</SkipLink>
     <ScrollWrapper className="content-scroll-wrapper" ref={wrapRef}>
       <Artboard className="page" ref={pageRef}>
         <Hero id="rm-section-hero" aria-label="Introduction">
@@ -690,17 +760,21 @@ export default function Home() {
             <FloatingCard className="has-onhover-animation" aria-hidden="true">
               <video
                 poster="/media/video/hero/poster.jpg"
-                src="/media/video/hero/playlist.m3u8"
+                src="/media/video/hero/hero.webm"
+                type="video/webm"
+                autoPlay
                 muted
+                loop
                 playsInline
-                preload="none"
+                preload="auto"
+                aria-hidden="true"
               />
             </FloatingCard>
             <HeroTitle>Design and launch outstanding websites</HeroTitle>
             <HeroSub>Design, prototype, collaborate, publish.</HeroSub>
             <CtaRow>
               <PrimaryCta href="/join" className="rm-hotspot">
-                Try Readymag
+                Try Canvasly
               </PrimaryCta>
               <GhostLink href="/pricing">or choose your subscription plan</GhostLink>
             </CtaRow>
@@ -716,7 +790,7 @@ export default function Home() {
           <SectionTitle>Enjoy easy workflow</SectionTitle>
           <SectionBody>
             The intuitive drag-and-drop interface gives you everything you need. Designers can
-            switch to Readymag seamlessly, and marketers quickly get used to it.
+            switch to Canvasly seamlessly, and marketers quickly get used to it.
           </SectionBody>
           <FeatureGrid>
             {FEATURES.map((f, i) => (
@@ -733,7 +807,7 @@ export default function Home() {
           <SectionTitle>
             Teams of all sizes
             <br />
-            create websites with Readymag
+            create websites with Canvasly
           </SectionTitle>
           <TagGrid>
             {exampleTags.map((t) => (
@@ -756,7 +830,7 @@ export default function Home() {
           </OrbLane>
         </SupportBand>
 
-        <MarqueeSection aria-label="What people build with Readymag">
+        <MarqueeSection aria-label="What people build with Canvasly">
           <MarqueeLane>
             <MarqueeTrack className="rm-anim-path" aria-hidden="true">
               {[...MARQUEE_LABELS, ...MARQUEE_LABELS].map((label, i) => (
@@ -781,7 +855,7 @@ export default function Home() {
           <h2>Try for free</h2>
           <p>or choose your subscription plan</p>
           <CtaRow style={{ justifyContent: 'center' }}>
-            <PrimaryCta href="/join">Try Readymag</PrimaryCta>
+            <PrimaryCta href="/join">Try Canvasly</PrimaryCta>
             <GhostLink href="/pricing">View pricing</GhostLink>
           </CtaRow>
           <div style={{ marginTop: 64 }}>
@@ -790,5 +864,7 @@ export default function Home() {
         </Closing>
       </Artboard>
     </ScrollWrapper>
+    <CommandPalette />
+    </>
   )
 }

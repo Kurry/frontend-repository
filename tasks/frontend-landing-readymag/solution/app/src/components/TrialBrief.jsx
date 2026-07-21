@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import styled from '@emotion/styled';
 import { colors, fonts } from '../theme/tokens';
 import { z } from 'zod';
@@ -158,7 +158,7 @@ const SecondaryButton = styled(Button)`
 `;
 
 const ErrorText = styled.span`
-  color: red;
+  color: #b3261e;
   font-size: 12px;
 `;
 
@@ -182,6 +182,13 @@ export default function TrialBrief() {
   const [successMsg, setSuccessMsg] = useState("");
   const [copiedMsg, setCopiedMsg] = useState(false);
   const [importError, setImportError] = useState("");
+  const [importOk, setImportOk] = useState("");
+  // Surface inline field errors only after the user has actually edited the
+  // brief (or imported a payload). A fresh load and a Reset return to the empty
+  // baseline with no error wall, while validation/import errors still show once
+  // the form is dirty.
+  const [touched, setTouched] = useState(false);
+  const importFileRef = useRef(null);
 
   const updateBrief = useCallback((newBrief) => {
     appStore.setKey('trialBriefUndoStore', [...undoStack, brief]);
@@ -189,6 +196,8 @@ export default function TrialBrief() {
     appStore.setKey('trialBrief', { ...newBrief, generated_at: new Date().toISOString() });
     setSuccessMsg("");
     setImportError("");
+    setImportOk("");
+    setTouched(true);
   }, [undoStack, brief]);
 
   const handleReset = useCallback(() => {
@@ -197,6 +206,8 @@ export default function TrialBrief() {
     appStore.setKey('trialBrief', { ...defaultBriefState, generated_at: new Date().toISOString() });
     setSuccessMsg("");
     setImportError("");
+    setImportOk("");
+    setTouched(false);
   }, [undoStack, brief]);
 
   const handleUndo = useCallback(() => {
@@ -206,6 +217,8 @@ export default function TrialBrief() {
     appStore.setKey('trialBriefUndoStore', undoStack.slice(0, -1));
     appStore.setKey('trialBrief', previous);
     setSuccessMsg("");
+    setImportError("");
+    setImportOk("");
   }, [undoStack, redoStack, brief]);
 
   const handleRedo = useCallback(() => {
@@ -215,6 +228,8 @@ export default function TrialBrief() {
     appStore.setKey('trialBriefRedoStore', redoStack.slice(0, -1));
     appStore.setKey('trialBrief', next);
     setSuccessMsg("");
+    setImportError("");
+    setImportOk("");
   }, [undoStack, redoStack, brief]);
 
   useEffect(() => {
@@ -250,7 +265,25 @@ export default function TrialBrief() {
     return formErrors;
   }, [validationResult]);
 
+  // A field is "dirty" once it differs from the empty baseline. Inline field
+  // errors are only rendered for dirty fields (or after any edit / import), so a
+  // fresh load and a Reset show the clean empty baseline with no error wall,
+  // while cross-field conflicts still appear the moment the relevant field is
+  // touched (the form is then dirty).
+  const dirtyFields = useMemo(() => ({
+    name: brief.name !== "",
+    email: brief.email !== "",
+    plan: brief.plan !== "",
+    team_size: brief.team_size !== "",
+    interests: brief.interests.length > 0,
+  }), [brief]);
+  const showError = useCallback((field) => {
+    if (!errors[field]) return false;
+    return touched || dirtyFields[field];
+  }, [errors, touched, dirtyFields]);
+
   const handleSubmit = useCallback(() => {
+    setTouched(true);
     if (isValid) {
       setSuccessMsg("Trial brief ready — download or copy your JSON above");
     }
@@ -286,13 +319,19 @@ export default function TrialBrief() {
               const result = trialBriefSchema.safeParse(imported);
               if (result.success) {
                   updateBrief(result.data);
+                  setTouched(true);
+                  setImportOk("Brief imported — form and preview restored");
               } else {
                   const issue = result.error.issues[0];
                   const field = issue.path.length ? issue.path.join(".") : "payload";
                   setImportError(`Import failed — ${field}: ${issue.message}`);
+                  setImportOk("");
+                  setTouched(true);
               }
           } catch {
               setImportError("Import failed — file is not valid JSON");
+              setImportOk("");
+              setTouched(true);
           }
       };
       reader.readAsText(file);
@@ -310,6 +349,7 @@ export default function TrialBrief() {
              interests: ["Portfolios", "Editorials"],
              generated_at: new Date().toISOString()
          });
+         setTouched(true);
          return true;
       }
       return false;
@@ -334,6 +374,7 @@ export default function TrialBrief() {
         return loaded ? { ok: true, mode: 'replace', loadedSample: true } : { ok: false, error: 'cancelled' };
     };
     webmcpBus.validateBrief = () => {
+         setTouched(true);
          return { ok: isValid, errors: errors };
     };
     webmcpBus.submitBrief = () => {
@@ -341,6 +382,7 @@ export default function TrialBrief() {
              handleSubmit();
              return { ok: true };
          }
+         setTouched(true);
          return { ok: false, errors: errors };
     };
     webmcpBus.resetBrief = () => {
@@ -368,7 +410,7 @@ export default function TrialBrief() {
               }
             }}
           />
-          {errors.name && <ErrorText>{errors.name}</ErrorText>}
+          {showError('name') && <ErrorText>{errors.name}</ErrorText>}
         </Field>
 
         <Field>
@@ -379,7 +421,7 @@ export default function TrialBrief() {
             value={brief.email}
             onChange={e => updateBrief({...brief, email: e.target.value})}
           />
-          {errors.email && <ErrorText>{errors.email}</ErrorText>}
+          {showError('email') && <ErrorText>{errors.email}</ErrorText>}
         </Field>
 
         <Field>
@@ -394,7 +436,7 @@ export default function TrialBrief() {
             <option value="Pro">Pro</option>
             <option value="Team">Team</option>
           </Select>
-          {errors.plan && <ErrorText>{errors.plan}</ErrorText>}
+          {showError('plan') && <ErrorText>{errors.plan}</ErrorText>}
         </Field>
 
         <Field>
@@ -410,7 +452,7 @@ export default function TrialBrief() {
             <option value="11-50">11-50</option>
             <option value="51+">51+</option>
           </Select>
-          {errors.team_size && <ErrorText>{errors.team_size}</ErrorText>}
+          {showError('team_size') && <ErrorText>{errors.team_size}</ErrorText>}
         </Field>
 
         <Field>
@@ -432,7 +474,7 @@ export default function TrialBrief() {
               </Chip>
             ))}
           </ChipContainer>
-          {errors.interests && <ErrorText>{errors.interests}</ErrorText>}
+          {showError('interests') && <ErrorText>{errors.interests}</ErrorText>}
         </Field>
 
         <ButtonGroup>
@@ -453,24 +495,33 @@ export default function TrialBrief() {
               {copiedMsg ? "Copied" : "Copy brief"}
             </span>
           </Button>
-          <label htmlFor="import-brief" style={{cursor: 'pointer'}}>
-             <SecondaryButton as="span" aria-label="Import brief">Import brief</SecondaryButton>
-          </label>
+          <SecondaryButton
+            type="button"
+            aria-label="Import brief"
+            onClick={() => importFileRef.current?.click()}
+          >
+            Import brief
+          </SecondaryButton>
           <input
+              ref={importFileRef}
               type="file"
               id="import-brief"
-              accept=".json"
-              style={{display: 'none'}}
+              accept=".json,application/json"
+              aria-hidden="true"
+              tabIndex={-1}
+              style={{position: 'absolute', width: 1, height: 1, overflow: 'hidden', clipPath: 'inset(50%)'}}
               onChange={handleImport}
           />
         </ButtonGroup>
         {importError && <ErrorText style={{display: 'block', marginBottom: '16px'}}>{importError}</ErrorText>}
+        {importOk && !importError && <div style={{color: '#1b6e2e', fontSize: '13px', marginBottom: '16px'}}>{importOk}</div>}
         {JSON.stringify(brief, null, 2)}
       </PreviewSection>
       <LiveRegion aria-live="polite">
-        {Object.values(errors).join(". ")}
-        {successMsg ? `. ${successMsg}` : ""}
-        {importError ? `. ${importError}` : ""}
+        {touched ? Object.values(errors).join(". ") : ""}
+        {successMsg ? ` ${successMsg}` : ""}
+        {importError ? ` ${importError}` : ""}
+        {importOk && !importError ? ` ${importOk}` : ""}
       </LiveRegion>
     </Container>
   );

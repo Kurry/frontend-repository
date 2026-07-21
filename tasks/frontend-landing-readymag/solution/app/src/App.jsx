@@ -6,17 +6,15 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import CustomCursor from './components/CustomCursor'
 import Home from './pages/Home'
-import Pricing from './pages/Pricing'
-import Examples from './pages/Examples'
-import Templates from './pages/Templates'
-import ContentPage from './pages/ContentPage'
 import { colors, fonts } from './theme/tokens'
 import './motion/keyframes.css'
 
 /**
- * Native React app. `/` is the graded homepage; the secondary catalog routes
- * (`/pricing`, `/examples`, `/templates`, …) exist so header and footer
- * navigation resolves, but only the homepage is in scope.
+ * Single-page Canvasly homepage. Only route "/" is in scope; every header,
+ * footer, CTA, tile, and menu link resolves back to the homepage (the
+ * catch-all redirects any other path), so chrome never lands on a blank,
+ * error, or "Not found" page and secondary destinations are never promoted
+ * into separate features.
  */
 
 const globalStyles = css`
@@ -87,14 +85,6 @@ export default function App() {
       <Routes>
         <Route element={<SiteLayout />}>
           <Route index element={<Home />} />
-          <Route path="pricing" element={<Pricing />} />
-          <Route path="examples" element={<Examples />} />
-          <Route path="examples/:tag" element={<Examples />} />
-          <Route path="templates" element={<Templates />} />
-          <Route path="templates/:slug" element={<Templates />} />
-          <Route path="join" element={<ContentPage title="Join / Login" kind="auth" />} />
-          <Route path="login" element={<ContentPage title="Join / Login" kind="auth" />} />
-          <Route path="about" element={<ContentPage title="About Readymag" kind="viewer" slug="about" />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
