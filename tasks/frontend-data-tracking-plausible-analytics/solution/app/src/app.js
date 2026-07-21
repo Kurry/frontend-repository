@@ -396,6 +396,8 @@ document.addEventListener('keydown', (e) => {
     const openModalKey = Object.keys(modals).find((k) => modals[k].overlay.classList.contains('active'));
     if (openModalKey) { closeModal(openModalKey); e.preventDefault(); return; }
     if (segmentsMenuOpen) { closeSegmentsMenu(); e.preventDefault(); return; }
+    const openListbox = [C.siteBox, C.periodBox, C.sortBox].find((box) => box?.isOpen());
+    if (openListbox) { openListbox.close(true); e.preventDefault(); }
   }
 });
 document.addEventListener('keydown', (e) => {
@@ -537,7 +539,7 @@ function makeListbox({ label, options, getSelectedId, onSelect }) {
       if (open) renderOptions();
     },
     isOpen: () => open,
-    close: () => closePopup(false),
+    close: (returnFocus = false) => closePopup(returnFocus),
   };
 }
 
@@ -999,7 +1001,7 @@ function buildSaveModal() {
     if (n.length < 1 || n.length > 40) { if (showNameError) txt(nameErr, 'Segment name must be 1 to 40 characters'); ok = false; }
     else if (state.savedSegments.some((s) => s.name === n)) { if (showNameError) txt(nameErr, 'A segment with this name already exists'); ok = false; }
     else if (showNameError) txt(nameErr, '');
-    if (state.filters.length === 0) { txt(filterErr, 'Cannot save a segment with no active filters'); ok = false; }
+    if (state.filters.length === 0) { txt(filterErr, 'The filters field requires at least one active filter'); ok = false; }
     else txt(filterErr, '');
     submitBtn.disabled = !ok;
     return ok;
@@ -1358,8 +1360,8 @@ function update() {
   txt(C.brandSub, `${state.site} · ${tz} · ${model.period.label}`);
   C.themeBtn.textContent = state.theme === 'light' ? 'Dark' : 'Light';
   C.themeBtn.setAttribute('aria-label', state.theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
-  C.undoBtn.disabled = undoStack.length === 0;
-  C.redoBtn.disabled = redoStack.length === 0;
+  C.undoBtn.setAttribute('aria-disabled', undoStack.length === 0 ? 'true' : 'false');
+  C.redoBtn.setAttribute('aria-disabled', redoStack.length === 0 ? 'true' : 'false');
   C.compareBtn.classList.toggle('active', state.compare);
   C.compareBtn.setAttribute('aria-pressed', state.compare ? 'true' : 'false');
   if (document.activeElement !== C.ceilingInput) C.ceilingInput.value = state.ceiling;
@@ -1546,6 +1548,7 @@ function updatePanel(dim, entries, model) {
   if (!showEmpty && p.empty.isConnected) p.empty.remove();
 
   // reconcile values + active + compare chip, and reorder to desired order (FLIP)
+  let nextPosition = list.firstElementChild;
   entries.forEach((entry) => {
     const node = p.rowMap.get(entry.name);
     const active = state.filters.some((f) => f.dimension === dim && f.value === entry.name);
@@ -1566,7 +1569,11 @@ function updatePanel(dim, entries, model) {
     } else {
       node.chip.classList.add('hidden');
     }
-    list.appendChild(node.btn); // reorders to desired order; preserves identity
+    // Only move a row when its position actually changes. Re-appending every
+    // row on a filter commit preserves node identity but Chromium drops focus
+    // when the focused button is detached/reinserted into the same list.
+    if (node.btn !== nextPosition) list.insertBefore(node.btn, nextPosition);
+    nextPosition = node.btn.nextElementSibling;
   });
 
   // FLIP: animate rows that existed before to their new position
