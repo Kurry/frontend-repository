@@ -42,27 +42,27 @@ const singleSelectedId = computed(() => selectionCount.value === 1 ? store.selec
 
       <!-- Non-drag move/resize controls -->
       <div class="flex items-center gap-1 ml-auto">
-        <button type="button" class="btn-icon" aria-label="Move left" @click="store.moveObject({ id: singleSelectedId, dx: -24, dy: 0 })">
+        <button type="button" class="btn-icon" aria-label="Move left" @click="store.nudgeObject({ id: singleSelectedId, dx: -24, dy: 0 })">
            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12 L6 8 L10 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
         <div class="flex flex-col gap-1">
-          <button type="button" class="btn-icon" aria-label="Move up" @click="store.moveObject({ id: singleSelectedId, dx: 0, dy: -24 })">
+          <button type="button" class="btn-icon" aria-label="Move up" @click="store.nudgeObject({ id: singleSelectedId, dx: 0, dy: -24 })">
              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 10 L8 6 L12 10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
-          <button type="button" class="btn-icon" aria-label="Move down" @click="store.moveObject({ id: singleSelectedId, dx: 0, dy: 24 })">
+          <button type="button" class="btn-icon" aria-label="Move down" @click="store.nudgeObject({ id: singleSelectedId, dx: 0, dy: 24 })">
              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6 L8 10 L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
           </button>
         </div>
-        <button type="button" class="btn-icon" aria-label="Move right" @click="store.moveObject({ id: singleSelectedId, dx: 24, dy: 0 })">
+        <button type="button" class="btn-icon" aria-label="Move right" @click="store.nudgeObject({ id: singleSelectedId, dx: 24, dy: 0 })">
            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 12 L10 8 L6 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
       </div>
 
       <div class="flex items-center gap-1 ml-2">
-         <button type="button" class="btn-action" @click="store.resizeObject({ id: singleSelectedId, dw: 24, dh: 24 })">
+         <button type="button" class="btn-action" @click="store.nudgeResize({ id: singleSelectedId, dw: 24, dh: 24 })">
            Grow
          </button>
-         <button type="button" class="btn-action" @click="store.resizeObject({ id: singleSelectedId, dw: -24, dh: -24 })">
+         <button type="button" class="btn-action" @click="store.nudgeResize({ id: singleSelectedId, dw: -24, dh: -24 })">
            Shrink
          </button>
       </div>

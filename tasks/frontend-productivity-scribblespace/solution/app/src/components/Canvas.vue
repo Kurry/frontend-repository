@@ -213,7 +213,7 @@ const connectorMidpoint = (conn: any) => {
 
     <!-- No search results -->
     <div v-if="store.searchQuery.trim() && store.searchMatchIds.length === 0" class="absolute top-3 left-1/2 -translate-x-1/2 px-4 py-2 shadow-md bg-white border-[1.5px] border-gray-500 rounded-lg text-[13px] text-gray-900 z-40 pointer-events-none max-w-[calc(100%-24px)]">
-       No results for "{{ store.searchQuery.trim() }}" — try a different word
+       No results for the query
     </div>
 
     <MiniMap :objects="objects" :viewportWidth="width" :viewportHeight="height" />

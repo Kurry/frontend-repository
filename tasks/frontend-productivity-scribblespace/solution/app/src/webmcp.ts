@@ -301,12 +301,28 @@ export function registerWebMCP() {
       import_modes: ['workspace-json'],
       export_formats: ['json', 'markdown', 'text'],
       value_bounds: {
-          color: ['#FFF9C4', '#FFE0B2', '#FFCDD2', '#C8E6C9', '#BBDEFB', '#E1BEE7', '#6D5BD0', '#E0A030', '#3F9E6E', '#D95563', '#3E7CB1', '#5A5F73'],
+          type: ['note', 'flashcard', 'rectangle', 'circle', 'arrow'],
+          color: {
+            note: ['#FFF9C4', '#FFE0B2', '#FFCDD2', '#C8E6C9', '#BBDEFB', '#E1BEE7'],
+            flashcard: ['#FFF9C4', '#FFE0B2', '#FFCDD2', '#C8E6C9', '#BBDEFB', '#E1BEE7'],
+            shape: ['#6D5BD0', '#E0A030', '#3F9E6E', '#D95563', '#3E7CB1', '#5A5F73'],
+          },
+          boardName: { minLength: 1, maxLength: 60 },
           name: { maxLength: 60, minLength: 1 },
           text: { maxLength: 8000 },
           front: { maxLength: 8000 },
           back: { maxLength: 8000 },
-          schemaVersion: 'scribblespace-workspace-v1'
+          geometry: {
+            note: { minWidth: 120, minHeight: 96 },
+            flashcard: { minWidth: 120, minHeight: 96 },
+            shape: { minWidth: 48, minHeight: 48 },
+          },
+          connector: {
+            fromId: 'required non-empty object id on same board',
+            toId: 'required distinct non-empty object id on same board',
+            duplicateRule: 'undirected pair rejected with visible message; no second line',
+          },
+          schemaVersion: 'scribblespace-workspace-v1',
       },
       tools: Object.keys(tools),
       tool_count: Object.keys(tools).length,

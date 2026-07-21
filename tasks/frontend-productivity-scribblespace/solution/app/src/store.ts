@@ -131,10 +131,13 @@ export const useAppStore = defineStore('app', {
     },
     renameBoard(id: string, name: string) {
       const b = this.boards.find(b => b.id === id);
-      if (b) {
-        b.name = name;
-        this.announce('Board renamed');
+      const trimmed = name.trim();
+      if (!b || !trimmed || trimmed.length > 60) {
+        this.announce('board-name field must be 1 to 60 characters');
+        return;
       }
+      b.name = trimmed;
+      this.announce(`Board renamed to ${trimmed}`);
     },
     requestDeleteBoard(id: string | null) {
       this.boardDeleteId = id;
@@ -288,21 +291,29 @@ export const useAppStore = defineStore('app', {
         this.recomputeMatches();
       }
     },
-    moveObject({ id, dx, dy }: { id: string; dx: number; dy: number }) {
+    moveObject({ id, dx, dy, recordHistory = false }: { id: string; dx: number; dy: number; recordHistory?: boolean }) {
       const board = this.activeBoard;
       const obj = board?.objects.find(o => o.id === id);
       if (obj) {
+        if (recordHistory) this._saveHistory();
         obj.x += dx;
         obj.y += dy;
       }
     },
-    resizeObject({ id, dw, dh }: { id: string; dw: number; dh: number }) {
+    nudgeObject({ id, dx, dy }: { id: string; dx: number; dy: number }) {
+      this.moveObject({ id, dx, dy, recordHistory: true });
+    },
+    resizeObject({ id, dw, dh, recordHistory = false }: { id: string; dw: number; dh: number; recordHistory?: boolean }) {
       const board = this.activeBoard;
       const obj = board?.objects.find(o => o.id === id);
       if (obj) {
+        if (recordHistory) this._saveHistory();
         obj.width = Math.max(obj.type === 'note' || obj.type === 'flashcard' ? 120 : 48, obj.width + dw);
         obj.height = Math.max(obj.type === 'note' || obj.type === 'flashcard' ? 96 : 48, obj.height + dh);
       }
+    },
+    nudgeResize({ id, dw, dh }: { id: string; dw: number; dh: number }) {
+      this.resizeObject({ id, dw, dh, recordHistory: true });
     },
     duplicateSelectedObjects() {
       const board = this.activeBoard;
@@ -342,7 +353,21 @@ export const useAppStore = defineStore('app', {
       this.announce(count === 1 ? '1 object deleted' : `${count} objects deleted`);
     },
     archiveSelectedObjects() {
-       this.deleteSelectedObjects();
+      const board = this.activeBoard;
+      if (!board || this.selectedIds.length === 0) return;
+      this._saveHistory();
+      const ids = new Set(this.selectedIds);
+      const toArchive = board.objects.filter(o => ids.has(o.id));
+      toArchive.forEach(obj => {
+        this.archive.push({ id: generateId(), boardId: board.id, obj: JSON.parse(JSON.stringify(obj)) });
+      });
+      const count = toArchive.length;
+      board.objects = board.objects.filter(o => !ids.has(o.id));
+      board.connectors = board.connectors.filter(c => !ids.has(c.fromId) && !ids.has(c.toId));
+      this.selectedIds = [];
+      this.connectFromId = null;
+      this.recomputeMatches();
+      this.announce(count === 1 ? '1 object archived' : `${count} objects archived`);
     },
     restoreFromArchive(id: string) {
       this._saveHistory();
