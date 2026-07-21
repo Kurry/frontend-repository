@@ -12,14 +12,31 @@ export const ORIGINAL_RATES = {
   'meridian-pro': 0.022,
 };
 
+// Workload pricing: every event is billed as tokens × model rate × the team's
+// infrastructure tier factor × the feature's orchestration overhead. This is
+// why recategorizing events between teams or features moves every aggregate —
+// spend genuinely shifts when work moves.
+export const TEAM_FACTORS = { Research: 1.0, Product: 1.12, Support: 0.92, Platform: 1.22 };
+export const FEATURE_FACTORS = {
+  'Chat assist': 1.0,
+  'Document summary': 1.05,
+  'Code review': 1.1,
+  'Semantic search': 0.95,
+  'Agent workflow': 1.18,
+};
+
+export function workloadFactor(team, feature) {
+  return (TEAM_FACTORS[team] ?? 1) * (FEATURE_FACTORS[feature] ?? 1);
+}
+
 export const INITIAL_CEILINGS = {
-  Research: 28,
+  Research: 5,
   Product: 24,
   Support: 18,
   Platform: 20,
 };
 
-const END_DATE = new Date('2026-07-20T12:00:00.000Z');
+export const END_DATE = new Date('2026-07-20T12:00:00.000Z');
 const DAYS = 96;
 const EVENTS_PER_DAY = 16;
 
@@ -43,7 +60,7 @@ export function seedEvents() {
       const hour = 1 + ((row * 5 + dayOffset) % 22);
       const minute = (row * 17 + dayOffset * 3) % 60;
       const timestamp = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), hour, minute)).toISOString();
-      const cost = Number((((promptTokens + completionTokens) / 1000) * ORIGINAL_RATES[model]).toFixed(6));
+      const cost = Number((((promptTokens + completionTokens) / 1000) * ORIGINAL_RATES[model] * workloadFactor(team, feature)).toFixed(6));
       events.push({
         id: `evt-${String(events.length + 1).padStart(4, '0')}`,
         timestamp,
@@ -65,3 +82,9 @@ export const DEFAULT_RANGE = {
   to: formatISO(END_DATE, { representation: 'date' }),
 };
 
+export function quickRange(days) {
+  return {
+    from: formatISO(subDays(END_DATE, days - 1), { representation: 'date' }),
+    to: formatISO(END_DATE, { representation: 'date' }),
+  };
+}

@@ -1,18 +1,17 @@
-import { dateRangeSchema, scheduleSchema, savedViewSchema, teamCeilingSchema } from './contracts';
+import { dateRangeSchema, formulaValues, scheduleSchema, savedViewSchema, teamCeilingSchema } from './contracts';
 import { FEATURES, MODELS, TEAMS } from './data';
-import { buildCostReport, useCostStore } from './store';
+import { buildCostReport, rateBounds, useCostStore } from './store';
 
-const DESTINATIONS = {
-  'spend-overview': null,
-  'spend-over-time': 'spend-over-time',
-  'dimension-breakdown': 'dimension-breakdown',
-  'team-budgets': 'team-budgets',
-  'anomaly-list': 'anomaly-list',
-  'event-table': 'event-table',
-  'unit-cost-explorer': 'unit-cost-explorer',
-  'report-history': 'report-history',
-};
+const DESTINATIONS = [
+  'spend-overview', 'spend-over-time', 'dimension-breakdown', 'team-budgets',
+  'anomaly-list', 'event-table', 'unit-cost-explorer', 'report-history',
+];
+const FILTERS = ['date-range', 'breakdown-dimension', 'series-toggle', 'drill-down-chip', 'anomaly-day', 'saved-view', 'period-compare-toggle'];
 const SORTS = { timestamp: 'timestamp', model: 'model', feature: 'feature', team: 'team', 'prompt-tokens': 'promptTokens', 'completion-tokens': 'completionTokens', cost: 'cost' };
+const ENTITY_FIELDS = ['team', 'feature', 'tag', 'team-ceiling', 'what-if-rate', 'budget-cap', 'saved-view-name', 'formula-expression', 'report-frequency', 'report-sections'];
+const DIMENSIONS = ['model', 'feature', 'team'];
+const membersFor = (dimension) => (dimension === 'model' ? MODELS : dimension === 'team' ? TEAMS : FEATURES);
+const ALL_MEMBERS = [...MODELS, ...TEAMS, ...FEATURES];
 
 function ok(message, details = {}) { return { ok: true, message, ...details }; }
 function fail(message) { return { ok: false, error: message }; }
@@ -30,28 +29,51 @@ function csv(report) {
 
 const tools = {
   browse_open: (args = {}) => {
-    if (!(args.destination in DESTINATIONS)) return fail('destination must be a declared dashboard destination');
-    const id = DESTINATIONS[args.destination];
-    if (id) document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); else window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (!DESTINATIONS.includes(args.destination)) return fail(`destination must be one of: ${DESTINATIONS.join(', ')}`);
+    const element = document.getElementById(args.destination);
+    if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' }); else window.scrollTo({ top: 0, behavior: 'smooth' });
     return ok(`Opened ${args.destination}`);
   },
   browse_apply_filter: (args = {}) => {
     const state = useCostStore.getState();
     if (args.filter === 'date-range') {
       const parsed = dateRangeSchema.safeParse({ from: args.from, to: args.to });
-      if (!parsed.success) return fail('date range: to must not precede from and both dates must use YYYY-MM-DD');
-      state.applyRange(parsed.data); return ok('Date range applied');
+      if (!parsed.success) return fail('date range: both dates must use YYYY-MM-DD and to must be on or after from');
+      state.applyRange(parsed.data); return ok('Date range applied', parsed.data);
     }
-    if (args.filter === 'breakdown-dimension' && ['model', 'feature', 'team'].includes(args.dimension)) { state.setDimension(args.dimension); return ok('Breakdown dimension applied'); }
-    if (args.filter === 'series-toggle') { state.toggleSeries(String(args.member)); return ok('Series visibility toggled'); }
-    if (args.filter === 'drill-down-chip' && /^\d{4}-\d{2}-\d{2}$/.test(args.day) && ['model', 'feature', 'team'].includes(args.dimension)) { state.applyDrilldown(args.day, args.dimension, args.member); return ok('Drill-down applied'); }
-    if (args.filter === 'anomaly-day' && /^\d{4}-\d{2}-\d{2}$/.test(args.day)) { state.applyAnomalyDay(args.day); return ok('Anomaly day applied'); }
-    if (args.filter === 'saved-view' && state.savedViews.some((v) => v.id === args.id)) { state.applyView(args.id); return ok('Saved view applied'); }
-    if (args.filter === 'period-compare-toggle' && typeof args.value === 'boolean') { state.setCompare(args.value); return ok('Period compare updated'); }
-    return fail('filter or bounded filter values are invalid');
+    if (args.filter === 'breakdown-dimension') {
+      if (!DIMENSIONS.includes(args.dimension)) return fail('dimension must be one of: model, feature, team');
+      state.setDimension(args.dimension); return ok(`Breakdown dimension set to ${args.dimension}`);
+    }
+    if (args.filter === 'series-toggle') {
+      if (!ALL_MEMBERS.includes(args.member)) return fail('member must be a seeded model, team, or feature name');
+      state.toggleSeries(String(args.member));
+      return ok(`Series ${args.member} toggled`, { hidden: Boolean(useCostStore.getState().hiddenSeries[args.member]) });
+    }
+    if (args.filter === 'drill-down-chip') {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(args.day || '') || !DIMENSIONS.includes(args.dimension)) return fail('drill-down needs a YYYY-MM-DD day and a dimension in model, feature, team');
+      if (!membersFor(args.dimension).includes(args.member)) return fail(`member must be one of the seeded ${args.dimension} names`);
+      state.applyDrilldown(args.day, args.dimension, args.member); return ok(`Drill-down applied to ${args.day} · ${args.dimension}: ${args.member}`);
+    }
+    if (args.filter === 'anomaly-day') {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(args.day || '')) return fail('day must use YYYY-MM-DD');
+      state.applyAnomalyDay(args.day); return ok(`Anomaly day ${args.day} applied as the table filter`);
+    }
+    if (args.filter === 'saved-view') {
+      if (!state.savedViews.some((v) => v.id === args.id)) return fail('id must name an existing saved view');
+      state.applyView(args.id); return ok('Saved view applied — its filters, dimension, and range are restored');
+    }
+    if (args.filter === 'period-compare-toggle') {
+      if (typeof args.value !== 'boolean') return fail('value must be true or false');
+      state.setCompare(args.value); return ok(`Period compare ${args.value ? 'on' : 'off'}`);
+    }
+    return fail(`filter must be one of: ${FILTERS.join(', ')}`);
   },
-  browse_clear_filter: () => { useCostStore.getState().clearFilter(); return ok('Applied drill-down filters cleared'); },
-  browse_sort: (args = {}) => { if (!SORTS[args.sort]) return fail('sort is outside the declared set'); useCostStore.getState().setSort(SORTS[args.sort]); return ok(`Sorted by ${args.sort}`); },
+  browse_clear_filter: () => { useCostStore.getState().clearFilter(); return ok('Applied drill-down and anomaly filters cleared'); },
+  browse_sort: (args = {}) => {
+    if (!SORTS[args.sort]) return fail(`sort must be one of: ${Object.keys(SORTS).join(', ')}`);
+    useCostStore.getState().setSort(SORTS[args.sort]); return ok(`Sorted by ${args.sort}`);
+  },
   entity_select: (args = {}) => {
     const ids = Array.isArray(args.ids) ? args.ids : args.id ? [args.id] : [];
     const valid = new Set(useCostStore.getState().events.map((e) => e.id));
@@ -60,61 +82,104 @@ const tools = {
   },
   entity_update: (args = {}) => {
     const state = useCostStore.getState();
-    if (args.field === 'budget-cap') { const capUsd = Number(args.value); if (!(capUsd > 0) || Math.round(capUsd * 100) !== capUsd * 100) return fail('capUsd must be positive with at most 2 decimals'); state.setBudgetCap({ capUsd }); return ok('Budget cap updated'); }
+    if (args.field === 'budget-cap') {
+      const capUsd = Number(args.value);
+      if (!(capUsd > 0) || Math.round(capUsd * 100) !== capUsd * 100) return fail('capUsd must be greater than 0 with at most 2 decimal places');
+      state.setBudgetCap({ capUsd }); return ok(`Budget cap updated to $${capUsd.toFixed(2)}`);
+    }
     if (args.field === 'team-ceiling') {
-      const parsed = teamCeilingSchema.safeParse({ team: args.team, ceilingUsd: Number(args.value) }); if (!parsed.success) return fail('team and ceilingUsd are invalid');
+      const parsed = teamCeilingSchema.safeParse({ team: args.team, ceilingUsd: Number(args.value) });
+      if (!parsed.success) return fail('team must be a seeded team and ceilingUsd must be greater than 0 with at most 2 decimals');
       const sum = TEAMS.reduce((n, team) => n + (team === parsed.data.team ? parsed.data.ceilingUsd : state.teamCeilings[team]), 0);
-      if (sum > state.budgetCap) return fail(`team ceilings exceed capUsd by $${(sum - state.budgetCap).toFixed(2)}`);
-      state.setTeamCeiling(parsed.data); return ok('Team ceiling updated');
+      if (sum > state.budgetCap) return fail(`team ceilings would exceed capUsd by $${(sum - state.budgetCap).toFixed(2)} — lower another ceiling or raise the cap first`);
+      state.setTeamCeiling(parsed.data); return ok(`${parsed.data.team} ceiling updated to $${parsed.data.ceilingUsd.toFixed(2)}`);
     }
     if (args.field === 'what-if-rate') {
       const rate = Number(args.value ?? args.rate);
-      if (!MODELS.includes(args.model) || !(rate > 0)) return fail('model or rate is invalid');
+      if (!MODELS.includes(args.model)) return fail(`model must be one of: ${MODELS.join(', ')}`);
+      const bounds = rateBounds(args.model);
+      if (!(rate > 0) || rate < bounds.min || rate > bounds.max) return fail(`rate for ${args.model} must be between ${bounds.min} and ${bounds.max} (0.25×–2.5× of the seeded rate)`);
       state.setRate(args.model, rate);
-      return ok('What-if rate updated', { model: args.model, rate });
+      return ok('What-if rate updated — tiles, charts, table, and estimator are repriced', { model: args.model, rate });
     }
-    if (args.field === 'formula-expression') { state.setFormula(String(args.value)); return ok('Formula expression updated'); }
+    if (args.field === 'formula-expression') {
+      const value = String(args.value ?? '');
+      if (!formulaValues.includes(value)) return fail(`formula must be exactly one of: ${formulaValues.join(', ')}`);
+      state.setFormula(value); return ok(`Formula set to ${value}`);
+    }
     if (args.field === 'team' || args.field === 'feature') {
-      const valid = args.field === 'team' ? TEAMS : FEATURES; if (!valid.includes(args.value) || !state.selectedIds.length) return fail('value must use the seeded closed set and events must be selected');
-      state.recategorize({ [args.field]: args.value }); return ok('Selected usage events recategorized');
+      const valid = args.field === 'team' ? TEAMS : FEATURES;
+      if (!valid.includes(args.value)) return fail(`value must be one of the seeded ${args.field} names: ${valid.join(', ')}`);
+      if (!state.selectedIds.length) return fail('select usage events first (entity_select)');
+      const count = state.selectedIds.length;
+      state.recategorize({ [args.field]: args.value });
+      return ok(`${count} usage events recategorized — every aggregate recomputed`);
+    }
+    if (args.field === 'tag') {
+      const value = String(args.value ?? '').trim();
+      if (!value || value.length > 40) return fail('tag must be a string of 1–40 characters');
+      if (!state.selectedIds.length) return fail('select usage events first (entity_select)');
+      const count = state.selectedIds.length;
+      state.recategorize({ tag: value });
+      return ok(`${count} usage events tagged "${value}"`);
     }
     if (args.field === 'report-frequency' || args.field === 'report-sections') {
-      const proposed = { frequency: args.field === 'report-frequency' ? args.value : state.schedule?.frequency || 'weekly', sections: args.field === 'report-sections' ? args.value : state.schedule?.sections || [] };
-      const parsed = scheduleSchema.safeParse(proposed); if (!parsed.success) return fail('frequency or sections request body is invalid'); state.saveSchedule(parsed.data); return ok('Report schedule updated');
+      const proposed = {
+        frequency: args.field === 'report-frequency' ? args.value : state.schedule?.frequency || 'weekly',
+        sections: args.field === 'report-sections' ? args.value : state.schedule?.sections || [],
+      };
+      const parsed = scheduleSchema.safeParse(proposed);
+      if (!parsed.success) return fail('frequency must be daily, weekly, or monthly, and sections must be a non-empty subset of totals, per-dimension-tables, anomalies');
+      state.saveSchedule(parsed.data); return ok('Report schedule updated');
     }
     if (args.field === 'saved-view-name') {
-      const body = { name: args.value, dimension: state.dimension, range: state.range }; const parsed = savedViewSchema.safeParse(body); if (!parsed.success) return fail('saved-view name must be a trimmed string of 2–60 characters'); state.saveView(parsed.data); return ok('Saved view created');
+      const body = { name: String(args.value ?? ''), dimension: state.dimension, range: state.range };
+      const parsed = savedViewSchema.safeParse(body);
+      if (!parsed.success) return fail('saved-view name must be a trimmed string of 2–60 characters');
+      state.saveView(parsed.data);
+      return ok(`Saved view "${parsed.data.name}" created and now active`);
     }
-    return fail('field is outside the declared entity fields');
+    return fail(`field must be one of: ${ENTITY_FIELDS.join(', ')}`);
   },
   entity_create: (args = {}) => tools.entity_update(args),
   entity_delete: (args = {}) => {
     if (args.confirm !== true) return fail('delete requires confirm=true');
     const state = useCostStore.getState();
-    if (args.savedViewId && state.savedViews.some((v) => v.id === args.savedViewId)) { state.deleteView(args.savedViewId); return ok('Saved view deleted; active filters remain visible'); }
-    return fail('Only declared saved views can be deleted');
+    if (args.savedViewId && state.savedViews.some((v) => v.id === args.savedViewId)) {
+      state.deleteView(args.savedViewId);
+      return ok('Saved view deleted — its currently applied filters remain active');
+    }
+    return fail('savedViewId must name an existing saved view');
   },
-  session_trigger_demo: (args = {}) => { if (args.demo !== 'run-schedule-now') return fail('demo must be run-schedule-now'); if (!useCostStore.getState().schedule) return fail('Save a valid schedule first'); useCostStore.getState().runScheduleNow(); return ok('One report snapshot generated'); },
+  session_trigger_demo: (args = {}) => {
+    if (args.demo !== 'run-schedule-now') return fail('demo must be run-schedule-now');
+    const state = useCostStore.getState();
+    if (!state.schedule) return fail('Save a valid schedule first (entity_update field=report-frequency / report-sections)');
+    const ran = state.runScheduleNow();
+    return ran
+      ? ok('One report snapshot generated — report history and the capacity gauge updated')
+      : ok('Run was pressed again inside the dedupe window — exactly one snapshot was kept');
+  },
   artifact_export: (args = {}) => {
     const report = buildCostReport(useCostStore.getState());
     if (args.format === 'cost-report-json') download('cost-analytics-report.json', 'application/json', JSON.stringify(report, null, 2));
     else if (args.format === 'cost-report-csv') download('cost-analytics-report.csv', 'text/csv;charset=utf-8', csv(report));
     else return fail('format must be cost-report-json or cost-report-csv');
-    return ok(`${args.format} download started`, { eventCount: report.totals.eventCount });
+    return ok(`${args.format} download started`, { eventCount: report.totals.eventCount, totalCost: report.totals.cost });
   },
 };
 
 const descriptions = {
-  browse_open: 'Open a declared Cost Command dashboard destination.',
-  browse_apply_filter: 'Apply one declared analytics filter using visible dashboard state.',
-  browse_clear_filter: 'Clear the active drill-down or anomaly filter.',
+  browse_open: 'Scroll to a declared Cost Command dashboard destination.',
+  browse_apply_filter: 'Apply one declared analytics filter (date-range, breakdown-dimension, series-toggle, drill-down-chip, anomaly-day, saved-view, period-compare-toggle) through the same handlers the visible controls use.',
+  browse_clear_filter: 'Clear the active drill-down or anomaly-day filter.',
   browse_sort: 'Sort the visible usage-event table by a declared column.',
-  entity_select: 'Select declared usage events for the bulk workflow.',
-  entity_update: 'Update one bounded analytics entity field.',
+  entity_select: 'Select seeded usage events for the bulk workflow.',
+  entity_update: 'Update one bounded analytics entity field (team, feature, tag, team-ceiling, what-if-rate, budget-cap, saved-view-name, formula-expression, report-frequency, report-sections).',
   entity_create: 'Create a saved view through its bounded field contract.',
-  entity_delete: 'Delete a saved view with explicit confirmation.',
-  session_trigger_demo: 'Run the saved report schedule once.',
-  artifact_export: 'Download the live cost report as JSON or CSV.',
+  entity_delete: 'Delete a saved view with explicit confirm=true.',
+  session_trigger_demo: 'Run the saved report schedule once (demo: run-schedule-now).',
+  artifact_export: 'Download the live cost report as cost-report-json or cost-report-csv.',
 };
 
 function toolArgs(value) {
@@ -129,7 +194,18 @@ export function registerWebMCP() {
   registered = true;
   window.webmcp_list_tools = () => Object.keys(tools).map((name) => ({ name, description: descriptions[name] || `${name.replaceAll('_', ' ')} operation` }));
   window.webmcp_invoke_tool = async (name, args = {}) => tools[name] ? tools[name](toolArgs(args)) : fail('Unknown WebMCP tool');
-  window.webmcp_session_info = () => ({ contractVersion: 'zto-webmcp-v1', app: 'Cost Command', toolCount: Object.keys(tools).length });
+  window.webmcp_session_info = () => ({
+    contractVersion: 'zto-webmcp-v1',
+    app: 'Cost Command',
+    toolCount: Object.keys(tools).length,
+    modules: ['browse-query-v1', 'entity-collection-v1', 'command-session-v1', 'artifact-transfer-v1'],
+    destinations: DESTINATIONS,
+    filters: FILTERS,
+    sorts: Object.keys(SORTS),
+    entityFields: ENTITY_FIELDS,
+    exportFormats: ['cost-report-json', 'cost-report-csv'],
+    demos: ['run-schedule-now'],
+  });
   const modelContext = navigator.modelContext;
   if (modelContext?.registerTool) {
     Object.entries(tools).forEach(([name, handler]) => {

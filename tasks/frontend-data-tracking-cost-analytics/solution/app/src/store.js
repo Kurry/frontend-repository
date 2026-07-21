@@ -1,12 +1,18 @@
 import { create } from 'zustand';
 import { differenceInCalendarDays, eachDayOfInterval, endOfMonth, format, parseISO, subDays } from 'date-fns';
-import { DEFAULT_RANGE, FEATURES, INITIAL_CEILINGS, MODELS, ORIGINAL_RATES, TEAMS, seedEvents } from './data';
+import { DEFAULT_RANGE, FEATURES, INITIAL_CEILINGS, MODELS, ORIGINAL_RATES, TEAMS, workloadFactor, seedEvents } from './data';
 import { formulaValues } from './contracts';
 
 const initialEvents = seedEvents();
 
 export const currentRate = (state, model) => state.rateOverrides[model] ?? ORIGINAL_RATES[model];
-export const pricedCost = (event, state) => Number((((event.promptTokens + event.completionTokens) / 1000) * currentRate(state, event.model)).toFixed(6));
+export const rateBounds = (model) => ({
+  min: Number((ORIGINAL_RATES[model] * 0.25).toFixed(4)),
+  max: Number((ORIGINAL_RATES[model] * 2.5).toFixed(4)),
+});
+export const pricedCost = (event, state) => Number(
+  (((event.promptTokens + event.completionTokens) / 1000) * currentRate(state, event.model) * workloadFactor(event.team, event.feature)).toFixed(6),
+);
 export const dateOf = (event) => event.timestamp.slice(0, 10);
 
 export function scopedEvents(state, includeRange = true) {
@@ -85,11 +91,24 @@ export function anomalyData(state) {
 export function teamAnalytics(state) {
   const events = scopedEvents(state);
   const span = Math.max(1, differenceInCalendarDays(parseISO(state.range.to), parseISO(state.range.from)) + 1);
-  const projectionDays = differenceInCalendarDays(endOfMonth(parseISO(state.range.to)), new Date(parseISO(state.range.to).getFullYear(), parseISO(state.range.to).getMonth(), 1)) + 1;
+  const monthEnd = endOfMonth(parseISO(state.range.to));
+  const projectionDays = differenceInCalendarDays(monthEnd, new Date(monthEnd.getFullYear(), monthEnd.getMonth(), 1)) + 1;
   return TEAMS.map((team) => {
     const spendToDate = events.filter((e) => e.team === team).reduce((sum, e) => sum + pricedCost(e, state), 0);
     return { team, ceilingUsd: state.teamCeilings[team], spendToDate, projectedMonthEnd: (spendToDate / span) * projectionDays };
   });
+}
+
+export function teamSparkline(state, team, days = 14) {
+  const to = parseISO(state.range.to);
+  const from = subDays(to, days - 1);
+  const map = new Map(eachDayOfInterval({ start: from, end: to }).map((date) => [format(date, 'yyyy-MM-dd'), 0]));
+  state.events.forEach((event) => {
+    const day = dateOf(event);
+    if (event.team !== team || !map.has(day)) return;
+    map.set(day, map.get(day) + pricedCost(event, state));
+  });
+  return [...map.values()];
 }
 
 export function kpiData(state) {
@@ -128,14 +147,14 @@ export function evaluateFormula(expression, events, state) {
   return { label: 'Completion tokens', value: totals.completionTokens };
 }
 
+// Undo/redo covers the durable edits the toolbar promises — bulk
+// recategorizations, ceiling edits, saved-view changes, and schedule changes —
+// without rewinding navigation state such as the active range or drill-down.
 const snapshot = (state) => ({
   events: state.events,
   teamCeilings: state.teamCeilings,
   savedViews: state.savedViews,
   schedule: state.schedule,
-  range: state.range,
-  dimension: state.dimension,
-  filter: state.filter,
 });
 
 const withHistory = (state, patch) => ({ ...patch, history: [...state.history.slice(-19), snapshot(state)], future: [] });
@@ -163,9 +182,20 @@ export const useCostStore = create((set, get) => ({
   future: [],
   toast: null,
   announce: '',
+  theme: 'light',
+  density: 'comfortable',
+  pinnedTeams: [],
+  tourDismissed: false,
 
   setToast: (toast) => set({ toast }),
-  setBudgetCap: ({ capUsd, note }) => set({ budgetCap: capUsd, budgetNote: note || '', announce: `Monthly budget cap set to $${capUsd.toFixed(2)}` }),
+  announceMessage: (message) => set({ announce: message }),
+  toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
+  setDensity: (density) => set({ density }),
+  togglePin: (team) => set((state) => ({
+    pinnedTeams: state.pinnedTeams.includes(team) ? state.pinnedTeams.filter((t) => t !== team) : [...state.pinnedTeams, team],
+  })),
+  dismissTour: () => set({ tourDismissed: true }),
+  setBudgetCap: ({ capUsd, note }) => set({ budgetCap: capUsd, budgetNote: note || '', announce: `Monthly budget cap set to $${Number(capUsd).toFixed(2)}` }),
   applyRange: (range) => set({ range, selectedIds: [], activeViewId: null }),
   setCompare: (compare) => set({ compare }),
   setDimension: (dimension) => set({ dimension, hiddenSeries: {}, activeViewId: null }),
@@ -177,14 +207,19 @@ export const useCostStore = create((set, get) => ({
   setSort: (key) => set((state) => ({ sort: { key, direction: state.sort.key === key && state.sort.direction === 'asc' ? 'desc' : 'asc' } })),
   setSelected: (ids) => set({ selectedIds: ids }),
   toggleSelected: (id) => set((state) => ({ selectedIds: state.selectedIds.includes(id) ? state.selectedIds.filter((x) => x !== id) : [...state.selectedIds, id] })),
-  recategorize: ({ team, feature }) => set((state) => withHistory(state, {
-    events: state.events.map((event) => state.selectedIds.includes(event.id) ? { ...event, ...(team ? { team } : {}), ...(feature ? { feature } : {}) } : event),
+  recategorize: ({ team, feature, tag }) => set((state) => withHistory(state, {
+    events: state.events.map((event) => state.selectedIds.includes(event.id)
+      ? { ...event, ...(team ? { team } : {}), ...(feature ? { feature } : {}), ...(tag ? { tag } : {}) }
+      : event),
     selectedIds: [],
     announce: `${state.selectedIds.length} events recategorized`,
   })),
-  setTeamCeiling: ({ team, ceilingUsd }) => set((state) => withHistory(state, { teamCeilings: { ...state.teamCeilings, [team]: ceilingUsd }, announce: `${team} ceiling updated` })),
-  setRate: (model, rate) => set((state) => ({ rateOverrides: { ...state.rateOverrides, [model]: rate } })),
-  revertRates: () => set({ rateOverrides: {}, announce: 'What-if rates reverted' }),
+  setTeamCeiling: ({ team, ceilingUsd }) => set((state) => withHistory(state, { teamCeilings: { ...state.teamCeilings, [team]: ceilingUsd }, announce: `${team} ceiling updated to $${Number(ceilingUsd).toFixed(2)}` })),
+  setRate: (model, rate) => set((state) => {
+    const { min, max } = rateBounds(model);
+    return { rateOverrides: { ...state.rateOverrides, [model]: Math.min(max, Math.max(min, Number(rate))) } };
+  }),
+  revertRates: () => set({ rateOverrides: {}, announce: 'What-if rates reverted to the originals' }),
   setFormula: (formula) => set({ formula }),
   saveView: ({ name, dimension, range }) => set((state) => {
     const view = { id: `view-${Date.now()}`, name: name.trim(), dimension, range, filter: state.filter };
@@ -205,13 +240,15 @@ export const useCostStore = create((set, get) => ({
     toast: { kind: 'success', title: 'Schedule saved', subtitle: `${schedule.frequency} report schedule is active.` },
     announce: `${schedule.frequency} report schedule saved`,
   })),
-  runScheduleNow: () => set((state) => {
+  runScheduleNow: () => {
+    const state = get();
     const now = Date.now();
-    if (now - state.lastReportRunAt < 600) return {};
+    if (now - state.lastReportRunAt < 600) return false;
     const totals = totalsFor(scopedEvents(state), state);
     const report = { id: `report-${now}`, generatedAt: new Date(now).toISOString(), totals };
-    return { snapshots: [...state.snapshots, report], lastReportRunAt: now, toast: { kind: 'success', title: 'Report generated', subtitle: 'A live snapshot was added to history.' }, announce: 'Report generated' };
-  }),
+    set({ snapshots: [...state.snapshots, report], lastReportRunAt: now, toast: { kind: 'success', title: 'Report generated', subtitle: 'A live snapshot was added to history.' }, announce: 'Report generated' });
+    return true;
+  },
   undo: () => set((state) => {
     if (!state.history.length) return {};
     const prior = state.history.at(-1);
