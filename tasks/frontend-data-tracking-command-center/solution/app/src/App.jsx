@@ -223,7 +223,7 @@ function KpiStrip() {
 
 function ConfirmDialog({ open, title, description, confirmLabel, danger = true, onConfirm, onClose }) {
   const [render, exiting] = usePresence(open)
-  const ref = useFocusTrap(open, onClose)
+  const ref = useFocusTrap(render, onClose)
   if (!render) return null
   return (
     <div className={cx('overlay overlay-center', exiting && 'overlay-exit')} role="presentation">
@@ -374,7 +374,8 @@ function ConnectDialog({ openerRef }) {
   const open = useCommandStore((state) => state.connectOpen)
   const setOpen = useCommandStore((state) => state.setConnectOpen)
   const connectAgent = useCommandStore((state) => state.connectAgent)
-  const dialogRef = useFocusTrap(open, () => setOpen(false), openerRef)
+  const [render, exiting] = usePresence(open)
+  const dialogRef = useFocusTrap(render, () => setOpen(false), openerRef)
   const submitLock = useRef(false)
   const { register, control, handleSubmit, reset, trigger, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(agentInputSchema), mode: 'onChange', defaultValues: { name: '', model: '', description: '' } })
   useEffect(() => {
@@ -390,7 +391,6 @@ function ConnectDialog({ openerRef }) {
     const outcome = connectAgent(values)
     if (!outcome.ok) submitLock.current = false
   }
-  const [render, exiting] = usePresence(open)
   if (!render) return null
   const descriptionLength = watch('description')?.length || 0
   return (
@@ -417,7 +417,7 @@ function NightSchedule({ badgeRef }) {
   const setAccent = useCommandStore((state) => state.setAccent)
   const save = useCommandStore((state) => state.saveNightSchedule)
   const [render, exiting] = usePresence(open, 160)
-  const popoverRef = useFocusTrap(open, () => setOpen(false), badgeRef)
+  const popoverRef = useFocusTrap(render, () => setOpen(false), badgeRef)
   const { register, control, handleSubmit, reset, trigger, watch, formState: { errors } } = useForm({ resolver: zodResolver(nightScheduleSchema), mode: 'onChange', defaultValues: schedule })
   useEffect(() => { if (open) reset(schedule) }, [open, reset, schedule])
   const enabled = watch('enable')
@@ -522,7 +522,8 @@ const fuzzy = (text, query) => {
 function CommandPalette({ openerRef, exportRef }) {
   const open = useCommandStore((state) => state.paletteOpen)
   const setOpen = useCommandStore((state) => state.setPaletteOpen)
-  const dialogRef = useFocusTrap(open, () => setOpen(false), openerRef)
+  const [render, exiting] = usePresence(open, 170)
+  const dialogRef = useFocusTrap(render, () => setOpen(false), openerRef)
   const [query, setQuery] = useState('')
   useEffect(() => { if (open) setQuery('') }, [open])
   const store = useCommandStore.getState
@@ -535,7 +536,6 @@ function CommandPalette({ openerRef, exportRef }) {
     { name: 'Keyboard shortcuts', meta: 'Help', icon: Keyboard, action: () => store().setShortcutsOpen(true) },
   ]
   const filtered = commands.filter((command) => fuzzy(command.name, query))
-  const [render, exiting] = usePresence(open, 170)
   if (!render) return null
   return (
     <div className={cx('overlay palette-overlay', exiting && 'overlay-exit')} role="presentation">
@@ -554,7 +554,7 @@ function SummaryDialog() {
   const setOpen = useCommandStore((state) => state.setSummaryOpen)
   const state = useCommandStore()
   const [render, exiting] = usePresence(open)
-  const dialogRef = useFocusTrap(open, () => setOpen(false))
+  const dialogRef = useFocusTrap(render, () => setOpen(false))
   if (!render) return null
   const kpis = getLiveKpis(state)
   return (
@@ -579,7 +579,7 @@ function ShortcutsDialog() {
   const open = useCommandStore((state) => state.shortcutsOpen)
   const setOpen = useCommandStore((state) => state.setShortcutsOpen)
   const [render, exiting] = usePresence(open, 160)
-  const dialogRef = useFocusTrap(open, () => setOpen(false))
+  const dialogRef = useFocusTrap(render, () => setOpen(false))
   if (!render) return null
   const shortcuts = [
     ['⌘K / Ctrl K', 'Open the command palette'],
@@ -671,7 +671,7 @@ function App() {
       }
       if (event.key === '?' && !typing) {
         const state = useCommandStore.getState()
-        const overlayOpen = state.connectOpen || state.exportOpen || state.paletteOpen || state.nightOpen || state.summaryOpen || state.shortcutsOpen
+        const overlayOpen = state.connectOpen || state.exportOpen || state.paletteOpen || state.nightOpen || state.summaryOpen || state.shortcutsOpen || document.querySelector('.confirm-card')
         if (!overlayOpen) { event.preventDefault(); state.setShortcutsOpen(true) }
       }
     }
