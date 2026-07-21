@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+/* IBM Plex served from bundled woff2 files — no CDN requests. */
+@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("./fonts/IBMPlexSans-Regular.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url("./fonts/IBMPlexSans-Medium.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("./fonts/IBMPlexSans-SemiBold.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("./fonts/IBMPlexMono-Regular.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url("./fonts/IBMPlexMono-Medium.woff2") format("woff2"); }
+@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600; font-display: swap; src: url("./fonts/IBMPlexMono-SemiBold.woff2") format("woff2"); }
+
 @theme {
   --color-ink: #17213a;
   --color-muted: #667085;
@@ -48,7 +56,8 @@ kbd { border: 1px solid #cdd4df; border-bottom-width: 2px; border-radius: 4px; b
 .section-intro h1, .library-hero h1 { margin: 0; color: #17213a; font-size: 23px; font-weight: 500; letter-spacing: -.03em; }
 .section-intro > p { margin: 0 0 2px; color: #79849a; font-size: 12px; }
 
-.toolbar { display: flex; min-width: 0; align-items: center; gap: 7px; border-block: 1px solid #e3e8ef; background: #f8fafc; padding: 8px 10px; }
+.toolbar { display: flex; min-width: 0; flex-wrap: wrap; align-items: center; gap: 7px; border-block: 1px solid #e3e8ef; background: #f8fafc; padding: 8px 10px; }
+.toolbar-run { margin-left: auto; }
 .toolbar .cds--select, .toolbar .cds--select-input__wrapper { height: 32px; }
 .toolbar .cds--select-input { height: 32px; min-width: 164px; border-bottom: 0; background: white; font-size: 12px; }
 .toolbar .cds--btn { min-height: 32px; padding-block: 0; padding-inline: 11px 35px; white-space: nowrap; transition: transform .13s, box-shadow .13s, background .13s; }
@@ -59,7 +68,6 @@ kbd { border: 1px solid #cdd4df; border-bottom-width: 2px; border-radius: 4px; b
 .metric strong { color: #1f2a44; font-family: var(--font-mono); font-size: 11px; font-weight: 600; }
 .metric span { margin-top: 3px; color: #7b879c; font-size: 9px; text-transform: uppercase; }
 .toolbar-divider { width: 1px; height: 22px; background: #d9dfe8; }
-.toolbar-spacer { flex: 1; }
 
 .suggestion-row { display: flex; min-width: 0; gap: 8px; overflow-x: auto; padding: 11px 14px 10px; scrollbar-width: thin; }
 .suggestion-chip { display: inline-flex; height: 30px; flex: 0 0 auto; align-items: center; gap: 6px; border: 1px solid #dce3ed; border-radius: 999px; background: #fff; padding: 0 12px; color: #34415d; font-size: 11px; cursor: pointer; transition: background .15s, border-color .15s, transform .15s; }
@@ -78,10 +86,12 @@ kbd { border: 1px solid #cdd4df; border-bottom-width: 2px; border-radius: 4px; b
 .attachment-badge:hover .attachment-remove, .attachment-badge:focus-within .attachment-remove { display: grid; }
 .attachment-badge:hover .attachment-preview, .attachment-badge:focus .attachment-preview { display: flex; }
 @keyframes badge-in { from { opacity: 0; transform: translateY(-4px) scale(.96); } }
+.attachment-badge.leaving { animation: badge-out .18s ease both; }
+@keyframes badge-out { to { opacity: 0; transform: translateY(-4px) scale(.94); } }
 
 .prompt-editor { overflow: hidden; border-top: 1px solid #e7ebf0; border-radius: 0 0 8px 8px; background: #fff; }
 .cm-editor { color: #26324b; background: transparent; }
-.cm-editor.cm-focused { box-shadow: inset 0 0 0 2px #0f62fe; }
+.cm-editor.cm-focused { outline: 2px solid #0f62fe; outline-offset: -2px; box-shadow: inset 0 0 0 2px #0f62fe; }
 .cm-placeholder { border-radius: 4px; background: #dbeafe; padding: 1px 3px; color: #174ea6; font-weight: 600; box-shadow: inset 0 0 0 1px #bfdbfe; }
 
 .side-panel { position: sticky; top: 82px; min-width: 0; overflow: hidden; border-radius: 8px; }
@@ -232,7 +242,17 @@ kbd { border: 1px solid #cdd4df; border-bottom-width: 2px; border-radius: 4px; b
 .library-row.cds--tile { display: grid; min-height: 78px; grid-template-columns: 34px minmax(0,1fr) auto 55px 42px; align-items: center; gap: 14px; border: 1px solid #e0e5ec; background: white; padding: 0 10px 0 15px; box-shadow: 0 1px 2px rgba(16,24,40,.025); animation: row-in .2s ease both; transition: border-color .16s, background .16s, transform .16s, box-shadow .16s; }
 .library-row.cds--tile:hover { border-color: #bdcbe7; background: #fbfcff; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(16,24,40,.06); }
 @keyframes row-in { from { opacity: 0; transform: translateY(5px); } }
-.library-check .cds--checkbox-label-text { display: none; }
+.library-row.cds--tile.leaving { animation: row-out .18s ease both; }
+@keyframes row-out { to { opacity: 0; transform: translateY(5px); } }
+.library-row.cds--tile:focus-within { border-color: #5478d5; box-shadow: 0 0 0 2px #dbe5ff; }
+.library-open:hover strong { color: #1649a8; }
+/* Visually hide the label text but keep it in the accessibility tree. */
+.library-check .cds--checkbox-label-text { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+/* Let the pointer hit the real checkbox input (the label passes events through). */
+.library-check { position: relative; width: 22px; height: 22px; }
+.library-check .cds--checkbox { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; margin: 0; opacity: 0; clip: auto; cursor: pointer; pointer-events: auto; }
+.library-check .cds--checkbox-label { pointer-events: none; }
+.library-check:hover .cds--checkbox-label::before { background-color: #a7c4fb; }
 .library-open { min-width: 0; border: 0; background: transparent; padding: 14px 0; color: #26334d; text-align: left; cursor: pointer; }
 .library-open > span { display: flex; min-width: 0; flex-direction: column; }
 .library-open strong { font-size: 13px; }
@@ -278,11 +298,44 @@ kbd { border: 1px solid #cdd4df; border-bottom-width: 2px; border-radius: 4px; b
 
 .toast-stack { position: fixed; z-index: 200; top: 78px; right: 16px; display: grid; width: min(360px, calc(100vw - 32px)); gap: 8px; }
 .toast-stack .cds--inline-notification { width: 100%; max-width: none; margin: 0; box-shadow: 0 8px 24px rgba(16,24,40,.14); animation: toast-in .22s ease both; }
+.toast-stack .cds--inline-notification.leaving { animation: toast-out .3s ease both; }
 @keyframes toast-in { from { opacity: 0; transform: translateX(16px); } }
+@keyframes toast-out { to { opacity: 0; transform: translateX(16px); } }
+
+/* Variant flip cross-fade and coordinated stagger beat */
+.response-body.variant-in { animation: variant-in .26s ease both; }
+@keyframes variant-in { from { opacity: .1; transform: translateY(4px); } }
+.response-body.fading { opacity: .12; }
+.response-main.staggering .variant-row { animation: stagger-in .26s ease both; }
+.response-main.staggering .reasoning { animation: stagger-in .26s ease .06s both; }
+.response-main.staggering .response-body { animation: stagger-in .26s ease .12s both; }
+@keyframes stagger-in { from { opacity: .15; transform: translateY(5px); } }
+
+/* Run-complete settle cue: status pill morph plus a light sweep over the response */
+.status.morph { animation: status-pop .5s cubic-bezier(.2,.9,.3,1.35) both; }
+@keyframes status-pop { 0% { transform: scale(.75); } 55% { transform: scale(1.14); } 100% { transform: scale(1); } }
+.response-body.settled::after { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(105deg, transparent 32%, rgba(143,178,255,.18) 50%, transparent 68%); animation: settle-sweep .85s ease-out both; content: ''; }
+@keyframes settle-sweep { from { transform: translateX(-65%); } to { transform: translateX(65%); } }
+
+/* First-run coachmark strip */
+.coachmark { display: flex; align-items: center; gap: 12px; margin: 10px 14px 0; border: 1px solid #c9d8fb; border-left: 3px solid #2457d6; border-radius: 6px; background: #f3f7ff; padding: 9px 12px; animation: pop-in .22s ease both; }
+.coachmark ol { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 0; padding: 0; list-style: none; color: #3c4c6d; font-size: 11px; line-height: 1.5; }
+.coachmark li { display: flex; align-items: center; gap: 6px; }
+.coachmark .step-num { display: grid; width: 16px; height: 16px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: #2457d6; color: white; font-size: 9px; font-weight: 700; }
+.coachmark strong { color: #1c2c52; }
+.coachmark .cds--btn { flex: 0 0 auto; }
+
+/* Reduce-motion toggle in the header (mirrors prefers-reduced-motion) */
+.motion-toggle { display: inline-flex; height: 36px; align-items: center; gap: 7px; border: 1px solid transparent; border-radius: 6px; background: transparent; padding: 0 10px; color: #5d6b85; font-size: 11px; cursor: pointer; transition: background .15s, color .15s; }
+.motion-toggle:hover { background: #eef2f9; color: #2c3a57; }
+.motion-toggle[aria-pressed="true"] { border-color: #cdd8ec; background: #e8edf7; color: #1d2c4d; }
+
+/* Shareable package summary chips in the Export modal */
+.package-summary { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 12px; }
+.sum-chip { display: inline-flex; align-items: center; gap: 5px; border: 1px solid #dfe5ee; border-radius: 999px; background: #f6f8fc; padding: 3px 10px; color: #45536f; font-family: var(--font-mono); font-size: 10px; }
+.sum-chip strong { color: #22314f; font-weight: 600; }
 
 @media (max-width: 1250px) {
-  .toolbar { flex-wrap: wrap; }
-  .toolbar-spacer { display: none; }
   .shortcut-hint { min-width: 46px; }
   .shortcut-hint span { display: none; }
 }
@@ -311,6 +364,7 @@ kbd { border: 1px solid #cdd4df; border-bottom-width: 2px; border-radius: 4px; b
   .toolbar .cds--select-input { width: 100%; min-width: 0; }
   .toolbar-divider { display: none; }
   .toolbar .cds--btn:not(.cds--btn--icon-only) { flex: 1 0 auto; justify-content: flex-start; }
+  .suggestion-row { flex-wrap: wrap; overflow-x: visible; }
   .editor-meta-row { align-items: flex-start; flex-direction: column; }
   .attachment-strip { width: 100%; flex-wrap: wrap; }
   .response-grid { grid-template-columns: 1fr; }
@@ -350,3 +404,7 @@ kbd { border: 1px solid #cdd4df; border-bottom-width: 2px; border-radius: 4px; b
   *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
   .stream-cursor { animation: none !important; opacity: 1 !important; }
 }
+
+/* In-app mirror of prefers-reduced-motion, driven by the header toggle */
+.reduce-motion *, .reduce-motion *::before, .reduce-motion *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
+.reduce-motion .stream-cursor { animation: none !important; opacity: 1 !important; }

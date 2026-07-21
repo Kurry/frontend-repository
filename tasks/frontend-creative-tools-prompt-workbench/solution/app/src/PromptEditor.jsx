@@ -12,12 +12,14 @@ const placeholderPlugin = ViewPlugin.fromClass(class {
   update(update) { this.decorations = placeholders.updateDeco(update, this.decorations) }
 }, { decorations: (instance) => instance.decorations })
 
-export const PromptEditor = forwardRef(function PromptEditor({ value, onChange }, ref) {
+export const PromptEditor = forwardRef(function PromptEditor({ value, onChange, onPastePlaceholders }, ref) {
   const hostRef = useRef(null)
   const viewRef = useRef(null)
   const syncingRef = useRef(false)
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
+  const onPasteRef = useRef(onPastePlaceholders)
+  onPasteRef.current = onPastePlaceholders
 
   useEffect(() => {
     if (!hostRef.current) return
@@ -29,6 +31,14 @@ export const PromptEditor = forwardRef(function PromptEditor({ value, onChange }
         EditorView.lineWrapping,
         placeholderPlugin,
         EditorView.contentAttributes.of({ 'aria-label': 'Prompt editor', spellcheck: 'true' }),
+        EditorView.domEventHandlers({
+          paste(event) {
+            const text = event.clipboardData?.getData('text/plain') || ''
+            const names = [...new Set([...text.matchAll(/\{\{([A-Za-z0-9_]+)\}\}/g)].map((match) => match[1]))]
+            if (names.length) onPasteRef.current?.(names)
+            return false
+          },
+        }),
         EditorView.theme({
           '&': { minHeight: '258px', height: '100%' },
           '.cm-content': { padding: '20px', fontFamily: 'IBM Plex Mono, ui-monospace, monospace', fontSize: '14px', lineHeight: '1.7', caretColor: '#2563eb' },

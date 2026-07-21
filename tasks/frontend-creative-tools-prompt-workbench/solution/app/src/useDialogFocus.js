@@ -9,7 +9,10 @@ export function useDialogFocus(open, ref, onClose) {
     const timer = window.setTimeout(() => ref.current?.querySelector(focusable)?.focus(), 20)
     const handleKey = (event) => {
       if (event.key === 'Escape') {
+        // Capture phase: Carbon's internal handlers can otherwise swallow the
+        // first Escape before it reaches a document-level bubble listener.
         event.preventDefault()
+        event.stopPropagation()
         onClose()
         return
       }
@@ -21,10 +24,10 @@ export function useDialogFocus(open, ref, onClose) {
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
     }
-    document.addEventListener('keydown', handleKey)
+    document.addEventListener('keydown', handleKey, true)
     return () => {
       window.clearTimeout(timer)
-      document.removeEventListener('keydown', handleKey)
+      document.removeEventListener('keydown', handleKey, true)
       previous?.focus?.()
     }
   }, [open, ref, onClose])
