@@ -2,10 +2,8 @@
 [[reward]]
 name = "reward"
 aggregation = "weighted_mean"
-gate_dimensions = ["anticheat"]
 
 [[reward]]
 name = "pass"
 aggregation = "threshold"
 threshold = 0.7
-gate_dimensions = ["anticheat"]
