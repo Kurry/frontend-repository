@@ -495,24 +495,22 @@ export default function TechniqueForm({ technique, active }) {
           >
             Reset form
           </Button>
-          <span
-            className="submit-proxy"
-            onClick={() => {
-              if (isValid) return
-              setSubmitAttempted(true)
-              trigger()
-              setAnnouncement('Prompt not generated. Resolve the named fields and try again.')
-            }}
-          >
-            <Button
+          <Button
               type="submit"
               kind="primary"
               size="md"
               renderIcon={(props) => <ArrowRight {...props} aria-hidden="true" />}
+              onClick={(e) => {
+                if (!isValid) {
+                  e.preventDefault();
+                  setSubmitAttempted(true);
+                  trigger();
+                  setAnnouncement('Prompt not generated. Resolve the named fields and try again.');
+                }
+              }}
             >
               Generate prompt
             </Button>
-          </span>
         </div>
       </div>
     </form>
