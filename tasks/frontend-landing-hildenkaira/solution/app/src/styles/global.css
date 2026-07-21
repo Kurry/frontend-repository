@@ -522,8 +522,11 @@ h1, h2, h3, h4, h5, h6, p, blockquote { margin: 0; }
 .swiper-group { position: relative; display: flex; flex-direction: column; gap: 2em; width: 100%; }
 .swiper { display: flex; justify-content: flex-start; align-items: flex-start; width: 100%; overflow: visible !important; }
 .swiper-wrapper { display: flex; align-items: center; width: 100%; }
-.swiper-slide { flex: none; width: 85vw; max-width: 85vw; transform: scale(.94); transition: transform 600ms ease; }
-.swiper-slide-active { transform: scale(1); }
+.swiper-slide { flex: none; width: 85vw; max-width: 85vw; }
+/* Swiper writes an inline translate3d on the slide, which would clobber any
+   CSS transform here — so the active/neighbor scale lives on the inner card. */
+.client-deck_card { transform: scale(.94); transition: transform 600ms cubic-bezier(.625, .05, 0, 1); }
+.swiper-slide-active .client-deck_card { transform: scale(1); }
 .swiper-navigation {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
   z-index: 2; display: flex; justify-content: space-between; align-items: center;
@@ -986,4 +989,29 @@ dialog.cta-pop-up[open] {
 button[data-shortlist-btn].is-active {
   background: var(--_theme---button-primary-bg, #ecfdad) !important;
   color: #181818 !important;
+}
+
+/* Contact form inline error text (named, per-field, announced via role=alert) */
+.form-error-msg { min-height: 1em; margin: .35em 0 0; font-size: .8em; line-height: 1.3; color: #ff4545; }
+.form-field-group:not(.is--error) .form-error-msg { color: transparent; }
+.theme-chrome .form-error-msg { color: #ff4545; }
+
+/* Reduced motion: present every section in its settled, fully-visible state.
+   The js-motion hiding class is not applied here, so reveals never hide
+   content; we additionally flatten the pinned services stack and parallax so
+   no card, heading, control, or form depends on a transform to be seen. */
+html.reduce-motion .hero-home_pageload-bg { display: none !important; }
+html.reduce-motion .hero-home_item { opacity: .9 !important; }
+html.reduce-motion [data-scroll-speed],
+html.reduce-motion [data-parallax-image] { transform: none !important; }
+html.reduce-motion .services-pin-height { height: auto !important; padding-top: 0 !important; }
+html.reduce-motion .services-container { position: static !important; height: auto !important; }
+html.reduce-motion .services-list { height: auto !important; }
+html.reduce-motion .services-item {
+  position: static !important; width: 100% !important; height: auto !important;
+  transform: none !important; margin-bottom: 1.5em;
+}
+html.reduce-motion .client-deck_card { transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  html:not(.js-motion) .hero-home_pageload-bg { display: none !important; }
 }

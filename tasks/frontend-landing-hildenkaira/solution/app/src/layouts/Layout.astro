@@ -11,32 +11,26 @@ interface Props {
   title?: string;
   bodyClass?: string;
 }
-const { title = "Hildén & Kaira", bodyClass = "" } = Astro.props;
+const { title = "Cinder & Bloom", bodyClass = "" } = Astro.props;
 
 const orgJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Hildén & Kaira",
-  url: "https://www.hildenkaira.fi/",
-  slogan: "We will 10x your organic presence or work for free until it's done.",
-  sameAs: [
-    "https://instagram.com/hildenkaira",
-    "https://tiktok.com/@hildenkaira",
-    "https://youtube.com/@hildenkaira",
-    "https://www.facebook.com/hildenkaira/",
-  ],
+  name: "Cinder & Bloom",
+  url: "/",
+  slogan: "We will 10x your social presence or work for free until it's done.",
   review: [
     {
       "@type": "Review",
-      author: { "@type": "Person", name: "Nea Mertsalmi" },
+      author: { "@type": "Person", name: "Marcus Virtanen" },
       reviewBody:
-        "Results speak for themselves. We've reached a massive audience and broken into traditional media's awareness in just a few months.",
+        "Results speak for themselves. We reached a massive audience and broke into traditional media's awareness in just a few months.",
     },
     {
       "@type": "Review",
-      author: { "@type": "Person", name: "Alma Rapakko" },
+      author: { "@type": "Person", name: "Aino Laine" },
       reviewBody:
-        "Hildén & Kaira has succeeded in bringing the expertise and knowledge at the core of our work to a wide audience, and the results have followed.",
+        "Cinder & Bloom has succeeded in bringing the expertise at the core of our work to a wide audience, and the results have followed.",
     },
   ],
 };
@@ -51,12 +45,17 @@ const orgJsonLd = {
     <link rel="apple-touch-icon" href="/webclip.png" />
     <link rel="alternate" hreflang="en-GB" href="/" />
     <link rel="alternate" hreflang="x-default" href="/" />
-    <link rel="preload" href="/fonts/PPEditorialNew-Regular.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/PPNeueMontreal-Medium.woff2" as="font" type="font/woff2" crossorigin />
     <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} />
     <script is:inline>
-      // Motion gate + Safari class, before first paint.
-      document.documentElement.classList.add("js-motion");
+      // Motion gate + Safari class, before first paint. Only add the
+      // js-motion hiding/animation class when motion is allowed; otherwise
+      // mark reduce-motion so CSS shows every section in its settled state.
+      var _rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (_rm) {
+        document.documentElement.classList.add("reduce-motion");
+      } else {
+        document.documentElement.classList.add("js-motion");
+      }
       if (/^((?!chrome|android).)*safari/i.test(navigator.userAgent)) {
         document.documentElement.classList.add("is-safari");
       }

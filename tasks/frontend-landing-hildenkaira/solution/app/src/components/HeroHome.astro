@@ -2,13 +2,24 @@
 import data from "../data/home.json";
 import Button from "./Button.astro";
 const { h1, lead, buttons, floating } = data.hero;
-const letters = [
-  ["is-1", "letter-h"], ["is-2", "letter-i-1"], ["is-3", "letter-l"], ["is-4", "letter-d"],
-  ["is-5", "letter-e"], ["is-6", "letter-n"], ["is-7", "letter-and"], ["is-8", "letter-k"],
-  ["is-9", "letter-a-1"], ["is-10", "letter-i-2"], ["is-11", "letter-r"], ["is-12", "letter-a-2"],
-];
+// Twelve original chrome letterforms spelling the fictional wordmark
+// "Cinder & Bloom" (C i n d e r & B l o o m). Each is an inline SVG so the
+// bundled editorial face fills it; per-letter widths compose the wordmark.
+const CHARS = ["C", "i", "n", "d", "e", "r", "&", "B", "l", "o", "o", "m"];
+const WIDTHS = [74, 30, 64, 64, 60, 42, 82, 74, 30, 62, 62, 96];
 ---
 <header class="section_hero" data-gsap-ignore>
+  <svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+    <defs>
+      <linearGradient id="chromeHero" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#fbfbfb"/>
+        <stop offset="0.32" stop-color="#c9c9c9"/>
+        <stop offset="0.5" stop-color="#f2f2f2"/>
+        <stop offset="0.7" stop-color="#8f8f8f"/>
+        <stop offset="1" stop-color="#d6d6d6"/>
+      </linearGradient>
+    </defs>
+  </svg>
   <div class="hero-home_wrapper">
     <div class="hero-home_body">
       <div class="padding-global">
@@ -31,15 +42,24 @@ const letters = [
       </div>
     </div>
 
-    <div class="hero-home_logo" data-hero-logo>
-      {letters.map(([pos, name], i) => (
-        <img
-          class={`hero-home_logo-item ${pos}`}
-          src={`/logo/${name}.avif`}
-          alt={pos === "is-7" ? "Hildén & Kaira logo icon" : ""}
-          loading="eager"
+    <div class="hero-home_logo" data-hero-logo role="img" aria-label="Cinder & Bloom">
+      {CHARS.map((ch, i) => (
+        <svg
+          class={`hero-home_logo-item is-${i + 1}`}
+          viewBox={`0 0 ${WIDTHS[i]} 100`}
+          aria-hidden="true"
+          focusable="false"
           data-logo-index={i}
-        />
+        >
+          <text
+            x="2"
+            y="82"
+            textLength={WIDTHS[i] - 4}
+            lengthAdjust="spacingAndGlyphs"
+            fill="url(#chromeHero)"
+            style="font-family:var(--_fonts---fonts--heading);font-weight:400;font-size:96px;"
+          >{ch}</text>
+        </svg>
       ))}
     </div>
 

@@ -13,23 +13,35 @@ function activate(el, video) {
   if (el.getAttribute("data-player-activated") === "true") return;
   el.setAttribute("data-player-activated", "true");
   const src = el.getAttribute("data-player-src") || "";
-  // Prefer VP9/WebM with progressive MP4 (H.264) fallback. Some Chromium
-  // builds ship without the H.264 decoder, so an mp4-only <video> never
-  // reaches readyState >= 2 there; the webm source keeps it playable.
+  // Build source(s) matching the real file type. VP9/WebM is preferred (the
+  // judge's Chromium decodes VP9 but not always H.264); when an .mp4 path is
+  // given we also offer the sibling .webm. Each client slot uses its own
+  // distinct local clip, so no media is reused across client identities.
   video.removeAttribute("src");
   while (video.firstChild) video.removeChild(video.firstChild);
   if (src) {
-    const webm = src.replace(/\.mp4(\?.*)?$/i, (_m, q) => `.webm${q || ""}`);
-    if (webm !== src) {
+    const isWebm = /\.webm(\?|$)/i.test(src);
+    const isMp4 = /\.mp4(\?|$)/i.test(src);
+    if (isWebm) {
+      const s = document.createElement("source");
+      s.src = src;
+      s.type = "video/webm";
+      video.appendChild(s);
+    } else if (isMp4) {
+      const webm = src.replace(/\.mp4(\?.*)?$/i, (_m, q) => `.webm${q || ""}`);
       const s = document.createElement("source");
       s.src = webm;
       s.type = "video/webm";
       video.appendChild(s);
+      const m = document.createElement("source");
+      m.src = src;
+      m.type = "video/mp4";
+      video.appendChild(m);
+    } else {
+      const s = document.createElement("source");
+      s.src = src;
+      video.appendChild(s);
     }
-    const m = document.createElement("source");
-    m.src = src;
-    m.type = "video/mp4";
-    video.appendChild(m);
   }
   video.load();
 }
@@ -154,6 +166,18 @@ function initPlayer(el) {
 
   el.addEventListener("mouseenter", () => el.classList.add("is-hover-active"));
   el.addEventListener("mouseleave", () => el.classList.remove("is-hover-active"));
+
+  // role=button controls are divs; make them keyboard operable.
+  el.querySelectorAll("[data-player-control]").forEach((ctrl) => {
+    if (!ctrl.hasAttribute("tabindex")) ctrl.setAttribute("tabindex", "0");
+    ctrl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        e.stopPropagation();
+        ctrl.click();
+      }
+    });
+  });
 
   // Lazy: attach src when scrolled near.
   const io = new IntersectionObserver(

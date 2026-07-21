@@ -42,6 +42,12 @@ function initSplitReveals() {
       return;
     }
     if (el.hasAttribute("data-split-visible")) return;
+    // Empty nodes (e.g. inline error placeholders) have no lines to animate —
+    // animating an empty target only produces a GSAP "target not found" warning.
+    if (!el.textContent || !el.textContent.trim()) {
+      el.setAttribute("data-split-visible", "");
+      return;
+    }
     const isHeading = /^H\d$/.test(el.tagName);
     let split;
     try {
@@ -52,6 +58,10 @@ function initSplitReveals() {
         linesClass: "gsap-line",
       });
     } catch (e) {
+      el.setAttribute("data-split-visible", "");
+      return;
+    }
+    if (!split || !split.lines || !split.lines.length) {
       el.setAttribute("data-split-visible", "");
       return;
     }
@@ -72,9 +82,40 @@ function initSplitReveals() {
 
 /* ------------------------------------------------ hero load + floating items */
 function initHero() {
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const veil = document.querySelector("[data-pageload-bg]");
   const logoItems = gsap.utils.toArray(".hero-home_logo-item");
   const content = document.querySelector("[data-hero-content]");
+  const nav = document.querySelector("[data-nav-root]");
+  const heroItems = gsap.utils.toArray("[data-hero-item]");
+
+  // Deterministic parameter table (duration s, x vw offset, rotation deg,
+  // scale delta, initial progress) — matches the documented motion ranges.
+  const params = [
+    { d: 13.2, x: -32, r: -9, s: 0.05, p: 0.55 },
+    { d: 14.1, x: 31, r: 11, s: -0.06, p: 0.8 },
+    { d: 12.4, x: -25, r: -12, s: 0.08, p: 0.3 },
+    { d: 14.8, x: 38, r: 8, s: -0.03, p: 0.12 },
+    { d: 12.9, x: -40, r: 10, s: 0.02, p: 0.68 },
+    { d: 13.6, x: 24, r: -7, s: -0.08, p: 0.42 },
+    { d: 14.4, x: -36, r: 12, s: 0.06, p: 0.02 },
+  ];
+
+  const placeItemStatic = (item, i) => {
+    const cfg = params[i % params.length];
+    gsap.set(item, { xPercent: -50, yPercent: -50, x: `${cfg.x}vw`, rotation: cfg.r, scale: 1 + cfg.s, opacity: 0.9 });
+  };
+
+  if (reduced) {
+    // Settled state, no intro timeline, no drifting loops, no veil.
+    if (veil) gsap.set(veil, { autoAlpha: 0, display: "none" });
+    if (logoItems.length) gsap.set(logoItems, { yPercent: 0, autoAlpha: 1 });
+    if (content) gsap.set(content.children, { y: 0, autoAlpha: 1 });
+    if (nav) gsap.set(nav.querySelectorAll(".nav-link, .nav-logo, .nav-button > *, .menu-button"), { yPercent: 0, autoAlpha: 1 });
+    heroItems.forEach(placeItemStatic);
+    return;
+  }
+
   const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
   if (logoItems.length) {
@@ -93,7 +134,6 @@ function initHero() {
       0.35
     );
   }
-  const nav = document.querySelector("[data-nav-root]");
   if (nav) {
     tl.fromTo(
       nav.querySelectorAll(".nav-link, .nav-logo, .nav-button > *, .menu-button"),
@@ -108,18 +148,7 @@ function initHero() {
   }
 
   // Floating case thumbnails: continuous bottom-to-top drift loops.
-  // Deterministic parameter table (duration s, x vw offset, rotation deg,
-  // scale delta, initial progress) — matches the documented motion ranges.
-  const params = [
-    { d: 13.2, x: -32, r: -9, s: 0.05, p: 0.55 },
-    { d: 14.1, x: 31, r: 11, s: -0.06, p: 0.8 },
-    { d: 12.4, x: -25, r: -12, s: 0.08, p: 0.3 },
-    { d: 14.8, x: 38, r: 8, s: -0.03, p: 0.12 },
-    { d: 12.9, x: -40, r: 10, s: 0.02, p: 0.68 },
-    { d: 13.6, x: 24, r: -7, s: -0.08, p: 0.42 },
-    { d: 14.4, x: -36, r: 12, s: 0.06, p: 0.02 },
-  ];
-  gsap.utils.toArray("[data-hero-item]").forEach((item, i) => {
+  heroItems.forEach((item, i) => {
     const cfg = params[i % params.length];
     const travel = window.innerHeight + 300;
     const setup = () => {
@@ -257,10 +286,22 @@ function initLocaleDropdown() {
   if (!root) return;
   const toggle = root.querySelector(".locale-dropdown_toggle");
   const current = root.querySelector("[data-locale-current]");
-  toggle.addEventListener("click", (e) => {
-    e.preventDefault();
+  const toggleOpen = () => {
     const open = root.classList.toggle("is-open");
     toggle.setAttribute("aria-expanded", String(open));
+  };
+  toggle.addEventListener("click", (e) => {
+    e.preventDefault();
+    toggleOpen();
+  });
+  toggle.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+      e.preventDefault();
+      toggleOpen();
+    } else if (e.key === "Escape") {
+      root.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+    }
   });
   root.querySelectorAll("[data-locale-option]").forEach((opt) => {
     opt.addEventListener("click", (e) => {
@@ -375,7 +416,9 @@ function initTestimonials() {
       } catch (e) { /* no-op */ }
     }
     const details = active.querySelectorAll("[data-testimonial-split], [data-testimonial-img]");
-    gsap.fromTo(details, { autoAlpha: 0, y: "0.5em" }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" });
+    if (details.length) {
+      gsap.fromTo(details, { autoAlpha: 0, y: "0.5em" }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power2.out" });
+    }
   };
   const restart = () => {
     clearInterval(timer);
@@ -448,12 +491,56 @@ function initParallax() {
 }
 
 /* ------------------------------------------------ CTA popup + contact form */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^[0-9 +\-()]{0,40}$/;
+
+function setFieldError(form, key, message) {
+  const group = form.querySelector(`[data-validate="${key}"]`);
+  const msg = form.querySelector(`[data-error="${key}"]`);
+  if (group) group.classList.toggle("is--error", Boolean(message));
+  if (msg) msg.textContent = message || "";
+}
+
+function validateContact(form) {
+  const email = form.querySelector('input[name="E-mail"]');
+  const phone = form.querySelector('input[name="Telefoonnummer"]');
+  const terms = form.querySelector('input[name="Terms-Conditions"]');
+  let firstInvalid = null;
+  let ok = true;
+  const ev = email.value.trim();
+  if (!ev) { setFieldError(form, "email", "Email is required — enter an address like name@domain.tld."); ok = false; firstInvalid ||= email; }
+  else if (ev.length > 254 || !EMAIL_RE.test(ev)) { setFieldError(form, "email", "Enter a valid email address (name@domain.tld, at most 254 characters)."); ok = false; firstInvalid ||= email; }
+  else setFieldError(form, "email", "");
+  const pv = phone.value;
+  if (pv && (pv.length > 40 || !PHONE_RE.test(pv))) { setFieldError(form, "phone", "Phone may only use digits, spaces and + - ( ) — at most 40 characters."); ok = false; firstInvalid ||= phone; }
+  else setFieldError(form, "phone", "");
+  if (!terms.checked) { setFieldError(form, "terms", "Please accept the Privacy Policy to continue."); ok = false; firstInvalid ||= terms; }
+  else setFieldError(form, "terms", "");
+  return { ok, firstInvalid };
+}
+
+function trapFocus(dialog) {
+  const sel = 'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  dialog.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+    const items = Array.from(dialog.querySelectorAll(sel)).filter((el) => el.offsetParent !== null || el === document.activeElement);
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
+}
+
 function initContact() {
   const popup = document.querySelector("[data-cta-popup]");
+  let lastFocused = null;
   if (popup) {
+    trapFocus(popup);
     document.querySelectorAll("[data-cta-popup-open]").forEach((btn) =>
       btn.addEventListener("click", (e) => {
         e.preventDefault();
+        lastFocused = btn;
         popup.showModal();
         // Move focus into the dialog (first form field, falling back to the
         // close button) instead of leaving it on the <dialog> element itself.
@@ -464,6 +551,9 @@ function initContact() {
     popup.querySelector("[data-cta-popup-close]")?.addEventListener("click", () => popup.close());
     popup.addEventListener("click", (e) => {
       if (e.target === popup) popup.close();
+    });
+    popup.addEventListener("close", () => {
+      if (lastFocused && typeof lastFocused.focus === "function") lastFocused.focus();
     });
   }
 
@@ -483,22 +573,12 @@ function initContact() {
     e.preventDefault();
     // Anti-spam: silently ignore submissions within 5s of load.
     if (Date.now() - loadedAt < 5000) return;
+    const { ok, firstInvalid } = validateContact(form);
+    if (!ok) {
+      firstInvalid?.focus();
+      return;
+    }
     const email = form.querySelector('input[name="E-mail"]');
-    const terms = form.querySelector('input[name="Terms-Conditions"]');
-    let valid = true;
-    if (!email.value || !/.+@.+\..+/.test(email.value)) {
-      email.closest("[data-validate]")?.classList.add("is--error");
-      valid = false;
-    } else {
-      email.closest("[data-validate]")?.classList.remove("is--error");
-    }
-    if (!terms.checked) {
-      terms.closest("[data-validate]")?.classList.add("is--error");
-      valid = false;
-    } else {
-      terms.closest("[data-validate]")?.classList.remove("is--error");
-    }
-    if (!valid) return;
     try {
       const res = await fetch(form.action, {
         method: "POST",
@@ -510,7 +590,7 @@ function initContact() {
         fail?.classList.remove("is-visible");
         // Record the successful lead in the discovery-brief session state.
         window.appState.contactSubmitted = true;
-        window.appState.contactEmail = email.value;
+        window.appState.contactEmail = email.value.trim();
         pushHistory();
         updateUIFromState();
       } else {
@@ -618,11 +698,27 @@ function initMisc() {
   document.querySelectorAll("img").forEach((img) => img.setAttribute("draggable", "false"));
 }
 
+/* ------------------------------------------------ chrome link guard */
+// Single-page site: no in-page control performs a real outbound navigation.
+// Every nav/footer/CTA chrome link stays on / (anchors that open the contact
+// popup or cookie panels keep their own handlers).
+function initChromeGuard() {
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a[href]");
+    if (!a) return;
+    const href = a.getAttribute("href") || "";
+    if (href === "#" || href.startsWith("/") || /^https?:\/\//i.test(href) || href.startsWith("mailto:")) {
+      e.preventDefault();
+    }
+  });
+}
+
 /* ------------------------------------------------ boot */
 function boot() {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!reducedMotion) initLenis();
   initMisc();
+  initChromeGuard();
   initHero();
   initNavDock();
   initNavThemeSync();
@@ -1082,19 +1178,36 @@ document.addEventListener("DOMContentLoaded", () => {
     if (copyBtn) {
       const copyLabel = copyBtn.textContent;
       let copyRevertTimer = null;
-      copyBtn.addEventListener("click", () => {
+      copyBtn.addEventListener("click", async () => {
         // Copy whatever format is currently visible (JSON or Markdown tab),
         // not always the JSON export.
         const activeTab = db.querySelector("[data-brief-tab].is-active")?.getAttribute("data-brief-tab");
         const text = activeTab === "markdown" ? window.exportBriefMarkdown() : window.exportBriefJSON();
-        navigator.clipboard.writeText(text).then(() => {
+        let copied = false;
+        try {
+          await navigator.clipboard.writeText(text);
+          copied = true;
+        } catch (error) {
+          const textarea = document.createElement("textarea");
+          textarea.value = text;
+          textarea.setAttribute("readonly", "");
+          textarea.style.position = "fixed";
+          textarea.style.opacity = "0";
+          document.body.appendChild(textarea);
+          textarea.select();
+          copied = document.execCommand("copy");
+          textarea.remove();
+        }
+        if (copied) {
           copyBtn.textContent = "Copied!";
           if (copyRevertTimer) clearTimeout(copyRevertTimer);
           copyRevertTimer = setTimeout(() => {
             copyBtn.textContent = copyLabel;
             copyRevertTimer = null;
           }, 2000);
-        });
+        } else {
+          copyBtn.textContent = "Copy failed";
+        }
       });
     }
     
@@ -1151,4 +1264,3 @@ document.addEventListener("DOMContentLoaded", () => {
   // Contact state is recorded by initContact's guarded submit handler only
   // after validation passes and the local endpoint responds OK.
 });
-
