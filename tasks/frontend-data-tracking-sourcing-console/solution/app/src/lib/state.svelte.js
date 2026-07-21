@@ -5,6 +5,7 @@ export const LICENSES = ['permissive', 'weak-copyleft', 'strong-copyleft', 'unli
 export const REASONS = ['license-blocked', 'gui-heavy', 'network-dependent', 'duplicate-cluster', 'too-large'];
 export const LANGUAGES = ['Python', 'TypeScript', 'Rust', 'Go', 'Kotlin', 'Elixir'];
 export const BANDS = ['easy', 'medium', 'hard'];
+export const TIMELINE_TYPES = ['score', 'select', 'reject', 'pin', 'queue', 'import'];
 
 export const rejectionSchema = z.object({ reason: z.enum(REASONS, { error: 'Reason field: choose one of the listed reasons.' }) });
 export const pinSchema = z.object({ notes: z.string().max(200, 'Notes field: use 200 characters or fewer.') });
@@ -49,7 +50,7 @@ const seedRows = [
   ['opalharbor/keel-test','Python',2900,1.7,'Testing','cl-keel','permissive','selected'],
   ['copperfield/wren-query','Kotlin',11800,8.3,'Query','cl-wren','strong-copyleft','scored'],
   ['lanternvale/glow-jobs','TypeScript',4430,4.2,'Scheduling','cl-glow','permissive','candidate'],
-  ['velvetorbit/comet-lint','Rust',15600,6.9,'Tooling','cl-comet','unlicensed','rejected','too-large'],
+  ['velvetorbit/comet-lint','Rust',15600,6.9,'Tooling','cl-crater','unlicensed','rejected','too-large'],
   ['mirthworks/jolly-log','Go',2860,2.1,'Logging','cl-jolly','permissive','scored'],
   ['bluequartz/prism-diff','TypeScript',7600,7.2,'Developer tools','cl-prism','weak-copyleft','candidate'],
   ['willowgrid/sedge-graph','Kotlin',3300,5.1,'Graph','cl-sedge','permissive','candidate'],
@@ -67,7 +68,8 @@ const seedRows = [
   ['ivorydelta/tusk-format','TypeScript',2980,1.3,'Formatting','cl-tusk','weak-copyleft','candidate'],
   ['starlingyard/nest-build','Go',10800,4.6,'Build','cl-nest','permissive','candidate'],
   ['glassbadger/burrow-sync','Rust',4310,8.1,'Synchronization','cl-burrow','strong-copyleft','scored'],
-  ['plumgrove/pit-auth','Kotlin',5610,3.8,'Authorization','cl-pit','permissive','candidate']
+  ['plumgrove/pit-auth','Kotlin',5610,3.8,'Authorization','cl-pit','permissive','candidate'],
+  ['emberforge/slag-mirror','Go',5140,5.2,'Mirrors','cl-slag','weak-copyleft','scored']
 ];
 
 function makeCandidate(row) {
@@ -89,6 +91,22 @@ const deepCopy = (value) => JSON.parse(JSON.stringify(value));
 export const titleCase = (value) => value ? value[0].toUpperCase() + value.slice(1).replaceAll('-', ' ') : '';
 export function getBand(score) { return score < 4 ? 'easy' : score < 7 ? 'medium' : 'hard'; }
 export function randomCommit() { return Array.from(crypto.getRandomValues(new Uint8Array(6)), (n) => n.toString(16).padStart(2, '0')).join(''); }
+export function fnvHex(text) {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) { hash ^= text.charCodeAt(i); hash = Math.imul(hash, 0x01000193) >>> 0; }
+  return hash.toString(16).padStart(8, '0');
+}
+export function orgHue(name) {
+  const org = name.split('/')[0];
+  let hash = 0;
+  for (let i = 0; i < org.length; i++) hash = (hash * 31 + org.charCodeAt(i)) >>> 0;
+  return `hsl(${hash % 360} 52% 40%)`;
+}
+
+const TRANSITION_TYPES = {
+  'candidate>scored': 'score', 'scored>selected': 'select', 'scored>rejected': 'reject',
+  'selected>pinned': 'pin', 'pinned>queued': 'queue', 'queued>selected': 'queue'
+};
 
 class AppState {
   candidates = $state(seedRows.map(makeCandidate));
@@ -103,10 +121,16 @@ class AppState {
   queueOpen = $state(false);
   mobileMenu = $state(false);
   modal = $state(null);
+  panel = $state(null);
   focusedId = $state('');
   toast = $state(null);
   liveMessage = $state('');
   fetchState = $state({ running: false, steps: ['pending','pending','pending'], runs: 0 });
+  presets = $state([]);
+  timelineFilter = $state('all');
+  sessionFlags = $state({ score: false, select: false, pin: false, queue: false, export: false });
+  snapshots = $state([]);
+  fillHistory = $state([]);
 
   get visibleCandidates() {
     let rows = this.candidates.filter((candidate) => {
@@ -135,6 +159,36 @@ class AppState {
     const totalAchieved = this.quota.reduce((sum, cell) => sum + cell.achieved, 0);
     return Math.min(100, Math.round(totalAchieved / totalTarget * 100));
   }
+  get bandPressure() {
+    return BANDS.map((band) => {
+      const cells = this.quota.filter((cell) => cell.band === band);
+      const achieved = cells.reduce((sum, cell) => sum + cell.achieved, 0);
+      const target = cells.reduce((sum, cell) => sum + cell.target, 0);
+      return { band, achieved, target, need: Math.max(0, target - achieved) };
+    });
+  }
+  get orgReadout() {
+    const map = new Map();
+    for (const c of this.candidates) {
+      const org = c.name.split('/')[0];
+      const slot = map.get(org) || { org, held: 0, candidates: 0 };
+      slot.candidates += 1;
+      if (['selected','pinned','queued'].includes(c.status)) slot.held += 1;
+      map.set(org, slot);
+    }
+    return [...map.values()].sort((a,b) => b.held - a.held || b.candidates - a.candidates || a.org.localeCompare(b.org));
+  }
+  get clusterGroups() {
+    const map = new Map();
+    for (const c of this.candidates) {
+      const members = map.get(c.clusterId) || [];
+      members.push(c);
+      map.set(c.clusterId, members);
+    }
+    return [...map.entries()].filter(([, members]) => members.length > 1)
+      .map(([clusterId, members]) => ({ clusterId, members: [...members].sort((a,b) => a.name.localeCompare(b.name)) }))
+      .sort((a,b) => b.members.length - a.members.length || a.clusterId.localeCompare(b.clusterId));
+  }
   get selectedCount() { return this.selectedIds.length; }
   get activeFilterLabels() {
     const labels = [];
@@ -145,17 +199,35 @@ class AppState {
     if (this.filters.search) labels.push(`name contains “${this.filters.search}”`);
     return labels;
   }
+  entryType(entry) {
+    if (entry.name === 'Sourcing pack import') return 'import';
+    if (entry.name.startsWith('Sourcing run')) return 'score';
+    return TRANSITION_TYPES[`${entry.fromStatus}>${entry.toStatus}`] ?? 'score';
+  }
+  get timelineCounts() {
+    const counts = Object.fromEntries(TIMELINE_TYPES.map((type) => [type, 0]));
+    for (const entry of this.timeline) counts[this.entryType(entry)] += 1;
+    return counts;
+  }
+  get visibleTimeline() {
+    return [...this.timeline].reverse().filter((entry) => this.timelineFilter === 'all' || this.entryType(entry) === this.timelineFilter);
+  }
   snapshot() { return deepCopy({ candidates: this.candidates, queue: this.queue, timeline: this.timeline }); }
   restore(snapshot) {
     this.candidates = deepCopy(snapshot.candidates); this.queue = [...snapshot.queue]; this.timeline = deepCopy(snapshot.timeline); this.selectedIds = [];
   }
+  recordFill() {
+    const value = this.quotaFillPercent;
+    if (this.fillHistory.at(-1) !== value) this.fillHistory.push(value);
+    if (this.fillHistory.length > 24) this.fillHistory.shift();
+  }
   transact(change) {
     const before = this.snapshot(); const changed = change();
     if (!changed) return false;
-    const after = this.snapshot(); this.undoStack.push({ before, after }); this.redoStack = []; return true;
+    const after = this.snapshot(); this.undoStack.push({ before, after }); this.redoStack = []; this.recordFill(); return true;
   }
-  undo() { const entry = this.undoStack.pop(); if (!entry) return; this.restore(entry.before); this.redoStack.push(entry); this.notify('Undid the last action.'); }
-  redo() { const entry = this.redoStack.pop(); if (!entry) return; this.restore(entry.after); this.undoStack.push(entry); this.notify('Redid the last action.'); }
+  undo() { const entry = this.undoStack.pop(); if (!entry) return; this.restore(entry.before); this.redoStack.push(entry); this.recordFill(); this.notify('Undid the last action.'); }
+  redo() { const entry = this.redoStack.pop(); if (!entry) return; this.restore(entry.after); this.undoStack.push(entry); this.recordFill(); this.notify('Redid the last action.'); }
   notify(message, kind = 'success') {
     const id = Date.now(); this.toast = { message, kind, id }; this.liveMessage = message;
     setTimeout(() => { if (this.toast?.id === id) this.toast = null; }, 4200);
@@ -171,6 +243,14 @@ class AppState {
   drillQuota(language, band) { this.clearFilters(); this.filters.language = language; this.filters.band = band; this.activeView = 'candidates'; }
   setSelection(id, checked) { this.selectedIds = checked ? [...new Set([...this.selectedIds, id])] : this.selectedIds.filter((item) => item !== id); }
   selectAllVisible(checked) { this.selectedIds = checked ? this.visibleCandidates.map((c) => c.id) : []; }
+  savePreset(name) {
+    const trimmed = (name || '').trim();
+    if (!trimmed) return false;
+    this.presets.push({ id: crypto.randomUUID(), name: trimmed, filters: deepCopy(this.filters) });
+    return true;
+  }
+  applyPreset(id) { const preset = this.presets.find((item) => item.id === id); if (!preset) return; this.filters = deepCopy(preset.filters); this.selectedIds = []; this.activeView = 'candidates'; }
+  deletePreset(id) { this.presets = this.presets.filter((item) => item.id !== id); }
   guardFor(candidate) {
     const holder = this.achievedCandidates.find((c) => c.id !== candidate.id && c.clusterId === candidate.clusterId);
     if (holder) return `Cluster guard: ${candidate.clusterId} is already held by ${holder.name}.`;
@@ -179,12 +259,14 @@ class AppState {
     return '';
   }
   score(ids) {
-    return this.transact(() => { let count = 0; for (const id of ids) { const c = this.find(id); if (c?.status === 'candidate') { c.status = 'scored'; c.guardMessage = ''; this.event(c,'candidate','scored'); count++; } } return count > 0; });
+    return this.transact(() => { let count = 0; for (const id of ids) { const c = this.find(id); if (c?.status === 'candidate') { c.status = 'scored'; c.guardMessage = ''; this.event(c,'candidate','scored'); count++; } } if (count) this.sessionFlags.score = true; return count > 0; });
   }
-  select(ids) {
+  lastBlockedCount = 0;
+  select(ids, { silent = false } = {}) {
     const blocked = [];
-    const changed = this.transact(() => { let count = 0; for (const id of ids) { const c = this.find(id); if (c?.status !== 'scored') continue; const guard = this.guardFor(c); if (guard) { c.guardMessage = guard; blocked.push(c.name); continue; } c.guardMessage = ''; c.status = 'selected'; this.event(c,'scored','selected'); count++; } return count > 0; });
-    if (blocked.length) this.notify(`${blocked.length} candidate${blocked.length > 1 ? 's were' : ' was'} blocked by diversity guards.`, 'warning');
+    const changed = this.transact(() => { let count = 0; for (const id of ids) { const c = this.find(id); if (c?.status !== 'scored') continue; const guard = this.guardFor(c); if (guard) { c.guardMessage = guard; blocked.push(c.name); continue; } c.guardMessage = ''; c.status = 'selected'; this.event(c,'scored','selected'); count++; } if (count) this.sessionFlags.select = true; return count > 0; });
+    this.lastBlockedCount = blocked.length;
+    if (!silent && blocked.length) this.notify(`${blocked.length} candidate${blocked.length > 1 ? 's were' : ' was'} blocked by diversity guards.`, 'warning');
     return changed;
   }
   reject(ids, reason) {
@@ -197,11 +279,13 @@ class AppState {
   pin(id, notes, commit) {
     const parsed = pinSchema.safeParse({ notes }); if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
     const changed = this.transact(() => { const c = this.find(id); if (c?.status !== 'selected') return false; c.status = 'pinned'; c.notes = notes; c.commit = commit; this.event(c,'selected','pinned'); return true; });
-    if (changed) this.notify(`${this.find(id).name} pinned to ${commit}.`); return { ok: changed, error: changed ? '' : 'Candidate is no longer Selected.' };
+    if (changed) { this.sessionFlags.pin = true; this.notify(`${this.find(id).name} pinned to ${commit}.`); }
+    return { ok: changed, error: changed ? '' : 'Candidate is no longer Selected.' };
   }
   enqueue(id) {
     const changed = this.transact(() => { const c = this.find(id); if (c?.status !== 'pinned' || this.queue.includes(c.id)) return false; c.status = 'queued'; this.queue.push(c.id); this.event(c,'pinned','queued'); return true; });
-    if (changed) this.notify(`${this.find(id).name} added to the build queue.`); return changed;
+    if (changed) { this.sessionFlags.queue = true; this.notify(`${this.find(id).name} added to the build queue.`); }
+    return changed;
   }
   removeFromQueue(id) {
     const changed = this.transact(() => { const c = this.find(id); if (!c || !this.queue.includes(c.id)) return false; this.queue = this.queue.filter((item) => item !== c.id); c.status = 'selected'; this.event(c,'queued','selected'); return true; });
@@ -214,24 +298,31 @@ class AppState {
   bulk(action, reason = '') {
     const ids = [...this.selectedIds]; let result;
     if (action === 'score') result = { ok: this.score(ids) };
-    if (action === 'select') result = { ok: this.select(ids) };
+    if (action === 'select') result = { ok: this.select(ids, { silent: true }) };
     if (action === 'reject') result = this.reject(ids, reason);
-    if (result?.ok) { this.selectedIds = []; this.notify(`Bulk ${action} completed for the eligible selection.`); }
+    if (result) this.selectedIds = [];
+    if (action === 'select' && this.lastBlockedCount > 0) {
+      const outcome = result.ok ? 'applied' : 'blocked';
+      this.notify(`Bulk select ${outcome}; ${this.lastBlockedCount} candidate${this.lastBlockedCount > 1 ? 's were' : ' was'} blocked by diversity guards.`, 'warning');
+    } else if (result?.ok) this.notify(`Bulk ${action} completed for the eligible selection.`);
+    else if (result && action !== 'reject') this.notify(`Bulk ${action} found no eligible candidates.`, 'warning');
     return result;
   }
-  async fetchMore() {
+  async fetchMore(stepMs = 800) {
     if (this.fetchState.running) return; this.fetchState.running = true; this.fetchState.steps = ['pending','pending','pending'];
-    for (let i=0; i<3; i++) { this.fetchState.steps[i] = 'running'; await new Promise((resolve) => setTimeout(resolve, 650)); this.fetchState.steps[i] = 'complete'; }
+    await new Promise((resolve) => setTimeout(resolve, Math.min(stepMs, 350))); // opening beat: all three steps visibly pending
+    for (let i = 0; i < 3; i++) { this.fetchState.steps[i] = 'running'; await new Promise((resolve) => setTimeout(resolve, stepMs)); this.fetchState.steps[i] = 'complete'; }
     const run = ++this.fetchState.runs;
     const orgs = ['sunnyanvil','marblefox','cobaltpond','hazelrocket','tinyprairie','lilacbeacon'];
     const repos = ['spark-reader','vein-store','ripple-task','grove-codec','orbit-check','plume-shell'];
     const next = orgs.map((org,i) => makeCandidate([`${org}${run}/${repos[i]}-${run}`, LANGUAGES[(i+run)%LANGUAGES.length], 1200+run*311+i*727, Number((1.2+((i*1.63+run)%8.5)).toFixed(1)), ['Parsing','Storage','Workers','Encoding','Testing','CLI'][i], `cl-run${run}-${i+1}`, LICENSES[(i+run)%4], i%3===0?'scored':'candidate']));
     next.forEach((candidate) => candidate.fresh = true); this.candidates.push(...next);
     this.timeline.push({ at: new Date().toISOString(), name: `Sourcing run ${run}`, fromStatus: 'candidate', toStatus: 'scored' });
-    this.fetchState.running = false; this.notify(`Sourcing run ${run} complete — 6 candidates added.`); setTimeout(() => next.forEach((candidate) => candidate.fresh = false), 900);
+    this.fetchState.running = false; this.recordFill();
+    this.notify(`Sourcing run ${run} complete — 6 candidates added.`); setTimeout(() => next.forEach((candidate) => candidate.fresh = false), 900);
   }
   queueEntries() { return this.queue.map((id, index) => ({ candidate: this.find(id), position: index + 1 })).filter((entry) => entry.candidate); }
-  exportPack() {
+  exportPack(at) {
     const positions = Object.fromEntries(this.queue.map((id,index) => [id,index+1]));
     const candidates = this.candidates.map((c) => {
       const entry = { name:c.name, language:c.language, stars:c.stars, difficulty:c.difficulty, category:c.category, clusterId:c.clusterId, license:c.license, status:c.status };
@@ -241,10 +332,63 @@ class AppState {
       if (c.status === 'queued') entry.queuePosition = positions[c.id]; return entry;
     });
     const queue = this.queueEntries().map(({candidate:c,position}) => ({ position, name:c.name, difficulty:c.difficulty, clusterId:c.clusterId, commit:c.commit }));
-    return { schemaVersion:'sourcing-pack/v1', generatedAt:new Date().toISOString(), quotaFillPercent:this.quotaFillPercent, queue, candidates, quota:this.quota.map((cell) => ({language:cell.language,band:cell.band,achieved:cell.achieved,target:cell.target})), timeline:this.timeline.map((entry) => ({...entry})) };
+    return { schemaVersion:'sourcing-pack/v1', generatedAt: at || new Date().toISOString(), quotaFillPercent:this.quotaFillPercent, queue, candidates, quota:this.quota.map((cell) => ({language:cell.language,band:cell.band,achieved:cell.achieved,target:cell.target})), timeline:this.timeline.map((entry) => ({...entry})) };
   }
-  exportText(format) {
-    if (format === 'queue-json') return JSON.stringify(this.exportPack(),null,2);
+  // generatedAt is a volatile timestamp; exclude it so the integrity fingerprint
+  // is stable for identical session state instead of churning on every re-render.
+  packHash(pack) { const { generatedAt, ...stable } = pack; return fnvHex(JSON.stringify(stable)); }
+  packFingerprint() { return this.packHash(this.exportPack('')); }
+  takeSnapshot() {
+    const pack = deepCopy(this.exportPack(''));
+    const fingerprint = this.packHash(pack);
+    this.snapshots.push({ id: crypto.randomUUID(), label: `Snapshot ${this.snapshots.length + 1}`, at: new Date().toISOString(), fingerprint, pack });
+    if (this.snapshots.length > 4) this.snapshots.shift();
+    return fingerprint;
+  }
+  get snapshotDiff() {
+    if (this.snapshots.length < 2) return null;
+    const older = this.snapshots.at(-2), newer = this.snapshots.at(-1);
+    const lines = [];
+    const beforeByName = new Map(older.pack.candidates.map((c) => [c.name, c]));
+    const afterByName = new Map(newer.pack.candidates.map((c) => [c.name, c]));
+    for (const [name, c] of afterByName) {
+      const prev = beforeByName.get(name);
+      if (!prev) lines.push(`+ ${name} joins the pack as ${c.status}`);
+      else if (prev.status !== c.status) lines.push(`${name}: ${prev.status} → ${c.status}`);
+    }
+    for (const [name] of beforeByName) if (!afterByName.has(name)) lines.push(`- ${name} leaves the pack`);
+    const beforeQueue = older.pack.queue.map((q) => q.name).join(' › ') || 'empty';
+    const afterQueue = newer.pack.queue.map((q) => q.name).join(' › ') || 'empty';
+    if (beforeQueue !== afterQueue) lines.push(`Queue order: ${beforeQueue} → ${afterQueue}`);
+    if (older.pack.quotaFillPercent !== newer.pack.quotaFillPercent) lines.push(`Quota fill: ${older.pack.quotaFillPercent}% → ${newer.pack.quotaFillPercent}%`);
+    return { older, newer, lines: lines.length ? lines : ['No differences between the last two snapshots.'] };
+  }
+  importDiff(raw) {
+    let data; try { data = typeof raw === 'string' ? JSON.parse(raw) : raw; } catch { return null; }
+    const parsed = packSchema.safeParse(data); if (!parsed.success) return null;
+    const incoming = parsed.data;
+    const lines = [];
+    const currentByName = new Map(this.candidates.map((c) => [c.name, c]));
+    const incomingNames = new Set(incoming.candidates.map((c) => c.name));
+    for (const item of incoming.candidates) {
+      const prev = currentByName.get(item.name);
+      if (!prev) lines.push(`+ ${item.name} joins as ${item.status}`);
+      else if (prev.status !== item.status) lines.push(`${item.name}: ${prev.status} → ${item.status}`);
+    }
+    for (const [name] of currentByName) if (!incomingNames.has(name)) lines.push(`- ${name} leaves the pack`);
+    const currentPosition = new Map(this.queue.map((id, index) => [this.find(id)?.name, index + 1]));
+    for (const q of incoming.queue) {
+      const prev = currentPosition.get(q.name);
+      if (prev === undefined) lines.push(`Queue: ${q.name} enters at position ${q.position}`);
+      else if (prev !== q.position) lines.push(`Queue: ${q.name} moves from position ${prev} to ${q.position}`);
+    }
+    for (const [name, position] of currentPosition) {
+      if (!incoming.queue.some((q) => q.name === name)) lines.push(`Queue: ${name} leaves the queue (was position ${position})`);
+    }
+    return { changes: lines.slice(0, 9), extra: Math.max(0, lines.length - 9), candidateCount: incoming.candidates.length, queueCount: incoming.queue.length };
+  }
+  exportText(format, at) {
+    if (format === 'queue-json') return JSON.stringify(this.exportPack(at),null,2);
     if (format === 'candidates-csv') {
       const position = Object.fromEntries(this.queue.map((id,index) => [id,index+1])); const quote = (value) => `"${String(value ?? '').replaceAll('"','""')}"`;
       const keys = ['name','language','stars','difficulty','category','clusterId','license','status','rejectionReason','commit','notes','queuePosition'];
@@ -275,5 +419,6 @@ class AppState {
 }
 
 export const app = new AppState();
+app.recordFill();
 const SEEDED_SAMPLE_PACK = JSON.stringify(app.exportPack(), null, 2);
 export const samplePack = () => SEEDED_SAMPLE_PACK;

@@ -1,4 +1,4 @@
-import { BANDS, LICENSES, STATUSES, REASONS, rejectionSchema, pinSchema } from './state.svelte.js';
+import { BANDS, LICENSES, STATUSES, REASONS, rejectionSchema, pinSchema, randomCommit, samplePack } from './state.svelte.js';
 
 const objectSchema = (properties = {}, required = []) => ({ type:'object', properties, required, additionalProperties:false });
 const stringEnum = (values) => ({ type:'string', enum:values });
@@ -39,12 +39,13 @@ export function registerWebMCP(app, ui) {
   });
   add('entity_reorder','Reorder a queued candidate for setup; gesture behavior remains in the UI.',objectSchema({name:{type:'string',maxLength:120},'queue-position':{type:'integer',minimum:1}},['name','queue-position']),args => { const candidate=app.find(args.name); if(!candidate)return {ok:false,error:'Candidate not found.'}; const ok=app.reorder(candidate.id,args['queue-position']-1); return {ok,position:app.queue.indexOf(candidate.id)+1}; });
 
-  add('form_validate','Validate declared rejection or pin form fields.',objectSchema({form:stringEnum(['rejection','pin']),'rejection-reason':{type:'string'},'pin-notes':{type:'string'}},['form']),args => {
+  add('form_validate','Validate declared rejection or pin form fields; invalid values surface the same inline field errors as the UI.',objectSchema({form:stringEnum(['rejection','pin']),'rejection-reason':{type:'string'},'pin-notes':{type:'string'}},['form']),args => {
     const result=args.form==='rejection'?rejectionSchema.safeParse({reason:args['rejection-reason']}):pinSchema.safeParse({notes:args['pin-notes']??''});
     if(!result.success) {
-      if(args.form==='rejection') ui.setRejectionError(result.error.issues[0].message);
-      if(args.form==='pin') ui.setPinError(result.error.issues[0].message);
-      return {ok:false,error:result.error.issues[0].message};
+      const message=result.error.issues[0].message;
+      if(args.form==='rejection'){ if(app.modal?.type!=='reject') ui.openRejectForValidation(); ui.setRejectionError(message); }
+      if(args.form==='pin'){ if(app.modal?.type!=='pin') ui.openPinForValidation(); ui.setPinError(message); }
+      return {ok:false,error:message};
     }
     if(args.form==='rejection') ui.setRejectionError('');
     if(args.form==='pin') ui.setPinError('');
@@ -53,16 +54,16 @@ export function registerWebMCP(app, ui) {
   add('form_submit','Open or submit a declared candidate form through the visible product flow.',objectSchema({form:stringEnum(['rejection','pin']),name:{type:'string',maxLength:120},'rejection-reason':stringEnum(REASONS),'pin-notes':{type:'string',maxLength:200}},['form','name']),args => {
     const candidate=app.find(args.name); if(!candidate)return {ok:false,error:'Candidate not found.'};
     if(args.form==='rejection'){ const result=app.reject([candidate.id],args['rejection-reason']); return {ok:result.ok,error:result.error||undefined}; }
-    ui.statusAction(candidate,'pin'); return visible(`Pin form opened for ${candidate.name}; confirm its generated commit in the visible dialog.`);
+    const result=app.pin(candidate.id,args['pin-notes']??'',randomCommit()); return {ok:result.ok,error:result.error||undefined,status:candidate.status};
   });
   add('form_cancel','Cancel the open rejection or pin form.',objectSchema({form:stringEnum(['rejection','pin'])},['form']),() => { if(['reject','pin'].includes(app.modal?.type))ui.closeModal(); return visible('Form cancelled with no state change.'); });
 
-  add('artifact_export','Open a live export format without returning artifact contents.',objectSchema({format:stringEnum(['queue-json','candidates-csv','sourcing-report-markdown'])},['format']),({format}) => { ui.openPanel('export'); return visible(`Export panel opened for ${format}; use the visible controls to copy or download.`); });
+  add('artifact_export','Open a live export format without returning artifact contents.',objectSchema({format:stringEnum(['queue-json','candidates-csv','sourcing-report-markdown'])},['format']),({format}) => { ui.openExportSurface(format,false); return visible(`Export panel opened for ${format}; use the visible controls to copy or download.`); });
   add('artifact_import','Start a declared sourcing-pack import mode without accepting raw artifact content.',objectSchema({mode:stringEnum(['sourcing-pack-json','seeded-sample'])},['mode']),({mode}) => {
-    if(mode==='seeded-sample'){ const result=app.importPack(JSON.stringify(app.exportPack())); return {ok:result.ok,message:result.ok?'Seeded sample applied.':result.error}; }
+    if(mode==='seeded-sample'){ const result=app.importPack(samplePack()); return {ok:result.ok,message:result.ok?'Seeded sample pack applied; statuses and queue order restored to the seeded baseline.':result.error}; }
     ui.openPanel('import'); return visible('Import panel opened; choose a file or paste JSON in the visible form.');
   });
-  add('artifact_copy','Open the export surface for a declared format; clipboard interaction remains visible.',objectSchema({format:stringEnum(['queue-json','candidates-csv','sourcing-report-markdown'])},['format']),({format}) => { ui.openPanel('export'); return visible(`Export panel opened for ${format}; activate Copy in the visible panel.`); });
+  add('artifact_copy','Open and focus the visible Copy control for a declared format; clipboard interaction remains Playwright-driven.',objectSchema({format:stringEnum(['queue-json','candidates-csv','sourcing-report-markdown'])},['format']),({format}) => { ui.openExportSurface(format,true); return visible(`Export panel opened for ${format}; activate the focused Copy control.`); });
 
   window.sourcebenchWebMCPTools=tools;
   window.webmcp_session_info=() => ({
