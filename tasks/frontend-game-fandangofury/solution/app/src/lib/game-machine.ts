@@ -18,6 +18,8 @@ export const gameMachine = createMachine({
     MAP: {
       on: {
         START_STAGE: 'COMBAT',
+        RESUME_RUN_WAVE: 'COMBAT',
+        RESUME_RUN_BOSS: 'BOSS',
         OPEN_SHOP: 'SHOP',
         OPEN_MASKS: 'MASKS',
         OPEN_HISTORY: 'HISTORY',

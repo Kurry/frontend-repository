@@ -4,32 +4,37 @@
 
   interface Props {
     screen: string;
+    paused: boolean;
     onBossStart: () => void;
     onVictory: () => void;
     onDefeat: () => void;
   }
 
-  let { screen, onBossStart, onVictory, onDefeat }: Props = $props();
+  let { screen, paused, onBossStart, onVictory, onDefeat }: Props = $props();
 
   let animFrame = 0;
+  let arena: HTMLDivElement;
 
   function playerBodyClass(): string {
-    const base = 'w-12 h-16 sm:w-14 sm:h-20 rounded-lg flex items-center justify-center text-2xl sm:text-3xl';
-    if (gameState.playerHealth <= game.getMaxHealth() * 0.25) return `${base} bg-red-700`;
+    const base =
+      'w-12 h-16 sm:w-14 sm:h-20 rounded-lg flex items-center justify-center text-2xl sm:text-3xl transition-colors';
+    if (gameState.playerHealth <= game.getMaxHealth() * 0.25 && gameState.playerHealth > 0) {
+      return `${base} bg-red-700`;
+    }
     return `${base} bg-emerald-600`;
   }
 
   function bossHealthBar(health: number, maxHealth: number): string {
     const pct = health / maxHealth;
     const base = 'h-full transition-all duration-300 rounded-full';
-    if (pct <= 0.25) return `${base} bg-red-900 animate-pulse`;
+    if (pct <= 0.25 && health > 0) return `${base} bg-red-900 animate-pulse`;
     return `${base} bg-fury-red`;
   }
 
   function enemyHealthBar(health: number, maxHealth: number): string {
     const pct = health / maxHealth;
     const base = 'h-full transition-all duration-200 rounded-full';
-    if (pct <= 0.25) return `${base} bg-red-900`;
+    if (pct <= 0.25 && health > 0) return `${base} bg-red-900`;
     return `${base} bg-amber-500`;
   }
 
@@ -43,35 +48,45 @@
   }
 
   onMount(() => {
+    let bossAnnounced = false;
+
     function tick() {
-      game.tickEnemies();
-      game.tickCombo();
+      if (!paused && !gameState.paused && gameState.playerHealth > 0) {
+        game.tickEnemies();
+        game.tickCombo();
 
-      if (screen === 'COMBAT' && gameState.isBoss && gameState.enemies.some((e) => e.type === 'boss' && !e.dead)) {
-        onBossStart();
-      }
+        if (screen === 'COMBAT' && gameState.isBoss && gameState.enemies.some((e) => e.type === 'boss' && !e.dead)) {
+          onBossStart();
+        }
 
-      if ((screen === 'BOSS' || screen === 'COMBAT') && gameState.isBoss) {
-        const boss = gameState.enemies.find((e) => e.type === 'boss');
-        if (boss?.dead) {
-          game.saveToStorage();
-          setTimeout(() => onVictory(), 500);
+        if ((screen === 'BOSS' || screen === 'COMBAT') && gameState.isBoss) {
+          const boss = gameState.enemies.find((e) => e.type === 'boss');
+          if (boss?.dead) {
+            game.saveToStorage();
+            setTimeout(() => onVictory(), 500);
+            return;
+          }
+        }
+
+        if (gameState.playerHealth <= 0) {
+          setTimeout(() => onDefeat(), 300);
           return;
         }
       }
-
-      if (gameState.playerHealth <= 0) {
-        setTimeout(() => onDefeat(), 300);
-        return;
-      }
-
+      bossAnnounced = gameState.isBoss;
       animFrame = requestAnimationFrame(tick);
     }
 
     animFrame = requestAnimationFrame(tick);
 
     function handleKey(e: KeyboardEvent) {
-      if (gameState.playerHealth <= 0) return;
+      // Combat keys are inert while paused or dead — stale input from a frozen
+      // run (or a finished one) must never mutate Health, Fury, or waves.
+      if (paused || gameState.playerHealth <= 0) return;
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+        return;
+      }
       switch (e.key.toLowerCase()) {
         case 'z':
           e.preventDefault();
@@ -97,6 +112,7 @@
     }
 
     function handleKeyUp(e: KeyboardEvent) {
+      if (paused) return;
       if (e.key.toLowerCase() === 'c') game.stopBlock();
     }
 
@@ -109,11 +125,40 @@
       window.removeEventListener('keyup', handleKeyUp);
     };
   });
+
+  const theme = $derived(game.theme);
+  const furyColor = $derived(game.furyColor);
+  const maskAura = $derived(
+    MASK_DEFS.find((m) => gameState.ownedMasks.includes(m.id) && gameState.equippedMask === m.id)?.furyColor ?? null,
+  );
 </script>
 
-<div class="combat-stage relative w-full h-screen overflow-hidden" aria-label="Combat stage">
-  <div class="absolute inset-0 bg-gradient-to-b from-blue-950 via-fury-dark to-fury-darker">
-    <div class="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-amber-900/30 to-transparent" />
+<div
+  bind:this={arena}
+  class="combat-stage relative w-full h-screen overflow-hidden"
+  aria-label="Combat stage"
+>
+  {#key gameState.shakeId}
+  <div class="absolute inset-0 {gameState.shakeId > 0 ? 'screen-shake' : ''}">
+  <!-- Per-stage festival-night arena (the palette shifts between stages) -->
+  <div
+    class="absolute inset-0 transition-colors duration-700"
+    style="background: linear-gradient(to bottom, {theme.skyTop}, {theme.skyMid} 55%, {theme.skyBot});"
+  >
+    <!-- papel picado bunting -->
+    <div class="absolute top-10 left-0 right-0 flex justify-around opacity-70 pointer-events-none">
+      {#each [0, 1, 2, 3, 4, 5, 6, 7] as i}
+        <span
+          class="inline-block w-5 h-4 rounded-b-full"
+          style="background: {i % 2 ? theme.banner : theme.lantern}; transform: rotate({(i % 3) - 1}deg);"
+        />
+      {/each}
+    </div>
+    <!-- floating lanterns -->
+    <div class="absolute top-16 left-[12%] w-3 h-4 rounded-full animate-pulse" style="background: {theme.lantern}; box-shadow: 0 0 18px {theme.lantern};" />
+    <div class="absolute top-24 right-[18%] w-2.5 h-3.5 rounded-full animate-pulse" style="background: {theme.lantern}; box-shadow: 0 0 14px {theme.lantern};" />
+    <div class="absolute top-20 left-[46%] w-2 h-3 rounded-full animate-pulse" style="background: {theme.banner}; box-shadow: 0 0 12px {theme.banner};" />
+    <div class="absolute bottom-0 left-0 right-0 h-32" style="background: linear-gradient(to top, {theme.ground}, transparent);" />
     <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-stone-900 to-stone-800/50" />
   </div>
 
@@ -123,10 +168,25 @@
     </div>
   </div>
 
-  <div aria-live="polite" aria-atomic="true" class="sr-only">{gameState.statusMessage}</div>
+  <!-- Boss duel banner (animated entrance when the duel begins) -->
+  {#if gameState.bossBanner}
+    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 z-30 pointer-events-none boss-banner">
+      <div class="text-3xl sm:text-4xl font-black text-fury-red drop-shadow-[0_2px_10px_rgba(230,57,70,0.6)] tracking-wide whitespace-nowrap">
+        ⚔️ {gameState.bossBanner} ⚔️
+      </div>
+    </div>
+  {/if}
 
-  <div class="absolute z-20" style="left: 80px; bottom: 100px;">
+  <div aria-live="polite" aria-atomic="true" class="sr-only-ff">{gameState.statusMessage}</div>
+
+  <div class="absolute z-20" style="left: 80px; bottom: 110px;">
     <div class="relative">
+      {#if maskAura}
+        <div
+          class="absolute -inset-3 rounded-2xl opacity-60 animate-pulse pointer-events-none"
+          style="box-shadow: 0 0 22px {maskAura}, 0 0 8px {maskAura} inset; border: 1px solid {maskAura}80;"
+        />
+      {/if}
       <div
         class={playerBodyClass()}
         class:animate-pulse={gameState.playerHitFlash}
@@ -149,7 +209,7 @@
 
   {#each gameState.enemies as enemy (enemy.id)}
     {#if !enemy.dead}
-      <div class="absolute z-15 enemy-enter" style="left: {Math.max(130, enemy.x)}px; bottom: 100px;">
+      <div class="absolute z-15 enemy-enter" style="left: {Math.max(130, enemy.x)}px; bottom: 110px;">
         <div class="relative {enemy.telegraphing ? 'boss-telegraph' : ''} {enemy.hitFlash ? 'shake' : ''}">
           {#if enemy.type === 'boss'}
             <div class="w-16 h-20 sm:w-20 sm:h-24 rounded-lg flex items-center justify-center text-3xl sm:text-4xl border-2 border-fury-red bg-fury-red/20">
@@ -165,7 +225,7 @@
               </div>
             </div>
             {#if enemy.telegraphing}
-              <div class="absolute -top-6 left-1/2 -translate-x-1/2 text-lg animate-bounce">⚡</div>
+              <div class="absolute -top-7 left-1/2 -translate-x-1/2 text-lg animate-bounce text-yellow-300">⚡ WIND-UP ⚡</div>
             {/if}
           {:else if enemy.type === 'brute'}
             <div class="w-14 h-16 sm:w-16 rounded-lg flex items-center justify-center text-2xl sm:text-3xl border border-amber-500/50 bg-amber-500/10">
@@ -196,15 +256,30 @@
     {/if}
   {/each}
 
-  {#if gameState.playerAttacking === 'fury'}
-    {@const mask = gameState.equippedMask
-      ? MASK_DEFS.find((m) => m.id === gameState.equippedMask)
-      : null}
+  <!-- Screen-wide Fiesta Fury special, colored by the equipped Mask -->
+  {#if gameState.screenFuryActive}
     <div class="absolute inset-0 z-30 pointer-events-none">
       <div
-        class="absolute inset-0 animate-pulse"
-        style="background: radial-gradient(circle at center, {(mask?.furyColor ?? '#e63946')}66, transparent 70%);"
+        class="absolute inset-0 fury-burst"
+        style="background: radial-gradient(circle at center, {furyColor}cc, {furyColor}33 45%, transparent 72%);"
       />
+      <div
+        class="absolute inset-0 fury-ring"
+        style="border: 4px solid {furyColor}; box-shadow: 0 0 40px {furyColor} inset;"
+      />
+      <div class="absolute inset-0 flex items-center justify-center">
+        <span class="text-4xl sm:text-6xl font-black drop-shadow-lg" style="color: {furyColor};">💥 FIESTA FURY!</span>
+      </div>
+    </div>
+  {/if}
+
+  <!-- First-combat guided hint (non-blocking, fades away) -->
+  {#if gameState.showCombatHint && !paused}
+    <div class="absolute top-28 left-1/2 -translate-x-1/2 z-20 pointer-events-none hint-chip">
+      <div class="bg-fury-dark/90 border border-fury-gold/40 rounded-xl px-3 py-2 text-xs text-slate-100 text-center max-w-[90vw]">
+        Press <kbd class="px-1 bg-gray-800 rounded">Z</kbd> / <kbd class="px-1 bg-gray-800 rounded">X</kbd> to attack ·
+        <kbd class="px-1 bg-gray-800 rounded">P</kbd> to pause
+      </div>
     </div>
   {/if}
 
@@ -230,7 +305,7 @@
         onmouseup={() => game.stopBlock()}
         ontouchstart={() => game.startBlock()}
         ontouchend={() => game.stopBlock()}
-        aria-label="Block (C)"
+        aria-label="Hold to block (C)"
       >
         🛡️ Block (C)
       </button>
@@ -242,7 +317,7 @@
         aria-label="Dodge roll (Space)"
       >
         {#if gameState.dodgeCooldown > 0}
-          💨 {Math.ceil(game.dodgeCooldownPct * 100)}%
+          💨 {game.dodgeCooldownSeconds}s
         {:else}
           💨 Dodge
         {/if}
@@ -254,19 +329,18 @@
         onclick={() => game.activateFury()}
         disabled={!game.furyReady}
         aria-disabled={!game.furyReady}
-        aria-label="Activate Fiesta Fury"
+        aria-label="Activate Fiesta Fury (F)"
       >
         🌶️ Fiesta Fury
       </button>
     </div>
   </div>
+  </div>
+  {/key}
 </div>
 
 <style>
-  .bg-gradient-radial {
-    background: radial-gradient(circle at center, var(--tw-gradient-from), var(--tw-gradient-to));
-  }
-  .sr-only {
+  .sr-only-ff {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -276,5 +350,50 @@
     clip: rect(0, 0, 0, 0);
     white-space: nowrap;
     border: 0;
+  }
+  .screen-shake {
+    animation: arena-shake 0.3s ease-in-out;
+  }
+  @keyframes arena-shake {
+    0%, 100% { transform: translate(0, 0); }
+    20% { transform: translate(-5px, 2px); }
+    40% { transform: translate(5px, -2px); }
+    60% { transform: translate(-3px, 1px); }
+    80% { transform: translate(3px, -1px); }
+  }
+  .boss-banner {
+    animation: boss-banner-in 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  @keyframes boss-banner-in {
+    0% { opacity: 0; transform: translate(-50%, 0) scale(0.6); letter-spacing: 0.4em; }
+    40% { opacity: 1; transform: translate(-50%, 0) scale(1.12); }
+    100% { opacity: 1; transform: translate(-50%, 0) scale(1); letter-spacing: normal; }
+  }
+  .fury-burst {
+    animation: fury-burst 1.2s ease-out forwards;
+  }
+  @keyframes fury-burst {
+    0% { opacity: 0; transform: scale(0.4); }
+    25% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.4); }
+  }
+  .fury-ring {
+    border-radius: 9999px;
+    animation: fury-ring 1.2s ease-out forwards;
+  }
+  @keyframes fury-ring {
+    0% { opacity: 0; transform: scale(0.1); }
+    30% { opacity: 1; }
+    100% { opacity: 0; transform: scale(2.2); }
+  }
+  .hint-chip {
+    animation: hint-pulse 2s ease-in-out infinite;
+  }
+  @keyframes hint-pulse {
+    0%, 100% { opacity: 0.85; }
+    50% { opacity: 1; transform: translate(-50%, -2px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .screen-shake, .boss-banner, .fury-burst, .fury-ring, .hint-chip { animation: none; }
   }
 </style>
