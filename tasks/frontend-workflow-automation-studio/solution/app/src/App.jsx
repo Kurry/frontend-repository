@@ -518,7 +518,7 @@ function reportFor(script) {
   if (!run) return { run: null }
   return { run: { id: run.id, trigger: run.trigger, start_time: run.start_time, duration: run.duration, totals: run.totals,
     steps: run.steps.map(step => ({ order: step.order, type: step.type, status: step.status, attempts: step.attempts, ...(step.error_reason ? { error_reason: step.error_reason } : {}), ...(step.extracted_name ? { extracted_name: step.extracted_name, extracted_value: step.extracted_value } : {}) })),
-    timeline_summary: run.timeline.map(event => ({ step: event.step, status: event.status, timestamp: event.timestamp })) } }
+    } }
 }
 
 function ExportView() {
