@@ -20,7 +20,7 @@ import {
   setTheme, toggleTheme, setAccent, setActiveView, setSidebarOpen, setExpandedGroup,
   setFilterRole, setFilterStatus, setSearch, setSort, setExportOpen, setExportTab, setDensity,
   setSelection, toggleSelection, clearSelection, setEditingId, pushToast, dismissToast,
-  setConfirm, setLastMutation, resetFilters, type ViewKey,
+  setConfirm, setLastMutation, setAddUserDraft, clearAddUserDraft, resetFilters, type ViewKey,
 } from './store/uiSlice';
 import {
   addUser, updateUser, patchUsers, deleteUser, deleteUsers, updateUsersStatus, updateUsersRole,
@@ -412,6 +412,7 @@ const CONTRACT_RULES = (v: any) => [
 function UserForm() {
   const dispatch = useDispatch();
   const editingId = useSelector((s: RootState) => s.ui.editingId);
+  const addUserDraft = useSelector((s: RootState) => s.ui.addUserDraft);
   const editing = useSelector((s: RootState) => s.users.data.find((u) => u.id === editingId));
   const isEdit = !!editing;
   const [live, setLive] = useState('');
@@ -423,15 +424,21 @@ function UserForm() {
       firstName: editing!.firstName, lastName: editing!.lastName, email: editing!.email, phone: editing!.phone || '',
       notes: editing!.notes || '', temporaryPassword: '', accountSegment: 'Internal', status: editing!.status, role: editing!.role,
       sendInvitation: false, enable2FA: false, productAccess: true, permissions: ['read'],
-    } : { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'] },
+    } : { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'], ...addUserDraft },
   });
   useEffect(() => {
     reset(isEdit ? {
       firstName: editing!.firstName, lastName: editing!.lastName, email: editing!.email, phone: editing!.phone || '',
       notes: editing!.notes || '', temporaryPassword: '', accountSegment: 'Internal', status: editing!.status, role: editing!.role,
       sendInvitation: false, enable2FA: false, productAccess: true, permissions: ['read'],
-    } : { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'] });
+    } : { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'], ...addUserDraft });
   }, [isEdit, editingId, editing, reset]);
+
+  useEffect(() => {
+    if (isEdit) return undefined;
+    const subscription = watch((value) => dispatch(setAddUserDraft(value as Partial<UserCreateValues>)));
+    return () => subscription.unsubscribe();
+  }, [dispatch, isEdit, watch]);
 
   const vals = watch();
   const rules = CONTRACT_RULES(vals);
@@ -453,11 +460,12 @@ function UserForm() {
       dispatch(addUser(makeUserFromCreate(data)));
       dispatch(pushToast({ kind: 'success', title: 'User added', body: `${data.firstName} ${data.lastName} added to the directory` }));
       dispatch(setLastMutation(`Created ${data.firstName}`));
+      dispatch(clearAddUserDraft());
       setTimeout(() => dispatch(setActiveView('all-users')), 700);
     }
     setTimeout(() => setSubmitting(false), 400);
   };
-  const cancel = () => { dispatch(setActiveView('all-users')); };
+  const cancel = () => { if (!isEdit) dispatch(clearAddUserDraft()); dispatch(setActiveView('all-users')); };
 
   const Err = ({ k }: { k: keyof UserCreateValues }) => (errors as any)[k] ? <span className="field-error" id={`${k}-error`} role="alert">{(errors as any)[k].message}</span> : null;
   const inv = (k: keyof UserCreateValues) => !!(errors as any)[k];
