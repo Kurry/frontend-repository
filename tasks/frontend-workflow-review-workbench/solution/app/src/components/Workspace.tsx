@@ -8,6 +8,7 @@ import { notesFormSchema } from '../schemas';
 import { useReviewStore } from '../store';
 import { REVIEWER_STEPS, type ReviewerStepName, type ReviewBundle, type WorkspacePanel } from '../types';
 import { FlagBadge, HeroBanner } from './Common';
+import { DependencyMinimap, ReviewDuration } from './InnovationExtras';
 import FixList from './FixList';
 import GateBoard from './GateBoard';
 import ReviewSummary from './ReviewSummary';
@@ -103,8 +104,9 @@ export default function Workspace() {
           <div><Text className="eyebrow">TASK BUNDLE</Text><Title order={1}>{bundle.slug}</Title><Text size="sm" c="dimmed">{bundle.description}</Text></div>
           <div className="workspace-status"><HeroBanner state={deriveHero(bundle)} />{bundle.recommendation ? <Badge size="lg" leftSection={<IconShieldCheck size={15} />}>{bundle.recommendation}</Badge> : <Badge variant="outline" size="lg">Recommendation unset</Badge>}{bundle.overrideJustification && <Badge size="lg" color="orange">Override</Badge>}</div>
         </div>
-        <Group mt="md" gap="xs">{bundle.stopEarlyFlags.map((flag) => <FlagBadge key={flag} flag={flag} />)}<Badge variant="outline">{completionCount(bundle)} of 5 reviewer steps complete</Badge>{bundle.reviewerSteps.at(-1)?.done && <Badge className="bundled-badge" leftSection={<IconPackage size={13} />}>Bundled</Badge>}</Group>
+        <Group mt="md" gap="xs">{bundle.stopEarlyFlags.map((flag) => <FlagBadge key={flag} flag={flag} />)}<Badge variant="outline">{completionCount(bundle)} of 5 reviewer steps complete</Badge>{bundle.reviewerSteps.at(-1)?.done && <Badge className="bundled-badge" leftSection={<IconPackage size={13} />}>Bundled</Badge>}<ReviewDuration bundle={bundle} /></Group>
         <Breadcrumb bundle={bundle} />
+        <DependencyMinimap bundle={bundle} />
       </header>
       <div className="workspace-layout">
         <aside className="step-rail" aria-label="Reviewer steps">

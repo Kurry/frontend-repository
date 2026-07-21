@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Drawer, Group, Modal, SegmentedControl, Stack, Text, Textarea, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { Controller, useForm } from 'react-hook-form';
-import { IconCheck, IconClipboard, IconDownload, IconFileImport, IconPackageExport } from '@tabler/icons-react';
+import { IconBraces, IconCheck, IconClipboard, IconDownload, IconFileImport, IconPackageExport, IconPrinter } from '@tabler/icons-react';
 import { buildReviewPackage, portfolioSummaryMarkdown, reviewPackageJson } from '../exporters';
 import { importFormSchema } from '../schemas';
 import { useReviewStore } from '../store';
@@ -51,6 +51,13 @@ export function ArtifactDrawers() {
     setAnnouncement('Certification package imported.');
     notifications.show({ title: 'Package imported', message: 'Portfolio and bundle session facets now match the imported document.', color: 'teal', icon: <IconCheck size={16} /> });
   };
+  const loadLiveJson = () => {
+    const liveJson = reviewPackageJson(bundles, new Date().toISOString());
+    setImportDraft(liveJson);
+    reset({ packageText: liveJson });
+    clearErrors('packageText');
+    setAnnouncement('Current live Review Package JSON loaded into the import editor.');
+  };
   return (
     <>
       <Drawer
@@ -69,7 +76,10 @@ export function ArtifactDrawers() {
           <SegmentedControl fullWidth value={ui.exportFormat} onChange={(value) => setExportFormat(value as 'json' | 'markdown')} data={[{ value: 'json', label: 'Review Package JSON' }, { value: 'markdown', label: 'Review Summary Markdown' }]} />
           <Group justify="space-between"><Text size="sm" c="dimmed">Preview regenerates from live session state.</Text><Text size="xs" fw={700}>{preview.length.toLocaleString()} characters</Text></Group>
           <pre className="artifact-preview" aria-label={`${ui.exportFormat} export preview`}>{preview}</pre>
-          <Group justify="flex-end"><Button variant="default" leftSection={<IconClipboard size={16} />} onClick={copy}>Copy</Button><Button leftSection={<IconDownload size={16} />} onClick={download}>Download</Button></Group>
+          <Group justify="space-between" className="artifact-actions">
+            <Button variant="subtle" leftSection={<IconPrinter size={16} />} onClick={() => window.print()}>Print summary</Button>
+            <Group><Button variant="default" leftSection={<IconClipboard size={16} />} onClick={copy}>Copy</Button><Button leftSection={<IconDownload size={16} />} onClick={download}>Download</Button></Group>
+          </Group>
         </Stack>
       </Drawer>
       <Modal
@@ -110,7 +120,12 @@ export function ArtifactDrawers() {
             />
           </div>
           <Group justify="flex-end" mt="md">
-            <Button type="button" variant="default" leftSection={<IconClipboard size={16} />} onClick={() => navigator.clipboard.writeText(ui.importDraft)}>Copy</Button>
+            <Button type="button" variant="light" leftSection={<IconBraces size={16} />} onClick={loadLiveJson}>Load current JSON</Button>
+            <Button type="button" variant="default" leftSection={<IconClipboard size={16} />} onClick={async () => {
+              await navigator.clipboard.writeText(ui.importDraft);
+              setAnnouncement('Import draft copied.');
+              notifications.show({ title: 'Import draft copied', message: 'The exact JSON in the editor is on the clipboard.', color: 'teal', icon: <IconCheck size={16} /> });
+            }}>Copy</Button>
             <Button type="button" variant="default" leftSection={<IconDownload size={16} />} onClick={() => {
               const blob = new Blob([ui.importDraft || '{}'], { type: 'application/json' });
               const url = URL.createObjectURL(blob);
