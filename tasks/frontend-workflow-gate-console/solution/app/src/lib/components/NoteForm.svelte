@@ -103,7 +103,7 @@
   :global(.dark) .form-heading span { color:#8fa1b7; }
   label { display:flex; align-items:center; justify-content:space-between; margin:.55rem 0 .3rem; font-size:.7rem; font-weight:750; }
   .required { color:#b63c4b; text-transform:uppercase; font-size:.56rem; letter-spacing:.07em; }
-  textarea, select { width:100%; color:inherit; background:white; border:1px solid #cbd5e2; border-radius:.5rem; padding:.55rem .6rem; font-size:.74rem; transition:border-color .18s, box-shadow .18s; }
+  textarea, select { width:100%; color:inherit; background:white; border:1px solid #cbd5e2; border-radius:.5rem; padding:.55rem .6rem; font-size:.74rem; transition:border-color .09s, box-shadow .09s; }
   textarea { resize:vertical; min-height:4.4rem; }
   :global(.dark) textarea, :global(.dark) select { background:#071421; border-color:#32465c; }
   .field-meta { display:flex; justify-content:space-between; gap:1rem; color:#546478; font-size:.63rem; padding-top:.22rem; }
