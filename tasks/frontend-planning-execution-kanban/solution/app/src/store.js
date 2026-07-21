@@ -230,10 +230,14 @@ export const useBoardStore = create((set, get) => ({
     const state = get()
     const card = state.cards[cardId]
     if (!card) return false
-    const index = state.order[card.column].indexOf(cardId)
-    const nextIndex = direction === 'up' ? index - 1 : index + 1
-    if (nextIndex < 0 || nextIndex >= state.order[card.column].length) return false
-    return get().moveCard(cardId, card.column, nextIndex)
+    const currentOrder = state.order[card.column]
+    const index = currentOrder.indexOf(cardId)
+    if (direction === 'up' && index <= 0) return false
+    if (direction === 'down' && index >= currentOrder.length - 1) return false
+
+    // Calculate the logical insertion index for the array WITHOUT the source card
+    const position = direction === 'up' ? index - 1 : index + 1
+    return get().moveCard(cardId, card.column, position)
   },
 
   toggleSelection: (cardId) => set((state) => ({

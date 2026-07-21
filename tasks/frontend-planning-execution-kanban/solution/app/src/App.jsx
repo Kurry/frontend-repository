@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { motion, MotionConfig } from 'motion/react'
 import { compileJSON, compileMarkdown } from './exporters.js'
 import {
   Button,
@@ -261,7 +262,10 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
   return (
     <>
       {dropPosition === index && <div className="drop-placeholder" aria-hidden="true"><span>Drop card here</span></div>}
-      <article
+      <motion.article
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.15, ease: 'easeOut' }}
         ref={setNodeRef}
         style={style}
         {...attributes}
@@ -355,7 +359,7 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
             </Button>
           </span>
         </div>
-      </article>
+      </motion.article>
     </>
   )
 }
@@ -487,6 +491,7 @@ function CreateCardModal({ column, shown }) {
       Object.entries(formErrors).map(([key, value]) => [key, value?.message]).filter(([, message]) => message),
     )
     state.setCreateFormErrors(mapped)
+    state.announce('Form contains validation errors.')
   })
 
   return (
@@ -518,7 +523,7 @@ function CreateCardModal({ column, shown }) {
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={close}>Cancel</Button>
-        <Button type="submit" form="create-card-form" disabled={isSubmitting || !title.trim()}>Add Card</Button>
+        <Button type="submit" form="create-card-form" disabled={isSubmitting}>Add Card</Button>
       </ModalFooter>
     </ComposedModal>
   )
@@ -550,10 +555,13 @@ function DetailEditForm({ card, onSave }) {
     defaultValues: { title: card.title, description: card.description, assignee: card.assignee || '' },
   })
   const submitted = useRef(false)
+  const state = useBoardStore()
   const submit = handleSubmit((payload) => {
     if (submitted.current) return
     submitted.current = true
     onSave(payload)
+  }, () => {
+    state.announce('Form contains validation errors.')
   })
   return (
     <form id="detail-edit-form" onSubmit={submit} className="modal-form" noValidate>
@@ -601,6 +609,8 @@ function CardDetailModal({ cardId, shown }) {
   const submitComment = commentForm.handleSubmit(({ comment }) => {
     state.addComment(card.id, comment)
     commentForm.reset()
+  }, () => {
+    state.announce('Form contains validation errors.')
   })
 
   return (
@@ -684,11 +694,15 @@ function CardDetailModalHost() {
   const open = Boolean(detailId)
   const { rendered, shown } = useSurface(open, 240)
   const [frozenId, setFrozenId] = useState(null)
+  const [frozenToken, setFrozenToken] = useState(0)
   useEffect(() => {
-    if (detailId) setFrozenId(detailId)
+    if (detailId) {
+      setFrozenId(detailId)
+      setFrozenToken(Date.now())
+    }
   }, [detailId])
   if (!rendered || !frozenId) return null
-  return <CardDetailModal key={frozenId} cardId={frozenId} shown={shown} />
+  return <CardDetailModal key={`${frozenId}-${frozenToken}`} cardId={frozenId} shown={shown} />
 }
 
 function PromptPanel({ promptId, shown }) {
@@ -708,7 +722,7 @@ function PromptPanel({ promptId, shown }) {
   if (!prompt) return null
   return (
     <div className={`drawer-scrim ${shown ? 'is-shown' : ''}`} onMouseDown={(event) => { if (event.target === event.currentTarget) close() }}>
-      <aside ref={panelRef} className={`side-panel prompt-panel ${shown ? 'is-open' : ''}`} role="dialog" aria-modal="true" aria-labelledby="prompt-panel-title">
+      <aside ref={panelRef} className={`side-panel prompt-panel ${shown ? 'is-open' : ''}`} role="dialog" aria-modal="true" aria-labelledby="prompt-panel-title" onKeyDown={(event) => { if (event.key === 'Escape') close() }}>
         <header className="drawer-header">
           <div><span className="eyebrow">Prompt library</span><h2 id="prompt-panel-title">{prompt.title}</h2></div>
           <Button hasIconOnly kind="ghost" renderIcon={Close} iconDescription="Close prompt panel" onClick={close} />
@@ -785,7 +799,16 @@ function ExportDrawer({ shown }) {
   const copy = async (text, control) => {
     control.dataset.copyStatus = 'pending'
     try {
-      await navigator.clipboard.writeText(text)
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text)
+      } else {
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
       control.dataset.copyStatus = 'success'
       state.notify('success', 'Copied', 'The exact visible preview is on your clipboard.')
       state.announce('Export copied to clipboard.')
@@ -807,7 +830,10 @@ function ExportDrawer({ shown }) {
       importForm.reset({ import: '' })
       state.setImportDraft('')
     }
-  }, (errors) => state.setImportError(errors.import?.message || 'Import field is invalid.'))
+  }, (errors) => {
+    state.setImportError(errors.import?.message || 'Import field is invalid.')
+    state.announce('Form contains validation errors.')
+  })
 
   return (
     <div className={`drawer-scrim ${shown ? 'is-shown' : ''}`} onMouseDown={(event) => { if (event.target === event.currentTarget) close() }}>
@@ -1025,34 +1051,23 @@ function App() {
     const targetVisible = visibleByColumn[targetColumn].filter((id) => id !== event.active.id)
 
     const activeRect = event.active.rect.current.translated
-    const probeY = typeof event.activatorEvent?.clientY === 'number'
-      ? event.activatorEvent.clientY + event.delta.y
-      : activeRect
-        ? activeRect.top + activeRect.height / 2
+    const probeY = activeRect
+      ? activeRect.top + activeRect.height / 2
+      : typeof event.activatorEvent?.clientY === 'number'
+        ? event.activatorEvent.clientY + event.delta.y
         : null
     if (probeY == null) return { column: targetColumn, position: targetVisible.length }
 
-    if (over?.data?.current?.isColumn || String(over?.id || '').startsWith('column-')) {
-      const listElement = document.querySelector(`.column-list[data-column="${targetColumn}"]`)
-      const articles = listElement ? [...listElement.querySelectorAll('article.card-tile')] : []
-      let position = 0
-      for (const element of articles) {
-        if (element.dataset.cardId === String(event.active.id)) continue
-        const rect = element.getBoundingClientRect()
-        if (probeY < rect.top + rect.height / 2) break
-        position += 1
-      }
-      return { column: targetColumn, position }
+    const listElement = document.querySelector(`.column-list[data-column="${targetColumn}"]`)
+    const articles = listElement ? [...listElement.querySelectorAll('article.card-tile')] : []
+    let position = 0
+    for (const element of articles) {
+      if (element.dataset.cardId === String(event.active.id)) continue
+      const rect = element.getBoundingClientRect()
+      if (probeY < rect.top + rect.height / 2) break
+      position += 1
     }
-
-    const overIndex = targetVisible.indexOf(over.id)
-    if (overIndex < 0) return { column: targetColumn, position: targetVisible.length }
-    const overRect = over.rect
-    if (!overRect) return { column: targetColumn, position: overIndex }
-
-    const overCenterY = overRect.top + overRect.height / 2
-    const below = probeY > overCenterY
-    return { column: targetColumn, position: overIndex + (below ? 1 : 0) }
+    return { column: targetColumn, position }
   }
   const endDrag = (event) => {
     keyboardDragActive = false
@@ -1092,6 +1107,7 @@ function App() {
   const reduceMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="app-shell">
       <header className="app-header">
         <div className="brand-lockup">
@@ -1165,6 +1181,7 @@ function App() {
 
       <div className="announcement" aria-live="polite" aria-atomic="true">{state.announcement}</div>
     </div>
+    </MotionConfig>
   )
 }
 

@@ -157,6 +157,9 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, textar
 .toolbar-actions { flex: none; }
 .cds--btn { transition: background-color 150ms ease, box-shadow 150ms ease, transform 100ms ease, color 150ms ease; }
 .cds--btn:hover:not(:disabled) { box-shadow: 0 3px 10px rgb(15 23 42 / 12%); }
+.cds--btn--ghost:hover:not(:disabled) { background-color: #e5e5e5; }
+.cds--overflow-menu-options__option:hover { background-color: #e5e5e5; }
+.cds--text-input:focus, .cds--text-area:focus, .cds--select-input:focus { outline: 2px solid #0f62fe; outline-offset: -2px; }
 .cds--btn:active:not(:disabled) { transform: translateY(1px); }
 .card-footer .cds--btn--tertiary:hover:not(:disabled) { background-color: #0043ce; color: #fff; }
 .card-footer .cds--btn--danger--tertiary:hover:not(:disabled) { background-color: #a2191f; color: #fff; }
@@ -342,9 +345,11 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, textar
 
 .task-list { margin: 3px 0 10px; display: grid; gap: 4px; }
 .task-row { min-height: 20px; display: flex; align-items: flex-start; gap: 7px; color: #6f6f6f; font-size: 11px; line-height: 15px; }
-.task-state-icon { width: 16px; height: 16px; display: grid; place-items: center; flex: none; margin-top: 1px; color: #8d8d8d; }
+.task-state-icon { width: 16px; height: 16px; display: grid; place-items: center; flex: none; margin-top: 1px; color: #8d8d8d; transition: color 200ms ease; }
+.task-state-icon svg { transition: transform 200ms cubic-bezier(.2,0,.2,1); }
 .pending-ring { width: 10px; height: 10px; border: 1.5px solid #a8a8a8; border-radius: 50%; }
-.task-complete .task-state-icon { color: #24a148; animation: check-pop 200ms ease; }
+@keyframes check-pop { 0% { transform: scale(.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.task-complete .task-state-icon { color: #24a148; animation: check-pop 200ms cubic-bezier(.2,0,.2,1); }
 .task-complete .task-title { color: #8d8d8d; text-decoration: line-through; }
 .task-running .task-state-icon { color: #0f62fe; }
 .task-retrying .task-state-icon { color: #b28600; }
@@ -417,6 +422,8 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, textar
 .comment p { margin: 0 0 6px; font-size: 12px; line-height: 17px; white-space: pre-wrap; }
 .comment time { color: #6f6f6f; font-size: 10px; }
 .comment-form { margin-top: 13px; display: grid; gap: 8px; justify-items: start; }
+
+[data-invalid="true"] { outline: 2px solid #da1e28; outline-offset: -2px; }
 
 /* Drawers and side panels: real transform/opacity transitions in and out. */
 .drawer-scrim {
