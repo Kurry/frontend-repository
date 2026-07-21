@@ -176,7 +176,7 @@ button {
   }
 
   .canvas-object-fade-leave-active,
-  .canvas-object-fade-leave-active :deep(.canvas-object-wrapper),
+  .canvas-object-fade-leave-active .canvas-object-wrapper,
   .list-enter-active,
   .list-leave-active,
   .list-move {

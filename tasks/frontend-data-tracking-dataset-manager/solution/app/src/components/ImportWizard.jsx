@@ -67,7 +67,7 @@ function WizardInner({ dataset }) {
   const included = state.diagnostic.filter((r) => !r.excluded)
   const issues = included.reduce((n, r) => n + Object.keys(r.errors).length, 0)
   const ready = included.filter((r) => !Object.keys(r.errors).length).length
-  const hasMapping = Object.values(state.mapping).some((m) => m !== 'ignore')
+  const hasMapping = state.mapping && Object.keys(state.mapping).length > 0 && Object.values(state.mapping).some((m) => m !== 'ignore')
   const commit = () => {
     const live = useStore.getState().importState
     if (commitLock.current || live.committing) return
@@ -125,14 +125,15 @@ function WizardInner({ dataset }) {
             )}
             {state.sourceTab === 'file' && (
               <div className={cx('dropzone grid min-h-52 place-items-center p-8 text-center', state.dragging && 'dragging')}
+                onDragEnter={(e) => { e.preventDefault(); update({ dragging: true }) }}
                 onDragOver={(e) => { e.preventDefault(); if (!state.dragging) update({ dragging: true }) }}
-                onDragLeave={() => update({ dragging: false })}
+                onDragLeave={(e) => { e.preventDefault(); if (!e.currentTarget.contains(e.relatedTarget)) update({ dragging: false }) }}
                 onDrop={(e) => { e.preventDefault(); update({ dragging: false }); loadFile(e.dataTransfer.files?.[0]) }}>
                 <div>
-                  <Upload size={32} className="mx-auto" style={{ color: 'var(--brand)' }} aria-hidden="true" />
-                  <strong className="mt-3 block t-primary">Drop a .csv file here</strong>
-                  <p className="mt-1 text-sm t-3">{state.dragging ? 'Release to load the file' : 'or choose one from your device'}</p>
-                  <label className="btn btn-primary btn-sm mt-4 cursor-pointer"><Upload size={14} aria-hidden="true" />Choose CSV<input className="sr-only" type="file" accept=".csv,text/csv" onChange={(e) => loadFile(e.target.files?.[0])} /></label>
+                  <Upload size={32} className="mx-auto pointer-events-none" style={{ color: 'var(--brand)' }} aria-hidden="true" />
+                  <strong className="mt-3 block t-primary pointer-events-none">Drop a .csv file here</strong>
+                  <p className="mt-1 text-sm t-3 pointer-events-none">{state.dragging ? 'Release to load the file' : 'or choose one from your device'}</p>
+                  <label className="btn btn-primary btn-sm mt-4 cursor-pointer relative z-10"><Upload size={14} aria-hidden="true" />Choose CSV<input className="sr-only" type="file" accept=".csv,text/csv" onChange={(e) => loadFile(e.target.files?.[0])} /></label>
                 </div>
               </div>
             )}

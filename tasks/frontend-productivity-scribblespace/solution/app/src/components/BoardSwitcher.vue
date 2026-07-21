@@ -53,7 +53,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
       role="tab"
       :aria-selected="board.id === store.activeBoardId"
       class="flex items-center min-w-[120px] max-w-[200px] bg-white border border-gray-200 rounded-t-lg overflow-hidden shrink-0"
-      :class="{'border-b-0 border-[#6D5BD0] shadow-sm z-10': board.id === store.activeBoardId}"
+      :class="{'border-b-0 border-[#6D5BD0] shadow-sm z-10 bg-[#6D5BD0] text-white': board.id === store.activeBoardId}"
     >
       <div v-if="renameState?.id === board.id" class="flex flex-col w-full px-2 py-1">
         <input
@@ -71,8 +71,8 @@ const handleKeyDown = (e: KeyboardEvent) => {
       <button
         v-else
         type="button"
-        class="flex-1 truncate px-3 py-1.5 text-sm text-left hover:bg-gray-50 outline-none focus:ring-2 focus:ring-inset focus:ring-[#6D5BD0]"
-        :class="board.id === store.activeBoardId ? 'font-semibold text-gray-900' : 'text-gray-600'"
+        class="flex-1 truncate px-3 py-1.5 text-sm text-left outline-none focus:ring-2 focus:ring-inset focus:ring-[#6D5BD0]"
+        :class="board.id === store.activeBoardId ? 'font-semibold text-white hover:bg-[#5A4AB8]' : 'text-gray-600 hover:bg-gray-50'"
         @click="store.setActiveBoard(board.id)"
       >
         {{ board.name }}

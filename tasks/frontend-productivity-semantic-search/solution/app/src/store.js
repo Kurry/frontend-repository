@@ -392,7 +392,7 @@ export const useAppStore = create((set, get) => ({
           ...s.indexRun,
           status: 'running',
           steps: s.indexRun.steps.map((step, i) => step.status === 'failed'
-            ? { ...step, status: 'pending', error: null, attempts: 0, manualRetryUsed: true, retryIn: null }
+            ? { ...step, status: 'pending', error: null, manualRetryUsed: true, retryIn: null }
             : step),
         },
       }))
