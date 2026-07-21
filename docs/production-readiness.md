@@ -42,8 +42,6 @@ GitHub issue that tracks its work. Run all commands from the repo root unless no
       `python3 scripts/install_reference_screenshots.py <slug ...>`,
       then `python3 scripts/propagate_canonical.py` (Dockerfile COPY line) and `--check`.
 - [ ] Decide README policy and make the corpus uniform (38 tasks lack `README.md`).
-- [ ] Regenerate `solution/reward-details.json` for `frontend-creative-tools-story-docs`
-      (only task missing it).
 
 ## Phase 4 — Docs / tooling truthfulness (#536)
 
