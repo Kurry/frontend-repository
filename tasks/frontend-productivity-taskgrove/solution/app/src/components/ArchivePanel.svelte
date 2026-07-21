@@ -6,7 +6,7 @@
 
 <div class="archive-panel border-l border-[var(--color-border)] bg-[var(--color-surface)] transition-theme w-full lg:w-64 flex-shrink-0">
   <div class="p-2 border-b border-[var(--color-border)]">
-    <h2 class="text-[12px] font-bold heading" style="font-family: var(--font-heading);">Archive</h2>
+    <h2 class="heading font-bold" style="font-size: 48px; line-height: 1.1;">Archive</h2>
   </div>
   <div class="p-2 overflow-y-auto" style="max-height: calc(100vh - 200px);">
     {#if archived.length === 0}
