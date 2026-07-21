@@ -1548,7 +1548,7 @@ function CriterionTable({ trial, ui }) {
     }
     setExitingIds([]);
     return undefined;
-  }, [ui.flipsOnly, flipKey, trial.criteria]);
+  }, [ui.flipsOnly, flipKey, trial.criteria, trial.id]);
   const visibleCriteria = trial.criteria.filter((criterion) => {
     if (!ui.flipsOnly) return true;
     return flips.includes(criterion.id) || exitingIds.includes(criterion.id);
