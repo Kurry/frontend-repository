@@ -38,7 +38,7 @@ export function CategoryBadge({ category }: { category: FixCategory }) {
 export function ReviewProgress({ count }: { count: number }) {
   return (
     <div className="review-progress" aria-label={`${count} of 5 reviewer steps complete`}>
-      <Group justify="space-between" gap="xs"><Text size="xs" fw={650}>{count}/5 complete</Text><IconClock size={13} /></Group>
+      <Group justify="space-between" gap="xs"><Text size="xs" fw={650}>{count} of 5 reviewer steps complete</Text><IconClock size={13} aria-hidden="true" /></Group>
       <Progress value={(count / 5) * 100} size="xs" radius="xl" mt={5} />
     </div>
   );
