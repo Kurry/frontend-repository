@@ -105,7 +105,7 @@ const columns = [
 
 function rowProps(row) {
   return {
-    class: selectedIds.value.includes(row.id) ? 'queue-row-selected' : '',
+    class: selectedIds.value.includes(row.id) ? 'queue-row-selected' : '', role: 'button',
     tabindex: 0,
     'aria-label': `Open ${row.title}`,
     onClick: () => store.openSubmission(row.id),
@@ -161,7 +161,7 @@ function rowProps(row) {
         @leave="onBulkBarLeave"
       >
         <form v-if="store.selectedCount" class="bulk-bar" aria-label="Bulk submission actions" @submit.prevent>
-          <div class="bulk-count"><span>{{ store.selectedCount }}</span> selected</div>
+          <div class="bulk-count" aria-live="polite"><span>{{ store.selectedCount }}</span> selected</div>
           <div class="bulk-actions">
             <NButton type="primary" @click="runBulk('stage')"><IconLayers /> Move to in-review</NButton>
             <NButton @click="runBulk('payout')"><IconPause /> Hold payout</NButton>
