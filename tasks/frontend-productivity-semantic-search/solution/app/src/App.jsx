@@ -36,8 +36,8 @@ function Header() {
       <div className="brand-title">Atlas semantic library</div>
     </div>
     <div className="header-actions">
-      <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Undo} title={undo ? `Undo ${undo.label}` : 'Nothing to undo'} disabled={!undo} onClick={state.undo}>{undo ? `Undo · ${undo.label}` : 'Undo'}</Button>
-      <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Redo} title={redo ? `Redo ${redo.label}` : 'Nothing to redo'} disabled={!redo} onClick={state.redo}>{redo ? `Redo · ${redo.label}` : 'Redo'}</Button>
+      <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Undo} aria-label={undo ? `Undo ${undo.label}` : 'Nothing to undo'} title={undo ? `Undo ${undo.label}` : 'Nothing to undo'} disabled={!undo} onClick={state.undo}>{undo ? `Undo · ${undo.label}` : 'Undo'}</Button>
+      <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Redo} aria-label={redo ? `Redo ${redo.label}` : 'Nothing to redo'} title={redo ? `Redo ${redo.label}` : 'Nothing to redo'} disabled={!redo} onClick={state.redo}>{redo ? `Redo · ${redo.label}` : 'Redo'}</Button>
       <Button kind="ghost" renderIcon={MacCommand} onClick={() => state.setPalette(true)}><span className="action-label">Commands</span></Button>
       <Button kind="primary" renderIcon={Export} onClick={() => state.openExport('report')}><span className="action-label">Export</span></Button>
     </div>
@@ -99,8 +99,8 @@ function RailEmpty({ icon: Icon, text }) {
 }
 
 function queryChoices(state) {
-  const saved = state.savedSearches.map((item) => ({ id: `saved:${item.name}`, label: item.name, ...item }))
-  const history = state.history.map((item) => ({ id: `history:${item.id}`, label: item.raw || 'All documents', ...item }))
+  const saved = state.savedSearches.map((item) => ({ ...item, id: `saved:${item.name}`, label: item.name }))
+  const history = state.history.map((item) => ({ ...item, id: `history:${item.id}`, label: item.raw || 'All documents' }))
   return [...saved, ...history]
 }
 
@@ -268,7 +268,7 @@ function SaveSearchModal() {
   const schema = SavedSearchSchema.superRefine((value, ctx) => { if (state.savedSearches.some((item) => item.name.toLowerCase() === value.name.toLowerCase())) ctx.addIssue({ code:'custom', path:['name'], message:'name must be unique' }) })
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(schema), mode:'onChange', defaultValues:{ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold } })
   useEffect(() => { if (state.saveOpen) reset({ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold }) }, [state.saveOpen, state.activeQuery, state.filters, state.threshold, reset])
-  return <Modal open={state.saveOpen} modalHeading="Save search" primaryButtonText="Save search" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.saveSearch)}><div className="modal-copy" ref={modalRef}><TextInput id="saved-name" labelText="Search name" {...register('name')} invalid={!!errors.name} invalidText={errors.name?.message || 'name is required'} aria-invalid={!!errors.name} aria-describedby={errors.name ? 'saved-name-error' : undefined} /><div className="p-4 bg-gray-50 text-sm"><div><strong>Query</strong> {state.activeQuery || 'All documents'}</div><div><strong>Threshold</strong> {state.threshold.toFixed(2)}</div><div><strong>Filters</strong> {state.filters.map((f) => `${f.kind}:${f.value}`).join(', ') || 'None'}</div></div></div></Modal>
+  return <Modal open={state.saveOpen} modalHeading="Save search" primaryButtonText="Save search" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.saveSearch)} selectorPrimaryFocus="#saved-name"><div className="modal-copy" ref={modalRef}><TextInput id="saved-name" labelText="Search name" {...register('name')} invalid={!!errors.name} invalidText={errors.name?.message || 'name is required'} aria-invalid={!!errors.name} aria-describedby={errors.name ? 'saved-name-error' : undefined} /><div className="p-4 bg-gray-50 text-sm"><div><strong>Query</strong> {state.activeQuery || 'All documents'}</div><div><strong>Threshold</strong> {state.threshold.toFixed(2)}</div><div><strong>Filters</strong> {state.filters.map((f) => `${f.kind}:${f.value}`).join(', ') || 'None'}</div></div></div></Modal>
 }
 
 function AddDocumentModal() {
@@ -279,7 +279,7 @@ function AddDocumentModal() {
   useOverlayFocusTrap(state.addOpen, close, modalRef)
   const { register, control, handleSubmit, reset, formState:{ errors, isValid } } = useForm({ resolver:zodResolver(DocumentSchema), mode:'onChange', defaultValues:{ title:'', body:'', type:'guide', tags:[] } })
   useEffect(() => { if (state.addOpen) reset({ title:'', body:'', type:'guide', tags:[] }) }, [state.addOpen, reset])
-  return <Modal open={state.addOpen} modalHeading="Add document" primaryButtonText="Add document" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.addDocument)}><div className="modal-copy" ref={modalRef}><TextInput id="doc-title" labelText="Title" {...register('title')} invalid={!!errors.title} invalidText={errors.title?.message} /><TextArea id="doc-body" labelText="Body" rows={6} {...register('body')} invalid={!!errors.body} invalidText={errors.body?.message} /><div className="form-row"><Select id="doc-type" labelText="Type" {...register('type')} invalid={!!errors.type} invalidText={errors.type?.message}>{['guide','reference','prompt','checklist','paper','note'].map((type) => <SelectItem value={type} text={type} key={type} />)}</Select><Controller control={control} name="tags" render={({ field }) => <TextInput id="doc-tags" labelText="Tags, comma separated" value={field.value.join(', ')} onChange={(e) => field.onChange(e.target.value.split(',').map((tag) => tag.trim()).filter(Boolean))} onBlur={field.onBlur} invalid={!!errors.tags} invalidText={errors.tags?.message || errors.tags?.root?.message} />} /></div></div></Modal>
+  return <Modal open={state.addOpen} modalHeading="Add document" primaryButtonText="Add document" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.addDocument)} selectorPrimaryFocus="#doc-title"><div className="modal-copy" ref={modalRef}><TextInput id="doc-title" labelText="Title" {...register('title')} invalid={!!errors.title} invalidText={errors.title?.message} /><TextArea id="doc-body" labelText="Body" rows={6} {...register('body')} invalid={!!errors.body} invalidText={errors.body?.message} /><div className="form-row"><Select id="doc-type" labelText="Type" {...register('type')} invalid={!!errors.type} invalidText={errors.type?.message}>{['guide','reference','prompt','checklist','paper','note'].map((type) => <SelectItem value={type} text={type} key={type} />)}</Select><Controller control={control} name="tags" render={({ field }) => <TextInput id="doc-tags" labelText="Tags, comma separated" value={field.value.join(', ')} onChange={(e) => field.onChange(e.target.value.split(',').map((tag) => tag.trim()).filter(Boolean))} onBlur={field.onBlur} invalid={!!errors.tags} invalidText={errors.tags?.message || errors.tags?.root?.message} />} /></div></div></Modal>
 }
 
 const ImportFormSchema = z.object({ packageText: z.string().trim().min(1, 'package is required') })
@@ -294,7 +294,7 @@ function ImportModal() {
   useEffect(() => { if (state.importOpen) { reset({ packageText:'' }); setServerError('') } }, [state.importOpen, reset])
   const submit = ({ packageText }) => { const result = state.importPackage(packageText); if (!result.ok) setServerError(result.error) }
   const file = async (event) => { const picked = event.target.files?.[0]; if (picked) setValue('packageText', await picked.text(), { shouldValidate:true }) }
-  return <Modal open={state.importOpen} modalHeading="Import library package" primaryButtonText="Import package" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(submit)}><div className="modal-copy" ref={modalRef}><p className="muted">A valid package replaces the current documents and saved searches. Imported documents remain stale until indexing completes.</p><label className="cds--label" htmlFor="package-file">Choose JSON file</label><input id="package-file" type="file" accept="application/json,.json" onChange={file} /><TextArea id="package-text" labelText="Package JSON" rows={10} {...register('packageText')} invalid={!!errors.packageText || !!serverError} invalidText={errors.packageText?.message || serverError} /></div></Modal>
+  return <Modal open={state.importOpen} modalHeading="Import library package" primaryButtonText="Import package" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(submit)} selectorPrimaryFocus="#package-text"><div className="modal-copy" ref={modalRef}><p className="muted">A valid package replaces the current documents and saved searches. Imported documents remain stale until indexing completes.</p><label className="cds--label" htmlFor="package-file">Choose JSON file</label><input id="package-file" type="file" accept="application/json,.json" onChange={file} /><TextArea id="package-text" labelText="Package JSON" rows={10} {...register('packageText')} invalid={!!errors.packageText || !!serverError} invalidText={errors.packageText?.message || serverError} /></div></Modal>
 }
 
 function ExportModal() {
