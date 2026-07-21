@@ -1,0 +1,59 @@
+This PR adds deterministic Playwright e2e criterion tests for the Harbor eval task `frontend-creative-tools-prompt-diff`.
+
+### What this PR does
+- Adds `@playwright/test` devDependency to the application's package.json
+- Adds `"test:e2e": "playwright test e2e.spec.mjs"` to package.json scripts
+- Adds `e2e.spec.mjs` containing the tests for deterministically testable criteria and lists NOT-AUTOMATABLE ones. Includes real UI sequences for 1.25 undo_redo_version_operations and 14.8 resolve_unresolve_round_trip.
+
+### This PR must
+- [x] Checklist mapping every criterion covered to its test + the NOT-AUTOMATABLE list
+- [x] Verification contract — honest `npx playwright test` output, verify:build clean, start serves on 3000
+
+NOT-AUTOMATABLE:
+- 3.1 rail_header_diff_layout — Subjective category visual_design
+- 3.2 split_pane_divider_gutter — Subjective visual criterion
+- 3.3 diff_color_treatments — Subjective visual criterion
+- 3.4 summary_tags_and_conflict_accent — Subjective visual criterion
+- 3.5 picker_and_history_anatomy — Subjective visual criterion
+- 3.6 graph_node_kind_distinction — Subjective visual criterion
+- 3.7 monospace_prompt_type_hierarchy — Subjective visual criterion
+- 3.8 control_states_and_icon_set — Subjective visual criterion
+- 3.9 responsive_stack_and_rail — Subjective visual criterion
+- 3.10 export_surface_anatomy — Subjective visual criterion
+- 11.1 delightful_diff_microinteractions — Subjective category innovation
+- 11.2 advanced_graph_or_blame_motion — Subjective category innovation
+- 11.3 guided_first_merge_coachmarks — Subjective category innovation
+- 11.4 enhanced_interactive_graphics — Subjective category innovation
+- 11.5 keyboard_power_user_shortcuts — Subjective category innovation
+- 11.6 preference_personalization — Subjective category innovation
+- 11.7 polished_studio_branding — Subjective category innovation
+- 11.8 theme_or_density_beyond_requirements — Subjective category innovation
+- 11.9 shareable_deep_link_or_print — Subjective category innovation
+- 11.10 competition_level_innovation — Subjective category innovation
+- innovation.catchall innovation_catchall — Subjective category innovation
+- 15.1 headings_use_consistent_capitalization — Subjective category writing
+- 15.2 actions_use_specific_labels — Subjective category writing
+- 15.3 errors_name_problem_and_fix — Subjective category writing
+- 15.4 empty_states_explain_next_step — Subjective category writing
+- 15.5 body_copy_is_well_written — Subjective category writing
+- 15.6 terminology_is_consistent — Subjective category writing
+- 15.7 numbers_dates_and_units_are_consistent — Subjective category writing
+- 15.8 success_messages_are_specific — Subjective category writing
+- 3.1 spacing_matches_studio_scale — Subjective category design_fidelity
+- 3.2 typography_matches_chrome_and_mono_spec — Subjective category design_fidelity
+- 3.3 layout_matches_rail_header_diff_spec — Subjective category design_fidelity
+- 3.4 specified_state_changes_animate — Subjective category design_fidelity
+- 3.5 responsive_behavior_matches_spec — Subjective category design_fidelity
+- 3.6 control_styling_matches_spec — Subjective category design_fidelity
+- 3.7 typography_has_clear_hierarchy — Subjective category design_fidelity
+- 3.8 component_states_match_spec — Subjective category design_fidelity
+- 3.9 diff_surface_treatments_match_spec — Subjective category design_fidelity
+- 3.10 microinteractions_match_spec — Subjective category design_fidelity
+- 4.1 empty_states_designed — Subjective visual criterion
+
+Total criteria: 163.
+Implemented: 117
+Subjective: 46
+
+Passed tests: 106
+Failed tests (real defects left failing): 11
