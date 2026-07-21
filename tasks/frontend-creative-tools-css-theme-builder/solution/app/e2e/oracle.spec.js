@@ -44,7 +44,7 @@ test('downloaded Theme JSON restores edited tokens and modal close paths cleanly
   await page.mouse.up();
   await page.getByRole('button', { name: 'Skip tour' }).click();
 
-  await page.getByLabel('Theme name').fill('Studio Dawn');
+  await page.getByLabel('Theme name').fill('studio-dawn');
   await page.getByLabel('Primary face color').fill('#336699');
   await page.getByRole('button', { name: 'Boxes: 1rem (1rem)' }).click();
   await page.getByLabel('Dark color scheme').check();
@@ -65,7 +65,7 @@ test('downloaded Theme JSON restores edited tokens and modal close paths cleanly
   }));
   expect(downloadArtifact.name).toBe('studio-dawn.json');
   const downloadedJson = downloadArtifact.text;
-  expect(JSON.parse(downloadedJson).name).toBe('Studio Dawn');
+  expect(JSON.parse(downloadedJson).name).toBe('studio-dawn');
 
   await page.getByRole('button', { name: 'Close' }).click();
   await expect(exportModal).toHaveAttribute('aria-hidden', 'true');
@@ -79,7 +79,7 @@ test('downloaded Theme JSON restores edited tokens and modal close paths cleanly
   await page.getByLabel('Theme JSON document').fill(downloadedJson);
   await page.getByRole('button', { name: 'Import theme' }).last().click();
   await expect(page.locator('#import-modal')).toHaveAttribute('aria-hidden', 'true');
-  await expect(page.getByLabel('Theme name')).toHaveValue('Studio Dawn');
+  await expect(page.getByLabel('Theme name')).toHaveValue('studio-dawn');
   await expect(page.getByLabel('Primary face color')).toHaveValue('#336699');
   await expect(page.getByRole('button', { name: 'Boxes: 1rem (1rem)' })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByLabel('Dark color scheme')).toBeChecked();

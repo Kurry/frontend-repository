@@ -85,11 +85,12 @@ export function registerWebMCP(api) {
     {
       name: "editor_preview",
       module: "structured-editor-v1",
-      description: "Apply a css-theme (by id or name) to the live preview.",
+      description: "Read a bounded summary of a css-theme (by id or name) without changing the active theme or visible preview.",
       inputSchema: {
         type: "object",
         properties: { id: { type: "string" }, name: { type: "string" } },
       },
+      annotations: { readOnlyHint: true },
     },
     {
       name: "entity_create",
@@ -178,7 +179,12 @@ export function registerWebMCP(api) {
   ];
 
   window.webmcp_list_tools = () =>
-    TOOL_DEFS.map(({ name, description, inputSchema }) => ({ name, description, inputSchema }));
+    TOOL_DEFS.map(({ name, description, inputSchema, annotations }) => ({
+      name,
+      description,
+      inputSchema,
+      ...(annotations ? { annotations } : {}),
+    }));
 
   // Accept both invoke_tool("name", args) and the bridge's invoke_tool({name, arguments}).
   window.webmcp_invoke_tool = (nameOrRequest, maybeArgs) => {
@@ -188,8 +194,25 @@ export function registerWebMCP(api) {
       (typeof nameOrRequest === "string" ? maybeArgs : nameOrRequest?.arguments) || {};
 
     switch (toolName) {
+      case "editor_preview": {
+        const hasLookup =
+          args.id != null ||
+          (typeof args.name === "string" && args.name.trim().length > 0);
+        const found = hasLookup ? findTheme(args) : state.active;
+        if (!found) return { error: "Theme not found — pass a valid id or name" };
+        return {
+          success: true,
+          theme: {
+            id: found.id,
+            name: found.name,
+            type: found.type,
+            colorScheme: found["color-scheme"],
+            tokenCount: Object.keys(serializeTheme(found)).filter((key) => key.startsWith("--")).length,
+          },
+        };
+      }
+
       case "editor_select":
-      case "editor_preview":
       case "entity_select": {
         const found = findTheme(args);
         if (!found) return { error: "Theme not found — pass a valid id or name" };

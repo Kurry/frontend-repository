@@ -333,10 +333,10 @@ function uniqueName(base) {
   const names = new Set(allThemes().map((t) => t.name));
   if (!names.has(trimmed)) return trimmed;
   for (let i = 2; i < 999; i++) {
-    const candidate = `${trimmed} ${i}`;
+    const candidate = `${trimmed}-${i}`;
     if (!names.has(candidate)) return candidate;
   }
-  return `${trimmed} ${Date.now().toString(36)}`;
+  return `${trimmed}-${Date.now().toString(36)}`;
 }
 
 function syncCustomsEntry() {
@@ -390,7 +390,7 @@ function forkActive() {
   const fork = cloneTheme(src);
   fork.id = uid();
   fork.type = "custom";
-  fork.name = uniqueName(`${src.name} copy`);
+  fork.name = uniqueName(`${src.name}-copy`);
   fork.default = false;
   fork.prefersdark = false;
   fork.baseline = serializeTheme(src);
@@ -517,7 +517,7 @@ function duplicateActive() {
     ...cloneTheme(source),
     id: uid(),
     type: "custom",
-    name: uniqueName(`${source.name} copy`),
+    name: uniqueName(`${source.name}-copy`),
     default: false,
     prefersdark: false,
   });
@@ -626,8 +626,17 @@ function randomizeTheme() {
 
 /* ------------------------------ snapshots ------------------------------ */
 
+function validateSnapshotName(rawName) {
+  const name = String(rawName ?? "").trim();
+  if (!name) return "Snapshot name is required — enter a name before saving.";
+  if (name.length > 64) {
+    return `Snapshot name must be 64 characters or fewer (currently ${name.length}) — shorten it.`;
+  }
+  return null;
+}
+
 function saveSnapshot(rawName) {
-  const nameError = validateThemeName(rawName);
+  const nameError = validateSnapshotName(rawName);
   if (nameError) return nameError;
   const snap = {
     id: uid(),

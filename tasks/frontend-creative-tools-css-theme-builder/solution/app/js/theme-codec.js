@@ -74,8 +74,8 @@ export function clearThemeHash() {
 /* ---------------- Theme JSON field contract ---------------- */
 
 export const NAME_MAX = 64;
-/** Letters (any case), digits, spaces, hyphens, underscores. */
-export const NAME_PATTERN = /^[A-Za-z0-9 _-]+$/;
+/** Lowercase ASCII letters, digits, hyphens, and underscores only. */
+export const NAME_PATTERN = /^[a-z0-9_-]+$/;
 
 export function validateThemeName(name) {
   const raw = String(name ?? "");
@@ -85,7 +85,7 @@ export function validateThemeName(name) {
     return `Theme name must be ${NAME_MAX} characters or fewer (currently ${trimmed.length}) — shorten it.`;
   }
   if (!NAME_PATTERN.test(trimmed)) {
-    return "Theme name may only use letters, numbers, spaces, hyphens, and underscores — remove any other characters.";
+    return "Theme name may only use lowercase letters, numbers, hyphens, and underscores — remove spaces, uppercase letters, or other characters.";
   }
   return null;
 }
