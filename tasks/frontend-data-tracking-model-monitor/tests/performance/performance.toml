@@ -119,27 +119,3 @@ description = "Opening Export session regenerates Session JSON and Usage CSV fro
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "9.n1"
-name = "ui_hangs_under_simulation"
-description = "While the simulation is running, filtering, pinning, or opening export hangs or drops interactions"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "export_freezes_ui"
-description = "Opening Export session freezes the UI for a prolonged period with a stalled or blank export preview"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0
-

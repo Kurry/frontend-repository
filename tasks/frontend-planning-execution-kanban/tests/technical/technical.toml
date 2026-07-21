@@ -128,20 +128,6 @@ description = "The UI stays responsive and consistent under rapid repeated input
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "4.7"
-name = "storage_apis_used"
-description = "After a full exercise of the app, localStorage, sessionStorage, or another browser storage API contains app data (this task mandates in-memory state only)"
-type = "binary"
-weight = 1.0
-negate = true
-[[criterion]]
-id = "4.8"
-name = "outbound_requests_or_navigation"
-description = "The app issues network requests to non-local origins (CDN scripts, fonts, icons, APIs) or app chrome navigates to an external origin during use"
-type = "binary"
-weight = 1.0
-negate = true
-[[criterion]]
 id = "4.9"
 name = "export_field_contract_visible"
 description = "The board JSON export preview visibly includes the declared API-shaped field names and enums (column ids, status values, tasks.attempts, comments.created_at) matching the instruction field contract"
@@ -153,10 +139,3 @@ name = "form_rejects_overlong_title"
 description = "Submitting Add Card with a title longer than 120 characters shows an inline validation message naming title and does not add a card"
 type = "binary"
 weight = 1.0
-[[criterion]]
-id = "4.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network request, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

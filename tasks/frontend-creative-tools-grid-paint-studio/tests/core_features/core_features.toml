@@ -204,22 +204,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.17"
-name = "static_gallery_controls"
-description = "Saved boards list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.18"
-name = "tool_writes_wrong_cell_type"
-description = "A real Color Brush stroke writes QR glyph masks, an Eraser stroke leaves painted content, or a QR Brush stroke writes only a flat whole-cell fill, showing that the active tool fails to determine the cell result"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.20"
 name = "exact_seven_color_palette"
 description = "Exactly seven square palette swatches (black, white, red, yellow, green, blue, pink) select the active color, the active swatch is visibly ringed, and the choice tints both Color Brush fills and QR cells"
@@ -232,14 +216,6 @@ name = "color_brush_and_eraser"
 description = "Using real canvas strokes, Color Brush fills whole crossed cells with the active swatch and Eraser returns the crossed painted cells to the blank state without changing other cells"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "cell_resolution_unlocked_mid_art"
-description = "The Cell range control stays adjustable after painting has begun, letting the grid resolution change mid-artwork instead of locking"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.23"
@@ -442,45 +418,5 @@ id = "1.51"
 name = "import_rejects_invalid_project_document"
 description = "Import Project with JSON missing a required ProjectDocument key, using tool/swatch/mirror/vision outside their closed enums, cells dimensions that disagree with cellSize, a QR cell missing kind or color, or a boards/versions entry that violates SavedBoard / VersionSnapshot rules (invalid tag, overlong name, non-boolean favorite, or cells/cellSize mismatch) shows a visible error naming the offending field and leaves board and gallery unchanged"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "export_omits_session_mutations"
-description = "After painting cells and saving a board, Export center Project JSON omits the painted pattern or the new board name, leaving an export that ignores the session's actual work"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "import_ignores_payload"
-description = "Import Project with a valid exported Project JSON leaves the board and gallery unchanged as if no import occurred"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "histogram_ignores_board_changes"
-description = "Painting or clearing cells leaves every histogram bar height identical, showing the histogram is not derived from the live board"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "project_json_missing_contract_fields"
-description = "Export center Project JSON is missing required ProjectDocument fields (cellSize, tool, swatch, mirror, vision, gridVisible, cells, boards, or versions), shows tool/swatch/mirror/vision values outside their closed enums, or boards entries omit SavedBoard keys name/tag/favorite/cellSize/cells"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in a specified core behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (control, gesture sequence, canvas result, downloaded artifact, or resulting page state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

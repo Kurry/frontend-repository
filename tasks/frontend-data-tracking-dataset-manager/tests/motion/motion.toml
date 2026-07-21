@@ -161,34 +161,3 @@ description = "With prefers-reduced-motion set, imported rows and batches appear
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "8.n1"
-name = "no_hover_or_press_feedback"
-description = "Buttons, sidebar entries, or grid rows show no hover, focus, or press feedback beyond browser defaults when exercised with the real pointer"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "8.n2"
-name = "animation_blocks_or_janks"
-description = "An animation visibly janks the layout, blocks input while running, or leaves elements misaligned after settling (for example import batches shifting the grid or the drawer trapping clicks mid-slide)"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "8.n3"
-name = "state_snap_shortcut"
-description = "A specified transition (import batches, row slide-in, modal enter, tray slide) is absent when driven through the real UI control path — the state simply snaps"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "motion.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

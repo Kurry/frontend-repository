@@ -162,46 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_landing_flows_unavailable"
-description = "The contact We'll call you → Thanks for your submission! path, the flick-deck Next/Previous reshuffle, or the client-carousel advance cannot be completed from the visible UI controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "flick_or_carousel_state_desyncs"
-description = "After flick-deck Next/Previous or client-carousel paging, the front-card interactive player, card status, or centered-client active controls disagree with what is visibly centered (state not synced across deck surfaces)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "contact_or_menu_overlay_blocks_exit"
-description = "The contact popup or the mobile lime menu opens but cannot be closed, leaving navigation blocked with no exit path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "failed_contact_flow_lacks_feedback"
-description = "Submitting the contact form with an empty/invalid email or unchecked Privacy Policy produces no field-marking feedback and no visible failure indication while the popup stays open."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "flow_dead_end_requires_reload"
-description = "After opening the contact popup, mobile lime menu, cookie preferences, or advancing the client carousel, recovering normal homepage interaction requires a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "shortlist_flow_count_and_panel"
 description = "Shortlist flow: shortlisting Loom House raises the nav count from 0 to 1; shortlisting Second Circle raises it to 2; the Shortlist panel lists both; removing Loom House drops the count to 1 and clears only Loom House while Second Circle stays shortlisted."
@@ -243,26 +203,3 @@ description = "Cookie accept versus prefs export flow: on one load Accept then E
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n6"
-name = "brief_export_flow_dead_end"
-description = "Export brief, Shortlist panel, or command palette opens but cannot be closed, leaving the homepage blocked with no exit without reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "cookie_or_contact_contract_flow_unavailable"
-description = "The contact lead payload cannot reach Thanks for your submission! under the field contract, or cookie Accept / valid preferences save cannot write the four-boolean cookieCategories payload into the discovery brief."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

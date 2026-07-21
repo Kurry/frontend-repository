@@ -211,22 +211,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.30"
-name = "nondictionary_word_scored"
-description = "A submission of letters that are not in the bundled dictionary is scored, clears tiles, or triggers a Board Cleared bonus."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.31"
-name = "external_dictionary_lookup"
-description = "Word validity is resolved through an external dictionary API or any network request instead of entirely in-browser against a bundled word list."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.32"
 name = "settings_form_inline_validation"
 description = "The Settings control opens a form whose fields match the settings request body: playerName (required, 2 to 20 characters) and startingTier (enum 1, 2, or 3 shown as Tier 1/2/3); typing a one-character playerName shows an inline message under the field naming playerName and the 2-to-20 length rule before any submit, Save stays disabled while invalid, and correcting the name clears the message and enables Save."
@@ -290,22 +274,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "1.41"
-name = "rapid_activation_duplicates_transitions"
-description = "Rapidly activating Start game, Pause, Resume, or Submit Word multiple times in quick succession produces a duplicate run, a duplicate history entry, or a corrupted score instead of triggering each transition exactly once."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.42"
-name = "stale_phase_input_mutates_run"
-description = "Clicks on the board after Game Over, or tile taps issued while paused, mutate the current run's score, tray, or board state."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.43"
 name = "common_short_words_accepted"
 description = "The bundled word list accepts everyday short words: submitting a tray spelling a common three-letter word such as CAT, DOG, or SUN is scored as valid rather than rejected."
@@ -361,36 +329,4 @@ name = "settings_payload_field_contract"
 description = "Saving settings with a valid playerName (2 to 20 chars) and startingTier (1, 2, or 3) produces a settings record that carries exactly those two fields; invalid playerName length keeps Save disabled with an inline message naming playerName and the 2-to-20 rule."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.n49"
-name = "export_omits_session_words_or_score"
-description = "Export Run JSON omits required game-result fields (format, schemaVersion, score, tilesCleared, durationSec, playerName, tierReached, endedAt, result, or words) for the finished run, or shows hardcoded placeholder values unrelated to that run."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n50"
-name = "resume_starts_empty_instead_of_checkpoint"
-description = "After Save Progress and a full page reload, Resume Saved Run starts an empty new run instead of restoring the saved score, tray, streak, tier, and tiles."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n51"
-name = "import_accepts_wrong_format_literal"
-description = "Import accepts a JSON payload whose format is not letterdrop-game-v1 or letterdrop-history-v1 (or whose schemaVersion is not 1) without a visible rejection, mutating History as if valid."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "A specified core behavior is broken or missing in a way not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot). If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true
 

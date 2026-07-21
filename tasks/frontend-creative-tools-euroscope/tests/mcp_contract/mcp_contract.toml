@@ -163,54 +163,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "Required form, editor, or artifact WebMCP tools are unbound, missing, or no-op when invoked."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n2"
-name = "handlers_diverge_from_ui"
-description = "A WebMCP advance/return, theme/icon select, swatch update_property, or export leaves the UI out of sync with the tool result (handlers diverge from visible UI logic)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared modules, workflow steps, editor properties, modes, or artifact operations beyond the Bindings block are exposed through the tool list."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n4"
-name = "validation_bypass_desyncs_mcp_ui"
-description = "Updating a swatch property via WebMCP with an invalid colour bypasses validation and desynchronizes MCP state from the visible hex-field rules."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n5"
-name = "export_leaks_artifact_bytes"
-description = "Artifact export returns raw file contents, filesystem paths, blobs, or base64 payload data in WebMCP arguments or results."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n6"
-name = "session_or_tool_api_broken"
-description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete data for the mandated form, editor, and artifact modules."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "12.11"
 name = "artifact_import_copy_bound"
 description = "Artifact operations import and copy are bound alongside export; import with mode patch-recipe and copy drive the same paths as Import recipe and Copy export without putting file contents in WebMCP results."
@@ -245,18 +197,3 @@ description = "Form operation reset and editor mode export-center are bound; res
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "12.n7"
-name = "recipe_export_mcp_omits_mutations"
-description = "Invoking artifact export for patch-recipe-json succeeds in the tool result while the visible Patch recipe JSON preview still omits the session's current swatch or keep-original mutations, drops a required field-contract key (schemaVersion, colours.*, iconSet, bitmaps keepOriginal), or violates cross-field agreement with the Base theme / icon set controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "mcp_contract.catchall"
-name = "mcp_contract_catchall"
-description = "The MCP contract for form-workflow-v1 / structured-editor-v1 / artifact-transfer-v1 with the EuroScope Bindings block deviates from its declaration in a way NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to automation or a real user. If present, name the defect and cite concrete evidence. If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

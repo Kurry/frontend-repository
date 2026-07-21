@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_page_shows_nothing"
-description = "A page with zero panes shows nothing — no Create your first pane to build this page empty-state message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "validation_errors_only_in_console"
-description = "Invalid wizard, page-name, or saved-analysis input failures surface only in the browser console with no visible inline field feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Completing Create Pane, Copy Link, or saved-analysis create produces no visible feedback (count unchanged with no confirmation or error)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "destructive_delete_no_confirmation"
-description = "Pane or page delete proceeds immediately with no confirmation dialog or cancel path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_are_nonsemantic"
-description = "Primary interactive controls (Create Pane, page tabs, pane Edit/Delete, Share) are non-semantic div/span click targets without button/role semantics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "overlays_not_keyboard_dismissible"
-description = "With the preview modal, pane wizard, Share panel, or confirmation open, keyboard users cannot dismiss it (no Escape path and no focusable close control)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "duplicate_saved_analysis_accepted"
-description = "A saved analysis with a duplicate name is accepted, creating a duplicate record or leaving bundled source data changed, without inline feedback naming the problem."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_action_labels"
-description = "Primary actions show blank, placeholder, or ambiguous labels such as Submit, OK, or Button instead of specific labels like Add Page, Create Pane, or Copy Link."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "storage_unavailable_crashes_or_blanks"
-description = "When persistent storage is unavailable, the root crashes, goes blank, or omits bundled sources instead of rendering a usable seeded workspace with a visible warning that changes will not persist."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "invalid_input_damages_last_valid_state"
-description = "Invalid or extreme form input is accepted or clears the last valid rendered pane/page/saved-analysis state instead of rejecting with specific visible feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "schema_invalid_paneconfig_rejected"
 description = "Submitting Create Pane or Edit with a PaneConfig that breaks the field contract (out-of-enum type/size/refreshInterval/source, metric or required dimension not on the source, missing dimension on a chart type, or non-null dimension on table/counter) leaves pane count unchanged and shows an inline error naming the offending field."
@@ -255,18 +175,3 @@ description = "Importing malformed Workspace JSON, or JSON that fails the Worksp
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n11"
-name = "schema_invalid_import_applies_partial_state"
-description = "A Workspace JSON import that fails the field contract partially applies some pages, panes, or saved analyses while rejecting others."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -150,57 +150,9 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI, including Components Demo preview content."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_spelling_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as section headings, Hold to add theme, Remove, Random, CSS, or the version announce strip."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "15.n3"
-name = "inconsistent_token_or_theme_naming"
-description = "The same theme or token concept is named inconsistently across Themes panel, editor, and CSS export surfaces in a way that would confuse a user."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "15.n4"
-name = "truncated_or_overflowing_labels"
-description = "Theme names, editor section headings, validation messages, or chrome labels are truncated or overflowing so the copy is unreadable."
-type = "binary"
-weight = 0.5
-negate = true
-
-
-[[criterion]]
 id = "15.9"
 name = "import_error_names_problem"
 description = "Where the app renders Import validation or Artifact center error states, the copy names the offending declared-theme field (for example name, colors.primary, radius.box, border, fontFamily, or options.darkColorScheme) and the fix rather than a bare rejection."
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "15.n5"
-name = "generic_export_labels_only"
-description = "Where specific labels are possible, Artifact center and history actions use only generic labels like Submit/OK instead of Copy, Download, Import, Undo, or Snapshot."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

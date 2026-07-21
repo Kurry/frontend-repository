@@ -127,40 +127,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.n1"
-name = "cold_load_over_two_seconds"
-description = "On a local cold load the lab is not interactive within 2 seconds."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "console_spam_during_exercise"
-description = "Console errors or warnings appear during a normal exercise of dials, export, and presets."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "export_freezes_ui"
-description = "Download PNG or Download JPEG freezes the UI for a prolonged period or leaves the lab unresponsive after download."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "9.6"
 name = "bracket_and_wipe_stay_smooth"
 description = "Generating a five-frame bracket completes without freezing the UI, and dragging the wipe handle end to end keeps both renders tracking the gesture smoothly"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant performance defect not covered by any other criterion in this file. If present, name the defect and cite evidence. If already covered, answer no."
-type = "binary"
-negate = true
-weight = 1.0

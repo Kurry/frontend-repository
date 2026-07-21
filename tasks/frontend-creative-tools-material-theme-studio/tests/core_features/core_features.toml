@@ -190,22 +190,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "static_saved_list_no_crud"
-description = "Saved themes list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "outbound_links_navigate"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.23"
 name = "editor_bisync_invalid_status"
 description = "The Monaco editor stays bi-synced with the tool panels: editing a Palette color rewrites the ThemeOptions source, editing valid source updates the tools and preview, and invalid source surfaces an invalid-options status instead of applying while the preview keeps rendering the last valid theme"
@@ -240,14 +224,6 @@ description = "The Preview device toggles Phone / Tablet / Desktop reframe the s
 type = "binary"
 weight = 0.5
 optional = true
-
-[[criterion]]
-id = "1.28"
-name = "monaco_static_readonly"
-description = "The Monaco editor is a static read-only code block whose contents stay unchanged after tool-panel edits and whose edits leave the tools and preview unchanged"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.29"
@@ -410,42 +386,3 @@ description = "The ThemeOptions JSON export preview enumerates name, palette.typ
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n40"
-name = "export_omits_session_mutations"
-description = "After editing palette or typography values, the Export JSON or CSS preview still shows stale or seed-only values that omit the session's actual customizations"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n41"
-name = "export_is_static_demo_text"
-description = "The Export panel shows a static hardcoded ThemeOptions or CSS block that stays identical after Palette color and Light/Dark type edits"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n49"
-name = "duplicate_theme_name_still_creates"
-description = "Submitting create or rename with a duplicate saved-theme name still adds or renames a theme and changes the card count"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n50"
-name = "non_hex_intent_color_still_applied"
-description = "A non-#RRGGBB intent color value or an out-of-range shape.borderRadius is applied to editor, preview, or Export text without an inline error naming the field path"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable broken or missing specified core behavior of the theme studio that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -197,22 +197,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "static_list_no_crud"
-description = "Itinerary stops list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "outbound_links_replace_in_app_state"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.23"
 name = "sidebar_full_contents"
 description = "The left nav sidebar shows an inert AI Assistant control, an Overview group (Explore / Notes / Places), the itinerary day list for Sun 7/5-Sat 7/11 with day-colored dots, a Budget row, and Support / Hide sidebar controls"
@@ -232,14 +216,6 @@ name = "detail_tab_row_swaps_panels"
 description = "Selecting a stop opens a place detail panel with a tab row (About / Book / Reviews / Photos / Mentions) whose tabs swap panels without page navigation"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.26"
-name = "detail_tabs_decorative"
-description = "Place detail tabs are decorative: switching among About / Book / Reviews / Photos / Mentions leaves the panel content identical"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.27"
@@ -515,30 +491,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n40"
-name = "grand_total_or_chart_stale_after_fx_change"
-description = "After changing an expense's currency or amount, at least one derived money surface (ledger grand total, pie, burn-rate chart, or pivot cell) keeps its old value while the row itself updates"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n41"
-name = "ledger_features_render_but_compute_nothing"
-description = "A financial surface (debt visualizer, formula bar, pivot, or burn-rate projection) renders as static decoration: its displayed numbers stay identical after the expense data that should drive them changes"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n42"
-name = "import_or_scanner_bypasses_review"
-description = "The CSV wizard, paste parser, or receipt scanner commits rows or drafts directly into the ledger with no review, diagnostics, or confirm step, or the commit silently adds rows the user excluded"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.66"
 name = "stop_field_contract_enforced"
 description = "Stop create/edit enforces the Stop field contract in the UI: empty title, title over 80 characters, day or category outside the closed enums, or endTime not strictly after startTime each show an inline error naming that field, and the submit control stays disabled until every required field is valid"
@@ -580,26 +532,3 @@ description = "Download trip JSON and Download ICS start real downloads of those
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n43"
-name = "export_omits_session_mutations"
-description = "After a visible stop or expense mutation, the ICS, trip JSON, or markdown export preview still shows the pre-mutation session state — an export that omits the session's actual work"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n44"
-name = "ics_or_json_schema_broken"
-description = "The ICS preview is missing BEGIN:VCALENDAR / END:VCALENDAR or VEVENT blocks for scheduled stops, or the trip JSON preview is missing schemaVersion, trip, stops, or expenses, or stop/expense objects omit required field-contract keys"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

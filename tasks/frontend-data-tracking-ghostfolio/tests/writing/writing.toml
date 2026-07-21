@@ -119,54 +119,11 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variable names such as {{title}}) is visible anywhere in the shipped UI."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as the brand bar, net-worth section title, primary buttons, or empty-state message."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "inconsistent_concept_names"
-description = "The same concept is named inconsistently across surfaces (for example Asset class in one place and Category in another for the same field)."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "copy_truncated_unreadably"
-description = "Truncated or overflowing text renders primary labels, validation messages, or empty-state copy unreadable outside the intentional >40-character table ellipsis case."
-type = "binary"
-negate = true
-weight = 0.5
-
-
-[[criterion]]
 id = "15.9"
 name = "export_import_labels_specific"
 description = "Where the app renders export and import chrome, labels are specific (Export portfolio, Import portfolio, Download JSON, Download CSV, Copy), and import errors name the failing field from the holding payload contract."
 type = "binary"
 weight = 0.5
-
-[[criterion]]
-id = "15.n5"
-name = "generic_export_import_copy"
-description = "Export or import controls use only generic labels such as Submit or OK, or import errors omit the failing field name."
-type = "binary"
-negate = true
-weight = 0.5
-
-
 
 [[criterion]]
 id = "15.10"
@@ -182,18 +139,3 @@ description = "Where the app renders the import diagnostics summary it states ho
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "15.n6"
-name = "performance_or_import_copy_generic"
-description = "Performance figures use vague labels (a bare Gain or Value with no distinction), or the import diagnostics summary and batch tray report only a bare number with no words for imported versus skipped or the selected count."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

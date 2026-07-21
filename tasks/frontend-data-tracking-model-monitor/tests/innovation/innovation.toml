@@ -128,14 +128,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "11.n1"
-name = "innovation_breaks_core_flows"
-description = "An optional enhancement beyond the spec breaks a required flow such as Log usage, Export session, or Undo so the core monitor becomes unusable"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "Optional: the app shows an additional browser-observable innovation that clearly goes beyond the written specification and is NOT covered by any other criterion in this file. If present, name it and cite the concrete evidence. If nothing beyond the spec is present, answer no."

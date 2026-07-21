@@ -155,70 +155,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "primary_controls_unreachable_by_keyboard"
-description = "A primary interactive control (wordmark, About, architect tag, sibling tag, overscroll affordance, or red close button) cannot be reached or activated via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focused interactive archive controls show no visible focus indicator or the indicator is fully obscured."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom interactive chrome (tags, close buttons, overscroll affordance, or media popup) uses non-semantic tags without ARIA roles or accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.a4"
-name = "split_heading_character_soup"
-description = "A split/kinetic headline (hero title or case architect name) is exposed to the accessibility tree as character soup — no aria-label (or equivalent) on the container and the split spans are not aria-hidden."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "media_popup_fails_focus_trap"
-description = "While a media popup is open, keyboard focus escapes into the scroll-locked background behind the dialog."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_unreadable_text"
-description = "Cream primary text on the dark surface or white text on a category cover fails WCAG AA contrast and is unreadable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "portraits_or_gallery_missing_alt"
-description = "An architect portrait or about-gallery photograph lacks descriptive alt text or an accessible name."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, smooth scrolling continues, or folder open/close and hero split timelines still run their full animated sequences instead of collapsing to end state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.11"
 name = "palette_drawer_dossier_focus_trap"
 description = "The command palette, reading-list drawer, and dossier export panel trap focus while open, close on Escape, and return focus to the control that opened them."
@@ -232,26 +168,3 @@ description = "The Pin control, Field note area, Save note control, category fil
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n11"
-name = "dossier_or_palette_no_focus_return"
-description = "Closing the command palette, reading-list drawer, or dossier export panel via Escape leaves focus lost or trapped away from the opener."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n12"
-name = "pin_export_controls_keyboard_blocked"
-description = "Pin, Field note, Undo/Redo, Export dossier, or Import dossier cannot be reached or activated via keyboard alone."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

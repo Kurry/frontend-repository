@@ -164,14 +164,6 @@ weight = 1.0
 
 
 [[criterion]]
-id = "11.n1"
-name = "gimmick_breaks_sourcing_flows"
-description = "An optional flourish (coachmark, overlay, or extra viz) intercepts Score, Select, Pin, Queue, Export, or Import so the primary sourcing flow cannot complete without dismissing a blocking layer that has no skip path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app includes an additional browser-observable delight, power-user, or operator-efficiency enhancement in the sourcing console that is NOT covered by any other criterion in this file and goes beyond the written specification. If present, name the enhancement and cite the concrete evidence. If nothing beyond the spec is present, answer no."

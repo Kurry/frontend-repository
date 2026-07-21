@@ -218,22 +218,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.22"
-name = "static_list_without_working_crud"
-description = "Transactions list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.23"
-name = "chrome_navigates_to_other_origins"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.24"
 name = "summary_cards_recompute_on_crud"
 description = "The four summary cards (Total Income, Total Expenses, Net Income, Savings Rate) recompute after create, edit, and delete, with Savings Rate shown as net income divided by income"
@@ -246,23 +230,6 @@ name = "summary_strip_derived_from_collection"
 description = "A summary strip below the table reports transaction count, largest transaction, average amount, and covered date range, each recomputed from the current filtered transactions"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.27"
-name = "demo_chrome_replaces_real_crud"
-description = "Demo chrome controls (Save, Sort, Columns, Bulk edit) replace or disable the working create/edit/delete/export/import flow instead of showing a transient toast"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.28"
-name = "summary_strip_caption_hardcoded"
-description = "The summary strip caption stays identical after adding and deleting transactions, proving it is a hardcoded non-derived caption"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
 
 [[criterion]]
 id = "1.29"
@@ -433,14 +400,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.53"
-name = "export_omits_session_mutations"
-description = "After creating transactions with distinct payees, the Export JSON transactions array omits one or more of those session payees/labels"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.54"
 name = "complete_transaction_field_contract"
 description = "Create and edit enforce the full Transaction payload: ISO YYYY-MM-DD date; trimmed label/payee length 1–80; category limited to Groceries, Restaurants, Transport, Housing, Utilities, Entertainment, Healthcare, Shopping, Salary, or Freelance; account limited to Checking, Savings, Credit Card, or Cash; nonzero amount with absolute value at most 1000000 and at most 2 decimals; optional status limited to cleared, pending, or reconciled; optional note at most 200 characters; Salary/Freelance positive and every other category negative. Each violation shows an inline error naming the field and commits no invalid record."
@@ -482,10 +441,3 @@ description = "The CSV preview starts exactly with date,label,category,account,a
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core functionality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, action sequence) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

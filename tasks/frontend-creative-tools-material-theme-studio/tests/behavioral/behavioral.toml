@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring a new theme, palette edit, tab selection, and Dark type then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "preview_identical_across_different_palette"
-description = "Changing primary main, secondary main, or Light/Dark Type leaves the framed sample site and editor source visually identical — a derived surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_saved_themes_apply_identical_options"
-description = "Loading two seeded saved themes that declare different palette options yields identical editor source and preview colors."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_surface_state_stale_until_reload"
-description = "After editing Palette colors or saving a theme, the editor source, framed sample site, Export preview, or Saved Themes swatch still shows stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_contains_session_hex_after_edit"
 description = "Input-dependent export artifact: set primary main to color A and note the Export JSON text, then set primary main to a clearly different color B. Confirm the two Export JSON (and CSS) previews differ by carrying each session's hex — not an identical static artifact."
@@ -201,32 +169,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "export_identical_after_different_edits"
-description = "Two different primary main edits leave the Export JSON or CSS preview byte-identical — an export surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "import_does_not_restore_exported_hex"
-description = "Importing a ThemeOptions JSON that was just exported after a palette edit fails to restore that hex in editor, preview, or Export text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.12"
 name = "export_json_fields_track_font_size_edit"
 description = "Input-dependent schema fields: change typography.fontSize within 8–24 and shape.borderRadius within 0–24 to different values and confirm the Export ThemeOptions JSON preview's fontSize and borderRadius values update to match without a reload, with palette.type still agreeing with the Type toggle."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

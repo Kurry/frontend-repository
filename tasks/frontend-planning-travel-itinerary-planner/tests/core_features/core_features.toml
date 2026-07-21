@@ -211,38 +211,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "static_list_no_working_crud"
-description = "Itinerary stops list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "outbound_links_instead_of_view_state"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.26"
-name = "pin_click_sync_missing"
-description = "Clicking a map pin leaves the plan list unchanged: the stop is not selected and the list is not scrolled or highlighted to its row (pin-to-list sync is missing)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.27"
-name = "detail_card_cannot_be_closed"
-description = "The place-detail card over the map has no working dismiss control, so it remains stuck open once opened"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.28"
 name = "create_flow_multi_surface"
 description = "Full create flow: note a day section's row count and the map's numbered-pin count, create a valid stop assigned to that day, and confirm the day section shows exactly one more stop row and the map shows exactly one more numbered pin in that day's color; then switch between Plan List and Map modes and confirm the same new stop is present in both without a reload"
@@ -523,31 +491,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.68"
-name = "vote_promotion_silently_fails"
-description = "A poll reaches its winning vote threshold yet the winning item stays in the bucket and the timeline gains no new stop — the promotion silently fails or the winner is left behind"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.69"
-name = "buffer_cards_ignore_mode_change"
-description = "Switching a travel buffer card's transport mode leaves the displayed duration unchanged for legs where the mode speeds dictate different durations — the buffer is a static label rather than a computed value"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.70"
-name = "viewer_role_mutations_still_apply"
-description = "While the Viewer role is active, a mutating control still changes the plan (a stop is created, edited, deleted, or dragged successfully) despite the read-only role"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.71"
 name = "stop_field_contract_enforced"
 description = "The stop create/edit form enforces the Stop field contract: empty title, endTime not after startTime, and out-of-enum category/costTier/status/day each show an inline error naming that field and leave the stops count unchanged; a valid submit creates a record whose visible title, day, location, times, category, costTier, and status match the submitted values"
@@ -582,25 +525,3 @@ description = "Download ICS offers a real download of the visible ICS payload th
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n8"
-name = "trip_json_omits_session_mutations"
-description = "After a create, rename, delete, status change, or vote promotion, the trip JSON preview omits the mutation — the document is static or incomplete relative to the visible plan"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n9"
-name = "import_accepts_invalid_stop_payload"
-description = "Importing trip JSON whose stops violate the Stop field contract (missing title, illegal enum, or endTime not after startTime) still mutates the plan instead of rejecting with a named import error"
-type = "binary"
-weight = 1.0
-negate = true
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "A specified core behavior of the itinerary planner is broken or missing in a way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

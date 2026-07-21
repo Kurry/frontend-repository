@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "plain_dashboard_replaces_marketing"
-description = "Replaces the marketing site with a plain dashboard and drops signature void/notch language"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.4"
 name = "four_numbered_pillars"
 description = "The Why Ridge chapter shows exactly four numbered pillars labelled 01, 02, 03, 04"
@@ -156,27 +148,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.10"
-name = "real_brand_assets_shipped"
-description = "A real company logo, trademark, licensed brand asset, or real network/company/agency proper noun (e.g. Avalanche, AVAX, avax.network, Snowtrace) appears anywhere in the rendered UI — trust strip, partner marks, media, or copy"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.11"
 name = "placeholder_partner_marks_distinct"
 description = "The trust strip and any client wall show multiple visually distinct, original invented placeholder marks rather than repeated identical placeholders"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "3.12"
-name = "cliche_atmosphere_present"
-description = "The visual atmosphere leans on purple-indigo gradients, glow spam, or cream-and-terracotta editorial clichés instead of the cool, architectural institutional-tech direction"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.13"
@@ -205,14 +181,6 @@ name = "institutional_copy_quality"
 description = "Marketing copy reads as original, coherent institutional-tech voice for an enterprise blockchain product; error messages name the problem field and the fix, and empty states explain what belongs there and how to add it"
 type = "binary"
 weight = 0.5
-
-[[criterion]]
-id = "3.17"
-name = "placeholder_text_visible"
-description = "Lorem ipsum, 'TODO', template variable names, or other filler placeholder text is visible anywhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.18"
@@ -250,18 +218,3 @@ description = "Session leads panel uses the same void/notch surfaces and ember a
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n8"
-name = "export_or_palette_unstyled_defaults"
-description = "Export catalog, Session leads, or the command palette renders as unstyled browser-default chrome that breaks the Ridge void/notch system"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

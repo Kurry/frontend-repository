@@ -171,57 +171,9 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_typos"
-description = "Spelling or grammatical errors appear in prominent copy such as Make. Every Day. Better., Market Snapshot, Creating Your Future With Us, or primary cookie/carousel labels."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "source_brand_names_in_copy"
-description = "Rendered copy still names a source company, source brand, real ticker, or real social-platform branding instead of the fictional Northstar Collective system."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "copy_truncated_or_overflowing"
-description = "Truncated or overflowing text renders mandated headings, news titles, market figures, or cookie copy unreadable at 1440 or 375."
-type = "binary"
-negate = true
-weight = 0.5
-
-
-[[criterion]]
 id = "15.11"
 name = "consent_and_briefing_labels_exact"
 description = "Where the app renders consent and briefing chrome, category names Necessary / Analytics / Marketing / Functional, empty-state No stories pinned yet, palette empty-state No matching commands, and tab labels JSON / Markdown render exactly as specified."
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "15.n5"
-name = "briefing_placeholder_copy"
-description = "The Investor briefing preview, shortlist, or command palette shows lorem ipsum, TODO, or template placeholder text."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

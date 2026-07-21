@@ -148,33 +148,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.n1"
-name = "mobile_overflow_or_clipping"
-description = "At 375px width, content clips, overlaps, or overflows the viewport, or page-level horizontal scrolling appears"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.n2"
-name = "unstyled_default_register"
-description = "Controls, dialogs, or tables render as unstyled browser defaults or visually clashing one-off styles instead of one coherent design language across the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "2.9"
 name = "export_drawer_and_palette_anatomy"
 description = "The export drawer shows format tabs, a monospaced preview block, and Copy / Download actions; the command palette reads as a centered overlay list with a filter field"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

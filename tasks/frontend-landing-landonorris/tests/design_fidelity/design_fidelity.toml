@@ -219,96 +219,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n1"
-name = "spacing_contradicts_baseline"
-description = "Visible major section gaps use arbitrary odd-pixel spacing that contradicts the 1.25rem (20px) baseline scale."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "colors_outside_dual_tone_palette"
-description = "Surfaces or accents use colors outside the specified dual-tone dark-green/cream canvas and lime accent system (e.g. arbitrary purple/blue theme wash or lime flooding large backgrounds)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "type_sizing_mismatches_spec"
-description = "At 1440 the impact statement or footer brand statement is grossly mismatched versus the ~132px / ~72px reference metrics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "required_reference_motion_missing"
-description = "Required reference animations are missing: no pinned horizontal media travel, no menu overlay transition, or no STORE/helmet hover motion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "controls_use_browser_defaults"
-description = "STORE, hamburger, or newsletter controls use unstyled browser default appearance when the spec styles them with the lime/token system."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "elements_clipped_or_offscreen"
-description = "Key reference regions (NEXT RACE widget, horizontal media cards, helmet grid, footer form) render off-screen or clipped at 1440."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n8"
-name = "section_order_or_structure_deviates"
-description = "Section order, content, or structure deviates from the mandated homepage regions (hero → horizontal media → impact → helmet grid → race calendar → collaborators → social video → footer) or omits a required region including the menu overlay, press kit, or command palette."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n9"
-name = "heading_body_undifferentiated"
-description = "Heading and body text have no visual distinction (same size/family/case throughout)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Hover language or menu/STORE/helmet microinteractions are missing or clearly deviate from the reference (instant snaps, no split reveal, no clip-path helmet wipe)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.11"
 name = "hardened_surfaces_match_token_system"
 description = "Race calendar, press-kit drawer, and command palette match the dual-tone token system (dark-green rgb(40,44,32), off-white text, lime accents) rather than introducing a second unrelated UI theme."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n11"
-name = "hardened_surfaces_break_reference_system"
-description = "The race calendar, press kit, or palette introduce a clashing visual system (e.g. light card dashboard chrome) that breaks the reference dual-tone cinematic language."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

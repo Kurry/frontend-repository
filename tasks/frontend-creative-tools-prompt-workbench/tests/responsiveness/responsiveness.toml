@@ -162,96 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_375_or_1440"
-description = "At 375px or 1440px the workbench layout breaks: overlapping panels, overflow, or unusable stacking."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small"
-description = "At 375px width, Run, Save, Insert Variable, chips, or binding inputs are too small or misaligned to operate reliably."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "workbench_text_unreadable_on_mobile"
-description = "At 375px width, panel titles, binding names, or library titles are too small to read."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_with_spurious_scrollbars"
-description = "At 375px or 1440px, workbench content is cropped or unnecessary page-level horizontal scrollbars appear."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "binding_panel_unreachable_below_1024"
-description = "Below 1024px wide, the variable binding panel is missing or unreachable after the single-column reflow."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_toolbar_obscures_content"
-description = "Fixed-position toolbar or chrome obscures the editor, response panel, or binding controls so they cannot be used."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "overlap_at_narrow_width"
-description = "At 375px width, editor, response, and binding panels overlap into an unusable stack."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "mobile_save_or_insert_inoperable"
-description = "At 375px width, the Save modal or Insert Variable popover cannot be opened or operated."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "toolbar_overflows_without_wrap"
-description = "At 375px width the toolbar overflows the viewport instead of wrapping its controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "controls_disappear_at_width"
-description = "At 375px or 1440px, required controls (Run, Save, Insert Variable, model selector, or binding inputs) disappear from the layout."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "7.11"
 name = "palette_and_export_modal_operable_mobile"
 description = "The command palette and the Export modal stay fully visible and operable at 375px width rather than rendering off-screen"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

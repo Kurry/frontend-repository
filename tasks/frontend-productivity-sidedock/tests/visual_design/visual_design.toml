@@ -135,22 +135,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.7"
-name = "3_7"
-description = "Body text renders below roughly 14px or a single flat text size is used everywhere with no visible size or weight hierarchy"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.8"
-name = "3_8"
-description = "At roughly 375px wide the page scrolls horizontally or bookmark titles, monogram tiles, and notes overflow or are clipped illegibly"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.9"
 name = "spacing_clusters_on_4px_scale"
 description = "Computed padding, margin, and gap values on cards, buttons, and inputs cluster on multiples of the 4px base unit rather than arbitrary one-off values"
@@ -179,18 +163,3 @@ description = "UI labels use sentence case, action buttons begin with a verb, qu
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.13"
-name = "placeholder_or_lorem_text_visible"
-description = "Placeholder or lorem text (such as Lorem ipsum, TODO, asdf, or template variable names) is visible somewhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

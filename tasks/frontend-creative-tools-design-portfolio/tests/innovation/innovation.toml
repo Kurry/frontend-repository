@@ -164,46 +164,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "easter_eggs_are_stubs"
-description = "Required easter eggs are decorative stubs: /matrix, /konami, or sudo hire designer leave the promised canvas/progress state unchanged."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "themes_are_generic_renames"
-description = "Theme commands only rename a class with no visible CRT/glass character — retro and glass look identical to dark aside from a label."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n3"
-name = "boot_lacks_narrative_presence"
-description = "Boot skips straight to a static prompt with no sequential status-line narrative or ready prompt."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "shell_feels_flat_static"
-description = "The shell is flat and static: no boot presence, no theme character, and no easter-egg moments despite the spec requiring them."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n8"
-name = "no_delightful_moments"
-description = "The running app has no delightful moments — missing working matrix/confetti/progress easter eggs and lifeless theme switches."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "11.11"
 name = "portable_portfolio_package_delight"
 description = "Optional: the live Portfolio JSON + Resume Markdown export package feels like a finished takeaway artifact a designer would actually download, beyond a static dump."

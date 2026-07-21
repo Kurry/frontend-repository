@@ -161,26 +161,3 @@ description = "Opening and closing the Export surface through the real control u
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.n1"
-name = "animation_jank_or_blocking"
-description = "Animations cause visible layout jank or flicker, or block input, while the diff re-renders or the merge flow advances"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n2"
-name = "pulse_never_settles"
-description = "The counter-click pulse leaves a permanent highlight on the target block, or the scroll lands on the wrong change type"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

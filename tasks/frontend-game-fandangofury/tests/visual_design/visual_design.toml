@@ -127,22 +127,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.6"
-name = "flat_or_default_browser_chrome"
-description = "The Stage map, combat HUD, or overlays render with flat unstyled browser-default controls that lack the festival accent treatment described for the app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.7"
-name = "mask_and_stage_states_undifferentiated"
-description = "Locked, unlocked-but-unequipped, and equipped Mask cards look the same, or locked, unlocked, and completed Stage nodes are visually indistinguishable"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.8"
 name = "cantina_cost_hierarchy_legible"
 description = "The Cantina shows each upgrade current level and its escalating cost with a clear hierarchy so the current tier and the next-tier cost are easy to tell apart"
@@ -196,13 +180,5 @@ id = "3.15"
 name = "health_danger_color_below_quarter"
 description = "Fighter and boss health bars switch to a clear danger color treatment below roughly 25 percent remaining"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

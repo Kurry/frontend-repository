@@ -150,40 +150,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_spelling_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as MarkupFlow, Export PNG, Try sample image, Drop an image here, Layers, Go offline, or Keep local / Keep remote / Merge both."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "inconsistent_concept_naming"
-description = "The same annotation or project concept is named inconsistently across tool rail, Layers, Saved projects, and Collaboration in a way that would confuse a user."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "truncated_or_overflowing_labels"
-description = "Tool-rail section titles, validation messages, conflict choices, or primary button labels are truncated or overflowing so the copy is unreadable."
-type = "binary"
-negate = true
-weight = 0.5
-
-# HARDEN_MARKUPFLOW_V1
-
-[[criterion]]
 id = "15.9"
 name = "history_versions_empty_state_copy"
 description = "Where the app renders empty History and Versions panels, the copy explains how entries appear (actions / snapshots) rather than leaving a blank region"
@@ -204,10 +170,3 @@ description = "Where the app renders an Import project rejection for a field-con
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

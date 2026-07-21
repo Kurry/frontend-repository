@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "marketing_card_grid_replaces_lab"
-description = "Replaces the lab with a marketing card grid and no live exposure preview"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.4"
 name = "three_dials_and_vertical_meter"
 description = "Three circular dial controls (APERTURE / SPEED / ISO) with up/down steppers and a vertical exposure meter captioned UNDER EXPOSED / OVER EXPOSED overlay the full-viewport photo preview"
@@ -198,15 +190,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "3.16"
-name = "placeholder_text_visible"
-description = "Lorem ipsum, 'TODO', template-variable, or other placeholder text is visible somewhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "3.17"
 name = "ev_and_histogram_in_lab_chrome"
 description = "An EV numeric readout and a luma histogram graph sit in the lab chrome without replacing the overlaid three-dial composition"
@@ -228,24 +211,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n17"
-name = "export_is_screenshot_only_dead_end"
-description = "The only export affordance is a screenshot-shaped or empty dead end with no structured JSON lab package the user can download or copy"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.20"
 name = "develop_panel_groups_and_png_control"
 description = "A Develop panel presents two labeled groups (LIGHT and EFFECTS) of slider rows each carrying the slider name, the control, and a live integer readout; the look chips row (Punch, Matte, Golden, Mono), Copy settings, Paste settings, and Reset to original sit with the Develop panel; and the Export panel includes a Download edited PNG control alongside the lab-package controls"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

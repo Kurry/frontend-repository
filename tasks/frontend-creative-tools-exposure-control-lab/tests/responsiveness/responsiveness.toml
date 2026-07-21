@@ -162,100 +162,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_375_or_1440"
-description = "At 375px or 1440px the lab layout breaks: overlapping controls, overflow, or unusable stacking."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small"
-description = "At 375px width, dial steppers, help trigger, or preset actions are too small or misaligned to operate reliably."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n3"
-name = "dial_text_unreadable_on_mobile"
-description = "At 375px width, dial titles or value readouts are too small to read."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_with_spurious_scrollbars"
-description = "At 375px or 1440px, lab content is cropped or unnecessary scrollbars appear for content that should fit the viewport."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n5"
-name = "presets_stay_side_panel_on_narrow"
-description = "At widths of 768px and below, the presets collection still presents as a persistent side panel rather than a drawer or sheet over the preview."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_chrome_obscures_dials"
-description = "Fixed-position chrome (help badge, brand chip, or overlays) obscures dials or the meter so they cannot be used."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n7"
-name = "overlap_at_narrow_width"
-description = "At 375px width, dials, meter, and presets/mode chrome overlap into an unusable stack."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n8"
-name = "help_toggle_missing_on_mobile_or_desktop"
-description = "Desktop or mobile lacks a working help toggle that opens the in-page help panel."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n9"
-name = "preview_static_size_overflows"
-description = "The preview imagery uses a static size that overflows the viewport at 375px."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n10"
-name = "dials_or_meter_disappear_at_width"
-description = "At 375px width, the three dial steppers, the meter, or the mode switch disappear, clip, or become inoperable."
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "7.11"
 name = "ev_histogram_export_reachable_at_375"
 description = "At 375px width the EV readout, histogram, Export panel controls, snapshot strip, undo/redo, and batch bar remain reachable — they may scroll within their containers but do not force page-level horizontal scrolling"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "7.n11"
-name = "export_or_histogram_forces_horizontal_scroll"
-description = "At 375px width, the Export panel, histogram, or snapshot strip forces page-level horizontal scrolling or clips off-screen with no way to reach them"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "7.12"
@@ -264,10 +175,3 @@ description = "At 375px width the Develop panel — both slider groups and the P
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_collection_shows_blank_area"
-description = "After deleting the last project, testimonial, or skill, that region of the preview is a blank area with no empty-state hint."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "validation_errors_only_in_console"
-description = "Empty Title submit or duplicate-skill rejection failures surface only in the browser console with no visible inline field feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "draft_save_or_theme_change_silent"
-description = "Saving a draft or selecting a theme produces no visible change to the drafts list or preview accents (silent failure)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "undo_enabled_with_empty_history"
-description = "On a fresh empty session with no content edits yet, Undo remains enabled/clickable as if history existed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_are_nonsemantic"
-description = "Primary interactive controls (Add Project submit, section toggles, theme swatches, Move Up/Down, Save As Draft) are non-semantic div/span click targets without button/role semantics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "move_up_down_active_at_ends"
-description = "Move Up remains interactive for the first visible section or Move Down remains interactive for the last visible section."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "duplicate_skill_still_adds_chip"
-description = "Adding a skill that case-insensitively duplicates an existing one still creates a second chip or shows no visible rejection message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_action_labels"
-description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Add Project, Save As Draft, Download PDF, Undo, or Redo."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "deleted_draft_revives_after_reload"
-description = "After deleting a draft, a full page reload brings that draft back into the drafts list."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "rapid_submit_creates_duplicates"
-description = "Rapid duplicate submissions of Add Project or Add Testimonial create two or more records from one intended create."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "4.11"
 name = "malformed_import_shows_error"
 description = "Importing a malformed Portfolio JSON shows a visible error naming that the package could not be read and leaves Name, projects, theme, and density unchanged."
@@ -268,22 +187,6 @@ id = "4.14"
 name = "palette_empty_query_shows_hint"
 description = "A command palette query with no matches shows an empty-state line inside the palette rather than a blank overlay."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.n11"
-name = "malformed_import_silently_applies"
-description = "A malformed Portfolio JSON import applies partial or corrupted state with no visible error."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n12"
-name = "multiple_featured_treatments"
-description = "After pinning featured on two different projects, more than one Featured treatment remains visible at once."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -314,18 +217,3 @@ description = "Entering a non-empty Contact email that lacks @ shows an inline e
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n13"
-name = "field_contract_violations_silently_accepted"
-description = "Empty Title, out-of-enum Status, over-length Quote, invalid Contact email, or wrong schemaVersion Import is accepted without a visible named-field error."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

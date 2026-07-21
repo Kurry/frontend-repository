@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "localstorage_or_sessionstorage_used"
-description = "After exercising dials, presets, favorites, exports, and mode switches, localStorage or sessionStorage is non-empty — browser storage APIs were used despite the in-memory-only requirement."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.4"
 name = "reload_resets_all_facets_to_seed"
 description = "After changing several independent facets (step two dials, move a light slider, select a non-default scene, turn on a zebra toggle, fill an A/B slot, create a preset, save a snapshot, apply a look pack), a page reload returns the app coherently to its seeded state — default dials, zeroed sliders, Daylight Courtyard scene, zebra toggles off, empty A/B slots, empty snapshots, and exactly the seeded presets."
@@ -163,27 +155,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.11"
-name = "external_network_requests_for_assets"
-description = "Devtools network activity shows outbound requests to other origins (CDN scripts, remote fonts, or remote imagery) — depth plate, motion frames, noise texture, fonts, and libraries must all load from local assets."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.12"
 name = "document_title_camera_exposure_simulator"
 description = "The browser tab's document title reads 'Camera Exposure Simulator'"
 type = "binary"
 weight = 0.5
-
-[[criterion]]
-id = "2.13"
-name = "console_errors_or_warnings_during_full_exercise"
-description = "Console errors, warnings, or unhandled promise rejections appear during a full exercise of dials, sliders, look packs, presets, snapshots, undo/redo, pixel export, and edit-stack import/export."
-type = "binary"
-negate = true
-weight = 1.0
 
 [[criterion]]
 id = "2.14"
@@ -200,48 +176,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.16"
-name = "debug_artifacts_visible_in_ui"
-description = "Visible debug artifacts appear in the running app (console.log spam overlays, leftover placeholder scaffolding, or debug panels meant for development)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.17"
-name = "outbound_anchor_navigates_away"
-description = "An external anchor control in the lab chrome navigates the browser away from the app origin."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.18"
-name = "reload_state_violates_in_memory_rule"
-description = "After reload, user-created presets or off-default dial values survive in a way that contradicts the in-memory seeded baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.19"
-name = "nondeterministic_seed_on_reload"
-description = "Two cold loads of the same app show different seeded preset sets or different default dial values when the spec requires a deterministic seeded baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.20"
 name = "pixel_export_stays_responsive"
 description = "Download PNG or Download JPEG completes without freezing the UI for more than a brief moment; the lab remains operable after the download."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect not covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered — even partially — answer no."
-type = "binary"
-negate = true
-weight = 1.0

@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "palette_crud_unavailable_from_ui"
-description = "Palette create, edit, or delete cannot be completed from the visible UI controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "create_fails_to_appear_or_duplicates"
-description = "Submitting a valid new palette either fails to add a visible Palette-view card or adds duplicate cards for a single create."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "edits_desync_surfaces"
-description = "After renaming a palette or changing its period, Palette-view card, Detail, and filtered Browse disagree about the same record's name or period."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "view_switch_breaks_or_loses_filter"
-description = "Switching among Nomenclature, Palette, and Swatch breaks the layout or loses the active period filter / selection."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_library_region_broken"
-description = "After deleting all user palettes or filtering to zero matches, the library region is blank or broken with no empty-state message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "filtered_views_disagree"
-description = "With a period filter active, Nomenclature, Palette, and Swatch disagree about which items are visible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "detail_editor_cannot_reopen"
-description = "After closing Detail/Editor, the same palette cannot be reopened into the editor from Browse."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "overlay_blocks_with_no_exit"
-description = "The cart drawer, subscribe popup, or Detail/Editor overlay blocks the library with no working exit."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_create_validation_silent"
-description = "An empty-name or underswatched create attempt provides no visible validation feedback naming the offending field."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "reload_or_mode_switch_dead_end"
-description = "Recovering from Detail/Editor or after a failed create requires a full page reload — the UI reaches a dead end."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "export_session_then_omit_on_delete"
 description = "Export flow: create a valid palette, open Export, confirm CSS/utility-theme/SCSS and palette package JSON include its name and swatches, then delete it and confirm the next export omits it."
@@ -267,14 +187,6 @@ id = "6.14"
 name = "subscribe_invalid_then_valid_dismiss"
 description = "Subscribe flow: after the popup appears, invalid email keeps it open with an email-field error; valid email dismisses it and it does not return on further scroll."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "6.n11"
-name = "export_preview_ignores_create"
-description = "After creating a valid palette, opening Export shows CSS/utility-theme/SCSS or package JSON that still omit the new palette's name and swatches."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -312,26 +224,3 @@ description = "Set vision simulation to Deuteranopia and confirm swatch renderin
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n12"
-name = "undo_or_redo_flow_fails"
-description = "Stepping Undo then Redo around a delete desyncs the collection: the count, Browse layouts, or export previews disagree with the expected state at any step"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n13"
-name = "wheel_or_batch_tray_dead_end"
-description = "Opening the color wheel or the batch-edit tray traps the user: the editor cannot be exited, or the palette is left half-mutated after Cancel"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

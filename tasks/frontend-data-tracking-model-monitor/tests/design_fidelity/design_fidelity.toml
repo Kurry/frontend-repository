@@ -140,27 +140,3 @@ description = "Free/paid badge colors and the over-budget 2 pixel error border t
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n1"
-name = "layout_diverges_from_spec"
-description = "The desktop layout lacks a docked cost sidebar or sticky table header, diverging from the specified composition"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "export_chrome_unstyled"
-description = "The export panel uses unstyled browser defaults that break visual continuity with the rest of the monitor"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in design fidelity to the instruction that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0
-

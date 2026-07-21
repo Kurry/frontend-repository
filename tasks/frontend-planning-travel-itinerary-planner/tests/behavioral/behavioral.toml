@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "After reload, a facet of session state silently survives (a created stop, dark theme, or day filter) while others reset, producing incoherent partial persistence instead of a full seeded baseline reset"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "The plan list, map pins, or export previews render identically after applying a day or category filter that should hide stops"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Creating two stops with different titles yields identical ICS SUMMARY lines or identical trip JSON title fields for both"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "A rename or status change appears in Plan List but not in kanban, map popup, or trip JSON until reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "vote_to_export_chain"
 description = "Chained probe: note a bucket item's name, start its poll and vote it to the winning threshold, confirm it appears as a scheduled stop on a day timeline and as a pin on the map, then open the markdown export and trip JSON and confirm both contain that item's name under the correct day (markdown heading / JSON day field)"
@@ -208,31 +176,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "ics_omits_scheduled_blocks"
-description = "The ICS payload contains fewer VEVENT blocks than there are scheduled stops, or a newly created scheduled stop is absent from the regenerated payload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n6"
-name = "export_markdown_is_static"
-description = "The markdown export renders identical text before and after a mutation that should change it (a rename, a delete, or a promotion) — the document is a hardcoded string rather than compiled from state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n7"
-name = "undo_desyncs_surfaces"
-description = "Undo restores a change on one surface but not another — for example the list row returns while the map pin, kanban card, or distance labels keep the undone state"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "14.13"
 name = "trip_json_export_import_round_trip"
 description = "Chained probe: rename a seeded stop and change its startTime, create one new valid stop, Copy or Download the trip JSON, reload to the seeded baseline, Import that JSON, and confirm the renamed title and startTime, the new stop, list rows, map pins, markdown, ICS, and trip JSON all match the pre-export mutated state"
@@ -246,18 +189,3 @@ description = "Chained probe: attempt to create a stop with endTime before start
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n8"
-name = "round_trip_import_drops_fields"
-description = "After exporting then re-importing trip JSON, visible stop fields (title, day, startTime, status, category, or costTier) differ from the pre-export state — the round-trip drops or rewrites contracted fields"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

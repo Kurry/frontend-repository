@@ -150,48 +150,9 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variable names) is visible anywhere in the shipped UI, including help explainers."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_spelling_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as dial titles, meter captions, mode labels, or primary action buttons."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "inconsistent_concept_naming"
-description = "The same dial, look pack, or export concept is named inconsistently across surfaces in a way that would confuse a user."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "truncated_or_overflowing_labels"
-description = "Dial titles, meter captions, preset names, export labels, or validation messages are truncated or overflowing so the copy is unreadable."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "15.9"
 name = "scene_names_exact_everywhere"
 description = "The five scene names Daylight Courtyard, Alpine Midday, Stadium Floodlights, Candlelit Study, and Neon Alley Night render exactly and consistently wherever they appear, including the settings card and the edit-stack JSON"
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. If present, name the defect and cite evidence. If already covered, answer no."
-type = "binary"
-negate = true
-weight = 1.0

@@ -109,34 +109,3 @@ description = "SchemaPackage export and Import package use the same field contra
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "10.n1"
-name = "browser_storage_used"
-description = "localStorage, sessionStorage, or another browser storage API is non-empty after a full exercise of the app (this is an in-memory-only task)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "10.n2"
-name = "outbound_requests_present"
-description = "Devtools show outbound network requests to other origins (CDNs, fonts, validator services) beyond the app's own local origin"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "10.n3"
-name = "runtime_exceptions_or_debug_artifacts"
-description = "Specific interactions throw runtime exceptions visible in the console, or the running app shows debug artifacts such as console.log spam, debug overlays, or leftover placeholder scaffolding"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "10.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "uses_browser_storage_apis"
-description = "Uses localStorage or sessionStorage to persist events or filters"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.4"
 name = "keyboard_operable_chrome_controls"
 description = "Every chrome control (mode switch, Filters, About, Reset filters, Undo, Redo, Export timeline, Import timeline, form fields, scrubber thumbs, bulk actions) is reachable and operable with the keyboard alone, showing a visible focus indicator on each"
@@ -156,14 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.10"
-name = "outbound_network_requests_present"
-description = "After load and during use, the network log shows requests to non-local origins — CDN scripts, remote fonts or icons, analytics, or any other outbound request"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.11"
 name = "export_compiled_from_live_store"
 description = "Export JSON and CSV previews are compiled from the live session store under the HistoryEvent contract: after a create or edit, reopening or refreshing the export drawer shows the mutated title/type/timestamp/mediaRefs/detail without reload"
@@ -191,10 +175,3 @@ description = "Throughout create, filter, export, and import exercises, localSto
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "technical.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

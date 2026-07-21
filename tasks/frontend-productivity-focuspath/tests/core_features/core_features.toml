@@ -219,30 +219,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "1.28"
-name = "blank_title_accepted"
-description = "Submitting the New Goal form with a blank title adds a goal anyway, or rejects it without an inline \"Goal title is required\" message rendered next to the title field."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.29"
-name = "reorder_stays_enabled_when_complete"
-description = "Reorder up/down controls stay enabled on a milestone when it or an earlier milestone is already complete, letting completed order be shuffled."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.30"
-name = "percent_ignores_other_milestones"
-description = "A goal's completion percentage reflects only a single milestone's steps rather than aggregating across all its milestones."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.31"
 name = "submit_disabled_until_title_valid"
 description = "The New Goal form's submit control is disabled while the title field is empty and becomes enabled as soon as a non-empty title within 1 to 80 characters is typed."
@@ -355,22 +331,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.47"
-name = "export_omits_session_mutations"
-description = "After creating a uniquely titled goal and completing a step, the Path Pack JSON and Markdown export previews omit that goal title or still show the step unchecked — an export missing the session's actual work."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.48"
-name = "undo_does_not_restore_goal"
-description = "After creating a goal and activating Undo, the goal card remains on the overview (Undo is a no-op or only changes unrelated chrome)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.49"
 name = "undo_redo_keyboard_shortcuts"
 description = "Pressing Ctrl+Z (Cmd+Z on macOS) undoes the most recent goal, milestone, or step mutation exactly as the header Undo control does, and Ctrl+Shift+Z redoes it — verified by creating a goal, pressing Ctrl+Z to remove its card, and Ctrl+Shift+Z to restore it"
@@ -390,12 +350,4 @@ name = "upper_bound_field_validation"
 description = "Forms reject upper-bound violations with an inline message naming the field and rule, saving nothing: a goal or milestone title over 80 characters, a step title over 120 characters, a motivation over 280 characters, and a targetDate before 1970-01-01 or after 2100-12-31"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true
 

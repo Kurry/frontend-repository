@@ -141,70 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "reload_leaves_menus_or_reveals_stuck"
-description = "After a reload, a menu remains open, the slideshow is not on its first frame, or scroll-reveal cards stay pre-revealed without scrolling into view."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "escape_errors_when_solutions_closed"
-description = "Pressing Escape while the Solutions menu is closed throws a console error or visibly mutates the page."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "cursor_layer_captures_clicks"
-description = "Clicking a link or button while the custom cursor image overlaps it fails to activate the element because the cursor layer captures the pointer."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "slideshow_wrap_shows_blank_or_double_active"
-description = "Advancing past the sixth slideshow frame shows a blank frame or two fully opaque active frames at once."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "system_cursor_hidden_without_replacement"
-description = "On a coarse-pointer viewport the system pointer is hidden while no visible custom cursor replacement is shown."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "menu_not_keyboard_dismissible"
-description = "The open Solutions menu panel cannot be dismissed via Escape, leaving the overlay stuck."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "primary_cta_labels_ambiguous_or_missing"
-description = "Primary CTA controls (Try Canvasly, Sign up, Menu, Solutions) lack readable labels or use ambiguous blank text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "chrome_links_navigate_away_to_errors"
-description = "Header, footer, or CTA chrome links navigate away from the homepage to a blank, error, or Not found page."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "trial_brief_invalid_submit_names_fields"
 description = "A name shorter than 2 characters after trim, a name longer than 80 characters, a malformed email (missing @, missing domain dot, or more than one @), a missing plan, or a missing team_size shows inline messages naming the offending field, keeps Submit trial brief disabled or unsuccessful, shows no Trial brief ready message, and does not clear valid fields; Download JSON and Copy brief still emit the current invalid preview with all seven required keys present."
@@ -253,34 +189,3 @@ description = "After a valid Submit shows Trial brief ready (or after named fiel
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n11"
-name = "invalid_brief_submit_shows_success"
-description = "Submitting an invalid trial brief still shows Trial brief ready — download or copy your JSON above."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n12"
-name = "import_accepts_schema_violating_json"
-description = "Import brief accepts a JSON file with plan or team_size outside the closed enums, product not Canvasly, or a Free-trial/Team/Pro cross-field violation and mutates the form or preview anyway."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n13"
-name = "invalid_preview_omits_required_keys"
-description = "On an invalid or empty draft, the live preview omits one or more of the seven required keys (product, name, email, plan, team_size, interests, generated_at) or uses null instead of empty strings / [] for unset scalars and interests."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

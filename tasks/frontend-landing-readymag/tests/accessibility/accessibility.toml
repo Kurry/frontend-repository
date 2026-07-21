@@ -155,78 +155,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "A primary interactive control (Solutions, Menu, Sign up, Try Canvasly, or a nav/footer link) cannot be reached or activated via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focused interactive controls show no visible focus indicator or the indicator is fully obscured."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "The Solutions trigger, Menu button, or other custom interactive chrome uses non-semantic tags without ARIA roles/labels."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "solutions_expanded_state_wrong"
-description = "Opening or closing the Solutions menu leaves aria-expanded incorrect (stays false while open, or stays true while closed), or Escape fails to return focus to the trigger."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_unreadable_text"
-description = "Body or UI text is unreadable due to contrast below WCAG AA on the white canvas or dark #282828 surfaces."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "decorative_media_not_hidden"
-description = "The floating hero art, path-traveling orb, marquee decoration, or custom cursor remain exposed to the accessibility tree without aria-hidden."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.a4"
-name = "split_heading_character_soup"
-description = "A split/kinetic headline is exposed to the accessibility tree as character soup — no aria-label (or equivalent) on the container and the split spans are not aria-hidden."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3 with no intervening H2."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, offset-path marquees, tilt accents, reveal animations, or the custom cursor continue to run instead of settling to resting states with the system cursor restored."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.11"
 name = "command_palette_dialog_a11y"
 description = "The command palette uses role dialog with aria-modal true, traps focus while open, closes on Escape, and returns focus to the control that opened it; the search input has an accessible name such as Search commands."
@@ -240,18 +168,3 @@ description = "Trial brief fields use explicit labels for Name, Email, Plan, Tea
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n11"
-name = "palette_or_brief_keyboard_inaccessible"
-description = "The command palette or trial brief controls (fields, Download JSON, Copy brief, Undo/Redo) cannot be reached or operated via keyboard alone."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

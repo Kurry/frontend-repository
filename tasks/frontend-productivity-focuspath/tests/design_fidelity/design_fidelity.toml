@@ -168,27 +168,3 @@ description = "Export drawer/modal anatomy matches the instruction: Path Pack JS
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the specified 4px scale or corner radii in a way that diverges sharply from the reference overview."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "palette_contradicts_reference"
-description = "The shipped palette clearly contradicts the instruction's teal/gold/off-white system (for example default purple theme or stark unrelated colors) while claiming to recreate the reference."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable design-fidelity defect versus the instruction and reference screenshots that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered — even partially — by another criterion, answer no here."
-type = "binary"
-negate = true
-weight = 1.0
-

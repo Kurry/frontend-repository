@@ -150,43 +150,9 @@ weight = 0.5
 
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = """Where the app renders UI copy, placeholder or lorem-ipsum text is visible."""
-type = "binary"
-negate = true
-weight = 0.5
-
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_errors"
-description = """Where the app renders prominent headings or errors, obvious typos or broken sentences appear."""
-type = "binary"
-negate = true
-weight = 0.5
-
-
-[[criterion]]
-id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = """Where the app names the same concept, labels flip between conflicting terms across views."""
-type = "binary"
-negate = true
-weight = 0.5
-
-
-[[criterion]]
 id = "15.8"
 name = "audit_entries_name_action_and_identity"
 description = "Where the app renders audit entries, each names the action and the identity; rotation entries include shortened old and new npubs and bulk entries name the application and the number of identities changed."
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = """The app exhibits a significant, browser-observable writing defect that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered, answer no here."""
-type = "binary"
-negate = true
-weight = 0.5

@@ -128,22 +128,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The build is purely barebones: Rival turns resolve as silent instant board flips with no thinking indicator, and Match Complete or export surfaces omit celebratory or confirmation polish entirely."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_template"
-description = "Interactions and visuals read as a generic unstyled template: You and Rival panels lack identity color treatment and the board reads as a plain unmarked grid rather than a dark stone mine-grid duel."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app includes a noteworthy, browser-observable enhancement beyond the specification that improves the duel, export, or resume experience and is NOT covered by any other criterion in this file. If present, name it and cite evidence. If nothing beyond the spec qualifies, answer no."

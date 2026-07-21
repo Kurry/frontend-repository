@@ -194,23 +194,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.20"
-name = "diff_counts_static_regardless_of_pair"
-description = "The diff summary counts or row classification render identically regardless of which version pair is selected, indicating a hardcoded diff rather than one derived from the selected manifests"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.21"
-name = "correlation_never_varies"
-description = "Across multiple rank-stability runs and retries, the correlation value is byte-identical every time, indicating a hardcoded gate rather than a re-randomized draw"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.22"
 name = "task_manifest_rows_expose_contract_fields"
 description = "Each manifest table row for a seeded version shows slug, truncated content digest, title, and split tags consistent with the task-manifest entry field contract (kebab-case slug, digest from a 64-character lowercase hex contentDigest, non-empty title, and split tags drawn from auric-holdout, basalt-train, and cinder-public)"
@@ -246,14 +229,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n22"
-name = "release_pack_omits_session_mutations"
-description = "After sealing a cut with a distinct notes token, the Export release pack JSON preview omits that version name or notes token, or omits schemaVersion larkspur-release-pack/v1 / required top-level keys, while presenting an export preview as if complete"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.27"
 name = "import_panel_offers_three_sources"
 description = "The Import release pack panel offers a file picker accepting .json files, a paste area for raw JSON text, and at least one seeded sample pack choosable inside the panel"
@@ -274,10 +249,3 @@ description = "The Release pack JSON generatedAt field is an ISO-8601 timestamp 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

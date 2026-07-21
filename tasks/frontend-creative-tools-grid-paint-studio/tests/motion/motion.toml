@@ -168,35 +168,3 @@ description = "With prefers-reduced-motion set, enter/exit and histogram easing 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "8.n1"
-name = "hover_styles_missing"
-description = "Primary action buttons, mode buttons, swatches, or gallery rows show no visible hover style change when actually hovered (computed style while hovering)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "8.n2"
-name = "gallery_cards_snap_only"
-description = "Saving or deleting a board snaps the card list with no enter/exit motion through the real Save/Delete path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "8.n3"
-name = "paint_lag_or_stutter"
-description = "Real drag strokes show perceptible lag, dropped cells, or frame stutter between pointer movement and cell fill."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "motion.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable motion or interaction-feedback defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0
-

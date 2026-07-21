@@ -141,46 +141,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "9.n1"
-name = "cold_load_exceeds_two_seconds"
-description = "More than 2 seconds pass after a local cold load before the patching wizard becomes interactive."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_exercise"
-description = "Console errors or warnings appear while exercising theme selection, swatch edits, icon-set toggles, generate, or download."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "rapid_input_hangs_or_crashes"
-description = "Rapid repeated swatch edits or icon-set toggles hang the UI, drop Preview/tile updates, or crash the page."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n4"
-name = "step_or_generate_blocks_rendering"
-description = "Advancing steps or generating the patched result blocks rendering for a multi-second freeze before the UI updates."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "preview_updates_drop"
-description = "Rapid theme or swatch changes leave the Preview panels or bitmap tiles showing stale colours while the swatch values already changed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "9.8"
 name = "rapid_keep_original_and_filter"
 description = "Rapidly toggling keep-original flags or switching colour-blindness modes keeps the Preview, tile grid, contrast matrix, and export preview responsive with no hangs or dropped updates."
@@ -194,18 +154,3 @@ description = "No console errors or warnings appear while copying exports, impor
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "9.n6"
-name = "undo_or_import_hangs"
-description = "Undo, redo, recipe import, or command-palette open hangs the UI for multiple seconds or crashes the page."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

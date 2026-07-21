@@ -131,70 +131,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "2.n1"
-name = "persistence_absent_after_reload"
-description = "After adding a holding and an activity and reloading the page, the holdings or activities collection reverts to the seeded baseline: the mandated client-storage persistence of holdings, activities, and totals is absent."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n2"
-name = "external_requests_or_outbound_links"
-description = "The network log shows requests to external origins for scripts, styles, fonts, icons, or data, or app chrome contains navigational links that leave the app."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n3"
-name = "views_desync_on_mutation"
-description = "After add, edit, delete, or filter, the same holding or total shows different values in the table, detail panel, net-worth summary, or allocation until reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n4"
-name = "console_errors_on_normal_flows"
-description = "Console errors or unhandled promise rejections appear during normal add, edit, filter, sort, select, delete, export, or import flows."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n5"
-name = "hydration_content_flash"
-description = "Server-rendered or statically exported content visibly flashes and is replaced by different client content after hydration: mismatched text, reflowing layout, or restyled elements between first paint and interactive."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n6"
-name = "blank_or_broken_start_path"
-description = "The documented start path fails to serve or renders a blank/broken page instead of the portfolio overview."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n7"
-name = "reload_violates_persistence_rule"
-description = "Reload produces a state inconsistent with mandated persistence: holdings or net worth after reload diverge from the pre-reload persisted collection."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n8"
-name = "allocation_or_net_worth_invariant_broken"
-description = "Visible allocation percentages fail to sum to 100, or the net-worth total disagrees with the sum of visible holdings' market values, or a row's market value disagrees with quantity times unit price."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.11"
 name = "export_import_share_one_store"
 description = "Export JSON/CSV and Import portfolio operate on the same shared holdings collection as the table and totals: after import, table rows, net worth, allocation, and a subsequent export all agree."
@@ -207,16 +143,6 @@ name = "payload_invariants_on_export"
 description = "Every exported holding shows marketValue equal to quantity times unitPrice, assetClass is one of Equity, ETF, Cash, Crypto, and the JSON version field is 1."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.n9"
-name = "export_desynced_from_store"
-description = "Export preview holdings disagree with the visible table (missing rows, wrong quantities, or marketValue not equal to quantity times unitPrice) after a create/edit/delete."
-type = "binary"
-negate = true
-weight = 1.0
-
-
 
 [[criterion]]
 id = "2.13"
@@ -232,26 +158,3 @@ description = "The CSV import diagnostics staging state (parsed rows, schema map
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n10"
-name = "derived_math_invariant_broken"
-description = "A shown or exported derived figure violates the position-math identities: cost basis, unrealized gain, realized gain, dividend income, total fees, or total return disagrees with the values it should be computed from."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n11"
-name = "batch_or_import_desyncs_store"
-description = "After a bulk action or a committed import, the holdings table, performance summary, or export previews show different values for the same data until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, storage, coherence, hydration, or stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, or page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

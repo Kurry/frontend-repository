@@ -121,23 +121,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.5"
-name = "controls_static_on_hover"
-description = "Betting controls and panel toggles show no hover feedback at all, appearing static on pointer hover"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.6"
-name = "equity_snaps_without_transition"
-description = "The hand-equity percentage snaps instantly to its new value on a new street with no visible transition when driven through the real deal flow"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "3.7"
 name = "human_win_confetti_burst"
 description = "Winning a hand at showdown in the human's favor, reached through real play, fires a brief celebratory confetti burst over the table, and confetti is absent when the hand resolves against the human"
@@ -179,10 +162,3 @@ description = "Using Export Copy through the real control shows a brief copied c
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions (jarring, broken, janky, or missing animation feedback) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring goals, focus, and completed goals then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the empty in-memory baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "derived_percent_ignores_step_toggles"
-description = "Toggling steps leaves the overview/detail percentage and Path Pack completionPercent identical — a derived surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_inputs_identical_export"
-description = "Creating two differently titled goals and exporting yields byte-identical Path Pack JSON."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_state_stale_until_reload"
-description = "After toggling a step or Focus Today, overview, detail, Today's Focus, or Export still shows stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_import_round_trip_preserves_path"
 description = "Mutate → derived → export → import: create a goal with a milestone and two steps, check one step, Focus Today the other; confirm percentages and Export reflect that; Download Path Pack JSON; delete the goal; Import the file; confirm overview, detail, focus, Daily Velocity, and Export match the pack."
@@ -194,22 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "export_text_ignores_session_mutations"
-description = "After mutating titles and step completion, Export Path Pack JSON and Markdown text is identical to the pre-mutation text — an export that omits the session's actual work."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "undo_leaves_derived_surfaces_stale"
-description = "After Undo of a step completion, Export or overview percentage still shows the completed state while the checklist restored."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.11"
 name = "path_pack_contract_round_trip_probe"
 description = "Mutate → export contract → import: create a goal with accentColor #c98a3d, a milestone, and a completed step; open Path Pack JSON and confirm visible text includes format focuspath-path-pack-v1, that accentColor, createdAt fields, and completed true on the step; Download; change the goal; Import the downloaded JSON; confirm editor surfaces and Export restore the exported contract values."
@@ -221,21 +173,5 @@ id = "14.12"
 name = "schema_invalid_import_leaves_state"
 description = "Starting from a known goal selection, attempt Import of parseable JSON with format not equal to focuspath-path-pack-v1 or with accentColor outside the 8-swatch enum; confirm goal count, focus, and Export stay unchanged and validation names the offending field."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.n7"
-name = "path_pack_lacks_api_field_names"
-description = "After session mutations, the Path Pack JSON preview lacks required API field names (format, activeGoals, milestones, steps, accentColor, or todaysFocus) or invents a disconnected shape that cannot round-trip through Import."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

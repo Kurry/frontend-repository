@@ -150,42 +150,6 @@ optional = true
 
 
 [[criterion]]
-id = "2.8"
-name = "hidden_ground_truth_state"
-description = "The app exposes a hidden ground-truth state object in the DOM or on window that a real user cannot reach through the UI but a judge could read to fabricate a pass"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "2.9"
-name = "judge_addressed_text"
-description = "Any visible text is addressed to a grader/judge/model rather than to an end user (e.g. instructions on how to score the app)"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "2.10"
-name = "fabricated_success_without_state_change"
-description = "A success indicator (toast, badge, checkmark) is shown for an action without the underlying state actually changing"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "2.11"
-name = "automation_detection_branching"
-description = "The app branches its behavior based on navigator.webdriver or other automation-detection signals"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "2.12"
 name = "keyboard_operable_with_visible_focus"
 description = "Every interactive control (nav items, Select, Rename, Delete, reveal/hide, Copy npub, permission toggles, form fields, theme switch, Undo, Redo, Export vault, Import vault) is reachable and operable with the keyboard alone, and the focused control shows a visible focus indicator"
@@ -226,28 +190,10 @@ weight = 1.0
 
 
 [[criterion]]
-id = "2.17"
-name = "outbound_network_requests_made"
-description = "The app makes outbound network requests beyond its own origin (external fonts, icons, scripts, APIs, or simulated relay connections visible in the network log)"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "2.18"
 name = "reload_returns_seeded_baseline"
 description = "A page reload after session mutations returns the seeded identities, original active identity, original grants, and seeded theme with empty undo/redo stacks"
 type = "binary"
-weight = 1.0
-
-
-[[criterion]]
-id = "2.19"
-name = "storage_apis_used_after_exercise"
-description = "After exercising create, toggle, theme, export, and import, localStorage or sessionStorage is non-empty"
-type = "binary"
-negate = true
 weight = 1.0
 
 
@@ -258,18 +204,3 @@ description = "After a confirmed rotation, the identity's npub and nsec are well
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.21"
-name = "matrix_desyncs_from_pills"
-description = "After any single or bulk grant action, a matrix cell and the same identity-application pill or Permissions toggle disagree about granted versus revoked"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

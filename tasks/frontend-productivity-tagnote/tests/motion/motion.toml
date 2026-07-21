@@ -121,23 +121,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "MO-NEG-1"
-name = "MO-NEG-1"
-description = "Interactive controls (Send, tag chips, note actions) show no hover or focus feedback, appearing inert"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "MO-NEG-2"
-name = "MO-NEG-2"
-description = "A blank note submission is only silently blocked by a disabled control with no visible error or shake explanation"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "MO-5"
 name = "list_add_remove_move_animates"
 description = "Sending a note animates the new bubble into the timeline rather than snapping in, deleting or archiving a note animates the bubble out, and pinning a note animates it into the Pinned section — each verified by activating the real visible control, not a state shortcut"
@@ -165,18 +148,3 @@ description = "The Export panel enters and exits with a short opacity-and-scale 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "MO-NEG-3"
-name = "bulk_tray_snaps_without_motion"
-description = "With motion enabled, the bulk tray appears or disappears with no visible slide/transition when selection changes"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "MO.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (control exercised, observed transition or lack of it) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

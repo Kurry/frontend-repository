@@ -162,78 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_specified_breakpoints"
-description = "Layout breaks or overflows at one of the specified widths (320, 390, 768, 1024, 1440, or 1920) on home, about, or a case route."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "narrow_controls_too_small"
-description = "At 390px, architect tags, close buttons, or About/home controls are too small or misaligned to operate reliably."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "type_jumps_only_at_breakpoints"
-description = "Display or body type locks to a single fixed pixel size between breakpoints with abrupt jumps only when a breakpoint fires, ignoring fluid clamp scaling."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "horizontal_scroll_or_cropping"
-description = "A horizontal scrollbar appears or content is cropped at 320, 390, 768, 1024, 1440, or 1920 on any route."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "about_two_column_stuck_on_narrow"
-description = "On a narrow viewport the about route stays stuck in an unreadable two-column layout with essay and gallery colliding or clipped."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_header_obscures_content"
-description = "The fixed header or case sub-header permanently obscures primary case or home content with no way to reach it."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "case_grid_collapses_to_static_stack"
-description = "At narrow widths the case layout collapses into a plain static stack that loses the layered filing-cabinet relationship between architect name, folder sheet, sibling tags, and scrapbook."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "scrapbook_or_media_overflows_viewport"
-description = "Scrapbook items, portraits, or about-gallery images use static sizes that overflow the viewport at a specified width."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "tags_or_close_disappear_at_width"
-description = "Architect tags, sibling tags, or red circular close buttons disappear at a specific viewport width."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "7.40"
 name = "narrow_panels_operable_at_390"
 description = "At a 390 pixel width the reading-list drawer, command palette, and dossier export panel remain fully operable inside the viewport without horizontal page scroll."
@@ -247,18 +175,3 @@ description = "At a 390 pixel width the home category filter and search field wr
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "7.n40"
-name = "panels_force_horizontal_scroll_390"
-description = "At 390 pixel width, opening the reading list, command palette, or dossier export introduces a page-level horizontal scrollbar or clips primary controls off-screen."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

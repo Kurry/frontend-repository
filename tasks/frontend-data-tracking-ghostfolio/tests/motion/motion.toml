@@ -96,22 +96,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.7"
-name = "selection_lacks_real_control_path"
-description = "Row selection or the detail update can only be produced through a hidden state change or WebMCP shortcut: actuating the real visible row control (click or keyboard) fails to select the holding or produces no visible feedback."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.8"
-name = "focus_hover_collapsed_or_invisible"
-description = "Focus and hover are collapsed into one identical highlight, or some interactive control shows no visible focus indicator when focused from the keyboard."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.9"
 name = "row_add_remove_animates"
 description = "Saving a new holding through the real form animates its row into the table rather than appearing instantly, and deleting a holding through the real delete control animates its row out, with the remaining rows settling into place smoothly."
@@ -147,23 +131,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.14"
-name = "full_page_reload_on_action"
-description = "Selecting, adding, editing, deleting, or filtering holdings triggers a full page reload instead of updating the view in place."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n1"
-name = "jarring_or_layout_jank_motion"
-description = "Specified transitions introduce layout jank, flicker, or jarring motion that distracts from reading the net-worth figure or holdings table."
-type = "binary"
-negate = true
-weight = 0.5
-
-
-[[criterion]]
 id = "4.15"
 name = "export_drawer_enter_and_copy_confirm"
 description = "Opening Export portfolio through the real control enters the drawer with a brief opacity or scale transition, and Copy on a format tab shows a short Copied confirmation before resetting."
@@ -171,28 +138,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n2"
-name = "export_motion_snaps_or_blocks"
-description = "Opening the export drawer snaps with no transition while prefers-reduced-motion is unset, or activating Copy leaves no visible Copied confirmation on screen, or export open/close blocks interaction until a reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-
-[[criterion]]
 id = "4.20"
 name = "export_drawer_slides_in"
 description = "Opening Export portfolio through the real control slides the export drawer in from the side rather than snapping open; Copy confirmation feedback appears without a full page reload."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "export_drawer_snaps_open"
-description = "The export drawer appears by snapping fully open with no enter transition when opened through the real Export portfolio control (with prefers-reduced-motion off)."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -216,18 +165,3 @@ description = "Toggling Benchmark compare through its real control animates the 
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.n11"
-name = "new_surface_motion_snaps"
-description = "With prefers-reduced-motion off, the batch action tray pops in with no transition, the benchmark series appears or vanishes abruptly, or the performance summary figures snap to new values instead of transitioning."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

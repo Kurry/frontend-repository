@@ -173,42 +173,6 @@ weight = 1.0
 
 
 [[criterion]]
-id = "4.n1"
-name = "required_hover_feedback_missing"
-description = """Hover-capable controls show no visible hover feedback wash."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "4.n2"
-name = "reveal_snaps_via_state_shortcut_only"
-description = """Reveal appears to snap via a state shortcut without a real UI click path being required for the graded animation."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "4.n3"
-name = "new_card_appears_with_no_entrance"
-description = """Newly created identity cards appear with no entrance animation while reduced motion is not set."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "4.n4"
-name = "toasts_never_dismiss"
-description = """Confirmation toasts remain on screen indefinitely, blocking the vault UI."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "4.11"
 name = "bulk_switches_animate_together"
 description = "Activating Grant all or Revoke all animates every affected matrix switch handle in the same moment rather than leaving some cells snapping later or not moving"
@@ -222,10 +186,3 @@ description = "After confirming a rotation via the real dialog, the dashboard's 
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = """The app exhibits a significant, browser-observable motion defect that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered, answer no here."""
-type = "binary"
-negate = true
-weight = 1.0

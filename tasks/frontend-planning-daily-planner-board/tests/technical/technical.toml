@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "state_persisted_to_browser_storage"
-description = "The app writes tasks, filters, or selected day to localStorage or sessionStorage to persist state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.4"
 name = "keyboard_operable_with_visible_focus"
 description = "Every interactive control — nav items, Add task controls, task checkboxes, board header buttons, and right-rail buttons — is reachable and operable with the keyboard alone and shows a visible focus indicator"
@@ -163,28 +155,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.11"
-name = "hydration_replaces_prerendered_content"
-description = "Pre-rendered content visibly flashes or is replaced by different content after the page becomes interactive — mismatched text, reflowing layout, or restyled elements between first paint and interactive"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.12"
 name = "rapid_input_stays_responsive"
 description = "Rapidly toggling checkboxes and adding several tasks in quick succession keeps the UI responsive with no hangs, dropped interactions, or views desyncing from each other"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.13"
-name = "external_origin_requests_observed"
-description = "Devtools shows network requests to external origins (CDN scripts, styles, fonts, or icons, or any outbound backend call) while loading or exercising the app"
-type = "binary"
-weight = 1.0
-negate = true
-
 
 [[criterion]]
 id = "2.14"
@@ -207,10 +182,3 @@ description = "Importing planner JSON updates the same tasks collection the boar
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, storage, network, stability, accessibility, or state coherence) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

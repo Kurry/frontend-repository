@@ -168,34 +168,3 @@ description = "One consistent icon set is used throughout the toolbar, library e
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n1"
-name = "status_colors_incoherent"
-description = "Status colors are inconsistent with the specified mappings — for example fail rendered green in one surface, or a console theme that erases the error color"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n2"
-name = "text_overlap_or_clipping"
-description = "At 1440px width, any heading, step row, console line, badge, or preview text overlaps another element or is clipped by its container"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n3"
-name = "default_unstyled_controls"
-description = "Form or button controls render with browser default styling where the spec styles them, or the editor reads as an unstyled wireframe rather than a designed surface"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "visual_design.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

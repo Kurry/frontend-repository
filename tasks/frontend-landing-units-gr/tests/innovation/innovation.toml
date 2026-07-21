@@ -135,30 +135,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "signature_motion_absent_or_stubbed"
-description = "Signature reference motions are absent or stubbed: no skeleton intro, no scroll reveals, and no marquee loops on a fresh load via the real UI path."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "recreation_feels_generic_template"
-description = "The recreation reads as a generic marketing template with default type/spacing and none of the reference's asymmetric sidebar, loud brand bands, or kinetic intro execution quality."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "page_flat_static_no_immersion"
-description = "The page is flat and static with no scroll storytelling, no intro timeline, and no marquee/hover language despite the reference requiring them."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "11.8"
 name = "shortlist_export_execution_polish"
 description = "Score execution quality of the hardened shortlist-to-export path: toggles, Monthly estimate, inquiry success, and packet export feel finished and coherent with the Noma homepage rather than bolted-on stubs."

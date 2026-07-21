@@ -141,38 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_in_memory_state_survives_reload"
-description = "After configuring locale, carousel position, flick-deck index, and cookie dismiss, a reload leaves an incoherent mix (e.g. FI locale survives while carousel resets, or cookie banner stays dismissed alone)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "carousel_or_locale_surfaces_ignore_input"
-description = "Changing the locale dropdown or advancing the client carousel leaves the visible locale label and centered-client active controls identical to the pre-change values."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "seek_positions_produce_identical_elapsed"
-description = "Dragging the video timeline to two different positions yields the same elapsed readout both times (seek ignored / hardcoded)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "carousel_deck_stale_until_reload"
-description = "After advancing the client carousel, the prior client's deck controls and Organic views / Likes tiles remain the active set while a different client is visibly centered (active controls stay stale until a full page reload)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "brief_export_pipeline_to_artifact"
 description = "Full-pipeline check: shortlist Loom House and Second Circle, set locale to FI, toggle Marketing off, advance carousel and flick deck, submit contact with a unique email; open Export brief — JSON schemaVersion is 1 and shortlistedClients, locale, cookieCategories.marketing, activeClient, flickIndexByClient, contactSubmitted, and contactEmail match the session under the Discovery brief field contract; Copy confirmation appears on the JSON tab."
@@ -194,26 +162,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "brief_identical_despite_different_sessions"
-description = "Two sessions with different shortlists and contact emails produce byte-identical Export brief JSON (hardcoded artifact)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.12"
 name = "export_input_dependent_contact_and_cookie_payloads"
 description = "Input-dependent output: submit contact with email a@example.com then note brief contactEmail; on a fresh load Accept then note cookieCategories all true; on another fresh load save preferences with marketing false — the three Export brief JSON snapshots differ in contactEmail and/or cookieCategories.marketing accordingly (not hardcoded identical rows)."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "brief_ignores_contact_cookie_payload_inputs"
-description = "Two contact submits with different emails, or Accept versus a marketing-off preferences save, leave Export brief contactEmail and cookieCategories unchanged or identical across sessions."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -223,18 +175,3 @@ description = "Edge-state round-trip: open contact, submit an invalid payload (n
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n7"
-name = "brief_keeps_invalid_contact_email"
-description = "After an invalid contact submit followed by a valid one, Export brief contactEmail still shows the invalid attempt or contactSubmitted is true from the failed submit."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

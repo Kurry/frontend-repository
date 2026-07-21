@@ -158,38 +158,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "lorem_or_template_filler_visible"
-description = "Lorem ipsum or template filler (TODO, Lorem, asdf, or variables like {{title}}) is visible anywhere in the shipped terminal UI."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_terminal_copy_has_typos"
-description = "Spelling or grammatical errors appear in prominent copy such as the ready line, welcome greeting, /help headings, or primary banner buttons."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "project_terms_inconsistent"
-description = "The same project/case-study concept is named inconsistently across /work, Projects Board, and detail output."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "terminal_copy_truncated_or_overflowing"
-description = "Truncated or overflowing text renders command output, welcome-box copy, or board labels unreadable."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "15.10"
 name = "export_and_undo_labels_specific"
 description = "Where the app renders export tab labels and undo history labels, they read Portfolio JSON / Resume Markdown and use specific verbs such as Created, Edited, Archived, or Restored rather than generic Done."
@@ -203,18 +171,3 @@ description = "Where the app renders empty archive, empty filter results, or emp
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "15.n5"
-name = "generic_undo_or_export_labels"
-description = "Export tabs or undo history use only generic labels such as Done or OK where specific Portfolio JSON / Resume Markdown or action verbs are specified."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

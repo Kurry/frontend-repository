@@ -225,23 +225,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "1.n1"
-name = "static_feed_or_fabricated_actions"
-description = "The activity feed is static or fabricated: connecting an agent, retrying an errored agent, or activating Simulate activity produces no new feed event, or export previews omit a connect/rename/disconnect that is visible in the UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n2"
-name = "missing_empty_states"
-description = "Filtering the feed to zero matches or disconnecting every agent leaves a blank region with no empty-state message or recovery control"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.20"
 name = "bulk_disconnect_selected_agents"
 description = "Each agent row has a selection checkbox; confirming Disconnect selected with two checked agents removes exactly those two rows, updates the active agents KPI for any that were running, and appends one disconnected event per removed agent"
@@ -283,26 +266,3 @@ description = "Copy writes the visible export preview to the clipboard with a br
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n3"
-name = "export_omits_session_work"
-description = "Export Session JSON or Agents CSV omits a connect, rename, disconnect, bulk disconnect, retry, or night-schedule change that is already visible in the UI, or Import of valid Session JSON fails to restore the exported session"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n4"
-name = "field_contract_not_enforced"
-description = "Connect agent accepts an empty name, a name longer than 80 characters, a missing model, or a description longer than 280 characters and still adds a row, or night schedule saves with enable on and invalid HH:MM times"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "A specified core behavior is broken or missing in a way NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

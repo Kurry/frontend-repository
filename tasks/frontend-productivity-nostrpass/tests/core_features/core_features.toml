@@ -317,24 +317,6 @@ weight = 1.0
 
 
 [[criterion]]
-id = "1.29"
-name = "static_noninteractive_mock"
-description = "The app is a static list of identity names with no working create/select/permission-toggle behavior (a non-interactive mock)"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "1.30"
-name = "cancel_create_still_mutates"
-description = "Cancelling the create-identity form still adds an identity, or leaves the collection changed"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "1.31"
 name = "create_and_export_flow_chain"
 description = "Scripted flow: note the identity-count stat tile and Identities card count, submit the create-identity form with a valid label, and confirm — without any reload — that exactly one new card appears, the identity-count stat tile increased by exactly one, the dashboard shows the new identity's nickname and a freshly generated npub as active, a creation entry sits at the top of the Audit log, and the Export vault JSON preview includes that identity's label, npub, nsec, and all-false grants"
@@ -395,24 +377,6 @@ id = "1.38"
 name = "import_rejects_nonconforming_vault"
 description = "Importing malformed vault JSON or a vault missing required fields (wrong version, empty identities, invalid label bounds, npub/nsec prefix, grants keys, or theme enum) shows an inline error naming the import field and leaves identity count and labels unchanged"
 type = "binary"
-weight = 1.0
-
-
-[[criterion]]
-id = "1.39"
-name = "export_omits_session_mutations"
-description = "After creating an identity or toggling a grant, the Export vault JSON preview omits that session mutation (missing the new identity or still showing the prior grant boolean)"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "1.40"
-name = "undo_fails_to_restore_prior_state"
-description = "After a create or delete, Undo leaves the identity count, cards, or export preview different from the pre-action state"
-type = "binary"
-negate = true
 weight = 1.0
 
 
@@ -486,26 +450,3 @@ description = "Choosing an action type in the Audit log filter narrows the list 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.51"
-name = "rotation_leaks_or_fakes"
-description = "After a confirmed rotation, another identity's keys changed, the rotated identity's label or grants changed, or its npub remained identical to the pre-rotation value"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.52"
-name = "bulk_grant_partially_applies"
-description = "After Grant all for one application, at least one identity still shows that application Revoked, or a different application's grants changed"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

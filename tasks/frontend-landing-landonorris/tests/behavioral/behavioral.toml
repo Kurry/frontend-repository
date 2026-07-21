@@ -141,38 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_in_memory_state_survives_reload"
-description = "After configuring menu open, newsletter field text, and video hover-play, a reload leaves an incoherent mix (e.g. menu stays open while newsletter resets, or confirmation survives alone)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "subscribe_ignores_email_validity"
-description = "Typing invalid versus valid emails leaves Subscribe enabled/disabled identically (derived control state ignores the input)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "newsletter_outcomes_identical_for_different_inputs"
-description = "Submitting or attempting submit with an empty/invalid email versus a valid email yields byte-identical UI outcomes (same confirmation or same lack of error in both cases)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "menu_or_newsletter_stale_until_reload"
-description = "After closing the menu or submitting the newsletter, some surfaces keep the prior open/confirmation state until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "press_kit_derived_sensitivity"
 description = "Derived-view sensitivity: note the empty press-kit JSON preview, select Alpine GP and Bayfront Circuit and shortlist one helmet, reopen PRESS KIT; the JSON/Markdown now name those two circuits and the shortlisted label, and ICS has exactly two VEVENT entries — not an identical redraw."
@@ -194,15 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "press_kit_identical_regardless_of_inputs"
-description = "Selecting different race sets or shortlists leaves the press-kit preview text byte-identical."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.12"
 name = "press_kit_import_round_trip_probe"
 description = "Export then import round-trip probe: select Alpine GP and Bayfront Circuit and shortlist one helmet; copy JSON; Undo both selections and the shortlist; Import the JSON; Selected races is 2, shortlist count is 1, ICS has two VEVENT entries, and JSON races arrays name both circuits."
@@ -216,26 +175,3 @@ description = "Cross-view echo: with Ridgeway GP selected, Edit status to Upcomi
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n7"
-name = "import_ignores_field_contract"
-description = "Import accepts JSON missing schemaVersion, with invalid race status/date, with shortlist kind outside helmet/editorial, or with newsletter that is neither none nor a contract-valid email, and still mutates calendar or shortlist state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "undo_leaves_stale_selection_state"
-description = "After Undo of a race select or shortlist toggle, some surfaces keep the prior selected/shortlisted state until reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

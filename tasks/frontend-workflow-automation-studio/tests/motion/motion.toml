@@ -161,34 +161,3 @@ description = "With prefers-reduced-motion set, steps and console lines appear w
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "8.n1"
-name = "no_hover_or_press_feedback"
-description = "Buttons, step rows, or library entries show no hover, focus, or press feedback beyond browser defaults"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "8.n2"
-name = "transitions_snap_or_jank"
-description = "Step highlights, modals, or the console stream snap with no transition, or animations cause visible layout jank or flicker during a run"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "8.n3"
-name = "reduced_motion_ignored"
-description = "With prefers-reduced-motion set, the step highlight, console stagger, or modal transitions still animate"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "motion.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion and microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

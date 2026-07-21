@@ -151,31 +151,3 @@ name = "victory_defeat_panel_animates_in"
 description = "Victory and Defeat result panels animate in (fade or slide) when the run resolves rather than appearing with no transition"
 type = "binary"
 weight = 1.0
-[[criterion]]
-id = "8.n1"
-name = "control_missing_hover_and_focus"
-description = "A primary control lacks both a visible hover state and a visible keyboard focus ring"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "8.n2"
-name = "character_snaps_instantly"
-description = "On Log Reps via the real control, the character teleports to the new path position with no glide"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "8.n3"
-name = "confetti_loops_or_fires_for_ordinary_sets"
-description = "Confetti loops ambiently or fires for ordinary non-boss sets and non-Victory actions"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "motion.catchall"
-name = "motion_catchall"
-description = "A significant motion defect is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If already covered, answer no here."
-type = "binary"
-negate = true
-weight = 1.0

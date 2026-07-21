@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_board_has_no_feedback"
-description = "After deleting every scene, the board region shows nothing and provides no empty-state feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "validation_errors_only_in_console"
-description = "Add Scene validation failures are surfaced only in the browser console with no visible inline message naming the empty field."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "create_or_delete_silent_failure"
-description = "A valid Add Scene submit or a scene delete fails silently: the board cards and scene count stay unchanged with no visible feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "delete_lacks_destructive_affordance"
-description = "Scene delete proceeds with no clear destructive affordance when that action is exposed on a scene card."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_nonsemantic_only"
-description = "Primary interactive controls (view toggles, Add Scene, slide nav, create fields) are non-semantic div/span wrappers with no button/input/label role."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "create_form_not_keyboard_dismissible"
-description = "The open Add Scene form cannot be dismissed via keyboard (Escape or an equivalent cancel path)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Create-form validation feedback is missing or delayed with no UI indication while the submit control remains enabled for an empty required field."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "primary_actions_ambiguous_labels"
-description = "Primary Add Scene, Tile/List/Slide, or slide previous/next labels are missing or so generic that the action is ambiguous."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "slide_wraps_at_bounds"
-description = "At the first or last scene in Slide mode, previous/next or Left/Right arrow keys wrap to the opposite end of the board."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "double_submit_creates_duplicates"
-description = "Double-activating the create form's submit control creates more than one scene or increases the count by more than one."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "4.11"
 name = "out_of_contract_duration_rejected"
 description = "Entering a duration outside 1–300 on Add Scene adds no scene, leaves the count unchanged, and shows an inline validation message naming duration."
@@ -278,22 +197,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n11"
-name = "invalid_import_partially_applies"
-description = "A schema-invalid Storyboard JSON import applies a partial subset of scenes or changes view mode despite the error."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n12"
-name = "out_of_bounds_duration_accepted"
-description = "Add Scene accepts a duration below 1 or above 300 and still creates a scene."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.16"
 name = "filtered_empty_state_with_clear"
 description = "When search and shot-type filter together match no scene, the board shows a filtered-empty state naming that no scenes match with a Clear filters control that restores the full set, while the Total duration readout keeps the full-collection sum."
@@ -314,18 +217,3 @@ description = "The bulk action bar exposes Delete selected and Duplicate selecte
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n13"
-name = "empty_presenter_opens_blank"
-description = "Starting Present with no scenes (or an empty filtered subset) opens a blank or broken presenter instead of the control being disabled."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

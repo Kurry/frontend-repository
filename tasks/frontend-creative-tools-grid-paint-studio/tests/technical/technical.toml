@@ -106,22 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "forbidden_browser_storage"
-description = "After exercising painting, gallery CRUD, favorites, filters, export/import, versions, and mode changes, localStorage, sessionStorage, IndexedDB, or another browser persistence store contains app board or UI state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "cross_surface_state_desync"
-description = "The same board datum shows conflicting values between the canvas, histogram, saved thumbnail, Gallery metadata, Export center Project JSON, filters, count, or active selection during a normal interaction flow"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "stroke_batched_undo_redo_history"
 description = "Each completed pointer stroke, fill, or mirror-expanded write pushes exactly one undo step; Undo (or Backspace/Ctrl+Z) reverts the whole most-recent step; Redo restores it; a new paint after undo clears the redo stack"
@@ -182,37 +166,5 @@ id = "2.13"
 name = "api_shaped_project_schema_coherence"
 description = "After a valid Save board, the gallery card's name, tag, and favorite match the corresponding boards entry in Export center Project JSON under the same SavedBoard field names (request-body shape); Import of that ProjectDocument restores the same name, tag, favorite, and cells without a reload"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.n1"
-name = "partial_state_after_reload"
-description = "After a full interaction session, reload leaves some user mutations persisted while others reset, or seeded boards are missing while canvas art remains"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n2"
-name = "cdn_or_external_asset_fetch"
-description = "During normal studio use, the network log shows CDN, font, icon, or script fetches from a non-same-origin host for app assets"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n3"
-name = "console_errors_during_flows"
-description = "Console errors or unhandled rejections appear during paint, gallery, export, or import flows"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "technical.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical or state-management defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

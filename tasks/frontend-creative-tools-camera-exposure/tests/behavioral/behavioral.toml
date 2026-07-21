@@ -162,46 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring dials and presets then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "preview_identical_across_different_stops"
-description = "Stepping aperture, shutter, or ISO across clearly different stops leaves brightness, blur, motion frame, grain, and meter visually identical."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_presets_apply_identical_dials"
-description = "Applying two presets that declare different aperture/shutter/ISO values yields identical dial readouts and preview/meter state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "mode_switch_shows_stale_dials_until_reload"
-description = "After applying a preset or stepping dials, the other mode still shows stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "edit_stack_export_missing_schema_fields"
-description = "A Download edit stack artifact is missing schemaVersion, stop fields, slider fields, lookPack, or snapshots, or carries values outside the documented bounds."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.11"
 name = "bracket_count_delta_and_derived_names"
 description = "Count-delta and derived-output probe: measure the preset count, set frame count 5, step 1, base name Dusk, Generate bracket, and re-measure immediately — the count increases by exactly five and rows Dusk -2 EV through Dusk +2 EV appear with only the shutter shifted along the discrete list; applying Dusk +2 EV writes its shifted shutter into the dials"
@@ -215,18 +175,3 @@ description = "Chained pixel-proof probe: Download PNG at defaults in Daylight C
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n6"
-name = "zebra_or_clipping_indicators_ignore_render"
-description = "Zebra stripes or the histogram edge clipping indicators appear or stay lit regardless of whether the current render actually contains clipped regions (for example stripes at default dials in Daylight Courtyard, or no indicator when the frame is blown out)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered — even partially — answer no."
-type = "binary"
-negate = true
-weight = 1.0

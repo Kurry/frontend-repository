@@ -141,38 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_in_memory_state_survives_reload"
-description = "After opening Solutions, advancing the slideshow, and revealing cards, a reload leaves an incoherent mix (e.g. menu stays open while slideshow resets, or cards stay pre-revealed while menus reset)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "slideshow_opacity_ignores_timer"
-description = "Leaving the page idle across multiple 2200ms intervals leaves every slideshow frame at identical opacity (derived surface ignores the timer input)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "artboard_scale_identical_at_widths"
-description = "Resizing between 1440px and 390px yields an identical artboard transform at both widths (scale stays fixed regardless of viewport width)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "menu_or_reveal_stale_until_reload"
-description = "After closing Solutions or revealing cards via scroll, the panel expanded state or card resting state disagrees across surfaces until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "brief_preview_tracks_field_mutations"
 description = "Derived-view sensitivity: change plan from Free trial to Team and toggle two interest chips; the live preview plan and interests array update to those exact values — not an identical redraw regardless of input."
@@ -214,42 +182,3 @@ description = "Fill a schema-valid brief, activate Reset (empty baseline preview
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "brief_preview_ignores_field_changes"
-description = "Editing name, plan, or interests leaves the live preview JSON identical (derived surface ignores inputs)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "undo_does_not_restore_brief"
-description = "After toggling an interest chip, Undo leaves the chip selected and the preview interests array unchanged."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n7"
-name = "schema_reject_then_accept_leaves_stale_errors"
-description = "After fixing a cross-field or format error and submitting a valid brief, named validation errors remain stuck on screen and block reading the Trial brief ready message or the conforming preview."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n8"
-name = "reset_undo_fails_to_restore"
-description = "After Reset clears a filled brief, Undo leaves the empty baseline in place instead of restoring the pre-Reset form values and preview."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

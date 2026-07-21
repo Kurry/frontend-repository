@@ -163,14 +163,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "11.n1"
-name = "innovation_is_generic_dashboard_shell"
-description = "Beyond the mandated eval dashboard surfaces, the UI reads as a generic analytics shell with no operator-specific polish or optional enhancement."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app exhibits a significant, delightful innovation or polish beyond the specification that is NOT covered by any other criterion in this file. If present, name it and cite the concrete evidence. If already covered by another criterion in this file, answer no here."

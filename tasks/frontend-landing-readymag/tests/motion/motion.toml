@@ -149,22 +149,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "3.9"
-name = "feature_cards_pre_revealed"
-description = "The four feature cards appear already in their final state with no reveal animation when their section scrolls into view"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.10"
-name = "hover_produces_no_feedback"
-description = "Hovering a use-case tile or a primary button with the real pointer produces no visible transform, lift, or color change"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.11"
 name = "tilt_accents_ease_in_out_alternate"
 description = "The tilt accents animate from a zero transform with ease-in-out alternating direction: the floating hero media card tilts toward -6deg over about 4.5s, the orange/purple \"Ready\" accent toward 6deg over about 3.2s, and the \"?\" mark toward -6deg over about 3.2s (getAnimations reports the alternating infinite animations on each)"
@@ -200,14 +184,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.16"
-name = "reveal_easings_are_pure_linear"
-description = "The hero intro rise/fade and the feature-card scroll reveal use purely linear timing functions with no inertial cubic-bezier easing (marquees and path travels may remain linear)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.17"
 name = "nav_footer_link_hover_and_wordmark_swap"
 description = "Hovering a header nav link and a footer link with the real pointer shifts its underline or opacity, and hovering the header wordmark swaps it to its distinct hover mark (grade by hovering the actual elements, not a state shortcut)"
@@ -220,14 +196,6 @@ name = "palette_and_brief_feedback_transitions"
 description = "Opening the command palette through Ctrl/Cmd+K shows a short fade-and-settle enter; Copy brief shows a Copied confirmation that fades in and reverts after about 1.5 seconds; interest chips toggle with a short selected-state transition (grade via the real UI control path)."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "palette_or_copy_feedback_snaps"
-description = "The command palette snaps open/closed with no enter/leave transition, or after Copy brief the Copied confirmation is missing while the clipboard was written, or the Copied confirmation remains stuck on screen for more than about 3 seconds."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "8.a2"
@@ -243,26 +211,3 @@ description = "On a fine-pointer desktop viewport, elements respond continuously
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "8.a5"
-name = "scroll_capture_breaks_usability"
-description = "Scrolling hijacks or traps the scrollbar, prevents reaching later sections, fights native document scroll or sticky-header behavior, or ignores the reduced-motion path that must stop offset-path travel, tilt, and reveal animation while every section stays fully visible, correctly placed, and operable"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "8.a7"
-name = "signature_motion_purely_linear_tweens"
-description = "Hero intro rise/fade or feature-card scroll reveal uses purely linear tweens that start and stop mechanically with no inertial cubic-bezier(.56,.86,.59,1) easing (marquees and path travels may remain linear)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

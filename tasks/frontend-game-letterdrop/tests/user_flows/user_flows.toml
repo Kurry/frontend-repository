@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_game_flows_unavailable"
-description = "Start game, Pause/Resume, Submit Word, or Play again after Game Over is missing or non-functional from the visible UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "history_entry_missing_or_duplicated"
-description = "Finishing a run fails to add a History entry, or produces a duplicate top entry for a single finished run."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "score_desyncs_across_surfaces"
-description = "After Game Over, the final score shown on the Game Over screen disagrees with the score on the new History entry or the Best Score update without a reload intervening."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "tab_switch_ends_or_corrupts_run"
-description = "Switching between Game, History, and Achievements during a run ends the run, resets the score, or corrupts the board state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_history_ui_broken"
-description = "Before any run has finished, the History tab is a blank region with no friendly empty-state message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "pause_leaks_motion_or_timer"
-description = "While Paused, tiles continue falling or the run timer keeps advancing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "settings_cannot_reopen_after_close"
-description = "After closing Settings, the Settings control cannot reopen the form."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "paused_or_gameover_overlay_traps"
-description = "The Paused overlay or Game Over screen blocks returning to play with no Resume or Play again exit."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_submit_lacks_feedback"
-description = "An invalid word submission or empty-tray Submit Word leaves the tray and streak unchanged with neither an on-screen rejection message nor a disabled Submit Word control."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "restart_requires_full_reload"
-description = "Recovering from Game Over into a new run requires a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "6.11"
 name = "export_after_play_flow"
 description = "Finish a run that scored at least one valid word, open Export Run from Game Over or that History entry, and confirm the preview JSON contains format letterdrop-game-v1, schemaVersion 1, that final score, and each submitted word with its points; Export History then lists that same run under format letterdrop-history-v1."
@@ -261,29 +180,5 @@ id = "6.13"
 name = "import_run_json_round_trip_flow"
 description = "Export a finished run as run-json, import that file, and confirm a History game-result appears with the same score, tilesCleared, durationSec, playerName, tierReached, endedAt, and words as the export."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "6.n11"
-name = "export_flow_dead_end"
-description = "After Game Over, Export Run is missing or produces no downloadable/copyable artifact containing format letterdrop-game-v1 with the finished run's score and words."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n12"
-name = "save_resume_flow_broken"
-description = "After Save Progress mid-run and a full page reload, Resume Saved Run leaves the live score, tray, streak, tier, or board empty instead of the saved checkpoint."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

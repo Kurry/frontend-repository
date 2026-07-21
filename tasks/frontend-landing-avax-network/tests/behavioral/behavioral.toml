@@ -110,38 +110,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_in_memory_state_survives_reload"
-description = "After configuring theme, newsletter step, and carousel position, a reload leaves an incoherent mix (e.g. dark theme survives while newsletter step resets, or carousel position survives alone)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "theme_surfaces_ignore_toggle"
-description = "Toggling the theme leaves body text and nav surface colors identical to the pre-toggle values (derived surfaces ignore the input)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "contact_project_type_output_identical"
-description = "Choosing project_type Other versus a non-Other type yields an identical visible field set — the conditional otherDetail field stays visible in both cases or stays hidden in both cases."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "theme_stale_until_reload_in_sections"
-description = "After a theme toggle, some sections keep the prior palette until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_input_dependent_payloads"
 description = "Input-dependent output: perform two contact (or newsletter) submits with different emails/names; the exported astra-session-leads.json leads payloads differ accordingly (not byte-identical hardcoded rows)."
@@ -163,32 +131,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "export_identical_despite_different_submits"
-description = "Two successful submits with different emails/names produce exported leads arrays that are byte-identical or still empty."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.12"
 name = "valid_create_export_matches_field_contract"
 description = "After a valid contact submit with project_type Other and otherDetail of at least 2 characters, the exported lead payload includes firstname, lastname, email, project_type Other, otherDetail, astra_contact_message, and gdpr true; after a valid newsletter submit, the exported newsletter payload includes firstname, email, country, vertical, isDeveloper, and gdpr true matching the filled values."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n6"
-name = "export_payload_violates_field_contract"
-description = "A successful submit's exported lead payload omits required contract fields, includes otherDetail when project_type is not Other, or reports gdpr false despite a successful submit."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

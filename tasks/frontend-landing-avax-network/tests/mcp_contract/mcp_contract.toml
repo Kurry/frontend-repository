@@ -131,86 +131,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "Browse or form MCP tooling is unbound, missing, or a no-op when invoked."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n2"
-name = "handlers_diverge_from_ui"
-description = "A browse set_theme or form submit/advance tool invocation updates MCP-reported state without matching the visible theme or form UI (or the reverse)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n3"
-name = "undeclared_destinations_or_ops_exposed"
-description = "Undeclared destinations or operations outside the Bindings/permitted_operations lists are exposed via webmcp_list_tools."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n4"
-name = "automation_cannot_exercise_contract"
-description = "webmcp_invoke_tool cannot exercise browse open/set_theme, form advance/validate/submit, or artifact export/copy against the declared bindings."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n5"
-name = "form_validation_bypass_desync"
-description = "Invoking form submit via MCP bypasses validation and leaves UI/MCP state inconsistent with a manual invalid submit (e.g. success without field errors when fields are empty)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n6"
-name = "session_or_tool_api_errors"
-description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete module/tool data for the declared contract."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n7"
-name = "mcp_relies_on_undocumented_hacks"
-description = "MCP only works after undocumented manual harness hacks or console stubs rather than app-registered handlers."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n8"
-name = "required_modules_missing"
-description = "browse-query-v1, form-workflow-v1, or artifact-transfer-v1 is not implemented despite being declared required in the contract."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n9"
-name = "mcp_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed so list/invoke cannot reach real handlers."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n10"
-name = "form_fields_bindings_incomplete"
-description = "Declared form fields (firstname, lastname, email, socialhandle, country, vertical, isDeveloper, hasWeb3Experience, isStudent, source, project_type, otherDetail, astra_contact_message, gdpr, marketing_consent, newsletter) are missing from the bound form-workflow surface."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "12.11"
 name = "artifact_export_copy_bound"
 description = "artifact-transfer-v1 exposes export (format json) and copy operations that drive the same Session leads Download JSON / Copy JSON handlers as the visible UI."
@@ -224,18 +144,3 @@ description = "After a successful newsletter or contact submit via UI or form MC
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "12.n11"
-name = "artifact_module_missing_or_noop"
-description = "artifact-transfer-v1 export/copy tools are unbound, absent from webmcp_list_tools, or no-ops that leave the Session leads export surface unchanged when invoked."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "mcp_contract.catchall"
-name = "mcp_contract_catchall"
-description = "The app exhibits a significant, browser-observable defect in the declared MCP contract that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

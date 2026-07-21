@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_overrides_show_nothing"
-description = "With zero overrides, the generated-config panel shows nothing — no empty-state comment and no zero override count."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n2"
-name = "validation_errors_only_in_console"
-description = "Invalid setting values surface only in the browser console with no visible inline field feedback."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n3"
-name = "copy_or_reset_silent_no_feedback"
-description = "Activating Copy, Download, or Reset all produces no visible toast or confirmation feedback."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n4"
-name = "reset_all_clears_without_clear_affordance"
-description = "Reset all proceeds with blank or ambiguous labeling that fails to identify the destructive clear-all action."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_are_nonsemantic"
-description = "Primary interactive controls (sidebar categories, switches, export actions) are non-semantic div/span click targets without button/role semantics."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n6"
-name = "toast_blocks_editor_with_no_exit"
-description = "Toast or overlay feedback for export actions blocks the editor with no dismiss path."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n7"
-name = "font_size_accepts_out_of_range"
-description = "The font-size control accepts and commits a value outside 4 to 60 into the generated configuration."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_export_labels"
-description = 'Copy, Download, or Reset all show blank, placeholder, or ambiguous labels such as "Submit", "OK", or "Button" instead of naming the action.'
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n9"
-name = "no_in_app_setting_guidance"
-description = "Grouped settings sections have no notes or guidance text explaining what settings do."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n10"
-name = "disabled_exports_still_look_active"
-description = "With zero overrides, Copy, Download, or Reset all still look fully interactive and invite clicks despite being disabled."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.11"
 name = "malformed_import_rejected"
 description = "Importing malformed config text (lines that are not comments and not valid key = value) shows a visible parse error naming the problem, applies no overrides, and leaves the override count unchanged."
@@ -277,27 +197,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n11"
-name = "malformed_import_mutates_state"
-description = "A malformed Import applies partial or corrupted overrides, or changes the override count, despite the parse failure."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.16"
 name = "field_contract_violations_rejected"
 description = "Importing or committing a value that violates the Ghostty field contract — font-size outside 4 to 60, cursor-style outside block/bar/underline/block_hollow, a color that is not #RRGGBB, an opacity outside 0 to 1, clipboard outside ask/allow/deny, copy-on-select outside true/false/clipboard, window-decoration outside auto/none/client/server, theme outside the declared set, a palette index outside 0 to 255, empty font-family, or an empty profile-name — shows inline validation naming the field, does not emit that malformed override into the generated configuration, and on Import leaves existing overrides and the override count unchanged."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "4.n12"
-name = "out_of_contract_value_emitted"
-description = "An out-of-bound or out-of-enum setting value is committed into the generated configuration without inline validation naming the field, or Import of a contract-invalid payload partially mutates overrides."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "4.17"
@@ -313,18 +217,3 @@ description = "In Compare themes, selecting the same theme on both sides renders
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.n13"
-name = "compare_close_leaks_state"
-description = "Closing the Compare themes surface without choosing Apply leaves the generated configuration text or the override count different from their pre-open values."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

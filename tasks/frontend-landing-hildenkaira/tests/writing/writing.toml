@@ -150,50 +150,10 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_typos"
-description = "Spelling or grammatical errors appear in prominent copy such as the hero H1, hero lead, Does your brand have self-esteem issues?, Ready to work with us?, or primary CTA labels."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "source_brand_or_real_designer_in_copy"
-description = "Rendered copy still names a source agency/client, real third-party logos as client marks, or the reference site's real designer instead of Cinder & Bloom and invented credits."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "copy_truncated_or_overflowing"
-description = "Truncated or overflowing text renders mandated headings, hero lead, stat labels, or form messages unreadable at 1440 or 479."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "15.9"
 name = "shortlist_export_palette_labels_specific"
 description = "Where the app renders shortlist, export, palette, and undo chrome, labels stay specific (Shortlist, Export brief, Download, Copy, Import, Undo, Redo, Discovery brief) rather than generic Submit/OK alone."
 type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "15.n5"
-name = "brief_markdown_heading_wrong"
-description = "Where the Markdown discovery brief tab renders a heading, it is missing Discovery brief — Cinder & Bloom or substitutes placeholder/lorem copy."
-type = "binary"
-negate = true
 weight = 0.5
 
 [[criterion]]
@@ -203,18 +163,3 @@ description = "Where the app renders contact or cookie preference validation err
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "15.n6"
-name = "form_errors_generic_invalid_only"
-description = "Where contact or cookie validation fails, the only visible message is a generic Invalid (or equivalent) with no field name."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

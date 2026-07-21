@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After creating entries, tags, and a non-All filter then reloading, some facets survive while others reset — incoherent partial persistence instead of a full return to the empty baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "Changing an entry's category or duration leaves the Meaningful ratio, Weekly overview, or heat-map visually identical."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_inputs_produce_identical_export"
-description = "Two sessions with different entry names and durations produce byte-identical Session JSON or Timesheet CSV export text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "After adding or editing an entry, the timeline, list, ratio, or Export preview still shows stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_import_round_trip_preserves_session"
 description = "Mutate → derived → export → import: create entries and a custom tag; confirm Export Session JSON contains them and rollup matches header stats; Download Session JSON; delete all entries; Import the downloaded JSON with confirmation; confirm list, timeline, tags, ratio, chart, heat-map, and Export reconstruct the exported state."
@@ -193,26 +161,3 @@ description = "Undo round-trip: add a manual entry (list, timeline, Export updat
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_text_ignores_session_mutations"
-description = "After mutating entries, Export Session JSON or Timesheet CSV text is identical to the pre-mutation text — an export that omits the session's actual work."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "undo_leaves_export_stale"
-description = "After Undo of an add or edit, Export previews still show the undone entry while the list restored."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

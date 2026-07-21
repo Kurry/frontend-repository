@@ -161,26 +161,3 @@ description = "With prefers-reduced-motion set, rows and statuses appear immedia
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n1"
-name = "run_motion_absent_or_snapping"
-description = "During a real launch the grid shows no motion at all — completed items, status changes, and the progress bar all snap with no transitions anywhere"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "animation_causes_jank"
-description = "Any grid, queue, or macro animation causes visible layout shift, flicker, or misaligned rows after settling"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "motion.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion and microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

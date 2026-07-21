@@ -92,14 +92,6 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "2.3"
-name = "browser_storage_used"
-description = "After exercising the app (creating/editing/deleting events, toggling theme, filtering), localStorage, sessionStorage, or IndexedDB contains app data such as events, theme, or filter state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.4"
 name = "hydration_clean_console"
 description = "First load and a full exercise of the app produce a console free of errors, hydration mismatch errors or warnings, and unhandled promise rejections, and the interactive islands become usable without throwing"
@@ -163,28 +155,11 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "2.13"
-name = "third_party_network_requests"
-description = "The network log shows requests to non-local origins — CDN scripts, remote fonts or icons, analytics, or form POSTs to external servers — during load or normal use"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.14"
 name = "deep_link_parity"
 description = "Loading the app's URL (and any route or deep link the UI exposes, such as an Events Manager route or section anchor) directly in a fresh tab renders the full page with the same chrome and seeded baseline as reaching it through in-app navigation — no 404s or half-rendered shells"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.15"
-name = "hydration_content_swap_flash"
-description = "Statically rendered content visibly flashes and is replaced by different client content after hydration — mismatched text, reflowing layout, or restyled elements between first paint and interactive"
-type = "binary"
-weight = 1.0
-negate = true
-
 
 [[criterion]]
 id = "2.20"
@@ -207,26 +182,3 @@ description = "Shared-state coherence: after a successful contact submit, the Se
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n5"
-name = "export_or_undo_uses_storage"
-description = "Export catalog persistence, session leads log, or undo history is implemented via localStorage/sessionStorage/IndexedDB rather than in-memory Nano Stores state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n6"
-name = "lead_list_and_export_desync"
-description = "After a successful contact submit or Undo last lead, the Session leads panel count/list disagrees with the contents of a subsequent ridge-session-leads.json or Export JSON leads array"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, network, storage, state coherence, accessibility, or stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

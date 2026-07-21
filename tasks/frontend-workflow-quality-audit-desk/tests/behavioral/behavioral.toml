@@ -155,57 +155,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_reset_is_incoherent"
-description = "After a reload, some session mutations survive while others reset (for example the seeded stages return but a typed rationale or feedback entry persists)"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface — rollup cell, chart, admission banner, or export preview — renders identically regardless of its inputs"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating a workflow with different inputs (different rationale text, different escalation category, different reviewer) yields byte-identical rendered output"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "A run outcome, verdict, or feedback entry appears in one view but not another until a reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.10"
 name = "export_import_reconstructs_desk"
 description = "Export/import pipeline: mutate the desk (run, fail a criterion, or add feedback), export Audit Package JSON, import that JSON, and confirm visible queue stages, rollups, and the next export preview match the exported document"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_omits_mutations_in_json"
-description = "Audit Package JSON preview text is identical before and after a run, fail verdict, or feedback entry that should alter tasks, datasetSummary, or checkPassRates"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

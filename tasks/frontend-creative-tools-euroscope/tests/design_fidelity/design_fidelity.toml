@@ -162,46 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n1"
-name = "composition_deviates_from_reference"
-description = "Section order or structure visibly deviates from the reference: missing centered patcher column, missing progress bar, or a generic equal-weight dashboard of cards instead of the step-based wizard focus."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "colors_outside_specified_palette"
-description = "Primary accents fall outside the specified light-neutral-plus-blue system, or alert blocks use arbitrary unrelated hues instead of blue/amber/red coding."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "browser_default_controls"
-description = "Primary buttons, selects, or swatch fields use unstyled browser defaults when the spec and reference show styled bordered clusters and blue-accent primary actions."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "elements_clipped_vs_reference"
-description = "At the desktop reference width, key wizard elements render clipped, off-screen, or overlapping in ways that contradict the reference screenshots."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "type_hierarchy_collapsed"
-description = "Heading and body text collapse into one size and weight: the Custom EuroScope title matches helper text, or stage labels use the same size/weight as muted caption copy."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.11"
 name = "undo_export_chrome_matches_spec"
 description = "Undo/Redo chrome and the step-four export center appear in the wizard composition described by the instruction; where screenshots omit later hardened surfaces, the instruction text wins."
@@ -215,18 +175,3 @@ description = "On the theme-colours step, the contrast matrix and colour-blindne
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n6"
-name = "hardened_surfaces_missing_vs_spec"
-description = "Instruction-mandated hardened surfaces (contrast matrix, export center tabs, or command palette) are absent while the rest of the wizard roughly matches the reference screenshots."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference screenshots that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

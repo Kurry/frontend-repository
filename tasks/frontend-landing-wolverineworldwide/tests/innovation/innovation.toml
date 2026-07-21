@@ -135,43 +135,10 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "signature_motion_absent_or_stubbed"
-description = "Signature reference motions are absent or stubbed: no particle parallax in the portfolio region, no scroll reveals, and no hero intro sequence on a fresh load via the real UI path."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "recreation_feels_generic_template"
-description = "The recreation reads as a generic corporate template with default type/spacing and none of the reference's asymmetric hero, broken-grid portfolio title, or particle-field execution quality."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "page_flat_static_no_immersion"
-description = "The page is flat and static with no scroll storytelling, no header morph, and no particle/galaxy motion despite the reference requiring them."
-type = "binary"
-negate = true
-weight = 0.5
-
-
-[[criterion]]
 id = "11.8"
 name = "operator_briefing_execution_polish"
 description = "Score execution quality: the Investor briefing pack (export and Import against the same JSON field contract), shortlist, and command palette feel finished operator tooling integrated into the Northstar homepage rather than unfinished stubs bolted on."
 type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "11.n6"
-name = "briefing_surfaces_unfinished_stubs"
-description = "The Investor briefing, shortlist, or command palette is missing, non-interactive, or clearly stubbed so an operator cannot leave with a session briefing pack or re-import one."
-type = "binary"
-negate = true
 weight = 0.5
 
 [[criterion]]

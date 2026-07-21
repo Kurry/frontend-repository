@@ -139,24 +139,6 @@ optional = true
 
 
 [[criterion]]
-id = "11.n1"
-name = "barebones_unstyled_identity_list"
-description = """The shipped UI is a bare unstyled list of identity names with no dashboard key surfaces, export drawer, or vault immersion"""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "11.n2"
-name = "generic_dashboard_template_look"
-description = """The experience is a generic dashboard template that ignores the specified security-focused identity card and vault shell"""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = """The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."""

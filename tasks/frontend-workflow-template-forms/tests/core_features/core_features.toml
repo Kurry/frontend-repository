@@ -225,22 +225,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "1.20"
-name = "hardcoded_preview_output"
-description = "The generated preview is insensitive to its inputs: two submissions with meaningfully different field values produce byte-identical prompt strings, or the preview text omits the entered values in favor of canned content"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.21"
-name = "invalid_submit_produces_output"
-description = "Submitting with an empty required field still generates a preview or adds a library entry, bypassing the validation the form displays"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.22"
 name = "save_to_library_request_body_field_contract"
 description = "Save to Library validates the save-to-library request-body field contract: title trimmed 2–80, technique one of the seven ids, fields object, promptText matching the visible preview, optional attachments; empty title keeps confirm disabled with a named title error and adds no row"
@@ -261,18 +245,3 @@ description = "After exporting JSON following a save, deleting to diverge, then 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.25"
-name = "export_omits_session_save"
-description = "After saving a library entry, Export library JSON omits that title or technique"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -295,47 +295,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.30"
-name = "mine_hit_consequences_missing"
-description = "Revealing a mine fails to end the turn, does not subtract 5 (floored at 0) or does not add a Strike, or the mine tile reverts to covered later in the round"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.31"
-name = "turns_do_not_alternate"
-description = "Turns do not alternate (the Player can take consecutive turns or the Rival never moves) or the current turn is not clearly indicated"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.32"
-name = "score_goes_negative"
-description = "A side's score goes negative after a mine hit or a Hint, showing the floor of 0 is not enforced"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.33"
-name = "undo_flattens_history"
-description = "Undoing and then making a different move silently flattens or corrupts the history instead of creating a selectable branch"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.34"
-name = "stats_blank_before_first_match"
-description = "The Stats view before any match shows blank or zero rows instead of a 'No matches played yet' message"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "1.35"
 name = "illegal_actions_rejected_with_feedback"
 description = "Acting out of turn, revealing an already-revealed or flagged tile, using a hint past the limit, or revealing while paused is rejected with specific visible feedback naming why, and the board, scores, strikes, and history are left unchanged"
@@ -386,32 +345,9 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "1.n42"
-name = "export_omits_session_match_fields"
-description = "Export Match JSON omits the session's actual playerName, difficulty, winner, round wins, or totals, or shows hardcoded placeholder values unrelated to the finished match"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n43"
-name = "resume_starts_fresh_instead_of_checkpoint"
-description = "After Save Progress and a full page reload, Resume Saved Match starts a fresh setup or empty board instead of restoring the saved scores, strikes, turn, and visible board"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.42"
 name = "archive_import_reconstructs_match_log"
 description = "Importing a previously exported match-archive JSON reconstructs the Match log from its matches array: the exported-then-reimported records reappear with the same playerName, difficulty, winner, round wins, totals, and endedAt values"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in its core game features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

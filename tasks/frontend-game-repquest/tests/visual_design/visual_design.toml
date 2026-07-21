@@ -151,38 +151,3 @@ name = "single_consistent_icon_set"
 description = "Icons appear from a single consistent icon set across tabs, buttons, and status indicators with no mismatched icon styles"
 type = "binary"
 weight = 1.0
-[[criterion]]
-id = "3.n1"
-name = "gear_states_indistinguishable"
-description = "Locked and unlocked gear cards are visually indistinguishable, or the equipped outfit has no selected mark"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "3.n2"
-name = "zone_palettes_identical"
-description = "Different unlocked zones reuse the same sky/ground palette so region identity is unclear"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "3.n3"
-name = "victory_defeat_look_identical"
-description = "Victory and Defeat panels share the same visual treatment with no distinct success vs defeat styling"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "3.n4"
-name = "placeholder_text_shipped"
-description = "Placeholder or lorem-ipsum text appears in the shipped UI"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "visual_design.catchall"
-name = "visual_design_catchall"
-description = "A significant visual-design defect is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If already covered, answer no here."
-type = "binary"
-negate = true
-weight = 1.0

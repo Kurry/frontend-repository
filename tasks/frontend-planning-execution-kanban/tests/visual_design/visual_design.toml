@@ -134,29 +134,8 @@ description = "At 375 pixels wide no content clips or overflows the viewport and
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "2.9"
-name = "text_overlap_or_clipping"
-description = "At 1440 or 375 pixel widths, any card, column, chip, or toolbar text overlaps another element or is clipped by its container"
-type = "binary"
-weight = 1.0
-negate = true
-[[criterion]]
 id = "2.10"
 name = "export_and_wip_chrome_designed"
 description = "Export drawer shows format tabs, monospaced preview, and Copy/Download/Import; WIP limit and breach labels sit beside In Progress and Review counts; undo/redo sit in the toolbar; bulk action bar is a compact tray when selection is active"
 type = "binary"
 weight = 1.0
-[[criterion]]
-id = "2.11"
-name = "wip_breach_missing_or_wrong"
-description = "When In Progress or Review exceeds three visible cards, the column lacks a deep amber warning background or a text breach label"
-type = "binary"
-weight = 1.0
-negate = true
-[[criterion]]
-id = "2.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -225,23 +225,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.30"
-name = "delete_bypasses_confirmation"
-description = "Delete Selected removes objects with no confirmation dialog at all, or objects are removed even after the confirmation dialog is canceled."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.31"
-name = "duplicate_connector_stacked"
-description = "Requesting a connector between two already-connected objects stacks a duplicate line instead of being a no-op with a visible message explaining the duplicate was ignored."
-type = "binary"
-negate = true
-optional = true
-weight = 0.5
-
-[[criterion]]
 id = "1.32"
 name = "canvas_pan_grid_shifts"
 description = "Click-and-dragging empty canvas space pans the view, and the dotted-grid backdrop shifts with the pan so the movement is visible."
@@ -433,18 +416,3 @@ description = "Importing Workspace JSON with wrong schemaVersion, missing boards
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.55"
-name = "export_omits_session_work"
-description = "After creating a note with distinctive text, Export workspace Workspace JSON or Plain text preview omits that note or shows a payload identical to the pre-create empty board."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

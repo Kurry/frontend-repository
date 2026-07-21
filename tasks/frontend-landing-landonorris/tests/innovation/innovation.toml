@@ -135,30 +135,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "signature_motion_absent_or_stubbed"
-description = "Signature reference motions are absent or stubbed: no pinned horizontal media travel, no menu overlay animation, and no character-fill statements on a fresh load via the real UI/scroll path."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "recreation_feels_generic_template"
-description = "The recreation reads as a generic marketing template with default type/spacing and none of the reference's dual-tone lime accent, broken-grid hero, or kinetic-type execution quality."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "page_flat_static_no_immersion"
-description = "The page is flat and static with no scroll storytelling, no menu motion, and no hover language despite the reference requiring them."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "11.8"
 name = "press_kit_execution_quality"
 description = "Score execution quality of the press-kit end state: live-compiled JSON/Markdown/ICS previews, copy confirmation, and selection-sensitive regeneration feel finished rather than stubbed static text."

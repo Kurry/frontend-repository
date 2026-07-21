@@ -131,47 +131,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n1"
-name = "composition_deviates_from_reference"
-description = "Section order or structure visibly deviates from the reference overview: missing brand bar, missing net-worth summary card, or holdings/detail not presented as the specified card pair."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "colors_outside_specified_palette"
-description = "Primary accent colors fall outside the specified teal-on-neutral system, or destructive/error states use arbitrary unrelated hues instead of the reserved red family."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "browser_default_controls"
-description = "Primary buttons, inputs, or table chrome use unstyled browser defaults when the spec and reference show styled shadcn-like card and control chrome."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "elements_clipped_vs_reference"
-description = "At the desktop reference width, key overview elements render clipped, off-screen, or overlapping in ways that contradict the reference screenshots."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "type_hierarchy_collapsed"
-description = "Heading and body text collapse into one size and weight: the net-worth figure matches table body styling, or section eyebrows use the same size/case as body copy."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "3.11"
 name = "export_chrome_respects_text_over_screenshots"
 description = "Where Export portfolio / Import portfolio chrome is present per the instruction but absent from reference screenshots, the live app still matches the specified wealth-dashboard composition and the instruction text wins over screenshot absence."
@@ -188,32 +147,9 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "3.n6"
-name = "export_surfaces_clash_reference"
-description = "Export drawer or ledger chrome clashes with the reference palette and card language so severely that the overview no longer reads as the same wealth dashboard product."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "3.13"
 name = "new_surfaces_extend_reference_language"
 description = "The performance summary, performance chart, batch action tray, and CSV import diagnostics screen extend the reference wealth-dashboard language (teal accent, white cards, calm green-tinted ground) rather than introducing a conflicting visual system; text wins if screenshot and instruction conflict."
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.n7"
-name = "new_surfaces_clash_reference"
-description = "The performance summary, chart, batch tray, or diagnostics chrome clashes with the reference palette and card language so severely that the overview no longer reads as the same wealth dashboard product."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference screenshots that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

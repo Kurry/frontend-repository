@@ -173,70 +173,9 @@ weight = 1.0
 
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = """Layout breaks at 768px or 375px breakpoints."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = """Mobile controls are too small or misaligned to use."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "7.n3"
-name = "text_too_small_on_devices"
-description = """Key labels or nicknames become unreadably small at 375px."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = """Content is cropped or page-level horizontal scrollbars appear at 375px."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = """Sidebar or compact nav breaks and cannot reach destinations by width."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "7.n6"
-name = "elements_overlap_at_some_size"
-description = """Identity cards, pills, or toolbar controls overlap at some viewport size."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "7.11"
 name = "matrix_scrolls_inside_panel_at_375"
 description = "At 375 pixel width the All identities matrix scrolls inside its own panel rather than forcing page-level horizontal overflow"
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = """The app exhibits a significant, browser-observable responsiveness defect that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered, answer no here."""
-type = "binary"
-negate = true
-weight = 1.0

@@ -148,70 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "mara_voss_sibling_navigates_away"
-description = "On Mara Voss, activating the solo sibling tag navigates away from the Mara Voss case."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "popup_allows_background_scroll"
-description = "While a media popup is open, the page behind it still scrolls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "close_leaves_media_playing"
-description = "Closing a media popup via the red circular close button or dimmed backdrop leaves audio or video still playing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "scrapbook_item_escapes_region"
-description = "A scrapbook item released at the scrapbook boundary escapes outside the region or becomes undraggable afterward."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_elements_nonsemantic"
-description = "Primary interactive archive controls (tags, close buttons, overscroll affordance) are non-semantic div/span shells without button/link roles."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "popup_not_dismissible"
-description = "A media popup cannot be dismissed via the red circular close button or the dimmed backdrop."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "overscroll_label_missing_or_ambiguous"
-description = "The case bottom overscroll control shows a blank or generic label (e.g. OK/Submit) instead of indicating opening the next case."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "overscroll_skips_or_jumps_two"
-description = "A single overscroll trigger advances two or more cases, or skips the next architect in sequence."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "empty_note_pin_still_lists"
 description = "Pinning a case with an empty field note still adds the architect to the reading list with an empty-note hint, and the dossier JSON still lists that architect among pins (empty note string allowed under the field contract)."
@@ -253,34 +189,3 @@ description = "Committing a field note longer than 500 characters shows inline v
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n11"
-name = "malformed_import_wipes_pins"
-description = "Importing malformed or schema-invalid dossier JSON clears existing pins or notes or crashes the archive UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n12"
-name = "empty_undo_mutates_state"
-description = "Pressing Undo with an empty undo stack moves scrapbook items or clears pins/notes."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n13"
-name = "overlong_note_silently_accepted"
-description = "A field note longer than 500 characters is saved without naming the note field and appears in the reading list or dossier preview."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

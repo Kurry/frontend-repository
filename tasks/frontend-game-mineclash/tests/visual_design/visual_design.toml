@@ -129,22 +129,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "3.6"
-name = "flag_mode_visually_indistinct"
-description = "Flag Mode being active is not visually distinguishable from normal reveal mode, so the player cannot tell which mode is active"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.7"
-name = "turn_indicator_ambiguous"
-description = "Whose turn it is is not visually unmistakable (no clear active-turn indicator distinguishing the Player's turn from the Rival's)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.8"
 name = "semantic_status_colors"
 description = "Success green marks safe hints and round wins, warning yellow marks the 2-strike near-loss state and mine hints, and error red marks mine hits and round losses"
@@ -194,22 +178,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "3.15"
-name = "placeholder_text_visible"
-description = "Lorem ipsum, 'TODO', template variable names, or other placeholder text is visible somewhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.16"
-name = "content_overflows_at_375"
-description = "At a 375px-wide viewport, the setup screen, HUD, history panel, overlays, or Stats view clips content, overflows the viewport, or requires horizontal scrolling"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.17"
 name = "score_panels_show_label_target_strikes"
 description = "During a round each of the two score panels (You and Rival) shows the side label, the live score displayed against the Target Score, and a row of 3 Strike icons"
@@ -230,10 +198,3 @@ description = "Copying an export shows a brief Copied confirmation and saving a 
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

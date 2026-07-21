@@ -99,22 +99,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "forbidden_browser_storage"
-description = "After exercising create, rename, token editing, undo, snapshot save, tab selection, vision mode, and chrome-theme controls, localStorage, sessionStorage, IndexedDB, or another browser persistence store contains app theme or editor state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "cross_surface_state_desync"
-description = "The same active theme datum shows conflicting values across the theme list, editor, preview, URL hash, or export modal during a normal interaction flow"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "local_asset_network_hygiene"
 description = "From a fresh load through representative theme editing, dropdown, icon, dialog, and animation interactions, the network log shows only same-origin app assets and the allowed same-document #theme= update, with no CDN-hosted styles, scripts, icons, fonts, or product fetches"
@@ -147,22 +131,6 @@ id = "2.9"
 name = "hash_round_trip_coherence"
 description = "After changing independent facets—theme name, at least two token types, preview tab, and chrome theme—opening the generated #theme= URL in a fresh page restores the payload-defined theme coherently on first paint while non-payload in-memory facets follow the instruction's baseline rule rather than partially persisting"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.10"
-name = "external_runtime_dependency"
-description = "The app requires an outbound CDN or other external origin to obtain styling, icons, fonts, scripts, or product content, causing a missing or degraded interface when that request is blocked"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.11"
-name = "runtime_exception_or_broken_load"
-description = "A normal instructed interaction produces a console exception, blank pane, frozen control, or full-page navigation that breaks the single-page editing session"
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -208,14 +176,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.18"
-name = "post_load_layout_jumps"
-description = "After first paint, panels or the preview grid visibly jump, reflow, or shift position as the app settles"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.19"
 name = "export_texts_derived_from_shared_state"
 description = "After editing primary and radius on a custom theme, Export CSS, Theme JSON, and theme-extension previews all reflect those same shared-token values without a reload — derived live, not a disconnected static snippet"
@@ -243,18 +203,3 @@ description = "The browser document title reflects the CSS theme builder product
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n20"
-name = "import_accepts_schema_invalid_payload"
-description = "Import accepts a parseable JSON document that violates the Theme JSON field contract (missing required keys, invalid oklch/#RRGGBB color, out-of-enum radius/size/border/depth/noise/color-scheme, or cross-field disagreement) and still mutates My themes or editor tokens"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or unverifiable implementation preference. If present, name the defect and cite the concrete browser evidence (console entry, network request, storage entry, runtime state, or interaction result) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

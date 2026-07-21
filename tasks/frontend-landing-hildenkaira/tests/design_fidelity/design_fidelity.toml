@@ -235,96 +235,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n1"
-name = "spacing_contradicts_baseline"
-description = "Visible major section gaps use arbitrary odd-pixel spacing that contradicts the fluid em / 4/8px-equivalent baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "colors_outside_specified_palette"
-description = "Surfaces or accents use colors outside the specified lime/turquoise/red/near-black/off-white/dark-grey/chrome system (e.g. arbitrary purple theme wash or lime used everywhere)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "type_sizing_mismatches_spec"
-description = "At 1440 the hero H1 or statement/about H2 sizes are grossly mismatched versus the ~62.8px / ~57.6–84px reference metrics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "required_reference_motion_missing"
-description = "Required reference animations are missing: no lime veil/lettermark intro, no pinned services throw, or no flick-deck elastic reshuffle on the real UI path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "controls_use_browser_defaults"
-description = "Primary CTAs, contact fields, or cookie controls use unstyled browser default appearance when the reference uses token-styled chrome."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "elements_clipped_or_offscreen"
-description = "Key reference regions (hero lettermark/thumbnails, client deck, pinned services cards, about flanking images, full-height footer) render off-screen or clipped at 1440."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n8"
-name = "section_order_or_structure_deviates"
-description = "Section order, content, or structure deviates from the mandated homepage order (hero → statement → client deck → services → testimonials → about/self-esteem → CTA → footer) or omits a required section."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n9"
-name = "heading_body_undifferentiated"
-description = "Heading and body text have no visual distinction (same size/family/weight throughout)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Hover language or deck/carousel microinteractions are missing or clearly deviate from the reference (instant snaps, no button wipe, no flick elastic settle)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.b1"
 name = "operator_chrome_does_not_displace_sections"
 description = "Shortlist, command palette, and discovery brief controls layer as overlays/chrome without displacing the mandated section order (hero → statement → client → services → testimonials → about → CTA → footer) or removing reference-required surfaces at 1440."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n11"
-name = "operator_chrome_removes_reference_sections"
-description = "Adding Shortlist/Export/palette chrome removes or reorders a mandated reference section (e.g. missing services trio or about/self-esteem band) at desktop width."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

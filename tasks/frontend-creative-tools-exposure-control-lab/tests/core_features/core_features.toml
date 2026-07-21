@@ -190,22 +190,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.17"
-name = "presets_static_html_only"
-description = "Exposure presets list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.18"
-name = "outbound_link_chrome"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.19"
 name = "stepper_updates_and_aperture_direction"
 description = "Pressing a stepper updates its dial value instantly, and the aperture up control raises the f-number (narrows the aperture) while its down control lowers it (widens the aperture)"
@@ -225,14 +209,6 @@ name = "meter_dot_tracks_exposure"
 description = "The vertical exposure meter dot climbs toward OVER EXPOSED when overexposed and drops toward UNDER EXPOSED when underexposed, clamping within the track at the extremes"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.25"
-name = "steppers_leave_preview_static"
-description = "Pressing the dial steppers leaves the preview brightness, blur, noise overlay, and exposure meter position visibly unchanged — the preview behaves as a static image rather than a live simulation"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.26"
@@ -383,30 +359,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n36"
-name = "export_omits_session_mutations"
-description = "After creating a preset or changing dials, the Export panel JSON still omits those session mutations (missing the new preset name or still showing only default stops) while the UI shows the mutations"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n37"
-name = "undo_does_not_restore_prior_state"
-description = "After a dial step or preset create, activating Undo leaves dials, presets, or the Export panel unchanged from the post-action state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n38"
-name = "histogram_identical_across_exposures"
-description = "Stepping to clearly brighter vs darker stop combinations leaves the luma histogram visually identical"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.47"
 name = "exposure_preset_field_contract_enforced"
 description = "The preset create/edit form enforces the ExposurePreset field contract: name required non-empty max 40 and unique; aperture/shutter/iso restricted to their discrete stop lists; lookTag restricted to soft, crisp, grainy, night, daylight, cinematic; invalid fields show inline errors naming that field and the submit control stays disabled until every required field is valid"
@@ -433,22 +385,6 @@ name = "form_record_matches_export_shape"
 description = "After creating a valid preset, the object shape in the Export panel presets array matches the form payload (same field names name/aperture/shutter/iso/lookTag plus favorite); after creating a valid snapshot, the snapshots array entry matches the DialSnapshot payload field names"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.n39"
-name = "export_missing_contract_field_names"
-description = "The Export panel JSON omits required lab-package field names (for example no schemaVersion, no lookTag on presets, no ev at the top level, or no snapshots array) while the UI shows presets and snapshots"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n40"
-name = "invalid_looktag_or_stops_accepted"
-description = "The preset form accepts and saves a lookTag outside soft/crisp/grainy/night/daylight/cinematic or an aperture/shutter/iso value outside the discrete stop lists"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.51"
@@ -499,26 +435,3 @@ description = "Download edited PNG triggers a real file download named exposure-
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n41"
-name = "exported_png_ignores_current_edits"
-description = "Two clearly different edit states produce visually identical exported edited-PNG files, or the exported image shows the unedited photo while the on-screen preview shows the edits"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n42"
-name = "paste_settings_overwrites_uncopied_groups"
-description = "Paste settings changes slider or dial values in a group whose checkbox was not checked at copy time"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core functionality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

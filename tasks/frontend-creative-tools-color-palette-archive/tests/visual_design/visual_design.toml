@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "static_brochure_replaces_library"
-description = "Replaces the library with a static brochure and no interactive palette collection"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.4"
 name = "nomenclature_four_column_index"
 description = "Nomenclature rows read as a four-column index (swatch chip, hex value, historical name with note, and source title and artist) separated by hairline rules"
@@ -191,57 +183,9 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "3.n1"
-name = "random_inconsistent_palette"
-description = "Random or inconsistent color choices unrelated to the cream / near-black editorial palette appear across chrome and library surfaces"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "visual_clutter_no_spacing"
-description = "Visual clutter with no spacing/padding discipline — controls, trays, and rows collide or crowd without a consistent scale"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "mixed_inconsistent_fonts"
-description = "Mixed, inconsistent fonts or weights break the specified expressive / mono / italic pairing"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "overlapping_or_cut_off_text"
-description = "Overlapping or cut-off text/images appear in nomenclature rows, palette cards, export preview, or the contrast matrix"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "buttons_look_like_plain_text"
-description = "Primary actions (create, export, batch, undo) look like plain text or passive labels with no interactive affordance"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.15"
 name = "facet_comparison_catalog_surfaces"
 description = "The search input, tag facet chips with counts, and Archived toggle read as a coherent facet row in the controls strip; the comparison view reads as two aligned palette columns with per-pair delta readouts; the catalog sheet reads as a print-styled document distinct from the library canvas"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, viewport, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

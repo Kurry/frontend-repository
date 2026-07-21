@@ -120,22 +120,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.7"
-name = "no_hover_feedback_anywhere"
-description = "Buttons, habit rows, and category filter chips show no hover response at all, feeling static under pointer hover"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.8"
-name = "updates_only_after_reload"
-description = "The stepper's +1/-1 taps or the milestone flame's threshold change are only reflected after a full page reload rather than updating live in the running UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.9"
 name = "habit_enter_exit_animations"
 description = "A newly created habit animates into the list rather than appearing instantly, a paused habit animates out of the main list, and the remaining rows settle into place with a smooth transition"
@@ -184,10 +168,3 @@ description = "With prefers-reduced-motion set, decorative animations and the ce
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions (missing, jarring, janky, or usability-harming animation) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

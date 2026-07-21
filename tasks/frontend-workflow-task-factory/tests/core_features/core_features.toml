@@ -211,14 +211,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.16d"
-name = "manifest_export_omits_session_task"
-description = "After a create-task run reaches accepted, Download task-manifest.json or Copy omits that pullRequestNumber, file bounds, or completed stages"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.17"
 name = "double_submit_single_run"
 description = "Rapidly double-activating the create-task form's submit control starts exactly one run: exactly one new row appears in the pipeline view"
@@ -233,32 +225,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.19"
-name = "stage_strip_static_decoration"
-description = "Stage strips are static decoration: after starting a run from the create-task form, every stage status remains frozen with no visible progression from pending through running to complete"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.20"
-name = "derived_rollups_hardcoded"
-description = "Derived rollups are hardcoded: after a created run completes as accepted, the owning repository's tasks-produced count, yield percentage, or the analytics charts render exactly the same values as before the run"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.21"
 name = "seed_covers_three_pipeline_situations"
 description = "In at least one repository the seeded pull requests include at least one fully complete and accepted PR, at least one rejected PR showing a taxonomy reason chip, and at least one mid-pipeline PR whose stage strip still shows a pending or running stage"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

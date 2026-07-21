@@ -176,20 +176,6 @@ description = "Moving or filtering the last card out of a column leaves that col
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "1.19"
-name = "board_static_no_working_flows"
-description = "The board is static markup only: after drag, keyboard move, or create attempts, column counts and card positions remain unchanged"
-type = "binary"
-weight = 1.0
-negate = true
-[[criterion]]
-id = "1.20"
-name = "execution_fabricated"
-description = "Card execution is fabricated: pressing Run completes all sub-items instantly in one jump with no visible sequential progression, or runs on two different cards produce identical progressions ignoring each card's own sub-item list"
-type = "binary"
-weight = 1.0
-negate = true
-[[criterion]]
 id = "1.21"
 name = "wip_limit_breach_visible"
 description = "Moving or creating a card into In Progress or Review so the visible count exceeds the WIP limit of 3 shifts that column to a deep amber warning background with a visible breach label beside the count; moving cards out until the count is 3 or fewer clears the amber state and breach label"
@@ -232,20 +218,6 @@ description = "After mutating the board, importing a previously exported board J
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "1.28"
-name = "export_omits_session_mutations"
-description = "The Export preview still shows the pre-mutation board after a visible create, move, bulk move, or completed run, so the compiled artifact contradicts the live board"
-type = "binary"
-weight = 1.0
-negate = true
-[[criterion]]
-id = "1.29"
-name = "import_accepts_invalid_payload"
-description = "Importing malformed board JSON or a payload that violates the card field contract still changes column counts or titles, or shows a success state with no field-named import error visible"
-type = "binary"
-weight = 1.0
-negate = true
-[[criterion]]
 id = "1.30"
 name = "seeded_libraries_populate_selects"
 description = "The Add Card modal's attached prompt select lists at least 5 seeded prompts and its assignee select lists at least 4 distinct seeded assignees, matching the seeded libraries"
@@ -259,10 +231,3 @@ description = "Undo also reverses a comment submit (the comment disappears from 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

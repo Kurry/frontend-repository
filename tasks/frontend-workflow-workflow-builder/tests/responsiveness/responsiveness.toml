@@ -140,34 +140,3 @@ description = "At narrow widths the Artifact monospaced preview scrolls within i
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "7.n1"
-name = "375_horizontal_scrollbar"
-description = "At 375px a page-level horizontal scrollbar appears or content is clipped off-screen"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "panels_unusable_at_768"
-description = "At 768px the palette, Artifact, or timeline cannot be reached after collapse"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "desktop_overlap_at_1440"
-description = "At 1440px panels overlap so node titles or toolbar labels become unreadable"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable responsiveness defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

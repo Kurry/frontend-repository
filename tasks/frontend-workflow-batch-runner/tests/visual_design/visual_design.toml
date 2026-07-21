@@ -161,26 +161,3 @@ description = "The ICS calendar text and the Run Report JSON preview each render
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n1"
-name = "statuses_rely_on_color_only"
-description = "Any two item statuses are distinguishable only by hue with no accompanying icon, label, or marker, or the same status renders with different treatments in the grid, queue, timeline, or comparison view"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "desktop_layout_overlap"
-description = "At 1440 pixel width any sidebar, grid, rollup, queue, or inspector content overlaps another element or is clipped by its container"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "visual_design.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

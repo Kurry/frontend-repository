@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "A primary review flow — re-running a gate, resolving a fix item, recording a recommendation, marking steps done, or bundling — is not reachable from the visible UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "rerun_duplicates_or_misses_events"
-description = "A single re-run produces duplicated step sequences or timeline entries, or completes with no published result reaching the gate card"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across displays: the workspace and the portfolio disagree about a bundle's hero state, gate chips, progress, or Bundled badge"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "step_switch_loses_selection_or_notes"
-description = "Switching between reviewer steps or between bundles loses the current selection, entered notes, or recorded recommendation"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "lock_bypass_possible"
-description = "A locked step's content or done control can be operated before its prerequisite steps are done, or Complete bundling activates without the Verdict step done and a recommendation recorded"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered views disagree with each other about what is visible — the rollup counts, the filtered table, and the filter chips contradict one another"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "Collapsed or overlaid chrome (the mobile stepper, an expanded reasons list, a collapsed pane) cannot be re-opened once closed"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "An overlay (override form, diff picker, confirmation) blocks navigation with no exit option"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A blocked or failed flow — an invalid override submission, a disabled recommendation activation, a locked step interaction — gives no visible feedback about why"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Some navigation state (deep in the inspector, diff mode, or a locked step) dead-ends and requires a page reload to recover"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "6.11"
 name = "mutation_to_export_flow"
 description = "Mutation-to-export: after recording a recommendation with a distinctive overrideJustification, resolving a fix item, writing a distinctive step note, and completing bundling, Export certification package Review Package JSON shows schemaVersion review-certification/v1 and those session values under the bundle, with Copy and Download available"
@@ -256,18 +175,3 @@ description = "Export then import round-trip: after session mutations, Copy or D
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n11"
-name = "export_import_flow_dead_end"
-description = "Export or Import certification package cannot be completed from the UI, or a successful-looking import leaves portfolio and workspace disagreeing with the imported document"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "A critical end-to-end flow fails in a way that is NOT covered by any other criterion in this file. If present, name the flow and cite the concrete evidence (action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

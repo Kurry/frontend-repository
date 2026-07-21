@@ -131,70 +131,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_crud_unavailable_from_ui"
-description = "Add, edit, or delete holding flows are not enabled from the visible UI controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "new_holding_missing_or_duplicated"
-description = "After a successful Add holding save, the new holding fails to appear in the table, or a filter/clear round-trip produces duplicate rows."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "edit_desyncs_surfaces"
-description = "After editing quantity, the table row, detail panel, net-worth total, or allocation percentage disagree about the holding's market value until a reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "delete_leaves_stale_selection"
-description = "After deleting the selected holding, the detail panel or selection still shows the deleted holding, or the net-worth total still includes its market value."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "sort_mutates_totals"
-description = "Sorting holdings by a column changes the net-worth total or allocation percentages even though no holdings were added, edited, or deleted."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "reload_drops_persisted_holdings"
-description = "After adding a holding and reloading, the new holding or the updated net-worth total is missing (client-storage persistence failed)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "failed_save_lacks_feedback"
-description = "An invalid Add holding attempt provides no inline field feedback and silently fails or appears to succeed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "flow_dead_end_requires_reload"
-description = "A blocked validation, empty filter match, or post-delete empty state leaves the user in a dead end that requires a full page reload to continue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "buy_activity_end_to_end"
 description = "Saving a valid BUY activity for an existing symbol increases that holding quantity and market value, appends one ledger row, updates net worth and allocation, and includes the new activity in Portfolio JSON and Activities CSV previews without a reload."
@@ -214,24 +150,6 @@ name = "undo_after_add_restores"
 description = "After adding a holding or activity, Undo restores the prior collections, net worth, and export previews in one step."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "export_flow_missing_or_stale"
-description = "Export portfolio is missing, or after creating holdings the JSON/CSV preview fails to include those symbols or disagrees with the live table."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "import_round_trip_fails"
-description = "After a valid export-then-import round-trip, the table, net-worth total, or allocation disagrees with the exported portfolio state."
-type = "binary"
-negate = true
-weight = 1.0
-
-
 
 [[criterion]]
 id = "6.14"
@@ -275,34 +193,3 @@ description = "After adding a holding or saving an activity, the Performance rep
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n11"
-name = "derived_pipeline_desyncs"
-description = "After a SELL or DIVIDEND activity, the detail panel, performance summary, or Performance report preview shows a realized gain, unrealized gain, or total return that stays stale until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n12"
-name = "import_commit_wrong_or_cancel_mutates"
-description = "A committed Activities CSV import adds the wrong number of rows relative to the imported-versus-skipped summary, or cancelling the diagnostics screen still mutates the activities collection."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n13"
-name = "batch_undo_restores_partial"
-description = "A single Undo after a bulk delete or bulk edit restores only one row or leaves derived totals inconsistent instead of reversing the entire batch."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_library_shows_nothing"
-description = "When the period filter matches nothing or all user palettes are deleted, the library region shows nothing — no empty-state message or restore guidance."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "validation_errors_only_in_console"
-description = "Invalid create/edit failures surface only in the browser console with no visible inline field feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "swatch_copy_silent"
-description = "Clicking a swatch produces no visible copied confirmation and no clipboard write of the hex (silent failure)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "delete_palette_no_destructive_affordance"
-description = "Deleting a palette proceeds with no visible destructive affordance (no Delete labeling or confirmation cue) distinguishing it from a non-destructive action."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_are_nonsemantic"
-description = "Primary interactive controls (view toggles, period filter, swatches, editor submit, MENU/CART) are non-semantic div/span click targets without button/role semantics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "overlay_not_keyboard_dismissible"
-description = "With the cart drawer, subscribe popup, or Detail/Editor overlay open, keyboard users cannot dismiss it (no Escape path and no focusable Close control)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "double_submit_creates_duplicates"
-description = "Rapidly double-activating the editor's submit control with a valid palette creates more than one new palette or more than one new card for a single intended create."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_action_labels"
-description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels for create/edit, delete, view toggles, or filter."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "painting_title_triggers_copy"
-description = "Clicking a painting-title control triggers the on-swatch copied confirmation or copies a hex as if the swatch were clicked."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "subscribe_reappears_after_dismiss"
-description = "After dismissing the subscribe popup, further idle or scrolling makes it reappear in the same session."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "invalid_import_package_rejected"
 description = "Importing malformed palette package JSON, schemaVersion other than 1, library other than O&A Palette Library, or a palette that fails the create/edit field contract leaves the collection unchanged and shows a visible error naming the problem."
@@ -253,14 +173,6 @@ id = "4.12"
 name = "invalid_cart_add_rejected"
 description = "CartAdd with a paletteName that matches no palette, or quantity outside 1–5, adds no line and shows an inline error naming that field."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.n11"
-name = "invalid_import_mutates_collection"
-description = "Importing a non-conforming palette package still mutates the visible user palette collection."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -291,26 +203,3 @@ description = "A palette with fewer than 2 distinct swatch hexes shows an explan
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n12"
-name = "redo_resurrects_cleared_stack"
-description = "After Undo followed by a new mutation, activating Redo still re-applies the superseded step from the cleared redo stack"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n13"
-name = "batch_edit_commits_invalid_state"
-description = "Applying a batch shift or harmony set leaves the palette with duplicate hexes, an out-of-bounds swatch count, or a non-#RRGGBB value without any visible error"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

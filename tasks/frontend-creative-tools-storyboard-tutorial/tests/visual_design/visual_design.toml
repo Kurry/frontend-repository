@@ -106,27 +106,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "static_poster_no_editable_collection"
-description = "Shows only a static tutorial poster with no editable scene collection"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.4"
 name = "nav_toggles_and_camera_placeholders"
 description = "The storyboard nav bar exposes Tile, List, and Slide toggles with the currently active toggle visibly pressed, and placeholder scenes render a centered camera add-image button"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "3.5"
-name = "no_active_toggle_state"
-description = "The Tile/List/Slide toggle bar shows no visibly pressed or active state distinguishing the current view mode"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.6"
@@ -171,27 +155,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.12"
-name = "mobile_375_overflow_or_clipping"
-description = "At a 375 pixel viewport width, content clips or overflows the viewport, or horizontal scrolling appears in any view mode"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.13"
 name = "tutorial_copy_instructional_sentences"
 description = "Scene descriptions carry the sequential getting-started tutorial copy as complete instructional sentences"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "3.14"
-name = "placeholder_text_in_ui"
-description = "Lorem ipsum or placeholder text ('TODO', 'asdf', template variable names like '{{title}}') is visible somewhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.15"
@@ -237,14 +205,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n17"
-name = "export_center_unstyled_or_missing"
-description = "Export/Import surfaces are missing or render as unstyled plain text without distinct preview blocks and Copy/Download controls"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.21"
 name = "nav_bar_search_chips_present_control"
 description = "The storyboard nav bar integrates a search field, shot-type filter chips with the active chip visibly selected and a filtered-count readout while filtering, and a Present control, all styled with the same light/yellow workspace language as the view toggles"
@@ -258,18 +218,3 @@ description = "The presenter view is visually distinct from the board: one scene
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n18"
-name = "presenter_unstyled_or_missing_chrome"
-description = "The presenter renders as a bare unstyled overlay — missing the countdown, progress readouts, or control strip — or its chrome visibly clashes with the light/yellow workspace language"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

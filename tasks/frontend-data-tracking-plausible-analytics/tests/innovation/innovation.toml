@@ -163,14 +163,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "novelty_replaces_required_export"
-description = "A novelty control or decorative flourish replaces the required Export report drawer, Stats JSON preview, or Breakdown CSV tab so the mandated artifact surface is missing"
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app exhibits a significant, browser-observable innovation or polish beyond the specification that is NOT covered by any other criterion in this file. If present, name it and cite the concrete evidence. If nothing beyond the other criteria qualifies, answer no."

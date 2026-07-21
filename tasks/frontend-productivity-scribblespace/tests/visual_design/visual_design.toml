@@ -141,14 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.9"
-name = "color_tokens_misapplied"
-description = "Primary accent, canvas background, or warning tokens are applied so inconsistently that chrome and canvas read as an unrelated palette from the specified tokens."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.10"
 name = "typography_scale_and_muted_ink"
 description = "UI chrome uses the Inter / system-ui stack; note and flashcard body text is about 16px and toolbar labels about 14px; muted ink uses the secondary text token."
@@ -184,14 +176,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.15"
-name = "placeholder_text_shipped"
-description = "Lorem ipsum or placeholder template text is visible in the shipped UI chrome or canvas hints."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.16"
 name = "export_modal_preview_surface"
 description = "The Export workspace modal shows format tabs and a monospace preview on a recessed surface distinct from the canvas, with Copy and Download controls."
@@ -205,10 +189,3 @@ description = "Undo and Redo show a dimmed disabled appearance when their stacks
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

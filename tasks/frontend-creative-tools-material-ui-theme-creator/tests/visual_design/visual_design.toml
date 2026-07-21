@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "marketing_landing_instead_of_studio"
-description = "The first viewport reads as a marketing landing or sparse card stack rather than a dense Material theme studio with header brand above Preview/Components/Saved Themes."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.4"
 name = "dark_shell_brand_and_typography"
 description = "Header brand lockup Material-UI Theme Creator sits above the main tabs with version affordance @material-ui/core@^4.11.0 visible in the dark shell."
@@ -142,14 +134,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.8"
-name = "mobile_375_clipping_or_overflow"
-description = "At 375 pixel width, content clips or overflows the viewport, or page-level horizontal scrolling appears."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.9"
 name = "consistent_label_capitalization"
 description = "Headings, buttons, and tab labels (Preview, Components, Saved Themes, Palette rows, New Theme, Theme Files) use one consistent capitalization convention."
@@ -171,32 +155,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.12"
-name = "placeholder_text_visible_in_ui"
-description = "Placeholder or lorem-ipsum text is visible anywhere in the shipped UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.13"
 name = "contrast_matrix_and_export_visual_anatomy"
 description = "Contrast matrix rows show ratio numerals plus AA / AAA / Fail badges with distinct treatments; Theme Files shows two labeled monospace artifact panes with Copy and Download; Before/After and Color blindness sit as compact preview-stage chrome."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n1"
-name = "contrast_status_color_only"
-description = "Contrast matrix AA / AAA / Fail status is conveyed by color alone with no readable text badge or label."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

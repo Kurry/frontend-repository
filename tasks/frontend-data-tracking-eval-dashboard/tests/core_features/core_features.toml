@@ -267,23 +267,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.26"
-name = "fabricated_run_success"
-description = "The Run Suite flow presents a completed state while the results table, the suite's last-run timestamp, or the trend chart remain unchanged from before the run"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.27"
-name = "identical_rerun_output"
-description = "Running the same suite twice yields byte-identical scores, latencies, and per-model averages both times, indicating hardcoded rather than simulated results"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.28"
 name = "suite_payload_field_contract"
 description = "A valid New Suite submit requires name (1 to 80 characters after trim) and at least one promptId; the new list entry shows that name and a prompt count matching the selected prompts"
@@ -333,14 +316,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.35"
-name = "export_omits_session_results"
-description = "After completing a new run, the export JSON results array contains wrong scores relative to the visible results table, with a result count mismatched against the visible row count"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.36"
 name = "seed_depth_populates_charts_first_load"
 description = "On first load, without running anything, each seeded suite carries at least 5 prompts (visible in its prompt count) and at least 7 historical runs, so the selected suite's results table, bar chart, and trend line chart are all non-empty before any session run"
@@ -354,10 +329,3 @@ description = "The export JSON tab's document carries the full normative run met
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

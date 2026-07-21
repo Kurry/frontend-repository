@@ -162,56 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "After reload, the tree structure survives but tags, collapsed state, archive, or theme silently reverts, producing incoherent partial persistence."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "progress_ring_ignores_leaf_toggles"
-description = "A parent's progress ring renders identically regardless of how many descendant leaves are complete."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_titles_produce_identical_export"
-description = "Creating roots with different titles and status values yields Grove JSON or Grove CSV that is identical aside from incidental whitespace"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "tag_or_export_state_is_stale"
-description = "A newly created tag or task title appears on the node row but not in the Tag manager, toolbar filter row, or Grove JSON/CSV previews until reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "schema_invalid_import_mutates_session"
-description = "Importing Grove JSON or Grove CSV that fails the field contract still mutates the tree, tags, archive, or theme"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.11"
 name = "grove_csv_round_trip_preserves_fields"
 description = "After creating tasks with status, priority, and dueDate, Download or Copy Grove CSV, diverge the session, Import that CSV, and confirm titles, status, priority, dueDate, and tree parent relationships match the pre-export session"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

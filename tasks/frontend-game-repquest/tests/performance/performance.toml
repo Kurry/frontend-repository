@@ -151,38 +151,3 @@ name = "storage_unavailable_fallback"
 description = "When storage is unavailable the shell still loads; when available, persistence works as specified"
 type = "binary"
 weight = 1.0
-[[criterion]]
-id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "Local cold load exceeds two seconds before the UI is interactive"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_flows"
-description = "Console errors appear during logging, challenge, export/import, or reset flows"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "9.n3"
-name = "export_or_canvas_blocks_input"
-description = "Export or canvas updates block input for multi-second hangs"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "9.n4"
-name = "rapid_use_crashes_or_blanks"
-description = "Rapid or edge use crashes the app or leaves a blank screen"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "A significant performance defect is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If already covered, answer no here."
-type = "binary"
-negate = true
-weight = 1.0

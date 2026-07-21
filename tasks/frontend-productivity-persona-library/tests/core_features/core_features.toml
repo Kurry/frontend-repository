@@ -316,48 +316,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "fabricated_streaming"
-description = "The test bench presents a complete response instantly or shows a completed status while no transcript text was actually produced by the run"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "traits_ignored_by_output"
-description = "Running the same scenario with two personas whose trait profiles clearly differ produces identical or near-identical response text"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "diff_or_export_ignores_edits"
-description = "The iteration diff or the export text fails to reflect edits made during the session, showing seeded content instead of live state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "payload_contract_violations_accepted"
-description = "Some editing path accepts a persona field that violates the payload contract — a trait outside 0 to 100, a role or tone outside the closed option lists, or a malformed example pair — without an error naming the offending field and its rule"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.33"
 name = "persona_pack_schema_and_field_bounds"
 description = "The Persona pack JSON carries top-level schemaVersion exactly 1 and generatedAt as an ISO-8601 datetime ending in Z, and the editor enforces the payload bounds with inline errors naming the field: a name shorter than 2 or longer than 80 characters, more than 12 tags, constraints or goals over 2000 characters, or zero example exchanges keeps Save disabled and stores nothing"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "core_features.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

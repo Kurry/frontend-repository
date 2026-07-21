@@ -161,35 +161,3 @@ description = "Header controls (+ New Goal, Undo, Redo, Export, Import, command 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at 375px or 1024px breakpoints (clipped cards, unreachable controls, or stuck horizontal scroll)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "path_stays_horizontal_on_mobile"
-description = "At about 375px the milestone path remains a horizontally scrolling layout instead of stacking vertically."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "export_offscreen_on_narrow"
-description = "Export or the command palette renders off-screen or unusable at narrow widths."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable responsiveness defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0
-

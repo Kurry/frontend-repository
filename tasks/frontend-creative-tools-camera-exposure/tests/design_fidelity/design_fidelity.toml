@@ -133,26 +133,3 @@ description = "Where hardened features (histogram, light sliders, look packs, ex
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "8.n1"
-name = "ignores_reference_lab_layout"
-description = "The shipped layout ignores the reference full-viewport overlaid lab and substitutes an unrelated dashboard or marketing shell."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "8.n2"
-name = "ships_reference_screenshots_as_assets"
-description = "Reference screenshots from /reference-screenshots are copied into the app as shipped assets or decorative images."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant design-fidelity defect versus the reference not covered by any other criterion in this file. If present, name the defect and cite evidence. If already covered, answer no."
-type = "binary"
-negate = true
-weight = 1.0

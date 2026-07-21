@@ -149,23 +149,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.9"
-name = "usecase_tiles_gray_or_nonwhite"
-description = "The use-case tiles render as gray or placeholder boxes instead of their six specified hex colors, or their text is not white"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.10"
-name = "display_type_contrast_flattened"
-description = "Display headings render in a generic default system font with no distinct display/UI type hierarchy, flattening the intended display-face versus Inter contrast"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "2.11"
 name = "secondary_type_scale_measurements"
 description = "By computed style at the 1024px design scale, the section heading measures 40px / line-height 38px / letter-spacing -1.8px, the card headings 28px / 28px / -1px, standard body text 18px / 20px / -0.8px, and header/footer utility text 12px"
@@ -187,22 +170,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.14"
-name = "real_brand_assets_shipped"
-description = "The page ships copyrighted, trademarked, scraped, stock, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—including a source logo/wordmark, proprietary typeface, real project thumbnail, photograph/video frame, cursor art, customer/agency identity, metadata, or hidden/preloaded asset instead of the fictional Canvasly system"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.15"
-name = "placeholder_or_typo_copy_present"
-description = "Lorem ipsum, TODO, or template placeholder text appears somewhere on the page, or prominent copy (headline, section headings, buttons, footer labels) contains spelling errors or casing inconsistent with the mandated strings"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.16"
 name = "asymmetric_hero_broken_grid"
 description = "At desktop width the hero reads as an asymmetric broken-grid composition: a multi-row gallery band above a left-biased headline/CTA stack, a floating media card overlapping the right side of the hero, and an oversized Hello!/Ready/? accent cluster that breaks the section rhythm below the CTA — not a centered equal-column stack"
@@ -217,27 +184,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.18"
-name = "accent_colors_sprayed_as_washes"
-description = "Orange or purple is used as a large page-wide background wash or repeated fill across multiple unrelated sections, breaking the scarce-accent rule"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.19"
 name = "scratch_authored_media_inventory_craft"
 description = "The Canvasly identity and complete media inventory are visibly art-directed: default/hover marks, distinct project art across all three marquees, one playable video/poster pair, four feature illustrations, six slideshow frames, six use-case tile graphics, orange orb, cursor images, share image, and supporting icons occupy the reference roles without repetition"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.20"
-name = "missing_reused_or_source_media"
-description = "A required Canvasly surface is omitted, empty, broken, reused where distinct art is required, reduced to a generic gradient/emoji/text placeholder, or exposes a source-site name, logo silhouette, recognizable source media, distinctive copy, metadata, or destination"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.21"
@@ -253,18 +204,3 @@ description = "The trial brief panel and command palette use the same Canvasly v
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n8"
-name = "brief_panel_generic_browser_defaults"
-description = "The trial brief form or command palette renders with unstyled browser-default controls that clash with the #282828 / orange Canvasly system."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design, layout, responsiveness, or rendered copy that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

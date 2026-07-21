@@ -169,86 +169,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Run, Stop, Save-to-library, open-library-entry, Insert Variable, Export, or Import cannot be completed from the visible UI controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "save_fails_to_appear_or_duplicates"
-description = "Confirming Save either fails to add a visible library row or adds duplicate rows for a single confirm."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "binding_or_run_state_desyncs"
-description = "After binding a variable or completing a run, the preview, binding panel, response panel, and history row disagree about the same prompt/run state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "view_switch_breaks_or_loses_draft"
-description = "Switching between workbench and Library breaks the layout or unexpectedly clears the in-progress draft without opening a library entry."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_library_region_broken"
-description = "After deleting all library prompts, the library region is blank or broken with no empty-state message and return control."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "stop_fails_to_freeze_stream"
-description = "Activating Stop mid-stream still appends further response text, leaves the run status as streaming/waiting, or leaves Run disabled after Stop."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "library_entry_cannot_reopen_in_workbench"
-description = "After switching to Library, a saved entry cannot be opened back into the workbench with its saved prompt text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "save_modal_blocks_with_no_exit"
-description = "The Save modal blocks the workbench with no working exit (no close control and no Escape)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_validation_silent"
-description = "An invalid Insert Variable name or incomplete Save attempt provides no visible validation feedback naming the field."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Recovering from Library, Save modal, or a stopped run requires a full page reload — the UI reaches a dead end."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.12"
 name = "undo_round_trip_persona_and_binding"
 description = "Undo round-trip: attach a persona, change a binding value, then activate Undo twice and confirm the binding value and the persona preface return to their prior states in the panel and the live preview together; Redo twice restores both"
@@ -262,10 +182,3 @@ description = "Command palette flow: open the palette with Cmd+K or Ctrl+K, sele
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

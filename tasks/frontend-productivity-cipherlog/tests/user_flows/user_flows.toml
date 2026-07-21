@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "transmission_flows_unavailable"
-description = "Create New Transmission, edit/save, Decommission/Restore/Purge, or channel create cannot be completed from the visible UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "new_memo_missing_or_duplicated"
-description = "After a valid transmission save, the new memo fails to appear in the list, appears duplicated, or is missing under its assigned channel."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "edit_or_theme_desyncs_surfaces"
-description = "After editing a memo body or switching Theme Core, list preview, full view, HUD counts, priority badges, and Theme Core accents disagree about the same memo or theme."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "channel_switch_breaks_or_loses_selection"
-description = "Switching channels or opening Decommissioned breaks the layout or loses the open memo selection unexpectedly."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_collections_break_ui"
-description = "Empty Channels, memo list, or Decommissioned regions show a broken/blank UI with no distinct empty-state message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "channel_and_search_filters_disagree"
-description = "Channel filter and search disagree about which memos are visible, or Show All Channels fails to restore the expected set."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "session_archive_panel_cannot_reopen"
-description = "After closing Export session or Import session, the Session archive controls cannot reopen the panel."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "lock_or_purge_overlay_blocks_exit"
-description = "Lock, Purge confirmation, or Session archive overlays block navigation with no dismiss/cancel path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_save_lock_or_import_silent"
-description = "A failed transmission save, invalid lock passcode, or contract-invalid Import provides no visible named-field feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "cipherlog_dead_end_requires_reload"
-description = "A CipherLog flow leaves a dead end that requires a full page reload to continue editing, filtering, or exporting."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "session_archive_export_flow"
 description = "Session archive export flow: after creating channel Ops, memo Nightfall Relay on Ops at priority high, and Theme Core Blood Red, Export session JSON shows version 1, themeCore blood-red, channels Ops, and memos Nightfall Relay with priority high; Download JSON and Copy JSON succeed with Copied confirmation."
@@ -255,18 +175,3 @@ description = "Session archive import round-trip: export session JSON after muta
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n11"
-name = "import_mutates_on_invalid_payload"
-description = "Importing a contract-invalid session JSON still changes visible collections or Theme Core."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

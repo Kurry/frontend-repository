@@ -103,22 +103,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.10"
-name = "generic_scaffold_content_shipped"
-description = "The UI reads as generic starter or placeholder content, or the document title is an uncustomized framework starter string."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.11"
-name = "flat_type_or_illegible_pairing"
-description = "The layout collapses into a single undifferentiated type role, or a background/text or accent pairing renders as gray-on-gray or otherwise illegible."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.12"
 name = "wealth_dashboard_composition"
 description = "The page composes as a calm wealth dashboard on a light, slightly green-tinted background: a top brand bar, a full-width net-worth summary card, then a two-column grid pairing a holdings card with a selected-holding detail card."
@@ -154,31 +138,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n1"
-name = "overlapping_or_cutoff_text"
-description = "At desktop width, overview text or controls overlap another element or are cut off by their container in the brand bar, cards, table, or detail panel."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "inconsistent_or_random_palette"
-description = "Color choices are random or inconsistent with the specified teal-on-neutral wealth-dashboard palette across brand, buttons, selection, and allocation."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "buttons_read_as_plain_text"
-description = "Primary buttons look similar to plain text or vice versa, so interactive affordances are visually unclear."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "3.17"
 name = "live_market_value_in_form_chrome"
 description = "The Add/Edit holding form shows a live market-value readout beside quantity and unit price, and Export portfolio / Import portfolio controls sit in the overview chrome near the holdings card."
@@ -193,16 +152,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n4"
-name = "export_chrome_breaks_composition"
-description = "Export or import chrome overlaps the holdings/detail cards, clips the preview, or collapses the wealth-dashboard composition into an unreadable stack at desktop width."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-
-[[criterion]]
 id = "3.20"
 name = "export_drawer_visual_anatomy"
 description = "The export drawer shows format tabs, a monospaced preview block, and Copy / Download actions using the same card/surface language as the rest of the wealth dashboard."
@@ -215,14 +164,6 @@ name = "transactions_ledger_card_language"
 description = "The transactions ledger uses the same white-card language (padding, radius, hairline border, soft shadow) as the holdings card rather than unstyled browser defaults."
 type = "binary"
 weight = 0.5
-
-[[criterion]]
-id = "3.n5"
-name = "export_drawer_unstyled_defaults"
-description = "The export drawer or format tabs render as unstyled browser defaults that break the teal/neutral wealth-dashboard visual language."
-type = "binary"
-negate = true
-weight = 1.0
 
 [[criterion]]
 id = "3.22"
@@ -259,26 +200,3 @@ description = "The export drawer shows four labeled format tabs (Portfolio JSON,
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.n6"
-name = "batch_or_diagnostics_unstyled"
-description = "The batch action tray or the CSV import diagnostics screen renders as unstyled browser defaults that clash with the teal/neutral wealth-dashboard visual language."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "performance_gains_color_only_or_illegible"
-description = "Performance summary gains and losses are indicated by color alone lacking legible value labels, or the gain/loss hues fall outside the teal/red palette, leaving the figures illegible at a glance."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

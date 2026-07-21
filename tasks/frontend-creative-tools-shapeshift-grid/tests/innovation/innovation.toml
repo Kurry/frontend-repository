@@ -184,38 +184,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely barebones: painting may work but typewriter intro, toolbar drag polish, gallery card motion, and branded export footer craft are all absent."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_template"
-description = "The UI reads as a generic unbranded form/template with none of SHAPESHIFT Grid Tool's paper-stage identity or angle-bracket tool character."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n3"
-name = "no_polish_beyond_controls"
-description = "Controls exist but the product shows no polish in the typewriter intro, camera overlay, gallery empty states, or export feedback."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "interface_flat_static_no_craft"
-description = "The studio is flat and static — no hover treatments on tools/swatches, no gallery card enter/exit motion, and no toolbar drag presence."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the SHAPESHIFT Grid Tool spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

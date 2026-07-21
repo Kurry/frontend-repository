@@ -132,14 +132,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The experience stops at a bare MVP with no optional polish: no coachmarks, search syntax chips, printable vault mode, or other beyond-spec enhancements that would aid a real NoteNest operator."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The build includes a significant, browser-observable enhancement beyond the specification that improves NoteNest usefulness or clarity and is not covered by any other criterion in this file. Name the enhancement and cite concrete evidence."

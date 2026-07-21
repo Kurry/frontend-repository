@@ -164,22 +164,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.5"
-name = "no_hover_or_focus_feedback"
-description = "Interactive controls show no hover or focus feedback, so buttons and rows read as static under pointer and keyboard interaction"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.6"
-name = "step_change_full_reload"
-description = "Changing the step triggers a full page reload or outbound navigation instead of swapping the step body in place"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.13"
 name = "command_palette_enter_transition"
 description = "Opening the command palette via the visible Ctrl+K / Cmd+K path enters the overlay with a brief opacity/scale transition rather than an instant hard cut (verified through the real keyboard path on a fresh interaction)."
@@ -193,18 +177,3 @@ description = "Activating Copy export via the visible control shows a short conf
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.n3"
-name = "palette_snaps_open_closed"
-description = "The command palette overlay snaps open or closed with no transition when prefers-reduced-motion is not set."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

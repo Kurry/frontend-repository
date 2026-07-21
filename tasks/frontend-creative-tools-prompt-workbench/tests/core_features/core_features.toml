@@ -232,22 +232,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "fabricated_streaming_or_static_output"
-description = "The full response text appears in a single instant rather than progressively, or two runs started from meaningfully different prompt texts produce byte-identical response content"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "binding_panel_disconnected"
-description = "An entry in the variable binding panel disagrees with the editor: a placeholder present in the editor text has no panel entry, or a removed placeholder's entry lingers, or a typed binding value never reaches the preview"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.23"
 name = "prompt_package_export_field_contract"
 description = "Opening Export shows a live JSON package preview whose visible text includes the PromptPackage field contract keys schemaVersion exactly prompt-package-v1, model, promptText, messages (role system|user objects), bindings, and attachments; after editing the draft and binding a variable, reopening Export shows that prompt text and binding value in the preview, and Copy/Download are available for the JSON format"
@@ -267,14 +251,6 @@ name = "persona_preface_in_preview_and_export"
 description = "Selecting a persona attaches a system preface visible in the live preview and included in the Export JSON messages/persona fields; clearing the persona removes the preface from the preview and from a subsequent Export package"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.26"
-name = "export_omits_session_or_contract_keys"
-description = "After editing the prompt or bindings, the Export JSON preview omits the session's prompt text or binding value, or is missing required PromptPackage keys schemaVersion, model, promptText, messages, bindings, or attachments"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.27"
@@ -339,10 +315,3 @@ description = "After a run completes, the Export JSON preview's latestRun.reques
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

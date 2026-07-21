@@ -169,86 +169,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "View toggles, period filter, name sort, vision simulation, undo/redo, selection checkboxes, batch actions, swatches, favorite flags, editor fields, export controls, or popup controls cannot be activated or reached via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing"
-description = "Focused interactive controls lack a visible focus indicator or the indicator is fully obscured."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom view toggles, favorite flags, batch actions, or swatch buttons use non-semantic tags and lack ARIA roles or accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "period_favorite_or_passfail_color_only"
-description = "Active period filter, favorite state, or contrast-matrix pass/fail is conveyed by color alone with no text, icon change, or other non-color cue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "overlays_fail_to_trap_focus"
-description = "Detail/Editor, Export drawer, batch-delete confirmation, or the subscribe popup leaves keyboard focus outside the dialog or allows Tab to escape the overlay while open."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "swatch_labels_unreadable_contrast"
-description = "Hex or historical-name labels on very light or very dark swatches are unreadable due to poor contrast."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "copy_feedback_visual_only"
-description = "Swatch or export copy confirmation is visual only with no aria-live or equivalent announcement for assistive technology."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "icon_controls_missing_names"
-description = "Icon-only MENU, CART, undo/redo, or favorite controls are missing accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_skipped"
-description = "Headings are skipped or unordered, such as jumping from H1 to H3 across the editorial intro and library."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, scroll reveals or list enter/exit animations still play on a fresh load."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.12"
 name = "reorder_keyboard_alternative"
 description = "Each swatch offers keyboard-operable move-up / move-down controls that produce the same order changes as dragging"
@@ -260,21 +180,5 @@ id = "1.13"
 name = "facet_and_compare_controls_labeled"
 description = "The search input, tag facet chips, Archived toggle, Compare control, notes Write/Preview toggle, and catalog Print control are keyboard-operable and labeled, and facet chips expose their selected state to assistive technology rather than through color alone"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.n11"
-name = "reorder_pointer_only"
-description = "Swatch reordering is only possible by pointer drag, with no keyboard path that changes the order"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

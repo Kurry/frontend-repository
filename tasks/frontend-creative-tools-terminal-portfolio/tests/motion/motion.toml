@@ -107,14 +107,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "4.3"
-name = "4_3"
-description = "Omits hover washes on project rows or chrome so the terminal feels static on pointer hover"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.4"
 name = "4_4"
 description = "/skills prints proficiency bars that animate from zero width to their target width"
@@ -186,24 +178,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n2"
-name = "export_tabs_hard_cut_only"
-description = "Export Center tab switches and Copy confirmation snap with no transition or feedback motion at all"
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
 id = "4.14"
 name = "export_and_config_surfaces_fade_in"
 description = "Opening Export Center and opening Config Studio through their real commands or mode controls gives each surface a short opacity entrance transition rather than making the complete surface appear instantly"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

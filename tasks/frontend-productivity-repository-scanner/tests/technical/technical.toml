@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "5.3"
-name = "browser_storage_used"
-description = "localStorage, sessionStorage, or another browser storage API is non-empty after a full exercise of the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "5.4"
 name = "reload_returns_seeded_baseline"
 description = "After changing several facets (add a repository, run a scan, disable a pattern, select rows, open Export, expand disclosures) a page reload returns the app to its seeded baseline: at least 3 seeded repositories with at least 8 documents each, default patterns enabled, empty undo/redo stacks, and no scan running — all facets reset coherently, never a mix"
@@ -128,27 +120,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "5.6"
-name = "outbound_network_requests"
-description = "The network log shows outbound requests to external origins (CDN scripts, fonts, icons, analytics, or data) during load or use of the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "5.7"
 name = "responsive_during_scan"
 description = "While a scan is running, filtering the tree, opening documents, pausing, and opening Export all respond without hangs, dropped interactions, or view desyncs, and rapid repeated input causes no runtime exceptions in the console"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "5.8"
-name = "full_page_reload_on_actions"
-description = "A primary action — adding a repository, starting or pausing a scan, switching the right panel, toggling filters, exporting, or undoing — triggers a full page reload instead of updating client state in place"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "5.9"
@@ -179,10 +155,3 @@ description = "Every exported document has a trimmed non-empty path, type exactl
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "5.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

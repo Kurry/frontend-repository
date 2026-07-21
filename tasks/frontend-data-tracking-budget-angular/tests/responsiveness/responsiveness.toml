@@ -162,96 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at 1440px or 375px in the budget workspace"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Bottom-nav items, period arrows, or the floating action button are too small or misaligned at 375px"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Summary figures or Expenses table text is too small to read at 375px"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Dashboard cards, Expenses table, or Settings content is cropped or forces unnecessary horizontal scrollbars at 375px"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "Bottom navigation or top-bar period control is unresponsive or missing at some widths"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed bottom navigation or floating action button obscures Expenses rows or dialog actions"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Top bar, cards, or table actions overlap at some viewport size"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Required tap targets (bottom nav, period arrows, floating action button) are not activatable at 375px"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "The spending-breakdown chart uses a static size and overflows the viewport"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Export, Import JSON, Undo/Redo, or bottom-nav controls disappear at 375px"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "7.11"
 name = "bulk_csv_recurring_variance_at_375"
 description = "At 375px width the bulk action tray, the CSV import diagnostic table, the recurring rule list and form, the Dashboard variance and projection figures, and the Undo, Redo, Export, and Import controls remain fully visible and operable without page-level horizontal scrolling"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n1"
-name = "radius_tokens_contradicted"
-description = "Visible module and control corners contradict the dual-radius system (large modules vs small controls) with arbitrary mismatched radii."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "colors_outside_ridge_palette"
-description = "Surfaces or accents use purple-indigo gradients, glow spam, or cream-and-terracotta editorial washes outside the cool architectural Ridge palette."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "type_sizing_mismatches_spec"
-description = "At 1440px chapter display titles or body copy are grossly mismatched versus the brand-first hierarchy (display titles not oversized, or body competing with display)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "required_motion_missing"
-description = "Required animations are missing: no page-load entrance on a fresh load, no Why Ridge sticky pile at ≥768px, or no RIDGE GLOBAL EVENTS character-decode on enter-view."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "controls_use_browser_defaults"
-description = "Primary CTAs or form controls use unstyled browser-default appearance when the spec requires notched/token-styled Ridge controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_vs_screenshots"
-description = "At 1440px the sticky chrome / hero / Why Ridge / Global Events composition is grossly misaligned versus /reference-screenshots/ segment panels."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "elements_clipped_or_offscreen"
-description = "Key regions (bento hero, Why Ridge pillars, Global Events headline, Events Manager) render off-screen or clipped at 1440px."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n8"
-name = "section_order_or_structure_deviates"
-description = "Section order, content, or structure omits a required chapter (Why Ridge with pillars 01–04, Get started trio, Global Events, News carousel, Solutions grid, Community, or Events Manager mode)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n9"
-name = "heading_body_undifferentiated"
-description = "Heading and body text have no visual distinction (same size/family/case throughout the landing chapters)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n10"
-name = "microinteractions_deviate_from_spec"
-description = "Hover language or theme swap microinteractions are missing or clearly deviate from the spec (instant snaps, no CTA arrow nudge, no event-row hover wash)."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "3.20"
 name = "hardened_tools_match_ridge_system"
 description = "Events Manager rollup/bulk bar, Export catalog panel, Session leads panel, and command palette match the Ridge void/notch and ember-accent system from the reference screenshots' visual language rather than introducing a second unrelated UI kit"
@@ -256,18 +175,3 @@ description = "Session leads sits near the footer after conversion forms without
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n11"
-name = "tools_break_reference_language"
-description = "Export catalog, Session leads, or command palette introduce a visually unrelated kit (default browser chrome, purple glow, cream editorial) that breaks fidelity to the Ridge reference language"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

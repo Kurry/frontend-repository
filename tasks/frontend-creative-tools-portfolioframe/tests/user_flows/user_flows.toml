@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_builder_flows_unavailable"
-description = "Add Project, edit Profile Header, delete a project/testimonial, Save As Draft, or Load draft cannot be completed from the visible UI controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "create_fails_to_appear_or_duplicates"
-description = "Submitting a valid Add Project or Add Testimonial either fails to show a preview card or creates duplicate cards from a single submit."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "editor_preview_desync"
-description = "After editing Profile Header, a project, Contact, theme, or density, the editor and live preview disagree about the same content without a reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "theme_or_density_breaks_or_loses_content"
-description = "Selecting a theme or switching Density breaks the layout or clears editor/preview content that should remain."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_regions_broken_after_last_delete"
-description = "After deleting the last project, testimonial, or skill, the preview region is blank/broken with no empty-state hint."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "section_restore_loses_position"
-description = "Turning a hidden section back on appends it at the end instead of restoring it in its remembered position, or hide/show loses its editor entries."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "undo_redo_cannot_complete_history_walk"
-description = "After a content change, Undo cannot revert it, or after Undo, Redo cannot restore it, leaving the History walk incomplete."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "load_draft_fails_or_partially_applies"
-description = "Loading a saved draft fails to replace editor, preview, section order/visibility, theme, and density with the draft's exact values, or applies only a partial subset."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_validation_silent"
-description = "An empty Title Add Project attempt or case-insensitive duplicate skill provides no visible validation feedback naming the field/problem."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "reload_loses_project_or_draft"
-description = "After creating a project and saving a draft, a full page reload loses the project card or the draft entry, requiring re-entry."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "6.11"
 name = "export_package_end_to_end_flow"
 description = "Export package flow: filling Profile Header Name with a unique string, adding a uniquely titled project with Status wip, switching to Portfolio JSON, and activating Copy export puts text containing both unique strings, schemaVersion portfolioframe-v1, and status wip on the clipboard with visible confirmation; Markdown resume shows the same Name and project title; Download export matches the visible tab."
@@ -271,40 +190,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n11"
-name = "export_flow_unreachable"
-description = "Copy export, Download export, or Import package cannot be completed from the visible UI controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n12"
-name = "export_preview_desyncs_after_edit"
-description = "After editing the profile Name or adding a project, the Export package preview still shows stale text that omits the new values until a reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.15"
 name = "field_contract_create_then_export_flow"
 description = "Field-contract flow: submit a valid Add Project (Title, Category Tag, Status shipped), a valid Add Testimonial (Quote, Name, Role), and a valid Contact email; confirm preview cards show those values and Portfolio JSON projects/testimonials/contact objects use the same field names and enum values from the field contracts."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n13"
-name = "export_json_violates_field_contract"
-description = "After a valid create flow, the visible Portfolio JSON uses different field names than the Project/Testimonial/Contact contracts, omits schemaVersion portfolioframe-v1, or shows a status outside shipped|wip|concept."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

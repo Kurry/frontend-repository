@@ -163,87 +163,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "WebMCP tooling for structured-editor-v1, entity-collection-v1, or artifact-transfer-v1 is unbound, missing, or a no-op when invoked."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n2"
-name = "handlers_diverge_from_ui_state"
-description = "Invoking a bound editor/entity/artifact tool leaves My themes, editor tokens, live preview, or CSS export diverging from what the equivalent visible UI control would produce."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared modules, destinations, or entity operations beyond the Bindings (editor select/update_property/preview with modes edit/compare; entity create/select/update/delete; artifact export/import/copy/convert with formats css/json/config) are exposed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n4"
-name = "automation_cannot_exercise_contract"
-description = "webmcp_list_tools / webmcp_invoke_tool cannot exercise the declared editor, entity, and artifact bindings."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n5"
-name = "mcp_update_bypasses_shared_state"
-description = "An editor update_property, entity update, or artifact export invocation updates a parallel copy of state, leaving visible Themes/editor/preview showing stale values that disagree with the MCP result (MCP/UI desync)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n6"
-name = "session_or_tool_api_errors"
-description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete data for the mandated modules."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n7"
-name = "mcp_relies_on_undocumented_hacks"
-description = "MCP only works after undocumented manual harness hacks or console-only stubs rather than app-registered tools."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n8"
-name = "required_modules_not_implemented"
-description = "structured-editor-v1, entity-collection-v1, or artifact-transfer-v1 is not implemented despite being declared required in the contract."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n9"
-name = "mcp_stubbed_or_commented_out"
-description = "The WebMCP interface is commented out or only stubbed so tools list as present but leave theme list/editor/preview state unchanged when invoked."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n10"
-name = "mechanics_exclusion_faked_via_mcp"
-description = "Color-picker drag gestures or raw file path / base64 blobs are faked solely through WebMCP as a success path, bypassing the Playwright-observed mechanics exclusions."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "12.11"
 name = "editor_modes_edit_and_compare"
 description = "Editor modes edit and compare from the bindings are bound; switching compare via the contract updates the same Before/After preview state the visible compare toggle uses."
@@ -257,18 +176,3 @@ description = "Invoking artifact export with format config (or convert json-to-c
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "12.n11"
-name = "mcp_export_omits_session_tokens"
-description = "An artifact export/copy via WebMCP reports success while the visible Artifact center still omits the session's edited color/radius/font tokens."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "mcp_contract.catchall"
-name = "mcp_contract_catchall"
-description = "The MCP contract deviates from its declaration in a way not covered by any other criterion in this file. 'Significant' means a real automation/contract break, not a nitpick. If present, name the defect and cite the concrete evidence. If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

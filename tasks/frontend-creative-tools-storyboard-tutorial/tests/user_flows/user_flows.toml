@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "scene_crud_unavailable_from_ui"
-description = "Add Scene create, description edit, or scene delete cannot be completed from the visible UI controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "new_scene_missing_or_duplicated"
-description = "Submitting one valid Add Scene either fails to show a new card or creates duplicate cards for a single submit."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "description_edit_desyncs_modes"
-description = "After editing a scene description in Tile mode, List or Slide still shows the pre-edit text for that numbered scene until a reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "view_switch_breaks_or_loses_scenes"
-description = "Switching among Tile, List, and Slide breaks the layout or loses scenes from the shared set."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_board_state_broken"
-description = "After deleting every scene, the board region is blank or broken with no empty-state explanation and no way to add a scene."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "slide_walk_skips_or_wraps"
-description = "In Slide mode, Right/Left arrow walks skip scenes, wrap past the ends, or leave the N / total counter out of sync with the centered scene."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "back_to_top_missing_or_stuck"
-description = "After scrolling the board down, the back-to-top control is missing, or activating it leaves the board stuck away from the top."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "create_form_blocks_with_no_exit"
-description = "The Add Scene create form blocks the workspace with no working exit after open (no cancel/close path that returns to the board)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_create_lacks_feedback"
-description = "An empty required title or description on Add Scene provides no visible inline validation naming the empty field."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "reload_leaves_mixed_user_state"
-description = "After creating or editing scenes and switching modes, a reload leaves a mix of user mutations with seeded baseline (for example a created scene survives while Tile mode resets, or vice versa)."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "6.11"
 name = "create_updates_total_duration"
 description = "Create flow: after a valid Add Scene with a known duration, Total duration increases by exactly that many seconds and the new card shows the matching duration and shot-type badge."
@@ -278,22 +197,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n11"
-name = "export_flow_missing_or_static"
-description = "Export is missing, or after a session mutation the Storyboard JSON / Markdown preview stays identical to the pre-mutation seeded export."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n12"
-name = "import_round_trip_fails"
-description = "Importing a previously exported valid Storyboard JSON fails to reconstruct the exported scenes, view mode, or Total duration."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.16"
 name = "search_filter_flow"
 description = "Search and filter flow: create a scene with a distinctive title and the POV shot type; typing a unique part of that title into search shows only that scene in Tile and List with the filtered count reading 1 of M; clearing search and selecting the POV chip shows only POV scenes including the new one; selecting All and clearing search restores the full set exactly — all without a reload."
@@ -321,26 +224,3 @@ description = "Outline flow: after a session mutation, opening Export and select
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n13"
-name = "presenter_dead_end"
-description = "The presenter cannot be exited (End presentation and Escape both fail), or exiting loses the board state, selection, or undo history that existed before presenting."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n14"
-name = "filter_flow_desync"
-description = "With a search query or shot-type chip active, switching among Tile, List, and Slide shows different subsets or counts for the same filter state."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

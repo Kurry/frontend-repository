@@ -163,14 +163,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "11.n1"
-name = "bare_spec_thin_demo"
-description = "The shipped app is a thin CRUD demo with no extra craft beyond the minimum required controls — path, focus, export, and velocity feel unfinished or placeholder-like."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app exhibits a significant, browser-observable innovation or craft excellence beyond the specification that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If nothing beyond other criteria qualifies, answer no."

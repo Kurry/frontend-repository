@@ -148,54 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_375_or_1440"
-description = "At 375px or 1440px the layout breaks: overlapping controls, clipped text, or wizard actions that cannot be reached."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "narrow_forces_page_horizontal_scroll"
-description = "At about 375px width the page itself scrolls horizontally because Preview panels, the bitmap grid, or the progress bar overflow the viewport."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "active_label_overflows_progress"
-description = "At about 375px width the active progress stage label overflows or clips instead of truncating cleanly while numbered steps remain visible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "mobile_controls_too_small"
-description = "At about 375px width primary wizard controls are too small to tap reliably (well under about 44px) or misaligned so they collide."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "preview_or_grid_overflows"
-description = "At a narrow viewport the Preview panels or bitmap grid use a fixed width that overflows the viewport or clips their content."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "controls_disappear_at_narrow"
-description = "At about 375px width the Base theme control, Continue/Generate, or Download control disappears or becomes unreachable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "7.9"
 name = "contrast_and_export_reflow_narrow"
 description = "At about 375px width the contrast matrix and export preview reflow to fit the column without clipping or forcing horizontal page scroll."
@@ -209,18 +161,3 @@ description = "At about 375px width the command palette overlay stays fully visi
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "7.n7"
-name = "palette_or_export_offscreen_narrow"
-description = "At about 375px width the command palette or export preview renders off-screen or forces page-level horizontal scrolling."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

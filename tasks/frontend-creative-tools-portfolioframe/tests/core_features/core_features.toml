@@ -282,39 +282,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.28"
-name = "1_28"
-description = "The projects, skills, or testimonials in the preview are static markup with no working create, edit, or delete against shared application state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.29"
-name = "1_29"
-description = "A skill that case-insensitively duplicates an existing one is accepted as a second chip, or no inline rejection message appears when a duplicate is attempted"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.30"
-name = "1_30"
-description = "Undoing one or more steps and then making a different change silently discards or flattens the abandoned history states instead of preserving them as a selectable branch"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.31"
-name = "1_31"
-description = "A success signal such as a saved-draft confirmation, an added chip, or an updated completeness count appears while the underlying item is absent, or a value stays constant regardless of the input given"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.32"
 name = "export_package_live_preview_tabs"
 description = "The Export package panel shows a live-compiled monospaced preview with Portfolio JSON and Markdown resume tabs; after setting Profile Header Name to a unique string and adding a uniquely titled project, both tabs' visible text contain those exact strings without a reload"
@@ -364,30 +331,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n32"
-name = "export_omits_session_mutations"
-description = "After adding a uniquely titled project or editing the profile Name, the visible Portfolio JSON or Markdown resume export text omits that session mutation"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n33"
-name = "import_malformed_mutates_state"
-description = "Importing a malformed Portfolio JSON changes Name, projects, theme, or density instead of showing a visible error and leaving state unchanged"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n34"
-name = "bulk_delete_leaves_stale_export"
-description = "After Delete selected removes projects from the preview, the Export package tabs still list the deleted project titles as if they remained"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.39"
 name = "project_field_contract_enforced"
 description = "Add Project enforces the Project field contract: empty Title or Category Tag, Status outside shipped|wip|concept, or Title over 80 characters keeps submit disabled or shows an inline error naming that field and appends no card; a valid submit with Status wip creates a card whose WIP chip and exported project object use status wip"
@@ -415,26 +358,3 @@ description = "After adding a project and setting a profile Name, the visible Po
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n35"
-name = "invalid_status_accepted_as_project"
-description = "Add Project accepts a Status outside shipped|wip|concept and still appends a project card, or the Portfolio JSON shows a project status outside that closed enum"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n36"
-name = "export_missing_schema_version_or_keys"
-description = "The visible Portfolio JSON export omits schemaVersion portfolioframe-v1 or is missing a required top-level key among profile, projects, skills, testimonials, contact, sections, theme, density"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

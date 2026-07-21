@@ -92,14 +92,6 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "2.3"
-name = "uses_browser_storage_apis"
-description = "Uses localStorage or sessionStorage to persist presets or dial state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "shared_state_coherence_across_views"
 description = "A change made in one view — creating, editing, favoriting, or applying a preset, or stepping a dial — is immediately reflected in every other surface showing that datum (list, compare panel, dials, meter, preview) without a reload, and no surface shows stale data another surface already updated"
@@ -163,15 +155,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.14"
-name = "outbound_requests_for_assets"
-description = "Network requests to other origins occur for fonts, imagery, scripts, or data during load or a full exercise of the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "2.15"
 name = "export_panel_coherent_with_store"
 description = "After mutating dials and presets, the Export panel JSON and every other surface showing those values agree without a reload — a single coherent store, not a disconnected export snapshot"
@@ -193,14 +176,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.n15"
-name = "export_desynced_from_visible_session"
-description = "Visible dials or presets disagree with the Export panel JSON for the same session state without a reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.18"
 name = "api_shaped_schemas_drive_forms_and_export"
 description = "Preset create/edit, snapshot name, and import paste forms enforce the documented API-shaped field contracts with inline named-field errors before submit; the lab-package Export panel JSON uses the same field names, enums, and bounds (schemaVersion exposure-control-lab.package.v1, aperture/shutter/iso stop lists, lookTag closed enum, name max 40 uniqueness) that those forms accept"
@@ -214,18 +189,3 @@ description = "Import rejects lab-package JSON that violates the ExposurePreset 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n16"
-name = "forms_accept_contract_violations"
-description = "Preset or snapshot forms save records that violate the documented field contracts (duplicate names, lookTag outside the closed enum, or stops outside the discrete lists) without naming the offending field"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

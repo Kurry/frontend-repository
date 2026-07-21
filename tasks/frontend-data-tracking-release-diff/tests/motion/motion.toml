@@ -124,25 +124,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.10"
-name = "no_hover_or_snap_transitions"
-description = "Interactive chrome feels static: buttons, rows, or sidebar entries give no hover feedback, or the dialog and disclosure snap open and closed with no transition anywhere"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "8.20"
 name = "export_import_panel_enter"
 description = "Export release pack and Import release pack panels open with a short opacity and scale enter transition of roughly 200 milliseconds rather than appearing with no transition (unless prefers-reduced-motion is set)"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -106,22 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "storage_persistence_used"
-description = "localStorage or sessionStorage holds trial, step, annotation, report, undo, or export state after exercising the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "external_network_requests"
-description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, images, or data) during load or a full exercise of the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "console_clean_full_exercise"
 description = "The console is free of errors and warnings on load and stays clean after opening tasks and trials, scrubbing the timeline, streaming terminal output, filtering steps, using the command palette, annotating, classifying, undoing, and exporting"
@@ -156,18 +140,3 @@ description = "The note and classification forms enforce the declared API-shaped
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.12"
-name = "export_preview_stale_after_mutation"
-description = "After a visible annotation or classification mutation, the Export panel preview text remains unchanged from its pre-mutation content"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

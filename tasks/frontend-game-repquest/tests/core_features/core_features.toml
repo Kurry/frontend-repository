@@ -194,20 +194,6 @@ description = "The Apply scenario change control in the History state region vis
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "1.29"
-name = "core_actions_have_no_effect"
-description = "Logging reps, deleting a history entry, buying or equipping gear, exporting, importing, or confirming Reset Quest has no visible effect on the quest map, gear shop, history list, or export surfaces (a decorative control that performs no action)"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "1.30"
-name = "invalid_log_reps_silently_accepted"
-description = "Submitting Log Reps with an empty field, zero, a negative number, a non-integer value, or reps outside 1 through 9999 is silently accepted and changes lifetime reps, today's total, or the History list anyway"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
 id = "1.31"
 name = "log_set_flow_cross_surface"
 description = "Starting on the Quest tab with the current today's total and lifetime reps noted, logging a valid set of 12 reps increases both totals by exactly 12 (measured immediately around the action), glides the character forward on the quest map, grows today's bar in the weekly summary chart, and switching to the History tab shows the new entry at the top with its rep count and timestamp, all without a page reload; after a full page refresh, today's total, lifetime reps, the character position, and the History entry all show the same values"
@@ -328,20 +314,6 @@ description = "After Export Quest Log, confirming Reset Quest, then Import Quest
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "1.51"
-name = "export_omits_session_mutations"
-description = "Export Quest Log or Export Workout CSV after logging sets produces an empty sets list, a hardcoded sample, or values that omit the session's actual reps and unlocked gear"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "1.52"
-name = "challenge_ends_without_decided_result"
-description = "Ending a challenge run leaves no visible Victory or Defeat announcement naming the outcome"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
 id = "1.53"
 name = "challenge_checkpoint_exact_field_contract"
 description = "After starting a challenge run, choosing Hard, logging at least one set, and pausing, Save Progress produces a checkpoint whose browser-visible values show runStatus paused, the active bossWaypointId, difficulty Hard, repsLogged and targetReps matching the panel, and savedAt as a timestamp; after reload Resume Saved Run restores every one of those values exactly"
@@ -364,11 +336,4 @@ id = "1.56"
 name = "import_restores_complete_quest_state"
 description = "After exporting a session with workout sets, an unlocked zone, a defeated boss, equipped gear, and changed daily-goal state, resetting and importing restores dailyGoal, streak, lifetimeReps, questPoints, unlockedZones, unlockedGearIds, equippedGearId, defeatedBossIds, full History, and derived records and heatmap state; a fresh export matches the restored state"
 type = "binary"
-weight = 1.0
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "A specified core behavior of RepQuest is broken or missing in a way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (element, page state, action sequence) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0

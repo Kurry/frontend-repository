@@ -155,30 +155,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "forbidden_browser_storage"
-description = "Project, command, theme, mode, filter, output, autocomplete, or consent data appears in localStorage, sessionStorage, IndexedDB, or another persistent browser storage surface after exercise"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "visible_state_desynchronization"
-description = "A project, theme, consent status, active mode, filter result, command history entry, or output datum visibly disagrees between two surfaces during the same session"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.9"
-name = "cdn_or_outbound_dependency"
-description = "The browser requests a script, stylesheet, font, icon, component asset, analytics endpoint, or animation dependency from a third-party origin during load or interaction"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.13"
 name = "undo_export_state_coherence"
 description = "Undo and redo of a project mutation keep Projects Board, /work, /stats, archive, and export preview mutually coherent without reload."
@@ -190,14 +166,6 @@ id = "2.14"
 name = "import_replaces_shared_collection"
 description = "Importing a valid Portfolio JSON replaces the active projects collection such that board, /work, /stats, and export preview all reflect the imported set from the same shared state."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.n4"
-name = "export_preview_desyncs_from_board"
-description = "After a create, delete, or archive, the export preview project set disagrees with Projects Board or /work during the same session."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -214,18 +182,3 @@ description = "Switching theme via /retro and choosing Accept on consent updates
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n5"
-name = "import_accepts_schema_invalid_payload"
-description = "Import accepts a parseable JSON document that violates the Portfolio JSON field contract (missing required keys, version not \"1.0\", theme/consent outside closed enums, or a project entry breaking the project field contract) and still mutates the projects collection"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

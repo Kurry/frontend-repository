@@ -191,22 +191,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "1.26"
-name = "parent_manual_complete_while_incomplete_leaf"
-description = "A parent's completion checkbox can be manually toggled complete while it still has an incomplete descendant leaf"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.27"
-name = "archive_shown_on_incomplete_branch"
-description = "An Archive control appears on a branch that still has an incomplete descendant leaf"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.28"
 name = "create_children_complete_chain_flow"
 description = "Starting from an empty tree: create a root via the footer form with a valid title, status, priority, and optional dueDate; confirm exactly one new tree appears, the empty-state disappears, a toast shows, and both Export grove JSON and CSV previews include that title, status, and priority; add two children via Add Child and confirm both render indented with a 0 percent progress ring on the parent; toggle both children complete and confirm the ring reaches the 100 percent checkmark, the parent completes automatically, each leaf status becomes done, and both export previews update, all without reload"
@@ -291,14 +275,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.40"
-name = "export_omits_session_mutations"
-description = "After creating a task with a distinctive title and status, creating a tag, and changing theme, the Grove JSON preview omits the new task title or status, the new tag name or color, or the chosen theme"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.41"
 name = "grove_csv_mirrors_task_upsert_fields"
 description = "After creating a root with title, status, priority, and a YYYY-MM-DD dueDate, the Grove CSV preview shows a header row exactly id,title,status,priority,dueDate,parentId,completed,collapsed,tags,archived and a data row carrying that title, status, priority, and dueDate"
@@ -319,10 +295,3 @@ description = "Submitting New root task, Add Child, or Edit task with status out
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

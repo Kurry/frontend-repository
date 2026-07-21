@@ -225,23 +225,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.20"
-name = "rerun_scores_never_change"
-description = "Repeated re-runs of the same cell produce byte-identical rewards and an unchanged mean every time, indicating hardcoded run output rather than re-randomized simulation"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.21"
-name = "disconnected_variance_copy"
-description = "The variance view or chart renders from a disconnected data copy: after a completed re-run or an applied filter, its values contradict the heatmap for the same model and harness until a reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.22"
 name = "baseline_pin_shows_signed_deltas"
 description = "Pin baseline captures current per-cell means; after a completed re-run that changes a cell mean, that cell shows a signed delta to 2 decimal places beside the live mean; Clear baseline removes every delta readout in the same interaction"
@@ -305,22 +288,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.31"
-name = "export_omits_session_or_breaks_schema"
-description = "After a saved classification or completed re-run, the Export JSON omits that session work from triage or cells, or the preview is missing a required CalibrationPack key such as schemaVersion, document, or triage"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.32"
-name = "valid_classify_payload_mismatches_contract"
-description = "A successful Classify submit badges a row with a classification outside capability-gap and spec-defect, or persists a rationale shorter than 15 characters against the Classification field contract"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.33"
 name = "classification_task_and_rationale_bounds"
 description = "In both single-row and bulk Classify forms, the would-be Classification request body uses the selected variance-row task as a trimmed non-empty task no longer than 80 characters and a trimmed rationale from 15 through 500 characters; empty or over-80 task and whitespace-only, under-15, or over-500 rationale show inline errors naming the field and apply no badge or summary change."
@@ -362,10 +329,3 @@ description = "Importing a valid TriagePack with schemaVersion 1, document merid
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

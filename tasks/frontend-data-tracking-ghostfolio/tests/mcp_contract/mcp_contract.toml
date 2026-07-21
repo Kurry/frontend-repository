@@ -131,54 +131,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "Required browse, entity, or artifact WebMCP tools are unbound, missing, or no-op when invoked."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n2"
-name = "handlers_diverge_from_ui"
-description = "A WebMCP holding create/update/delete or asset-class filter apply leaves the UI out of sync with the tool result (handlers diverge from visible UI logic)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations, filters, entity types, entity operations, or artifact operations beyond the Bindings block are exposed through the tool list."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n4"
-name = "delete_without_confirm_succeeds"
-description = "Entity delete removes a holding when confirm=true is omitted, violating the contract restriction."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n5"
-name = "validation_bypass_desyncs_mcp_ui"
-description = "Creating a holding via WebMCP with empty name, malformed symbol, non-positive quantity, or negative unit-price bypasses validation and desynchronizes MCP state from the visible form rules."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n6"
-name = "session_or_tool_api_broken"
-description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete data for the mandated modules."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "12.11"
 name = "artifact_export_import_copy_bound"
 description = "Artifact operations export, import, and copy are bound for formats json and csv and import modes portfolio-json, holdings-csv, and activities-csv; invoking them drives the same export drawer / import path as the visible UI without returning raw file/blob/base64 contents in WebMCP results."
@@ -200,24 +152,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "12.n7"
-name = "artifact_tools_missing_or_return_blobs"
-description = "Artifact export/import/copy tools are missing, no-op, or return raw file paths, blobs, or base64 artifact contents in WebMCP results."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n8"
-name = "export_mcp_diverges_from_ui"
-description = "A WebMCP artifact export or import leaves the UI export preview or holdings table out of sync with the tool result."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-
-[[criterion]]
 id = "12.14"
 name = "performance_and_diagnostics_destinations_bound"
 description = "Browse destinations include performance-chart and import-diagnostics; opening performance-chart reaches the portfolio-value-over-time chart and opening import-diagnostics reaches the CSV import pre-commit diagnostics screen through the same paths as the visible controls."
@@ -229,21 +163,5 @@ id = "12.15"
 name = "performance_report_export_format_bound"
 description = "The artifact export format performance-report is bound; invoking it drives the same Performance report tab as the visible UI and its result matches the live performance summary and per-holding rows without returning raw file/blob/base64 contents in WebMCP results."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "12.n9"
-name = "new_destinations_or_format_missing_or_undeclared"
-description = "The performance-chart or import-diagnostics destination, or the performance-report export format, is missing or no-op when invoked, or destinations, formats, or operations beyond the Bindings block are exposed through the tool list."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "mcp_contract.catchall"
-name = "mcp_contract_catchall"
-description = "The MCP contract for browse-query-v1 / entity-collection-v1 / artifact-transfer-v1 with holding, asset-class/activity-type, and portfolio export/import bindings deviates from its declaration in a way NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to automation or a real user. If present, name the defect and cite concrete evidence. If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

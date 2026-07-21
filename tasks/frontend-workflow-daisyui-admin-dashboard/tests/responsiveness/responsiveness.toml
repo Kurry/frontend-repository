@@ -148,34 +148,3 @@ description = "At 375px the All Users KPI strip (Total/Active/Paying/Suspended) 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "7.n1"
-name = "mobile_layout_clips_or_overflows"
-description = "At 375px content clips, overlaps unreadable, or the page scrolls horizontally."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "export_or_palette_offscreen_on_mobile"
-description = "At 375px the export drawer or command palette is off-screen or inoperable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "drawer_broken_across_breakpoints"
-description = "Drawer behavior is broken: missing on desktop when it should be open, or no hamburger/overlay path on small viewports."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsiveness that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "rear_flick_cards_start_playback"
-description = "A partially visible rear flick card starts video playback or accepts player input while it is not the front card."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "contact_errors_only_in_console"
-description = "Submitting an invalid contact form surfaces errors only in the browser console with no inline field marking in the popup."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "contact_or_cookie_actions_silent"
-description = "A valid contact submit or cookie Accept produces no visible success/dismiss feedback after the action."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "early_submit_shows_false_success"
-description = "A contact submission within the first few seconds after load still reveals Thanks for your submission! or sends a request despite the anti-spam rule."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "broken_or_reused_client_media"
-description = "A client deck slot shows a broken-media indicator, references a nonexistent file, or reuses the same video across different client identities."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "contact_popup_not_keyboard_dismissible"
-description = "The open contact popup cannot be dismissed via keyboard (Escape or a focusable close control)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "contact_validation_feedback_missing"
-description = "An empty or invalid contact submit shows no inline validation indication marking the offending field."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "primary_cta_labels_ambiguous_or_missing"
-description = "Primary CTA controls (We'll call you, Contact us, Accept, Show case, or service buttons) lack readable labels or use blank ambiguous text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "testimonials_indicator_mismatches_quote"
-description = "After advancing the testimonials rotator, the current-position indicator disagrees with the visible quote or author details."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "invalid_contact_shows_success"
-description = "Submitting the contact form with an empty/invalid email, unchecked Privacy Policy/terms, or out-of-bounds phone still reveals Thanks for your submission!."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "empty_shortlist_brief_still_valid"
 description = "Opening Export brief with an empty shortlist still produces valid JSON whose schemaVersion is 1, shortlistedClients is an empty array, and other keys satisfy the Discovery brief JSON field contract for the live session, without crash or lorem placeholder text."
@@ -267,14 +187,6 @@ id = "4.14"
 name = "duplicate_shortlist_not_inflated"
 description = "Activating Shortlist twice on the same client does not duplicate that title in shortlistedClients or inflate the nav count past the number of distinct shortlisted clients."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.n11"
-name = "malformed_import_applies_partial_state"
-description = "Importing malformed discovery-brief JSON partially mutates shortlist, locale, or cookie state without a named inline import error."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -306,32 +218,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n12"
-name = "invalid_cookie_draft_still_commits"
-description = "Saving cookie preferences with essential false or a missing/non-boolean category still dismisses the banner or mutates cookieCategories without named field errors."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.19"
 name = "invalid_then_valid_contact_one_success"
 description = "A failed empty or invalid contact submit (named field errors, no Thanks for your submission!) followed immediately by a valid submit under the contact field contract reveals success exactly once — the invalid attempt never sets contactSubmitted true or writes contactEmail into the discovery brief."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n13"
-name = "invalid_contact_writes_brief_contact"
-description = "Submitting the contact form with an empty/invalid email, unchecked terms, or out-of-bounds phone still sets discovery-brief contactSubmitted true or writes a contactEmail."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

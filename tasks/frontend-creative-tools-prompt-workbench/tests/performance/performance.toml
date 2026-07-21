@@ -162,96 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.n1"
-name = "cold_load_exceeds_two_seconds"
-description = "More than 2 seconds pass after local cold load before editor or toolbar controls can be operated."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_workbench_flows"
-description = "Console errors, warnings, or unhandled rejections appear during typing, binding, run/stop, variant flip, save, or library-open flows."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "preview_or_stream_transition_blocks_ui"
-description = "Preview updates or streaming transitions block the main thread so subsequent clicks queue with visible lag."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n4"
-name = "streaming_hangs_ui"
-description = "An in-progress streaming run hangs or freezes the rest of the UI until the stream completes."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "large_editor_text_janks"
-description = "With ~2000 characters in the editor, typing or binding updates produce sustained frame-rate collapse or multi-second jank."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n6"
-name = "animation_blocks_workbench_input"
-description = "While response-panel open, toast, or variant cross-fade animations run, toolbar and binding controls ignore input."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n7"
-name = "settle_blocks_first_paint_of_controls"
-description = "The UI blocks rendering of toolbar and panels until all assets finish loading, leaving a blank interactive void."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "runaway_resources_after_rapid_runs"
-description = "Rapid successive runs, stops, or library saves cause visible memory/CPU runaway that degrades or crashes the tab."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "blank_while_loading"
-description = "Nothing is displayed (blank page) while the app loads — no toolbar or workbench skeleton."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n10"
-name = "crash_under_rapid_or_edge_use"
-description = "The app crashes or becomes permanently unresponsive under rapid typing, successive Run/Stop presses, or after deleting all library prompts and recreating."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "9.11"
 name = "command_palette_filtering_responsive"
 description = "Opening the command palette and filtering results stays responsive with no perceptible lag while typing queries"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

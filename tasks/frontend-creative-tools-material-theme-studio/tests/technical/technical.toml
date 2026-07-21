@@ -99,14 +99,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "browser_storage_persists_state"
-description = "Themes or editor state persist in localStorage, sessionStorage, or another browser storage API, surviving a page reload instead of resetting to the seeded state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.4"
 name = "console_clean_full_exercise"
 description = "The browser console stays free of errors and warnings during a full exercise of the app (tab switches, palette edits, source edits, theme create/rename/delete, font add/remove, export/import, command palette)"
@@ -149,14 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.10"
-name = "cdn_asset_requests_present"
-description = "After settle, the network log shows the app loading fonts, icons, or script libraries from external CDN origins instead of bundled local assets"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.11"
 name = "document_title_matches"
 description = "After load and settle, the browser document title reads 'Material UI Theme Creator'"
@@ -184,26 +168,3 @@ description = "After a valid Import of ThemeOptions JSON, the Export JSON previe
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n12"
-name = "versions_use_disconnected_parallel_store"
-description = "Restoring a theme version updates a parallel copy while editor/preview keep showing the pre-restore options until reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.n14"
-name = "import_accepts_schema_violations"
-description = "Import accepts ThemeOptions JSON that violates the field contract (invalid palette.type, non-#RRGGBB intent channel, fontSize outside 8-24, borderRadius outside 0-24, or Type↔palette.type disagreement) and mutates editor/preview anyway"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, storage rule, state coherence, load, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

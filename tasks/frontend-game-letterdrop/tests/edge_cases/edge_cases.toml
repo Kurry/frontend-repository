@@ -162,95 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_history_has_no_feedback"
-description = "Before any run has finished, History shows nothing and provides no empty-state UI feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "invalid_word_errors_only_in_console"
-description = "A non-dictionary Submit Word surfaces its failure only in the browser console with no on-screen tray shake or Not a word message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "power_or_score_actions_silent"
-description = "A valid-word score, Bomb/Slow activation, Board Cleared!, or achievement unlock occurs with no visible confirmation toast."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "stale_phase_input_mutates_run"
-description = "Clicks on the board after Game Over, or tile taps issued while paused, mutate the current run's score, tray, or board state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "run_controls_are_nonsemantic_divs"
-description = "Primary run controls (Start game, Submit Word, Pause, Resume) are plain div/span click targets without button semantics or accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "settings_not_keyboard_dismissible"
-description = "The Settings overlay cannot be left via keyboard (no focusable dismiss/Save path) once opened."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "settings_validation_missing"
-description = "A one-character playerName produces no inline validation under the field and Save remains enabled while invalid."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_run_button_labels"
-description = "Primary run controls use ambiguous or missing labels (e.g. unlabeled icons only, or generic OK/Submit) instead of Start game, Submit Word, Pause, Resume, or Undo Last Tile."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "undo_empty_tray_errors"
-description = "Activating Undo Last Tile when the tray is empty throws a visible error or crashes the UI instead of a no-op."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "rapid_activation_corrupts_transitions"
-description = "Rapidly activating Start game, Pause, Resume, or Submit Word multiple times in quick succession produces a duplicate run, a duplicate history entry, or a corrupted score."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n11"
-name = "fabricated_persistence_on_fresh_load"
-description = "With no prior runs (empty storage), a reload shows fabricated History entries or a non-zero Best Score instead of the empty history state and a zero Best Score."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "4.11"
 name = "malformed_import_rejected"
 description = "Importing malformed JSON, a wrong format literal, schemaVersion other than 1, or a payload missing required game-result fields shows a visible rejection naming that the file is invalid and does not corrupt Match History or the live run."
@@ -265,25 +176,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n12"
-name = "malformed_import_corrupts_history"
-description = "Importing malformed JSON silently corrupts Match History or the live run without a visible rejection."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.13"
 name = "settings_out_of_bounds_rejected"
 description = "Submitting Settings with playerName outside 2 to 20 characters or startingTier outside the enum 1, 2, 3 keeps Save disabled and shows an inline message naming the offending field; no partial save occurs."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

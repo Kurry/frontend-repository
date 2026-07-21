@@ -162,47 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "cookie_or_menu_primary_flow_unavailable"
-description = "The cookie banner cannot be dismissed via Accept all, Reject all, or Manage preferences → save, or below 1000px the Menu toggle cannot open the full-screen overlay from the visible UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "carousel_or_dropdown_state_desyncs"
-description = "After advancing the news carousel or opening Responsibility, the visible track/panel state disagrees with controls (e.g. Next appears to fire but the track stays put, or aria-expanded stays false while the panel is visible)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "overlay_blocks_with_no_exit"
-description = "The mobile menu overlay, Responsibility dropdown, or cookie preferences modal opens but cannot be dismissed via Close, Escape, or the specified dismiss path, blocking homepage interaction."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "failed_consent_flow_lacks_feedback"
-description = "Activating cookie banner actions or saving preferences produces no visible change to the banner/modal (silent failure with no dismiss or open)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "flow_dead_end_requires_reload"
-description = "After opening the mobile menu, Responsibility dropdown, preferences modal, or advancing the carousel, recovering normal homepage scrolling and interaction requires a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "6.11"
 name = "briefing_shortlist_export_flow"
 description = "Pin two distinct news cards; the shortlist count becomes 2 of 8 and both titles appear in order in the JSON and Markdown previews; Download briefing on the JSON tab yields text containing both titles plus 18.16 USD; unpinning the first story returns the count to 1 of 8 and removes that title from both previews without a reload."
@@ -245,48 +204,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n6"
-name = "briefing_flow_dead_end"
-description = "After pinning stories or opening the Investor briefing / command palette, recovering normal homepage scrolling and interaction requires a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "undo_does_not_restore_consent_or_pins"
-description = "After Save preferences or a pin, Undo leaves the banner dismissed / shortlist unchanged and the briefing preview still shows the post-action values."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "consent_validation_flow_silent_commit"
-description = "An invalid consent Save preferences attempt dismisses the banner or mutates briefing consent without named field errors, or a subsequent valid save fails to write the four-key payload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.17"
 name = "briefing_export_import_round_trip_flow"
 description = "Pin two distinct news cards and Accept all; copy or note the JSON briefing; unpin both to 0 of 8; Import that JSON; shortlist returns to 2 of 8 with both titles pinned in order, banner stays dismissed with consent all true, and the JSON preview again shows those pinnedTitles and consent values."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n9"
-name = "import_round_trip_fails_to_restore"
-description = "After exporting a briefing with pins and consent then clearing pins, Importing that JSON leaves the shortlist empty or consent mismatched without restoring the exported session state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

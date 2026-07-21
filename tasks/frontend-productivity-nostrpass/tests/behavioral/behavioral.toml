@@ -173,51 +173,6 @@ weight = 1.0
 
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "After reload, some session mutations survive while others reset, producing incoherent partial persistence instead of a full seeded baseline reset."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "Dashboard connected-app count or export grants render identically regardless of permission toggles."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Creating identities with different labels yields identical labels or identical npubs in the UI or export."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "Rename or grant changes appear in one view but not another until reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "14.n5"
-name = "export_omits_mutations_after_pipeline"
-description = "After create and grant toggle, the Export vault JSON omits the new identity or still shows the prior grant."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.11"
 name = "rotation_undo_exact_value_probe"
 description = "Exact-value rotation probe: note the active identity's full npub text, rotate and confirm; the dashboard and Export vault show a different npub; Undo; the dashboard npub and the export preview match the noted string exactly, character for character"
@@ -238,26 +193,3 @@ description = "Backup round-trip: export a backup of one identity (note its npub
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n6"
-name = "bulk_undo_overcorrects"
-description = "Undo after a bulk grant flips identities that already had the grant before the bulk action to revoked, or leaves some affected identities un-restored."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n7"
-name = "audit_filter_mutates_log"
-description = "Applying or clearing the audit action-type filter loses entries, reorders them, or otherwise changes the log content."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

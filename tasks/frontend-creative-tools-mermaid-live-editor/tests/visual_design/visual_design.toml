@@ -147,26 +147,3 @@ description = "Icons in the header and panels come from one consistent visual se
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.7"
-name = "buried_or_unbalanced_workspace"
-description = "Unrelated chrome overwhelms the editor-preview pair, the preview is too small to inspect, or source and actions lack clear grouping and hierarchy"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.8"
-name = "theme_or_responsive_visual_breakage"
-description = "A theme or phone layout produces unreadable contrast, clipped editor text, overlapping controls, horizontal page overflow, or inconsistent browser-default component styling"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable visual-design defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

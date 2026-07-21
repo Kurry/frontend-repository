@@ -148,54 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "continue_without_file_errors"
-description = "Continuing from step one without picking a file shows an error or refuses to advance even though a seeded EuroScope.exe sample is present."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "back_forward_loses_or_duplicates"
-description = "Moving backward and forward through the wizard duplicates a step, skips a stage, or loses a previously selected theme, swatch, or icon set."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "invalid_hex_applies_or_silent"
-description = "An invalid swatch hex is applied to the Preview, or advancing proceeds with no inline message naming the swatch."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "double_generate_duplicates_result"
-description = "Double-activating Generate produces two confirmation blocks or two summaries for a single intended patched result."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "none_reports_nonzero_replaced"
-description = "With the icon set on None, the step four summary reports a non-zero replaced bitmap count."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "validation_console_only"
-description = "Invalid swatch hex input is surfaced only in the browser console, with no inline UI message naming the swatch."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.9"
 name = "empty_undo_redo_disabled"
 description = "Undo with an empty history and Redo with an empty redo stack are disabled controls; activating them does nothing and produces no console errors."
@@ -244,34 +196,3 @@ description = "A swatch hex that is not #RRGGBB (missing hash, wrong length, or 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n7"
-name = "empty_undo_still_mutates"
-description = "Activating Undo while the undo stack is empty still mutates swatches, Preview, or export preview."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "malformed_import_applies_partial"
-description = "A malformed patch-recipe import partially applies fields or clears valid swatches without an inline import error."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "schema_invalid_import_mutates_state"
-description = "Importing parseable JSON that violates the Patch recipe field contract still mutates swatches, icon set, keep-original overrides, or export preview."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

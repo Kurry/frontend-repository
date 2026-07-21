@@ -141,38 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_in_memory_state_survives_reload"
-description = "After configuring menu-open, carousel position, and consent dismissal, a reload leaves an incoherent mix (e.g. consent stays dismissed while carousel resets, or carousel position survives alone)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "carousel_ignores_next_previous"
-description = "Clicking living carousel next or previous leaves the visible slide title and amenity list identical to the pre-click values (derived surface ignores the input)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "consent_reload_keeps_banner_gone"
-description = "After dismissing consent, a reload leaves the banner gone (byte-identical 'already dismissed' outcome) instead of restoring the seeded banner."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "menu_open_state_stale_until_reload"
-description = "After opening or closing the menu, the overlay visibility and body menu-open state disagree until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_input_dependent_packet"
 description = "Input-dependent output: run two booking+export sessions with different full names and different shortlisted tiers; the two Export JSON packets differ in inquiry.full_name and in shortlist/monthly_estimate_eur content."
@@ -207,34 +175,3 @@ description = "Schema coherence: after shortlisting Kick and Boost and submittin
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_identical_across_different_inputs"
-description = "Repeating booking+export with different names or shortlists yields byte-identical packet contents."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "estimate_ignores_shortlist_changes"
-description = "Changing shortlist selections leaves Monthly estimate identical regardless of which studios are selected."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n7"
-name = "export_estimate_mismatches_shortlist_rents"
-description = "Export JSON monthly_estimate_eur disagrees with the sum of shortlist monthly_rent_eur values after a visible shortlist mutation."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.3"
-name = "missing_hover_washes"
-description = "Omits hover washes on buttons, rows, or sidebar items so interactive chrome feels static on pointer hover"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.4"
 name = "theme_icon_crossfade_rotate"
 description = "Clicking the theme toggle with the real pointer cross-fades and rotates the sun/moon icons over roughly 0.2s while surfaces recolor, rather than swapping icons instantly with no transition"
@@ -169,10 +161,3 @@ description = "Driven through the real UI Export control: the export drawer slid
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

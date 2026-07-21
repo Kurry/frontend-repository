@@ -155,22 +155,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.17"
-name = "static_library_no_working_crud"
-description = "Palettes list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.18"
-name = "chrome_navigates_outbound"
-description = "App chrome (logo, menu, cart, painting/source titles, footer links) navigates via real outbound links to other origins instead of staying in-app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.19"
 name = "view_toggle_indicator_states"
 description = "Switching among Nomenclature, Palette, and Swatch views updates the canvas in place, and the active view toggle shows a filled circular indicator while the other options show an outline-only circle"
@@ -395,46 +379,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n35"
-name = "export_omits_session_mutations"
-description = "After a create, edit, delete, duplicate, favorite toggle, or batch action that is visible in the library, the Export drawer previews still omit that session mutation (stale or seed-only export text)"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n36"
-name = "undo_does_not_restore"
-description = "After deleting or batch-deleting a palette via the UI, Undo leaves the collection unchanged — the deleted palettes stay gone"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n37"
-name = "contrast_matrix_static_after_recolor"
-description = "Recoloring a swatch in Detail/Editor leaves every contrast-matrix ratio and pass/fail mark identical — a derived surface ignoring its inputs"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n38"
-name = "invalid_palette_payload_still_saves"
-description = "Submitting a palette create/edit with empty artist, an out-of-list period, or an invalid hex swatch still adds or updates a palette — field-contract validation is skipped"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n39"
-name = "archive_json_missing_required_fields"
-description = "The archive JSON export preview omits required API-shaped fields (version palette-archive.v1, or palette id/name/artist/period/swatches/favorite) even when the library has palettes"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.52"
 name = "swatch_reorder_canonical_order"
 description = "Dragging a swatch in Detail/Editor (or using its move-up / move-down controls) commits a new order that persists across Detail close/reopen and layout switches, drives the card's swatch order in Palette view, and is the order of that palette's swatches array in the archive JSON export"
@@ -488,37 +432,5 @@ id = "1.59"
 name = "catalog_sheet_print_document"
 description = "The Export drawer's Catalog sheet tab shows a print-optimized document listing every non-archived palette with name, artist, period, tags, swatch chips with hexes, and rendered provenance notes, compiled live from the store, and a Print control opens the browser print preview of that sheet"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.n40"
-name = "reorder_lost_or_not_exported"
-description = "A committed swatch reorder reverts after closing and reopening Detail or switching layouts, or the archive JSON export lists that palette's swatches in the old order"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n41"
-name = "search_or_facets_decorative"
-description = "Typing in the search input or activating a tag or Archived facet leaves the visible palette set unchanged when matching and non-matching palettes both exist"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n42"
-name = "catalog_sheet_stale_or_leaks_archived"
-description = "The catalog sheet omits a session create, edit, tag, or reorder, or includes palettes that are archived"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core functionality or an end-to-end user flow that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

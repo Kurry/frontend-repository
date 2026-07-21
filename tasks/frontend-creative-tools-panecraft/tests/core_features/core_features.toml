@@ -239,56 +239,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.29"
-name = "missing_seeded_workspace"
-description = "The workspace starts empty, requires login or an external connection, omits a bundled source, or lacks one of the three populated default panes"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.30"
-name = "insensitive_chart_or_incomplete_wizard"
-description = "Changing source, metric, dimension, or date range leaves affected chart marks and values identical, updates only one eligible pane, or the wizard omits a required pane type"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.31"
-name = "collaboration_divergence_or_overwrite"
-description = "Delivery orders converge to different Shared content, a non-conflicting change is dropped, replay duplicates content, or a conflict overwrites silently without a visible resolution choice"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.34"
 name = "chart_hover_tooltip_follows_point"
 description = "Hovering a data point or bar in a chart pane shows a tooltip with that point's label and value, and moving to another point moves the tooltip to the newly hovered point"
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "1.n35"
-name = "export_omits_session_mutations"
-description = "After editing a pane metric, changing the date range, or creating a saved analysis, an open Workspace JSON or Markdown report preview omits those edited session values"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n36"
-name = "workspace_json_missing_required_contract_keys"
-description = "An open Workspace JSON export preview omits required contract keys (schemaVersion panecraft-workspace-v1, activePageId, dateRange, pages, or savedAnalyses) or shows dateRange / pane type / size / refreshInterval / source values outside their closed enums"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable core-feature defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

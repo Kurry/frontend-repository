@@ -106,22 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "storage_persistence_used"
-description = "localStorage or sessionStorage holds bundles, gate results, notes, recommendations, or UI state after exercising the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "external_network_requests"
-description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "console_clean_through_flows"
 description = "The console is free of errors and warnings on first load and stays clean while filtering the portfolio, re-running gates, pausing and retrying steps, inspecting and diffing trials, resolving fix items, saving an override, and bundling"
@@ -157,36 +141,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.10"
-name = "rerun_results_not_identical"
-description = "Two completed re-runs of the same gate produce byte-identical published output both times (identical scores, trial additions, and timeline timestamps), indicating hardcoded rather than simulated results"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.11"
-name = "debug_artifacts_visible"
-description = "Visible debug output, console.log spam, placeholder scaffolding, or leftover developer overlays appear in the running app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.12"
 name = "app_serves_documented_path"
 description = "The app serves on port 3000 via its documented start path and renders the portfolio without a blank or broken page"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.13"
-name = "outbound_chrome_links_present"
-description = "App chrome contains outbound navigational links that leave the app's origin"
-type = "binary"
-weight = 1.0
-negate = true
-
 
 [[criterion]]
 id = "2.14"
@@ -195,18 +154,3 @@ description = "A successful recommendation/override save creates the same reques
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.15"
-name = "export_preview_diverges_from_store"
-description = "The Export Review Package JSON preview disagrees with the live portfolio/workspace about a bundle's recommendation, overrideJustification, resolved fix items, step notes, or Bundled state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

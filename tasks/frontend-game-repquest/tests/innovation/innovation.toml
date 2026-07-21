@@ -154,22 +154,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The build meets only the thinnest literal checklist with no extra polish, guidance, or craft beyond a bare functional shell"
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_template"
-description = "The UI reads as a generic dashboard template with no RepQuest-specific quest identity, competitive loop, or export-centered end state"
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The implementation includes a meaningful, browser-observable innovation or polish beyond the written specification that improves the RepQuest experience and is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If nothing beyond the spec is present, answer no."

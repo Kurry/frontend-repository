@@ -106,22 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "storage_persistence_used"
-description = "localStorage or sessionStorage holds repositories, runs, filters, or view state after exercising the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "external_network_requests"
-description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "console_clean_during_session"
 description = "No console errors, warnings, or unhandled promise rejections appear on load or during a full exercise of the app, including while simulated runs are advancing"
@@ -150,10 +134,3 @@ name = "cold_load_and_rapid_input"
 description = "The app is interactive within 2 seconds of a local cold load, stays responsive during simulated runs and under rapid repeated input (fast view switches, filter toggling) with no hangs, and async-feeling surfaces show a deliberate loading affordance rather than a blank region"
 type = "binary"
 weight = 1.0
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

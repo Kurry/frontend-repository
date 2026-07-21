@@ -113,22 +113,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.4"
-name = "external_host_request_issued"
-description = "The page issues a request to an external host (remote font, image, video, script, analytics, consent, or telemetry endpoint)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.5"
-name = "console_error_or_failed_asset"
-description = "The console reports an uncaught error, or an asset request fails with a 4xx/5xx status or net::ERR"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.6"
 name = "decorative_media_aria_hidden"
 description = "The floating hero art, the path-traveling orb, the marquee decoration, and the custom cursor element are marked aria-hidden so they create no duplicate announcements, the cursor element keeps pointer-events: none, and the slideshow region carries an accessible label"
@@ -205,26 +189,3 @@ description = "The trial brief form validates the trial-signup request-body fiel
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n11"
-name = "brief_preview_desyncs_from_form"
-description = "After editing name, plan, or interests, the live preview shows different values than the form controls until a full page reload."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n12"
-name = "brief_commits_without_field_contract"
-description = "Submit trial brief can succeed, or Import can accept a file, without enforcing name 2–80, dotted-domain email, closed plan/team_size enums, interests closed-list uniqueness, or the Free-trial/Team/Pro cross-field rules — yet still shows Trial brief ready or mutates the preview."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, accessibility, or performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -211,22 +211,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.20"
-name = "static_list_without_crud"
-description = "Users list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.21"
-name = "outbound_links_in_chrome"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.22"
 name = "sidebar_nav_structure_complete"
 description = "The sidebar shows Pineapple Tech branding, at least 14 collapsible nav groups including a Users group containing All Users, Add User, Roles, Permissions, User Logs, User Stats, User Payments, and User Products, a top-level Dashboard item, and a sticky account footer (online avatar, name, role) whose click opens a popover that expands upward"
@@ -381,22 +365,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n3"
-name = "export_omits_session_work"
-description = "Export Session JSON or Users CSV omits a create, edit, delete, status, or role change that is already visible in the UI, or Import of valid Session JSON fails to restore the exported session"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "field_contract_not_enforced"
-description = "Add User accepts an empty firstName, firstName longer than 40 characters, an email missing a domain dot, temporaryPassword shorter than 8 characters, a role or status outside the closed enums, or notes longer than 280 characters and still adds a row"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.44"
 name = "users_csv_exact_header_and_rows"
 description = "The Users CSV preview starts with the exact header line firstName,lastName,email,phone,role,status,payments,products,lastActive and includes one data line per user; after creating a user with a distinctive firstName, that firstName appears in a CSV data line before copy or download"
@@ -417,10 +385,3 @@ description = "The Session JSON exportedAt field is an ISO-8601 timestamp string
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

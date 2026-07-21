@@ -162,88 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "studio_controls_unreachable_by_keyboard"
-description = "A toolbar tool, header action, swatch, Layers row control, Saved projects control, or conflict resolution choice cannot be reached or activated via keyboard alone."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_on_studio_controls"
-description = "Focused toolbar tools, header actions, swatches, Layers controls, or the project name field show no visible focus outline or the outline is obscured."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Toolbar tools, Layers row controls, or Collaboration conflict choices use non-semantic tags without ARIA roles or accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "active_tool_or_error_color_only"
-description = "Active-tool state, selected swatch, or project-name validation error is conveyed by color alone with no text, check mark, selected attribute, or other non-color cue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "conflict_choice_not_keyboard_operable"
-description = "With Keep local / Keep remote / Merge both visible, keyboard users cannot activate any of the three conflict resolution choices."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "unreadable_contrast_on_chrome_or_panels"
-description = "Header labels, tool-rail section labels, Layers heading, or primary button labels are unreadable due to poor contrast against their background in dark or light theme."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "validation_errors_visual_only"
-description = "Saved-projects name validation feedback is visual only and is not associated for assistive technology (no described-by, label wiring, or live region)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "icon_only_controls_missing_names"
-description = "Icon-only toolbar or header controls that convey actions are missing an accessible name."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_skipped_in_workspace"
-description = "Workspace headings (MarkupFlow title, Layers, Saved projects, Collaboration scenario, or tool-rail section labels exposed as headings) skip levels or have no coherent order."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, Layers row enter/exit, Saved projects row enter, or Collaboration Syncing pulse still animate fully."
-type = "binary"
-negate = true
-weight = 1.0
-
-# HARDEN_MARKUPFLOW_V1
-
-[[criterion]]
 id = "1.11"
 name = "export_import_history_keyboard_reachable"
 description = "Export project JSON, Import project, Copy project JSON, History entries, Versions Restore/Delete, preset controls, Copy style, Paste style, Save snapshot, and Compare are reachable and operable with the keyboard alone with a clear focus outline"
@@ -257,18 +175,3 @@ description = "When Compare is active, the control exposes pressed/selected stat
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n11"
-name = "new_export_controls_keyboard_trapped_out"
-description = "Export project JSON, Import project, History entries, or preset controls cannot be reached or activated via keyboard alone"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

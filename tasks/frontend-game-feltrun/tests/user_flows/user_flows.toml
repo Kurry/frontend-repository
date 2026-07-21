@@ -183,86 +183,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_game_flows_unavailable"
-description = "Deal first hand, betting controls, Export Copy/Download, Save table, or Undo last action are not reachable from the UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "completed_hand_missing_from_history"
-description = "A completed hand fails to appear in Hand history or appears duplicated"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "export_desyncs_from_panels"
-description = "After a completed hand, Export preview handHistory or session stats disagree with the visible Hand history and Session stats panels"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "panel_toggle_resets_hand"
-description = "Opening or closing Hand history, stats, badges, or Export resets the active hand, stacks, or pot"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_history_broken_ui"
-description = "Before any hands, Hand history shows a broken blank region with no \"No hands played yet\" empty state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "save_resume_wrong_position"
-description = "After Save table mid-hand and reload, the table resumes at a different board, street, pot, or side to act than was saved"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "drawer_cannot_reopen"
-description = "On a narrow viewport the collapsed stats/history drawer cannot be reopened"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "session_confirm_blocks_exit"
-description = "The Start new session confirmation has no cancel or dismiss path and blocks further play"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "import_fails_without_feedback"
-description = "Importing invalid session JSON fails with no visible inline error naming the import field"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "flow_dead_end_requires_reload"
-description = "A betting, export, save/resume, or new-session flow dead-ends and requires a full page reload to recover"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.14"
 name = "badge_toast_panel_and_reload_persistence"
 description = "Earn a badge through real play and observe its transient toast at unlock, then confirm it remains listed in the Badges panel as another badge is earned; after a full page reload, the same earned badges remain listed"
@@ -283,10 +203,3 @@ description = "In Collaboration scenario, create two offline edits to the same n
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

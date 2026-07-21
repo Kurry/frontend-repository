@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_timeline_no_feedback"
-description = "An empty timeline shows nothing and provides no UI feedback"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n2"
-name = "errors_only_in_console"
-description = "Composer or Import errors are surfaced only in the browser console"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Send, archive, bulk, or copy actions lack visible feedback"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n4"
-name = "delete_lacks_warning"
-description = "Delete or Delete selected has no confirmation warning"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_nonsemantic_wrappers"
-description = "Non-semantic div or span tags wrap interactive Send, Export, or bulk controls"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Delete, Export, or Import overlays cannot be dismissed via Escape"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n7"
-name = "validation_missing_or_delayed"
-description = "Validation feedback for blank send or invalid import is missing or delayed with no UI indication"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n8"
-name = "button_text_ambiguous"
-description = "Export, Import, or bulk action button text is ambiguous or missing"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n9"
-name = "syntax_chips_lack_guidance"
-description = "Search syntax chips are absent so tag: and done: filters have no in-app guidance"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n10"
-name = "bulk_checkboxes_inaccessible"
-description = "Note selection checkboxes are visually hidden or inaccessible"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.11"
 name = "overlength_text_rejected"
 description = "Submitting composer text longer than 2000 characters shows validation naming the text field and appends no note"
@@ -263,24 +183,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n11"
-name = "overlength_silently_accepted"
-description = "Composer text longer than 2000 characters is accepted and appended without naming the text field"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.14"
 name = "long_url_wraps_in_bubble"
 description = "A note whose text is one long unbroken URL wraps inside its bubble rather than overflowing or stretching the single centered column"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

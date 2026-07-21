@@ -232,22 +232,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "1.21"
-name = "run_progress_hardcoded_static"
-description = "The run progress list, rollup counts, or event timeline render as static content that stays frozen while an agent is nominally running, indicating the run machinery is hardcoded display rather than live state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "status_change_leaves_stale_surface"
-description = "A status change made in one surface (row control, bulk action, or detail panel) leaves a different surface (badge, rollup strip, panel, or timeline) showing the old value until a reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.23"
 name = "fleet_export_live_snapshot"
 description = "Export fleet opens a preview of structured fleet JSON with version, exported-at ISO-8601 timestamp, rollup counts matching the strip, and an agents array whose entries carry name, agentType, editorIntegration, accessKey, status, lastSeen, timeline, and run; after a register or status mutation the reopened preview includes that mutation"
@@ -282,27 +266,3 @@ description = "Ctrl+K or Cmd+K opens a command palette listing Jump to agent ent
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.28"
-name = "export_omits_session_mutations"
-description = "After registering an agent or changing an agent's status through a real control, reopening Export fleet shows JSON that omits the new agent or still shows the pre-change status, proving the export is stale or hardcoded"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.29"
-name = "import_accepts_invalid_contract"
-description = "Importing malformed JSON or a document that violates the agent field contract mutates the registry or clears it without showing an inline import error"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

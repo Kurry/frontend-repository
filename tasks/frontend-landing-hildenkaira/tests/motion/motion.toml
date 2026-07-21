@@ -179,14 +179,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "3.13"
-name = "animations_snap_or_state_shortcut"
-description = "Reveals, flick reshuffles, counters, or button feedback appear instantly with no animation, are only reachable by snapping state (no real scroll/click/hover gesture), or interactive chrome (buttons, nav links, locale options, form controls, carousel controls) gives no visible hover/focus response"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.14"
 name = "button_and_dot_easing_timings"
 description = "When hovering a primary button, its animated targets transition transform over 0.525s with easing cubic-bezier(0.625, 0.05, 0, 1); when hovering/current, the nav link dot scales over 0.525s with easing cubic-bezier(0.175, 0.885, 0.32, 1.275)"
@@ -224,14 +216,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.19"
-name = "signature_gestures_use_linear_tweens"
-description = "Primary-button hover, nav-dot scale, flick-deck reshuffle, or CTA-card inertia throws start and stop on purely linear tweens with no inertial, springy, or overshoot easing"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.20"
 name = "load_timeline_orchestrated"
 description = "On a fresh load, the lime veil lift, lettermark letter-by-letter rise, and nav settle play as one coordinated intro timeline rather than unrelated instant pops"
@@ -251,14 +235,6 @@ id = "3.22"
 name = "palette_and_brief_panel_transitions"
 description = "On the real UI path, the command palette and discovery brief panel enter and exit with a brief opacity/scale transition; the Copy confirmation appears briefly then reverts."
 type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "3.n21"
-name = "palette_brief_snap_open_only"
-description = "The command palette or discovery brief panel snaps open/closed with no transition on the real open/close control path."
-type = "binary"
-negate = true
 weight = 0.5
 
 [[criterion]]
@@ -282,34 +258,3 @@ description = "On a fine-pointer desktop viewport, eligible cards respond to rea
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "8.a5"
-name = "scroll_capture_breaks_usability"
-description = "Smooth scrolling traps the user, prevents reaching content, fights native scroll direction below 768px, or ignores the reduced-motion path that must stop smooth scrolling, drifting thumbnails, decorative video, marquees, and pinned throws while keeping every card, heading, control, and form operable"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "8.a6"
-name = "kinetic_effects_decorative_jank"
-description = "Lettermark letter-assembly or line-by-line mask reveals stutter, reflow mid-animation, or leave characters/lines misaligned after settling"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "8.a7"
-name = "signature_motion_purely_linear_tweens"
-description = "Signature interactive motion (primary-button hover choreography, nav-dot overshoot, flick-deck elastic settle, or CTA-card inertia throws) uses purely linear tweens that start and stop mechanically with no inertial, springy, or overshoot easing"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

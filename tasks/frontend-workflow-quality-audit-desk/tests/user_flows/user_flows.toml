@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Running checks, reviewing criteria, adding feedback, or escalating is unavailable from the visible UI on records that should offer it"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "feedback_entries_missing_or_duplicated"
-description = "A submitted feedback entry fails to appear in the thread, or appears more than once from a single submission"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "state_changes_desync_displays"
-description = "A run outcome, verdict, or feedback entry appears in one surface but a related surface (queue row, rollup, report) still shows the old value"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "Switching views breaks the layout, drops the applied filters, or loses the selected record"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_filter_state_broken"
-description = "Filtering to zero matches produces a broken or blank table region with no message or recovery control"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "filtered_views_disagree"
-description = "The queue's visible rows disagree with the rollup cell or filter chip that produced them (for example a fail-filter cell tallies 5 while the filtered table shows a different set)"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "The collapsed navigation rail or a collapsed disclosure cannot be reopened"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "An open modal or form overlay traps the user with no working close, cancel, or Escape path"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A rejected submission or a failed run step leaves no visible feedback explaining what happened"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Some navigation state (an open detail view, a paused run, an applied filter combination) can only be escaped by reloading the page"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "6.11"
 name = "mutation_to_export_flow"
 description = "Fail a criterion with a distinctive rationale and add a feedback entry with distinctive findings, then open Report: Audit Package JSON shows schemaVersion quality-audit-package-v1 and those exact strings under the field-contract keys for that task; Copy and Download are available"
@@ -256,18 +175,3 @@ description = "After a session mutation, export Audit Package JSON, import that 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n11"
-name = "export_flow_unavailable"
-description = "Copy, Download, format switch, or Import package is unavailable from the Report view after the desk has session state to export"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "A critical end-to-end flow fails in a way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

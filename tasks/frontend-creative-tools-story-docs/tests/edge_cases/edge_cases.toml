@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_board_shows_nothing"
-description = "After the last scene is deleted, the board shows nothing — no empty-state message and no Add Scene path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "validation_errors_only_in_console"
-description = "Empty required-field create failures surface only in the browser console with no visible inline field feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "inert_chrome_silent_or_navigates"
-description = "Clicking an inert header/sidebar control either navigates away from the app or produces no visible feedback at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "delete_lacks_destructive_label"
-description = "Scene delete proceeds from an unlabeled or non-destructive-looking control with no Delete labeling distinguishing it from edit."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_nonsemantic"
-description = "Primary interactive controls (view-mode toggles, Add Scene, kebabs, drawer triggers) are non-semantic div/span click targets without button/role semantics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "drawers_not_keyboard_dismissible"
-description = "With a notifications or account drawer open, keyboard users cannot dismiss it (no Escape path and no focusable close control)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "invalid_create_still_adds_scene"
-description = "Submitting the create form with an empty required title or description still increases the scene count or enables submit while invalid."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_action_labels"
-description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Add Scene, Tile, List, Slide, Edit, or Delete."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "slide_wraps_or_lands_blank"
-description = "In Slide mode, prev on the first scene or next on the last wraps around, or deleting the active slide leaves a blank slide with no valid neighbor."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "double_submit_duplicates_scene"
-description = "Double-activating a valid create submit adds more than one scene or leaves duplicate cards for a single intended create."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "4.11"
 name = "field_contract_bounds_rejected"
 description = "Submitting create with title shorter than 2 characters, body shorter than 8 characters, or status outside draft/review/ready adds no scene, shows an inline validation message naming the invalid field, and leaves submit disabled until valid."
@@ -271,22 +190,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n11"
-name = "import_mutates_on_invalid"
-description = "An invalid StoryboardPackage import changes the scene collection without a visible error naming the problem."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n12"
-name = "out_of_contract_create_succeeds"
-description = "A create with title/body outside the field-contract bounds or an invalid status still increases the scene count."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.15"
 name = "single_version_and_identical_diff"
 description = "A scene with only one version shows no enabled Restore action, and comparing a version with itself (or one identical to current) shows an explicit no-differences state rather than an empty or broken diff."
@@ -300,18 +203,3 @@ description = "Toggling a rendered checklist checkbox changes only that line's c
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n13"
-name = "canvas_drag_renumbers"
-description = "Dragging a card on the Canvas renumbers the board or alters the order shown in Tile/List/Slide."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

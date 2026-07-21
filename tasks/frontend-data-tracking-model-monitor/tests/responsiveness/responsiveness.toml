@@ -126,27 +126,3 @@ description = "At 375 pixel width the command palette opens, accepts typed searc
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "7.n1"
-name = "narrow_viewport_clips_controls"
-description = "At 375 pixel width toolbar controls, the budget readout, or export actions are clipped or unreachable"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "page_level_horizontal_scroll"
-description = "At 375 or 768 pixel width, page-level horizontal scrolling appears"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0
-

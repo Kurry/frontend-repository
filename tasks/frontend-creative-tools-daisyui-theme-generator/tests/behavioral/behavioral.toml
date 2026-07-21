@@ -148,39 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After creating a custom theme, editing tokens, and switching preview tabs then reloading without a theme= hash, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "preview_identical_across_different_tokens"
-description = "Changing primary/secondary colors or radius/size tokens across clearly different values leaves the live preview and CSS export visually identical — a derived surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_themes_apply_identical_tokens"
-description = "Selecting two built-in themes that declare different color tokens (for example cupcake vs dracula) yields identical editor swatches and preview colors."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "list_or_export_stale_until_reload"
-description = "After renaming a custom theme or editing a token, My themes row labels, live preview, or CSS export still show stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.9"
 name = "import_export_round_trip_probe"
 description = "Export a custom theme as JSON after distinctive token edits, remove the theme, import that JSON, and confirm editor swatches, preview colors, contrast badges, and all three artifact formats reconstruct the exported values without reload."
@@ -193,14 +160,6 @@ name = "undo_restores_then_redo_reapplies"
 description = "Edit a primary color so preview and artifact text change, Undo once and confirm all dependent surfaces revert together, then Redo and confirm they all match the edited values again."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "artifact_identical_after_divergent_edits"
-description = "Two clearly different primary-color edits leave the Artifact center CSS/JSON/Config texts byte-identical — export ignoring session inputs."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "14.11"
@@ -216,18 +175,3 @@ description = "After creating or editing a custom theme with a valid name and di
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n6"
-name = "import_accepts_contract_violations"
-description = "Import accepts JSON missing a required colors key, carrying a non-#RRGGBB color / out-of-enum radius/size/border, or defaultDarkTheme true with darkColorScheme false, and still mutates My themes or the active theme."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

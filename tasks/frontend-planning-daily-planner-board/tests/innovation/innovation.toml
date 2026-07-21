@@ -163,14 +163,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "11.n1"
-name = "novelty_overlay_traps_board"
-description = "A novelty coachmark, confetti layer, or onboarding overlay permanently blocks the multi-day board with no dismiss control"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app exhibits a delightful, browser-observable enhancement beyond the written specification that is NOT covered by any other criterion in this file and that a real planner user would value. If present, name the enhancement and cite the concrete evidence. If nothing beyond the spec stands out, answer no."

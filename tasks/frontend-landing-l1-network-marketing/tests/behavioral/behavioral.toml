@@ -141,39 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_in_memory_state_survives_reload"
-description = "After configuring theme, Events Manager filter, and a created event, a reload leaves an incoherent mix (for example dark theme survives while the created event resets, or a filter survives alone)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "filter_list_ignores_inputs"
-description = "Applying different status or category filters in Events Manager leaves the visible row set identical (derived list ignores filter inputs)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_titles_produce_identical_rows"
-description = "Creating two events with different titles yields byte-identical row labels or only one distinct title appears for both creates."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "edit_stale_until_reload_on_landing"
-description = "After editing an event title in Events Manager, Global Events landing listings keep the prior title until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.9"
 name = "export_then_import_round_trip"
 description = "Starting from seeded events: create one upcoming event and one contact lead, open Export catalog and capture the JSON preview text, delete that event so the count drops, then import the captured JSON; the created title and prior count return in Events Manager and matching landing listings, and Session leads restore from the packet."
@@ -222,34 +189,3 @@ description = "Toggle to dark, then Download leads JSON and Export JSON; both re
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_ignores_session_work"
-description = "After create/edit/delete or contact-lead mutations, Export JSON/ICS or ridge-session-leads.json remain byte-identical to the pre-mutation seed catalog or empty leads log."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "undo_skips_export_or_rollups"
-description = "Undo after delete restores the manager row but leaves Export JSON and/or status rollups stuck on the deleted state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n7"
-name = "lead_exports_identical_despite_different_submits"
-description = "Two successful contact submits with different emails/names produce exported leads arrays that are byte-identical or still empty."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

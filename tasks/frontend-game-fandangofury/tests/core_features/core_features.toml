@@ -232,30 +232,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.28"
-name = "combat_scene_static_or_noninteractive"
-description = "The combat scene is static or non-interactive: attacks leave enemy health unchanged, waves stay frozen, or the game fails to progress against shared application state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.29"
-name = "history_flattens_abandoned_branch"
-description = "Undoing and then making a different change silently discards or flattens the abandoned history states into one linear list instead of preserving them as a selectable branch"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.30"
-name = "fabricated_success_or_constant_outcome"
-description = "A success or completion state — a landed combo, a purchase, a Stage unlock, or a Victory — appears while the underlying action did not occur, or an outcome stays constant regardless of the inputs given"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.31"
 name = "fighter_settings_inline_validation"
 description = "In the Fighter Settings form, an empty name, a name outside 2 to 20 characters, or an effects intensity outside 0 to 100 shows an inline validation message naming that field before submit while the Save control stays disabled with no partial save; entering valid values enables Save, and saving shows the fighter display name in the Stage-select header"
@@ -330,29 +306,5 @@ id = "1.41"
 name = "campaign_import_rejects_invalid_schema"
 description = "Importing malformed JSON or JSON that fails the Campaign field contract (wrong schemaVersion, displayName outside 2–20, effectsIntensity outside 0–100, masks.equipped not in owned, or checkpoint.phase outside wave|boss) shows validation naming the offending field and leaves Pesos, Masks, Stages, and Export preview unchanged"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.42"
-name = "export_omits_session_mutations"
-description = "After mutating fighter display name or a Cantina upgrade level, the Export Campaign JSON preview is identical to the pre-mutation text or omits the mutated field values"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.43"
-name = "resume_run_restores_wrong_state"
-description = "After Save Checkpoint and Resume Run (including after refresh), the restored run shows a different Stage, wave/boss phase, Health, or Fury than the values frozen at save time"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

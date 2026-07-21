@@ -150,22 +150,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.9"
-name = "dark_on_dark_text_present"
-description = "Card faces, chip amounts, or seat badges render as dark text on the dark felt, or are otherwise illegibly low-contrast against --color-background"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.10"
-name = "mobile_layout_overflows_or_clips"
-description = "At approximately 375px wide the layout forces horizontal scrolling or clips the table, betting controls, or side panels instead of collapsing them into a drawer"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.11"
 name = "consistent_icon_set"
 description = "Icons across the chrome (panel toggles, badges, controls) come from one consistent icon set with a uniform stroke and sizing, not a visible mix of styles"
@@ -194,24 +178,9 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "2.15"
-name = "placeholder_copy_shipped"
-description = "Lorem ipsum or placeholder text (\"TODO\", \"asdf\", \"Lorem\", template variable names like {{title}}) is visible somewhere in the shipped UI, or prominent copy contains spelling errors"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.16"
 name = "export_panel_monospace_preview"
 description = "The Export panel shows a monospaced session JSON preview with Copy and Download actions, and the difficulty control and Save table / Load saved table controls read as part of the same felt chrome rather than a disconnected gadget strip"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

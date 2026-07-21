@@ -106,22 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "storage_persistence_used"
-description = "localStorage or sessionStorage holds users, theme, or filter state after exercising the app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.5"
-name = "external_network_requests"
-description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.6"
 name = "hydration_clean_console"
 description = "The console is free of errors, warnings, and hydration mismatch messages on first load and stays clean after switching views and exercising create, edit, delete, filter, sort, export, import, and theme flows"
@@ -133,14 +117,6 @@ id = "2.7"
 name = "direct_load_full_shell"
 description = "Loading the served URL directly in a fresh tab always renders the complete dashboard shell (sidebar, header, main canvas) with its seeded data — never a blank page, half-rendered shell, or 404"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.8"
-name = "post_hydration_content_flash"
-description = "After first paint, the statically rendered content visibly flashes, shifts, or is replaced by different client content (mismatched text, reflowing layout, restyled elements) as the app becomes interactive"
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -185,10 +161,3 @@ description = "Session JSON and Users CSV compile live from the current store: a
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "technical.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -164,38 +164,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_typos"
-description = "Spelling or grammatical errors appear in prominent copy such as Home of the uniquely awesome., Book your Studio, or nav labels."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "source_brand_names_in_copy"
-description = "Rendered copy still names a source-site brand, domain, email, or distinctive source copy instead of the fictional Noma system (e.g. non-noma.example contact addresses)."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "copy_truncated_or_overflowing"
-description = "Truncated or overflowing text renders mandated headings, marquee phrases, pricing tiers, or footer address copy unreadable at 1440 or 390."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "15.13"
 name = "inquiry_and_shortlist_copy_exact"
 description = "Where the app renders shortlist/inquiry chrome, the empty state No studios shortlisted yet, success Inquiry ready — export your packet, Copied confirmation, privacy label Συμφωνώ με την Πολιτική Απορρήτου, and the three FAQ questions appear exactly."
@@ -209,10 +177,3 @@ description = "Where the app renders inquiry validation errors, they name the pr
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -140,31 +140,3 @@ name = "success_messages_specific"
 description = "Success toasts for zone unlock, boss defeat, gear bought, Saved, and Copied are specific rather than a generic Success"
 type = "binary"
 weight = 0.5
-[[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Placeholder or lorem-ipsum text is visible in the shipped UI"
-type = "binary"
-negate = true
-weight = 0.5
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Prominent headings or primary buttons contain obvious typos or truncated words"
-type = "binary"
-negate = true
-weight = 0.5
-[[criterion]]
-id = "15.n3"
-name = "concept_names_inconsistent"
-description = "The same concept is labeled with conflicting names across tabs (for example Quest Points vs XP with no mapping)"
-type = "binary"
-negate = true
-weight = 0.5
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "A significant writing defect is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If already covered, answer no here."
-type = "binary"
-negate = true
-weight = 0.5

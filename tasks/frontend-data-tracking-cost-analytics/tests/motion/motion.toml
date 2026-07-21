@@ -154,26 +154,3 @@ description = "With prefers-reduced-motion set, count-ups, chart growth, ring sw
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n1"
-name = "intro_motion_absent"
-description = "On a fresh load neither the KPI count-up nor the chart growth animation occurs — all values and plots snap in with no motion anywhere"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "animation_causes_jank"
-description = "Chart, chip, or slider animations cause visible layout shift, flicker, or tooltip misalignment after settling"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "motion.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion and microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

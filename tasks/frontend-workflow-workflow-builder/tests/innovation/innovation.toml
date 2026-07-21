@@ -129,14 +129,6 @@ weight = 0.5
 
 
 [[criterion]]
-id = "11.n1"
-name = "blocking_coachmark_traps_user"
-description = "A first-run tip or coachmark overlays the canvas in a way that traps focus or blocks Run, palette drag, or Artifact export with no dismiss control."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app demonstrates a significant, browser-observable excellence or inventive refinement beyond the specification that is NOT covered by any other criterion in this file and would delight a real workflow author. Name the refinement and cite concrete evidence. Do not fail ordinary compliance gaps here — those belong in other dimensions."

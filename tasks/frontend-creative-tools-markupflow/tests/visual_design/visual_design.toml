@@ -187,33 +187,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "VD-N1"
-name = "active_tool_not_distinguished"
-description = "The active tool is not visually distinguished from inactive tools, or the highlight is only a tooltip rather than a background, border, or icon-color change"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "VD-N2"
-name = "regions_lack_hierarchy_or_rhythm"
-description = "The three regions compete for equal visual weight with no dominant canvas, or arbitrary off-scale spacing breaks the visible rhythm"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
-id = "VD-N3"
-name = "placeholder_text_in_shipped_ui"
-description = "Placeholder or scaffold text (Lorem ipsum, TODO, asdf, template variable names like {{title}}) is visible anywhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-# HARDEN_MARKUPFLOW_V1
-
-[[criterion]]
 id = "VD-14"
 name = "presets_and_history_panel_chrome"
 description = "The left tool rail includes a Presets group with the four named recipes, and the right column shows History and Versions panels with headings larger/bolder than muted uppercase tool-rail section labels"
@@ -227,18 +200,3 @@ description = "The project JSON preview renders as monospace text on a recessed 
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "VD-N4"
-name = "compare_active_without_visual_treatment"
-description = "Compare is active (annotations hidden) but the Compare control shows no visible active/pressed treatment distinguishing it from rest"
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "VD.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

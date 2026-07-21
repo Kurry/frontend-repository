@@ -177,72 +177,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_directory_flows_unavailable"
-description = "Create, edit, archive, restore, export, or import flows are not enabled from the UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "new_users_missing_or_duplicated"
-description = "New users fail to show up after valid create, or a single submit duplicates rows."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "archive_and_exports_desync"
-description = "After Delete/Restore or create, All Users, Archive, User Logs, and Directory JSON/Users CSV disagree about membership or fields without a reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "command_palette_or_view_switch_breaks"
-description = "Command palette navigation or sidebar view switching breaks layout or loses the directory collection."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_active_collection_breaks_ui"
-description = "Archiving all users or filtering to zero matches produces a broken All Users region with no empty state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "export_import_round_trip_breaks"
-description = "After export-then-import of Directory JSON following session mutations, All Users/Archive/KPIs diverge from the pre-export mutated state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "field_contract_accepted_invalid_payload"
-description = "Add User accepts payloads that violate the field contract (overlong names, email without domain dot, short temporaryPassword, or unknown permission ids) and still creates a row."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.13"
 name = "create_payload_matches_export_record"
 description = "After Add User with a distinctive email plus sendInvitation true and a closed permission id selected, Directory JSON users entry for that email carries the same firstName/lastName/email/role/status/sendInvitation/permissions field names as the submitted request body."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

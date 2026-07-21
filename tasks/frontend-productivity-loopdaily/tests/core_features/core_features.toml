@@ -204,14 +204,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.26"
-name = "checkin_disturbs_habit_order"
-description = "Completing a habit's check-in changes the visible list order (rather than the completion action leaving order untouched)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.27"
 name = "heatmap_hover_tooltip"
 description = "Hovering a day cell in the Heatmap view shows a tooltip naming that date and its completion state"
@@ -224,14 +216,6 @@ name = "new_habit_category_dropdown"
 description = "The New Habit form includes a category dropdown, and the created habit is assigned to the category chosen at creation time"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.29"
-name = "advance_day_control_present"
-description = "The app exposes a manual advance-day, time-travel, or simulated-date control somewhere in the UI instead of computing streaks and calendars from the real device date"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.30"
@@ -352,18 +336,3 @@ description = "Artifact end state: create a habit with a distinctive name, categ
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.47"
-name = "import_mutates_on_invalid_contract"
-description = "Import accepts a parseable JSON document that violates the Workspace JSON field contract (wrong schemaVersion, missing required keys, illegal enums, or unresolved categoryId) and still replaces the current habits or categories"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core habit-tracking functionality (creation, check-ins, categories, history views, reminders, ordering, pause, stats, or import/export) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

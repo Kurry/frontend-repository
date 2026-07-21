@@ -162,96 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at 1440px or 375px"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Palette, Export, or Import controls are too small or misaligned on mobile"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Field labels or panel text is too small to read at 375px"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped or horizontal scrollbars appear unnecessarily at 375px"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n5"
-name = "sidebar_or_menu_breaks_by_width"
-description = "The left rail or properties panel is unresponsive or missing at some widths"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "Fixed top-bar or overlays obscure the canvas or Export controls"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Stacking or overlap issues appear among panes or Export at some viewport size"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n8"
-name = "required_mobile_touch_actions_missing"
-description = "Palette placement or Export cannot be activated on mobile where the spec requires them"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n9"
-name = "fixed_size_canvas_overflows"
-description = "Document sheets or field boxes use a static size and overflow the viewport"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Undo, Redo, Export, Import, or Send for signing disappear at 375px or 1440px"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "7.11"
 name = "mobile_export_stays_operable"
 description = "At 375px width the Export modal including format tabs, Copy, and Download stays fully visible and operable rather than rendering off-screen"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

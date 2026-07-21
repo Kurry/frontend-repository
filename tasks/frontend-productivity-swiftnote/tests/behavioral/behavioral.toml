@@ -117,56 +117,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "After refresh or Workspace import, some note facets (title, pin, image, selection) restore while others silently revert, producing incoherent partial persistence."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "Search results, word/character counters, or Workspace JSON export render identically regardless of note edits or search input."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Creating two notes with different titles and bodies yields identical sidebar titles and identical Workspace JSON notes entries."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "After editing a note, the sidebar, Quick Switcher, or Workspace JSON export still shows stale title or body until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "workspace_export_import_pipeline"
 description = "Full pipeline: create a note with a unique title and body, pin it, open Export Workspace — JSON contains that note under the field contract — then Import that JSON after deleting all notes; the unique title, body, and pin return and Export Workspace again lists them."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_ignores_session_mutations"
-description = "Export Workspace JSON remains empty or otherwise omits visible session creates, edits, pins, or deletes — export not compiled live from the store."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

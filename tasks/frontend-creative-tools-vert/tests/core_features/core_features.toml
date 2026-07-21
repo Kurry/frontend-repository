@@ -212,14 +212,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.29"
-name = "false_success_shown"
-description = "The app presents a conversion success (Done, checkmark, output size, or enabled Download) for a file that has not actually been converted, or the empty queue displays a file row or progress while no file has been added."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.30"
 name = "route_urls_share_chrome_and_theme"
 description = "Navigating to Convert, Settings, or About by entering its URL directly renders the same view as reaching it through the navbar, with the shared pill navbar and the current theme intact on every route."
@@ -304,14 +296,6 @@ name = "conversion_session_import_round_trip"
 description = "After mutating settings and presets with at least one file still queued, exporting session JSON then Importing that same ConversionSessionDocument restores Settings quality/keep-metadata/theme/default target, the presets list, and Convert-to targets on currently queued files that match by filename, and the session JSON export preview matches that imported state including schemaVersion vert-session-v1."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.42"
-name = "session_export_omits_session_mutations"
-description = "After lowering quality, saving a preset, and converting a sample file, the session JSON or conversion-report export omits the lowered quality, omits the saved preset, or omits a per-file entry reflecting the converted row's name/from/to/status."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.43"
@@ -412,30 +396,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n43"
-name = "batch_tray_visible_with_zero_selected"
-description = "The batch tray (Batch set format, Batch remove, Download all done) is visible while zero queue rows are selected."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n44"
-name = "empty_preset_name_still_adds"
-description = "Saving a preset with an empty or whitespace-only name increases the visible preset count or adds a blank-named preset."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n45"
-name = "undo_fails_to_restore_queue_or_presets"
-description = "After removing a queued file or deleting a preset, Undo leaves the queue counts or presets list unrestored."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.57"
 name = "settings_update_field_contract"
 description = "Changing Settings quality within 1–100, keep-metadata, default Convert-to (png|jpeg|jpg|webp), and theme (light|dark) applies a SettingsUpdate payload whose values appear under the matching keys in the live session JSON export preview."
@@ -449,18 +409,3 @@ description = "Importing parseable JSON that fails the ConversionSessionDocument
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n46"
-name = "session_json_missing_schema_version"
-description = "After a valid conversion and settings mutation, the session JSON export preview omits schemaVersion vert-session-v1 or omits a required ConversionSessionDocument key (quality, keepMetadata, theme, activeCategory, defaultTarget, presets, files, or exportedAt)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

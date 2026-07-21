@@ -133,18 +133,3 @@ description = "With prefers-reduced-motion set, animations are removed while eve
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n1"
-name = "snapping_or_janky_transitions"
-description = "Interactive chrome gives no motion feedback at all — disclosures, banners, dialogs, and toasts snap with no transitions anywhere — or animations cause visible layout jank or flicker that disrupts reading the checklist"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

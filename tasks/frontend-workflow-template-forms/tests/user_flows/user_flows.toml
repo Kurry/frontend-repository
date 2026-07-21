@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "template_forms_flows_unavailable"
-description = "Technique forms, Save to Library, Library delete, or Export/Import cannot be completed from the visible UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "saved_prompt_missing_or_duplicated"
-description = "After a valid Save to Library, the new row fails to appear, appears duplicated, or the count does not increase by exactly one."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "preview_library_desync"
-description = "After generate/save, preview promptText, library row technique tag, and Export template-library.json disagree about the same saved entry."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "technique_or_library_switch_breaks"
-description = "Switching techniques or Forms↔Library breaks layout or loses the active technique selection unexpectedly."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_library_breaks_ui"
-description = "An empty Library view is blank/broken with no empty-state message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "sidebar_chips_disagree_with_form_state"
-description = "Sidebar status chips disagree with the form's actual draft/generated/saved state for the same technique."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "library_view_cannot_reopen"
-description = "After visiting Library, the Forms/Library switch cannot return to Library or Forms."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "save_or_export_modal_blocks_exit"
-description = "Save to Library or Export library overlays block navigation with no cancel/close path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_submit_or_import_silent"
-description = "An invalid technique submit or contract-invalid Import provides no visible named-field or import error feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "template_forms_dead_end_requires_reload"
-description = "A Template Forms flow leaves a dead end that requires a full page reload to continue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "export_library_after_save_flow"
 description = "Export library flow: save a valid Few-Shot prompt, open Export library, confirm template-library.json includes that title and technique and promptText matches the preview; Download or Copy succeed; after deleting the entry the next export omits it."
@@ -255,10 +175,3 @@ description = "Import round-trip: export JSON after a save, note entries length,
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

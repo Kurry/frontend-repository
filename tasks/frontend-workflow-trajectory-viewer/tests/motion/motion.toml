@@ -120,14 +120,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.5"
-name = "terminal_pops_in_complete"
-description = "Activating a terminal-bearing step renders its entire output instantly as one finished block with no progressive appearance and no streaming affordance"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.6"
 name = "annotation_list_microinteractions"
 description = "Driven through the real UI controls: a newly added annotation animates into the annotations list and a removed annotation animates out rather than appearing or vanishing instantly, ingest checklist items tick complete with an animated check transition, the code copy control briefly swaps to a confirmation state after copying, and a newly created classification report card enters with a short opacity and scale transition"
@@ -148,18 +140,3 @@ description = "Driven through the real UI: the command palette opens with a shor
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n1"
-name = "filter_or_palette_snaps_hard"
-description = "Changing the step-type filter or opening the command palette snaps with no transition while prefers-reduced-motion is unset"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

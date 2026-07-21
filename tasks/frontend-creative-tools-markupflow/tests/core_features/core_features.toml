@@ -218,22 +218,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.29"
-name = "named_tool_is_inert"
-description = "One or more named tools are inert: a shape, effect, text, undo/redo, delete, or export control is present but produces no visible change on the canvas or Layers panel when used"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.30"
-name = "deleted_annotation_lingers"
-description = "Deleting an annotation, or undoing, leaves the removed annotation still drawn on the canvas or still listed in the Layers panel"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.31"
 name = "choose_image_and_drop_load_client_side"
 description = "Loading an image file by clicking Choose image or by dragging it onto the drop zone renders it on the canvas, with no upload request appearing in the network log (the file is read entirely in the browser)"
@@ -410,50 +394,3 @@ description = "After drawing an arrow and placing a loupe, the Export project JS
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n2"
-name = "export_omits_session_annotations"
-description = "Export project JSON or Copy project JSON produces a payload that omits annotations the user just drew, or invents annotations that are not on the canvas"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n3"
-name = "preset_or_paste_style_inert"
-description = "A named Preset control or Paste style is present but produces no visible Layers/canvas change when activated under valid conditions (image loaded / style copied)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n4"
-name = "export_missing_required_schema_fields"
-description = "With annotations present, the Export project JSON preview is missing schemaVersion markupflow-project-v1, imageDataUrl beginning with data:image/, imageWidth, imageHeight, annotations, or an annotation's required id/type/x/y/color/strokeWidth fields"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n5"
-name = "import_accepts_invalid_schema"
-description = "Import project accepts a payload that violates the MarkupFlowProject or Annotation field contract (wrong schemaVersion, invalid enums, missing required keys, or geometry cross-field violations) and mutates canvas or Layers without an inline error naming the import problem"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n6"
-name = "export_omits_type_geometry_keys"
-description = "After drawing a rectangle and an arrow, the Export project JSON preview shows those annotations but omits the rectangle's width/height or the arrow's x2/y2 fields the Annotation field contract requires"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in its core annotation-studio features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

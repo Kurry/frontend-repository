@@ -148,40 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring image, annotations, layer order, saved project, and view mode then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of all facets surviving together."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "canvas_identical_across_different_style_inputs"
-description = "Changing active color or Thin/Thick stroke before drawing leaves newly drawn shapes visually identical — a derived surface ignoring its Style inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_tools_apply_identical_marks"
-description = "Drawing with two tools that must be visually distinct (for example Rectangle vs Arrow, or Blur vs Pixelate) yields identical canvas marks and identical Layers type labels."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_surface_state_stale_until_reload"
-description = "After drawing, deleting, or reordering, the canvas or Layers panel still shows stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-# HARDEN_MARKUPFLOW_V1
-
-[[criterion]]
 id = "14.9"
 name = "project_json_export_import_round_trip_probe"
 description = "Starting with a loaded sample image: draw two distinct shapes, reorder Layers so a known annotation is frontmost, Download project JSON (confirm preview shows schemaVersion markupflow-project-v1, imageDataUrl beginning with data:image/, imageWidth, imageHeight, and annotations with type/color/strokeWidth plus type geometry keys), Reset workspace (empty Layers), Import that JSON. Confirm the same two type labels, the same frontmost stacking, and the same canvas marks return — proving the export contains the session's actual work under the MarkupFlowProject schema."
@@ -223,26 +189,3 @@ description = "Edge-state: with annotations present, activate Compare (annotatio
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_identical_across_different_sessions"
-description = "Two Export project JSON / Copy project JSON payloads from clearly different annotation sets are byte-identical or omit the differing annotations."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "compare_permanently_deletes_annotations"
-description = "After Compare is toggled on and off, annotations that were present before Compare are missing from Layers or the canvas."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

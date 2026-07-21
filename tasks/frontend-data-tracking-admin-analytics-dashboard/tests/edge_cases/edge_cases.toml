@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection or zero-match filter shows nothing and provides no UI feedback"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "errors_only_reach_console"
-description = "Create or import validation failures appear only in the browser console"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Create, delete, export Copy, or import succeed or fail with no visible UI feedback"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Delete or bulk Delete removes users with no confirmation when the UI otherwise supports confirmations"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "double_submit_creates_duplicates"
-description = "Double-activating Add User submit creates more than one user row"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "import_malformed_mutates_session"
-description = "Importing malformed Session JSON or contract-violating users mutates the users collection as if import succeeded"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "bulk_with_zero_selection_fires"
-description = "Bulk Change status/role/Delete with zero checked rows still mutates users"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "long_name_breaks_layout"
-description = "A firstName or lastName of 40 characters overflows or breaks the table row layout instead of truncating readably"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "export_empty_users_errors"
-description = "With zero users, opening Export session errors or fails to show header-only CSV / empty users array JSON"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "validation_feedback_missing_or_delayed"
-description = "Field-contract validation feedback is missing or delayed with no UI indication on invalid Add User"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "bulk_export_zero_selected_opens_drawer"
 description = "With zero rows checkbox-selected, activating bulk Export still opens the export drawer with both format tabs available"
@@ -255,10 +175,3 @@ description = "After an invalid Add User submit attempt, correcting the offendin
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

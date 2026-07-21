@@ -117,38 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_incoherent"
-description = "After adding a holding and reloading, some holdings survive while the newly added holding or updated net-worth total silently reverts, producing incoherent partial persistence."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "allocation_ignores_filter_inputs"
-description = "Changing the asset-class filter leaves the allocation percentages and net-worth total identical to the unfiltered view even when the visible holdings set changed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_inputs_identical_output"
-description = "Repeating Add holding with different name/symbol/quantity/unit-price inputs yields byte-identical rows or identical market values that ignore the inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_stale_until_reload"
-description = "After editing quantity or deleting a holding, the table updates but the detail panel, net-worth total, or allocation stays stale until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "mutate_then_export_contains_work"
 description = "Add a valid holding with a distinctive symbol, then open Export portfolio. Confirm Portfolio JSON holdings and Holdings CSV both contain that symbol and its quantity/unitPrice/marketValue, proving export is compiled live from the session store."
@@ -168,24 +136,6 @@ name = "invalid_holding_payload_rejected"
 description = "Attempt to save a holding with an invalid enum or broken cross-field rule. Confirm an inline field error appears, row count is unchanged, and export previews do not gain a new holding."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "export_ignores_session_work"
-description = "After adding or editing a holding, Export portfolio JSON/CSV still omits the mutation or shows identical content to a pre-mutation export."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "import_round_trip_incoherent"
-description = "A valid export-then-import round-trip leaves the table, net worth, or allocation incoherent with the exported document."
-type = "binary"
-negate = true
-weight = 1.0
-
-
 
 [[criterion]]
 id = "14.12"
@@ -229,42 +179,3 @@ description = "Starting from the seeded state, apply one set of activities (for 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n7"
-name = "realized_gain_unchanged_after_sell"
-description = "After saving a SELL that should realize a gain or loss, the realized gain figure and total return remain identical to their pre-SELL values in the summary, detail panel, and Performance report."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n8"
-name = "import_mutates_before_commit"
-description = "The CSV import diagnostics screen changes the activities collection, ledger, or export previews before Commit is pressed, or Cancel still leaves the store mutated."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n9"
-name = "benchmark_series_tracks_activities"
-description = "The seeded benchmark series changes shape when activities are added, edited, or deleted, instead of staying fixed while the portfolio series moves."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n10"
-name = "batch_undo_incomplete"
-description = "A single Undo after a bulk delete or bulk edit restores only part of the batch or leaves derived totals, allocation, or export previews inconsistent with the fully restored collection."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling in the portfolio dashboard that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot). If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

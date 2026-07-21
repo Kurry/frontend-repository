@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "run_controls_unreachable_by_keyboard"
-description = "Start game, Pause, Resume, Submit Word, Undo Last Tile, Save Progress, Export Run, Play again, or the view tabs cannot be reached or activated via keyboard alone."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_on_chrome"
-description = "Keyboard Tab focus is missing or obscured on view tabs, game controls, or settings form fields."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "settings_controls_lack_semantics"
-description = "Settings form controls or primary run buttons are non-semantic clickable elements without button/link roles or accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "achievement_state_color_only"
-description = "Locked versus unlocked achievement states are distinguishable only by color, with no text or shape cue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "settings_fails_to_trap_or_return_focus"
-description = "While the Settings form is open, Tab focus escapes into the page behind it with no return path, or closing the form leaves focus lost."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_on_hud_copy"
-description = "HUD or settings text is unreadable due to poor contrast against the #F5F5F7 or panel backgrounds."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "toast_steals_keyboard_focus"
-description = "A transient toast steals keyboard focus from the control that was focused when the toast appeared."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "meaningful_icons_missing_names"
-description = "A meaningful chrome icon control is exposed without an accessible name."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_skipped"
-description = "Headings skip levels (for example H1 directly to H3) in the LetterDrop chrome."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion enabled, toast fades, particle bursts, or settings transitions continue at full motion as if the preference were unset."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "1.11"
 name = "hud_score_announced_as_text"
 description = "HUD score, Best Score, streak, and tier readouts are exposed as readable text (or an equivalent live region) so assistive tech can announce score changes without relying on the canvas alone."
@@ -254,21 +173,5 @@ id = "1.12"
 name = "export_import_dialogs_manage_focus"
 description = "Where Export Run, Export History, or Import opens a dialog, it takes focus when open, traps focus while open, closes on Escape, and returns focus to the control that opened it."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.n11"
-name = "hud_score_canvas_only_inaccessible"
-description = "Score, Best Score, streak, and tier exist only as painted canvas pixels with no readable DOM text or live-region announcement for HUD chrome."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

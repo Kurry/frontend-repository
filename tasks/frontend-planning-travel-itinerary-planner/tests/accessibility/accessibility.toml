@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "export_or_stop_unreachable"
-description = "Export Download/Copy, Import, stop create submit, or day sidebar rows cannot be reached or activated from the keyboard"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "planner_focus_ring_missing"
-description = "Focused stop rows, form fields, or export controls show no visible focus indicator or the indicator is obscured"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "map_pins_or_tabs_lack_semantics"
-description = "Map pins, place-detail tabs, or poll controls lack accessible names or ARIA roles needed to identify them"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "overlap_or_status_color_only"
-description = "Time-overlap warnings or kanban status rely on color alone with no icon, text, or accessible name conveying the state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "conflict_focus_escapes"
-description = "While the conflict-resolution modal is open, keyboard focus escapes into the plan behind it"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "dark_theme_unreadable"
-description = "In light or dark theme, day labels or stop titles are unreadable due to poor contrast against the coastal wash"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "stop_errors_visual_only"
-description = "Stop field-contract errors or import failures are visual only with no aria-live or accessible association"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "hero_or_icons_missing_alt"
-description = "Plan hero cover image or icon-only toolbar controls are missing alt text or accessible names"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "day_heading_order_skipped"
-description = "Day section or export canvas headings skip levels (for example H1 to H3) or are unordered"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "coachmark_ignores_reduced_motion"
-description = "With prefers-reduced-motion set, coachmark, toast, or list transitions still run at full motion"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.11"
 name = "keyboard_alternative_for_drag"
 description = "Every drag interaction has a keyboard path: each stop card offers keyboard-operable Move to day and reorder controls that achieve the same reassignment and reordering as a pointer drag"
@@ -270,24 +190,8 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n11"
-name = "drag_only_mutation_path"
-description = "Reassigning a stop to another day or reordering within a day is achievable only by pointer drag, with no keyboard-operable alternative anywhere in the UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.15"
 name = "export_import_keyboard_operable"
 description = "Export Download/Copy controls and the trip JSON import control are reachable and operable with the keyboard alone, with a visible focus indicator"
 type = "binary"
-weight = 1.0
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0

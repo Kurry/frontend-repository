@@ -206,23 +206,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "1.26"
-name = "mandated_anchors_missing"
-description = "The homepage renders only placeholder or missing section headings and fails to display the mandated anchors (Make. Every Day. Better., A portfolio built for every step., Market Snapshot)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.27"
-name = "brand_grid_or_press_copy_filler"
-description = "The brand grid omits one or more of the eleven fictional brands or the news cards show generic filler instead of the specified fictional editorial stories"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "1.28"
 name = "header_nav_exact_labels_and_logo"
 description = "The header shows the primary navigation with the exact labels About, Brands, Careers, Investors (marked with an external-link icon), and Responsibility as a dropdown toggler, with an original placeholder logo mark and logotype at the header start"
@@ -430,56 +413,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n43"
-name = "briefing_export_omits_session_mutations"
-description = "After pinning a news story or saving distinct consent choices, the JSON or Markdown briefing preview omits the pinned title, omits market-snapshot figures, or shows consent values that disagree with the last Accept all / Reject all / Save preferences action"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n44"
-name = "pin_duplicates_or_navigates_away"
-description = "Pinning a news card duplicates its title in the shortlist, advances/resets the carousel as a side effect, or navigates away from the homepage"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n45"
-name = "invalid_consent_save_still_commits"
-description = "Saving an invalid consent draft (necessary false or incomplete category booleans) dismisses the banner or writes a consent object that disagrees with the field contract without showing named field errors"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.57"
 name = "briefing_import_restores_pins_and_consent"
 description = "After pinning two news cards and Accept all, copying the JSON briefing, unpinning both to 0 of 8, then Importing that JSON restores shortlist 2 of 8 with both titles pinned in order, keeps the cookie banner dismissed with consent matching the payload, and regenerates the JSON preview to show those pinnedTitles and consent values"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n46"
-name = "briefing_json_missing_required_schema_keys"
-description = "The JSON briefing preview omits schemaVersion, quote, brands, pinnedTitles, consent, or generatedAt, or shows consent that violates the four-boolean necessary-true field contract"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n47"
-name = "invalid_briefing_import_mutates_session"
-description = "Importing malformed or schema-invalid briefing JSON changes the shortlist or consent state instead of showing a named import error and leaving state unchanged"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or end-to-end flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

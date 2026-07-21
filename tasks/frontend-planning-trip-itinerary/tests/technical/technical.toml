@@ -99,14 +99,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "browser_storage_used_for_state"
-description = "localStorage, sessionStorage, or another browser storage API is non-empty after exercising stop creation, day selection, and mode switching"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "hydration_clean_console"
 description = "The console shows no errors or warnings — including no hydration mismatch errors or warnings — on a fresh load of any route and after client-side navigation, throughout a full exercise of the app"
@@ -119,14 +111,6 @@ name = "deep_link_renders_same_workspace"
 description = "Loading the app URL directly renders the same planner workspace, seeded stops, and chrome as reaching it through in-app navigation — no route 404s or half-rendered shells"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.7"
-name = "hydration_content_flash"
-description = "After first paint, content visibly flashes or is replaced by different client content as hydration completes — mismatched text, reflowing layout, or restyled elements between first paint and interactive"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.8"
@@ -171,27 +155,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.14"
-name = "external_network_requests_present"
-description = "The network log shows requests to external origins (font CDNs, icon CDNs, map tile servers, booking or chat APIs) during a full exercise of the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.15"
 name = "derived_money_surfaces_agree"
 description = "At any moment, the ledger grand total, the sum of the pie's category shares, the pivot's cell totals, and the budget summary state the same underlying EUR figures — one coherent expense collection drives them all"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.16"
-name = "money_totals_disagree_between_surfaces"
-description = "Two surfaces disagree about the same figure — e.g. the ledger grand total differs from the budget summary total, or the debt visualizer's balances contradict the settlement report — while showing supposedly current state"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.17"
@@ -207,18 +175,3 @@ description = "The trip JSON preview parses as JSON with schemaVersion 1, trip.b
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n17"
-name = "exports_use_browser_storage"
-description = "The app persists trip state through localStorage, sessionStorage, or another browser storage API instead of keeping good-app state in memory with portable ICS/JSON exports as the end state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

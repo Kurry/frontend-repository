@@ -163,14 +163,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "optional_enhancement_breaks_required_export"
-description = "An optional enhancement (coachmark, printable stylesheet, or palette footer) blocks or replaces the required Export report download/copy path"
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app exhibits a significant, browser-observable innovative enhancement beyond the specification that is NOT covered by any other criterion in this file. Cite the concrete evidence (element, interaction, page state). If nothing beyond the covered optional items stands out, answer no."

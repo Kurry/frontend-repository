@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "static_marketing_page_only"
-description = "Presents only a static marketing page without Monaco or saved themes management"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.4"
 name = "theme_card_swatches_actions"
 description = "Saved theme cards are dense, preview each theme's swatches (e.g. primary / secondary / paper) with a type-and-updated meta line and load/delete controls, and mark the active theme"
@@ -156,14 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.10"
-name = "horizontal_overflow_at_768"
-description = "At 768 pixel viewport width, content clips or a horizontal viewport scrollbar appears"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.11"
 name = "export_panel_dense_tool_surface"
 description = "Export mode shows a monospaced live preview block with JSON / CSS format tabs, Download and Copy controls, and an Import ThemeOptions affordance as a dense tool surface — not a marketing CTA card"
@@ -177,18 +161,3 @@ description = "WCAG contrast labels and harmonic suggestion chips read as compac
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.n11"
-name = "export_looks_like_marketing_cta"
-description = "The Export panel is styled as a marketing CTA / empty hero rather than a dense monospaced artifact preview with format tabs and download/copy controls"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable visual-design defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

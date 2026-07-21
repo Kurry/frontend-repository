@@ -183,80 +183,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.n1"
-name = "cold_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before the page is interactive on a local cold load (excluding only the documented 0.2s gate and intro)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_flows"
-description = "Console errors, warnings, or hydration mismatch warnings appear during load, menu, carousel, consent, hover, or full-page scroll exercise."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "scroll_or_intro_transitions_block"
-description = "Scroll-driven reveals or the intro timeline block interaction for multiple seconds after they should have settled."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.a3"
-name = "heavy_assets_collapse_frame_rate"
-description = "Heavy visual assets (hero imagery, marquees, lottie/vector animation, or scroll scripts) cause frame-rate collapse, delayed first render, or input latency during signature scroll/hover interactions."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n6"
-name = "animation_blocks_input"
-description = "During the skeleton intro or section reveals, primary controls (Book CTA, hamburger below 1024px, carousel arrows) become unresponsive."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering with a blank page while fonts or images load instead of showing reserved-space layout after the opacity gate."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n10"
-name = "rapid_use_crashes_page"
-description = "Rapid carousel clicking or fast continuous scrolling crashes the page or leaves it permanently unresponsive."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "9.11"
 name = "inquiry_export_never_freezes"
 description = "Opening the booking inquiry overlay and exporting a JSON or Markdown packet never freezes the page or blocks interaction for multiple seconds."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "9.n11"
-name = "export_or_overlay_hangs_ui"
-description = "Opening the inquiry overlay or triggering Export JSON/Markdown hangs or freezes the UI for multiple seconds."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

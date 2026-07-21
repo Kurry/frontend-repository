@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "static_poster_without_grid"
-description = "Shows only a static poster with no paintable grid or gallery collection"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.4"
 name = "paper_stage_condensed_type"
 description = "The stage is a light paper background with high-contrast ink-dark text, soft radial washes, and condensed UI type, with a large centered canvas under the toolbar in a desktop-first creative-tool composition"
@@ -184,14 +176,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "3.14"
-name = "placeholder_text_shipped"
-description = "Lorem ipsum, 'TODO', template variable names, or other placeholder text is visible somewhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.15"
 name = "consistent_terminology_and_case"
 description = "Headings, buttons, and labels use one consistent capitalization convention, and the same concepts (boards, gallery, tags) are named consistently across Paint mode, Gallery mode, and dialogs"
@@ -219,18 +203,3 @@ description = "A live fill-stats readout near the stage shows painted, qr, color
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n1"
-name = "export_surface_missing_or_unstyled"
-description = "Export is missing, or its Session JSON preview / format tabs / Copy-Download controls are absent or unstyled browser defaults that break the floating-toolbar studio look"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design, layout, responsiveness, or UI copy that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

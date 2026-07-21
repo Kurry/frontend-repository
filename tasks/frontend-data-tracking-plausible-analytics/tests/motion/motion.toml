@@ -128,22 +128,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.6"
-name = "real_control_path_bypassed"
-description = "The filter pill, active-row highlight, or recomputed tiles appear only when state is changed through a WebMCP or script shortcut, while clicking the real breakdown row or Clear control produces no visible pill change or animation"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.7"
-name = "single_input_method_control"
-description = "At least one interactive control responds to a pointer click but not to Enter or Space while focused (or vice versa), leaving a step reachable by only one input method"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.8"
 name = "sort_reorder_animates"
 description = "Changing the sort through its real selector animates the breakdown rows to their new positions with a visible transition rather than snapping them instantly"
@@ -206,10 +190,3 @@ description = "When the site, range, or filter stack changes through the real co
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

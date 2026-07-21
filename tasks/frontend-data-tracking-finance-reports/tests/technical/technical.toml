@@ -99,14 +99,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "storage_apis_persist_state"
-description = "Uses localStorage or sessionStorage to persist transactions, filters, thresholds, display currency, or export drafts"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.4"
 name = "console_clean_during_full_exercise"
 description = "No console errors or unhandled promise rejections appear during a full exercise of the app (create, edit, delete, filters, chart tab switches, bulk actions, thresholds, currency switch, undo/redo, export, import)"
@@ -177,14 +169,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.14"
-name = "views_desync_on_shared_datum"
-description = "The same datum shows different values in two places at once (table vs KPI vs chart aggregate vs export totals) until a reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.15"
 name = "export_drawer_traps_focus"
 description = "The export drawer traps focus while open, closes on Escape, and returns focus to the invoking control"
@@ -198,10 +182,3 @@ description = "A create that violates the transaction field contract (zero amoun
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

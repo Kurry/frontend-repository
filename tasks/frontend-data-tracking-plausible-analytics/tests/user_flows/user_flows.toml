@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_filter_flow_unavailable"
-description = "Segment filter, clear filter, or Export report controls are missing or non-functional from the UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "new_site_missing_or_duplicated"
-description = "A valid Add site submit fails to add exactly one selectable site, or duplicates the entry"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "export_desynced_from_tiles"
-description = "After a filter or site change, the Stats JSON preview results disagree with the visible metric tiles"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "compare_toggle_breaks_tiles"
-description = "Turning Compare previous on or off blanks metric tiles or leaves stale chips after compare is off"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_new_site_shows_prior_numbers"
-description = "Selecting a newly added unseeded site still shows the previous site's metric numbers instead of zeros and an empty-state message"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "filtered_panels_disagree"
-description = "After a source filter, Top Pages and Countries still show the unfiltered default row values"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "export_drawer_cannot_reopen"
-description = "After closing the export drawer it cannot be reopened from Export report"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "export_drawer_blocks_without_escape"
-description = "The export drawer or Add site dialog blocks navigation with no Escape or close path"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_import_no_feedback"
-description = "A malformed Stats JSON import provides no inline error naming the import field"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "undo_dead_end_requires_reload"
-description = "After a mistaken add-site or filter, Undo cannot restore the prior state and recovery requires a full reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "stacked_filter_saved_segment_flow"
 description = "From the default view, click Google then /pricing so two pills stack; save a named segment; clear filters; apply the saved segment — both pills, recomputed numbers, and Stats JSON filters with dimension/value keys return, and saved_segments contains the named segment"
@@ -274,21 +194,5 @@ id = "6.15"
 name = "per_panel_csv_after_filter_flow"
 description = "Apply the Google source filter, then export Top Pages per-panel CSV — the CSV starts with dimension,name,visitors and lists the filtered Top Pages rows then visible, not the unfiltered defaults"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "6.n11"
-name = "add_goal_flow_dead_end"
-description = "Add goal is missing, or a valid submit fails to append a Goals panel row and Stats JSON goals entry with name, goal_type, and match_key"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

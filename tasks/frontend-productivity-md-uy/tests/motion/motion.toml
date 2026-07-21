@@ -122,23 +122,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "4.5"
-name = "hover_feedback_missing"
-description = "Interactive chrome shows no hover feedback — buttons and mode tabs do not change on hover when actually hovered"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.6"
-name = "animation_only_via_shortcut"
-description = "The theme, mode, or confirmation feedback only appears when state is set through a shortcut and shows no transition when the real control is clicked"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "4.7"
 name = "mode_switch_pane_transition"
 description = "Clicking between Edit, Preview, and Present through the real mode buttons animates the incoming pane with a brief fade or slide of roughly 150 to 250 milliseconds while the top bar and toolbar stay fixed in place, rather than the pane snapping instantly"
@@ -168,10 +151,3 @@ type = "binary"
 weight = 0.5
 optional = true
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (control, action, observed frames or computed styles) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

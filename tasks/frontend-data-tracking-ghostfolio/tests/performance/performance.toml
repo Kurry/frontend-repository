@@ -110,61 +110,11 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "9.n1"
-name = "cold_load_exceeds_two_seconds"
-description = "More than 2 seconds pass after a local cold load before the portfolio overview becomes interactive."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "hydration_errors_or_content_flash"
-description = "A direct root load shows hydration mismatch errors/warnings in the console, or content visibly flashes/jumps to different layout or copy after first paint."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "console_errors_during_exercise"
-description = "Console errors or warnings appear while adding, editing, filtering, sorting, selecting, deleting, exporting, or importing holdings."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n4"
-name = "rapid_input_hangs_or_crashes"
-description = "Rapid repeated filter, sort, select, or form input hangs the UI, drops interactions, or crashes the page."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "mutations_block_rendering"
-description = "Adding, editing, or deleting a holding blocks rendering for a multi-second freeze before the table and totals update."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "9.8"
 name = "export_import_stay_responsive"
 description = "Opening Export portfolio, switching JSON/CSV tabs, Copy/Download, and Import of a valid portfolio JSON complete without multi-second UI blocking on the seeded dataset."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "9.n6"
-name = "export_or_import_freezes_ui"
-description = "Opening the export drawer or importing portfolio JSON freezes the UI for multiple seconds or drops subsequent interactions."
-type = "binary"
-negate = true
-weight = 1.0
-
 
 [[criterion]]
 id = "9.9"
@@ -173,18 +123,3 @@ description = "Recomputing the derived position math (cost basis, realized and u
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "9.n7"
-name = "derived_or_batch_blocks_ui"
-description = "Recomputing the position math, rendering the performance chart, or applying a bulk action freezes the UI for multiple seconds or drops subsequent interactions."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

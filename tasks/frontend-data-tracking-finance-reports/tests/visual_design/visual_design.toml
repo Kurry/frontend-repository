@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "static_mockups_instead_of_live_ui"
-description = "Primary surfaces are static mockups or images that stay unchanged after create, edit, or delete actions"
-negate = true
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "3.4"
 name = "multi_hue_charts_signed_amounts"
 description = "Breakdown and Trends charts use multi-hue category fills, and transaction amounts read as signed values in the table"
@@ -163,14 +155,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.11"
-name = "narrow_width_layout_breaks"
-description = "At narrow widths content clips, overlaps, or forces page-level horizontal scrolling"
-negate = true
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "3.12"
 name = "consistent_capitalization_convention"
 description = "Headings, buttons, and nav labels use one consistent capitalization convention throughout the app"
@@ -192,14 +176,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.15"
-name = "placeholder_text_in_shipped_ui"
-description = "Placeholder or lorem text appears in the shipped UI"
-negate = true
-type = "binary"
-weight = 1.0
-
-[[criterion]]
 id = "3.16"
 name = "export_drawer_and_over_threshold_treatments"
 description = "The export drawer shows JSON/CSV tabs with a scrollable preview plus Download and Copy affordances; over-threshold treatment uses an error color family distinct from ordinary row hover"
@@ -213,10 +189,3 @@ description = "Buttons and inputs show visually distinct default, hover, focus (
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "visual_design.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

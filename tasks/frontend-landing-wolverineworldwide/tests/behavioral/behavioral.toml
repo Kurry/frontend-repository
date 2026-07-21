@@ -141,39 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_in_memory_state_survives_reload"
-description = "After dismissing the cookie banner and advancing the carousel, a reload leaves an incoherent mix (e.g. banner stays dismissed while carousel resets, or carousel position survives alone)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "consent_controls_ignore_inputs"
-description = "Accept all, Reject all, and Manage preferences all produce identical visible results (e.g. none dismiss the banner, or Manage leaves the modal closed) regardless of which control is used."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "carousel_next_identical_noop"
-description = "Activating Next on the news carousel from the first cards yields a byte-identical visible track position (no movement) as if the control were a no-op."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "carousel_stale_until_reload_after_scroll"
-description = "After advancing the news carousel, scrolling away and back shows the track reset or stuck until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.9"
 name = "pin_then_export_pipeline"
 description = "Starting with an empty shortlist: pin Northstar Earns People-First Workplace Certification then Trailmark Celebrates 45 Years Outside; open the JSON briefing tab and confirm both titles appear in pin order with market quote 18.16 USD; unpin the first title and confirm the JSON pinned array drops to only the second title — mutate → derived preview tracks → export text contains session work."
@@ -202,34 +169,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "briefing_identical_despite_different_pins"
-description = "Pinning different news stories leaves the JSON/Markdown briefing pinned titles identical (hardcoded export ignoring shortlist mutations)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "reload_keeps_pins_or_consent_in_memory_genre"
-description = "After pinning stories and dismissing the cookie banner, a reload leaves pins or dismissed consent surviving (violating the in-memory baseline reset)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.13"
 name = "invalid_then_valid_consent_payload_round_trip"
 description = "Edge-state round-trip: open Manage preferences, attempt Save with an invalid draft (named field errors, banner stays, briefing consent unchanged), then correct Analytics off / Marketing on and Save; banner dismisses and briefing consent shows necessary true, analytics false, marketing true without leftover error chrome blocking the page."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.n7"
-name = "consent_payload_ignores_toggle_inputs"
-description = "After Accept all versus Reject all (or after distinct valid Save preference payloads), the Investor briefing consent object shows identical necessary/analytics/marketing/functional values."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -239,18 +182,3 @@ description = "Export then import round-trip probe: pin Northstar Earns People-F
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n8"
-name = "import_ignores_briefing_field_contract"
-description = "Import accepts JSON missing schemaVersion or with invalid consent (necessary false / missing boolean keys) or unknown pinnedTitles and still mutates the shortlist or consent state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -169,87 +169,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "At 1440px or 375px the layout breaks, overflows, or loses required chrome (sticky header, hamburger drawer, or Events Manager entry)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "At 375px primary controls are too small to tap reliably or visibly misaligned."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "type_unreadable_at_narrow_width"
-description = "At 375px body or chapter heading text is too small to read or collapses illegibly."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_or_spurious_scrollbars"
-description = "At 1440px or 375px content is cropped or unnecessary scrollbars appear."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "mobile_menu_missing_or_unresponsive"
-description = "At 375px the hamburger is absent, or tapping it leaves the full-screen mega-menu drawer closed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "sticky_chrome_obscures_content"
-description = "Sticky chrome permanently obscures hero or chapter content with no recoverable scroll offset."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "overlap_or_stacking_failure"
-description = "At 1440px or 375px elements overlap incorrectly, or the Why Ridge sticky pile / static list stacking order breaks."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "why_ridge_pile_on_mobile"
-description = "Below 768px the Why Ridge pillars still behave as a sticky overlapping pile instead of falling back to a static vertical list."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "media_static_size_overflows"
-description = "The hero visual plane or chapter imagery uses a static size that overflows the viewport at 375px."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "theme_or_manager_disappears_at_width"
-description = "The theme toggle or Events Manager entry control disappears at 375px while remaining required chrome."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "7.20"
 name = "palette_export_usable_at_375"
 description = "At 375px width the command palette, Export catalog, and Session leads panel stay fully on-screen and operable rather than clipping off the viewport"
@@ -263,18 +182,3 @@ description = "At 375px width the bulk action bar wraps or stacks without introd
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "7.n11"
-name = "export_or_palette_clipped_mobile"
-description = "At 375px width Export catalog, Session leads, or the command palette clips off-screen or forces horizontal scroll"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

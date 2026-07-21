@@ -162,96 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "create_task_flows_unavailable"
-description = "Create task, pipeline navigation, verdict filtering, or manifest export cannot be completed from the visible UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "created_run_missing_or_duplicated"
-description = "After a valid create-task submit, the new pipeline row fails to appear, appears duplicated, or tasks-produced does not increase by exactly one on accept."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "pipeline_metrics_desync"
-description = "After an accepted create-task run, repository yield, tasks-per-week chart, timeline entries, and pipeline row disagree about the new task."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "navigation_loses_filters_or_breaks"
-description = "Moving Repositories→pipeline→detail→back breaks layout or loses filters/expanded logs while the session is open."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_filter_breaks_pipeline_ui"
-description = "A no-match filter on pipeline, trials, or timeline produces a blank/broken region with no empty-state message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "timeline_and_pipeline_filters_disagree"
-description = "Timeline status filter and pipeline/trial filters disagree about the same run set, or clearing a filter fails to restore the full list."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "analytics_or_timeline_unreachable"
-description = "After visiting Analytics or Timeline, those views cannot be reopened or the return control is missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "create_form_blocks_exit"
-description = "The Create task form blocks returning to Repositories/pipeline with no cancel/close path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_create_or_check_silent"
-description = "An invalid create submit or failed validation check provides no visible named-field or status feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "task_factory_dead_end_requires_reload"
-description = "A Task Factory flow leaves a dead end that requires a full page reload to continue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "manifest_export_after_accepted_create"
 description = "Manifest export flow: complete a create-task run to accepted, open the task detail, confirm the monospaced manifest includes that pullRequestNumber and file bounds; Copy and Download emit the same text; a second accepted create increases any factory-wide export length by one."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

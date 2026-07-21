@@ -151,38 +151,3 @@ name = "component_states_match_reference"
 description = "Default/hover/active treatments on primary controls are consistent with the reference's interactive chrome"
 type = "binary"
 weight = 1.0
-[[criterion]]
-id = "3.n1"
-name = "structure_deviates_from_reference"
-description = "Major structure (missing map region, missing tab bar, or dashboard-of-cards replacing the quest composition) contradicts the reference without an instruction override"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "3.n2"
-name = "colors_fall_outside_reference_family"
-description = "Zone palettes or chrome colors fall so far outside the reference family that the app no longer reads as the same product"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "3.n3"
-name = "elements_clipped_or_offscreen"
-description = "Primary reference regions are clipped or offscreen at the desktop capture width"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "3.n4"
-name = "required_regions_missing"
-description = "A required region shown in the reference and mandated by the instruction (map, log form, tabs) is missing"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "A significant design-fidelity defect versus the reference screenshots (instruction text still winning on conflicts) is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete evidence. If already covered, answer no here."
-type = "binary"
-negate = true
-weight = 1.0

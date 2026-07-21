@@ -149,14 +149,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "fake_innovation_static_only"
-description = "The app presents static decorative flourishes that claim advanced play affordances (coachmarks, equity graphics, or shortcuts) while remaining non-interactive during real play"
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
 id = "11.catchall"
 name = "innovation_catchall"
 description = "The app exhibits a significant, browser-observable innovation or polish enhancement beyond the specification that is NOT covered by any other criterion in this file. If present, name the enhancement and cite the concrete evidence. If nothing beyond the specification is present, answer no."

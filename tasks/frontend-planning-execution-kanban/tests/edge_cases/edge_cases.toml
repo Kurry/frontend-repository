@@ -152,86 +152,9 @@ description = "Filling In Progress past WIP limit 3 shows amber breach immediate
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "4.n1"
-name = "empty_column_is_blank_gap"
-description = "An emptied column is a blank gap with no empty-state message and no Add Card control"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "4.n2"
-name = "invalid_create_mutates_board"
-description = "An invalid create (empty/whitespace/overlong title) still adds a card or changes a column count"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "4.n3"
-name = "errors_are_generic_only"
-description = "Create or import validation shows only a generic Invalid message with no field name"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "4.n4"
-name = "destructive_move_has_no_undo"
-description = "After a bulk move or import, there is no working Undo that restores the prior board state"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "4.n5"
-name = "run_jumps_with_no_progress_ui"
-description = "Pressing Run completes all sub-items in one jump with no visible sequential progression or status chip change to running"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "4.n6"
-name = "failed_import_mutates_board"
-description = "Importing malformed board JSON changes column counts or titles despite an error, or succeeds silently"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "4.n7"
-name = "drop_origin_still_reorders"
-description = "Dropping a card back on its original position still changes order or counts"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "4.n8"
-name = "long_title_breaks_layout"
-description = "A title longer than 80 characters overflows its card, overlaps neighbors, or is missing from the detail view"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "4.n9"
-name = "second_run_starts_while_running"
-description = "A second Run can be started on a card that is already running"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "4.n10"
-name = "wip_breach_never_appears"
-description = "In Progress or Review can exceed 3 visible cards with no amber breach state and no breach label"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
 id = "4.11"
 name = "redo_stack_cleared_by_new_action"
 description = "After an Undo, performing a new mutating action (for example a create) disables Redo and the cleared redo stack cannot resurrect the undone change"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

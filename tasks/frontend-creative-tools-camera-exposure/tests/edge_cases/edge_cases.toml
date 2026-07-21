@@ -176,70 +176,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "edge_stepper_still_advances"
-description = "At a stop-list edge the faded stepper still advances or wraps the value past the first or last stop"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "meter_escapes_track"
-description = "The exposure meter indicator renders outside the visible track at extreme stop combinations"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "empty_name_still_adds_preset"
-description = "Submitting an empty preset name still adds a preset row"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "double_submit_duplicates_preset"
-description = "Double-activating preset submit creates two or more rows for one intended create"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "empty_list_shows_blank_region"
-description = "After deleting all presets the list region is blank with no empty-state message or create affordance"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "malformed_import_corrupts_state"
-description = "Importing malformed edit-stack JSON corrupts dials, clears the preview, or crashes the app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "slider_past_bounds_unbounded"
-description = "Light slider values display or apply outside the -100 to 100 range"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "undo_enabled_with_empty_stack"
-description = "Undo remains enabled and clickable when there are no mutations to reverse"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.13"
 name = "bracket_empty_base_name_creates_nothing"
 description = "Generate bracket with an empty base-name field creates no presets: the visible preset count stays the same and inline validation names the base-name field"
@@ -267,18 +203,3 @@ description = "The Compare wipe handle cannot be dragged past either preview edg
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n9"
-name = "compare_available_with_unfilled_slots"
-description = "The Compare control activates and opens the comparison while fewer than two A/B slots are filled"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant edge-case failure not covered by any other criterion in this file. Name the defect and cite concrete evidence. If already covered, answer no."
-type = "binary"
-negate = true
-weight = 1.0

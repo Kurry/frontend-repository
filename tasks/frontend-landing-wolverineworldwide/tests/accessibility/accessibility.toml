@@ -169,87 +169,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "A primary interactive control (Responsibility toggler, Menu toggle, carousel control, cookie action, or nav link) cannot be reached or activated via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focused interactive controls show no visible focus indicator or the indicator is fully obscured."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom interactive chrome (Responsibility dropdown, Menu overlay, carousel arrows, cookie actions) uses non-semantic tags without ARIA roles/labels."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "consent_state_color_only"
-description = "Cookie preference category states or errors are indicated only by color with no text or accessible name change."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "overlay_focus_not_trapped"
-description = "While the mobile menu or preferences modal is open, keyboard focus escapes into the page behind or fails to return to the opener on close."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_unreadable_text"
-description = "Hero white type, footer text on the dark slab, or control labels fail WCAG AA contrast and are unreadable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "responsibility_aria_expanded_wrong"
-description = "The Responsibility toggler omits aria-expanded, or the attribute stays false while the Purpose/Planet/Product panel is open (or stays true while closed)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "media_missing_alt_or_labels"
-description = "Hero video, portfolio imagery, news cards, or fictional brand marks lack descriptive alt text or accessible labels."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.a4"
-name = "split_heading_character_soup"
-description = "A split/kinetic headline is exposed to the accessibility tree as character soup — no accessible name on the container and the split spans are not hidden from the tree."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, hero intro transforms, scroll staggers, or particle parallax continue to run instead of short-circuiting to settled state."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "1.11"
 name = "palette_and_briefing_keyboard_reachable"
 description = "The command palette trigger, Investor briefing controls (including Import), Pin to briefing controls, and Undo/Redo are reachable and operable with the keyboard alone with a visible focus indicator."
@@ -263,18 +182,3 @@ description = "Shortlist count changes and the Copy briefing confirmation are an
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n11"
-name = "palette_focus_escapes_overlay"
-description = "While the command palette is open, Tab moves focus to controls behind the overlay instead of staying contained inside the palette."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

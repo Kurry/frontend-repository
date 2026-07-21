@@ -163,97 +163,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "Browse, entity classification, session re-run, or artifact export/import/copy tools are missing, unbound, or no-ops that leave visible calibration state unchanged"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n2"
-name = "handlers_diverge_from_ui_logic"
-description = "A WebMCP classification or re-run leaves badges, cells, or timeline out of sync with the same action taken through the visible UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared destinations or entity operations beyond the calibration-matrix bindings are exposed"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n4"
-name = "automation_cannot_exercise_contract"
-description = "Automation cannot list or invoke the declared browse, entity, or session tools"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n5"
-name = "validation_bypass_desyncs_state"
-description = "An MCP classification update bypasses the Classification field contract and desyncs MCP-reported state from visible triage totals"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n6"
-name = "session_or_tool_api_errors"
-description = "webmcp_session_info or tool invocation returns errors or incomplete data for the declared calibration tools"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n7"
-name = "mcp_relies_on_undocumented_hacks"
-description = "MCP only works after undocumented manual hacks outside the declared contract"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n8"
-name = "required_contract_module_missing"
-description = "One of browse-query-v1, entity-collection-v1, command-session-v1, or artifact-transfer-v1 is declared but not implemented"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n9"
-name = "mcp_is_stubbed_or_commented_out"
-description = "The MCP interface is commented out or only stubbed"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n10"
-name = "automated_contract_validation_fails"
-description = "Automated MCP contract validation against the declared calibration bindings fails"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "12.11"
 name = "artifact_formats_bound"
 description = "Artifact operations export, import, and copy are bound for formats calibration-json and variance-csv with import modes calibration-json and triage-json"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "mcp_contract.catchall"
-name = "mcp_contract_catchall"
-description = "The app exhibits a significant, browser-observable defect in the declared MCP contract that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

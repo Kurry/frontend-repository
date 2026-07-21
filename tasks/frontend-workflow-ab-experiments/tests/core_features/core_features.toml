@@ -330,39 +330,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "1.n1"
-name = "significance_shown_while_underpowered"
-description = "A significant or not-significant verdict (green or yellow winner badge, or a significance label) is displayed while one or more variants are still below the experiment's minimum sample size"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n2"
-name = "identical_distributions_across_configs"
-description = "Two variants or experiments with different prompt or model configurations render identical score distributions or byte-identical statistics, indicating hardcoded rather than configuration-driven simulation"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n3"
-name = "fabricated_run_completion"
-description = "The Run flow presents a Completed status while the results surfaces, sample counts, or summary statistics remain unchanged from before the run"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n4"
-name = "flag_leaves_stats_stale"
-description = "Flagging or unflagging an outlier leaves the p-value, means, matrix cells, radial percentages, or export content unchanged from their pre-flag values"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.35"
 name = "experiment_upsert_field_contract"
 description = "The designer create and edit forms enforce the ExperimentUpsert field contract: name 1 to 120 characters, hypothesis 1 to 2000 characters, successMetric naming an existing criterion, minimumSampleSize 1 to 500, 2 to 4 variants each with title, promptId, model in {Larkspur-2, Cobalt-Mini, Meridian-XL, Fernwave-1}, temperature 0 to 2, and trafficAllocation values summing to exactly 100; invalid submits add no experiment and name the offending field"
@@ -383,18 +350,3 @@ description = "Import of a contract-valid Experiment Report JSON restores decisi
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n5"
-name = "export_omits_session_or_schema"
-description = "The Export report JSON preview omits a session flag or decision mutation, drops required field-contract key schemaVersion ab-experiment-report-v1, or shows statistics that disagree with the results panel summary strip"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

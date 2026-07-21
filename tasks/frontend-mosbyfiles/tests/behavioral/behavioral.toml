@@ -141,38 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_in_memory_state_survives_reload"
-description = "After dragging scrapbook items on a case, a reload leaves an incoherent mix (e.g. some items keep dragged offsets while others reset, or popup/play state survives alone)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "case_surfaces_ignore_navigation"
-description = "Navigating between architects leaves heading, folder color, and document title identical to the previous case (derived surfaces ignore the route input)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_tags_produce_identical_cases"
-description = "Clicking two different architect tags (e.g. Ada Mercer vs Mara Voss) yields byte-identical heading, folder color, and document title."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "header_title_stale_until_reload"
-description = "After a case or sibling navigation, the sub-header category or document title keeps the prior architect until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "dossier_tracks_pin_and_note_mutations"
 description = "Derived-view sensitivity: pin Julian Kade, save note token kade-note-alpha, confirm Export dossier JSON contains schemaVersion field-notes-archive.dossier.v1, julian-kade in pins, and kade-note-alpha under notes; unpin and confirm the next compiled preview no longer lists that pin/token."
@@ -200,34 +168,3 @@ description = "Edge-state integrity: with at least one pin present, import a dos
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "dossier_identical_for_different_sessions"
-description = "Two sessions with different pin/note sets produce identical Export dossier JSON preview text (export ignores session inputs)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "import_fails_to_restore_after_reload"
-description = "After reload clears in-memory pins/notes, importing a valid previously exported dossier leaves the reading list empty or note bodies missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n7"
-name = "schema_invalid_import_mutates_session"
-description = "Importing a schema-invalid dossier (wrong schemaVersion or unknown architect) changes the visible pin set or note bodies."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -162,96 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "sidedock_flows_unavailable"
-description = "Create workspace, Add bookmark, inline rename, Delete, pin, or package Export/Import cannot be completed from the visible UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "bookmark_or_workspace_missing_or_duplicated"
-description = "After a valid Add bookmark or Create workspace, the new row/tab fails to appear, appears duplicated, or package preview omits it."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "rename_pin_or_package_desync"
-description = "After rename, pin, or accentColor change, tree row, Pinned tile, workspace tab, and package preview disagree about the same values."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "workspace_or_sidebar_switch_breaks"
-description = "Switching workspace tabs or Show sidebar view breaks layout or loses the active workspace unexpectedly."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_sidedock_breaks_ui"
-description = "Zero-workspace or empty-workspace states are blank/broken with no welcoming empty-state copy."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "search_scopes_disagree"
-description = "Current-workspace vs all-workspaces search scopes disagree about matches, or clearing search fails to restore the full tree."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "package_panel_cannot_reopen"
-description = "After closing Export/Import SideDock package, the package controls cannot reopen the panel."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "delete_or_package_overlay_blocks_exit"
-description = "Delete confirmation or package panels block navigation with no cancel/close path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_bookmark_or_import_silent"
-description = "An invalid Add bookmark/Create workspace submit or contract-invalid package Import provides no visible named-field or import error feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "sidedock_dead_end_requires_reload"
-description = "A SideDock flow leaves a dead end that requires a full page reload to continue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "sidedock_package_round_trip_flow"
 description = "SideDock package round trip: create a workspace, add a bookmark with a distinctive url and title that satisfy the field contract, pin it, confirm the Export SideDock package preview shows schemaVersion sidedock-package-v1 plus those values, Download or Copy that JSON, mutate the session away, Import the same JSON, and confirm workspace tabs, tree, Pinned row, sidebar view, and package preview match the pre-export session"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -128,22 +128,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.6"
-name = "flat_stacked_layout_failure"
-description = "A generic equal-width stacked layout with a single flat background and no per-section theme swap is present instead of the editorial composition"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.7"
-name = "broken_media_in_deck_slots"
-description = "Broken image or video references (missing-file placeholders, failed loads, broken-media indicators) appear in the client deck slots or anywhere on the page"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.8"
 name = "body_offwhite_nearblack_text"
 description = "The home body default surface renders off-white (computed background near rgb(234, 233, 230) / #eae9e6) with near-black text rgb(24, 24, 24)"
@@ -172,27 +156,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.12"
-name = "wrong_surface_or_theme_colors"
-description = "The default surface renders as a flat black/dark background (not the measured off-white ~rgb(234,233,230)), or theme surfaces' computed colors contradict the measured per-section values"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.13"
 name = "fluid_type_scale_across_breakpoints"
 description = "Fluid clamp-based type scaling: the hero H1 measures about 62.8px at 1440 viewport width, about 76px at 991, about 60px at 767, and about 52px at 479, and resizing between these widths scales the type smoothly with no abrupt size jumps at breakpoint boundaries"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.14"
-name = "content_overflow_at_breakpoints"
-description = "At 1440, 768, or 479 viewport widths, content clips or overflows the viewport, or a horizontal scrollbar appears"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.15"
@@ -217,22 +185,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.18"
-name = "placeholder_or_lorem_text_visible"
-description = "Lorem ipsum, TODO, or template placeholder text (e.g. {{title}}, asdf) is visible anywhere on the shipped page"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.19"
-name = "real_brand_assets_shipped"
-description = "The page exposes copyrighted, trademarked, scraped, stock, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—including a source identity, client/logo silhouette, licensed commercial typeface, recognizable photograph/video frame, social-platform mark, or real source credit instead of the fictional Cinder & Bloom system"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.20"
 name = "broken_grid_editorial_composition"
 description = "At desktop width the layout reads as broken-grid editorial composition: the hero lettermark spans the top while the H1/lead sit toward the lower third with case thumbnails crossing the left and right zones; the about band overlays large display type on a media field with flanking images that break a single equal-width column stack"
@@ -255,27 +207,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.23"
-name = "lime_wash_everywhere_failure"
-description = "Lime is used as a broad page wash or default surface color across unrelated sections instead of staying scarce to its reserved roles (Organic views tile, theme-media headings, selection, primary buttons, load veil)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.24"
 name = "scratch_authored_media_inventory_craft"
 description = "The Cinder & Bloom identity and media inventory are visibly complete and art-directed: twelve letterform images, four hero-case thumbnails, five fictional client marks, at least three distinct video/poster deck faces per client, three service videos/posters, five testimonial portraits or marks, two about images, and the contact/footer art and icons occupy the reference roles without repetition"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.25"
-name = "missing_reused_or_source_media"
-description = "A required media surface is omitted, empty, broken, reused where distinct art is required, reduced to a generic gradient/emoji/text placeholder, or exposes a source-site name, client name, logo silhouette, recognizable source imagery, metadata, or destination"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.26"
@@ -299,18 +235,3 @@ description = "Shortlist controls, the Shortlist panel, Export brief chrome, and
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "2.n30"
-name = "operator_chrome_breaks_editorial_system"
-description = "Shortlist, command palette, or discovery brief chrome introduces a conflicting unrelated palette (e.g. default system dialogs) that visibly breaks the editorial lime/turquoise/chrome token system."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "2.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

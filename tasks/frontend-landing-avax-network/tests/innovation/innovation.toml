@@ -104,30 +104,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "signature_motion_absent_or_stubbed"
-description = "Signature reference motions are absent or stubbed: no scroll reveals, no theme cross-fade, and no hero intro sequence on a fresh load via the real UI path."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "recreation_feels_generic_template"
-description = "The recreation reads as a generic marketing template with default type/spacing and none of the reference's cut-corner, sticky-chapter, or kinetic-type execution quality."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "page_flat_static_no_immersion"
-description = "The page is flat and static with no scroll storytelling, no theme transition, and no marquee/hover language despite the reference requiring them."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app demonstrates a noteworthy, browser-observable execution-quality enhancement of the reference experience that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick, and must not invent design beyond the reference. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

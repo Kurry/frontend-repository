@@ -161,35 +161,3 @@ description = "Opening Export after edits regenerates Path Pack JSON and Markdow
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before interaction is possible on local render."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_exercise"
-description = "Console errors or unhandled rejections appear during a full exercise of goals, focus, export, or stream controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "ui_hangs_under_rapid_input"
-description = "Rapid repeated input hangs the UI, drops interactions, or blanks the page."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0
-

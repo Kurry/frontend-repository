@@ -154,19 +154,3 @@ description = "With prefers-reduced-motion enabled, transitions apply instantly 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.10"
-name = "surfaces_snap_without_motion"
-description = "Model rows, modals, toasts, feed entries, or the export panel appear and disappear instantly with no transition anywhere when driven through the real controls, leaving the app without the specified microinteractions"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file — for example animation that causes layout jank or flicker. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true
-

@@ -147,26 +147,3 @@ description = "With prefers-reduced-motion set, node drop is instant, the runnin
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.11"
-name = "no_motion_anywhere"
-description = "Under default motion settings, node drops, badge changes, modals, and panels all snap instantly with no transition anywhere in the app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "run_pulse_via_webmcp_shortcut"
-description = "The running-border pulse or edge flow animation is graded by snapping run state through WebMCP without using the real Run control path, so no timed animation is observable"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "motion.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

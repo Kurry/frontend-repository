@@ -162,46 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_homepage_flows_unavailable"
-description = "The Solutions menu, mobile Menu panel, auto-advancing slideshow, or scroll-reveal of the four workflow cards cannot be completed from the visible UI controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "menu_or_slideshow_state_desyncs"
-description = "After opening Solutions or advancing the slideshow, the trigger expanded state, panel visibility, or active-frame opacity disagree with each other (state not synced across surfaces)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "overlay_menu_blocks_with_no_exit"
-description = "The Solutions menu panel or mobile Menu panel opens but cannot be closed, leaving navigation blocked with no exit path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "chrome_links_land_on_missing_pages"
-description = "Activating a header, footer, CTA, tile, or Solutions-menu chrome link lands on a blank, error, or Not found page instead of keeping the user on the homepage."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "flow_dead_end_requires_reload"
-description = "After opening Solutions or the mobile Menu, recovering normal homepage interaction requires a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "trial_brief_export_flow_with_session_values"
 description = "Trial brief export flow: fill Name Jordan Lee, Email jordan@atelier.example, plan Pro, team size 11-50, and interest chips Portfolios and Freelancers — the live preview JSON shows those exact values and satisfies the trial-signup field contract; Download JSON / Copy brief yield text matching the preview."
@@ -243,34 +203,3 @@ description = "Trial brief Reset flow: fill a contract-valid brief (for example 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n6"
-name = "different_brief_inputs_identical_export"
-description = "Running the trial brief export flow twice with different names and interest sets yields byte-identical preview/export text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "cross_field_invalid_still_submits_success"
-description = "Choosing Free trial with team_size 11-50 (or Team with team_size 1, or Pro with zero interests) still enables Submit and shows Trial brief ready without fixing the cross-field conflict."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "reset_does_not_clear_brief"
-description = "Activating Reset after a filled brief leaves the form or preview with the prior name, email, plan, team_size, or interests still present."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

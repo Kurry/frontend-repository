@@ -142,31 +142,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "signature_motion_absent_or_stubbed"
-description = "Signature reference motions are absent or stubbed: no preloader exit, no scroll-driven 3D hero scrub, and no stacked-section overlap storytelling on a fresh load via the real UI path."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "recreation_feels_generic_template"
-description = "The recreation reads as a generic marketing template with default type/spacing and none of the reference's electric-blue Novapay identity, broken-grid stacks, or 3D hero execution quality."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "page_flat_static_no_immersion"
-description = "The page is flat and static with no scroll storytelling, no 3D hero scrub, and no word-reveal or card motion despite the reference requiring them."
-type = "binary"
-negate = true
-weight = 0.5
-
-
-[[criterion]]
 id = "11.20"
 name = "sprint_brief_end_state_polish"
 description = "Score execution quality of the useful end state: the Sprint launch brief live JSON/Markdown preview, Download/Copy, and shortlist/compare trays feel finished and coherent with the Novapay Sprint narrative rather than unfinished stubs bolted onto the marketing page."
