@@ -17,7 +17,7 @@ export const createTaskSchema = z.object({
     (value) => (value === undefined || value === null ? '' : String(value)),
     z.string()
       .min(1, 'Pull-request number is required')
-      .regex(/^\d{1,6}$/, 'Pull-request number must be a positive integer of 1–6 digits')
+      .regex(/^[1-9]\d{0,5}$/, 'Pull-request number must be a positive integer of 1–6 digits')
       .refine((value) => Number(value) > 0, 'Pull-request number must be positive'),
   ),
   minFiles: intField('Minimum file bound'),

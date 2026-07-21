@@ -15,6 +15,7 @@ import {
   ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts'
 import { Button, Badge, Card, EmptyState, Select, ToastStack } from './components/ui'
+import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { cn, downloadText, formatTime } from './lib/utils'
 import { createTaskSchema, repositoryIds, taskManifestSchema } from './lib/schemas'
 import {
@@ -47,12 +48,19 @@ async function copyText(text) {
     const area = document.createElement('textarea')
     area.value = text
     area.setAttribute('readonly', '')
-    area.style.position = 'fixed'
+    area.style.position = 'absolute'
     area.style.left = '-9999px'
     document.body.appendChild(area)
+    area.focus()
     area.select()
-    const ok = document.execCommand('copy')
-    area.remove()
+    area.setSelectionRange(0, 99999) // For mobile devices
+    let ok = false
+    try {
+      ok = document.execCommand('copy')
+    } catch (e) {
+      ok = false
+    }
+    document.body.removeChild(area)
     return ok
   }
 }
@@ -254,6 +262,7 @@ function RepositoriesView() {
 }
 
 function PipelineView() {
+  const [listRef] = useAutoAnimate()
   const repoId = useFactoryStore((s) => s.selectedRepositoryId)
   const repository = useFactoryStore((s) => s.repositories.find((repo) => repo.id === s.selectedRepositoryId))
   const allPrs = useFactoryStore((s) => s.pullRequests[s.selectedRepositoryId] || [])
@@ -311,7 +320,7 @@ function PipelineView() {
         {allPrs.length === 0 ? <EmptyState title="No pull requests" description="The pipeline register is empty. Restore the seed collection or create a new task to repopulate derived totals." /> : prs.length ? <div className="table-scroll">
           <table className="pipeline-table">
             <thead><tr><th style={{ width: 66 }}>PR</th><th style={{ width: 280 }}>Merged change</th><th style={{ width: 82 }}>Files</th><th style={{ width: 130 }}>Issue / result</th><th>Factory stages</th></tr></thead>
-            <tbody>
+            <tbody ref={listRef}>
               {prs.map((pr) => (
                 <tr key={pr.id} className={cn('pipeline-row', pr.fresh && 'fresh')} role="button" tabIndex={0} onClick={() => openTask(repoId, pr.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openTask(repoId, pr.id) } }} aria-label={`Open pull request ${pr.number}, ${pr.title}`}>
                   <td><span className="pr-number">#{pr.number}</span></td>
@@ -361,6 +370,7 @@ function CheckCard({ pr, type, title, description }) {
 }
 
 function TrialPanel({ pr }) {
+  const [listRef] = useAutoAnimate()
   const filter = useFactoryStore((s) => s.trialFilter)
   const setFilter = useFactoryStore((s) => s.setTrialFilter)
   const counts = VERDICTS.reduce((acc, verdict) => ({ ...acc, [verdict]: pr.trials.filter((trial) => trial.verdict === verdict).length }), {})
@@ -381,7 +391,7 @@ function TrialPanel({ pr }) {
         <div className="legend">
           {VERDICTS.map((verdict) => <button key={verdict} className={cn('legend-button', filter === verdict && 'active')} onClick={() => setFilter(filter === verdict ? null : verdict)}><span className={cn('legend-swatch', `verdict-${verdict}`)} />{verdict} · {counts[verdict]}</button>)}
         </div>
-        {filtered.length ? <div className="trial-list">
+        {filtered.length ? <div className="trial-list" ref={listRef}>
           {filtered.map((trial) => <div className="trial-row" key={trial.id}><span className="trial-id">{trial.id.includes('session') ? trial.id.split('-').slice(-2).join('-') : trial.id}</span><span className={cn('verdict-chip', `verdict-${trial.verdict}`)}>{trial.verdict}</span><span className="trial-duration">{trial.duration}</span><span className="trial-note">{trial.agent} · {trial.note}</span></div>)}
         </div> : <EmptyState title="No trials match" description="This task has no trials with the selected verdict." onClear={() => setFilter(null)} />}
       </Card>
@@ -475,6 +485,7 @@ function exportAllAccepted() {
 }
 
 function TimelineView() {
+  const [listRef] = useAutoAnimate()
   const events = useFactoryStore((s) => s.events)
   const filter = useFactoryStore((s) => s.timelineFilter)
   const setFilter = useFactoryStore((s) => s.setTimelineFilter)
@@ -484,7 +495,7 @@ function TimelineView() {
       <div className="page-header"><div><p className="page-eyebrow"><IconHistory size={14} />Factory activity</p><h1 className="page-title">Event timeline</h1><p className="page-subtitle">A durable in-session record of stage transitions, retries, and accepted tasks.</p></div><div className="header-actions"><Button variant="secondary" onClick={exportAllAccepted}><IconDownload size={15} />Export accepted tasks</Button></div></div>
       <div className="filter-row" aria-label="Filter events by status"><button className={cn('filter-chip', !filter && 'active')} onClick={() => setFilter(null)}>All · {events.length}</button>{EVENT_STATUSES.map((status) => <button key={status} className={cn('filter-chip', filter === status && 'active')} onClick={() => setFilter(status)}>{status}</button>)}</div>
       <Card>
-        {filtered.length ? <div className="timeline">{filtered.map((event) => <div className="event-row" key={event.id}><span className={cn('event-icon', event.status)}>{event.status === 'failed' ? <IconX size={11} aria-hidden /> : event.status === 'retry' ? <IconRefresh size={11} aria-hidden /> : event.status === 'started' ? <IconActivity size={11} aria-hidden /> : <IconCheck size={11} aria-hidden />}</span><div className="event-main"><strong>{event.text}</strong><span>{event.repository} · PR #{event.prNumber}</span></div><time className="event-time" dateTime={event.at}>{formatTime(event.at)} UTC</time></div>)}</div> : <EmptyState title="No events match" description="No timeline entries carry this status. The underlying event record is unchanged." onClear={() => setFilter(null)} />}
+        {filtered.length ? <div className="timeline" ref={listRef}>{filtered.map((event) => <div className="event-row" key={event.id}><span className={cn('event-icon', event.status)}>{event.status === 'failed' ? <IconX size={11} aria-hidden /> : event.status === 'retry' ? <IconRefresh size={11} aria-hidden /> : event.status === 'started' ? <IconActivity size={11} aria-hidden /> : <IconCheck size={11} aria-hidden />}</span><div className="event-main"><strong>{event.text}</strong><span>{event.repository} · PR #{event.prNumber}</span></div><time className="event-time" dateTime={event.at}>{formatTime(event.at)} UTC</time></div>)}</div> : <EmptyState title="No events match" description="No timeline entries carry this status. The underlying event record is unchanged." onClear={() => setFilter(null)} />}
       </Card>
     </div>
   )
@@ -503,17 +514,34 @@ function AnalyticsTooltip({ active, payload, label }) {
 }
 
 function AnalyticsView() {
+  const [chartRef, setChartRef] = useState(null)
+  const [chartInView, setChartInView] = useState(false)
+  useEffect(() => {
+    if (!chartRef) return
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setChartInView(true)
+    }, { threshold: 0.1 })
+    observer.observe(chartRef)
+    return () => observer.disconnect()
+  }, [chartRef])
   const repositories = useFactoryStore((s) => s.repositories)
   const pullRequests = useFactoryStore((s) => s.pullRequests)
   const [hoverTip, setHoverTip] = useState(null)
   const [parallax, setParallax] = useState(0)
   const tasks = useMemo(() => Object.values(pullRequests).flat().filter(isAccepted), [pullRequests])
   const weekly = useMemo(() => {
-    const weeks = [
-      { label: 'Jun 22', from: '2026-06-22', to: '2026-06-29' }, { label: 'Jun 29', from: '2026-06-29', to: '2026-07-06' },
-      { label: 'Jul 06', from: '2026-07-06', to: '2026-07-13' }, { label: 'Jul 13', from: '2026-07-13', to: '2026-07-20' },
-      { label: 'Jul 20', from: '2026-07-20', to: '2026-07-27' },
-    ]
+    const now = new Date()
+    const weeks = Array.from({ length: 5 }).map((_, i) => {
+      const fromDate = new Date(now)
+      fromDate.setDate(now.getDate() - (4 - i) * 7 - now.getDay() + 1)
+      const toDate = new Date(fromDate)
+      toDate.setDate(fromDate.getDate() + 7)
+      return {
+        label: fromDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        from: fromDate.toISOString().slice(0, 10),
+        to: toDate.toISOString().slice(0, 10),
+      }
+    })
     return weeks.map((week) => ({ week: week.label, tasks: tasks.filter((task) => task.createdAt.slice(0, 10) >= week.from && task.createdAt.slice(0, 10) < week.to).length }))
   }, [tasks])
   const languages = useMemo(() => repositories.map((repo) => ({ name: repo.language, value: tasks.filter((task) => task.repository === repo.id).length })).filter((item) => item.value > 0), [repositories, tasks])
@@ -544,7 +572,7 @@ function AnalyticsView() {
         <div className="header-actions"><Button variant="secondary" onClick={exportAllAccepted}><IconDownload size={15} aria-hidden />Export accepted tasks</Button></div>
       </div>
       <div className="chart-hover-banner" role="status" aria-live="polite" data-chart-tooltip={hoverTip ? 'true' : 'false'}>{hoverTip || 'Hover a chart mark to inspect underlying task values'}</div>
-      <div className="charts-grid">
+      <div className={cn("charts-grid", chartInView && "in-view")} ref={setChartRef} style={{ opacity: chartInView ? 1 : 0, transform: chartInView ? 'translateY(0)' : 'translateY(20px)', transition: 'opacity 0.6s ease, transform 0.6s ease' }}>
         <Card className="chart-card wide">
           <div className="chart-head"><h2>Tasks per week</h2><p>Accepted task output over the last five factory weeks</p></div>
           <div className="chart-wrap" onMouseLeave={() => setHoverTip(null)}>
@@ -598,37 +626,48 @@ function CreateTaskDialog() {
   const startRun = useFactoryStore((s) => s.startRun)
   const repositories = useFactoryStore((s) => s.repositories)
   const setCreateDraft = useFactoryStore((s) => s.setCreateDraft)
+  const createDrafts = useFactoryStore((s) => s.createDrafts)
   const { register, handleSubmit, control, reset, watch, formState: { errors, isValid, isSubmitting } } = useForm({
     resolver: zodResolver(createTaskSchema), mode: 'onChange', reValidateMode: 'onChange',
-    defaultValues: useFactoryStore.getState().createDraft,
+    defaultValues: useFactoryStore.getState().createDrafts['quartz-orm'],
   })
   useEffect(() => {
-    if (open) reset(useFactoryStore.getState().createDraft)
+    if (open) {
+      const state = useFactoryStore.getState()
+      const currentRepo = watch('repository') || 'quartz-orm'
+      reset(state.createDrafts[currentRepo])
+    }
   }, [open, reset])
   useEffect(() => {
     const resetHandler = () => {
       const blank = { repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' }
-      setCreateDraft(blank)
+      setCreateDraft('quartz-orm', blank)
       reset(blank)
     }
     window.addEventListener('factory:reset-form', resetHandler)
     return () => window.removeEventListener('factory:reset-form', resetHandler)
   }, [reset, setCreateDraft])
   useEffect(() => {
-    const subscription = watch((values) => {
-      setCreateDraft({
-        repository: values.repository || 'quartz-orm',
-        pullRequestNumber: values.pullRequestNumber || '',
-        minFiles: values.minFiles || '2',
-        maxFiles: values.maxFiles || '20',
-      })
+    const subscription = watch((values, { name, type }) => {
+      const repo = values.repository || 'quartz-orm'
+      if (name === 'repository' && type === 'change') {
+        const state = useFactoryStore.getState()
+        reset(state.createDrafts[repo] || { repository: repo, pullRequestNumber: '', minFiles: '2', maxFiles: '20' })
+      } else {
+        setCreateDraft(repo, {
+          repository: repo,
+          pullRequestNumber: values.pullRequestNumber || '',
+          minFiles: String(values.minFiles || '2'),
+          maxFiles: String(values.maxFiles || '20'),
+        })
+      }
     })
     return () => subscription.unsubscribe()
   }, [watch, setCreateDraft])
   const submit = (data) => {
     startRun(data)
     const blank = { repository: data.repository, pullRequestNumber: '', minFiles: String(data.minFiles), maxFiles: String(data.maxFiles) }
-    setCreateDraft(blank)
+    setCreateDraft(data.repository, blank)
     reset(blank)
   }
   const cancel = () => setOpen(false)
@@ -643,7 +682,7 @@ function CreateTaskDialog() {
     return () => window.clearTimeout(timer)
   }, [open])
   return (
-    <Dialog.Root open={open} modal={false} onOpenChange={(next) => setOpen(next)}>
+    <Dialog.Root open={open} modal={true} onOpenChange={(next) => setOpen(next)}>
       {portalMounted ? <Dialog.Portal forceMount>
         <Dialog.Overlay
           className="dialog-overlay"
@@ -655,8 +694,7 @@ function CreateTaskDialog() {
           forceMount
           data-state={open ? 'open' : 'closed'}
           aria-describedby="create-task-description"
-          onPointerDownOutside={(event) => event.preventDefault()}
-          onInteractOutside={(event) => event.preventDefault()}
+
           onEscapeKeyDown={() => setOpen(false)}
           onKeyDown={(event) => {
             if (event.key !== 'Tab') return
@@ -672,12 +710,12 @@ function CreateTaskDialog() {
           <form onSubmit={handleSubmit(submit)} noValidate>
             <div className="dialog-head"><div className="dialog-headline"><div><Dialog.Title asChild><h2>Create benchmark task</h2></Dialog.Title><Dialog.Description id="create-task-description">Start a simulated factory run from a merged pull request. One retry is included so resume behavior is observable. You can leave this dialog mid-draft and return — draft fields stay in session memory. Sidebar navigation stays clickable so interleaved flows remain intact.</Dialog.Description></div><Dialog.Close asChild><button className="icon-button" type="button" aria-label="Close create task dialog"><IconX size={17} aria-hidden /></button></Dialog.Close></div></div>
             <div className="form-body">
-              <div className="field"><label htmlFor="repository">Repository</label><Controller control={control} name="repository" render={({ field }) => <Select id="repository" value={field.value} onValueChange={field.onChange} ariaLabel="Repository" options={repositories.map((repo) => ({ value: repo.id, label: repo.name }))} />} /><p className="field-error" id="repository-error" role={errors.repository ? 'alert' : undefined} aria-live="polite">{errors.repository?.message}</p></div>
+              <div className="field"><label htmlFor="repository-trigger">Repository</label><Controller control={control} name="repository" render={({ field }) => <Select id="repository-trigger" value={field.value} onValueChange={field.onChange} ariaLabel="Repository" options={repositories.map((repo) => ({ value: repo.id, label: repo.name }))} />} /><p className="field-error" id="repository-error" role={errors.repository ? 'alert' : undefined} aria-live="polite">{errors.repository?.message}</p></div>
               <div className="field"><label htmlFor="pullRequestNumber">Pull-request number</label><input id="pullRequestNumber" className="field-input" inputMode="numeric" placeholder="e.g. 247" aria-invalid={!!errors.pullRequestNumber} aria-describedby="pullRequestNumber-error" {...register('pullRequestNumber')} /><p className="field-error" id="pullRequestNumber-error" role={errors.pullRequestNumber || !prValue ? 'alert' : undefined} aria-live="polite">{errors.pullRequestNumber?.message || (!prValue ? 'Pull-request number is required' : '')}</p></div>
               <div className="bounds-grid"><div className="field"><label htmlFor="minFiles">Minimum file bound</label><input id="minFiles" className="field-input" inputMode="numeric" aria-invalid={!!errors.minFiles} aria-describedby="minFiles-error" {...register('minFiles')} /><p className="field-error" id="minFiles-error" role={errors.minFiles ? 'alert' : undefined} aria-live="polite">{errors.minFiles?.message}</p></div><div className="field"><label htmlFor="maxFiles">Maximum file bound</label><input id="maxFiles" className="field-input" inputMode="numeric" aria-invalid={!!errors.maxFiles} aria-describedby="maxFiles-error" {...register('maxFiles')} /><p className="field-error" id="maxFiles-error" role={errors.maxFiles ? 'alert' : undefined} aria-live="polite">{errors.maxFiles?.message}</p></div></div>
               <div className="form-note"><IconInfoCircle size={15} aria-hidden />Bounds apply to source files only. Accepted range: 1–500, with the minimum no greater than the maximum.</div>
               <div className="voice-row" aria-label="Alternative input">
-                <button type="button" className="voice-chip" onClick={() => useFactoryStore.getState().addToast('Voice draft: say a pull-request number to fill the field', 'info')}>
+                <button type="button" className="voice-chip" onClick={() => { reset({ ...watch(), pullRequestNumber: '999' }); useFactoryStore.getState().addToast('Voice draft filled: 999', 'info'); }}>
                   <IconActivity size={14} aria-hidden /> Voice fill (demo)
                 </button>
                 <span>Or swipe up on mobile with gesture shortcuts enabled</span>
@@ -854,7 +892,7 @@ export default function App() {
     const onStart = (event) => { startY = event.touches?.[0]?.clientY || 0 }
     const onEnd = (event) => {
       const endY = event.changedTouches?.[0]?.clientY || 0
-      if (startY - endY > 80) setCreateDialogOpen(true)
+      if (startY - endY > 80) { setCreateDialogOpen(true); useFactoryStore.getState().addToast('Gesture recognized: opened dialog', 'info'); }
     }
     window.addEventListener('touchstart', onStart, { passive: true })
     window.addEventListener('touchend', onEnd, { passive: true })
