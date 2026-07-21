@@ -1,12 +1,26 @@
 // Shared UI chrome: focus-trapping modals, tabs with crossfade, toasts,
 // labeled form fields, JSON code surfaces, and small visualizations.
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Close, ChevronDown } from '@carbon/icons-react';
 
 export function useDur(fast = 0.15, base = 0.2) {
-  const reduced = useReducedMotion();
-  return { fast: reduced ? 0 : fast, base: reduced ? 0 : base };
+  const isRM = () => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    }
+    return false;
+  };
+  const [rm, setRm] = useState(isRM);
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      const q = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const cb = (e) => setRm(e.matches);
+      q.addEventListener('change', cb);
+      return () => q.removeEventListener('change', cb);
+    }
+  }, []);
+  return { fast: rm ? 0 : fast, base: rm ? 0 : base };
 }
 
 /* ------------------------------- Modal ----------------------------------- */

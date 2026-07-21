@@ -1,0 +1,1203 @@
+{
+  "core_features": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_library_and_tree",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "On first load the sidebar lists at least 4 seeded schemas (an evaluation result, an agent task, prompt metadata, and a classification response), the first is active and marked, and its tree renders at least 6 fields including at least one nested object and one array, each row showing key name, a type badge, and a required toggle, with chevrons collapsing object and array children",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.2",
+        "name": "add_field_and_inline_rename",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Clicking Add Field on an object node appends a child with a default name and string type; clicking a node's name makes it editable inline and committing the edit renames it in the tree, the compiled text, and the example payload",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.3",
+        "name": "delete_with_inline_confirm_root_protected",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "A node's Delete control shows an inline confirmation; confirming removes the node and all its descendants, canceling leaves it intact, and the root node offers no Delete control",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.4",
+        "name": "drag_reorder_and_nesting",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Dragging a node with the real pointer reorders it among its siblings immediately on drop, and the nest/un-nest controls move a node into the preceding object sibling or out to its parent's level, with the tree and compiled text updating immediately",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.5",
+        "name": "bulk_node_actions",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Multi-selecting nodes via checkboxes reveals a contextual action bar with Set required, Clear required, and Delete selected (its confirmation naming the count), and each action applies to exactly the selected nodes",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.6",
+        "name": "config_panel_field_definition_contract",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Clicking a node opens a side configuration panel that edits a FieldDefinition payload with key (1 to 40 characters, letters/digits/underscores, sibling-unique), type (closed enum string|number|boolean|object|array), required boolean, optional description, and type-dependent constraints \u2014 enumValues and pattern for string, minimum and maximum for number \u2014 and the visible constraint inputs change when the type changes",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.7",
+        "name": "constraint_validation_blocks_invalid",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Entering a minimum greater than the maximum, an invalid pattern expression, a sibling-duplicate or illegal key, or an empty enum entry shows an inline message naming the field and the FieldDefinition rule, and the invalid value is not applied to the compiled schema",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.8",
+        "name": "constraint_templates_apply",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The templates library lists at least Email pattern, Percentage 0 to 100, ISO date pattern, Non-empty string, and Status enum, and applying one fills the matching constraint inputs on the selected node with visible values that appear in the compiled text",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.9",
+        "name": "compiled_text_live_and_faithful",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The compiled JSON Schema text updates within roughly 100 milliseconds of any tree or configuration edit and is standard, consumable JSON Schema \u2014 valid JSON that parses, with a draft-07 $schema declaration and the standard type, properties, required, enum, minimum, maximum, and pattern keywords for the nodes defining them; renames and deletions change the text correspondingly, and its Copy control puts the exact text on the clipboard with visible confirmation",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.10",
+        "name": "example_satisfies_schema",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Example tab shows a generated JSON object satisfying the current schema \u2014 enum fields use one of their enum values, numbers fall within bounds, and required fields are present \u2014 and the Regenerate control produces different randomized values that still satisfy the schema",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.11",
+        "name": "example_tracks_every_edit",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Adding, renaming, retyping, or constraining a field immediately changes the example payload correspondingly, and the example never shows a field the schema no longer contains",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.12",
+        "name": "format_instruction_and_prompt_draft",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Format Prompt tab shows a natural-language instruction naming each field with its type and required status, updating when the schema changes, and the Insert into prompt draft control appends it to the editable prompt draft drawer with a success toast",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.13",
+        "name": "validation_run_steps_visible",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Run validation on a pasted payload starts a simulated run with one visible step per top-level schema field, each advancing through pending, running, and complete or failed as the run progresses",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.14",
+        "name": "retry_backoff_and_resume_from_step",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "A step that retries shows a visible backoff countdown and attempt counter (such as retry 2 of 3); a step that exhausts retries is marked failed with an inline error summary and a manual Retry control that resumes the run from that step while completed steps keep their outcomes and never re-execute",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.15",
+        "name": "pause_resume_rollup_timeline",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Pausing a running validation freezes at the current step and resuming continues from exactly that step; a rollup of fields checked out of total and failure count derives live from the step states, and an ordered event timeline of step transitions with timestamps can be filtered by status",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.16",
+        "name": "annotations_map_onto_tree",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "When the run completes, per-field pass/fail annotations appear on the tree \u2014 success markers on passing nodes and error markers with messages naming the field path and the violated constraint (for example, score must be at most 100) on failing nodes",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.17",
+        "name": "invalid_json_blocks_run",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Pasting a payload that is not valid JSON shows an inline parse error naming the position and does not start a validation run",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.18",
+        "name": "import_inference_follows_example",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Pasting a JSON object into Import from example produces an inferred schema draft whose field names, types, and constraints match the pasted object's keys and values, with per-field accept and reject toggles; pasting a different object produces a visibly different draft",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.19",
+        "name": "apply_import_replaces_tree",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Applying the reviewed import draft replaces the working tree with exactly the accepted fields \u2014 rejected fields are omitted \u2014 and the compiled text and example payload update to match",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.20",
+        "name": "version_save_validation",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Save version requires a name \u2014 saving with an empty name shows an inline message naming the field and saves nothing \u2014 and saved versions list with name and timestamp, newest first",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.21",
+        "name": "structural_diff_color_coded",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Diff view compares two selected versions with added fields in a success treatment, removed fields in an error treatment, and changed fields (type, required, or constraints) in a warning treatment each labeled with what changed; changing a selection updates the diff without a reload and diffing a version against itself shows an explicit no-differences state",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.22",
+        "name": "library_new_delete_duplicate",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The sidebar's New button starts a blank schema with a root object, Delete removes the selected schema after confirmation, Duplicate copies it under a copy-suffixed name, and clicking any entry loads it into the tree with the active entry visually marked",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.23",
+        "name": "metadata_field_builder",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The metadata field builder accepts a field label (required) and a type (text, number, date, or dropdown with options); defined fields immediately render as editable inputs on every library entry's details, and values entered there display on that entry",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.24",
+        "name": "undo_redo_with_labels",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Undo and Redo revert and reapply adds, renames, retypes, constraint edits, reorders, nesting, deletions, bulk actions, and imports, each control showing the label of the action it will affect and disabling when its stack is empty; undoing a drag reorder restores the previous sibling order in the tree and compiled text",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.25",
+        "name": "history_timeline_slider_scrubs",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The history timeline slider spans the active schema's edit history, and dragging it scrubs the tree, compiled text, and example payload backward and forward through recorded states with the current position labeled by its action name",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.26",
+        "name": "export_modal_live_and_copyable",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Export modal offers the compiled schema text, a SchemaPackage JSON preview, and, after a completed run, a validation report with the payload summary, per-field outcomes, and failure count; each format reflects the latest edits and run when reopened, and each Copy control puts the exact text on the clipboard with visible confirmation",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.27",
+        "name": "boundary_states_handled",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Deleting every child of the root yields a valid empty object schema (compiled text shows an object with no properties, the example shows an empty object), a sibling-duplicate rename shows a conflict message and is not applied, and an empty enum entry shows a message and is not added",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.28",
+        "name": "schema_package_export_field_contract",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Opening Export shows a live SchemaPackage JSON preview whose visible text includes schemaVersion exactly schema-package-v1 plus name, jsonSchema, fields, metadata, examplePayload, and formatInstruction; after adding a constrained field, reopening Export shows that field in fields and jsonSchema, and Copy and Download are available for the package format",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.29",
+        "name": "schema_package_import_round_trip_and_reject",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Exporting then importing a conforming SchemaPackage JSON reconstructs the same visible tree, compiled text, example payload, and format instruction; importing parseable JSON that fails the field contract (wrong schemaVersion, missing required keys, or a fields element outside the FieldDefinition contract) shows validation naming the offending field and leaves the working schema unchanged",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "edge_cases": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_states_present",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "An emptied tree, an empty version list, an empty playground, and a deleted-schema state each render a designed empty state naming what belongs there, never a blank region",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "4.2",
+        "name": "forms_validate_inline_before_submit",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The FieldDefinition configuration constraints, Save version, metadata field builder, Import from example, and Import package validate inline before submit, with required-field and field-contract rule errors naming the field",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Error copy is actionable: the JSON parse error names the position, constraint errors name the FieldDefinition rule and bound, SchemaPackage import errors name schemaVersion or the offending key, and the rename-conflict message names the colliding sibling",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Copying, saving a version, inserting into the prompt draft, applying an import, importing a package, and deleting each produce visible success feedback (toast or inline confirmation)",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "4.5",
+        "name": "simulated_run_shows_progress",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The simulated validation run shows live progress affordances \u2014 per-step statuses, the rollup, and the backoff countdown \u2014 rather than an unexplained wait",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_actions_guarded_and_undoable",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Destructive actions are guarded and recoverable: node, bulk, and schema deletions require confirmation naming the scope, and tree deletions can be reverted via Undo",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "4.7",
+        "name": "non_obvious_controls_have_help",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Non-obvious controls \u2014 nest/un-nest, the history slider, constraint templates, import accept/reject \u2014 carry labels, tooltips, or hints that explain them in-app",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_tags",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Buttons, inputs, selects, checkboxes, and the slider use semantic interactive elements with real labels rather than bare div or span wrappers",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "4.9",
+        "name": "overlays_support_close_paths",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The export modal and confirmation dialogs close via their close control, Escape, and a background click where applicable",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "4.10",
+        "name": "boundary_values_handled",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Boundary inputs behave: a 40-plus-character field name truncates with an ellipsis in the tree and shows in full in the panel, an empty enum entry is rejected with a message, an empty-object schema stays valid, and undo/redo at empty stacks are disabled",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "4.11",
+        "name": "schema_package_import_rejects_nonconforming",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Importing parseable JSON that fails the SchemaPackage field contract \u2014 schemaVersion not exactly schema-package-v1, missing required name/jsonSchema/fields/metadata/examplePayload/formatInstruction keys, or a fields element outside the FieldDefinition contract \u2014 shows visible validation naming the offending field and leaves the working schema unchanged",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "design_fidelity": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Spacing and sizing follow a consistent design-system scale across the sidebar, tree, panel, and panes, with no arbitrary one-off values visible in computed styles",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "3.2",
+        "name": "specified_treatments_implemented",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The treatments the spec calls out exist as described: monospace type badges with per-type colors, the error-accent required asterisk, syntax-styled code surfaces, and the roughly 280 pixel docked configuration panel",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_specified_composition",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The desktop layout matches the specified composition \u2014 library sidebar with metadata builder, central tree, and right tabbed panes for schema text, example, and format instruction",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The state changes the spec calls out animate at roughly their specified durations: 150 millisecond add expansion, 120 millisecond remove collapse, 200 millisecond reorder slide, panel slide, and step-ordered annotation pop-ins",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_spec",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Responsive behavior matches the spec: the sidebar collapses behind a toggle at 768 pixels and below, the panes stack as full-width tabs, and 375 pixels shows no page-level horizontal scroll",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_cohesive",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Buttons, tags, inputs, tabs, and form controls share cohesive radii, padding, and depth treatments rather than mixing unrelated styles",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Typography distinguishes app title, panel headings, tree rows, and body text as specified, with monospace reserved for badges and code",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Default, hover, focus, disabled, and error states are all present and visually distinct on interactive controls, as specified",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "innovation": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_microinteractions",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app has unique, delightful microinteractions beyond the specified motion \u2014 for example badges that morph on type change or a satisfying drop settle",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_motion_mechanics",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app has advanced animation mechanics beyond the spec, such as coordinated tree choreography or animated diff reveals",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "11.3",
+        "name": "guided_onboarding",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app has a guided onboarding or first-run explanation of the tree editing, validation, and versioning workflow",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "11.4",
+        "name": "enhanced_interactive_graphics",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The tree, diff, or validation surfaces gain extra interactive visualization beyond the required markers \u2014 for example a minimap of large trees or a coverage gauge",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_shortcut_depth",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app supports a broader keyboard-shortcut surface than required (per-type add shortcuts, a shortcut reference overlay)",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app provides personalization such as adjustable tree density, configurable default types, or pane arrangement preferences",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "11.7",
+        "name": "polished_product_narrative",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app presents a polished, coherent product identity \u2014 naming, empty states, and copy feel like one designed product rather than assembled panels",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "11.8",
+        "name": "dynamic_theming_beyond_requirements",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app provides a theme or color mode beyond requirements, applied consistently across all surfaces including the code panes",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "11.9",
+        "name": "schema_intelligence_extras",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app offers schema intelligence beyond the spec \u2014 inline constraint documentation hints, a shareable one-line schema summary, suggested constraints from example values, or a short first-run coachmark for Export package",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Competition-level innovation is visible to users beyond everything already listed",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Where the app renders headings and panel titles (library, tree, playground, versions, export), they use one consistent capitalization convention throughout",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Where the app renders action labels, they are specific verbs such as Add field, Save version, and Run validation rather than generic labels like Submit or OK when a specific label is possible",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Where the app renders FieldDefinition, Save version, or Import package validation messages, they name the field and the field-contract fix (for example allowed key pattern, type enum, minimum versus maximum, or schemaVersion schema-package-v1), not only a bare rejection like 'Invalid'",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Where the app renders empty states (blank schema, no versions, empty playground), the copy explains what belongs there and how to add it",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Where the app renders descriptions, format instructions, and notices, rate how free the copy is of spelling and grammatical errors",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Where the app names the same concept in multiple places, terminology is consistent \u2014 always fields (not properties here and keys there), the same type names, the same version and package terminology across the tree, panel, diff, and exports",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Where the app renders timestamps (versions, event timeline) and numeric bounds, formatting is consistent \u2014 one date format, consistent precision",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1.0,
+        "weight": 0.5,
+        "description": "Where the app renders confirmations, they state what happened \u2014 Schema copied, Version saved, Instruction inserted \u2014 not vague affirmations",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "user_flows": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "edit_flow_reaches_every_pane",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The core editing flow works end to end: adding, renaming, requiring, and constraining a field via a valid FieldDefinition lands in the tree, compiled text, example payload, format instruction, and SchemaPackage export within a beat of each edit and without a reload",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_forms_validate_inline",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Submitting Save version with an empty name, entering min greater than max, an invalid pattern, a sibling-duplicate key, or a metadata field with no label triggers immediate inline validation naming the field and the FieldDefinition or VersionSnapshot rule and applies nothing",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "6.3",
+        "name": "validation_flow_end_to_end",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The validation flow works end to end: paste payload, run, watch steps advance, see annotations land on the tree, and read the same outcomes in the validation report export",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "6.4",
+        "name": "delete_flow_updates_all_surfaces",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Deleting a node (singly or via bulk delete) removes it and its descendants from the tree, compiled text, example payload, format instruction, and any annotations after deletion",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "6.5",
+        "name": "schema_switch_retains_context",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Switching between library schemas and back loads each schema's own tree, and switching right-pane tabs retains the underlying schema state \u2014 no switch silently loses edits already committed",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "6.6",
+        "name": "empty_tree_state_recovers",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Deleting the loaded schema, or emptying the root's children, shows a clear state (blank-schema message or empty-object output) with working controls to create or select a schema and continue",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "6.7",
+        "name": "versioning_flow_complete",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The versioning flow works end to end: save, edit, save again, select the two versions, read the color-coded diff, and return to editing without losing the working tree",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "6.8",
+        "name": "collapsible_chrome_preserves_workflow",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Collapsing and reopening the sidebar, the configuration panel, and tree branches preserves workflow continuity \u2014 the same schema, selection, and edits remain in place",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "6.9",
+        "name": "overlays_support_expected_flows",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The export modal, delete confirmations, and inline confirms open, complete their flow, and close as expected, returning the user to an intact editing context",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "6.10",
+        "name": "flow_recovers_without_reload",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Every dead-end candidate recovers in-app: an invalid pasted payload, a failed validation step, a rejected import draft, a rejected SchemaPackage import, and an emptied library all leave working controls to continue without a reload",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "6.11",
+        "name": "export_package_flow_with_field_contract",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Export package flow: edit the schema by adding a constrained field, open Export, confirm the SchemaPackage JSON preview shows schemaVersion schema-package-v1 plus name, jsonSchema, fields, metadata, examplePayload, and formatInstruction with the new field present, then Import package that JSON and confirm the tree, compiled text, example, and format instruction restore the same session work",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "accessibility": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Every interactive control \u2014 tree rows and their toggles, chevrons, the configuration inputs, tabs, version selectors, the history slider, and run controls \u2014 is reachable and operable with Tab, Shift+Tab, Enter, Space, or arrow keys",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.2",
+        "name": "overlays_manage_focus",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The export modal and confirmation dialogs trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.3",
+        "name": "icons_have_accessible_names",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Icon-only controls (delete, nest/un-nest, chevrons, copy) carry accessible names or labels; decorative icons are hidden from the accessibility tree",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.4",
+        "name": "run_outcomes_announced",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Completion of a validation run and a step entering the failed state are announced through an aria-live region as well as shown visually",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The FieldDefinition configuration panel, Save version, metadata builder, Import from example, and Import package fields have visible labels, and validation messages are programmatically associated with their fields",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Panel and section headings follow a logical order with no skips (H1 for the app, H2 for panels, H3 within)",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.7",
+        "name": "tree_semantics_exposed",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The schema tree exposes hierarchy semantically (tree or equivalent list-with-level semantics) so nesting depth and expanded states are readable by assistive technology, and landmark structure or a skip path is present",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "All text \u2014 type badges, required asterisks, diff treatments, code surfaces, annotations \u2014 meets sufficient color contrast against its background",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Interactive and structural elements use semantic roles \u2014 real buttons for actions, real tab semantics for the pane tabs, slider semantics with value for the history control",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, height expansions, reorder slides, panel transitions, and annotation pop-ins are removed while all functionality remains",
+        "reasoning": "Observed via playwright testing that with reduced-motion forced, duration is returned as 0."
+      }
+    ]
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Cold start to an interactive tree editor is under 2 seconds on local render",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Browser devtools show no errors or warnings on load or while exercising editing, drag reorder, validation, versioning, import from example, SchemaPackage import, and export",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "9.3",
+        "name": "derivations_feel_instant",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The compiled text, example payload, and format instruction land within roughly 100 milliseconds of any edit with no perceptible lag",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "9.4",
+        "name": "simulated_run_has_progress_indicators",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The simulated validation run shows continuous progress (step statuses, rollup) rather than a frozen or blank interface",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "9.5",
+        "name": "large_trees_stay_smooth",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "A schema grown to dozens of fields with deep nesting still edits, collapses, and reorders smoothly without perceived lag",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "9.6",
+        "name": "ui_interactive_during_run",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The UI remains fully interactive while a validation run advances \u2014 switching tabs, selecting nodes, and reading panes all work mid-run",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Height expansions, reorder slides, and panel transitions hold a smooth frame rate with no visible stutter",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Rapid repeated input \u2014 fast renames, rapid history-slider scrubbing, quick tab switches, repeated undo/redo \u2014 never hangs or drops interactions",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "9.9",
+        "name": "extended_sessions_avoid_resource_runaway",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "An extended session with many edits, runs, versions, and scrubs shows no memory runaway or progressive slowdown",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "visual_design": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "three_region_layout_with_docked_panel",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At desktop width the app composes a left sidebar (schema library and metadata builder), a central tree editor, and a right region with tabs for compiled text, example, and format instruction; the configuration panel docks to the right at roughly 280 pixels wide with a structured form layout",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "2.2",
+        "name": "tree_rows_indented_with_chevrons",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The schema tree renders as indented rows with chevron toggles on object and array nodes, and indentation depth visibly communicates nesting level",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "2.3",
+        "name": "type_badges_monospace_consistent",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Type badges render in a monospace face inside compact tags with one consistent color per type (string, number, boolean, object, array) everywhere that type appears",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "2.4",
+        "name": "required_asterisk_error_accent",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Required fields show an asterisk in the error-accent color after the field name in the tree, consistent with the compiled text's required listing",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "2.5",
+        "name": "code_surfaces_syntax_styled",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The compiled schema text, example payload, and SchemaPackage JSON preview render in monospaced, syntax-styled read-only code surfaces with visible structure indentation",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "2.6",
+        "name": "diff_treatments_labeled",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Diff treatments are unambiguous: added fields in the success color, removed in the error color, changed in the warning color, each carrying a text label so color is not the only signal",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "2.7",
+        "name": "annotations_pair_icon_and_color",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Validation annotations pair an icon with the color \u2014 a success mark on passing nodes and an error mark with message text on failing nodes \u2014 and step statuses (pending, running, retrying, failed, complete) are visually distinct and consistent between the step list and event timeline",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "2.8",
+        "name": "typography_hierarchy",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Typography shows a clear hierarchy \u2014 app title larger than panel headings, panel headings larger than tree row and body text \u2014 consistent across views",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "2.9",
+        "name": "spacing_and_component_states",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Spacing follows a consistent rhythm across the sidebar, tree, and panes with no crowded or orphaned regions, and buttons, inputs, selects, toggles, and checkboxes show distinct default, hover, focus (visible ring), disabled, and error treatments with one consistent icon set throughout",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "technical": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "10.1",
+        "name": "serves_clean_and_fast",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app serves via its documented npm start path on port 3000, renders a working interface (not a blank or broken page), and is interactive within 2 seconds of a local cold load",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "10.2",
+        "name": "shared_state_coherence",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "A single edit propagates everywhere at once: renaming a field updates the tree, compiled text, example payload, format instruction, and SchemaPackage export together \u2014 the same datum never shows different values in two panes without a reload",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "10.3",
+        "name": "reload_resets_to_seed",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "A page reload returns the app to its seeded baseline: the seeded schema library with the first schema active, empty undo history, no user versions, and an empty playground",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "10.4",
+        "name": "console_stays_clean",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "No console errors or unhandled promise rejections appear on load or during a full exercise of editing, drag reorder, validation runs, versioning, import from example, SchemaPackage import, undo/redo scrubbing, and exports",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "10.5",
+        "name": "compiled_output_parses_as_json",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The compiled schema text and the SchemaPackage JSON preview are valid JSON at all times \u2014 after any sequence of edits the package parses without error, carries schemaVersion schema-package-v1, and its jsonSchema carries the draft-07 $schema declaration and standard keywords",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "10.6",
+        "name": "rapid_interaction_stays_synced",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Rapid interleaved interaction \u2014 fast renames, quick history-slider scrubs, tab switches during a validation run \u2014 leaves all panes consistent with each other, with no desynced or stale derivations",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "10.7",
+        "name": "api_shaped_exports_round_trip",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "SchemaPackage export and Import package use the same field contract: a package exported from the session can be re-imported to reconstruct the same tree and derived panes, and browser storage remains unused for that persistence",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The sidebar-tree-panes layout adapts gracefully from 1440px desktop to 375px mobile without breaking the editor, playground, or version surfaces",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At mobile width, tree-row toggles, chevrons, checkboxes, and tab headers are tap targets of at least 44px",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Tree rows, badges, code surfaces, and body text resize appropriately between desktop and mobile and remain readable at both",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "No tree row, panel, tab strip, or code surface clips or overflows the viewport at any width between 1440px and 375px",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_below_768",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At widths of 768 pixels and below the sidebar collapses behind a toggle that opens it as an overlay and the right panes stack below the tree as full-width tabs; at desktop widths all three regions are visible together",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At narrow widths the regions stack in a logical order \u2014 tree first, then the panes \u2014 with the configuration panel reachable as an overlay rather than interleaving arbitrarily",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "7.7",
+        "name": "deep_nesting_stays_usable",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Deeply nested tree levels remain readable and operable at narrow widths \u2014 indentation compresses or scrolls within the tree container rather than pushing rows off screen",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "At 375px width there is no page-level horizontal scrolling anywhere in the app",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "7.9",
+        "name": "code_surfaces_scroll_contained",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The compiled text, example payload, and report surfaces scroll within their own containers at every width",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Undo/redo, the history slider, and the run controls remain reachable at every viewport size",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "motion": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "8.1",
+        "name": "add_field_height_expand",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Adding a field through the real Add Field control animates the new row in with a height expansion of roughly 150 milliseconds rather than appearing instantly",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "8.2",
+        "name": "remove_field_height_collapse",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Removing a field through the real Delete flow collapses its height over roughly 120 milliseconds before it disappears",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "8.3",
+        "name": "drag_reorder_slides_siblings",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Drag reordering with the real pointer slides sibling nodes into their new positions over roughly 200 milliseconds rather than snapping",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "8.4",
+        "name": "panel_slide_and_tab_crossfade",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The configuration panel slides in when a node is selected and out when dismissed, and switching between the schema text, example, and format instruction tabs crossfades briefly",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "8.5",
+        "name": "annotations_pop_in_step_order",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "During a validation run started from the real Run validation control, tree annotations appear with a short pop-in in step order as each field's step completes, not all at once",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "8.6",
+        "name": "countdown_ticks_and_status_fades",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The retry backoff countdown ticks visibly and a completing step's status transitions with a short fade rather than snapping",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "8.7",
+        "name": "history_slider_scrubs_continuously",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Dragging the history timeline slider updates the tree continuously as it moves, not only on release",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "8.8",
+        "name": "hover_system_required",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "While hovering with the real pointer: buttons ease background and shadow with a slight press effect on activation, tree rows, library entries, and version rows take a full-width hover wash, and form controls show focus rings \u2014 verified via computed styles while hovering",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "8.9",
+        "name": "toasts_slide_and_dismiss",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Toasts for copies, saves, inserts, and deletions slide in, remain readable, and auto-dismiss with a fade",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "8.10",
+        "name": "reduced_motion_complete",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "With prefers-reduced-motion set, expansions, collapses, reorders, tab switches, and annotations apply instantly while every feature remains fully usable",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  },
+  "behavioral": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_reset",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Add a field, save a version, define a metadata field, paste a playground payload, and switch the right pane to the Example tab \u2014 then reload the page. All facets coherently reset to the seeded baseline: the seeded library with the first schema active, no user versions or metadata fields, an empty playground, and empty undo history \u2014 never a mix of surviving and reset facets",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "14.2",
+        "name": "edit_to_all_derivations_pipeline",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Full pipeline probe: add a number field with a FieldDefinition key matching the allowed pattern, minimum 1 and maximum 5, mark it required, then confirm without a reload that the tree shows it, the compiled text gains its property with minimum, maximum, and the required entry, the example payload shows it with a value between 1 and 5, the format instruction names it as a required number, and the SchemaPackage export fields/jsonSchema contain that same field \u2014 all surfaces track the one edit",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "14.3",
+        "name": "validate_edit_revalidate_tracks",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Paste a payload violating one constraint, run validation, and confirm exactly that field fails with a message naming the path and bound; edit the schema so the constraint now passes, re-run validation on the same payload, and confirm the annotation flips to pass and the exported validation report reflects the new outcome",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "14.4",
+        "name": "different_payloads_different_outcomes",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Validate two different payloads against the same schema: the per-field annotations, rollup failure counts, and validation reports differ in ways the payloads dictate",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "14.5",
+        "name": "version_diff_matches_edits_exactly",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Save a version, make exactly two structural edits (one added field, one type change), save a second version, and diff the two: the diff shows exactly one added entry and one changed entry with correct labels, and nothing else",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "14.6",
+        "name": "import_inference_input_dependent",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Paste two different example objects into Import from example in sequence: each inferred draft's field names and types match its own pasted object, and applying the second draft produces a tree, compiled text, and example payload matching the second object's shape",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_run_and_edit_integrity",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Start a validation run, pause it mid-run, switch tabs and edit an unrelated schema field's description, then resume: the run continues from exactly the paused step with earlier outcomes unchanged, and the description edit is still present \u2014 neither flow corrupted the other",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "14.8",
+        "name": "history_scrub_round_trip",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Make three labeled edits, scrub the history slider back to before the first edit and confirm the tree, compiled text, and example match the pre-edit state, then scrub forward to the end and confirm all three edits are back \u2014 derived panes track through both directions",
+        "reasoning": "Passes all required criteria"
+      },
+      {
+        "id": "14.9",
+        "name": "export_import_pipeline_preserves_session_contract",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Full pipeline probe: add a constrained field, open Export and confirm the SchemaPackage JSON shows schemaVersion schema-package-v1 with that field in fields and jsonSchema, copy or download the package, Import package it into a blank or different schema, and confirm the tree, compiled text, example payload, and format instruction match the exported session \u2014 then Import package a payload with schemaVersion not schema-package-v1 and confirm the tree is unchanged",
+        "reasoning": "Passes all required criteria"
+      }
+    ]
+  }
+}
