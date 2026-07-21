@@ -49,6 +49,10 @@ function onKeydown(event) {
     event.preventDefault()
     store.deleteFields()
   }
+  if (event.key === 'Escape' && store.selectedFieldIds.length > 0) {
+    event.preventDefault()
+    store.clearSelection()
+  }
 }
 
 onMounted(() => {

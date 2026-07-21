@@ -76,7 +76,7 @@ function keySelect(event, field) {
   <main class="canvas-shell" :class="{ previewing: store.mode === 'preview' }" aria-label="Document canvas">
     <div class="canvas-toolbar-mobile">
       <span>{{ store.activeTemplate.name }}</span>
-      <span>{{ store.activeTemplate.fields.length }} fields · {{ store.activeTemplate.pages }} pages</span>
+      <span>{{ store.activeTemplate.fields.length }} {{ store.activeTemplate.fields.length === 1 ? 'field' : 'fields' }} · {{ store.activeTemplate.pages }} {{ store.activeTemplate.pages === 1 ? 'page' : 'pages' }}</span>
     </div>
 
     <div class="pages-stack">
