@@ -41,12 +41,12 @@
   const cloneStops = (items) => items.map((item) => ({ ...item, tags: [...item.tags] }));
 
   const state = {
-    stops: cloneStops(SEEDED), selectedId: "negresco", selectedDay: "all", mode: "list", role: "Owner", theme: "light", timezone: "CET",
+    stops: cloneStops(SEEDED), selectedId: null, selectedDay: "all", mode: "list", role: "Owner", theme: "light", timezone: "CET",
     filters: { category: "", costTier: "", status: "", tag: "", search: "" }, selectedBulk: new Set(), collapsed: new Set(), detailTab: "About",
     history: [], future: [], activities: [{ actor: "Sarah", text: "prepared the French Riviera itinerary", at: new Date() }], votes: {}, zoomedOut: false,
     exportFormat: "markdown", editingId: null, submitting: false, dragId: null, lastStopFocus: null, sort: "time",
     voteBusy: null, isochroneOn: false,
-    lastAddedId: null, peerLatency: 320, accent: "teal", bulkConfirm: false, firstExportTip: false, firstPromoteTip: false,
+    lastAddedId: null, peerLatency: 320, accent: "teal", bulkConfirm: false, firstExportTip: false, firstPromoteTip: false, exportTrigger: null,
   };
 
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -297,8 +297,23 @@
   function renderRole() { $$(".mutating").forEach((el) => { if (el.closest("#stop-dialog") || el.closest("#conflict-dialog")) return; el.disabled = !roleCan(); }); $$(".owner-only").forEach((el) => { el.disabled = !roleCan("delete"); }); els.roleSelect.value = state.role; }
   function renderAll() { renderNav(); renderList(); renderBulk(); renderKanban(); renderMap(); renderIdeas(); renderActivity(); renderRole(); updateUndo(); }
 
+  function rememberStopFocus(id) {
+    const active = document.activeElement;
+    const surface = active?.closest?.(".pin") ? "pin" : active?.closest?.(".stop-row") ? "row" : null;
+    if (surface) state.lastStopFocus = { id, surface };
+  }
+  function restoreStopFocus() {
+    const remembered = state.lastStopFocus;
+    if (!remembered) return;
+    const selector = remembered.surface === "pin"
+      ? `.pin[data-id="${CSS.escape(remembered.id)}"]`
+      : `.stop-row[data-id="${CSS.escape(remembered.id)}"]`;
+    ($(selector) || els.addStop)?.focus();
+  }
+
   function selectStop(id, fromMap = false) {
     const item = state.stops.find((candidate) => candidate.id === id); if (!item) return false;
+    rememberStopFocus(id);
     state.selectedId = id; state.detailTab = "About"; renderAll(); flyTo(item);
     if (fromMap) { const row = $(`.stop-row[data-id="${CSS.escape(id)}"]`); row?.scrollIntoView({ behavior: "smooth", block: "center" }); }
     showToast(`${item.title} selected`); return true;
@@ -356,8 +371,8 @@
   function tripDocument() { return { schemaVersion: "1", trip: { title: els.tripTitle.textContent.trim(), dateStart: "2025-07-05", dateEnd: "2025-07-11" }, stops: state.stops.map(stopPayload) }; }
   function compileMarkdown() {
     const lines = [`# ${els.tripTitle.textContent.trim()}`, "", "July 5–11, 2025 · Côte d'Azur", ""];
-    DAYS.forEach((day) => { lines.push(`## ${day.label} — ${day.place}`); const items = sorted(state.stops.filter((item) => item.day === day.date)); if (!items.length) lines.push("- No stops planned"); items.forEach((item) => lines.push(`- ${item.startTime || "All day"}${item.endTime ? `–${item.endTime}` : ""} — **${item.title}** · ${item.location} · ${fmtStatus(item.status)}`)); lines.push(""); });
-    const ideas = state.stops.filter((item) => item.day === "unscheduled"); if (ideas.length) { lines.push("## Unscheduled ideas"); ideas.forEach((item) => lines.push(`- **${item.title}** · ${item.location}`)); }
+    DAYS.forEach((day) => { lines.push(`## ${day.label} — ${day.place}`); const items = sorted(state.stops.filter((item) => item.day === day.date)); if (!items.length) lines.push("- No stops planned"); items.forEach((item) => { lines.push(`- ${item.startTime || "All day"}${item.endTime ? `–${item.endTime}` : ""} — **${item.title}** · ${item.location} · ${fmtStatus(item.status)}`); if (item.notes) lines.push(`  - Notes: ${item.notes}`); }); lines.push(""); });
+    const ideas = state.stops.filter((item) => item.day === "unscheduled"); if (ideas.length) { lines.push("## Unscheduled ideas"); ideas.forEach((item) => { lines.push(`- **${item.title}** · ${item.location}`); if (item.notes) lines.push(`  - Notes: ${item.notes}`); }); }
     return lines.join("\n");
   }
   function icsEscape(value) { return String(value).replace(/\\/g, "\\\\").replace(/,/g, "\\,").replace(/;/g, "\\;").replace(/\n/g, "\\n"); }
@@ -373,7 +388,7 @@
     $$("[data-export]", els.exportDialog).forEach((button) => button.setAttribute("aria-selected", String(button.dataset.export === state.exportFormat)));
     if (!isImport) { els.exportPreview.textContent = exportText(); const label = state.exportFormat === "trip-json" ? "trip JSON" : state.exportFormat; els.copyFormat.textContent = label; els.downloadFormat.textContent = label; }
   }
-  function openExport(format = "markdown") { state.exportFormat = format; renderExport(); if (!els.exportDialog.open) els.exportDialog.showModal(); if (!state.firstExportTip) { state.firstExportTip = true; setTimeout(() => showToast("Tip: Copy trip JSON now to round-trip it later via Import."), 2700); } return { ok: true, format, scheduled_events: state.stops.filter((item) => item.day !== "unscheduled").length, stops: state.stops.length }; }
+  function openExport(format = "markdown") { state.exportFormat = format; renderExport(); if (!els.exportDialog.open) { state.exportTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : els.openExport; els.exportDialog.showModal(); } if (!state.firstExportTip) { state.firstExportTip = true; setTimeout(() => showToast("Tip: Copy trip JSON now to round-trip it later via Import."), 2700); } return { ok: true, format, scheduled_events: state.stops.filter((item) => item.day !== "unscheduled").length, stops: state.stops.length }; }
   function downloadExport() { const text = exportText(); const ext = state.exportFormat === "trip-json" ? "json" : state.exportFormat === "ics" ? "ics" : "md"; const blob = new Blob([text], { type: state.exportFormat === "trip-json" ? "application/json" : "text/plain" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `french-riviera-trip.${ext}`; link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000); showToast(`Downloaded ${ext.toUpperCase()} from the live plan`); }
   async function copyExport() { try { await navigator.clipboard.writeText(exportText()); showToast(`Copied exact ${state.exportFormat === "trip-json" ? "trip JSON" : state.exportFormat} preview`); } catch { showToast("Clipboard permission was unavailable — preview remains selected"); els.exportPreview.focus(); } }
   function importDocumentText(text) { let parsed; try { parsed = JSON.parse(text); } catch (error) { return { ok: false, error: `Malformed JSON: ${error.message}` }; } try { const valid = validateTripDocument(parsed); checkpoint(); state.stops = valid.stops; seedDayOrders(); els.tripTitle.textContent = valid.title; state.selectedId = state.stops[0]?.id || null; state.selectedDay = "all"; structuralChange("You", `imported ${state.stops.length} stops from trip JSON`); return { ok: true, stops: state.stops.length }; } catch (error) { return { ok: false, error: error.message }; } }
@@ -385,7 +400,7 @@
   }
   function formRaw() { return Object.fromEntries(new FormData(els.stopForm).entries()); }
   function clearFormErrors() { $$(".field-error", els.stopForm).forEach((el) => el.textContent = ""); els.formErrors.textContent = ""; }
-  function validateVisibleForm() { const result = validateStop(formRaw()); $$(".field-error", els.stopForm).forEach((el) => el.textContent = result.errors[el.dataset.error] || ""); const valid = Object.keys(result.errors).length === 0; els.stopSubmit.disabled = !valid || state.submitting; return { ...result, valid }; }
+  function validateVisibleForm() { const result = validateStop(formRaw()); $$(".field-error", els.stopForm).forEach((el) => el.textContent = result.errors[el.dataset.error] || ""); const messages = Object.values(result.errors); const valid = messages.length === 0; els.formErrors.textContent = valid ? "" : `Please fix: ${messages.join(". ")}.`; els.stopSubmit.disabled = !valid || state.submitting; return { ...result, valid }; }
   function closeDrawer() { $$(".drawer").forEach((drawer) => drawer.classList.add("hidden")); els.scrim.classList.add("hidden"); }
   function openDrawer(drawer) { closeDrawer(); drawer.classList.remove("hidden"); els.scrim.classList.remove("hidden"); drawer.querySelector("button")?.focus(); }
   function applyFilters(fields = {}) { Object.keys(state.filters).forEach((key) => { if (Object.prototype.hasOwnProperty.call(fields, key)) state.filters[key] = String(fields[key] ?? ""); }); els.search.value = state.filters.search; els.filterCategory.value = state.filters.category; els.filterCost.value = state.filters.costTier; els.filterStatus.value = state.filters.status; if (els.filterTag) els.filterTag.value = state.filters.tag; renderAll(); return visibleStops().length; }
@@ -452,7 +467,7 @@
       if (!id || state.voteBusy === id || (state.votes[id] || 0) >= 3) return;
       startVoteSimulation(id);
     });
-    els.detailClose.addEventListener("click", () => { els.detailCard.classList.add("hidden"); els.isochroneRing.classList.add("hidden"); state.isochroneOn = false; state.lastStopFocus?.focus(); }); $$("[data-detail-tab]").forEach((button) => button.addEventListener("click", () => { state.detailTab = button.dataset.detailTab; renderDetail(); }));
+    els.detailClose.addEventListener("click", () => { state.selectedId = null; state.isochroneOn = false; renderAll(); restoreStopFocus(); }); $$("[data-detail-tab]").forEach((button) => button.addEventListener("click", () => { state.detailTab = button.dataset.detailTab; renderDetail(); }));
     els.editSelected.addEventListener("click", () => { const item = selectedStop(); if (item) openStopDialog(item); }); els.deleteSelected.addEventListener("click", () => { const item = selectedStop(); if (item) animateThenDelete(item.id); });
     els.isochrone.addEventListener("click", () => {
       const item = selectedStop(); if (!isNegresco(item)) return;
@@ -462,7 +477,7 @@
       els.isochrone.textContent = state.isochroneOn ? "Hide 1.25 km isochrone" : "Show 1.25 km isochrone";
       showToast(state.isochroneOn ? "1.25 km isochrone drawn around Hotel Le Negresco" : "Isochrone overlay removed");
     });
-    els.conflictOpen.addEventListener("click", () => { if (!guard()) return; const item = selectedStop(); if (!item) return; state.lastStopFocus = $(`.stop-row[data-id="${CSS.escape(item.id)}"]`) || state.lastStopFocus; els.conflictCurrent.textContent = item.title; els.conflictIncoming.textContent = `${item.title} — sea entrance`; els.conflictDialog.showModal(); setTimeout(() => $$(".conflict-choice", els.conflictDialog)[0]?.focus(), 10); }); $$(".conflict-close").forEach((button) => button.addEventListener("click", () => { els.conflictDialog.close(); state.lastStopFocus?.focus(); })); $$(".conflict-choice").forEach((button) => button.addEventListener("click", () => resolveConflict(button.dataset.choice)));
+    els.conflictOpen.addEventListener("click", () => { if (!guard()) return; const item = selectedStop(); if (!item) return; if (!state.lastStopFocus) state.lastStopFocus = { id: item.id, surface: "row" }; els.conflictCurrent.textContent = item.title; els.conflictIncoming.textContent = `${item.title} — sea entrance`; els.conflictDialog.showModal(); setTimeout(() => $$(".conflict-choice", els.conflictDialog)[0]?.focus(), 10); }); $$(".conflict-close").forEach((button) => button.addEventListener("click", () => { els.conflictDialog.close(); restoreStopFocus(); })); $$(".conflict-choice").forEach((button) => button.addEventListener("click", () => resolveConflict(button.dataset.choice)));
     els.conflictDialog.addEventListener("keydown", (event) => {
       if (event.key !== "Tab" || !els.conflictDialog.open) return;
       const focusable = $$("button", els.conflictDialog).filter((node) => !node.disabled);
@@ -472,7 +487,7 @@
       else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     });
     els.stopForm.addEventListener("input", validateVisibleForm); els.stopForm.addEventListener("change", validateVisibleForm); $$(".modal-close").forEach((button) => button.addEventListener("click", () => els.stopDialog.close())); els.stopForm.addEventListener("submit", submitForm);
-    els.openExport.addEventListener("click", () => openExport("markdown")); $$("[data-export]").forEach((button) => button.addEventListener("click", () => { state.exportFormat = button.dataset.export; renderExport(); })); $$(".export-close").forEach((button) => button.addEventListener("click", () => els.exportDialog.close())); els.copyExport.addEventListener("click", copyExport); els.downloadExport.addEventListener("click", downloadExport); els.printPreview.addEventListener("click", () => window.print());
+    els.openExport.addEventListener("click", () => openExport("markdown")); $$("[data-export]").forEach((button) => button.addEventListener("click", () => { state.exportFormat = button.dataset.export; renderExport(); })); $$(".export-close").forEach((button) => button.addEventListener("click", () => els.exportDialog.close())); els.exportDialog.addEventListener("close", () => requestAnimationFrame(() => state.exportTrigger?.focus?.())); els.copyExport.addEventListener("click", copyExport); els.downloadExport.addEventListener("click", downloadExport); els.printPreview.addEventListener("click", () => window.print());
     els.importFile.addEventListener("change", async () => { const file = els.importFile.files[0]; if (file) els.importText.value = await file.text(); }); els.importSubmit.addEventListener("click", () => { const before = state.stops.length; const result = importDocumentText(els.importText.value); if (!result.ok) { els.importError.textContent = result.error; showToast(result.error); } else { els.importError.textContent = ""; showToast(`Imported ${result.stops} stops; replaced previous ${before}`); } });
     els.mapLayer.addEventListener("change", () => { els.mapPane.classList.remove("terrain", "night"); if (els.mapLayer.value !== "coastal") els.mapPane.classList.add(els.mapLayer.value); showToast(`${els.mapLayer.options[els.mapLayer.selectedIndex].text} map layer enabled`); }); els.zoomOut.addEventListener("click", () => { state.zoomedOut = true; renderMap(); }); els.zoomIn.addEventListener("click", () => { state.zoomedOut = false; renderMap(); });
     els.kanban.addEventListener("dragstart", (event) => { const card = event.target.closest(".kanban-card"); if (!card || !guard()) return event.preventDefault(); state.dragId = card.dataset.id; }); els.kanban.addEventListener("dragover", (event) => { if (event.target.closest(".kanban-col")) event.preventDefault(); }); els.kanban.addEventListener("drop", (event) => { const col = event.target.closest(".kanban-col"); if (!col || !state.dragId) return; event.preventDefault(); updateStop(state.dragId, { status: col.dataset.status }); state.dragId = null; });
@@ -488,7 +503,7 @@
   function handleListClick(event) {
     const row = event.target.closest(".stop-row"); const section = event.target.closest(".day-section");
     if (event.target.closest(".empty-add")) return openStopDialog(); if (event.target.closest(".collapse-day")) { const date = section.dataset.day; state.collapsed.has(date) ? state.collapsed.delete(date) : state.collapsed.add(date); renderList(); return; } if (event.target.closest(".focus-day")) return chooseDay(section.dataset.day); if (!row) return;
-    const id = row.dataset.id; state.lastStopFocus = row; if (event.target.closest(".edit-row")) return openStopDialog(state.stops.find((item) => item.id === id)); if (event.target.closest(".delete-row")) return animateThenDelete(id); if (event.target.closest(".move-up")) { const item = state.stops.find((candidate) => candidate.id === id); const peers = sorted(state.stops.filter((candidate) => candidate.day === item.day)); return reorderStop(id, item.day, Math.max(0, peers.findIndex((candidate) => candidate.id === id) - 1)); } if (event.target.closest(".move-day")) { const item = state.stops.find((candidate) => candidate.id === id); const current = DAY_VALUES.indexOf(item.day); return reorderStop(id, DAY_VALUES[(current + 1) % DAY_VALUES.length], 99); } if (!event.target.closest(".select-stop")) selectStop(id);
+    const id = row.dataset.id; rememberStopFocus(id); if (event.target.closest(".edit-row")) return openStopDialog(state.stops.find((item) => item.id === id)); if (event.target.closest(".delete-row")) return animateThenDelete(id); if (event.target.closest(".move-up")) { const item = state.stops.find((candidate) => candidate.id === id); const peers = sorted(state.stops.filter((candidate) => candidate.day === item.day)); return reorderStop(id, item.day, Math.max(0, peers.findIndex((candidate) => candidate.id === id) - 1)); } if (event.target.closest(".move-day")) { const item = state.stops.find((candidate) => candidate.id === id); const current = DAY_VALUES.indexOf(item.day); return reorderStop(id, DAY_VALUES[(current + 1) % DAY_VALUES.length], 99); } if (!event.target.closest(".select-stop")) selectStop(id);
   }
   function handleListChange(event) { const row = event.target.closest(".stop-row"); if (event.target.matches(".select-stop") && row) { event.target.checked ? state.selectedBulk.add(row.dataset.id) : state.selectedBulk.delete(row.dataset.id); cancelBulkConfirm(); renderBulk(); } if (event.target.matches(".buffer-mode")) { const card = event.target.closest(".travel-card"); const item = state.stops.find((candidate) => candidate.id === card.dataset.after); if (item && guard()) { item.bufferMode = event.target.value; renderList(); } } }
   function submitForm(event) { event.preventDefault(); if (state.submitting) return; const result = validateVisibleForm(); if (!result.valid) { els.formErrors.textContent = "Fix the named fields before saving."; return; } state.submitting = true; els.stopSubmit.disabled = true; const repeat = els.stopForm.elements.repeat.checked; const outcome = state.editingId ? updateStop(state.editingId, result.value) : createStop(result.value, { repeat }); state.submitting = false; if (outcome.ok) { els.stopDialog.close(); showToast(state.editingId ? "Stop updated across list, map, and exports" : repeat ? "Exactly 7 daily blocks created" : "Stop added across list, map, and exports"); } else { els.formErrors.textContent = outcome.error; validateVisibleForm(); } }
@@ -538,7 +553,7 @@
       }, stepMs);
     }, stepMs);
   }
-  function resolveConflict(choice) { const item = selectedStop(); if (!item || !guard()) return; checkpoint(); if (choice === "theirs") item.title = `${item.title} — sea entrance`; if (choice === "merge") item.notes = `${item.notes}${item.notes ? " " : ""}Meet by the sea entrance.`; structuralChange("You", `${choice === "merge" ? "merged John's edit into" : choice === "theirs" ? "accepted John's version of" : "kept your version of"} ${item.title}`); els.conflictDialog.close(); state.lastStopFocus?.focus(); showToast(`Conflict resolved: ${choice === "mine" ? "Keep mine" : choice === "theirs" ? "Take theirs" : "Merge"}`); }
+  function resolveConflict(choice) { const item = selectedStop(); if (!item || !guard()) return; checkpoint(); if (choice === "theirs") item.title = `${item.title} — sea entrance`; if (choice === "merge") item.notes = `${item.notes}${item.notes ? " " : ""}Meet by the sea entrance.`; structuralChange("You", `${choice === "merge" ? "merged John's edit into" : choice === "theirs" ? "accepted John's version of" : "kept your version of"} ${item.title}`); els.conflictDialog.close(); restoreStopFocus(); showToast(`Conflict resolved: ${choice === "mine" ? "Keep mine" : choice === "theirs" ? "Take theirs" : "Merge"}`); }
   function hideSidebar() { if (innerWidth <= 768) return els.sidebar.classList.remove("open"); document.querySelector(".app-shell").classList.add("sidebar-collapsed"); els.sidebar.classList.add("hidden"); els.sidebarReopen.classList.remove("hidden"); showToast("Sidebar hidden; current day preserved"); }
   function showSidebar() { document.querySelector(".app-shell").classList.remove("sidebar-collapsed"); els.sidebar.classList.remove("hidden"); els.sidebarReopen.classList.add("hidden"); }
   function bindCoachmark() { const steps = [
@@ -637,7 +652,7 @@
     const tools = Object.entries(specs).map(([name, [description, inputSchema]]) => ({ name, description, inputSchema, handler: handlers[name] }));
     window.webmcp_session_info = () => ({ contract_version: "zto-webmcp-v1", modules: ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "artifact-transfer-v1"], tools: tools.map((tool) => tool.name), tool_count: tools.length });
     window.webmcp_list_tools = () => tools.map(({ name, description, inputSchema }) => ({ name, description, inputSchema }));
-    window.webmcp_invoke_tool = async (name, args = {}) => { const tool = tools.find((candidate) => candidate.name === name); if (!tool) return { ok: false, error: `unknown_tool: ${name}` }; const inputError = validateInput(tool.inputSchema, args); if (inputError) return { ok: false, error: inputError }; try { return await tool.handler(args); } catch (error) { return { ok: false, error: String(error && error.message ? error.message : error) }; } };
+    window.webmcp_invoke_tool = async (name, args = {}) => { const tool = tools.find((candidate) => candidate.name === name); if (!tool) return { ok: false, error: `unknown_tool: ${name}` }; const inputError = validateInput(tool.inputSchema, args); if (inputError) return { ok: false, error: inputError }; try { const result = await tool.handler(args); await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))); return result; } catch (error) { return { ok: false, error: String(error && error.message ? error.message : error) }; } };
     try { if (navigator.modelContext?.registerTool) tools.forEach((tool) => navigator.modelContext.registerTool({ name: tool.name, description: tool.description, inputSchema: tool.inputSchema, invoke: (args) => tool.handler(args || {}) })); } catch (_) { /* optional browser surface */ }
   }
 
@@ -646,6 +661,6 @@
     ids.forEach((id) => { els[id.replace(/-([a-z])/g, (_, c) => c.toUpperCase())] = document.getElementById(id); });
   }
   function populateSelects() { const options = DAYS.map((day) => `<option value="${day.date}">${day.short} · ${day.place}</option>`).join("") + '<option value="unscheduled">Unscheduled idea</option>'; els.stopForm.elements.day.innerHTML = options; els.bulkDay.innerHTML = '<option value="">Move to day…</option>' + options; }
-  function boot() { cacheElements(); seedDayOrders(); document.documentElement.dataset.accent = state.accent; populateSelects(); bindEvents(); registerWebMcp(); renderAll(); selectStop("negresco"); }
+  function boot() { cacheElements(); seedDayOrders(); document.documentElement.dataset.accent = state.accent; populateSelects(); bindEvents(); registerWebMcp(); renderAll(); }
   document.readyState === "loading" ? document.addEventListener("DOMContentLoaded", boot) : boot();
 })();

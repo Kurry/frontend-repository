@@ -25,3 +25,11 @@ dialog{color:var(--ink);background:var(--panel);border:1px solid var(--line);bor
 .btn.danger.confirming{background:#a9342b;color:#fff;border-color:#a9342b;animation:pulse-confirm 1s ease infinite}@keyframes pulse-confirm{0%,100%{box-shadow:0 0 0 0 rgba(169,52,43,.45)}50%{box-shadow:0 0 0 6px rgba(169,52,43,0)}}
 .latency-control,.accent-control{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:700;color:var(--muted);margin:6px 8px}.latency-control select,.accent-control select{flex:1;min-width:0;height:34px;border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:0 8px;color:var(--ink);font-weight:600}.accent-control{color:var(--ink)}.sim-error-btn{margin:14px 0 0;width:100%}
 html[data-accent=coral]{--aqua:#d9664f;--navy2:#c4563f}html[data-accent=coral] .brand-mark{background:linear-gradient(145deg,#123047,#d9664f)}html[data-accent=gold]{--aqua:#c08a2d;--navy2:#a8761f}html[data-accent=gold] .brand-mark{background:linear-gradient(145deg,#123047,#c08a2d)}
+
+/* Oracle-readiness overrides: keep dense controls reachable without clipping. */
+.planner-toolbar,.toolbar-actions{flex-wrap:wrap}
+.kanban{grid-template-columns:repeat(3,minmax(0,1fr))}
+.btn,.icon-btn,.text-btn,.segmented button,.map-btn{transition-duration:.08s}
+.btn:hover,.icon-btn:hover,.segmented button:hover,.map-btn:hover{box-shadow:0 4px 12px rgba(18,48,71,.18)}
+@media(max-width:1023px){.top-actions .role-control{display:flex}}
+@media(max-width:768px){.topbar{gap:8px;padding-inline:8px}.role-control{font-size:0}.role-control select{width:78px;padding-inline:5px;font-size:12px}.top-actions{min-width:0}.top-actions #open-export{padding-inline:9px}}
