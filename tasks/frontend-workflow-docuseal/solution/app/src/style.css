@@ -37,7 +37,9 @@ button, [role="button"], input, textarea, [role="checkbox"], [role="switch"], [r
 
 button:focus-visible, [role="button"]:focus-visible, input:focus-visible, textarea:focus-visible,
 [role="checkbox"]:focus-visible, [role="switch"]:focus-visible, [role="combobox"]:focus-visible {
-  box-shadow: 0 0 0 3px rgba(15, 181, 167, .2), 0 0 0 1px #078b83;
+  outline: 2px solid #0fb5a7;
+  outline-offset: 2px;
+  box-shadow: none;
 }
 
 .app-shell { min-height: 100vh; background: #fff; }
