@@ -1283,7 +1283,7 @@ export default function App() {
                 <Show when={formError()}>{(message) => <div class="form-alert" role="alert">{message()}</div>}</Show>
                 <div class="dialog-actions">
                   <Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton>
-                  <button class="primary-button" type="submit">Save board <IconArrowRight size={17} /></button>
+                  <button class="primary-button" type="submit" disabled={!valid()}>Save board <IconArrowRight size={17} /></button>
                 </div>
               </form>
               <Dialog.CloseButton class="icon-close" aria-label="Close Save board dialog"><IconX size={19} /></Dialog.CloseButton>
