@@ -35,7 +35,7 @@ Instead found: ${r.outerHTML}`;throw console.error(i),new Error(i)}},[t,e])},Iy=
             })));
           }
         }
-
+        
         if (${P}.value === undefined) {
           if (${j} in input) {
             newResult[${j}] = undefined;
@@ -43,7 +43,7 @@ Instead found: ${r.outerHTML}`;throw console.error(i),new Error(i)}},[t,e])},Iy=
         } else {
           newResult[${j}] = ${P}.value;
         }
-
+        
       `):N?y.write(`
         if (${P}.issues.length) {
           payload.issues = payload.issues.concat(${P}.issues.map(iss => ({
@@ -51,7 +51,7 @@ Instead found: ${r.outerHTML}`;throw console.error(i),new Error(i)}},[t,e])},Iy=
             path: iss.path ? [${j}, ...iss.path] : [${j}]
           })));
         }
-
+        
         if (${P}.value === undefined) {
           if (${j} in input) {
             newResult[${j}] = undefined;
@@ -59,7 +59,7 @@ Instead found: ${r.outerHTML}`;throw console.error(i),new Error(i)}},[t,e])},Iy=
         } else {
           newResult[${j}] = ${P}.value;
         }
-
+        
       `):y.write(`
         const ${P}_present = ${j} in input;
         if (${P}.issues.length) {
