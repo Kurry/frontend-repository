@@ -126,8 +126,10 @@ function scrollDiffTo(type) {
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const containerTop = container.getBoundingClientRect().top;
   const targetTop = target.getBoundingClientRect().top;
+  // Start the required ~400 ms highlight on activation so it is observable
+  // immediately, including while the container performs its smooth scroll.
+  pulseTarget(target);
   container.scrollTo({ top: container.scrollTop + targetTop - containerTop - container.clientHeight / 2 + target.clientHeight / 2, behavior: reduce ? 'auto' : 'smooth' });
-  window.setTimeout(() => pulseTarget(target), reduce ? 0 : 240);
 }
 
 function stepChange(direction) {
@@ -199,7 +201,7 @@ function AppHeader() {
       <Button kind="ghost" size="md" hasIconOnly renderIcon={Help} iconDescription="Keyboard shortcuts (?)" tooltipPosition="bottom" onClick={(event) => { rememberOpener(shortcutsOpenerRef)(event); state.setShortcutsOpen(true); }} />
       <PrefsMenu />
       <Button className="export-button" kind="tertiary" size="md" renderIcon={ExportIcon} onClick={(event) => { rememberOpener(exportOpener)(event); state.setExportOpen(true); }}>Export</Button>
-      <Button className="mobile-menu" kind="ghost" size="md" hasIconOnly renderIcon={Menu} iconDescription="Open prompt rail" onClick={() => state.setSidebarOpen(true)} />
+      <Button className="mobile-menu" kind="ghost" size="md" hasIconOnly renderIcon={Menu} iconDescription="Open prompt rail" aria-label="Open prompt rail" onClick={() => state.setSidebarOpen(true)} />
     </div>
     <ExportModal openerRef={exportOpener} />
   </header>;
@@ -745,7 +747,10 @@ function ExportModal({ openerRef }) {
     setClosing(true);
     window.setTimeout(() => { setClosing(false); state.setExportOpen(false); }, 170);
   };
-  useDialogControls(isOpen && !closing, close, { openerRef });
+  // Keep the focus trap active through the exit animation. Restoring while
+  // the modal is still mounted lets Carbon pull focus back to a hidden footer
+  // button; restoration should happen only after exportOpen becomes false.
+  useDialogControls(isOpen, close, { openerRef });
   useEffect(() => {
     if (!isOpen) return undefined;
     state.setExportBusy(true);
@@ -767,7 +772,7 @@ function ExportModal({ openerRef }) {
     const blob = new Blob([content], { type: types[state.exportTab] }); const href = URL.createObjectURL(blob); const anchor = document.createElement('a'); anchor.href = href; anchor.download = `prompt-ledger-${state.exportTab}.${extensions[state.exportTab]}`; anchor.click(); URL.revokeObjectURL(href);
     state.pushToast('Artifact download started.');
   };
-  return <ComposedModal className={`export-modal ${closing ? 'is-closing' : ''}`} open={isOpen} onClose={close} size="lg" preventCloseOnClickOutside>
+  return <ComposedModal className={`export-modal ${closing ? 'is-closing' : ''}`} open={isOpen} onClose={close} size="lg" selectorPrimaryFocus=".export-tab" preventCloseOnClickOutside>
     <ModalHeader label="Live artifacts" title="Export prompt history" buttonOnClick={close} />
     <ModalBody>{state.importOpen ? <ImportForm /> : <>
       <div className="export-tab-row" role="tablist" aria-label="Export formats">
@@ -796,8 +801,8 @@ function ToastStack() {
     toasts.forEach((item) => {
       if (item.leaving || timers.current[item.id]) return;
       timers.current[item.id] = [
-        window.setTimeout(() => markLeaving(item.id), 4000),
-        window.setTimeout(() => dismiss(item.id), 4450),
+        window.setTimeout(() => markLeaving(item.id), 2600),
+        window.setTimeout(() => dismiss(item.id), 3000),
       ];
     });
     Object.keys(timers.current).forEach((id) => {
