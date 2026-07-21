@@ -118,9 +118,25 @@ const tools: ToolDefinition[] = [
       additionalProperties: false,
       properties: { repositoryId: repositoryIdSchema, selected: { type: 'boolean' } },
     },
-    handler: async ({ repositoryId, selected }) => selected === true
-      ? { ok: true, completed: await scanSelected() }
-      : { ok: await startScan(String(repositoryId ?? '')) },
+    handler: ({ repositoryId, selected }) => {
+      if (selected === true) {
+        const count = useAppStore.getState().selectedRepositoryIds.length
+        if (!count) return { ok: false, error: 'No repositories selected' }
+        void scanSelected()
+        return { ok: true, started: true, selectedCount: count }
+      }
+      const id = String(repositoryId ?? '')
+      const state = useAppStore.getState()
+      if (!id || !state.repositories.some((repository) => repository.id === id)) {
+        return { ok: false, error: 'repositoryId was not found' }
+      }
+      const currentRun = state.scanRuns[id]
+      if (currentRun?.status === 'running' || currentRun?.status === 'paused') {
+        return { ok: false, error: 'Scan already active for this repository' }
+      }
+      void startScan(id)
+      return { ok: true, repositoryId: id, status: 'running' }
+    },
   },
   {
     name: 'session_scan_pause',
@@ -144,7 +160,15 @@ const tools: ToolDefinition[] = [
     name: 'session_scan_restart',
     description: 'Restart a completed or failed repository scan with current pattern configuration.',
     inputSchema: { type: 'object', additionalProperties: false, required: ['repositoryId'], properties: { repositoryId: repositoryIdSchema } },
-    handler: async ({ repositoryId }) => ({ ok: await startScan(String(repositoryId)) }),
+    handler: ({ repositoryId }) => {
+      const id = String(repositoryId)
+      const state = useAppStore.getState()
+      if (!state.repositories.some((repository) => repository.id === id)) {
+        return { ok: false, error: 'repositoryId was not found' }
+      }
+      void startScan(id)
+      return { ok: true, repositoryId: id, status: 'running' }
+    },
   },
   {
     name: 'browse_open',
