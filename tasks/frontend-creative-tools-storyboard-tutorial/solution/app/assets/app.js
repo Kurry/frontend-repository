@@ -205,15 +205,17 @@
     const isPh = !s.img;
     const last = store.lastEditedId === s.id ? " is-lastedit" : "";
     const sel = selected ? " is-selected" : "";
+    const meta = '<div class="scene-meta"><span class="shot-badge">' + esc(SHOT_LABEL[s.shotType]) + '</span><span class="dur-badge"><span class="icon icon-clock" aria-hidden="true"></span>' + (Number(s.duration) || 0) + 's</span></div>';
     const media = isPh
       ? '<div class="scene-image placeholder" role="img" aria-label="' + esc(s.alt) + '">' +
           '<button type="button" class="scene-actions" data-act="menu" data-id="' + s.id + '" aria-label="Scene ' + order + ' actions"><span class="icon icon-kebab" aria-hidden="true"></span></button>' +
           '<div class="placeholder-center"><button type="button" class="btn-camera inert-nav" aria-label="Add image to scene ' + order + '"><span class="icon icon-camera" aria-hidden="true"></span></button></div>' +
+          meta +
         '</div>'
       : '<div class="scene-image" role="img" aria-label="' + esc(s.alt) + '">' +
           '<img src="' + esc(s.img) + '" alt="' + esc(s.alt) + '" loading="lazy">' +
           '<button type="button" class="scene-actions" data-act="menu" data-id="' + s.id + '" aria-label="Scene ' + order + ' actions"><span class="icon icon-kebab" aria-hidden="true"></span></button>' +
-          '<div class="scene-meta"><span class="shot-badge">' + esc(SHOT_LABEL[s.shotType]) + '</span><span class="dur-badge"><span class="icon icon-clock" aria-hidden="true"></span>' + (Number(s.duration) || 0) + 's</span></div>' +
+          meta +
         '</div>';
     return '' +
       '<div class="scene-column" data-col="' + s.id + '">' +
@@ -229,17 +231,18 @@
       '</div>';
   }
 
+  let firstGridRender = true;
   function renderGrid(animateFlip) {
     const visible = filteredScenes();
     const mode = store.viewMode;
-    grid.classList.toggle("is-list", mode === "list");
-    grid.classList.toggle("is-slide", mode === "slide");
 
     let firsts = null;
     if (animateFlip && !reduceMotion()) {
       firsts = new Map();
       grid.querySelectorAll("[data-card]").forEach((el) => firsts.set(el.getAttribute("data-card"), el.getBoundingClientRect()));
     }
+    grid.classList.toggle("is-list", mode === "list");
+    grid.classList.toggle("is-slide", mode === "slide");
 
     const filtering = isFiltering();
     const totalAll = store.scenes.length;
@@ -259,6 +262,14 @@
               '</div></div></div>';
     }
     grid.innerHTML = html;
+
+    if (firstGridRender && !reduceMotion()) {
+      grid.querySelectorAll("[data-card]").forEach((el, index) => {
+        el.classList.add("is-initial-enter");
+        el.style.setProperty("--enter-delay", Math.min(index * 55, 440) + "ms");
+      });
+    }
+    firstGridRender = false;
 
     // entrance animation
     if (!reduceMotion()) {
@@ -429,12 +440,27 @@
       render(true);
       if (!opts.silent) { toast("Scene deleted"); announce("Scene deleted. Total duration " + totalDuration() + " seconds."); }
     };
-    if (opts.animate && !reduceMotion()) {
-      const el = grid.querySelector('[data-card="' + cssEsc(id) + '"]');
-      if (el) { el.classList.add("is-removing"); setTimeout(doCommit, 220); return true; }
-    }
+    if (opts.animate && !reduceMotion()) animateRemovalGhosts([id]);
     doCommit();
     return true;
+  }
+
+  function animateRemovalGhosts(ids) {
+    ids.forEach((id) => {
+      const el = grid.querySelector('[data-card="' + cssEsc(id) + '"]');
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const ghost = el.cloneNode(true);
+      ghost.className = "scene-item removal-ghost";
+      ghost.removeAttribute("data-card");
+      ghost.querySelectorAll("[data-act],[data-id]").forEach((node) => { node.removeAttribute("data-act"); node.removeAttribute("data-id"); });
+      ghost.querySelectorAll(".scene-title,.scene-body-field,.scene-select,.scene-actions,.scene-meta").forEach((node) => node.remove());
+      Object.assign(ghost.style, { position: "fixed", left: rect.left + "px", top: rect.top + "px", width: rect.width + "px", height: rect.height + "px", margin: "0" });
+      ghost.setAttribute("aria-hidden", "true");
+      document.body.appendChild(ghost);
+      requestAnimationFrame(() => ghost.classList.add("is-removing"));
+      setTimeout(() => ghost.remove(), 260);
+    });
   }
 
   function deleteSelected() {
@@ -450,10 +476,8 @@
       toast(n + " scenes deleted");
       announce(n + " scenes deleted. Total duration " + totalDuration() + " seconds.");
     };
-    if (!reduceMotion()) {
-      ids.forEach((id) => { const el = grid.querySelector('[data-card="' + cssEsc(id) + '"]'); if (el) el.classList.add("is-removing"); });
-      setTimeout(finish, 220);
-    } else finish();
+    if (!reduceMotion()) animateRemovalGhosts(ids);
+    finish();
   }
 
   function duplicateSelected() {
@@ -537,23 +561,31 @@
      Dialogs (focus-managed, focus trap, labelled fields)
      ============================================================ */
   let lastFocus = null;
+  let lastFocusSelector = null;
   let dialogOnClose = null;
 
   function openDialog(html, opts) {
     opts = opts || {};
     lastFocus = document.activeElement;
+    lastFocusSelector = lastFocus && lastFocus.id ? "#" + cssEsc(lastFocus.id) :
+      lastFocus && lastFocus.getAttribute && lastFocus.getAttribute("data-act") ? '[data-act="' + lastFocus.getAttribute("data-act") + '"]' : null;
     dialog.className = "dialog" + (opts.wide ? " dialog-wide" : "");
     dialog.innerHTML = html;
     overlay.hidden = false;
     dialogOnClose = opts.onClose || null;
     const focusTarget = dialog.querySelector("[data-autofocus]") || dialog.querySelector("input,textarea,select,button");
-    if (focusTarget) setTimeout(() => focusTarget.focus(), 20); else dialog.focus();
+    if (focusTarget) focusTarget.focus(); else dialog.focus();
   }
   function closeDialog() {
     overlay.hidden = true;
     dialog.innerHTML = "";
     const cb = dialogOnClose; dialogOnClose = null;
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    const returnTarget = lastFocus && lastFocus.isConnected ? lastFocus : lastFocusSelector ? document.querySelector(lastFocusSelector) : null;
+    if (returnTarget && returnTarget.focus) returnTarget.focus();
+    else setTimeout(() => {
+      const fallback = lastFocusSelector ? document.querySelector(lastFocusSelector) : document.querySelector(".add-scene");
+      if (fallback) fallback.focus();
+    }, 0);
     if (cb) cb();
   }
   function focusables(root) {
@@ -695,7 +727,7 @@
       else if (m === "up") moveScene(id, -1);
       else if (m === "down") moveScene(id, 1);
       else if (m === "dup") { store.selection = new Set([id]); duplicateSelected(); }
-      else if (m === "del") deleteScene(id, { animate: true });
+      else if (m === "del") openConfirm("Delete scene?", "This removes " + s.title + " from the storyboard. You can undo this afterwards.", "Delete scene", () => deleteScene(id, { animate: true }));
     });
     menuEl.addEventListener("keydown", (e) => {
       const items = focusables(menuEl);
