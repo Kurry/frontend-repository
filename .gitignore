@@ -47,7 +47,9 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 desktop.ini
-.cursor/
+.cursor/*
+!.cursor/BUGBOT.md
+!*/.cursor/
 
 .idea/
 *.swp
@@ -79,3 +81,8 @@ tasks/*/solution/app/verification*.png
 
 # Transient git worktrees (jules teleport / agent checkouts)
 .worktrees/
+
+# Bugbot review-context files are tracked; everything else under .cursor/ stays ignored
+!**/.cursor/
+**/.cursor/*
+!**/.cursor/BUGBOT.md
