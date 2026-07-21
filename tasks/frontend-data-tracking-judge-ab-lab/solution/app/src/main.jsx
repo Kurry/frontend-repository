@@ -10,3 +10,11 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
   </React.StrictMode>,
 )
+
+// Progressive enhancement: once the app shell has been served once, the lab
+// keeps working offline from the local cache (network-first, cache fallback).
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => { /* offline support is best-effort */ })
+  })
+}
