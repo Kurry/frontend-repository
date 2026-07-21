@@ -9,6 +9,11 @@ import net from 'node:net';
 import path from 'node:path';
 import readline from 'node:readline';
 import { observePageFailures, resolvePlaywright, waitForServer } from './browser_smoke_shared.mjs';
+import {
+  analyzeAutonomousSnapshots,
+  causalMutationPaths,
+  changedPaths,
+} from './oracle_ci_semantics.mjs';
 
 const { chromium } = resolvePlaywright();
 const APP_URL = 'http://127.0.0.1:3000';
@@ -185,13 +190,61 @@ async function invokeTool(page, name, args) {
   }, [name, args]);
 }
 
-async function domSnapshot(page) {
-  return page.evaluate(() => JSON.stringify({
-    href: location.href,
-    title: document.title,
-    theme: document.documentElement.getAttribute('data-theme'),
-    body: document.body?.innerHTML || '',
-  }));
+async function semanticSnapshot(page) {
+  return page.evaluate(() => {
+    const serialize = (element) => {
+      const attributes = {};
+      for (const attribute of element.attributes) {
+        if (
+          attribute.name === 'id' || attribute.name === 'name' ||
+          attribute.name === 'type' || attribute.name === 'role' ||
+          attribute.name === 'class' || attribute.name === 'style' ||
+          attribute.name.startsWith('aria-') || attribute.name.startsWith('data-')
+        ) {
+          attributes[attribute.name] = attribute.value;
+        }
+      }
+      const state = {
+        hidden: Boolean(element.hidden),
+        open: element.hasAttribute('open'),
+        disabled: Boolean(element.disabled),
+      };
+      if ('value' in element) state.value = element.value;
+      if ('checked' in element) state.checked = Boolean(element.checked);
+      if ('selected' in element) state.selected = Boolean(element.selected);
+      const text = [...element.childNodes]
+        .filter((node) => node.nodeType === Node.TEXT_NODE)
+        .map((node) => node.textContent.trim())
+        .filter(Boolean)
+        .join(' ');
+      return {
+        tag: element.tagName.toLowerCase(),
+        attributes,
+        state,
+        text,
+        children: [...element.children].map(serialize),
+      };
+    };
+    return {
+      href: location.href,
+      title: document.title,
+      theme: document.documentElement.getAttribute('data-theme'),
+      body: document.body ? serialize(document.body) : null,
+    };
+  });
+}
+
+async function settleSemanticSnapshot(page, waitMs = 400) {
+  await page.waitForTimeout(waitMs);
+  return semanticSnapshot(page);
+}
+
+async function sampleAutonomousSemantics(page, samples = 5) {
+  const snapshots = [await semanticSnapshot(page)];
+  for (let index = 0; index < samples; index += 1) {
+    snapshots.push(await settleSemanticSnapshot(page));
+  }
+  return analyzeAutonomousSnapshots(snapshots);
 }
 
 function mutationPriority(tool) {
@@ -297,18 +350,24 @@ async function browserAndWebMcp(config) {
     const mutationFailures = [];
     for (const candidate of mutationCandidates) {
       try {
+        // Establish which semantic paths change without an invocation, then
+        // invoke the tool on that same loaded page. The final control sample is
+        // the mutation probe's before-state, so child-index paths cannot drift
+        // across reloads and impersonate a tool-caused change.
         await page.reload({ waitUntil: 'networkidle' });
         await waitForWebMcp(page);
-        const before = await domSnapshot(page);
+        await page.waitForTimeout(500);
+        const { autonomousPaths, before } = await sampleAutonomousSemantics(page);
         const result = await invokeTool(page, candidate.tool.name, candidate.args);
-        await page.waitForTimeout(400);
-        const after = await domSnapshot(page);
-        if (!isErrorResult(result) && before !== after) {
+        const after = await settleSemanticSnapshot(page);
+        const causalPaths = causalMutationPaths(before, after, autonomousPaths);
+        if (!isErrorResult(result) && causalPaths.length) {
           mutationProbe = candidate.tool.name;
           break;
         }
+        const semanticChanged = changedPaths(before, after).length > 0;
         mutationFailures.push(
-          `${candidate.tool.name}: ${isErrorResult(result) ? 'error result' : 'DOM unchanged'}`,
+          `${candidate.tool.name}: ${isErrorResult(result) ? 'error result' : semanticChanged ? 'only autonomous semantic paths changed' : 'semantic DOM unchanged'}`,
         );
       } catch (error) {
         mutationFailures.push(`${candidate.tool.name}: ${error.message}`);

@@ -5,6 +5,7 @@ on:
     paths:
       - "tasks/**/solution/**"
       - "packages/corpuscheck/**"
+      - ".github/workflows/oracle-ci.yml"
 
 permissions:
   contents: read
@@ -44,7 +45,7 @@ jobs:
           if grep -qE '^tasks/[^/]+/solution/' <<<"$changed"; then
             echo "oracles=true" >> "$GITHUB_OUTPUT"
           fi
-          if grep -qE '^packages/corpuscheck/' <<<"$changed"; then
+          if grep -qE '^(packages/corpuscheck/|\.github/workflows/oracle-ci\.yml$)' <<<"$changed"; then
             echo "corpuscheck=true" >> "$GITHUB_OUTPUT"
           fi
 

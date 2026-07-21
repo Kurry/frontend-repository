@@ -25,6 +25,62 @@ def completed(
     return subprocess.CompletedProcess(command or [], code, stdout, stderr)
 
 
+def test_semantic_diff_excludes_only_matching_autonomous_paths() -> None:
+    helper = (
+        Path(__file__).parents[1]
+        / "src/corpuscheck/assets/oracle_ci_semantics.mjs"
+    )
+    script = f"""
+      import {{ causalMutationPaths, changedPaths }} from {json.dumps(helper.as_uri())};
+      const before = {{ body: {{ clock: '10:00', dialog: false, className: 'closed', rows: ['a'] }} }};
+      const control = {{ body: {{ clock: '10:01', dialog: false, className: 'closed', rows: ['a'] }} }};
+      const after = {{ body: {{ clock: '10:01', dialog: true, className: 'open', rows: ['a', 'b'] }} }};
+      const autonomous = new Set(changedPaths(before, control));
+      console.log(JSON.stringify(causalMutationPaths(before, after, autonomous)));
+    """
+    result = subprocess.run(
+        ["node", "--input-type=module", "--eval", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert json.loads(result.stdout) == [
+        "$.body.dialog",
+        "$.body.className",
+        "$.body.rows[1]",
+    ]
+
+
+def test_autonomous_analysis_uses_final_same_page_sample_as_before() -> None:
+    helper = (
+        Path(__file__).parents[1]
+        / "src/corpuscheck/assets/oracle_ci_semantics.mjs"
+    )
+    script = f"""
+      import {{ analyzeAutonomousSnapshots, causalMutationPaths }} from {json.dumps(helper.as_uri())};
+      const samples = [
+        {{ body: {{ clock: '10:00', dialog: false }} }},
+        {{ body: {{ clock: '10:01', dialog: false }} }},
+        {{ body: {{ clock: '10:02', dialog: false }} }},
+      ];
+      const {{ autonomousPaths, before }} = analyzeAutonomousSnapshots(samples);
+      const after = {{ body: {{ clock: '10:03', dialog: true }} }};
+      console.log(JSON.stringify({{
+        before,
+        causal: causalMutationPaths(before, after, autonomousPaths),
+      }}));
+    """
+    result = subprocess.run(
+        ["node", "--input-type=module", "--eval", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    payload = json.loads(result.stdout)
+    assert payload["before"] == {"body": {"clock": "10:02", "dialog": False}}
+    assert payload["causal"] == ["$.body.dialog"]
+
+
 def test_changed_oracle_slugs_filters_and_deduplicates_solution_paths(
     tmp_path: Path,
 ) -> None:
