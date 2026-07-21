@@ -79,6 +79,27 @@ const tools = [
     handler: async () => { command(); return result(`${name.replace('_', ' ')} requested. Observe node-status-badges and the run rollup for completion.`); },
   })),
   {
+    name: 'session_trigger_demo',
+    description: 'Trigger a declared session demo: seeded-workflow-run or retry-from-failed-node.',
+    inputSchema: {
+      type: 'object',
+      properties: { demo: { enum: ['seeded-workflow-run', 'retry-from-failed-node'] } },
+      required: ['demo'],
+      additionalProperties: false,
+    },
+    handler: async ({ demo }) => {
+      const state = useWorkflowStore.getState();
+      if (demo === 'seeded-workflow-run') {
+        const started = await state.runSeededWorkflowDemo();
+        if (!started) throw new Error('Seeded workflow demo could not start. Finish or reset the current run and try again.');
+        return result('Seeded workflow run demo started. Observe retries on Atlas Agent and the run rollup.');
+      }
+      const started = await state.runRetryFromFailedDemo();
+      if (!started) throw new Error('Retry-from-failed demo could not start. Ensure a failed run is visible or reset the active run.');
+      return result('Retry-from-failed-node demo started. Faultline Agent exhausts retries; use Retry from failed node or observe the failed run.');
+    },
+  },
+  {
     name: 'entity_create',
     description: 'Create a saved-workflow snapshot from the active canvas.',
     inputSchema: { type: 'object', properties: { entity: { const: 'saved-workflow' }, name: { type: 'string', minLength: 2, maxLength: 80 } }, required: ['entity', 'name'], additionalProperties: false },
@@ -109,7 +130,7 @@ const tools = [
     handler: ({ format }) => {
       const state = useWorkflowStore.getState();
       state.setArtifactMode(format);
-      state.openModal('artifact');
+      state.setArtifactOpen(true);
       return result(`${format} artifact preview is visible and current with the active canvas.`);
     },
   })),
@@ -123,7 +144,7 @@ const tools = [
     name: 'artifact_convert',
     description: 'Open a live JSON-to-Mermaid conversion preview without returning artifact contents.',
     inputSchema: { type: 'object', properties: { mode: { const: 'json-to-mermaid' } }, required: ['mode'], additionalProperties: false },
-    handler: () => { const state = useWorkflowStore.getState(); state.setArtifactMode('mermaid'); state.openModal('artifact'); return result('JSON-to-Mermaid artifact preview is visible.'); },
+    handler: () => { const state = useWorkflowStore.getState(); state.setArtifactMode('mermaid'); state.setArtifactOpen(true); return result('JSON-to-Mermaid artifact preview is visible.'); },
   },
 ];
 
