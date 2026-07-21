@@ -52,6 +52,12 @@
     appState.setEvidenceFocus(appState.evidenceFocusIndex + delta);
   }
 
+  function chooseVerdict(value) {
+    verdict = value;
+    appState.updateDecisionDraft('verdict', value);
+    touched.verdict = true;
+  }
+
   async function onSubmit(event) {
     event.preventDefault();
     touched = { verdict: true, rationale: true };
@@ -67,6 +73,16 @@
     appState.navigate('queue');
   }
 </script>
+
+<svelte:window onkeydown={(e) => {
+  const target = e.target;
+  const isEditable = target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+  const hasModifier = e.ctrlKey || e.metaKey || e.altKey || e.shiftKey;
+  if (appState.activeView === 'evidence-view' && !e.defaultPrevented && !isEditable && !hasModifier) {
+    if (e.key.toLowerCase() === 'c') { e.preventDefault(); chooseVerdict('confirm-clean'); }
+    if (e.key.toLowerCase() === 'l') { e.preventDefault(); chooseVerdict('confirm-leak'); }
+  }
+}} />
 
 {#if submission}
   <div class="space-y-5">
@@ -162,7 +178,7 @@
                   name="verdict"
                   value="confirm-clean"
                   checked={verdict === 'confirm-clean'}
-                  onchange={() => { verdict = 'confirm-clean'; appState.updateDecisionDraft('verdict', verdict); touched.verdict = true; }}
+                  onchange={() => chooseVerdict('confirm-clean')}
                   aria-describedby="verdict-error"
                 />
                 <CheckCircle aria-hidden="true" class="text-emerald-600" size={20} weight="fill" />
@@ -175,7 +191,7 @@
                   name="verdict"
                   value="confirm-leak"
                   checked={verdict === 'confirm-leak'}
-                  onchange={() => { verdict = 'confirm-leak'; appState.updateDecisionDraft('verdict', verdict); touched.verdict = true; }}
+                  onchange={() => chooseVerdict('confirm-leak')}
                   aria-describedby="verdict-error"
                 />
                 <WarningDiamond aria-hidden="true" class="text-rose-600" size={20} weight="fill" />
