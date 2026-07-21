@@ -1,6 +1,5 @@
-// WebMCP action surface (contract zto-webmcp-v1).
-// Modules: structured-editor-v1, artifact-transfer-v1.
-// Every tool routes through the same domain handlers the visible UI uses.
+// Exact zto-webmcp-v1 surface for md.uy. Every handler routes through the same
+// product command as the visible editor or artifact control.
 
 export interface WebmcpApi {
 	setContent: (content: string) => void;
@@ -11,135 +10,125 @@ export interface WebmcpApi {
 	getState: () => Record<string, unknown>;
 }
 
+type Schema = Record<string, unknown>;
+type Handler = (args: Record<string, unknown>) => unknown;
 interface ToolDef {
 	name: string;
-	module: string;
 	description: string;
-	parameters: Record<string, unknown>;
-	handler: (args: Record<string, unknown>) => unknown;
+	inputSchema: Schema;
+	handler: Handler;
+}
+
+const objectSchema = (properties: Record<string, unknown> = {}, required: string[] = []): Schema => ({
+	type: 'object',
+	additionalProperties: false,
+	...(required.length ? { required } : {}),
+	properties
+});
+
+function validateInput(schema: Schema, input: Record<string, unknown>): string {
+	if (!input || typeof input !== 'object' || Array.isArray(input)) return 'arguments must be an object';
+	const properties = (schema.properties ?? {}) as Record<string, Record<string, unknown>>;
+	const unknown = Object.keys(input).find((key) => !(key in properties));
+	if (unknown) return `unknown argument: ${unknown}`;
+	const missing = ((schema.required ?? []) as string[]).find((key) => input[key] === undefined);
+	if (missing) return `missing required argument: ${missing}`;
+	for (const [key, rule] of Object.entries(properties)) {
+		const value = input[key];
+		if (value === undefined) continue;
+		if (rule.type === 'string' && typeof value !== 'string') return `${key} must be a string`;
+		if (rule.maxLength && typeof value === 'string' && value.length > Number(rule.maxLength)) return `${key} is too long`;
+		if (rule.enum && !(rule.enum as unknown[]).includes(value)) return `${key} is outside the declared enum`;
+	}
+	return '';
 }
 
 export function installWebmcp(api: WebmcpApi) {
-	const modules = ['structured-editor-v1', 'artifact-transfer-v1'];
-
-	const bindings = {
-		editor_object_types: ['markdown-document'],
-		editor_modes: ['edit', 'preview', 'presentation'],
-		artifact_operations: ['export', 'copy'],
-		export_formats: ['markdown']
-	};
-
+	const modes = ['edit', 'preview', 'presentation'];
 	const tools: ToolDef[] = [
 		{
-			name: 'editor_set_content',
-			module: 'structured-editor-v1',
-			description:
-				'Replace the Markdown source of the current document. The source pane and rendered preview both update from the same shared document.',
-			parameters: {
-				type: 'object',
-				properties: { content: { type: 'string', description: 'New Markdown source text.' } },
-				required: ['content']
-			},
-			handler: (args) => {
-				const content = String(args.content ?? '');
-				api.setContent(content);
-				return { ok: true, length: content.length };
+			name: 'editor.set_content',
+			description: 'Set bounded textual content on an object.',
+			inputSchema: objectSchema({ id: { type: 'string', maxLength: 128 }, content: { type: 'string', maxLength: 200 } }, ['id', 'content']),
+			handler: ({ id, content }) => {
+				if (id !== 'markdown-document') return { ok: false, error: 'id must be markdown-document' };
+				api.setContent(String(content));
+				return { ok: true, id, sourceLength: api.getState().sourceLength };
 			}
 		},
 		{
-			name: 'editor_switch_mode',
-			module: 'structured-editor-v1',
-			description: 'Switch the editor between edit, preview and presentation modes.',
-			parameters: {
-				type: 'object',
-				properties: {
-					mode: { type: 'string', enum: ['edit', 'preview', 'presentation'] }
-				},
-				required: ['mode']
-			},
-			handler: (args) => {
-				const mode = args.mode as 'edit' | 'preview' | 'presentation';
-				if (!['edit', 'preview', 'presentation'].includes(mode)) {
-					throw new Error('mode must be one of edit, preview, presentation');
-				}
-				api.switchMode(mode);
+			name: 'editor.switch_mode',
+			description: 'Switch to a declared editor mode.',
+			inputSchema: objectSchema({ mode: { type: 'string', enum: modes } }, ['mode']),
+			handler: ({ mode }) => {
+				api.switchMode(mode as 'edit' | 'preview' | 'presentation');
 				return { ok: true, mode };
 			}
 		},
 		{
-			name: 'editor_preview',
-			module: 'structured-editor-v1',
-			description: 'Switch to preview mode and return the current rendered Markdown as HTML.',
-			parameters: { type: 'object', properties: {} },
+			name: 'editor.preview',
+			description: 'Run or refresh the declared preview.',
+			inputSchema: objectSchema(),
 			handler: () => {
-				const html = api.showPreview();
-				return { ok: true, html };
+				api.showPreview();
+				return { ok: true, mode: 'preview' };
 			}
 		},
 		{
-			name: 'artifact_export',
-			module: 'artifact-transfer-v1',
-			description: 'Export the current document as a Markdown (.md) file, the same as the Download control.',
-			parameters: {
-				type: 'object',
-				properties: { format: { type: 'string', enum: ['markdown'] } }
-			},
-			handler: (args) => {
-				const format = (args.format as string) ?? 'markdown';
-				if (format !== 'markdown') throw new Error('only markdown export is supported');
-				const length = api.exportMarkdown().length;
-				return { ok: true, format: 'markdown', length };
+			name: 'artifact.export',
+			description: 'Export using a declared format (no blob/base64 in results).',
+			inputSchema: objectSchema({ format: { type: 'string', enum: ['markdown'] } }, ['format']),
+			handler: ({ format }) => {
+				api.exportMarkdown();
+				return { ok: true, format, export_started: true };
 			}
 		},
 		{
-			name: 'artifact_copy',
-			module: 'artifact-transfer-v1',
-			description: 'Copy the current Markdown source to the clipboard, the same as the Copy control.',
-			parameters: { type: 'object', properties: {} },
+			name: 'artifact.copy',
+			description: 'Trigger copy via the visible control (clipboard verified in Playwright).',
+			inputSchema: objectSchema(),
 			handler: async () => {
-				const length = String(await api.copyMarkdown()).length;
-				return { ok: true, length };
+				await api.copyMarkdown();
+				return { ok: true, copy_triggered: true };
 			}
 		}
 	];
 
-	const listTools = () =>
-		tools.map((t) => ({
-			name: t.name,
-			module: t.module,
-			description: t.description,
-			parameters: t.parameters
-		}));
-
+	const listTools = () => tools.map(({ handler: _handler, ...tool }) => tool);
 	const w = window as unknown as Record<string, unknown>;
-
 	w.webmcp_session_info = () => ({
 		contract_version: 'zto-webmcp-v1',
 		app: 'md.uy',
-		modules,
-		bindings,
-		tools: tools.map((t) => t.name),
+		modules: ['structured-editor-v1', 'artifact-transfer-v1'],
+		tool_names: tools.map((tool) => tool.name),
+		tool_count: tools.length,
 		state: api.getState()
 	});
-
 	w.webmcp_list_tools = () => listTools();
-
 	w.webmcp_invoke_tool = async (name: string, args: Record<string, unknown> = {}) => {
-		const tool = tools.find((t) => t.name === name);
-		if (!tool) throw new Error(`Unknown tool: ${name}`);
-		return await tool.handler(args ?? {});
+		const tool = tools.find((candidate) => candidate.name === name);
+		if (!tool) return { ok: false, error: `unknown_tool: ${name}` };
+		const error = validateInput(tool.inputSchema, args);
+		if (error) return { ok: false, error };
+		try {
+			return await tool.handler(args);
+		} catch (cause) {
+			return { ok: false, error: String((cause as Error)?.message ?? cause) };
+		}
 	};
 
-	// Optional additional registration surface.
 	try {
-		const nav = navigator as unknown as { modelContext?: Record<string, unknown> };
-		nav.modelContext = {
-			contractVersion: 'zto-webmcp-v1',
-			listTools,
-			callTool: (name: string, args: Record<string, unknown> = {}) =>
-				(w.webmcp_invoke_tool as (n: string, a: Record<string, unknown>) => unknown)(name, args)
-		};
+		const context = (navigator as unknown as { modelContext?: { registerTool?: (tool: Record<string, unknown>) => void } }).modelContext;
+		if (context?.registerTool) {
+			tools.forEach((tool) => context.registerTool?.({
+				name: tool.name,
+				description: tool.description,
+				inputSchema: tool.inputSchema,
+				invoke: (args: Record<string, unknown>) =>
+					(w.webmcp_invoke_tool as (name: string, args: Record<string, unknown>) => unknown)(tool.name, args ?? {})
+			}));
+		}
 	} catch {
-		// navigator not writable in some environments; window surface is authoritative.
+		// The window self-test surface remains available when native WebMCP is absent.
 	}
 }

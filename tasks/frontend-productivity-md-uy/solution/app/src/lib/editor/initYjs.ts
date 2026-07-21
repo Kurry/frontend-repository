@@ -16,13 +16,20 @@ export const initYjs = (
 		const ytext = ydoc.getText(Y_TEXT_KEY);
 
 		const cleanup = () => {
-			ydoc.destroy();
 			persistence.destroy();
+			ydoc.destroy();
 		};
 
-		// Wait for IndexedDB to sync before resolving so a reload restores the doc.
-		persistence.on('synced', () => {
+		let settled = false;
+		const finish = () => {
+			if (settled) return;
+			settled = true;
 			resolve({ ydoc, persistence, ytext, cleanup });
-		});
+		};
+
+		// IndexedDB is authoritative. Do not resolve on a timer: doing so lets the
+		// caller seed/mirror text before a late persisted update is applied to this
+		// same Y.Doc, which can duplicate document content on reload.
+		persistence.on('synced', finish);
 	});
 };

@@ -22,7 +22,12 @@
 	});
 </script>
 
-<div class="bg-card relative h-full w-full overflow-hidden rounded" class:hidden={!isVisible}>
+<div
+	class="bg-card relative h-full w-full overflow-hidden rounded"
+	class:hidden={!isVisible}
+	inert={!isVisible ? true : undefined}
+	aria-hidden={!isVisible}
+>
 	{#if isEmpty && isVisible}
 		<div class="text-foreground/40 absolute top-5.5 left-4 z-10 sm:left-11">
 			No content to preview yet

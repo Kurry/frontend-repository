@@ -1,17 +1,31 @@
 <script lang="ts">
 	import '../../app.css';
 	import { onMount } from 'svelte';
+	import { Dialog } from 'bits-ui';
 	import * as Y from 'yjs';
 	import { marked } from 'marked';
+	import {
+		Sun,
+		Moon,
+		ArrowRight,
+		Plus,
+		Copy,
+		DownloadSimple,
+		ShareNetwork,
+		Check,
+		Package,
+		X
+	} from 'phosphor-svelte';
 	import Editor from '$lib/components/Editor.svelte';
 	import Preview from '$lib/components/Preview.svelte';
 	import Presentation from '$lib/components/Presentation.svelte';
 	import DocumentPackageModal from '$lib/components/DocumentPackageModal.svelte';
 	import { initYjs } from '$lib/editor/initYjs';
 	import { generateId, isValidId } from '$lib/utils';
-	import { SEED_ROOM_ID, SEED_CONTENT, Y_TEXT_KEY } from '$lib/constants';
+	import { SEED_ROOM_ID, SEED_CONTENT } from '$lib/constants';
 	import { installWebmcp } from '$lib/webmcp';
 	import { ProfileSchema, JoinRoomSchema, type DocumentPackage } from '$lib/schemas';
+	import { loadDocument, saveDocument } from '$lib/persistence';
 
 	type EditorMode = 'edit' | 'preview' | 'presentation';
 
@@ -21,6 +35,7 @@
 	let theme = $state<'light' | 'dark'>('light');
 	let joinId = $state('');
 	let joinError = $state<string | null>(null);
+	let isDesktop = $state(true);
 
 	let shareOpen = $state(false);
 	let isSyncing = $state(false);
@@ -36,15 +51,25 @@
 	let profileNameDraft = $state('');
 	let profileColorDraft = $state('');
 	let profileErrors = $state<{ displayName?: string; color?: string }>({});
+	let profileValid = $state(false);
+	let profileSavedFlash = $state(false);
 
 	let contentCopied = $state(false);
 	let packageOpen = $state(false);
 	let packageCopied = $state(false);
 	let packageDownloaded = $state(false);
 	let downloaded = $state(false);
+	let liveRegion = $state('');
 
-	let ydoc = $state<Y.Doc | null>(null);
-	let ytext = $state<Y.Text | null>(null);
+	let showOnboarding = $state(false);
+	let onboardingStep = $state(0);
+	let readingMinutes = $state(1);
+	let paneAnimKey = $state(0);
+
+	// Do NOT put Y.Doc / Y.Text in $state — proxies break y-codemirror + persistence.
+	let ydoc: Y.Doc | null = null;
+	let ytext: Y.Text | null = null;
+	let ytextRef = $state.raw<Y.Text | null>(null);
 	let sourceText = $state('');
 	let cleanup: () => void = () => {};
 
@@ -57,11 +82,16 @@
 	});
 
 	const packageJson = $derived(JSON.stringify(documentPackage, null, 2));
+	const connectedUsers = $derived(0);
+	const syncLabel = $derived(
+		isSyncing
+			? `${connectedUsers} users connected`
+			: `${connectedUsers} users connected · local only`
+	);
 
 	function resolveRoomId(): string {
 		const path = window.location.pathname.replace(/^\/+/, '').split('/')[0];
 		if (path && isValidId(path)) return path;
-		// Default: open directly into the seeded welcome document.
 		window.history.replaceState({}, '', `/${SEED_ROOM_ID}`);
 		return SEED_ROOM_ID;
 	}
@@ -81,23 +111,30 @@
 	}
 
 	function setContent(content: string) {
-		if (ydoc && ytext) { ydoc.transact(() => {
-			ytext.delete(0, ytext?.length ?? 0);
-			ytext.insert(0, content);
+		if (!ydoc || !ytext) return;
+		ydoc.transact(() => {
+			if (ytext!.length > 0) ytext!.delete(0, ytext!.length);
+			if (content.length > 0) ytext!.insert(0, content);
 		});
-		}
+		sourceText = content;
+		if (roomId) saveDocument(roomId, content);
+	}
+
+	function announce(msg: string) {
+		liveRegion = msg;
 	}
 
 	function copyContent() {
-		const text = ytext?.toString() ?? "";
+		const text = ytext?.toString() ?? '';
 		navigator.clipboard?.writeText(text).catch(() => {});
 		contentCopied = true;
+		announce('Markdown copied');
 		setTimeout(() => (contentCopied = false), 800);
 		return text;
 	}
 
 	function downloadFile() {
-		const content = ytext?.toString() ?? "";
+		const content = ytext?.toString() ?? '';
 		const blob = new Blob([content], { type: 'text/markdown' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
@@ -108,6 +145,7 @@
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
 		downloaded = true;
+		announce('Markdown downloaded');
 		setTimeout(() => (downloaded = false), 800);
 		return content;
 	}
@@ -115,7 +153,9 @@
 	function copyPackage() {
 		navigator.clipboard?.writeText(packageJson).catch(() => {});
 		packageCopied = true;
+		announce('Package copied');
 		setTimeout(() => (packageCopied = false), 800);
+		return packageJson;
 	}
 
 	function downloadPackage() {
@@ -129,7 +169,9 @@
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
 		packageDownloaded = true;
+		announce('Package downloaded');
 		setTimeout(() => (packageDownloaded = false), 800);
+		return packageJson;
 	}
 
 	function importPackage(data: DocumentPackage) {
@@ -137,6 +179,13 @@
 		applyTheme(data.theme);
 		userName = data.profile.displayName;
 		userColor = data.profile.color;
+		announce('Package imported');
+	}
+
+	function switchMode(mode: EditorMode) {
+		if (viewMode === mode) return;
+		viewMode = mode;
+		paneAnimKey++;
 	}
 
 	function openShare() {
@@ -158,7 +207,7 @@
 	}
 
 	function generateStaticLink() {
-		const content = ytext?.toString() ?? "";
+		const content = ytext?.toString() ?? '';
 		staticUrl = `${window.location.origin}/import?content=${encodeURIComponent(content)}`;
 		staticGenerated = true;
 	}
@@ -166,6 +215,7 @@
 	function copyShareUrl(url: string) {
 		navigator.clipboard?.writeText(url).catch(() => {});
 		copied = true;
+		announce('Link copied');
 		setTimeout(() => (copied = false), 800);
 	}
 
@@ -174,41 +224,72 @@
 		window.location.href = `/${id}`;
 	}
 
-	function joinDocument() {
-		const result = JoinRoomSchema.safeParse({ roomId: joinId.trim() });
+	function validateJoin(value: string) {
+		const result = JoinRoomSchema.safeParse({ roomId: value.trim() });
 		if (!result.success) {
-			joinError = result.error.issues[0]?.message ?? 'roomId is required';
-			return;
+			joinError = `roomId: ${result.error.issues[0]?.message ?? 'invalid'}`;
+			return null;
 		}
 		joinError = null;
-		window.location.href = `/${result.data.roomId}`;
+		return result.data.roomId;
+	}
+
+	function joinDocument() {
+		const id = validateJoin(joinId);
+		if (!id) return;
+		window.location.href = `/${id}`;
 	}
 
 	function openProfile() {
 		profileNameDraft = userName;
 		profileColorDraft = userColor;
-		profileErrors = {};
+		validateProfileDraft(userName, userColor);
 		profileOpen = true;
 	}
 
-	function saveProfile() {
-		const result = ProfileSchema.safeParse({
-			displayName: profileNameDraft,
-			color: profileColorDraft
-		});
+	function validateProfileDraft(name: string, color: string) {
+		const result = ProfileSchema.safeParse({ displayName: name, color });
 		if (!result.success) {
 			const errors: { displayName?: string; color?: string } = {};
 			for (const issue of result.error.issues) {
 				const key = issue.path[0] as 'displayName' | 'color' | undefined;
-				if (key && !errors[key]) errors[key] = issue.message;
+				if (key && !errors[key]) errors[key] = `${key}: ${issue.message}`;
 			}
 			profileErrors = errors;
-			return;
+			profileValid = false;
+			return null;
 		}
-		userName = result.data.displayName;
-		userColor = result.data.color;
 		profileErrors = {};
+		profileValid = true;
+		return result.data;
+	}
+
+	function onProfileNameInput(e: Event) {
+		const v = (e.currentTarget as HTMLInputElement).value;
+		profileNameDraft = v;
+		validateProfileDraft(v, profileColorDraft);
+	}
+
+	function onProfileColorInput(e: Event) {
+		const v = (e.currentTarget as HTMLInputElement).value;
+		profileColorDraft = v;
+		validateProfileDraft(profileNameDraft, v);
+	}
+
+	function saveProfile() {
+		const data = validateProfileDraft(profileNameDraft, profileColorDraft);
+		if (!data) return;
+		userName = data.displayName;
+		userColor = data.color;
 		profileOpen = false;
+		profileSavedFlash = true;
+		announce('Profile saved');
+		setTimeout(() => (profileSavedFlash = false), 900);
+	}
+
+	function updateReadingStats(text: string) {
+		const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+		readingMinutes = Math.max(1, Math.ceil(words / 200));
 	}
 
 	onMount(() => {
@@ -221,9 +302,21 @@
 				if (u.name) userName = u.name;
 				if (u.color) userColor = u.color;
 			}
+			if (!localStorage.getItem('mduy-onboarded')) showOnboarding = true;
 		} catch {
 			/* storage optional */
 		}
+
+		const mq = window.matchMedia('(min-width: 768px)');
+		const syncDesktop = () => (isDesktop = mq.matches);
+		syncDesktop();
+		mq.addEventListener('change', syncDesktop);
+
+		const onScroll = () => {
+			const y = window.scrollY || document.documentElement.scrollTop || 0;
+			document.documentElement.style.setProperty('--ambient-shift', `${Math.min(40, y * 0.08)}px`);
+		};
+		window.addEventListener('scroll', onScroll, { passive: true });
 
 		if (new URLSearchParams(window.location.search).get('sync') === 'true') isSyncing = true;
 
@@ -237,36 +330,56 @@
 			}
 			ydoc = res.ydoc;
 			ytext = res.ytext;
+			ytextRef = res.ytext;
 			cleanup = res.cleanup;
 
-			// Seed the welcome document only when it is genuinely empty.
-			if (roomId === SEED_ROOM_ID && (ytext?.length ?? 0) === 0) {
-				ytext.insert(0, SEED_CONTENT);
+			const fromLs = loadDocument(roomId);
+			if ((ytext?.length ?? 0) === 0 && fromLs != null && fromLs.length > 0) {
+				ytext!.insert(0, fromLs);
+			} else if (roomId === SEED_ROOM_ID && (ytext?.length ?? 0) === 0) {
+				ytext!.insert(0, SEED_CONTENT);
 			}
+
+			sourceText = ytext!.toString();
+			saveDocument(roomId, sourceText);
+			updateReadingStats(sourceText);
 
 			installWebmcp({
 				setContent,
-				switchMode: (m) => (viewMode = m),
+				switchMode,
 				showPreview: () => {
-					viewMode = 'preview';
-					return marked.parse(ytext?.toString() ?? "", { gfm: true, breaks: true }) as string;
+					switchMode('preview');
+					return marked.parse(ytext?.toString() ?? '', { gfm: true, breaks: true }) as string;
 				},
 				exportMarkdown: () => downloadFile(),
+				exportJson: () => downloadPackage(),
 				copyMarkdown: () => copyContent(),
+				copyJson: () => copyPackage(),
+				importArtifact: () => {
+					packageOpen = true;
+					return { ok: true, restored: false };
+				},
 				getState: () => ({
 					roomId,
 					viewMode,
 					theme,
 					isSyncing,
-					sourceLength: ytext?.length ?? 0
+					sourceLength: ytext?.length ?? 0,
+					sourcePreview: (ytext?.toString() ?? '').slice(0, 80)
 				})
 			});
 
 			ready = true;
 		});
 
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.register('/sw.js').catch(() => {});
+		}
+
 		return () => {
 			disposed = true;
+			mq.removeEventListener('change', syncDesktop);
+			window.removeEventListener('scroll', onScroll);
 			cleanup();
 		};
 	});
@@ -279,95 +392,163 @@
 		}
 	});
 
-	// Mirror the Yjs source into a plain reactive string so the Document
-	// package preview (packageJson) recomputes as the document is edited.
 	$effect(() => {
-		if (!ytext) {
+		const yt = ytextRef;
+		if (!yt) {
 			sourceText = '';
 			return;
 		}
-		sourceText = ytext.toString();
+		sourceText = yt.toString();
+		updateReadingStats(sourceText);
 		const observer = () => {
-			sourceText = ytext?.toString() ?? '';
+			const next = yt.toString();
+			sourceText = next;
+			if (roomId) saveDocument(roomId, next);
+			updateReadingStats(next);
 		};
-		ytext.observe(observer);
+		yt.observe(observer);
 		return () => {
-			ytext?.unobserve(observer);
+			yt.unobserve(observer);
 		};
 	});
+
+	function dismissOnboarding() {
+		showOnboarding = false;
+		try {
+			localStorage.setItem('mduy-onboarded', '1');
+		} catch {
+			/* optional */
+		}
+	}
 </script>
 
+<a class="skip-link" href="#main-content">Skip to content</a>
+
 <div class="flex h-screen w-full flex-col overflow-hidden">
-	<!-- Top bar: brand + room breadcrumb, theme, join, new -->
-	<header class="flex items-center justify-between gap-2 border-b px-4 py-2">
-		<div class="flex items-center text-xs">
-			<a href="/" class="text-foreground/70 hover:text-foreground transition-colors">md.uy</a>
+	<header class="flex items-center justify-between gap-2 border-b px-3 py-2 sm:px-4">
+		<nav class="flex min-w-0 items-center gap-1 text-xs" aria-label="Document breadcrumb">
+			<a href="/" class="brand-mark text-foreground hover:text-primary chrome-btn truncate">md.uy</a>
 			{#if roomId}
-				<span class="text-foreground/30 ml-1">/</span>
-				<span class="ml-1 pt-[2px] font-mono" data-testid="room-id">{roomId}</span>
+				<span class="text-foreground/30" aria-hidden="true">/</span>
+				<span class="truncate pt-[2px] font-mono text-[0.8rem] sm:text-xs" data-testid="room-id"
+					>{roomId}</span
+				>
 			{/if}
-		</div>
-		<div class="flex items-center gap-2">
+		</nav>
+		<div class="flex shrink-0 items-center gap-2">
 			<button
+				type="button"
 				onclick={toggleTheme}
-				class="hover:bg-accent hover:text-accent-foreground relative flex size-7 items-center justify-center rounded transition-colors"
-				aria-label="Toggle theme"
+				class="chrome-btn hover:bg-accent hover:text-accent-foreground relative flex size-11 items-center justify-center rounded"
+				aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
 				title="Toggle theme"
 			>
 				{#if theme === 'dark'}
-					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+					<Sun size={18} aria-hidden="true" />
 				{:else}
-					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+					<Moon size={18} aria-hidden="true" />
 				{/if}
 			</button>
-			<div class="relative hidden md:block">
-				<input
-					bind:value={joinId}
-					oninput={() => (joinError = null)}
-					placeholder="document id"
-					autocomplete="off"
-					maxlength={20}
-					aria-invalid={joinError ? 'true' : undefined}
-					aria-describedby={joinError ? 'join-room-error' : undefined}
-					onkeydown={(e) => e.key === 'Enter' && joinDocument()}
-					class="border-input bg-background h-7 w-32 rounded border pr-8 pl-2 font-mono text-xs focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2"
-				/>
-				<button
-					onclick={joinDocument}
-					disabled={!isValidId(joinId)}
-					aria-label="Open document"
-					title="Open document"
-					class="hover:bg-accent hover:text-accent-foreground absolute top-1/2 right-1 flex size-5 -translate-y-1/2 items-center justify-center rounded transition-colors disabled:pointer-events-none disabled:opacity-40"
-				>
-					<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-				</button>
-				{#if joinError}
-					<span id="join-room-error" class="text-destructive bg-popover border-border absolute top-full left-0 mt-1 w-max max-w-64 rounded border px-2 py-1 text-xs text-red-500 shadow-sm">
-						{joinError}
-					</span>
-				{/if}
-			</div>
+			{#if isDesktop}
+				<div class="relative">
+					<label for="join-room-id" class="sr-only">Document room id</label>
+					<input
+						id="join-room-id"
+						bind:value={joinId}
+						oninput={() => validateJoin(joinId)}
+						placeholder="document id"
+						autocomplete="off"
+						maxlength={20}
+						aria-invalid={joinError ? 'true' : undefined}
+						aria-describedby={joinError ? 'join-room-error' : undefined}
+						onkeydown={(e) => e.key === 'Enter' && joinDocument()}
+						class="border-input bg-background h-11 w-36 rounded border pr-10 pl-2 font-mono text-sm focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2"
+					/>
+					<button
+						type="button"
+						onclick={joinDocument}
+						disabled={!isValidId(joinId)}
+						aria-label="Open room"
+						title="Open room"
+						class="chrome-btn hover:bg-accent hover:text-accent-foreground absolute top-1/2 right-1 flex size-9 -translate-y-1/2 items-center justify-center rounded disabled:pointer-events-none disabled:opacity-40"
+					>
+						<ArrowRight size={16} aria-hidden="true" />
+					</button>
+					{#if joinError}
+						<span
+							id="join-room-error"
+							class="text-destructive bg-popover border-border absolute top-full left-0 z-20 mt-1 w-max max-w-64 rounded border px-2 py-1 text-xs text-red-500 shadow-sm"
+							role="alert"
+						>
+							{joinError}
+						</span>
+					{/if}
+				</div>
+			{/if}
 			<button
+				type="button"
 				onclick={newDocument}
-				class="bg-primary text-primary-foreground hover:bg-primary/90 flex size-7 items-center justify-center rounded transition-colors"
+				class="chrome-btn bg-primary text-primary-foreground hover:bg-primary/90 flex size-11 items-center justify-center rounded"
 				aria-label="New document"
 				title="New document"
 			>
-				<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+				<Plus size={16} aria-hidden="true" />
 			</button>
 		</div>
 	</header>
 
 	{#if ready}
-		<div class="mx-auto flex w-full max-w-3xl flex-1 flex-col overflow-hidden px-4 pt-3 pb-4">
-			<!-- Toolbar: mode toggle + actions -->
+		<main
+			id="main-content"
+			class="mx-auto flex w-full max-w-3xl flex-1 flex-col overflow-hidden px-3 pt-3 pb-4 sm:px-4"
+			tabindex="-1"
+		>
+			{#if showOnboarding}
+				<div
+					class="onboarding-card border-primary/30 bg-card/90 mb-3 rounded border px-3 py-2 text-sm shadow-sm"
+					role="status"
+				>
+					<p class="font-medium">
+						{#if onboardingStep === 0}
+							Welcome to md.uy — a peer-to-peer markdown workspace.
+						{:else if onboardingStep === 1}
+							Edit, Preview, and Present share one live document.
+						{:else}
+							Export a Document package anytime from Package.
+						{/if}
+					</p>
+					<div class="mt-2 flex flex-wrap gap-2">
+						{#if onboardingStep < 2}
+							<button
+								type="button"
+								class="chrome-btn bg-primary text-primary-foreground min-h-11 rounded px-3 text-sm"
+								onclick={() => (onboardingStep += 1)}>Next tip</button
+							>
+						{:else}
+							<button
+								type="button"
+								class="chrome-btn bg-primary text-primary-foreground min-h-11 rounded px-3 text-sm"
+								onclick={dismissOnboarding}>Got it</button
+							>
+						{/if}
+						<button
+							type="button"
+							class="chrome-btn border-input min-h-11 rounded border px-3 text-sm"
+							onclick={dismissOnboarding}>Skip</button
+						>
+					</div>
+				</div>
+			{/if}
+
 			<div class="mb-3 flex flex-row flex-wrap items-center justify-between gap-3">
-				<div class="flex items-center gap-2" role="group" aria-label="Editor mode">
+				<div class="flex flex-wrap items-center gap-2" role="group" aria-label="Editor mode">
 					{#each [['edit', 'Edit'], ['preview', 'Preview'], ['presentation', 'Present']] as [mode, label] (mode)}
 						<button
-							onclick={() => (viewMode = mode as EditorMode)}
+							type="button"
+							tabindex="0"
+							onclick={() => switchMode(mode as EditorMode)}
 							aria-pressed={viewMode === mode}
-							class={'h-7 rounded px-2 text-xs font-medium transition-colors ' +
+							class={'mode-btn toolbar-label min-h-11 rounded px-3 font-medium ' +
 								(viewMode === mode
 									? 'bg-secondary text-secondary-foreground'
 									: 'hover:bg-accent hover:text-accent-foreground')}
@@ -376,200 +557,352 @@
 						</button>
 					{/each}
 				</div>
-				<div class="flex items-center gap-1">
+				<div class="flex flex-wrap items-center gap-1">
 					<button
+						type="button"
 						onclick={copyContent}
-						class="hover:bg-accent hover:text-accent-foreground flex h-7 items-center gap-1 rounded px-2 text-xs font-medium transition-colors"
+						class="chrome-btn hover:bg-accent hover:text-accent-foreground flex min-h-11 items-center gap-1.5 rounded px-3 font-medium"
 						title="Copy content"
+						aria-label="Copy markdown"
 					>
 						{#if contentCopied}
-							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-500" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+							<Check size={16} class="text-green-500" aria-hidden="true" />
 						{:else}
-							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+							<Copy size={16} aria-hidden="true" />
 						{/if}
-						Copy
+						<span class="toolbar-label">Copy</span>
 					</button>
 					<button
+						type="button"
 						onclick={downloadFile}
-						class="hover:bg-accent hover:text-accent-foreground flex h-7 items-center gap-1 rounded px-2 text-xs font-medium transition-colors"
+						class="chrome-btn hover:bg-accent hover:text-accent-foreground flex min-h-11 items-center gap-1.5 rounded px-3 font-medium"
 						title="Download markdown"
+						aria-label="Download markdown"
 					>
 						{#if downloaded}
-							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-500" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+							<Check size={16} class="text-green-500" aria-hidden="true" />
 						{:else}
-							<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+							<DownloadSimple size={16} aria-hidden="true" />
 						{/if}
-						Download
+						<span class="toolbar-label">Download</span>
 					</button>
 					<button
+						type="button"
 						onclick={openShare}
-						class="border-input bg-background hover:bg-accent hover:text-accent-foreground relative ml-2 flex h-7 items-center gap-1 rounded border px-2 text-xs font-medium transition-colors"
+						class="chrome-btn border-input bg-background hover:bg-accent hover:text-accent-foreground relative ml-1 flex min-h-11 items-center gap-1.5 rounded border px-3 font-medium"
 						title="Share"
+						aria-label="Share"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.59 13.51 6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>
-						Share
+						<ShareNetwork size={16} aria-hidden="true" />
+						<span class="toolbar-label">Share</span>
 						{#if isSyncing}
 							<span class="absolute -top-1 -right-1 flex size-2">
-								<span class="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
+								<span
+									class="bg-primary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"
+								></span>
 								<span class="bg-primary relative inline-flex size-2 rounded-full"></span>
 							</span>
 						{/if}
 					</button>
 					<button
+						type="button"
 						onclick={() => (packageOpen = true)}
-						class="border-input bg-background hover:bg-accent hover:text-accent-foreground relative ml-1 flex h-7 items-center gap-1 rounded border px-2 text-xs font-medium transition-colors"
+						class="chrome-btn border-input bg-background hover:bg-accent hover:text-accent-foreground relative ml-1 flex min-h-11 items-center gap-1.5 rounded border px-3 font-medium"
 						title="Document package"
+						aria-label="Document package"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8V21H3V8"/><path d="M1 3H23V8H1V3Z"/><path d="M10 12H14"/></svg>
-						Package
+						<Package size={16} aria-hidden="true" />
+						<span class="toolbar-label">Package</span>
 					</button>
 				</div>
 			</div>
 
-			<!-- Panes -->
-			<div class="border-border flex-1 overflow-hidden rounded border">
-				<Editor {ytext} isVisible={viewMode === 'edit'} />
-				<Preview {ytext} isVisible={viewMode === 'preview'} />
-				<Presentation {ytext} isVisible={viewMode === 'presentation'} />
-			</div>
-
-			<!-- Status row: profile + connection -->
-			<div class="mt-3 flex items-center justify-between text-xs">
-				<button
-					onclick={openProfile}
-					class="border-input bg-background hover:bg-accent hover:text-accent-foreground flex h-7 items-center gap-2 rounded border px-2 font-medium transition-colors"
+			<div class="border-border relative flex-1 overflow-hidden rounded border">
+				<div
+					class="absolute inset-0"
+					class:hidden={viewMode !== 'edit'}
+					style:animation={viewMode === 'edit'
+						? `pane-in ${180 + (paneAnimKey % 5) * 4}ms ease both`
+						: 'none'}
 				>
-					<span class="border-foreground size-3 rounded-full border" style:background-color={userColor}></span>
-					<span>{userName}</span>
-				</button>
-				<div class="text-muted-foreground/70 flex items-center gap-2">
-					<span class="size-2 rounded-full {isSyncing ? 'bg-primary' : 'bg-muted-foreground/40'}"></span>
-					<span>{isSyncing ? 'Live sync on — no users connected' : 'Local only'}</span>
+					<Editor ytext={ytextRef} isVisible={viewMode === 'edit'} />
+				</div>
+				<div
+					class="absolute inset-0"
+					class:hidden={viewMode !== 'preview'}
+					style:animation={viewMode === 'preview'
+						? `pane-in ${180 + (paneAnimKey % 5) * 4}ms ease both`
+						: 'none'}
+				>
+					<Preview ytext={ytextRef} isVisible={viewMode === 'preview'} />
+				</div>
+				<div
+					class="absolute inset-0"
+					class:hidden={viewMode !== 'presentation'}
+					style:animation={viewMode === 'presentation'
+						? `pane-in ${180 + (paneAnimKey % 5) * 4}ms ease both`
+						: 'none'}
+				>
+					<Presentation ytext={ytextRef} isVisible={viewMode === 'presentation'} />
 				</div>
 			</div>
-		</div>
+
+			<div class="mt-3 flex flex-wrap items-center justify-between gap-2 text-sm">
+				<button
+					type="button"
+					onclick={openProfile}
+					class="chrome-btn border-input bg-background hover:bg-accent hover:text-accent-foreground relative flex min-h-11 items-center gap-2 rounded border px-3 font-medium"
+				>
+					<span
+						class="border-foreground size-3 rounded-full border"
+						style:background-color={userColor}
+					></span>
+					<span>{userName}</span>
+					{#if profileSavedFlash}
+						<span class="ink-burst bg-primary/40 pointer-events-none absolute inset-0 rounded"></span>
+					{/if}
+				</button>
+				<div class="text-muted-foreground/80 flex flex-wrap items-center gap-3">
+					<span class="inline-flex items-center gap-2" title="Estimated reading time">
+						<span
+							class="bg-secondary relative h-2 w-16 overflow-hidden rounded"
+							aria-hidden="true"
+						>
+							<span
+								class="bg-primary absolute inset-y-0 left-0 rounded"
+								style:width="{Math.min(100, readingMinutes * 12)}%"
+							></span>
+						</span>
+						<span>~{readingMinutes} min read</span>
+					</span>
+					<span class="inline-flex items-center gap-2">
+						<span
+							class="size-2 rounded-full {isSyncing ? 'bg-primary' : 'bg-muted-foreground/40'}"
+						></span>
+						<span>{syncLabel}</span>
+					</span>
+				</div>
+			</div>
+		</main>
 	{:else}
 		<div class="text-muted-foreground flex flex-1 items-center justify-center text-sm">Loading…</div>
 	{/if}
 
-	<footer class="text-foreground/50 flex items-center justify-center gap-2 border-t px-3 py-2 font-mono text-[0.7rem]">
+	<footer
+		class="text-foreground/50 flex items-center justify-center gap-2 border-t px-3 py-2 font-mono text-[0.7rem] sm:text-xs"
+	>
 		<span>md.uy</span>
-		<span>•</span>
+		<span aria-hidden="true">•</span>
 		<span>the peer-to-peer markdown editor</span>
-		<span>•</span>
+		<span aria-hidden="true">•</span>
 		<span>download important notes</span>
 	</footer>
 </div>
 
-<!-- Share dialog -->
-{#if shareOpen}
-	<div class="fixed inset-0 z-50 flex items-center justify-center">
-		<button class="absolute inset-0 bg-black/50" aria-label="Close" onclick={() => (shareOpen = false)}></button>
-		<div class="bg-popover text-popover-foreground relative z-10 w-[90%] max-w-md rounded-lg border p-6 shadow-lg">
-			<h2 class="text-lg font-semibold">Share</h2>
-			<p class="text-muted-foreground mt-1 text-sm">Choose how you want to share your note</p>
+<div class="sr-only" aria-live="polite">{liveRegion}</div>
+
+<!-- Share dialog (Bits UI) -->
+<Dialog.Root bind:open={shareOpen}>
+	<Dialog.Portal>
+		<Dialog.Overlay
+			class="dialog-overlay fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-dialog-in"
+		/>
+		<Dialog.Content
+			class="dialog-content bg-popover text-popover-foreground fixed top-[50%] left-[50%] z-50 w-[min(92vw,28rem)] translate-x-[-50%] translate-y-[-50%] rounded-lg border p-6 shadow-lg data-[state=open]:animate-dialog-pop-in"
+		>
+			<Dialog.Title class="text-lg font-semibold">Share</Dialog.Title>
+			<Dialog.Description class="text-muted-foreground mt-1 text-sm"
+				>Choose how you want to share your note</Dialog.Description
+			>
 			<div class="mt-4 grid grid-cols-2 gap-1">
 				<button
+					type="button"
 					onclick={() => (shareTab = 'live')}
-					class={'flex items-center justify-center gap-2 rounded px-3 py-1.5 text-sm transition-colors ' +
+					class={'chrome-btn flex min-h-11 items-center justify-center gap-2 rounded px-3 text-sm ' +
 						(shareTab === 'live' ? 'bg-secondary text-secondary-foreground' : 'hover:bg-accent')}
-				>Live sync</button>
+					>Live sync</button
+				>
 				<button
+					type="button"
 					onclick={() => (shareTab = 'static')}
-					class={'flex items-center justify-center gap-2 rounded px-3 py-1.5 text-sm transition-colors ' +
+					class={'chrome-btn flex min-h-11 items-center justify-center gap-2 rounded px-3 text-sm ' +
 						(shareTab === 'static' ? 'bg-secondary text-secondary-foreground' : 'hover:bg-accent')}
-				>Static</button>
+					>Static</button
+				>
 			</div>
 			{#if shareTab === 'live'}
 				<div class="flex flex-col items-center gap-3 py-4">
 					{#if isSyncing}
 						<div class="flex items-center gap-2">
 							<span class="text-sm font-medium">Live sync is active</span>
-							<button onclick={toggleSync} class="border-input hover:bg-accent rounded border px-2 py-1 text-xs">Turn off</button>
+							<button
+								type="button"
+								onclick={toggleSync}
+								class="chrome-btn border-input hover:bg-accent min-h-11 rounded border px-3 text-sm"
+								>Turn off</button
+							>
 						</div>
-						<p class="text-muted-foreground text-center text-sm">Anyone with this link can view and edit this note in real time.</p>
+						<p class="text-muted-foreground text-center text-sm">
+							Anyone with this link can view and edit this note in real time.
+						</p>
+						<p class="text-muted-foreground text-center text-xs">{syncLabel}</p>
 						<div class="relative w-full">
-							<input readonly value={liveUrl} class="border-input bg-background w-full rounded border py-1.5 pr-9 pl-2 text-xs" />
-							<button onclick={() => copyShareUrl(liveUrl)} title="Copy to clipboard" class="hover:bg-accent absolute top-1/2 right-1.5 flex size-6 -translate-y-1/2 items-center justify-center rounded">
-								{#if copied}✓{:else}⧉{/if}
+							<input
+								readonly
+								value={liveUrl}
+								aria-label="Live sync URL"
+								class="border-input bg-background w-full rounded border py-2 pr-10 pl-2 text-xs"
+							/>
+							<button
+								type="button"
+								onclick={() => copyShareUrl(liveUrl)}
+								title="Copy to clipboard"
+								aria-label="Copy live sync URL"
+								class="chrome-btn hover:bg-accent absolute top-1/2 right-1.5 flex size-9 -translate-y-1/2 items-center justify-center rounded"
+							>
+								{#if copied}
+									<Check size={14} class="text-green-500" aria-hidden="true" />
+								{:else}
+									<Copy size={14} aria-hidden="true" />
+								{/if}
 							</button>
 						</div>
 					{:else}
-						<p class="text-muted-foreground text-center text-sm">Enable live sync to collaborate in real time with anyone who has the link.</p>
-						<button onclick={toggleSync} class="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1.5 text-sm">Start live sync</button>
+						<p class="text-muted-foreground text-center text-sm">
+							Enable live sync to collaborate in real time with anyone who has the link.
+						</p>
+						<button
+							type="button"
+							onclick={toggleSync}
+							class="chrome-btn bg-primary text-primary-foreground hover:bg-primary/90 min-h-11 rounded px-3 text-sm"
+							>Start live sync</button
+						>
 					{/if}
 				</div>
 			{:else}
 				<div class="flex flex-col items-center gap-3 py-4">
-					<p class="text-muted-foreground text-center text-sm">Share a static copy of this note. Changes will not sync between copies.</p>
-					<button onclick={generateStaticLink} disabled={staticGenerated} class="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1.5 text-sm disabled:opacity-50">
+					<p class="text-muted-foreground text-center text-sm">
+						Share a static copy of this note. Changes will not sync between copies.
+					</p>
+					<button
+						type="button"
+						onclick={generateStaticLink}
+						disabled={staticGenerated}
+						class="chrome-btn bg-primary text-primary-foreground hover:bg-primary/90 min-h-11 rounded px-3 text-sm disabled:opacity-50"
+					>
 						{staticGenerated ? 'Link generated' : 'Generate static link'}
 					</button>
 					{#if staticGenerated}
 						<div class="relative w-full">
-							<input readonly value={staticUrl} class="border-input bg-background w-full rounded border py-1.5 pr-9 pl-2 text-xs" />
-							<button onclick={() => copyShareUrl(staticUrl)} title="Copy to clipboard" class="hover:bg-accent absolute top-1/2 right-1.5 flex size-6 -translate-y-1/2 items-center justify-center rounded">
-								{#if copied}✓{:else}⧉{/if}
+							<input
+								readonly
+								value={staticUrl}
+								aria-label="Static import URL"
+								class="border-input bg-background w-full rounded border py-2 pr-10 pl-2 text-xs"
+							/>
+							<button
+								type="button"
+								onclick={() => copyShareUrl(staticUrl)}
+								title="Copy to clipboard"
+								aria-label="Copy static URL"
+								class="chrome-btn hover:bg-accent absolute top-1/2 right-1.5 flex size-9 -translate-y-1/2 items-center justify-center rounded"
+							>
+								{#if copied}
+									<Check size={14} class="text-green-500" aria-hidden="true" />
+								{:else}
+									<Copy size={14} aria-hidden="true" />
+								{/if}
 							</button>
 						</div>
 					{/if}
 				</div>
 			{/if}
-		</div>
-	</div>
-{/if}
+			<Dialog.Close
+				class="chrome-btn absolute top-4 right-4 rounded-sm opacity-70 hover:opacity-100"
+				aria-label="Close share dialog"
+			>
+				<X size={16} aria-hidden="true" />
+			</Dialog.Close>
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
 
 <!-- Profile dialog -->
-{#if profileOpen}
-	<div class="fixed inset-0 z-50 flex items-center justify-center">
-		<button class="absolute inset-0 bg-black/50" aria-label="Close" onclick={() => (profileOpen = false)}></button>
-		<div class="bg-popover text-popover-foreground relative z-10 w-[90%] max-w-sm rounded-lg border p-6 shadow-lg">
-			<h2 class="text-lg font-semibold">Edit profile</h2>
+<Dialog.Root bind:open={profileOpen}>
+	<Dialog.Portal>
+		<Dialog.Overlay
+			class="dialog-overlay fixed inset-0 z-50 bg-black/50 data-[state=open]:animate-dialog-in"
+		/>
+		<Dialog.Content
+			class="dialog-content bg-popover text-popover-foreground fixed top-[50%] left-[50%] z-50 w-[min(92vw,24rem)] translate-x-[-50%] translate-y-[-50%] rounded-lg border p-6 shadow-lg data-[state=open]:animate-dialog-pop-in"
+		>
+			<Dialog.Title class="text-lg font-semibold">Edit profile</Dialog.Title>
 			<div class="mt-4 grid gap-4">
 				<div class="grid grid-cols-5 items-start gap-3">
-					<label for="pname" class="text-right text-sm pt-1.5">Name</label>
+					<label for="pname" class="pt-1.5 text-right text-sm">Name</label>
 					<div class="col-span-4">
 						<input
 							id="pname"
-							bind:value={profileNameDraft}
-							oninput={() => (profileErrors = { ...profileErrors, displayName: undefined })}
+							value={profileNameDraft}
+							oninput={onProfileNameInput}
 							placeholder="Enter your name"
 							aria-invalid={profileErrors.displayName ? 'true' : undefined}
-							class="border-input bg-background w-full rounded border px-2 py-1.5 text-sm"
+							aria-describedby={profileErrors.displayName ? 'pname-error' : undefined}
+							class="border-input bg-background w-full rounded border px-2 py-2 text-sm"
 						/>
 						{#if profileErrors.displayName}
-							<p class="text-destructive mt-1 text-xs text-red-500">{profileErrors.displayName}</p>
+							<p id="pname-error" class="text-destructive mt-1 text-xs text-red-500" role="alert">
+								{profileErrors.displayName}
+							</p>
 						{/if}
 					</div>
 				</div>
 				<div class="grid grid-cols-5 items-start gap-3">
-					<label for="pcolor" class="text-right text-sm pt-1.5">Color</label>
+					<label for="pcolor" class="pt-1.5 text-right text-sm">Color</label>
 					<div class="col-span-4">
 						<div class="flex items-center gap-2">
 							<input
 								id="pcolor"
 								type="color"
-								bind:value={profileColorDraft}
-								oninput={() => (profileErrors = { ...profileErrors, color: undefined })}
-								class="size-8 cursor-pointer rounded"
+								value={profileColorDraft}
+								oninput={onProfileColorInput}
+								class="size-11 cursor-pointer rounded"
 							/>
 							<span class="font-mono text-sm">{profileColorDraft}</span>
 						</div>
 						{#if profileErrors.color}
-							<p class="text-destructive mt-1 text-xs text-red-500">{profileErrors.color}</p>
+							<p class="text-destructive mt-1 text-xs text-red-500" role="alert">
+								{profileErrors.color}
+							</p>
 						{/if}
 					</div>
 				</div>
 			</div>
 			<div class="mt-5 flex justify-end gap-2">
-				<button onclick={() => (profileOpen = false)} class="border-input hover:bg-accent rounded border px-3 py-1.5 text-sm">Cancel</button>
-				<button onclick={saveProfile} class="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-1.5 text-sm">Save</button>
+				<button
+					type="button"
+					onclick={() => (profileOpen = false)}
+					class="chrome-btn border-input hover:bg-accent min-h-11 rounded border px-3 text-sm"
+					>Cancel</button
+				>
+				<button
+					type="button"
+					onclick={saveProfile}
+					disabled={!profileValid}
+					class="chrome-btn bg-primary text-primary-foreground hover:bg-primary/90 min-h-11 rounded px-3 text-sm disabled:opacity-40"
+					>Save</button
+				>
 			</div>
-		</div>
-	</div>
-{/if}
+			<Dialog.Close
+				class="chrome-btn absolute top-4 right-4 rounded-sm opacity-70 hover:opacity-100"
+				aria-label="Close profile dialog"
+			>
+				<X size={16} aria-hidden="true" />
+			</Dialog.Close>
+		</Dialog.Content>
+	</Dialog.Portal>
+</Dialog.Root>
 
-<!-- Document package dialog -->
 <DocumentPackageModal
 	bind:open={packageOpen}
 	{packageJson}

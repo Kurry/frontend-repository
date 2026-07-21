@@ -23,6 +23,8 @@
   "dependencies": {
     "@codemirror/lang-markdown": "^6.3.2",
     "@codemirror/state": "^6.5.2",
+    "@fontsource/fira-code": "^5.2.6",
+    "@fontsource/ibm-plex-serif": "^5.2.6",
     "bits-ui": "^2.18.1",
     "codemirror": "^6.0.1",
     "formsnap": "^2.0.1",

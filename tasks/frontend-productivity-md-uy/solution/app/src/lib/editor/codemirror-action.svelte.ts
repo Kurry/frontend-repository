@@ -13,7 +13,14 @@ export const codemirror = (node: HTMLElement, { ytext, isVisible }: CodeMirrorOp
 
 	return {
 		update(options: CodeMirrorOptions) {
-			if (options.isVisible) editorView.focus();
+			// Only focus when becoming visible — never steal focus while Present/Preview.
+			if (options.isVisible && !isVisible) {
+				editorView.focus();
+			}
+			isVisible = options.isVisible;
+			if (!options.isVisible) {
+				editorView.contentDOM.blur();
+			}
 		},
 		destroy: () => {
 			editorView.destroy();

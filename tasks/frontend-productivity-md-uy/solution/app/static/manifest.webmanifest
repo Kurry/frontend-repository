@@ -1,0 +1,17 @@
+{
+  "name": "md.uy — peer-to-peer markdown",
+  "short_name": "md.uy",
+  "description": "Collaborative markdown editor with live preview and presentation mode",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8f4",
+  "theme_color": "#559ede",
+  "icons": [
+    {
+      "src": "/mduy-favicon.png",
+      "sizes": "64x64",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

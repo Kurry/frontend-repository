@@ -17,12 +17,17 @@
 		};
 		ytext.observe(observer);
 		return () => {
-			if (ytext) ytext.unobserve(observer);
-		}
+			ytext?.unobserve(observer);
+		};
 	});
 </script>
 
-<div class="relative h-full w-full overflow-hidden" class:hidden={!isVisible}>
+<div
+	class="relative h-full w-full overflow-hidden"
+	class:hidden={!isVisible}
+	inert={!isVisible ? true : undefined}
+	aria-hidden={!isVisible}
+>
 	{#if isEmpty && isVisible}
 		<span class="text-foreground/40 absolute top-6.5 left-4 z-10 font-mono text-sm sm:left-11">
 			Start typing to add content...
