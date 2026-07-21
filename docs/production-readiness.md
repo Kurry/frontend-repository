@@ -45,15 +45,16 @@ innovation's single positive catch-all).
 
 ## Phase 3 — Task shape completeness (#535)
 
-- [ ] Capture + install `environment/reference-screenshots/` for the 35 active tasks
-      missing them (recounted after the quarantine; original 37-task list in #535
-      included quarantined slugs):
-      `uv run corpuscheck screenshots capture <slug ...>` then
-      `uv run corpuscheck screenshots install <slug ...>`,
-      then `uv run corpuscheck propagate` (Dockerfile COPY line) and `--check`.
+- [x] Capture + install `environment/reference-screenshots/` for all 65 active
+      tasks (#555). Every tracked task now has the directory, and
+      `uv run corpuscheck propagate --check` reports zero drift.
 - [x] Decide README policy and make the corpus uniform: every active task's `README.md`
       and `solution/app/README.md` are standardized generated surfaces owned by
       `corpuscheck propagate` (drift-checked by `--check`).
+
+Task-local `solution/reward-details.json` files are not part of the active task
+shape. PR #541 removed those stale trial artifacts corpus-wide; current verifier
+results live in Harbor trial output under `verifier/reward-details.json`.
 
 ## Phase 4 — Docs / tooling truthfulness (#536)
 
