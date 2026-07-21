@@ -171,7 +171,7 @@ export function EventForm({ initialData, onClose }) {
 
           <Group justify="flex-end" mt="xl">
             <Button variant="default" onClick={onClose}>Cancel</Button>
-            <Button type="submit" color="cyan" disabled={!isValid || isSubmitting} loading={isSubmitting}>
+            <Button type="submit" color="cyan" disabled={isSubmitting} loading={isSubmitting}>
               {initialData && initialData !== 'new' ? 'Save' : 'Add event'}
             </Button>
           </Group>
