@@ -268,11 +268,25 @@ async function invoke(name, args = {}) {
     return { ok: true, quantity: state.library.length }
   }
   if (name === 'entity_reorder') {
-    const fromIndex = visibleLibraryIndex(state, args.fromIndex)
-    const toIndex = visibleLibraryIndex(state, args.toIndex)
-    if (fromIndex === null || toIndex === null) throw new Error('Library prompt index is out of range.')
-    state.reorderLibrary(fromIndex, toIndex)
-    return { ok: true, fromIndex: args.fromIndex, toIndex: args.toIndex }
+    const entries = visibleLibraryEntries(state)
+    const fromVisible = args.fromIndex
+    const toVisible = args.toIndex
+    if (!Number.isInteger(fromVisible) || !Number.isInteger(toVisible)
+      || fromVisible < 0 || toVisible < 0
+      || fromVisible >= entries.length || toVisible >= entries.length) {
+      throw new Error('Library prompt index is out of range.')
+    }
+    const order = entries.map((entry) => entry.originalIndex)
+    const [moved] = order.splice(fromVisible, 1)
+    order.splice(toVisible, 0, moved)
+    const included = new Set(order)
+    const library = order.map((index) => state.library[index])
+    state.library.forEach((record, index) => {
+      if (!included.has(index)) library.push(record)
+    })
+    state.replaceLibrary(library)
+    state.setSortOrder('manual')
+    return { ok: true, fromIndex: fromVisible, toIndex: toVisible }
   }
 
   if (name === 'artifact_copy') {
