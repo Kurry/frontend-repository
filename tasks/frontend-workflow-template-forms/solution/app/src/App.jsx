@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef } from 'react'
-import { Button, Select, SelectItem, Tag, ToastNotification, Modal, ContentSwitcher, Switch } from '@carbon/react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Button, Select, SelectItem, Tag, ToastNotification, ContentSwitcher, Switch } from '@carbon/react'
 import {
   Asleep,
   Book,
@@ -7,10 +7,11 @@ import {
   Education,
   IbmGranite,
   Light,
+  Microphone,
   Template,
 } from '@carbon/icons-react'
 import { TECHNIQUES, techniqueById } from './domain'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { useStudioStore } from './store'
 import TechniqueForm from './components/TechniqueForm'
 import PreviewPanel from './components/PreviewPanel'
@@ -138,8 +139,44 @@ function AppHeader() {
   const activeView = useStudioStore((state) => state.activeView)
   const libraryCount = useStudioStore((state) => state.library.length)
   const theme = useStudioStore((state) => state.theme)
+  const density = useStudioStore((state) => state.density)
+  const voiceListening = useStudioStore((state) => state.voiceListening)
   const setView = useStudioStore((state) => state.setView)
   const setTheme = useStudioStore((state) => state.setTheme)
+  const setDensity = useStudioStore((state) => state.setDensity)
+  const setVoiceListening = useStudioStore((state) => state.setVoiceListening)
+  const showToast = useStudioStore((state) => state.showToast)
+
+  function toggleVoice() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    if (!SpeechRecognition) {
+      showToast('info', 'Voice input', 'Speech recognition is unavailable in this browser. Use the dictation hint to paste spoken notes.')
+      setVoiceListening(false)
+      return
+    }
+    if (voiceListening) {
+      setVoiceListening(false)
+      return
+    }
+    const recognition = new SpeechRecognition()
+    recognition.lang = 'en-US'
+    recognition.interimResults = false
+    recognition.onstart = () => setVoiceListening(true)
+    recognition.onend = () => setVoiceListening(false)
+    recognition.onerror = () => setVoiceListening(false)
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results).map((result) => result[0].transcript).join(' ').trim()
+      if (!transcript) return
+      const applied = window.__templateFormVoiceTranscript?.(transcript)
+      showToast(
+        applied ? 'success' : 'error',
+        applied ? 'Voice captured' : 'Voice input unavailable',
+        applied ? 'Transcript appended to the active technique form.' : 'Return to an active technique form and try again.',
+      )
+    }
+    recognition.start()
+  }
+
   return (
     <header className="app-header">
       <button type="button" className="brand" onClick={() => setView('forms')} aria-label="Template Forms home">
@@ -162,6 +199,27 @@ function AppHeader() {
         >
           {theme === 'dark' ? 'Light' : 'Dark'}
         </Button>
+        <Button
+          type="button"
+          kind="ghost"
+          size="md"
+          onClick={() => setDensity(density === 'comfortable' ? 'compact' : 'comfortable')}
+          aria-label={density === 'comfortable' ? 'Switch to compact density' : 'Switch to comfortable density'}
+        >
+          {density === 'comfortable' ? 'Compact' : 'Comfort'}
+        </Button>
+        <Button
+          type="button"
+          kind="ghost"
+          size="md"
+          className={voiceListening ? 'nav-active' : ''}
+          renderIcon={(props) => <Microphone {...props} aria-hidden="true" />}
+          onClick={toggleVoice}
+          aria-pressed={voiceListening}
+          aria-label={voiceListening ? 'Stop voice input' : 'Start voice input'}
+        >
+          {voiceListening ? 'Listening' : 'Voice'}
+        </Button>
       </nav>
     </header>
   )
@@ -173,13 +231,17 @@ function FormsView() {
   const info = techniqueById[technique]
   const position = TECHNIQUES.findIndex((item) => item.id === technique) + 1
   const reduce = useReducedMotion()
+  const heroRef = useRef(null)
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
+  const parallaxY = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [0, 28])
 
   return (
     <div className="studio-layout">
       <Sidebar />
       <main className="studio-main" id="main-content">
         <MobileTechniqueSelect />
-        <div className="technique-hero">
+        <div className="technique-hero" ref={heroRef}>
+          <motion.div className="hero-parallax" style={{ y: parallaxY }} aria-hidden="true" />
           <div>
             <span className="eyebrow">Technique {String(position).padStart(2, '0')} / 07</span>
             <h1>{info.name}</h1>
@@ -196,8 +258,10 @@ function FormsView() {
             {info.short}
           </motion.div>
         </div>
-        <div className={`form-panel ${reduce ? '' : 'form-fade'}`} key={technique}>
-          <TechniqueForm technique={technique} active />
+        <div className={`form-panel ${reduce ? '' : 'form-fade'}`}>
+          {TECHNIQUES.map((item) => (
+            <TechniqueForm key={item.id} technique={item.id} active={technique === item.id} />
+          ))}
         </div>
         <PreviewPanel saveButtonRef={saveButtonRef} />
         <SaveModal launcherButtonRef={saveButtonRef} />
@@ -216,7 +280,7 @@ function ToastRegion() {
   }, [clearToast, toast])
   if (!toast) return null
   return (
-    <div className="toast-region" role="region" aria-label="Notifications">
+    <div className="toast-region" role="status" aria-live="polite" aria-label="Notifications">
       <ToastNotification
         kind={toast.kind}
         title={toast.title}
@@ -229,10 +293,11 @@ function ToastRegion() {
   )
 }
 
-function OnboardingModal() {
+function OnboardingCoach() {
   const hasSeenOnboarding = useStudioStore((state) => state.hasSeenOnboarding)
   const onboardingStep = useStudioStore((state) => state.onboardingStep)
   const setChrome = useStudioStore((state) => state.setChrome)
+  const [open, setOpen] = useState(!hasSeenOnboarding)
   const steps = [
     {
       heading: 'Welcome to Template Forms',
@@ -250,36 +315,62 @@ function OnboardingModal() {
   const step = steps[onboardingStep] || steps[0]
   const isLast = onboardingStep >= steps.length - 1
 
+  if (hasSeenOnboarding && !open) {
+    return (
+      <button type="button" className="tour-reopen" onClick={() => { setOpen(true); setChrome({ onboardingStep: 0 }) }}>
+        Guided tour
+      </button>
+    )
+  }
+
+  if (!open && hasSeenOnboarding) return null
+
   return (
-    <Modal
-      open={!hasSeenOnboarding}
-      modalHeading={step.heading}
-      primaryButtonText={isLast ? 'Start building prompts' : 'Continue tour'}
-      secondaryButtonText={onboardingStep === 0 ? 'Skip' : 'Back'}
-      onRequestSubmit={() => {
-        if (isLast) setChrome({ hasSeenOnboarding: true, onboardingStep: 0 })
-        else setChrome({ onboardingStep: onboardingStep + 1 })
-      }}
-      onRequestClose={() => setChrome({ hasSeenOnboarding: true, onboardingStep: 0 })}
-      onSecondarySubmit={() => {
-        if (onboardingStep === 0) setChrome({ hasSeenOnboarding: true, onboardingStep: 0 })
-        else setChrome({ onboardingStep: onboardingStep - 1 })
-      }}
-      focusTrap
-      size="sm"
-    >
-      <p className="modal-copy">{step.copy}</p>
-      <ContentSwitcher
-        size="sm"
-        selectedIndex={onboardingStep}
-        onChange={({ index }) => setChrome({ onboardingStep: index })}
-        aria-label="Onboarding steps"
-      >
-        <Switch name="welcome" text="1" />
-        <Switch name="studio" text="2" />
-        <Switch name="library" text="3" />
-      </ContentSwitcher>
-    </Modal>
+    <aside className="onboarding-coach" aria-label="Guided onboarding">
+      <div className="onboarding-coach__body">
+        <span className="eyebrow">Studio tour · {onboardingStep + 1}/3</span>
+        <h2>{step.heading}</h2>
+        <p>{step.copy}</p>
+        <ContentSwitcher
+          size="sm"
+          selectedIndex={onboardingStep}
+          onChange={({ index }) => setChrome({ onboardingStep: index })}
+          aria-label="Onboarding steps"
+        >
+          <Switch name="welcome" text="1" />
+          <Switch name="studio" text="2" />
+          <Switch name="library" text="3" />
+        </ContentSwitcher>
+      </div>
+      <div className="onboarding-coach__actions">
+        <Button
+          type="button"
+          kind="ghost"
+          size="sm"
+          onClick={() => {
+            setChrome({ hasSeenOnboarding: true, onboardingStep: 0 })
+            setOpen(false)
+          }}
+        >
+          Skip tour
+        </Button>
+        <Button
+          type="button"
+          kind="primary"
+          size="sm"
+          onClick={() => {
+            if (isLast) {
+              setChrome({ hasSeenOnboarding: true, onboardingStep: 0 })
+              setOpen(false)
+            } else {
+              setChrome({ onboardingStep: onboardingStep + 1 })
+            }
+          }}
+        >
+          {isLast ? 'Start building prompts' : 'Continue tour'}
+        </Button>
+      </div>
+    </aside>
   )
 }
 
@@ -303,14 +394,15 @@ export default function App() {
     <div className={`app-shell theme-${theme} density-${density}`}>
       <a className="skip-link" href="#main-content">Skip to main content</a>
       <AppHeader />
+      <OnboardingCoach />
       <div className="view-stage">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={activeView}
             className="view-layer"
-            initial={reduce ? false : { opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? undefined : { opacity: 0, y: -6 }}
+            initial={reduce ? false : { opacity: 0, y: 8, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={reduce ? undefined : { opacity: 0, y: -6, scale: 0.985 }}
             transition={{ duration: reduce ? 0 : 0.09, ease: [0.2, 0.8, 0.2, 1] }}
           >
             {activeView === 'forms'
@@ -321,7 +413,6 @@ export default function App() {
       </div>
       <ImportModal launcherButtonRef={importLauncherRef} />
       <ToastRegion />
-      <OnboardingModal />
     </div>
   )
 }

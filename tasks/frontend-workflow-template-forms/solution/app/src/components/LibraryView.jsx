@@ -242,22 +242,36 @@ export default function LibraryView({ importLauncherRef }) {
         </section>
       )}
 
-      <Modal
-        open={Boolean(confirmDelete)}
-        danger
-        modalHeading="Delete prompt"
-        primaryButtonText="Delete prompt"
-        secondaryButtonText="Cancel"
-        onRequestSubmit={commitRemove}
-        onRequestClose={() => {
-          deleteInFlight.current = false
-          setConfirmDelete(null)
-          requestAnimationFrame(() => deleteLauncher.current?.focus())
-        }}
-        focusTrap
-      >
-        <p className="modal-copy">Are you sure you want to delete this prompt? This action cannot be undone.</p>
-      </Modal>
+      {confirmDelete ? (
+        <Modal
+          open
+          danger
+          modalHeading="Delete prompt"
+          primaryButtonText="Delete prompt"
+          secondaryButtonText="Cancel"
+          onRequestSubmit={commitRemove}
+          onRequestClose={() => {
+            deleteInFlight.current = false
+            setConfirmDelete(null)
+            requestAnimationFrame(() => {
+              if (deleteLauncher.current?.isConnected) deleteLauncher.current.focus()
+              else libraryActionFallback.current?.focus()
+            })
+          }}
+          onSecondarySubmit={() => {
+            deleteInFlight.current = false
+            setConfirmDelete(null)
+            requestAnimationFrame(() => {
+              if (deleteLauncher.current?.isConnected) deleteLauncher.current.focus()
+              else libraryActionFallback.current?.focus()
+            })
+          }}
+          preventCloseOnClickOutside={false}
+          className="scale-modal"
+        >
+          <p className="modal-copy">Are you sure you want to delete this prompt? This action cannot be undone.</p>
+        </Modal>
+      ) : null}
     </main>
   )
 }

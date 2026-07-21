@@ -15,10 +15,10 @@ import { assemblePrompt, clone, formSchemas, techniqueById } from '../domain'
 import { useStudioStore } from '../store'
 import AttachmentsField from './AttachmentsField'
 
-const requiredMark = <span className="required-mark" aria-hidden="true">*</span>
+const requiredMark = <span className="required-mark" aria-hidden="true"> *</span>
 
 function Label({ children, required = false }) {
-  return <>{children}{required && requiredMark}</>
+  return <>{children}{required ? requiredMark : null}</>
 }
 
 function CharacterCount({ value }) {
@@ -59,14 +59,13 @@ const DynamicRow = memo(function DynamicRow({ index, title, onRemove, children }
   )
 })
 
-function TextAreaField({ idPrefix, name, label, required, register, errors, watch, placeholder, rows = 5 }) {
+function TextAreaField({ idPrefix, name, label, required, register, errors, watch, placeholder, rows = 5, showError }) {
   const error = errors[name]
   const value = watch(name)
-  const [parent] = useAutoAnimate()
+  const [parent] = useAutoAnimate({ duration: 90 })
   const fieldId = `${idPrefix}-${name}`
   const countId = `${fieldId}-count`
-  const errorId = `${fieldId}-error`
-  const describedBy = error ? `${countId} ${errorId}` : countId
+  const visibleError = showError && error
   return (
     <div className="field-stack" ref={parent}>
       <TextArea
@@ -75,24 +74,21 @@ function TextAreaField({ idPrefix, name, label, required, register, errors, watc
         rows={rows}
         required={required}
         aria-required={required}
-        invalid={Boolean(error)}
-        invalidText={error?.message}
+        invalid={Boolean(visibleError)}
+        invalidText={visibleError?.message || ''}
         {...register(name)}
         id={fieldId}
-        aria-describedby={describedBy}
-        aria-errormessage={error ? errorId : undefined}
       />
       <span id={countId}><CharacterCount value={value} /></span>
-      {error?.message ? <span id={errorId} className="sr-only">{error.message}</span> : null}
     </div>
   )
 }
 
-function TextField({ idPrefix, name, label, required, register, errors, placeholder }) {
+function TextField({ idPrefix, name, label, required, register, errors, placeholder, showError }) {
   const error = name.split('.').reduce((current, part) => current?.[part], errors)
-  const [parent] = useAutoAnimate()
+  const [parent] = useAutoAnimate({ duration: 90 })
   const fieldId = `${idPrefix}-${name.replaceAll('.', '-')}`
-  const errorId = `${fieldId}-error`
+  const visibleError = showError && error
   return (
     <div className="field-stack" ref={parent}>
       <TextInput
@@ -100,38 +96,33 @@ function TextField({ idPrefix, name, label, required, register, errors, placehol
         placeholder={placeholder}
         required={required}
         aria-required={required}
-        invalid={Boolean(error)}
-        invalidText={error?.message}
+        invalid={Boolean(visibleError)}
+        invalidText={visibleError?.message || ''}
         {...register(name)}
         id={fieldId}
-        aria-describedby={error ? errorId : undefined}
-        aria-errormessage={error ? errorId : undefined}
       />
-      {error?.message ? <span id={errorId} className="sr-only">{error.message}</span> : null}
     </div>
   )
 }
 
-function SelectField({ idPrefix, name, label, options, register, errors, required = false }) {
+function SelectField({ idPrefix, name, label, options, register, errors, required = false, showError }) {
   const error = errors[name]
-  const [parent] = useAutoAnimate()
+  const [parent] = useAutoAnimate({ duration: 90 })
   const fieldId = `${idPrefix}-${name}`
-  const errorId = `${fieldId}-error`
+  const visibleError = showError && error
   return (
     <div className="field-stack" ref={parent}>
       <Select
         labelText={<Label required={required}>{label}</Label>}
         required={required}
         aria-required={required}
-        invalid={Boolean(error)}
-        invalidText={error?.message}
+        invalid={Boolean(visibleError)}
+        invalidText={visibleError?.message || ''}
         {...register(name)}
         id={fieldId}
-        aria-describedby={error ? errorId : undefined}
       >
         {options.map(([val, text]) => <SelectItem key={val} value={val} text={text} />)}
       </Select>
-      {error?.message ? <span id={errorId} className="sr-only">{error.message}</span> : null}
     </div>
   )
 }
@@ -165,7 +156,7 @@ export default function TechniqueForm({ technique, active }) {
     getValues,
     reset,
     trigger,
-    formState: { errors, isValid },
+    formState: { errors, isValid, touchedFields, dirtyFields, isSubmitted },
   } = useForm({
     resolver: zodResolver(formSchemas[technique]),
     mode: 'onChange',
@@ -173,6 +164,19 @@ export default function TechniqueForm({ technique, active }) {
     defaultValues: defaults,
     shouldUnregister: false,
   })
+  const [submitAttempted, setSubmitAttempted] = useState(false)
+  const revealErrors = submitAttempted || isSubmitted
+  const showFieldError = (name) => {
+    if (revealErrors) return true
+    const path = name.split('.')
+    let touched = touchedFields
+    let dirty = dirtyFields
+    for (const part of path) {
+      touched = touched?.[part]
+      dirty = dirty?.[part]
+    }
+    return Boolean(touched || dirty)
+  }
 
   const examples = useFieldArray({ control, name: 'examples' })
   const reasoningSteps = useFieldArray({ control, name: 'reasoningSteps' })
@@ -189,16 +193,13 @@ export default function TechniqueForm({ technique, active }) {
   }, [])
 
   useEffect(() => {
+    setSubmitAttempted(false)
     reset({
       ...clone(draft.fields),
       ...(hasAttachments ? { attachments: clone(draft.attachments) } : {}),
     })
-    requestAnimationFrame(() => trigger())
+    requestAnimationFrame(() => { trigger() })
   }, [hydrationVersion, technique]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (active) trigger()
-  }, [active, trigger])
 
   useEffect(() => {
     const subscription = watch((nextValues) => {
@@ -228,11 +229,48 @@ export default function TechniqueForm({ technique, active }) {
   }
 
   function onInvalid() {
+    setSubmitAttempted(true)
     setAnnouncement('Prompt not generated. Resolve the named fields and try again.')
   }
 
   useEffect(() => {
     if (!active) return undefined
+    window.__templateFormApplyFields = (incoming) => {
+      const fields = getValues()
+      const mapping = {
+        'task-description': 'taskDescription',
+        'output-format': 'outputFormat',
+        tone: 'tone',
+        'example-input': 'exampleInput',
+        'expected-output': 'expectedOutput',
+        goal: 'goal',
+        scratchpad: 'scratchpad',
+        measurement: 'measurement',
+        role: 'role',
+        audience: 'audience',
+      }
+      for (const [contractName, value] of Object.entries(incoming || {})) {
+        let path = mapping[contractName]
+        if (contractName === 'reasoning-step') path = 'reasoningSteps.0.step'
+        if (contractName === 'success-criterion') path = 'successCriteria.0.text'
+        if (contractName === 'constraint-type') path = 'constraints.0.type'
+        if (contractName === 'constraint-text') path = 'constraints.0.text'
+        if (!path || (path.split('.')[0] !== 'reasoningSteps' && path.split('.')[0] !== 'successCriteria' && path.split('.')[0] !== 'constraints' && !(path in fields))) {
+          return { ok: false, error: `${contractName} is not available for the active technique` }
+        }
+        const next = contractName === 'scratchpad' ? value === 'true' : value
+        setValue(path, next, { shouldDirty: true, shouldTouch: true, shouldValidate: true })
+      }
+      return { ok: true }
+    }
+    window.__templateFormVoiceTranscript = (transcript) => {
+      const fields = getValues()
+      const field = 'taskDescription' in fields ? 'taskDescription' : 'goal' in fields ? 'goal' : 'role' in fields ? 'role' : null
+      if (!field) return false
+      const next = field === 'role' ? transcript : `${fields[field] || ''} ${transcript}`.trim()
+      setValue(field, next, { shouldDirty: true, shouldTouch: true, shouldValidate: true })
+      return true
+    }
     window.__templateFormCommand = async (operation) => {
       if (operation === 'validate') {
         const valid = await trigger()
@@ -261,8 +299,10 @@ export default function TechniqueForm({ technique, active }) {
     }
     return () => {
       if (window.__templateFormCommand) delete window.__templateFormCommand
+      if (window.__templateFormVoiceTranscript) delete window.__templateFormVoiceTranscript
+      if (window.__templateFormApplyFields) delete window.__templateFormApplyFields
     }
-  }, [active, getValues, resetTechnique, setChrome, technique, trigger])
+  }, [active, getValues, resetTechnique, setChrome, setValue, technique, trigger])
 
   const arrayError = (name) => errors[name]?.root?.message || errors[name]?.message
 
@@ -273,23 +313,23 @@ export default function TechniqueForm({ technique, active }) {
       noValidate
       hidden={!active}
       aria-hidden={!active}
-      {...(!active ? { inert: '' } : {})}
+      inert={active ? undefined : true}
     >
       <div className="sr-only" aria-live="polite">{announcement}</div>
 
       {technique === 'zero-shot' && (
         <>
           <Section eyebrow="01 · Instruction" title="Describe the task">
-            <TextAreaField idPrefix={technique} name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="Explain exactly what the model should accomplish…" />
+            <TextAreaField idPrefix={technique} name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="Explain exactly what the model should accomplish…"  showError={showFieldError('taskDescription')} />
           </Section>
           <Section eyebrow="02 · Response" title="Shape the answer">
             <div className="field-grid">
               <SelectField idPrefix={technique} name="outputFormat" label="Output format" required register={register} errors={errors} options={[
                 ['paragraph', 'Paragraph'], ['bullets', 'Bulleted list'], ['table', 'Table'], ['json', 'JSON'],
-              ]} />
+              ]}  showError={showFieldError('outputFormat')} />
               <SelectField idPrefix={technique} name="tone" label="Tone" required register={register} errors={errors} options={[
                 ['clear', 'Clear'], ['professional', 'Professional'], ['friendly', 'Friendly'], ['persuasive', 'Persuasive'],
-              ]} />
+              ]}  showError={showFieldError('tone')} />
             </div>
           </Section>
         </>
@@ -298,12 +338,12 @@ export default function TechniqueForm({ technique, active }) {
       {technique === 'one-shot' && (
         <>
           <Section eyebrow="01 · Instruction" title="Describe the task">
-            <TextAreaField idPrefix={technique} name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What should the model do?" />
+            <TextAreaField idPrefix={technique} name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What should the model do?"  showError={showFieldError('taskDescription')} />
           </Section>
           <Section eyebrow="02 · Demonstration" title="Provide one ideal example">
             <div className="example-pair">
-              <TextAreaField idPrefix={technique} name="exampleInput" label="Example input" required register={register} errors={errors} watch={watch} placeholder="A representative input…" rows={3} />
-              <TextAreaField idPrefix={technique} name="expectedOutput" label="Expected output" required register={register} errors={errors} watch={watch} placeholder="The ideal response…" rows={3} />
+              <TextAreaField idPrefix={technique} name="exampleInput" label="Example input" required register={register} errors={errors} watch={watch} placeholder="A representative input…" rows={3}  showError={showFieldError('exampleInput')} />
+              <TextAreaField idPrefix={technique} name="expectedOutput" label="Expected output" required register={register} errors={errors} watch={watch} placeholder="The ideal response…" rows={3}  showError={showFieldError('expectedOutput')} />
             </div>
           </Section>
         </>
@@ -312,26 +352,26 @@ export default function TechniqueForm({ technique, active }) {
       {technique === 'few-shot' && (
         <>
           <Section eyebrow="01 · Instruction" title="Describe the task">
-            <TextAreaField idPrefix={technique} name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What pattern should the model learn?" />
+            <TextAreaField idPrefix={technique} name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What pattern should the model learn?"  showError={showFieldError('taskDescription')} />
           </Section>
           <Section eyebrow="02 · Demonstrations" title="Build an example set">
             <div className="dynamic-stack" ref={parent}>
               {examples.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Example" onRemove={() => examples.remove(index)}>
                   <div className="field-grid">
-                    <TextField idPrefix={technique} name={`examples.${index}.input`} label="Example input" required register={register} errors={errors} placeholder="Input or question" />
-                    <TextField idPrefix={technique} name={`examples.${index}.output`} label="Expected output" required register={register} errors={errors} placeholder="Ideal response" />
+                    <TextField idPrefix={technique} name={`examples.${index}.input`} label="Example input" required register={register} errors={errors} placeholder="Input or question" showError={showFieldError(`examples.${index}.input`)} />
+                    <TextField idPrefix={technique} name={`examples.${index}.output`} label="Expected output" required register={register} errors={errors} placeholder="Ideal response" showError={showFieldError(`examples.${index}.output`)} />
                   </div>
                 </DynamicRow>
               ))}
             </div>
-            <ArrayMessage visible={examples.fields.length === 0 || Boolean(arrayError('examples'))}>
+            <ArrayMessage visible={revealErrors && (examples.fields.length === 0 || Boolean(arrayError('examples')))}>
               {arrayError('examples') || 'At least one example is required.'}
             </ArrayMessage>
             <Button type="button" kind="tertiary" size="sm" renderIcon={(props) => <Add {...props} aria-hidden="true" />} onClick={() => examples.append({ input: '', output: '' })}>Add example</Button>
           </Section>
           <Section eyebrow="03 · Context" title="Add source material">
-            <AttachmentsField idPrefix={technique} selected={values.attachments || []} onChange={(next) => setValue('attachments', next, { shouldDirty: true, shouldValidate: true })} />
+            <AttachmentsField active={active} idPrefix={technique} selected={values.attachments || []} onChange={(next) => setValue('attachments', next, { shouldDirty: true, shouldValidate: true })} />
           </Section>
         </>
       )}
@@ -339,14 +379,14 @@ export default function TechniqueForm({ technique, active }) {
       {technique === 'chain-of-thought' && (
         <>
           <Section eyebrow="01 · Objective" title="Set the reasoning goal">
-            <TextAreaField idPrefix={technique} name="goal" label="Goal" required register={register} errors={errors} watch={watch} placeholder="What conclusion or solution should be reached?" />
+            <TextAreaField idPrefix={technique} name="goal" label="Goal" required register={register} errors={errors} watch={watch} placeholder="What conclusion or solution should be reached?"  showError={showFieldError('goal')} />
           </Section>
           <Section eyebrow="02 · Reasoning" title="Outline useful steps">
             <p className="section-help">Optional guidance. Blank steps are omitted from the assembled prompt.</p>
             <div className="dynamic-stack" ref={parent}>
               {reasoningSteps.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Reasoning step" onRemove={() => reasoningSteps.remove(index)}>
-                  <TextField idPrefix={technique} name={`reasoningSteps.${index}.step`} label={`Step ${index + 1}`} register={register} errors={errors} placeholder="Describe a reasoning checkpoint" />
+                  <TextField idPrefix={technique} name={`reasoningSteps.${index}.step`} label={`Step ${index + 1}`} register={register} errors={errors} placeholder="Describe a reasoning checkpoint" showError={showFieldError(`reasoningSteps.${index}.step`)} />
                 </DynamicRow>
               ))}
             </div>
@@ -368,23 +408,23 @@ export default function TechniqueForm({ technique, active }) {
       {technique === 'outcome-based' && (
         <>
           <Section eyebrow="01 · Objective" title="Define the desired outcome">
-            <TextAreaField idPrefix={technique} name="goal" label="Goal" required register={register} errors={errors} watch={watch} placeholder="Describe the end state you want…" />
+            <TextAreaField idPrefix={technique} name="goal" label="Goal" required register={register} errors={errors} watch={watch} placeholder="Describe the end state you want…"  showError={showFieldError('goal')} />
           </Section>
           <Section eyebrow="02 · Success" title="Make success measurable">
             <div className="dynamic-stack" ref={parent}>
               {successCriteria.fields.map((field, index) => (
                 <DynamicRow key={field.id} index={index} title="Success criterion" onRemove={() => successCriteria.remove(index)}>
-                  <TextField idPrefix={technique} name={`successCriteria.${index}.text`} label={`Criterion ${index + 1}`} required register={register} errors={errors} placeholder="What must be true for this to succeed?" />
+                  <TextField idPrefix={technique} name={`successCriteria.${index}.text`} label={`Criterion ${index + 1}`} required register={register} errors={errors} placeholder="What must be true for this to succeed?" showError={showFieldError(`successCriteria.${index}.text`)} />
                 </DynamicRow>
               ))}
             </div>
-            <ArrayMessage visible={successCriteria.fields.length === 0 || Boolean(arrayError('successCriteria'))}>
+            <ArrayMessage visible={revealErrors && (successCriteria.fields.length === 0 || Boolean(arrayError('successCriteria')))}>
               {arrayError('successCriteria') || 'At least one success criterion is required.'}
             </ArrayMessage>
             <Button type="button" kind="tertiary" size="sm" renderIcon={(props) => <Add {...props} aria-hidden="true" />} onClick={() => successCriteria.append({ text: '' })}>Add success criterion</Button>
             <SelectField idPrefix={technique} name="measurement" label="Measurement" required register={register} errors={errors} options={[
               ['qualitative', 'Qualitative review'], ['score', 'Numeric score'], ['percentage', 'Percentage'], ['pass-fail', 'Pass / fail'],
-            ]} />
+            ]}  showError={showFieldError('measurement')} />
           </Section>
         </>
       )}
@@ -393,15 +433,15 @@ export default function TechniqueForm({ technique, active }) {
         <>
           <Section eyebrow="01 · Perspective" title="Assign expertise">
             <div className="field-grid">
-              <TextField idPrefix={technique} name="role" label="Role or persona" required register={register} errors={errors} placeholder="e.g. Senior product strategist" />
-              <TextField idPrefix={technique} name="audience" label="Audience" register={register} errors={errors} placeholder="e.g. Product leadership" />
+              <TextField idPrefix={technique} name="role" label="Role or persona" required register={register} errors={errors} placeholder="e.g. Senior product strategist"  showError={showFieldError('role')} />
+              <TextField idPrefix={technique} name="audience" label="Audience" register={register} errors={errors} placeholder="e.g. Product leadership"  showError={showFieldError('audience')} />
             </div>
           </Section>
           <Section eyebrow="02 · Instruction" title="Describe the task">
-            <TextAreaField idPrefix={technique} name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What should this expert accomplish?" />
+            <TextAreaField idPrefix={technique} name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What should this expert accomplish?"  showError={showFieldError('taskDescription')} />
           </Section>
           <Section eyebrow="03 · Context" title="Add source material">
-            <AttachmentsField idPrefix={technique} selected={values.attachments || []} onChange={(next) => setValue('attachments', next, { shouldDirty: true, shouldValidate: true })} />
+            <AttachmentsField active={active} idPrefix={technique} selected={values.attachments || []} onChange={(next) => setValue('attachments', next, { shouldDirty: true, shouldValidate: true })} />
           </Section>
         </>
       )}
@@ -409,7 +449,7 @@ export default function TechniqueForm({ technique, active }) {
       {technique === 'constraint-based' && (
         <>
           <Section eyebrow="01 · Instruction" title="Describe the task">
-            <TextAreaField idPrefix={technique} name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What should the model produce?" />
+            <TextAreaField idPrefix={technique} name="taskDescription" label="Task description" required register={register} errors={errors} watch={watch} placeholder="What should the model produce?"  showError={showFieldError('taskDescription')} />
           </Section>
           <Section eyebrow="02 · Boundaries" title="Set explicit constraints">
             <div className="dynamic-stack" ref={parent}>
@@ -423,12 +463,12 @@ export default function TechniqueForm({ technique, active }) {
                       <SelectItem value="style" text="Style" />
                       <SelectItem value="other" text="Other" />
                     </Select>
-                    <TextField idPrefix={technique} name={`constraints.${index}.text`} label="Constraint text" required register={register} errors={errors} placeholder="State the boundary precisely" />
+                    <TextField idPrefix={technique} name={`constraints.${index}.text`} label="Constraint text" required register={register} errors={errors} placeholder="State the boundary precisely" showError={showFieldError(`constraints.${index}.text`)} />
                   </div>
                 </DynamicRow>
               ))}
             </div>
-            <ArrayMessage visible={constraints.fields.length === 0 || Boolean(arrayError('constraints'))}>
+            <ArrayMessage visible={revealErrors && (constraints.fields.length === 0 || Boolean(arrayError('constraints')))}>
               {arrayError('constraints') || 'At least one constraint is required.'}
             </ArrayMessage>
             <Button type="button" kind="tertiary" size="sm" renderIcon={(props) => <Add {...props} aria-hidden="true" />} onClick={() => constraints.append({ type: 'length', text: '' })}>Add constraint</Button>
@@ -449,14 +489,31 @@ export default function TechniqueForm({ technique, active }) {
             renderIcon={(props) => <Reset {...props} aria-hidden="true" />}
             onClick={() => {
               setChrome({ assetPickerOpen: false })
+              setSubmitAttempted(false)
               resetTechnique(technique)
             }}
           >
             Reset form
           </Button>
-          <Button type="submit" kind="primary" size="md" renderIcon={(props) => <ArrowRight {...props} aria-hidden="true" />} disabled={!isValid}>
-            Generate prompt
-          </Button>
+          <span
+            className={`submit-proxy ${isValid ? '' : 'is-blocked'}`}
+            onClick={() => {
+              if (isValid) return
+              setSubmitAttempted(true)
+              trigger()
+              setAnnouncement('Prompt not generated. Resolve the named fields and try again.')
+            }}
+          >
+            <Button
+              type="submit"
+              kind="primary"
+              size="md"
+              renderIcon={(props) => <ArrowRight {...props} aria-hidden="true" />}
+              disabled={!isValid}
+            >
+              Generate prompt
+            </Button>
+          </span>
         </div>
       </div>
     </form>

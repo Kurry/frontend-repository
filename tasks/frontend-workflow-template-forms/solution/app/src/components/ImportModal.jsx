@@ -51,15 +51,14 @@ export default function ImportModal({ launcherButtonRef }) {
   useEffect(() => {
     if (!open) return undefined
     function onKeyDown(event) {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        event.stopPropagation()
-        close()
-      }
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      event.stopPropagation()
+      close()
     }
-    window.addEventListener('keydown', onKeyDown, true)
-    return () => window.removeEventListener('keydown', onKeyDown, true)
-  }, [open])
+    document.addEventListener('keydown', onKeyDown, true)
+    return () => document.removeEventListener('keydown', onKeyDown, true)
+  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function close() {
     setChrome({ importModalOpen: false })
@@ -104,16 +103,22 @@ export default function ImportModal({ launcherButtonRef }) {
     await trigger('documentText')
   }
 
+  if (!open) return null
+
   return (
     <Modal
-      open={open}
+      open
       modalHeading="Import library JSON"
       modalLabel="Validated replacement"
       primaryButtonText="Replace library"
       secondaryButtonText="Cancel"
       onRequestSubmit={attemptImport}
       onRequestClose={close}
+      onSecondarySubmit={close}
+      preventCloseOnClickOutside={false}
       size="md"
+      className="scale-modal"
+      selectorPrimaryFocus="#import-document-text"
     >
       <p className="modal-copy">Importing a conforming Template Forms document replaces the current in-memory library. Invalid files leave it unchanged.</p>
       <FileUploaderDropContainer
@@ -126,7 +131,8 @@ export default function ImportModal({ launcherButtonRef }) {
       <div className="import-divider"><span>or paste JSON</span></div>
       <TextArea
         id="import-document-text"
-        labelText={<>Library document <span className="required-mark" aria-hidden="true">*</span></>}
+        data-modal-primary-focus
+        labelText="Library document"
         rows={10}
         placeholder={'{\n  "schemaVersion": 1,\n  "product": "Template Forms",\n  ...\n}'}
         invalid={Boolean(errors.documentText || submitError)}

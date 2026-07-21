@@ -40,15 +40,14 @@ export default function SaveModal({ launcherButtonRef }) {
   useEffect(() => {
     if (!open) return undefined
     function onKeyDown(event) {
-      if (event.key === 'Escape') {
-        event.preventDefault()
-        event.stopPropagation()
-        close()
-      }
+      if (event.key !== 'Escape') return
+      event.preventDefault()
+      event.stopPropagation()
+      close()
     }
-    window.addEventListener('keydown', onKeyDown, true)
-    return () => window.removeEventListener('keydown', onKeyDown, true)
-  }, [open])
+    document.addEventListener('keydown', onKeyDown, true)
+    return () => document.removeEventListener('keydown', onKeyDown, true)
+  }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function close() {
     setChrome({ saveModalOpen: false })
@@ -75,9 +74,11 @@ export default function SaveModal({ launcherButtonRef }) {
     setTimeout(() => { setSubmitting(false) }, 300)
   }
 
+  if (!open) return null
+
   return (
     <Modal
-      open={open}
+      open
       modalHeading="Save prompt to library"
       modalLabel={techniqueById[technique].name}
       primaryButtonText="Save prompt"
@@ -85,14 +86,18 @@ export default function SaveModal({ launcherButtonRef }) {
       primaryButtonDisabled={!isValid || submitting}
       onRequestSubmit={handleSubmit(confirm)}
       onRequestClose={close}
+      onSecondarySubmit={close}
       preventCloseOnClickOutside={false}
       shouldSubmitOnEnter
       size="sm"
+      className="scale-modal"
+      selectorPrimaryFocus="#library-title"
     >
       <p className="modal-copy">Give this prompt a clear name so it is easy to find and reuse later.</p>
       <TextInput
         id="library-title"
-        labelText={<>Title <span className="required-mark" aria-hidden="true">*</span></>}
+        data-modal-primary-focus
+        labelText="Title"
         placeholder="Name this prompt"
         invalid={Boolean(errors.title)}
         invalidText={errors.title?.message}

@@ -3,12 +3,13 @@ import { Add, Close, DocumentAttachment } from '@carbon/icons-react'
 import { REFERENCE_ASSETS } from '../domain'
 import { useStudioStore } from '../store'
 
-export default function AttachmentsField({ selected, onChange, idPrefix = 'attachments' }) {
+export default function AttachmentsField({ selected, onChange, idPrefix = 'attachments', active = true }) {
   const open = useStudioStore((state) => state.assetPickerOpen)
   const setChrome = useStudioStore((state) => state.setChrome)
   const available = REFERENCE_ASSETS.filter((asset) => !selected.includes(asset.name))
   const labelId = `${idPrefix}-reference-documents-label`
   const pickerId = `${idPrefix}-asset-picker`
+  const pickerVisible = active && open
 
   function add(name) {
     onChange([...selected, name])
@@ -30,9 +31,10 @@ export default function AttachmentsField({ selected, onChange, idPrefix = 'attac
           onClick={(event) => {
             event.preventDefault()
             event.stopPropagation()
+            if (!active) return
             setChrome({ assetPickerOpen: !open })
           }}
-          aria-expanded={open}
+          aria-expanded={pickerVisible}
           aria-controls={pickerId}
         >
           Add document
@@ -66,7 +68,7 @@ export default function AttachmentsField({ selected, onChange, idPrefix = 'attac
         <p className="empty-inline">No reference documents added.</p>
       )}
 
-      {open && (
+      {pickerVisible && (
         <div className="asset-picker" id={pickerId} role="listbox" aria-label="Choose a reference document">
           <div className="asset-picker__top">
             <div>
