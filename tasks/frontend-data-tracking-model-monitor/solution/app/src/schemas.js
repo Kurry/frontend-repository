@@ -10,7 +10,7 @@ export const modelSchema = z.object({
   output_cost_per_1k: z.number().nonnegative(),
   pricing_tier: z.enum(['free', 'paid']),
   pinned: z.boolean(),
-})
+}).strict()
 
 export const usageEventSchema = z.object({
   timestamp: z.iso.datetime(),
@@ -19,14 +19,14 @@ export const usageEventSchema = z.object({
   prompt_tokens: z.number().int().nonnegative(),
   completion_tokens: z.number().int().nonnegative(),
   cost: z.number().nonnegative(),
-})
+}).strict()
 
 export const alertSchema = z.object({
   alerts_enabled: z.boolean(),
   min_context_window: z.number({ error: namedMessage('Minimum context window', 'is required') })
     .int(namedMessage('Minimum context window', 'must be a whole number'))
     .nonnegative(namedMessage('Minimum context window', 'must be 0 or greater')),
-})
+}).strict()
 
 export const budgetSchema = z.object({
   session_budget_usd: z.string().min(1, namedMessage('Session budget', 'is required'))
@@ -56,7 +56,7 @@ export const sessionReportSchema = z.object({
     model: z.string().min(1),
     requests: z.number().int().nonnegative(),
     subtotal: z.number().nonnegative(),
-  })),
+  }).strict()),
   session_total: z.number().nonnegative(),
   total_requests: z.number().int().nonnegative(),
   alert_config: alertSchema,
@@ -64,6 +64,52 @@ export const sessionReportSchema = z.object({
     .refine((value) => Math.abs(value * 100 - Math.round(value * 100)) < Number.EPSILON * 100, 'Session budget must have at most 2 decimal places'),
   compare_selected: z.array(z.string()),
   pinned_models: z.array(z.string()),
+}).strict().superRefine((report, ctx) => {
+  const modelNames = report.catalog.map((model) => model.name)
+  const catalogNames = new Set(modelNames)
+  if (catalogNames.size !== modelNames.length) {
+    ctx.addIssue({ code: 'custom', path: ['catalog'], message: 'Catalog model names must be unique' })
+  }
+
+  const expectedPins = report.catalog.filter((model) => model.pinned).map((model) => model.name)
+  if (new Set(report.pinned_models).size !== report.pinned_models.length
+    || report.pinned_models.length !== expectedPins.length
+    || report.pinned_models.some((name) => !expectedPins.includes(name))) {
+    ctx.addIssue({ code: 'custom', path: ['pinned_models'], message: 'Pinned models must exactly match catalog pin flags' })
+  }
+
+  if (new Set(report.compare_selected).size !== report.compare_selected.length
+    || report.compare_selected.some((name) => !catalogNames.has(name))) {
+    ctx.addIssue({ code: 'custom', path: ['compare_selected'], message: 'Compare selection must contain unique catalog model names' })
+  }
+
+  const rollupsByModel = new Map()
+  report.usage_events.forEach((event) => {
+    const row = rollupsByModel.get(event.model) || { model: event.model, requests: 0, subtotal: 0 }
+    row.requests += 1
+    row.subtotal = Number((row.subtotal + event.cost).toFixed(8))
+    rollupsByModel.set(event.model, row)
+  })
+  const expectedRollups = [...rollupsByModel.values()].sort((a, b) => b.subtotal - a.subtotal)
+  const rollupsMatch = report.cost_rollups.length === expectedRollups.length
+    && report.cost_rollups.every((row, index) => {
+      const expected = expectedRollups[index]
+      return expected
+        && row.model === expected.model
+        && row.requests === expected.requests
+        && Math.abs(row.subtotal - expected.subtotal) <= 1e-8
+    })
+  if (!rollupsMatch) {
+    ctx.addIssue({ code: 'custom', path: ['cost_rollups'], message: 'Cost rollups must match usage events' })
+  }
+
+  if (report.total_requests !== report.usage_events.length) {
+    ctx.addIssue({ code: 'custom', path: ['total_requests'], message: 'Total requests must match usage event count' })
+  }
+  const expectedTotal = Number(expectedRollups.reduce((sum, row) => sum + row.subtotal, 0).toFixed(8))
+  if (Math.abs(report.session_total - expectedTotal) > 1e-8) {
+    ctx.addIssue({ code: 'custom', path: ['session_total'], message: 'Session total must match cost rollups' })
+  }
 })
 
 export const importInputSchema = z.object({
