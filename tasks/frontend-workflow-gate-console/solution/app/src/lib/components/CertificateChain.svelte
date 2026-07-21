@@ -59,7 +59,7 @@
   .chain-scroll { overflow-x:auto; padding:.2rem .1rem .5rem; }
   .chain { width:max-content; min-width:100%; display:flex; align-items:center; gap:.35rem; flex-wrap:nowrap; }
   .chain-node { width:5.6rem; flex:0 0 5.6rem; min-width:5.6rem; display:flex; flex-direction:column; align-items:center; color:inherit; background:transparent; border:0; border-radius:.6rem; padding:.35rem .15rem; }
-  .chain-node.clickable { cursor:pointer; transition:background-color .18s, transform .16s; }
+  .chain-node.clickable { cursor:pointer; transition:background-color .09s, transform .16s; }
   .chain-node.clickable:hover { background:rgba(75,148,162,.09); transform:translateY(-2px); }
   .node-icon { display:grid; place-items:center; width:2.4rem; height:2.4rem; border-radius:.65rem; }
   .node-stage { margin-top:.35rem; max-width:100%; font-size:.58rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }

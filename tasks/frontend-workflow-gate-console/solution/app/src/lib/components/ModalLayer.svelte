@@ -68,7 +68,9 @@
     const anchor = document.createElement('a');
     anchor.href = url;
     anchor.download = `${consoleStore.selectedRun.id.toLowerCase()}-${json ? 'acceptance-package.json' : 'certificate-chain.md'}`;
+    document.body.appendChild(anchor);
     anchor.click();
+    anchor.remove();
     URL.revokeObjectURL(url);
     consoleStore.showToast(json ? 'Acceptance package downloaded' : 'Certificate chain downloaded');
   }
