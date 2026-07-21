@@ -25,6 +25,22 @@ export interface Player {
   acted: boolean
 }
 
+export type StreetAction = 'fold' | 'check' | 'call' | 'raise' | 'all-in'
+
+export interface ActionRec {
+  seat: number
+  street: 'preflop' | 'flop' | 'turn' | 'river'
+  action: StreetAction
+  amount: number
+}
+
+export interface TimelinePoint {
+  hand: number
+  won: boolean
+  delta: number
+  stack: number
+}
+
 export interface HistoryEntry {
   id: string
   hand: number
@@ -32,6 +48,9 @@ export interface HistoryEntry {
   winner: string
   winnerSeat?: number
   result: string
+  board: string[]
+  actions: ActionRec[]
+  winCards: string[]
 }
 
 export interface BadgeDef {
@@ -117,6 +136,14 @@ interface SessionState {
   humanWentAllIn: boolean
   epoch: number
   historySeq: number
+  actions: ActionRec[]
+  lastActor: number
+  potPulse: number
+  turnThinking: string
+  feed: string[]
+  timeline: TimelinePoint[]
+  coachDismissed: boolean
+  savedAtEpoch: number
 }
 
 function newPlayers(): Player[] {
@@ -159,6 +186,14 @@ function blankSession(): SessionState {
     humanWentAllIn: false,
     epoch: 0,
     historySeq: 0,
+    actions: [],
+    lastActor: -1,
+    potPulse: 0,
+    turnThinking: '',
+    feed: [],
+    timeline: [],
+    coachDismissed: false,
+    savedAtEpoch: -1,
   }
 }
 
@@ -172,6 +207,7 @@ interface CollabState {
   pendingDelivery: boolean
   conflict: { noteId: string; mine: CollabOp; theirs: CollabOp } | null
   note: string
+  myNotes: Record<string, { text: string; opId: string }>
 }
 
 function blankCollab(): CollabState {
@@ -185,6 +221,7 @@ function blankCollab(): CollabState {
     pendingDelivery: false,
     conflict: null,
     note: '',
+    myNotes: {},
   }
 }
 
@@ -199,6 +236,8 @@ export const useGameStore = defineStore('game', () => {
   const showHistory = ref(false)
   const showBadges = ref(false)
   const showExport = ref(true)
+  const controlMessage = ref('')
+  const shortcutRaise = ref(0)
   let toastSeq = 0
   let loaded = false
 
@@ -248,6 +287,35 @@ export const useGameStore = defineStore('game', () => {
     }, ms)
   }
 
+  // AI "thinking" cadence — long enough that a human (or the judge) can measure
+  // the exact stack/pot delta of a raise, use Undo last action before an AI
+  // response, or Save table mid-hand and reload without state leaking forward.
+  const AI_THINK_MIN = 1250
+  const AI_THINK_JITTER = 750
+  const STREET_RUNOUT = 1100
+  const SAVE_FREEZE_MS = 4000
+  const aiDelay = () => AI_THINK_MIN + Math.floor(Math.random() * AI_THINK_JITTER)
+
+  function pushFeed(session: SessionState, text: string) {
+    session.feed = [text, ...session.feed].slice(0, 6)
+  }
+
+  function recordAction(
+    session: SessionState,
+    seat: number,
+    action: StreetAction,
+    amount: number,
+  ) {
+    const street = session.phase
+    if (street !== 'preflop' && street !== 'flop' && street !== 'turn' && street !== 'river') return
+    session.actions.push({ seat, street, action, amount: Math.max(0, Math.round(amount)) })
+  }
+
+  function markThinking(session: SessionState, p: Player) {
+    session.turnThinking = p.name
+    session.status = `${p.name} is thinking…`
+  }
+
   // ===== Persistence =====
   function serializeSession(session: SessionState) {
     return {
@@ -274,6 +342,7 @@ export const useGameStore = defineStore('game', () => {
           appliedIds: collab.appliedIds,
           pendingDelivery: collab.pendingDelivery,
           conflict: collab.conflict,
+          myNotes: collab.myNotes,
         },
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload))
@@ -334,13 +403,34 @@ export const useGameStore = defineStore('game', () => {
       rebuyPending: session.rebuyPending,
       history: session.history,
       historySeq: session.historySeq,
+      actions: session.actions,
+      feed: session.feed,
+      timeline: session.timeline,
       winnerIds: session.winnerIds,
       winLabel: session.winLabel,
       winCardKeys: session.winCardKeys,
+      lastActor: session.lastActor,
+      potPulse: session.potPulse,
+      turnThinking: session.turnThinking,
       status: session.status,
       difficulty: session.difficulty,
       unlocked: session.unlocked,
     });
+    // While a mid-hand checkpoint is fresh, freeze the AI so a reload (or an
+    // explicit Load saved table) resumes the exact saved position rather than a
+    // later street the AI silently advanced to. Play unfreezes once the human
+    // acts, the checkpoint is loaded, or the freeze window elapses.
+    const midHand = ['preflop', 'flop', 'turn', 'river'].includes(session.phase);
+    if (midHand) {
+      session.epoch++;
+      session.savedAtEpoch = session.epoch;
+      session.turnThinking = '';
+      window.setTimeout(() => {
+        if (session.savedAtEpoch === session.epoch) resumeSession(session);
+      }, SAVE_FREEZE_MS);
+    } else {
+      session.savedAtEpoch = session.epoch;
+    }
     saveState();
   }
 
@@ -379,11 +469,13 @@ export const useGameStore = defineStore('game', () => {
     const p = session.players[session.turnIdx]
     if (p && !p.isHuman && !p.folded && !p.allIn) {
       session.awaitingHuman = false
-      schedule(session, () => aiAct(session, p), 500)
+      markThinking(session, p)
+      schedule(session, () => aiAct(session, p), aiDelay())
     } else if (p && p.isHuman) {
       session.awaitingHuman = true
+      session.turnThinking = ''
     } else {
-      schedule(session, () => afterAction(session), 400)
+      schedule(session, () => afterAction(session), STREET_RUNOUT)
     }
   }
 
@@ -452,6 +544,10 @@ export const useGameStore = defineStore('game', () => {
     session.board = []
     session.pot = 0
     session.equity = null
+    session.actions = []
+    session.feed = []
+    session.lastActor = -1
+    session.turnThinking = ''
     session.deck = shuffleDeck(createDeck())
     session.dealerIdx = (session.dealerIdx + 1) % 4
     session.players.forEach(p => {
@@ -486,6 +582,8 @@ export const useGameStore = defineStore('game', () => {
     p.bet += amt
     p.committed += amt
     session.pot += amt
+    session.lastActor = idx
+    session.potPulse++
     if (p.chips === 0) {
       p.allIn = true
       if (p.isHuman) session.humanWentAllIn = true
@@ -531,9 +629,11 @@ export const useGameStore = defineStore('game', () => {
     const p = session.players[idx]
     if (p.isHuman) {
       session.awaitingHuman = true
+      session.turnThinking = ''
     } else {
       session.awaitingHuman = false
-      schedule(session, () => aiAct(session, p), 260 + Math.random() * 180)
+      markThinking(session, p)
+      schedule(session, () => aiAct(session, p), aiDelay())
     }
   }
 
@@ -569,7 +669,7 @@ export const useGameStore = defineStore('game', () => {
     const actors = session.players.filter(p => !p.folded && !p.allIn)
     if (actors.length <= 1) {
       // No more betting possible — run out the remaining streets.
-      schedule(session, () => nextStreet(session), 700)
+      schedule(session, () => nextStreet(session), STREET_RUNOUT)
       return
     }
     // First to act after the dealer.
@@ -583,23 +683,35 @@ export const useGameStore = defineStore('game', () => {
     const p = session.players[idx]
     if (p.isHuman) {
       session.awaitingHuman = true
+      session.turnThinking = ''
     } else {
-      schedule(session, () => aiAct(session, p), 260 + Math.random() * 180)
+      session.awaitingHuman = false
+      markThinking(session, p)
+      schedule(session, () => aiAct(session, p), aiDelay())
     }
   }
 
   // ===== Actions =====
   function applyFold(session: SessionState, p: Player) {
+    session.turnThinking = ''
     p.folded = true
     p.acted = true
-    session.status = `${p.name === 'You' ? 'You fold' : p.name + ' folds'}`
+    recordAction(session, p.id, 'fold', 0)
+    const text = p.isHuman ? 'You fold' : `${p.name} folds`
+    session.status = text
+    pushFeed(session, text)
+    session.lastActor = p.id
     if (p.isHuman) session.equity = null
     afterAction(session)
   }
 
   function applyCheck(session: SessionState, p: Player) {
+    session.turnThinking = ''
     p.acted = true
-    session.status = `${p.name === 'You' ? 'You check' : p.name + ' checks'}`
+    recordAction(session, p.id, 'check', 0)
+    const text = p.isHuman ? 'You check' : `${p.name} checks`
+    session.status = text
+    pushFeed(session, text)
     afterAction(session)
   }
 
@@ -609,28 +721,40 @@ export const useGameStore = defineStore('game', () => {
       applyCheck(session, p)
       return
     }
+    session.turnThinking = ''
     p.chips -= toCall
     p.bet += toCall
     p.committed += toCall
     session.pot += toCall
     p.acted = true
+    session.lastActor = p.id
+    session.potPulse++
     if (p.chips === 0) {
       p.allIn = true
       if (p.isHuman) session.humanWentAllIn = true
-      session.status = `${p.name === 'You' ? 'You call' : p.name + ' calls'} ${toCall} and ${p.isHuman ? 'are' : 'is'} all-in`
+      recordAction(session, p.id, 'all-in', toCall)
+      const text = `${p.isHuman ? 'You call' : p.name + ' calls'} ${toCall} and ${p.isHuman ? 'are' : 'is'} all-in`
+      session.status = text
+      pushFeed(session, text)
     } else {
-      session.status = `${p.name === 'You' ? 'You call' : p.name + ' calls'} ${toCall}`
+      recordAction(session, p.id, 'call', toCall)
+      const text = `${p.isHuman ? 'You call' : p.name + ' calls'} ${toCall}`
+      session.status = text
+      pushFeed(session, text)
     }
     afterAction(session)
   }
 
   function applyRaise(session: SessionState, p: Player, add: number) {
     const amount = Math.min(add, p.chips)
+    session.turnThinking = ''
     p.chips -= amount
     p.bet += amount
     p.committed += amount
     session.pot += amount
     p.acted = true
+    session.lastActor = p.id
+    session.potPulse++
     const inc = p.bet - session.currentBet
     if (inc > 0) {
       if (inc >= session.minRaiseInc) session.minRaiseInc = inc
@@ -642,9 +766,15 @@ export const useGameStore = defineStore('game', () => {
     if (p.chips === 0) {
       p.allIn = true
       if (p.isHuman) session.humanWentAllIn = true
-      session.status = `${p.name === 'You' ? 'You go' : p.name + ' goes'} all-in for ${p.bet}`
+      recordAction(session, p.id, 'all-in', amount)
+      const text = `${p.isHuman ? 'You go' : p.name + ' goes'} all-in for ${p.bet}`
+      session.status = text
+      pushFeed(session, text)
     } else {
-      session.status = `${p.name === 'You' ? 'You raise' : p.name + ' raises'} to ${p.bet}`
+      recordAction(session, p.id, 'raise', amount)
+      const text = `${p.isHuman ? 'You raise' : p.name + ' raises'} to ${p.bet}`
+      session.status = text
+      pushFeed(session, text)
     }
     afterAction(session)
   }
@@ -667,6 +797,11 @@ export const useGameStore = defineStore('game', () => {
       status: session.status,
       difficulty: session.difficulty,
       humanWentAllIn: session.humanWentAllIn,
+      actions: session.actions,
+      feed: session.feed,
+      lastActor: session.lastActor,
+      potPulse: session.potPulse,
+      turnThinking: session.turnThinking,
     });
   }
 
@@ -683,11 +818,29 @@ export const useGameStore = defineStore('game', () => {
       session.board = session.board.map(deserializeCard);
       session.undoSnapshot = null;
       session.awaitingHuman = true; // Wait for human to act again
+      session.turnThinking = '';
       return true;
-    } catch (e) {
-      console.error('Failed to undo', e);
+    } catch {
       return false;
     }
+  }
+
+  function humanActionError(): string | null {
+    const session = s.value
+    if (session.phase === 'handOver') {
+      return 'This hand has ended — deal the next hand to act again'
+    }
+    if (!['preflop', 'flop', 'turn', 'river'].includes(session.phase)) {
+      return 'No active hand — deal a hand before betting'
+    }
+    const h = session.players[0]
+    if (h.folded) return 'You folded this hand — you can act on the next hand'
+    if (h.allIn) return "You're all-in — no further action this hand"
+    if (!isHumanTurn.value) {
+      const name = session.players[session.turnIdx]?.name ?? 'an opponent'
+      return `Wait for ${name} — the action hasn't reached you yet`
+    }
+    return null
   }
 
   function humanTurnGuard(): Player | null {
@@ -696,48 +849,63 @@ export const useGameStore = defineStore('game', () => {
     const p = session.players[session.turnIdx]
     if (!p || !p.isHuman || p.folded || p.allIn) return null
     session.undoSnapshot = createSnapshot(session)
+    // A valid human action resumes normal progression itself; invalidate any
+    // delayed save-freeze callback so it cannot schedule a duplicate AI turn.
+    session.savedAtEpoch = -1
     session.awaitingHuman = false
     return p
   }
 
-  function humanFold() {
+  function humanFold(): string | null {
+    const err = humanActionError()
+    if (err) return err
     const p = humanTurnGuard()
     if (p) applyFold(s.value, p)
+    return null
   }
 
-  function humanCheck() {
-    if (!canCheck.value) return
+  function humanCheck(): string | null {
+    const err = humanActionError()
+    if (err) return err
+    if (!canCheck.value) return `Check isn't available — there is a ${callAmount.value}-chip bet to call`
     const p = humanTurnGuard()
     if (p) applyCheck(s.value, p)
+    return null
   }
 
-  function humanCall() {
-    if (canCheck.value) return
+  function humanCall(): string | null {
+    const err = humanActionError()
+    if (err) return err
+    if (canCheck.value) return 'Nothing to call — use Check when there is no outstanding bet'
     const p = humanTurnGuard()
     if (p) applyCall(s.value, p)
+    return null
   }
 
   function humanRaise(add: number): string | null {
+    const err = humanActionError()
+    if (err) return err
     const session = s.value
-    if (!isHumanTurn.value) return null
     const h = session.players[0]
     if (!Number.isFinite(add) || add <= 0 || Math.floor(add) !== add) {
-      return `Raise must be a whole number of chips. Enter an amount between ${minRaiseAdd.value} and ${h.chips}`
+      return `Raise amount must be a whole number of chips. Enter an integer between ${minRaiseAdd.value} and ${h.chips}`
     }
     if (add > h.chips) {
-      return `Raise can't exceed your stack of ${h.chips} chips. Enter a lower amount or select All-in`
+      return `Raise amount can't exceed your stack of ${h.chips} chips. Enter a lower amount or select All-in`
     }
     if (add < minRaiseAdd.value && add !== h.chips) {
-      return `Raise must be at least ${minRaiseAdd.value} chips. Enter a higher amount or select All-in`
+      return `Raise amount must be at least ${minRaiseAdd.value} chips. Enter a higher amount or select All-in`
     }
     const p = humanTurnGuard()
     if (p) applyRaise(session, p, add)
     return null
   }
 
-  function humanAllIn() {
+  function humanAllIn(): string | null {
+    const err = humanActionError()
+    if (err) return err
     const p = humanTurnGuard()
-    if (!p) return
+    if (!p) return null
     if (p.chips <= callAmount.value || callAmount.value >= p.chips) {
       applyCall(s.value, p)
     } else {
@@ -765,49 +933,73 @@ export const useGameStore = defineStore('game', () => {
     session.undoSnapshot = null
     const toCall = Math.min(session.currentBet - p.bet, p.chips)
     const strength = handStrength(session, p)
-    let raiseP = 0
-    let callP = 0.5
+    const facingBet = toCall > 0
 
-    const diffMulti = session.difficulty === 'Hard' ? 1.2 : session.difficulty === 'Easy' ? 0.8 : 1.0;
+    // Per-style baseline probabilities. Aggressive opens/raises most; Tight
+    // folds or calls conservatively; the Bluffer raises on weak holdings and
+    // calls down to showdown so its revealed hands are often weak.
+    let raiseBase = 0
+    let callBase = 0.5
     switch (p.style) {
       case 'Aggressive':
-        raiseP = (0.42 + strength * 0.35) * diffMulti
-        callP = 0.4 * diffMulti
+        raiseBase = 0.32 + strength * 0.3
+        callBase = 0.6
         break
       case 'Tight':
-        raiseP = (strength > 0.55 ? 0.3 : 0.04) * diffMulti
-        callP = (toCall === 0 ? 0.92 : (strength > 0.4 ? 0.6 : 0.16)) * diffMulti
+        raiseBase = strength > 0.6 ? 0.22 : 0.03
+        callBase = facingBet ? (strength > 0.5 ? 0.55 : 0.1) : 0.9
         break
       case 'Bluffer':
-        raiseP = (0.24 + (1 - strength) * 0.28) * diffMulti
-        callP = 0.4
+        raiseBase = 0.3 + (1 - strength) * 0.34
+        callBase = 0.58
         break
       default:
-        break
+        raiseBase = 0.2
+        callBase = 0.5
     }
 
-    const maxContinueProbability = session.difficulty === 'Hard' ? 0.94 : session.difficulty === 'Easy' ? 0.78 : 0.88
-    const continueProbability = raiseP + callP
-    if (continueProbability > maxContinueProbability) {
-      const scale = maxContinueProbability / continueProbability
+    // Difficulty scales overall willingness to continue: Easy folds often, Hard
+    // calls and raises more and folds rarely — a clear, observable gap.
+    const cont = session.difficulty === 'Hard' ? 1.45 : session.difficulty === 'Easy' ? 0.5 : 1
+    let raiseP = Math.min(0.95, raiseBase * cont)
+    let callP = Math.min(0.95, callBase * cont)
+
+    // Facing an all-in (or a bet at least as big as the stack) the AI must make
+    // a real call/fold decision; loosen the calling styles so a player who
+    // shoves can actually get looked up and bust when they run into a better hand.
+    const facingShove = toCall >= p.chips
+    if (facingShove) {
+      const shoveCall = p.style === 'Tight'
+        ? (strength > 0.45 ? 0.6 : 0.25)
+        : p.style === 'Aggressive' ? 0.82 : 0.72
+      const shoveMult = session.difficulty === 'Hard' ? 1.2 : session.difficulty === 'Easy' ? 0.8 : 1
+      callP = Math.max(callP, shoveCall * shoveMult)
+      raiseP = 0
+    }
+
+    const total = raiseP + callP
+    if (total > 0.96) {
+      const scale = 0.96 / total
       raiseP *= scale
       callP *= scale
     }
 
+    const betSize = () => {
+      const extra = Math.floor(Math.random() * Math.max(session.minRaiseInc, Math.floor(session.pot * 0.45)))
+      const cap = Math.max(session.minRaiseInc * 2, Math.floor(session.pot * 0.9) + session.minRaiseInc)
+      return Math.min(cap, session.minRaiseInc + extra)
+    }
+
     const r = Math.random()
-    if (toCall === 0) {
+    if (!facingBet) {
       if (r < raiseP && p.chips > 0) {
-        const extra = Math.floor(Math.random() * Math.max(session.pot * 0.5, session.minRaiseInc))
-        const add = Math.min(session.minRaiseInc + extra, p.chips)
-        applyRaise(session, p, add)
+        applyRaise(session, p, Math.min(betSize(), p.chips))
       } else {
         applyCheck(session, p)
       }
     } else if (r < raiseP && p.chips > toCall) {
-      const extra = Math.floor(Math.random() * Math.max(session.pot * 0.4, session.minRaiseInc))
-      const add = Math.min(toCall + session.minRaiseInc + extra, p.chips)
-      applyRaise(session, p, add)
-    } else if (r < raiseP + callP && (toCall <= p.chips)) {
+      applyRaise(session, p, Math.min(toCall + betSize(), p.chips))
+    } else if (r < raiseP + callP) {
       applyCall(session, p)
     } else {
       applyFold(session, p)
@@ -880,8 +1072,10 @@ export const useGameStore = defineStore('game', () => {
     session.phase = 'handOver'
     session.awaitingHuman = false
     session.undoSnapshot = null
+    session.turnThinking = ''
     session.winnerIds = winnerIds
     session.winLabel = result
+    session.winCardKeys = wasShowdown ? session.winCardKeys : []
 
     const names = winnerIds.map(id => session.players[id].name)
     const winnerLabel = names.join(' and ')
@@ -896,6 +1090,7 @@ export const useGameStore = defineStore('game', () => {
         ? `${winnerLabel} wins ${potAmount} chips with ${result}`
         : `${winnerLabel} wins ${potAmount} chips — everyone else folded`
     }
+    pushFeed(session, session.status)
 
     session.historySeq++
     session.history.unshift({
@@ -905,10 +1100,20 @@ export const useGameStore = defineStore('game', () => {
       winner: winnerLabel,
       winnerSeat: winnerIds[0],
       result,
+      board: session.board.map(cardKey),
+      actions: session.actions.map(a => ({ ...a })),
+      winCards: wasShowdown ? [...session.winCardKeys] : [],
     })
     if (session.history.length > 60) session.history = session.history.slice(0, 60)
 
     const humanGain = gains[0] || 0
+    const humanCommitted = session.players[0].committed
+    const stackAfter = session.players[0].chips
+    session.timeline = [
+      ...session.timeline,
+      { hand: session.completedHands, won: humanGain > 0, delta: humanGain - humanCommitted, stack: stackAfter },
+    ].slice(-30)
+
     if (humanGain > 0) {
       session.handsWon++
       if (potAmount > session.biggestPot) session.biggestPot = potAmount
@@ -992,6 +1197,7 @@ export const useGameStore = defineStore('game', () => {
       const note = collab.notes.find(n => n.id === op.noteId)
       if (note) note.text = op.text
     }
+    if (op.author === 'You') collab.myNotes[op.noteId] = { text: op.text, opId: op.opId }
   }
 
   function addNote(text: string): boolean {
@@ -1008,6 +1214,7 @@ export const useGameStore = defineStore('game', () => {
     }
     if (collab.offline) collab.queued.push(op)
     else applyOp(op)
+    collab.myNotes[op.noteId] = { text: op.text, opId: op.opId }
     return true
   }
 
@@ -1025,6 +1232,7 @@ export const useGameStore = defineStore('game', () => {
     }
     if (collab.offline) collab.queued.push(op)
     else applyOp(op)
+    collab.myNotes[op.noteId] = { text: op.text, opId: op.opId }
     return true
   }
 
@@ -1059,8 +1267,23 @@ export const useGameStore = defineStore('game', () => {
       text: `${latest.text} (peer revision)`,
       author: 'Peer',
     }
-    if (collab.offline) collab.peerPending.push(op)
-    else applyOp(op)
+    if (collab.offline) {
+      collab.peerPending.push(op)
+      return true
+    }
+    // Online: if I authored or edited this note, the peer revision is a
+    // same-note conflict that must surface an explicit keep-mine / keep-peer
+    // choice rather than silently overwriting my version.
+    const mine = collab.myNotes[latest.id]
+    if (mine) {
+      collab.conflict = {
+        noteId: latest.id,
+        mine: { opId: mine.opId, kind: 'edit', noteId: latest.id, noteSeq: latest.seq, text: mine.text, author: 'You' },
+        theirs: op,
+      }
+      return true
+    }
+    applyOp(op)
     return true
   }
 
@@ -1079,13 +1302,22 @@ export const useGameStore = defineStore('game', () => {
 
   function deliver(order: 'mine' | 'peer') {
     if (!collab.pendingDelivery) return
-    const mineEdits = collab.queued.filter(o => o.kind === 'edit')
     const theirEdits = collab.peerPending.filter(o => o.kind === 'edit')
     let conflictPair: { noteId: string; mine: CollabOp; theirs: CollabOp } | null = null
-    for (const m of mineEdits) {
-      const t = theirEdits.find(o => o.noteId === m.noteId)
-      if (t) {
-        conflictPair = { noteId: m.noteId, mine: m, theirs: t }
+    for (const t of theirEdits) {
+      const queuedMine = collab.queued.find(o => o.kind === 'edit' && o.noteId === t.noteId)
+      if (queuedMine) {
+        conflictPair = { noteId: t.noteId, mine: queuedMine, theirs: t }
+        break
+      }
+      const m = collab.myNotes[t.noteId]
+      if (m) {
+        const note = collab.notes.find(n => n.id === t.noteId)
+        conflictPair = {
+          noteId: t.noteId,
+          mine: { opId: m.opId, kind: 'edit', noteId: t.noteId, noteSeq: note?.seq ?? 0, text: m.text, author: 'You' },
+          theirs: t,
+        }
         break
       }
     }
@@ -1107,6 +1339,7 @@ export const useGameStore = defineStore('game', () => {
     if (!collab.conflict) return
     const op = keep === 'mine' ? collab.conflict.mine : collab.conflict.theirs
     applyOp(op)
+    collab.myNotes[op.noteId] = { text: op.text, opId: op.opId }
     collab.conflict = null
   }
   
@@ -1137,8 +1370,13 @@ export const useGameStore = defineStore('game', () => {
         winnerSeat: h.winnerSeat ?? session.players.find(player => h.winner.split(' and ').includes(player.name))?.id ?? 0,
         winnerName: h.winner,
         handType: h.result,
-        board: [], // We don't store this in history yet
-        actions: [] // Not stored in history yet
+        board: h.board ?? [],
+        actions: (h.actions ?? []).map(a => ({
+          seat: a.seat,
+          street: a.street,
+          action: a.action,
+          amount: a.amount,
+        })),
       })),
       inProgressHand: session.phase === 'idle' || session.phase === 'handOver' ? null : {
         street: session.phase,
@@ -1149,6 +1387,36 @@ export const useGameStore = defineStore('game', () => {
       }
     };
     return JSON.stringify(doc, null, 2);
+  }
+
+  // Second portable view: a human-readable hand log, in addition to the
+  // mandated session JSON. Same data, formatted for sharing in plain text.
+  function generateHandHistoryText(): string {
+    const session = s.value
+    const bl = blindsOf(session)
+    const lines: string[] = []
+    lines.push(`FeltRun session — Level ${bl.level} (blinds ${bl.small}/${bl.big}), difficulty ${session.difficulty}`)
+    lines.push(`Hands played ${session.completedHands} · won ${session.handsWon} (${winRate.value}%) · biggest pot ${session.biggestPot} · rebuys ${session.rebuys}`)
+    if (session.history.length === 0) {
+      lines.push('')
+      lines.push('No hands played yet.')
+      return lines.join('\n')
+    }
+    for (const h of session.history) {
+      lines.push('')
+      lines.push(`Hand ${h.hand} — pot ${h.pot} — ${h.winner} (${h.result})`)
+      if (h.board && h.board.length > 0) lines.push(`  Board: ${h.board.join(' ')}`)
+      const byStreet: Record<string, string[]> = { preflop: [], flop: [], turn: [], river: [] }
+      for (const a of h.actions ?? []) {
+        const name = session.players[a.seat]?.name ?? `Seat ${a.seat}`
+        const amount = a.action === 'call' || a.action === 'raise' || a.action === 'all-in' ? ` ${a.amount}` : ''
+        byStreet[a.street]?.push(`${name} ${a.action}${amount}`)
+      }
+      for (const street of ['preflop', 'flop', 'turn', 'river'] as const) {
+        if (byStreet[street].length) lines.push(`  ${street[0].toUpperCase()}${street.slice(1)}: ${byStreet[street].join(' · ')}`)
+      }
+    }
+    return lines.join('\n')
   }
 
   const cardCodeSchema = z.string().regex(/^[2-9TJQKA][♠♥♦♣]$/, 'must be a valid card code')
@@ -1250,6 +1518,9 @@ export const useGameStore = defineStore('game', () => {
         winner: hand.winnerName,
         winnerSeat: hand.winnerSeat,
         result: hand.handType,
+        board: hand.board ?? [],
+        actions: (hand.actions ?? []).map(a => ({ seat: a.seat, street: a.street, action: a.action, amount: a.amount })),
+        winCards: [],
       }))
       session.historySeq = Math.max(0, ...doc.handHistory.map(hand => hand.handNumber))
 
@@ -1284,13 +1555,14 @@ export const useGameStore = defineStore('game', () => {
   return {
     // state
     tournament, practice, collab, mode, toasts, confirmOpen, drawerOpen,
-    showHistory, showBadges, showExport,
+    showHistory, showBadges, showExport, controlMessage, shortcutRaise,
     // getters
     s, blinds, human, isHumanTurn, callAmount, canCheck, minRaiseAdd, winRate, badges,
     // actions
     initGame, dealNextHand, humanFold, humanCheck, humanCall, humanRaise, humanAllIn,
     rebuy, removeHistory, requestNewSession, cancelNewSession, confirmNewSession, setMode,
     addNote, editNote, peerAddNote, peerEditLatest, goOffline, goOnline, deliver, resolveConflict,
-    pushToast, generateExportJson, validateSessionJson, importSessionJson, saveTable, loadSavedTable, undoAction,
+    pushToast, generateExportJson, generateHandHistoryText, validateSessionJson, importSessionJson, saveTable, loadSavedTable, undoAction,
+    dismissCoach: () => { s.value.coachDismissed = true },
   }
 })

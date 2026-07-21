@@ -34,6 +34,7 @@ body {
   background-color: var(--color-background);
   color: #e8ecf4;
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
 body {
@@ -252,6 +253,73 @@ input[type="checkbox"] {
 .pcard.win-card {
   box-shadow: 0 0 0 3px var(--color-primary), 0 0 16px rgba(255, 255, 125, 0.65);
   transform: translateY(-3px);
+  transition: box-shadow 0.3s ease 0.45s, transform 0.3s ease 0.45s;
+}
+
+/* Showdown reveal: hole cards flip face-up as the hand resolves */
+@keyframes card-flip {
+  from { transform: rotateY(90deg); opacity: 0.35; }
+  to { transform: rotateY(0deg); opacity: 1; }
+}
+
+.pcard.card-reveal {
+  animation: card-flip 0.4s ease both;
+  transform-style: preserve-3d;
+}
+
+/* Equity street markers */
+.street-markers {
+  display: flex;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.street-marker {
+  font-size: 10px;
+  font-weight: 700;
+  color: #5c6879;
+  width: 14px;
+  text-align: center;
+  line-height: 1;
+}
+
+.street-marker.active {
+  color: var(--color-accent);
+}
+
+/* Chip-fly micro-interaction */
+.chip-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.chip-fly {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff6b0, #d6b45f 70%);
+  border: 1px solid #8f6a1f;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Play-by-play entrance */
+@keyframes feed-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: none; }
+}
+
+.feed-new {
+  animation: feed-in 0.4s ease-out;
+}
+
+/* Coachmark */
+.coachmark {
+  background-color: #10233b;
+  border-color: var(--color-accent);
 }
 
 .pcard-back {
@@ -391,7 +459,29 @@ input[type="checkbox"] {
   animation: pulse-ring 1.6s ease-in-out infinite;
 }
 
-/* Drawer — inline collapsible sheet */
+/* Drawer — smooth in-flow collapsible sheet (never overlays the table). The
+   grid display lives inside the mobile media query so it can't override the
+   layered `md:hidden` that removes the drawer from the desktop layout (and the
+   accessibility tree) entirely. */
+.drawer-wrap {
+  transition: grid-template-rows 0.32s ease;
+}
+
+.drawer-inner {
+  overflow: hidden;
+}
+
+@media (max-width: 767px) {
+  .drawer-wrap {
+    display: grid;
+    grid-template-rows: 0fr;
+  }
+
+  .drawer-wrap.is-open {
+    grid-template-rows: 1fr;
+  }
+}
+
 .drawer {
   background-color: #081426;
   border: 2px solid #9aa7bd;
@@ -413,35 +503,67 @@ input[type="checkbox"] {
 }
 
 .dialog {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 51;
   background-color: #0d1e34;
   border: 1px solid #9aa7bd;
   border-radius: 5px;
   padding: 24px;
   max-width: 460px;
-  width: 100%;
+  width: calc(100% - 32px);
 }
 
 @media (max-width: 420px) {
   .pcard,
   .pcard-back {
-    width: 36px;
-    height: 52px;
+    width: 32px;
+    height: 46px;
   }
 
   .pcard .rank {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .pcard .suit {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .seat {
-    min-width: 92px;
+    min-width: 0;
     padding: 6px;
   }
 
   .h-section {
     font-size: 34.56px;
+  }
+
+  .copy {
+    font-size: 21px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pcard.card-reveal,
+  .feed-new {
+    animation: none;
+  }
+
+  .pcard.win-card {
+    transition: none;
+  }
+
+  .drawer-wrap {
+    transition: none;
+  }
+
+  .equity-fill {
+    transition: none;
+  }
+
+  .pulse-ring {
+    animation: none;
   }
 }

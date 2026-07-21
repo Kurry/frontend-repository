@@ -1,6 +1,7 @@
 <template>
   <div
     class="seat"
+    :data-seat-id="player.id"
     :class="{
       'seat-human': player.isHuman,
       'seat-active pulse-ring': isTurn,
@@ -37,10 +38,15 @@
     <div class="flex gap-1 items-center" style="min-height: 52px;">
       <template v-if="player.hole.length === 2 && cardsVisible">
         <div
-          v-for="card in player.hole"
+          v-for="(card, idx) in player.hole"
           :key="cardKey(card)"
           class="pcard"
-          :class="[isRed(card.suit) ? 'red' : 'black', isWinCard(card) ? 'win-card' : '']"
+          :class="[
+            isRed(card.suit) ? 'red' : 'black',
+            isWinCard(card) ? 'win-card' : '',
+            revealAnim ? 'card-reveal' : '',
+          ]"
+          :style="revealAnim ? { animationDelay: `${idx * 120 + revealDelay}ms` } : undefined"
         >
           <span class="rank">{{ card.rank }}</span>
           <span class="suit" aria-hidden="true">{{ card.suit }}</span>
@@ -70,7 +76,7 @@
     <div v-if="player.folded" style="color: #ff9d9d; font-size: 12px; font-weight: 600;">Folded</div>
     <div v-else-if="player.allIn" style="color: var(--color-accent); font-size: 12px; font-weight: 600;">All-in</div>
 
-    <!-- Equity meter (human only) -->
+    <!-- Equity meter with street markers (human only) -->
     <div v-if="player.isHuman && s.equity !== null && !player.folded" class="w-full mt-1" style="min-width: 96px;">
       <div class="flex items-center justify-between gap-2">
         <span class="caption" style="font-size: 12px;">Equity</span>
@@ -82,6 +88,9 @@
       </div>
       <div class="equity-bar" aria-hidden="true">
         <div class="equity-fill" :style="{ width: equityWidth }"></div>
+      </div>
+      <div class="street-markers" aria-hidden="true">
+        <span v-for="m in streetMarkers" :key="m.key" class="street-marker" :class="{ active: m.active }">{{ m.label }}</span>
       </div>
     </div>
   </div>
@@ -109,17 +118,23 @@ const isDealer = computed(() => s.value.dealerIdx === props.player.id && s.value
 const cardsVisible = computed(() => props.player.isHuman || (s.value.revealed && !props.player.folded))
 const styleClass = computed(() => {
   switch (props.player.style) {
-    case 'Aggressive':
-      return 'style-aggressive'
-    case 'Tight':
-      return 'style-tight'
-    case 'Bluffer':
-      return 'style-bluffer'
-    default:
-      return ''
+    case 'Aggressive': return 'style-aggressive'
+    case 'Tight': return 'style-tight'
+    case 'Bluffer': return 'style-bluffer'
+    default: return ''
   }
 })
 const isWinner = computed(() => s.value.phase === 'handOver' && s.value.winnerIds.includes(props.player.id) && !!s.value.winLabel)
+
+const streetMarkers = computed(() => {
+  const phase = s.value.phase
+  return [
+    { key: 'preflop', label: 'P', active: phase === 'preflop' },
+    { key: 'flop', label: 'F', active: phase === 'flop' },
+    { key: 'turn', label: 'T', active: phase === 'turn' },
+    { key: 'river', label: 'R', active: phase === 'river' },
+  ]
+})
 
 function isWinCard(card: Card): boolean {
   return s.value.phase === 'handOver' && s.value.winCardKeys.includes(cardKey(card))
@@ -133,10 +148,11 @@ const equityWidth = computed(() => `${Math.min(100, Math.max(0, displayEquity.va
 const flash = ref(false)
 let flashTimer = 0
 let equityFrame = 0
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 function animateEquityValue(target: number) {
   window.cancelAnimationFrame(equityFrame)
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  if (prefersReducedMotion) {
     displayEquity.value = target
     return
   }
@@ -166,21 +182,34 @@ watch(
   { immediate: true },
 )
 
+// Flip the revealed hole cards in as the hand resolves; AI seats reveal at
+// showdown, the human's cards flip in on the deal.
+const revealAnim = ref(false)
+const revealDelay = computed(() => (props.player.isHuman ? 0 : 150 + props.player.id * 80))
+watch(
+  cardsVisible,
+  (visible) => {
+    if (visible && !prefersReducedMotion) {
+      revealAnim.value = true
+      window.setTimeout(() => { revealAnim.value = false }, 900 + revealDelay.value)
+    } else {
+      revealAnim.value = false
+    }
+  },
+  { immediate: true },
+)
+
 watch(isWinner, (winner) => {
   if (
     winner &&
     props.player.isHuman &&
     s.value.winLabel &&
     s.value.winLabel !== 'Uncontested' &&
-    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    !prefersReducedMotion
   ) {
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
+    confetti({ particleCount: 110, spread: 72, origin: { y: 0.6 } })
   }
-});
+})
 
 onBeforeUnmount(() => {
   window.cancelAnimationFrame(equityFrame)

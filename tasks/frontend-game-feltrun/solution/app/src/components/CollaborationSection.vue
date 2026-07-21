@@ -85,15 +85,23 @@
     <!-- Shared content -->
     <div role="region" :aria-labelledby="contentId">
       <h3 :id="contentId" class="font-semibold mb-2" style="font-size: 18px;">Shared content</h3>
-      <p v-if="collab.notes.length === 0" class="caption m-0" style="font-size: 15px;">No shared notes yet</p>
+      <p v-if="displayNotes.length === 0" class="caption m-0" style="font-size: 15px;">No shared notes yet</p>
       <ul v-else class="m-0 p-0 flex flex-col gap-2" style="list-style: none;">
         <li
-          v-for="note in collab.notes"
+          v-for="note in displayNotes"
           :key="note.id"
           class="flex items-center gap-3 rounded-[5px] px-3 py-2"
-          style="background-color: #122540; border: 1px solid #3d4c63;"
+          :style="{
+            backgroundColor: note.queued ? '#16283f' : '#122540',
+            border: note.queued ? '1px dashed var(--color-accent)' : '1px solid #3d4c63',
+          }"
         >
           <span class="grow" style="font-size: 15px;">{{ note.text }}</span>
+          <span
+            v-if="note.queued"
+            class="num"
+            style="font-size: 12px; fontWeight: 600; border-radius: 5px; padding: 0 8px; line-height: 22px; color: #10141c; background-color: var(--color-accent);"
+          >Queued</span>
           <span
             class="num"
             :style="{
@@ -102,7 +110,7 @@
               backgroundColor: note.author === 'You' ? 'var(--color-primary)' : 'var(--color-accent)',
             }"
           >{{ note.author }}</span>
-          <button class="btn btn-sm" @click="startEdit(note.id)">Edit</button>
+          <button v-if="!note.queued" class="btn btn-sm" @click="startEdit(note.id)">Edit</button>
         </li>
       </ul>
     </div>
@@ -110,12 +118,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, useId } from 'vue'
+import { computed, ref, useId } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useGameStore } from '../stores/game'
 
 const store = useGameStore()
 const { collab } = storeToRefs(store)
+
+// Applied notes plus offline-queued additions shown as pending entries so the
+// queued state is visible (and Shared content is never mysteriously empty while
+// offline). Queued edits to an existing note appear in the queue list above.
+const displayNotes = computed(() => {
+  const queuedAdds = collab.value.queued
+    .filter(op => op.kind === 'add')
+    .map(op => ({ id: op.noteId, seq: op.noteSeq, text: op.text, author: 'You' as const, queued: true }))
+  const applied = collab.value.notes.map(n => ({ id: n.id, seq: n.seq, text: n.text, author: n.author, queued: false }))
+  return [...applied, ...queuedAdds]
+    .filter(n => !applied.some(a => a.id === n.id && n.queued))
+    .sort((a, b) => a.seq - b.seq)
+})
 
 const headingId = useId()
 const editorId = useId()
