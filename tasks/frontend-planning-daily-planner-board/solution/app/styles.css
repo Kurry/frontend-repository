@@ -229,17 +229,14 @@ button { font: inherit; color: inherit; }
   border-width: 0; overflow: hidden; pointer-events: none;
 }
 .chk {
-  flex: 0 0 auto; border: 0; background: transparent; padding: 2px 0 0;
-  cursor: pointer; display: grid; place-items: center;
-}
-.box {
-  display: block; width: 15px; height: 15px; border: 1.5px solid var(--muted);
-  border-radius: 50%; position: relative;
+  appearance: none; flex: 0 0 auto; width: 16px; height: 16px; margin: 2px 0 0;
+  border: 1.5px solid var(--muted); border-radius: 50%; background: transparent;
+  cursor: pointer; position: relative;
   transition: background 0.18s var(--ease), border-color 0.18s var(--ease), transform 0.12s var(--ease);
 }
-.chk:hover .box { border-color: var(--accent); transform: scale(1.12); }
-.chk[aria-pressed="true"] .box { background: var(--accent); border-color: var(--accent); animation: checkPop 0.22s var(--ease); }
-.chk[aria-pressed="true"] .box::after {
+.chk:hover { border-color: var(--accent); transform: scale(1.12); }
+.chk:checked { background: var(--accent); border-color: var(--accent); animation: checkPop 0.22s var(--ease); }
+.chk:checked::after {
   content: ""; position: absolute; left: 4px; top: 1.5px; width: 4px; height: 8px;
   border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(42deg);
 }
