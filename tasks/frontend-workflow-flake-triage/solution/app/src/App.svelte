@@ -3,7 +3,7 @@
   import { IconActivity, IconAlertTriangle, IconCircleCheck, IconFlask2 } from '@tabler/icons-svelte';
   import { triage } from './lib/triage.svelte';
   import { registerWebMcpTools } from './lib/webmcp';
-  import { verdictFor } from './lib/types';
+  import { motion, setReducedMotion, toggleDensity } from './lib/motion.svelte';
   import AppHeader from './components/AppHeader.svelte';
   import TestQueue from './components/TestQueue.svelte';
   import TestDetail from './components/TestDetail.svelte';
@@ -12,25 +12,65 @@
   import ExportDrawer from './components/ExportDrawer.svelte';
   import ImportDialog from './components/ImportDialog.svelte';
   import ToastViewport from './components/ToastViewport.svelte';
+  import Coachmarks from './components/Coachmarks.svelte';
 
   let exportTrigger = $state<HTMLButtonElement>();
   let importTrigger = $state<HTMLButtonElement>();
+  let appRoot: HTMLElement | undefined = $state();
 
   $effect(() => {
     document.documentElement.classList.toggle('dark', triage.theme === 'dark');
     document.documentElement.dataset.theme = 'cerberus';
+    document.documentElement.dataset.density = motion.density;
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', triage.theme === 'dark' ? '#111815' : '#f5f7f3');
+  });
+
+  $effect(() => {
+    const blocked = triage.exportOpen || triage.importOpen;
+    const nodes = [document.querySelector('.topbar'), appRoot].filter(Boolean) as HTMLElement[];
+    document.documentElement.toggleAttribute('data-export-open', triage.exportOpen);
+    document.documentElement.toggleAttribute('data-import-open', triage.importOpen);
+    for (const node of nodes) {
+      if (blocked) node.setAttribute('inert', '');
+      else node.removeAttribute('inert');
+    }
   });
 
   onMount(() => {
     window.__triageStore = triage;
     registerWebMcpTools();
+
+    const onKey = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const typing = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable);
+      if (typing || triage.exportOpen || triage.importOpen) return;
+      if (event.key === 'e' || event.key === 'E') {
+        event.preventDefault();
+        triage.openExport('quarantine-text', exportTrigger ?? null);
+      } else if (event.key === 'i' || event.key === 'I') {
+        event.preventDefault();
+        triage.openImport(importTrigger ?? null);
+      } else if (event.key === '/') {
+        event.preventDefault();
+        document.querySelector<HTMLInputElement>('input[aria-label="Search test identifiers"]')?.focus();
+      } else if (event.key === 'd' || event.key === 'D') {
+        event.preventDefault();
+        toggleDensity();
+      } else if (event.key === 'm' || event.key === 'M') {
+        event.preventDefault();
+        setReducedMotion(!motion.reduced);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   });
 </script>
 
-<AppHeader bind:exportTrigger bind:importTrigger />
+<div class="chrome" inert={triage.exportOpen || triage.importOpen ? true : undefined} aria-hidden={triage.exportOpen || triage.importOpen ? 'true' : undefined}>
+  <AppHeader bind:exportTrigger bind:importTrigger />
+</div>
 
-<main class="app-shell">
+<main class="app-shell" class:compact={motion.density === 'compact'} bind:this={appRoot} inert={triage.exportOpen || triage.importOpen ? true : undefined}>
   <section class="hero" aria-labelledby="page-title">
     <div class="hero-copy">
       <span class="eyebrow">Generated suite operations</span>
@@ -70,10 +110,11 @@
 </main>
 
 {#if triage.exportOpen}
-  <ExportDrawer returnFocus={exportTrigger} />
+  <ExportDrawer />
 {/if}
-<ImportDialog returnFocus={importTrigger} />
+<ImportDialog />
 <ToastViewport />
+<Coachmarks />
 
 <style>
   .hero { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; padding: 34px 4px 23px; }
@@ -90,7 +131,6 @@
   .suite-rail { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 12px; }
   .suite-rail button { display: grid; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 9px; min-width: 0; border: 1px solid #dce4df; border-radius: 13px; background: rgba(255,255,255,.72); padding: 9px 10px; color: #5b6963; text-align: left; transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 100ms ease; }
   .suite-rail button:hover { border-color: #b9c8c1; background: #fff; box-shadow: 0 6px 18px rgba(32,54,46,.06); }
-  .suite-rail button:active { transform: translateY(1px); }
   .suite-rail button.active { border-color: #8fcab8; background: #eef8f4; box-shadow: inset 0 0 0 1px rgba(8,127,109,.08); }
   .suite-icon { display: inline-grid; width: 32px; height: 32px; place-items: center; border-radius: 9px; background: #e9f0ec; color: #5e6e67; }
   .suite-rail button.active .suite-icon { background: #d4eee4; color: #087f6d; }
@@ -103,26 +143,30 @@
   .side-stack { display: grid; min-width: 0; gap: 12px; }
   .audit-slot { grid-column: 1 / -1; min-width: 0; }
   .app-footer { display: flex; justify-content: space-between; gap: 16px; padding: 18px 4px 0; color: #85908c; font-size: 9px; }
+  .app-shell.compact :global(.triage-table td) { height: 48px; }
+  .app-shell.compact :global(.panel-title) { font-size: 15px; }
   :global(.dark) h1 { color: #f1f5f3; }
   :global(.dark) .hero-copy p { color: #a0aca6; }
   :global(.dark) .summary-card, :global(.dark) .suite-rail button { border-color: #2f3e39; background: rgba(27,38,34,.8); }
   :global(.dark) .summary-card strong, :global(.dark) .suite-rail strong { color: #e5ece8; }
-  :global(.dark) .suite-rail button:hover { border-color: #4c6058; background: #202d28; }
   :global(.dark) .suite-rail button.active { border-color: #297e69; background: #19342c; }
   :global(.dark) .suite-icon, :global(.dark) .suite-rail em { background: #293630; color: #b5c0bb; }
-  :global(.dark) .suite-rail button.active .suite-icon { background: #205043; color: #83d7ba; }
   @media (max-width: 1080px) {
     .workspace-grid { grid-template-columns: minmax(0, 1.4fr) minmax(320px, .8fr); }
     .summary-cards { grid-template-columns: repeat(3, 78px); }
   }
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     .hero { align-items: stretch; flex-direction: column; gap: 18px; padding: 25px 3px 18px; }
     .summary-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .suite-rail { display: grid; grid-template-columns: 1fr; overflow: visible; padding-bottom: 2px; }
     .suite-rail button { min-width: 0; }
-    .workspace-grid { grid-template-columns: minmax(0, 1fr); }
-    .audit-slot { grid-column: 1; }
-    .side-stack { grid-row: auto; }
+    .workspace-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .side-stack { width: 100%; min-width: 0; }
+    .audit-slot { width: 100%; }
   }
   @media (max-width: 420px) {
     h1 { font-size: 29px; }

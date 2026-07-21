@@ -2,12 +2,13 @@
   import { IconActivityHeartbeat, IconPlayerStopFilled, IconRefresh, IconSparkles } from '@tabler/icons-svelte';
   import { fly } from 'svelte/transition';
   import { triage } from '../lib/triage.svelte';
+  import { motion } from '../lib/motion.svelte';
   import { divergentIndexes, divergenceFor, verdictFor } from '../lib/types';
   import RunMatrix from './RunMatrix.svelte';
   import VerdictChip from './VerdictChip.svelte';
   import RerunForm from './RerunForm.svelte';
 
-  let rerunTrigger: HTMLButtonElement;
+  let rerunTrigger: HTMLButtonElement | undefined = $state();
 
   const conditionValue: Record<string, string> = {
     'CPU quota': '750m → 500m',
@@ -18,6 +19,9 @@
     'parallel execution': '1 → 8 workers',
   };
 
+  function openRerunFromDetail() {
+    triage.openRerun(triage.selectedTestId, rerunTrigger ?? null);
+  }
 </script>
 
 <section class="card-panel detail-panel" id="test-detail" aria-labelledby="detail-title" tabindex="-1">
@@ -26,6 +30,7 @@
     {@const verdict = verdictFor(test.runs)}
     {@const diverged = divergentIndexes(test.runs)}
     {@const rerun = triage.rerunFor(test.id)}
+    {@const progress = rerun ? (rerun.completed.length / rerun.runCount) * 100 : 0}
     <div class="detail-header">
       <div>
         <span class="eyebrow">Selected test</span>
@@ -37,7 +42,7 @@
       <p class="test-id mono">{test.id}</p>
       <div class="matrix-block">
         <div class="block-label"><span>Current five-run matrix</span><span>{divergenceFor(test.runs)} divergent</span></div>
-        <RunMatrix runs={test.runs} size="large" label={`Five run matrix for ${test.id}`} />
+        <RunMatrix runs={test.runs} size="large" label={`Five run matrix for ${test.id}`} animateIndex={rerun?.completed.length ? ((rerun.completed.length - 1) % 5) + 1 : 0} />
       </div>
 
       {#if verdict === 'flaky'}
@@ -74,10 +79,12 @@
             <span><IconActivityHeartbeat size={16} /> Re-run {rerun.status}</span>
             <span class="mono">{rerun.completed.length} / {rerun.runCount}</span>
           </div>
-          <progress max={rerun.runCount} value={rerun.completed.length} aria-label={`Re-run progress ${rerun.completed.length} of ${rerun.runCount}`}></progress>
+          <div class="progress-track" aria-label={`Re-run progress ${rerun.completed.length} of ${rerun.runCount}`} role="progressbar" aria-valuemin={0} aria-valuemax={rerun.runCount} aria-valuenow={rerun.completed.length}>
+            <div class="progress-fill" style={`width: ${progress}%`}></div>
+          </div>
           <ol class="ticker" aria-label="Re-run results">
             {#each rerun.completed as run (run.index)}
-              <li class:pass={run.result === 'pass'} class:fail={run.result === 'fail'} in:fly={{ y: 6, duration: 170 }}>
+              <li class:pass={run.result === 'pass'} class:fail={run.result === 'fail'} in:fly={{ y: 8, duration: motion.reduced ? 0 : 200 }}>
                 <span class="mono">{run.index}</span>
                 <span>{run.condition}</span>
                 <strong>{run.result}</strong>
@@ -97,16 +104,17 @@
         </div>
       {/if}
 
-      <RerunForm testId={test.id} open={triage.openRerunTestId === test.id} returnFocus={rerunTrigger} />
+      <RerunForm testId={test.id} open={triage.openRerunTestId === test.id} />
       <button
         bind:this={rerunTrigger}
         class="action-btn primary rerun-action"
         type="button"
-        onclick={() => triage.openRerun(test.id)}
+        data-rerun-opener="true"
+        aria-expanded={triage.openRerunTestId === test.id}
+        onclick={openRerunFromDetail}
         disabled={rerun?.status === 'running'}
-        hidden={triage.openRerunTestId === test.id}
       >
-        <IconRefresh size={15} /> {rerun?.status === 'running' ? 'Re-run in progress' : 'Start re-run'}
+        <IconRefresh size={15} /> {triage.openRerunTestId === test.id ? 'Re-run form open' : rerun?.status === 'running' ? 'Re-run in progress' : 'Start re-run'}
       </button>
     </div>
   {:else}
@@ -127,14 +135,12 @@
   .matrix-block { border: 1px solid #e1e7e3; border-radius: 12px; background: #f9fbf9; padding: 11px; }
   .block-label { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; color: #6c7974; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
   .insight-callout { display: flex; align-items: flex-start; gap: 8px; margin-top: 11px; border-radius: 10px; background: #fff4d3; padding: 10px; color: #80510d; font-size: 11px; line-height: 1.45; }
-  .insight-callout :global(svg) { margin-top: 1px; flex: 0 0 auto; }
   .schedule-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 20px 0 9px; }
   .schedule-heading h3 { margin: 0; color: #27342f; font-size: 13px; }
   .schedule-heading p { margin: 2px 0 0; color: #7a8782; font-size: 10px; }
   .reason-tag { max-width: 165px; overflow: hidden; border: 1px solid #dbe3de; border-radius: 7px; background: #f7f9f7; padding: 5px 7px; color: #50605a; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
   .schedule-list, .ticker { display: grid; gap: 5px; margin: 0; padding: 0; list-style: none; }
-  .schedule-list li { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto auto; align-items: center; gap: 8px; min-height: 45px; border: 1px solid #e2e7e4; border-radius: 9px; padding: 6px 8px; transition: background-color 150ms ease, border-color 150ms ease, transform 150ms ease; }
-  .schedule-list li:hover { background: #f4f8f5; }
+  .schedule-list li { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto auto; align-items: center; gap: 8px; min-height: 45px; border: 1px solid #e2e7e4; border-radius: 9px; padding: 6px 8px; transition: background-color 150ms ease, border-color 150ms ease; }
   .schedule-list li.divergent { border-color: #e6bb4f; background: #fff8df; box-shadow: inset 3px 0 0 #d99a0b; }
   .run-number { display: grid; width: 24px; height: 24px; place-items: center; border-radius: 6px; background: #edf1ee; color: #53615b; font-size: 10px; font-weight: 800; }
   .condition { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
@@ -147,9 +153,8 @@
   .run-progress { margin-top: 14px; border: 1px solid #d7e3dd; border-radius: 12px; background: #f7faf8; padding: 12px; }
   .progress-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #4d5c56; font-size: 11px; font-weight: 800; text-transform: capitalize; }
   .progress-heading span { display: inline-flex; align-items: center; gap: 6px; }
-  progress { width: 100%; height: 6px; margin: 9px 0 10px; overflow: hidden; border: 0; border-radius: 99px; background: #dfe7e2; accent-color: #087f6d; transition: value 350ms ease; }
-  progress::-webkit-progress-bar { border-radius: 99px; background: #dfe7e2; }
-  progress::-webkit-progress-value { border-radius: 99px; background: #087f6d; transition: width 350ms ease; }
+  .progress-track { width: 100%; height: 8px; margin: 9px 0 10px; overflow: hidden; border-radius: 99px; background: #dfe7e2; }
+  .progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #087f6d, #19a78f); transition: width 480ms cubic-bezier(.22,.61,.36,1); }
   .ticker { max-height: 172px; overflow-y: auto; }
   .ticker li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; align-items: center; gap: 6px; min-height: 27px; border-radius: 7px; padding: 4px 7px; font-size: 9px; }
   .ticker li.pass { background: #e4f4ed; color: #0b6653; }
@@ -169,10 +174,8 @@
   :global(.dark) .condition strong { color: #e5ece8; }
   :global(.dark) .matrix-block,
   :global(.dark) .run-progress { background: #17211e; }
-  :global(.dark) .schedule-list li:hover { background: #20302a; }
   :global(.dark) .schedule-list li.divergent { border-color: #76632f; background: #3a331f; }
-  :global(.dark) .run-number { background: #2b3934; color: #c0cbc6; }
-  :global(.dark) .reason-tag { border-color: #394842; background: #1a2521; color: #bac5c0; }
+  :global(.dark) .progress-track { background: #31403a; }
   :global(.dark) .result.pass, :global(.dark) .ticker li.pass { background: #193e34; color: #8be0c0; }
   :global(.dark) .result.fail, :global(.dark) .ticker li.fail { background: #47282b; color: #f5aaab; }
 </style>

@@ -277,7 +277,7 @@ textarea.control {
   border: 0;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .app-shell {
     padding: 0 12px 32px;
   }
@@ -292,4 +292,21 @@ textarea.control {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+:root.reduce-motion *,
+:root.reduce-motion *::before,
+:root.reduce-motion *::after,
+:root[data-reduced-motion='true'] *,
+:root[data-reduced-motion='true'] *::before,
+:root[data-reduced-motion='true'] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+:root[data-density='compact'] .action-btn {
+  min-height: 34px;
+  font-size: 12px;
 }

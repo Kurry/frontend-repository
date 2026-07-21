@@ -2,12 +2,23 @@
   import { IconCheck, IconX } from '@tabler/icons-svelte';
   import type { Run } from '../lib/types';
 
-  let { runs, size = 'normal', label = 'Five run result matrix' }: { runs: Run[]; size?: 'small' | 'normal' | 'large'; label?: string } = $props();
+  let {
+    runs,
+    size = 'normal',
+    label = 'Five run result matrix',
+    animateIndex = 0,
+  }: { runs: Run[]; size?: 'small' | 'normal' | 'large'; label?: string; animateIndex?: number } = $props();
 </script>
 
 <ol class={`matrix ${size}`} aria-label={label}>
   {#each runs as run (run.index)}
-    <li class:pass={run.result === 'pass'} class:fail={run.result === 'fail'} aria-label={`Run ${run.index}: ${run.result}`} title={`Run ${run.index} · ${run.condition} · ${run.result}`}>
+    <li
+      class:pass={run.result === 'pass'}
+      class:fail={run.result === 'fail'}
+      class:tick={animateIndex === run.index}
+      aria-label={`Run ${run.index}: ${run.result}`}
+      title={`Run ${run.index} · ${run.condition} · ${run.result}`}
+    >
       <span class="run-index">{run.index}</span>
       {#if size === 'large'}
         {#if run.result === 'pass'}<IconCheck size={14} stroke={3} aria-hidden="true" />{:else}<IconX size={14} stroke={3} aria-hidden="true" />{/if}
@@ -37,7 +48,14 @@
     font-family: var(--font-mono);
     font-size: 11px;
     font-weight: 800;
-    transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
+    transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease, opacity 180ms ease;
+  }
+  .matrix li.tick {
+    animation: cell-tick 260ms cubic-bezier(.22,.61,.36,1);
+  }
+  @keyframes cell-tick {
+    from { opacity: 0; transform: translateY(6px) scale(.92); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
   .matrix.small {
     min-width: 116px;

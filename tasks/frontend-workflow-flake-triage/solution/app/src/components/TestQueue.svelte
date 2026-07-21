@@ -157,6 +157,14 @@
   </div>
 
   <div class="table-scroll">
+    {#if triage.visibleTests.length === 0}
+      <div class="empty-state" role="status">
+        <div class="empty-icon"><IconAdjustmentsHorizontal size={20} /></div>
+        <strong>No tests match these filters</strong>
+        <span>Clear the active verdict, reason, or search filter to restore the full queue.</span>
+        <button class="action-btn" type="button" onclick={clearFilters}>Clear filters</button>
+      </div>
+    {:else}
     <table class="triage-table">
       <thead>
         <tr>
@@ -203,25 +211,23 @@
             <td><ReasonSelect testId={test.id} reason={test.reason} onReasonChange={updateReason} /></td>
             <td><span class="divergence-count mono">{divergenceFor(test.runs)} / 5</span></td>
             <td>
-              <button class="rerun-button" type="button" onclick={(event) => { event.stopPropagation(); triage.openRerun(test.id); }} aria-label={`Open re-run form for ${test.id}`}>
+              <button
+                class="rerun-button"
+                type="button"
+                onclick={(event) => {
+                  event.stopPropagation();
+                  triage.openRerun(test.id, event.currentTarget);
+                }}
+                aria-label={`Open re-run form for ${test.id}`}
+              >
                 <IconRefresh size={15} /> Re-run
               </button>
-            </td>
-          </tr>
-        {:else}
-          <tr class="empty-row">
-            <td colspan="6">
-              <div class="empty-state">
-                <div class="empty-icon"><IconAdjustmentsHorizontal size={20} /></div>
-                <strong>No tests match these filters</strong>
-                <span>Clear the active verdict, reason, or search filter to restore the full queue.</span>
-                <button class="action-btn" type="button" onclick={clearFilters}>Clear filters</button>
-              </div>
             </td>
           </tr>
         {/each}
       </tbody>
     </table>
+    {/if}
   </div>
 </section>
 
@@ -312,13 +318,13 @@
     max-width: 260px;
     overflow: hidden;
     color: #26332f;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 1.35;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .divergence-count { color: #65736d; font-size: 11px; white-space: nowrap; }
+  .divergence-count { color: #65736d; font-size: 12px; white-space: nowrap; }
   .sort-button {
     display: inline-flex;
     align-items: center;
@@ -348,9 +354,22 @@
     white-space: nowrap;
   }
   .rerun-button:hover { background: #dcefe8; }
-  .empty-row td { height: 260px; }
-  .empty-state { display: flex; max-width: 380px; margin: 0 auto; align-items: center; flex-direction: column; gap: 8px; color: #73807b; text-align: center; font-size: 12px; }
-  .empty-state strong { color: #2b3834; font-size: 14px; }
+  .empty-state {
+    display: flex;
+    width: min(100%, 420px);
+    margin: 28px auto;
+    align-items: center;
+    flex-direction: column;
+    gap: 8px;
+    padding: 0 16px;
+    color: #73807b;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.45;
+    box-sizing: border-box;
+  }
+  .empty-state span { max-width: 100%; overflow-wrap: anywhere; }
+  .empty-state strong { color: #2b3834; font-size: 15px; }
   .empty-icon { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 12px; background: #e9f2ed; color: #087f6d; }
   :global(.dark) .queue-header,
   :global(.dark) .filter-bar,
@@ -368,11 +387,26 @@
     .filter-bar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .clear-button { align-self: end; }
   }
-  @media (max-width: 767px) {
+  @media (max-width: 768px) {
     .queue-header { align-items: flex-start; padding: 16px; }
     .result-legend { flex-direction: column; align-items: flex-start; gap: 4px; }
     .filter-bar { grid-template-columns: 1fr; padding: 12px 16px; }
     .queue-meta { align-items: flex-start; flex-direction: column; padding: 10px 16px; }
     .suite-subtitle { display: none !important; }
+    .test-id, .divergence-count, .rerun-button { font-size: 12px; }
+    th, td { font-size: 12px; }
+    .triage-table { min-width: 0; }
+  }
+  @media (max-width: 420px) {
+    .empty-state {
+      width: 100%;
+      margin: 20px auto;
+      padding: 0 12px;
+      font-size: 12px;
+    }
+    .empty-state strong { font-size: 14px; }
+    .empty-state span { hyphens: auto; overflow-wrap: break-word; word-break: break-word; }
+    .test-id { font-size: 12px; max-width: 100%; white-space: normal; }
+    th, td { font-size: 12px; }
   }
 </style>
