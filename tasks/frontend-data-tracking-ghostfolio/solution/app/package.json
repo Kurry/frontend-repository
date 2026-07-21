@@ -7,9 +7,13 @@
     "start": "node server.js",
     "dev": "node server.js",
     "build": "node -e \"require('fs').accessSync('index.html');console.log('ok')\"",
-    "verify:build": "node -e \"require('fs').accessSync('index.html');require('fs').accessSync('src/app.js');console.log('build ok');process.exit(0)\""
+    "verify:build": "node -e \"require('fs').accessSync('index.html');require('fs').accessSync('src/app.js');console.log('build ok');process.exit(0)\"",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "serve": "14.2.4"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.0"
   }
 }
