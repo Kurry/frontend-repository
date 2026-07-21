@@ -1,7 +1,10 @@
-# Story Docs Application
+# Story Docs — 1. Getting Started (oracle)
 
-This is the fully functioning solution for the Story Docs tutorial app.
+Reference oracle for the `frontend-creative-tools-story-docs` eval task: a storyboard
+getting-started tutorial built with Astro + React islands, Nanostores, Tailwind, and
+DaisyUI. All state is in-memory (no browser storage); the portable end state is the
+StoryboardPackage JSON produced by the Export drawer and consumed by Import.
 
-To capture the screenshot, you can run the following Playwright script using `node screenshot.js` (you may need to create this script).
-
-![Screenshot of the App](screenshot.png)
+- `npm run build` — static build into `dist/` (committed alongside source)
+- `npm run verify:build` — build + assert the dist entry exists
+- `npm start` — serve the built app on port 3000

@@ -20,39 +20,224 @@
     unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
   }
 
+  html {
+    color-scheme: light;
+  }
+
   body {
-    font-family: 'Gabarito', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-    background-color: #fff;
+    font-family: 'Gabarito', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+      Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
+    background-color: #fdfdfa;
     color: #111827;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: #fde68a;
+    color: #451a03;
   }
 }
 
 @layer utilities {
-    .animate-fade-in-up {
-        animation: fadeInUp 0.4s ease-out forwards;
-    }
+  /* Slide-over panels: closed state hides content from tab order AFTER the
+     slide-out finishes, so focus can never land in an invisible dialog. */
+  .panel-open {
+    visibility: visible;
+    transition: transform 0.3s ease-out, visibility 0s linear 0s;
+  }
+  .panel-closed {
+    visibility: hidden;
+    transition: transform 0.3s ease-out, visibility 0s linear 0.3s;
+  }
 
-    .animate-slide-in-right {
-        animation: slideInRight 0.3s ease-out forwards;
-    }
+  /* Keyframed entrances */
+  .form-enter {
+    animation: rise-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .menu-pop {
+    animation: pop-in 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transform-origin: top right;
+  }
+
+  .toast-enter {
+    animation: toast-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .toast-leave {
+    animation: toast-out 0.3s ease-in both;
+  }
+
+  /* Canvas tabletop surface */
+  .canvas-surface {
+    background-image: radial-gradient(circle, #d6d3cd 1.1px, transparent 1.1px);
+    background-size: 22px 22px;
+  }
+
+  /* Rendered scene markdown */
+  .md-body p {
+    margin: 0 0 0.5em;
+  }
+  .md-body p:last-child {
+    margin-bottom: 0;
+  }
+  .md-body h1,
+  .md-body h2,
+  .md-body h3 {
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #111827;
+    margin: 0.6em 0 0.3em;
+    line-height: 1.25;
+  }
+  .md-body h1 {
+    font-size: 1.15em;
+  }
+  .md-body h2 {
+    font-size: 1.08em;
+  }
+  .md-body h3 {
+    font-size: 1em;
+  }
+  .md-body ul {
+    list-style: disc;
+    padding-left: 1.25em;
+    margin: 0 0 0.5em;
+  }
+  .md-body ol {
+    list-style: decimal;
+    padding-left: 1.25em;
+    margin: 0 0 0.5em;
+  }
+  .md-body li {
+    margin: 0.15em 0;
+  }
+  .md-body strong {
+    font-weight: 700;
+    color: #1f2937;
+  }
+  .md-body code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.85em;
+    background: #f3f4f6;
+    border-radius: 0.3em;
+    padding: 0.1em 0.35em;
+  }
+
+  /* Rendered checklist rows */
+  .md-body li:has(> input.scene-checkbox),
+  .md-body li:has(> p > input.scene-checkbox) {
+    list-style: none;
+    margin-left: -1.25em;
+  }
+  .md-body input.scene-checkbox {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-right: 0.5em;
+    border: 2px solid #d1d5db;
+    border-radius: 0.35rem;
+    background: #fff;
+    vertical-align: -0.2em;
+    cursor: pointer;
+    transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.12s ease;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .md-body input.scene-checkbox:hover {
+    border-color: #facc15;
+  }
+  .md-body input.scene-checkbox:focus-visible {
+    outline: 2px solid #facc15;
+    outline-offset: 2px;
+  }
+  .md-body input.scene-checkbox:checked {
+    background-color: #facc15;
+    border-color: #facc15;
+  }
+  .md-body input.scene-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 0.28rem;
+    top: 0.08rem;
+    width: 0.32rem;
+    height: 0.6rem;
+    border: solid #713f12;
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg) scale(1);
+    animation: tick-pop 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 }
 
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-    }
-    to {
-        transform: translateX(0);
-    }
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 18px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+}
+
+@keyframes tick-pop {
+  from {
+    transform: rotate(45deg) scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(45deg) scale(1);
+    opacity: 1;
+  }
+}
+
+/* The toast chip keeps its own centering transform, so its keyframes carry the -50%. */
+.toast-chip {
+  transform: translate(-50%, 0);
+}
+
+/* Reduced motion: state changes apply instantly, everything stays reachable. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,124 +1,291 @@
-import React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useStore } from '@nanostores/react';
-import { viewModeStore, scenesStore, statusFilterStore, searchFilterStore, injectTemplate, undo, redo, resetCanvasPositions } from '@/store';
-import { isExportDrawerOpenStore, isCommandPaletteOpenStore, isImportModalOpenStore } from '@/store/ui';
+import {
+  viewModeStore,
+  statusFilterStore,
+  searchFilterStore,
+  historyStore,
+  tutorialProgressStore,
+  injectTemplate,
+  undo,
+  redo,
+  resetCanvasPositions,
+  SCENE_TEMPLATES,
+  type ViewMode,
+} from '@/store';
+import {
+  isExportDrawerOpenStore,
+  isImportModalOpenStore,
+  showToast,
+} from '@/store/ui';
+import { Ri, type RiIconName } from '../common/Ri';
 import { clsx } from 'clsx';
-import { showToast } from '@/store/ui';
+
+const MODES: { mode: ViewMode; label: string; icon: RiIconName }[] = [
+  { mode: 'tile', label: 'Tile', icon: 'apps-line' },
+  { mode: 'list', label: 'List', icon: 'list-unordered' },
+  { mode: 'slide', label: 'Slide', icon: 'slideshow-line' },
+  { mode: 'canvas', label: 'Canvas', icon: 'drag-move-2-line' },
+];
+
+function TemplatesMenu() {
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey, true);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey, true);
+    };
+  }, [open]);
+
+  const inject = (id: string) => {
+    const result = injectTemplate(id);
+    setOpen(false);
+    triggerRef.current?.focus();
+    if (result) showToast(`${result.name} Added ${result.added} Scenes`);
+  };
+
+  return (
+    <div ref={rootRef} className="relative">
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={clsx(
+          'inline-flex h-11 items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors',
+          'hover:border-yellow-400 hover:bg-yellow-50 hover:text-yellow-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400',
+          open && 'border-yellow-400 bg-yellow-50 text-yellow-800'
+        )}
+      >
+        <Ri name="sparkling-2-fill" size={16} className="text-yellow-500" />
+        Templates
+      </button>
+      {open && (
+        <ul
+          role="menu"
+          aria-label="Scene templates"
+          onKeyDown={(e) => {
+            const items = itemRefs.current.filter(Boolean) as HTMLButtonElement[];
+            const cur = items.findIndex((el) => el === document.activeElement);
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              items[(cur + 1) % items.length]?.focus();
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              items[(cur - 1 + items.length) % items.length]?.focus();
+            }
+          }}
+          className="menu-pop absolute left-0 z-40 mt-1.5 w-72 rounded-xl border border-gray-200 bg-white p-1.5 shadow-xl"
+        >
+          {SCENE_TEMPLATES.map((t, i) => (
+            <li key={t.id} role="none">
+              <button
+                ref={(el) => {
+                  itemRefs.current[i] = el;
+                }}
+                role="menuitem"
+                type="button"
+                onClick={() => inject(t.id)}
+                className="flex w-full items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:bg-yellow-50 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+              >
+                <span>{t.name}</span>
+                <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-bold text-gray-500">
+                  {t.scenes.length} scenes
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
 
 export function StoryboardNav() {
   const viewMode = useStore(viewModeStore);
   const statusFilter = useStore(statusFilterStore);
   const searchFilter = useStore(searchFilterStore);
-  const scenes = useStore(scenesStore);
+  const history = useStore(historyStore);
+  const progress = useStore(tutorialProgressStore);
 
-  const handleTemplateInject = (type: string) => {
-    if (type === 'feature') {
-      injectTemplate([
-        { title: 'Feature Overview', body: 'Introduce the new feature.', status: 'draft' },
-        { title: 'Key Benefits', body: 'Highlight what users gain.', status: 'draft' },
-        { title: 'How to Use', body: 'Step-by-step guide.', status: 'draft' }
-      ]);
-      showToast('Injected Feature Walkthrough (3 scenes)');
-    } else {
-      injectTemplate([
-        { title: 'Announcement', body: 'We are thrilled to announce...', status: 'draft' },
-        { title: 'Changes', body: 'What has changed.', status: 'draft' },
-        { title: 'Rollout', body: 'When to expect it.', status: 'draft' }
-      ]);
-      showToast('Injected Release Announcement (3 scenes)');
-    }
+  const switchMode = (mode: ViewMode) => {
+    if (viewModeStore.get() === mode) return;
+    viewModeStore.set(mode);
+    const label = MODES.find((m) => m.mode === mode)?.label ?? mode;
+    showToast(`${label} Mode`);
   };
 
   return (
-    <nav className="flex items-center gap-2 mb-6 storyboard-nav sticky top-14 bg-white z-10 py-4 -mx-4 px-4 sm:mx-0 sm:px-0 border-b border-gray-100 flex-wrap" aria-label="Storyboard View Options">
-      <div className="flex-1 flex gap-2 items-center flex-wrap">
-        <label htmlFor="status-filter" className="sr-only">Filter by status</label>
+    <nav
+      aria-label="Storyboard controls"
+      className="storyboard-nav sticky top-16 z-20 -mx-4 mb-6 border-b border-gray-200/70 bg-white/95 px-4 py-3 backdrop-blur sm:mx-0 sm:px-0"
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        <label htmlFor="status-filter" className="sr-only">
+          Filter scenes by status
+        </label>
         <select
-            id="status-filter"
-            className="select select-sm select-bordered w-32 focus:ring-2 focus:ring-yellow-400"
-            value={statusFilter}
-            onChange={(e) => statusFilterStore.set(e.target.value as any)}
+          id="status-filter"
+          value={statusFilter}
+          onChange={(e) => statusFilterStore.set(e.target.value as 'all' | 'draft' | 'review' | 'ready')}
+          className="h-11 w-32 rounded-xl border border-gray-300 bg-white px-3 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:border-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
         >
-            <option value="all">All Status</option>
-            <option value="draft">Draft</option>
-            <option value="review">Review</option>
-            <option value="ready">Ready</option>
+          <option value="all">All Status</option>
+          <option value="draft">Draft</option>
+          <option value="review">Review</option>
+          <option value="ready">Ready</option>
         </select>
-        <div className="relative">
-            <svg className="absolute left-2.5 top-2 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <label htmlFor="search-scenes" className="sr-only">Search scenes</label>
-            <input
-                id="search-scenes"
-                type="text"
-                placeholder="Search scenes..."
-                className="input input-sm input-bordered pl-8 w-48 focus:ring-2 focus:ring-yellow-400"
-                value={searchFilter}
-                onChange={(e) => searchFilterStore.set(e.target.value)}
-            />
+
+        <div className="relative min-w-0 flex-1 sm:max-w-60">
+          <Ri
+            name="search-line"
+            size={16}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
+          <label htmlFor="search-scenes" className="sr-only">
+            Search scenes by title or description
+          </label>
+          <input
+            id="search-scenes"
+            type="search"
+            placeholder="Search scenes"
+            value={searchFilter}
+            onChange={(e) => searchFilterStore.set(e.target.value)}
+            className="h-11 w-full rounded-xl border border-gray-300 bg-white pl-9 pr-3 text-sm text-gray-800 shadow-sm transition-colors placeholder:text-gray-400 hover:border-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          />
         </div>
 
-        <div className="dropdown dropdown-bottom">
-          <button tabIndex={0} className="btn btn-sm btn-outline m-1 hover:bg-yellow-50 hover:text-yellow-700 hover:border-yellow-400" aria-haspopup="true">Templates</button>
-          <ul tabIndex={0} className="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52 border border-gray-100" role="menu">
-            <li role="menuitem"><button onClick={() => handleTemplateInject('feature')}>Feature Walkthrough <span className="text-xs text-gray-400 ml-auto">3 scenes</span></button></li>
-            <li role="menuitem"><button onClick={() => handleTemplateInject('release')}>Release Announcement <span className="text-xs text-gray-400 ml-auto">3 scenes</span></button></li>
-          </ul>
-        </div>
+        <TemplatesMenu />
 
         {viewMode === 'canvas' && (
-            <button className="btn btn-sm btn-outline hover:bg-yellow-50 hover:text-yellow-700 hover:border-yellow-400" onClick={() => resetCanvasPositions()}>
-                Reset layout
-            </button>
+          <button
+            type="button"
+            onClick={() => {
+              resetCanvasPositions();
+              showToast('Canvas Layout Reset');
+            }}
+            className="inline-flex h-11 items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3.5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-yellow-400 hover:bg-yellow-50 hover:text-yellow-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          >
+            <Ri name="refresh-line" size={16} />
+            Reset Layout
+          </button>
         )}
+
+        {/* Tutorial progress — live tutorial-wide checklist readout */}
+        <div
+          className="hidden items-center gap-2 rounded-xl bg-yellow-50 px-3 py-2 ring-1 ring-inset ring-yellow-200/70 md:flex"
+          title="Tutorial checklist progress across all scenes"
+        >
+          <Ri name="checkbox-circle-line" size={16} className="text-yellow-600" />
+          <div className="flex items-center gap-2" aria-label={`Tutorial progress: ${progress.checked} of ${progress.total} checklist items complete`}>
+            <div className="h-1.5 w-16 overflow-hidden rounded-full bg-yellow-200/70">
+              <div
+                className="h-full rounded-full bg-yellow-500 transition-[width] duration-500 ease-out"
+                style={{ width: progress.total ? `${(progress.checked / progress.total) * 100}%` : '0%' }}
+              />
+            </div>
+            <span className="text-xs font-bold tabular-nums text-yellow-800">
+              {progress.checked}/{progress.total}
+            </span>
+          </div>
+        </div>
+
+        <div className="ml-auto flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => undo()}
+            disabled={history.past.length === 0}
+            aria-label="Undo"
+            title="Undo"
+            className="grid h-11 w-11 place-items-center rounded-xl text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 disabled:pointer-events-none disabled:opacity-30"
+          >
+            <Ri name="arrow-go-back-line" size={19} />
+          </button>
+          <button
+            type="button"
+            onClick={() => redo()}
+            disabled={history.future.length === 0}
+            aria-label="Redo"
+            title="Redo"
+            className="grid h-11 w-11 place-items-center rounded-xl text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 disabled:pointer-events-none disabled:opacity-30"
+          >
+            <Ri name="arrow-go-forward-line" size={19} />
+          </button>
+
+          <span className="mx-1 hidden h-6 w-px bg-gray-200 sm:block" aria-hidden="true" />
+
+          <button
+            type="button"
+            onClick={() => isImportModalOpenStore.set(true)}
+            className="inline-flex h-11 items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-yellow-400 hover:bg-yellow-50 hover:text-yellow-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 sm:px-3.5"
+          >
+            <Ri name="upload-2-line" size={16} />
+            <span className="hidden sm:inline">Import</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => isExportDrawerOpenStore.set(true)}
+            className="inline-flex h-11 items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-yellow-400 hover:bg-yellow-50 hover:text-yellow-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 sm:px-3.5"
+          >
+            <Ri name="download-2-line" size={16} />
+            <span className="hidden sm:inline">Export</span>
+          </button>
+        </div>
       </div>
 
-      <div className="flex items-center gap-2 mr-4 flex-wrap">
-        <button className="btn btn-sm btn-ghost px-2 hover:bg-gray-100" onClick={undo} aria-label="Undo">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/></svg>
-        </button>
-        <button className="btn btn-sm btn-ghost px-2 hover:bg-gray-100" onClick={redo} aria-label="Redo">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7"/></svg>
-        </button>
-
-        <button className="btn btn-sm btn-outline text-gray-600 hover:bg-yellow-50 hover:text-yellow-700 hover:border-yellow-400" onClick={() => isImportModalOpenStore.set(true)}>Import</button>
-        <button className="btn btn-sm btn-outline text-gray-600 hover:bg-yellow-50 hover:text-yellow-700 hover:border-yellow-400" onClick={() => isExportDrawerOpenStore.set(true)}>Export</button>
-      </div>
-
-      <div className="flex items-center bg-gray-100 p-1 rounded-lg" role="group" aria-label="View Modes">
-        <button
-          className={clsx("p-1.5 rounded-md transition-all focus:ring-2 focus:ring-yellow-400", viewMode === 'tile' ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900")}
-          onClick={() => { viewModeStore.set('tile'); showToast('Tile mode'); }}
-          aria-pressed={viewMode === 'tile'}
-          aria-label="Tile mode"
+      <div className="mt-3 flex items-center justify-between gap-3">
+        <div
+          className="flex items-center gap-1 rounded-xl bg-gray-100 p-1"
+          role="group"
+          aria-label="View mode"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-tiles" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-        </button>
-        <button
-          className={clsx("p-1.5 rounded-md transition-all focus:ring-2 focus:ring-yellow-400", viewMode === 'list' ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900")}
-          onClick={() => { viewModeStore.set('list'); showToast('List mode'); }}
-          aria-pressed={viewMode === 'list'}
-          aria-label="List mode"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-list" aria-hidden="true"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
-        </button>
-        <button
-          className={clsx("p-1.5 rounded-md transition-all focus:ring-2 focus:ring-yellow-400", viewMode === 'slide' ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900")}
-          onClick={() => { viewModeStore.set('slide'); showToast('Slide mode'); }}
-          aria-pressed={viewMode === 'slide'}
-          aria-label="Slide mode"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-slides" aria-hidden="true"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M3 11h18"/></svg>
-        </button>
-        <button
-          className={clsx("p-1.5 rounded-md transition-all focus:ring-2 focus:ring-yellow-400", viewMode === 'canvas' ? "bg-white shadow-sm text-gray-900" : "text-gray-500 hover:text-gray-900")}
-          onClick={() => { viewModeStore.set('canvas'); showToast('Canvas mode'); }}
-          aria-pressed={viewMode === 'canvas'}
-          aria-label="Canvas mode"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon-canvas" aria-hidden="true"><path d="M5 3v18"/><path d="M19 3v18"/><path d="M3 5h18"/><path d="M3 19h18"/></svg>
-        </button>
+          {MODES.map(({ mode, label, icon }) => {
+            const active = viewMode === mode;
+            return (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => switchMode(mode)}
+                aria-pressed={active}
+                aria-label={`${label} view`}
+                title={`${label} view`}
+                className={clsx(
+                  'grid h-11 w-12 place-items-center rounded-lg transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 sm:w-16',
+                  active
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-500 hover:bg-gray-200/60 hover:text-gray-800 active:scale-95'
+                )}
+              >
+                <span className="flex flex-col items-center gap-0.5">
+                  <Ri name={icon} size={18} />
+                  <span className="text-[10px] font-bold leading-none tracking-wide">{label}</span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+        <p className="hidden text-xs font-medium text-gray-400 sm:block">
+          Press <kbd className="rounded-md border border-gray-300 bg-gray-50 px-1.5 py-0.5 font-sans text-[10px] font-bold text-gray-500">⌘K</kbd> for
+          commands
+        </p>
       </div>
     </nav>
   );
