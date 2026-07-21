@@ -33,16 +33,23 @@ button, input, select, textarea { font: inherit; }
 button { -webkit-tap-highlight-color: transparent; }
 
 button, [role="button"], input, select, textarea {
-  outline: none;
+  outline: 2px solid transparent;
+  outline-offset: 2px;
 }
 
-button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible,
+button:focus, [role="button"]:focus, input:focus, select:focus, textarea:focus {
+  outline: 2px solid #1aa7bc;
+  outline-offset: 2px;
   box-shadow: 0 0 0 3px color-mix(in srgb, #39c6dd 38%, transparent);
   border-color: #25b8cf !important;
 }
 
 .dark button:focus-visible, .dark [role="button"]:focus-visible, .dark input:focus-visible,
-.dark select:focus-visible, .dark textarea:focus-visible {
+.dark select:focus-visible, .dark textarea:focus-visible,
+.dark button:focus, .dark [role="button"]:focus, .dark input:focus,
+.dark select:focus, .dark textarea:focus {
+  outline-color: #56d9ec;
   box-shadow: 0 0 0 3px color-mix(in srgb, #56d9ec 42%, transparent);
 }
 
@@ -81,14 +88,14 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select
 .dark .action.primary { background: #1592a6; border-color: #1592a6; color: white; }
 .dark .action.danger { color: #ff9ba8; border-color: #6d3341; background: #2a1721; }
 
-.status-passed { --status: #21a879; --status-bg: #e5f8f1; --status-border: #9cdfc8; }
-.status-rejected { --status: #df475a; --status-bg: #fff0f2; --status-border: #f1a6b1; }
-.status-running { --status: #d48a17; --status-bg: #fff5df; --status-border: #efc474; }
-.status-pending { --status: #687a91; --status-bg: #edf1f5; --status-border: #c5cfda; }
-.dark .status-passed { --status: #3ad5a0; --status-bg: #0d322c; --status-border: #246853; }
-.dark .status-rejected { --status: #ff7181; --status-bg: #351a25; --status-border: #733543; }
-.dark .status-running { --status: #f8bc55; --status-bg: #372911; --status-border: #765725; }
-.dark .status-pending { --status: #9bacc0; --status-bg: #172538; --status-border: #3a4e64; }
+.status-passed { --status: #064e37; --status-bg: #dff5eb; --status-border: #6fbf9f; }
+.status-rejected { --status: #8a1328; --status-bg: #ffe8ec; --status-border: #e07a8a; }
+.status-running { --status: #684100; --status-bg: #fff0cf; --status-border: #d9a23d; }
+.status-pending { --status: #243447; --status-bg: #e8edf2; --status-border: #a8b6c6; }
+.dark .status-passed { --status: #7ef0c8; --status-bg: #0d322c; --status-border: #246853; }
+.dark .status-rejected { --status: #ffb3bc; --status-bg: #351a25; --status-border: #733543; }
+.dark .status-running { --status: #ffd27a; --status-bg: #372911; --status-border: #765725; }
+.dark .status-pending { --status: #d7e3ef; --status-bg: #172538; --status-border: #3a4e64; }
 
 .status-pill { color: var(--status); background: var(--status-bg); border: 1px solid var(--status-border); }
 .status-dot { background: var(--status); }
@@ -99,17 +106,40 @@ button:focus-visible, [role="button"]:focus-visible, input:focus-visible, select
 .dark .severity-S2 { background: #34260f; color: #f5bd59; border-color: #76551d; }
 .dark .severity-S3 { background: #122c38; color: #8ed2e4; border-color: #31596a; }
 
-.banner-enter { animation: banner-in .24s ease both; }
-.toast-enter { animation: toast-in .24s ease both; }
-.timeline-enter { animation: timeline-in .3s ease both; }
-.modal-card { animation: modal-in .24s cubic-bezier(.2,.8,.2,1) both; }
+.banner-enter { animation: banner-in .28s ease both; }
+.toast-enter { animation: toast-in .28s ease both; }
+.timeline-enter { animation: timeline-in .32s ease both; }
 
-@keyframes banner-in { from { opacity: 0; transform: translateY(-8px); } }
-@keyframes toast-in { from { opacity: 0; transform: translateY(10px); } }
-@keyframes timeline-in { from { opacity: 0; transform: translateX(8px); } }
-@keyframes modal-in { from { opacity: 0; transform: scale(.97); } }
+@keyframes banner-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes timeline-in {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
-@media (max-width: 768px) { button, .action, .header-action, .close-button, .icon-button, select, input { min-height: 44px; } .close-button, .icon-button, .header-action { min-width: 44px; justify-content: center; align-items: center; } }
+@media (max-width: 768px) {
+  button, .action, .header-action, .close-button, .icon-button, select, input, nav button, .stage-segment, .add-note-inline, .gate-state {
+    min-height: 44px;
+  }
+  .close-button, .icon-button, .header-action, nav button {
+    min-width: 44px;
+    justify-content: center;
+    align-items: center;
+  }
+  .search-field, .sort-field { min-height: 44px; }
+  .sort-field select, .search-field input { min-height: 44px; font-size: .78rem; }
+}

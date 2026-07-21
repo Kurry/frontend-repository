@@ -16,7 +16,13 @@
     </div>
     <div class="filter-block">
       <label for="severity-filter"><Funnel size={14} /> Severity filter</label>
-      <select id="severity-filter" bind:value={consoleStore.severityFilter}>
+      <select
+        id="severity-filter"
+        value={consoleStore.severityFilter}
+        onchange={(event) => {
+          consoleStore.severityFilter = event.currentTarget.value as 'all' | 'S1' | 'S2' | 'S3';
+        }}
+      >
         <option value="all">All severities</option>
         <option value="S1">S1 · hard gates</option>
         <option value="S2">S2 · required</option>
@@ -121,9 +127,11 @@
   .empty-state strong { color:inherit; font-size:.8rem; }
   .empty-state span { font-size:.67rem; }
   @media (max-width:760px) {
-    .back { display:flex; }
+    .back { display:flex; min-height:44px; }
     .registry-header { align-items:flex-start; flex-direction:column; gap:.8rem; }
     .registry-layout { grid-template-columns:1fr; }
     .registry-detail { position:static; order:-1; }
+    select { min-height:44px; font-size:.78rem; width:100%; }
+    .clear-filter { min-height:44px; }
   }
 </style>

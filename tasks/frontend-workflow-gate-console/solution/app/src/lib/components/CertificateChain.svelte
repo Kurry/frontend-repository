@@ -57,17 +57,21 @@
   h3 { margin:.12rem 0 0; font-size:.94rem; }
   .chain-count { color:#728196; font:600 .64rem var(--font-mono); }
   .chain-scroll { overflow-x:auto; padding:.2rem .1rem .5rem; }
-  .chain { min-width:690px; display:flex; align-items:center; justify-content:space-between; }
-  .chain-node { width:92px; flex:none; display:flex; flex-direction:column; align-items:center; color:inherit; background:transparent; border:0; border-radius:.6rem; padding:.35rem .2rem; }
+  .chain { width:max-content; min-width:100%; display:flex; align-items:center; gap:.35rem; flex-wrap:nowrap; }
+  .chain-node { width:5.6rem; flex:0 0 5.6rem; min-width:5.6rem; display:flex; flex-direction:column; align-items:center; color:inherit; background:transparent; border:0; border-radius:.6rem; padding:.35rem .15rem; }
   .chain-node.clickable { cursor:pointer; transition:background-color .18s, transform .16s; }
   .chain-node.clickable:hover { background:rgba(75,148,162,.09); transform:translateY(-2px); }
   .node-icon { display:grid; place-items:center; width:2.4rem; height:2.4rem; border-radius:.65rem; }
-  .node-stage { margin-top:.35rem; font-size:.64rem; font-weight:800; white-space:nowrap; }
+  .node-stage { margin-top:.35rem; max-width:100%; font-size:.58rem; font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .node-status { margin-top:.08rem; color:var(--status); font-size:.54rem; font-weight:750; text-transform:uppercase; letter-spacing:.05em; }
-  .chain-link { flex:1; min-width:40px; display:flex; align-items:center; color:#8798aa; }
+  .chain-link { flex:0 0 auto; width:1.4rem; min-width:1.1rem; display:flex; align-items:center; color:#8798aa; }
   .chain-link span { flex:1; height:2px; background:currentColor; }
   .chain-link.intact { color:#20a777; }
   .chain-link.broken { color:#df475a; }
   .chain-link.broken span, .chain-link.waiting span { height:0; border-top:2px dashed currentColor; background:transparent; }
   .chain-link.waiting:not(.broken) { color:#8898aa; opacity:.72; }
+  @media (max-width:700px) {
+    .chain-node { min-height:44px; }
+    .node-stage { font-size:.52rem; }
+  }
 </style>
