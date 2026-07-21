@@ -97,7 +97,18 @@ export function watchHash() {
   window.addEventListener('hashchange', () => {
     if (location.hash === lastWrittenHash) return;
     const m = /#theme=([^&]+)/.exec(location.hash);
-    if (!m) return;
+    if (!m) {
+      state.customs = [];
+      state.snapshots = [];
+      state.past = [];
+      state.future = [];
+      state.activeId = 'builtin-light';
+      state.previewTab = 'demo';
+      state.colorBlind = 'none';
+      try { history.replaceState(null, '', location.pathname + location.search); lastWrittenHash = null; } catch { /* noop */ }
+      notify('structure');
+      return;
+    }
     const decoded = decodeThemeHash(m[1]);
     if (!decoded) {
       state.customs = [];
@@ -105,6 +116,8 @@ export function watchHash() {
       state.past = [];
       state.future = [];
       state.activeId = 'builtin-light';
+      state.previewTab = 'demo';
+      state.colorBlind = 'none';
       try {
         history.replaceState(null, '', location.pathname + location.search);
         lastWrittenHash = null;
@@ -442,11 +455,29 @@ export function diffAgainstSnapshot() {
 // Fresh-load: apply the #theme= hash or fall back to the seeded defaults.
 export function loadFromHash() {
   const m = /#theme=([^&]+)/.exec(location.hash);
-  if (!m) return false;
+  if (!m) {
+    state.customs = [];
+    state.snapshots = [];
+    state.past = [];
+    state.future = [];
+    state.activeId = 'builtin-light';
+    state.previewTab = 'demo';
+    state.colorBlind = 'none';
+    notify('structure');
+    return false;
+  }
   const decoded = decodeThemeHash(m[1]);
   if (!decoded) {
     // Malformed / undecodable payload: fall back to seeded defaults, no errors.
+    state.customs = [];
+    state.snapshots = [];
+    state.past = [];
+    state.future = [];
+    state.activeId = 'builtin-light';
+    state.previewTab = 'demo';
+    state.colorBlind = 'none';
     try { history.replaceState(null, '', location.pathname + location.search); } catch { /* noop */ }
+    notify('structure');
     return false;
   }
   const name = uniqueName(decoded.name);
