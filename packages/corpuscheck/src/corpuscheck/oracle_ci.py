@@ -22,6 +22,7 @@ STAGES = (
     "build",
     "serve-browser",
     "webmcp",
+    "e2e",
     "judge-setup",
 )
 _SOLUTION_PATH = re.compile(r"^tasks/([^/]+)/solution(?:/|$)")
@@ -327,7 +328,7 @@ def run_oracle_ci(
     repo_root: Path | None = None,
     run: Run = subprocess.run,
 ) -> int:
-    """Run all five oracle-CI stages serially for each requested task."""
+    """Run all oracle-CI stages serially for each requested task."""
     root = repo_root or find_repo_root(tasks_root)
     for slug in slugs:
         task = _task_dir(tasks_root, slug)

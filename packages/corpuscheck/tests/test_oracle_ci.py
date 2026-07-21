@@ -222,7 +222,7 @@ def test_build_stage_names_verify_build_failure(tmp_path: Path) -> None:
         _build_stage(task, run=run)
 
 
-@pytest.mark.parametrize("stage", ["serve-browser", "webmcp", "judge-setup"])
+@pytest.mark.parametrize("stage", ["serve-browser", "webmcp", "e2e", "judge-setup"])
 def test_runtime_stage_preserves_named_runtime_failure(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -245,3 +245,192 @@ def test_runtime_stage_preserves_named_runtime_failure(
         _runtime_stage(task, tmp_path, run=run)
     assert caught.value.stage == stage
     assert caught.value.message == "expected failure"
+
+
+# --- e2e stage (assets/oracle_ci_e2e.mjs) ------------------------------------
+
+_E2E_HELPER = Path(__file__).parents[1] / "src/corpuscheck/assets/oracle_ci_e2e.mjs"
+_REPO_NODE_MODULES = Path(__file__).parents[3] / "node_modules"
+
+requires_playwright_test = pytest.mark.skipif(
+    not (_REPO_NODE_MODULES / "@playwright/test/package.json").is_file(),
+    reason="@playwright/test is not installed at the repo root (run npm ci)",
+)
+
+_PASSING_SPEC = """
+import { test, expect } from '@playwright/test';
+test('adds numbers', () => { expect(1 + 1).toBe(2); });
+test('joins strings', () => { expect('a' + 'b').toBe('ab'); });
+"""
+_FAILING_SPEC = """
+import { test, expect } from '@playwright/test';
+test('adds numbers', () => { expect(1 + 1).toBe(2); });
+test('states a falsehood', () => { expect(1).toBe(2); });
+"""
+_SKIP_HEAVY_SPEC = """
+import { test, expect } from '@playwright/test';
+test('adds numbers', () => { expect(1 + 1).toBe(2); });
+test.skip('first stub', () => { expect(1).toBe(2); });
+test.skip('second stub', () => { expect(1).toBe(2); });
+"""
+_DECOY_CONFIG = "module.exports = { testDir: '.', testMatch: 'decoy.spec.mjs' };\n"
+_DECOY_SPEC = """
+import { test, expect } from '@playwright/test';
+test('decoy must never run', () => { expect(true).toBe(false); });
+"""
+_CANONICAL_CONFIG = """
+import { defineConfig } from '@playwright/test';
+export default defineConfig({
+  testDir: '.',
+  testMatch: 'e2e.spec.mjs',
+  timeout: 30_000,
+  retries: 0,
+  reporter: [['list']],
+});
+"""
+
+
+def make_e2e_app(
+    tmp_path: Path, *, spec: str | None, extra: dict[str, str] | None = None
+) -> Path:
+    app = tmp_path / "app"
+    app.mkdir()
+    (app / "package.json").write_text('{"name": "fixture", "private": true}')
+    if spec is not None:
+        (app / "e2e.spec.mjs").write_text(spec)
+    for name, content in (extra or {}).items():
+        (app / name).write_text(content)
+    if _REPO_NODE_MODULES.is_dir():
+        (app / "node_modules").symlink_to(_REPO_NODE_MODULES, target_is_directory=True)
+    return app
+
+
+def run_e2e_suite(tmp_path: Path, app: Path) -> dict:
+    runtime = tmp_path / "runtime"
+    runtime.mkdir(exist_ok=True)
+    script = f"""
+      import {{ runE2eSuite }} from {json.dumps(_E2E_HELPER.as_uri())};
+      const result = await runE2eSuite({{
+        slug: 'fixture',
+        appDir: {json.dumps(str(app))},
+        runtimeDir: {json.dumps(str(runtime))},
+      }});
+      console.log(JSON.stringify(result));
+    """
+    completed = subprocess.run(
+        ["node", "--input-type=module", "--eval", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(completed.stdout.strip().splitlines()[-1])
+
+
+def test_e2e_stage_skips_when_task_has_no_spec(tmp_path: Path) -> None:
+    app = tmp_path / "app"
+    app.mkdir()
+    (app / "package.json").write_text('{"name": "fixture", "private": true}')
+
+    assert run_e2e_suite(tmp_path, app) == {"status": "skip"}
+
+
+def test_e2e_stage_fails_clearly_when_playwright_test_is_missing(
+    tmp_path: Path,
+) -> None:
+    app = tmp_path / "app"
+    app.mkdir()
+    (app / "package.json").write_text('{"name": "fixture", "private": true}')
+    (app / "e2e.spec.mjs").write_text(_PASSING_SPEC)
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "fail"
+    assert "@playwright/test is not resolvable" in result["message"]
+
+
+@requires_playwright_test
+def test_e2e_stage_passes_with_stub_passing_suite(tmp_path: Path) -> None:
+    app = make_e2e_app(tmp_path, spec=_PASSING_SPEC)
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "pass"
+    assert (result["passed"], result["failed"], result["skipped"]) == (2, 0, 0)
+    assert "warning" not in result
+    assert result["detail"] == "passed=2 failed=0 skipped=0 flaky=0"
+
+
+@requires_playwright_test
+def test_e2e_stage_fails_and_names_the_failing_tests(tmp_path: Path) -> None:
+    app = make_e2e_app(tmp_path, spec=_FAILING_SPEC)
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "fail"
+    assert "passed=1 failed=1" in result["message"]
+    assert "states a falsehood" in result["message"]
+
+
+@requires_playwright_test
+def test_e2e_stage_warns_when_skipped_exceeds_passed(tmp_path: Path) -> None:
+    app = make_e2e_app(tmp_path, spec=_SKIP_HEAVY_SPEC)
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "pass"
+    assert (result["passed"], result["skipped"]) == (1, 2)
+    assert "skip stub" in result["warning"]
+
+
+@requires_playwright_test
+def test_e2e_stage_discovery_ignores_app_local_playwright_config(
+    tmp_path: Path,
+) -> None:
+    app = make_e2e_app(
+        tmp_path,
+        spec=_PASSING_SPEC,
+        extra={"playwright.config.js": _DECOY_CONFIG, "decoy.spec.mjs": _DECOY_SPEC},
+    )
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "pass"
+    assert (result["passed"], result["failed"]) == (2, 0)
+
+
+def test_generated_e2e_config_targets_the_served_app() -> None:
+    script = f"""
+      import {{ generatedConfigSource }} from {json.dumps(_E2E_HELPER.as_uri())};
+      const source = generatedConfigSource('/tmp/app');
+      const config = (await import(`data:text/javascript,${{encodeURIComponent(source)}}`)).default;
+      console.log(JSON.stringify(config));
+    """
+    completed = subprocess.run(
+        ["node", "--input-type=module", "--eval", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    config = json.loads(completed.stdout)
+    assert config["use"]["baseURL"] == "http://127.0.0.1:3000"
+
+
+@requires_playwright_test
+def test_e2e_stage_prefers_canonical_config_and_still_ignores_decoy(
+    tmp_path: Path,
+) -> None:
+    app = make_e2e_app(
+        tmp_path,
+        spec=_PASSING_SPEC,
+        extra={
+            "e2e.playwright.config.mjs": _CANONICAL_CONFIG,
+            "playwright.config.js": _DECOY_CONFIG,
+            "decoy.spec.mjs": _DECOY_SPEC,
+        },
+    )
+
+    result = run_e2e_suite(tmp_path, app)
+
+    assert result["status"] == "pass"
+    assert (result["passed"], result["failed"]) == (2, 0)

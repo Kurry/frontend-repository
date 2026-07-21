@@ -94,10 +94,12 @@ The NOP scaffold contains an empty body, WebMCP contract stubs, and exactly the
 ## Oracle contract CI
 
 `oracle-ci` is the deterministic pre-scoring gate for solution oracles. It runs
-the same five stages locally and in `.github/workflows/oracle-ci.yml`: all
+the same six stages locally and in `.github/workflows/oracle-ci.yml`: all
 static validation tiers; `npm ci` plus `verify:build`; a port-3000 Chromium
 smoke with non-empty HTML and zero console/page errors; assigned-module,
-read-only, and visible-mutation WebMCP probes; and a structural boot of every
+read-only, and visible-mutation WebMCP probes; the task's canonical Playwright
+e2e suite (`solution/app/e2e.spec.mjs`, run against the same served app —
+skipped with a log line when the spec is absent); and a structural boot of every
 dimension TOML's judge MCP servers against the primary and reduced-motion CDP
 browsers. It never installs rewardkit, calls an LLM, or needs API keys.
 

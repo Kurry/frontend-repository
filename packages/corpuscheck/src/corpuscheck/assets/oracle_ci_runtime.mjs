@@ -15,6 +15,7 @@ import {
   changedPaths,
   isErrorResult,
 } from './oracle_ci_semantics.mjs';
+import { runE2eSuite } from './oracle_ci_e2e.mjs';
 
 const { chromium } = resolvePlaywright();
 const APP_URL = 'http://127.0.0.1:3000';
@@ -381,11 +382,34 @@ async function browserAndWebMcp(config) {
     );
     await browser.close();
     browser = null;
+    await e2eStage(config);
     await judgeSetup(config);
   } finally {
     if (browser) await browser.close().catch(() => {});
     stopProcess(app.proc);
   }
+}
+
+// Runs the task's canonical Playwright suite (solution/app/e2e.spec.mjs)
+// against the same `npm start` server the serve-browser/webmcp stages used —
+// the app process is still alive here, so no second server is started.
+async function e2eStage(config) {
+  const result = await runE2eSuite({
+    slug: config.slug,
+    appDir: config.appDir,
+    runtimeDir: config.runtimeDir,
+  });
+  if (result.status === 'skip') {
+    console.log(
+      `ORACLE_CI_STAGE ${config.slug} [e2e]: SKIP (no e2e.spec.mjs; canonical coverage arrives progressively)`,
+    );
+    return;
+  }
+  if (result.status === 'fail') throw new StageError('e2e', result.message);
+  if (result.warning) {
+    console.log(`ORACLE_CI_STAGE ${config.slug} [e2e]: WARNING ${result.warning}`);
+  }
+  stagePass(config, 'e2e', result.detail);
 }
 
 function startChrome(config, port, reducedMotion) {
