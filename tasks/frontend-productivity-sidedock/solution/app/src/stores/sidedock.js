@@ -764,9 +764,9 @@ export const useSidedockStore = defineStore('sidedock', () => {
       })
     }
     activeWorkspace.value.items = items
-    pinnedBookmarks.value = pinnedBookmarks.value.filter((pin) => {
-      return findItemById(pin.id, activeWorkspace.value.items)
-    })
+    pinnedBookmarks.value = pinnedBookmarks.value.filter((pin) =>
+      workspaces.value.some((workspace) => findItemById(pin.id, workspace.items)),
+    )
     selectedItemIds.value = []
     focusedItemId.value = null
     addToast('Loaded 10,000 virtualized items', 'success')

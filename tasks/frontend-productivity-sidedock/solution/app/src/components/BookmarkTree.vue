@@ -322,9 +322,7 @@ const allSelected = computed(() => flatItems.value.length > 0 && flatItems.value
 
     <!-- Virtual list -->
     <div
-      v-else
-      v-auto-animate
-      role="list"
+      v-else      role="list"
       aria-label="Bookmarks and folders"
       :style="{ height: totalSize + 'px', position: 'relative', width: '100%' }"
       @dragover.prevent

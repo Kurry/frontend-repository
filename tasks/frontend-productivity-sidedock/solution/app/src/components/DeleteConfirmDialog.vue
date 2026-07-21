@@ -18,17 +18,22 @@ const lastTrigger = ref(null)
 watch(() => props.show, (open) => {
   if (open) {
     lastTrigger.value = document.activeElement
-    nextTick(() => deleteBtn.value?.focus())
+    nextTick(() => buttonEl(deleteBtn)?.focus())
   } else if (lastTrigger.value && typeof lastTrigger.value.focus === 'function') {
     nextTick(() => lastTrigger.value.focus())
     lastTrigger.value = null
   }
 })
 
+function buttonEl(ref) {
+  const node = ref?.value
+  return node?.$el ?? node
+}
+
 function onKeydown(event) {
   if (!props.show) return
   if (event.key === 'Tab') {
-    const focusables = [deleteBtn.value, cancelBtn.value].filter(Boolean)
+    const focusables = [buttonEl(deleteBtn), buttonEl(cancelBtn)].filter((el) => el instanceof HTMLElement)
     if (focusables.length < 2) return
     const first = focusables[0]
     const last = focusables[focusables.length - 1]
