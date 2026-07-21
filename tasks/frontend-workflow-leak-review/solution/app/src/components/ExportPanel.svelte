@@ -14,25 +14,29 @@
   let closeButtonEl = $state(null);
 
   const { form: importForm, errors: importErrors, reset: resetImport } = createForm({
-    initialValues: { document: undefined },
+    initialValues: { documentFile: undefined, documentText: '' },
     extend: validator({ schema: importFileSchema }),
     onSubmit: async (values) => {
       appState.importError = '';
       readingFile = true;
       try {
-        const file = typeof File !== 'undefined' && values.document instanceof File ? values.document : values.document?.[0];
-        if (!file) {
-          appState.importError = 'payload: Select one Review report JSON file.';
+        const file = typeof File !== 'undefined' && values.documentFile instanceof File ? values.documentFile : values.documentFile?.[0];
+        let rawText = '';
+        if (file) {
+          rawText = await file.text();
+        } else if (values.documentText && values.documentText.trim().length > 0) {
+          rawText = values.documentText;
+        } else {
+          appState.importError = 'payload: Select one Review report JSON file or paste JSON.';
           return;
         }
-        const rawText = await file.text();
         const result = appState.importReport(rawText);
         if (result.ok) {
           selectedFileName = '';
           resetImport();
         }
       } catch {
-        appState.importError = 'payload: The selected import file could not be read.';
+        appState.importError = 'payload: The selected import payload could not be read.';
       } finally {
         readingFile = false;
       }
@@ -122,16 +126,22 @@
               </label>
               <input
                 id="report-import"
-                name="document"
+                name="documentFile"
                 type="file"
                 accept="application/json,.json"
                 class="sr-only"
                 onchange={(event) => selectedFileName = event.currentTarget.files?.[0]?.name || ''}
               />
-              <Button type="submit" size="sm" color="alternative" class="interactive w-full !min-h-11 !rounded-lg !border-white/15 !bg-white/10 !text-white hover:!bg-white/20" disabled={!selectedFileName || readingFile}>
+              <textarea
+                name="documentText"
+                rows="2"
+                placeholder="Or paste JSON payload here..."
+                class="w-full rounded border border-white/20 bg-white/5 px-3 py-2 text-[10px] text-slate-200 placeholder:text-slate-400 focus:border-teal-500 focus:ring-1 focus:ring-teal-500"
+              ></textarea>
+              <Button type="submit" size="sm" color="alternative" class="interactive w-full !min-h-11 !rounded-lg !border-white/15 !bg-white/10 !text-white hover:!bg-white/20" disabled={readingFile}>
                 {readingFile ? 'Validating…' : 'Import report'}
               </Button>
-              {#if selectedFileName && $importErrors.document}<p class="text-[10px] font-bold leading-4 text-rose-200">{$importErrors.document}</p>{/if}
+              {#if $importErrors.documentFile}<p class="text-[10px] font-bold leading-4 text-rose-200" aria-live="polite">{$importErrors.documentFile}</p>{/if}
               {#if appState.importError}<p class="rounded-md border border-rose-400/40 bg-rose-500/15 p-2 text-[10px] font-bold leading-4 text-rose-100" role="alert">{appState.importError}</p>{/if}
             </form>
           </div>

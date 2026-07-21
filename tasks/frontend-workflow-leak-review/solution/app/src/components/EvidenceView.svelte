@@ -8,9 +8,7 @@
   let { state: appState } = $props();
   let submissionPane = $state();
   let referencePane = $state();
-  let verdict = $state('');
-  let rationale = $state('');
-  let submitError = $state('');
+      let submitError = $state('');
   let touched = $state({ verdict: false, rationale: false });
 
   const submission = $derived(appState.selectedSubmission);
@@ -18,7 +16,7 @@
   const existingDecision = $derived(appState.decisions.find((entry) => entry.submissionId === submission?.id));
 
   const validation = $derived.by(() => {
-    const parsed = decisionSchema.safeParse({ verdict, rationale });
+    const parsed = decisionSchema.safeParse(appState.draftDecision);
     if (parsed.success) return { ok: true, errors: {} };
     const errors = {};
     for (const issue of parsed.error.issues) {
@@ -32,8 +30,7 @@
     // Reset draft fields when the selected submission changes.
     const id = appState.selectedSubmissionId;
     void id;
-    verdict = '';
-    rationale = '';
+    appState.draftDecision.verdict = ''; appState.draftDecision.rationale = '';
     submitError = '';
     touched = { verdict: false, rationale: false };
   });
@@ -57,7 +54,7 @@
     touched = { verdict: true, rationale: true };
     submitError = '';
     if (!validation.ok) return;
-    const result = await appState.submitDecision({ verdict, rationale });
+    const result = await appState.submitDecision(appState.draftDecision);
     if (!result.ok) {
       submitError = result.error;
       return;
@@ -67,6 +64,13 @@
     appState.navigate('queue');
   }
 </script>
+
+<svelte:window onkeydown={(e) => {
+  if (appState.activeView === 'evidence-view' && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+    if (e.key.toLowerCase() === 'c') { e.preventDefault(); appState.draftDecision.verdict = 'confirm-clean'; touched.verdict = true; }
+    if (e.key.toLowerCase() === 'l') { e.preventDefault(); appState.draftDecision.verdict = 'confirm-leak'; touched.verdict = true; }
+  }
+}} />
 
 {#if submission}
   <div class="space-y-5">
@@ -155,41 +159,41 @@
           <fieldset>
             <legend class="mb-2 text-sm font-extrabold">Verdict <span class="text-rose-600">*</span></legend>
             <div class="grid gap-2 sm:grid-cols-2">
-              <label class={`interactive flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border p-3.5 ${verdict === 'confirm-clean' ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/15' : 'border-slate-300 bg-white hover:border-emerald-300'}`}>
+              <label class={`interactive flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border p-3.5 ${appState.draftDecision.verdict === 'confirm-clean' ? 'border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/15' : 'border-slate-300 bg-white hover:border-emerald-300'}`}>
                 <input
                   class="size-4 accent-emerald-600"
                   type="radio"
                   name="verdict"
                   value="confirm-clean"
-                  checked={verdict === 'confirm-clean'}
-                  onchange={() => { verdict = 'confirm-clean'; touched.verdict = true; }}
+                  checked={appState.draftDecision.verdict === 'confirm-clean'}
+                  onchange={() => { appState.draftDecision.verdict = 'confirm-clean'; touched.verdict = true; }}
                   aria-describedby="verdict-error"
                 />
                 <CheckCircle aria-hidden="true" class="text-emerald-600" size={20} weight="fill" />
                 <span><span class="block text-sm font-extrabold">Confirm clean</span><span class="block text-[11px] text-slate-500">Evidence does not establish a leak.</span></span>
               </label>
-              <label class={`interactive flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border p-3.5 ${verdict === 'confirm-leak' ? 'border-rose-500 bg-rose-50 ring-2 ring-rose-500/15' : 'border-slate-300 bg-white hover:border-rose-300'}`}>
+              <label class={`interactive flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border p-3.5 ${appState.draftDecision.verdict === 'confirm-leak' ? 'border-rose-500 bg-rose-50 ring-2 ring-rose-500/15' : 'border-slate-300 bg-white hover:border-rose-300'}`}>
                 <input
                   class="size-4 accent-rose-600"
                   type="radio"
                   name="verdict"
                   value="confirm-leak"
-                  checked={verdict === 'confirm-leak'}
-                  onchange={() => { verdict = 'confirm-leak'; touched.verdict = true; }}
+                  checked={appState.draftDecision.verdict === 'confirm-leak'}
+                  onchange={() => { appState.draftDecision.verdict = 'confirm-leak'; touched.verdict = true; }}
                   aria-describedby="verdict-error"
                 />
                 <WarningDiamond aria-hidden="true" class="text-rose-600" size={20} weight="fill" />
                 <span><span class="block text-sm font-extrabold">Confirm leak</span><span class="block text-[11px] text-slate-500">Evidence establishes reference exposure.</span></span>
               </label>
             </div>
-            {#if touched.verdict && validation.errors.verdict}<p id="verdict-error" class="field-error">{validation.errors.verdict}</p>
-            {:else if touched.verdict && !verdict}<p id="verdict-error" class="field-error">Verdict is required: choose Confirm clean or Confirm leak.</p>{/if}
+            {#if touched.verdict && validation.errors.verdict}<p id="verdict-error" class="field-error" aria-live="polite">{validation.errors.verdict}</p>
+            {:else if touched.verdict && !appState.draftDecision.verdict}<p id="verdict-error" class="field-error" aria-live="polite">Verdict is required: choose Confirm clean or Confirm leak.</p>{/if}
           </fieldset>
 
           <div>
             <div class="mb-2 flex items-center justify-between">
               <label for="rationale" class="text-sm font-extrabold">Rationale <span class="text-rose-600">*</span></label>
-              <span class={`tabular text-[10px] font-bold ${rationale.length > 2000 ? 'text-rose-700' : 'text-slate-500'}`}>{rationale.length} / 2000</span>
+              <span class={`tabular text-[10px] font-bold ${appState.draftDecision.rationale.length > 2000 ? 'text-rose-700' : 'text-slate-500'}`}>{appState.draftDecision.rationale.length} / 2000</span>
             </div>
             <textarea
               id="rationale"
@@ -199,19 +203,19 @@
               aria-describedby="rationale-help rationale-error"
               aria-invalid={touched.rationale && Boolean(validation.errors.rationale)}
               class={`w-full rounded-xl border bg-white px-3 py-2.5 text-sm focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-500/20 ${touched.rationale && validation.errors.rationale ? 'border-rose-500' : 'border-slate-300'}`}
-              value={rationale}
-              oninput={(event) => { rationale = event.currentTarget.value; touched.rationale = true; }}
+              value={appState.draftDecision.rationale}
+              oninput={(event) => { appState.draftDecision.rationale = event.currentTarget.value; touched.rationale = true; }}
             ></textarea>
             <p id="rationale-help" class="mt-1 text-[11px] text-slate-500">Required trimmed string, 20 to 2000 characters inclusive.</p>
-            {#if touched.rationale && validation.errors.rationale}<p id="rationale-error" class="field-error">rationale: {validation.errors.rationale}</p>{/if}
+            {#if touched.rationale && validation.errors.rationale}<p id="rationale-error" class="field-error" aria-live="polite">rationale: {validation.errors.rationale}</p>{/if}
           </div>
 
           {#if submitError}<p class="rounded-lg border border-rose-300 bg-rose-50 px-3 py-2 text-xs font-bold text-rose-800" role="alert">{submitError}</p>{/if}
 
           <div class="flex flex-col-reverse gap-2 border-t border-line pt-4 sm:flex-row sm:justify-end">
             <Button type="button" color="alternative" class="interactive !min-h-11 !rounded-lg" onclick={() => appState.cancelDecision()}>Cancel</Button>
-            <Button type="submit" color="red" class="interactive !min-h-11 !rounded-lg !bg-signal-600 hover:!bg-signal-500" disabled={!validation.ok || appState.submitting}>
-              {appState.submitting ? 'Recording decision…' : (verdict === 'confirm-clean' ? 'Confirm clean' : verdict === 'confirm-leak' ? 'Confirm leak' : 'Choose a verdict')}
+            <Button type="submit" color="red" class="interactive !min-h-11 !rounded-lg !bg-signal-600 hover:!bg-signal-500" disabled={appState.submitting}>
+              {appState.submitting ? 'Recording decision…' : (appState.draftDecision.verdict === 'confirm-clean' ? 'Confirm clean' : appState.draftDecision.verdict === 'confirm-leak' ? 'Confirm leak' : 'Choose a verdict')}
             </Button>
           </div>
         </form>
