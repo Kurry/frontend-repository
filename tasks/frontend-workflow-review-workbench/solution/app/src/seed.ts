@@ -10,7 +10,7 @@ const PROFILES = [
   { slug: 'ember-relay-router', title: 'Ember relay router', subject: 'a relay routing repair across fallback and retry branches', state: 'ember' },
   { slug: 'drift-ledger-repair', title: 'Drift ledger repair', subject: 'a ledger reconciliation repair for duplicated journal edges', state: 'fixable-oracle' },
   { slug: 'spruce-query-normalizer', title: 'Spruce query normalizer', subject: 'a query normalization task around escaped grouping tokens', state: 'fixable-difficulty' },
-  { slug: 'harbor-state-reducer', title: 'Harbor state reducer', subject: 'a state reducer correction for out-of-order acknowledgements', state: 'fixable-analysis' },
+  { slug: 'anchor-state-reducer', title: 'Anchor state reducer', subject: 'a state reducer correction for out-of-order acknowledgements', state: 'fixable-analysis' },
   { slug: 'linen-timeout-guard', title: 'Linen timeout guard', subject: 'a timeout guard that separates cancellation from transport failure', state: 'fixable-noop' },
   { slug: 'basalt-runtime-audit', title: 'Basalt runtime audit', subject: 'a runtime audit task for deferred worker cleanup', state: 'risk-runtime' },
   { slug: 'orchid-oracle-bridge', title: 'Orchid oracle bridge', subject: 'an oracle bridge task with competing precedence rules', state: 'risk-oracle' },
