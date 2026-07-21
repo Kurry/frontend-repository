@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jules Live Code Review"
+  short_description: "Review and steer live Jules coding sessions"
+  default_prompt: "Use $jules-live-code-review to audit ongoing Jules sessions and send focused code-review feedback."
