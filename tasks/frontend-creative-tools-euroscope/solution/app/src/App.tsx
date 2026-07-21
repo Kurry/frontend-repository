@@ -15,7 +15,8 @@ export default function App() {
   let restoreFocus: HTMLElement | null = null;
 
   const openPalette = () => {
-    restoreFocus = document.activeElement as HTMLElement | null;
+    const active = document.activeElement as HTMLElement | null;
+    restoreFocus = active && active !== document.body ? active : openerRef ?? null;
     setPaletteOpen(true);
   };
   const closePalette = () => {

@@ -1,4 +1,4 @@
-import { createStore } from "solid-js/store";
+import { createStore, reconcile } from "solid-js/store";
 import { BITMAPS, type IconSet } from "./data/bitmaps";
 import { type ColourBlindness, hexToInt } from "./data/colour";
 import {
@@ -205,7 +205,7 @@ function applyHistory(entry: HistoryEntry) {
   setState("baseTheme", entry.baseTheme);
   setState("swatches", [...entry.swatches]);
   setState("iconSet", entry.iconSet);
-  setState("keepOriginal", { ...entry.keepOriginal });
+  setState("keepOriginal", reconcile({ ...entry.keepOriginal }));
   markPatchStale();
   persist();
 }
@@ -291,7 +291,7 @@ export function batchKeepOriginal(value: boolean): number {
   if (ids.length === 0) return 0;
   pushUndo();
   for (const id of ids) setState("keepOriginal", String(id), value);
-  setState("selection", {});
+  setState("selection", reconcile({}));
   markPatchStale();
   persist();
   return ids.length;
@@ -303,7 +303,7 @@ export function toggleTileSelected(id: number): void {
 }
 
 export function clearSelection(): void {
-  setState("selection", {});
+  setState("selection", reconcile({}));
 }
 
 export function setFileName(name: string): void {
@@ -528,7 +528,7 @@ function applyRecipe(recipe: PatchRecipe): void {
     const entry = recipe.bitmaps[String(bm.id)];
     if (entry?.keepOriginal) keep[String(bm.id)] = true;
   }
-  setState("keepOriginal", keep);
+  setState("keepOriginal", reconcile(keep));
   markPatchStale();
   persist();
 }
