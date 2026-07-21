@@ -1,0 +1,5 @@
+Research notes
+
+- Teams need a faster way to find trusted prompts.
+- Version context is as important as the current text.
+- Structured exports unblock review and reuse.
