@@ -80,7 +80,7 @@ async function copyAndStage(text) {
   useQueueStore.getState().stageClipboard(text)
 }
 
-function invoke(name, args = {}) {
+async function invoke(name, args = {}) {
   const state = useQueueStore.getState()
   let result
   switch (name) {
@@ -207,7 +207,7 @@ function invoke(name, args = {}) {
     case 'artifact_copy': {
       if (args.format === 'queue-snapshot-json') {
         const text = state.refreshExport()
-        copyAndStage(text)
+        await copyAndStage(text)
         state.setChrome('exportOpen', true); state.addToast('Queue snapshot copied')
         result = { success: true, format: args.format, message: 'Visible Queue Snapshot preview copied.' }
         break
@@ -216,7 +216,7 @@ function invoke(name, args = {}) {
       state.setFormDraft(draft)
       state.setChrome('submitOpen', true)
       const text = previewYaml(draft)
-      copyAndStage(text)
+      await copyAndStage(text)
       state.addToast('Configuration preview copied')
       result = { success: true, format: args.format, message: 'Visible configuration preview copied.' }
       break
@@ -242,5 +242,5 @@ export function registerWebMcp() {
     entity: 'jobs',
   })
   window.webmcp_list_tools = () => tools
-  window.webmcp_invoke_tool = (name, args) => Promise.resolve(invoke(name, args))
+  window.webmcp_invoke_tool = (name, args) => invoke(name, args)
 }
