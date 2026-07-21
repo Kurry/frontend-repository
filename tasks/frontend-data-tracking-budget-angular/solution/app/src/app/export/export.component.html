@@ -1,18 +1,8 @@
 <div class="export-drawer">
   <h2>Export / Import</h2>
+  <p class="status-line" aria-live="polite" role="status">{{ importStatus }}</p>
   <mat-tab-group>
-    <mat-tab label="JSON">
-      <div class="tab-content">
-        <button mat-button color="primary" (click)="downloadJson()">Download Budget report JSON</button>
-        <button mat-button color="accent" (click)="copyJson()">Copy JSON</button>
-        <pre class="export-preview" aria-label="Budget report JSON preview">{{ jsonPreview }}</pre>
-        <mat-divider></mat-divider>
-        <h3>Import</h3>
-        <input type="file" (change)="importJson($event)" accept=".json" />
-        <p class="import-error" role="alert" *ngIf="importJsonError">{{ importJsonError }}</p>
-      </div>
-    </mat-tab>
-    <mat-tab label="CSV">
+    <mat-tab label="Transactions CSV">
       <div class="tab-content">
         <label class="csv-scope">
           <input
@@ -22,15 +12,23 @@
           />
           Include expenses from all periods
         </label>
-        <button mat-button color="primary" (click)="downloadCsv()">Download Transactions CSV</button>
-        <button mat-button color="accent" (click)="copyCsv()">Copy CSV</button>
+        <div class="action-row">
+          <button mat-flat-button color="primary" class="ripple-host" (click)="downloadCsv()">Download Transactions CSV</button>
+          <button mat-flat-button color="accent" class="ripple-host" (click)="copyCsv()">Copy CSV</button>
+        </div>
         <pre class="export-preview" aria-label="Transactions CSV preview">{{ csvPreview }}</pre>
         <mat-divider></mat-divider>
-        <h3>Import</h3>
-        <input type="file" (change)="importCsv($event)" accept=".csv" />
+        <h3>Import Transactions CSV</h3>
+        <input type="file" (change)="importCsv($event)" accept=".csv" aria-label="Choose Transactions CSV file" />
+        <mat-form-field class="full-width paste-field">
+          <mat-label>Or paste Transactions CSV (date,counterparty,category,value)</mat-label>
+          <textarea matInput rows="4" [(ngModel)]="pasteCsvText" aria-label="Paste Transactions CSV text"></textarea>
+        </mat-form-field>
+        <button mat-flat-button color="primary" class="ripple-host" (click)="importPastedCsv()" [disabled]="!pasteCsvText.trim()">Validate pasted CSV</button>
 
         <div class="diagnostic" *ngIf="csvDiagnostics.length > 0">
            <h4>CSV Import Diagnostic</h4>
+           <p class="diagnostic-summary">Imported {{ pendingCsvExpenses.length }}, will skip {{ csvDiagnostics.length - pendingCsvExpenses.length }} of {{ csvDiagnostics.length }} rows.</p>
            <div class="diagnostic-row" *ngFor="let d of csvDiagnostics">
              <label class="diagnostic-include">
                <input
@@ -93,8 +91,31 @@
              </p>
            </div>
            <br />
-           <button mat-button color="primary" (click)="commitCsv()" [disabled]="pendingCsvExpenses.length === 0">Commit Included Valid Rows</button>
+           <button mat-flat-button color="primary" class="ripple-host" (click)="commitCsv()" [disabled]="pendingCsvExpenses.length === 0">Commit Included Valid Rows</button>
         </div>
+      </div>
+    </mat-tab>
+    <mat-tab label="Budget report JSON">
+      <div class="tab-content">
+        <div class="action-row">
+          <button mat-flat-button color="primary" class="ripple-host" (click)="downloadJson()">Download Budget report JSON</button>
+          <button mat-flat-button color="accent" class="ripple-host" (click)="copyJson()">Copy JSON</button>
+        </div>
+        <pre class="export-preview" aria-label="Budget report JSON preview">{{ jsonPreview }}</pre>
+        <mat-divider></mat-divider>
+        <h3>Import Budget report JSON</h3>
+        <input type="file" (change)="importJson($event)" accept=".json" aria-label="Choose Budget report JSON file" />
+        <mat-form-field class="full-width paste-field">
+          <mat-label>Or paste Budget report JSON</mat-label>
+          <textarea matInput rows="5" [(ngModel)]="pasteJsonText" (ngModelChange)="onPasteJsonChange()" aria-label="Paste Budget report JSON text"></textarea>
+        </mat-form-field>
+        <div class="diff-preview" *ngIf="jsonDiff" role="status" aria-live="polite">
+          <strong>Before / after import</strong>
+          <span>Expenses: {{ jsonDiff.currentCount }} &rarr; {{ jsonDiff.importedCount }}</span>
+          <span>Categories: {{ jsonDiff.currentCategories }} &rarr; {{ jsonDiff.importedCategories }}</span>
+        </div>
+        <button mat-flat-button color="primary" class="ripple-host" (click)="importPastedJson()" [disabled]="!pasteJsonText.trim()">Import pasted JSON</button>
+        <p class="import-error" role="alert" *ngIf="importJsonError">{{ importJsonError }}</p>
       </div>
     </mat-tab>
   </mat-tab-group>

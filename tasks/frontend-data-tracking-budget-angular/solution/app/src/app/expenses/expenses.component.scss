@@ -1,6 +1,6 @@
 .expenses {
   position: relative;
-  padding-bottom: 72px;
+  padding-bottom: 88px;
 }
 
 .filter-bar {
@@ -18,12 +18,21 @@
 
 .edit-btn {
   color: #c2185b;
-  min-width: 32px;
 }
 
 .delete-btn {
   color: #c2185b;
-  min-width: 32px;
+}
+
+.recurring-badge {
+  font-size: 16px;
+  vertical-align: -3px;
+  margin-right: 4px;
+  color: #c2185b;
+}
+
+.recurring-row {
+  background: rgba(194, 24, 91, 0.04);
 }
 
 .empty-state {
@@ -31,13 +40,43 @@
   color: #777;
   padding: 24px 0;
 }
+.empty-state kbd {
+  background: #e7e7e7;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-family: ui-monospace, monospace;
+  font-size: 12px;
+}
 
-.add-fab {
+/* Bulk action tray floats above the bottom navigation so it is never obscured (6.13). */
+.bulk-tray {
   position: fixed;
-  right: 24px;
-  bottom: 88px;
-  background: #c2185b;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 70px;
+  width: min(600px, calc(100% - 24px));
+  background: #1c1c1e;
   color: #fff;
-  font-size: 28px;
-  line-height: 1;
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  z-index: 35;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+.bulk-count {
+  font-weight: 700;
+  white-space: nowrap;
+}
+.bulk-category {
+  flex: 1 1 140px;
+}
+.bulk-category ::ng-deep .mdc-select__selected-text,
+.bulk-category ::ng-deep .mat-mdc-select-value-text {
+  color: #fff;
+}
+.bulk-tray button {
+  white-space: nowrap;
 }

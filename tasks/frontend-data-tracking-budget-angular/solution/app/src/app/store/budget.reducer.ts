@@ -4,6 +4,10 @@ import { BudgetDefinition, Expense, ExpenseCategory, Period, RecurringRule } fro
 import { SEED_BUDGET_DEFINITIONS, SEED_CATEGORIES, SEED_EXPENSES, SEED_PERIOD } from './seed-data';
 import { loadPersistedState } from './persistence';
 
+export interface RecurringRuleState extends RecurringRule {
+  key: string;
+}
+
 export interface BudgetState {
   view: 'dashboard' | 'expenses' | 'settings' | 'export';
   expenses: Expense[];
@@ -13,9 +17,12 @@ export interface BudgetState {
   filterCategoryId: string | null;
   displayName: string;
   thresholdPercent: number;
-  recurringRules: RecurringRule[];
+  recurringRules: RecurringRuleState[];
+  detachedRuleInstances: string[];
+  selectedExpenseIds: string[];
   nextExpenseSeq: number;
   nextCategorySeq: number;
+  nextRuleSeq: number;
   undoStack: any[];
   redoStack: any[];
 }
@@ -30,15 +37,28 @@ const defaultState: BudgetState = {
   displayName: 'john@app.com',
   thresholdPercent: 80,
   recurringRules: [],
+  detachedRuleInstances: [],
+  selectedExpenseIds: [],
   nextExpenseSeq: SEED_EXPENSES.length + 1,
   nextCategorySeq: 1,
+  nextRuleSeq: 1,
   undoStack: [],
   redoStack: [],
 };
 
 const persisted = loadPersistedState();
 
-export const initialState: BudgetState = persisted ? { ...defaultState, ...persisted, view: 'dashboard' } : defaultState;
+export const initialState: BudgetState = persisted
+  ? {
+      ...defaultState,
+      ...persisted,
+      recurringRules: (persisted as any).recurringRules ?? [],
+      detachedRuleInstances: (persisted as any).detachedRuleInstances ?? [],
+      selectedExpenseIds: [],
+      nextRuleSeq: (persisted as any).nextRuleSeq ?? 1,
+      view: 'dashboard',
+    }
+  : defaultState;
 
 function shiftPeriod(period: Period, delta: number): Period {
   const totalMonths = period.year * 12 + (period.month - 1) + delta;
@@ -70,6 +90,17 @@ function nextCategorySequence(categories: ExpenseCategory[]): number {
   }, 0) + 1;
 }
 
+function nextRuleSequence(rules: RecurringRuleState[]): number {
+  return rules.reduce((max, rule) => {
+    const match = /^r(\d+)$/.exec(rule.key);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0) + 1;
+}
+
+export function isDerivedExpenseId(id: string): boolean {
+  return id.startsWith('rr:');
+}
+
 export const budgetReducer = createReducer(
   initialState,
   on(BudgetActions.undo, (state) => {
@@ -79,6 +110,7 @@ export const budgetReducer = createReducer(
     const { undoStack, redoStack, ...rest } = state;
     return {
       ...previousState,
+      selectedExpenseIds: [],
       undoStack: newUndoStack,
       redoStack: [...state.redoStack, rest],
     };
@@ -90,6 +122,7 @@ export const budgetReducer = createReducer(
     const { undoStack, redoStack, ...rest } = state;
     return {
       ...nextState,
+      selectedExpenseIds: [],
       undoStack: [...state.undoStack, rest],
       redoStack: newRedoStack,
     };
@@ -123,6 +156,7 @@ export const budgetReducer = createReducer(
     return {
       ...saved,
       expenses: saved.expenses.filter((e) => e.id !== id),
+      selectedExpenseIds: saved.selectedExpenseIds.filter((sid) => sid !== id),
     };
   }),
   on(BudgetActions.importExpenses, (state, { expenses }) => {
@@ -137,9 +171,9 @@ export const budgetReducer = createReducer(
     ...state,
     filterCategoryId: categoryId,
   })),
-  on(BudgetActions.setPeriod, (state, { period }) => ({ ...state, period })),
-  on(BudgetActions.nextPeriod, (state) => ({ ...state, period: shiftPeriod(state.period, 1) })),
-  on(BudgetActions.previousPeriod, (state) => ({ ...state, period: shiftPeriod(state.period, -1) })),
+  on(BudgetActions.setPeriod, (state, { period }) => ({ ...state, period, selectedExpenseIds: [] })),
+  on(BudgetActions.nextPeriod, (state) => ({ ...state, period: shiftPeriod(state.period, 1), selectedExpenseIds: [] })),
+  on(BudgetActions.previousPeriod, (state) => ({ ...state, period: shiftPeriod(state.period, -1), selectedExpenseIds: [] })),
   on(BudgetActions.addCategory, (state, { name }) => {
     const id = 'custom-' + state.nextCategorySeq;
     const category: ExpenseCategory = { id, name, counterpartyPatterns: [] };
@@ -164,6 +198,7 @@ export const budgetReducer = createReducer(
       ...saved,
       categories: saved.categories.filter((c) => c.id !== id),
       budgetDefinitions: saved.budgetDefinitions.filter((b) => b.categoryId !== id),
+      recurringRules: saved.recurringRules.filter((r) => r.categoryId !== id),
     };
   }),
   on(BudgetActions.setDisplayName, (state, { name }) => {
@@ -174,17 +209,116 @@ export const budgetReducer = createReducer(
     if (state.thresholdPercent === thresholdPercent) return state;
     return { ...saveUndoState(state), thresholdPercent };
   }),
-  on(BudgetActions.hydrateState, (state, { state: persisted }) => {
+  on(BudgetActions.addRecurringRule, (state, { rule }) => {
+    const key = 'r' + state.nextRuleSeq;
     const saved = saveUndoState(state);
     return {
       ...saved,
-      ...persisted,
-      nextExpenseSeq: Array.isArray(persisted.expenses)
-        ? nextExpenseSequence(persisted.expenses)
-        : saved.nextExpenseSeq,
-      nextCategorySeq: Array.isArray(persisted.categories)
-        ? nextCategorySequence(persisted.categories)
-        : saved.nextCategorySeq,
+      recurringRules: [...saved.recurringRules, { key, ...rule }],
+      nextRuleSeq: saved.nextRuleSeq + 1,
     };
+  }),
+  on(BudgetActions.updateRecurringRule, (state, { key, rule }) => {
+    const saved = saveUndoState(state);
+    return {
+      ...saved,
+      recurringRules: saved.recurringRules.map((r) => (r.key === key ? { key, ...rule } : r)),
+    };
+  }),
+  on(BudgetActions.deleteRecurringRule, (state, { key }) => {
+    const saved = saveUndoState(state);
+    return {
+      ...saved,
+      recurringRules: saved.recurringRules.filter((r) => r.key !== key),
+    };
+  }),
+  on(BudgetActions.detachRecurringInstance, (state, { syntheticId }) => {
+    if (state.detachedRuleInstances.includes(syntheticId)) return state;
+    const saved = saveUndoState(state);
+    return { ...saved, detachedRuleInstances: [...saved.detachedRuleInstances, syntheticId] };
+  }),
+  on(BudgetActions.bulkCategorize, (state, { ids, categoryId }) => {
+    if (ids.length === 0) return state;
+    const idSet = new Set(ids);
+    const realIds = ids.filter((id) => !isDerivedExpenseId(id));
+    const derivedIds = ids.filter((id) => isDerivedExpenseId(id));
+    const saved = saveUndoState(state);
+    const derivedById = new Map<string, Expense>();
+    // Build derived instances for the current period to materialise any selected derived rows.
+    const period = saved.period;
+    const detached = new Set(saved.detachedRuleInstances);
+    const storedRecurringKeys = new Set(
+      saved.expenses
+        .filter((e) => e.recurring)
+        .map((e) => `${e.counterparty}::${e.categoryId}::${e.period.month}-${e.period.year}-${Number(e.datetime.slice(8, 10))}`)
+    );
+    saved.recurringRules.forEach((rule) => {
+      const syntheticId = `rr:${rule.key}:${period.month}-${period.year}`;
+      if (detached.has(syntheticId)) return;
+      const storedKey = `${rule.name}::${rule.categoryId}::${period.month}-${period.year}-${rule.dayOfMonth}`;
+      if (storedRecurringKeys.has(storedKey)) return;
+      const day = String(rule.dayOfMonth).padStart(2, '0');
+      const month = String(period.month).padStart(2, '0');
+      derivedById.set(syntheticId, {
+        id: syntheticId,
+        value: rule.value,
+        datetime: `${period.year}-${month}-${day}`,
+        categoryId: rule.categoryId,
+        counterparty: rule.name,
+        period,
+        recurring: true,
+      });
+    });
+    const materialised: Expense[] = derivedIds
+      .filter((id) => idSet.has(id) && derivedById.has(id))
+      .map((id) => {
+        const inst = derivedById.get(id)!;
+        return { ...inst, id: 'e' + saved.nextExpenseSeq + materialised.length, categoryId, recurring: false };
+      });
+    // Recalculate nextExpenseSeq accounting for materialised rows.
+    const nextSeq = saved.nextExpenseSeq + materialised.length;
+    return {
+      ...saved,
+      expenses: [
+        ...saved.expenses.map((e) => (realIds.includes(e.id) ? { ...e, categoryId } : e)),
+        ...materialised,
+      ],
+      detachedRuleInstances: [...saved.detachedRuleInstances, ...derivedIds.filter((id) => idSet.has(id))],
+      nextExpenseSeq: nextSeq,
+      selectedExpenseIds: [],
+    };
+  }),
+  on(BudgetActions.bulkDelete, (state, { ids }) => {
+    if (ids.length === 0) return state;
+    const realIds = new Set(ids.filter((id) => !isDerivedExpenseId(id)));
+    const derivedIds = ids.filter((id) => isDerivedExpenseId(id));
+    const saved = saveUndoState(state);
+    return {
+      ...saved,
+      expenses: saved.expenses.filter((e) => !realIds.has(e.id)),
+      detachedRuleInstances: [...saved.detachedRuleInstances, ...derivedIds],
+      selectedExpenseIds: [],
+    };
+  }),
+  on(BudgetActions.setSelection, (state, { ids }) => ({ ...state, selectedExpenseIds: ids })),
+  on(BudgetActions.hydrateState, (state, { state: persistedState }) => {
+    const saved = saveUndoState(state);
+    const merged = {
+      ...saved,
+      ...persistedState,
+      selectedExpenseIds: [],
+      detachedRuleInstances: Array.isArray(persistedState.detachedRuleInstances) ? persistedState.detachedRuleInstances : saved.detachedRuleInstances,
+      recurringRules: Array.isArray(persistedState.recurringRules) ? persistedState.recurringRules : saved.recurringRules,
+      nextExpenseSeq: Array.isArray(persistedState.expenses)
+        ? nextExpenseSequence(persistedState.expenses)
+        : saved.nextExpenseSeq,
+      nextCategorySeq: Array.isArray(persistedState.categories)
+        ? nextCategorySequence(persistedState.categories)
+        : saved.nextCategorySeq,
+      nextRuleSeq: Array.isArray(persistedState.recurringRules)
+        ? nextRuleSequence(persistedState.recurringRules)
+        : saved.nextRuleSeq,
+    };
+    return merged;
   })
 );

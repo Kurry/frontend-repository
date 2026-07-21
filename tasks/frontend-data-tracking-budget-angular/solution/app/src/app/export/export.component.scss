@@ -1,5 +1,38 @@
 .export-drawer {
-  padding: 16px;
+  padding: 4px 4px 16px;
+}
+.status-line {
+  min-height: 1.2em;
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #6b2140;
+  font-weight: 600;
+}
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.full-width {
+  width: 100%;
+}
+.paste-field textarea {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+}
+.diff-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border-left: 3px solid var(--accent, #c2185b);
+  background: rgba(194, 24, 91, 0.06);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.diagnostic-summary {
+  font-weight: 600;
+  margin: 4px 0 8px;
 }
 .tab-content {
   padding-top: 16px;
