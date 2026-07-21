@@ -129,6 +129,9 @@ export const labResultsSchema = z.object({
 export const formatZodError = (error) => {
   const issue = error?.issues?.[0]
   if (!issue) return 'document: validation failed'
-  // To satisfy strict judge validation strings when using Zod, avoid returning prepended key paths (e.g., 'schemaVersion: schemaVersion must be ...')
-  return issue.message
+  // Only prepend the path when the message does not already begin with the field prefix.
+  if (issue.message.includes(':') || !issue.path || issue.path.length === 0) {
+    return issue.message;
+  }
+  return `${issue.path.join('.') || 'document'}: ${issue.message}`;
 }

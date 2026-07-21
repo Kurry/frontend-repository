@@ -111,14 +111,26 @@ function SectionTitle({ eyebrow, title, description, actions }) {
 function Reveal({ children, className = '' }) {
   const ref = useRef(null)
   useEffect(() => {
-    const isRM = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const el = ref.current
-    if (!el || isRM()) { el?.classList.add('in'); return undefined }
+    if (!el) return undefined
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const handleMQ = (e) => { if (e.matches) el.classList.add('in') }
+    mq.addEventListener('change', handleMQ)
+
+    if (mq.matches) {
+      el.classList.add('in')
+      return () => mq.removeEventListener('change', handleMQ)
+    }
+
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => { if (entry.isIntersecting) { el.classList.add('in'); observer.disconnect() } })
+      entries.forEach((entry) => { if (entry.isIntersecting || mq.matches) { el.classList.add('in'); observer.disconnect() } })
     }, { threshold: 0.06 })
     observer.observe(el)
-    return () => observer.disconnect()
+
+    return () => {
+      observer.disconnect()
+      mq.removeEventListener('change', handleMQ)
+    }
   }, [])
   return <div ref={ref} className={`reveal ${className}`}>{children}</div>
 }
@@ -1025,7 +1037,7 @@ function CostView() {
                     </div>
                   ) : null)} />
                   {labels.map((item, index) => (visible[item.name] ? (
-                    <Line key={item.name} type="monotone" dataKey={item.name} stroke={SERIES_PALETTE[index % SERIES_PALETTE.length]} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 6 }} animationDuration={reduce ? 0 : 500} />
+                    <Line key={item.name} type="monotone" dataKey={item.name} stroke={SERIES_PALETTE[index % SERIES_PALETTE.length]} strokeWidth={2.5} dot={{ r: 3 }} activeDot={{ r: 6 }} animationDuration={isRM() ? 0 : 500} />
                   ) : null))}
                 </LineChart>
               </ResponsiveContainer>
