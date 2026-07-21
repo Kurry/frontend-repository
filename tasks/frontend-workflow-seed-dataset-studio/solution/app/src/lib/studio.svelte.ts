@@ -320,6 +320,7 @@ export class StudioState {
       seed.timeline.push(event('triage', 'Accepted for authoring'));
       seed.timeline.push(event('transition', 'Status changed from draft to harvest-pending'));
     }
+    this.seeds = [...this.seeds];
     this.selectedIds = [];
     this.ariaMessage = `${targets.length} seed${targets.length === 1 ? '' : 's'} accepted for authoring`;
     if (open && targets[0]) this.openSeed(targets[0].id);
@@ -338,6 +339,7 @@ export class StudioState {
       seed.timeline.push(event('triage', `Rejected as ${parsed.data.rejectClass}: ${parsed.data.justification}`));
       seed.timeline.push(event('transition', 'Status changed from draft to rejected'));
     }
+    this.seeds = [...this.seeds];
     this.selectedIds = [];
     this.rejectOpen = false;
     this.ariaMessage = `${targets.length} seed${targets.length === 1 ? '' : 's'} rejected`;
@@ -353,6 +355,7 @@ export class StudioState {
       seed.rejectClass = snapshot.rejectClass;
       seed.timeline = clone(snapshot.timeline);
     }
+    this.seeds = [...this.seeds];
     this.lastTriage = null;
     this.ariaMessage = 'Last triage action undone';
     this.showToast('Last triage action undone');
@@ -380,6 +383,7 @@ export class StudioState {
     const previous = seed.status;
     seed.status = 'authored';
     seed.timeline.push(event('transition', `Status changed from ${previous} to authored`));
+    this.seeds = [...this.seeds];
     this.ariaMessage = `${seed.id} marked authored`;
     this.showToast('Seed marked authored');
     return true;
@@ -387,6 +391,8 @@ export class StudioState {
 
   saveAuthoring(seed: Seed) {
     seed.timeline.push(event('save', 'Authoring workbench saved'));
+    // Make sure we create a new reference to trigger reactive updates in the queue
+    this.seeds = [...this.seeds];
     this.showToast('Authoring changes saved');
   }
 
@@ -464,7 +470,9 @@ export class StudioState {
       seed.authoring.harvest.paused = false;
       seed.authoring.harvest.forceFailReproduce = false;
       const elapsed = ((Date.now() - (seed.authoring.harvest.startedAt ?? Date.now())) / 1000).toFixed(1);
-      seed.authoring.golden = { status: 'present', value: `Runtime evidence from the pinned commit shows the failing lifecycle transition retains ownership after rollback. A trace captured during reproduction links the unreleased token to the next blocked checkout; counters before and after the transition confirm the invariant violation. Harvest completed in ${elapsed} seconds.` };
+      const caps = seed.authoring.foils.map(f => f.correctnessCap).join(',');
+      const questionPreview = seed.authoring.questionText.slice(0, 15);
+      seed.authoring.golden = { status: 'present', value: `Runtime evidence from the pinned commit shows the failing lifecycle transition retains ownership after rollback. A trace captured during reproduction links the unreleased token to the next blocked checkout; counters before and after the transition confirm the invariant violation. Caps: [${caps}], Q: ${questionPreview}. Harvest completed in ${elapsed} seconds.` };
       if (seed.status === 'harvest-pending') {
         const previous = seed.status;
         seed.status = 'draft';
@@ -478,7 +486,7 @@ export class StudioState {
     const step = seed.authoring.harvest.steps[stepIndex];
     if (step.status === 'failed') return;
     step.status = 'running';
-    const delay = 480 + Math.floor(Math.random() * 420);
+    const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : (480 + Math.floor(Math.random() * 420));
     const timer = setTimeout(() => {
       const currentSeed = this.seeds.find((item) => item.id === seedId);
       if (!currentSeed || !currentSeed.authoring.harvest.running) return;
@@ -517,7 +525,8 @@ export class StudioState {
     const step = seed.authoring.harvest.steps[stepIndex];
     if (seed.authoring.harvest.paused) return;
     if (step.backoff <= 0) { this.advanceHarvest(seedId); return; }
-    const timer = setTimeout(() => { step.backoff--; this.retryCountdown(seedId, stepIndex); }, 1000);
+    const delay = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1000;
+    const timer = setTimeout(() => { step.backoff--; this.retryCountdown(seedId, stepIndex); }, delay);
     this.timers.set(seedId, timer);
   }
 
@@ -554,8 +563,14 @@ export class StudioState {
   jumpToCriterion(id: string) {
     this.activePane = id.startsWith('1.') ? 'positive' : 'negative';
     this.highlightedCriterion = id;
-    setTimeout(() => { this.highlightedCriterion = null; }, 1600);
-    setTimeout(() => document.getElementById(`criterion-${id.replace('.', '-')}`)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' }), 40);
+    const isReduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (isReduced) {
+      this.highlightedCriterion = null;
+      document.getElementById(`criterion-${id.replace('.', '-')}`)?.scrollIntoView({ behavior: 'auto', block: 'center' });
+    } else {
+      setTimeout(() => { this.highlightedCriterion = null; }, 1600);
+      setTimeout(() => document.getElementById(`criterion-${id.replace('.', '-')}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 40);
+    }
   }
 
   packageManifest(seed: Seed): PackageManifest {
@@ -572,6 +587,7 @@ export class StudioState {
       deferenceProfile: seed.deferenceProfile,
       failureModel: seed.failureModel,
       questionText: seed.authoring.questionText.trim(),
+      checklist: clone(seed.authoring.checklist),
       positiveCriteria: clone(seed.authoring.positiveCriteria),
       negativeCriteria: clone(seed.authoring.negativeCriteria),
       foils: clone(seed.authoring.foils),
@@ -662,6 +678,9 @@ export class StudioState {
       seed.deferenceProfile = manifest.deferenceProfile;
       seed.failureModel = manifest.failureModel;
       seed.authoring.questionText = manifest.questionText;
+      if (manifest.checklist && manifest.checklist.length === 4) {
+        seed.authoring.checklist = clone(manifest.checklist);
+      }
       seed.authoring.positiveCriteria = clone(manifest.positiveCriteria);
       seed.authoring.negativeCriteria = clone(manifest.negativeCriteria);
       seed.authoring.foils = clone(manifest.foils);
@@ -714,6 +733,14 @@ export class StudioState {
     if (this.toastClearTimer) clearTimeout(this.toastClearTimer);
     this.toastLeaving = false;
     this.toast = message;
+
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      this.toastTimer = setTimeout(() => {
+        if (this.toast === message) { this.toast = ''; this.toastLeaving = false; }
+      }, 2400);
+      return;
+    }
+
     this.toastTimer = setTimeout(() => {
       this.toastLeaving = true;
       this.toastClearTimer = setTimeout(() => {

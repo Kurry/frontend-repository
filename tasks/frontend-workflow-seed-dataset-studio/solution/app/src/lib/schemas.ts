@@ -59,6 +59,7 @@ export const PackageManifestSchema = z.object({
   deferenceProfile: z.enum(deferenceProfiles),
   failureModel: z.enum(failureModes),
   questionText: z.string().trim().min(1, 'questionText is required'),
+  checklist: z.array(z.boolean()).length(4).optional(),
   positiveCriteria: z.array(PositiveCriterionSchema),
   negativeCriteria: z.array(NegativeCriterionSchema),
   foils: z.array(FoilUpsertSchema),

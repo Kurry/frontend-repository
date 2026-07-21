@@ -33,7 +33,7 @@
         mounted = false;
         leaving = false;
         if (opener instanceof HTMLElement) opener.focus();
-      }, 250);
+      }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 250);
       return () => {
         cancelAnimationFrame(enterFrame);
         clearTimeout(timer);
