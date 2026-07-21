@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a frontend task's complete 15-dimension rubric layout."""
+"""Validate a frontend task's complete 13-dimension rubric layout."""
 
 from __future__ import annotations
 
@@ -23,8 +23,6 @@ DIMENSIONS = (
     "writing",
     "innovation",
     "design_fidelity",
-    "mcp_contract",
-    "anticheat",
     "behavioral",
 )
 ALLOWED_CRITERION_WEIGHTS = {0.5, 1.0}
@@ -74,37 +72,24 @@ def validate_dimension(
     if not isinstance(criteria, list):
         criteria = []
 
-    scoring = data.get("scoring")
-    aggregation = scoring.get("aggregation") if isinstance(scoring, dict) else None
-    if dimension == "anticheat":
-        all_negative = bool(criteria) and all(item.get("negate") is True for item in criteria)
-        if aggregation == "all_pass" and all_negative:
-            report("PASS", "anticheat uses all_pass and every criterion is negated")
-        else:
-            report("FAIL", "anticheat must use all_pass and every criterion must have negate=true")
-            failures += 1
+    positives = sum(item.get("negate") is not True for item in criteria)
+    if positives >= 1:
+        report("PASS", f"{dimension} has at least one positive criterion")
     else:
-        positives = sum(item.get("negate") is not True for item in criteria)
-        negatives = sum(item.get("negate") is True for item in criteria)
-        if positives >= 1 and negatives >= 1:
-            report("PASS", f"{dimension} has at least one positive and one negative criterion")
-        else:
-            report("FAIL", f"{dimension} needs at least one positive and one negative criterion")
-            failures += 1
-
-    catchalls = [
-        item
-        for item in criteria
-        if isinstance(item.get("id"), str) and item["id"].endswith(".catchall")
-    ]
-    expected_negate = dimension != "innovation"
-    if len(catchalls) == 1 and (catchalls[0].get("negate") is True) == expected_negate:
-        polarity = "positive" if dimension == "innovation" else "negated"
-        report("PASS", f"{dimension} has exactly one {polarity} catch-all")
-    else:
-        polarity = "non-negated" if dimension == "innovation" else "negated"
-        report("FAIL", f"{dimension} must have exactly one {polarity} .catchall criterion")
+        report("FAIL", f"{dimension} needs at least one positive criterion")
         failures += 1
+
+    if dimension == "innovation":
+        catchalls = [
+            item
+            for item in criteria
+            if isinstance(item.get("id"), str) and item["id"].endswith(".catchall")
+        ]
+        if len(catchalls) == 1 and catchalls[0].get("negate") is not True:
+            report("PASS", "innovation has exactly one positive catch-all")
+        else:
+            report("FAIL", "innovation must have exactly one non-negated .catchall criterion")
+            failures += 1
 
     ids = [item.get("id") for item in criteria]
     duplicate_ids = sorted({item_id for item_id in ids if ids.count(item_id) > 1}, key=str)
@@ -155,12 +140,7 @@ def validate_reward(task_dir: Path) -> int:
     if reward_entry is None:
         report("FAIL", 'reward.toml has no [[reward]] entry with name="reward"')
         return 1
-
-    gates = reward_entry.get("gate_dimensions")
-    if isinstance(gates, list) and "anticheat" in gates:
-        report("PASS", 'reward.toml name="reward" gates on anticheat')
-    else:
-        report("WARN", 'reward.toml name="reward" does not yet gate on anticheat')
+    report("PASS", 'reward.toml has a [[reward]] entry with name="reward"')
     return 0
 
 

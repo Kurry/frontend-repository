@@ -194,7 +194,7 @@ def reconcile_pass(args, state_path, term_cache) -> dict:
             rj = sub / "verifier" / "reward.json"
             try:
                 d = json.loads(rj.read_text())
-                score = f" reward={d.get('reward')} pass={d.get('pass')} anticheat={d.get('anticheat')}"
+                score = f" reward={d.get('reward')} pass={d.get('pass')}"
             except Exception:
                 pass
             cm = run(["git", "commit", "-m",

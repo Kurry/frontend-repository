@@ -12,7 +12,7 @@ description: >-
 
 # Harden a task to pro-app depth with a useful end state
 
-You are upgrading ONE existing task (instruction.md + its 15 dimension rubrics
+You are upgrading ONE existing task (instruction.md + its 13 dimension rubrics
 + its webmcp assignment when bindings change) so a finished build would be a
 tool a real operator could adopt — not a demo. Work within the task's existing
 identity: extend, never rewrite wholesale; preserve every existing behavior and
@@ -152,14 +152,14 @@ challenge loop, decided outcomes, a clean restart, and save/resume.
    genre-appropriate persistence line in `<requirements>`, and — when bindings
    are needed — extend the task's webmcp assignment and re-render the contract
    block.
-5. **Update ALL 15 rubrics** per the create-rubrics skill's
+5. **Update ALL 13 rubrics** per the create-rubrics skill's
    pre-existing-vs-add rules and polarity-mix doctrine: new criteria for every
    added feature group; behavioral gains chained full-pipeline probes ending
    at the export text (mutate → derived surfaces track → export contains the
    session's actual work; import/export round-trip; undo round-trip); negatives
    from silent failures (export omitting session mutations, undo not
    restoring, derived surface identical after input change, vote that never
-   promotes). anticheat stays verbatim. Keep ids stable; descriptive
+   promotes). Keep ids stable; descriptive
    snake_case names for new/rewritten criteria.
 6. **Validate until clean**:
 

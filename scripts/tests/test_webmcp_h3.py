@@ -15,11 +15,11 @@ import webmcp_h3  # noqa: E402
 
 class TestWebmcpContract(unittest.TestCase):
     def test_every_task_has_dimension_tomls(self) -> None:
-        existing = {"core_features", "visual_design", "motion", "technical"}
-        full = existing | {
+        required = {
+            "core_features", "visual_design", "motion", "technical",
             "user_flows", "edge_cases", "responsiveness", "accessibility",
             "performance", "writing", "innovation", "design_fidelity",
-            "mcp_contract", "anticheat", "behavioral",
+            "behavioral",
         }
         task_dirs = sorted(
             path for path in (ROOT / "tasks").iterdir()
@@ -27,10 +27,6 @@ class TestWebmcpContract(unittest.TestCase):
             and (path / "instruction.md").is_file()
         )
         self.assertTrue(task_dirs)
-        anticheat_count = sum(
-            (task / "tests" / "anticheat").is_dir() for task in task_dirs
-        )
-        required = full if anticheat_count > len(task_dirs) / 2 else existing
         missing = [
             f"{task.name}/tests/{dim}/{dim}.toml"
             for task in task_dirs

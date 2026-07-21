@@ -27,7 +27,7 @@ failures — keeping a fixed number of Jules sessions in flight.
   (minus `node_modules`/`.git`) and `verifier/reward-details.json` →
   `tasks/<slug>/solution/reward-details.json`, ONLY for tasks with no oracle
   (unless `--force`). Prints one JSON line per harvested task. Optional score
-  gates: `--min-reward`, `--require-anticheat-pass`.
+  gate: `--min-reward`.
 - `scripts/jules_fleet_driver.py` — ONE idempotent reconcile pass: count our
   live Jules sessions, and for each finished-but-undispatched task, fill open
   slots up to `--target` by (harvest if oracle-less → `git commit` per app →

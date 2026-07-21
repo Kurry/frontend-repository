@@ -13,7 +13,7 @@ Prints one JSON line per harvested task so the caller can commit each separately
 
 Usage:
   harvest_oracle.py [--job <dir>] [--slug <slug> ...] [--force] [--dry-run]
-                    [--min-reward X] [--require-anticheat-pass]
+                    [--min-reward X]
 Defaults: newest jobs/*/ dir; all finished oracle-less tasks; no score gate.
 """
 from __future__ import annotations
@@ -67,7 +67,7 @@ def read_score(subdir: Path) -> dict:
     rj = subdir / "verifier" / "reward.json"
     try:
         d = json.loads(rj.read_text())
-        return {"reward": d.get("reward"), "pass": d.get("pass"), "anticheat": d.get("anticheat")}
+        return {"reward": d.get("reward"), "pass": d.get("pass")}
     except Exception:
         return {}
 
@@ -79,7 +79,6 @@ def main() -> None:
     ap.add_argument("--force", action="store_true", help="overwrite existing oracles")
     ap.add_argument("--dry-run", action="store_true")
     ap.add_argument("--min-reward", type=float, default=None)
-    ap.add_argument("--require-anticheat-pass", action="store_true")
     args = ap.parse_args()
 
     job = args.job or newest_job()
@@ -101,10 +100,6 @@ def main() -> None:
         if args.min_reward is not None and (score.get("reward") or 0) < args.min_reward:
             print(f"SKIP {slug}: reward {score.get('reward')} < {args.min_reward}", file=sys.stderr)
             continue
-        if args.require_anticheat_pass and (score.get("anticheat") or 0) < 1.0:
-            print(f"SKIP {slug}: anticheat {score.get('anticheat')} < 1.0", file=sys.stderr)
-            continue
-
         sol = ROOT / "tasks" / slug / "solution"
         dst_app = sol / "app"
         dst_rd = sol / "reward-details.json"

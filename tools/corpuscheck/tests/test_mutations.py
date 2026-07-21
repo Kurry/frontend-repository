@@ -29,27 +29,9 @@ def _dimension_toml(header: str, dim: str) -> str:
         else ""
     )
     header = header.replace("[judge]\n", f"[judge]\n{judge_weight}", 1)
-    aggregation = "all_pass" if dim == "anticheat" else "weighted_mean"
-    if dim == "anticheat":
-        criteria = f'''[[criterion]]
-id = "{dim}.1"
-name = "confirmed_deception"
-description = "The rendered app contains fabricated success evidence intended to deceive grading."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "{dim}.catchall"
-name = "{dim}_catchall"
-description = "The app exhibits unambiguous deception not covered by any other criterion; name it and cite concrete browser evidence."
-type = "binary"
-negate = true
-weight = 1.0
-'''
-    else:
-        catchall_negate = "" if dim == "innovation" else "negate = true\n"
-        criteria = f'''[[criterion]]
+    aggregation = "weighted_mean"
+    catchall_negate = "" if dim == "innovation" else "negate = true\n"
+    criteria = f'''[[criterion]]
 id = "{dim}.1"
 name = "{dim}_positive"
 description = "The browser-visible result satisfies the dimension's primary observable requirement."
@@ -126,12 +108,12 @@ def test_missing_webmcp_contract_fails_contract(copy_task, tmp_path):
     assert any("contract" in message.lower() for message in result.messages)
 
 
-def test_missing_dimension_catchall_fails_rubric(copy_task, tmp_path):
+def test_missing_innovation_catchall_fails_rubric(copy_task, tmp_path):
     _, task = copy_task(EVAL_SLUG, tmp_path)
-    path = task / "tests/core_features/core_features.toml"
+    path = task / "tests/innovation/innovation.toml"
     text = path.read_text()
     text, count = re.subn(
-        r"\n\[\[criterion\]\]\nid = \"1\.catchall\".*\Z", "\n", text, flags=re.DOTALL
+        r"\n\[\[criterion\]\]\nid = \"innovation\.catchall\".*\Z", "\n", text, flags=re.DOTALL
     )
     assert count == 1
     path.write_text(text)
@@ -142,29 +124,26 @@ def test_missing_dimension_catchall_fails_rubric(copy_task, tmp_path):
     assert any("catch" in message.lower() for message in result.messages)
 
 
-def test_all_15_valid_dimensions_pass_strict_validation(copy_task, tmp_path):
+def test_missing_catchall_outside_innovation_is_allowed(copy_task, tmp_path):
+    _, task = copy_task(EVAL_SLUG, tmp_path)
+
+    result = validate_rubric(task)
+
+    # No dimension except innovation ships a catch-all, and no dimension ships
+    # negate=true criteria; neither may fail or warn.
+    assert result.passed, result.messages
+    assert not any("catch" in item.lower() for item in result.messages + result.warnings)
+    assert not any("negate" in item.lower() for item in result.messages)
+
+
+def test_all_13_valid_dimensions_pass_strict_validation(copy_task, tmp_path):
     _, task = copy_task(EVAL_SLUG, tmp_path)
     _add_new_dimensions(task)
 
     result = validate_task(task, strict_dimensions=True)
 
-    assert len(FULL_DIMENSIONS) == 15
+    assert len(FULL_DIMENSIONS) == 13
     assert result.passed, result.messages
-
-
-def test_anticheat_non_negated_criterion_fails(copy_task, tmp_path):
-    _, task = copy_task(EVAL_SLUG, tmp_path)
-    _add_new_dimensions(task)
-    path = task / "tests/anticheat/anticheat.toml"
-    path.write_text(path.read_text().replace("negate = true\n", "", 1))
-
-    result = validate_rubric(task)
-
-    assert not result.passed
-    assert any(
-        "every criterion must set negate=true" in message
-        for message in result.messages
-    )
 
 
 def test_innovation_positive_catchall_passes(copy_task, tmp_path):
@@ -197,10 +176,16 @@ def test_stack_identity_description_fails_eval_validity(copy_task, tmp_path):
 
 def test_catchalls_are_exempt_from_eval_validity_heuristics(copy_task, tmp_path):
     _, task = copy_task(EVAL_SLUG, tmp_path)
-    path = task / "tests/core_features/core_features.toml"
-    text = path.read_text().replace(
-        "The app exhibits a significant, browser-observable defect",
-        "Implemented with React and never exhibits a defect",
+    path = task / "tests/innovation/innovation.toml"
+    text = path.read_text()
+    original = (
+        "The app exhibits a significant, delightful innovation or polish beyond the "
+        "specification that is NOT covered"
+    )
+    assert original in text
+    text = text.replace(
+        original,
+        "Implemented with React: a delightful innovation NOT covered",
     )
     path.write_text(text)
 

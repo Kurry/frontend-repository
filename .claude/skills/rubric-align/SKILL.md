@@ -1,10 +1,10 @@
 ---
 name: rubric-align
 description: >-
-  Align a frontend eval task's fifteen tag-aligned dimension rubrics with its
+  Align a frontend eval task's thirteen tag-aligned dimension rubrics with its
   instruction.md, following
   docs/rubrics.md — instruction↔verifier coverage both directions, dimension-
-  appropriate criterion polarity, an open-ended judge catch-all per dimension,
+  appropriate criterion polarity, an open-ended judge catch-all for innovation,
   and criteria for the task's assigned kit (microinteractions, chart
   sensitivity, editor round-trips, hydration for meta-framework tasks). Use
   whenever asked to align, update, extend, or audit a task's rubrics, dimension
@@ -15,16 +15,16 @@ description: >-
 
 # Align a task's dimension rubrics with its instruction
 
-You are editing the fifteen dimension tomls of one task so the rubric and the instruction agree in both directions: everything the instruction promises is graded somewhere, and nothing is graded that the instruction never asked for. During the corpus rollout, iterate every canonical dimension file that is present and warn for missing new dimensions; the original four remain required. docs/rubrics.md is the criterion style guide; this skill is the workflow.
+You are editing the thirteen dimension tomls of one task so the rubric and the instruction agree in both directions: everything the instruction promises is graded somewhere, and nothing is graded that the instruction never asked for. All thirteen canonical dimension files are required. docs/rubrics.md is the criterion style guide; this skill is the workflow.
 
-The tag-to-dimension map is: `<core_features>` → `core_features`, `<visual_design>` → `visual_design`, `<motion>` → `motion`, `<user_flows>` → `user_flows`, `<edge_cases>` → `edge_cases`, `<responsiveness>` → `responsiveness`, `<accessibility>` → `accessibility`, `<performance>` → `performance`, `<writing>` → `writing`, `<innovation>` → `innovation`, `<reference_screenshots>` → `design_fidelity`, `<webmcp_action_contract>` → `mcp_contract`, and `<requirements>` → `technical`. `anticheat` and `behavioral` are deliberately tag-less.
+The tag-to-dimension map is: `<core_features>` → `core_features`, `<visual_design>` → `visual_design`, `<motion>` → `motion`, `<user_flows>` → `user_flows`, `<edge_cases>` → `edge_cases`, `<responsiveness>` → `responsiveness`, `<accessibility>` → `accessibility`, `<performance>` → `performance`, `<writing>` → `writing`, `<innovation>` → `innovation`, `<reference_screenshots>` → `design_fidelity`, and `<requirements>` → `technical`. `behavioral` is deliberately tag-less.
 
 ## Inputs to read first
 
 **Blocker check before anything else:** the instruction must contain a non-empty `<webmcp_action_contract>` block. State-setup criteria presume the judge can drive state through the contract's bindings; aligning rubrics against a contract-less instruction produces criteria the judge cannot set up. If the block is missing, STOP and report it — the contract (assignment in `schemas/webmcp-assignments.json`, rendered by `scripts/webmcp_h3.py`) must be added first.
 
 1. The task's `instruction.md` — the contract being graded. List its behavioral promises per section as you read.
-2. Every present canonical toml under `tests/<dimension>/<dimension>.toml`: `core_features`, `visual_design`, `motion`, `technical`, `user_flows`, `edge_cases`, `responsiveness`, `accessibility`, `performance`, `writing`, `innovation`, `design_fidelity`, `mcp_contract`, `anticheat`, and `behavioral`. Missing new dimensions are transitional warnings until propagation; use `--require-15` when validating a fully propagated task.
+2. Every present canonical toml under `tests/<dimension>/<dimension>.toml`: `core_features`, `visual_design`, `motion`, `technical`, `user_flows`, `edge_cases`, `responsiveness`, `accessibility`, `performance`, `writing`, `innovation`, `design_fidelity`, and `behavioral`. All thirteen are required; the validator FAILs any missing file.
 3. `docs/rubrics.md` — you need: the dimension definitions, "Authoring Criteria: From HLI Verifier to TOML", "Open-Ended Judge Catch-All Criterion", and (when the task's kit or genre calls for them) the showcase extensions and Meta-Framework Delivery Criteria (10.m).
 4. `docs/distribution.md` — the task's row, to know which kit categories need criteria (domain library asks, celebration moments, delivery mode).
 
@@ -44,9 +44,9 @@ Read adversarially: for each promise, ask "would any existing criterion actually
 
 **Pass 2 — rubric → instruction (no phantom grading).** Flag and fix criteria that grade behavior the instruction never states. Prefer fixing the *instruction-side gap was already handled by instruction-migrate*; here, if a criterion is genuinely orphaned (references removed features, wrong stack names, old styling system), rewrite it to match the instruction or delete it. Never grade internal implementation ("uses Zustand") — a browser judge can't verify it.
 
-**Pass 3 — polarity and style.** Each dimension keeps at least one positive and at least one negative criterion, except `anticheat` is legally all-negative and `innovation` may be all-positive. Negatives state the bad condition being present and set `negate = true` — never phrase a negated description as an absence (that double-inverts). **The polarity-bug class to hunt (found live corpus-wide):** a criterion whose description asserts a FAILURE ("shows no hover feedback", "fails to close", "the counts desync") but is missing `negate = true` — it silently rewards the failure (present→1.0). Every criterion whose description describes something BAD must carry `negate = true`; every `negate = true` criterion must describe the bad condition as PRESENT, never as an absence. When you write or review a negative, say the polarity out loud: "this describes a defect, so negate=true; the judge answering 'yes, the defect is present' must score 0." The validator WARNs on the most unambiguous cases but cannot catch "shows no X" ambiguity — that is your job. Every criterion is one observable pass/fail statement with resolved quantifiers; animation/gesture criteria require the real UI control path (never a WebMCP state shortcut, which snaps state and falsely shows no animation); scroll-reveal and intro-animation criteria note fresh-load. Weights: must-have 1.0, nice-to-have 0.5; the `[judge]` weights are 0.5 for Writing and 0.25 for Innovation.
+**Pass 3 — polarity and style.** Each dimension keeps at least one positive criterion; negative (`negate = true`) criteria are allowed but never required. When a negative is used, it states the bad condition being present and set `negate = true` — never phrase a negated description as an absence (that double-inverts). **The polarity-bug class to hunt (found live corpus-wide):** a criterion whose description asserts a FAILURE ("shows no hover feedback", "fails to close", "the counts desync") but is missing `negate = true` — it silently rewards the failure (present→1.0). Every criterion whose description describes something BAD must carry `negate = true`; every `negate = true` criterion must describe the bad condition as PRESENT, never as an absence. When you write or review a negative, say the polarity out loud: "this describes a defect, so negate=true; the judge answering 'yes, the defect is present' must score 0." The validator WARNs on the most unambiguous cases but cannot catch "shows no X" ambiguity — that is your job. Every criterion is one observable pass/fail statement with resolved quantifiers; animation/gesture criteria require the real UI control path (never a WebMCP state shortcut, which snaps state and falsely shows no animation); scroll-reveal and intro-animation criteria note fresh-load. Weights: must-have 1.0, nice-to-have 0.5; the `[judge]` weights are 0.5 for Writing and 0.25 for Innovation.
 
-**Pass 4 — catch-all.** Every dimension file ends with exactly one open-ended judge catch-all criterion (id `<dim>.catchall`, binary, weight 1.0), specialized to the dimension, requiring the judge to (a) name the defect, (b) cite concrete browser evidence, (c) answer no if any other criterion in the file already covers it, and (d) apply a "would plausibly matter to a real user" significance bar. It is `negate = true` except for Innovation's positive catch-all. Anti-Cheat uses `aggregation = "all_pass"`, makes every criterion negative, and requires the catch-all to demand unambiguous deception. Copy the appropriate template from docs/rubrics.md.
+**Pass 4 — catch-all.** Only `innovation` carries a catch-all: exactly one open-ended, positive judge catch-all criterion (id `innovation.catchall`, binary, weight 1.0) requiring the judge to (a) name the enhancement, (b) cite concrete browser evidence, (c) answer no if any other criterion in the file already covers it, and (d) apply a "would plausibly matter to a real user" significance bar. Other dimensions do not need a catch-all. Copy the template from docs/rubrics.md.
 
 ## TOML mechanics (match the house shape exactly)
 
@@ -67,10 +67,10 @@ weight = 1.0
 - Validate every edited file parses and passes the polarity/catch-all checks:
 
 ```bash
-python3 .claude/skills/rubric-align/scripts/validate_rubric.py tasks/<slug>/tests [--require-15]
+python3 .claude/skills/rubric-align/scripts/validate_rubric.py tasks/<slug>/tests
 ```
 
-The validator checks: TOML parses; ordinary dimensions have ≥1 positive and ≥1 negative; Anti-Cheat is all-negative with `all_pass`; Innovation's catch-all is positive; exactly one catch-all per dimension has the required clauses; no negated description is phrased as an absence ("does not", "no longer", "never" openers); no internal-implementation phrasing appears ("uses <library>", "implemented with"); ids are unique. Fix every FAIL it reports.
+The validator checks: TOML parses; every dimension has ≥1 positive criterion; Innovation has exactly one positive catch-all with the required clauses; no negated description is phrased as an absence ("does not", "no longer", "never" openers); no internal-implementation phrasing appears ("uses <library>", "implemented with"); ids are unique. Fix every FAIL it reports.
 
 ## Report
 

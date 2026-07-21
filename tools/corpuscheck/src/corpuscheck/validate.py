@@ -25,8 +25,6 @@ NEW_DIMENSIONS = (
     "writing",
     "innovation",
     "design_fidelity",
-    "mcp_contract",
-    "anticheat",
     "behavioral",
 )
 FULL_DIMENSIONS = EXISTING_DIMENSIONS + NEW_DIMENSIONS
@@ -389,30 +387,6 @@ def validate_rubric(task_dir: Path) -> CheckResult:
         duplicates = sorted({cid for cid in ids if cid is not None and ids.count(cid) > 1})
         if duplicates and not any("duplicate ids" in item for item in failures):
             messages.append(f"{path.name}: duplicate criterion ids {duplicates}")
-        if dim == "anticheat":
-            if (data.get("scoring") or {}).get("aggregation") != "all_pass":
-                messages.append("anticheat.toml: [scoring].aggregation must be 'all_pass'")
-            non_negated = [
-                str(criterion.get("id") or criterion.get("name") or "<unknown>")
-                for criterion in criteria
-                if criterion.get("negate") is not True
-            ]
-            if non_negated:
-                messages.append(
-                    "anticheat.toml: every criterion must set negate=true "
-                    f"(non-negated: {non_negated})"
-                )
-            catchalls = [
-                criterion for criterion in criteria
-                if "catchall" in str(criterion.get("id", ""))
-                or "catchall" in str(criterion.get("name", ""))
-            ]
-            if len(catchalls) == 1 and "unambiguous" not in str(
-                catchalls[0].get("description", "")
-            ).casefold():
-                messages.append(
-                    "anticheat.toml: catch-all description must contain 'unambiguous'"
-                )
         headers[dim] = _judge_header(path.read_text())
     if len(headers) > 1 and len(set(headers.values())) != 1:
         messages.append("[judge] header block is not byte-identical across dimensions")

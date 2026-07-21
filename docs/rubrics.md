@@ -680,12 +680,12 @@ Guardrails when authoring showcase-grade criteria:
 | 9 Performance | performance | technical |
 | 10 Technical Quality | technical | technical |
 | 11 Innovation | innovation | design |
-| 12 MCP Contract | mcp_contract | technical |
-| 13 Anti-Cheat | anticheat | anticheat |
 | 14 Behavioral | behavioral | behavioral |
 | 15 Writing | writing | writing |
 
-Each instruction tag maps 1:1 to its judged dimension: `<accessibility>`, `<visual_design>`, `<reference_screenshots>`, `<edge_cases>`, `<core_features>`, `<user_flows>`, `<responsiveness>`, `<motion>`, `<performance>`, `<requirements>`, `<innovation>`, and `<webmcp_action_contract>` map respectively to the folders in rows 1–12 above, while `<writing>` maps to `writing`. `anticheat` and `behavioral` are deliberately tag-less.
+The corpus ships exactly the 13 judged dimension folders above. §12 (MCP Contract) and §13 (Anti-Cheat) remain in this document as reference material only — neither has a dimension toml, and no criterion may require one.
+
+Each instruction tag maps 1:1 to its judged dimension: `<accessibility>`, `<visual_design>`, `<reference_screenshots>`, `<edge_cases>`, `<core_features>`, `<user_flows>`, `<responsiveness>`, `<motion>`, `<performance>`, `<requirements>`, and `<innovation>` map respectively to the folders in rows 1–11 above, while `<writing>` maps to `writing`. `behavioral` is deliberately tag-less.
 
 ---
 
@@ -712,7 +712,7 @@ Each verifier above becomes one `[[criterion]]` entry in a dimension's TOML rubr
 
 **Positive verifiers** become plain criteria: the description states the good behavior and the judge confirms it is present.
 
-**Negative verifiers** become `negate = true` criteria: the description states the **bad condition being present**. The judge scores presence as usual; the score is then inverted (`value → 1 - value`): present → 0.0, absent → 1.0. The raw judge answer is kept in `reward-details.json`, so the flip is auditable.
+**Negative verifiers** are optional — no dimension is required to carry one, and an all-positive dimension is valid. When used, they become `negate = true` criteria: the description states the **bad condition being present**. The judge scores presence as usual; the score is then inverted (`value → 1 - value`): present → 0.0, absent → 1.0. The raw judge answer is kept in `reward-details.json`, so the flip is auditable.
 
 Never phrase a negated description as an absence ("the app does not reload on save") — combined with `negate = true` that double-inverts and rewards the failure. The description always asserts the failure; `negate` does the flipping.
 
@@ -750,7 +750,7 @@ threshold = 0.7                # only used with "threshold"
 ```
 
 - `weighted_mean` — the default for ordinary dimensions (design, functional, ux, writing, behavioral).
-- `all_pass` — the Anti-Cheat gate: every criterion is `negate = true`; a clean app scores 1.0, one confirmed cheat scores 0.0.
+- `all_pass` — a gate: 1.0 only when every criterion passes; a single failing criterion scores the dimension 0.0.
 - `required_pass` — 1.0 only when every non-`optional` criterion passes; use for must-pass cores with `optional = true` bonus extras.
 
 Score normalization: binary yes → 1.0, else 0.0; likert normalizes as `(raw - 1) / (points - 1)`; numeric as `(raw - min) / (max - min)`.
@@ -759,28 +759,26 @@ Score normalization: binary yes → 1.0, else 0.0; likert normalizes as `(raw - 
 
 ## Open-Ended Judge Catch-All Criterion
 
-Enumerated criteria can never anticipate every failure. To future-proof each rubric, **every dimension includes exactly one open-ended, judge-discretion criterion** — the "Catch-all" line in each dimension above. It lets the judge fail (or, for Innovation, reward) the dimension for a defect the authors never thought of, with a mandatory justification, so the rubric catches new failure modes without needing an update.
+Enumerated criteria can never anticipate every enhancement. **Only the Innovation & Creativity dimension carries a catch-all** — exactly one open-ended, positive, judge-discretion criterion that rewards a noteworthy enhancement the authors never thought of, with a mandatory justification. Other dimensions do not need (and are not required to carry) a catch-all; the per-dimension "Catch-all" lines above are optional authoring aids, never a corpus requirement.
 
-**Template** (copy and specialize per dimension; id convention `"<dim>.catchall"`):
+**Template** (id convention `"<dim>.catchall"`):
 
 ```toml
 [[criterion]]
-id = "2.catchall"
-name = "design-catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
 type = "binary"
-negate = true
 weight = 1.0
 ```
 
 Rules:
 
-- **Usually negative.** The catch-all is `negate = true` in every dimension except Innovation & Creativity, where a positive form ("a noteworthy enhancement not captured elsewhere") rewards unanticipated excellence.
-- **Justification is mandatory.** The description must require the judge to name the defect and cite concrete browser evidence. The raw judge answer (including the justification) lands in `reward-details.json`, making every catch-all verdict auditable — review these justifications periodically; recurring ones are candidates for promotion to explicit criteria.
-- **No double-penalizing.** The description must instruct the judge to answer "no" when the defect is already covered by another criterion in the file, even partially.
+- **Positive.** The Innovation catch-all is never `negate = true`: it rewards unanticipated excellence.
+- **Justification is mandatory.** The description must require the judge to name the enhancement and cite concrete browser evidence. The raw judge answer (including the justification) lands in `reward-details.json`, making every catch-all verdict auditable — review these justifications periodically; recurring ones are candidates for promotion to explicit criteria.
+- **No double-rewarding.** The description must instruct the judge to answer "no" when the enhancement is already covered by another criterion in the file, even partially.
 - **Significance bar.** "Significant" = would plausibly matter to a real user. Nitpicks, taste disagreements, and hypotheticals do not qualify.
-- **Weight 1.0** in `weighted_mean` dimensions — strong enough to matter, diluted enough not to dominate the enumerated criteria.
-- **Gate dimensions need a stricter bar.** In the `all_pass` Anti-Cheat dimension a catch-all zeroes the entire dimension, so its description must demand unambiguous deception with exact evidence (see §13's catch-all wording) — never suspicion or heuristics.
+- **Weight 1.0** — strong enough to matter, diluted enough not to dominate the enumerated criteria.
 
 ---
 

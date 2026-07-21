@@ -21,6 +21,11 @@ GitHub issue that tracks its work. Run all commands from the repo root unless no
 - [ ] Run once with `--strict-dimensions --strict-oracle` and record the delta
       (non-core dimension tomls and oracle paths only warn by default).
 
+Rubric-tier decision: there is no negative-rubric requirement — negatives
+(`negate=true`) and non-innovation catch-alls are optional, and corpuscheck is
+relaxed to match (it only requires ≥1 positive criterion per dimension and
+innovation's single positive catch-all).
+
 ## Phase 2 — Repo hygiene (#534)
 
 - [ ] Delete untracked root captures (`smoke-desktop-postboot.png`, `smoke-mineclash-game.png`).
@@ -47,20 +52,11 @@ GitHub issue that tracks its work. Run all commands from the repo root unless no
 
 - [x] Docs half done on main: CLAUDE.md/AGENTS.md no longer mention anticheat or
       mcp_contract; the corpus is canonically **13** dimension tomls.
-- [ ] Align tooling: remove `anticheat` + `mcp_contract` from `tools/corpuscheck`
+- [x] Align tooling: remove `anticheat` + `mcp_contract` from `tools/corpuscheck`
       (dimension list, anticheat rubric-tier checks, README, tests) and update
       `scripts/tests/test_webmcp_h3.py` + scaffold/skill assets to the 13-dim set.
 
-## Phase 5 — CI (#533)
-
-- [ ] Add `.github/workflows/corpus-check.yml` running on PRs and pushes to main:
-      `propagate_canonical.py --check`, the `test_webmcp_h3` unit suite,
-      `corpuscheck validate --all --force --json`, corpuscheck pytest,
-      `npm run test:webmcp-contracts` + `npm run typecheck:webmcp-contracts`.
-- [ ] CI must use `--force` (fingerprint-based `--incremental` can miss breakage
-      from changed shared dependencies).
-
-## Phase 6 — Evidence gates (stretch, not release-blocking)
+## Phase 5 — Evidence gates (stretch, not release-blocking)
 
 - [ ] Advance tasks through the corpuscheck readiness lifecycle
       (`registered → static_valid → oracle_serving → oracle_certified → nop_certified → trial_ready`)
