@@ -1,0 +1,9 @@
+{
+  "name": "Relaydeck Evaluation Queue",
+  "short_name": "Relaydeck",
+  "description": "Provider-aware evaluation queue monitor",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09100e",
+  "theme_color": "#09100e"
+}
