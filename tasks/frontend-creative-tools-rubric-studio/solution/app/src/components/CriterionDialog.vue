@@ -74,7 +74,7 @@ const submit = handleSubmit((values) => emit('submitted', CriterionSchema.parse(
     stay clickable while the form is open. Keyboard focus is still trapped by
     useFocusTrap, Escape still closes, and focus returns to the opener.
   -->
-  <Dialog :visible="open" :modal="false" :header="mode === 'add' ? 'Add criterion' : 'Edit criterion'" class="form-dialog" :style="{ width: 'min(680px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
+  <Dialog :visible="open" :modal="false" :pt="{ mask: { class: 'non-modal-mask' } }" :header="mode === 'add' ? 'Add criterion' : 'Edit criterion'" class="form-dialog" :style="{ width: 'min(680px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
     <form class="criterion-form" novalidate @submit.prevent="submit">
       <div class="field-grid two-col">
         <div class="field-block">

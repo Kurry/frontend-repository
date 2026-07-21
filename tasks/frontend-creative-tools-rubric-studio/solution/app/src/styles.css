@@ -394,6 +394,7 @@ h1, h2, .rail-brand strong, .view-switcher button, .section-kicker, .bump-callou
     animation: none !important;
     transition: none !important;
     scroll-behavior: auto !important;
+    transform: none !important;
   }
 }
 
