@@ -110,24 +110,24 @@ function SectionTitle({ eyebrow, title, description, actions }) {
 
 function Reveal({ children, className = '' }) {
   const ref = useRef(null)
-  const reduce = useReducedMotion()
   useEffect(() => {
+    const isRM = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const el = ref.current
-    if (!el || reduce) { el?.classList.add('in'); return undefined }
+    if (!el || isRM()) { el?.classList.add('in'); return undefined }
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => { if (entry.isIntersecting) { el.classList.add('in'); observer.disconnect() } })
     }, { threshold: 0.06 })
     observer.observe(el)
     return () => observer.disconnect()
-  }, [reduce])
+  }, [])
   return <div ref={ref} className={`reveal ${className}`}>{children}</div>
 }
 
 function BackgroundLayers() {
   const ref = useRef(null)
   useEffect(() => {
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (reduce) return undefined
+    const isRM = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    if (isRM()) return undefined
     let frame = 0
     const onScroll = () => {
       cancelAnimationFrame(frame)
@@ -779,7 +779,7 @@ function AttributionDrawer() {
         <strong>{draft.criterionId}</strong>
         <small>{draft.labelA} → {draft.labelB}</small>
       </div>
-      <form onSubmit={handleSubmit(submit)} noValidate className="drawer-form">
+      <form autoComplete="off" onSubmit={handleSubmit(submit)} noValidate className="drawer-form">
         <Controller
           name="cause"
           control={control}
@@ -822,7 +822,7 @@ function SavePairModal() {
   const submit = (record) => { savePair(record); reset(); setSavePairOpen(false) }
   return (
     <Modal opened={savePairOpen} onClose={() => setSavePairOpen(false)} title={<div className="modal-title"><span className="eyebrow">Saved comparison pair</span><strong>Save the current pair</strong></div>} transitionProps={{ transition: 'pop', duration: 220 }}>
-      <form onSubmit={handleSubmit(submit)} className="modal-form" noValidate>
+      <form autoComplete="off" onSubmit={handleSubmit(submit)} className="modal-form" noValidate>
         <TextInput label="Pair name" placeholder="For example: weekly rubric check" description="Required, unique (case-insensitive), at most 40 characters." {...register('name')} error={errors.name?.message} required />
         <div className="pair-selects">
           <Controller name="labelA" control={control} render={({ field }) => <Select {...field} label="Label A" data={labels.map((label) => label.name)} error={errors.labelA?.message} required />} />
@@ -928,7 +928,7 @@ function RescoreModal() {
       title={<div className="modal-title"><span className="eyebrow">{showForm ? 'Rescore with new label' : 'Rescore run'}</span><strong>{showForm ? 'Create an alternative scoring label' : run.label?.labelName}</strong></div>}
     >
       {showForm ? (
-        <form onSubmit={handleSubmit(submit)} className="modal-form" noValidate>
+        <form autoComplete="off" onSubmit={handleSubmit(submit)} className="modal-form" noValidate>
           <div className="form-intro">
             <span className="form-icon" aria-hidden="true"><IconSparkles size={19} /></span>
             <div>
@@ -960,7 +960,7 @@ function RescoreModal() {
 
 function CostView() {
   const { labels, trials } = useLabStore()
-  const reduce = useReducedMotion()
+  const isRM = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
   const [visible, setVisible] = useState(() => Object.fromEntries(labels.map((label) => [label.name, true])))
   const [copied, setCopied] = useState(null)
   useEffect(() => setVisible((current) => Object.fromEntries(labels.map((label) => [label.name, current[label.name] ?? true]))), [labels])
@@ -1087,7 +1087,9 @@ function ExportModal() {
     const link = window.document.createElement('a')
     link.href = url
     link.download = 'lab-results.json'
+    window.document.body.appendChild(link)
     link.click()
+    window.document.body.removeChild(link)
     URL.revokeObjectURL(url)
   }
   const runImport = (raw) => {
