@@ -22,6 +22,6 @@ export function restoreDialogOpener(event, dialog) {
     opener.focus()
     return
   }
-  const fallbackIds = { export: 'btn-export', import: 'btn-import', palette: 'btn-palette' }
+  const fallbackIds = { export: 'btn-export', import: 'btn-import', palette: 'btn-palette', note: 'btn-annotate' }
   document.getElementById(fallbackIds[dialog])?.focus()
 }

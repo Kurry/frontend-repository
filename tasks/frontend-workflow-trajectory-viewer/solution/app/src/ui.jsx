@@ -29,15 +29,21 @@ export function Textarea({ className = '', ...props }) {
   return <textarea className={`focusable w-full resize-y rounded-md border border-ink-600 bg-ink-900 px-3 py-2.5 text-sm leading-relaxed text-mist-100 placeholder:text-mist-500 ${className}`} {...props} />
 }
 
+const EMPTY_SELECT = '__empty__'
+
 export function RadixSelect({ value, onValueChange, placeholder, options, ariaLabel, ...props }) {
+  const selected = value ? value : EMPTY_SELECT
   return (
-    <Select.Root value={value || undefined} onValueChange={onValueChange}>
-      <Select.Trigger aria-label={ariaLabel} aria-labelledby={props["aria-labelledby"]} className="focusable flex h-10 w-full items-center justify-between rounded-md border border-ink-600 bg-ink-900 px-3 text-left text-sm text-mist-100 data-[placeholder]:text-mist-500">
+    <Select.Root value={selected} onValueChange={(next) => onValueChange(next === EMPTY_SELECT ? '' : next)}>
+      <Select.Trigger aria-label={ariaLabel} aria-labelledby={props['aria-labelledby']} className="focusable flex h-10 w-full items-center justify-between rounded-md border border-ink-600 bg-ink-900 px-3 text-left text-sm text-mist-100 data-[placeholder]:text-mist-500">
         <Select.Value placeholder={placeholder} /><Select.Icon><CaretDown size={14} /></Select.Icon>
       </Select.Trigger>
       <Select.Portal>
         <Select.Content position="popper" sideOffset={5} className="z-[80] min-w-[var(--radix-select-trigger-width)] overflow-hidden rounded-md border border-ink-600 bg-ink-850 p-1 shadow-2xl">
           <Select.Viewport>
+            <Select.Item value={EMPTY_SELECT} disabled className="relative flex cursor-default select-none items-center rounded px-8 py-2 text-sm text-mist-500 outline-none">
+              <Select.ItemText>{placeholder}</Select.ItemText>
+            </Select.Item>
             {options.map((option) => (
               <Select.Item key={option.value} value={option.value} className="relative flex cursor-pointer select-none items-center rounded px-8 py-2 text-sm text-mist-300 outline-none data-[highlighted]:bg-ink-700 data-[highlighted]:text-white">
                 <Select.ItemIndicator className="absolute left-2"><Check size={13} /></Select.ItemIndicator>
