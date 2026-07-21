@@ -51,7 +51,9 @@ innovation's single positive catch-all).
       `node scripts/capture_reference_screenshots.mjs <slug ...>` then
       `python3 scripts/install_reference_screenshots.py <slug ...>`,
       then `python3 scripts/propagate_canonical.py` (Dockerfile COPY line) and `--check`.
-- [ ] Decide README policy and make the corpus uniform (37 active tasks lack `README.md`).
+- [x] Decide README policy and make the corpus uniform: every active task's `README.md`
+      and `solution/app/README.md` are standardized generated surfaces owned by
+      `scripts/propagate_canonical.py` (drift-checked by `--check`).
 
 ## Phase 4 — Docs / tooling truthfulness (#536)
 

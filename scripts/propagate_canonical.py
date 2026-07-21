@@ -16,6 +16,10 @@ Surfaces:
                                     directory exists)
   task.toml                     <- render_task_toml(slug, description) using
                                    schemas/webmcp-task-sources.json descriptions
+  README.md                     <- render_task_readme(slug, description) using
+                                   the same webmcp-task-sources.json descriptions
+  solution/app/README.md        <- render_oracle_readme(slug, modules) using
+                                   schemas/webmcp-assignments.json module lists
   [judge] cwd                   <- enforced to "/logs/verifier" in every
                                    tests/<dim>/<dim>.toml
   [[judge.mcp_servers]] block   <- scripts/canonical/mcp/reward_mcp_servers.toml
@@ -44,7 +48,7 @@ SCREENSHOT_COPY = "COPY reference-screenshots/ /reference-screenshots/\n"
 JUDGE_CWD = 'cwd = "/logs/verifier"'
 
 
-def desired_files(task: Path, sources: dict) -> dict[Path, bytes]:
+def desired_files(task: Path, sources: dict, modules: dict) -> dict[Path, bytes]:
     out: dict[Path, bytes] = {}
     canon = ROOT / "scripts/canonical"
     out[task / "tests/test.sh"] = (canon / "test.sh").read_bytes()
@@ -70,6 +74,13 @@ def desired_files(task: Path, sources: dict) -> dict[Path, bytes]:
     if meta and meta.get("description"):
         out[task / "task.toml"] = pkg.render_task_toml(
             task.name, meta["description"]
+        ).encode()
+        out[task / "README.md"] = pkg.render_task_readme(
+            task.name, meta["description"]
+        ).encode()
+    if task.name in modules:
+        out[task / "solution/app/README.md"] = pkg.render_oracle_readme(
+            task.name, modules[task.name]
         ).encode()
     return out
 
@@ -116,6 +127,10 @@ def main() -> int:
     args = ap.parse_args()
 
     sources = json.loads((ROOT / "schemas/webmcp-task-sources.json").read_text())
+    assignments = json.loads(
+        (ROOT / "schemas/webmcp-assignments.json").read_text()
+    )
+    modules = {a["task"]: a["modules"] for a in assignments["assignments"]}
     tasks = (
         [ROOT / "tasks" / s for s in args.slugs]
         if args.slugs
@@ -128,7 +143,7 @@ def main() -> int:
     for task in tasks:
         if not (task / "tests").is_dir():
             continue
-        for path, want in desired_files(task, sources).items():
+        for path, want in desired_files(task, sources, modules).items():
             if not path.exists() or path.read_bytes() != want:
                 drift.append(str(path.relative_to(ROOT)))
                 if not args.check:

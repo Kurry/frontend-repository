@@ -1,14 +1,17 @@
-# ScribbleSpace
+# Scribblespace — Oracle
 
-ScribbleSpace is a freeform notes canvas built with Vue 3, Pinia, Tailwind CSS 4.3.2, and Reka UI.
+Reference solution (oracle) for the `frontend-productivity-scribblespace` task. Serves the app
+described in `../../instruction.md`; used by `solve.sh`, the reference
+screenshot capture harness, and oracle validation runs. Must serve with
+zero console/page errors.
 
-## Features
+## Run
 
-- Infinite pannable and zoomable canvas.
-- Draggable and resizable notes, flashcards, and shapes.
-- Deterministic local live-event stream tracking.
-- WebMCP-compliant artifact transfer and session integrations.
-- Complete undo/redo, outline view, search, and more.
+    npm install
+    npm run verify:build
+    npm start          # serves on port 3000
 
-## Screens
-![Scribblespace Screenshot](/reference-screenshots/overview.png)
+## WebMCP
+
+Registers the task's contract modules: structured-editor-v1, entity-collection-v1, command-session-v1, artifact-transfer-v1. Tools are exposed via
+window.webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool.

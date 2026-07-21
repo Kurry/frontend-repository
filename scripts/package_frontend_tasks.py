@@ -2881,51 +2881,91 @@ TASK_README_TMPL = textwrap.dedent(
 
     {description}
 
-    A frontend-only Harbor eval task. A builder agent recreates the application
-    described in `instruction.md` (an observable-behavior PRD for an opaque
-    reference app), delivering a self-contained SPA in `/app` with npm scripts
-    named exactly `start` (serves on port 3000) and `verify:build`, plus the
-    in-page WebMCP tool surface defined by the instruction's action contract.
+    A frontend-only Harbor eval task. A builder agent recreates the
+    app in `instruction.md`, delivering a self-contained SPA in `/app`
+    with `start` (port 3000) and `verify:build` scripts plus the
+    WebMCP tool surface from the action contract.
 
     ## Judging
 
-    The verifier serves the built app and grades it in a real browser across
-    four weighted dimensions — core_features, technical, visual_design, motion
-    — with `pass` at reward >= 0.7. The judge observes via Playwright MCP and
-    drives state-changing setup through the app's registered WebMCP tools (a
-    task-local CDP bridge vendored at `tests/webmcp_stdio_server.mjs`). Criteria live in
+    The verifier serves the built app and grades it in a real browser
+    across 13 weighted dimensions; `pass` at reward >= 0.7. The judge
+    observes via Playwright MCP and drives state-changing setup through
+    the app's registered WebMCP tools (a task-local CDP bridge in
+    `tests/webmcp_stdio_server.mjs`). Criteria live in
     `tests/<dimension>/<dimension>.toml`.
 
     ## Running
 
-    ```bash
-    # full trial (builder + verifier); needs CLAUDE_CODE_OAUTH_TOKEN + OPENAI_API_KEY
-    harbor run -p tasks/{slug} -a claude-code -m sonnet
-
-    # re-score an existing trial (harbor fork at ~/harbor)
-    cd ~/harbor && uv run harbor score <trial-dir> --task <abs-path-to>/tasks/{slug} \\
-      --label rescore --action append
-    ```
-
-    Set `REWARDKIT_MODEL=gpt-5.6-luna` in the environment for cheap dev-tier
-    judging; production uses the toml default.
-
-    ## Layout
-
-    - `instruction.md` — the builder's complete specification
-    - `environment/` — container image + reference screenshots shown to the builder
-    - `solution/` — working oracle app + `solve.sh` (verifier-side only)
-    - `tests/` — verifier entrypoint, judge prompt, dimension rubrics, WebMCP bridge
+        harbor run -p tasks/{slug} -a claude-code -m sonnet
     """
 )
+
+# Genre prefixes stripped from the slug when deriving the README title
+# (e.g. frontend-creative-tools-css-theme-builder -> "Css Theme Builder").
+README_TITLE_GENRE_PREFIXES = (
+    "creative-tools-",
+    "data-tracking-",
+    "game-",
+    "landing-",
+    "planning-",
+    "productivity-",
+    "workflow-",
+)
+
+
+def readme_title(slug: str) -> str:
+    """Deterministic README title from the task slug: drop the `frontend-`
+    namespace and the genre prefix, then title-case the remaining words."""
+    rest = slug.removeprefix("frontend-")
+    for prefix in README_TITLE_GENRE_PREFIXES:
+        if rest.startswith(prefix):
+            rest = rest.removeprefix(prefix)
+            break
+    return rest.replace("-", " ").title()
 
 
 def render_task_readme(slug: str, description: str) -> str:
     """Canonical packaged-task README: registry/maintainer-facing, and must not
     leak authoring provenance (original brands, capture sources, inspiration
-    URLs), oracle implementation details, or judge criteria text."""
-    title = slug.replace("frontend-", "").replace("-", " ").title()
-    return TASK_README_TMPL.format(title=title, description=description, slug=slug)
+    URLs), oracle implementation details, or judge criteria text. Title and
+    one-line description derive from schemas/webmcp-task-sources.json — the
+    same source task.toml descriptions come from."""
+    return TASK_README_TMPL.format(
+        title=readme_title(slug), description=description, slug=slug
+    )
+
+
+ORACLE_README_TMPL = textwrap.dedent(
+    """\
+    # {title} — Oracle
+
+    Reference solution (oracle) for the `{slug}` task. Serves the app
+    described in `../../instruction.md`; used by `solve.sh`, the reference
+    screenshot capture harness, and oracle validation runs. Must serve with
+    zero console/page errors.
+
+    ## Run
+
+        npm install
+        npm run verify:build
+        npm start          # serves on port 3000
+
+    ## WebMCP
+
+    Registers the task's contract modules: {modules}. Tools are exposed via
+    window.webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool.
+    """
+)
+
+
+def render_oracle_readme(slug: str, modules: list[str]) -> str:
+    """Canonical solution/app README: title/slug derive exactly like the task
+    README; the module list comes from the task's entry in
+    schemas/webmcp-assignments.json."""
+    return ORACLE_README_TMPL.format(
+        title=readme_title(slug), slug=slug, modules=", ".join(modules)
+    )
 
 
 SOLVE_SH = textwrap.dedent(
