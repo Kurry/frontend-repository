@@ -247,9 +247,11 @@ function Progress({label,value}) { return <div className="progress-item"><div cl
 function Uptime({label,value,alert}) { return <div style={{marginTop:50}}><div className="progress-label"><span>{label}</span><span>{value}</span></div><div className="uptime-bars">{Array.from({length:12},(_,i)=><i key={i} className={alert&&i===2?'alert':''}/>)}</div></div>; }
 function MetricLine({a,b}) { return <div style={{display:'flex',justifyContent:'space-between',fontSize:12,marginTop:12}}><span>{a}</span><strong>{b}</strong></div>; }
 
-function KpiCard({ label, value, color, index }) {
+function KpiCard({ label, value, color }) {
   const seed = [6,7,6,9,10,9,12,value];
-  return <article className="card kpi-card"><div><small>{label}</small><strong>{value}</strong></div><div className="spark"><ChartCanvas data={{labels:seed.map((_,i)=>i),datasets:[{data:seed,borderColor:color,backgroundColor:`${color}22`,borderWidth:2,tension:.35,pointRadius:0,fill:true}]}} options={{animation:{duration:380+index*50}}}/></div></article>;
+  const max = Math.max(...seed, 1);
+  const points = seed.map((point, pointIndex) => `${pointIndex * 14.25},${38 - (point / max) * 32}`).join(' ');
+  return <article className="card kpi-card"><div><small>{label}</small><strong>{value}</strong></div><svg className="spark" viewBox="0 0 100 42" preserveAspectRatio="none" role="img" aria-label={`${label} trend chart ending at ${value}`}><polyline points={points} fill="none" stroke={color} strokeWidth="3" vectorEffect="non-scaling-stroke"/><circle cx="99.75" cy={38 - (value / max) * 32} r="3" fill={color}/></svg></article>;
 }
 
 function UsersShell({ children, title, subtitle, actions = true }) {
@@ -266,7 +268,7 @@ function AllUsers() {
   const bulkDisabled = selected.size === 0;
   return <UsersShell title="All users" subtitle="Manage access, lifecycle status, and customer value from one live directory.">
     <section className="users-kpis" aria-label="User KPIs">
-      <KpiCard label="Total" value={store.kpis.value.total} color="#25b8ef" index={0}/><KpiCard label="Active" value={store.kpis.value.active} color="#09c8b8" index={1}/><KpiCard label="Paying" value={store.kpis.value.paying} color="#f5b941" index={2}/><KpiCard label="Suspended" value={store.kpis.value.suspended} color="#f15d79" index={3}/>
+      <KpiCard label="Total" value={store.kpis.value.total} color="#25b8ef"/><KpiCard label="Active" value={store.kpis.value.active} color="#09c8b8"/><KpiCard label="Paying" value={store.kpis.value.paying} color="#f5b941"/><KpiCard label="Suspended" value={store.kpis.value.suspended} color="#f15d79"/>
     </section>
     <div className="card filterbar">
       <FunnelIcon className="icon-sm muted"/>
@@ -310,11 +312,8 @@ function UserForm() {
     : null;
   const defaults = draftValues || (editing ? {...editing,temporaryPassword:''} : source ? {...source,id:undefined,email:'',temporaryPassword:'',status:'Invited',sendInvitation:true} : defaultUser);
   const schema = editing ? store.userEditSchema : store.userCreateSchema;
-  const {register,handleSubmit,formState:{errors,isSubmitting},watch,reset} = useForm({resolver:zodResolver(schema),mode:'onSubmit',defaultValues:defaults});
+  const {register,handleSubmit,formState:{errors,isSubmitting,isValid},watch} = useForm({resolver:zodResolver(schema),mode:'onChange',defaultValues:defaults});
   const lock = useRef(false);
-  useEffect(() => {
-    reset(defaults);
-  }, [store.editUserId.value, store.duplicateSourceId.value, draftValues]);
   useEffect(() => {
     const sub = watch((values) => {
       store.formDraft.value = {
@@ -332,8 +331,8 @@ function UserForm() {
     catch(error){ store.toast.value=error.message; }
     finally { setTimeout(()=>lock.current=false,400); }
   };
-  const onInvalid = () => {
-    store.toast.value = Object.values(errors).map(e=>e?.message).filter(Boolean).join('. ') || 'Fix the highlighted fields before submitting.';
+  const onInvalid = (invalidFields) => {
+    store.toast.value = Object.values(invalidFields).map(e=>e?.message).filter(Boolean).join('. ') || 'Fix the highlighted fields before submitting.';
   };
   const title = editing ? 'Edit user' : source ? 'Duplicate user' : 'Add user';
   return <UsersShell title={title} subtitle={editing?'Update this API-shaped directory record.':source?'Create an invited user from an existing profile.':'Create an API-shaped directory record with validated access settings.'} actions={false}>
@@ -359,7 +358,7 @@ function UserForm() {
       <div className="form-section"><h3>Permissions</h3><p>Only declared permission IDs can be included in the payload.</p><div className="check-grid">
         {store.PERMISSIONS.map(p=><label className="check-row" key={p}><input className="checkbox" type="checkbox" value={p} {...register('permissions')}/>{p}</label>)}
       </div><div className="field-error" role="status">{errors.permissions?.message}</div></div>
-      <div className="form-actions"><button className="btn" type="button" onClick={()=>{store.formDraft.value=null;store.setView('all-users')}}>Cancel</button><button className="btn btn-primary" type="submit" disabled={isSubmitting}>{editing?'Save changes':'Create user'}</button></div>
+      <div className="form-actions"><button className="btn" type="button" onClick={()=>{store.formDraft.value=null;store.setView('all-users')}}>Cancel</button><button className="btn btn-primary" type="submit" disabled={!isValid||isSubmitting}>{editing?'Save changes':'Create user'}</button></div>
       <div className="sr-only" aria-live="polite">{Object.values(errors).map(e=>e?.message).filter(Boolean).join('. ')}</div>
     </form>
   </UsersShell>;
@@ -434,8 +433,7 @@ function ExportDrawer({triggerRef}) {
   return <><div className="drawer-backdrop" onClick={close}/><aside ref={ref} className="export-drawer" role="dialog" aria-modal="true" aria-label="Export directory"><div className="drawer-head"><div><h2>Export directory</h2><p>Live artifacts compiled from this session’s shared store.</p></div><button className="icon-btn" aria-label="Close export drawer" onClick={close}><XMarkIcon className="icon"/></button></div><div className="export-summary"><div className="summary-chip"><small>Active users</small><strong>{store.users.value.length}</strong></div><div className="summary-chip"><small>Archived</small><strong>{store.archive.value.length}</strong></div><div className="summary-chip"><small>Log entries</small><strong>{store.activityLog.value.length}</strong></div></div><div className="tabs" role="tablist"><button className={`tab ${store.exportTab.value==='json'?'active':''}`} onClick={()=>store.exportTab.value='json'} role="tab">Directory JSON</button><button className={`tab ${store.exportTab.value==='csv'?'active':''}`} onClick={()=>store.exportTab.value='csv'} role="tab">Users CSV</button></div><pre className="preview" tabIndex="0">{text}</pre><div className="drawer-actions"><button className="btn" onClick={copy}><ClipboardDocumentIcon className="icon-sm"/>Copy</button><button className="btn btn-primary" onClick={download}><ArrowDownTrayIcon className="icon-sm"/>Download</button></div></aside></>;
 }
 
-function CurrentView() {
-  const view=store.activeView.value;
+function CurrentView({view}) {
   if(view==='operations-overview')return <OperationsOverview/>;
   if(view==='all-users')return <AllUsers/>;
   if(view==='add-user')return <UserForm/>;
@@ -447,11 +445,12 @@ function CurrentView() {
 
 export default function App() {
   store.uiEpoch.value;
+  const activeView=store.activeView.value;
   const commandTriggerRef=useRef(null),exportTriggerRef=useRef(null);
   useEffect(()=>{document.documentElement.dataset.theme=store.theme.value},[store.theme.value]);
   useEffect(()=>{const key=(e)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();store.commandOpen.value=true}if(e.key==='Escape'){store.resetTransientMenus();if(store.importOpen.value)store.importOpen.value=false;if(store.bulkDialog.value)store.bulkDialog.value=null}};document.addEventListener('keydown',key);return()=>document.removeEventListener('keydown',key)},[]);
   useEffect(()=>{if(!store.toast.value)return;const timer=setTimeout(()=>store.toast.value='',2600);return()=>clearTimeout(timer)},[store.toast.value]);
   useEffect(()=>registerWebMcp(),[]);
   const rememberExportTrigger=(event)=>{const button=event.target.closest?.('button');if(!button)return;const label=`${button.textContent} ${button.getAttribute('aria-label')||''}`;if(/export/i.test(label))window.__lastExportTrigger=button.closest('.command-card')?commandTriggerRef.current:button;};
-  return <div className="app-shell" onClickCapture={rememberExportTrigger}><Sidebar/><div className="main"><Header commandTriggerRef={commandTriggerRef} exportTriggerRef={exportTriggerRef}/><CurrentView/></div>{store.commandOpen.value&&<CommandPalette triggerRef={commandTriggerRef}/>} {store.exportOpen.value&&<ExportDrawer triggerRef={exportTriggerRef}/>} {store.importOpen.value&&<ImportModal/>}<BulkDialog/>{store.toast.value&&<div className="toast-live" role="status" aria-live="polite"><CheckCircleIcon className="icon-sm" style={{display:'inline',marginRight:7}}/>{store.toast.value}</div>}<div className="sr-only" aria-live="polite">{store.toast.value}</div></div>;
+  return <div className="app-shell" onClickCapture={rememberExportTrigger}><Sidebar/><div className="main"><Header commandTriggerRef={commandTriggerRef} exportTriggerRef={exportTriggerRef}/><CurrentView key={activeView} view={activeView}/></div>{store.commandOpen.value&&<CommandPalette triggerRef={commandTriggerRef}/>} {store.exportOpen.value&&<ExportDrawer triggerRef={exportTriggerRef}/>} {store.importOpen.value&&<ImportModal/>}<BulkDialog/>{store.toast.value&&<div className="toast-live" role="status" aria-live="polite"><CheckCircleIcon className="icon-sm" style={{display:'inline',marginRight:7}}/>{store.toast.value}</div>}<div className="sr-only" aria-live="polite">{store.toast.value}</div></div>;
 }
