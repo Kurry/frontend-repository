@@ -4,16 +4,15 @@
 
 Each task asks a builder agent to recreate a reference web application from an
 observable-behavior PRD (`instruction.md`). An LLM judge then grades the built
-app in a real browser across fifteen dimensions:
+app in a real browser across thirteen dimensions:
 
 ```
 core_features    visual_design    motion           technical        user_flows
 edge_cases       responsiveness   accessibility    performance      writing
-innovation       design_fidelity  mcp_contract     anticheat        behavioral
+innovation       design_fidelity  behavioral
 ```
 
-A trial passes at `reward >= 0.7`. Both reward and pass are gated on
-`anticheat`.
+A trial passes at `reward >= 0.7`.
 
 Task slugs carry their category as a prefix (`frontend-<category>-<name>`) —
 see the distribution below.
@@ -55,9 +54,9 @@ tasks/frontend-<slug>/
     ├── test.sh                    # entry point
     ├── system_prompt.md           # judge prompt
     ├── webmcp_stdio_server.mjs    # judge-side WebMCP bridge
-    ├── reward.toml                # aggregation + anticheat gating
+    ├── reward.toml                # aggregation
     └── <dimension>/
-        └── <dimension>.toml       # rubric criteria, one dir per dimension (15)
+        └── <dimension>.toml       # rubric criteria, one dir per dimension (13)
 ```
 
 ## Corpus distribution
