@@ -7,10 +7,13 @@ export const visionEnum = z.enum(['off', 'protanopia', 'deuteranopia', 'tritanop
 export const swatchEnum = z.enum(['#000000', '#ffffff', '#ff0000', '#ffff00', '#00ff00', '#0000ff', '#ff0098']);
 
 export const savedBoardSchema = z.object({
-  name: z.string().min(1, "Name is required").max(40, "Name must be 40 characters or less"),
+  name: z.string().trim().min(1, "Name is required — enter a board name").max(40, "Name must be 40 characters or less"),
   tag: tagsEnum,
   favorite: z.boolean().default(false),
 });
+
+// Field rules for renaming an existing board (no tag/favorite here).
+export const boardNameSchema = z.string().trim().min(1, "Name is required — enter a board name").max(40, "Name must be 40 characters or less");
 
 // A cell is blank (null), a flat solid-color fill ({ kind: 'color', color }),
 // or a QR-glyph fill ({ kind: 'qr', color }) — matching the shape the app
