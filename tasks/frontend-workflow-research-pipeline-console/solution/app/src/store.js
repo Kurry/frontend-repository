@@ -75,6 +75,7 @@ export const usePipelineStore = create((set, get) => ({
   datasets: clone(seedDatasets),
   trialData: clone(seedTrials),
   activeView: 'pipeline',
+      datasetFilter: null,
   selectedRunId: null,
   datasetFilter: null,
   timelinePhase: 'all',
@@ -96,7 +97,8 @@ export const usePipelineStore = create((set, get) => ({
   closeSubmission: () => set({ submissionOpen: false }),
   setFormDraft: (formDraft) => set({ formDraft }),
   selectRun: (selectedRunId) => set({ selectedRunId, highlightedPhase: null, timelinePhase: 'all', timelineStatus: 'all', submissionOpen: false }),
-  setDatasetFilter: (datasetFilter) => set({ datasetFilter, activeView: 'pipeline', mobileNavOpen: false, selectedRunId: null }),
+  setDatasetFilter: (datasetFilter) => set({ datasetFilter, activeView: 'pipeline',
+      datasetFilter: null, mobileNavOpen: false, selectedRunId: null }),
   setTimelinePhase: (timelinePhase) => set({ timelinePhase }),
   setTimelineStatus: (timelineStatus) => set({ timelineStatus }),
   setHighlightedPhase: (highlightedPhase) => set({ highlightedPhase }),
@@ -117,6 +119,7 @@ export const usePipelineStore = create((set, get) => ({
       runs: [run, ...s.runs],
       submissionOpen: false,
       activeView: 'pipeline',
+      datasetFilter: null,
       selectedRunId: null,
       submitting: false,
       alerts: [...s.alerts, { id: `submit-${run.id}`, message: `${run.id} submitted to ${config.cluster}`, color: 'indigo' }],
@@ -201,6 +204,7 @@ export const usePipelineStore = create((set, get) => ({
         runs: [...runs, ...s.runs],
         importError: null,
         activeView: 'pipeline',
+      datasetFilter: null,
         alerts: [...s.alerts, { id: `import-${Date.now()}`, message: `Imported ${runs.length} job config(s)`, color: 'green' }],
       }));
       return true;
@@ -218,6 +222,7 @@ export const usePipelineStore = create((set, get) => ({
       runs: [run, ...s.runs],
       importError: null,
       activeView: 'pipeline',
+      datasetFilter: null,
       alerts: [...s.alerts, { id: `import-${run.id}`, message: `Imported ${run.id} from job-config`, color: 'green' }],
     }));
     return true;
