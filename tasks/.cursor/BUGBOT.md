@@ -33,3 +33,33 @@ Included when a PR touches any `tasks/frontend-<slug>/` path.
   aria-hidden sprinkled to silence checks.
 - Seed/demo data must stay brand-clean (no Anthropic/OpenAI/Harbor/etc. — use invented
   vendor names) and consistent with any rubric criteria that quote it.
+
+---
+
+# Deep-review protocol for task PRs (mandatory — a review without these outputs is incomplete)
+
+1. **Load the ground truth first.** Before judging any fix claim, read the task's actual
+   rubric text: every `tests/<dim>/<dim>.toml` criterion the PR references (and the whole
+   dimension when a claim is vague), plus the relevant `instruction.md` sections. Judge
+   claims against the criterion's literal wording — not the PR's paraphrase of it. A fix
+   that satisfies the paraphrase but not the criterion text is NOT a fix (e.g. a
+   criterion expecting a regenerated `exportedAt` stamp is violated, not satisfied, by
+   making the stamp stable).
+2. **Determine the genre before applying rules.** good-app (no storage), website-fidelity
+   (pixel/brand fidelity is itself the spec), hard browser app/game, or framework rebuild
+   — the README genre list + instruction.md tell you. Several rules invert by genre.
+3. **Trace, don't trust.** For each claimed fix: locate the hunk; walk the code path from
+   user action to observable result; state what a user would now see. For WebMCP-adjacent
+   changes: trace tool handler → store mutation → rendered view to confirm same-state.
+4. **Criterion-coverage table.** Output a table of every criterion the PR claims
+   (rows) × columns: criterion's literal requirement, implementing hunk (file:line),
+   traced observable outcome, verdict (confirmed/plausible/not-demonstrated/contradicts).
+5. **Reward-file cross-check (judge PRs).** Parse the committed reward-details.json and
+   diff its criterion list against the toml files IN THIS PR's HEAD; recompute the
+   weighted means; partition all 1.0s (diff-supported / observation-reasoned /
+   unsupported); list unsupported ones individually.
+6. **Media audit.** Open every file under solution/app/testing/ touched or referenced:
+   state what each actually shows and which criterion it evidences; flag mismatches,
+   mp4s, and auto-generated filenames.
+7. **Full-diff sweep last.** After the claimed items, list every remaining hunk and
+   classify it: supporting change / undeclared behavior change / scope violation.
