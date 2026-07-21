@@ -498,6 +498,10 @@ button { font: inherit; color: inherit; cursor: pointer; }
   to { opacity: 1; transform: none; }
 }
 .col-enter { animation: colEnter 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes colEnter {
+  from { opacity: 0; transform: translateX(10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
 
 /* ---------------------------------------------------------------------------
    Empty states
@@ -1190,4 +1194,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .reveal { opacity: 1; transform: none; }
   .bg-glow { animation: none !important; }
   .bg-layers { transform: none !important; }
+}
+
+.mantine-Notification-root {
+  animation: toastSlide 0.35s cubic-bezier(0.2, 1, 0.3, 1) both;
+}
+@keyframes toastSlide {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
