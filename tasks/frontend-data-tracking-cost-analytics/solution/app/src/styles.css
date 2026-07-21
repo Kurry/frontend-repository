@@ -161,6 +161,7 @@ html[data-theme="dark"] :focus-visible { outline-color: #78a9ff; }
 .range-form { display: flex; flex-wrap: wrap; gap: .45rem; align-items: flex-end; }
 .compact-field label { display: block; color: var(--muted); font-size: .68rem; font-weight: 600; margin-bottom: .25rem; }
 .compact-field input, .compact-field select { height: 34px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 0 .55rem; }
+.compact-field input:focus-visible, .ceiling-edit input:focus-visible, .cmd-input:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 20%, transparent); }
 .inline-error { color: var(--error-text); font-size: .72rem; margin-top: .35rem; }
 .compare-toggle { display: flex; align-items: center; gap: .45rem; font-size: .76rem; white-space: nowrap; min-height: 34px; cursor: pointer; }
 .compare-toggle input { accent-color: var(--teal); width: 1rem; height: 1rem; }
@@ -179,6 +180,8 @@ html[data-theme="dark"] .segmented button.active { background: #f4f4f4; color: #
 .chart-tooltip { background: var(--code-bg); color: #fff; padding: .6rem .75rem; box-shadow: 0 4px 16px rgba(0, 0, 0, .2); font-size: 12px; }
 .chart-tooltip-date { color: var(--lime); font-size: 11px; margin-bottom: 3px; }
 .chart-tooltip div + div { margin-top: 3px; }
+.spend-line .recharts-line-curve { stroke-dasharray: 2000; stroke-dashoffset: 0; animation: spend-line-draw 600ms cubic-bezier(.2, .8, .2, 1); }
+@keyframes spend-line-draw { from { stroke-dashoffset: 2000; } }
 
 .team-row { padding: .85rem 0; border-bottom: 1px solid var(--line-soft); transition: background-color 160ms ease; }
 .team-row:hover { background: var(--hover-wash); }
@@ -197,7 +200,7 @@ html[data-theme="dark"] .segmented button.active { background: #f4f4f4; color: #
 .ceiling-edit { margin-top: .5rem; display: flex; gap: .4rem; align-items: flex-end; }
 .ceiling-label { color: var(--muted); margin-bottom: .25rem; }
 .ceiling-edit input { width: 92px; height: 32px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 0 .4rem; }
-.ceiling-edit button { height: 32px; border: 1px solid var(--teal); color: var(--teal-deep); background: var(--surface); padding: 0 .55rem; cursor: pointer; transition: background-color 150ms ease, box-shadow 150ms ease, transform 100ms ease; }
+.ceiling-edit button { min-height: 32px; border: 1px solid var(--teal); color: var(--teal-deep); background: var(--surface); padding: .25rem .55rem; cursor: pointer; transition: background-color 150ms ease, box-shadow 150ms ease, transform 100ms ease; }
 .ceiling-edit button:hover:not(:disabled) { background: var(--teal-soft); box-shadow: 0 2px 8px rgba(8, 30, 44, .12); }
 .ceiling-edit button:active:not(:disabled) { transform: translateY(1px); }
 .ceiling-edit button:disabled { opacity: .4; cursor: not-allowed; }
