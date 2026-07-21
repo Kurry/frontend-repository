@@ -54,8 +54,9 @@ export function closeExport(silent = false) {
   const entry = exportEntry;
   exportEntry = null;
   ui.exportOpen = false;
+  if (exportInvoker && document.contains(exportInvoker)) exportInvoker.focus();
   closePanel($('#export-drawer'), entry, () => {
-    if (exportInvoker && document.contains(exportInvoker)) exportInvoker.focus();
+    exportInvoker = null;
   });
   if (!silent) announce('Export drawer closed.');
 }
@@ -341,11 +342,13 @@ function throttle(fn, ms) {
   };
 }
 
-export function showPopup() {
-  if (ui.popupDismissed || ui.popupOpen) return;
+export function showPopup(force = false) {
+  if (ui.popupOpen || (ui.popupDismissed && !force)) return;
+  if (force) ui.popupDismissed = false;
   const el = $('#subscribe-popup');
   ui.popupOpen = true;
-  el.hidden = false;
+  if (el.hasAttribute('popover') && typeof el.showPopover === 'function' && !el.matches(':popover-open')) el.showPopover();
+  else el.hidden = false;
   requestAnimationFrame(() => el.classList.add('is-visible'));
   popupEntry = { el, onEscape: () => dismissPopup() };
   openOverlay(popupEntry);
@@ -360,7 +363,10 @@ export function dismissPopup(viaSubmit = false) {
   const el = $('#subscribe-popup');
   el.classList.remove('is-visible');
   if (popupEntry) { closeOverlay(popupEntry); popupEntry = null; }
-  setTimeout(() => { el.hidden = true; }, prefersReducedMotion() ? 0 : 380);
+  setTimeout(() => {
+    if (el.hasAttribute('popover') && typeof el.hidePopover === 'function' && el.matches(':popover-open')) el.hidePopover();
+    else el.hidden = true;
+  }, prefersReducedMotion() ? 0 : 380);
   announce(viaSubmit ? 'Subscribed — the popup is dismissed for this session.' : 'Popup dismissed for this session.');
 }
 

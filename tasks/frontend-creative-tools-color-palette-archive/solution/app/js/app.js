@@ -9,7 +9,7 @@ import { renderAll, renderCanvas, copySwatch, spotlightRow, bindUndoState } from
 import { openEditor, closeEditor, isEditorOpen, initEditorDrag } from './editor.js';
 import {
   openExport, closeExport, renderExportDrawer, copyExport, downloadExport, printCatalog, runImport,
-  openCompare, closeCompare, renderCompare, applyBatchTag, closeBatchTag,
+  openCompare, closeCompare, renderCompare, openBatchTag, applyBatchTag, closeBatchTag,
   initPopup, dismissPopup, submitPopup,
   openMenu, closeMenu, openCart, closeCart, initCoachmark, dismissCoachmark,
 } from './overlays.js';
@@ -200,7 +200,6 @@ $('#compare-select-a').addEventListener('change', (e) => { ui.compareA = e.targe
 $('#compare-select-b').addEventListener('change', (e) => { ui.compareB = e.target.value; renderCompare(); announce('Right palette swapped — deltas recomputed.'); });
 $('#batch-tag-apply').addEventListener('click', applyBatchTag);
 $('#batch-tag-cancel').addEventListener('click', closeBatchTag);
-
 // ---------- subscribe popup ---------------------------------------------------------------------
 
 $('#popup-close').addEventListener('click', () => dismissPopup());
@@ -292,13 +291,12 @@ function initReveals() {
   els.forEach((el) => io.observe(el));
 }
 
-// The footer sits sticky behind the main content; main needs matching
-// bottom padding so the last row is never hidden by it.
+// The footer follows the archive in normal flow, so no compensating blank
+// padding is needed and its controls remain directly clickable.
 function syncFooterReveal() {
-  const footer = document.querySelector('.site-footer');
   const main = document.getElementById('MainContent');
-  if (!footer || !main) return;
-  main.style.setProperty('padding-bottom', `${footer.offsetHeight}px`, 'important');
+  if (!main) return;
+  main.style.setProperty('padding-bottom', '0px', 'important');
 }
 
 // ---------- boot -----------------------------------------------------------------------------------------

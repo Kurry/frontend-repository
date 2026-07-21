@@ -498,6 +498,7 @@ kbd {
   opacity: 0; transform: scale(0.85); pointer-events: none;
   transition: opacity 0.18s ease, transform 0.18s var(--ease-out);
 }
+.copy-label[hidden] { display: none !important; }
 .is-copied .copy-label { opacity: 1; transform: scale(1); }
 .is-flashing { animation: ink-flash 0.5s ease; }
 @keyframes ink-flash {
@@ -847,7 +848,7 @@ textarea.ed-input { border: 1px solid rgba(var(--ink), 0.4); resize: vertical; }
 
 /* footer */
 .site-footer {
-  position: sticky; bottom: 0; z-index: 0; min-height: 70vh;
+  position: relative; z-index: 1; min-height: 70vh;
   background: rgb(var(--bg)); border-top: 1px solid rgba(var(--ink), 0.2);
   display: flex; flex-direction: column; justify-content: space-between;
   padding: 3rem var(--page-gutter) 2rem;
@@ -899,6 +900,10 @@ textarea.ed-input { border: 1px solid rgba(var(--ink), 0.4); resize: vertical; }
   .control-select, .facet-search { min-height: 44px; }
   .btn { min-height: 44px; }
   .control-icon-btn { width: 44px; height: 44px; }
+  .site-header__menu, .site-header__cart, .palette-card__fav { min-width: 44px; min-height: 44px; }
+  .ed-input, .ed-mini-btn, .oa-popup input, .oa-popup button { min-height: 44px; }
+  .hue-strip { flex-wrap: wrap; overflow-x: visible; }
+  .hue-chip { flex: 1 0 44px; min-width: 44px; height: 44px; }
 
   .nomenclature-row--header { display: none; }
   .nomenclature-row {
