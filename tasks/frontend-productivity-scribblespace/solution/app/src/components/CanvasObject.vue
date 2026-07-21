@@ -59,6 +59,11 @@ const editorText = computed({
 const editor = useEditor({
   content: editorText.value,
   extensions: [StarterKit],
+  editorProps: {
+    attributes: {
+      'aria-label': props.obj.type === 'note' ? 'Note text editor' : 'Flashcard text editor',
+    },
+  },
   onUpdate: ({ editor }) => {
     const txt = editor.getText()
     if (txt.length > 8000) {
@@ -366,7 +371,7 @@ const motionConfig = computed(() => {
       </div>
 
       <!-- Colors Swatch -->
-      <div v-if="singleSelected" class="absolute -top-[45px] left-0 bg-white shadow-md p-1 rounded z-20 flex gap-1" :style="{ transform: (!prefersReducedMotion && obj.type === 'flashcard' && obj.flipped) ? 'rotateY(180deg)' : 'none' }">
+      <div v-if="singleSelected" class="object-color-toolbar absolute top-full mt-2 left-0 bg-white shadow-md p-1 rounded z-[100] flex gap-1" :style="{ transform: (!prefersReducedMotion && obj.type === 'flashcard' && obj.flipped) ? 'rotateY(180deg)' : 'none' }">
          <button
             v-for="c in colors"
             :key="c.hex"
@@ -395,7 +400,7 @@ const motionConfig = computed(() => {
             <button type="button" @mousedown.prevent="editor?.chain().focus().redo().run()" class="px-2 py-1 bg-white border rounded text-xs">Redo</button>
          </div>
          <!-- Editor -->
-         <editor-content :editor="editor" class="flex-1 overflow-auto outline-none prose prose-sm focus:ring-2 focus:ring-purple-500 rounded bg-transparent" />
+         <editor-content :editor="editor" :aria-label="obj.type === 'note' ? 'Note text editor' : (obj.flipped ? 'Flashcard back editor' : 'Flashcard front editor')" class="flex-1 overflow-auto outline-none prose prose-sm focus:ring-2 focus:ring-purple-500 rounded bg-transparent" />
       </div>
 
       <div v-else-if="(obj.type === 'note' || obj.type === 'flashcard') && !isEditing" class="flex-1 p-2 overflow-hidden break-words z-10" :style="{ transform: (!prefersReducedMotion && obj.type === 'flashcard' && obj.flipped) ? 'rotateY(180deg)' : 'none' }">

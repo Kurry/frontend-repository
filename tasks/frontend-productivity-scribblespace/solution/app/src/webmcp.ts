@@ -1,4 +1,5 @@
 import { useAppStore } from './store'
+import { nextTick } from 'vue'
 import type { ObjectType, ToolType, CanvasObject } from './types'
 
 // Setup window interface for TypeScript
@@ -333,8 +334,11 @@ export function registerWebMCP() {
     return Object.keys(tools).map(name => ({ name, description: tools[name].description }));
   };
 
-  window.webmcp_invoke_tool = function (name: string, args?: Record<string, unknown>) {
+  window.webmcp_invoke_tool = async function (name: string, args?: Record<string, unknown>) {
     if (!tools[name]) throw new Error('Unknown WebMCP tool: ' + name);
-    return tools[name].handler(args || {});
+    const result = await tools[name].handler(args || {});
+    await nextTick();
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    return result;
   };
 }

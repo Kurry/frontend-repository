@@ -101,7 +101,7 @@ const objectCount = computed(() => store.activeBoard?.objects.length || 0)
       <SelectionControls />
     </div>
 
-    <main ref="mainRef" class="flex-1 relative overflow-hidden min-h-[280px]">
+    <main ref="mainRef" class="app-main flex-1 relative overflow-hidden min-h-[280px]">
       <Canvas v-if="store.viewMode === 'canvas'" :width="mainSize.width" :height="mainSize.height" />
       <OutlineView v-else />
       <LivePanel v-if="store.showLivePanel" />

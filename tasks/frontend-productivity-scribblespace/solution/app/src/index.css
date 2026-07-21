@@ -233,12 +233,33 @@ button {
   .app-actions [role="toolbar"] {
     padding: 8px;
     justify-content: flex-start;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+    flex-wrap: wrap;
+    overflow: visible;
   }
 
   .app-actions [role="toolbar"] button {
     flex-shrink: 0;
+    min-height: 44px;
+  }
+
+  .app-main {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .app-main > [role="region"] {
+    flex: 1 0 260px;
+    min-height: 260px;
+    height: auto !important;
+  }
+
+  .live-panel {
+    position: relative !important;
+    inset: auto !important;
+    width: auto !important;
+    margin: 8px;
+    max-height: 220px !important;
+    flex: 0 0 auto;
   }
 }

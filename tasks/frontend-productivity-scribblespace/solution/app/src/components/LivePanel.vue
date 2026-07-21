@@ -38,7 +38,7 @@ const statusBadge = computed(() => {
 </script>
 
 <template>
-  <div class="absolute bottom-4 left-4 bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden w-[320px] z-[45] flex flex-col max-h-[300px]">
+  <div class="live-panel absolute bottom-4 left-4 bg-white border border-gray-200 shadow-lg rounded-xl overflow-hidden w-[320px] z-[45] flex flex-col max-h-[300px]">
     <div class="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between shrink-0">
       <h3 class="font-semibold text-gray-900 text-sm m-0">Live Events</h3>
       <div class="px-2 py-0.5 rounded text-xs font-medium border" :class="statusBadge.classes">
