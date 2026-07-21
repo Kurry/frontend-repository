@@ -1,431 +1,1025 @@
+// Shared application state (Zustand, in-memory only). Every pane derives
+// from the one shared tree of the active schema; the validation run engine
+// lives here and drives steps, rollups, timeline, and tree annotations.
 import { create } from 'zustand';
-import Ajv from 'ajv';
-import { seedSchemas } from './seeds';
 import {
-  compileSchema, diffFields, fieldToJsonSchema, findField, findParent, flattenFields,
-  formatInstruction, generateExample, inferFields, mapField, packageFor, schemaPackageSchema,
-  stripIds, validateSiblingKeys, withIds,
-} from './domain';
+  uid, makeNode, rootNode, findNode, findParent, updateNode, removeNode,
+  reorderChildren, uniqueKey, uniqueSchemaName, countFields,
+  compileSchema, generateExample, formatInstruction, nodeToFieldDef, fieldDefToNode,
+  validateFieldPayload, validateSchemaPackage, inferFields, inferredToNode,
+  versionNameSchema, KEY_PATTERN,
+} from './lib.js';
+import { buildSeeds, SEED_METADATA_FIELDS } from './seeds.js';
 
-const clone = (value) => structuredClone(value);
-let nextId = 1000;
-export const makeId = () => `node-${++nextId}`;
-const schemaId = () => `schema-${Date.now()}-${++nextId}`;
-const versionId = () => `version-${Date.now()}-${++nextId}`;
-const initialSchemas = clone(seedSchemas);
-const initialTree = clone(initialSchemas[0].fields);
-const ajv = new Ajv({ allErrors: true, strict: false });
-let runToken = 0;
+let toastSeq = 0;
+let runSeq = 0;
 
-function emptyValidation() {
-  return { payloadText: '', payload: null, parseError: '', status: 'idle', paused: false, steps: [], timeline: [], annotations: {}, runId: 0 };
+const burst = { active: false, base: null, label: '', timer: null };
+
+function deepCopy(v) {
+  return typeof structuredClone === 'function' ? structuredClone(v) : JSON.parse(JSON.stringify(v));
 }
 
-function historyBase(tree) {
-  return { history: [{ label: 'Session opened', tree: clone(tree) }], historyIndex: 0 };
+function remapIds(node) {
+  const copy = { ...node, id: uid() };
+  if (node.children) copy.children = node.children.map(remapIds);
+  return copy;
 }
 
-function findSchema(state) {
-  return state.schemas.find((item) => item.id === state.activeSchemaId) || null;
+function ev(key, to, label) {
+  return { id: uid('ev'), t: Date.now(), key, to, label: label || undefined };
 }
 
-function replaceActiveFields(state, fields) {
-  return state.schemas.map((schema) => schema.id === state.activeSchemaId ? { ...schema, fields, importedExample: undefined, importedInstruction: undefined } : schema);
+export function copyToClipboard(text) {
+  const legacy = () => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+    } finally {
+      document.body.removeChild(ta);
+    }
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).catch(legacy);
+  }
+  legacy();
+  return Promise.resolve();
 }
 
-function recordMutation(state, label, mutator) {
-  const active = findSchema(state);
-  if (!active) return {};
-  const nextTree = mutator(clone(active.fields));
-  if (!nextTree) return {};
-  const nextHistory = state.history.slice(0, state.historyIndex + 1);
-  nextHistory.push({ label, tree: clone(nextTree) });
+export function downloadTextFile(text, filename) {
+  const blob = new Blob([text], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+}
+
+/* ------------------------------ Selectors -------------------------------- */
+
+export const activeSchema = (s) => s.schemas.find((sc) => sc.id === s.activeId) || null;
+
+export const displayedTree = (s) => {
+  const sc = activeSchema(s);
+  if (!sc) return null;
+  if (s.viewIndex !== null && s.viewIndex < sc.past.length) return sc.past[s.viewIndex].tree;
+  return sc.tree;
+};
+
+export const isScrubbing = (s) => {
+  const sc = activeSchema(s);
+  return !!(sc && s.viewIndex !== null && s.viewIndex < sc.past.length);
+};
+
+export function compiledText(s) {
+  const sc = activeSchema(s);
+  const tree = displayedTree(s);
+  if (!sc || !tree) return '';
+  return JSON.stringify(compileSchema(tree, sc.name), null, 2);
+}
+
+export function examplePayload(s) {
+  const sc = activeSchema(s);
+  const tree = displayedTree(s);
+  if (!sc || !tree) return {};
+  if (sc.exampleOverride) return sc.exampleOverride;
+  return generateExample(tree);
+}
+
+export function formatText(s) {
+  const sc = activeSchema(s);
+  const tree = displayedTree(s);
+  if (!sc || !tree) return '';
+  if (sc.formatOverride) return sc.formatOverride;
+  return formatInstruction(tree);
+}
+
+export function metadataMap(s, sc) {
+  const map = {};
+  s.metaFields.forEach((mf) => {
+    map[mf.label] = String(sc.metaValues[mf.label] ?? '');
+  });
+  return map;
+}
+
+export function packageObject(s) {
+  const sc = activeSchema(s);
+  const tree = displayedTree(s);
+  if (!sc || !tree) return null;
   return {
-    schemas: replaceActiveFields(state, nextTree),
-    history: nextHistory,
-    historyIndex: nextHistory.length - 1,
-    validation: { ...state.validation, status: 'idle', steps: [], annotations: {}, timeline: [] },
+    schemaVersion: 'schema-package-v1',
+    name: sc.name,
+    jsonSchema: compileSchema(tree, sc.name),
+    fields: (tree.children || []).map(nodeToFieldDef),
+    metadata: metadataMap(s, sc),
+    examplePayload: examplePayload(s),
+    formatInstruction: formatText(s),
   };
 }
 
-function removeNode(fields, id) {
-  return fields.filter((field) => field.id !== id).map((field) => ({ ...field, children: field.children ? removeNode(field.children, id) : undefined }));
+export function reportObject(s) {
+  const r = s.run;
+  if (!r || r.status !== 'done') return null;
+  const sc = activeSchema(s);
+  return {
+    generatedAt: new Date(r.completedAt).toISOString(),
+    schemaName: sc ? sc.name : '',
+    payloadSummary: {
+      topLevelFields: r.total,
+      fieldsChecked: r.checked,
+      failures: r.failures,
+    },
+    perField: r.steps.map((st) => {
+      const ann = r.annotations[st.nodeId];
+      return {
+        path: st.key,
+        status: st.status,
+        pass: ann ? ann.pass : st.status === 'complete',
+        message: st.error || (ann && ann.message) || (st.status === 'complete' ? 'All checks passed' : ''),
+      };
+    }),
+    failureCount: r.failures,
+    events: r.events.map((e) => ({ at: new Date(e.t).toISOString(), field: e.key, to: e.to, label: e.label || e.to })),
+  };
 }
 
-function removeNodes(fields, ids) {
-  return fields.filter((field) => !ids.includes(field.id)).map((field) => ({ ...field, children: field.children ? removeNodes(field.children, ids) : undefined }));
-}
+/* -------------------------------- Store ---------------------------------- */
 
-function annotateAll(fields, required) {
-  return fields.map((field) => ({ ...field, required, children: field.children ? annotateAll(field.children, required) : undefined }));
-}
+export const useStore = create((set, get) => {
+  const seeds = buildSeeds();
 
-function nowTime() {
-  return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-}
-
-function event(step, status, detail = '') {
-  return { id: `${Date.now()}-${Math.random()}`, field: step.path, status, detail, time: nowTime() };
-}
-
-function errorMessage(field, error, missing) {
-  if (missing) return `${field.key} is required`;
-  if (!error) return '';
-  const path = `${field.key}${error.instancePath?.replaceAll('/', '.') || ''}`;
-  if (error.keyword === 'maximum') return `${path} must be at most ${error.params.limit} (maximum)`;
-  if (error.keyword === 'minimum') return `${path} must be at least ${error.params.limit} (minimum)`;
-  if (error.keyword === 'pattern') return `${path} must match pattern ${error.params.pattern}`;
-  if (error.keyword === 'enum') return `${path} must be one of ${error.params.allowedValues.join(', ')} (enum)`;
-  if (error.keyword === 'required') return `${path}.${error.params.missingProperty} is required`;
-  if (error.keyword === 'type') return `${path} must be type ${error.params.type}`;
-  return `${path} failed ${error.keyword}`;
-}
-
-function checkField(field, payload) {
-  const missing = payload[field.key] === undefined;
-  if (missing && field.required) return { pass: false, message: errorMessage(field, null, true) };
-  if (missing) return { pass: true, message: '' };
-  const validate = ajv.compile(fieldToJsonSchema(field));
-  const pass = validate(payload[field.key]);
-  return { pass, message: pass ? '' : errorMessage(field, validate.errors?.[0]) };
-}
-
-const sleepActive = async (ms, token) => {
-  let elapsed = 0;
-  while (elapsed < ms && token === runToken) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    if (!useSchemaStore.getState().validation.paused) elapsed += 100;
+  function toast(message, tone = 'success') {
+    toastSeq += 1;
+    const id = `t${toastSeq}`;
+    set((s) => ({ toasts: [...s.toasts, { id, message, tone }] }));
+    setTimeout(() => {
+      set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) }));
+    }, 3200);
   }
-};
 
-async function executeValidation(token, startIndex = 0) {
-  for (let index = startIndex; index < useSchemaStore.getState().validation.steps.length; index++) {
-    if (token !== runToken) return;
-    while (useSchemaStore.getState().validation.paused && token === runToken) await new Promise((resolve) => setTimeout(resolve, 100));
-    const current = useSchemaStore.getState();
-    const step = current.validation.steps[index];
-    if (!step || step.status === 'complete') continue;
-    useSchemaStore.setState((state) => ({ validation: {
-      ...state.validation,
-      status: 'running',
-      steps: state.validation.steps.map((item, i) => i === index ? { ...item, status: 'running', attempts: item.attempts + 1 } : item),
-      timeline: [...state.validation.timeline, event(step, 'running', `Attempt ${step.attempts + 1} of 3`)],
-    }}));
-    await sleepActive(260 + Math.random() * 260, token);
-    if (token !== runToken) return;
-
-    const refreshed = useSchemaStore.getState().validation.steps[index];
-    if (index === 1 && refreshed.attempts === 1) {
-      for (let countdown = 2; countdown >= 1; countdown--) {
-        useSchemaStore.setState((state) => ({ validation: {
-          ...state.validation,
-          steps: state.validation.steps.map((item, i) => i === index ? { ...item, status: 'retrying', countdown } : item),
-          timeline: countdown === 2 ? [...state.validation.timeline, event(itemAt(state, index), 'retrying', 'Waiting before retry 2 of 3')] : state.validation.timeline,
-        }}));
-        await sleepActive(500, token);
-      }
-      index -= 1;
-      continue;
-    }
-
-    const state = useSchemaStore.getState();
-    const active = findSchema(state);
-    const field = active?.fields.find((item) => item.id === step.fieldId);
-    if (!field) continue;
-    const outcome = checkField(field, state.validation.payload);
-    const status = outcome.pass ? 'complete' : 'failed';
-    useSchemaStore.setState((latest) => ({ validation: {
-      ...latest.validation,
-      steps: latest.validation.steps.map((item, i) => i === index ? { ...item, status, message: outcome.message, countdown: 0 } : item),
-      annotations: { ...latest.validation.annotations, [field.id]: { status: outcome.pass ? 'pass' : 'fail', message: outcome.message } },
-      timeline: [...latest.validation.timeline, event(step, status, outcome.message || 'All checks passed')],
-    }}));
+  function setLive(message) {
+    set({ live: message });
   }
-  if (token !== runToken) return;
-  useSchemaStore.setState((state) => ({ validation: { ...state.validation, status: 'complete', paused: false } }));
-}
 
-const itemAt = (state, index) => state.validation.steps[index] || { path: 'field' };
+  function patchSchema(id, patch) {
+    set((s) => ({ schemas: s.schemas.map((sc) => (sc.id === id ? { ...sc, ...patch } : sc)) }));
+  }
 
-export const useSchemaStore = create((set, get) => ({
-  schemas: initialSchemas,
-  activeSchemaId: initialSchemas[0].id,
-  selectedNodeId: null,
-  selectedIds: [],
-  collapsedIds: [],
-  activeTab: 'schema',
-  sidebarOpen: false,
-  workflowPanel: 'versions',
-  workflowOpen: true,
-  exportOpen: false,
-  importPackageOpen: false,
-  promptDrawerOpen: false,
-  promptDraft: '',
-  toast: null,
-  exampleNonce: 1,
-  metadataFields: [
-    { id: 'metadata-owner', label: 'Owner', type: 'text' },
-    { id: 'metadata-stage', label: 'Stage', type: 'dropdown', options: ['Draft', 'Review', 'Production'] },
-  ],
-  versions: [
-    { id: 'version-seed-a', schemaId: initialSchemas[0].id, name: 'Initial draft', timestamp: new Date(Date.now() - 86400000).toISOString(), fields: clone(initialSchemas[0].fields) },
-    { id: 'version-seed-b', schemaId: initialSchemas[0].id, name: 'Published baseline', timestamp: new Date().toISOString(), fields: clone(initialSchemas[0].fields) },
-  ],
-  diffA: 'version-seed-a',
-  diffB: 'version-seed-b',
-  importDraft: null,
-  importError: '',
-  packageImportError: '',
-  validation: emptyValidation(),
-  ...historyBase(initialTree),
+  // Immediate history commit: past stores the tree BEFORE the labeled mutation.
+  function commit(label, buildNewTree) {
+    const s = get();
+    const sc = activeSchema(s);
+    if (!sc) return;
+    const base = displayedTree(s);
+    const newTree = buildNewTree(base);
+    const past = s.viewIndex !== null && s.viewIndex < sc.past.length
+      ? [...sc.past.slice(0, s.viewIndex), { label, tree: base }]
+      : [...sc.past, { label, tree: base }];
+    patchSchema(sc.id, { tree: newTree, past, future: [], exampleOverride: null, formatOverride: null });
+    set({ viewIndex: null });
+  }
 
-  activeSchema: () => findSchema(get()),
-  compiledSchema: () => compileSchema(findSchema(get())?.fields || []),
-  compiledText: () => JSON.stringify(compileSchema(findSchema(get())?.fields || []), null, 2),
-  examplePayload: () => {
-    const active = findSchema(get());
-    return active?.importedExample ?? generateExample(active?.fields || [], get().exampleNonce);
-  },
-  instruction: () => {
-    const active = findSchema(get());
-    return active?.importedInstruction ?? formatInstruction(active?.fields || []);
-  },
-  schemaPackage: () => {
-    const active = findSchema(get()) || { name: 'Untitled schema', fields: [], metadata: {} };
-    const pkg = packageFor(active, get().metadataFields, get().exampleNonce);
-    pkg.examplePayload = active.importedExample ?? pkg.examplePayload;
-    pkg.formatInstruction = active.importedInstruction ?? pkg.formatInstruction;
-    return pkg;
-  },
-
-  showToast: (kind, title, subtitle = '') => {
-    set({ toast: { kind, title, subtitle, id: Date.now() } });
-    setTimeout(() => { if (get().toast?.title === title) set({ toast: null }); }, 3200);
-  },
-  setTab: (activeTab) => set({ activeTab }),
-  setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
-  setWorkflow: (workflowPanel) => set((state) => ({ workflowPanel, workflowOpen: state.workflowPanel === workflowPanel ? !state.workflowOpen : true })),
-  setExportOpen: (exportOpen) => set({ exportOpen }),
-  setImportPackageOpen: (importPackageOpen) => set({ importPackageOpen, packageImportError: '' }),
-  setPromptDrawerOpen: (promptDrawerOpen) => set({ promptDrawerOpen }),
-  setPromptDraft: (promptDraft) => set({ promptDraft }),
-  insertPrompt: () => { set((state) => ({ promptDraft: `${state.promptDraft}${state.promptDraft ? '\n\n' : ''}${state.instruction()}`, promptDrawerOpen: true })); get().showToast('success', 'Format instruction inserted'); },
-  regenerateExample: () => { set((state) => ({ exampleNonce: state.exampleNonce + 1, schemas: state.schemas.map((schema) => schema.id === state.activeSchemaId ? { ...schema, importedExample: undefined } : schema) })); get().showToast('success', 'Example regenerated'); },
-
-  selectSchema: (id) => set((state) => {
-    const schema = state.schemas.find((item) => item.id === id);
-    if (!schema) return {};
-    runToken++;
-    return { activeSchemaId: id, selectedNodeId: null, selectedIds: [], validation: emptyValidation(), ...historyBase(schema.fields) };
-  }),
-  createSchema: (name = 'Untitled schema') => set((state) => {
-    const created = { id: schemaId(), name, fields: [], metadata: {} };
-    get().showToast('success', 'Blank schema created');
-    return { schemas: [created, ...state.schemas], activeSchemaId: created.id, selectedNodeId: null, selectedIds: [], validation: emptyValidation(), ...historyBase([]) };
-  }),
-  duplicateSchema: (id) => set((state) => {
-    const source = state.schemas.find((item) => item.id === id);
-    if (!source) return {};
-    const copy = { ...clone(source), id: schemaId(), name: `${source.name} copy`, fields: withIds(stripIds(source.fields), makeId) };
-    get().showToast('success', 'Schema duplicated');
-    return { schemas: [copy, ...state.schemas], activeSchemaId: copy.id, ...historyBase(copy.fields) };
-  }),
-  deleteSchema: (id) => set((state) => {
-    const schemas = state.schemas.filter((item) => item.id !== id);
-    const wasActive = state.activeSchemaId === id;
-    get().showToast('success', 'Schema deleted');
-    return { schemas, ...(wasActive ? { activeSchemaId: null, selectedNodeId: null, selectedIds: [], validation: emptyValidation(), ...historyBase([]) } : {}) };
-  }),
-  renameSchema: (name) => set((state) => ({ schemas: state.schemas.map((schema) => schema.id === state.activeSchemaId ? { ...schema, name } : schema) })),
-
-  selectNode: (id) => set({ selectedNodeId: id }),
-  toggleSelected: (id) => set((state) => ({ selectedIds: state.selectedIds.includes(id) ? state.selectedIds.filter((item) => item !== id) : [...state.selectedIds, id] })),
-  clearSelected: () => set({ selectedIds: [] }),
-  toggleCollapsed: (id) => set((state) => ({ collapsedIds: state.collapsedIds.includes(id) ? state.collapsedIds.filter((item) => item !== id) : [...state.collapsedIds, id] })),
-
-  addField: (parentId = null) => set((state) => recordMutation(state, 'Add field', (tree) => {
-    const siblings = parentId ? findField(tree, parentId)?.children || [] : tree;
-    let counter = siblings.length + 1;
-    let key = `field_${counter}`;
-    while (siblings.some((field) => field.key === key)) key = `field_${++counter}`;
-    const created = { id: makeId(), key, type: 'string', required: false };
-    setTimeout(() => set({ selectedNodeId: created.id }), 0);
-    if (!parentId) return [...tree, created];
-    return mapField(tree, parentId, (field) => ({ ...field, children: [...(field.children || []), created] }));
-  })),
-  deleteField: (id) => set((state) => ({ ...recordMutation(state, 'Delete field', (tree) => removeNode(tree, id)), selectedNodeId: state.selectedNodeId === id ? null : state.selectedNodeId, selectedIds: state.selectedIds.filter((item) => item !== id) })),
-  updateField: (id, patch, label = 'Update field') => {
-    let accepted = false;
-    set((state) => recordMutation(state, label, (tree) => {
-      const info = findParent(tree, id);
-      if (!info) return null;
-      const candidate = { ...info.field, ...patch };
-      if (patch.type && patch.type !== info.field.type) {
-        if (patch.type !== 'string') { delete candidate.enumValues; delete candidate.pattern; }
-        if (patch.type !== 'number') { delete candidate.minimum; delete candidate.maximum; }
-        if (!['object', 'array'].includes(patch.type)) delete candidate.children;
-        else candidate.children = candidate.children || [];
-      }
-      if (info.siblings.some((field) => field.id !== id && field.key === candidate.key)) return null;
-      accepted = true;
-      return mapField(tree, id, () => candidate);
-    }));
-    return accepted;
-  },
-  reorderField: (activeId, overId) => set((state) => recordMutation(state, 'Reorder field', (tree) => {
-    const active = findParent(tree, activeId); const over = findParent(tree, overId);
-    if (!active || !over || active.parent?.id !== over.parent?.id) return null;
-    const ids = active.siblings.map((f) => f.id);
-    const from = ids.indexOf(activeId); const to = ids.indexOf(overId);
-    if (from === to) return null;
-    const sorted = [...active.siblings]; const [moved] = sorted.splice(from, 1); sorted.splice(to, 0, moved);
-    if (!active.parent) return sorted;
-    return mapField(tree, active.parent.id, (field) => ({ ...field, children: sorted }));
-  })),
-  nestField: (id) => set((state) => recordMutation(state, 'Nest field', (tree) => {
-    const info = findParent(tree, id); if (!info) return null;
-    const index = info.siblings.findIndex((item) => item.id === id); const preceding = info.siblings[index - 1];
-    if (!preceding || preceding.type !== 'object') return null;
-    const without = removeNode(tree, id);
-    return mapField(without, preceding.id, (field) => ({ ...field, children: [...(field.children || []), info.field] }));
-  })),
-  unnestField: (id) => set((state) => recordMutation(state, 'Un-nest field', (tree) => {
-    const info = findParent(tree, id); if (!info?.parent) return null;
-    const parentInfo = findParent(tree, info.parent.id); if (!parentInfo) return null;
-    const without = removeNode(tree, id);
-    const updatedParent = findParent(without, info.parent.id);
-    if (!updatedParent) return null;
-    const insertAt = updatedParent.siblings.findIndex((item) => item.id === info.parent.id) + 1;
-    if (!updatedParent.parent) { const result = [...without]; result.splice(insertAt, 0, info.field); return result; }
-    const siblings = [...updatedParent.siblings]; siblings.splice(insertAt, 0, info.field);
-    return mapField(without, updatedParent.parent.id, (field) => ({ ...field, children: siblings }));
-  })),
-  bulkRequired: (required) => set((state) => ({ ...recordMutation(state, required ? 'Set required' : 'Clear required', (tree) => {
-    const ids = state.selectedIds;
-    const apply = (items) => items.map((field) => ({ ...field, required: ids.includes(field.id) ? required : field.required, children: field.children ? apply(field.children) : undefined }));
-    return apply(tree);
-  }), selectedIds: [] })),
-  bulkDelete: () => set((state) => ({ ...recordMutation(state, `Delete ${state.selectedIds.length} fields`, (tree) => removeNodes(tree, state.selectedIds)), selectedIds: [], selectedNodeId: null })),
-
-  undo: () => set((state) => {
-    if (state.historyIndex <= 0) return {};
-    const index = state.historyIndex - 1; return { historyIndex: index, schemas: replaceActiveFields(state, clone(state.history[index].tree)), selectedNodeId: null };
-  }),
-  redo: () => set((state) => {
-    if (state.historyIndex >= state.history.length - 1) return {};
-    const index = state.historyIndex + 1; return { historyIndex: index, schemas: replaceActiveFields(state, clone(state.history[index].tree)), selectedNodeId: null };
-  }),
-  scrubHistory: (index) => set((state) => {
-    const bounded = Math.max(0, Math.min(index, state.history.length - 1));
-    return { historyIndex: bounded, schemas: replaceActiveFields(state, clone(state.history[bounded].tree)), selectedNodeId: null };
-  }),
-
-  saveVersion: (payload) => {
-    if (get().savingVersion) return;
-    set({ savingVersion: true });
-    const active = findSchema(get());
-    if (active) {
-      const version = { id: versionId(), schemaId: active.id, name: payload.name, timestamp: new Date().toISOString(), fields: clone(active.fields) };
-      set((state) => ({ versions: [version, ...state.versions], diffA: state.diffA || version.id, diffB: version.id }));
-      get().showToast('success', 'Version saved', payload.name);
+  // Panel edits arrive as a burst of valid FieldDefinition commits that
+  // collapse into a single history entry after a short idle window.
+  function applyPanelEdit(nodeId, patchFn, label) {
+    const s = get();
+    const sc = activeSchema(s);
+    if (!sc || isScrubbing(s)) return;
+    if (!burst.active) {
+      burst.active = true;
+      burst.base = sc.tree;
+      burst.label = label;
     }
-    setTimeout(() => set({ savingVersion: false }), 250);
-  },
-  setDiff: (side, id) => set(side === 'a' ? { diffA: id } : { diffB: id }),
-  diffResults: () => {
-    const a = get().versions.find((v) => v.id === get().diffA); const b = get().versions.find((v) => v.id === get().diffB);
-    return a && b ? diffFields(a.fields, b.fields) : [];
-  },
-
-  addMetadataField: (payload) => set((state) => {
-    const field = { ...payload, id: `metadata-${++nextId}` };
-    get().showToast('success', 'Metadata field added');
-    return { metadataFields: [...state.metadataFields, field] };
-  }),
-  setMetadataValue: (label, value) => set((state) => ({ schemas: state.schemas.map((schema) => schema.id === state.activeSchemaId ? { ...schema, metadata: { ...schema.metadata, [label]: String(value) } } : schema) })),
-
-  inferExample: (text) => {
-    try {
-      const parsed = JSON.parse(text);
-      if (!parsed || Array.isArray(parsed) || typeof parsed !== 'object') throw new Error('Example must be a JSON object');
-      const fields = inferFields(parsed, makeId);
-      set({ importDraft: { text, fields, accepted: Object.fromEntries(fields.map((field) => [field.id, true])) }, importError: '' });
-      return true;
-    } catch (error) { set({ importDraft: null, importError: `Import example: ${error.message}` }); return false; }
-  },
-  toggleImportField: (id) => set((state) => ({ importDraft: { ...state.importDraft, accepted: { ...state.importDraft.accepted, [id]: !state.importDraft.accepted[id] } } })),
-  applyImportDraft: () => set((state) => {
-    if (!state.importDraft) return {};
-    const fields = state.importDraft.fields.filter((field) => state.importDraft.accepted[field.id]);
-    get().showToast('success', 'Example draft applied', `${fields.length} fields imported`);
-    return { ...recordMutation(state, 'Import example', () => fields), importDraft: null };
-  }),
-
-  importPackage: (text) => {
-    try {
-      const parsedJson = JSON.parse(text);
-      const parsed = schemaPackageSchema.safeParse(parsedJson);
-      if (!parsed.success) { set({ packageImportError: `SchemaPackage.${parsed.error.issues[0].path.join('.')}: ${parsed.error.issues[0].message}` }); return false; }
-      const siblingError = validateSiblingKeys(parsed.data.fields);
-      if (siblingError) { set({ packageImportError: siblingError }); return false; }
-      const fields = withIds(parsed.data.fields, makeId);
-      const active = findSchema(get());
-      if (active) set((state) => {
-        const history = state.history.slice(0, state.historyIndex + 1);
-        history.push({ label: 'Import SchemaPackage', tree: clone(fields) });
-        return {
-        schemas: state.schemas.map((schema) => schema.id === active.id ? { ...schema, name: parsed.data.name, fields, metadata: parsed.data.metadata, importedExample: parsed.data.examplePayload, importedInstruction: parsed.data.formatInstruction } : schema),
-        exampleNonce: 1,
-        importPackageOpen: false,
-        packageImportError: '',
-        selectedNodeId: null,
-        history,
-        historyIndex: history.length - 1,
-      }});
-      else {
-        const created = { id: schemaId(), name: parsed.data.name, fields, metadata: parsed.data.metadata, importedExample: parsed.data.examplePayload, importedInstruction: parsed.data.formatInstruction };
-        set((state) => ({ schemas: [created, ...state.schemas], activeSchemaId: created.id, ...historyBase(fields), importPackageOpen: false, packageImportError: '' }));
+    const newTree = updateNode(sc.tree, nodeId, patchFn);
+    patchSchema(sc.id, { tree: newTree });
+    if (burst.timer) clearTimeout(burst.timer);
+    burst.timer = setTimeout(() => {
+      const s2 = get();
+      const sc2 = activeSchema(s2);
+      if (sc2 && burst.active) {
+        patchSchema(sc2.id, {
+          past: [...sc2.past, { label: burst.label, tree: burst.base }],
+          future: [],
+        });
       }
-      get().showToast('success', 'SchemaPackage imported', parsed.data.name);
-      return true;
-    } catch (error) { set({ packageImportError: `SchemaPackage JSON parse error: ${error.message}` }); return false; }
-  },
+      burst.active = false;
+      burst.base = null;
+      burst.label = '';
+      burst.timer = null;
+    }, 1100);
+  }
 
-  setPlaygroundPayload: (payloadText) => set((state) => ({ validation: { ...state.validation, payloadText, parseError: '' } })),
-  startValidation: () => {
-    const state = get();
-    if (state.validation.status === 'running') return;
-    let payload;
-    try { payload = JSON.parse(state.validation.payloadText); }
-    catch (error) { const match = error.message.match(/position\s+(\d+)/); set((s) => ({ validation: { ...s.validation, parseError: `Payload JSON parse error${match ? ` at position ${match[1]}` : ''}: ${error.message}` } })); return; }
-    if (!payload || Array.isArray(payload) || typeof payload !== 'object') { set((s) => ({ validation: { ...s.validation, parseError: 'Payload must be a JSON object' } })); return; }
-    const active = findSchema(state); if (!active) return;
-    const token = ++runToken;
-    const steps = active.fields.map((field) => ({ fieldId: field.id, path: field.key, status: 'pending', attempts: 0, countdown: 0, message: '' }));
-    set((s) => ({ validation: { payloadText: s.validation.payloadText, payload, parseError: '', status: 'running', paused: false, steps, timeline: [{ id: Date.now(), field: 'Run', status: 'running', detail: 'Validation started', time: nowTime() }], annotations: {}, runId: token } }));
-    executeValidation(token);
-  },
-  pauseValidation: () => set((state) => state.validation.status === 'running' ? ({ validation: { ...state.validation, paused: true } }) : {}),
-  resumeValidation: () => set((state) => state.validation.status === 'running' ? ({ validation: { ...state.validation, paused: false } }) : {}),
-  retryValidation: (index) => {
-    const state = get(); if (!state.validation.payload) return;
-    const token = ++runToken;
-    set((s) => ({ validation: { ...s.validation, status: 'running', paused: false, steps: s.validation.steps.map((step, i) => i === index ? { ...step, status: 'pending', message: '', attempts: 2 } : step), timeline: [...s.validation.timeline, event(s.validation.steps[index], 'running', 'Manual retry started')] } }));
-    executeValidation(token, index);
-  },
-}));
+  /* --------------------------- Validation run engine --------------------- */
 
-const EMPTY_FIELDS = [];
-// Must return a STABLE reference when there is no active schema — a fresh `[]`
-// literal here is a new getSnapshot value every render and drives useSyncExternalStore
-// into an infinite update loop (blank page) the moment the active schema is deleted.
-export const getActiveFields = (state) => state.schemas.find((schema) => schema.id === state.activeSchemaId)?.fields || EMPTY_FIELDS;
-export const getSelectedField = (state) => findField(getActiveFields(state), state.selectedNodeId);
-export const getActiveSchema = (state) => state.schemas.find((schema) => schema.id === state.activeSchemaId) || null;
-export const getRollup = (state) => ({
-  checked: state.validation.steps.filter((step) => ['complete', 'failed'].includes(step.status)).length,
-  total: state.validation.steps.length,
-  failures: state.validation.steps.filter((step) => step.status === 'failed').length,
+  function scheduleTick(id, i, delay) {
+    setTimeout(() => tickStep(id, i), delay);
+  }
+
+  function tickStep(id, i) {
+    const s = get();
+    const r = s.run;
+    if (!r || r.id !== id || r.status !== 'running') return;
+    const key = r.steps[i].key;
+    set({
+      run: {
+        ...r,
+        steps: r.steps.map((st, idx) => (idx === i ? { ...st, status: 'running' } : st)),
+        events: [...r.events, ev(key, 'running')].slice(-250),
+      },
+    });
+    setTimeout(() => resolveStep(id, i), 320 + Math.random() * 430);
+  }
+
+  function resolveStep(id, i) {
+    const s = get();
+    const r = s.run;
+    if (!r || r.id !== id || r.status !== 'running') return;
+    const st = r.steps[i];
+    if (st.attempts < st.maxAttempts - 1 && Math.random() < 0.3) {
+      const attempts = st.attempts + 1;
+      set({
+        run: {
+          ...r,
+          steps: r.steps.map((x, idx) => (idx === i ? { ...x, status: 'retrying', attempts, backoff: 3 } : x)),
+          events: [
+            ...r.events,
+            ev(st.key, 'retrying', `Slowdown detected — waiting before retry ${attempts} of ${st.maxAttempts}`),
+          ].slice(-250),
+        },
+      });
+      const iv = setInterval(() => {
+        const s2 = get();
+        const r2 = s2.run;
+        if (!r2 || r2.id !== id) {
+          clearInterval(iv);
+          return;
+        }
+        if (r2.status === 'paused') return; // countdown freezes while paused
+        const cur = r2.steps[i];
+        if (cur.status !== 'retrying') {
+          clearInterval(iv);
+          return;
+        }
+        const next = cur.backoff - 1;
+        if (next <= 0) {
+          clearInterval(iv);
+          set({
+            run: {
+              ...r2,
+              steps: r2.steps.map((x, idx) => (idx === i ? { ...x, backoff: 0, status: 'running' } : x)),
+            },
+          });
+          setTimeout(() => finishStep(id, i), 200);
+        } else {
+          set({ run: { ...r2, steps: r2.steps.map((x, idx) => (idx === i ? { ...x, backoff: next } : x)) } });
+        }
+      }, 430);
+      return;
+    }
+    finishStep(id, i);
+  }
+
+  function finishStep(id, i) {
+    const s = get();
+    const r = s.run;
+    if (!r || r.id !== id || r.status !== 'running') return;
+    const st = r.steps[i];
+    const tree = displayedTree(s);
+    const node = tree ? findNode(tree, st.nodeId) : null;
+    const res = node
+      ? validateFieldPayload(node, r.payload)
+      : { pass: false, message: `${st.key}: the field was removed from the schema mid-run` };
+    const steps = r.steps.map((x, idx) => (idx === i ? { ...x, status: res.pass ? 'complete' : 'failed', error: res.message } : x));
+    const annotations = { ...r.annotations, [st.nodeId]: { pass: res.pass, message: res.message, key: st.key } };
+    const checked = r.checked + 1;
+    const failures = r.failures + (res.pass ? 0 : 1);
+    const events = [...r.events, ev(st.key, res.pass ? 'complete' : 'failed', res.pass ? undefined : res.message)].slice(-250);
+    if (i + 1 < steps.length) {
+      set({ run: { ...r, steps, annotations, checked, failures, events } });
+      if (!res.pass) setLive(`Step failed — ${res.message}`);
+      scheduleTick(id, i + 1, 150);
+    } else {
+      const passed = checked - failures;
+      set({
+        run: {
+          ...r,
+          steps,
+          annotations,
+          checked,
+          failures,
+          status: 'done',
+          completedAt: Date.now(),
+          events: [...events, ev('run', 'done', `Run complete — ${passed} of ${checked} passed, ${failures} failed`)].slice(-250),
+        },
+      });
+      setLive(`Validation run complete: ${passed} of ${checked} fields passed, ${failures} failed`);
+      toast(
+        failures
+          ? `Validation complete — ${failures} field${failures === 1 ? '' : 's'} failed, see tree annotations`
+          : 'Validation complete — every field passed',
+        failures ? 'error' : 'success',
+      );
+    }
+  }
+
+  const lastAdd = { parentId: null, t: 0 };
+  const lastSave = { name: null, t: 0 };
+
+  return {
+    /* UI chrome */
+    theme: 'dark',
+    density: 'comfortable',
+    defaultType: 'string',
+    toasts: [],
+    live: '',
+    sidebarOpen: false,
+    exportOpen: false,
+    exportTab: 'schema',
+    shortcutsOpen: false,
+    drawerOpen: true,
+    onboarding: { open: true, step: 0 },
+    confirm: null,
+    promptDrawerOpen: false,
+
+    /* Layout / modes */
+    tab: 'schema',
+    drawerTab: 'playground',
+    importTab: 'example',
+
+    /* Library + shared state */
+    schemas: seeds,
+    activeId: seeds[0].id,
+    metaFields: SEED_METADATA_FIELDS,
+    selectedNodeId: null,
+    selectedIds: [],
+    collapsedIds: [],
+    viewIndex: null,
+    exampleNonce: 0,
+    lastDroppedId: null,
+    diffBaseId: null,
+    diffCompareId: null,
+
+    /* Playground / imports */
+    payloadText: '',
+    payloadError: '',
+    run: null,
+    importExampleText: '',
+    importDraft: null,
+    importDraftError: '',
+    packageText: '',
+    packageError: '',
+    promptDraft: '',
+    eventFilter: 'all',
+
+    toast,
+    setLive,
+
+    setTheme: (theme) => set({ theme }),
+    toggleTheme: () => set((s) => ({ theme: s.theme === 'dark' ? 'light' : 'dark' })),
+    setDensity: (density) => set({ density }),
+    setDefaultType: (defaultType) => set({ defaultType }),
+    setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
+    setTab: (tab) => set({ tab }),
+    setDrawerTab: (drawerTab) => set({ drawerTab, drawerOpen: true }),
+    setImportTab: (importTab) => set({ importTab }),
+    setDrawerOpen: (drawerOpen) => set({ drawerOpen }),
+    setEventFilter: (eventFilter) => set({ eventFilter }),
+    setShortcutsOpen: (shortcutsOpen) => set({ shortcutsOpen }),
+    setPromptDrawerOpen: (promptDrawerOpen) => set({ promptDrawerOpen }),
+    setPromptDraft: (promptDraft) => set({ promptDraft }),
+    dismissOnboarding: () => set({ onboarding: { open: false, step: 0 } }),
+    onboardingStep: (step) => set((s) => ({ onboarding: { ...s.onboarding, step } })),
+
+    switchMode: (mode) => {
+      const map = {
+        'schema-text': () => set({ tab: 'schema' }),
+        example: () => set({ tab: 'example' }),
+        'format-prompt': () => set({ tab: 'format' }),
+        diff: () => set({ drawerTab: 'versions', drawerOpen: true }),
+        playground: () => set({ drawerTab: 'playground', drawerOpen: true }),
+        import: () => set({ drawerTab: 'import', drawerOpen: true }),
+      };
+      (map[mode] || (() => {}))();
+    },
+
+    openExport: (tabName = 'schema') => set({ exportOpen: true, exportTab: tabName }),
+    closeExport: () => set({ exportOpen: false }),
+    setExportTab: (exportTab) => set({ exportTab }),
+
+    openConfirm: (confirm) => set({ confirm }),
+    closeConfirm: () => set({ confirm: null }),
+
+    /* ------------------------------ Library ------------------------------ */
+
+    selectSchema: (id) => {
+      const s = get();
+      if (!s.schemas.some((sc) => sc.id === id)) return { ok: false, error: `No schema with id "${id}"` };
+      set({ activeId: id, viewIndex: null, selectedNodeId: null, selectedIds: [], run: null, collapsedIds: [] });
+      return { ok: true };
+    },
+
+    newSchema: (name) => {
+      const s = get();
+      const tree = rootNode([]);
+      const finalName = uniqueSchemaName(s.schemas, name || 'Untitled schema');
+      const sc = {
+        id: uid('sc'),
+        name: finalName,
+        tree,
+        past: [],
+        future: [],
+        versions: [],
+        metaValues: {},
+        exampleOverride: null,
+        formatOverride: null,
+      };
+      set((st) => ({ schemas: [...st.schemas, sc], activeId: sc.id, viewIndex: null, selectedNodeId: null, selectedIds: [], run: null }));
+      toast(`Created schema "${finalName}"`);
+      return { ok: true, id: sc.id, name: finalName };
+    },
+
+    duplicateSchema: (id) => {
+      const s = get();
+      const sc = s.schemas.find((x) => x.id === id);
+      if (!sc) return { ok: false, error: 'Schema not found' };
+      const tree = remapIds(deepCopy(sc.tree));
+      const name = uniqueSchemaName(s.schemas, `${sc.name} copy`);
+      const copy = {
+        id: uid('sc'),
+        name,
+        tree,
+        past: [],
+        future: [],
+        versions: [],
+        metaValues: { ...sc.metaValues },
+        exampleOverride: null,
+        formatOverride: null,
+      };
+      set((st) => ({ schemas: [...st.schemas, copy], activeId: copy.id, viewIndex: null, selectedNodeId: null, selectedIds: [] }));
+      toast(`Duplicated schema as "${name}"`);
+      return { ok: true, id: copy.id, name };
+    },
+
+    requestDeleteSchema: (id) => {
+      const s = get();
+      const sc = s.schemas.find((x) => x.id === id);
+      if (!sc) return { ok: false, error: 'Schema not found' };
+      get().openConfirm({
+        title: 'Delete schema',
+        body: `Delete "${sc.name}" and its ${countFields(sc.tree)} fields? This cannot be undone.`,
+        confirmLabel: 'Delete schema',
+        tone: 'danger',
+        action: 'delete-schema',
+        payload: { id },
+      });
+      return { ok: true };
+    },
+
+    doDeleteSchema: (id) => {
+      const s = get();
+      const sc = s.schemas.find((x) => x.id === id);
+      if (!sc) return;
+      const remaining = s.schemas.filter((x) => x.id !== id);
+      const nextActive = s.activeId === id ? (remaining[0] ? remaining[0].id : null) : s.activeId;
+      set({
+        schemas: remaining,
+        activeId: nextActive,
+        viewIndex: null,
+        selectedNodeId: nextActive === s.activeId ? s.selectedNodeId : null,
+        selectedIds: [],
+        run: nextActive === s.activeId ? s.run : null,
+      });
+      toast(`Deleted schema "${sc.name}"`, 'info');
+    },
+
+    renameSchema: (id, name) => {
+      const clean = String(name).trim();
+      if (!clean) return { ok: false, error: 'Schema name is required — enter 1 to 80 characters' };
+      if (clean.length > 80) return { ok: false, error: 'Schema name must be 1 to 80 characters' };
+      patchSchema(id, { name: clean });
+      return { ok: true };
+    },
+
+    setMetaValue: (schemaId, label, value) => {
+      const s = get();
+      const sc = s.schemas.find((x) => x.id === schemaId);
+      if (!sc) return;
+      patchSchema(schemaId, { metaValues: { ...sc.metaValues, [label]: value } });
+    },
+
+    addMetadataField: (def) => {
+      const field = { id: uid('mf'), label: def.label, type: def.type, ...(def.type === 'dropdown' ? { options: def.options } : {}) };
+      set((s) => ({ metaFields: [...s.metaFields, field] }));
+      toast(`Added metadata field "${def.label}"`);
+      return { ok: true };
+    },
+
+    removeMetadataField: (id) => {
+      set((s) => ({ metaFields: s.metaFields.filter((mf) => mf.id !== id) }));
+      toast('Removed metadata field', 'info');
+    },
+
+    /* ---------------------------- Tree editing --------------------------- */
+
+    selectNode: (id) => set({ selectedNodeId: id }),
+
+    toggleCollapsed: (id) =>
+      set((s) => ({
+        collapsedIds: s.collapsedIds.includes(id) ? s.collapsedIds.filter((c) => c !== id) : [...s.collapsedIds, id],
+      })),
+
+    toggleSelect: (id) =>
+      set((s) => ({
+        selectedIds: s.selectedIds.includes(id) ? s.selectedIds.filter((c) => c !== id) : [...s.selectedIds, id],
+      })),
+    clearSelection: () => set({ selectedIds: [] }),
+
+    addField: (parentId) => {
+      const s = get();
+      const tree = displayedTree(s);
+      if (!tree) return { ok: false, error: 'No active schema — create or select one first' };
+      if (isScrubbing(s)) return { ok: false, error: 'History preview is read-only — return to the current state to edit' };
+      const parent = findNode(tree, parentId || tree.id);
+      if (!parent) return { ok: false, error: 'Parent node not found' };
+      if (parent.type !== 'object' && parent.type !== 'array') {
+        return { ok: false, error: `${parent.key} is a ${parent.type} — fields can only be added inside object or array nodes` };
+      }
+      const now = Date.now();
+      if (lastAdd.parentId === parent.id && now - lastAdd.t < 150) {
+        return { ok: false, error: 'ignored-duplicate' };
+      }
+      lastAdd.parentId = parent.id;
+      lastAdd.t = now;
+      const key = uniqueKey(parent);
+      const node = makeNode({ key, type: get().defaultType, required: false });
+      commit('Add field', (base) => {
+        const p = findNode(base, parent.id) || base;
+        return updateNode(base, p.id, (n) => ({ ...n, children: [...(n.children || []), { ...node }] }));
+      });
+      return { ok: true, id: node.id, key };
+    },
+
+    renameNode: (id, newKey) => {
+      const s = get();
+      const tree = displayedTree(s);
+      if (!tree) return { ok: false, error: 'No active schema' };
+      const node = findNode(tree, id);
+      if (!node) return { ok: false, error: 'Node not found' };
+      const key = String(newKey).trim();
+      if (key === node.key) return { ok: true };
+      if (!key || key.length > 40 || !KEY_PATTERN.test(key)) {
+        return { ok: false, error: 'Key must be 1 to 40 characters — letters, digits, and underscores only (no spaces or punctuation)' };
+      }
+      const parent = findParent(tree, id);
+      if (parent && (parent.children || []).some((c) => c.id !== id && c.key === key)) {
+        return { ok: false, error: `A sibling field named "${key}" already exists — keys must be unique among siblings` };
+      }
+      commit('Rename field', (base) => updateNode(base, id, (n) => ({ ...n, key })));
+      return { ok: true };
+    },
+
+    checkSiblingKey: (id, key) => {
+      const s = get();
+      const tree = displayedTree(s);
+      if (!tree) return null;
+      const parent = findParent(tree, id);
+      if (parent && (parent.children || []).some((c) => c.id !== id && c.key === key)) {
+        return `A sibling field named "${key}" already exists — keys must be unique among siblings`;
+      }
+      return null;
+    },
+
+    applyPanelEdit: (id, patchFn, label) => applyPanelEdit(id, patchFn, label || 'Update field'),
+
+    setNodeRequired: (id, required) => {
+      const s = get();
+      const tree = displayedTree(s);
+      const node = tree && findNode(tree, id);
+      if (!node) return { ok: false, error: 'Node not found' };
+      commit(required ? 'Set required' : 'Clear required', (base) => updateNode(base, id, (n) => ({ ...n, required: !!required })));
+      return { ok: true };
+    },
+
+    bulkSetRequired: (ids, required) => {
+      commit(required ? 'Set required (bulk)' : 'Clear required (bulk)', (base) => {
+        let t = base;
+        ids.forEach((id) => {
+          t = updateNode(t, id, (n) => ({ ...n, required: !!required }));
+        });
+        return t;
+      });
+      set({ selectedIds: [] });
+      toast(required ? `Marked ${ids.length} field${ids.length === 1 ? '' : 's'} required` : `Cleared required on ${ids.length} field${ids.length === 1 ? '' : 's'}`);
+    },
+
+    requestDeleteNode: (id) => {
+      const s = get();
+      const tree = displayedTree(s);
+      const node = tree && findNode(tree, id);
+      if (!node) return { ok: false, error: 'Node not found' };
+      const descendants = countFields(node);
+      get().openConfirm({
+        title: 'Delete field',
+        body:
+          descendants > 0
+            ? `Delete "${node.key}" and its ${descendants} nested field${descendants === 1 ? '' : 's'}?`
+            : `Delete "${node.key}"?`,
+        confirmLabel: 'Delete',
+        tone: 'danger',
+        action: 'delete-node',
+        payload: { id },
+      });
+      return { ok: true, confirm: true };
+    },
+
+    doDeleteNode: (id) => {
+      const s = get();
+      const tree = displayedTree(s);
+      const node = tree && findNode(tree, id);
+      if (!node) return;
+      commit('Delete field', (base) => removeNode(base, id));
+      set((st) => ({
+        selectedNodeId: st.selectedNodeId === id ? null : st.selectedNodeId,
+        selectedIds: st.selectedIds.filter((x) => x !== id),
+      }));
+      toast(`Deleted field "${node.key}"`, 'info');
+    },
+
+    requestBulkDelete: (ids) => {
+      const s = get();
+      const tree = displayedTree(s);
+      if (!tree || !ids.length) return { ok: false, error: 'Nothing selected' };
+      get().openConfirm({
+        title: 'Delete selected fields',
+        body: `Delete ${ids.length} selected field${ids.length === 1 ? '' : 's'} and all of their descendants?`,
+        confirmLabel: `Delete ${ids.length} selected`,
+        tone: 'danger',
+        action: 'bulk-delete',
+        payload: { ids },
+      });
+      return { ok: true };
+    },
+
+    doBulkDelete: (ids) => {
+      commit('Delete selected fields', (base) => {
+        let t = base;
+        ids.forEach((id) => {
+          t = removeNode(t, id);
+        });
+        return t;
+      });
+      set({ selectedIds: [], selectedNodeId: null });
+      toast(`Deleted ${ids.length} field${ids.length === 1 ? '' : 's'}`, 'info');
+    },
+
+    nestNode: (id) => {
+      const s = get();
+      const tree = displayedTree(s);
+      if (!tree) return { ok: false, error: 'No active schema' };
+      const parent = findParent(tree, id);
+      if (!parent) return { ok: false, error: 'The root node cannot be nested' };
+      const siblings = parent.children || [];
+      const idx = siblings.findIndex((c) => c.id === id);
+      const prev = siblings[idx - 1];
+      if (!prev || prev.type !== 'object') {
+        return { ok: false, error: `Nest needs an object sibling immediately before this field${prev ? ` — "${prev.key}" is a ${prev.type}` : ''}` };
+      }
+      const node = siblings[idx];
+      commit('Nest field', (base) => {
+        const t = removeNode(base, id);
+        return updateNode(t, prev.id, (n) => ({ ...n, children: [...(n.children || []), deepCopy(node)] }));
+      });
+      return { ok: true };
+    },
+
+    unnestNode: (id) => {
+      const s = get();
+      const tree = displayedTree(s);
+      if (!tree) return { ok: false, error: 'No active schema' };
+      const parent = findParent(tree, id);
+      if (!parent) return { ok: false, error: 'Node not found' };
+      if (parent.id === tree.id) return { ok: false, error: 'This field is already at the top level' };
+      const grand = findParent(tree, parent.id);
+      if (!grand) return { ok: false, error: 'Cannot move further up' };
+      const node = findNode(tree, id);
+      commit('Un-nest field', (base) => {
+        const parentIdx = (grand.children || []).findIndex((c) => c.id === parent.id);
+        const t = removeNode(base, id);
+        return updateNode(t, grand.id, (n) => {
+          const children = [...(n.children || [])];
+          children.splice(parentIdx + 1, 0, deepCopy(node));
+          return { ...n, children };
+        });
+      });
+      return { ok: true };
+    },
+
+    reorderNode: (parentId, fromIdx, toIdx) => {
+      if (fromIdx === toIdx) return { ok: true };
+      commit('Reorder field', (base) => reorderChildren(base, parentId, fromIdx, toIdx));
+      return { ok: true };
+    },
+
+    setLastDropped: (id) => {
+      set({ lastDroppedId: id });
+      setTimeout(() => set((s) => ({ lastDroppedId: s.lastDroppedId === id ? null : s.lastDroppedId })), 500);
+    },
+
+    /* -------------------------- History / undo ---------------------------- */
+
+    undo: () => {
+      const s = get();
+      const sc = activeSchema(s);
+      if (!sc || !sc.past.length) return { ok: false, error: 'Nothing to undo' };
+      const entry = sc.past[sc.past.length - 1];
+      patchSchema(sc.id, {
+        tree: entry.tree,
+        past: sc.past.slice(0, -1),
+        future: [...sc.future, { label: entry.label, tree: sc.tree }],
+        exampleOverride: null,
+        formatOverride: null,
+      });
+      return { ok: true, label: entry.label };
+    },
+
+    redo: () => {
+      const s = get();
+      const sc = activeSchema(s);
+      if (!sc || !sc.future.length) return { ok: false, error: 'Nothing to redo' };
+      const entry = sc.future[sc.future.length - 1];
+      patchSchema(sc.id, {
+        tree: entry.tree,
+        future: sc.future.slice(0, -1),
+        past: [...sc.past, { label: entry.label, tree: sc.tree }],
+        exampleOverride: null,
+        formatOverride: null,
+      });
+      return { ok: true, label: entry.label };
+    },
+
+    scrubTo: (index) => set({ viewIndex: index }),
+
+    setDiffBase: (diffBaseId) => set({ diffBaseId }),
+    setDiffCompare: (diffCompareId) => set({ diffCompareId }),
+
+    /* ------------------------------ Versions ------------------------------ */
+
+    saveVersion: (name) => {
+      const s = get();
+      const sc = activeSchema(s);
+      if (!sc) return { ok: false, error: 'No active schema' };
+      const parsed = versionNameSchema.safeParse(String(name ?? '').trim());
+      if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message };
+      const now = Date.now();
+      if (lastSave.name === parsed.data && now - lastSave.t < 400) return { ok: false, error: 'ignored-duplicate' };
+      lastSave.name = parsed.data;
+      lastSave.t = now;
+      const v = { id: uid('v'), name: parsed.data, ts: now, tree: deepCopy(displayedTree(s)) };
+      patchSchema(sc.id, { versions: [v, ...sc.versions] });
+      toast(`Saved version "${v.name}"`);
+      return { ok: true, id: v.id };
+    },
+
+    /* ----------------------------- Playground ----------------------------- */
+
+    setPayloadText: (payloadText) => set({ payloadText, payloadError: '' }),
+
+    startRun: () => {
+      const s = get();
+      const sc = activeSchema(s);
+      if (!sc) return { ok: false, error: 'No active schema' };
+      const r = s.run;
+      if (r && ['running', 'retrying', 'paused'].includes(r.status)) {
+        return { ok: false, error: 'A validation run is already in progress — pause or finish it first' };
+      }
+      const text = s.payloadText.trim();
+      if (!text) {
+        const msg = 'The playground payload is empty — paste a JSON payload to validate';
+        set({ payloadError: msg });
+        return { ok: false, error: msg };
+      }
+      let payload;
+      try {
+        payload = JSON.parse(text);
+      } catch (e) {
+        const msg = `Invalid JSON payload — ${e.message}`;
+        set({ payloadError: msg });
+        return { ok: false, error: msg };
+      }
+      const tree = displayedTree(s);
+      const fields = tree.children || [];
+      if (!fields.length) {
+        const msg = 'The active schema has no top-level fields — add a field before validating';
+        set({ payloadError: msg });
+        return { ok: false, error: msg };
+      }
+      set({ payloadError: '' });
+      runSeq += 1;
+      const id = runSeq;
+      const run = {
+        id,
+        status: 'running',
+        payload,
+        steps: fields.map((f) => ({ nodeId: f.id, key: f.key, status: 'pending', attempts: 0, maxAttempts: 3, backoff: 0, error: null })),
+        events: [ev('run', 'started', `Run started — ${fields.length} step${fields.length === 1 ? '' : 's'}`)],
+        annotations: {},
+        checked: 0,
+        failures: 0,
+        total: fields.length,
+        completedAt: null,
+      };
+      set({ run });
+      setLive(`Validation run started — ${fields.length} steps`);
+      scheduleTick(id, 0, 130);
+      return { ok: true, message: `Validation run started with ${fields.length} steps` };
+    },
+
+    pauseRun: () => {
+      const r = get().run;
+      if (!r || !['running', 'retrying'].includes(r.status)) return { ok: false, error: 'No active run to pause' };
+      set({ run: { ...r, status: 'paused', events: [...r.events, ev('run', 'paused', 'Run paused')].slice(-250) } });
+      setLive('Validation run paused');
+      return { ok: true };
+    },
+
+    resumeRun: () => {
+      const r = get().run;
+      if (!r || r.status !== 'paused') return { ok: false, error: 'No paused run to resume' };
+      let idx = r.steps.findIndex((st) => st.status === 'running' || st.status === 'retrying');
+      if (idx < 0) idx = r.steps.findIndex((st) => st.status === 'pending');
+      set({ run: { ...r, status: 'running', events: [...r.events, ev('run', 'resumed', 'Run resumed')].slice(-250) } });
+      setLive('Validation run resumed');
+      if (idx >= 0 && r.steps[idx].status !== 'retrying') scheduleTick(r.id, idx, 220);
+      return { ok: true };
+    },
+
+    advanceRun: () => {
+      const r = get().run;
+      if (!r) return { ok: false, error: 'No validation run exists' };
+      if (r.status === 'paused') return get().resumeRun();
+      if (r.status === 'done') return { ok: false, error: 'The run already completed' };
+      return { ok: true, message: 'The run is advancing automatically' };
+    },
+
+    retryStep: (index) => {
+      const r = get().run;
+      if (!r || !r.steps[index] || r.steps[index].status !== 'failed') {
+        return { ok: false, error: 'Only failed steps can be retried' };
+      }
+      const st = r.steps[index];
+      const annotations = { ...r.annotations };
+      delete annotations[st.nodeId];
+      const status = r.status === 'done' ? 'running' : r.status;
+      set({
+        run: {
+          ...r,
+          status,
+          annotations,
+          checked: Math.max(0, r.checked - 1),
+          failures: Math.max(0, r.failures - 1),
+          steps: r.steps.map((x, i) => (i === index ? { ...x, status: 'pending', attempts: 0, backoff: 0, error: null } : x)),
+          events: [...r.events, ev(st.key, 'retry', `Manual retry of "${st.key}"`)].slice(-250),
+        },
+      });
+      scheduleTick(r.id, index, 150);
+      return { ok: true };
+    },
+
+    regenerateExample: () => {
+      const s = get();
+      const sc = activeSchema(s);
+      if (!sc) return { ok: false, error: 'No active schema' };
+      patchSchema(sc.id, { exampleOverride: null });
+      set({ exampleNonce: s.exampleNonce + 1 });
+      toast('Regenerated example payload');
+      return { ok: true };
+    },
+
+    /* -------------------------- Import from example ----------------------- */
+
+    setImportExampleText: (importExampleText) => set({ importExampleText, importDraftError: '' }),
+
+    inferDraft: () => {
+      const s = get();
+      const text = s.importExampleText.trim();
+      if (!text) {
+        const msg = 'Paste a JSON object first — the inferred draft follows the pasted example';
+        set({ importDraftError: msg });
+        return { ok: false, error: msg };
+      }
+      let obj;
+      try {
+        obj = JSON.parse(text);
+      } catch (e) {
+        const msg = `Invalid JSON — ${e.message}`;
+        set({ importDraftError: msg });
+        return { ok: false, error: msg };
+      }
+      if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
+        const msg = 'Import from example expects a JSON object at the root (for example {"name": "value"})';
+        set({ importDraftError: msg });
+        return { ok: false, error: msg };
+      }
+      const fields = inferFields(obj);
+      set({ importDraft: { fields }, importDraftError: '' });
+      return { ok: true, count: fields.length };
+    },
+
+    toggleDraftField: (id) => {
+      const s = get();
+      if (!s.importDraft) return;
+      set({
+        importDraft: {
+          fields: s.importDraft.fields.map((f) => (f.id === id ? { ...f, accepted: !f.accepted } : f)),
+        },
+      });
+    },
+
+    applyImportDraft: () => {
+      const s = get();
+      if (!s.importDraft) return { ok: false, error: 'No inferred draft — paste a JSON object and press Infer draft first' };
+      const accepted = s.importDraft.fields.filter((f) => f.accepted);
+      if (!accepted.length) return { ok: false, error: 'Every field is rejected — accept at least one inferred field to apply' };
+      commit('Import from example', () => rootNode(accepted.map(inferredToNode)));
+      set({ importDraft: null });
+      toast(`Applied ${accepted.length} inferred field${accepted.length === 1 ? '' : 's'}`);
+      return { ok: true, count: accepted.length };
+    },
+
+    /* ----------------------------- Package import ------------------------- */
+
+    setPackageText: (packageText) => set({ packageText, packageError: '' }),
+
+    importPackage: () => {
+      const s = get();
+      const sc = activeSchema(s);
+      if (!sc) return { ok: false, error: 'No active schema — create or select one first' };
+      const text = s.packageText.trim();
+      if (!text) {
+        const msg = 'Paste a SchemaPackage JSON first';
+        set({ packageError: msg });
+        return { ok: false, error: msg };
+      }
+      const v = validateSchemaPackage(text);
+      if (!v.ok) {
+        set({ packageError: v.error });
+        return { ok: false, error: v.error };
+      }
+      const pkg = v.pkg;
+      const newTree = rootNode(pkg.fields.map(fieldDefToNode));
+      commit('Import schema package', () => newTree);
+      patchSchema(sc.id, {
+        name: pkg.name,
+        exampleOverride: pkg.examplePayload,
+        formatOverride: pkg.formatInstruction,
+        metaValues: { ...sc.metaValues, ...pkg.metadata },
+      });
+      set({ packageError: '' });
+      toast(`Imported schema package "${pkg.name}"`);
+      return { ok: true, name: pkg.name };
+    },
+
+    /* ------------------------------- Export -------------------------------- */
+
+    copyText: (text, label) => {
+      copyToClipboard(text);
+      toast(`Copied ${label} to clipboard`);
+      return { ok: true };
+    },
+
+    downloadText: (text, filename, label) => {
+      downloadTextFile(text, filename);
+      toast(`Downloaded ${label}`);
+      return { ok: true };
+    },
+
+    insertIntoPromptDraft: () => {
+      const s = get();
+      const text = formatText(s);
+      set({ promptDraft: s.promptDraft ? `${s.promptDraft}\n\n${text}` : text, promptDrawerOpen: true });
+      toast('Inserted format instruction into prompt draft');
+      return { ok: true };
+    },
+
+    /* ------------------------------ Confirm -------------------------------- */
+
+    doConfirm: () => {
+      const s = get();
+      const c = s.confirm;
+      if (!c) return;
+      set({ confirm: null });
+      if (c.action === 'delete-node') get().doDeleteNode(c.payload.id);
+      if (c.action === 'bulk-delete') get().doBulkDelete(c.payload.ids);
+      if (c.action === 'delete-schema') get().doDeleteSchema(c.payload.id);
+    },
+  };
 });
-export const getVersions = (state) => state.versions.filter((version) => version.schemaId === state.activeSchemaId);
-export { flattenFields, stripIds };
