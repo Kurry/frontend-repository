@@ -229,9 +229,9 @@ function AddRepositoryModal() {
       preventCloseOnClickOutside
       size="sm"
     >
-      <form onSubmit={submit} className="modal-form" noValidate>
+      <form autoComplete="off" onSubmit={submit} className="modal-form" noValidate>
         <p className="modal-intro">Track a local repository path. Files are simulated in this browser-only workspace.</p>
-        <TextInput
+        <TextInput autoComplete="off"
           id="repository-path"
           labelText="Local path"
           placeholder="/workspace/my-project"
@@ -244,7 +244,7 @@ function AddRepositoryModal() {
           aria-describedby="repository-path-error"
           {...register('path')}
         />
-        <TextInput
+        <TextInput autoComplete="off"
           id="repository-display-name"
           labelText="Display name (optional)"
           helperText="Leave blank to use the path basename. Maximum 80 characters."
@@ -282,7 +282,7 @@ function RenameEditor({ repository, onClose }: { repository: Repository; onClose
         else onClose()
       })}
     >
-      <TextInput
+      <TextInput autoComplete="off"
         id={`rename-${repository.id}`}
         labelText="Display name"
         size="sm"
@@ -323,7 +323,7 @@ function RepositoryRow({ repository, onRemove }: { repository: Repository; onRem
       aria-label={`${repositoryLabel(repository)} repository`}
     >
       <div className="repository-select">
-        <Checkbox
+        <Checkbox autoComplete="off"
           id={`select-${repository.id}`}
           labelText={`Select ${repositoryLabel(repository)}`}
           hideLabel
@@ -457,7 +457,7 @@ function PatternSettings() {
           <h2 id="settings-heading">Scan configuration</h2>
         </div>
       </div>
-      <form className="pattern-grid" onSubmit={(event) => event.preventDefault()}>
+      <form autoComplete="off" className="pattern-grid" onSubmit={(event) => event.preventDefault()}>
         {PATTERN_KEYS.map((key) => (
           <div className="pattern-item" key={key}>
             <div>
@@ -596,7 +596,7 @@ function ScanPanel() {
           </div>
           <div className="timeline-filters" aria-label="Filter timeline by status">
             {(['pending', 'running', 'retrying', 'complete', 'failed'] as StepStatus[]).map((status) => (
-              <Checkbox
+              <Checkbox autoComplete="off"
                 key={status}
                 id={`timeline-${status}`}
                 labelText={status}
@@ -688,7 +688,7 @@ function DocumentFilters() {
       <div className="filter-label"><Filter size={16} /><span>Document type</span></div>
       <div className="filter-options">
         {DOCUMENT_TYPES.map((type) => (
-          <Checkbox key={type} id={`filter-${type}`} labelText={typeLabels[type]} checked={filters.includes(type)} onChange={() => toggle(type)} />
+          <Checkbox autoComplete="off" key={type} id={`filter-${type}`} labelText={typeLabels[type]} checked={filters.includes(type)} onChange={() => toggle(type)} />
         ))}
       </div>
       {filters.length > 0 && <Button size="sm" kind="ghost" onClick={clear}>Clear filters</Button>}
@@ -945,13 +945,14 @@ function ImportModal() {
       preventCloseOnClickOutside
       size="md"
     >
-      <form className="modal-form" onSubmit={submit} noValidate>
+      <form autoComplete="off" className="modal-form" onSubmit={submit} noValidate>
         <div className="import-file-row">
           <p>Paste a complete <strong>repo-scan-index/v1</strong> payload or choose a JSON file.</p>
           <input
             ref={fileInput}
             className="sr-only"
             type="file"
+            autoComplete="off"
             accept="application/json,.json"
             onChange={async (event) => {
               const file = event.target.files?.[0]
@@ -1075,7 +1076,7 @@ function CommandPalette() {
       >
         <div className="palette-search">
           <Search size={20} />
-          <input ref={inputRef} value={query} onChange={(event) => { setQuery(event.target.value); setHighlight(0) }} placeholder="Search commands or repositories" aria-label="Filter commands" />
+          <input autoComplete="off" ref={inputRef} value={query} onChange={(event) => { setQuery(event.target.value); setHighlight(0) }} placeholder="Search commands or repositories" aria-label="Filter commands" />
           <kbd>Esc</kbd>
         </div>
         <h2 id="palette-title" className="sr-only">Command palette</h2>
@@ -1173,8 +1174,16 @@ function Toolbar() {
 }
 
 export default function App() {
+  const [isRM, setIsRM] = useState(false);
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setIsRM(mediaQuery.matches);
+    const listener = (e: MediaQueryListEvent) => setIsRM(e.matches);
+    mediaQuery.addEventListener('change', listener);
+    return () => mediaQuery.removeEventListener('change', listener);
+  }, []);
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionConfig reducedMotion={isRM ? "always" : "never"}>
       <AppContent />
     </MotionConfig>
   )
