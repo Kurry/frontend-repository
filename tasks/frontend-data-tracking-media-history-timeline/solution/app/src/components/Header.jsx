@@ -10,10 +10,11 @@ import {
   redoHistoryAtom,
   undoAtom,
   redoAtom,
-  resetFiltersAtom
+  resetFiltersAtom,
+  fullSpanAtom
 } from '../store.js';
 import { ActionIcon, Button, Group } from '@mantine/core';
-import { IconFilter, IconInfoCircle, IconArrowBackUp, IconArrowForwardUp, IconDownload, IconUpload } from '@tabler/icons-react';
+import { IconFilter, IconInfoCircle, IconArrowBackUp, IconArrowForwardUp, IconDownload, IconUpload, IconArrowsHorizontal } from '@tabler/icons-react';
 import { MT_DATA } from '../data.js';
 
 export function Header({ historyDisabled = false }) {
@@ -29,6 +30,7 @@ export function Header({ historyDisabled = false }) {
   const undo = useSetAtom(undoAtom);
   const redo = useSetAtom(redoAtom);
   const reset = useSetAtom(resetFiltersAtom);
+  const fullSpan = useSetAtom(fullSpanAtom);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -55,18 +57,20 @@ export function Header({ historyDisabled = false }) {
 
   return (
     <header className="h-[var(--h-header)] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-[var(--z-header)] sticky top-0 shrink-0 shadow-sm">
-      <button
-        type="button"
-        className="flex flex-col items-start text-left gap-0 focus-visible"
-        onClick={() => {
-          reset();
-          setMode('explore');
-        }}
-        aria-label="MediaHistoryTimeline home"
-      >
-        <span className="font-serif font-bold text-xl leading-none">{MT_DATA.productName}</span>
-        <span className="text-xs text-gray-500 font-medium">{MT_DATA.tagline}</span>
-      </button>
+      <h1 className="m-0 shrink min-w-0">
+        <button
+          type="button"
+          className="flex flex-col items-start text-left gap-0 focus-visible max-w-full"
+          onClick={() => {
+            reset();
+            setMode('explore');
+          }}
+          aria-label="MediaHistoryTimeline home"
+        >
+          <span className="font-serif font-bold text-base sm:text-xl leading-none truncate">{MT_DATA.productName}</span>
+          <span className="hidden sm:inline text-xs text-gray-500 font-medium truncate">{MT_DATA.tagline}</span>
+        </button>
+      </h1>
 
       <Group gap="xs" wrap="nowrap">
         <Button
@@ -75,14 +79,25 @@ export function Header({ historyDisabled = false }) {
           size="xs"
           onClick={() => {
             setMode('explore');
-            window.requestAnimationFrame(() => {
-              window.dispatchEvent(new CustomEvent('full-span'));
-            });
+            fullSpan();
           }}
           className="hidden sm:flex"
         >
           Full span
         </Button>
+        <ActionIcon
+          variant="default"
+          radius="xl"
+          size="lg"
+          className="sm:hidden"
+          onClick={() => {
+            setMode('explore');
+            fullSpan();
+          }}
+          aria-label="Fit full span"
+        >
+          <IconArrowsHorizontal size={18} aria-hidden />
+        </ActionIcon>
         <Button
           variant={mode === 'explore' ? 'filled' : 'light'}
           color="cyan"
@@ -110,7 +125,7 @@ export function Header({ historyDisabled = false }) {
           variant="default"
           radius="xl"
           size="xs"
-          leftSection={<IconFilter size={14} />}
+          leftSection={<IconFilter size={14} aria-hidden />}
           onClick={() => setFilterOpen(o => !o)}
           className="hidden sm:flex"
           aria-expanded={filterOpen}
@@ -121,13 +136,13 @@ export function Header({ historyDisabled = false }) {
         <ActionIcon
           variant="default"
           radius="xl"
-          size="md"
+          size="lg"
           className="sm:hidden"
           onClick={() => setFilterOpen(o => !o)}
           aria-label="Filters"
           aria-expanded={filterOpen}
         >
-          <IconFilter size={16} />
+          <IconFilter size={16} aria-hidden />
         </ActionIcon>
 
         <ActionIcon
@@ -138,7 +153,7 @@ export function Header({ historyDisabled = false }) {
           aria-label="About this timeline"
           aria-expanded={aboutOpen}
         >
-          <IconInfoCircle size={16} />
+          <IconInfoCircle size={16} aria-hidden />
         </ActionIcon>
 
         <div className="w-px h-6 bg-gray-300 mx-1"></div>
@@ -151,7 +166,7 @@ export function Header({ historyDisabled = false }) {
           onClick={undo}
           aria-label="Undo"
         >
-          <IconArrowBackUp size={16} />
+          <IconArrowBackUp size={16} aria-hidden />
         </ActionIcon>
 
         <ActionIcon
@@ -162,7 +177,7 @@ export function Header({ historyDisabled = false }) {
           onClick={redo}
           aria-label="Redo"
         >
-          <IconArrowForwardUp size={16} />
+          <IconArrowForwardUp size={16} aria-hidden />
         </ActionIcon>
 
         <div className="w-px h-6 bg-gray-300 mx-1"></div>
@@ -172,7 +187,7 @@ export function Header({ historyDisabled = false }) {
           radius="xl"
           size="xs"
           color="cyan"
-          leftSection={<IconUpload size={14} />}
+          leftSection={<IconUpload size={14} aria-hidden />}
           onClick={() => {
             setExportTab('import');
             setExportOpen(true);
@@ -193,7 +208,7 @@ export function Header({ historyDisabled = false }) {
           className="sm:hidden"
           aria-label="Import timeline"
         >
-          <IconUpload size={16} />
+          <IconUpload size={16} aria-hidden />
         </ActionIcon>
 
         <Button
@@ -201,7 +216,7 @@ export function Header({ historyDisabled = false }) {
           radius="xl"
           size="xs"
           color="cyan"
-          leftSection={<IconDownload size={14} />}
+          leftSection={<IconDownload size={14} aria-hidden />}
           onClick={() => {
             setExportTab('json');
             setExportOpen(true);
@@ -222,7 +237,7 @@ export function Header({ historyDisabled = false }) {
           className="sm:hidden"
           aria-label="Export timeline"
         >
-          <IconDownload size={16} />
+          <IconDownload size={16} aria-hidden />
         </ActionIcon>
       </Group>
     </header>

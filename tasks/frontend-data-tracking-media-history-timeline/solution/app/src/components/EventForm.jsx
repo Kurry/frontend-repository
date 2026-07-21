@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -55,11 +55,15 @@ export function EventForm({ initialData, onClose }) {
     detail: ''
   };
 
-  const { control, handleSubmit, formState: { errors, isValid } } = useForm({
+  const { control, handleSubmit, formState: { errors, isValid }, trigger } = useForm({
     resolver: zodResolver(schema),
     defaultValues,
-    mode: 'onChange'
+    mode: 'onChange',
+    reValidateMode: 'onChange'
   });
+
+  // Validate once on mount so isValid (and the disabled submit) reflects the empty form immediately.
+  useEffect(() => { trigger(); }, [trigger]);
 
   const onSubmit = (data) => {
     if (submittingRef.current) return;
@@ -86,6 +90,9 @@ export function EventForm({ initialData, onClose }) {
     <div className="flex-1 overflow-auto bg-white p-6">
       <div className="max-w-2xl mx-auto">
         <h2 className="font-serif font-bold text-2xl mb-6">{initialData && initialData !== 'new' ? 'Edit event' : 'Add event'}</h2>
+        <span className="sr-only" role="status" aria-live="polite">
+          {Object.values(errors).map(e => e?.message).filter(Boolean).join('. ')}
+        </span>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
           <Controller

@@ -3,7 +3,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import { filteredEventsAtom, categoryTallyAtom, bulkSetCategoryAtom, bulkDeleteAtom, selectedEventIdAtom, resetFiltersAtom } from '../store.js';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { MT_DATA } from '../data.js';
-import { Checkbox, Button, Menu, ActionIcon, Group } from '@mantine/core';
+import { Checkbox, Button, Menu, ActionIcon, Group, Modal } from '@mantine/core';
 import { IconDots, IconEdit, IconTrash } from '@tabler/icons-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 
@@ -22,6 +22,7 @@ export function Library({ onEdit }) {
   const reduceMotion = useReducedMotion();
 
   const [checkedIds, setCheckedIds] = useState(new Set());
+  const [confirmReq, setConfirmReq] = useState(null); // { ids: string[] }
   const parentRef = useRef(null);
 
   // Chronological sort
@@ -60,10 +61,14 @@ export function Library({ onEdit }) {
 
   const handleBulkDelete = () => {
     if (checkedIds.size === 0) return;
-    if (confirm(`Delete ${checkedIds.size} events?`)) {
-      bulkDelete(Array.from(checkedIds));
-      setCheckedIds(new Set());
-    }
+    setConfirmReq({ ids: Array.from(checkedIds) });
+  };
+
+  const confirmDelete = () => {
+    if (!confirmReq) return;
+    bulkDelete(confirmReq.ids);
+    setCheckedIds(new Set());
+    setConfirmReq(null);
   };
 
   return (
@@ -76,7 +81,7 @@ export function Library({ onEdit }) {
           aria-label="Select all"
           color="cyan"
         />
-        <div className="font-semibold text-sm mr-auto text-gray-700">Library ({sortedEvents.length})</div>
+        <h2 className="font-semibold text-sm mr-auto text-gray-700 m-0">Library ({sortedEvents.length})</h2>
 
         {checkedIds.size > 0 && (
           <Group gap="xs">
@@ -147,15 +152,15 @@ export function Library({ onEdit }) {
                   key={ev.id}
                   data-index={virtualItem.index}
                   ref={rowVirtualizer.measureElement}
-                  className={`absolute top-0 left-0 w-full flex items-center gap-4 px-6 py-3 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer ${isChecked ? 'bg-cyan-50' : ''}`}
+                  className={`library-row absolute top-0 left-0 w-full flex items-center gap-4 px-6 py-3 border-b border-gray-100 hover:bg-cyan-50/70 hover:shadow-[inset_3px_0_0_var(--c-brand)] transition-all duration-150 cursor-pointer ${isChecked ? 'bg-cyan-50' : ''}`}
                   style={{
                     transform: `translateY(${virtualItem.start}px)`,
                     transition: reduceMotion ? 'none' : 'transform 220ms var(--ease-settle)',
                   }}
-                  initial={reduceMotion ? false : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: reduceMotion ? 0.01 : 0.18 }}
+                  initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reduceMotion ? { opacity: 0 } : { opacity: 0, x: -24 }}
+                  transition={{ duration: reduceMotion ? 0.01 : 0.22, ease: 'easeOut' }}
                   onClick={() => setSelectedId(ev.id)}
                 >
                   <Checkbox
@@ -181,17 +186,13 @@ export function Library({ onEdit }) {
 
                   <Menu shadow="sm" withinPortal onClick={e => e.stopPropagation()}>
                     <Menu.Target>
-                      <ActionIcon variant="subtle" color="gray" onClick={e => e.stopPropagation()}>
-                        <IconDots size={18} />
+                      <ActionIcon variant="subtle" color="gray" onClick={e => e.stopPropagation()} aria-label="Event actions">
+                        <IconDots size={18} aria-hidden />
                       </ActionIcon>
                     </Menu.Target>
                     <Menu.Dropdown>
-                      <Menu.Item leftSection={<IconEdit size={14} />} onClick={() => onEdit(ev)}>Edit event</Menu.Item>
-                      <Menu.Item color="red" leftSection={<IconTrash size={14} />} onClick={() => {
-                        if(confirm('Delete event?')) {
-                          bulkDelete([ev.id]);
-                        }
-                      }}>
+                      <Menu.Item leftSection={<IconEdit size={14} aria-hidden />} onClick={() => onEdit(ev)}>Edit event</Menu.Item>
+                      <Menu.Item color="red" leftSection={<IconTrash size={14} aria-hidden />} onClick={() => setConfirmReq({ ids: [ev.id] })}>
                         Delete event
                       </Menu.Item>
                     </Menu.Dropdown>
@@ -203,6 +204,26 @@ export function Library({ onEdit }) {
           </div>
         )}
       </div>
+
+      <Modal
+        opened={!!confirmReq}
+        onClose={() => setConfirmReq(null)}
+        title="Delete events"
+        zIndex={120}
+        centered
+        size="sm"
+      >
+        <p className="text-sm text-gray-700 mb-4">
+          {confirmReq && confirmReq.ids.length === 1
+            ? 'This removes 1 event from the timeline.'
+            : `This removes ${confirmReq ? confirmReq.ids.length : 0} events from the timeline.`}
+          {' '}You can restore it with Undo in the header afterward.
+        </p>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={() => setConfirmReq(null)}>Cancel</Button>
+          <Button color="red" onClick={confirmDelete} autoFocus>Delete</Button>
+        </Group>
+      </Modal>
     </div>
   );
 }
