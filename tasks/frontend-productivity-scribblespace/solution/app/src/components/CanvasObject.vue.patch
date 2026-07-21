@@ -1,0 +1,39 @@
+--- tasks/frontend-productivity-scribblespace/solution/app/src/components/CanvasObject.vue
++++ tasks/frontend-productivity-scribblespace/solution/app/src/components/CanvasObject.vue
+@@ -330,7 +330,7 @@
+         type="button"
+         :aria-label="`Select object`"
+         :aria-pressed="selected"
+-        class="w-full h-full text-left p-0 bg-transparent border-0 outline-none rounded-inherit"
++        class="w-full h-full text-left p-0 bg-transparent border-0 outline-none rounded-inherit rounded-[8px]"
+         :class="{ 'pointer-events-none': isEditing }"
+       >
+         <span class="sr-only">{{ obj.type }} at {{ obj.x }}, {{ obj.y }}</span>
+@@ -351,10 +351,10 @@
+
+     <!-- Object Content -->
+     <div
+-      class="canvas-object-content absolute inset-0 rounded-inherit overflow-hidden bg-inherit"
++      class="canvas-object-content absolute inset-0 rounded-[8px] overflow-hidden bg-inherit"
+       :class="{'rounded-full': obj.type === 'circle'}"
+       :style="{
+-        borderRadius: obj.type === 'circle' ? '50%' : undefined,
++        borderRadius: obj.type === 'circle' ? '50%' : '8px',
+         boxShadow: obj.type === 'note' || obj.type === 'flashcard' ? '0 2px 8px rgba(33, 29, 58, 0.12)' : 'none'
+       }"
+     >
+@@ -415,10 +415,10 @@
+
+     <template v-if="singleSelected && (obj.type === 'rectangle' || obj.type === 'circle' || obj.type === 'note' || obj.type === 'flashcard')">
+       <template v-if="singleSelected">
+-        <div @mousedown="e => handleResizeMouseDown(e, 'tl')" class="resize-handle absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-[#6D5BD0] cursor-nwse-resize z-20" :class="{'rounded-full': obj.type === 'circle', 'rounded-none': obj.type !== 'circle'}" />
+-        <div @mousedown="e => handleResizeMouseDown(e, 'tr')" class="resize-handle absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-[#6D5BD0] cursor-nesw-resize z-20" :class="{'rounded-full': obj.type === 'circle', 'rounded-none': obj.type !== 'circle'}" />
+-        <div @mousedown="e => handleResizeMouseDown(e, 'bl')" class="resize-handle absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-[#6D5BD0] cursor-nesw-resize z-20" :class="{'rounded-full': obj.type === 'circle', 'rounded-none': obj.type !== 'circle'}" />
+-        <div @mousedown="e => handleResizeMouseDown(e, 'br')" class="resize-handle absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-[#6D5BD0] cursor-nwse-resize z-20" :class="{'rounded-full': obj.type === 'circle', 'rounded-none': obj.type !== 'circle'}" />
++        <div @mousedown="e => handleResizeMouseDown(e, 'tl')" class="resize-handle absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-[#6D5BD0] cursor-nwse-resize z-20" :class="{'rounded-none': obj.type !== 'circle'}" />
++        <div @mousedown="e => handleResizeMouseDown(e, 'tr')" class="resize-handle absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-[#6D5BD0] cursor-nesw-resize z-20" :class="{'rounded-none': obj.type !== 'circle'}" />
++        <div @mousedown="e => handleResizeMouseDown(e, 'bl')" class="resize-handle absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-[#6D5BD0] cursor-nesw-resize z-20" :class="{'rounded-none': obj.type !== 'circle'}" />
++        <div @mousedown="e => handleResizeMouseDown(e, 'br')" class="resize-handle absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-[#6D5BD0] cursor-nwse-resize z-20" :class="{'rounded-none': obj.type !== 'circle'}" />
+       </template>
+     </template>
+   </div>
