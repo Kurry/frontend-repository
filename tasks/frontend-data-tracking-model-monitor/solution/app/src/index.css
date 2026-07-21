@@ -253,6 +253,7 @@ kbd {
 .catalog-table-container { max-height: 560px; overflow: auto; border-radius: 10px; }
 .catalog-table { min-width: 740px; }
 .catalog-table thead th {
+  position: sticky; top: 0; z-index: 4;
   background: var(--ink-2) !important; color: var(--text-3) !important;
   font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase;
   border-bottom: 1px solid var(--line-strong);
