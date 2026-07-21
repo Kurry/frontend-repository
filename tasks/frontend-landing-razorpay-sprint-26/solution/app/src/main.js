@@ -1,6 +1,6 @@
 import { z } from "zod";
 /**
- * Novapay Sprint 26 — page runtime.
+ * Razorpay Sprint 26 — page runtime.
  * Loader lifecycle, GSAP/ScrollTrigger motion, scroll-spy nav, mobile menu,
  * lazy Rive hydration, local VP9 video modal, session chrome (shortlist /
  * compare / theme filter / search / watch log / command palette / sprint
@@ -561,7 +561,7 @@ function closeBrief() {
 
 window.generateBriefData = function () {
   return {
-    brand: "Novapay", event: "Sprint 26",
+    brand: "Razorpay", event: "Sprint 26",
     shortlistedFeatures: window.appState.shortlist.slice(),
     compareFeatures: window.appState.compare.slice(),
     watchedExecutives: window.appState.watchLog.slice(),
@@ -589,7 +589,7 @@ window.updateBriefPreview = function () {
 function briefSchema() {
   const unique = (values) => new Set(values).size === values.length;
   return z.object({
-    brand: z.literal("Novapay"),
+    brand: z.literal("Razorpay"),
     event: z.literal("Sprint 26"),
     shortlistedFeatures: z.array(z.string().refine((v) => catalogFeatures.includes(v), "feature not in catalog")).refine(unique, "shortlistedFeatures must not contain duplicates"),
     compareFeatures: z.array(z.string().refine((v) => catalogFeatures.includes(v), "feature not in catalog")).max(3, "compareFeatures must have at most 3 entries").refine(unique, "compareFeatures must not contain duplicates"),
@@ -725,7 +725,7 @@ function wireChrome() {
   }
   const btnLoadSample = $("#btn-load-sample");
   if (btnLoadSample) btnLoadSample.addEventListener("click", () => doImport({
-    brand: "Novapay", event: "Sprint 26",
+    brand: "Razorpay", event: "Sprint 26",
     shortlistedFeatures: catalogFeatures.slice(0, 2),
     compareFeatures: catalogFeatures.slice(2, 4),
     watchedExecutives: ["Arjun Mehta"],

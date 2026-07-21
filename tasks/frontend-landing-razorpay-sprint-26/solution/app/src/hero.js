@@ -1,5 +1,5 @@
 /**
- * Three.js scroll hero (Novapay Sprint 26).
+ * Three.js scroll hero (Razorpay Sprint 26).
  * Loads the Draco-compressed GLB scene and scrubs its baked camera animation
  * from native scroll progress across the scroll stage, with desktop mouse
  * parallax. The hero fold stays pinned while the stage is in view and releases
