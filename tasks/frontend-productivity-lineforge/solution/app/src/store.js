@@ -4,7 +4,10 @@ import { sanEq } from './chess';
 
 // In-memory session state only — no localStorage/sessionStorage. A page reload
 // returns the app to its seeded baseline (empty favorites and saved lines,
-// Classic theme). This is a hard requirement of the good-app genre.
+// Classic theme). This is a hard requirement of the good-app genre. The undo /
+// redo history below is likewise an in-memory signal and never touches any
+// browser storage API.
+
 export const currentOpeningId = signal(null);
 export const favorites = signal([]);
 export const savedLines = signal([]);
@@ -25,6 +28,10 @@ export const practiceCorrect = signal(0);
 export const practiceTotal = signal(0);
 export const practicePrompt = signal('');
 export const practiceMessage = signal('');
+// Illustrative, offline practice metrics (beyond-spec polish — explicitly NOT a
+// live engine). An eval figure per attempt plus a fixed "depth" readout.
+export const practiceEval = signal([]);
+export const PRACTICE_ILLUSTRATIVE_DEPTH = 12;
 
 // Board interaction state
 export const boardSelection = signal(null); // { r, c } of the picked-up piece
@@ -38,12 +45,37 @@ export const activeGame = signal(null);
 // Session deviation branch: { base: [...sans], moves: [...sans] }
 export const userLine = signal(null);
 
-// Save-line form
+// Save-line form (inline, modeless — the explorer stays interactive while open)
 export const saveFormOpen = signal(false);
 export const saveName = signal('');
 export const saveTags = signal([]);
 export const saveNotes = signal('');
 export const saveError = signal('');
+export const savingInProgress = signal(false); // double-activation guard
+
+// Saved-lines multi-selection + keyboard move entry state
+export const selectedLineIds = signal([]);
+export const moveEntryError = signal('');
+
+// Coachmark tour (first visit per session, in-memory only)
+export const coachStep = signal(0); // 0 idle, 1..n active, -1 dismissed
+export const COACH_STEPS = 3;
+
+// Blindfold training mode (beyond-spec polish)
+export const blindfoldActive = signal(false);
+export const blindfoldPeek = signal(false);
+
+// Export center / study artifacts (in-memory, live-compiled)
+export const showExportCenter = signal(false);
+export const importError = signal('');
+
+// Overlay coordination (z-order: palette > confirmations > export > drawer)
+export const paletteOpen = signal(false);
+export const paletteQuery = signal('');
+export const importConfirmOpen = signal(false);
+export const importPendingText = signal('');
+export const bulkConfirmOpen = signal(false);
+export const compareOpen = signal(false);
 
 // Derived state
 export const currentOpening = computed(() =>
@@ -88,12 +120,14 @@ export function clearBoardInteraction() {
   previewMoves.value = null;
 }
 
-export function resetPractice() {
-  practiceActive.value = false;
+// Reset only the practice counters/prompts, leaving the mode active so the
+// readouts visibly return to their starting values instead of disappearing.
+function resetPracticeCounters() {
   practiceStreak.value = 0;
   practiceCorrect.value = 0;
   practiceTotal.value = 0;
-  practicePrompt.value = '';
+  practiceEval.value = [];
+  practicePrompt.value = practiceActive.value ? 'Your move' : '';
   practiceMessage.value = '';
 }
 
@@ -102,35 +136,107 @@ export function loadOpening(id) {
   selectedNodeId.value = 'root';
   userLine.value = null;
   activeGame.value = null;
-  resetPractice();
   clearBoardInteraction();
   saveFormOpen.value = false;
   saveTags.value = [];
   saveNotes.value = '';
   saveError.value = '';
+  savingInProgress.value = false;
+  moveEntryError.value = '';
+  // Choosing a different opening is a mode boundary: return to explore so a
+  // practice prompt from the previous line cannot carry into the new one.
+  if (practiceActive.value) exitPractice();
+}
+
+// --- Undo / redo -------------------------------------------------------------
+// The undoable surface is favorites, My Saved Lines, and board theme — the
+// mutations the PRD enumerates (save, rename, delete, bulk tag/delete, favorite
+// toggle, board-theme change). Session-only state (board position, practice,
+// relay, search, palette) is intentionally NOT undoable.
+
+const undoStack = signal([]);
+const redoStack = signal([]);
+const UNDO_LIMIT = 120;
+
+export const canUndo = computed(() => undoStack.value.length > 0);
+export const canRedo = computed(() => redoStack.value.length > 0);
+
+function snapshotUndoable() {
+  return JSON.stringify({
+    f: favorites.value,
+    s: savedLines.value,
+    t: boardTheme.value
+  });
+}
+
+function applySnapshot(str) {
+  const snap = JSON.parse(str);
+  favorites.value = snap.f;
+  savedLines.value = snap.s;
+  boardTheme.value = snap.t;
+}
+
+// Run a mutation that changes undoable state. Records the prior state for undo
+// and clears the redo stack (a new mutation after undo discards the future).
+// Mutations that touch undoable state MUST route through here so the undo/redo
+// controls and the visible UI stay on the same shared state.
+export function commit(mutator) {
+  const stack = [...undoStack.value, snapshotUndoable()];
+  if (stack.length > UNDO_LIMIT) stack.shift();
+  undoStack.value = stack;
+  redoStack.value = [];
+  mutator();
+}
+
+export function undo() {
+  if (!canUndo.value) return;
+  const stack = [...undoStack.value];
+  const prev = stack.pop();
+  undoStack.value = stack;
+  redoStack.value = [...redoStack.value, snapshotUndoable()];
+  applySnapshot(prev);
+  selectedLineIds.value = selectedLineIds.value.filter(id => savedLines.value.some(l => l.id === id));
+  showToast('Undid last change');
+}
+
+export function redo() {
+  if (!canRedo.value) return;
+  const stack = [...redoStack.value];
+  const next = stack.pop();
+  redoStack.value = stack;
+  const past = [...undoStack.value, snapshotUndoable()];
+  if (past.length > UNDO_LIMIT) past.shift();
+  undoStack.value = past;
+  applySnapshot(next);
+  selectedLineIds.value = selectedLineIds.value.filter(id => savedLines.value.some(l => l.id === id));
+  showToast('Redid change');
 }
 
 export function toggleFavorite(openingId) {
+  commit(() => {
+    const isFav = favorites.value.includes(openingId);
+    favorites.value = isFav
+      ? favorites.value.filter(id => id !== openingId)
+      : [...favorites.value, openingId];
+  });
   const isFav = favorites.value.includes(openingId);
-  favorites.value = isFav
-    ? favorites.value.filter(id => id !== openingId)
-    : [...favorites.value, openingId];
   const name = OPENINGS.find(o => o.id === openingId)?.name || 'Opening';
-  showToast(isFav ? `${name} removed from favorites` : `${name} added to favorites`);
+  showToast(isFav ? `${name} added to favorites` : `${name} removed from favorites`);
 }
 
 export function toggleAllFavorites() {
-  if (favorites.value.length === OPENINGS.length) {
-    favorites.value = [];
-    showToast('All favorites cleared');
-    return;
-  }
-  favorites.value = OPENINGS.map(o => o.id);
-  showToast('All openings added to favorites');
+  commit(() => {
+    if (favorites.value.length === OPENINGS.length) favorites.value = [];
+    else favorites.value = OPENINGS.map(o => o.id);
+  });
+  showToast(favorites.value.length === OPENINGS.length
+    ? 'All openings added to favorites'
+    : 'All favorites cleared');
 }
 
 export function setBoardTheme(theme) {
-  boardTheme.value = theme;
+  if (boardTheme.value === theme) return;
+  commit(() => { boardTheme.value = theme; });
 }
 
 // --- Move-tree path helpers -------------------------------------------------
@@ -284,18 +390,31 @@ export function startPractice() {
   selectedNodeId.value = 'root';
   clearBoardInteraction();
   practiceActive.value = true;
-  practiceStreak.value = 0;
-  practiceCorrect.value = 0;
-  practiceTotal.value = 0;
-  practicePrompt.value = 'Your move';
-  practiceMessage.value = '';
+  resetPracticeCounters();
 }
 
 export function exitPractice() {
   practiceActive.value = false;
-  practicePrompt.value = '';
-  practiceMessage.value = '';
+  resetPracticeCounters();
   clearBoardInteraction();
+}
+
+export function recordPracticeAttempt(correct) {
+  practiceTotal.value += 1;
+  if (correct) {
+    practiceCorrect.value += 1;
+    practiceStreak.value += 1;
+  } else {
+    practiceStreak.value = 0;
+  }
+  // Illustrative eval swing — purely offline sample numbers, never presented as
+  // a live engine. Bounded so the sparkline stays readable.
+  const prev = practiceEval.value[practiceEval.value.length - 1] ?? 0;
+  const swing = correct ? 0.3 + Math.random() * 0.5 : -(0.3 + Math.random() * 0.6);
+  let next = prev + swing;
+  if (next > 2) next = 2;
+  if (next < -2) next = -2;
+  practiceEval.value = [...practiceEval.value, Math.round(next * 10) / 10];
 }
 
 // --- Saved lines --------------------------------------------------------------
@@ -303,19 +422,24 @@ export function exitPractice() {
 export function addSavedLine(name, openingId, moves, userLineSnapshot, opts) {
   const id = 'line-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7);
   const o = opts || {};
-  savedLines.value = [...savedLines.value, {
-    id, name, openingId, moves,
-    ply: typeof o.ply === 'number' ? o.ply : moves.length,
-    tags: Array.isArray(o.tags) ? o.tags.slice() : [],
-    notes: typeof o.notes === 'string' ? o.notes : '',
-    userLine: userLineSnapshot || null
-  }];
+  commit(() => {
+    savedLines.value = [...savedLines.value, {
+      id, name, openingId, moves,
+      ply: typeof o.ply === 'number' ? o.ply : moves.length,
+      tags: Array.isArray(o.tags) ? o.tags.slice() : [],
+      notes: typeof o.notes === 'string' ? o.notes : '',
+      userLine: userLineSnapshot || null
+    }];
+  });
   return id;
 }
 
 export function deleteSavedLine(id) {
-  savedLines.value = savedLines.value.filter(l => l.id !== id);
-  showToast('Line deleted');
+  commit(() => {
+    savedLines.value = savedLines.value.filter(l => l.id !== id);
+  });
+  selectedLineIds.value = selectedLineIds.value.filter(x => x !== id);
+  showToast('Line deleted — undo to restore it');
 }
 
 // Update a saved line's name/tags/notes. Only the provided (defined) fields
@@ -323,14 +447,16 @@ export function deleteSavedLine(id) {
 // (rename UI, WebMCP entity_update) must validate with validateTagsNotes first.
 export function updateSavedLine(id, patch) {
   const p = patch || {};
-  savedLines.value = savedLines.value.map(l => {
-    if (l.id !== id) return l;
-    return {
-      ...l,
-      name: typeof p.name === 'string' ? p.name : l.name,
-      tags: Array.isArray(p.tags) ? p.tags.slice() : l.tags,
-      notes: typeof p.notes === 'string' ? p.notes : l.notes
-    };
+  commit(() => {
+    savedLines.value = savedLines.value.map(l => {
+      if (l.id !== id) return l;
+      return {
+        ...l,
+        name: typeof p.name === 'string' ? p.name : l.name,
+        tags: Array.isArray(p.tags) ? p.tags.slice() : l.tags,
+        notes: typeof p.notes === 'string' ? p.notes : l.notes
+      };
+    });
   });
   showToast('Line updated');
 }
@@ -345,7 +471,61 @@ export function loadSavedLine(line) {
     selectedNodeId.value = nodeIdForPath(line.moves.slice(0, ply)) || 'root';
   }
   showSavedPanel.value = false;
-  showToast('Line loaded');
+  showToast(`Loaded ${line.name}`);
+}
+
+// --- Multi-selection / bulk operations ---------------------------------------
+
+export function isLineSelected(id) { return selectedLineIds.value.includes(id); }
+
+export function toggleLineSelection(id) {
+  const sel = selectedLineIds.value;
+  selectedLineIds.value = sel.includes(id)
+    ? sel.filter(x => x !== id)
+    : [...sel, id];
+}
+
+export function clearLineSelection() { selectedLineIds.value = []; }
+
+export function bulkAddTag(tag) {
+  const ids = selectedLineIds.value;
+  if (ids.length === 0) return;
+  if (!TAG_SET.includes(tag)) return;
+  commit(() => {
+    savedLines.value = savedLines.value.map(l => {
+      if (!ids.includes(l.id)) return l;
+      const tags = (l.tags || []).includes(tag) ? l.tags : [...(l.tags || []), tag];
+      return { ...l, tags };
+    });
+  });
+  const n = ids.length;
+  selectedLineIds.value = [];
+  showToast(`Tag "${tag}" added to ${n} line${n === 1 ? '' : 's'}`);
+}
+
+export function bulkRemoveTag(tag) {
+  const ids = selectedLineIds.value;
+  if (ids.length === 0) return;
+  commit(() => {
+    savedLines.value = savedLines.value.map(l => {
+      if (!ids.includes(l.id)) return l;
+      return { ...l, tags: (l.tags || []).filter(t => t !== tag) };
+    });
+  });
+  const n = ids.length;
+  selectedLineIds.value = [];
+  showToast(`Tag "${tag}" removed from ${n} line${n === 1 ? '' : 's'}`);
+}
+
+export function bulkDeleteSelected() {
+  const ids = selectedLineIds.value;
+  if (ids.length === 0) return;
+  commit(() => {
+    savedLines.value = savedLines.value.filter(l => !ids.includes(l.id));
+  });
+  const n = ids.length;
+  selectedLineIds.value = [];
+  showToast(`Deleted ${n} line${n === 1 ? '' : 's'} — undo to restore them`);
 }
 
 // --- Live relay: deterministic local event stream ------------------------------
@@ -502,9 +682,6 @@ export function relayReconnect() {
 
 // --- Export center / study artifacts (in-memory, live-compiled) --------------
 
-export const showExportCenter = signal(false);
-export const importError = signal('');
-
 const CODE_BY_ID = {};
 const ID_BY_CODE = {};
 for (const o of OPENINGS) { CODE_BY_ID[o.id] = o.code; ID_BY_CODE[o.code] = o.id; }
@@ -518,15 +695,15 @@ function sideForPly(ply) { return ply % 2 === 0 ? 'white' : 'black'; }
 // WebMCP entity_create/entity_update, and Study pack import validation.
 export function validateTagsNotes(tags, notes) {
   if (tags !== undefined) {
-    if (!Array.isArray(tags) || tags.length > 8) return 'tags: at most 8 tags';
+    if (!Array.isArray(tags) || tags.length > 8) return 'tags: at most 8 tags — deselect a tag and try again';
     for (const t of tags) {
       if (typeof t !== 'string' || t.length > 24 || !TAG_SET.includes(t)) {
-        return `tags: "${t}" is outside the allowed tag set`;
+        return `tags: "${t}" is outside the allowed set (study, sharp, solid, trap, endgame) — use a chip shown above`;
       }
     }
   }
   if (notes !== undefined && (typeof notes !== 'string' || notes.length > 280)) {
-    return 'notes: string of length 0 to 280';
+    return 'notes: use 280 characters or fewer';
   }
   return null;
 }
@@ -587,15 +764,15 @@ export function buildCurrentPGN() {
 
 // Validate a parsed StudyPackDocument; returns a field-naming error string or null.
 export function validateStudyPack(doc) {
-  if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return 'payload: not a JSON object';
-  if (doc.formatVersion !== '1') return 'formatVersion: must be exactly the string "1"';
+  if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return 'payload: not a JSON object — paste the full exported study pack';
+  if (doc.formatVersion !== '1') return 'formatVersion: must be exactly the string "1" — re-export from a current LineForge session';
   if (!THEMES_SET.includes(doc.boardTheme)) return 'boardTheme: must be one of classic, forest, slate';
   if (typeof doc.generatedAt !== 'string' || Number.isNaN(Date.parse(doc.generatedAt))) {
     return 'generatedAt: required ISO-8601 timestamp string';
   }
-  if (!Array.isArray(doc.favorites)) return 'favorites: must be an array';
+  if (!Array.isArray(doc.favorites)) return 'favorites: must be an array of bundled opening codes';
   for (const c of doc.favorites) {
-    if (!ID_BY_CODE[c]) return `favorites: "${c}" is not a bundled opening code`;
+    if (!ID_BY_CODE[c]) return `favorites: "${c}" is not a bundled opening code — remove it or correct the code`;
   }
   if (!Array.isArray(doc.savedLines)) return 'savedLines: must be an array';
   for (let i = 0; i < doc.savedLines.length; i++) {
@@ -658,29 +835,97 @@ function reconstructUserLine(openingId, path) {
   return { base: path.slice(0, bestLen), moves };
 }
 
-// Import a StudyPack from raw text; replaces favorites, boardTheme, savedLines.
-export function importStudyPackText(text) {
+// Parse without committing (used by the import confirmation to preview counts).
+export function parseStudyPackText(text) {
   let doc;
   try { doc = JSON.parse(text); }
-  catch { importError.value = 'payload: the JSON could not be parsed'; return { ok: false, error: importError.value }; }
+  catch { return { ok: false, error: 'payload: the JSON could not be parsed — paste the complete exported study pack' }; }
   const err = validateStudyPack(doc);
-  if (err) { importError.value = err; return { ok: false, error: err }; }
-  importError.value = '';
-  boardTheme.value = doc.boardTheme;
-  favorites.value = doc.favorites.map(c => ID_BY_CODE[c]);
-  savedLines.value = doc.savedLines.map(s => {
-    const openingId = ID_BY_CODE[s.openingCode];
-    return {
-      id: 'line-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
-      name: s.name.trim(),
-      openingId,
-      moves: s.moves.slice(),
-      ply: s.ply,
-      tags: Array.isArray(s.tags) ? s.tags.slice() : [],
-      notes: typeof s.notes === 'string' ? s.notes : '',
-      userLine: reconstructUserLine(openingId, s.moves.slice(0, s.ply))
-    };
+  if (err) return { ok: false, error: err };
+  return {
+    ok: true,
+    favorites: doc.favorites.length,
+    savedLines: doc.savedLines.length,
+    boardTheme: doc.boardTheme
+  };
+}
+
+// Import a StudyPack from raw text; replaces favorites, boardTheme, savedLines.
+export function importStudyPackText(text) {
+  const parsed = parseStudyPackText(text);
+  if (!parsed.ok) { importError.value = parsed.error; return { ok: false, error: parsed.error }; }
+  let doc;
+  try { doc = JSON.parse(text); } catch { return parsed; }
+  commit(() => {
+    importError.value = '';
+    boardTheme.value = doc.boardTheme;
+    favorites.value = doc.favorites.map(c => ID_BY_CODE[c]);
+    savedLines.value = doc.savedLines.map(s => {
+      const openingId = ID_BY_CODE[s.openingCode];
+      return {
+        id: 'line-' + Date.now() + '-' + Math.random().toString(36).slice(2, 7),
+        name: s.name.trim(),
+        openingId,
+        moves: s.moves.slice(),
+        ply: s.ply,
+        tags: Array.isArray(s.tags) ? s.tags.slice() : [],
+        notes: typeof s.notes === 'string' ? s.notes : '',
+        userLine: reconstructUserLine(openingId, s.moves.slice(0, s.ply))
+      };
+    });
   });
-  showToast('Study pack imported');
+  selectedLineIds.value = [];
+  showToast(`Study pack imported — ${favorites.value.length} favorite${favorites.value.length === 1 ? '' : 's'}, ${savedLines.value.length} saved line${savedLines.value.length === 1 ? '' : 's'}`);
   return { ok: true, favorites: favorites.value.length, savedLines: savedLines.value.length };
+}
+
+// --- Share link (beyond-spec): encodes the current line into the URL hash -----
+export function buildSharePayload() {
+  const open = currentOpening.value;
+  if (!open) return null;
+  const moves = getNodeMoves();
+  return {
+    o: open.id,
+    m: moves.join(','),
+    t: boardTheme.value
+  };
+}
+
+export function encodeShareHash(payload) {
+  if (!payload) return '';
+  const parts = [];
+  if (payload.o) parts.push('o=' + encodeURIComponent(payload.o));
+  if (payload.m) parts.push('m=' + encodeURIComponent(payload.m));
+  if (payload.t) parts.push('t=' + encodeURIComponent(payload.t));
+  return '#lineforge=' + parts.join(';');
+}
+
+export function parseShareHash(hash) {
+  if (!hash || !hash.includes('#lineforge=')) return null;
+  const body = hash.slice(hash.indexOf('#lineforge=') + '#lineforge='.length);
+  const out = {};
+  for (const part of body.split(';')) {
+    const i = part.indexOf('=');
+    if (i < 0) continue;
+    out[part.slice(0, i)] = decodeURIComponent(part.slice(i + 1));
+  }
+  if (!out.o || !OPENINGS.some(o => o.id === out.o)) return null;
+  return out;
+}
+
+export function applySharePayload(p) {
+  if (!p) return;
+  loadOpening(p.o);
+  if (p.t && THEMES_SET.includes(p.t)) setBoardTheme(p.t);
+  if (p.m) {
+    const moves = p.m.split(',').filter(Boolean);
+    // Replay by selecting the node that matches the prefix in the bundled tree,
+    // otherwise grow a session Your Line branch as we walk.
+    for (const san of moves) {
+      const path = getNodeMoves();
+      const bundled = nodeIdForPath([...path, san]);
+      if (bundled && !bundled.startsWith('user-')) selectedNodeId.value = bundled;
+      else recordExploredMove(path, san);
+    }
+  }
 }

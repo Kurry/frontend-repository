@@ -51,9 +51,14 @@ export function LiveRelay() {
           Deliver out of order
         </button>
       </div>
-      <div class="flex items-center gap-2 mb-2 flex-wrap" role="status">
+      <div class="flex items-center gap-2 mb-2 flex-wrap" role="status" aria-live="polite">
         <span class={`relay-status ${status.cls}`}>{status.label}</span>
-        <span class="text-base stat-figures">Events applied: {s.applied.length} of {RELAY_SCRIPT.length}</span>
+        <span class="text-base stat-figures">
+          Delivered: {s.applied.length} of {RELAY_SCRIPT.length}
+        </span>
+        <span class="text-base stat-figures">
+          Buffered: {s.buffer.length}
+        </span>
       </div>
       <div class="text-base min-h-6 break-words">
         {s.applied.length === 0

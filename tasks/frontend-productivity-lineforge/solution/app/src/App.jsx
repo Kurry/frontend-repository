@@ -4,11 +4,14 @@ import './index.css';
 
 import {
   currentOpening, openingFamilies, filteredOpenings, favorites, savedLines,
-  boardTheme, boardFlipped, selectedNodeId, searchQuery, showFavoritesOnly,
+  boardTheme, boardFlipped, searchQuery, showFavoritesOnly,
   practiceActive, userLine, activeGame, showSavedPanel, saveFormOpen,
   getNodeMoves, scrubberSequence, stepPrev, stepNext, resetToStart,
   toggleFavorite, toggleAllFavorites, loadOpening, setBoardTheme, startPractice, exitPractice,
-  clearBoardInteraction, boardSelection, showExportCenter
+  clearBoardInteraction, boardSelection, showExportCenter,
+  canUndo, canRedo, undo, redo, paletteOpen,
+  blindfoldActive, blindfoldPeek,
+  buildSharePayload, encodeShareHash, parseShareHash, applySharePayload, showToast
 } from './store';
 
 import { ChessBoard } from './components/ChessBoard';
@@ -20,6 +23,11 @@ import { PracticePanel } from './components/PracticePanel';
 import { LiveRelay } from './components/LiveRelay';
 import { ExportCenter } from './components/ExportCenter';
 import { Toast } from './components/Toast';
+import { CommandPalette } from './components/CommandPalette';
+import { Coachmarks } from './components/Coachmarks';
+import { MoveEntry } from './components/MoveEntry';
+import { Icon } from './icons';
+import { soundsOn, toggleSounds } from './sound';
 import { OPENINGS } from './openings';
 
 const THEMES = [
@@ -29,12 +37,35 @@ const THEMES = [
 ];
 
 function Header() {
+  const share = () => {
+    const payload = buildSharePayload();
+    if (!payload) {
+      showToast('Load an opening before sharing a study link');
+      return;
+    }
+    const hash = encodeShareHash(payload);
+    const url = `${window.location.origin}${window.location.pathname}${hash}`;
+    const finish = (ok) => {
+      if (ok) {
+        try { window.location.hash = hash.slice(1); } catch { /* ignore */ }
+        showToast('Study link copied to clipboard');
+      } else {
+        showToast('Could not copy study link');
+      }
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => finish(true), () => finish(false));
+    } else {
+      finish(false);
+    }
+  };
+
   return (
     <header class="bg-[var(--color-primary)] text-white px-4 py-3 flex items-center justify-between flex-wrap gap-3">
       <h1 class="app-title">
         <span class="text-[var(--color-accent)]">Line</span>Forge
       </h1>
-      <div class="flex items-center gap-3 flex-wrap">
+      <div class="flex items-center gap-2 flex-wrap">
         <div class="flex items-center gap-2">
           <label class="text-base" for="board-theme">Board theme</label>
           <select
@@ -51,16 +82,66 @@ function Header() {
         <button
           type="button"
           class="header-btn"
+          onClick={undo}
+          disabled={!canUndo.value}
+          aria-label="Undo last change"
+          title="Undo (Ctrl/Cmd+Z)"
+        >
+          <Icon name="undo" size={18} /> Undo
+        </button>
+        <button
+          type="button"
+          class="header-btn"
+          onClick={redo}
+          disabled={!canRedo.value}
+          aria-label="Redo change"
+          title="Redo (Ctrl/Cmd+Shift+Z)"
+        >
+          <Icon name="redo" size={18} /> Redo
+        </button>
+        <button
+          type="button"
+          class="header-btn"
+          onClick={() => { paletteOpen.value = true; }}
+          aria-label="Open command palette"
+          title="Command palette (Ctrl/Cmd+K)"
+        >
+          <Icon name="command" size={18} /> Command palette
+        </button>
+        <button
+          type="button"
+          id="coach-export"
+          class="header-btn"
           onClick={() => { showExportCenter.value = true; }}
         >
-          Export center
+          <Icon name="export" size={18} /> Export center
         </button>
         <button
           type="button"
           class="header-btn"
           onClick={() => { showSavedPanel.value = !showSavedPanel.value; }}
         >
-          View saved lines ({savedLines.value.length})
+          <Icon name="save" size={18} /> View saved lines ({savedLines.value.length})
+        </button>
+        <button
+          type="button"
+          class="header-btn"
+          onClick={share}
+          aria-label="Copy shareable study link"
+          title="Copy shareable study link"
+        >
+          <Icon name="link" size={18} /> Share link
+        </button>
+        <button
+          type="button"
+          class="header-btn"
+          onClick={toggleSounds}
+          aria-label={soundsOn.value ? 'Mute sound cues' : 'Enable sound cues'}
+          aria-pressed={soundsOn.value}
+          title="Toggle move and practice sound cues"
+        >
+          <Icon name={soundsOn.value ? 'soundOn' : 'soundOff'} size={18} />
+          {soundsOn.value ? 'Sounds on' : 'Sounds off'}
         </button>
       </div>
     </header>
@@ -82,7 +163,7 @@ function OpeningItem({ opening }) {
   const hideMoves = practiceActive.value && isActive;
 
   return (
-    <div class={`flex items-start gap-1 rounded-md ${isActive ? 'opening-active' : ''}`}>
+    <article class={`opening-item flex items-start gap-1 rounded-md ${isActive ? 'opening-active' : ''}`}>
       <button
         type="button"
         class={`star-btn ${isFav ? 'star-on' : 'star-off'}`}
@@ -90,7 +171,7 @@ function OpeningItem({ opening }) {
         aria-label={isFav ? `Unfavorite ${opening.name}` : `Favorite ${opening.name}`}
         aria-pressed={isFav}
       >
-        <span aria-hidden="true">{isFav ? '★' : '☆'}</span>
+        <Icon name="star" size={20} filled={isFav} />
       </button>
       <button
         type="button"
@@ -104,7 +185,7 @@ function OpeningItem({ opening }) {
           {hideMoves ? 'Moves hidden during practice' : formatMovePreview(opening.moves)}
         </span>
       </button>
-    </div>
+    </article>
   );
 }
 
@@ -126,8 +207,8 @@ function LibraryPanel() {
   };
 
   return (
-    <section class="card flex flex-col">
-      <h2 class="mb-3">Opening library</h2>
+    <section class="card flex flex-col" aria-labelledby="library-heading">
+      <h2 id="library-heading" class="mb-3">Opening Library</h2>
       <div class="mb-2">
         <label class="block text-sm font-medium mb-1" for="opening-search">Search openings</label>
         <input
@@ -161,14 +242,14 @@ function LibraryPanel() {
           </button>
         </div>
       </div>
-      <div class="overflow-y-auto flex-1 space-y-1" style="max-height: 62vh;">
+      <div class="overflow-y-auto flex-1 space-y-1 library-list" style="max-height: 62vh;">
         {noResults && favoritesEmpty && (
-          <p class="text-base text-neutral-700">
-            No favorites yet. Select the star beside an opening to add it here.
+          <p class="text-base text-neutral-700 empty-state-msg">
+            No favorites yet. Select the star beside an opening to add it here, then use Show favorites only to study just those openings.
           </p>
         )}
         {noResults && !favoritesEmpty && (
-          <p class="text-base text-neutral-700">
+          <p class="text-base text-neutral-700 empty-state-msg">
             No openings match your search. Try a different name, code or family.
           </p>
         )}
@@ -198,34 +279,52 @@ function BoardControls() {
     : (practiceActive.value || path.length >= seq.length);
 
   return (
-    <div class="flex flex-wrap gap-2 mt-3">
+    <div class="flex flex-wrap gap-2 mt-3 board-controls">
       <button
         type="button"
-        class="btn-secondary"
+        class="btn-secondary board-control-btn"
         onClick={() => { boardFlipped.value = !boardFlipped.value; }}
       >
-        Flip board
+        <Icon name="flip" size={16} /> Flip board
       </button>
-      <button type="button" class="btn-secondary" onClick={resetToStart}>
+      <button type="button" class="btn-secondary board-control-btn" onClick={resetToStart}>
         Reset to start
       </button>
       <button
         type="button"
-        class="btn-secondary"
+        class="btn-secondary board-control-btn"
         onClick={stepPrev}
         disabled={prevDisabled}
       >
-        Previous move
+        <Icon name="arrowLeft" size={16} /> Previous move
       </button>
       <button
         type="button"
-        class="btn-secondary"
+        class="btn-secondary board-control-btn"
         onClick={stepNext}
         disabled={nextDisabled}
         title={practiceActive.value && !game ? 'Unavailable during practice' : undefined}
       >
-        Next move
+        Next move <Icon name="arrowRight" size={16} />
       </button>
+      <button
+        type="button"
+        class={`btn-secondary board-control-btn ${blindfoldActive.value ? 'filter-on' : ''}`}
+        onClick={() => { blindfoldActive.value = !blindfoldActive.value; blindfoldPeek.value = false; }}
+        aria-pressed={blindfoldActive.value}
+      >
+        <Icon name="eye" size={16} /> Blindfold
+      </button>
+      {blindfoldActive.value && (
+        <button
+          type="button"
+          class="btn-secondary board-control-btn"
+          onClick={() => { blindfoldPeek.value = !blindfoldPeek.value; }}
+          aria-pressed={blindfoldPeek.value}
+        >
+          {blindfoldPeek.value ? 'Hide pieces' : 'Peek'}
+        </button>
+      )}
     </div>
   );
 }
@@ -235,9 +334,9 @@ function BoardCard() {
   const isFav = favorites.value.includes(opening.id);
 
   return (
-    <section class="card">
+    <section class="card" aria-labelledby="board-heading">
       <div class="flex items-center justify-between gap-2 mb-2 flex-wrap">
-        <h2>{opening.name}</h2>
+        <h2 id="board-heading">{opening.name}</h2>
         <div class="flex items-center gap-2">
           <span class="mode-chip">{practiceActive.value ? 'Practice mode' : 'Explore mode'}</span>
           <button
@@ -247,12 +346,13 @@ function BoardCard() {
             aria-label={isFav ? `Unfavorite ${opening.name}` : `Favorite ${opening.name}`}
             aria-pressed={isFav}
           >
-            <span aria-hidden="true">{isFav ? '★' : '☆'}</span>
+            <Icon name="star" size={20} filled={isFav} />
           </button>
         </div>
       </div>
       <ChessBoard />
       <BoardControls />
+      <MoveEntry />
       {userLine.value && !practiceActive.value && (
         <div class="new-line-badge mt-3" role="status">
           New Line
@@ -264,17 +364,19 @@ function BoardCard() {
 
 function PracticeCard() {
   return (
-    <section class="card mt-4">
+    <section class="card mt-4" aria-labelledby="practice-heading">
       <div class="flex items-center justify-between gap-2 flex-wrap">
-        <h3>Practice</h3>
+        <h3 id="practice-heading">Practice</h3>
         <button
           type="button"
+          id="coach-practice"
           class={practiceActive.value ? 'btn-secondary' : 'btn-primary'}
           onClick={() => {
             if (practiceActive.value) exitPractice();
             else startPractice();
           }}
         >
+          <Icon name="practice" size={16} />
           {practiceActive.value ? 'Exit practice' : 'Practice this line'}
         </button>
       </div>
@@ -287,9 +389,34 @@ export function App() {
   const opening = currentOpening.value;
 
   useEffect(() => {
+    const payload = parseShareHash(window.location.hash || '');
+    if (payload) applySharePayload(payload);
+  }, []);
+
+  useEffect(() => {
     const onKeyDown = (e) => {
+      const mod = e.metaKey || e.ctrlKey;
+      const tag = (e.target && e.target.tagName) || '';
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || (e.target && e.target.isContentEditable);
+
+      if (mod && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        paletteOpen.value = true;
+        return;
+      }
+      if (mod && (e.key === 'z' || e.key === 'Z')) {
+        if (typing) return;
+        e.preventDefault();
+        if (e.shiftKey) redo();
+        else undo();
+        return;
+      }
       if (e.key !== 'Escape') return;
-      if (showSavedPanel.value) {
+      if (paletteOpen.value) {
+        paletteOpen.value = false;
+      } else if (showExportCenter.value) {
+        showExportCenter.value = false;
+      } else if (showSavedPanel.value) {
         showSavedPanel.value = false;
       } else if (saveFormOpen.value) {
         saveFormOpen.value = false;
@@ -316,37 +443,44 @@ export function App() {
               </p>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <LibraryPanel />
-              <section class="card flex items-center justify-center min-h-[300px]">
+              <nav aria-label="Opening Library">
+                <LibraryPanel />
+              </nav>
+              <section class="card flex items-center justify-center min-h-[300px]" aria-label="Board explorer placeholder">
                 <div class="text-center text-neutral-600">
                   <div class="text-6xl mb-3" aria-hidden="true">♔</div>
                   <p class="text-base">Select an opening to see the board</p>
                 </div>
               </section>
             </div>
+            <aside class="mt-4" aria-label="Live relay">
+              <LiveRelay />
+            </aside>
           </div>
         ) : (
           <div class="max-w-7xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-              <div class="lg:col-span-3 order-2 lg:order-1">
+              <nav class="lg:col-span-3 order-2 lg:order-1" aria-label="Opening Library">
                 <LibraryPanel />
-              </div>
-              <div class="lg:col-span-5 order-1 lg:order-2">
+              </nav>
+              <section class="lg:col-span-5 order-1 lg:order-2" aria-label="Board explorer">
                 <BoardCard />
                 <PracticeCard />
-              </div>
-              <div class="lg:col-span-4 order-3">
+              </section>
+              <aside class="lg:col-span-4 order-3" aria-label="Study panels">
                 <MoveTree />
                 <StatsPanel />
                 <NotableGames />
                 <LiveRelay />
-              </div>
+              </aside>
             </div>
           </div>
         )}
       </main>
       {showSavedPanel.value && <SavedLinesPanel />}
       {showExportCenter.value && <ExportCenter />}
+      <CommandPalette />
+      <Coachmarks />
       <Toast />
     </div>
   );
