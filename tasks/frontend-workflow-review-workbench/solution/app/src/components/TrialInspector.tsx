@@ -37,6 +37,7 @@ function TrialDiff({ bundle }: { bundle: ReviewBundle }) {
         closeOnEscape
         withinPortal
         closeButtonProps={{ 'aria-label': 'Close diff picker' }}
+        closeOnClickOutside={true}
         overlayProps={{ backgroundOpacity: 0.35, blur: 2 }}
       >
         <form className="diff-picker" onSubmit={handleSubmit((values) => { if (values.leftTrialId === values.rightTrialId) return; setDiffTrials(values.leftTrialId, values.rightTrialId); })}>
