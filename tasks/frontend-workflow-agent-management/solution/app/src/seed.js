@@ -52,7 +52,7 @@ export function createRun(id, serial = 1, failureScenario = false, seeded = fals
 const configs = [
   ['agent-aster-finch', 'Aster Finch', 'aster', 'codedeck', 'running', true, true],
   ['agent-boreal-echo', 'Boreal Echo', 'boreal', 'nimbus', 'idle', false, false],
-  ['agent-cinder-vale', 'Cinder Vale', 'cinder', 'quill', 'idle', true, false],
+  ['agent-cinder-vale', 'Cinder Vale', 'cinder', 'quill', 'running', true, true],
   ['agent-aster-drift', 'Aster Drift', 'aster', 'vector', 'paused', false, true],
   ['agent-boreal-sable', 'Boreal Sable', 'boreal', 'codedeck', 'error', false, true],
   ['agent-cinder-nova', 'Cinder Nova', 'cinder', 'none', 'offline', false, false],
@@ -77,6 +77,19 @@ export function seedAgents() {
         status: 'failed',
         currentStep: 1,
         steps: run.steps.map((step, stepIndex) => stepIndex === 1 ? { ...step, status: 'failed', attempts: 3, error: 'Verification failed after 3 automatic attempts' } : step),
+      }
+    }
+    if (status === 'running' && run && failureScenario && id === 'agent-cinder-vale') {
+      run = {
+        ...run,
+        status: 'running',
+        currentStep: 2,
+        progressComplete: 2,
+        steps: run.steps.map((step, stepIndex) => {
+          if (stepIndex === 2) return { ...step, status: 'retrying', attempts: 1, maxAttempts: 3, backoffRemaining: 5, error: 'Verification command returned exit code 1', ticksRemaining: 0, plannedFailures: 2 }
+          if (stepIndex < 2) return { ...step, status: 'complete', attempts: 1, completedAt: isoAgo(1), output: `${step.name} completed successfully` }
+          return step
+        }),
       }
     }
     return {
