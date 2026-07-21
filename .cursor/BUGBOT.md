@@ -85,16 +85,36 @@ checklist never mentions. A PR with a thin body (no checklist) is itself a defec
 ## Reward files are self-assessments — audit them
 
 `solution/reward.json` and `solution/reward-details.json` in oracle-judge PRs are the
-session's own graded claims, not verifier output. Flag: (a) all-1.0 scores with little or
-no corresponding app diff; (b) criteria marked 1.0 whose `reasoning` describes code
-inspection rather than a browser observation; (c) reward-details that omit dimensions or
-criteria present in `tests/`. Fabricated scores are an anticheat-class defect.
+session's own graded claims, not verifier output. They are intentional review evidence:
+do not request their deletion and do not flag their presence by itself. Audit their
+contents instead. Flag: (a) all-1.0 scores with little or no corresponding app diff;
+(b) criteria marked 1.0 whose `reasoning` describes code inspection rather than a
+browser observation; (c) reward-details that omit dimensions or criteria present in
+`tests/`; (d) snapshots older than the newest app commit in the PR — if code changed
+after the snapshot was generated, the scores no longer describe the PR's HEAD and must
+be regenerated (pairs with the Review lifecycle rule below). Fabricated scores are an
+anticheat-class defect.
+
+## Build-output policy
+
+Do not accept a newly committed `solution/app/dist/` or `solution/app/build/` merely as
+review evidence. Keep build output only when the app's committed `npm start` command
+actually serves that directory (for example, `vite preview` or `http-server dist`) and
+the task therefore requires it at runtime. When `npm start` serves source through a dev
+server, generated build output is duplicate/stale-prone and must stay uncommitted.
 
 ## Verification media
 
 Fix/polish/judge PRs should include screenshots (and WebM recordings for motion claims)
 under `solution/app/testing/` with descriptive names. Flag PRs claiming visual/motion/
 accessibility fixes with no committed evidence.
+
+## Review lifecycle
+
+A PR is merge-ready only after Bugbot has reviewed its current HEAD. If the latest
+Bugbot run predates any code, artifact, or conflict-resolution commit, require a fresh
+run via a PR comment such as `cursor review` or `bugbot run`; findings from an older
+diff do not clear the final commit.
 
 ---
 

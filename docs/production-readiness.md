@@ -55,9 +55,10 @@ innovation's single positive catch-all).
       and `solution/app/README.md` are standardized generated surfaces owned by
       `corpuscheck propagate` (drift-checked by `--check`).
 
-Task-local `solution/reward-details.json` files are not part of the active task
-shape. PR #541 removed those stale trial artifacts corpus-wide; current verifier
-results live in Harbor trial output under `verifier/reward-details.json`.
+PR #541 removed the stale task-local `solution/reward-details.json` files that existed
+at that point. Current verifier results still live in Harbor trial output under
+`verifier/reward-details.json`; newly generated oracle-judge snapshots may be committed
+under `solution/` as audited review evidence according to `.cursor/BUGBOT.md`.
 
 ## Phase 4 — Docs / tooling truthfulness (#536)
 

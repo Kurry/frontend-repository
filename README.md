@@ -95,9 +95,10 @@ as Next.js, Nuxt, and SvelteKit count within their base framework):
   `window.webmcp_*` tools on the same page. It accelerates judging but is
   never itself a scoring criterion.
 - Criteria live in `tests/<dimension>/<dimension>.toml`.
-- Results, including per-dimension `cost_usd`, land in each Harbor trial's
-  verifier output as `reward.json` and `reward-details.json`; they are not
-  committed inside task solutions.
+- Runtime results, including per-dimension `cost_usd`, land in each Harbor trial's
+  verifier output as `reward.json` and `reward-details.json`. Oracle-judge PRs may also
+  commit audited snapshots under `solution/` as review evidence; those snapshots are
+  not verifier plumbing and must match the current rubric, app diff, and browser run.
 
 ## Corpus sweeps
 
