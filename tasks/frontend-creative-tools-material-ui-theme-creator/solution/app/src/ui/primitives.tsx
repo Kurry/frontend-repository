@@ -10,6 +10,35 @@ export function Icon({ name, className = '', style }: { name: string; className?
   );
 }
 
+// Overlay stack for Escape handling. All Escape listeners sit on document in
+// the capture phase, so listener registration order — not visual stacking —
+// decides who runs first. Each open Modal registers here in open order; only
+// the topmost (last-opened) overlay consumes Escape, and non-modal overlays
+// below it (the Name panel) can yield via hasOpenModalOverlay().
+let overlayCounter = 0;
+const overlayStack = new Map<symbol, number>();
+
+function pushOverlay(id: symbol) {
+  overlayStack.set(id, ++overlayCounter);
+}
+function removeOverlay(id: symbol) {
+  overlayStack.delete(id);
+}
+function isTopOverlay(id: symbol) {
+  let topOrder = -1;
+  let topId: symbol | null = null;
+  for (const [oid, order] of overlayStack) {
+    if (order > topOrder) {
+      topOrder = order;
+      topId = oid;
+    }
+  }
+  return topId === id;
+}
+export function hasOpenModalOverlay() {
+  return overlayStack.size > 0;
+}
+
 // Accessible modal: role dialog, aria-modal, focus trap, Escape to close,
 // returns focus to the control that opened it. Animated enter/exit.
 export function Modal({
@@ -31,6 +60,14 @@ export function Modal({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const opener = useRef<Element | null>(null);
+  const overlayId = useRef<symbol | null>(null);
+  if (!overlayId.current) overlayId.current = Symbol('modal');
+
+  useEffect(() => {
+    if (!open) return;
+    pushOverlay(overlayId.current!);
+    return () => removeOverlay(overlayId.current!);
+  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -51,6 +88,8 @@ export function Modal({
     if (!open) return;
     function onKey(e: KeyboardEvent) {
       if (e.key === 'Escape') {
+        // A newer overlay owns this Escape — let its handler run instead.
+        if (!isTopOverlay(overlayId.current!)) return;
         e.stopPropagation();
         onClose();
       } else if (e.key === 'Tab') {
@@ -74,7 +113,7 @@ export function Modal({
     return () => document.removeEventListener('keydown', onKey, true);
   }, [open, onClose]);
 
-  const panelInit = variant === 'drawer' ? { opacity: 0, x: 40 } : { opacity: 0, scale: 0.96, y: 8 };
+  const panelInit = variant === 'drawer' ? { opacity: 0, x: 64 } : { opacity: 0, scale: 0.94, y: 14 };
   const panelAnim = variant === 'drawer' ? { opacity: 1, x: 0 } : { opacity: 1, scale: 1, y: 0 };
 
   return (
@@ -86,7 +125,7 @@ export function Modal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.18 }}
+          transition={{ duration: 0.24, ease: 'easeOut' }}
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) onClose();
           }}
@@ -108,7 +147,7 @@ export function Modal({
             initial={panelInit}
             animate={panelAnim}
             exit={panelInit}
-            transition={{ duration: 0.2, ease: 'easeOut' }}
+            transition={{ duration: 0.28, ease: 'easeOut' }}
           >
             {children}
           </motion.div>

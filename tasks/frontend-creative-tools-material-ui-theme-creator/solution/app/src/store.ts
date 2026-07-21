@@ -29,6 +29,19 @@ export interface Toast {
   text: string;
 }
 
+// New Theme / Rename / Snapshot live in the store (not component state) so the
+// panel stays open across main-tab switches — the interleaved create flow.
+export type NamePanelMode = 'new' | 'rename' | 'snapshot';
+export interface NamePanelState {
+  mode: NamePanelMode;
+  themeId?: string;
+}
+
+export interface RecentCommand {
+  id: string;
+  label: string;
+}
+
 interface Result {
   ok: boolean;
   error?: string;
@@ -36,6 +49,22 @@ interface Result {
 }
 
 const MAX_HISTORY = 60;
+
+// Order-insensitive deep JSON: sibling key order in the editor source must not
+// decide whether parsed options equal the live state (raw JSON.stringify is
+// insertion-order-sensitive, so a reordered-but-identical literal would look
+// "changed" and record a spurious history entry).
+function canonicalJSON(v: unknown): string {
+  if (Array.isArray(v)) return `[${v.map(canonicalJSON).join(',')}]`;
+  if (v && typeof v === 'object') {
+    const rec = v as Record<string, unknown>;
+    return `{${Object.keys(rec)
+      .sort()
+      .map((k) => `${JSON.stringify(k)}:${canonicalJSON(rec[k])}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(v);
+}
 
 interface State {
   savedThemes: SavedTheme[];
@@ -66,6 +95,8 @@ interface State {
   toasts: Toast[];
   liveMessage: string;
   copyMessage: string;
+  namePanel: NamePanelState | null;
+  recentCommands: RecentCommand[];
 
   // derived
   contrast: () => ContrastRow[];
@@ -112,6 +143,9 @@ interface State {
   setImportOpen: (v: boolean) => void;
   setTutorialOpen: (v: boolean) => void;
 
+  setNamePanel: (v: NamePanelState | null) => void;
+  pushRecentCommand: (id: string, label: string) => void;
+
   copyText: (text: string, label: string) => Promise<void>;
   pushToast: (text: string) => void;
   dismissToast: (id: number) => void;
@@ -119,6 +153,7 @@ interface State {
 }
 
 let toastSeq = 1;
+let announceSeq = 0;
 
 function clampHistory(hist: ThemeOptions[], idx: number): { history: ThemeOptions[]; historyIndex: number } {
   if (hist.length <= MAX_HISTORY) return { history: hist, historyIndex: idx };
@@ -158,6 +193,8 @@ export const useStore = create<State>((set, get) => {
     toasts: [],
     liveMessage: '',
     copyMessage: '',
+    namePanel: null,
+    recentCommands: [],
 
     contrast: () => contrastMatrix(get().options),
     jsonArtifact: () => exportJSON(get().themeName, get().options),
@@ -193,6 +230,14 @@ export const useStore = create<State>((set, get) => {
     setSource: (src) => {
       const res = sourceToOptions(src);
       if (res.ok) {
+        // Formatting (or whitespace-only typing) parses back to options equal
+        // to the current state: refresh the text without recording a no-op
+        // history entry, so Format Source never adds a spurious undo step or
+        // scrubber state.
+        if (canonicalJSON(res.options) === canonicalJSON(get().options)) {
+          set({ source: src, sourceError: null, saveStatus: 'All changes saved' });
+          return;
+        }
         set({ source: src, sourceError: null });
         get().applyOptions(res.options, { record: true, regenSource: false });
       } else {
@@ -295,10 +340,13 @@ export const useStore = create<State>((set, get) => {
       const parsed = themePackageSchema.safeParse(pkg);
       if (!parsed.success) {
         const fe = firstError(parsed.error);
+        get().announce(fe.message);
         return { ok: false, error: fe.message, field: fe.path };
       }
       if (get().savedThemes.some((t) => t.name === trimmed)) {
-        return { ok: false, error: 'name must be unique among saved themes', field: 'name' };
+        const msg = 'name must be unique among saved themes';
+        get().announce(msg);
+        return { ok: false, error: msg, field: 'name' };
       }
       const id = `theme-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
       const record: SavedTheme = {
@@ -315,11 +363,27 @@ export const useStore = create<State>((set, get) => {
     },
 
     renameTheme: (id, name) => {
+      // The rename panel is non-modal and stays open across tab switches, so
+      // the target can be deleted while it is open — fail instead of silently
+      // reporting a rename that matched no theme.
+      if (!get().savedThemes.some((t) => t.id === id)) {
+        const msg = 'That theme no longer exists';
+        get().announce(msg);
+        return { ok: false, error: msg, field: 'name' };
+      }
       const trimmed = (name ?? '').trim();
-      if (!trimmed) return { ok: false, error: 'name is required', field: 'name' };
-      if (trimmed.length > 64) return { ok: false, error: 'name must be at most 64 characters', field: 'name' };
+      if (!trimmed) {
+        get().announce('name is required');
+        return { ok: false, error: 'name is required', field: 'name' };
+      }
+      if (trimmed.length > 64) {
+        get().announce('name must be at most 64 characters');
+        return { ok: false, error: 'name must be at most 64 characters', field: 'name' };
+      }
       if (get().savedThemes.some((t) => t.id !== id && t.name === trimmed)) {
-        return { ok: false, error: 'name must be unique among saved themes', field: 'name' };
+        const msg = 'name must be unique among saved themes';
+        get().announce(msg);
+        return { ok: false, error: msg, field: 'name' };
       }
       set((s) => ({
         savedThemes: s.savedThemes.map((t) => (t.id === id ? { ...t, name: trimmed } : t)),
@@ -365,10 +429,20 @@ export const useStore = create<State>((set, get) => {
 
     saveSnapshot: (name) => {
       const { activeThemeId } = get();
-      if (!activeThemeId) return { ok: false, error: 'Load a saved theme before taking a snapshot', field: 'name' };
+      if (!activeThemeId) {
+        const msg = 'Load a saved theme before taking a snapshot';
+        get().announce(msg);
+        return { ok: false, error: msg, field: 'name' };
+      }
       const trimmed = (name ?? '').trim();
-      if (!trimmed) return { ok: false, error: 'name is required', field: 'name' };
-      if (trimmed.length > 64) return { ok: false, error: 'name must be at most 64 characters', field: 'name' };
+      if (!trimmed) {
+        get().announce('name is required');
+        return { ok: false, error: 'name is required', field: 'name' };
+      }
+      if (trimmed.length > 64) {
+        get().announce('name must be at most 64 characters');
+        return { ok: false, error: 'name must be at most 64 characters', field: 'name' };
+      }
       const snap = { name: trimmed, themeOptions: structuredClone(get().options) };
       set((s) => ({
         savedThemes: s.savedThemes.map((t) =>
@@ -427,13 +501,23 @@ export const useStore = create<State>((set, get) => {
     setImportOpen: (v) => set({ importOpen: v }),
     setTutorialOpen: (v) => set({ tutorialOpen: v }),
 
+    setNamePanel: (v) => set({ namePanel: v }),
+    pushRecentCommand: (id, label) =>
+      set((s) => ({
+        recentCommands: [{ id, label }, ...s.recentCommands.filter((r) => r.id !== id)].slice(0, 4)
+      })),
+
     copyText: async (text, label) => {
       try {
         if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(text);
       } catch {
         /* clipboard may be unavailable in headless; still confirm visibly */
       }
-      set({ copyMessage: `${label} copied to clipboard` });
+      // alternate an invisible marker so identical consecutive confirmations
+      // still change the live-region text and re-announce
+      announceSeq++;
+      const marker = announceSeq % 2 ? '' : '​';
+      set({ copyMessage: `${label} copied to clipboard${marker}` });
       get().pushToast(`${label} copied to clipboard`);
       get().announce(`${label} copied to clipboard`);
     },
@@ -445,9 +529,12 @@ export const useStore = create<State>((set, get) => {
     },
     dismissToast: (id) => set((s) => ({ toasts: s.toasts.filter((t) => t.id !== id) })),
     announce: (msg) => {
-      // reset then set so identical consecutive messages still trigger AT
-      set({ liveMessage: '' });
-      setTimeout(() => set({ liveMessage: msg }), 30);
+      // set directly (never blank first, so an observer always finds the text)
+      // and alternate an invisible marker so identical consecutive messages
+      // still change the region content and re-announce for AT
+      announceSeq++;
+      const marker = announceSeq % 2 ? '' : '​';
+      set({ liveMessage: `${msg}${marker}` });
     }
   };
 });
