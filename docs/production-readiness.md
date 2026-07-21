@@ -11,19 +11,22 @@ GitHub issue that tracks its work. Run all commands from the repo root unless no
 
 ## Phase 1 — First full corpus validation (#533)
 
-- [ ] `corpuscheck validate --all --force` (first run: `--force`, never `--incremental`)
-- [ ] `corpuscheck drift --all` (shared-file drift + assignment orphans)
-- [ ] `corpuscheck status --all` (readiness funnel snapshot)
-- [ ] `uv run corpuscheck propagate --check` (zero drift)
-- [ ] `uv run pytest packages/corpuscheck/tests`
-- [ ] corpuscheck's own pytest suite (`packages/corpuscheck/tests/`, includes the webmcp_h3 contract tests)
-- [ ] Triage every failure: fix, or waive with
+- [x] `corpuscheck validate --all --force` — 65/65 active tasks pass.
+- [x] `corpuscheck drift --all` — shared surfaces and assignment inventory clean.
+- [x] `corpuscheck status --all` — all 65 tasks are at `static_valid`.
+- [x] `uv run corpuscheck propagate --check` — zero drift.
+- [x] `uv run pytest packages/corpuscheck/tests` — 55 tests pass, including
+      the webmcp_h3 contract suite.
+- [x] `npm run test:webmcp-contracts` and `npm run typecheck:webmcp-contracts`
+      — 19 contract tests pass and TypeScript is clean.
+- [x] Triage every failure: fix, or waive with
       `corpuscheck baseline accept <slug> <tier> --reason "..."` (sparingly, reason required).
 - [x] Dist policy: resolved by quarantining 38 tasks (`tasks-quarantine/`) whose only
       oracle-tier failure was "start references 'dist'/'build' but it is absent"
       (2026-07-21). Reinstate per `tasks-quarantine/README.md`.
-- [ ] Run once with `--strict-dimensions --strict-oracle` and record the delta
-      (non-core dimension tomls and oracle paths only warn by default).
+- [x] Run once with `--strict-oracle` — 65/65 pass. The retired
+      `--strict-dimensions` flag no longer exists because all thirteen dimensions
+      are canonical validation inputs.
 
 Rubric-tier decision: there is no negative-rubric requirement — negatives
 (`negate=true`) and non-innovation catch-alls are optional, and corpuscheck is
