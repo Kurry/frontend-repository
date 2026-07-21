@@ -1,2 +1,1 @@
 # Verification
-![screenshot](screenshot.png)

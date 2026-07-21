@@ -2,4 +2,3 @@
 
 This is the Routewatch model monitoring application.
 
-![App Preview](preview.png)

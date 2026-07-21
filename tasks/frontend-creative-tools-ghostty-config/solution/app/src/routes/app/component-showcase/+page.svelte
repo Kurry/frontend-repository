@@ -12,8 +12,6 @@
     import Switch from "$lib/components/settings/Switch.svelte";
     import Color from "$lib/components/settings/Color.svelte";
     import type {HexColor} from "$lib/utils/colors";
-    import LinkItem from "$lib/components/settings/LinkItem.svelte";
-    import CogIconUrl from "$lib/images/tabs/application.webp";
     import Number from "$lib/components/settings/Number.svelte";
     import Range from "$lib/components/settings/Range.svelte";
     import Palette from "$lib/components/settings/Palette.svelte";
@@ -160,11 +158,6 @@
             <DualTheme bind:value={values.dualTheme} options={themeOptions} />
         </Item>
     </Group>
-    <Group>
-        <LinkItem name="Advanced Dropdown Debug" href="/app/dropdown-debug" icon={CogIconUrl} />
-    </Group>
-
-
     <Group title="Numbers">
         <Item name="Basic number" note="This is a number input.">
             <Number bind:value={values.numberBasic} min={0} max={100} step={1} />

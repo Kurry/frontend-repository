@@ -13,4 +13,3 @@ entity-collection-v1, artifact-transfer-v1) are registered on
 `window.webmcp_session_info / webmcp_list_tools / webmcp_invoke_tool` and
 drive the same handlers as the visible UI.
 
-![App Screenshot](./screenshot_final.png)

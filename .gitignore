@@ -35,14 +35,18 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-start.log
-start_output.log
 
-# Local dev server output (e.g. `vite --host` startup logs)
-server*.log
+# Logs (blanket — covers dev-server output, npm output, etc.)
+*.log
+
+# Merge/patch leftovers
+*.orig
+*.rej
 
 # OS / editor
 .DS_Store
+Thumbs.db
+desktop.ini
 .cursor/*
 !.cursor/skills/
 
@@ -67,6 +71,12 @@ venv/
 
 # Built oracle output — rebuilt by verify:build, never committed
 tasks/*/solution/app/dist/
+
+# Stray dev/QA captures at oracle app roots (reference screenshots live in
+# tasks/*/environment/reference-screenshots/, which stays tracked)
+tasks/*/solution/app/smoke*.png
+tasks/*/solution/app/screenshot*.png
+tasks/*/solution/app/verification*.png
 
 # Transient git worktrees (jules teleport / agent checkouts)
 .worktrees/
