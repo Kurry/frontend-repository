@@ -1,6 +1,13 @@
+import { nextTick } from 'vue'
+
 const enumSchema = (values) => ({ type: 'string', enum: values })
 const ok = (message, visible_postcondition = message) => ({ success: true, message, visible_postcondition })
 const fail = (message) => ({ success: false, error: message })
+
+async function settleVisibleUi() {
+  await nextTick()
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+}
 
 function normalizeId(id) {
   if (typeof id !== 'string') return id
@@ -101,7 +108,11 @@ export function registerWebMcp(store) {
   window.webmcp_invoke_tool = async (name, args = {}) => {
     const tool = tools.find((candidate) => candidate.name === name)
     if (!tool) return fail(`Unknown WebMCP tool: ${name}`)
-    try { return await tool.run(args) } catch (error) { return fail(error?.message || 'Tool invocation failed.') }
+    try {
+      const result = await tool.run(args)
+      await settleVisibleUi()
+      return result
+    } catch (error) { return fail(error?.message || 'Tool invocation failed.') }
   }
 }
 
