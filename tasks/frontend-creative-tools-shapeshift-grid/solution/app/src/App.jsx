@@ -51,6 +51,7 @@ import {
 
 const DEFAULT_CELL_SIZE = 32;
 const FESTIVAL_URL = "SHAPESHIFTFESTIVAL.COM";
+const INTRO_LINE = "Browser-based open canvas. Everything you touch becomes structured festival data.";
 const COLOR_HEX = {
   white: "#ffffff",
   black: "#050505",
@@ -60,6 +61,10 @@ const COLOR_HEX = {
   blue: "#7878e9",
   pink: "#e86fb8",
 };
+
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" &&
+  Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
 
 const qrUrlCache = new Map();
 const qrCanvasCache = new Map();
@@ -202,7 +207,6 @@ export default function App() {
     boards: seededBoards(),
     tagFilter: "",
     activeMode: "paint",
-    exportPreviewText: "",
     sliderLocked: false,
     selectedBoard: null,
     selectedCell: null,
@@ -213,12 +217,16 @@ export default function App() {
   const [importOpen, setImportOpen] = createSignal(false);
   const [cameraOpen, setCameraOpen] = createSignal(false);
   const [exportTab, setExportTab] = createSignal("session-json");
+  const [exportJson, setExportJson] = createSignal("");
   const [copyStatus, setCopyStatus] = createSignal("");
   const [cameraError, setCameraError] = createSignal("");
   const [sessionNotice, setSessionNotice] = createSignal("");
   const [deletingBoard, setDeletingBoard] = createSignal("");
   const [pngPreviewUrl, setPngPreviewUrl] = createSignal("");
   const [toolbarPosition, setToolbarPosition] = createSignal({ x: 0, y: 78 });
+  const [typedCount, setTypedCount] = createSignal(prefersReducedMotion() ? INTRO_LINE.length : 0);
+  const [coachMark, setCoachMark] = createSignal(false);
+  const [confirmClear, setConfirmClear] = createSignal(false);
   let toolbarRef;
   let canvasRef;
   let uploadInputRef;
@@ -226,7 +234,11 @@ export default function App() {
   let cameraStream = null;
   let activeStroke = null;
   let pointerPainting = false;
+  let strokeLastIndex = null;
   let pngGeneration = 0;
+  let coachShownOnce = false;
+  let coachTimer;
+  let clearArmTimer;
   const registeredWebMcpTools = [];
 
   const dimensions = createMemo(() => gridDimensions(state.cellSize));
@@ -254,9 +266,38 @@ export default function App() {
     };
   }
 
+  function syncExportText() {
+    setExportJson(JSON.stringify(compileSession(), null, 2));
+  }
+
+  // The Session JSON preview is compiled live from the shared store, but only
+  // while the Export surface is open — a dense 40×40 session is a large
+  // document and must never block painting or mode switches behind it.
   createEffect(() => {
-    setState("exportPreviewText", JSON.stringify(compileSession(), null, 2));
+    if (!exportOpen()) return;
+    state.history.length;
+    state.boards.length;
+    state.cellSize;
+    state.brushMode;
+    state.paletteColor;
+    state.mirrorMode;
+    state.gridOverlay;
+    state.fillStats.painted;
+    syncExportText();
   });
+
+  function flashNotice(message, ms = 1800) {
+    setSessionNotice(message);
+    setTimeout(() => setSessionNotice(""), ms);
+  }
+
+  function showCoachMark() {
+    if (coachShownOnce) return;
+    coachShownOnce = true;
+    setCoachMark(true);
+    clearTimeout(coachTimer);
+    coachTimer = setTimeout(() => setCoachMark(false), 7000);
+  }
 
   function replaceCells(cells, { history = [], locked = state.sliderLocked } = {}) {
     batch(() => {
@@ -307,15 +348,41 @@ export default function App() {
     return changed;
   }
 
+  // Paint every cell on the line between two stroke samples so fast pointer /
+  // touch drags leave a continuous stroke instead of dotted skips.
+  function paintSegment(fromIndex, toIndex) {
+    const { cols } = dimensions();
+    let x0 = fromIndex % cols;
+    let y0 = Math.floor(fromIndex / cols);
+    const x1 = toIndex % cols;
+    const y1 = Math.floor(toIndex / cols);
+    const dx = Math.abs(x1 - x0);
+    const dy = -Math.abs(y1 - y0);
+    const sx = x0 < x1 ? 1 : -1;
+    const sy = y0 < y1 ? 1 : -1;
+    let err = dx + dy;
+    let changed = false;
+    for (;;) {
+      changed = applyBrushAt(y0 * cols + x0) || changed;
+      if (x0 === x1 && y0 === y1) break;
+      const e2 = 2 * err;
+      if (e2 >= dy) { err += dy; x0 += sx; }
+      if (e2 <= dx) { err += dx; y0 += sy; }
+    }
+    return changed;
+  }
+
   function beginStroke(index) {
     activeStroke = new Map();
     pointerPainting = true;
+    strokeLastIndex = index;
     applyBrushAt(index);
   }
 
   function finishStroke() {
     if (!pointerPainting) return;
     pointerPainting = false;
+    strokeLastIndex = null;
     if (activeStroke?.size) {
       const changes = [...activeStroke.entries()].map(([index, previous]) => ({ index, previous }));
       setState("history", (history) => [...history.slice(-199), changes]);
@@ -334,10 +401,17 @@ export default function App() {
   }
 
   function clearBoard() {
+    setConfirmClear(false);
     replaceCells(blankCells(state.cellSize), { history: [], locked: false });
     setState("selectedBoard", null);
-    setSessionNotice("Canvas cleared — cell size unlocked");
-    setTimeout(() => setSessionNotice(""), 1800);
+    flashNotice("Canvas cleared — cell size unlocked");
+  }
+
+  function armClear() {
+    if (confirmClear()) { clearBoard(); return; }
+    setConfirmClear(true);
+    clearTimeout(clearArmTimer);
+    clearArmTimer = setTimeout(() => setConfirmClear(false), 2600);
   }
 
   function resizeGrid(nextCellSize) {
@@ -379,8 +453,7 @@ export default function App() {
     if (!parsed.success) return { ok: false, error: formatZodError(parsed.error) };
     setState("boards", (boards) => [...boards, parsed.data]);
     setState("selectedBoard", parsed.data.name);
-    setSessionNotice(`Saved “${parsed.data.name}”`);
-    setTimeout(() => setSessionNotice(""), 2200);
+    flashNotice(`Saved “${parsed.data.name}”`, 2200);
     return { ok: true, board: parsed.data };
   }
 
@@ -408,14 +481,17 @@ export default function App() {
   function removeBoard(name, animate = true) {
     const exists = state.boards.some((board) => board.name === name);
     if (!exists) return false;
-    const reduced = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (animate && !reduced) setDeletingBoard(name);
     const complete = () => batch(() => {
       setState("boards", (boards) => boards.filter((board) => board.name !== name));
       if (state.selectedBoard === name) setState("selectedBoard", null);
       setDeletingBoard("");
     });
-    if (animate && !reduced) setTimeout(complete, 180); else complete();
+    if (animate && !prefersReducedMotion()) {
+      setDeletingBoard(name);
+      setTimeout(complete, 300);
+    } else {
+      complete();
+    }
     return true;
   }
 
@@ -439,8 +515,7 @@ export default function App() {
       setState("selectedBoard", board.name);
       setState("activeMode", "paint");
     });
-    setSessionNotice(`Loaded “${board.name}”`);
-    setTimeout(() => setSessionNotice(""), 1800);
+    flashNotice(`Loaded “${board.name}”`);
     return true;
   }
 
@@ -487,8 +562,9 @@ export default function App() {
         image.src = url;
       });
       await imageToGrid(image);
-      setSessionNotice("Image pixelized onto the grid");
-      setTimeout(() => setSessionNotice(""), 1800);
+      flashNotice("Image pixelized onto the grid");
+    } catch (error) {
+      flashNotice(error?.message || "image: choose a readable image file", 2600);
     } finally {
       URL.revokeObjectURL(url);
       if (uploadInputRef) uploadInputRef.value = "";
@@ -523,11 +599,14 @@ export default function App() {
       setCameraError("camera: wait for the preview before capturing");
       return;
     }
-    await imageToGrid(videoRef);
-    setCameraOpen(false);
-    stopCamera();
-    setSessionNotice("Camera capture pixelized onto the grid");
-    setTimeout(() => setSessionNotice(""), 1800);
+    try {
+      await imageToGrid(videoRef);
+      cameraMotion.requestClose();
+      stopCamera();
+      flashNotice("Camera capture pixelized onto the grid");
+    } catch (error) {
+      setCameraError(error?.message || "camera: capture failed");
+    }
   }
 
   function applySession(session) {
@@ -562,8 +641,8 @@ export default function App() {
 
   async function buildBrandedPng() {
     const canvas = document.createElement("canvas");
-    const artSize = 900;
-    const footerHeight = 120;
+    const artSize = 1000;
+    const footerHeight = 132;
     const { rows, cols } = dimensions();
     canvas.width = artSize;
     canvas.height = artSize + footerHeight;
@@ -599,20 +678,39 @@ export default function App() {
         context.stroke();
       }
     }
+    // Black branded footer band: caption left, festival URL right.
     context.fillStyle = "#000000";
     context.fillRect(0, artSize, artSize, footerHeight);
     context.fillStyle = "#ffffff";
-    context.font = "800 28px ui-monospace, SFMono-Regular, Menlo, monospace";
     context.textBaseline = "middle";
-    context.fillText("/MADE WITH SHAPESHIFT GRID TOOL", 24, artSize + footerHeight / 2);
-    const right = "<SHAPESHIFTFESTIVAL.COM>";
-    context.fillText(right, artSize - 24 - context.measureText(right).width, artSize + footerHeight / 2);
+    const leftText = "/MADE WITH SHAPESHIFT GRID TOOL";
+    const rightText = "<SHAPESHIFTFESTIVAL.COM>";
+    let fontSize = 30;
+    context.font = `800 ${fontSize}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+    const gap = 40;
+    const pad = 28;
+    while (
+      fontSize > 14 &&
+      context.measureText(leftText).width + context.measureText(rightText).width > artSize - pad * 2 - gap
+    ) {
+      fontSize -= 2;
+      context.font = `800 ${fontSize}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+    }
+    const midY = artSize + footerHeight / 2;
+    context.fillText(leftText, pad, midY);
+    const rightWidth = context.measureText(rightText).width;
+    context.fillText(rightText, artSize - pad - rightWidth, midY);
     return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("PNG rendering failed")), "image/png"));
   }
 
   async function refreshPngPreview() {
     const generation = ++pngGeneration;
-    const blob = await buildBrandedPng();
+    let blob;
+    try {
+      blob = await buildBrandedPng();
+    } catch {
+      return;
+    }
     if (generation !== pngGeneration) return;
     const next = URL.createObjectURL(blob);
     const previous = pngPreviewUrl();
@@ -621,15 +719,21 @@ export default function App() {
   }
 
   createEffect(() => {
-    state.exportPreviewText;
-    if (exportOpen() && exportTab() === "png") refreshPngPreview();
+    if (exportOpen() && exportTab() === "png") {
+      state.history.length;
+      state.fillStats.painted;
+      state.gridOverlay;
+      state.cellSize;
+      refreshPngPreview();
+    }
   });
 
   async function copyExport() {
     setCopyStatus("");
     try {
       if (exportTab() === "session-json") {
-        await navigator.clipboard.writeText(state.exportPreviewText);
+        syncExportText();
+        await navigator.clipboard.writeText(exportJson());
         setCopyStatus("Session JSON copied");
       } else {
         const blob = await buildBrandedPng();
@@ -645,7 +749,8 @@ export default function App() {
 
   async function downloadExport(format = exportTab()) {
     if (format === "session-json") {
-      downloadBlob(new Blob([state.exportPreviewText], { type: "application/json" }), "shapeshift-session.json");
+      syncExportText();
+      downloadBlob(new Blob([exportJson()], { type: "application/json" }), "shapeshift-session.json");
       return;
     }
     downloadBlob(await buildBrandedPng(), "shapeshift-grid.png");
@@ -666,10 +771,22 @@ export default function App() {
     downloadBlob(blob, "shapeshift-grid.png");
   }
 
+  function cellIndexFromPoint(clientX, clientY) {
+    const target = document.elementFromPoint(clientX, clientY)?.closest?.("[data-cell-index]");
+    return target && canvasRef?.contains(target) ? Number(target.dataset.cellIndex) : null;
+  }
+
   function handleCanvasPointerDown(event) {
     if (event.button !== 0 && event.pointerType !== "touch") return;
     const cell = event.target.closest("[data-cell-index]");
     if (!cell) return;
+    // Drop focus from any control (e.g. the cell-size slider input) so global
+    // brush / palette shortcuts keep working right after a canvas click.
+    const active = document.activeElement;
+    if (active && active !== document.body && typeof active.blur === "function") {
+      const tag = active.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") active.blur();
+    }
     event.preventDefault();
     canvasRef?.setPointerCapture?.(event.pointerId);
     beginStroke(Number(cell.dataset.cellIndex));
@@ -678,8 +795,15 @@ export default function App() {
   function handleCanvasPointerMove(event) {
     if (!pointerPainting) return;
     event.preventDefault();
-    const target = document.elementFromPoint(event.clientX, event.clientY)?.closest?.("[data-cell-index]");
-    if (target && canvasRef?.contains(target)) applyBrushAt(Number(target.dataset.cellIndex));
+    const index = cellIndexFromPoint(event.clientX, event.clientY);
+    if (index === null) return;
+    if (strokeLastIndex === null || strokeLastIndex === index) {
+      if (strokeLastIndex === null) applyBrushAt(index);
+      strokeLastIndex = index;
+      return;
+    }
+    paintSegment(strokeLastIndex, index);
+    strokeLastIndex = index;
   }
 
   function handleToolbarDragStart(event) {
@@ -707,19 +831,79 @@ export default function App() {
     });
   }
 
-  function applyBrushToSelectedCell() {
+  // Write an explicit cell value into the selected grid-cell (and its mirror
+  // partner) through the same stroke/history path the canvas uses.
+  function writeSelectedCell(value) {
     const selected = state.selectedCell;
     if (!selected) return false;
-    const { cols } = dimensions();
+    const { rows, cols } = dimensions();
+    if (selected.row >= rows || selected.col >= cols) return false;
     const index = selected.row * cols + selected.col;
-    activeStroke = new Map();
-    const changed = applyBrushAt(index);
-    if (changed && activeStroke.size) {
-      const changes = [...activeStroke.entries()].map(([cellIndex, previous]) => ({ index: cellIndex, previous }));
-      setState("history", (history) => [...history.slice(-199), changes]);
+    const targets = new Set([index]);
+    if (state.mirrorMode !== "off") targets.add(mirrorIndex(index));
+    const stroke = [];
+    for (const target of targets) {
+      const current = state.cells[target];
+      const next = value.kind === "blank"
+        ? { row: current.row, col: current.col, kind: "blank", color: null }
+        : { row: current.row, col: current.col, kind: value.kind, color: value.color };
+      if (sameCell(current, next)) continue;
+      stroke.push({ index: target, previous: { ...current } });
+      setState("cells", target, next);
     }
-    activeStroke = null;
-    return changed;
+    if (!stroke.length) return false;
+    batch(() => {
+      setState("history", (history) => [...history.slice(-199), stroke]);
+      setState("fillStats", calculateStats(state.cells));
+      setState("sliderLocked", true);
+    });
+    return true;
+  }
+
+  // Dialog surfaces enter and exit with a brief opacity/scale transition: the
+  // Kobalte root stays mounted through a short closing phase before unmount.
+  // Escape always dismisses — handled on the content itself (focus inside) and
+  // on the document as a safety net (focus anywhere else).
+  function createDialogMotion(isOpen, setOpen) {
+    const [closing, setClosing] = createSignal(false);
+    let timer;
+    const requestClose = () => {
+      if (!isOpen() || closing()) return;
+      if (prefersReducedMotion()) { setOpen(false); return; }
+      setClosing(true);
+      clearTimeout(timer);
+      timer = setTimeout(() => { setClosing(false); setOpen(false); }, 160);
+    };
+    const handleOpenChange = (next) => {
+      if (next) { clearTimeout(timer); setClosing(false); setOpen(true); } else requestClose();
+    };
+    const onContentKeyDown = (event) => {
+      if (event.key === "Escape") { event.stopPropagation(); requestClose(); }
+    };
+    const onDocumentKeyDown = (event) => {
+      if (event.key === "Escape") requestClose();
+    };
+    createEffect(() => {
+      if (isOpen()) {
+        document.addEventListener("keydown", onDocumentKeyDown);
+        onCleanup(() => document.removeEventListener("keydown", onDocumentKeyDown));
+      }
+    });
+    onCleanup(() => clearTimeout(timer));
+    return { closing, requestClose, handleOpenChange, onContentKeyDown, shown: () => isOpen() || closing() };
+  }
+
+  const saveMotion = createDialogMotion(saveOpen, setSaveOpen);
+  const exportMotion = createDialogMotion(exportOpen, setExportOpen);
+  const importMotion = createDialogMotion(importOpen, setImportOpen);
+  const cameraMotion = createDialogMotion(cameraOpen, setCameraOpen);
+
+  function applyBrushToSelectedCell() {
+    const mode = state.brushMode;
+    const value = mode === "erase"
+      ? { kind: "blank" }
+      : { kind: mode, color: state.paletteColor };
+    return writeSelectedCell(value);
   }
 
   function registerTool(definition) {
@@ -770,21 +954,24 @@ export default function App() {
       },
       editor_update_property: async (raw = {}) => {
         const args = pickArgs(raw);
-        const property = args.property;
+        const property = String(args.property ?? "").toLowerCase();
         const value = String(args.value ?? "").toLowerCase();
+        let painted = false;
         if (property === "color") {
           if (!COLORS.includes(value)) throw new Error("color value is outside its closed enum");
           setPalette(value);
-          applyBrushToSelectedCell();
+          painted = writeSelectedCell({ kind: "color", color: value });
         } else if (property === "brush") {
           if (!["qr", "color", "erase"].includes(value)) throw new Error("brush value is outside its closed enum");
           setBrush(value);
-          applyBrushToSelectedCell();
+          painted = value === "erase"
+            ? writeSelectedCell({ kind: "blank" })
+            : writeSelectedCell({ kind: value, color: state.paletteColor });
         } else if (property === "mirror") {
           if (!["off", "horizontal", "vertical"].includes(value)) throw new Error("mirror value is outside its closed enum");
           setMirror(value);
         } else {
-          throw new Error(`${property} is not a bound editor property`);
+          throw new Error(`${args.property} is not a bound editor property`);
         }
         await waitForUi();
         return resultText({
@@ -793,6 +980,7 @@ export default function App() {
           brushMode: state.brushMode,
           paletteColor: state.paletteColor,
           mirrorMode: state.mirrorMode,
+          paintedCell: painted,
           visible: true,
         });
       },
@@ -809,6 +997,7 @@ export default function App() {
       editor_preview: async () => {
         setExportTab("session-json");
         setExportOpen(true);
+        syncExportText();
         await waitForUi();
         return resultText({ preview: "session-json", visible: true });
       },
@@ -864,7 +1053,7 @@ export default function App() {
       entity_delete: async (raw = {}) => {
         const args = pickArgs(raw);
         const name = args.name || args.id;
-        if (args.confirm !== true) throw new Error("confirm=true is required");
+        if (!(args.confirm === true || args.confirm === "true")) throw new Error("confirm=true is required");
         if (!name || !removeBoard(name, false)) throw new Error("confirmed board was not found");
         setState("activeMode", "gallery");
         await waitForUi();
@@ -891,6 +1080,7 @@ export default function App() {
         setExportTab(format);
         setExportOpen(true);
         if (format === "png") await refreshPngPreview();
+        else syncExportText();
         await waitForUi();
         return resultText({ format, previewOpen: true, visible: true });
       },
@@ -907,10 +1097,11 @@ export default function App() {
         setExportTab(format);
         setExportOpen(true);
         if (format === "png") await refreshPngPreview();
+        else syncExportText();
         await waitForUi();
         await copyExport();
         await waitForUi();
-        return resultText({ format, copyAttempted: true, visible: true });
+        return resultText({ format, copyAttempted: true, copyStatus: copyStatus(), visible: true });
       },
     };
 
@@ -960,19 +1151,39 @@ export default function App() {
 
   onMount(() => {
     registerWebMcpTools();
+    if (!prefersReducedMotion() && typedCount() === 0) {
+      const typer = setInterval(() => {
+        setTypedCount((count) => {
+          if (count >= INTRO_LINE.length) { clearInterval(typer); return count; }
+          return count + 1;
+        });
+      }, 21);
+      onCleanup(() => clearInterval(typer));
+    }
     const keydown = (event) => {
       const element = event.target;
-      if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement || element instanceof HTMLSelectElement || element?.isContentEditable) return;
+      const tag = element?.tagName;
+      const isTextInput =
+        (tag === "INPUT" && element?.type !== "range") ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        Boolean(element?.isContentEditable);
+      if (isTextInput) return;
+      if (event.metaKey || event.ctrlKey || event.altKey) return;
       if (event.key === "Backspace" || event.code === "Backspace") { event.preventDefault(); undo(); return; }
       const codeMap = { KeyQ: "qr", KeyB: "color", KeyE: "erase" };
       if (codeMap[event.code]) { setBrush(codeMap[event.code]); return; }
-      const key = event.key.toLowerCase();
-      if (key === "q") setBrush("qr");
-      else if (key === "b") setBrush("color");
-      else if (key === "e") setBrush("erase");
-      else if (key === "g" || event.code === "KeyG") setState("gridOverlay", (value) => !value);
-      const digit = event.code.startsWith("Digit") ? Number(event.code.slice(5)) : Number(event.key);
-      if (digit >= 1 && digit <= COLORS.length) setPalette(COLORS[digit - 1]);
+      const key = String(event.key || "").toLowerCase();
+      if (key === "q") { setBrush("qr"); return; }
+      if (key === "b") { setBrush("color"); return; }
+      if (key === "e") { setBrush("erase"); return; }
+      if (key === "g" || event.code === "KeyG") { setState("gridOverlay", (value) => !value); return; }
+      const digit = event.code?.startsWith?.("Digit")
+        ? Number(event.code.slice(5))
+        : event.code?.startsWith?.("Numpad")
+          ? Number(event.code.slice(6))
+          : Number(key);
+      if (Number.isInteger(digit) && digit >= 1 && digit <= COLORS.length) setPalette(COLORS[digit - 1]);
     };
     window.addEventListener("keydown", keydown);
     onCleanup(() => window.removeEventListener("keydown", keydown));
@@ -980,6 +1191,8 @@ export default function App() {
 
   onCleanup(() => {
     stopCamera();
+    clearTimeout(coachTimer);
+    clearTimeout(clearArmTimer);
     if (pngPreviewUrl()) URL.revokeObjectURL(pngPreviewUrl());
   });
 
@@ -988,7 +1201,7 @@ export default function App() {
       <div class="stats-readout" aria-live="polite" aria-label="Live fill statistics">
         <span><b>{state.fillStats.painted}</b> painted</span>
         <span><b>{state.fillStats.qr}</b> qr</span>
-        <span><b>{state.fillStats.colorFilled}</b> colorFilled</span>
+        <span><b>{state.fillStats.colorFilled}</b> color filled</span>
         <span><b>{state.fillStats.blank}</b> blank</span>
       </div>
     );
@@ -1006,7 +1219,8 @@ export default function App() {
         form.reset();
         setAttempted(false);
         setFormError("");
-        setSaveOpen(false);
+        showCoachMark();
+        saveMotion.requestClose();
       },
     }));
     const values = form.useSelector((formState) => formState.values);
@@ -1014,14 +1228,17 @@ export default function App() {
     const tagIssue = () => boardTagError(values().tag);
     const valid = () => !nameIssue() && !tagIssue();
     return (
-      <Dialog.Root open={saveOpen()} onOpenChange={(open) => { setSaveOpen(open); if (!open) { setAttempted(false); setFormError(""); } }}>
+      <Dialog.Root open={saveMotion.shown()} onOpenChange={(open) => { saveMotion.handleOpenChange(open); if (!open) { setAttempted(false); setFormError(""); } }}>
         <Dialog.Trigger class="action-button save-button" aria-label="Save current board">
           <IconDeviceFloppy size={17} /> Save board
         </Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Overlay class="dialog-overlay" />
+          <Dialog.Overlay class={`dialog-overlay ${saveMotion.closing() ? "is-closing" : ""}`} />
           <div class="dialog-positioner">
-            <Dialog.Content class="dialog-content compact-dialog">
+            <Dialog.Content
+              class={`dialog-content compact-dialog ${saveMotion.closing() ? "is-closing" : ""}`}
+              onKeyDown={saveMotion.onContentKeyDown}
+            >
               <div class="dialog-kicker">/CREATE BOARD RECORD</div>
               <Dialog.Title>Save board</Dialog.Title>
               <Dialog.Description>Snapshot the current cells into the shared gallery collection.</Dialog.Description>
@@ -1038,7 +1255,7 @@ export default function App() {
                         aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && nameIssue())}
                       />
                       <Show when={(attempted() || field().state.meta.isTouched) && nameIssue()}>
-                        <small class="field-error" role="alert">{nameIssue()}</small>
+                        {(issue) => <small class="field-error" role="alert">{issue()}</small>}
                       </Show>
                     </label>
                   )}
@@ -1055,12 +1272,12 @@ export default function App() {
                         aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && tagIssue())}
                       />
                       <Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}>
-                        <small class="field-error" role="alert">{tagIssue()}</small>
+                        {(issue) => <small class="field-error" role="alert">{issue()}</small>}
                       </Show>
                     </label>
                   )}
                 </form.Field>
-                <Show when={formError()}><div class="form-alert" role="alert">{formError()}</div></Show>
+                <Show when={formError()}>{(message) => <div class="form-alert" role="alert">{message()}</div>}</Show>
                 <div class="dialog-actions">
                   <Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton>
                   <button class="primary-button" type="submit" disabled={!valid()}>Save board <IconArrowRight size={17} /></button>
@@ -1088,26 +1305,33 @@ export default function App() {
         setImportError("");
         setAttempted(false);
         form.reset();
-        setImportOpen(false);
-        setSessionNotice("Session imported — canvas, tools, and gallery replaced");
-        setTimeout(() => setSessionNotice(""), 2400);
+        importMotion.requestClose();
+        flashNotice("Session imported — canvas, tools, and gallery replaced", 2400);
       },
     }));
     const values = form.useSelector((formState) => formState.values);
     const currentValidation = () => values().json.trim() ? parseSessionText(values().json) : { ok: false, error: "import: paste Session JSON or choose a file" };
+    const importAlertText = () => importError() || (values().json.trim() && !currentValidation().ok ? currentValidation().error : "");
     const handleFile = async (file) => {
       if (!file) return;
-      const text = await file.text();
-      form.setFieldValue("json", text);
-      setImportError("");
+      try {
+        const text = await file.text();
+        form.setFieldValue("json", text);
+        setImportError("");
+      } catch {
+        setImportError("import: that file could not be read");
+      }
     };
     return (
-      <Dialog.Root open={importOpen()} onOpenChange={(open) => { setImportOpen(open); if (!open) { setImportError(""); setAttempted(false); } }}>
+      <Dialog.Root open={importMotion.shown()} onOpenChange={(open) => { importMotion.handleOpenChange(open); if (!open) { setImportError(""); setAttempted(false); } }}>
         <Dialog.Trigger class="tool-button secondary-tool"><IconUpload size={16} /> Import</Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Overlay class="dialog-overlay" />
+          <Dialog.Overlay class={`dialog-overlay ${importMotion.closing() ? "is-closing" : ""}`} />
           <div class="dialog-positioner">
-            <Dialog.Content class="dialog-content import-dialog">
+            <Dialog.Content
+              class={`dialog-content import-dialog ${importMotion.closing() ? "is-closing" : ""}`}
+              onKeyDown={importMotion.onContentKeyDown}
+            >
               <div class="dialog-kicker">/SESSION TRANSFER</div>
               <Dialog.Title>Import Session JSON</Dialog.Title>
               <Dialog.Description>A valid document atomically replaces the canvas, tools, fill stats, and boards.</Dialog.Description>
@@ -1121,7 +1345,6 @@ export default function App() {
                         value={field().state.value}
                         onInput={(event) => { field().handleChange(event.currentTarget.value); setImportError(""); }}
                         onBlur={field().handleBlur}
-                        placeholder={'{\n  "schemaVersion": "shapeshift-session-v1"\n}'}
                         aria-invalid={Boolean(importError())}
                       />
                     </label>
@@ -1132,8 +1355,8 @@ export default function App() {
                   <button type="button" class="outline-button" onClick={() => fileRef?.click()}><IconFileCode size={17} /> Choose JSON file</button>
                   <span>{values().json ? `${values().json.length.toLocaleString()} characters ready` : "No file selected"}</span>
                 </div>
-                <Show when={importError() || ((attempted() || values().json.trim()) && !currentValidation().ok)}>
-                  <div class="form-alert" role="alert" aria-live="assertive">{importError() || currentValidation().error}</div>
+                <Show when={importAlertText()}>
+                  {(message) => <div class="form-alert" role="alert" aria-live="assertive">{message()}</div>}
                 </Show>
                 <div class="dialog-actions">
                   <Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton>
@@ -1150,12 +1373,15 @@ export default function App() {
 
   function ExportDialog() {
     return (
-      <Dialog.Root open={exportOpen()} onOpenChange={(open) => { setExportOpen(open); if (open && exportTab() === "png") refreshPngPreview(); }}>
-        <Dialog.Trigger class="action-button export-button"><span>Export</span><IconArrowRight size={17} /></Dialog.Trigger>
+      <Dialog.Root open={exportMotion.shown()} onOpenChange={(open) => { exportMotion.handleOpenChange(open); if (open && exportTab() === "png") refreshPngPreview(); }}>
+        <Dialog.Trigger class="action-button export-button" onClick={() => setExportTab("session-json")}><span>Export</span><IconArrowRight size={17} /></Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Overlay class="dialog-overlay" />
+          <Dialog.Overlay class={`dialog-overlay ${exportMotion.closing() ? "is-closing" : ""}`} />
           <div class="dialog-positioner">
-            <Dialog.Content class="dialog-content export-dialog">
+            <Dialog.Content
+              class={`dialog-content export-dialog ${exportMotion.closing() ? "is-closing" : ""}`}
+              onKeyDown={exportMotion.onContentKeyDown}
+            >
               <div class="dialog-kicker">/LIVE SESSION ARTIFACT</div>
               <Dialog.Title>Export</Dialog.Title>
               <Dialog.Description>Preview exactly what Copy and Download will produce from the current store.</Dialog.Description>
@@ -1166,21 +1392,21 @@ export default function App() {
                   <Tabs.Indicator />
                 </Tabs.List>
                 <Tabs.Content value="session-json" class="export-content">
-                  <pre aria-label="Session JSON preview">{state.exportPreviewText}</pre>
+                  <pre aria-label="Session JSON preview">{exportJson()}</pre>
                 </Tabs.Content>
                 <Tabs.Content value="png" class="export-content png-content">
                   <Show when={pngPreviewUrl()} fallback={<div class="rendering">Rendering branded PNG…</div>}>
-                    <img src={pngPreviewUrl()} alt="Branded PNG preview of the current SHAPESHIFT grid" />
+                    {(url) => <img src={url()} alt="Branded PNG preview of the current SHAPESHIFT grid" />}
                   </Show>
                 </Tabs.Content>
               </Tabs.Root>
               <div class="export-footer">
                 <p>Live preview · regenerated from shared canvas and gallery state.</p>
                 <div class="dialog-actions">
-                  <button class="outline-button" type="button" onClick={copyExport}><IconCopy size={17} /> Copy {exportTab() === "png" ? "PNG" : "JSON"}</button>
-                  <button class="primary-button" type="button" onClick={() => downloadExport()}><IconDownload size={17} /> Download</button>
+                  <button class="outline-button" type="button" onClick={() => copyExport().catch(() => {})}><IconCopy size={17} /> Copy {exportTab() === "png" ? "PNG" : "JSON"}</button>
+                  <button class="primary-button" type="button" onClick={() => downloadExport().catch(() => setCopyStatus("Download failed"))}><IconDownload size={17} /> Download</button>
                 </div>
-                <Show when={copyStatus()}><div class="copy-status" role="status">{copyStatus()}</div></Show>
+                <Show when={copyStatus()}>{(status) => <div class="copy-status" role="status">{status()}</div>}</Show>
               </div>
               <Dialog.CloseButton class="icon-close" aria-label="Close Export dialog"><IconX size={19} /></Dialog.CloseButton>
             </Dialog.Content>
@@ -1192,23 +1418,27 @@ export default function App() {
 
   function CameraDialog() {
     return (
-      <Dialog.Root open={cameraOpen()} onOpenChange={(open) => {
-        setCameraOpen(open);
-        if (open) setTimeout(startCamera, 0); else stopCamera();
+      <Dialog.Root open={cameraMotion.shown()} onOpenChange={(open) => {
+        cameraMotion.handleOpenChange(open);
+        if (open) setTimeout(startCamera, 0);
+        else stopCamera();
       }}>
         <Dialog.Trigger class="tool-button media-button"><span>Camera</span><IconCamera size={18} /></Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Overlay class="dialog-overlay" />
+          <Dialog.Overlay class={`dialog-overlay ${cameraMotion.closing() ? "is-closing" : ""}`} />
           <div class="dialog-positioner">
-            <Dialog.Content class="dialog-content camera-dialog">
+            <Dialog.Content
+              class={`dialog-content camera-dialog ${cameraMotion.closing() ? "is-closing" : ""}`}
+              onKeyDown={cameraMotion.onContentKeyDown}
+            >
               <div class="dialog-kicker">/FRONT CAMERA</div>
               <Dialog.Title>Capture image</Dialog.Title>
               <Dialog.Description>The center square will be pixelized into the seven-color palette.</Dialog.Description>
               <div class="camera-frame"><video ref={videoRef} playsinline muted /></div>
-              <Show when={cameraError()}><div class="form-alert" role="alert">{cameraError()}</div></Show>
+              <Show when={cameraError()}>{(message) => <div class="form-alert" role="alert">{message()}</div>}</Show>
               <div class="dialog-actions">
                 <Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton>
-                <button class="primary-button" type="button" onClick={captureCamera}><IconCamera size={17} /> Capture</button>
+                <button class="primary-button" type="button" onClick={() => captureCamera().catch(() => setCameraError("camera: capture failed"))}><IconCamera size={17} /> Capture</button>
               </div>
               <Dialog.CloseButton class="icon-close" aria-label="Close Camera dialog"><IconX size={19} /></Dialog.CloseButton>
             </Dialog.Content>
@@ -1222,40 +1452,44 @@ export default function App() {
     const [open, setOpen] = createSignal(false);
     const [attempted, setAttempted] = createSignal(false);
     const [formError, setFormError] = createSignal("");
+    const renameMotion = createDialogMotion(open, setOpen);
     const form = createForm(() => ({
       defaultValues: { name: props.board.name, tag: props.board.tag, favorite: props.board.favorite, cells: cloneCells(props.board.cells) },
       onSubmit: async ({ value }) => {
         setAttempted(true);
         const result = renameBoard(props.board.name, value);
         if (!result.ok) { setFormError(result.error); return; }
-        setOpen(false);
         setAttempted(false);
         setFormError("");
+        renameMotion.requestClose();
       },
     }));
     const values = form.useSelector((formState) => formState.values);
     const nameIssue = () => boardNameError(values().name, state.boards, props.board.name);
     const tagIssue = () => boardTagError(values().tag);
     return (
-      <Dialog.Root open={open()} onOpenChange={setOpen}>
+      <Dialog.Root open={renameMotion.shown()} onOpenChange={renameMotion.handleOpenChange}>
         <Dialog.Trigger class="card-icon-button" aria-label={`Rename ${props.board.name}`}><IconPencil size={16} /></Dialog.Trigger>
         <Dialog.Portal>
-          <Dialog.Overlay class="dialog-overlay" />
+          <Dialog.Overlay class={`dialog-overlay ${renameMotion.closing() ? "is-closing" : ""}`} />
           <div class="dialog-positioner">
-            <Dialog.Content class="dialog-content compact-dialog">
+            <Dialog.Content
+              class={`dialog-content compact-dialog ${renameMotion.closing() ? "is-closing" : ""}`}
+              onKeyDown={renameMotion.onContentKeyDown}
+            >
               <div class="dialog-kicker">/UPDATE BOARD RECORD</div>
               <Dialog.Title>Rename board</Dialog.Title>
               <Dialog.Description>The same record is updated; its cell snapshot and favorite state stay intact.</Dialog.Description>
               <form onSubmit={(event) => { event.preventDefault(); setAttempted(true); form.handleSubmit(); }} novalidate>
                 <form.Field name="name">
-                  {(field) => <label class="form-field"><span>Name <em>required · max 40</em></span><input value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} />
-                    <Show when={(attempted() || field().state.meta.isTouched) && nameIssue()}><small class="field-error" role="alert">{nameIssue()}</small></Show></label>}
+                  {(field) => <label class="form-field"><span>Name <em>required · max 40</em></span><input value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && nameIssue())} />
+                    <Show when={(attempted() || field().state.meta.isTouched) && nameIssue()}>{(issue) => <small class="field-error" role="alert">{issue()}</small>}</Show></label>}
                 </form.Field>
                 <form.Field name="tag">
-                  {(field) => <label class="form-field"><span>Tag <em>required · max 24</em></span><input value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} />
-                    <Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}><small class="field-error" role="alert">{tagIssue()}</small></Show></label>}
+                  {(field) => <label class="form-field"><span>Tag <em>required · max 24</em></span><input value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && tagIssue())} />
+                    <Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}>{(issue) => <small class="field-error" role="alert">{issue()}</small>}</Show></label>}
                 </form.Field>
-                <Show when={formError()}><div class="form-alert" role="alert">{formError()}</div></Show>
+                <Show when={formError()}>{(message) => <div class="form-alert" role="alert">{message()}</div>}</Show>
                 <div class="dialog-actions"><Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton><button class="primary-button" type="submit" disabled={Boolean(nameIssue() || tagIssue())}>Update board</button></div>
               </form>
               <Dialog.CloseButton class="icon-close" aria-label="Close Rename dialog"><IconX size={19} /></Dialog.CloseButton>
@@ -1286,13 +1520,12 @@ export default function App() {
               minValue={16}
               maxValue={64}
               step={1}
-              disabled={state.sliderLocked}
               class="cell-slider"
               aria-label="Cell size"
             >
               <Slider.Track><Slider.Fill /><Slider.Thumb aria-label="Cell size"><Slider.Input /></Slider.Thumb></Slider.Track>
             </Slider.Root>
-            <span class="lock-note">{state.sliderLocked ? "Locked after paint · Clear to resize" : `${dimensions().cols} × ${dimensions().rows} cells`}</span>
+            <span class="lock-note">{state.sliderLocked ? "Locked after paint · resizing resamples art · Clear resets" : `${dimensions().cols} × ${dimensions().rows} cells`}</span>
           </div>
 
           <div class="control-label"><span>Brush</span><span class="shortcut-note">Q · B · E</span></div>
@@ -1330,22 +1563,45 @@ export default function App() {
               {state.gridOverlay ? "Grid On" : "Grid Off"}
             </ToggleButton.Root>
             <button class="tool-button" onClick={undo} disabled={!state.history.length}><IconArrowBackUp size={16} /> Undo</button>
-            <button class="tool-button" onClick={clearBoard}>Clear</button>
+            <button
+              class={`tool-button clear-button ${confirmClear() ? "is-armed" : ""}`}
+              onClick={armClear}
+              aria-label={confirmClear() ? "Confirm clear — empties the whole board" : "Clear the board"}
+            >{confirmClear() ? "Confirm clear" : "Clear"}</button>
           </div>
 
           <StatReadout />
 
           <div class="media-row">
-            <label class="tool-button media-button">
+            <button type="button" class="tool-button media-button" onClick={() => uploadInputRef?.click()} aria-label="Upload an image to pixelize">
               <span>Upload</span><IconPhotoUp size={18} />
-              <input ref={uploadInputRef} type="file" accept="image/*" onChange={(event) => handleUpload(event.currentTarget.files?.[0])} />
-            </label>
+            </button>
+            <input
+              ref={uploadInputRef}
+              type="file"
+              accept="image/*"
+              class="upload-input"
+              aria-hidden="true"
+              tabIndex={-1}
+              onChange={(event) => handleUpload(event.currentTarget.files?.[0])}
+            />
             <CameraDialog />
           </div>
 
           <div class="transfer-row"><SaveBoardDialog /><ImportDialog /></div>
-          <div class="primary-actions"><ExportDialog /><button class="action-button share-button" onClick={sharePng}><span>Share PNG</span><IconShare size={17} /></button></div>
-          <Show when={sessionNotice()}><div class="session-notice" role="status">{sessionNotice()}</div></Show>
+          <div class="primary-actions">
+            <div class="export-slot">
+              <ExportDialog />
+              <Show when={coachMark()}>
+                <div class="coach-mark" role="status">
+                  <button type="button" class="coach-dismiss" onClick={() => setCoachMark(false)} aria-label="Dismiss export tip"><IconX size={13} /></button>
+                  <b>Board saved.</b> Export the session JSON or the branded PNG from here.
+                </div>
+              </Show>
+            </div>
+            <button class="action-button share-button" onClick={() => sharePng().catch(() => flashNotice("PNG share failed", 2200))}><span>Share PNG</span><IconShare size={17} /></button>
+          </div>
+          <Show when={sessionNotice()}>{(notice) => <div class="session-notice" role="status">{notice()}</div>}</Show>
         </div>
       </aside>
     );
@@ -1415,8 +1671,17 @@ export default function App() {
 
   function BoardCard(props) {
     let thumb;
+    const [confirming, setConfirming] = createSignal(false);
+    let confirmTimer;
+    onCleanup(() => clearTimeout(confirmTimer));
     createEffect(() => drawThumbnail(thumb, props.board.cells));
     const stats = createMemo(() => calculateStats(props.board.cells));
+    const armDelete = () => {
+      if (confirming()) { removeBoard(props.board.name); return; }
+      setConfirming(true);
+      clearTimeout(confirmTimer);
+      confirmTimer = setTimeout(() => setConfirming(false), 2600);
+    };
     return (
       <article class={`board-card ${deletingBoard() === props.board.name ? "is-deleting" : ""} ${state.selectedBoard === props.board.name ? "is-current" : ""}`}>
         <button class="thumb-button" onClick={() => loadBoard(props.board.name)} aria-label={`Load ${props.board.name}`}>
@@ -1430,11 +1695,15 @@ export default function App() {
               <Show when={props.board.favorite} fallback={<IconStar size={18} />}><IconStarFilled size={18} /></Show>
             </button>
           </div>
-          <div class="board-stats"><span>{stats().painted} painted</span><span>{stats().qr} qr</span><span>{stats().colorFilled} color</span></div>
+          <div class="board-stats"><span>{stats().painted} painted</span><span>{stats().qr} qr</span><span>{stats().colorFilled} color filled</span></div>
           <div class="card-actions">
             <button class="load-button" onClick={() => loadBoard(props.board.name)}>Load</button>
             <RenameDialog board={props.board} />
-            <button class="card-icon-button danger" onClick={() => removeBoard(props.board.name)} aria-label={`Delete ${props.board.name}`}><IconTrash size={16} /></button>
+            <button
+              class={`card-icon-button danger ${confirming() ? "is-armed" : ""}`}
+              onClick={armDelete}
+              aria-label={confirming() ? `Confirm delete ${props.board.name}` : `Delete ${props.board.name}`}
+            >{confirming() ? <span class="confirm-label">Confirm</span> : <IconTrash size={16} />}</button>
           </div>
         </div>
       </article>
@@ -1487,9 +1756,9 @@ export default function App() {
       <div class="wash wash-one" aria-hidden="true" />
       <div class="wash wash-two" aria-hidden="true" />
       <header class="site-header">
-        <h1>&lt;SHAPESHIFT GRID<br />TOOL&gt;</h1>
+        <h1 class="display-title">&lt;SHAPESHIFT GRID<br />TOOL&gt;</h1>
         <div class="intro-copy">
-          <p class="type-line">Browser-based open canvas. Everything you touch becomes structured festival data.</p>
+          <p class="type-line">{INTRO_LINE.slice(0, typedCount())}</p>
           <p><strong>Capture. Draw. Download. Share.</strong></p>
           <div class="key-hint">Q/B/E tools · G grid · Backspace undo · 1–7 color</div>
         </div>
