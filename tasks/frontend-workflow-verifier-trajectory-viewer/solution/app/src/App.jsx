@@ -679,7 +679,6 @@ function StepDetail({ pane, step, trial }) {
 
 function Timeline({ pane, steps, trial, activeStep, linkedStep }) {
   const setStep = useReviewStore((s) => s.setStep);
-  const moveStep = useReviewStore((s) => s.moveStep);
   const refs = useRef({});
   useEffect(() => {
     refs.current[activeStep]?.scrollIntoView({
@@ -689,19 +688,30 @@ function Timeline({ pane, steps, trial, activeStep, linkedStep }) {
         : "smooth",
     });
   }, [activeStep]);
+  const move = (direction) => {
+    const currentIndex = Math.max(0, steps.findIndex((step) => step.id === activeStep));
+    const nextIndex = direction === "home"
+      ? 0
+      : direction === "end"
+        ? steps.length - 1
+        : Math.max(0, Math.min(steps.length - 1, currentIndex + direction));
+    const nextId = steps[nextIndex].id;
+    setStep(pane, nextId);
+    requestAnimationFrame(() => refs.current[nextId]?.focus());
+  };
   const onKeyDown = (event) => {
     if (event.key === "ArrowDown" || event.key === "ArrowRight") {
       event.preventDefault();
-      moveStep(pane, 1);
+      move(1);
     } else if (event.key === "ArrowUp" || event.key === "ArrowLeft") {
       event.preventDefault();
-      moveStep(pane, -1);
+      move(-1);
     } else if (event.key === "Home") {
       event.preventDefault();
-      moveStep(pane, "home");
+      move("home");
     } else if (event.key === "End") {
       event.preventDefault();
-      moveStep(pane, "end");
+      move("end");
     }
   };
   const icons = {
@@ -2474,6 +2484,17 @@ function CommandPalette({ task, trial, ui }) {
   useEffect(() => {
     if (open) setQuery("");
   }, [open]);
+  useEffect(() => {
+    if (!open) return undefined;
+    const onEscape = (event) => {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      event.stopPropagation();
+      close("palette");
+    };
+    window.addEventListener("keydown", onEscape, true);
+    return () => window.removeEventListener("keydown", onEscape, true);
+  }, [open, close]);
   const actions = [
     ...task.trials.map((item) => ({
       id: `trial-${item.id}`,
