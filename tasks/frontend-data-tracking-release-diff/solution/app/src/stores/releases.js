@@ -4,6 +4,13 @@ import { createSamplePack, createSeedRotation, createSeedTimeline, createSeedVer
 
 const pause = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms))
 const clone = (value) => JSON.parse(JSON.stringify(value))
+let dialogOpener = null
+const captureDialogOpener = () => { dialogOpener = document.activeElement instanceof HTMLElement ? document.activeElement : null }
+const restoreDialogOpener = () => {
+  const opener = dialogOpener
+  dialogOpener = null
+  window.setTimeout(() => { if (opener?.isConnected) opener.focus() }, 0)
+}
 const stepIds = ['collect-manifests', 'compute-digests', 'rank-stability-check', 'seal']
 const CATEGORY_NAMES = ['Reasoning', 'Extraction', 'Planning', 'Classification']
 const SPLIT_DESCRIPTIONS = {
@@ -202,12 +209,14 @@ export const useReleaseStore = defineStore('releases', {
       this.unchangedExpanded = false
     },
     openDialog(name) {
+      captureDialogOpener()
       this.dialog = name
       if (name === 'export') this.recompileExport()
     },
     closeDialog() {
       if (this.dialog === 'cut' && this.cutRun.running) return false
       this.dialog = null
+      restoreDialogOpener()
       return true
     },
     recompileExport() {
@@ -337,6 +346,7 @@ export const useReleaseStore = defineStore('releases', {
       this.touchExport()
       await pause(260)
       this.dialog = null
+      restoreDialogOpener()
       this.toast(`Release ${version.name} sealed and selected.`)
     },
     advanceRotation() {
@@ -370,6 +380,7 @@ export const useReleaseStore = defineStore('releases', {
       this.unchangedExpanded = false
       this.touchExport()
       this.dialog = null
+      restoreDialogOpener()
       this.toast(`Import applied: ${this.versions.length} versions.`)
       return { success: true, count: this.versions.length }
     },
