@@ -82,6 +82,10 @@ function patchRun(runId, updater) {
   useAppStore.setState((state) => state.run?.id === runId ? { run: updater(state.run) } : {})
 }
 
+function isActiveRun(runId) {
+  return useAppStore.getState().run?.id === runId
+}
+
 function setStage(runId, stageId, patch, eventStatus, message) {
   patchRun(runId, (run) => {
     let next = updateStage(run, stageId, patch)
@@ -168,6 +172,7 @@ async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) 
       const output = useAppStore.getState().aiStatus === 'connected'
         ? await streamLiveAI(runId, 'evaluate', `Assess whether this merged PR is substantial for an evaluation task. Source file count: ${count}. Window: 3-10. PR: ${pr.title}. Return a concise assessment.`, assessment)
         : await streamWords(runId, 'evaluate', assessment)
+      if (!isActiveRun(runId)) return
       setStage(runId, 'evaluate', { status: 'complete', completedAt: now(), output, verdict: substantial ? 'substantial' : 'trivial', reason }, 'complete', `Verdict: ${substantial ? 'substantial' : 'trivial'}`)
       if (!substantial) {
         patchRun(runId, (run) => ({ ...run, status: 'complete', outcome: 'trivial', completedAt: now() }))
@@ -206,6 +211,7 @@ async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) 
       const output = useAppStore.getState().aiStatus === 'connected'
         ? await streamLiveAI(runId, 'generate', `Write a complete coding task instruction derived from linked issue ${pr.linkedIssue ? `#${pr.linkedIssue.number} ${pr.linkedIssue.title}` : 'none'} and PR title: ${pr.title}. Include acceptance criteria.`, deterministic)
         : await streamWords(runId, 'generate', deterministic)
+      if (!isActiveRun(runId)) return
       setStage(runId, 'generate', { status: 'complete', completedAt: now(), output }, 'complete', 'Instruction document generated')
     }
 
@@ -216,6 +222,7 @@ async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) 
       if (!latestRun || latestRun.id !== runId) return
       const instruction = stripCredentialMaterial(latestRun.stages.find((stage) => stage.id === 'generate').output)
       const bundle = taskPackageSchema.parse({ ...packageFor(repo.name, pr, repo.language, deterministicCreatedAt(repo.name, pr.number)), instruction })
+      if (!isActiveRun(runId)) return
       useAppStore.getState().addPackage(bundle)
       setStage(runId, 'package', { status: 'complete', completedAt: now(), output: bundle }, 'complete', 'TaskPackageBundle ready')
       patchRun(runId, (run) => ({ ...run, status: 'complete', outcome: 'packaged', completedAt: now(), package: bundle }))
