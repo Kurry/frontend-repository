@@ -270,7 +270,7 @@ function AgentModal() {
       <div ref={containerRef}>
         <p className="modal-intro">{isEdit ? 'Update the API configuration for this fleet agent.' : 'Create the exact payload sent to the fleet registration API.'}</p>
         <div className="form-grid">
-          <TextInput id="agent-name" labelText="Name" placeholder="Example: Aster Harbor" invalid={Boolean(errors.name)} invalidText={errors.name?.message} aria-describedby={errors.name ? 'agent-name-error' : undefined} {...register('name')} />
+          <TextInput id="agent-name" labelText="Name" placeholder="Example: Aster Vale" invalid={Boolean(errors.name)} invalidText={errors.name?.message} aria-describedby={errors.name ? 'agent-name-error' : undefined} {...register('name')} />
           {errors.name && <span id="agent-name-error" className="sr-only">{errors.name.message}</span>}
           <Controller name="agentType" control={control} render={({ field }) => <Dropdown id="agent-type" titleText="Agent type" label="Choose a type" items={TYPE_ITEMS} itemToString={(item) => item?.label || ''} selectedItem={TYPE_ITEMS.find((item) => item.id === field.value) || null} onChange={({ selectedItem }) => field.onChange(selectedItem?.id || '')} invalid={Boolean(errors.agentType)} invalidText={errors.agentType?.message} aria-describedby={errors.agentType ? 'agent-type-error' : undefined} />} />
           {errors.agentType && <span id="agent-type-error" className="sr-only">{errors.agentType.message}</span>}

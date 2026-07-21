@@ -260,7 +260,7 @@ export const useAppStore = create(persist((set, get) => ({
   batch: null,
   batchReport: null,
   coachmarks: { connections: false, triage: false, pipeline: false },
-  aiBaseUrl: 'https://api.openai.com',
+  aiBaseUrl: 'https://api.nimbus-ai.com',
   ...initialConnections,
   connectionsOpen: false,
   commandOpen: false,

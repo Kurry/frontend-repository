@@ -18,7 +18,7 @@ const SEED_TRANSACTIONS = [
   { date: '2026-03-15', label: 'Maple Row Loft Rent', category: 'Housing', account: 'Checking', amount: -1500, status: 'cleared', note: 'Monthly rent' },
   { date: '2026-03-17', label: 'Nova Cinemas', category: 'Entertainment', account: 'Credit Card', amount: -32, status: 'cleared', note: '' },
   { date: '2026-03-19', label: 'City Power and Light', category: 'Utilities', account: 'Checking', amount: -85, status: 'pending', note: '' },
-  { date: '2026-03-23', label: 'Harbor Family Clinic', category: 'Healthcare', account: 'Checking', amount: -120, status: 'cleared', note: 'Annual checkup copay' },
+  { date: '2026-03-23', label: 'Bayside Family Clinic', category: 'Healthcare', account: 'Checking', amount: -120, status: 'cleared', note: 'Annual checkup copay' },
   { date: '2026-03-26', label: 'Fuel Stop 12', category: 'Transport', account: 'Credit Card', amount: -45, status: 'cleared', note: '' },
 ];
 

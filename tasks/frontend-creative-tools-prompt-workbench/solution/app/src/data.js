@@ -1,8 +1,8 @@
 export const MODELS = [
-  { id: 'nova-2-pro', name: 'Nova 2 Pro', provider: 'OpenAI', charsPerToken: 3.7, pricePerMillion: 12 },
-  { id: 'nova-2-mini', name: 'Nova 2 Mini', provider: 'OpenAI', charsPerToken: 4.2, pricePerMillion: 1.8 },
-  { id: 'sonnet-4', name: 'Sonnet 4', provider: 'Anthropic', charsPerToken: 3.5, pricePerMillion: 15 },
-  { id: 'haiku-3-5', name: 'Haiku 3.5', provider: 'Anthropic', charsPerToken: 4.4, pricePerMillion: 0.8 },
+  { id: 'nova-2-pro', name: 'Nova 2 Pro', provider: 'Nimbus AI', charsPerToken: 3.7, pricePerMillion: 12 },
+  { id: 'nova-2-mini', name: 'Nova 2 Mini', provider: 'Nimbus AI', charsPerToken: 4.2, pricePerMillion: 1.8 },
+  { id: 'sonnet-4', name: 'Sonnet 4', provider: 'Vertexa', charsPerToken: 3.5, pricePerMillion: 15 },
+  { id: 'haiku-3-5', name: 'Haiku 3.5', provider: 'Vertexa', charsPerToken: 4.4, pricePerMillion: 0.8 },
   { id: 'gemini-2-5-pro', name: 'Gemini 2.5 Pro', provider: 'Google', charsPerToken: 3.9, pricePerMillion: 10 },
   { id: 'gemini-2-5-flash', name: 'Gemini 2.5 Flash', provider: 'Google', charsPerToken: 4.6, pricePerMillion: 0.5 },
 ]

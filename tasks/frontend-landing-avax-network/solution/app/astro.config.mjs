@@ -8,7 +8,7 @@ export default defineConfig({
   // oracle build self-contained: every route and endpoint is materialized in
   // dist/ and no Astro/Node SSR process is required at grading time.
   output: "static",
-  // Dev toolbar pollutes pixel captures (bottom-center pill) — must stay off for ProgramBench.
+  // Dev toolbar pollutes pixel captures (bottom-center pill) — must stay off for reference captures.
   devToolbar: { enabled: false },
   vite: {
     plugins: [tailwindcss()],

@@ -16,7 +16,7 @@ const taskNames = [
   ['freight-window', 'Choose a freight delivery window'],
   ['glacier-notes', 'Structure fictional glacier field notes'],
   ['habitat-score', 'Score habitat restoration evidence'],
-  ['harbor-schedule', 'Resolve a synthetic harbor schedule'],
+  ['harvest-schedule', 'Resolve a synthetic harvest schedule'],
   ['heritage-index', 'Catalog invented heritage records'],
   ['hydrology-table', 'Repair a hydrology data table'],
   ['lab-protocol', 'Compare laboratory protocol revisions'],

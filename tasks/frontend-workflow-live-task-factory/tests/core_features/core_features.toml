@@ -101,7 +101,7 @@ weight = 1.0
 [[criterion]]
 id = "5.2"
 name = "connections_panel_masked_credentials"
-description = "The Connections control opens a slide-over panel containing a GitHub token field, an AI base URL field prefilled with https://api.openai.com, and an AI API key field; both key fields are masked by default and each has a show/hide toggle that reveals the value only while active"
+description = "The Connections control opens a slide-over panel containing a GitHub token field, an AI base URL field prefilled with https://api.nimbus-ai.com, and an AI API key field; both key fields are masked by default and each has a show/hide toggle that reveals the value only while active"
 type = "binary"
 weight = 1.0
 

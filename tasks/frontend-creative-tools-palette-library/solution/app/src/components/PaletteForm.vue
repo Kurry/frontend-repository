@@ -16,7 +16,7 @@
         :class="{ 'field-error': errors.name }"
         :aria-invalid="errors.name ? 'true' : 'false'"
         :aria-describedby="errors.name ? `${idPrefix}-name-error` : undefined"
-        placeholder="e.g. Harbor Coastal"
+        placeholder="e.g. Cove Coastal"
       />
       <p v-if="errors.name" :id="`${idPrefix}-name-error`" class="error-note" role="alert">{{ errors.name }}</p>
     </div>

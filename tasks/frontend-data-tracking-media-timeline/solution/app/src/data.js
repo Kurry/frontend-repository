@@ -89,7 +89,7 @@ const SPEC = [
   ["e25", "Rotary Press and Paper Reels", 1843, "United States", "Invention", ["Print", "Computing"], ["rotary-cylinder", "continuous-reel"], "Curved plates on a cylinder print from endless paper at speed."],
   ["e26", "Penny Press Mass Dailies", 1833, "New York", "Release", ["Publishing", "Print"], ["penny-sun", "street-vendors"], "A one-cent paper sells on the street and courts a vast new audience."],
   ["e27", "Electric Telegraph Lines", 1844, "United States", "Invention", ["Telecom", "Networks"], ["morse-key", "what-hath-god"], "Pulsed current carries coded words across continents in minutes."],
-  ["e28", "Associated Press Wire Service", 1846, "New York", "Milestone", ["Publishing", "Telecom"], ["harbor-news-pool", "shared-wire"], "Papers pool telegraph costs, birthing the wire service and shared copy."],
+  ["e28", "Associated Press Wire Service", 1846, "New York", "Milestone", ["Publishing", "Telecom"], ["press-news-pool", "shared-wire"], "Papers pool telegraph costs, birthing the wire service and shared copy."],
   ["e29", "Daguerreotype Photograph", 1839, "Paris", "Invention", ["Photography"], ["daguerre-plate", "silvered-copper"], "Light fixes a mirror-like image on silver, inaugurating practical photography."],
   ["e30", "Collodion Wet-Plate Process", 1851, "England", "Invention", ["Photography"], ["wet-plate", "glass-negative"], "A glass negative allows many prints and sharp field photographs."],
   ["e31", "Phonograph Records Sound", 1877, "United States", "Invention", ["Audio"], ["tinfoil-cylinder", "etched-groove"], "A stylus etches and replays sound, capturing the voice for the first time."],

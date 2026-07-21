@@ -882,7 +882,7 @@ function Catalog({ models, visibleModels, providers }) {
   const toggleCompare = useAppStore((state) => state.toggleCompare)
   const setCompareSelected = useAppStore((state) => state.setCompareSelected)
   const togglePin = useAppStore((state) => state.togglePin)
-  const suggestions = ['OpenAI', 'Anthropic', 'Google', 'Meta', 'Mistral', 'Free']
+  const suggestions = ['Nimbus AI', 'Vertexa', 'Google', 'Meta', 'Mistral', 'Free']
   const hasActiveFilter = Boolean(searchQuery) || providerFilter !== 'All providers' || pinnedOnly || freeOnly
   const emptyReason = searchQuery
     ? `“${searchQuery}”`

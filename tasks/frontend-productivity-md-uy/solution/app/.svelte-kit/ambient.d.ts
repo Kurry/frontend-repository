@@ -62,11 +62,9 @@ declare module '$env/static/private' {
 	export const EDITOR: string;
 	export const DAYTONA_API_KEY: string;
 	export const npm_lifecycle_event: string;
-	export const ANTHROPIC_API_KEY: string;
 	export const XPC_FLAGS: string;
 	export const npm_command: string;
 	export const GIT_EDITOR: string;
-	export const OPENAI_API_KEY: string;
 	export const USER: string;
 	export const __CFBundleIdentifier: string;
 	export const __CF_USER_TEXT_ENCODING: string;
@@ -115,7 +113,6 @@ declare module '$env/static/private' {
 	export const PNPM_HOME: string;
 	export const HOMEBREW_PREFIX: string;
 	export const HOMEBREW_REPOSITORY: string;
-	export const OPENROUTER_API_KEY: string;
 	export const COREPACK_ENABLE_AUTO_PIN: string;
 	export const TERMINFO_DIRS: string;
 	export const CLAUDE_PID: string;
@@ -237,11 +234,9 @@ declare module '$env/dynamic/private' {
 		EDITOR: string;
 		DAYTONA_API_KEY: string;
 		npm_lifecycle_event: string;
-		ANTHROPIC_API_KEY: string;
 		XPC_FLAGS: string;
 		npm_command: string;
 		GIT_EDITOR: string;
-		OPENAI_API_KEY: string;
 		USER: string;
 		__CFBundleIdentifier: string;
 		__CF_USER_TEXT_ENCODING: string;
@@ -290,7 +285,6 @@ declare module '$env/dynamic/private' {
 		PNPM_HOME: string;
 		HOMEBREW_PREFIX: string;
 		HOMEBREW_REPOSITORY: string;
-		OPENROUTER_API_KEY: string;
 		COREPACK_ENABLE_AUTO_PIN: string;
 		TERMINFO_DIRS: string;
 		CLAUDE_PID: string;

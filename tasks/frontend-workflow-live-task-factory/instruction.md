@@ -6,7 +6,7 @@ Build a live task factory console — a dual-mode workbench that turns merged Gi
 Core features (each line is an observable behavior the finished app must exhibit):
 
 Feature: Connections panel and dual mode —
-- A Connections control in the top bar opens a slide-over panel with two credential sections: a GitHub token field, and an AI endpoint section with a base URL field prefilled with https://api.openai.com and an API key field; both key fields are masked by default and each has a show/hide toggle that reveals the value only while active
+- A Connections control in the top bar opens a slide-over panel with two credential sections: a GitHub token field, and an AI endpoint section with a base URL field prefilled with https://api.nimbus-ai.com and an API key field; both key fields are masked by default and each has a show/hide toggle that reveals the value only while active
 - On first load, with no credentials entered, the app runs in demo mode on seeded fixture data: a clearly visible mode indicator in the top bar reads Demo data, and every screen is fully populated and exercisable without any credential
 - Entering a GitHub token and activating its Connect control performs a single lightweight account check against the GitHub API; while the check runs the credential row shows a checking status, on success it shows Connected with the account login, and on failure it shows a visible error carrying the failure status or message and remains Disconnected
 - Entering an AI API key and activating its Connect control performs one lightweight check against the configured base URL, with the same checking, Connected, and Disconnected-with-error presentation

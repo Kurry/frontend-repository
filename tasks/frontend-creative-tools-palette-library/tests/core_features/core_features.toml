@@ -108,7 +108,7 @@ weight = 1.0
 [[criterion]]
 id = "1.3"
 name = "create_palette"
-description = "After creating a valid palette named 'Harbor Coastal' with a period and the required number of swatches, the collection count increases by exactly one and that palette appears in Browse and Detail/Editor surfaces"
+description = "After creating a valid palette named 'Cove Coastal' with a period and the required number of swatches, the collection count increases by exactly one and that palette appears in Browse and Detail/Editor surfaces"
 type = "binary"
 weight = 1.0
 
@@ -256,7 +256,7 @@ optional = true
 [[criterion]]
 id = "1.27"
 name = "create_edit_filter_views_flow"
-description = "Starting from a recorded count: create 'Harbor Coastal' with a period and distinct swatches, edit its name/period/one swatch, favorite it, filter to the edited period, and inspect Nomenclature, Palette, Swatch, and Detail; the count is exactly one higher and every surface shows the same edited record, color, period, and favorite state without reload"
+description = "Starting from a recorded count: create 'Cove Coastal' with a period and distinct swatches, edit its name/period/one swatch, favorite it, filter to the edited period, and inspect Nomenclature, Palette, Swatch, and Detail; the count is exactly one higher and every surface shows the same edited record, color, period, and favorite state without reload"
 type = "binary"
 weight = 1.0
 
