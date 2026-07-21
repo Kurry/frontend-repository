@@ -67,6 +67,7 @@ export default function MegaMenu() {
       aria-modal="true"
       role="dialog"
       aria-label="Site menu"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) requestClose(); }}
     >
       <div
         ref={menuRef}

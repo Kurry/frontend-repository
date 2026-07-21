@@ -68,6 +68,7 @@ export default function EventForm({ eventToEdit, onClose }: Props) {
   }, [featured, setValue, status, trigger]);
 
   useEffect(() => {
+    submittingRef.current = false;
     const t = window.setTimeout(() => firstFieldRef.current?.focus(), 60);
     return () => window.clearTimeout(t);
   }, []);

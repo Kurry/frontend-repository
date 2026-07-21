@@ -206,7 +206,7 @@ export default function ExportCatalog() {
                 <input
                   type="file"
                   accept=".json,application/json"
-                  className="hidden"
+                  className="sr-only"
                   ref={fileInputRef}
                   onChange={handleFileUpload}
                   aria-label="Choose catalog JSON file to import"

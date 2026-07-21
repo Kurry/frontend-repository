@@ -134,7 +134,7 @@ export default function ContactForm() {
               {errors.privacy_consent && <span className="text-error text-sm block" role="alert">{errors.privacy_consent.message}</span>}
             </div>
 
-            <button type="submit" className="btn btn-primary w-full notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" disabled={!isValid} aria-disabled={!isValid}>Submit</button>
+            <button type="submit" className="btn btn-primary w-full notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">Submit</button>
           </form>
         </div>
       </div>
