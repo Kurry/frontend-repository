@@ -36,6 +36,7 @@ import {
   type DatasetRow,
 } from '../contracts'
 import { useBatchStore } from '../store'
+import { returnFocusToOpener } from '../modalFocus'
 
 const composerSchema = z.object({
   name: z.string().trim().min(1, 'Job name is required').max(80, 'Job name must be 80 characters or fewer'),
@@ -104,6 +105,7 @@ export function ComposerModal() {
   const updateJob = useBatchStore((state) => state.updateJob)
   const setUi = useBatchStore((state) => state.setUi)
   const [parseErrors, setParseErrors] = useState<string[]>([])
+  const [nameTouched, setNameTouched] = useState(false)
   const submitting = useRef(false)
 
   const defaults = useMemo<ComposerValues>(() => ({
@@ -129,6 +131,7 @@ export function ComposerModal() {
     if (open) {
       reset(defaults)
       setParseErrors([])
+      setNameTouched(false)
       submitting.current = false
     }
   }, [open, defaults, reset])
@@ -136,14 +139,31 @@ export function ComposerModal() {
   const dataset = watch('dataset') ?? []
   const paste = watch('datasetPaste') ?? ''
   const scheduleEnabled = watch('scheduleEnabled')
+
+  useEffect(() => {
+    if (!open || !paste.trim()) return
+    const timer = window.setTimeout(() => {
+      const result = parseDatasetPaste(paste)
+      setParseErrors(result.errors)
+      if (!result.errors.length) setValue('dataset', result.rows, { shouldValidate: true, shouldDirty: true })
+    }, 350)
+    return () => window.clearTimeout(timer)
+  }, [open, paste, setValue])
+
   const fields = useMemo(() => {
     const keys = new Set<string>(['input'])
     dataset.slice(0, 20).forEach((row) => Object.keys(row).forEach((key) => keys.add(key)))
     return [...keys].filter((key) => key !== 'input' || keys.has('input')).slice(0, 5)
   }, [dataset])
+  const nameValue = watch('name') ?? ''
+  const nameError = errors.name?.message ?? (nameTouched && !nameValue.trim() ? 'Job name is required' : undefined)
+
   const expectedDetected = dataset.some((row) => typeof row.expected === 'string')
 
-  const close = () => setUi({ composerOpen: false, editingJobId: null })
+  const close = () => {
+    setUi({ composerOpen: false, editingJobId: null })
+    returnFocusToOpener('composer')
+  }
 
   const chooseSlice = (id: string) => {
     setValue('datasetSlice', id, { shouldValidate: true, shouldDirty: true })
@@ -196,10 +216,10 @@ export function ComposerModal() {
               labelText="Job name"
               placeholder="Example: Overnight claim classifier"
               maxLength={120}
-              invalid={Boolean(errors.name)}
-              invalidText={errors.name?.message}
-              helperText={`${watch('name')?.length ?? 0} of 80 characters`}
-              {...register('name')}
+              invalid={Boolean(nameError)}
+              invalidText={nameError}
+              helperText={`${nameValue.length} of 80 characters`}
+              {...register('name', { onBlur: () => setNameTouched(true) })}
             />
             <NumberInput
               id="concurrency"
