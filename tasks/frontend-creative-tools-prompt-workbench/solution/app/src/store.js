@@ -16,6 +16,7 @@ const withHistory = (set, get, changes) => {
 }
 
 const toastId = () => `toast-${Date.now()}-${Math.random().toString(36).slice(2)}`
+const normalizedTitle = (title) => title.trim().toLocaleLowerCase()
 
 function makeRequest(state) {
   return {
@@ -115,10 +116,11 @@ export const useWorkbench = create((set, get) => ({
   }),
   switchView: (activeView) => set({ activeView, commandOpen: false }),
   saveLibrary: (payload) => {
-    if (get().library.some((item) => item.title.toLowerCase() === payload.title.toLowerCase())) return false
-    const record = { id: `lib-${Date.now()}`, ...structuredClone(payload) }
+    const title = payload.title.trim()
+    if (get().library.some((item) => normalizedTitle(item.title) === normalizedTitle(title))) return false
+    const record = { id: `lib-${Date.now()}`, ...structuredClone(payload), title }
     withHistory(set, get, () => ({ library: [...get().library, record], saveOpen: false }))
-    get().addToast(`“${payload.title}” saved to library`, 'success')
+    get().addToast(`“${record.title}” saved to library`, 'success')
     return record
   },
   deleteLibrary: (id) => {
@@ -273,4 +275,3 @@ export function compileMarkdown(state = useWorkbench.getState()) {
   const attachments = pkg.attachments.map((item) => item.name).join(', ') || 'None'
   return `# Prompt package\n\n## Model\n${model.name}\n\n${pkg.persona ? `## Persona: ${pkg.persona.name}\n${pkg.persona.preface}\n\n` : ''}## Prompt\n\n${pkg.promptText}\n\n## Bindings\n\n| Variable | Value |\n| --- | --- |\n${bindingRows}\n\n## Attachments\n${attachments}${pkg.latestRun ? `\n\n## Latest response summary\n${pkg.latestRun.summary}` : ''}\n`
 }
-

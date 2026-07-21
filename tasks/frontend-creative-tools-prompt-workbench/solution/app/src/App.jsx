@@ -19,7 +19,7 @@ import { importPasteSchema, libraryPromptInputSchema, variableInsertSchema } fro
 const IS_MAC = typeof navigator !== 'undefined' && /Mac|iP(hone|ad|od)/.test(navigator.platform)
 const MOD_KEY = IS_MAC ? '⌘' : 'Ctrl'
 
-function iconOnly(label) { return { hasIconOnly: true, iconDescription: label, tooltipPosition: 'bottom' } }
+function iconOnly(label) { return { hasIconOnly: true, iconDescription: label, 'aria-label': label, title: label, tooltipPosition: 'bottom' } }
 
 // Strip double-brace tokens for display-only surfaces so template syntax never
 // leaks into chrome that is not actively being edited.
@@ -311,11 +311,11 @@ function Reasoning({ run }) {
   const reasoning = run.variants[run.variantIndex]?.reasoning || ''
   return (
     <section className={`reasoning ${run.reasoningExpanded ? 'open' : ''}`}>
-      <button className="reasoning-header" onClick={() => toggle(run.id)} aria-expanded={run.reasoningExpanded}>
+      <button className="reasoning-header" onClick={() => toggle(run.id)} aria-expanded={run.reasoningExpanded} aria-controls={`reasoning-${run.id}`}>
         <span className="reasoning-icon"><ChevronDown size={18} /></span>
         <span><strong>Reasoning</strong><small>{run.status === 'streaming' ? <><i className="active-pulse" /> Active while generating</> : `Completed in ${run.reasoningDuration || 1}s`}</small></span>
       </button>
-      <div className="reasoning-region"><p>{reasoning}</p></div>
+      <div id={`reasoning-${run.id}`} className="reasoning-region" aria-hidden={!run.reasoningExpanded}><p>{reasoning}</p></div>
     </section>
   )
 }
@@ -578,7 +578,6 @@ function SaveModal() {
   const bindings = useWorkbench((state) => state.bindings)
   const attachments = useWorkbench((state) => state.attachmentIds)
   const persona = useWorkbench((state) => state.activePersona)
-  const library = useWorkbench((state) => state.library)
   const save = useWorkbench((state) => state.saveLibrary)
   const setChrome = useWorkbench((state) => state.setChrome)
   const [allowEmpty, setAllowEmpty] = useState(false)
@@ -591,12 +590,12 @@ function SaveModal() {
   const techniqueMessage = errors.technique?.message || (!techniqueValue ? `Technique is required. Choose exactly one of: ${TECHNIQUES.join(', ')}.` : '')
   const submit = (values) => {
     if (savingRef.current) return
-    if (library.some((item) => item.title.toLowerCase() === values.title.toLowerCase())) {
-      setError('title', { message: 'Title must be unique among existing library prompts.' })
-      return
-    }
     savingRef.current = true
-    save({ ...values, promptText: draft, bindings: { ...bindings }, attachments: [...attachments], personaId: persona?.id || null })
+    const record = save({ ...values, title: values.title.trim(), promptText: draft, bindings: { ...bindings }, attachments: [...attachments], personaId: persona?.id || null })
+    if (!record) {
+      savingRef.current = false
+      setError('title', { type: 'duplicate', message: 'Title must be unique among existing library prompts.' }, { shouldFocus: true })
+    }
   }
   return (
     <ComposedModal open={open} onClose={close} onKeyDown={(event) => { if (event.key === 'Escape') close() }} size="sm" preventCloseOnClickOutside>
@@ -604,7 +603,7 @@ function SaveModal() {
       <ModalBody>
         <p className="modal-copy">Create a reusable prompt record from the current workbench state.</p>
         <form id="save-library-form" onSubmit={handleSubmit(submit)} className="modal-form" noValidate>
-          <TextInput id="save-title" labelText="Title" placeholder="Quarterly launch brief" invalid={!!errors.title} invalidText={errors.title?.message} aria-describedby={errors.title ? 'save-title-error-msg save-title-error' : undefined} {...register('title')} /><div id="save-title-error" className="sr-only" aria-live="polite">{errors.title?.message}</div>
+          <TextInput id="save-title" labelText="Title" placeholder="Quarterly launch brief" invalid={!!errors.title} invalidText={errors.title?.message} aria-describedby={errors.title ? 'save-title-error-msg save-title-error' : undefined} {...register('title')} /><div id="save-title-error" className="field-alert" role="alert" aria-live="assertive">{errors.title?.message}</div>
           <Select id="save-technique" labelText="Technique" invalid={!!techniqueMessage} invalidText={techniqueMessage} aria-describedby={techniqueMessage ? 'save-technique-error-msg save-technique-error' : undefined} {...register('technique')}>
             <SelectItem value="" text="Choose a technique" />
             {TECHNIQUES.map((technique) => <SelectItem key={technique} value={technique} text={technique} />)}

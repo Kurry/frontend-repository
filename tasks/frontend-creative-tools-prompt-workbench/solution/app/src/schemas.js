@@ -12,12 +12,12 @@ export const techniqueSchema = z.enum(TECHNIQUES, {
 })
 
 export const libraryPromptInputSchema = z.object({
-  title: z.string().min(1, 'Title is required.').max(80, 'Title must be 80 characters or fewer.'),
+  title: z.string().trim().min(1, 'Title is required.').max(80, 'Title must be 80 characters or fewer.'),
   technique: techniqueSchema,
 })
 
 export const libraryPromptSchema = z.object({
-  title: z.string().min(1).max(80),
+  title: z.string().trim().min(1).max(80),
   technique: techniqueSchema,
   promptText: z.string(),
   bindings: z.record(z.string().regex(variableNamePattern, 'Binding key must contain letters, digits, or underscores only.'), z.string()),
