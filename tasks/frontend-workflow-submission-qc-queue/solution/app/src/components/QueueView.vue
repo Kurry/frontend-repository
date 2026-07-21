@@ -106,6 +106,7 @@ const columns = [
 function rowProps(row) {
   return {
     class: selectedIds.value.includes(row.id) ? 'queue-row-selected' : '',
+    role: 'button',
     tabindex: 0,
     'aria-label': `Open ${row.title}`,
     onClick: () => store.openSubmission(row.id),

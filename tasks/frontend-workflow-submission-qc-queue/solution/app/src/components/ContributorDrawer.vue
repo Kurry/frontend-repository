@@ -31,9 +31,9 @@ function closeDrawer() { store.drawerContributor = null }
     :auto-focus="true"
     display-directive="show"
     class="contributor-drawer-host"
-    @mask-click="closeDrawer"
+    :mask-closable="true"
     @esc="closeDrawer"
-    @update:show="!$event && closeDrawer()"
+    @update:show="val => { if (!val) closeDrawer() }"
   >
     <NDrawerContent closable :native-scrollbar="false" class="contributor-drawer" @close="closeDrawer">
       <template #header><span class="drawer-kicker">Contributor record</span></template>

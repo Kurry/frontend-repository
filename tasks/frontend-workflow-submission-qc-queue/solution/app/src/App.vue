@@ -72,6 +72,8 @@ function onKeydown(event) {
     }
     return
   }
+  if (command && event.key.toLowerCase() === 'e') { event.preventDefault(); store.openView('export'); return }
+  if (command && event.key.toLowerCase() === 'q') { event.preventDefault(); store.openView('queue'); return }
   if (command && event.key.toLowerCase() === 'z') { event.preventDefault(); event.shiftKey ? store.redo() : store.undo() }
   if (event.key === 'Escape' && store.drawerContributor) store.drawerContributor = null
 }

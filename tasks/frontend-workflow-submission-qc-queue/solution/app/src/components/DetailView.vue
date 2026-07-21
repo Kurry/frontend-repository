@@ -76,7 +76,7 @@ function beginReview() { store.updateSubmission(submission.value.id, 'stage', 'i
     </section>
 
     <Transition name="gate-swap" mode="out-in">
-      <section :key="gateFailed ? 'failed' : 'passed'" class="gate-banner" :class="gateFailed ? 'gate-failed' : 'gate-passed'" aria-live="polite">
+      <section :key="gateFailed ? 'failed' : 'passed'" class="gate-banner" :class="gateFailed ? 'gate-failed' : 'gate-passed gate-passed-flourish'" aria-live="polite">
         <div class="gate-icon"><IconShieldAlert v-if="gateFailed" /><IconShield v-else /></div>
         <div><span class="eyebrow">Automated release gate</span><h2>Gate {{ gateFailed ? 'failed' : 'passed' }}</h2><p v-if="gateFailed">{{ counts.blocker }} open blocker {{ counts.blocker === 1 ? 'finding stops' : 'findings stop' }} approval and payout release.</p><p v-else>No open blockers. This submission is eligible for approval when in-review.</p></div>
         <div class="gate-count"><strong>{{ counts.blocker }}</strong><span>open blockers</span></div>
@@ -91,7 +91,7 @@ function beginReview() { store.updateSubmission(submission.value.id, 'stage', 'i
         </div>
 
         <TransitionGroup v-if="submission.findings.length" name="finding-list" tag="div" class="findings-list">
-          <article v-for="item in submission.findings" :key="item.id" class="finding-card" :class="{ overridden: item.status === 'overridden' }">
+          <article v-for="(item, index) in submission.findings" :key="item.id" class="finding-card" :style="{ '--stagger': `${index * 50}ms` }" :class="{ overridden: item.status === 'overridden' }">
             <div class="finding-topline">
               <span class="tier-chip" :class="`tier-${item.tier}`"><span v-if="item.tier === 'blocker'" aria-hidden="true">!</span>{{ item.tier }}</span>
               <span class="finding-category">{{ item.category.replace('-', ' ') }}</span>

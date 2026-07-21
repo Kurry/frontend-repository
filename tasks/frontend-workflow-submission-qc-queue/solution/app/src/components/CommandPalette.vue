@@ -73,8 +73,8 @@ function keydown(event) {
   <Teleport to="body">
     <Transition name="palette-pop">
       <div v-if="store.palette.open" class="palette-overlay" @mousedown.self="store.palette.open = false">
-    <section ref="paletteEl" class="command-palette" role="dialog" aria-modal="true" aria-label="Command palette" @keydown.capture="keydown">
-      <div class="palette-search"><IconSearch /><input ref="searchInput" v-model="store.palette.query" type="search" placeholder="Search submissions, contributors, or views…" aria-label="Search commands" /><kbd>ESC</kbd></div>
+    <section ref="paletteEl" class="command-palette" role="dialog" aria-modal="true" aria-label="Command palette" @keydown.capture="keydown" tabindex="-1" autofocus>
+      <div class="palette-search"><IconSearch /><input ref="searchInput" v-model="store.palette.query" type="search" placeholder="Search submissions, contributors, or views…" aria-label="Search commands" @keydown.esc.prevent="store.palette.open = false" /><kbd>ESC</kbd></div>
       <div class="palette-body">
         <div class="palette-label">{{ store.palette.query ? 'Matching commands' : 'Quick navigation' }} <span>{{ results.length }}</span></div>
         <div v-if="results.length" class="palette-results" role="listbox" :aria-activedescendant="`palette-result-${store.palette.activeIndex}`">

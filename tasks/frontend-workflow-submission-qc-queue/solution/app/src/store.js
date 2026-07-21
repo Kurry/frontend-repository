@@ -227,7 +227,7 @@ export const useQcStore = defineStore('qc', {
     toggleSelected(id) { this.selectedIds = this.selectedIds.includes(id) ? this.selectedIds.filter((x) => x !== id) : [...this.selectedIds, id] },
     selectVisible(ids) { const allSelected = ids.length && ids.every((id) => this.selectedIds.includes(id)); this.selectedIds = allSelected ? this.selectedIds.filter((id) => !ids.includes(id)) : [...new Set([...this.selectedIds, ...ids])] },
     clearSelection() { this.selectedIds = [] },
-    bump() { this.mutationEpoch += 1 },
+    bump() { this.mutationEpoch += 1; this.submissions = [...this.submissions]; },
     snapshot(label) { this.undoStack.push({ label, submissions: clone(this.submissions) }); if (this.undoStack.length > 40) this.undoStack.shift(); this.redoStack = [] },
     undo() { if (!this.undoStack.length) return false; const entry = this.undoStack.pop(); this.redoStack.push({ label: entry.label, submissions: clone(this.submissions) }); this.submissions = entry.submissions; this.bump(); this.notify(`Undid ${entry.label}`, 'neutral'); return true },
     redo() { if (!this.redoStack.length) return false; const entry = this.redoStack.pop(); this.undoStack.push({ label: entry.label, submissions: clone(this.submissions) }); this.submissions = entry.submissions; this.bump(); this.notify(`Redid ${entry.label}`, 'neutral'); return true },
