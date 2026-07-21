@@ -73,8 +73,8 @@ export const zodErrorMessage = error => {
   if (!issue) return 'The payload is invalid'
   const path = issue.path?.length ? `${issue.path.join('.')}: ` : ''
   const leaf = issue.path?.at(-1)
-  if (leaf === 'schemaVersion') return 'schemaVersion must be ab-experiment-report-v1'
-  if (leaf === 'variants' && issue.message.includes('Traffic allocation')) return 'Traffic allocation must sum to exactly 100%'
+  if (issue.message === 'schemaVersion must be ab-experiment-report-v1') return issue.message
+  if (issue.message === 'Traffic allocation must sum to exactly 100%') return issue.message
   if (leaf === 'rationale') return issue.message
   return `${path}${issue.message}`
 }
