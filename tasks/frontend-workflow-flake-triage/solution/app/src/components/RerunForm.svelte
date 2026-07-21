@@ -105,7 +105,7 @@
   <button
     class="action-btn primary start-button"
     type="submit"
-    disabled={triage.rerunFor(testId)?.status === 'running' || !RUN_COUNTS.includes(runCount as (typeof RUN_COUNTS)[number])}
+    disabled={triage.rerunFor(testId)?.status === 'running'}
   >
     <IconPlayerPlayFilled size={14} />
     Start re-run
