@@ -327,6 +327,7 @@ export const useCalibrationStore = defineStore('calibration', {
     },
     addClassificationEvents(records) {
       records.forEach((record) => {
+        this.timeline = this.timeline.filter((entry) => !(entry.kind === 'classification' && entry.task === record.task))
         this.timeline.unshift({
           id: nextEventId(),
           kind: 'classification',

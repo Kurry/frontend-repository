@@ -112,8 +112,8 @@ export function registerWebMcp(pinia) {
       const row = store.varianceRows.find((item) => item.task === task)
       if (!row) return fail(`task "${task}" is not a visible variance row`)
       if (row.stability !== 'divergent') return fail(`task "${task}" is stable; only divergent rows can be selected for bulk triage`)
-      const toggled = store.toggleTaskSelection(task)
-      return ok({ task, selected: toggled, selectedTasks: [...store.selectedVarianceTasks], visible_postcondition: 'Row checkbox updated; the bulk action bar appears at two or more selections.' })
+      store.toggleTaskSelection(task)
+      return ok({ task, selected: store.selectedVarianceTasks.includes(task), selectedTasks: [...store.selectedVarianceTasks], visible_postcondition: 'Row checkbox updated; the bulk action bar appears at two or more selections.' })
     },
 
     entity_create: saveClassification,
