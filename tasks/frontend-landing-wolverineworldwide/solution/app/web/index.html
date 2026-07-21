@@ -19,7 +19,7 @@
   <meta name="twitter:image" content="/assets/og-northstar.jpg">
   <link rel="preload" href="/fonts/ABCDiatype-Bold.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="/northstar.css">
-  <script>try{if(!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.classList.add('motion-ok');}catch(e){}</script>
+  <script>try{function updateRM(){document.documentElement.classList.toggle('motion-ok',!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches));}updateRM();if(window.matchMedia)window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',updateRM);}catch(e){}</script>
   <script src="/northstar.js" defer></script>
   <script src="/webmcp.js" defer></script>
 </head>
