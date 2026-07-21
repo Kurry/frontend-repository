@@ -1,18 +1,26 @@
-import { defineConfig } from '@playwright/test'
-
-const port = Number(process.env.PLAYWRIGHT_PORT || 3657)
+import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './',
+  testMatch: /e2e\.spec\.mjs/,
+  fullyParallel: false,
+  forbidOnly: false,
+  retries: 0,
   workers: 1,
-  reporter: 'line',
+  reporter: 'list',
   use: {
-    baseURL: `http://127.0.0.1:${port}`,
-    trace: 'retain-on-failure',
+    baseURL: 'http://localhost:3000',
+    trace: 'off',
+    video: {
+      mode: 'off',
+      size: { width: 1280, height: 800 },
+    },
+    viewport: { width: 1280, height: 800 },
   },
-  webServer: {
-    command: `./node_modules/.bin/vite --host 127.0.0.1 --port ${port} --strictPort`,
-    url: `http://127.0.0.1:${port}`,
-    reuseExistingServer: false,
-  },
-})
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+  ],
+});
