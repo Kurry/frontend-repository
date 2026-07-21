@@ -89,6 +89,7 @@ watch(isOpen, (val) => {
       <DialogContent
         class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl w-[min(480px,calc(100vw-24px))] max-h-[min(420px,calc(100vh-48px))] z-[60] overflow-hidden flex flex-col"
         :trap-focus="true"
+        @escape-key-down="isOpen = false"
       >
          <DialogTitle class="sr-only">Command palette</DialogTitle>
          <ComboboxRoot

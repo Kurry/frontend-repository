@@ -59,6 +59,11 @@ const editorText = computed({
 const editor = useEditor({
   content: editorText.value,
   extensions: [StarterKit],
+  editorProps: {
+    attributes: {
+      'aria-label': props.obj.type === 'note' ? 'Note text' : (props.obj.flipped ? 'Back text' : 'Front text'),
+    },
+  },
   onUpdate: ({ editor }) => {
     const txt = editor.getText()
     if (txt.length > 8000) {
@@ -74,6 +79,11 @@ const renderEditor = useEditor({
   content: editorText.value,
   editable: false,
   extensions: [StarterKit],
+  editorProps: {
+    attributes: {
+      'aria-label': props.obj.type === 'note' ? 'Note text' : (props.obj.flipped ? 'Back text' : 'Front text'),
+    },
+  },
 })
 
 watch(editorText, (val) => {

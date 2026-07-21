@@ -276,7 +276,7 @@ const doImport = () => {
            <TabsContent value="import" class="flex-1 flex flex-col pt-4 min-h-0 outline-none">
               <p class="text-sm text-gray-600 mb-2">Paste a valid Workspace JSON package below to restore a previous session.</p>
               <label for="import-workspace-json" class="sr-only">Workspace JSON</label>
-              <textarea id="import-workspace-json" v-model="importText" aria-describedby="import-error" class="flex-1 w-full p-4 font-mono text-sm resize-none border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#6D5BD0] text-gray-800" placeholder='{"schemaVersion": "scribblespace-workspace-v1", ...}'></textarea>
+              <textarea id="import-workspace-json" v-model="importText" aria-label="Import Workspace JSON" aria-describedby="import-error" class="flex-1 w-full p-4 font-mono text-sm resize-none border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#6D5BD0] text-gray-800" placeholder='{"schemaVersion": "scribblespace-workspace-v1", ...}'></textarea>
               <div v-if="importError" id="import-error" role="alert" aria-live="polite" class="text-red-600 text-sm mt-2 font-medium">{{ importError }}</div>
 
               <div class="flex justify-end gap-3 mt-4 shrink-0">
