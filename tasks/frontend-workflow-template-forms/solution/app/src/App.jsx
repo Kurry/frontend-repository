@@ -1,23 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-
-function useReducedMotionDynamic() {
-  const [reduce, setReduce] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    }
-    return false;
-  });
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const onChange = () => setReduce(mediaQuery.matches);
-    mediaQuery.addEventListener('change', onChange);
-    return () => mediaQuery.removeEventListener('change', onChange);
-  }, []);
-
-  return reduce;
-}
-
 import { Button, Select, SelectItem, Tag, ToastNotification, ContentSwitcher, Switch } from '@carbon/react'
 import {
   Asleep,
@@ -30,7 +11,7 @@ import {
   Template,
 } from '@carbon/icons-react'
 import { TECHNIQUES, techniqueById } from './domain'
-import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { useStudioStore } from './store'
 import TechniqueForm from './components/TechniqueForm'
 import PreviewPanel from './components/PreviewPanel'
@@ -42,7 +23,7 @@ import { registerWebMCP } from './webmcp'
 function StatusChip({ status }) {
   const labels = { 'in-progress': 'In progress', generated: 'Generated', saved: 'Saved' }
   const types = { 'in-progress': 'warm-gray', generated: 'blue', saved: 'green' }
-  const reduce = useReducedMotionDynamic()
+  const reduce = useReducedMotion()
   return (
     <AnimatePresence mode="wait">
       {status !== 'neutral' && (
@@ -249,7 +230,7 @@ function FormsView() {
   const saveButtonRef = useRef(null)
   const info = techniqueById[technique]
   const position = TECHNIQUES.findIndex((item) => item.id === technique) + 1
-  const reduce = useReducedMotionDynamic()
+  const reduce = useReducedMotion()
   const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] })
   const parallaxY = useTransform(scrollYProgress, [0, 1], reduce ? [0, 0] : [0, 28])
@@ -398,7 +379,7 @@ export default function App() {
   const theme = useStudioStore((state) => state.theme)
   const density = useStudioStore((state) => state.density)
   const importLauncherRef = useRef(null)
-  const reduce = useReducedMotionDynamic()
+  const reduce = useReducedMotion()
 
   useEffect(() => {
     registerWebMCP()
