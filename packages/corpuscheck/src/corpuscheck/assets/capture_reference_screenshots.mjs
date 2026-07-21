@@ -31,13 +31,10 @@
 //        pass --viewports to restrict, e.g. --viewports=desktop for the
 //        legacy desktop-only output)
 
-import { createRequire } from 'node:module';
 import { execSync, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const requireCjs = createRequire(import.meta.url);
+import { observePageFailures, resolvePlaywright, waitForServer } from './browser_smoke_shared.mjs';
 
 // This script ships inside the corpuscheck python package; the repository is
 // located by walking up from the working directory (the CLI wrapper runs it
@@ -74,35 +71,12 @@ const RESPONSIVE_VIEWPORTS = {
 };
 const ALL_VIEWPORTS = ['desktop', ...Object.keys(RESPONSIVE_VIEWPORTS)];
 
-function resolvePlaywright() {
-  const candidates = [
-    'playwright',
-    path.join(ROOT, 'node_modules', 'playwright'),
-  ];
-  for (const c of candidates) {
-    try { return requireCjs(c); } catch { /* next */ }
-  }
-  throw new Error('playwright not resolvable; npm install playwright first');
-}
-
-const { chromium } = resolvePlaywright();
+const { chromium } = resolvePlaywright(ROOT);
 
 function taskSlugs() {
   return fs.readdirSync(path.join(ROOT, 'tasks'))
     .filter((d) => fs.existsSync(path.join(ROOT, 'tasks', d, 'solution', 'app')))
     .sort();
-}
-
-async function waitForServer(url, timeoutMs = 240000) {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    try {
-      const res = await fetch(url);
-      if (res.ok) return true;
-    } catch { /* not up yet */ }
-    await new Promise((r) => setTimeout(r, 500));
-  }
-  return false;
 }
 
 function startServer(appDir) {
@@ -176,10 +150,7 @@ async function captureTask(slug, viewports = ALL_VIEWPORTS) {
       // so errors are not double-counted)
       const ctx = await browser.newContext({ viewport: VIEWPORT });
       const page = await ctx.newPage();
-      page.on('console', (m) => { if (m.type() === 'error') result.consoleErrors.push(m.text().slice(0, 300)); });
-      page.on('pageerror', (e) => result.pageErrors.push(String(e).slice(0, 300)));
-      page.on('response', (r) => { if (r.status() >= 400) result.failedUrls.push(`${r.status()} ${r.url()}`.slice(0, 300)); });
-      page.on('requestfailed', (r) => result.failedUrls.push(`FAIL ${r.url()}`.slice(0, 300)));
+      observePageFailures(page, result);
       await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
       await page.waitForTimeout(SETTLE_MS);
 

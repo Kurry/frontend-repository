@@ -253,6 +253,45 @@ def validate_cmd(
         raise typer.Exit(1)
 
 
+@app.command("oracle-ci")
+def oracle_ci_cmd(
+    slugs: list[str] = typer.Argument(None, help="task slugs to check"),
+    changed: bool = typer.Option(
+        False, "--changed", help="check solution tasks changed from the base ref"
+    ),
+    root: str = typer.Option(DEFAULT_ROOT, "--root", help="tasks directory"),
+    base_ref: str = typer.Option(
+        "origin/main", "--base-ref", help="git base used by --changed"
+    ),
+) -> None:
+    """Build, serve, probe WebMCP, and dry-run judge setup without LLM calls."""
+    from .oracle_ci import OracleCIError, changed_oracle_slugs, run_oracle_ci
+    from .repo import find_repo_root
+
+    if changed and slugs:
+        err.print("[red]pass task slugs or --changed, not both[/red]")
+        raise typer.Exit(2)
+    if not changed and not slugs:
+        err.print("[red]provide task slugs or --changed[/red]")
+        raise typer.Exit(2)
+
+    tasks_root = Path(root).resolve()
+    try:
+        repo_root = find_repo_root(tasks_root)
+        selected = (
+            changed_oracle_slugs(repo_root, base_ref=base_ref)
+            if changed
+            else list(slugs)
+        )
+        if not selected:
+            console.print("[blue]SKIP[/blue] no changed task solution trees")
+            return
+        run_oracle_ci(selected, tasks_root=tasks_root, repo_root=repo_root)
+    except OracleCIError as exc:
+        err.print(f"[red]FAIL[/red] {exc}")
+        raise typer.Exit(1) from exc
+
+
 @app.command("drift")
 def drift_cmd(
     tasks: list[str] = typer.Argument(None, help="frontend-* task names"),

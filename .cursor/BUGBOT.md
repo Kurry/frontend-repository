@@ -75,9 +75,12 @@ proves otherwise.
 
 # PRODUCTION GATE CONTRACT — read first
 
-**Your approval is the ONLY gate to production.** This repository has no CI: no build
-runs, no tests execute, no linter fires on PRs. Nothing stands between a merged defect
-and the production eval corpus except this review. Operate accordingly:
+**Your approval is the semantic gate to production.** The repository's only automated
+PR gate is the narrow oracle-contract workflow: changed `tasks/*/solution/**` apps get
+build, browser, WebMCP, and judge-setup checks, and `packages/corpuscheck/**` changes run
+its unit suite. It makes no LLM calls and does not validate rubric meaning, product
+quality, or unrelated paths. Nothing stands between those semantic defects and the
+production eval corpus except this review. Operate accordingly:
 
 - **Default-deny posture.** Approve only when every requirement below is affirmatively
   demonstrated — absence of found bugs is NOT approval-worthy if verification evidence

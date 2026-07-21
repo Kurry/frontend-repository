@@ -10,8 +10,9 @@ All commands run from the repository root via the uv workspace
 (canonical shared surfaces), `scaffold` (dimension baselines), `webmcp`
 (contract render/check/apply), and `screenshots capture|install`
 (oracle reference screenshots; capture shells out to the node asset in
-`src/corpuscheck/assets/`). Canonical templates and WebMCP schemas ship as
-package data under `src/corpuscheck/canonical/` and `src/corpuscheck/schemas/`.
+`src/corpuscheck/assets/`), and `oracle-ci` (the no-LLM oracle workspace and
+judge-setup contract). Canonical templates and WebMCP schemas ship as package
+data under `src/corpuscheck/canonical/` and `src/corpuscheck/schemas/`.
 
 ```bash
 uv run corpuscheck discover
@@ -21,6 +22,8 @@ uv run corpuscheck drift --all
 uv run corpuscheck propagate --check
 uv run corpuscheck scaffold --check
 uv run corpuscheck webmcp check
+uv run corpuscheck oracle-ci frontend-workflow-docuseal
+uv run corpuscheck oracle-ci --changed
 uv run corpuscheck screenshots capture <slug>
 uv run corpuscheck screenshots install <slug>
 corpuscheck status --all
@@ -87,6 +90,26 @@ criteria that passed on the empty app.
 
 The NOP scaffold contains an empty body, WebMCP contract stubs, and exactly the
 `start` and `verify:build` scripts needed for a normal Harbor trial.
+
+## Oracle contract CI
+
+`oracle-ci` is the deterministic pre-scoring gate for solution oracles. It runs
+the same five stages locally and in `.github/workflows/oracle-ci.yml`: all
+static validation tiers; `npm ci` plus `verify:build`; a port-3000 Chromium
+smoke with non-empty HTML and zero console/page errors; assigned-module,
+read-only, and visible-mutation WebMCP probes; and a structural boot of every
+dimension TOML's judge MCP servers against the primary and reduced-motion CDP
+browsers. It never installs rewardkit, calls an LLM, or needs API keys.
+
+The command copies each `solution/app` to a temporary directory before install,
+build, and serve, so tracked oracle files stay unchanged. Install the root Node
+workspace and Playwright Chromium once before local use:
+
+```bash
+npm ci
+npx playwright install chromium
+uv run corpuscheck oracle-ci <slug>
+```
 
 ## Judge reliability
 
