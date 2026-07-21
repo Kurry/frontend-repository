@@ -1,1 +1,210 @@
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/instrument-sans';
+@import '@fontsource-variable/jetbrains-mono';
 @import 'tailwindcss';
+
+@plugin "daisyui" {
+  themes: light --default;
+}
+
+@theme {
+  --font-sans: 'Instrument Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces Variable', 'Instrument Sans Variable', serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+
+  --color-teal-950: #082727;
+  --color-teal-900: #0f3d3e;
+  --color-teal-800: #175250;
+  --color-teal-700: #1f6b68;
+  --color-teal-600: #2c8a85;
+  --color-mint-500: #22c79a;
+  --color-mint-400: #4fe0b5;
+  --color-mint-300: #8af0d3;
+  --color-mint-200: #c5f5e7;
+  --color-mint-100: #e6f7f1;
+  --color-wash: #f2faf7;
+  --color-surface: #ffffff;
+  --color-line: #d7eae3;
+  --color-ink: #102a2a;
+  --color-ink-soft: #4a6460;
+  --color-ink-mute: #7e958f;
+
+  --color-danger: #c2410c;
+  --color-danger-soft: #fff1e9;
+  --color-warn: #b45309;
+  --color-warn-soft: #fef6e6;
+  --color-ok: #047857;
+  --color-ok-soft: #e3f6ee;
+}
+
+:root {
+  color-scheme: light;
+  --p: 174 64% 17%;
+  --pc: 150 40% 97%;
+  --pf: 174 64% 12%;
+  --s: 161 70% 46%;
+  --sc: 174 64% 12%;
+  --sf: 161 70% 38%;
+  --b1: 0 0% 100%;
+  --b2: 152 38% 97%;
+  --b3: 153 33% 90%;
+  --bc: 174 47% 11%;
+  --in: 196 78% 41%;
+  --su: 160 84% 24%;
+  --wa: 32 95% 40%;
+  --er: 19 90% 40%;
+  --rounded-btn: 0.6rem;
+  --rounded-box: 1rem;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 12% -10%, #e2f5ee 0%, rgba(226, 245, 238, 0) 60%),
+    radial-gradient(900px 500px at 100% 0%, #e9f3f0 0%, rgba(233, 243, 240, 0) 55%),
+    var(--color-wash);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-teal-700);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.scroll-area {
+  scrollbar-width: thin;
+  scrollbar-color: #b9d7cd transparent;
+}
+.scroll-area::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.scroll-area::-webkit-scrollbar-thumb {
+  background: #c2ddd4;
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.scroll-area::-webkit-scrollbar-thumb:hover {
+  background: #a7cabd;
+  background-clip: padding-box;
+}
+
+@keyframes ld-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes ld-toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+}
+@keyframes ld-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes ld-scale-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes ld-drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes ld-row-flash {
+  0% {
+    background-color: rgba(34, 199, 154, 0.22);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.anim-toast-in {
+  animation: ld-toast-in 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.anim-toast-out {
+  animation: ld-toast-out 0.24s cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+.anim-fade-in {
+  animation: ld-fade-in 0.2s ease-out;
+}
+.anim-scale-in {
+  animation: ld-scale-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.anim-drawer-in {
+  animation: ld-drawer-in 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.anim-row-flash {
+  animation: ld-row-flash 0.9s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
