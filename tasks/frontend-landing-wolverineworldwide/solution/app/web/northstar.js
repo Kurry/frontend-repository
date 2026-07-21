@@ -294,8 +294,15 @@
     const target = document.getElementById(id); if (!target) return { ok: false, error: "Section not found" };
     target.scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "start" }); return { ok: true, destination: id };
   }
-  function reducedMotion() { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
-  document.documentElement.classList.toggle("motion-ok", !reducedMotion());
+  function reducedMotion() {
+    if (!window.matchMedia) return false;
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+  if (window.matchMedia) {
+    window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", () => {
+      document.documentElement.classList.toggle("motion-ok", !reducedMotion());
+    });
+  }
 
   function validateBriefing(value) {
     if (!value || typeof value !== "object" || Array.isArray(value)) return "briefing must be a single JSON object";
