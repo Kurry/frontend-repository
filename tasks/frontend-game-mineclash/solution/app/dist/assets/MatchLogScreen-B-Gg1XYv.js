@@ -1,0 +1,1 @@
+import{_ as a}from"./preload-helper-CVfkMyKi.js";import{y as o,L as r}from"./core.min-DGtNB905.js";const _={easy:"Easy",medium:"Medium",hard:"Hard"},t={player:"You won",rival:"Rival won",draw:"Draw"},i=o(r(()=>a(()=>import("./MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-voCzK3Cw.js"),[]),"s_0ZDMGydeKSw"));export{_ as D,i as M,t as W};

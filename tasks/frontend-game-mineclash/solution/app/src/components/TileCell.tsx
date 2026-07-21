@@ -1,6 +1,6 @@
 import { component$, useContext } from '@builder.io/qwik';
 import { AppCtx } from '../context';
-import { playerRevealTile, playerToggleFlag, playerUseHint, MAX_HINTS } from '../gameLogic';
+import { playerRevealTile, playerToggleFlag, playerUseHint, MAX_HINTS, showToast } from '../gameLogic';
 import { playMineHit, playOreReveal } from '../audio';
 
 interface Props { row: number; col: number; }
@@ -67,17 +67,17 @@ export const TileCell = component$<Props>(({ row, col }) => {
       }}
       onClick$={() => {
         if (store.paused) {
-          store.feedback = 'Match paused. Resume to continue.';
+          showToast(store, 'Match is paused — resume before acting on a tile.', 'reject');
           return;
         }
         if (store.currentTurn !== 'player' || store.isRivalThinking || store.phase !== 'playing') {
-          store.feedback = 'Rival turn in progress. Wait for your turn.';
+          showToast(store, 'Not your turn — wait for the Rival to finish.', 'reject');
           return;
         }
         const t = store.tiles[row]?.[col];
         if (!t) return;
         if (t.revealed) {
-          store.feedback = 'This tile is already revealed. Choose a covered tile.';
+          showToast(store, 'That tile is already revealed — pick a covered tile.', 'reject');
           return;
         }
         if (store.playerMode === 'hint') {
@@ -90,7 +90,7 @@ export const TileCell = component$<Props>(({ row, col }) => {
           return;
         }
         if (t.flagged) {
-          store.feedback = 'Unflag this tile before revealing it.';
+          showToast(store, 'That tile is flagged — unflag it before revealing.', 'reject');
           return;
         }
         const wasMine = t.isMine;

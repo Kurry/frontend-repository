@@ -54,7 +54,7 @@ const PlayerPanel = component$<PPProps>(({ label, score, strikes, isActive, isTh
         borderRadius: '12px',
         border: `2px solid ${isActive ? color : '#44403C'}`,
         padding: '12px',
-        transition: 'border-color 0.2s',
+        transition: 'border-color 0.25s, box-shadow 0.3s, color 0.25s',
         boxShadow: isActive ? `0 0 12px ${color}33` : 'none',
       }}
     >

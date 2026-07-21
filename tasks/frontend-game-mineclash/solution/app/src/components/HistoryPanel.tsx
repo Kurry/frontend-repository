@@ -1,5 +1,6 @@
-import { component$, useContext } from '@builder.io/qwik';
+import { component$, useContext, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import { AppCtx } from '../context';
+import type { HistoryNode } from '../types';
 import { undoHistory, redoHistory, applyHistoryNode } from '../gameLogic';
 
 export const HistoryPanel = component$(() => {
@@ -7,8 +8,37 @@ export const HistoryPanel = component$(() => {
 
   const current = store.historyNodes.find(n => n.id === store.currentHistoryId);
   const selected = store.historyNodes.find(n => n.id === store.selectedHistoryId);
-  const canUndo = !!current && current.parentId !== null && !store.isRivalThinking;
-  const canRedo = (current?.childIds.length ?? 0) > 0 && !store.isRivalThinking;
+  const canUndo = !!current && current.parentId !== null;
+  const canRedo = (current?.childIds.length ?? 0) > 0;
+
+  // Entries that left the list (a branch was discarded on round reset / resume)
+  // keep rendering with a fade-out class briefly instead of the list snapping
+  // shorter (motion 4.9).
+  const fading = useSignal<HistoryNode[]>([]);
+
+  useVisibleTask$(({ track }) => {
+    const ids = track(() => store.historyNodes.map(n => n.id).join('|'));
+    const currentIds = new Set(ids ? ids.split('|') : []);
+    const live = fading.value.filter(n => !currentIds.has(n.id));
+    if (live.length === 0) return;
+    const t = setTimeout(() => {
+      fading.value = [];
+    }, 280);
+    return () => clearTimeout(t);
+  });
+
+  useVisibleTask$(({ track }) => {
+    const nodes = track(() => store.historyNodes);
+    const prev = fading.value;
+    const byId = new Map(prev.map(n => [n.id, n]));
+    for (const n of nodes) byId.set(n.id, n);
+    const removed = prev.filter(n => !nodes.some(x => x.id === n.id));
+    if (removed.length === 0) return;
+    fading.value = removed;
+  });
+
+  const visible = store.historyNodes;
+  const allForDepth = [...visible, ...fading.value];
 
   return (
     <div class="panel" style={{ marginTop: '8px', fontSize: '13px' }}>
@@ -35,17 +65,18 @@ export const HistoryPanel = component$(() => {
       </div>
 
       {/* History list */}
-      <div style={{ maxHeight: '120px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '8px' }}>
-        {store.historyNodes.map(node => {
+      <div style={{ maxHeight: '140px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '8px' }}>
+        {visible.map(node => {
           const isCur = node.id === store.currentHistoryId;
           const isSel = node.id === store.selectedHistoryId;
-          const depth = getDepth(store.historyNodes, node.id);
-          const isBranch = node.parentId !== null && (store.historyNodes.find(n => n.id === node.parentId)?.childIds.length ?? 0) > 1;
+          const depth = getDepth(allForDepth, node.id);
+          const branchCount = node.parentId !== null ? (allForDepth.find(n => n.id === node.parentId)?.childIds.length ?? 0) : 0;
+          const isBranch = branchCount > 1;
 
           return (
             <button
               key={node.id}
-              class={`history-node${isCur ? ' current' : ''}${isSel ? ' selected' : ''}`}
+              class={`history-node hist-enter${isCur ? ' current' : ''}${isSel ? ' selected' : ''}`}
               style={{ paddingLeft: `${8 + depth * 12}px`, textAlign: 'left', width: '100%', background: 'none', border: '1px solid transparent', color: '#FAFAF9' }}
               onClick$={() => { store.selectedHistoryId = node.id; }}
             >
@@ -56,6 +87,19 @@ export const HistoryPanel = component$(() => {
             </button>
           );
         })}
+        {fading.value.map(node => {
+          const depth = getDepth(allForDepth, node.id);
+          return (
+            <span
+              key={`fade-${node.id}`}
+              class="history-node hist-exit"
+              aria-hidden="true"
+              style={{ paddingLeft: `${8 + depth * 12}px`, textAlign: 'left', width: '100%', background: 'none', border: '1px solid transparent', color: '#78716C' }}
+            >
+              {'  '}{node.label}
+            </span>
+          );
+        })}
       </div>
 
       {/* History state display */}
@@ -64,21 +108,21 @@ export const HistoryPanel = component$(() => {
           History state
         </div>
         {selected ? (
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ fontSize: '12px', lineHeight: 1.6 }}>
             <div>
-              <span style={{ color: '#38BDF8', fontSize: '12px' }}>You</span>
+              <span style={{ color: '#38BDF8', fontWeight: '700' }}>You</span>
               <span style={{ fontFamily: "'Courier New', monospace", color: '#FAFAF9', marginLeft: '6px' }}>
-                {selected.snapshot.player.score}pts · {selected.snapshot.player.strikes}⚡
+                {selected.snapshot.player.score} pts, {selected.snapshot.player.strikes} {selected.snapshot.player.strikes === 1 ? 'strike' : 'strikes'}
               </span>
             </div>
             <div>
-              <span style={{ color: '#FB923C', fontSize: '12px' }}>Rival</span>
+              <span style={{ color: '#FB923C', fontWeight: '700' }}>Rival</span>
               <span style={{ fontFamily: "'Courier New', monospace", color: '#FAFAF9', marginLeft: '6px' }}>
-                {selected.snapshot.rival.score}pts · {selected.snapshot.rival.strikes}⚡
+                {selected.snapshot.rival.score} pts, {selected.snapshot.rival.strikes} {selected.snapshot.rival.strikes === 1 ? 'strike' : 'strikes'}
               </span>
             </div>
-            <div style={{ color: '#A8A29E', fontSize: '11px' }}>
-              Turn: {selected.snapshot.currentTurn === 'player' ? 'Yours' : 'Rival\'s'}
+            <div style={{ color: '#A8A29E' }}>
+              Turn: <span style={{ color: '#FAFAF9' }}>{selected.snapshot.currentTurn === 'player' ? 'Yours' : 'Rival\'s'}</span>
             </div>
           </div>
         ) : (
@@ -90,7 +134,7 @@ export const HistoryPanel = component$(() => {
       <button
         class="btn-primary"
         style={{ width: '100%', fontSize: '13px', padding: '8px' }}
-        disabled={!selected || selected.id === store.currentHistoryId || store.isRivalThinking}
+        disabled={!selected || selected.id === store.currentHistoryId}
         onClick$={() => {
           if (store.selectedHistoryId) {
             applyHistoryNode(store, store.selectedHistoryId);
@@ -103,7 +147,7 @@ export const HistoryPanel = component$(() => {
   );
 });
 
-function getDepth(nodes: { id: string; parentId: string | null }[], id: string): number {
+function getDepth(nodes: HistoryNode[], id: string): number {
   let depth = 0;
   let cur = nodes.find(n => n.id === id);
   while (cur?.parentId !== null) {

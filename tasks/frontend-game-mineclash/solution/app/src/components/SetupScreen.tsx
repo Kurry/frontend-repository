@@ -1,7 +1,9 @@
 import { component$, useContext, useSignal } from '@builder.io/qwik';
 import { AppCtx } from '../context';
-import { DIFFICULTY_CONFIG, MAX_HINTS, initNewMatch, resetHistoryRoot } from '../gameLogic';
+import { DIFFICULTY_CONFIG, MAX_HINTS, initNewMatch, resetHistoryRoot, navigateTo } from '../gameLogic';
 import type { Difficulty } from '../types';
+
+const DIFF_LABELS_SHORT: Record<Difficulty, string> = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
 
 const DIFF_LABELS: Record<Difficulty, string> = {
   easy: 'Easy',
@@ -41,6 +43,8 @@ export const SetupScreen = component$(() => {
             class="input input-bordered w-full"
             style={{ background: '#292524', border: '1px solid #44403C', color: '#FAFAF9', padding: '12px', borderRadius: '8px', fontSize: '16px', width: '100%' }}
             value={store.playerName}
+            aria-invalid={!!nameError.value}
+            aria-describedby={nameError.value ? 'playerName-error' : undefined}
             onInput$={(e) => {
               const val = (e.target as HTMLInputElement).value;
               store.playerName = val;
@@ -50,9 +54,15 @@ export const SetupScreen = component$(() => {
                 nameError.value = '';
               }
             }}
+            onBlur$={(e) => {
+              const val = (e.target as HTMLInputElement).value;
+              if (val.length < 2 || val.length > 20) {
+                nameError.value = 'playerName must be 2 to 20 characters';
+              }
+            }}
           />
           {nameError.value && (
-            <div style={{ color: '#EF4444', fontSize: '12px', marginTop: '4px' }}>{nameError.value}</div>
+            <div id="playerName-error" role="alert" style={{ color: '#EF4444', fontSize: '12px', marginTop: '4px' }}>{nameError.value}</div>
           )}
         </div>
 
@@ -61,7 +71,7 @@ export const SetupScreen = component$(() => {
           <p id="difficulty-label" style={{ color: '#A8A29E', fontSize: '13px', letterSpacing: '0.4px', marginBottom: '12px', textAlign: 'center' }}>
           Select difficulty
         </p>
-        <div role="group" aria-labelledby="difficulty-label" style={{ display: 'flex', gap: '8px' }}>
+        <div role="group" aria-labelledby="difficulty-label" aria-describedby={diffError.value ? 'difficulty-error' : undefined} style={{ display: 'flex', gap: '8px' }}>
           {(['easy', 'medium', 'hard'] as Difficulty[]).map(d => (
             <button
               key={d}
@@ -81,7 +91,7 @@ export const SetupScreen = component$(() => {
           ))}
         </div>
         {diffError.value && (
-            <div style={{ color: '#EF4444', fontSize: '12px', marginTop: '4px', textAlign: 'center' }}>{diffError.value}</div>
+            <div id="difficulty-error" role="alert" style={{ color: '#EF4444', fontSize: '12px', marginTop: '4px', textAlign: 'center' }}>{diffError.value}</div>
           )}
         </div>
       </div>
@@ -113,9 +123,7 @@ export const SetupScreen = component$(() => {
             type="button"
             class="btn-secondary"
             style={{ width: '100%', marginBottom: '12px' }}
-            onClick$={() => {
-              if (store.phase === 'setup') store.phase = 'stats';
-            }}
+            onClick$={() => navigateTo(store, 'stats')}
           >
             📊 View stats
           </button>
@@ -124,9 +132,7 @@ export const SetupScreen = component$(() => {
               type="button"
               class="btn-secondary"
               style={{ flex: 1, fontSize: '14px' }}
-              onClick$={() => {
-                if (store.phase === 'setup') store.phase = 'match-log';
-              }}
+              onClick$={() => navigateTo(store, 'match-log')}
             >
               📜 Match log
             </button>
@@ -134,13 +140,24 @@ export const SetupScreen = component$(() => {
               type="button"
               class="btn-secondary"
               style={{ flex: 1, fontSize: '14px' }}
-              onClick$={() => {
-                if (store.phase === 'setup') store.phase = 'export-center';
-              }}
+              onClick$={() => navigateTo(store, 'export-center')}
             >
               📥 Export / Import
             </button>
           </div>
+          {store.savedCheckpoint && (
+            <div class="panel" style={{ padding: '10px 12px', marginBottom: '8px', fontSize: '12px', color: '#A8A29E', lineHeight: 1.5 }} aria-live="polite">
+              <div style={{ fontWeight: '700', color: '#F59E0B', marginBottom: '2px' }}>Saved checkpoint</div>
+              <span style={{ color: '#FAFAF9' }}>{store.savedCheckpoint.playerName || 'Player'}</span>
+              {' · '}{DIFF_LABELS_SHORT[store.savedCheckpoint.difficulty]}
+              {' · Round '}{store.savedCheckpoint.roundNumber}
+              {' · You '}{store.savedCheckpoint.playerScore}
+              <span style={{ color: '#38BDF8' }}>·</span>
+              {' Rival '}{store.savedCheckpoint.rivalScore}
+              {' · '}{store.savedCheckpoint.sideToMove === 'player' ? 'your turn' : 'Rival\'s turn'}
+              {store.savedCheckpoint.paused ? ' (paused)' : ''}
+            </div>
+          )}
           <button
             type="button"
             class="btn-secondary"
@@ -160,6 +177,12 @@ export const SetupScreen = component$(() => {
                 store.hintsUsed = MAX_HINTS - checkpoint.hintsRemaining;
                 store.playerMatchWins = checkpoint.playerRoundWins;
                 store.rivalMatchWins = checkpoint.rivalRoundWins;
+                store.matchRounds = checkpoint.matchRounds
+                  ? JSON.parse(JSON.stringify(checkpoint.matchRounds))
+                  : [];
+                store.lastRoundResult = checkpoint.lastRoundResult
+                  ? { ...checkpoint.lastRoundResult }
+                  : null;
                 // The checkpoint doesn't carry board dimensions directly (only
                 // mineCount) — derive rows/cols from the restored difficulty so
                 // the board renderer and win detection use the right grid size.
@@ -170,12 +193,13 @@ export const SetupScreen = component$(() => {
                 // Re-arm the rival's auto-turn effect (App.tsx only acts while
                 // isRivalThinking is true) so a rival-to-move checkpoint doesn't
                 // stall after resume.
-                store.isRivalThinking = checkpoint.sideToMove === 'rival';
+                const resumePhase = checkpoint.phase ?? 'playing';
+                store.isRivalThinking = resumePhase === 'playing' && checkpoint.sideToMove === 'rival';
                 store.feedback = 'Match resumed from saved checkpoint.';
                 // Rebuild history from the resumed board so Undo/Redo/History
                 // don't reflect a stale branch left over from before the save.
                 resetHistoryRoot(store, 'Resumed');
-                store.phase = 'playing';
+                store.phase = resumePhase;
               }
             }}
           >

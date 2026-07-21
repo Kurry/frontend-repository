@@ -1,0 +1,1 @@
+import{v as i}from"./core.min-DGtNB905.js";import{i as l}from"./gameLogic-BYBrtOsQ.js";import"./preloader-Bns9QiKi.js";const s=()=>{const[t,a,e]=i();let r=!0;(!e.playerName||e.playerName.length<2||e.playerName.length>20)&&(a.value="playerName must be 2 to 20 characters",r=!1),e.difficulty||(t.value="difficulty must be selected",r=!1),r&&l(e)};export{s as s_6GkoBWguNM4};

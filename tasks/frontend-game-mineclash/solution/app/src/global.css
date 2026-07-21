@@ -44,6 +44,13 @@ button:focus-visible {
   outline-offset: 3px;
 }
 
+input:focus-visible,
+textarea:focus-visible,
+[role="switch"]:focus-visible {
+  outline: 3px solid #38BDF8;
+  outline-offset: 2px;
+}
+
 button:active:not(:disabled) {
   filter: brightness(1.12);
 }
@@ -76,6 +83,34 @@ button:active:not(:disabled) {
   80% { transform: translateX(4px); }
 }
 
+@keyframes overlay-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes hist-in {
+  from { opacity: 0; transform: translateX(-6px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes hist-out {
+  from { opacity: 1; transform: translateX(0); max-height: 40px; }
+  to { opacity: 0; transform: translateX(8px); max-height: 0; padding-top: 0; padding-bottom: 0; margin: 0; }
+}
+
+@keyframes toast-in {
+  0% { opacity: 0; transform: translateX(-50%) translateY(12px) scale(0.96); }
+  12% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  82% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(0.98); }
+}
+
+@keyframes confetti-fall {
+  0% { opacity: 0; transform: translate(0, 0) rotate(0deg) scale(0.6); }
+  12% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--mc-dx, 0), 60vh) rotate(var(--mc-rot, 360deg)) scale(1); }
+}
+
 .animate-pulse-glow {
   animation: pulse-glow 1.2s ease-in-out infinite;
 }
@@ -86,6 +121,33 @@ button:active:not(:disabled) {
 
 .animate-shake {
   animation: shake 0.4s ease-in-out;
+}
+
+.overlay {
+  animation: overlay-fade 0.22s ease-out;
+}
+
+.history-node.hist-enter {
+  animation: hist-in 0.24s ease-out;
+}
+
+.history-node.hist-exit {
+  animation: hist-out 0.28s ease-in forwards;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.mc-toast {
+  animation: toast-in 1.7s ease-out forwards;
+}
+
+.mc-toast-reject {
+  animation: toast-in 1.7s ease-out forwards, shake 0.4s ease-in-out;
+}
+
+.mc-confetti-piece {
+  animation: confetti-fall 1.4s cubic-bezier(0.2, 0.6, 0.4, 1) forwards;
+  will-change: transform, opacity;
 }
 
 .tile-btn {
@@ -266,6 +328,7 @@ button:active:not(:disabled) {
   border-radius: 12px;
   border: 1px solid #44403C;
   padding: 20px;
+  position: relative;
 }
 
 .icon-button:hover:not(:disabled) {

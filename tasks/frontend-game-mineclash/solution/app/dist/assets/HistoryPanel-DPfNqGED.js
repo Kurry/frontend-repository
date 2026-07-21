@@ -1,0 +1,1 @@
+import{_ as o}from"./preload-helper-CVfkMyKi.js";import{y as p,L as n}from"./core.min-DGtNB905.js";const s=p(n(()=>o(()=>import("./HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-D-LVFqvz.js"),[]),"s_PO80pwp8je0"));function l(i,a){let t=0,e=i.find(r=>r.id===a);for(;e?.parentId!==null&&(t++,e=i.find(r=>r.id===e.parentId),!(t>20)););return t}export{s as H,l as g};

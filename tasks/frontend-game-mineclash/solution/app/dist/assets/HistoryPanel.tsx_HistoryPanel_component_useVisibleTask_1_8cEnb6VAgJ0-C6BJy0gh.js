@@ -1,0 +1,1 @@
+import{v as a}from"./core.min-DGtNB905.js";import{x as g}from"./core.min-DGtNB905.js";import"./preloader-Bns9QiKi.js";const p=({track:n})=>{const[e,i]=a(),t=n(()=>i.historyNodes),s=e.value,d=new Map(s.map(o=>[o.id,o]));for(const o of t)d.set(o.id,o);const r=s.filter(o=>!t.some(c=>c.id===o.id));r.length!==0&&(e.value=r)};export{g as _hW,p as s_8cEnb6VAgJ0};

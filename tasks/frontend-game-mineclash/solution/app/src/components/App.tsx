@@ -1,7 +1,7 @@
 import { component$, useStore, useContextProvider, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import { AppCtx } from '../context';
 import type { AppStore } from '../types';
-import { defaultStats, doRivalTurn, initNewMatch, resetMatch } from '../gameLogic';
+import { defaultStats, doRivalTurn, initNewMatch, resetMatch, clearToast, navigateTo, goBack } from '../gameLogic';
 import { loadFromStorage, saveToStorage } from '../storage';
 import { initWebMcp, type MineClashApi } from '../webmcp';
 import type { Difficulty } from '../types';
@@ -12,6 +12,7 @@ import { MatchCompleteScreen } from './MatchCompleteScreen';
 import { StatsScreen } from './StatsScreen';
 import { MatchLogScreen } from './MatchLogScreen';
 import { ExportCenterScreen } from './ExportCenterScreen';
+import { Toast } from './Toast';
 
 function makeStore(): AppStore {
   return {
@@ -47,6 +48,14 @@ function makeStore(): AppStore {
     feedback: '',
     savedCheckpoint: null,
     matchLog: [],
+    toast: '',
+    toastKind: 'info',
+    exportArtifact: null,
+    importText: '',
+    importMessage: '',
+    importOk: false,
+    returnToGame: false,
+    returnPhase: null,
   };
 }
 
@@ -61,15 +70,17 @@ export const App = component$(() => {
   });
 
   // Publish the WebMCP API bound to the real store + the same action functions
-  // the visible controls call, then expose the window.webmcp_* surface.
+  // the visible controls call, then expose the window.webmcp_* bridge surface.
+  // Nothing else is attached to window (no ground-truth / store leak).
   useVisibleTask$(() => {
-    const w = window as unknown as Record<string, unknown>;
     const mcApi: MineClashApi = {
       store,
       startMatch: () => initNewMatch(store),
       restartMatch: () => resetMatch(store),
       newMatch: () => {
         store.paused = false;
+        store.returnToGame = false;
+        store.returnPhase = null;
         store.phase = 'setup';
       },
       setPaused: (v: boolean) => {
@@ -78,21 +89,10 @@ export const App = component$(() => {
       setDifficulty: (d: Difficulty) => {
         if (store.phase === 'setup') store.difficulty = d;
       },
-      goto: (dest: 'game-board' | 'stats' | 'match-log' | 'export-center') => {
-        if (dest === 'stats') {
-          store.phase = 'stats';
-        } else if (dest === 'match-log') {
-          if (store.phase === 'setup') store.phase = 'match-log';
-        } else if (dest === 'export-center') {
-          if (store.phase === 'setup') store.phase = 'export-center';
-        } else if (store.phase !== 'playing' && store.phase !== 'round-result') {
-          store.phase = 'setup';
-        }
-      },
+      navigate: (dest) => navigateTo(store, dest),
+      back: () => goBack(store),
     };
-    w.__mineclashApi = mcApi;
-    initWebMcp();
-    w.API = mcApi;
+    initWebMcp(mcApi);
   });
 
   useVisibleTask$(({ track }) => {
@@ -130,6 +130,16 @@ export const App = component$(() => {
     return () => clearTimeout(tid);
   }, { strategy: 'document-ready' });
 
+  // Self-fading toast: any new message (Saved / Copied / rejection) clears after
+  // ~1.7s on its own (motion 4.12 / 4.14) without blocking play. Setting a fresh
+  // message mid-toast restarts the timer via the cleanup below.
+  useVisibleTask$(({ track }) => {
+    const msg = track(() => store.toast);
+    if (!msg) return;
+    const tid = setTimeout(() => clearToast(store), 1700);
+    return () => clearTimeout(tid);
+  }, { strategy: 'document-ready' });
+
   return (
     <main style={{ minHeight: '100vh', background: '#1C1917', color: '#FAFAF9', fontFamily: "'Segoe UI', Arial, sans-serif" }}>
       {store.phase === 'setup' && <SetupScreen />}
@@ -139,6 +149,7 @@ export const App = component$(() => {
       {store.phase === 'stats' && <StatsScreen />}
       {store.phase === 'match-log' && <MatchLogScreen />}
       {store.phase === 'export-center' && <ExportCenterScreen />}
+      <Toast />
     </main>
   );
 });

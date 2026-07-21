@@ -3,6 +3,12 @@ export type Phase = 'setup' | 'playing' | 'round-result' | 'match-complete' | 's
 export type Turn = 'player' | 'rival';
 export type HintStatus = 'none' | 'safe' | 'mine';
 export type PlayerMode = 'reveal' | 'flag' | 'hint';
+export type ToastKind = 'info' | 'success' | 'reject';
+
+export interface ExportArtifact {
+  title: string;
+  json: string;
+}
 
 export interface TileData {
   isMine: boolean;
@@ -58,6 +64,7 @@ export interface GameSnapshot {
   player: PlayerState;
   rival: PlayerState;
   roundPlayerOreMined: number;
+  roundRivalOreMined: number;
   currentTurn: Turn;
   playerMode: PlayerMode;
   hintsUsed: number;
@@ -73,6 +80,7 @@ export interface HistoryNode {
 }
 
 export interface MatchCheckpoint {
+  phase: 'playing' | 'round-result';
   playerName: string;
   difficulty: Difficulty;
   roundNumber: number;
@@ -90,6 +98,8 @@ export interface MatchCheckpoint {
   paused: boolean;
   roundPlayerOreMined: number;
   roundRivalOreMined: number;
+  matchRounds: MatchRoundSummary[];
+  lastRoundResult: RoundResult | null;
 }
 
 export interface MatchLogEntry {
@@ -145,4 +155,17 @@ export interface AppStore {
 
   savedCheckpoint: MatchCheckpoint | null;
   matchLog: MatchLogEntry[];
+
+  // Transient UI state (not persisted): a fading confirmation/rejection toast,
+  // an inline export artifact the player can read/copy, the import textarea
+  // contents + its last validation message, and a flag that lets the "back"
+  // control return to an in-progress round instead of the setup screen.
+  toast: string;
+  toastKind: ToastKind;
+  exportArtifact: ExportArtifact | null;
+  importText: string;
+  importMessage: string;
+  importOk: boolean;
+  returnToGame: boolean;
+  returnPhase: 'playing' | 'round-result' | null;
 }

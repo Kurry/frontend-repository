@@ -1,6 +1,6 @@
 import type {
   AppStore, Difficulty, TileData, Turn, GameSnapshot,
-  HistoryNode, RoundResult, PlayerMode
+  HistoryNode, RoundResult, PlayerMode, ToastKind, MatchLogEntry,
 } from './types';
 
 export const DIFFICULTY_CONFIG = {
@@ -16,6 +16,64 @@ export const HINT_COST = 3;
 export const MINE_PENALTY = 5;
 
 let _hid = 1;
+
+// ── Toast / confirmation helpers ──────────────────────────────────────────────
+// A transient confirmation/rejection that the App-level toaster fades out on its
+// own (motion 4.12 / 4.14, edge 4.4). Rejection feedback names the attempted
+// action and why it is unavailable (edge 4.3 / writing 15.2).
+export function showToast(store: AppStore, message: string, kind: ToastKind = 'info') {
+  store.toast = message;
+  store.toastKind = kind;
+}
+
+export function clearToast(store: AppStore) {
+  store.toast = '';
+}
+
+// ── Navigation (single source for the visible nav buttons and WebMCP goto) ────
+// Mid-round navigation to Stats / Match log / Export centre must preserve the
+// round (behavioral 14.7) and let "back" return to the same frozen round instead
+// of the setup screen. We never reset scores/turn when changing views.
+export function navigateTo(store: AppStore, dest: 'stats' | 'match-log' | 'export-center' | 'game-board' | 'setup') {
+  if (dest === 'setup') {
+    store.returnToGame = false;
+    store.returnPhase = null;
+    store.phase = 'setup';
+    return;
+  }
+  if (dest === 'game-board') {
+    const returnPhase = store.returnToGame ? store.returnPhase : null;
+    store.returnToGame = false;
+    store.returnPhase = null;
+    if (returnPhase) store.phase = returnPhase;
+    return;
+  }
+  // Leaving an active round to read stats/log/export — remember so "back"
+  // restores the round (and the pause state) rather than dumping to setup.
+  if (store.phase === 'playing' || store.phase === 'round-result') {
+    store.returnToGame = true;
+    store.returnPhase = store.phase;
+  } else if (!store.returnToGame) {
+    store.returnToGame = false;
+    store.returnPhase = null;
+  }
+  store.phase = dest;
+}
+
+// "← Go back" used by Stats / Match log / Export centre. Returns to the active
+// round when the player opened the view from one (round + pause preserved),
+// otherwise returns to the setup screen.
+export function goBack(store: AppStore) {
+  if (store.returnToGame) {
+    const returnPhase = store.returnPhase ?? 'playing';
+    store.returnToGame = false;
+    store.returnPhase = null;
+    store.phase = returnPhase;
+  } else {
+    store.returnPhase = null;
+    store.phase = 'setup';
+  }
+}
 
 // ── Board Generation ──────────────────────────────────────────────────────────
 
@@ -71,6 +129,7 @@ export function cloneGameState(store: AppStore): GameSnapshot {
     player: { ...store.player },
     rival: { ...store.rival },
     roundPlayerOreMined: store.roundPlayerOreMined,
+    roundRivalOreMined: store.roundRivalOreMined,
     currentTurn: store.currentTurn,
     playerMode: store.playerMode,
     hintsUsed: store.hintsUsed,
@@ -97,15 +156,20 @@ export function applyGameSnapshot(store: AppStore, snap: GameSnapshot) {
   store.rival.score = snap.rival.score;
   store.rival.strikes = snap.rival.strikes;
   store.roundPlayerOreMined = snap.roundPlayerOreMined;
+  store.roundRivalOreMined = snap.roundRivalOreMined;
   store.currentTurn = snap.currentTurn;
   store.playerMode = snap.playerMode;
   store.hintsUsed = snap.hintsUsed;
   store.feedback = snap.feedback;
-  store.isRivalThinking = false;
   store.lastRoundResult = null;
+  // If the restored node hands the turn to the Rival (e.g. undoing to a state
+  // right after the Player's reveal), re-arm the Rival's thinking timer so the
+  // turn does not stall. The App-level effect keys off isRivalThinking and
+  // schedules doRivalTurn; player-turn snapshots leave it false.
+  store.isRivalThinking = snap.currentTurn === 'rival';
 }
 
-// ── History ───────────────────────────────────────────────────────────────────
+// ── History ──────────────────────────────────────────────────────────────────
 
 export function addHistoryEntry(store: AppStore, label: string) {
   const id = String(_hid++);
@@ -130,7 +194,7 @@ export function addHistoryEntry(store: AppStore, label: string) {
 }
 
 export function undoHistory(store: AppStore) {
-  if (store.phase !== 'playing' || store.isRivalThinking) return;
+  if (store.phase !== 'playing') return;
   const cur = store.historyNodes.find(n => n.id === store.currentHistoryId);
   if (!cur || cur.parentId === null) return;
   const parent = store.historyNodes.find(n => n.id === cur.parentId);
@@ -141,7 +205,7 @@ export function undoHistory(store: AppStore) {
 }
 
 export function redoHistory(store: AppStore) {
-  if (store.phase !== 'playing' || store.isRivalThinking) return;
+  if (store.phase !== 'playing') return;
   const cur = store.historyNodes.find(n => n.id === store.currentHistoryId);
   if (!cur || cur.childIds.length === 0) return;
   const childId = cur.childIds[cur.childIds.length - 1];
@@ -153,7 +217,7 @@ export function redoHistory(store: AppStore) {
 }
 
 export function applyHistoryNode(store: AppStore, nodeId: string) {
-  if (store.phase !== 'playing' || store.isRivalThinking) return;
+  if (store.phase !== 'playing') return;
   const node = store.historyNodes.find(n => n.id === nodeId);
   if (!node) return;
   applyGameSnapshot(store, node.snapshot);
@@ -341,6 +405,11 @@ export function playerRevealTile(store: AppStore, row: number, col: number) {
     store.lastPlayerActionLabel = `Reveal(${row},${col})`;
     store.currentTurn = 'rival';
     store.isRivalThinking = true;
+    // Record the Player's reveal as its own history node immediately so the
+    // "History state" snapshot reflects the updated score with the Rival to
+    // move (core 1.22), and so Undo is available the instant the reveal lands
+    // (edge 4.6) instead of waiting for the Rival's delayed move.
+    addHistoryEntry(store, `Reveal(${row},${col})`);
   }
 }
 
@@ -362,7 +431,7 @@ export function playerUseHint(store: AppStore, row: number, col: number) {
   const tile = store.tiles[row][col];
   if (tile.revealed) return;
   if (tile.hintStatus !== 'none') {
-    store.feedback = 'This tile already has a hint. Choose another covered tile.';
+    showToast(store, 'That tile already has a hint — pick a different covered tile.', 'reject');
     return;
   }
   store.player.score = Math.max(0, store.player.score - HINT_COST);
@@ -429,7 +498,13 @@ export function chooseRivalTile(tiles: TileData[][], rows: number, cols: number)
 }
 
 export function doRivalTurn(store: AppStore) {
-  if (store.phase !== 'playing') { store.isRivalThinking = false; return; }
+  // A history jump can cancel the pending Rival move before the App effect's
+  // timer cleanup runs. Ignore that stale callback instead of mutating the
+  // newly restored Player-turn snapshot.
+  if (store.phase !== 'playing' || store.currentTurn !== 'rival' || !store.isRivalThinking) {
+    store.isRivalThinking = false;
+    return;
+  }
 
   const [row, col] = chooseRivalTile(store.tiles, store.rows, store.cols);
   if (row === -1) { store.isRivalThinking = false; store.currentTurn = 'player'; return; }
@@ -441,8 +516,7 @@ export function doRivalTurn(store: AppStore) {
     store.currentTurn = 'player';
     store.isRivalThinking = false;
     store.feedback = 'Your turn. Choose a covered tile.';
-    const label = `${store.lastPlayerActionLabel}→Rival(${row},${col})`;
-    addHistoryEntry(store, label);
+    addHistoryEntry(store, `Rival(${row},${col})`);
   } else {
     store.isRivalThinking = false;
   }
@@ -459,6 +533,8 @@ export function resetMatch(store: AppStore) {
   store.playerMode = 'reveal';
   store.isRivalThinking = false;
   store.paused = false;
+  store.returnToGame = false;
+  store.returnPhase = null;
   // Starting a fresh match (Start match / Rematch) makes any previously
   // saved in-progress checkpoint obsolete.
   store.savedCheckpoint = null;
@@ -469,4 +545,170 @@ export function resetMatch(store: AppStore) {
 export function initNewMatch(store: AppStore) {
   if (store.phase !== 'setup' && store.phase !== 'match-complete') return;
   resetMatch(store);
+}
+
+// ── Save / resume checkpoint ──────────────────────────────────────────────────
+
+export function saveProgress(store: AppStore) {
+  if (store.phase !== 'playing' && store.phase !== 'round-result') return;
+  const revealed = store.tiles.some(row => row.some(t => t.revealed));
+  if (!revealed) {
+    showToast(store, 'Reveal at least one tile before saving progress.', 'reject');
+    return;
+  }
+  store.savedCheckpoint = {
+    phase: store.phase,
+    playerName: store.playerName,
+    difficulty: store.difficulty,
+    roundNumber: store.roundNumber,
+    playerScore: store.player.score,
+    rivalScore: store.rival.score,
+    playerStrikes: store.player.strikes,
+    rivalStrikes: store.rival.strikes,
+    sideToMove: store.currentTurn,
+    hintsRemaining: MAX_HINTS - store.hintsUsed,
+    playerRoundWins: store.playerMatchWins,
+    rivalRoundWins: store.rivalMatchWins,
+    board: JSON.parse(JSON.stringify(store.tiles)),
+    targetScore: store.targetScore,
+    mineCount: store.mineCount,
+    paused: store.paused,
+    roundPlayerOreMined: store.roundPlayerOreMined,
+    roundRivalOreMined: store.roundRivalOreMined,
+    matchRounds: JSON.parse(JSON.stringify(store.matchRounds)),
+    lastRoundResult: store.lastRoundResult ? { ...store.lastRoundResult } : null,
+  };
+  showToast(store, 'Saved progress — your round checkpoint is stored.', 'success');
+}
+
+// ── Export / import / copy ────────────────────────────────────────────────────
+
+export function matchToJson(entry: MatchLogEntry): string {
+  return JSON.stringify(entry, null, 2);
+}
+
+export function archiveJson(matches: MatchLogEntry[]): string {
+  return JSON.stringify({ matches }, null, 2);
+}
+
+// Same handler the on-screen "Export Match" control uses, so a WebMCP
+// artifact-export call and a human click produce the same rendered artifact.
+// NOTE: no raw JSON or blob is returned through WebMCP — the artifact is shown
+// in the DOM (rendered as a readable, copyable preview) for Playwright to read.
+export function exportMatch(store: AppStore, entry: MatchLogEntry | null) {
+  if (!entry) {
+    showToast(store, 'No finished match to export yet.', 'reject');
+    return;
+  }
+  store.exportArtifact = { title: `Export Match — ${entry.playerName}`, json: matchToJson(entry) };
+}
+
+export function exportArchive(store: AppStore) {
+  if (store.matchLog.length === 0) {
+    showToast(store, 'No finished matches to export yet.', 'reject');
+    return;
+  }
+  store.exportArtifact = { title: 'Export Archive', json: archiveJson(store.matchLog) };
+}
+
+export function latestMatch(store: AppStore): MatchLogEntry | null {
+  return store.matchLog.length > 0 ? store.matchLog[store.matchLog.length - 1] : null;
+}
+
+// Writes text to the clipboard, returning whether it succeeded. Never throws or
+// rejects: the clipboard API may be unavailable (sandboxed iframe, permission
+// denial) so we fall back to a temporary textarea + execCommand. No native
+// download / file-chooser is ever opened.
+export async function copyText(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch { /* fall through to legacy path */ }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    ta.style.pointerEvents = 'none';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+export async function copyArtifact(store: AppStore, text: string, verb = 'Copied') {
+  const ok = await copyText(text);
+  if (ok) showToast(store, `${verb} to clipboard.`, 'success');
+  else showToast(store, 'Could not copy — select the JSON below and copy it manually.', 'reject');
+  return ok;
+}
+
+function isMatchLogEntry(v: unknown): v is MatchLogEntry {
+  if (!v || typeof v !== 'object') return false;
+  const r = v as Record<string, unknown>;
+  return (
+    typeof r.playerName === 'string' &&
+    (r.difficulty === 'easy' || r.difficulty === 'medium' || r.difficulty === 'hard') &&
+    typeof r.playerRoundWins === 'number' &&
+    typeof r.rivalRoundWins === 'number' &&
+    typeof r.playerTotalOre === 'number' &&
+    typeof r.rivalTotalOre === 'number' &&
+    (r.winner === 'player' || r.winner === 'rival' || r.winner === 'draw') &&
+    Array.isArray(r.rounds) &&
+    typeof r.endedAt === 'string'
+  );
+}
+
+// Single source for the visible Import button and the WebMCP artifact-import
+// tool. Reads store.importText, validates against the match-record contract, and
+// mutates the Match log (or leaves everything untouched on rejection).
+export function applyImport(store: AppStore): { ok: boolean; imported: number } {
+  const raw = store.importText.trim();
+  if (!raw) {
+    store.importOk = false;
+    store.importMessage = 'Import failed: the file is invalid — paste a JSON record first.';
+    return { ok: false, imported: 0 };
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    store.importOk = false;
+    store.importMessage = 'Import failed: the file is invalid — it is not valid JSON.';
+    return { ok: false, imported: 0 };
+  }
+  const isArchive = Array.isArray((parsed as { matches?: unknown })?.matches);
+  const candidates: unknown[] = isArchive ? (parsed as { matches: unknown[] }).matches : [parsed];
+  if (!Array.isArray(candidates) || candidates.length === 0 || !candidates.every(isMatchLogEntry)) {
+    store.importOk = false;
+    store.importMessage = 'Import failed: the file is invalid — it is missing required match fields.';
+    return { ok: false, imported: 0 };
+  }
+  const records = (candidates as MatchLogEntry[]).map((c) => ({
+    playerName: c.playerName,
+    difficulty: c.difficulty as Difficulty,
+    playerRoundWins: c.playerRoundWins,
+    rivalRoundWins: c.rivalRoundWins,
+    playerTotalOre: c.playerTotalOre,
+    rivalTotalOre: c.rivalTotalOre,
+    winner: c.winner,
+    rounds: c.rounds,
+    endedAt: c.endedAt,
+  }));
+  if (isArchive) {
+    store.matchLog = records;
+  } else {
+    store.matchLog.push(...records);
+  }
+  store.importOk = true;
+  store.importMessage = `Imported ${records.length} match record${records.length === 1 ? '' : 's'} into the Match log.`;
+  store.importText = '';
+  return { ok: true, imported: records.length };
 }

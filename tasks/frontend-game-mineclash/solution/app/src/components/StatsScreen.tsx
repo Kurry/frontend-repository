@@ -1,6 +1,7 @@
 import { component$, useContext } from '@builder.io/qwik';
 import { AppCtx } from '../context';
 import type { Difficulty } from '../types';
+import { goBack } from '../gameLogic';
 
 const DIFF_LABELS: Record<Difficulty, string> = { easy: 'Easy', medium: 'Medium', hard: 'Hard' };
 
@@ -18,9 +19,7 @@ export const StatsScreen = component$(() => {
         <button
           class="btn-secondary"
           style={{ fontSize: '13px', padding: '8px 16px' }}
-          onClick$={() => {
-            if (store.phase === 'stats') store.phase = 'setup';
-          }}
+          onClick$={() => goBack(store)}
         >
           ← Go back
         </button>
@@ -35,9 +34,7 @@ export const StatsScreen = component$(() => {
           <button
             class="btn-primary"
             style={{ marginTop: '24px', fontSize: '15px' }}
-            onClick$={() => {
-              if (store.phase === 'stats') store.phase = 'setup';
-            }}
+            onClick$={() => goBack(store)}
           >
             ⚔️ Start first match
           </button>
