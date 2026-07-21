@@ -1,18 +1,3 @@
-import { test, expect } from '@playwright/test';
-
-// We mock listTools and invokeTool for the standalone run.
-const listTools = async (page) => {
-  return await page.evaluate(async () => window.webmcp_list_tools ? await window.webmcp_list_tools() : []);
-};
-
-const invokeTool = async (page, name, args) => {
-  return await page.evaluate(async ({name, args}) => await window.webmcp_invoke_tool(name, args), {name, args});
-};
-
-test.beforeEach(async ({ page }) => {
-  await page.goto("http://localhost:3000");
-});
-
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
 
 test('1.24 inline_validation_disables_submit_until_valid', async ({ page }) => {
