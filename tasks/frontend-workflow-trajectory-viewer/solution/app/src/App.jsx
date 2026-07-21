@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react'
+import React, { lazy, Suspense, useEffect } from 'react'
 import { useAppStore } from './store'
 import { CatalogScreen, TaskScreen, IngestScreen } from './screens'
-import { TrialViewer } from './viewer'
 import { useWebMcp } from './webmcp'
+
+const TrialViewer = lazy(() => import('./viewer').then((module) => ({ default: module.TrialViewer })))
 
 export default function App() {
   const view = useAppStore((state) => state.view)
@@ -32,8 +33,7 @@ export default function App() {
       {view === 'catalog' && <CatalogScreen />}
       {view === 'task' && <TaskScreen />}
       {view === 'ingest' && <IngestScreen />}
-      {view === 'viewer' && <TrialViewer />}
+      {view === 'viewer' && <Suspense fallback={<div className="grid min-h-screen place-items-center text-sm text-mist-500">Loading trial viewer…</div>}><TrialViewer /></Suspense>}
     </main>
   )
 }
-
