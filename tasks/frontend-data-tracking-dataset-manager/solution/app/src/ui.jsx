@@ -160,7 +160,7 @@ export function PanelShell({ title, subtitle, onClose, wide = false, children })
   const close = onClose || (() => useStore.getState().setUi({ panel: null }))
   useOverlayBehavior(ref, close)
   return (
-    <div className="panel-overlay no-print" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}>
+    <div className="panel-overlay no-print" onMouseDown={(e) => { if (e.target === e.currentTarget) close() }}>
       <aside ref={ref} tabIndex={-1} className={cx('panel-sheet', wide && '!w-[min(780px,100vw)]')} role="dialog" aria-modal="true" aria-labelledby="panel-title">
         <header className="sticky top-0 z-20 flex items-start justify-between gap-3 border-b bd surface px-5 py-4">
           <div className="min-w-0">
