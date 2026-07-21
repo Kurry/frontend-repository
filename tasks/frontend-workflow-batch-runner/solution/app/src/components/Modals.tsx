@@ -32,6 +32,7 @@ import {
   selectedEntities,
   useBatchStore,
 } from '../store'
+import { returnFocusToOpener } from '../modalFocus'
 import { StatusBadge } from './StatusBadge'
 
 function downloadText(filename: string, text: string, type: string) {
@@ -74,7 +75,10 @@ export function ScheduleModal() {
     if (open) reset({ windowStart: localValue(job?.schedule?.windowStart), windowEnd: localValue(job?.schedule?.windowEnd) })
   }, [open, job?.schedule?.windowStart, job?.schedule?.windowEnd, reset])
 
-  const close = () => setUi({ scheduleOpen: false })
+  const close = () => {
+    setUi({ scheduleOpen: false })
+    returnFocusToOpener('schedule')
+  }
   const submit = handleSubmit((values) => {
     if (!job) return
     const parsed = scheduleSchema.parse({ windowStart: new Date(values.windowStart).toISOString(), windowEnd: new Date(values.windowEnd).toISOString() })
@@ -117,7 +121,10 @@ export function ExportModal() {
   useEffect(() => {
     if (open && sharedPreview !== compiledText) setUi({ exportPreviewText: compiledText })
   }, [open, sharedPreview, compiledText, setUi])
-  const close = () => setUi({ exportOpen: false })
+  const close = () => {
+    setUi({ exportOpen: false })
+    returnFocusToOpener('export')
+  }
   const safeName = (job?.name ?? 'run-report').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
   const copy = async () => {
@@ -158,7 +165,10 @@ export function ImportModal() {
     resolver: zodResolver(importFormSchema), mode: 'onChange', defaultValues: { reportText: importDraft },
   })
   useEffect(() => { if (open) reset({ reportText: useBatchStore.getState().ui.importDraft }) }, [open, reset])
-  const close = () => setUi({ importOpen: false })
+  const close = () => {
+    setUi({ importOpen: false })
+    returnFocusToOpener('import')
+  }
   const submit = handleSubmit((values) => {
     let value: unknown
     try { value = JSON.parse(values.reportText) }
@@ -193,7 +203,10 @@ export function CalendarModal() {
   const text = useMemo(() => compileCalendar(jobs), [jobs])
   const count = jobs.filter((job) => job.schedule).length
   useEffect(() => { if (open) setCopied(false) }, [open])
-  const close = () => setUi({ calendarOpen: false })
+  const close = () => {
+    setUi({ calendarOpen: false })
+    returnFocusToOpener('calendar')
+  }
   const copy = async () => {
     await copyText(text)
     setCopied(true)
@@ -273,8 +286,8 @@ export function DeleteModal() {
       modalLabel="Destructive action"
       primaryButtonText="Delete job"
       secondaryButtonText="Cancel"
-      onRequestClose={() => requestDelete(null)}
-      onSecondarySubmit={() => requestDelete(null)}
+      onRequestClose={() => { requestDelete(null); returnFocusToOpener('delete') }}
+      onSecondarySubmit={() => { requestDelete(null); returnFocusToOpener('delete') }}
       onRequestSubmit={() => { if (job) deleteJob(job.id) }}
     >
       <p><strong>{job?.name}</strong> and {job?.runs.length ?? 0} run history {(job?.runs.length ?? 0) === 1 ? 'entry' : 'entries'} will be removed. Undo can restore them during this session.</p>
@@ -285,7 +298,7 @@ export function DeleteModal() {
 export function OpenExportButton({ kind = 'tertiary', size = 'md' }: { kind?: 'tertiary' | 'ghost'; size?: 'sm' | 'md' }) {
   const hasRun = useBatchStore((state) => Boolean(selectedEntities(state).run))
   const setUi = useBatchStore((state) => state.setUi)
-  return <Button kind={kind} size={size} renderIcon={DocumentDownload} disabled={!hasRun} onClick={() => setUi({ exportOpen: true, exportTimestamp: new Date().toISOString() })}>Export run</Button>
+  return <Button kind={kind} size={size} renderIcon={DocumentDownload} data-modal-opener="export" disabled={!hasRun} onClick={() => setUi({ exportOpen: true, exportTimestamp: new Date().toISOString() })}>Export run</Button>
 }
 
 export { copyText, downloadText }

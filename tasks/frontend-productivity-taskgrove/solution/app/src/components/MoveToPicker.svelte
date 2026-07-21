@@ -47,7 +47,7 @@
       class="fixed left-[50%] top-[50%] z-50 max-h-[70vh] w-full max-w-sm translate-x-[-50%] translate-y-[-50%] rounded bg-[var(--color-background)] border border-[var(--color-border)] shadow-xl flex flex-col"
     >
       <div class="p-3 border-b border-[var(--color-border)] flex items-center justify-between">
-        <h3 {...$title} class="text-[12px] font-bold heading m-0">Move "{sourceNode?.title || ''}" to…</h3>
+        <h3 {...$title} class="heading m-0" style="font-size: 48px; line-height: 1.1;">Move "{sourceNode?.title || ''}" to…</h3>
         <button
           {...$close}
           class="text-[var(--color-muted)] hover:text-[var(--color-text-primary)] text-[14px]"

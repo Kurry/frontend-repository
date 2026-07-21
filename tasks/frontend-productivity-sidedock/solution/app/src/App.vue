@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useSidedockStore } from './stores/sidedock.js'
 import WorkspaceTabs from './components/WorkspaceTabs.vue'
 import AddBookmarkForm from './components/AddBookmarkForm.vue'
@@ -20,6 +20,16 @@ const showSearchResults = ref(false)
 watch(() => store.searchQuery, (q) => {
   showSearchResults.value = q.trim().length > 0
 })
+
+function onGlobalKeydown(event) {
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+    event.preventDefault()
+    document.getElementById('search-input')?.focus()
+  }
+}
+
+onMounted(() => window.addEventListener('keydown', onGlobalKeydown))
+onBeforeUnmount(() => window.removeEventListener('keydown', onGlobalKeydown))
 </script>
 
 <template>
@@ -40,9 +50,10 @@ watch(() => store.searchQuery, (q) => {
         </button>
         <button
           @click="store.toggleCompactMode()"
-          class="px-3 py-1.5 rounded-md text-sm font-medium cursor-pointer transition-all border"
+          class="sidebar-toggle px-4 py-2 rounded-md text-sm font-medium cursor-pointer transition-all border min-h-[44px]"
           :class="store.compactMode ? 'border-transparent' : 'border-[var(--color-border)]'"
           :style="store.compactMode ? { background: 'var(--color-accent)', color: 'white' } : { background: 'white', color: 'var(--color-text-primary)' }"
+          :aria-pressed="store.compactMode"
           title="Toggle sidebar view"
         >
           {{ store.compactMode ? 'Show full view' : 'Show sidebar view' }}
@@ -51,7 +62,7 @@ watch(() => store.searchQuery, (q) => {
     </header>
 
     <!-- Main Content -->
-    <div :class="store.compactMode ? 'compact-view max-w-[375px] border-r' : 'w-full'" class="flex-1 min-h-0 flex flex-col mx-auto transition-all duration-300" style="border-color: var(--color-border); background: var(--color-background);">
+    <div :class="store.compactMode ? 'compact-view max-w-[375px] w-full border-r overflow-x-hidden' : 'w-full'" class="flex-1 min-h-0 flex flex-col mx-auto transition-all duration-300 ease-in-out" style="border-color: var(--color-border); background: var(--color-background);">
       
       <!-- Empty State: No workspaces -->
       <EmptyState v-if="store.workspaces.length === 0" type="no-workspaces" />
@@ -144,6 +155,8 @@ watch(() => store.searchQuery, (q) => {
     <!-- Toasts -->
     <ToastContainer />
 
+    <div v-if="store.isBusy" class="loading-banner" role="status" aria-live="polite">Working…</div>
+
     <CreateWorkspaceModal />
     <CreateFolderModal />
     <ImportPackageModal />
@@ -165,14 +178,50 @@ watch(() => store.searchQuery, (q) => {
 }
 
 * { box-sizing: border-box; }
-html, body, #app { margin: 0; padding: 0; min-width: 0; min-height: 100%; }
-body, button, input, select, textarea { font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-button, input, select, textarea { font-size: 15px; font-family: Inter, sans-serif; }
-p, span, div { font-family: Inter, sans-serif; }
+html, body, #app { margin: 0; padding: 0; min-width: 0; min-height: 100%; font-size: 15px; }
+body, button, input, select, textarea {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+}
+p, span, div, label, a, li {
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+}
 .app-shell {
   background: var(--color-background);
   color: var(--color-text-primary);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+}
+.btn-primary, .btn-secondary {
+  min-height: 44px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  font-size: 15px;
+}
+.input-styled {
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 15px;
+}
+.compact-view {
+  max-width: 375px;
+  width: 100%;
+  overflow-x: hidden;
+}
+.loading-banner {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  padding: 8px 16px;
+  border-radius: 12px;
+  background: var(--color-text-primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
 }
 .dark-theme {
   --color-background: #181311;

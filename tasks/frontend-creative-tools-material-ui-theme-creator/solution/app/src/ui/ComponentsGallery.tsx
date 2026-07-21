@@ -52,7 +52,7 @@ const SECTIONS: Section[] = [
     </MuiAccordion>
   ) },
   { id: 'appbar', title: 'App Bar', render: () => (
-    <AppBar position="static" color="primary"><Toolbar variant="dense"><Typography variant="subtitle1">Themed App Bar</Typography></Toolbar></AppBar>
+    <AppBar position="static" color="primary"><Toolbar variant="dense"><Typography variant="subtitle1" component="span">Themed App Bar</Typography></Toolbar></AppBar>
   ) },
   { id: 'avatar', title: 'Avatar', render: () => (
     <Stack direction="row" spacing={1}><Avatar>A</Avatar><Avatar sx={{ bgcolor: 'secondary.main' }}>B</Avatar><Avatar sx={{ bgcolor: 'primary.main' }}>C</Avatar></Stack>
@@ -61,7 +61,7 @@ const SECTIONS: Section[] = [
     <Stack direction="row" spacing={3}><Badge badgeContent={4} color="primary"><Icon name="mail" /></Badge><Badge badgeContent={9} color="secondary"><Icon name="notifications" /></Badge></Stack>
   ) },
   { id: 'card', title: 'Card', render: () => (
-    <Card sx={{ maxWidth: 320 }}><CardContent><Typography variant="h6">Card Title</Typography><Typography variant="body2" color="text.secondary">Supporting text within a themed card surface.</Typography></CardContent></Card>
+    <Card sx={{ maxWidth: 320 }}><CardContent><Typography variant="h6" component="h3">Card Title</Typography><Typography variant="body2" color="text.secondary">Supporting text within a themed card surface.</Typography></CardContent></Card>
   ) },
   { id: 'checkboxes', title: 'Checkboxes', render: () => (
     <Stack direction="row"><Checkbox defaultChecked /><Checkbox /><Checkbox defaultChecked color="secondary" /><Checkbox disabled /></Stack>
@@ -94,7 +94,7 @@ const SECTIONS: Section[] = [
     <Tooltip title="Themed tooltip"><Button variant="outlined">Hover Me</Button></Tooltip>
   ) },
   { id: 'typography', title: 'Typography', render: () => (
-    <Stack><Typography variant="h4">Heading 4</Typography><Typography variant="body1">Body text renders in the theme font family and size.</Typography><Typography variant="caption" color="text.secondary">Caption text</Typography></Stack>
+    <Stack><Typography variant="h4" component="p">Heading 4</Typography><Typography variant="body1">Body text renders in the theme font family and size.</Typography><Typography variant="caption" component="p" color="text.secondary">Caption text</Typography></Stack>
   ) }
 ];
 
@@ -113,6 +113,7 @@ export function ComponentsGallery() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-4">
+      <h2 className="sr-only">Components Gallery</h2>
       <aside className="bg-shell-1 rounded-xl border border-shell-border p-3 h-max lg:sticky lg:top-2">
         <div className="flex items-center gap-2 bg-shell-2 rounded-md px-2 py-1.5 mb-2 border border-shell-border">
           <Icon name="search" style={{ fontSize: 16 }} className="text-shell-muted" />
@@ -120,7 +121,6 @@ export function ComponentsGallery() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             aria-label="Filter components"
-            placeholder="Filter components"
             className="bg-transparent text-xs text-shell-text outline-none flex-1"
           />
         </div>
@@ -142,7 +142,7 @@ export function ComponentsGallery() {
                 <Card variant="outlined">
                   <CardContent>
                     <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
-                      <Typography variant="h6">{s.title}</Typography>
+                      <Typography variant="h6" component="h2">{s.title}</Typography>
                       <button type="button" className="inert-link text-xs" style={{ color: 'inherit', opacity: 0.7 }} onClick={(e) => e.preventDefault()}>
                         Docs
                       </button>
@@ -152,7 +152,7 @@ export function ComponentsGallery() {
                 </Card>
               </section>
             ))}
-            {filtered.length === 0 && <Typography color="text.secondary">No components match your filter.</Typography>}
+            {filtered.length === 0 && <Typography color="text.secondary" component="p">No components match your filter.</Typography>}
           </Box>
         </MuiThemed>
       </div>

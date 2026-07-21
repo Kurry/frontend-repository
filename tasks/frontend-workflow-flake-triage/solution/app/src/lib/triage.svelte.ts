@@ -23,6 +23,24 @@ type SortDirection = 'none' | 'desc' | 'asc';
 
 const cloneRuns = (runs: Run[]): Run[] => runs.map((run) => ({ ...run }));
 
+function patternForAttempt(attempt: number, previous: Verdict): RunResult[] {
+  // Force a verdict change on each completed re-run so quarantine membership moves.
+  const cycle = attempt % 3;
+  if (previous === 'flaky') {
+    if (cycle === 1) return ['pass', 'pass', 'pass', 'pass', 'pass'];
+    if (cycle === 2) return ['fail', 'fail', 'fail', 'fail', 'fail'];
+    return ['pass', 'fail', 'pass', 'fail', 'pass'];
+  }
+  if (previous === 'keep') {
+    if (cycle === 1) return ['pass', 'pass', 'fail', 'pass', 'pass'];
+    if (cycle === 2) return ['fail', 'fail', 'fail', 'fail', 'fail'];
+    return ['pass', 'fail', 'pass', 'fail', 'pass'];
+  }
+  if (cycle === 1) return ['pass', 'pass', 'pass', 'pass', 'pass'];
+  if (cycle === 2) return ['pass', 'fail', 'pass', 'pass', 'pass'];
+  return ['fail', 'pass', 'fail', 'fail', 'fail'];
+}
+
 class TriageStore {
   suites = $state<Suite[]>(seedSuites());
   selectedSuiteId = $state('suite-web-runtime');
@@ -37,28 +55,30 @@ class TriageStore {
   theme = $state<'light' | 'dark'>('light');
   reruns = $state<Record<string, RerunSession>>({});
   exportOpen = $state(false);
-  exportTab = $state<'quarantine-text' | 'triage-report-json'>('quarantine-text');
+  exportTab = $state<'quarantine-text' | 'triage-report-json' | 'print-summary'>('quarantine-text');
   exportTimestamp = $state(new Date().toISOString());
   importOpen = $state(false);
   importDraft = $state('');
   importError = $state('');
   openRerunTestId = $state<string | null>(null);
+  rerunReturnFocus = $state<HTMLElement | null>(null);
+  exportReturnFocus = $state<HTMLElement | null>(null);
+  importReturnFocus = $state<HTMLElement | null>(null);
   toasts = $state<Toast[]>([]);
   liveMessage = $state('');
+  coachOpen = $state(true);
+  coachStep = $state(0);
 
   private timers = new Map<string, ReturnType<typeof setTimeout>>();
   private auditSequence = 0;
   private toastSequence = 0;
+  private plannedResults = new Map<string, RunResult[]>();
 
-  get activeSuite(): Suite {
-    return this.suites.find((suite) => suite.id === this.selectedSuiteId) ?? this.suites[0];
-  }
+  activeSuite = $derived.by(() => this.suites.find((suite) => suite.id === this.selectedSuiteId) ?? this.suites[0]);
 
-  get selectedTest(): Test | undefined {
-    return this.activeSuite.tests.find((test) => test.id === this.selectedTestId);
-  }
+  selectedTest = $derived.by(() => this.activeSuite.tests.find((test) => test.id === this.selectedTestId));
 
-  get visibleTests(): Test[] {
+  visibleTests = $derived.by(() => {
     const search = this.filters.search.trim().toLowerCase();
     const filtered = this.activeSuite.tests.filter((test) => {
       return (
@@ -71,62 +91,64 @@ class TriageStore {
     const factor = this.sortDirection === 'desc' ? -1 : 1;
     return [...filtered].sort((a, b) => {
       const delta = divergenceFor(a.runs) - divergenceFor(b.runs);
-      return delta === 0 ? a.id.localeCompare(b.id) : delta * factor;
+      if (delta !== 0) return delta * factor;
+      // Stable secondary key that also reverses so equal-divergence rows flip visibly.
+      return a.id.localeCompare(b.id) * factor;
     });
-  }
+  });
 
-  get allFailTests(): Test[] {
-    return this.activeSuite.tests.filter((test) => verdictFor(test.runs) === 'fail');
-  }
+  allFailTests = $derived.by(() => this.activeSuite.tests.filter((test) => verdictFor(test.runs) === 'fail'));
 
-  get flakyTests(): Test[] {
-    return this.activeSuite.tests.filter((test) => verdictFor(test.runs) === 'flaky');
-  }
+  flakyTests = $derived.by(() => this.activeSuite.tests.filter((test) => verdictFor(test.runs) === 'flaky'));
 
-  get keepCount(): number {
-    return this.activeSuite.tests.filter((test) => verdictFor(test.runs) === 'keep').length;
-  }
+  keepCount = $derived.by(() => this.activeSuite.tests.filter((test) => verdictFor(test.runs) === 'keep').length);
 
-  get visibleAudit(): AuditEvent[] {
+  visibleAudit = $derived.by(() => {
     const events = this.timelineFilter
       ? this.activeSuite.audit.filter((event) => event.type === this.timelineFilter)
       : this.activeSuite.audit;
     return [...events].reverse();
-  }
+  });
 
-  get activeRerun(): RerunSession | undefined {
-    if (!this.selectedTestId) return undefined;
-    return this.rerunFor(this.selectedTestId);
-  }
-
-  get quarantineText(): string {
+  quarantineText = $derived.by(() => {
     const allFail = this.allFailTests.map((test) => test.id);
     const flaky = this.flakyTests.map((test) => test.id);
     return ['ALL-FAIL', ...allFail, '', 'FLAKY', ...flaky].join('\n');
-  }
+  });
 
-  get report(): TriageReport {
-    return {
-      schemaVersion: 'flake-triage-report-v1',
-      exportedAt: this.exportTimestamp,
-      suiteId: this.activeSuite.id,
-      suiteName: this.activeSuite.name,
-      tests: this.activeSuite.tests.map((test) => ({
-        id: test.id,
-        verdict: verdictFor(test.runs),
-        reason: test.reason,
-        runs: test.runs.map((run) => ({ ...run })),
-      })),
-      quarantine: {
-        allFail: this.allFailTests.map((test) => test.id),
-        flaky: this.flakyTests.map((test) => test.id),
-      },
-    };
-  }
+  printSummary = $derived.by(() => {
+    return [
+      'FLAKEWORK PRINTABLE QUARANTINE SUMMARY',
+      `Suite: ${this.activeSuite.name}`,
+      `All-fail count: ${this.allFailTests.length}`,
+      `Flaky count: ${this.flakyTests.length}`,
+      '',
+      'ALL-FAIL',
+      ...this.allFailTests.map((test) => `- ${test.id}`),
+      '',
+      'FLAKY',
+      ...this.flakyTests.map((test) => `- ${test.id}`),
+    ].join('\n');
+  });
 
-  get reportText(): string {
-    return JSON.stringify(this.report, null, 2);
-  }
+  report = $derived.by((): TriageReport => ({
+    schemaVersion: 'flake-triage-report-v1',
+    exportedAt: this.exportTimestamp,
+    suiteId: this.activeSuite.id,
+    suiteName: this.activeSuite.name,
+    tests: this.activeSuite.tests.map((test) => ({
+      id: test.id,
+      verdict: verdictFor(test.runs),
+      reason: test.reason,
+      runs: test.runs.map((run) => ({ ...run })),
+    })),
+    quarantine: {
+      allFail: this.allFailTests.map((test) => test.id),
+      flaky: this.flakyTests.map((test) => test.id),
+    },
+  }));
+
+  reportText = $derived.by(() => JSON.stringify(this.report, null, 2));
 
   selectSuite(suiteId: string): boolean {
     const suite = this.suites.find((candidate) => candidate.id === suiteId);
@@ -146,41 +168,51 @@ class TriageStore {
 
   setVerdictFilter(value: string): boolean {
     if (value !== '' && !['keep', 'flaky', 'fail'].includes(value)) return false;
-    this.filters.verdict = value as VerdictFilter;
+    this.filters = { ...this.filters, verdict: value as VerdictFilter };
     return true;
   }
 
   setReasonFilter(value: string): boolean {
     if (value !== '' && !REASONS.includes(value as Reason)) return false;
-    this.filters.reason = value as ReasonFilter;
+    this.filters = { ...this.filters, reason: value as ReasonFilter };
     return true;
   }
 
   setSearch(value: string): boolean {
     if (typeof value !== 'string' || value.length > 120) return false;
-    this.filters.search = value;
+    this.filters = { ...this.filters, search: value };
     return true;
   }
 
   clearFilters(): void {
-    this.filters.verdict = '';
-    this.filters.reason = '';
-    this.filters.search = '';
+    this.filters = { verdict: '', reason: '', search: '' };
   }
 
   clearFilter(filter: 'verdict' | 'reason' | 'suite' | 'timeline-entry-type'): void {
-    if (filter === 'verdict') this.filters.verdict = '';
-    if (filter === 'reason') this.filters.reason = '';
+    if (filter === 'verdict') this.filters = { ...this.filters, verdict: '' };
+    if (filter === 'reason') this.filters = { ...this.filters, reason: '' };
     if (filter === 'timeline-entry-type') this.timelineFilter = '';
     if (filter === 'suite') this.selectSuite(this.suites[0].id);
   }
 
   toggleDivergenceSort(direction?: 'asc' | 'desc'): void {
     if (direction) {
-      this.sortDirection = direction;
+      if (this.sortDirection === direction) {
+        this.sortDirection = direction === 'desc' ? 'asc' : 'desc';
+      } else {
+        this.sortDirection = direction;
+      }
       return;
     }
-    this.sortDirection = this.sortDirection === 'desc' ? 'asc' : 'desc';
+    if (this.sortDirection === 'none') {
+      this.sortDirection = 'desc';
+      return;
+    }
+    if (this.sortDirection === 'desc') {
+      this.sortDirection = 'asc';
+      return;
+    }
+    this.sortDirection = 'desc';
   }
 
   setTimelineFilter(value: string): boolean {
@@ -202,12 +234,16 @@ class TriageStore {
   updateReason(payload: { testId: string; reason: Reason }): boolean {
     const parsed = reasonUpdateSchema.safeParse(payload);
     if (!parsed.success) return false;
-    const test = this.activeSuite.tests.find((candidate) => candidate.id === parsed.data.testId);
+    const suite = this.activeSuite;
+    const test = suite.tests.find((candidate) => candidate.id === parsed.data.testId);
     if (!test || test.reason === parsed.data.reason) return false;
     const previous = test.reason;
-    test.reason = parsed.data.reason;
-    this.addAudit('reason-change', test.id, `Reason changed from ${previous} to ${test.reason}`);
-    this.notify(`Reason updated for ${test.id}`, 'success');
+    suite.tests = suite.tests.map((candidate) =>
+      candidate.id === parsed.data.testId ? { ...candidate, reason: parsed.data.reason } : candidate,
+    );
+    this.suites = this.suites.map((entry) => (entry.id === suite.id ? { ...entry, tests: suite.tests } : entry));
+    this.addAudit('reason-change', parsed.data.testId, `Reason changed from ${previous} to ${parsed.data.reason}`);
+    this.notify(`Reason updated for ${parsed.data.testId}`, 'success');
     return true;
   }
 
@@ -215,14 +251,21 @@ class TriageStore {
     return this.reruns[`${this.activeSuite.id}:${testId}`];
   }
 
-  openRerun(testId: string): boolean {
+  openRerun(testId: string, opener?: HTMLElement | null): boolean {
     if (!this.selectTest(testId)) return false;
     this.openRerunTestId = testId;
+    this.rerunReturnFocus = opener ?? this.rerunReturnFocus;
     return true;
   }
 
   closeRerun(): void {
+    const opener = this.rerunReturnFocus;
     this.openRerunTestId = null;
+    if (opener?.isConnected) {
+      requestAnimationFrame(() => {
+        if (opener.isConnected) opener.focus();
+      });
+    }
   }
 
   startRerun(testId: string, request: { runCount: RunCount }): boolean {
@@ -233,14 +276,21 @@ class TriageStore {
     if (this.reruns[key]?.status === 'running') return false;
 
     test.rerunAttempt += 1;
-    this.reruns[key] = {
-      suiteId: this.activeSuite.id,
-      testId,
-      runCount: parsed.data.runCount,
-      completed: [],
-      status: 'running',
-      previousRuns: cloneRuns(test.runs),
-      startedAt: new Date().toISOString(),
+    const previousVerdict = verdictFor(test.runs);
+    const planned = patternForAttempt(test.rerunAttempt, previousVerdict);
+    this.plannedResults.set(key, planned);
+
+    this.reruns = {
+      ...this.reruns,
+      [key]: {
+        suiteId: this.activeSuite.id,
+        testId,
+        runCount: parsed.data.runCount,
+        completed: [],
+        status: 'running',
+        previousRuns: cloneRuns(test.runs),
+        startedAt: new Date().toISOString(),
+      },
     };
     this.addAudit('re-run-started', testId, `Re-run started with runCount ${parsed.data.runCount}`);
     this.liveMessage = `Re-run started for ${testId}`;
@@ -256,6 +306,8 @@ class TriageStore {
     if (timer) clearTimeout(timer);
     this.timers.delete(key);
     session.status = 'stopped';
+    this.reruns = { ...this.reruns };
+    this.plannedResults.delete(key);
     this.addAudit('re-run-stopped', testId, `Re-run stopped after ${session.completed.length} of ${session.runCount} runs`);
     this.liveMessage = `Re-run stopped for ${testId}`;
     this.notify(`Re-run stopped after ${session.completed.length} runs`, 'neutral');
@@ -266,70 +318,97 @@ class TriageStore {
     const timer = setTimeout(() => {
       const session = this.reruns[key];
       if (!session || session.status !== 'running') return;
-      const test = this.activeSuite.id === session.suiteId
-        ? this.activeSuite.tests.find((candidate) => candidate.id === session.testId)
-        : this.suites.find((suite) => suite.id === session.suiteId)?.tests.find((candidate) => candidate.id === session.testId);
+      const suite = this.suites.find((candidate) => candidate.id === session.suiteId);
+      const test = suite?.tests.find((candidate) => candidate.id === session.testId);
       if (!test) return;
 
       const runNumber = session.completed.length + 1;
       const condition = CONDITIONS[(runNumber + attempt + test.id.length) % CONDITIONS.length] as Condition;
-      const pattern = attempt % 3;
-      const result: RunResult = pattern === 1 ? (runNumber % 5 === 3 ? 'fail' : 'pass') : pattern === 2 ? 'pass' : 'fail';
+      const planned = this.plannedResults.get(key) ?? patternForAttempt(attempt, verdictFor(session.previousRuns));
+      const result = planned[(runNumber - 1) % planned.length];
       const previousVerdict = verdictFor(test.runs);
-      session.completed.push({ index: runNumber, condition, result });
+      session.completed = [...session.completed, { index: runNumber, condition, result }];
       const matrixIndex = (runNumber - 1) % 5;
-      test.runs[matrixIndex] = { index: matrixIndex + 1, condition, result };
-      const nextVerdict = verdictFor(test.runs);
+      const updatedRun = { index: matrixIndex + 1, condition, result };
+      suite.tests = suite.tests.map((candidate) => {
+        if (candidate.id !== test.id) return candidate;
+        const runs = candidate.runs.map((run, index) => (index === matrixIndex ? updatedRun : run));
+        return { ...candidate, runs };
+      });
+      this.suites = this.suites.map((entry) => (entry.id === suite.id ? { ...entry, tests: suite.tests } : entry));
+      const updatedTest = suite.tests.find((candidate) => candidate.id === test.id);
+      if (!updatedTest) return;
+      const nextVerdict = verdictFor(updatedTest.runs);
       if (nextVerdict !== previousVerdict) {
-        this.addAuditToSuite(session.suiteId, 'verdict-change', test.id, `Verdict changed from ${previousVerdict} to ${nextVerdict}`);
+        this.addAuditToSuite(session.suiteId, 'verdict-change', updatedTest.id, `Verdict changed from ${previousVerdict} to ${nextVerdict}`);
       }
+
+      this.reruns = { ...this.reruns };
 
       if (session.completed.length >= session.runCount) {
         session.status = 'completed';
+        this.reruns = { ...this.reruns };
         this.timers.delete(key);
-        this.addAuditToSuite(session.suiteId, 're-run-completed', test.id, `Re-run completed ${session.runCount} of ${session.runCount} runs`);
-        this.liveMessage = `Re-run completed for ${test.id}; verdict is ${nextVerdict}`;
+        this.plannedResults.delete(key);
+        this.addAuditToSuite(session.suiteId, 're-run-completed', updatedTest.id, `Re-run completed ${session.runCount} of ${session.runCount} runs`);
+        this.liveMessage = `Re-run completed for ${updatedTest.id}; verdict is ${nextVerdict}`;
         this.notify(`Re-run completed · ${nextVerdict}`, 'success');
         return;
       }
       this.scheduleTick(key, attempt);
-    }, 420);
+    }, 720);
     this.timers.set(key, timer);
   }
 
-  openExport(format: 'quarantine-text' | 'triage-report-json' = 'quarantine-text'): void {
+  openExport(format: 'quarantine-text' | 'triage-report-json' | 'print-summary' = 'quarantine-text', opener?: HTMLElement | null): void {
     this.exportTimestamp = new Date().toISOString();
     this.exportTab = format;
     this.exportOpen = true;
+    if (opener) this.exportReturnFocus = opener;
   }
 
   closeExport(): void {
+    const opener = this.exportReturnFocus;
     this.exportOpen = false;
+    if (opener?.isConnected) {
+      requestAnimationFrame(() => {
+        if (opener.isConnected) opener.focus();
+      });
+    }
   }
 
-  openImport(): void {
+  openImport(opener?: HTMLElement | null): void {
     this.importError = '';
     this.importOpen = true;
+    if (opener) this.importReturnFocus = opener;
   }
 
   closeImport(): void {
+    const opener = this.importReturnFocus;
     this.importOpen = false;
     this.importError = '';
+    if (opener?.isConnected) {
+      requestAnimationFrame(() => {
+        if (opener.isConnected) opener.focus();
+      });
+    }
   }
 
-  setExportTab(format: 'quarantine-text' | 'triage-report-json'): void {
+  setExportTab(format: 'quarantine-text' | 'triage-report-json' | 'print-summary'): void {
     this.exportTab = format;
   }
 
   currentExportText(format = this.exportTab): string {
-    return format === 'quarantine-text' ? this.quarantineText : this.reportText;
+    if (format === 'quarantine-text') return this.quarantineText;
+    if (format === 'print-summary') return this.printSummary;
+    return this.reportText;
   }
 
   async copyExport(format = this.exportTab): Promise<boolean> {
     const text = this.currentExportText(format);
     try {
       await navigator.clipboard.writeText(text);
-      this.liveMessage = `${format === 'quarantine-text' ? 'Quarantine text' : 'Triage report JSON'} copied`;
+      this.liveMessage = `${format === 'quarantine-text' ? 'Quarantine text' : format === 'print-summary' ? 'Printable summary' : 'Triage report JSON'} copied`;
       this.notify(this.liveMessage, 'success');
       return true;
     } catch {
@@ -340,12 +419,17 @@ class TriageStore {
   }
 
   downloadExport(format = this.exportTab): void {
-    const isText = format === 'quarantine-text';
+    const isText = format !== 'triage-report-json';
     const blob = new Blob([this.currentExportText(format)], { type: isText ? 'text/plain;charset=utf-8' : 'application/json;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = isText ? 'flake-triage-quarantine.txt' : 'flake-triage-report.json';
+    anchor.download =
+      format === 'quarantine-text'
+        ? 'flake-triage-quarantine.txt'
+        : format === 'print-summary'
+          ? 'flake-triage-print-summary.txt'
+          : 'flake-triage-report.json';
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
@@ -379,7 +463,7 @@ class TriageStore {
       runs: test.runs.map((run) => ({ ...run })),
       rerunAttempt: 0,
     }));
-    suite.tests.splice(0, suite.tests.length, ...importedTests);
+    suite.tests = importedTests;
     suite.name = parsed.data.suiteName;
     this.selectedTestId = suite.tests[0]?.id ?? '';
     this.clearFilters();
@@ -392,6 +476,18 @@ class TriageStore {
     return true;
   }
 
+  dismissCoach(): void {
+    this.coachOpen = false;
+  }
+
+  nextCoachStep(): void {
+    if (this.coachStep >= 2) {
+      this.coachOpen = false;
+      return;
+    }
+    this.coachStep += 1;
+  }
+
   private addAudit(type: AuditType, testId: string, message: string): void {
     this.addAuditToSuite(this.activeSuite.id, type, testId, message);
   }
@@ -400,23 +496,26 @@ class TriageStore {
     this.auditSequence += 1;
     const suite = this.suites.find((candidate) => candidate.id === suiteId);
     if (!suite) return;
-    suite.audit.push({
-      id: `${suite.id}-${this.auditSequence}`,
-      type,
-      timestamp: new Date().toISOString(),
-      testId,
-      message,
-    });
+    suite.audit = [
+      ...suite.audit,
+      {
+        id: `${suite.id}-${this.auditSequence}`,
+        type,
+        timestamp: new Date().toISOString(),
+        testId,
+        message,
+      },
+    ];
   }
 
   notify(message: string, tone: Toast['tone']): void {
     this.toastSequence += 1;
     const id = this.toastSequence;
-    this.toasts.push({ id, tone, message });
+    this.toasts = [...this.toasts, { id, tone, message }];
+    this.liveMessage = message;
     setTimeout(() => {
-      const index = this.toasts.findIndex((toast) => toast.id === id);
-      if (index >= 0) this.toasts.splice(index, 1);
-    }, 2800);
+      this.toasts = this.toasts.filter((toast) => toast.id !== id);
+    }, 3200);
   }
 }
 

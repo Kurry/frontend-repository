@@ -74,7 +74,17 @@
         opacity: 0.8;
     }
 
+    button:not(:disabled):hover {
+        filter: brightness(1.1);
+    }
+
     button:not(:disabled):active {
         filter: brightness(1.2);
+        transform: translateY(1px);
+    }
+
+    button:focus-visible {
+        outline: var(--border-input-focus);
+        outline-offset: 1px;
     }
 </style>

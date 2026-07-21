@@ -51,6 +51,9 @@ export interface WeblinkState {
 }
 
 const STORAGE_KEY = "weblink-shell-state-v1";
+const CONNECTING_MS = 2800;
+const TRANSFER_STEPS = 80;
+const TRANSFER_INTERVAL_MS = 200;
 
 export function randomId(prefix: string): string {
   return `${prefix}-${Math.random().toString(36).slice(2, 8)}${Math.random().toString(36).slice(2, 6)}`;
@@ -117,7 +120,7 @@ const initial = loadState();
 // only idle/disconnected states are safe to restore across a reload,
 // since no real peer connection can survive a reload.
 if (initial.room.status === "connecting" || initial.room.status === "waiting") {
-  initial.room.status = "disconnected";
+  initial.room.status = initial.room.roomId.trim() ? "disconnected" : "idle";
 }
 
 // A mid-transfer row restores as paused at its saved progress, never as transferring
@@ -152,7 +155,13 @@ export function joinRoom(roomId: string) {
     // that may never arrive.
     setState("room", "status", "waiting");
     persist();
-  }, 900);
+  }, CONNECTING_MS);
+}
+
+export function setRoomIdle() {
+  clearTimeout(pendingTimer);
+  setState("room", "status", "idle");
+  persist();
 }
 
 export function leaveRoom() {
@@ -249,7 +258,7 @@ export function startTransfer(id: string): boolean {
      return true;
   }
 
-  const chunk = Math.max(1, Math.floor(file.size / 20)); // Transfer in 20 steps
+  const chunk = Math.max(1, Math.floor(file.size / TRANSFER_STEPS));
 
   const interval = setInterval(() => {
     // Re-resolve the row index by id on every tick: the queue can be
@@ -274,10 +283,18 @@ export function startTransfer(id: string): boolean {
       setState("files", "queue", currentIndex, "bytesTransferred", nextBytes);
     }
     persist();
-  }, 200);
+  }, TRANSFER_INTERVAL_MS);
 
   transferIntervals.set(id, interval);
   return true;
+}
+
+export function pauseAllActiveTransfers() {
+  for (const file of state.files.queue) {
+    if (file.status === "transferring") {
+      pauseTransfer(file.id);
+    }
+  }
 }
 
 export function pauseTransfer(id: string): boolean {

@@ -10,6 +10,52 @@ body,
 
 body {
   margin: 0;
+  font-size: 1rem;
+}
+
+@media (min-width: 1024px) {
+  body {
+    font-size: 0.9375rem;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 1.0625rem;
+  }
+}
+
+:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
+}
+
+button:active:not(:disabled),
+[role="button"]:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+button,
+input,
+textarea,
+select,
+[role="switch"] {
+  transition-duration: 80ms;
+}
+
+.dragging-row {
+  opacity: 0.85;
+  transform: scale(1.02);
+  box-shadow:
+    0 10px 25px -5px rgb(14 165 233 / 0.25),
+    0 8px 10px -6px rgb(14 165 233 / 0.2);
+}
+
+@media (max-width: 640px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
 }
 
 /* With prefers-reduced-motion set, entrance and transition animations are

@@ -23,7 +23,7 @@ export default function App() {
       </header>
       {view === 'portfolio' ? <Portfolio /> : <Workspace />}
       <ArtifactDrawers />
-      <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
+      <div className="live-region" role="status" aria-live="polite" aria-atomic="true">{announcement}</div>
       <footer className="app-footer"><Text size="xs">In-memory certification session · page reload restores the 12-bundle seed baseline</Text><Text size="xs">Sable-4 / Quartz-Mini evidence model</Text></footer>
     </div>
   );

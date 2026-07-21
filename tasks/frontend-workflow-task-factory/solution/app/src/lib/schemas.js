@@ -1,19 +1,25 @@
 import { z } from 'zod'
 
-const intField = (label) => z.string()
-  .min(1, `${label} is required`)
-  .regex(/^\d+$/, `${label} must be a whole number`)
-  .refine((value) => Number(value) >= 1 && Number(value) <= 500, `${label} must be between 1 and 500`)
-  .transform(Number)
+const intField = (label) => z.preprocess(
+  (value) => (value === undefined || value === null ? '' : String(value)),
+  z.string()
+    .min(1, `${label} is required`)
+    .regex(/^\d+$/, `${label} must be a whole number`)
+    .refine((value) => Number(value) >= 1 && Number(value) <= 500, `${label} must be between 1 and 500`)
+    .transform(Number),
+)
 
 export const repositoryIds = ['quartz-orm', 'copperline', 'fernweh-gateway', 'lattice-db']
 
 export const createTaskSchema = z.object({
   repository: z.enum(repositoryIds, { message: 'Repository is required' }),
-  pullRequestNumber: z.string()
-    .min(1, 'Pull-request number is required')
-    .regex(/^\d{1,6}$/, 'Pull-request number must be a positive integer of 1–6 digits')
-    .refine((value) => Number(value) > 0, 'Pull-request number must be positive'),
+  pullRequestNumber: z.preprocess(
+    (value) => (value === undefined || value === null ? '' : String(value)),
+    z.string()
+      .min(1, 'Pull-request number is required')
+      .regex(/^\d{1,6}$/, 'Pull-request number must be a positive integer of 1–6 digits')
+      .refine((value) => Number(value) > 0, 'Pull-request number must be positive'),
+  ),
   minFiles: intField('Minimum file bound'),
   maxFiles: intField('Maximum file bound'),
 }).superRefine((data, ctx) => {

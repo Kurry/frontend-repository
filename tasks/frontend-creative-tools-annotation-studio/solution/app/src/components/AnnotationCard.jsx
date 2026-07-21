@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import {
   ActionableNotification, Button, Checkbox, CodeSnippet, Dropdown, InlineNotification, Select, SelectItem,
   Slider, TextArea, TextInput, Tile,
@@ -32,13 +33,18 @@ function RegionWorkspace({ item, draft }) {
   const [regionError, setRegionError] = useState('');
   const viewportRef = useRef(null);
   const panRef = useRef(null);
+  const anchorRef = useRef(null);
+  const drawingRef = useRef(null);
+  const [layerRef] = useAutoAnimate();
+  const [listRef] = useAutoAnimate();
   const ui = storedUi || { zoom: 1, panX: 0, panY: 0, tool: 'draw', armedClassId: taxonomy[0]?.id };
   const armed = taxonomy.find((cls) => cls.id === ui.armedClassId) || taxonomy[0];
   const selected = draft.regions.find((region) => region.id === selectedRegionId);
 
   useEffect(() => {
     const handler = (event) => {
-      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(event.target.tagName) || event.metaKey || event.ctrlKey || event.altKey) return;
+      const tag = event.target?.tagName;
+      if (['INPUT', 'TEXTAREA', 'SELECT'].includes(tag) || event.metaKey || event.ctrlKey || event.altKey) return;
       const cls = taxonomy.find((entry) => entry.shortcut === event.key);
       if (cls) updateUi(item.id, { armedClassId: cls.id, tool: 'draw' });
     };
@@ -53,34 +59,42 @@ function RegionWorkspace({ item, draft }) {
       y: Math.max(0, Math.min(360, ((event.clientY - rect.top - ui.panY) / (rect.height * ui.zoom)) * 360)),
     };
   };
+  const commitDrawing = (rect) => { drawingRef.current = rect; setDrawing(rect); };
   const pointerDown = (event) => {
-    event.currentTarget.setPointerCapture(event.pointerId);
+    if (event.pointerType === 'mouse' && event.button !== 0) return;
+    try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* capture is best-effort */ }
     if (ui.tool === 'pan') {
       panRef.current = { x: event.clientX, y: event.clientY, panX: ui.panX, panY: ui.panY };
       return;
     }
     const start = point(event);
-    setDrawing({ x: start.x, y: start.y, w: 0, h: 0 });
+    anchorRef.current = start;
+    commitDrawing({ x: start.x, y: start.y, w: 0, h: 0 });
   };
   const pointerMove = (event) => {
     if (panRef.current) {
       updateUi(item.id, { panX: panRef.current.panX + event.clientX - panRef.current.x, panY: panRef.current.panY + event.clientY - panRef.current.y });
       return;
     }
-    if (!drawing) return;
+    const anchor = anchorRef.current;
+    if (!anchor) return;
     const current = point(event);
-    setDrawing({ x: Math.min(drawing.x, current.x), y: Math.min(drawing.y, current.y), w: Math.abs(current.x - drawing.x), h: Math.abs(current.y - drawing.y) });
+    commitDrawing({ x: Math.min(anchor.x, current.x), y: Math.min(anchor.y, current.y), w: Math.abs(current.x - anchor.x), h: Math.abs(current.y - anchor.y) });
   };
   const pointerUp = () => {
     panRef.current = null;
-    if (!drawing) return;
-    if (drawing.w < 8 || drawing.h < 8) {
-      setRegionError('Region discarded: w and h must each be at least 8 image pixels.');
+    const anchor = anchorRef.current;
+    const rect = drawingRef.current;
+    anchorRef.current = null;
+    drawingRef.current = null;
+    if (!anchor || !rect) return;
+    if (rect.w < 8 || rect.h < 8) {
+      setRegionError('Region discarded: width and height must each be at least 8 image pixels.');
       setDrawing(null);
       return;
     }
     const attributeValues = Object.fromEntries((armed?.attributes || []).map((attribute) => [attribute.name, attribute.kind === 'select' ? attribute.options[0] : '']));
-    const result = addRegion(item.id, { classId: armed.id, x: Math.round(drawing.x), y: Math.round(drawing.y), w: Math.round(drawing.w), h: Math.round(drawing.h), attributeValues });
+    const result = addRegion(item.id, { classId: armed.id, x: Math.round(rect.x), y: Math.round(rect.y), w: Math.round(rect.w), h: Math.round(rect.h), attributeValues });
     setRegionError(result.ok ? '' : result.error);
     setDrawing(null);
   };
@@ -102,14 +116,16 @@ function RegionWorkspace({ item, draft }) {
       <div ref={viewportRef} className={`image-viewport tool-${ui.tool}`} onPointerDown={pointerDown} onPointerMove={pointerMove} onPointerUp={pointerUp} onPointerCancel={pointerUp}>
         <div className="image-transform" style={{ transform: `translate(${ui.panX}px, ${ui.panY}px) scale(${ui.zoom})` }}>
           <img src={item.image} alt="Warehouse evaluation scene for region labeling" draggable="false" />
-          {draft.regions.map((region) => {
-            const cls = taxonomy.find((c) => c.id === region.classId);
-            return <button key={region.id} type="button" aria-label={`Select ${cls?.name || 'Unclassified'} region`} className={`region-box ${region.id === selectedRegionId ? 'selected' : ''}`} style={boxStyle(region)} onPointerDown={(e) => e.stopPropagation()} onClick={() => selectRegion(region.id)}><span style={{ background: cls?.color || '#6f6f6f' }}>{cls?.name || 'Unclassified'}</span></button>;
-          })}
+          <div className="region-layer" ref={layerRef}>
+            {draft.regions.map((region) => {
+              const cls = taxonomy.find((c) => c.id === region.classId);
+              return <button key={region.id} type="button" aria-label={`Select ${cls?.name || 'Unclassified'} region`} className={`region-box ${region.id === selectedRegionId ? 'selected' : ''}`} style={boxStyle(region)} onPointerDown={(e) => e.stopPropagation()} onClick={() => selectRegion(region.id)}><span style={{ background: cls?.color || '#6f6f6f' }}>{cls?.name || 'Unclassified'}</span></button>;
+            })}
+          </div>
           {drawing && <div className="region-box drawing" style={boxStyle({ ...drawing, classId: armed.id })} />}
         </div>
       </div>
-      <div className="region-list" aria-label="Region list">
+      <div className="region-list" aria-label="Region list" ref={listRef}>
         <h3>Regions <span>{draft.regions.length}</span></h3>
         {draft.regions.map((region) => {
           const cls = taxonomy.find((c) => c.id === region.classId);
@@ -147,6 +163,7 @@ export default function AnnotationCard() {
   const itemId = useStudioStore((s) => s.activeItemId);
   const item = useStudioStore((s) => itemId ? s.items[itemId] : null);
   const draft = useStudioStore((s) => itemId ? s.drafts[itemId] : null);
+  const suites = useStudioStore((s) => s.suites);
   const suite = useStudioStore((s) => s.suites.find((entry) => entry.id === s.activeSuiteId));
   const metadataFields = useStudioStore((s) => s.metadataFields);
   const updateDraft = useStudioStore((s) => s.updateDraft);
@@ -154,6 +171,7 @@ export default function AnnotationCard() {
   const submit = useStudioStore((s) => s.submitAnnotation);
   const skip = useStudioStore((s) => s.skipItems);
   const accept = useStudioStore((s) => s.acceptSuggestion);
+  const selectSuite = useStudioStore((s) => s.selectSuite);
   const setView = useStudioStore((s) => s.setView);
   const [error, setError] = useState('');
   const [transitionKey, setTransitionKey] = useState(0);
@@ -166,7 +184,7 @@ export default function AnnotationCard() {
     return { valid: schemaValid && metadataValid && Object.values(draft.touchedScores).every(Boolean) };
   }, [draft, metadataFields]);
 
-  if (!item || !draft) return <div className="empty-state"><div className="empty-mark"><Checkmark size={36} /></div><h2>{suite?.name} is complete</h2><p>Every output in this suite has an annotation. Switch suites or open the Review queue.</p><Button onClick={() => setView('review-queue')}>Open Review queue</Button></div>;
+  if (!item || !draft) return <div className="empty-state"><div className="empty-mark"><Checkmark size={36} /></div><p className="eyebrow">Suite complete</p><h2>{suite?.name} is complete</h2><p>Every output in this suite has an annotation. Pick another suite to keep labeling, or review the work this suite produced.</p><div className="empty-actions"><Select id="switch-suite" labelText="Switch suite" value="" onChange={(e) => e.target.value && selectSuite(e.target.value)}><SelectItem value="" text="Choose a suite" disabled />{suites.map((entry) => <SelectItem key={entry.id} value={entry.id} text={entry.name} />)}</Select><Button kind="tertiary" onClick={() => setView('review-queue')}>Open Review queue</Button><Button kind="secondary" onClick={() => setView('export')}>Open Export</Button></div></div>;
   const onSubmit = () => {
     const result = submit(item.id);
     if (!result.ok) setError(result.error);
@@ -174,7 +192,7 @@ export default function AnnotationCard() {
   };
   return <article key={`${item.id}-${transitionKey}`} className="annotation-card card-enter">
     <header className="card-header"><div><p className="eyebrow">{suite?.name} · {item.id}</p><h1>{item.title}</h1></div><StateChip state={item.review_state} /></header>
-    {item.suggested && <ActionableNotification inline lowContrast kind="info" title="Suggested rating available" subtitle={`${item.suggested.rating.toUpperCase()} · Accuracy ${item.suggested.scores.Accuracy}, Clarity ${item.suggested.scores.Clarity}, Relevance ${item.suggested.scores.Relevance}`} actionButtonLabel="Accept suggestion" onActionButtonClick={() => accept(item.id)} hideCloseButton />}
+    {item.suggested && !item.suggestionAccepted && <ActionableNotification inline lowContrast kind="info" role="status" title="Suggested rating available" subtitle={`${item.suggested.rating === 'up' ? 'Up' : 'Down'} · Accuracy ${item.suggested.scores.Accuracy}, Clarity ${item.suggested.scores.Clarity}, Relevance ${item.suggested.scores.Relevance}`} actionButtonLabel="Accept suggestion" onActionButtonClick={() => accept(item.id)} hideCloseButton />}
     <section className="prompt-section"><h2>Original prompt</h2><CodeSnippet type="multi" hideCopyButton>{item.prompt}</CodeSnippet></section>
     {item.image && <RegionWorkspace item={item} draft={draft} />}
     <section className="response-section"><h2>Model response</h2><Tile className="response-tile">{item.response}</Tile></section>
@@ -182,7 +200,7 @@ export default function AnnotationCard() {
     <section className="rubric-section"><h2>Rubric scores</h2><div className="rubric-grid">{Object.keys(draft.scores).map((key) => <div className="rubric-row" key={key}>
       <div><strong>{key}</strong><span>{draft.touchedScores[key] ? 'Scored' : 'Move slider to confirm'}</span></div>
       <Slider id={`${item.id}-${key}`} labelText="" min={1} max={5} step={1} value={draft.scores[key]} hideTextInput onChange={({ value }) => updateScore(item.id, key, Number(value))} />
-      <output aria-label={`${key} score`}>{draft.scores[key]}</output>
+      <output key={`${key}-${draft.scores[key]}`} className="score-pop" aria-label={`${key} score`}>{draft.scores[key]}</output>
     </div>)}</div></section>
     <section className="comment-section"><TextArea id={`${item.id}-comment`} labelText="Annotator comments (optional)" maxLength={500} value={draft.comment} onChange={(event) => updateDraft(item.id, { comment: event.target.value.slice(0, 500) })} /><span className="char-counter">{500 - draft.comment.length} remaining</span></section>
     <MetadataControls itemId={item.id} draft={draft} />

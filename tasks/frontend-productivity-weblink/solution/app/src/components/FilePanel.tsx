@@ -19,26 +19,26 @@ export default function FilePanel() {
       data-testid="file-panel"
     >
       <div class="flex items-center justify-between mb-3">
-         <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">
-           File transfer
+         <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-600 dark:text-slate-400">
+           File Transfer
          </h2>
       </div>
 
-      <button
-        type="button"
-        class="mb-3 w-full rounded-lg border border-dashed border-slate-300 px-3 py-4 text-sm
-          text-slate-500 transition hover:border-sky-400 hover:bg-sky-50 hover:text-sky-600
-          active:scale-95 dark:border-slate-700 dark:hover:bg-slate-900/40"
-        onClick={() => fileInputRef?.click()}
+      <label
+        for="file-input"
         data-testid="choose-file-button"
+        class="touch-target mb-3 flex w-full cursor-pointer items-center justify-center rounded-lg border border-dashed border-slate-300 px-3 py-4 text-sm
+          text-slate-600 transition hover:border-sky-400 hover:bg-sky-50 hover:text-sky-700
+          dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-900/40"
       >
-        Choose file to queue
-      </button>
+        Choose File to Queue
+      </label>
       <input
+        id="file-input"
         ref={fileInputRef}
         type="file"
         multiple
-        class="hidden"
+        class="sr-only"
         onChange={handleFiles}
         data-testid="file-input"
       />

@@ -10,29 +10,29 @@ import ExportTranscriptDialog from "./components/ExportTranscriptDialog";
 export default function App() {
   return (
     <div
-      class="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-300 dark:bg-slate-900 dark:text-slate-100"
+      class="min-h-screen bg-slate-50 text-slate-900 transition-colors duration-75 dark:bg-slate-900 dark:text-slate-100"
       data-theme={state.ui.theme}
     >
       <header
         class="flex items-center justify-between border-b border-slate-200 bg-white/80 px-6 py-3
-          backdrop-blur transition-colors duration-300 dark:border-slate-800 dark:bg-slate-900/80"
+          backdrop-blur transition-colors duration-75 dark:border-slate-800 dark:bg-slate-900/80"
       >
         <div class="flex items-center gap-3">
-          <h1 class="text-lg font-semibold tracking-tight">Weblink</h1>
-          <span class="text-xs text-slate-400">peer-to-peer chat &amp; file transfer</span>
+          <h1 class="text-xl font-semibold tracking-tight lg:text-lg">Weblink</h1>
+          <span class="hidden text-xs text-slate-600 dark:text-slate-400 sm:inline">peer-to-peer chat &amp; file transfer</span>
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3">
           <ExportTranscriptDialog />
           <ImportDialog />
           <ExportDialog />
           <button
             type="button"
             data-testid="theme-toggle"
-            class="rounded-full border border-slate-300 px-3 py-1.5 text-xs font-medium transition
-              hover:bg-slate-100 hover:shadow-sm active:scale-95 dark:border-slate-700 dark:hover:bg-slate-800"
+            class="touch-target rounded-full border border-slate-300 px-4 py-2 text-sm font-medium transition
+              hover:bg-slate-100 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 dark:border-slate-700 dark:hover:bg-slate-800"
             onClick={toggleTheme}
           >
-            {state.ui.theme === "light" ? "Dark mode" : "Light mode"}
+            {state.ui.theme === "light" ? "Dark Mode" : "Light Mode"}
           </button>
         </div>
       </header>

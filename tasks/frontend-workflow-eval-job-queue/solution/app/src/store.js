@@ -70,12 +70,12 @@ function makeJob({ id, dataset, agent, model, trialCount, status, complete = 0, 
 }
 
 function seedJobs() {
-  return [
+  const core = [
     makeJob({ id: 'evq-309', dataset: 'orchard-qa', agent: 'scouthand', model: 'cobalt-4', trialCount: 8, status: 'running', complete: 5, minutes: 7 }),
     makeJob({ id: 'evq-308', dataset: 'ledgerline-suite', agent: 'forgeline', model: 'meridian-xl', trialCount: 6, status: 'running', complete: 2, minutes: 11, special: 'backoff' }),
     makeJob({ id: 'evq-307', dataset: 'orchard-qa', agent: 'forgeline', model: 'willow-mini', trialCount: 5, status: 'completed', complete: 5, minutes: 29 }),
     makeJob({ id: 'evq-306', dataset: 'ledgerline-suite', agent: 'scouthand', model: 'cobalt-4', trialCount: 4, status: 'completed', complete: 4, minutes: 41 }),
-    makeJob({ id: 'evq-305', dataset: 'orchard-qa', agent: 'scouthand', model: 'meridian-xl', trialCount: 7, status: 'failed', complete: 3, minutes: 54 }),
+    makeJob({ id: 'evq-305', dataset: 'orchard-qa', agent: 'scouthand', model: 'meridian-xl', trialCount: 7, status: 'running', complete: 3, minutes: 54, special: 'backoff' }),
     makeJob({ id: 'evq-304', dataset: 'ledgerline-suite', agent: 'forgeline', model: 'willow-mini', trialCount: 6, status: 'queued', minutes: 4 }),
     makeJob({ id: 'evq-303', dataset: 'orchard-qa', agent: 'forgeline', model: 'cobalt-4', trialCount: 3, status: 'cancelled', complete: 1, minutes: 68 }),
     makeJob({ id: 'evq-302', dataset: 'ledgerline-suite', agent: 'scouthand', model: 'meridian-xl', trialCount: 5, status: 'queued', minutes: 2, special: 'hold' }),
@@ -83,6 +83,23 @@ function seedJobs() {
     makeJob({ id: 'evq-300', dataset: 'ledgerline-suite', agent: 'forgeline', model: 'cobalt-4', trialCount: 4, status: 'completed', complete: 4, minutes: 96 }),
     makeJob({ id: 'evq-299', dataset: 'orchard-qa', agent: 'forgeline', model: 'meridian-xl', trialCount: 8, status: 'cancelled', complete: 2, minutes: 112 }),
   ]
+  const models = MODELS
+  const datasets = ['orchard-qa', 'ledgerline-suite']
+  const agents = ['scouthand', 'forgeline']
+  const archive = Array.from({ length: 24 }, (_, index) => {
+    const id = `evq-${280 - index}`
+    return makeJob({
+      id,
+      dataset: datasets[index % datasets.length],
+      agent: agents[index % agents.length],
+      model: models[index % models.length],
+      trialCount: 3 + (index % 4),
+      status: 'completed',
+      complete: 3 + (index % 4),
+      minutes: 120 + index * 3,
+    })
+  })
+  return [...core, ...archive]
 }
 
 function seedProviders() {
@@ -98,7 +115,7 @@ function seedTimeline() {
     { id: 'evt-12', timestamp: isoAgo(8), status: 'completed', kind: 'trial', label: 'evq-309 · trial 05 completed' },
     { id: 'evt-11', timestamp: isoAgo(29), status: 'completed', kind: 'job', label: 'evq-307 completed 5 trials' },
     { id: 'evt-10', timestamp: isoAgo(41), status: 'completed', kind: 'job', label: 'evq-306 completed 4 trials' },
-    { id: 'evt-09', timestamp: isoAgo(54), status: 'failed', kind: 'job', label: 'evq-305 failed after automatic retries' },
+    { id: 'evt-09', timestamp: isoAgo(54), status: 'running', kind: 'trial', label: 'evq-305 · automatic retry countdown active' },
     { id: 'evt-08', timestamp: isoAgo(68), status: 'cancelled', kind: 'job', label: 'evq-303 cancelled by operator' },
     { id: 'evt-07', timestamp: isoAgo(83), status: 'completed', kind: 'job', label: 'evq-301 completed 6 trials' },
   ]
@@ -174,6 +191,7 @@ const initialChrome = {
   exportOpen: false,
   importOpen: false,
   confirm: null,
+  focusReturn: null,
 }
 
 export const useQueueStore = create((set, get) => ({
@@ -183,6 +201,11 @@ export const useQueueStore = create((set, get) => ({
   filters: { status: '', model: '', dataset: '', timelineStatus: '' },
   selectedJobId: null,
   activeView: 'jobs',
+  tourStep: 0,
+  tourDismissed: false,
+  density: 'comfortable',
+  theme: 'dark',
+  clipboardStaging: '',
   formDraft: { dataset: '', agent: '', model: '', trialCount: '4', sweepModel: '' },
   exportPreviewText: '',
   importDraft: '',
@@ -197,14 +220,25 @@ export const useQueueStore = create((set, get) => ({
   clearFilters: () => set((state) => ({ filters: { ...state.filters, status: '', model: '', dataset: '' } })),
   setFormDraft: (formDraft) => set({ formDraft }),
   setImportDraft: (importDraft) => set({ importDraft, importError: '' }),
-  setChrome: (name, value) => set((state) => ({ chrome: { ...state.chrome, [name]: value } })),
+  setChrome: (name, value) => set((state) => ({
+    chrome: {
+      ...state.chrome,
+      [name]: value,
+      focusReturn: value && typeof document !== 'undefined' ? document.activeElement : state.chrome.focusReturn,
+    },
+  })),
+  dismissTour: () => set({ tourDismissed: true, tourStep: 0 }),
+  advanceTour: () => set((state) => ({ tourStep: state.tourStep + 1 })),
+  setDensity: (density) => set({ density }),
+  setTheme: (theme) => set({ theme }),
+  stageClipboard: (clipboardStaging) => set({ clipboardStaging }),
   requestConfirm: (confirm) => set((state) => ({ chrome: { ...state.chrome, confirm } })),
   closeConfirm: () => set((state) => ({ chrome: { ...state.chrome, confirm: null } })),
 
   addToast: (title, tone = 'success') => {
     const id = nextId('toast')
     set((state) => ({ toasts: [...state.toasts, { id, title, tone }] }))
-    window.setTimeout(() => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })), 3400)
+    window.setTimeout(() => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })), 5200)
   },
   dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })),
 
@@ -386,11 +420,14 @@ export const useQueueStore = create((set, get) => ({
     timeline: seedTimeline(),
     selectedJobId: null,
     activeView: 'jobs',
+    tourStep: 0,
+    tourDismissed: false,
     filters: { status: '', model: '', dataset: '', timelineStatus: '' },
     exportPreviewText: '',
     importDraft: '',
     importError: '',
     chrome: initialChrome,
+    clipboardStaging: '',
   }),
 
   tick: () => {
@@ -440,7 +477,7 @@ export const useQueueStore = create((set, get) => ({
           }
           if (!runningTrial) continue
           runningTrial.elapsed = (runningTrial.elapsed || 0) + 1
-          const multiplier = provider.rateLimit === 'throttled' ? 2 : 1
+          const multiplier = provider.rateLimit === 'throttled' ? 4 : 1
           if (runningTrial.elapsed >= runningTrial.targetDuration * multiplier) {
             const trialIndex = job.trials.findIndex((trial) => trial.id === runningTrial.id)
             runningTrial.status = 'completed'

@@ -29,10 +29,4 @@ export const THEMES: Record<ThemeName, number[]> = {
   Solarised: [0x000000, 0x002b36, 0x073642, 0x586e75, 0x657b83, 0xb58900],
 };
 
-export function css(n: number): string {
-  return "#" + (n & 0xffffff).toString(16).padStart(6, "0");
-}
-
-export function hexToInt(hex: string): number {
-  return parseInt(hex.replace(/^#/, ""), 16) & 0xffffff;
-}
+export { css, hexToInt } from "./colour";

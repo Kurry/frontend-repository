@@ -1,3 +1,5 @@
+import { formatSchemaError } from './schemas.js';
+
 const enumSchema = (values) => ({ type: 'string', enum: values });
 const ok = (message, data = {}) => ({ ok: true, message, ...data });
 const fail = (message) => ({ ok: false, message });
@@ -22,7 +24,12 @@ export function registerWebMCP(state, callbacks) {
       name: 'browse_search',
       description: 'Search the submissions collection by task, submitter, or submission id.',
       inputSchema: { type: 'object', properties: { query: { type: 'string', minLength: 0, maxLength: 120 } }, required: ['query'], additionalProperties: false },
-      execute: ({ query }) => { state.searchQuery = query; state.navigate('queue'); return ok('Submission search applied.', { visibleCount: state.visibleSubmissions.length }); }
+      execute: ({ query }) => {
+        state.searchQuery = query;
+        state.setReviewFilter('all');
+        state.navigate('queue');
+        return ok('Submission search applied.', { visibleCount: state.visibleSubmissions.length });
+      }
     },
     {
       name: 'browse_apply_filter',
@@ -73,7 +80,10 @@ export function registerWebMCP(state, callbacks) {
         required: ['verdict', 'rationale'],
         additionalProperties: false
       },
-      execute: (payload) => { const result = state.validateDecision(payload); return result.success ? ok('Decision payload is valid.') : fail(result.error.issues[0].message); }
+      execute: (payload) => {
+        const result = state.validateDecision(payload);
+        return result.success ? ok('Decision payload is valid.') : fail(formatSchemaError(result.error));
+      }
     },
     {
       name: 'form_submit',
@@ -84,7 +94,13 @@ export function registerWebMCP(state, callbacks) {
         required: ['verdict', 'rationale'],
         additionalProperties: false
       },
-      execute: async (payload) => state.submitDecision(payload)
+      execute: async (payload) => {
+        if (!state.selectedSubmissionId) {
+          return fail('submissionId: Select a submission before deciding.');
+        }
+        const result = await state.submitDecision(payload);
+        return result.ok ? ok('Decision recorded.', { requestBody: result.requestBody }) : fail(result.error);
+      }
     },
     {
       name: 'form_cancel',
@@ -101,9 +117,13 @@ export function registerWebMCP(state, callbacks) {
         required: ['task', 'testId', 'included'],
         additionalProperties: false
       },
-      execute: ({ task, testId, included }) => state.toggleMutationTest(task, testId, included)
-        ? ok('Mutation test inclusion updated.')
-        : fail('mutation-test: task and testId must identify the same declared test.')
+      execute: ({ task, testId, included }) => {
+        const updated = state.toggleMutationTest(task, testId, included);
+        state.navigate('mutation');
+        return updated
+          ? ok('Mutation test inclusion updated.')
+          : fail('mutationSuites.tests.id: task and testId must identify the same declared test.');
+      }
     },
     {
       name: 'artifact_export',

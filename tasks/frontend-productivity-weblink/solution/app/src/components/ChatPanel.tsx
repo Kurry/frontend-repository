@@ -68,7 +68,7 @@ export default function ChatPanel() {
               <div
                 class={`max-w-[80%] rounded-2xl px-4 py-2.5 text-sm shadow-sm transition-colors ${
                   m.from === "you"
-                    ? "bg-sky-600 text-white rounded-br-sm"
+                    ? "bg-sky-700 text-white rounded-br-sm"
                     : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200 rounded-bl-sm"
                 }`}
               >
@@ -127,7 +127,7 @@ export default function ChatPanel() {
                </div>
               <button
                 type="submit"
-                class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-500 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 h-[52px]"
+                class="touch-target rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:cursor-not-allowed disabled:opacity-50 h-[52px]"
                 disabled={chatDisabled() || !form.state.values.text.trim()}
                 data-testid="chat-send-button"
               >
@@ -138,7 +138,7 @@ export default function ChatPanel() {
         </form.Field>
       </form>
       <Show when={chatDisabled()}>
-        <p class="mt-2 text-xs text-slate-400" data-testid="chat-disabled-note">
+        <p class="mt-2 text-xs text-slate-600 dark:text-slate-400" data-testid="chat-disabled-note">
           Sending is disabled while disconnected — no peer session is active.
         </p>
       </Show>

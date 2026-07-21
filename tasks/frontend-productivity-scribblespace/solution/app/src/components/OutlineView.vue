@@ -7,8 +7,15 @@ const store = useAppStore()
 const board = computed(() => store.activeBoard)
 const sortedObjects = computed(() => {
   if (!board.value) return []
-  return [...board.value.objects].sort((a, b) => b.zIndex - a.zIndex)
+  let objs = [...board.value.objects]
+  const q = store.searchQuery.trim()
+  if (q) {
+    objs = objs.filter(o => store.searchMatchIds.includes(o.id))
+  }
+  return objs.sort((a, b) => b.zIndex - a.zIndex)
 })
+
+const hasSearchQuery = computed(() => store.searchQuery.trim().length > 0)
 
 const colorName = (hex: string) => {
   const map: Record<string, string> = {}
@@ -30,7 +37,7 @@ const snippet = (text?: string) => {
       <h2 class="text-2xl font-bold text-gray-900 mb-6">Outline: {{ board?.name }}</h2>
 
       <div v-if="sortedObjects.length === 0" class="text-gray-500 italic">
-        No objects on this board.
+        {{ hasSearchQuery ? 'No results for the query' : 'No objects on this board.' }}
       </div>
 
       <div v-else class="flex flex-col gap-2 relative">

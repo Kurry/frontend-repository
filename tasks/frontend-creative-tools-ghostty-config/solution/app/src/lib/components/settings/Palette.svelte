@@ -1,6 +1,9 @@
 <script lang="ts">
     import type {HexColor} from "$lib/utils/colors";
     import Color from "./Color.svelte";
+    import {getSetting} from "$lib/contexts";
+
+    const settingInfo = getSetting();
 
 
     interface Props {
@@ -23,7 +26,7 @@
 <div class="grid-container">
     <div class="color-grid" style:--count-per-row={countPerRow} style:--num-rows={numRows}>
         {#each value as _, i (i)}
-            <Color defaultValue={defaultValue[i]} bind:value={() => value[i], (v: HexColor) => onSet ? onSet(i, v) : value[i] = v} size={40} label={(i + 1).toString()} {resetMessage} tooltip={swatchTooltip?.(i)} />
+            <Color defaultValue={defaultValue[i]} bind:value={() => value[i], (v: HexColor) => onSet ? onSet(i, v) : value[i] = v} size={40} label={(i + 1).toString()} {resetMessage} tooltip={swatchTooltip?.(i)} inputId={i === 0 ? settingInfo?.controlId : `palette-swatch-${i}`} />
         {/each}
     </div>
 </div>

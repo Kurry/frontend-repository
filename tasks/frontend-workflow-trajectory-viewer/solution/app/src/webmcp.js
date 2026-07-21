@@ -93,7 +93,8 @@ export function useWebMcp() {
       app.deleteAnnotation(annotation_index); return response({ annotation_count: state().annotationsByTrial[app.activeTrialId].length })
     })
 
-    const failureProperties = {
+    const formProperties = {
+      note_text: { type: 'string', minLength: 1, maxLength: 500 },
       stage: { type: 'string', enum: ['planning', 'tool-use', 'verification', 'recovery'] },
       root_cause: { type: 'string', enum: ['wrong-tool', 'missing-context', 'hallucinated-path', 'timeout'] },
       behavior: { type: 'string', enum: ['loops', 'abandons', 'invents-files', 'ignores-errors'] },
@@ -101,14 +102,47 @@ export function useWebMcp() {
       evidence: { type: 'string', minLength: 20, maxLength: 2000 },
       implicated_steps: { type: 'array', minItems: 1, items: { type: 'integer', minimum: 1 } },
     }
+    const hasClassification = (args) => ['stage', 'root_cause', 'behavior', 'impact', 'evidence', 'implicated_steps'].some((key) => args[key] !== undefined)
     const validateFailure = (args) => {
       const trial = activeTrial(); const parsed = failureReportSchema.safeParse(args)
       if (!parsed.success) fail(parsed.error.issues[0].message)
       if (!trial || !validateStepIndices(parsed.data.implicated_steps, trial)) fail('implicated_steps must exist on the active trial')
       return parsed.data
     }
-    register('form_validate', 'Validate a failure classification without creating a report.', failureProperties, ['stage', 'root_cause', 'behavior', 'impact', 'evidence', 'implicated_steps'], async (args) => { validateFailure(args); return response({ valid: true }) })
-    register('form_submit', 'Submit a failure classification using the visible form command.', failureProperties, ['stage', 'root_cause', 'behavior', 'impact', 'evidence', 'implicated_steps'], async (args) => { const body = validateFailure(args); state().submitReport(body); return response({ report_card_present: true, active_step_index: state().activeStepIndex }) })
+    const validateNote = (args) => {
+      const trial = activeTrial()
+      const step_index = Number(args.step_index || state().activeStepIndex)
+      const parsed = annotationSchema.safeParse({ note_text: args.note_text, step_index })
+      if (!parsed.success) fail(parsed.error.issues[0].message)
+      if (!trial || !validateStepIndices([parsed.data.step_index], trial)) fail('step_index must exist on the active trial')
+      return parsed.data
+    }
+    register('form_validate', 'Validate note text and/or failure classification without mutating review state.', formProperties, [], async (args) => {
+      if (args.note_text === undefined && !hasClassification(args)) fail('Provide note_text and/or classification fields')
+      if (args.note_text !== undefined) validateNote(args)
+      if (hasClassification(args)) validateFailure(args)
+      return response({ valid: true })
+    })
+    register('form_submit', 'Submit a note and/or failure classification using the same commands as the visible forms.', formProperties, [], async (args) => {
+      if (args.note_text === undefined && !hasClassification(args)) fail('Provide note_text and/or classification fields')
+      if (hasClassification(args)) validateFailure(args)
+      let annotation_count
+      if (args.note_text !== undefined) {
+        const note = validateNote(args)
+        state().addAnnotation(note)
+        annotation_count = state().annotationsByTrial[activeTrial().id].length
+      }
+      if (hasClassification(args)) {
+        const body = validateFailure(args)
+        state().submitReport(body)
+      }
+      return response({
+        valid: true,
+        report_card_present: !!state().reportsByTrial[state().activeTrialId],
+        annotation_count: annotation_count ?? (state().annotationsByTrial[state().activeTrialId] || []).length,
+        active_step_index: state().activeStepIndex,
+      })
+    })
 
     register('artifact_export', 'Open the live review export preview in a declared format.', { format: { type: 'string', enum: ['json', 'markdown'] } }, ['format'], async ({ format }) => { state().setExportFormat(format); state().openExport(); return response({ export_preview_present: true, format }) })
     register('artifact_import', 'Open the visible review-package import workflow.', { mode: { type: 'string', enum: ['review-package'] } }, ['mode'], async () => { state().openImport(); return response({ import_surface_present: true }) })

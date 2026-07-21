@@ -10,12 +10,12 @@
 <aside class="w-64 bg-slate-50 border-r border-slate-200 flex flex-col h-full overflow-hidden flex-shrink-0">
   <!-- Header -->
   <div class="p-3 border-b border-slate-200">
-    <h1 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+    <div class="text-lg font-bold text-slate-800 flex items-center gap-2">
       <svg class="w-5 h-5 text-indigo-500" fill="currentColor" viewBox="0 0 20 20">
         <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/>
       </svg>
       NoteNest
-    </h1>
+    </div>
   </div>
 
   <!-- New Folder button -->

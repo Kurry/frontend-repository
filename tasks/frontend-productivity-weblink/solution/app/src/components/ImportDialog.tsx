@@ -80,7 +80,7 @@ export default function ImportDialog() {
 
   return (
     <Dialog open={open()} onOpenChange={(isOpen) => { setOpen(isOpen); if (!isOpen) { setJsonText(""); setErrorMsg(""); } }}>
-      <Dialog.Trigger class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium transition hover:bg-slate-100 active:scale-95 dark:border-slate-700 dark:hover:bg-slate-800">
+      <Dialog.Trigger class="touch-target rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium transition hover:bg-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 dark:border-slate-700 dark:hover:bg-slate-800">
         Import Session
       </Dialog.Trigger>
       <Dialog.Portal>
@@ -91,8 +91,8 @@ export default function ImportDialog() {
               <Dialog.Title class="text-lg font-semibold text-slate-900 dark:text-slate-100">
                 Import Session Pack
               </Dialog.Title>
-              <Dialog.CloseButton class="rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+              <Dialog.CloseButton class="rounded text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
                    <path d="M18 6l-12 12"></path>
                    <path d="M6 6l12 12"></path>
@@ -101,12 +101,16 @@ export default function ImportDialog() {
               </Dialog.CloseButton>
             </div>
 
-            <Dialog.Description class="text-sm text-slate-500 dark:text-slate-400 mb-4">
+            <Dialog.Description class="text-sm text-slate-600 dark:text-slate-400 mb-4">
               Paste a Session Pack JSON to restore identity, chat history, file queue, and transfer logs. This will replace your current session state.
             </Dialog.Description>
 
+            <label for="import-json" class="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Session Pack JSON
+            </label>
             <textarea
-              class="w-full flex-1 min-h-[200px] mb-2 rounded-lg border border-slate-300 bg-transparent px-3 py-2 text-sm font-mono transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:border-slate-700 dark:focus:ring-sky-900 resize-none"
+              id="import-json"
+              class="w-full flex-1 min-h-[200px] mb-2 rounded-lg border border-slate-300 bg-transparent px-3 py-2 text-sm font-mono transition focus:border-sky-400 focus:ring-2 focus:ring-sky-300 focus-visible:outline-none dark:border-slate-700 dark:focus:ring-sky-800 resize-none"
               placeholder="Paste JSON here..."
               value={jsonText()}
               onInput={(e) => setJsonText(e.currentTarget.value)}
@@ -117,7 +121,7 @@ export default function ImportDialog() {
             </Show>
 
             <div class="flex justify-end mt-auto pt-2">
-               <button onClick={handleImport} disabled={!jsonText().trim()} class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-500 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+               <button onClick={handleImport} disabled={!jsonText().trim()} class="touch-target rounded-lg bg-sky-700 px-4 py-2 text-sm font-medium text-white transition hover:bg-sky-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 disabled:opacity-50 disabled:cursor-not-allowed">
                  Apply Import
                </button>
             </div>

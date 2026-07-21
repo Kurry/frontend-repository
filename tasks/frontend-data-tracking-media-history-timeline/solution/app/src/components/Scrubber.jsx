@@ -1,8 +1,8 @@
 import React from 'react';
-import { useAtom, useAtomValue } from 'jotai';
-import { yearWindowAtom, filteredEventsAtom } from '../store.js';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
+import { yearWindowAtom, filteredEventsAtom, fullSpanAtom } from '../store.js';
 import { MT_DATA } from '../data.js';
-import { RangeSlider } from '@mantine/core';
+import { RangeSlider, Button } from '@mantine/core';
 
 function formatYear(y) {
   if (y < 1) return `${Math.abs(y)} BCE`;
@@ -12,6 +12,7 @@ function formatYear(y) {
 export function Scrubber() {
   const [yearWindow, setYearWindow] = useAtom(yearWindowAtom);
   const events = useAtomValue(filteredEventsAtom);
+  const fullSpan = useSetAtom(fullSpanAtom);
 
   const handleChange = (val) => {
     let from = Math.max(MT_DATA.yearMin, Math.min(val[0], MT_DATA.yearMax));
@@ -32,8 +33,13 @@ export function Scrubber() {
         <div className="text-sm font-bold font-serif">
           {formatYear(Math.round(yearWindow.from))} — {formatYear(Math.round(yearWindow.to))}
         </div>
-        <div className="text-xs text-gray-500 font-medium">
-          {events.length} events in view
+        <div className="flex items-center gap-3">
+          <div className="text-xs text-gray-500 font-medium">
+            {events.length} events in view
+          </div>
+          <Button size="xs" variant="default" radius="xl" onClick={() => fullSpan()} aria-label="Fit full span">
+            Full span
+          </Button>
         </div>
       </div>
       <div className="px-2">

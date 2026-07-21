@@ -1,7 +1,173 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Desmontilles';
+  src: url('./assets/fonts/desmontilles.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Abril';
+  src: url('./assets/fonts/abrilfatface.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Timezone';
+  src: url('./assets/fonts/HALTimezone-Book.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Timezone';
+  font-style: italic;
+  src: url('./assets/fonts/HALTimezone-BookItalic.woff2') format('woff2');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Timezone Mono';
+  src: url('./assets/fonts/HALTimezoneMono.woff2') format('woff2');
+  font-display: swap;
+}
+
 @theme {
-  --font-serif: 'Georgia', serif;
-  --font-mono: 'Courier New', monospace;
-  --font-sans: 'Arial', sans-serif;
+  --color-cream: #f4edde;
+  --color-parchment: #faf6ea;
+  --color-sand: #e9dfc8;
+  --color-ink: #211a12;
+  --color-ink-soft: #5c5240;
+  --color-rule: #d9cfb8;
+  --color-oxblood: #7c2d26;
+  --color-moss: #4a5d23;
+  --color-gold: #b79e4b;
+  --color-error: #a32c1e;
+
+  --font-display: 'Desmontilles', 'Snell Roundhand', cursive;
+  --font-plate: 'Abril', Georgia, serif;
+  --font-serif: 'Timezone', Georgia, serif;
+  --font-mono: 'Timezone Mono', 'Courier New', monospace;
+  --font-sans: 'Timezone', Georgia, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ambient layered field: paper grain + faint rule grid */
+.paper-field {
+  background-image:
+    radial-gradient(rgba(33, 26, 18, 0.035) 1px, transparent 1px),
+    linear-gradient(rgba(33, 26, 18, 0.025) 1px, transparent 1px);
+  background-size: 22px 22px, 100% 3.4rem;
+}
+
+/* Globally visible focus indicator */
+:focus-visible {
+  outline: 2px solid var(--color-oxblood);
+  outline-offset: 2px;
+}
+
+/* Every rendered color surface eases recoloring (vision sim, batch preview, apply) */
+.swatch-surface {
+  transition: background-color 0.45s ease, outline-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Palette card enter / exit / move */
+.card-move,
+.card-enter-active,
+.card-leave-active {
+  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+.card-enter-from {
+  opacity: 0;
+  transform: translateY(16px) scale(0.96);
+}
+.card-leave-to {
+  opacity: 0;
+  transform: scale(0.93);
+}
+.card-leave-active {
+  position: absolute;
+  width: 100%;
+}
+
+/* Generic fade (rows, chips) */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+/* Overlay / drawer fades */
+.overlay-enter-active,
+.overlay-leave-active {
+  transition: opacity 0.28s ease;
+}
+.overlay-enter-from,
+.overlay-leave-to {
+  opacity: 0;
+}
+
+/* On-swatch copied confirmation */
+.chip-pop-enter-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+.chip-pop-leave-active {
+  transition: opacity 0.35s ease;
+}
+.chip-pop-enter-from {
+  opacity: 0;
+  transform: translateY(4px) scale(0.94);
+}
+.chip-pop-leave-to {
+  opacity: 0;
+}
+
+/* Scroll-triggered editorial reveals */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Color-wheel companion points glide when the mode changes, track live while dragging */
+.wheel-point {
+  transition: left 0.35s cubic-bezier(0.3, 0.9, 0.3, 1), top 0.35s cubic-bezier(0.3, 0.9, 0.3, 1);
+}
+.wheel-dragging .wheel-point {
+  transition: none;
+}
+
+/* Wheel anchor eases hue changes made with the keyboard */
+.wheel-anchor {
+  transition: background-color 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+    scroll-behavior: auto !important;
+  }
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

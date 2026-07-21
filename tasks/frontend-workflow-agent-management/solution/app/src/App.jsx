@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
 import {
   Button,
-  Checkbox,
   Dropdown,
   InlineNotification,
   Modal,
@@ -57,27 +56,30 @@ import {
   createUniqueAgentSchema,
   importFormSchema,
   parseFleetText,
-  statusFilterSchema,
   timelineFilterSchema,
 } from './schemas'
 import { registerWebMCP } from './webmcp'
+import { trapFocus } from './focus'
 
-const STATUS_LABELS = { idle: 'Idle', running: 'Running', paused: 'Paused', error: 'Error', offline: 'Offline' }
+function useOverlayFocusTrap(open, containerRef) {
+  useEffect(() => {
+    if (!open || !containerRef.current) return undefined
+    const root = containerRef.current.closest('.cds--modal-container') ?? containerRef.current.closest('[role="dialog"]') ?? containerRef.current
+    return trapFocus(root)
+  }, [open, containerRef])
+}
+
+const timestampFormatter = new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit', second: '2-digit' })
+function formatTimestamp(value) {
+  return timestampFormatter.format(new Date(value))
+}
 const TYPE_LABELS = { aster: 'Aster', boreal: 'Boreal', cinder: 'Cinder' }
 const EDITOR_LABELS = { codedeck: 'Codedeck', nimbus: 'Nimbus', quill: 'Quill', vector: 'Vector', none: 'None' }
+const STATUS_LABELS = { idle: 'Idle', running: 'Running', paused: 'Paused', error: 'Error', offline: 'Offline' }
 const STATUS_TAG_TYPES = { idle: 'green', running: 'blue', paused: 'cyan', error: 'red', offline: 'gray' }
 const FILTER_ITEMS = STATUSES.map((id) => ({ id, label: STATUS_LABELS[id] }))
 const TYPE_ITEMS = Object.entries(TYPE_LABELS).map(([id, label]) => ({ id, label }))
 const EDITOR_ITEMS = Object.entries(EDITOR_LABELS).map(([id, label]) => ({ id, label }))
-
-function formatTime(value) {
-  const date = new Date(value)
-  return new Intl.DateTimeFormat('en', { hour: 'numeric', minute: '2-digit', second: '2-digit' }).format(date)
-}
-
-function formatLastSeen(value) {
-  return formatTime(value)
-}
 
 function maskKey(key) {
   if (!key) return '—'
@@ -111,34 +113,20 @@ function RollupStrip({ agents }) {
 function StatusFilterControl() {
   const statusFilters = useFleetStore((state) => state.statusFilters)
   const setFilters = useFleetStore((state) => state.setFilters)
-  const { control, reset } = useForm({
-    resolver: zodResolver(statusFilterSchema),
-    defaultValues: { statuses: statusFilters },
-  })
-  useEffect(() => reset({ statuses: statusFilters }), [reset, statusFilters])
   return (
-    <form className="status-filter" aria-label="Filter agents by status">
-      <Controller
-        name="statuses"
-        control={control}
-        render={({ field }) => (
-          <MultiSelect
-            id="fleet-status-filter"
-            items={FILTER_ITEMS}
-            itemToString={(item) => item?.label || ''}
-            selectedItems={FILTER_ITEMS.filter((item) => field.value.includes(item.id))}
-            onChange={({ selectedItems }) => {
-              const next = selectedItems.map((item) => item.id)
-              field.onChange(next)
-              setFilters(next)
-            }}
-            label={statusFilters.length ? `${statusFilters.length} statuses` : 'All statuses'}
-            titleText="Status filter"
-            size="sm"
-          />
-        )}
+    <div className="status-filter" aria-label="Filter agents by status">
+      <MultiSelect
+        id="fleet-status-filter"
+        key={statusFilters.join('|') || 'all'}
+        items={FILTER_ITEMS}
+        itemToString={(item) => item?.label || ''}
+        selectedItems={FILTER_ITEMS.filter((item) => statusFilters.includes(item.id))}
+        onChange={({ selectedItems }) => setFilters(selectedItems.map((item) => item.id))}
+        label={statusFilters.length ? `${statusFilters.length} statuses` : 'All statuses'}
+        titleText="Status filter"
+        size="sm"
       />
-    </form>
+    </div>
   )
 }
 
@@ -217,7 +205,7 @@ function AgentTable() {
       <Table className="agent-table" size="lg" useZebraStyles={false}>
         <TableHead>
           <TableRow>
-            <TableHeader className="checkbox-cell"><Checkbox id="select-all-agents" labelText="Select all visible agents" hideLabel checked={allSelected} indeterminate={!allSelected && visibleIds.some((id) => store.selectedIds.includes(id))} onChange={(_, { checked }) => store.toggleAllVisible(visibleIds, checked)} /></TableHeader>
+            <TableHeader className="checkbox-cell"><label className="row-checkbox"><input id="select-all-agents" type="checkbox" aria-label="Select all visible agents" checked={allSelected} ref={(node) => { if (node) node.indeterminate = !allSelected && visibleIds.some((id) => store.selectedIds.includes(id)) }} onChange={(event) => store.toggleAllVisible(visibleIds, event.target.checked)} /><span className="sr-only">Select all visible agents</span></label></TableHeader>
             <TableHeader><button className="sort-button" type="button" onClick={store.toggleSort}>Agent {store.sortDirection === 'asc' ? <ArrowUp size={14} /> : <ArrowDown size={14} />}</button></TableHeader>
             <TableHeader>Type</TableHeader>
             <TableHeader>Editor</TableHeader>
@@ -230,18 +218,18 @@ function AgentTable() {
         <TableBody>
           {filtered.map((agent) => {
             return (
-              <TableRow key={agent.id} className={`agent-row ${agent.isNew ? 'new-agent-row' : ''}`} onClick={() => store.selectAgent(agent.id)} tabIndex={0} onKeyDown={(event) => { if (event.currentTarget === event.target && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); store.selectAgent(agent.id) } }}>
-                <TableCell className="checkbox-cell" onClick={(event) => event.stopPropagation()}><Checkbox id={`select-${agent.id}`} labelText={`Select ${agent.name}`} hideLabel checked={store.selectedIds.includes(agent.id)} onChange={(_, { checked }) => store.toggleSelection(agent.id, checked)} /></TableCell>
+              <TableRow key={agent.id} className={`agent-row ${agent.isNew ? 'new-agent-row' : ''} ${store.detailAgentId === agent.id ? 'is-selected' : ''}`} onClick={() => store.selectAgent(agent.id)} tabIndex={0} onKeyDown={(event) => { if (event.currentTarget === event.target && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); store.selectAgent(agent.id) } }}>
+                <TableCell className="checkbox-cell" onClick={(event) => event.stopPropagation()}><label className="row-checkbox"><input id={`select-${agent.id}`} type="checkbox" aria-label={`Select ${agent.name}`} checked={store.selectedIds.includes(agent.id)} onChange={(event) => store.toggleSelection(agent.id, event.target.checked)} /><span className="sr-only">{`Select ${agent.name}`}</span></label></TableCell>
                 <TableCell><div className="agent-identity"><span className={`agent-mark type-${agent.agentType}`}>{agent.name.slice(0, 1)}</span><div><strong>{agent.name}</strong><CurrentWork agent={agent} /></div></div></TableCell>
                 <TableCell><span className="type-label">{TYPE_LABELS[agent.agentType]}</span></TableCell>
                 <TableCell>{EDITOR_LABELS[agent.editorIntegration]}</TableCell>
                 <TableCell className={agent.status === 'error' ? 'error-status-cell' : ''}><StatusBadge status={agent.status} /></TableCell>
-                <TableCell><time dateTime={agent.lastSeen} title={new Date(agent.lastSeen).toLocaleString()}>{formatLastSeen(agent.lastSeen)}</time></TableCell>
+                <TableCell><time dateTime={agent.lastSeen} title={new Date(agent.lastSeen).toLocaleString()}>{formatTimestamp(agent.lastSeen)}</time></TableCell>
                 <TableCell><AgentActions agent={agent} /></TableCell>
                 <TableCell className="overflow-cell" onClick={(event) => event.stopPropagation()}>
-                  <OverflowMenu size="sm" flipped aria-label={`Actions for ${agent.name}`} iconDescription={`Actions for ${agent.name}`}>
+                  <OverflowMenu size="sm" flipped align="left" aria-label={`Actions for ${agent.name}`} iconDescription={`Actions for ${agent.name}`} menuOptionsClass="agent-overflow-menu">
                     <OverflowMenuItem itemText="Edit" onClick={() => store.openEdit(agent.id)} />
-                    <OverflowMenuItem isDelete itemText="Remove" onClick={() => store.openRemove(agent.id)} />
+                    <OverflowMenuItem hasDivider isDelete itemText="Remove" onClick={() => store.openRemove(agent.id)} />
                   </OverflowMenu>
                 </TableCell>
               </TableRow>
@@ -259,8 +247,11 @@ function AgentModal() {
   const closeModal = useFleetStore((state) => state.closeModal)
   const registerAgent = useFleetStore((state) => state.registerAgent)
   const updateAgent = useFleetStore((state) => state.updateAgent)
+  const containerRef = useRef(null)
   const current = modal?.agentId ? agents.find((agent) => agent.id === modal.agentId) : null
   const isEdit = modal?.mode === 'edit'
+  const open = Boolean(modal && modal.mode !== 'remove')
+  useOverlayFocusTrap(open, containerRef)
   const schema = useMemo(() => createUniqueAgentSchema(agents.map((agent) => agent.name), current?.name || ''), [agents, current?.name])
   const { control, register, handleSubmit, reset, trigger, formState: { errors, isValid, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
@@ -272,16 +263,22 @@ function AgentModal() {
     reset(current ? { name: current.name, agentType: current.agentType, editorIntegration: current.editorIntegration, accessKey: current.accessKey } : { name: '', agentType: '', editorIntegration: '', accessKey: '' })
     setTimeout(() => trigger(), 0)
   }, [modal?.mode, modal?.agentId, current?.name, current?.agentType, current?.editorIntegration, current?.accessKey, reset, trigger])
-  if (!modal || modal.mode === 'remove') return null
+  if (!open) return null
   const onSubmit = (payload) => isEdit ? updateAgent(current.id, payload) : registerAgent(payload)
   return (
-    <Modal open modalHeading={isEdit ? `Edit ${current?.name}` : 'Register Agent'} modalLabel="Agent registry" primaryButtonText={isEdit ? 'Save changes' : 'Register Agent'} secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || isSubmitting} onRequestClose={closeModal} onSecondarySubmit={closeModal} onRequestSubmit={handleSubmit(onSubmit)} preventCloseOnClickOutside>
-      <p className="modal-intro">{isEdit ? 'Update the API configuration for this fleet agent.' : 'Create the exact payload sent to the fleet registration API.'}</p>
-      <div className="form-grid">
-        <TextInput id="agent-name" labelText="Name" placeholder="Example: Aster Harbor" invalid={Boolean(errors.name)} invalidText={errors.name?.message} {...register('name')} />
-        <Controller name="agentType" control={control} render={({ field }) => <Dropdown id="agent-type" titleText="Agent type" label="Choose a type" items={TYPE_ITEMS} itemToString={(item) => item?.label || ''} selectedItem={TYPE_ITEMS.find((item) => item.id === field.value) || null} onChange={({ selectedItem }) => field.onChange(selectedItem?.id || '')} invalid={Boolean(errors.agentType)} invalidText={errors.agentType?.message} />} />
-        <Controller name="editorIntegration" control={control} render={({ field }) => <Dropdown id="agent-editor" titleText="Editor integration" label="Choose an integration" items={EDITOR_ITEMS} itemToString={(item) => item?.label || ''} selectedItem={EDITOR_ITEMS.find((item) => item.id === field.value) || null} onChange={({ selectedItem }) => field.onChange(selectedItem?.id || '')} invalid={Boolean(errors.editorIntegration)} invalidText={errors.editorIntegration?.message} />} />
-        <TextInput id="agent-access-key" type="password" labelText="Access key" placeholder="16–64 letters, digits, hyphens, or underscores" invalid={Boolean(errors.accessKey)} invalidText={errors.accessKey?.message} {...register('accessKey')} />
+    <Modal open modalHeading={isEdit ? `Edit ${current?.name}` : 'Register Agent'} modalLabel="Agent registry" primaryButtonText={isEdit ? 'Save changes' : 'Register Agent'} secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || isSubmitting} onRequestClose={closeModal} onSecondarySubmit={closeModal} onRequestSubmit={handleSubmit(onSubmit)} preventCloseOnClickOutside selectorPrimaryFocus="#agent-name">
+      <div ref={containerRef}>
+        <p className="modal-intro">{isEdit ? 'Update the API configuration for this fleet agent.' : 'Create the exact payload sent to the fleet registration API.'}</p>
+        <div className="form-grid">
+          <TextInput id="agent-name" labelText="Name" placeholder="Example: Aster Harbor" invalid={Boolean(errors.name)} invalidText={errors.name?.message} aria-describedby={errors.name ? 'agent-name-error' : undefined} {...register('name')} />
+          {errors.name && <span id="agent-name-error" className="sr-only">{errors.name.message}</span>}
+          <Controller name="agentType" control={control} render={({ field }) => <Dropdown id="agent-type" titleText="Agent type" label="Choose a type" items={TYPE_ITEMS} itemToString={(item) => item?.label || ''} selectedItem={TYPE_ITEMS.find((item) => item.id === field.value) || null} onChange={({ selectedItem }) => field.onChange(selectedItem?.id || '')} invalid={Boolean(errors.agentType)} invalidText={errors.agentType?.message} aria-describedby={errors.agentType ? 'agent-type-error' : undefined} />} />
+          {errors.agentType && <span id="agent-type-error" className="sr-only">{errors.agentType.message}</span>}
+          <Controller name="editorIntegration" control={control} render={({ field }) => <Dropdown id="agent-editor" titleText="Editor integration" label="Choose an integration" items={EDITOR_ITEMS} itemToString={(item) => item?.label || ''} selectedItem={EDITOR_ITEMS.find((item) => item.id === field.value) || null} onChange={({ selectedItem }) => field.onChange(selectedItem?.id || '')} invalid={Boolean(errors.editorIntegration)} invalidText={errors.editorIntegration?.message} aria-describedby={errors.editorIntegration ? 'agent-editor-error' : undefined} />} />
+          {errors.editorIntegration && <span id="agent-editor-error" className="sr-only">{errors.editorIntegration.message}</span>}
+          <TextInput id="agent-access-key" type="password" labelText="Access key" placeholder="16–64 letters, digits, hyphens, or underscores" invalid={Boolean(errors.accessKey)} invalidText={errors.accessKey?.message} aria-describedby={errors.accessKey ? 'agent-access-key-error' : undefined} {...register('accessKey')} />
+          {errors.accessKey && <span id="agent-access-key-error" className="sr-only">{errors.accessKey.message}</span>}
+        </div>
       </div>
     </Modal>
   )
@@ -329,7 +326,7 @@ function HistoryTab({ agent }) {
             <span className="timeline-node" aria-hidden="true" />
             <div>
               {event.stepId ? <button type="button" className="timeline-label" onClick={() => highlightStep(event.stepId)}>{event.label}</button> : <p className="timeline-label">{event.label}</p>}
-              <time dateTime={event.timestamp}>{formatTime(event.timestamp)}</time>
+              <time dateTime={event.timestamp}>{formatTimestamp(event.timestamp)}</time>
             </div>
           </li>
         ))}
@@ -366,7 +363,7 @@ function ActivityTab({ agent }) {
                   <div className="step-meta">
                     <span>Step {index + 1}</span>
                     {step.attempts > 0 && <span>Attempt {step.attempts}{step.maxAttempts ? ` of ${step.maxAttempts}` : ''}</span>}
-                    {step.completedAt && <time dateTime={step.completedAt}>{formatTime(step.completedAt)}</time>}
+                    {step.completedAt && <time dateTime={step.completedAt}>{formatTimestamp(step.completedAt)}</time>}
                   </div>
                   {step.status === 'retrying' && <p className="backoff-copy">Waiting {step.backoffRemaining}s before retry {Math.min(step.attempts + 1, step.maxAttempts)} of {step.maxAttempts}</p>}
                   {step.checkpoint && <p className="checkpoint-copy"><Pause size={14} /> {step.checkpoint}</p>}
@@ -380,7 +377,7 @@ function ActivityTab({ agent }) {
       ) : agent.activity.length === 0 ? (
         <div className="activity-empty"><div className="empty-signal"><Play size={26} /></div><h3>No prompts executed today</h3><p>Start a run to see its live task progress and outputs here.</p>{agent.status === 'idle' && <Button size="sm" renderIcon={Play} onClick={() => useFleetStore.getState().startRun(agent.id)}>Start run</Button>}</div>
       ) : null}
-      {agent.activity.length > 0 && <section className="prompt-history"><h3>Today's prompts</h3><ul>{agent.activity.map((item) => <li key={item.id}><div><strong>{item.label}</strong><time dateTime={item.timestamp}>{formatTime(item.timestamp)}</time></div></li>)}</ul></section>}
+      {agent.activity.length > 0 && <section className="prompt-history"><h3>Today's prompts</h3><ul>{agent.activity.map((item) => <li key={item.id}><div><strong>{item.label}</strong><time dateTime={item.timestamp}>{formatTimestamp(item.timestamp)}</time></div></li>)}</ul></section>}
     </div>
   )
 }
@@ -392,14 +389,14 @@ function DetailPanel() {
   return (
     <>
       <button className="detail-backdrop" aria-label="Close agent detail" onClick={store.closeDetail} />
-      <aside className="detail-panel" aria-label={`${agent.name} details`}>
+      <aside className="detail-panel" role="complementary" aria-label={`${agent.name} details`}>
         <header className="detail-header">
           <div className="detail-kicker"><span>Agent detail</span><StatusBadge status={agent.status} /></div>
           <div className="detail-title-row"><div><h2>{agent.name}</h2><p>{TYPE_LABELS[agent.agentType]} · {EDITOR_LABELS[agent.editorIntegration]}</p></div><Button hasIconOnly kind="ghost" size="sm" renderIcon={Close} iconDescription="Close agent detail" onClick={store.closeDetail} /></div>
           <div className="detail-actions"><AgentActions agent={agent} /><Button size="sm" kind="tertiary" renderIcon={Settings} onClick={() => store.openEdit(agent.id)}>Edit</Button></div>
         </header>
-        <Tabs selectedIndex={store.detailTab} onChange={({ selectedIndex }) => store.setDetailTab(selectedIndex)}>
-          <TabList aria-label="Agent detail tabs" contained fullWidth>
+        <Tabs selectedIndex={store.detailTab} onChange={({ selectedIndex }) => store.setDetailTab(selectedIndex)} className="detail-tabs">
+          <TabList aria-label="Agent detail tabs" contained>
             <Tab>Configuration</Tab>
             <Tab>History</Tab>
             <Tab>Activity</Tab>
@@ -421,13 +418,17 @@ function ExportModal() {
   const close = useFleetStore((state) => state.closeExport)
   const copy = useFleetStore((state) => state.copyExport)
   const download = useFleetStore((state) => state.downloadExport)
+  const containerRef = useRef(null)
+  useOverlayFocusTrap(open, containerRef)
   if (!open) return null
   return (
-    <Modal className="export-modal" open passiveModal modalHeading="Export fleet" modalLabel="Live fleet snapshot" onRequestClose={close} size="lg">
-      <p className="modal-intro">This API-shaped document is compiled from the current registry, timelines, and run state.</p>
-      <div className="export-meta"><span>fleet-json</span><span>{new Blob([text]).size.toLocaleString()} bytes</span></div>
-      <pre className="json-preview" tabIndex={0} aria-label="Fleet JSON preview">{text}</pre>
-      <div className="modal-actions-row"><Button size="sm" renderIcon={Copy} onClick={copy}>Copy</Button><Button size="sm" kind="tertiary" renderIcon={Download} onClick={download}>Download</Button></div>
+    <Modal className="export-modal" open modalHeading="Export fleet" modalLabel="Live fleet snapshot" onRequestClose={close} size="lg" primaryButtonText="Close" onRequestSubmit={close} selectorPrimaryFocus=".json-preview">
+      <div ref={containerRef}>
+        <p className="modal-intro">This API-shaped document is compiled from the current registry, timelines, and run state.</p>
+        <div className="export-meta"><span>fleet-json</span><span>{new Blob([text]).size.toLocaleString()} bytes</span></div>
+        <pre className="json-preview" tabIndex={0} aria-label="Fleet JSON preview">{text}</pre>
+        <div className="modal-actions-row"><Button size="sm" renderIcon={Copy} onClick={copy}>Copy</Button><Button size="sm" kind="tertiary" renderIcon={Download} onClick={download}>Download</Button></div>
+      </div>
     </Modal>
   )
 }
@@ -438,25 +439,32 @@ function ImportModal() {
   const close = useFleetStore((state) => state.closeImport)
   const setDraft = useFleetStore((state) => state.setImportDraft)
   const importFleet = useFleetStore((state) => state.importFleet)
-  const { register, handleSubmit, reset, watch, trigger, formState: { errors, isValid, isSubmitting } } = useForm({ resolver: zodResolver(importFormSchema), mode: 'onChange', defaultValues: { jsonText: draft } })
-  useEffect(() => { if (open) { reset({ jsonText: draft }); setTimeout(() => trigger(), 0) } }, [open, reset, trigger])
-  const value = watch('jsonText')
-  useEffect(() => { if (open && value !== undefined && value !== draft) setDraft(value) }, [open, value, draft, setDraft])
+  const containerRef = useRef(null)
+  useOverlayFocusTrap(open, containerRef)
+  const { control, handleSubmit, reset, trigger, formState: { errors, isValid, isSubmitting } } = useForm({ resolver: zodResolver(importFormSchema), mode: 'onChange', defaultValues: { jsonText: draft } })
+  useEffect(() => { if (open) { reset({ jsonText: useFleetStore.getState().importDraft }); setTimeout(() => trigger(), 0) } }, [open, reset, trigger])
   if (!open) return null
   const submit = (data) => {
     const result = parseFleetText(data.jsonText)
     if (result.success) importFleet(result.data)
   }
   return (
-    <Modal open modalHeading="Import fleet" modalLabel="Fleet snapshot" primaryButtonText="Import fleet" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || isSubmitting} onRequestClose={close} onSecondarySubmit={close} onRequestSubmit={handleSubmit(submit)} size="lg" preventCloseOnClickOutside>
-      <p className="modal-intro">Paste a complete fleet JSON document. A valid import replaces the current registry and can be undone.</p>
-      <TextArea id="fleet-json-import" rows={13} labelText="Fleet JSON" placeholder="Paste the exported fleet snapshot here" invalid={Boolean(errors.jsonText)} invalidText={errors.jsonText?.message} {...register('jsonText')} />
+    <Modal open modalHeading="Import fleet" modalLabel="Fleet snapshot" primaryButtonText="Import fleet" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || isSubmitting} onRequestClose={close} onSecondarySubmit={close} onRequestSubmit={handleSubmit(submit)} size="lg" preventCloseOnClickOutside selectorPrimaryFocus="#fleet-json-import">
+      <div ref={containerRef}>
+        <p className="modal-intro">Paste a complete fleet JSON document. A valid import replaces the current registry and can be undone.</p>
+        <Controller name="jsonText" control={control} render={({ field }) => (
+          <TextArea id="fleet-json-import" rows={13} labelText="Fleet JSON" placeholder="Paste the exported fleet snapshot here" invalid={Boolean(errors.jsonText)} invalidText={errors.jsonText?.message} aria-describedby={errors.jsonText ? 'fleet-json-import-error' : undefined} value={field.value} onChange={(event) => { field.onChange(event); setDraft(event.target.value) }} onBlur={field.onBlur} />
+        )} />
+        {errors.jsonText && <span id="fleet-json-import-error" className="sr-only">{errors.jsonText.message}</span>}
+      </div>
     </Modal>
   )
 }
 
 function CommandPalette() {
   const store = useFleetStore()
+  const containerRef = useRef(null)
+  useOverlayFocusTrap(store.paletteOpen, containerRef)
   if (!store.paletteOpen) return null
   const commands = [
     ...store.agents.map((agent) => ({ id: `jump-${agent.id}`, label: `Jump to ${agent.name}`, hint: `${TYPE_LABELS[agent.agentType]} · ${STATUS_LABELS[agent.status]}`, icon: Settings, run: () => store.selectAgent(agent.id) })),
@@ -476,16 +484,18 @@ function CommandPalette() {
     buttons[next].focus()
   }
   return (
-    <Modal className="palette-modal" open passiveModal modalHeading="Command palette" modalLabel="Fleet navigation" onRequestClose={store.closePalette} size="sm">
-      <Search id="palette-search" autoFocus labelText="Search commands" placeholder="Search agents and actions" value={store.paletteQuery} onChange={(event) => store.setPaletteQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'ArrowDown') moveCommandFocus(event, 1) }} />
-      <div className="palette-shortcut"><span>Navigate</span><kbd>↑↓</kbd><span>Run</span><kbd>Enter</kbd><span>Close</span><kbd>Esc</kbd></div>
-      <ul className="command-list">
-        {visible.map((command) => {
-          const Icon = command.icon
-          return <li key={command.id}><button type="button" disabled={command.disabled} onKeyDown={(event) => { if (event.key === 'ArrowDown') moveCommandFocus(event, 1); if (event.key === 'ArrowUp') moveCommandFocus(event, -1) }} onClick={() => { command.run(); store.closePalette() }}><Icon size={18} /><span><strong>{command.label}</strong><small>{command.hint}</small></span></button></li>
-        })}
-      </ul>
-      {!visible.length && <div className="small-empty"><Filter size={24} /><p>No command matches “{store.paletteQuery}”.</p></div>}
+    <Modal className="palette-modal" open modalHeading="Command palette" modalLabel="Fleet navigation" onRequestClose={store.closePalette} size="sm" primaryButtonText="Close" onRequestSubmit={store.closePalette} selectorPrimaryFocus="#palette-search">
+      <div ref={containerRef}>
+        <Search id="palette-search" autoFocus labelText="Search commands" placeholder="Search agents and actions" value={store.paletteQuery} onChange={(event) => store.setPaletteQuery(event.target.value)} onKeyDown={(event) => { if (event.key === 'ArrowDown') moveCommandFocus(event, 1) }} />
+        <div className="palette-shortcut"><span>Navigate</span><kbd>↑↓</kbd><span>Run</span><kbd>Enter</kbd><span>Close</span><kbd>Esc</kbd></div>
+        <ul className="command-list">
+          {visible.map((command) => {
+            const Icon = command.icon
+            return <li key={command.id}><button type="button" disabled={command.disabled} onKeyDown={(event) => { if (event.key === 'ArrowDown') moveCommandFocus(event, 1); if (event.key === 'ArrowUp') moveCommandFocus(event, -1) }} onClick={() => { const modalCommand = command.id === 'register' || command.id === 'export'; command.run(); if (modalCommand) store.dismissPalette(); else store.closePalette(); }}><Icon size={18} /><span><strong>{command.label}</strong><small>{command.hint}</small></span></button></li>
+          })}
+        </ul>
+        {!visible.length && <div className="small-empty"><Filter size={24} /><p>No command matches “{store.paletteQuery}”. Try a different agent name or action, or clear the search to browse all commands.</p><Button kind="ghost" size="sm" onClick={() => store.setPaletteQuery('')}>Clear search</Button></div>}
+      </div>
     </Modal>
   )
 }

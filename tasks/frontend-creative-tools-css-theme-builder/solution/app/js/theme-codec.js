@@ -1,4 +1,6 @@
-/* Theme hash codec: JSON → UTF-8 → zlib deflate → URL-safe Base64 (no padding) */
+/* Theme hash codec: JSON → UTF-8 → zlib deflate → URL-safe Base64 (no padding).
+ * pako is bundled from node_modules — no CDN involved. */
+import { deflate, inflate } from "pako";
 
 function toUrlSafeB64(bytes) {
   let bin = "";
@@ -19,36 +21,73 @@ function fromUrlSafeB64(str) {
 
 export function encodeTheme(theme) {
   const json = JSON.stringify(theme);
-  const compressed = pako.deflate(new TextEncoder().encode(json));
+  const compressed = deflate(new TextEncoder().encode(json));
   return toUrlSafeB64(compressed);
 }
 
 export function decodeTheme(payload) {
   const bytes = fromUrlSafeB64(payload);
-  const inflated = pako.inflate(bytes);
+  const inflated = inflate(bytes);
   const json = new TextDecoder().decode(inflated);
   return JSON.parse(json);
 }
 
+/** Returns the decoded payload, or null when absent/malformed (never throws, never logs). */
 export function readThemeHash(hash = location.hash) {
   const raw = hash.startsWith("#") ? hash.slice(1) : hash;
-  const params = new URLSearchParams(raw);
-  const payload = params.get("theme");
-  if (!payload) return null;
+  if (!raw.includes("theme=")) return null;
   try {
+    const params = new URLSearchParams(raw);
+    const payload = params.get("theme");
+    if (!payload) return null;
     return decodeTheme(payload);
-  } catch (err) {
-    console.warn("Failed to decode #theme hash", err);
+  } catch {
     return null;
   }
 }
 
+export function hashHasThemePayload(hash = location.hash) {
+  const raw = hash.startsWith("#") ? hash.slice(1) : hash;
+  return raw.includes("theme=");
+}
+
 export function writeThemeHash(theme) {
-  const payload = encodeTheme(serializeTheme(theme));
-  const next = `#theme=${payload}`;
-  if (location.hash !== next) {
-    history.replaceState(null, "", next);
+  try {
+    const payload = encodeTheme(serializeTheme(theme));
+    const next = `#theme=${payload}`;
+    if (location.hash !== next) {
+      history.replaceState(null, "", next);
+    }
+  } catch {
+    /* hash sync is best-effort; never break the editing session */
   }
+}
+
+export function clearThemeHash() {
+  try {
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  } catch {
+    /* best-effort */
+  }
+}
+
+/* ---------------- Theme JSON field contract ---------------- */
+
+export const NAME_MAX = 64;
+/** Letters (any case), digits, spaces, hyphens, underscores. */
+export const NAME_PATTERN = /^[A-Za-z0-9 _-]+$/;
+
+export function validateThemeName(name) {
+  const raw = String(name ?? "");
+  const trimmed = raw.trim();
+  if (!trimmed) return "Theme name is required — enter a name to apply it.";
+  if (trimmed.length > NAME_MAX) {
+    return `Theme name must be ${NAME_MAX} characters or fewer (currently ${trimmed.length}) — shorten it.`;
+  }
+  if (!NAME_PATTERN.test(trimmed)) {
+    return "Theme name may only use letters, numbers, spaces, hyphens, and underscores — remove any other characters.";
+  }
+  return null;
 }
 
 const TOKEN_KEYS = [
@@ -84,6 +123,8 @@ const TOKEN_KEYS = [
   "--noise",
 ];
 
+export { TOKEN_KEYS };
+
 export function serializeTheme(theme) {
   const out = {};
   for (const key of TOKEN_KEYS) {
@@ -105,27 +146,40 @@ const ENUM_FIELDS = {
   "--noise": ["0", "1"],
 };
 
+export { COLOR_KEYS, ENUM_FIELDS };
+
+/**
+ * Validates a Theme JSON document (string or object) against the field contract.
+ * Throws an Error naming the offending field; returns the serialized record otherwise.
+ */
 export function validateThemeDocument(input) {
-  const data = typeof input === "string" ? JSON.parse(input) : input;
+  let data = input;
+  if (typeof input === "string") {
+    try {
+      data = JSON.parse(input);
+    } catch {
+      throw new Error("document: not parseable JSON — fix the syntax and try again");
+    }
+  }
   if (!data || typeof data !== "object" || Array.isArray(data)) {
-    throw new Error("theme: expected a JSON object");
+    throw new Error("document: expected a single JSON object");
   }
 
   const name = String(data.name ?? "").trim();
-  if (!name || name.length > 64 || !/^[a-z0-9_-]+$/.test(name)) {
-    throw new Error("name: use 1-64 lowercase letters, digits, hyphens, or underscores");
-  }
-  if (!['light', 'dark'].includes(data["color-scheme"])) {
-    throw new Error("color-scheme: expected light or dark");
+  const nameError = validateThemeName(name);
+  if (nameError) throw new Error(nameError);
+
+  if (!["light", "dark"].includes(data["color-scheme"])) {
+    throw new Error('color-scheme: expected exactly "light" or "dark"');
   }
   for (const key of COLOR_KEYS) {
     if (!COLOR_PATTERN.test(String(data[key] ?? ""))) {
-      throw new Error(`${key}: expected oklch(...) or #RRGGBB`);
+      throw new Error(`${key}: expected a color as oklch(...) or #RRGGBB`);
     }
   }
   for (const [key, allowed] of Object.entries(ENUM_FIELDS)) {
     if (!allowed.includes(String(data[key] ?? ""))) {
-      throw new Error(`${key}: value is outside the allowed set`);
+      throw new Error(`${key}: expected one of ${allowed.join(", ")}`);
     }
   }
 
@@ -146,9 +200,11 @@ export function themeToExtension(theme) {
   return lines.join("\n");
 }
 
-function cssThemeName(name) {
+/** Filesystem-safe slug for download filenames only. */
+export function fileSlug(name) {
   const cleaned = String(name || "mytheme")
     .toLowerCase()
+    .trim()
     .replace(/[^a-z0-9_-]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 64);
@@ -156,7 +212,7 @@ function cssThemeName(name) {
 }
 
 export function themeToCss(theme) {
-  const name = cssThemeName(theme.name || "mytheme");
+  const name = String(theme.name || "mytheme").trim() || "mytheme";
   const scheme = theme["color-scheme"] === "dark" ? "dark" : "light";
   const lines = [`[data-theme="${name}"] {`, `  color-scheme: ${scheme};`];
   for (const key of TOKEN_KEYS) {

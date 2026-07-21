@@ -21,6 +21,9 @@
     import {onMount} from "svelte";
     import config from "$lib/stores/config.svelte";
     import {registerWebMCP} from "$lib/webmcp.svelte";
+    import CommandPalette from "$lib/components/chrome/CommandPalette.svelte";
+    import CoachmarkTour from "$lib/components/chrome/CoachmarkTour.svelte";
+    import {startTourIfFirstRun} from "$lib/stores/editor.svelte";
     import {numberCodec} from "$lib/settings/codecs";
     import {effectiveColors} from "$lib/stores/theme.svelte";
     import {resolveCellColor} from "$lib/utils/colors";
@@ -66,6 +69,7 @@
 
     onMount(() => {
         registerWebMCP();
+        startTourIfFirstRun();
     });
 
 
@@ -163,12 +167,12 @@
             {/each}
             <Gap expand={true} />
             <Tab route="/app/import-export">
-                {#snippet icon()}<img src={sync} alt="Settings Sync" />{/snippet}
-                Import & Export
+                {#snippet icon()}<img src={sync} alt="Settings sync" />{/snippet}
+                Import & export
             </Tab>
             <Tab route="/app/font-playground">
-                {#snippet icon()}<img src={calligraphy} alt="Font Playground" />{/snippet}
-                Font Playground
+                {#snippet icon()}<img src={calligraphy} alt="Font playground" />{/snippet}
+                Font playground
             </Tab>
             <!-- {#if dev}
             <Tab route="/app/dropdown-debug">
@@ -193,6 +197,8 @@
     <MacDock />
     <ModalStack />
     <ToastStack />
+    <CommandPalette />
+    <CoachmarkTour />
 </div>
 
 <!-- <svelte:window onmouseup={onMouseUp} onmousemove={onMouseMove} /> -->

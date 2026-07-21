@@ -1,118 +1,133 @@
 <template>
-  <div v-if="isVisible" class="fixed inset-0 z-[110] flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-    <div class="absolute inset-0 bg-gray-900 bg-opacity-50 transition-opacity" @click="close" aria-hidden="true"></div>
-    <div class="bg-white rounded shadow-xl overflow-hidden max-w-md w-full z-10 p-6 relative" v-motion-fade>
-      <button @click="close" class="absolute top-4 right-4 text-gray-400 hover:text-black focus:outline-none focus:ring-2 focus:ring-black rounded">
-        <span class="sr-only">Close</span>
-        <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+  <Transition name="overlay">
+    <div
+      v-if="store.subscribeVisible"
+      ref="rootRef"
+      class="fixed inset-0 z-[110] flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="subscribe-title"
+    >
+      <div class="absolute inset-0 bg-ink/50" @click="dismiss" aria-hidden="true"></div>
 
-      <div v-if="!submitted">
-        <h2 id="modal-title" class="text-xl font-serif mb-4">Join our newsletter</h2>
-        <form @submit.prevent="onSubmit" class="space-y-4">
-          <div>
-            <label for="subEmail" class="block text-sm font-sans font-medium mb-1">Email</label>
-            <input
-              id="subEmail"
-              v-model="email"
-              type="email"
-              placeholder="name@example.com"
-              class="w-full border rounded px-3 py-2 font-sans focus:outline-none focus:ring-2 focus:ring-black"
-              :class="{'border-red-500': errors.email, 'border-gray-300': !errors.email}"
-            />
-            <p v-if="errors.email" class="text-red-500 text-xs mt-1" role="alert">{{ errors.email }}</p>
-          </div>
-          <div>
-            <label for="subName" class="block text-sm font-sans font-medium mb-1">Name</label>
-            <input
-              id="subName"
-              v-model="name"
-              type="text"
-              placeholder="First Name"
-              class="w-full border rounded px-3 py-2 font-sans focus:outline-none focus:ring-2 focus:ring-black"
-              :class="{'border-red-500': errors.name, 'border-gray-300': !errors.name}"
-            />
-            <p v-if="errors.name" class="text-red-500 text-xs mt-1" role="alert">{{ errors.name }}</p>
-          </div>
-          <button type="submit" :disabled="!meta.valid" class="w-full bg-black text-white py-2 rounded font-sans text-sm disabled:opacity-50 hover:bg-gray-800 transition-colors">
-            Subscribe
-          </button>
-        </form>
+      <div class="relative bg-parchment border border-ink shadow-2xl w-full max-w-md p-6">
+        <button
+          type="button"
+          data-autofocus
+          class="absolute top-3 right-3 min-w-11 min-h-11 inline-flex items-center justify-center font-mono text-sm hover:text-oxblood transition-colors"
+          :aria-label="`Close the subscribe popup`"
+          @click="dismiss"
+        >
+          Close<span aria-hidden="true" class="ml-1 text-lg leading-none">×</span>
+        </button>
+
+        <div v-if="!submitted">
+          <p class="font-mono text-[10px] tracking-[0.28em] uppercase text-ink-soft mb-2">The O&amp;A dispatch</p>
+          <h2 id="subscribe-title" class="font-plate text-2xl mb-2">Join the Newsletter</h2>
+          <p class="font-serif italic text-sm text-ink-soft mb-5">
+            One letter a month on pigment histories, new palettes, and archive notes. In-memory only — nothing is sent.
+          </p>
+
+          <form class="space-y-4" @submit.prevent="onSubmit" novalidate>
+            <div>
+              <label for="sub-email" class="block font-mono text-xs tracking-[0.18em] uppercase text-ink-soft mb-1.5">Email</label>
+              <input
+                id="sub-email"
+                v-model="email"
+                type="email"
+                autocomplete="off"
+                placeholder="name@example.com"
+                class="w-full min-h-11 border bg-cream px-3 font-sans text-sm"
+                :class="errors.email ? 'border-error' : 'border-rule'"
+                :aria-invalid="errors.email ? 'true' : 'false'"
+                aria-describedby="sub-email-error"
+              />
+              <p v-if="errors.email" id="sub-email-error" class="mt-1.5 font-mono text-[11px] text-error" role="alert">{{ errors.email }}</p>
+            </div>
+            <button
+              type="submit"
+              class="w-full min-h-11 bg-oxblood text-cream font-mono text-xs tracking-[0.2em] uppercase transition-colors hover:bg-ink"
+            >
+              Subscribe
+            </button>
+          </form>
+        </div>
+
+        <div v-else class="py-8 text-center" role="status">
+          <p class="font-plate text-2xl mb-2">You're on the list.</p>
+          <p class="font-serif italic text-sm text-ink-soft">The SubscribeRequest was kept in memory — no network call was made.</p>
+        </div>
       </div>
-
-      <div v-else class="py-8 text-center" aria-live="polite">
-        <p class="font-serif text-lg">You're on the list.</p>
-      </div>
-
     </div>
-  </div>
+  </Transition>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, reactive, computed, onMounted, onUnmounted } from 'vue';
 import { useField, useForm } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/zod';
-import { z } from 'zod';
 import { usePaletteStore } from '../stores/palette';
+import { subscribeSchema } from '../paletteSchema';
+import { useDialog } from '../composables/useDialog';
 
 const store = usePaletteStore();
-const isVisible = ref(false);
+const rootRef = ref(null);
+const open = computed(() => store.subscribeVisible);
+useDialog(open, rootRef, { onClose: dismiss });
+
 const submitted = ref(false);
-let timer;
+let idleTimer = null;
+let closeTimer = null;
 
-const schema = toTypedSchema(
-  z.object({
-    email: z.string().email('Valid email is required'),
-    name: z.string().optional()
-  })
-);
-
-const { handleSubmit, errors, meta } = useForm({
-  validationSchema: schema,
-  initialValues: { email: '', name: '' }
+const { handleSubmit, errors } = useForm({
+  validationSchema: toTypedSchema(subscribeSchema),
+  initialValues: { email: '' },
 });
-
 const { value: email } = useField('email');
-const { value: name } = useField('name');
 
-function close() {
-  isVisible.value = false;
-  store.popupDismissed = true;
+function show() {
+  if (store.subscribeDismissed || store.subscribeVisible) return;
+  store.subscribeVisible = true;
 }
 
-const onSubmit = handleSubmit((values) => {
+function dismiss() {
+  store.subscribeVisible = false;
+  store.subscribeDismissed = true; // stays dismissed for the rest of the session
+}
+
+const onSubmit = handleSubmit(() => {
   submitted.value = true;
-  store.popupDismissed = true;
-  setTimeout(() => {
-    isVisible.value = false;
-  }, 3000);
+  store.announce('Subscribed — the request was stored in memory only');
+  closeTimer = setTimeout(() => {
+    store.subscribeVisible = false;
+    store.subscribeDismissed = true;
+  }, 1600);
 });
 
-function handleScroll() {
-  if (store.popupDismissed) return;
-  const scrolled = window.scrollY / Math.max(1, (document.body.scrollHeight - window.innerHeight));
-  if (scrolled > 0.5) {
-    isVisible.value = true;
-    window.removeEventListener('scroll', handleScroll);
-    clearTimeout(timer);
-  }
+function resetIdle() {
+  if (store.subscribeDismissed || store.subscribeVisible) return;
+  if (idleTimer) clearTimeout(idleTimer);
+  idleTimer = setTimeout(show, 45000);
+}
+
+function onScroll() {
+  if (store.subscribeDismissed || store.subscribeVisible) return;
+  const total = document.documentElement.scrollHeight - window.innerHeight;
+  if (total > 0 && window.scrollY / total > 0.5) show();
 }
 
 onMounted(() => {
-  if (store.popupDismissed) return;
-  timer = setTimeout(() => {
-    if (!store.popupDismissed) {
-      isVisible.value = true;
-      window.removeEventListener('scroll', handleScroll);
-    }
-  }, 45000);
-  window.addEventListener('scroll', handleScroll, { passive: true });
+  resetIdle();
+  window.addEventListener('pointerdown', resetIdle, { passive: true });
+  window.addEventListener('keydown', resetIdle, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true });
 });
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
-  clearTimeout(timer);
+  if (idleTimer) clearTimeout(idleTimer);
+  if (closeTimer) clearTimeout(closeTimer);
+  window.removeEventListener('pointerdown', resetIdle);
+  window.removeEventListener('keydown', resetIdle);
+  window.removeEventListener('scroll', onScroll);
 });
 </script>

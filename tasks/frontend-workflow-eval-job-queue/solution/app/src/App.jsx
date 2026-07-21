@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   Badge,
   Button,
@@ -41,10 +41,14 @@ import {
   WarningCircle,
   X,
 } from '@phosphor-icons/react'
-import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { createJobSchema, DATASETS, AGENTS, MODELS, STATUSES } from './schemas'
-import { buildSnapshot, deriveAggregates, getProviderStats, MODEL_COLORS, useQueueStore } from './store'
+import { deriveAggregates, getProviderStats, useQueueStore } from './store'
 import { registerWebMcp } from './webmcp'
+
+const AggregatesView = lazy(async () => {
+  const module = await import('./AggregatesView.jsx')
+  return { default: module.default }
+})
 
 const toaster = createToaster({ placement: 'bottom-end', pauseOnPageIdle: true })
 const filterSchema = z.object({
@@ -73,6 +77,7 @@ async function copyText(text) {
     document.execCommand('copy')
     textarea.remove()
   }
+  useQueueStore.getState().stageClipboard(text)
 }
 
 function StatusBadge({ status, pulse = true }) {
@@ -93,9 +98,39 @@ function FieldError({ id, message }) {
   return <p id={id} className="field-error" role="alert" aria-live="polite"><WarningCircle size={14} weight="fill" aria-hidden="true" />{message}</p>
 }
 
+function DecorativeSvgGuard() {
+  useLayoutEffect(() => {
+    const root = document.querySelector('.app-shell')
+    if (!root) return undefined
+    const mark = () => {
+      root.querySelectorAll('svg').forEach((svg) => {
+        if (!svg.getAttribute('aria-label') && !svg.getAttribute('aria-labelledby') && !svg.getAttribute('aria-hidden')) {
+          svg.setAttribute('aria-hidden', 'true')
+        }
+      })
+    }
+    mark()
+    const observer = new MutationObserver(mark)
+    observer.observe(root, { childList: true, subtree: true })
+    return () => observer.disconnect()
+  }, [])
+  return null
+}
+
 function DialogShell({ open, onOpenChange, title, description, children, size = 'lg' }) {
+  const focusReturn = useQueueStore((state) => state.chrome.focusReturn)
+  const handleOpenChange = (value) => {
+    onOpenChange(value)
+    if (!value) {
+      const target = focusReturn
+      window.requestAnimationFrame(() => {
+        if (target && typeof target.focus === 'function') target.focus()
+        else document.querySelector('[data-dialog-trigger="submitOpen"]')?.focus()
+      })
+    }
+  }
   return (
-    <Dialog.Root open={open} onOpenChange={(details) => onOpenChange(details.open)} size={size} placement="center" motionPreset="scale">
+    <Dialog.Root lazyMount={false} open={open} onOpenChange={(details) => handleOpenChange(details.open)} size={size} placement="center" motionPreset="scale">
       <Portal>
         <Dialog.Backdrop className="dialog-backdrop" />
         <Dialog.Positioner className="dialog-positioner">
@@ -122,6 +157,10 @@ function Header() {
   const setActiveView = useQueueStore((state) => state.setActiveView)
   const setChrome = useQueueStore((state) => state.setChrome)
   const refreshExport = useQueueStore((state) => state.refreshExport)
+  const theme = useQueueStore((state) => state.theme)
+  const setTheme = useQueueStore((state) => state.setTheme)
+  const density = useQueueStore((state) => state.density)
+  const setDensity = useQueueStore((state) => state.setDensity)
 
   const openExport = () => {
     refreshExport()
@@ -130,6 +169,7 @@ function Header() {
 
   return (
     <header className="app-header">
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <div className="brand-lockup">
         <div className="brand-mark" aria-hidden="true"><Pulse size={21} weight="bold" aria-hidden="true" /></div>
         <div>
@@ -148,9 +188,11 @@ function Header() {
       </Tabs.Root>
 
       <div className="header-actions">
-        <Button className="button button-ghost" onClick={() => setChrome('importOpen', true)}><CloudArrowUp size={17} aria-hidden="true" />Import queue</Button>
-        <Button className="button button-ghost" onClick={openExport}><Export size={17} aria-hidden="true" />Export queue</Button>
-        <Button className="button button-primary" onClick={() => setChrome('submitOpen', true)}><Plus size={17} weight="bold" aria-hidden="true" />Submit job</Button>
+        <Button className="button button-ghost density-toggle" aria-label={`Switch to ${density === 'comfortable' ? 'compact' : 'comfortable'} density`} onClick={() => setDensity(density === 'comfortable' ? 'compact' : 'comfortable')}>{density === 'comfortable' ? 'Compact' : 'Comfort'}</Button>
+        <Button className="button button-ghost theme-toggle" aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{theme === 'dark' ? 'Light' : 'Dark'}</Button>
+        <Button className="button button-ghost" data-dialog-trigger="importOpen" onClick={() => setChrome('importOpen', true)}><CloudArrowUp size={17} aria-hidden="true" />Import queue</Button>
+        <Button className="button button-ghost" data-dialog-trigger="exportOpen" onClick={openExport}><Export size={17} aria-hidden="true" />Export queue</Button>
+        <Button className="button button-primary" data-dialog-trigger="submitOpen" onClick={() => setChrome('submitOpen', true)}><Plus size={17} weight="bold" aria-hidden="true" />Submit job</Button>
       </div>
     </header>
   )
@@ -209,6 +251,7 @@ function ProviderLanes() {
                 </div>
                 <RateBadge rate={provider.rateLimit} />
               </div>
+              {provider.rateLimit === 'throttled' ? <p className="lane-speed-note">Progress runs ~4× slower than normal lanes</p> : null}
               <div className="lane-stats">
                 <div><span>Queue depth</span><strong>{stats.queueDepth}</strong></div>
                 <div><span>In flight</span><strong>{stats.inFlight}</strong></div>
@@ -376,53 +419,6 @@ function JobsView() {
   return <div className="jobs-layout"><ProviderLanes /><JobsTable /></div>
 }
 
-function CustomTooltip({ active, payload }) {
-  if (!active || !payload?.length) return null
-  return <div className="chart-tooltip"><strong>{payload[0].name}</strong><span>Mean reward {Number(payload[0].value).toFixed(3)}</span></div>
-}
-
-function AggregatesView() {
-  const jobs = useQueueStore((state) => state.jobs)
-  const [hidden, setHidden] = useState(() => new Set())
-  const aggregates = useMemo(() => deriveAggregates(jobs), [jobs])
-  const chartData = [{ group: 'Completed jobs', ...aggregates.meanRewardByModel }]
-  const toggle = (model) => setHidden((current) => {
-    const next = new Set(current)
-    if (next.has(model)) next.delete(model); else next.add(model)
-    return next
-  })
-
-  return (
-    <div className="aggregates-grid">
-      <section className="panel chart-panel">
-        <div className="panel-heading"><div><p className="section-kicker">Quality</p><h2>Mean reward by model</h2></div><span className="panel-note">Completed jobs only</span></div>
-        <div className="chart-legend" aria-label="Toggle model series">{MODELS.map((model) => <button key={model} className={hidden.has(model) ? 'legend-hidden' : ''} onClick={() => toggle(model)} aria-pressed={!hidden.has(model)}><span style={{ background: MODEL_COLORS[model] }} />{model}</button>)}</div>
-        <div className="chart-wrap">
-          <ResponsiveContainer width="100%" height={395} minWidth={0} minHeight={320}>
-            <BarChart data={chartData} barGap={10} margin={{ top: 15, right: 12, left: -18, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 6" vertical={false} stroke="#27322e" />
-              <XAxis dataKey="group" stroke="#7e8b85" tickLine={false} axisLine={false} />
-              <YAxis domain={[0, 1]} stroke="#7e8b85" tickLine={false} axisLine={false} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(114, 215, 174, .04)' }} />
-              {MODELS.map((model) => !hidden.has(model) && <Bar key={model} dataKey={model} name={model} fill={MODEL_COLORS[model]} radius={[5, 5, 0, 0]} maxBarSize={58} animationDuration={400} />)}
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
-      <section className="panel cost-panel">
-        <div className="cost-icon"><Gauge size={25} aria-hidden="true" /></div>
-        <p>Total evaluation cost</p>
-        <strong>${aggregates.totalCost.toFixed(2)}</strong>
-        <span>Derived live from completed trials</span>
-        <div className="model-cost-list">{MODELS.map((model) => <div key={model}><i style={{ background: MODEL_COLORS[model] }} /><span>{model}</span><b>{jobs.flatMap((job) => job.model === model ? job.trials : []).filter((trial) => trial.status === 'completed').length} trials</b></div>)}</div>
-      </section>
-      <section className="panel aggregate-context">
-        <div><ArrowsClockwise size={20} aria-hidden="true" /><span>Live calculation</span></div><p>Rewards and cost update the moment a running trial completes. Hidden chart series remain in the queue snapshot.</p>
-      </section>
-    </div>
-  )
-}
-
 function TimelineView() {
   const timeline = useQueueStore((state) => state.timeline)
   const filter = useQueueStore((state) => state.filters.timelineStatus)
@@ -457,7 +453,7 @@ function ConfigPreview({ values }) {
     window.setTimeout(() => setCopied(false), 1800)
   }
   return (
-    <section className="config-preview"><div className="preview-heading"><div><Code size={17} aria-hidden="true" /><span>Configuration preview</span></div><button type="button" onClick={copy}>{copied ? <Check size={15} aria-hidden="true" /> : <Clipboard size={15} aria-hidden="true" />}{copied ? 'Copied' : 'Copy'}</button></div><pre>{text}</pre><p>API-shaped create payload</p></section>
+    <section className="config-preview"><div className="preview-heading"><div><Code size={17} aria-hidden="true" /><span>Configuration preview</span></div><button type="button" className={copied ? 'copy-confirmed' : ''} aria-live="polite" onClick={copy}>{copied ? <Check size={15} aria-hidden="true" /> : <Clipboard size={15} aria-hidden="true" />}{copied ? 'Copied to clipboard' : 'Copy'}</button></div><pre aria-label="Configuration preview">{text}</pre><p>API-shaped create payload</p></section>
   )
 }
 
@@ -468,16 +464,17 @@ function SubmitDialog() {
   const setFormDraft = useQueueStore((state) => state.setFormDraft)
   const submitJobs = useQueueStore((state) => state.submitJobs)
   const submitting = useQueueStore((state) => state.submitting)
-  const { register, handleSubmit, watch, formState: { errors, isValid, isSubmitting }, reset, trigger } = useForm({ resolver: zodResolver(createJobSchema), mode: 'onChange', defaultValues: draft })
+  const { register, handleSubmit, watch, formState: { errors, isSubmitting }, reset, trigger } = useForm({ resolver: zodResolver(createJobSchema), mode: 'onChange', defaultValues: draft })
   const values = watch()
   useEffect(() => { setFormDraft(values) }, [values.dataset, values.agent, values.model, values.trialCount, values.sweepModel])
   useEffect(() => { if (open) { reset(draft); trigger() } }, [open])
   const onSubmit = (payload) => submitJobs({ ...payload, sweepModel: payload.sweepModel || undefined })
+  const onInvalid = () => trigger()
   const described = (field) => errors[field] ? `${field}-error` : undefined
 
   return (
     <DialogShell open={open} onOpenChange={(value) => setChrome('submitOpen', value)} title="Submit job" description="Create an evaluation job using the queue API field contract." size="xl">
-      <form onSubmit={handleSubmit(onSubmit)} className="submit-layout" noValidate>
+      <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="submit-layout" noValidate>
         <div className="form-column">
           <label className="form-field"><span>Dataset <b>Required</b></span><NativeSelect.Root><NativeSelect.Field aria-invalid={Boolean(errors.dataset)} aria-describedby={described('dataset')} {...register('dataset')}><option value="">Select dataset</option>{DATASETS.map((value) => <option key={value}>{value}</option>)}</NativeSelect.Field><NativeSelect.Indicator /></NativeSelect.Root><FieldError id="dataset-error" message={errors.dataset?.message} /></label>
           <label className="form-field"><span>Agent <b>Required</b></span><NativeSelect.Root><NativeSelect.Field aria-invalid={Boolean(errors.agent)} aria-describedby={described('agent')} {...register('agent')}><option value="">Select agent</option>{AGENTS.map((value) => <option key={value}>{value}</option>)}</NativeSelect.Field><NativeSelect.Indicator /></NativeSelect.Root><FieldError id="agent-error" message={errors.agent?.message} /></label>
@@ -487,7 +484,7 @@ function SubmitDialog() {
           <label className="form-field"><span>Sweep model <b>Optional</b></span><NativeSelect.Root><NativeSelect.Field aria-invalid={Boolean(errors.sweepModel)} aria-describedby={described('sweepModel')} {...register('sweepModel')}><option value="">No sweep model</option>{MODELS.map((value) => <option key={value}>{value}</option>)}</NativeSelect.Field><NativeSelect.Indicator /></NativeSelect.Root><FieldError id="sweepModel-error" message={errors.sweepModel?.message} /><small>Creates one job for each selected model.</small></label>
         </div>
         <ConfigPreview values={values} />
-        <div className="dialog-actions submit-actions"><Button type="button" className="button button-ghost" onClick={() => setChrome('submitOpen', false)}>Cancel</Button><Button type="submit" className="button button-primary" disabled={!isValid || isSubmitting || submitting}>{isSubmitting || submitting ? <span className="spinner" /> : <Plus size={17} aria-hidden="true" />}Submit job</Button></div>
+        <div className="dialog-actions submit-actions"><Button type="button" className="button button-ghost" onClick={() => setChrome('submitOpen', false)}>Cancel</Button><Button type="submit" className="button button-primary" disabled={isSubmitting || submitting}>{isSubmitting || submitting ? <span className="spinner" /> : <Plus size={17} aria-hidden="true" />}Submit job</Button></div>
       </form>
     </DialogShell>
   )
@@ -567,7 +564,7 @@ function AppToaster() {
       if (shown.current.has(toast.id)) continue
       shown.current.add(toast.id)
       window.setTimeout(() => {
-        toaster.create({ title: toast.title, type: toast.tone === 'warning' ? 'warning' : toast.tone === 'neutral' ? 'info' : 'success', duration: 3000 })
+        toaster.create({ title: toast.title, type: toast.tone === 'warning' ? 'warning' : toast.tone === 'neutral' ? 'info' : 'success', duration: 5000 })
       }, 0)
     }
   }, [toasts])
@@ -578,20 +575,87 @@ function AppToaster() {
   )
 }
 
+function Coachmarks() {
+  const tourDismissed = useQueueStore((state) => state.tourDismissed)
+  const tourStep = useQueueStore((state) => state.tourStep)
+  const dismissTour = useQueueStore((state) => state.dismissTour)
+  const advanceTour = useQueueStore((state) => state.advanceTour)
+  if (tourDismissed) return null
+  const steps = [
+    { title: 'Jobs table', body: 'Track live trial progress, filters, and row actions for every evaluation job.', target: '.jobs-panel' },
+    { title: 'Export queue', body: 'Compile an API-shaped Queue Snapshot JSON from the current session.', target: '[data-dialog-trigger="exportOpen"]' },
+    { title: 'Submit job', body: 'Create jobs with the same payload contract the queue API expects.', target: '[data-dialog-trigger="submitOpen"]' },
+  ]
+  const step = steps[Math.min(tourStep, steps.length - 1)]
+  return (
+    <div className="coachmark-layer" role="region" aria-label="Product tour" aria-live="polite">
+      <div className="coachmark-card">
+        <p className="coachmark-step">Step {Math.min(tourStep + 1, steps.length)} of {steps.length}</p>
+        <h2>{step.title}</h2>
+        <p>{step.body}</p>
+        <div className="coachmark-actions">
+          <button type="button" className="button button-ghost" onClick={dismissTour}>Skip tour</button>
+          {tourStep >= steps.length - 1
+            ? <button type="button" className="button button-primary" onClick={dismissTour}>Done</button>
+            : <button type="button" className="button button-primary" onClick={advanceTour}>Next</button>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const activeView = useQueueStore((state) => state.activeView)
   const tick = useQueueStore((state) => state.tick)
+  const theme = useQueueStore((state) => state.theme)
+  const density = useQueueStore((state) => state.density)
+  const clipboardStaging = useQueueStore((state) => state.clipboardStaging)
+  const toasts = useQueueStore((state) => state.toasts)
+  const lastToast = toasts.at(-1)?.title ?? ''
+
   useEffect(() => { const timer = window.setInterval(tick, 1000); return () => window.clearInterval(timer) }, [tick])
   useEffect(() => registerWebMcp(), [])
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    document.documentElement.dataset.density = density
+  }, [theme, density])
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        useQueueStore.getState().setChrome('submitOpen', true)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [])
+  useEffect(() => {
+    const resetSession = () => {
+      const state = useQueueStore.getState()
+      state.setActiveView('jobs')
+      state.setChrome('submitOpen', false)
+      state.setChrome('exportOpen', false)
+      state.setChrome('importOpen', false)
+    }
+    resetSession()
+    const onPageShow = (event) => { if (event.persisted) useQueueStore.getState().resetQueue() }
+    window.addEventListener('pageshow', onPageShow)
+    return () => window.removeEventListener('pageshow', onPageShow)
+  }, [])
+
   return (
-    <div className="app-shell">
+    <div className={`app-shell theme-${theme} density-${density}`}>
+      <DecorativeSvgGuard />
+      <div className="sr-live" aria-live="polite" aria-atomic="true">{lastToast}</div>
+      <textarea className="clipboard-staging" readOnly aria-hidden="true" tabIndex={-1} value={clipboardStaging} />
       <Header />
-      <main>
+      <main id="main-content">
         <SummaryStrip />
         {activeView === 'jobs' && <JobsView />}
-        {activeView === 'aggregates' && <AggregatesView />}
+        {activeView === 'aggregates' && <Suspense fallback={<div className="panel loading-panel" role="status">Loading aggregates…</div>}><AggregatesView /></Suspense>}
         {activeView === 'timeline' && <TimelineView />}
       </main>
+      <Coachmarks />
       <SubmitDialog /><ExportDialog /><ImportDialog /><ConfirmDialog /><AppToaster />
     </div>
   )

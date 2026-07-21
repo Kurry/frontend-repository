@@ -18,7 +18,7 @@ function annotation(seed) {
     scores: { Accuracy: 3 + (seed % 3), Clarity: 4, Relevance: 3 + ((seed + 1) % 3) },
     comment: seed % 2 ? 'Seeded annotation for calibration.' : 'Clear response with a minor omission.',
     metadata: { 'Domain confidence': ['Low', 'Medium', 'High'][seed % 3], 'Escalation needed': seed % 4 === 0 },
-    regions: seed % 4 === 0 ? [{ classId: 'cls-person', x: 245, y: 152, w: 82, h: 184, attributeValues: { Severity: 'Medium' } }] : [],
+    regions: seed % 4 === 0 ? [{ id: `seed-region-${seed}`, classId: 'cls-person', x: 245, y: 152, w: 82, h: 184, attributeValues: { Severity: 'Medium' } }] : [],
   };
 }
 
@@ -80,13 +80,14 @@ export function createSeedState() {
 
   const drafts = {};
   Object.keys(items).forEach((id) => {
+    const item = items[id];
     drafts[id] = {
       rating: null,
       scores: { Accuracy: 3, Clarity: 3, Relevance: 3 },
       touchedScores: { Accuracy: false, Clarity: false, Relevance: false },
       comment: '',
       metadata: { 'Domain confidence': 'Medium', 'Escalation needed': false },
-      regions: [],
+      regions: item.annotation ? item.annotation.regions.map((region) => ({ ...region })) : [],
     };
   });
 

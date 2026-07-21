@@ -50,6 +50,8 @@ export interface AuthoringPackage {
     running: boolean;
     paused: boolean;
     startedAt?: number;
+    /** When true, the reproduce-failure step exhausts automatic retries then fails for manual Retry. */
+    forceFailReproduce?: boolean;
     steps: HarvestStep[];
   };
 }
@@ -229,12 +231,12 @@ export class StudioState {
     return parts;
   }
 
-  get rollup() {
+  private aggregate(seeds: Seed[]) {
     const byStatus: Record<Status, number> = { draft: 0, authored: 0, rejected: 0, 'harvest-pending': 0 };
     const byLanguage: Record<string, number> = {};
     const byRepository: Record<string, number> = {};
     const rejectedByClass: Record<string, number> = Object.fromEntries(rejectClasses.map((value) => [value, 0]));
-    for (const seed of this.seeds) {
+    for (const seed of seeds) {
       byStatus[seed.status]++;
       byLanguage[seed.language] = (byLanguage[seed.language] ?? 0) + 1;
       byRepository[seed.repository] = (byRepository[seed.repository] ?? 0) + 1;
@@ -242,6 +244,12 @@ export class StudioState {
     }
     return { byStatus, byLanguage, byRepository, rejectedByClass };
   }
+
+  /** Full-dataset rollups for snapshot/export (always all seeds). */
+  get globalRollup() { return this.aggregate(this.seeds); }
+
+  /** Visible-slice rollups for the queue panel (agree with matching-seeds + table). */
+  get rollup() { return this.aggregate(this.visibleSeeds); }
 
   sortBy(key: StudioState['sortKey']) {
     if (this.sortKey === key) this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -251,13 +259,24 @@ export class StudioState {
   clearFilters() {
     this.filters = { status: '', language: '', repository: '', difficulty: '' };
     this.search = '';
+    this.reconcileSelection();
   }
 
   applyRollupFilter(key: 'status' | 'language' | 'repository', value: string, status?: string) {
-    this.clearFilters();
+    this.filters = { status: '', language: '', repository: '', difficulty: '' };
+    this.search = '';
     this.filters[key] = value;
     if (status) this.filters.status = status;
     this.activeView = 'queue';
+    this.reconcileSelection();
+  }
+
+  reconcileSelection() {
+    const visible = new Set(this.visibleSeeds.map((seed) => seed.id));
+    const next = this.selectedIds.filter((id) => visible.has(id));
+    if (next.length !== this.selectedIds.length || next.some((id, index) => id !== this.selectedIds[index])) {
+      this.selectedIds = next;
+    }
   }
 
   saveCurrentFilter(name?: string) {
@@ -397,10 +416,12 @@ export class StudioState {
     const parsed = FoilUpsertSchema.safeParse(foil);
     if (!parsed.success) return parsed.error.issues;
     const validIds = new Set([...seed.authoring.positiveCriteria, ...seed.authoring.negativeCriteria].map((criterion) => criterion.id));
-    const invalid = parsed.data.expectsFailIds.find((id) => !validIds.has(id));
-    if (invalid) return [{ path: ['expectsFailIds'], message: `expectsFailIds contains unavailable criterion ${invalid}` }];
-    if (index === null) seed.authoring.foils.push(parsed.data);
-    else seed.authoring.foils[index] = parsed.data;
+    // Remap path: drop dangling ids the editor still carried after a criterion delete.
+    const resolved = parsed.data.expectsFailIds.filter((id) => validIds.has(id));
+    if (!resolved.length) return [{ path: ['expectsFailIds'], message: 'expectsFailIds must reference at least one current criterion id' }];
+    const cleaned = { ...parsed.data, expectsFailIds: resolved };
+    if (index === null) seed.authoring.foils.push(cleaned);
+    else seed.authoring.foils[index] = cleaned;
     this.foilEditorOpen = false;
     return [];
   }
@@ -419,12 +440,14 @@ export class StudioState {
     return null;
   }
 
-  startHarvest(seed: Seed) {
+  startHarvest(seed: Seed, options: { forceFailReproduce?: boolean } = {}) {
     if (seed.authoring.harvest.running) return false;
+    const forceFailReproduce = options.forceFailReproduce ?? true;
     seed.authoring.harvest = {
       running: true,
       paused: false,
       startedAt: Date.now(),
+      forceFailReproduce,
       steps: ['clone at pinned commit', 'install dependencies', 'reproduce failure', 'capture runtime evidence', 'distill golden answer'].map((name) => ({ name, status: 'pending', attempt: 1, backoff: 0 }))
     };
     seed.timeline.push(event('harvest', 'Harvest started'));
@@ -439,8 +462,14 @@ export class StudioState {
     if (stepIndex === -1) {
       seed.authoring.harvest.running = false;
       seed.authoring.harvest.paused = false;
+      seed.authoring.harvest.forceFailReproduce = false;
       const elapsed = ((Date.now() - (seed.authoring.harvest.startedAt ?? Date.now())) / 1000).toFixed(1);
       seed.authoring.golden = { status: 'present', value: `Runtime evidence from the pinned commit shows the failing lifecycle transition retains ownership after rollback. A trace captured during reproduction links the unreleased token to the next blocked checkout; counters before and after the transition confirm the invariant violation. Harvest completed in ${elapsed} seconds.` };
+      if (seed.status === 'harvest-pending') {
+        const previous = seed.status;
+        seed.status = 'draft';
+        seed.timeline.push(event('transition', `Status changed from ${previous} to draft after harvest completed`));
+      }
       seed.timeline.push(event('harvest', 'Harvest completed and golden answer drafted'));
       this.ariaMessage = 'Harvest completed; golden answer draft is ready';
       this.showToast('Harvest completed');
@@ -455,14 +484,15 @@ export class StudioState {
       if (!currentSeed || !currentSeed.authoring.harvest.running) return;
       if (currentSeed.authoring.harvest.paused) { currentSeed.authoring.harvest.steps[stepIndex].status = 'pending'; return; }
       const current = currentSeed.authoring.harvest.steps[stepIndex];
-      const shouldRetry = stepIndex === 2 && Math.random() < 0.38;
-      if (shouldRetry) {
+      // Deterministic failure path: exhaust automatic retries on reproduce-failure, then require manual Retry.
+      if (stepIndex === 2 && currentSeed.authoring.harvest.forceFailReproduce) {
         if (current.attempt >= 3) {
           current.status = 'failed';
           current.error = 'The reproduction fixture did not produce a stable failure after 3 attempts.';
           currentSeed.authoring.harvest.running = false;
           currentSeed.timeline.push(event('harvest', 'Harvest failed while reproducing the reported failure'));
           this.ariaMessage = 'Harvest step reproduce failure entered the failed state';
+          this.showToast('Harvest step failed — use Retry');
           return;
         }
         current.status = 'pending';
@@ -511,8 +541,13 @@ export class StudioState {
   retryHarvest(seed: Seed, index: number) {
     const step = seed.authoring.harvest.steps[index];
     if (!step || step.status !== 'failed') return;
-    step.status = 'pending'; step.error = undefined; step.attempt = 1; step.backoff = 0;
+    step.status = 'pending';
+    step.error = undefined;
+    step.attempt = 1;
+    step.backoff = 0;
+    seed.authoring.harvest.forceFailReproduce = false;
     seed.authoring.harvest.running = true;
+    seed.timeline.push(event('harvest', `Manual retry of ${step.name}`));
     this.advanceHarvest(seed.id);
   }
 
@@ -546,13 +581,14 @@ export class StudioState {
 
   snapshot(): DatasetSnapshot {
     const now = this.exportGeneratedAt;
+    const rollup = this.globalRollup;
     return {
       schemaVersion: 'dataset-snapshot-v1',
       totalSeeds: this.seeds.length,
-      byStatus: { ...this.rollup.byStatus },
-      byLanguage: { ...this.rollup.byLanguage },
-      byRepository: { ...this.rollup.byRepository },
-      rejectedByClass: { ...this.rollup.rejectedByClass } as DatasetSnapshot['rejectedByClass'],
+      byStatus: { ...rollup.byStatus },
+      byLanguage: { ...rollup.byLanguage },
+      byRepository: { ...rollup.byRepository },
+      rejectedByClass: { ...rollup.rejectedByClass } as DatasetSnapshot['rejectedByClass'],
       generatedAt: now
     };
   }
@@ -576,8 +612,14 @@ export class StudioState {
   }
 
   stampExport(format: string) {
-    if (format === 'package-manifest-json') format = 'manifest';
-    if (format === 'manifest' && this.activeSeed) this.activeSeed.timeline.push(event('export', 'Package manifest exported'));
+    const seed = this.activeSeed;
+    if (!seed) return;
+    const label =
+      format === 'manifest' || format === 'package-manifest-json' ? 'Package manifest exported' :
+      format === 'snapshot' || format === 'dataset-snapshot-json' ? 'Dataset snapshot exported' :
+      format === 'studio' ? 'Dataset studio package exported' :
+      `Artifact exported (${format})`;
+    seed.timeline.push(event('export', label));
   }
 
   importPackage(text: string) {
@@ -663,9 +705,40 @@ export class StudioState {
     return (kind === 'positive' ? PositiveCriterionSchema : NegativeCriterionSchema).safeParse(record);
   }
 
+  toastLeaving = $state(false);
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
+  private toastClearTimer: ReturnType<typeof setTimeout> | null = null;
+
   showToast(message: string) {
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    if (this.toastClearTimer) clearTimeout(this.toastClearTimer);
+    this.toastLeaving = false;
     this.toast = message;
-    setTimeout(() => { if (this.toast === message) this.toast = ''; }, 2600);
+    this.toastTimer = setTimeout(() => {
+      this.toastLeaving = true;
+      this.toastClearTimer = setTimeout(() => {
+        if (this.toast === message) { this.toast = ''; this.toastLeaving = false; }
+      }, 280);
+    }, 2400);
+  }
+
+  renameCriterion(seed: Seed, kind: 'positive' | 'negative', fromId: string, toId: string) {
+    const list = kind === 'positive' ? seed.authoring.positiveCriteria : seed.authoring.negativeCriteria;
+    const criterion = list.find((item) => item.id === fromId);
+    if (!criterion || fromId === toId) return false;
+    if (fromId === '1.4') { this.showToast('Criterion 1.4 id is locked'); return false; }
+    const pattern = kind === 'positive' ? /^1\.\d+$/ : /^2\.\d+$/;
+    if (!pattern.test(toId)) { this.showToast(`Criterion id must match ${kind === 'positive' ? '1.x' : '2.x'}`); return false; }
+    const taken = new Set([
+      ...seed.authoring.positiveCriteria.map((item) => item.id),
+      ...seed.authoring.negativeCriteria.map((item) => item.id)
+    ]);
+    if (taken.has(toId)) { this.showToast(`Criterion id ${toId} is already in use`); return false; }
+    criterion.id = toId;
+    for (const foil of seed.authoring.foils) {
+      foil.expectsFailIds = foil.expectsFailIds.map((id) => (id === fromId ? toId : id));
+    }
+    return true;
   }
 }
 

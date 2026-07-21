@@ -83,7 +83,8 @@ export type WidgetDef =
     | {type: "switch";}
     | {type: "text"; placeholder?: string; size?: number;}
     | {type: "number"; min?: number; max?: number; step?: number; size?: number; placeholder?: string; integer?: boolean;}
-    | {type: "range"; min: number; max: number; step?: number; showLabels?: boolean;}
+    | {type: "range"; min: number; max: number; step?: number; showLabels?: boolean;
+            showInput?: boolean;}
     | {type: "dropdown"; options: ReadonlyArray<DropdownOption | string>; searchable?: boolean; allowEmpty?: boolean; emptyLabel?: string; placeholder?: string;}
     | {type: "color";}
     | {type: "palette";}

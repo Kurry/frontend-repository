@@ -16,7 +16,8 @@ import {
 	cancelConversion,
 	download,
 	compileSession,
-	compileConversionReport
+	compileConversionReport,
+	importSession
 } from "./store.svelte.js";
 import { TARGET_FORMATS } from "./formats.js";
 
@@ -37,13 +38,42 @@ const TOOLS = [
 	{
 		name: "artifact_import",
 		description:
-			"Open the local file picker to add a file to the conversion queue. The actual file selection and bytes stay with the operator/Playwright.",
-		parameters: { type: "object", properties: {}, additionalProperties: false },
-		handler: () => {
-			const el = document.querySelector('[data-file-input]');
-			if (!el) return { ok: false, error: "file input not mounted" };
-			el.click();
-			return { ok: true, opened: true };
+			"Import a conversion session (the declared import mode). Pass a ConversionSessionDocument " +
+			"as `document` to apply it through the same store command the visible Import control uses " +
+			"(settings, presets, and matching queue targets are restored; invalid documents are rejected " +
+			"with named field errors and no state change). Omit `document` to open the visible Import session dialog. " +
+			"No raw file bytes are accepted: files enter the queue via the picker (Playwright) or entity_create samples.",
+		parameters: {
+			type: "object",
+			properties: {
+				document: {
+					type: "object",
+					description:
+						"A ConversionSessionDocument exactly as produced by artifact_export format=session-json.",
+				},
+			},
+			additionalProperties: false,
+		},
+		handler: async ({ document }) => {
+			let result = null;
+			if (document) result = importSession(document);
+			const detail = {
+				text: document ? JSON.stringify(document, null, 2) : "",
+				applied: !!(result && result.ok),
+			};
+			if (window.location.pathname.startsWith("/settings")) {
+				window.dispatchEvent(new CustomEvent("vert:open-import", { detail }));
+			} else {
+				store.importRequest = detail;
+				const { goto } = await import("$app/navigation");
+				await goto("/settings");
+			}
+			if (document) {
+				return result.ok
+					? { ok: true, import_mode: "conversion-session", imported: true }
+					: { ok: false, import_mode: "conversion-session", error: result.error };
+			}
+			return { ok: true, import_mode: "conversion-session", opened: "import-session" };
 		},
 	},
 	{

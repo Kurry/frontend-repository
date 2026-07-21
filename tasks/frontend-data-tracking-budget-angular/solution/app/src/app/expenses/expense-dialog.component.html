@@ -3,14 +3,16 @@
   <div mat-dialog-content class="dialog-content">
     <mat-form-field class="full-width">
       <mat-label>Amount</mat-label>
-      <input matInput type="number" step="0.01" formControlName="value" name="amount" required />
-      <mat-error *ngIf="form.controls.value.invalid">Amount must be greater than 0</mat-error>
+      <input matInput type="number" step="0.01" formControlName="value" name="amount" required aria-describedby="amount-error" />
+      <mat-error id="amount-error" *ngIf="form.controls.value.hasError('required')">Amount is required</mat-error>
+      <mat-error *ngIf="form.controls.value.hasError('min')">Amount must be a positive number</mat-error>
     </mat-form-field>
 
     <mat-form-field class="full-width">
       <mat-label>Date</mat-label>
-      <input matInput type="date" formControlName="datetime" name="date" required />
-      <mat-error *ngIf="form.controls.datetime.invalid">Date is required</mat-error>
+      <input matInput type="date" formControlName="datetime" name="date" required aria-describedby="date-error" />
+      <mat-error id="date-error" *ngIf="form.controls.datetime.hasError('required')">Date is required</mat-error>
+      <mat-error *ngIf="form.controls.datetime.hasError('pattern')">Date must be YYYY-MM-DD</mat-error>
     </mat-form-field>
 
     <mat-form-field class="full-width">
@@ -18,7 +20,7 @@
       <mat-select formControlName="categoryId" name="category" required>
         <mat-option *ngFor="let c of categories$ | async" [value]="c.id">{{ c.name }}</mat-option>
       </mat-select>
-      <mat-error *ngIf="form.controls.categoryId.invalid">Category is required</mat-error>
+      <mat-error *ngIf="form.controls.categoryId.hasError('required')">Category is required</mat-error>
     </mat-form-field>
 
     <mat-form-field class="full-width">
@@ -29,6 +31,6 @@
 
   <div mat-dialog-actions align="end">
     <button mat-button type="button" (click)="cancel()">Cancel</button>
-    <button mat-button color="primary" type="submit">{{ data.mode === 'add' ? 'Add' : 'Update' }}</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="form.invalid">{{ data.mode === 'add' ? 'Add expense' : 'Update expense' }}</button>
   </div>
 </form>

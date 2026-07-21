@@ -50,18 +50,26 @@ onUnmounted(() => {
   window.removeEventListener('keydown', handleGlobalKeydown)
 })
 
+const isCanvasTextEditorFocused = (target: EventTarget | null) => {
+  if (!(target instanceof HTMLElement)) return false
+  return !!target.closest('[data-canvas-text-editor]')
+}
+
 const handleGlobalKeydown = (e: KeyboardEvent) => {
-  // Undo: Ctrl+Z or Cmd+Z
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
-     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target as HTMLElement).isContentEditable) return
-     e.preventDefault()
-     store.undo()
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault()
+    window.dispatchEvent(new CustomEvent('scribblespace:open-palette'))
+    return
   }
-  // Redo: Ctrl+Shift+Z, Cmd+Shift+Z, or Ctrl+Y
+  if (isCanvasTextEditorFocused(e.target)) return
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+    e.preventDefault()
+    store.undo()
+    return
+  }
   if (((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z' && e.shiftKey) || ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y')) {
-     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement || (e.target as HTMLElement).isContentEditable) return
-     e.preventDefault()
-     store.redo()
+    e.preventDefault()
+    store.redo()
   }
 }
 

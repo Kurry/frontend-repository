@@ -71,7 +71,7 @@ export const saveWorkflowSchema = z.object({
 
 export const workflowDefinitionSchema = z.object({
   schemaVersion: z.literal(1),
-  generatedAt: z.iso.datetime({ offset: false }),
+  generatedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/, 'generatedAt must be an ISO-8601 datetime ending in Z'),
   name: z.string().trim().min(2).max(80),
   nodes: z.array(workflowNodeSchema).nonempty(),
   edges: z.array(edgeSchema),
@@ -122,10 +122,10 @@ export const createSeedNodes = () => [
 ];
 
 export const createSeedEdges = () => [
-  { id: 'edge-prompt-agent', source: 'prompt-1', target: 'agent-1', sourceHandle: 'out', targetHandle: 'in', type: 'smoothstep' },
-  { id: 'edge-agent-eval', source: 'agent-1', target: 'eval-1', sourceHandle: 'out', targetHandle: 'in', type: 'smoothstep' },
-  { id: 'edge-eval-condition', source: 'eval-1', target: 'condition-1', sourceHandle: 'out', targetHandle: 'in', type: 'smoothstep' },
-  { id: 'edge-condition-output', source: 'condition-1', target: 'output-1', sourceHandle: 'out', targetHandle: 'in', type: 'smoothstep' },
+  { id: 'edge-prompt-agent', source: 'prompt-1', target: 'agent-1', sourceHandle: 'out', targetHandle: 'in', type: 'default', interactionWidth: 24 },
+  { id: 'edge-agent-eval', source: 'agent-1', target: 'eval-1', sourceHandle: 'out', targetHandle: 'in', type: 'default', interactionWidth: 24 },
+  { id: 'edge-eval-condition', source: 'eval-1', target: 'condition-1', sourceHandle: 'out', targetHandle: 'in', type: 'default', interactionWidth: 24 },
+  { id: 'edge-condition-output', source: 'condition-1', target: 'output-1', sourceHandle: 'out', targetHandle: 'in', type: 'default', interactionWidth: 24 },
 ];
 
 export function summarizeConfig(type, config) {
@@ -190,3 +190,42 @@ export const ALLOWED_CONNECTIONS = new Set([
   'Eval>Condition', 'Eval>Output',
   'Condition>Agent', 'Condition>Output',
 ]);
+
+export function describeGraphValidity(nodes, edges) {
+  if (!nodes.length) return { valid: false, label: 'Incomplete', reason: 'Canvas is empty — drag a node from the palette to begin.' };
+  const nodeIds = new Set(nodes.map((node) => node.id));
+  const validEdges = edges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
+  if (nodes.length > 1 && validEdges.length === 0) return { valid: false, label: 'Incomplete', reason: 'Connect nodes into a source-to-sink path.' };
+  const neighbors = new Map(nodes.map((node) => [node.id, []]));
+  const undirected = new Map(nodes.map((node) => [node.id, []]));
+  const indegree = new Map(nodes.map((node) => [node.id, 0]));
+  validEdges.forEach((edge) => {
+    neighbors.get(edge.source).push(edge.target);
+    undirected.get(edge.source).push(edge.target);
+    undirected.get(edge.target).push(edge.source);
+    indegree.set(edge.target, indegree.get(edge.target) + 1);
+  });
+  if (nodes.length > 1) {
+    const seen = new Set();
+    const queue = [nodes[0].id];
+    while (queue.length) {
+      const id = queue.shift();
+      if (seen.has(id)) continue;
+      seen.add(id);
+      undirected.get(id).forEach((next) => queue.push(next));
+    }
+    if (seen.size !== nodes.length) return { valid: false, label: 'Incomplete', reason: 'Every node must belong to one connected path.' };
+  }
+  const queue = nodes.filter((node) => indegree.get(node.id) === 0).map((node) => node.id);
+  const order = [];
+  while (queue.length) {
+    const id = queue.shift();
+    order.push(id);
+    neighbors.get(id).forEach((target) => {
+      indegree.set(target, indegree.get(target) - 1);
+      if (indegree.get(target) === 0) queue.push(target);
+    });
+  }
+  if (order.length !== nodes.length) return { valid: false, label: 'Incomplete', reason: 'The workflow contains a cycle.' };
+  return { valid: true, label: 'Valid', reason: 'Source-to-sink path is ready to run.' };
+}

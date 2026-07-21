@@ -1,12 +1,12 @@
-import React, { useEffect, useRef } from 'react'
-import { Button, Checkbox, InlineNotification, Select, SelectItem, TextArea } from '@carbon/react'
-import { ArrowLeft, ArrowRight, Checkmark, Close, DocumentImport, Upload } from '@carbon/icons-react'
+import React, { useRef } from 'react'
+import { ArrowLeft, ArrowRight, Checkmark, Close, DocumentImport, Upload, Restart } from '@carbon/icons-react'
 import Papa from 'papaparse'
 import { fieldError, normalizeRowInput } from '../domain'
 import { newImportState, sampleCsvs, useStore } from '../store'
+import { Btn, cx, useOverlayBehavior } from '../ui'
 
 function parseCsv(text) {
-  const parsed = Papa.parse(text.trim(), { header: true, skipEmptyLines: 'greedy' })
+  const parsed = Papa.parse(String(text).trim(), { header: true, skipEmptyLines: 'greedy' })
   const headers = parsed.meta.fields?.filter(Boolean) || []
   const rows = parsed.data.filter((row) => headers.some((h) => String(row[h] ?? '').trim() !== ''))
   if (!headers.length || !rows.length) return { error: 'CSV source has no parseable rows' }
@@ -21,29 +21,20 @@ function diagnose(dataset, values) {
 }
 
 export function ImportWizard({ dataset }) {
+  const open = useStore((s) => s.importState.open)
+  if (!open) return null
+  return <WizardInner dataset={dataset} />
+}
+
+function WizardInner({ dataset }) {
   const state = useStore((s) => s.importState)
   const setUi = useStore((s) => s.setUi)
   const appendRows = useStore((s) => s.appendRows)
   const card = useRef(null)
-  const returnFocus = useRef(null)
-  useEffect(() => {
-    if (!state.open) return
-    returnFocus.current = document.activeElement
-    card.current?.querySelector('button, input, textarea, select')?.focus()
-    const key = (e) => {
-      if (e.key === 'Escape') { e.stopPropagation(); close() }
-      if (e.key === 'Tab') {
-        const nodes = [...card.current.querySelectorAll('button, input, textarea, select, [tabindex]:not([tabindex="-1"])')].filter((n) => !n.disabled)
-        if (!nodes.length) return
-        if (e.shiftKey && document.activeElement === nodes[0]) { e.preventDefault(); nodes.at(-1).focus() }
-        else if (!e.shiftKey && document.activeElement === nodes.at(-1)) { e.preventDefault(); nodes[0].focus() }
-      }
-    }
-    document.addEventListener('keydown', key)
-    return () => { document.removeEventListener('keydown', key); returnFocus.current?.focus?.() }
-  }, [state.open])
-  const close = () => setUi({ importState: newImportState(false) })
-  if (!state.open) return null
+  const commitLock = useRef(false)
+  const close = () => { setUi({ importState: { ...useStore.getState().importState, open: false } }); }
+  useOverlayBehavior(card, close)
+  const restart = () => setUi({ importState: newImportState(true) })
   const update = (patch) => setUi({ importState: { ...useStore.getState().importState, ...patch } })
   const load = (text) => {
     const result = parseCsv(text)
@@ -78,32 +69,176 @@ export function ImportWizard({ dataset }) {
   const ready = included.filter((r) => !Object.keys(r.errors).length).length
   const hasMapping = Object.values(state.mapping).some((m) => m !== 'ignore')
   const commit = () => {
-    if (state.committing || issues || !included.length) return
+    const live = useStore.getState().importState
+    if (commitLock.current || live.committing) return
+    if (issues || !included.length) return
+    commitLock.current = true
     update({ committing: true })
     const rows = included.map((r) => normalizeRowInput(dataset.schema, { values: Object.fromEntries(dataset.schema.map((f) => [f.name, r.cells[f.name]])), expectedOutput: r.cells.expectedOutput, verified: false }))
-    close(); appendRows(rows)
+    appendRows(rows)
+    useStore.getState().announce(`${rows.length} rows imported`)
+    setUi({ importState: newImportState(false) })
   }
   const steps = ['Source', 'Mapping', 'Diagnostics']
-  return <div className="modal-overlay" role="presentation">
-    <section ref={card} className="modal-card max-w-5xl" role="dialog" aria-modal="true" aria-labelledby="import-title">
-      <header className="sticky top-0 z-20 flex items-start justify-between border-b border-slate-200 bg-white p-5"><div><h2 id="import-title" className="text-xl font-semibold">Import CSV</h2><p className="mt-1 text-sm text-slate-600">Map and repair incoming rows before committing them to {dataset.name}.</p></div><Button hasIconOnly kind="ghost" size="sm" iconDescription="Close import wizard" renderIcon={Close} onClick={close}/></header>
-      <div className="border-b border-slate-200 px-5 py-3"><ol className="grid grid-cols-3 gap-2">{steps.map((label, i) => { const activeIndex = state.step === 'source' ? 0 : state.step === 'mapping' ? 1 : 2; return <li key={label} className={`flex items-center gap-2 text-xs font-semibold ${i <= activeIndex ? 'text-blue-700' : 'text-slate-400'}`}><span className={`grid h-6 w-6 place-items-center rounded-full ${i < activeIndex ? 'bg-green-100 text-green-800' : i === activeIndex ? 'bg-blue-600 text-white' : 'bg-slate-200'}`}>{i < activeIndex ? <Checkmark size={14}/> : i + 1}</span>{label}</li>})}</ol></div>
-      {state.step === 'source' && <div className="p-5">
-        <div className="mb-4 flex border-b border-slate-200" role="tablist">{['samples','file','paste'].map((t) => <button key={t} role="tab" aria-selected={state.sourceTab === t} className={`border-b-2 px-4 py-2 text-sm font-semibold capitalize ${state.sourceTab === t ? 'border-blue-600 text-blue-700' : 'border-transparent text-slate-500'}`} onClick={() => update({ sourceTab: t, sourceError: null })}>{t === 'samples' ? 'Sample fixtures' : t}</button>)}</div>
-        {state.sourceTab === 'samples' && <div className="grid gap-3 sm:grid-cols-2">{sampleCsvs.map((sample) => <button key={sample.id} className="rounded-lg border border-slate-200 p-4 text-left transition hover:border-blue-500 hover:bg-blue-50" onClick={() => load(sample.text)}><DocumentImport size={24} className="text-blue-700"/><strong className="mt-3 block text-sm">{sample.name}</strong><span className="mt-1 block text-xs text-slate-500">{sample.text.split('\n').length - 1} rows · selectable fixture</span></button>)}</div>}
-        {state.sourceTab === 'file' && <div className={`dropzone ${state.dragging ? 'dragging' : ''} grid min-h-52 place-items-center rounded-lg p-8 text-center`} onDragOver={(e) => { e.preventDefault(); update({ dragging: true }) }} onDragLeave={() => update({ dragging: false })} onDrop={(e) => { e.preventDefault(); update({ dragging: false }); loadFile(e.dataTransfer.files?.[0]) }}><div><Upload size={32} className="mx-auto text-blue-700"/><strong className="mt-3 block">Drop a .csv file here</strong><p className="mt-1 text-sm text-slate-500">or choose one from your device</p><label className="mt-4 inline-block cursor-pointer bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">Choose CSV<input className="sr-only" type="file" accept=".csv,text/csv" onChange={(e) => loadFile(e.target.files?.[0])}/></label></div></div>}
-        {state.sourceTab === 'paste' && <div><TextArea id="pasted-csv" rows={12} labelText="Paste raw CSV text" placeholder="prompt,score,category&#10;Example,8.5,Reasoning" value={state.paste} onChange={(e) => update({ paste: e.target.value })} invalid={Boolean(state.sourceError)} invalidText={state.sourceError}/><Button className="mt-3" size="sm" disabled={!state.paste.trim()} onClick={() => load(state.paste)}>Parse pasted CSV</Button></div>}
-        {state.sourceError && state.sourceTab !== 'paste' && <InlineNotification className="mt-4" kind="error" lowContrast title={state.sourceError} hideCloseButton/>}
-      </div>}
-      {state.step === 'mapping' && <div className="p-5"><div className="mb-4"><h3 className="font-semibold">Map detected columns</h3><p className="text-sm text-slate-600">Matched schema headers are pre-assigned. Change any destination before continuing.</p></div><div className="max-h-[55vh] overflow-auto rounded-lg border border-slate-200"><table className="w-full min-w-[620px] text-sm"><thead className="sticky top-0 bg-slate-100"><tr><th className="p-3 text-left">CSV column</th><th className="p-3 text-left">First values</th><th className="p-3 text-left">Destination</th></tr></thead><tbody>{state.headers.map((h) => <tr key={h} className="border-t border-slate-200"><td className="p-3 font-semibold">{h}</td><td className="max-w-72 truncate p-3 text-slate-600">{state.rawRows.slice(0,3).map((r) => r[h]).join(' · ')}</td><td className="p-3"><select aria-label={`Map ${h}`} className="native-input" value={state.mapping[h]} onChange={(e) => update({ mapping: { ...state.mapping, [h]: e.target.value } })}><option value="ignore">Ignore</option>{dataset.schema.map((f) => <option key={f.name} value={f.name}>{f.name} ({f.type})</option>)}<option value="expectedOutput">Expected output</option></select></td></tr>)}</tbody></table></div>{!hasMapping && <p className="error-text" role="alert">Assign at least one CSV column to a schema field or expected output.</p>}<footer className="mt-5 flex justify-between"><Button kind="secondary" renderIcon={ArrowLeft} onClick={() => update({ step: 'source' })}>Back</Button><Button renderIcon={ArrowRight} disabled={!hasMapping} onClick={toDiagnostics}>Continue to diagnostics</Button></footer></div>}
-      {state.step === 'diagnostics' && <div className="p-5"><div className="flex flex-wrap items-center justify-between gap-3"><div><h3 className="font-semibold">Review incoming rows</h3><p className="text-sm text-slate-600">Edit highlighted cells or exclude rows before commit.</p></div><div className="flex gap-2"><TagStat tone="green" text={`${ready} ready`}/><TagStat tone={issues ? 'red' : 'green'} text={`${issues} unresolved issue${issues === 1 ? '' : 's'}`}/><TagStat text={`${state.diagnostic.filter((r) => r.excluded).length} excluded`}/></div></div>
-        <div className="mt-4 max-h-[55vh] overflow-auto rounded-lg border border-slate-200"><table className="w-full min-w-[760px] text-xs"><thead className="sticky top-0 z-10 bg-slate-100"><tr><th className="p-2 text-left">Exclude</th>{dataset.schema.map((f) => <th key={f.name} className="p-2 text-left">{f.name}</th>)}<th className="p-2 text-left">Expected output</th></tr></thead><tbody>{state.diagnostic.map((row, i) => <tr key={row.id} className={`border-t border-slate-200 ${row.excluded ? 'opacity-50' : ''}`}><td className="p-2"><Checkbox id={`exclude-${i}`} hideLabel labelText={`Exclude incoming row ${i+1}`} checked={row.excluded} onChange={() => toggleExcluded(row.id)}/></td>{dataset.schema.map((field) => <td key={field.name} className={`min-w-40 p-2 align-top ${row.errors[field.name] ? 'bg-red-50' : ''}`}>{field.type === 'category' ? <select className={`h-9 w-full border px-2 ${row.errors[field.name] ? "border-red-600" : "border-slate-300"}`} value={row.cells[field.name]} aria-invalid={Boolean(row.errors[field.name])} aria-describedby={row.errors[field.name] ? `err-${row.id}-${field.name}` : undefined} onChange={(e) => editDiagnostic(row.id, field.name, e.target.value)}><option value={row.cells[field.name]}>{row.cells[field.name] || 'Choose…'}</option>{field.allowedValues.filter((v) => v !== row.cells[field.name]).map((v) => <option key={v}>{v}</option>)}</select> : <input className={`h-9 w-full border px-2 ${row.errors[field.name] ? "border-red-600 bg-white" : "border-slate-300"}`} value={row.cells[field.name]} aria-invalid={Boolean(row.errors[field.name])} aria-describedby={row.errors[field.name] ? `err-${row.id}-${field.name}` : undefined} onChange={(e) => editDiagnostic(row.id, field.name, e.target.value)}/>} {row.errors[field.name] && <p id={`err-${row.id}-${field.name}`} className="mt-1 max-w-48 text-[11px] leading-4 text-red-700">{row.errors[field.name]}</p>}</td>)}<td className={`min-w-48 p-2 align-top ${row.errors.expectedOutput ? 'bg-red-50' : ''}`}><input className={`h-9 w-full border px-2 ${row.errors.expectedOutput ? "border-red-600 bg-white" : "border-slate-300"}`} value={row.cells.expectedOutput} aria-invalid={Boolean(row.errors.expectedOutput)} aria-describedby={row.errors.expectedOutput ? `err-${row.id}-expectedOutput` : undefined} onChange={(e) => editDiagnostic(row.id, "expectedOutput", e.target.value)}/>{row.errors.expectedOutput && <p id={`err-${row.id}-expectedOutput`} className="mt-1 text-red-700">{row.errors.expectedOutput}</p>}</td></tr>)}</tbody></table></div>
-        <footer className="mt-5 flex justify-between"><Button kind="secondary" renderIcon={ArrowLeft} onClick={() => update({ step: 'mapping' })}>Back to mapping</Button><Button disabled={Boolean(issues) || !included.length || state.committing} onClick={commit}>{state.committing ? 'Committing…' : `Commit ${included.length} row${included.length === 1 ? '' : 's'}`}</Button></footer>
-      </div>}
-    </section>
-  </div>
+  const activeIndex = state.step === 'source' ? 0 : state.step === 'mapping' ? 1 : 2
+  return (
+    <div className="modal-overlay no-print" onMouseDown={(e) => { if (e.target === e.currentTarget) close() }}>
+      <section ref={card} tabIndex={-1} className="modal-card !w-[min(920px,100%)]" role="dialog" aria-modal="true" aria-labelledby="import-title">
+        <header className="sticky top-0 z-20 flex items-start justify-between gap-3 border-b bd surface px-5 py-4">
+          <div className="min-w-0">
+            <h2 id="import-title" className="text-xl font-bold t-primary">Import CSV</h2>
+            <p className="mt-1 text-sm t-2">Map and repair incoming rows before committing them to {dataset.name}.</p>
+          </div>
+          <div className="flex gap-1">
+            <Btn kind="ghost" size="sm" icon={Restart} iconOnly aria-label="Restart import from the beginning" title="Start over" onClick={restart} />
+            <Btn kind="ghost" size="sm" icon={Close} iconOnly aria-label="Close import wizard" title="Close (Escape)" onClick={close} />
+          </div>
+        </header>
+        <div className="border-b bd px-5 py-3">
+          <ol className="grid grid-cols-3 gap-2">
+            {steps.map((label, i) => (
+              <li key={label} className={cx('flex items-center gap-2 text-xs font-bold', i <= activeIndex ? 't-brand' : 't-3')}>
+                <span className={cx('grid h-6 w-6 flex-none place-items-center rounded-full text-[11px] transition-colors', i < activeIndex ? 'bg-[var(--ok-soft)] text-[var(--ok)]' : i === activeIndex ? 'bg-[var(--brand)] text-white' : 'surface-3 t-3')}>
+                  {i < activeIndex ? <Checkmark size={13} /> : i + 1}
+                </span>{label}
+              </li>
+            ))}
+          </ol>
+        </div>
+        {state.step === 'source' && (
+          <div className="step-enter p-5">
+            <div className="mb-4 flex border-b bd" role="tablist" aria-label="CSV source">
+              {[['samples', 'Sample fixtures'], ['file', 'File / drop'], ['paste', 'Paste text']].map(([t, label]) => (
+                <button key={t} role="tab" aria-selected={state.sourceTab === t} className="tab-btn" onClick={() => update({ sourceTab: t, sourceError: null })}>{label}</button>
+              ))}
+            </div>
+            {state.sourceTab === 'samples' && (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {sampleCsvs.map((sample) => (
+                  <button key={sample.id} type="button" className="rounded-lg hairline p-4 text-left transition hover:border-[var(--brand)] hover:bg-[var(--brand-soft)]" onClick={() => load(sample.text)}>
+                    <DocumentImport size={24} style={{ color: 'var(--brand)' }} aria-hidden="true" />
+                    <strong className="mt-3 block text-sm t-primary">{sample.name}</strong>
+                    <span className="mt-1 block text-xs t-3">{sample.text.split('\n').length - 1} rows · seeded fixture</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            {state.sourceTab === 'file' && (
+              <div className={cx('dropzone grid min-h-52 place-items-center p-8 text-center', state.dragging && 'dragging')}
+                onDragOver={(e) => { e.preventDefault(); if (!state.dragging) update({ dragging: true }) }}
+                onDragLeave={() => update({ dragging: false })}
+                onDrop={(e) => { e.preventDefault(); update({ dragging: false }); loadFile(e.dataTransfer.files?.[0]) }}>
+                <div>
+                  <Upload size={32} className="mx-auto" style={{ color: 'var(--brand)' }} aria-hidden="true" />
+                  <strong className="mt-3 block t-primary">Drop a .csv file here</strong>
+                  <p className="mt-1 text-sm t-3">{state.dragging ? 'Release to load the file' : 'or choose one from your device'}</p>
+                  <label className="btn btn-primary btn-sm mt-4 cursor-pointer"><Upload size={14} aria-hidden="true" />Choose CSV<input className="sr-only" type="file" accept=".csv,text/csv" onChange={(e) => loadFile(e.target.files?.[0])} /></label>
+                </div>
+              </div>
+            )}
+            {state.sourceTab === 'paste' && (
+              <div>
+                <label className="field-label" htmlFor="pasted-csv">Paste raw CSV text</label>
+                <textarea id="pasted-csv" rows={10} className="input mono !text-xs" placeholder={'prompt,score,category\nExample,8.5,Reasoning'} value={state.paste} onChange={(e) => update({ paste: e.target.value })} aria-invalid={Boolean(state.sourceError)} aria-describedby={state.sourceError ? 'pasted-csv-error' : undefined} />
+                {state.sourceError && <p className="error-text" id="pasted-csv-error" role="alert">{state.sourceError}</p>}
+                <Btn className="mt-3" size="sm" disabled={!state.paste.trim()} onClick={() => load(state.paste)}>Parse pasted CSV</Btn>
+              </div>
+            )}
+            {state.sourceError && state.sourceTab !== 'paste' && <p className="error-text mt-4" role="alert">{state.sourceError}</p>}
+          </div>
+        )}
+        {state.step === 'mapping' && (
+          <div className="step-enter p-5">
+            <div className="mb-4">
+              <h3 className="text-base font-bold t-primary">Map detected columns</h3>
+              <p className="text-sm t-2">Matched schema headers arrive pre-assigned. Change any destination before continuing.</p>
+            </div>
+            <div className="max-h-[52vh] overflow-auto rounded-lg hairline">
+              <table className="w-full min-w-[620px] text-sm">
+                <thead className="sticky top-0 surface-3"><tr><th className="p-3 text-left text-xs font-bold uppercase t-2">CSV column</th><th className="p-3 text-left text-xs font-bold uppercase t-2">First values</th><th className="p-3 text-left text-xs font-bold uppercase t-2">Destination</th></tr></thead>
+                <tbody>
+                  {state.headers.map((h) => (
+                    <tr key={h} className="border-t bd">
+                      <td className="p-3 font-bold t-primary">{h}</td>
+                      <td className="max-w-72 truncate p-3 t-3" title={state.rawRows.slice(0, 3).map((r) => r[h]).join(' · ')}>{state.rawRows.slice(0, 3).map((r) => r[h]).join(' · ')}</td>
+                      <td className="p-3">
+                        <label className="sr-only" htmlFor={`map-${h}`}>Map column {h}</label>
+                        <select id={`map-${h}`} className="input !min-h-9" value={state.mapping[h]} onChange={(e) => update({ mapping: { ...state.mapping, [h]: e.target.value } })}>
+                          <option value="ignore">Ignore</option>
+                          {dataset.schema.map((f) => <option key={f.name} value={f.name}>{f.name} ({f.type})</option>)}
+                          <option value="expectedOutput">Expected output</option>
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {!hasMapping && <p className="error-text" role="alert">Assign at least one CSV column to a schema field or the expected output.</p>}
+            <footer className="mt-5 flex justify-between">
+              <Btn kind="secondary" icon={ArrowLeft} onClick={() => update({ step: 'source' })}>Back</Btn>
+              <Btn icon={ArrowRight} disabled={!hasMapping} onClick={toDiagnostics}>Continue to diagnostics</Btn>
+            </footer>
+          </div>
+        )}
+        {state.step === 'diagnostics' && (
+          <div className="step-enter p-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className="text-base font-bold t-primary">Review incoming rows</h3>
+                <p className="text-sm t-2">Edit highlighted cells in place or exclude rows before commit.</p>
+              </div>
+              <div className="flex flex-wrap gap-2" aria-live="polite">
+                <Tag tone="green">{ready} ready</Tag>
+                <Tag tone={issues ? 'red' : 'green'}>{issues} unresolved issue{issues === 1 ? '' : 's'}</Tag>
+                <Tag tone="gray">{state.diagnostic.filter((r) => r.excluded).length} excluded</Tag>
+              </div>
+            </div>
+            <div className="mt-4 max-h-[50vh] overflow-auto rounded-lg hairline">
+              <table className="w-full min-w-[760px] text-xs">
+                <thead className="sticky top-0 z-10 surface-3"><tr><th className="p-2 text-left font-bold uppercase t-2">Exclude</th>{dataset.schema.map((f) => <th key={f.name} className="p-2 text-left font-bold uppercase t-2">{f.name}</th>)}<th className="p-2 text-left font-bold uppercase t-2">Expected output</th></tr></thead>
+                <tbody>
+                  {state.diagnostic.map((row, i) => (
+                    <tr key={row.id} className={cx('border-t bd transition-opacity', row.excluded && 'opacity-45')}>
+                      <td className="p-2">
+                        <label className="chk" title={row.excluded ? 'Excluded from commit' : 'Included'}>
+                          <input type="checkbox" checked={row.excluded} onChange={() => toggleExcluded(row.id)} aria-label={`Exclude incoming row ${i + 1}`} />
+                          <span className="chk-box" aria-hidden="true"><Checkmark size={11} /></span>
+                        </label>
+                      </td>
+                      {dataset.schema.map((field) => (
+                        <td key={field.name} className={cx('min-w-40 p-2 align-top', row.errors[field.name] && 'bg-[var(--danger-soft)]')}>
+                          {field.type === 'category' ? (
+                            <select className="input !min-h-9 !py-1 !text-xs" value={row.cells[field.name]} aria-label={`${field.name} for incoming row ${i + 1}`} aria-invalid={Boolean(row.errors[field.name])} aria-describedby={row.errors[field.name] ? `err-${row.id}-${field.name}` : undefined} onChange={(e) => editDiagnostic(row.id, field.name, e.target.value)}>
+                              <option value={row.cells[field.name]}>{row.cells[field.name] || 'Choose…'}</option>
+                              {field.allowedValues.filter((v) => v !== row.cells[field.name]).map((v) => <option key={v}>{v}</option>)}
+                            </select>
+                          ) : (
+                            <input className="input !min-h-9 !py-1 !text-xs" value={row.cells[field.name]} aria-label={`${field.name} for incoming row ${i + 1}`} aria-invalid={Boolean(row.errors[field.name])} aria-describedby={row.errors[field.name] ? `err-${row.id}-${field.name}` : undefined} onChange={(e) => editDiagnostic(row.id, field.name, e.target.value)} />
+                          )}
+                          {row.errors[field.name] && <p id={`err-${row.id}-${field.name}`} className="error-text !mt-1 max-w-48" role="alert">{row.errors[field.name]}</p>}
+                        </td>
+                      ))}
+                      <td className={cx('min-w-48 p-2 align-top', row.errors.expectedOutput && 'bg-[var(--danger-soft)]')}>
+                        <input className="input !min-h-9 !py-1 !text-xs" value={row.cells.expectedOutput} aria-label={`Expected output for incoming row ${i + 1}`} aria-invalid={Boolean(row.errors.expectedOutput)} aria-describedby={row.errors.expectedOutput ? `err-${row.id}-expectedOutput` : undefined} onChange={(e) => editDiagnostic(row.id, 'expectedOutput', e.target.value)} />
+                        {row.errors.expectedOutput && <p id={`err-${row.id}-expectedOutput`} className="error-text !mt-1" role="alert">{row.errors.expectedOutput}</p>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <footer className="mt-5 flex justify-between">
+              <Btn kind="secondary" icon={ArrowLeft} onClick={() => update({ step: 'mapping' })}>Back to mapping</Btn>
+              <Btn disabled={Boolean(issues) || !included.length || state.committing} onClick={commit}>{state.committing ? 'Committing…' : `Commit ${included.length} row${included.length === 1 ? '' : 's'}`}</Btn>
+            </footer>
+          </div>
+        )}
+      </section>
+    </div>
+  )
 }
 
-function TagStat({ text, tone = 'slate' }) {
-  return <span className={`rounded-full px-3 py-1 text-xs font-semibold ${tone === 'green' ? 'bg-green-100 text-green-800' : tone === 'red' ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-700'}`}>{text}</span>
+function Tag({ tone, children }) {
+  return <span className={cx('tag', `tag-${tone}`)}>{children}</span>
 }

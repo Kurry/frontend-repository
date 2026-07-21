@@ -56,29 +56,18 @@ export class WebmcpService {
   private store = inject(Store);
   private zone = inject(NgZone);
 
-  // Latest store snapshot, kept current by the subscription below.
-  private notes: Note[] = [];
-  private filtered: Note[] = [];
-  private selectedNoteId: string | null = null;
-  private focusMode = false;
-  private quickSwitcherOpen = false;
-  private shortcutsOpen = false;
-  private workspaceExportOpen = false;
-  private workspaceImportOpen = false;
-  private txtExportOpen = false;
+  private notesSnap = this.store.selectSignal(selectNotes);
+  private filteredSnap = this.store.selectSignal(selectFilteredNotes);
+  private selectedSnap = this.store.selectSignal(selectSelectedNoteId);
+  private focusModeSnap = this.store.selectSignal(selectFocusMode);
+  private quickSwitcherSnap = this.store.selectSignal(selectQuickSwitcherOpen);
+  private shortcutsSnap = this.store.selectSignal(selectShortcutsOpen);
+  private workspaceExportSnap = this.store.selectSignal(selectWorkspaceExportOpen);
+  private workspaceImportSnap = this.store.selectSignal(selectWorkspaceImportOpen);
+  private txtExportSnap = this.store.selectSignal(selectTxtExportOpen);
 
   register(): void {
     if (typeof window === 'undefined') return;
-
-    this.store.select(selectNotes).subscribe(v => (this.notes = v));
-    this.store.select(selectFilteredNotes).subscribe(v => (this.filtered = v));
-    this.store.select(selectSelectedNoteId).subscribe(v => (this.selectedNoteId = v));
-    this.store.select(selectFocusMode).subscribe(v => (this.focusMode = v));
-    this.store.select(selectQuickSwitcherOpen).subscribe(v => (this.quickSwitcherOpen = v));
-    this.store.select(selectShortcutsOpen).subscribe(v => (this.shortcutsOpen = v));
-    this.store.select(selectWorkspaceExportOpen).subscribe(v => (this.workspaceExportOpen = v));
-    this.store.select(selectWorkspaceImportOpen).subscribe(v => (this.workspaceImportOpen = v));
-    this.store.select(selectTxtExportOpen).subscribe(v => (this.txtExportOpen = v));
 
     const tools = this.buildTools();
 
@@ -128,98 +117,108 @@ export class WebmcpService {
 
   private buildTools(): Record<string, Tool> {
     const findNote = (id: unknown): Note | undefined =>
-      typeof id === 'string' ? this.notes.find(n => n.id === id) : undefined;
+      typeof id === 'string' ? this.notesSnap().find(n => n.id === id) : undefined;
+
+    const entityCreate: Tool = {
+      description:
+        'Create a new untitled note (same as the New Note / Create note control). ' +
+        'Returns the new note id and the updated note count.',
+      handler: () => {
+        this.store.dispatch(NoteActions.createNote());
+        this.store.dispatch(NoteActions.showToast({ message: 'Note created' }));
+        return { ok: true, id: this.selectedSnap(), count: this.notesSnap().length };
+      },
+    };
+
+    const entitySelect: Tool = {
+      description:
+        'Select an existing note by id so it opens in the editor (same as clicking ' +
+        'its sidebar row). Requires a known note id.',
+      handler: (args) => {
+        const note = findNote(args['id']);
+        if (!note) return { ok: false, error: 'Unknown note id' };
+        this.store.dispatch(NoteActions.selectNote({ id: note.id }));
+        return { ok: true, id: note.id, selectedNoteId: this.selectedSnap() };
+      },
+    };
+
+    const entityUpdate: Tool = {
+      description:
+        'Update a note field. field must be one of: title, body, pinned. For title/body ' +
+        'value is a bounded string (title ≤ 200 chars, body ≤ 20000); for pinned value is ' +
+        'a boolean. Dispatches the same edit command the editor/pin controls use; no ' +
+        'generic patch object is accepted.',
+      handler: (args) => {
+        const note = findNote(args['id']);
+        if (!note) return { ok: false, error: 'Note id was not found.' };
+        const field = args['field'];
+        if (typeof field !== 'string' || !ENTITY_FIELDS.includes(field as EntityField)) {
+          return { ok: false, error: 'field must be one of: ' + ENTITY_FIELDS.join(', ') };
+        }
+        const value = args['value'];
+        if (field === 'pinned') {
+          if (typeof value !== 'boolean') {
+            return { ok: false, error: 'pinned value must be a boolean' };
+          }
+          if (note.pinned !== value) {
+            this.store.dispatch(NoteActions.pinNote({ id: note.id }));
+          }
+          return { ok: true, id: note.id, field, value };
+        }
+        if (typeof value !== 'string') {
+          return { ok: false, error: 'value must be a string' };
+        }
+        const max = field === 'title' ? TITLE_MAX : BODY_MAX;
+        const length = field === 'title' ? value.trim().length : value.length;
+        if (length > max) {
+          return { ok: false, error: `value exceeds ${max} characters` };
+        }
+        const changes: Partial<Note> = { [field]: value } as Partial<Note>;
+        this.store.dispatch(NoteActions.updateNote({ id: note.id, changes }));
+        return { ok: true, id: note.id, field, value };
+      },
+    };
+
+    const entityDelete: Tool = {
+      description:
+        'Permanently delete a note by id (same as confirming the Delete control). ' +
+        'Requires confirm=true; without it nothing is deleted.',
+      handler: (args) => {
+        const note = findNote(args['id']);
+        if (!note) return { ok: false, error: 'Unknown note id' };
+        if (args['confirm'] !== true) {
+          return { ok: false, error: 'delete requires confirm=true' };
+        }
+        this.store.dispatch(NoteActions.deleteNote({ id: note.id }));
+        this.store.dispatch(NoteActions.showToast({ message: 'Note deleted' }));
+        return { ok: true, id: note.id, deleted: true, count: this.notesSnap().length };
+      },
+    };
+
+    const entityToggle: Tool = {
+      description:
+        'Toggle a note’s pinned state (same as the Pin control). Pinned notes sort ' +
+        'above unpinned notes in the sidebar regardless of edit time.',
+      handler: (args) => {
+        const note = findNote(args['id']);
+        if (!note) return { ok: false, error: 'Unknown note id' };
+        this.store.dispatch(NoteActions.pinNote({ id: note.id }));
+        const updated = this.notesSnap().find(n => n.id === note.id);
+        return { ok: true, id: note.id, pinned: updated ? updated.pinned : !note.pinned };
+      },
+    };
 
     return {
-      // ---- entity-collection-v1 ----------------------------------------
-      entity_create: {
-        description:
-          'Create a new untitled note (same as the New Note / Create note control). ' +
-          'Returns the new note id and the updated note count.',
-        handler: () => {
-          this.store.dispatch(NoteActions.createNote());
-          this.store.dispatch(NoteActions.showToast({ message: 'New note created' }));
-          return { ok: true, id: this.selectedNoteId, count: this.notes.length };
-        },
-      },
-      entity_select: {
-        description:
-          'Select an existing note by id so it opens in the editor (same as clicking ' +
-          'its sidebar row). Requires a known note id.',
-        handler: (args) => {
-          const note = findNote(args['id']);
-          if (!note) return { ok: false, error: 'Unknown note id' };
-          this.store.dispatch(NoteActions.selectNote({ id: note.id }));
-          return { ok: true, id: note.id, selected: this.selectedNoteId };
-        },
-      },
-      entity_update: {
-        description:
-          'Update a note field. field must be one of: title, body, pinned. For title/body ' +
-          'value is a bounded string (title ≤ 200 chars, body ≤ 20000); for pinned value is ' +
-          'a boolean. Dispatches the same edit command the editor/pin controls use; no ' +
-          'generic patch object is accepted.',
-        handler: (args) => {
-          const note = findNote(args['id']);
-          if (!note) return { ok: false, error: 'Unknown note id' };
-          const field = args['field'];
-          if (typeof field !== 'string' || !ENTITY_FIELDS.includes(field as EntityField)) {
-            return { ok: false, error: 'field must be one of: ' + ENTITY_FIELDS.join(', ') };
-          }
-          const value = args['value'];
-          if (field === 'pinned') {
-            if (typeof value !== 'boolean') {
-              return { ok: false, error: 'pinned value must be a boolean' };
-            }
-            if (note.pinned !== value) {
-              this.store.dispatch(NoteActions.pinNote({ id: note.id }));
-            }
-            return { ok: true, id: note.id, field, value };
-          }
-          if (typeof value !== 'string') {
-            return { ok: false, error: 'value must be a string' };
-          }
-          const max = field === 'title' ? TITLE_MAX : BODY_MAX;
-          // Title is bounded by its *trimmed* length (matches the editor's
-          // guard and the note field contract); body is bounded as typed.
-          const length = field === 'title' ? value.trim().length : value.length;
-          if (length > max) {
-            return { ok: false, error: `value exceeds ${max} characters` };
-          }
-          const changes: Partial<Note> = { [field]: value } as Partial<Note>;
-          this.store.dispatch(NoteActions.updateNote({ id: note.id, changes }));
-          return { ok: true, id: note.id, field, value };
-        },
-      },
-      entity_delete: {
-        description:
-          'Permanently delete a note by id (same as confirming the Delete control). ' +
-          'Requires confirm=true; without it nothing is deleted.',
-        handler: (args) => {
-          const note = findNote(args['id']);
-          if (!note) return { ok: false, error: 'Unknown note id' };
-          if (args['confirm'] !== true) {
-            return { ok: false, error: 'delete requires confirm=true' };
-          }
-          this.store.dispatch(NoteActions.deleteNote({ id: note.id }));
-          this.store.dispatch(NoteActions.showToast({ message: 'Note deleted' }));
-          return { ok: true, id: note.id, count: this.notes.length };
-        },
-      },
-      entity_toggle: {
-        description:
-          'Toggle a note’s pinned state (same as the Pin control). Pinned notes sort ' +
-          'above unpinned notes in the sidebar regardless of edit time.',
-        handler: (args) => {
-          const note = findNote(args['id']);
-          if (!note) return { ok: false, error: 'Unknown note id' };
-          this.store.dispatch(NoteActions.pinNote({ id: note.id }));
-          const updated = this.notes.find(n => n.id === note.id);
-          return { ok: true, id: note.id, pinned: updated ? updated.pinned : !note.pinned };
-        },
-      },
-
-      // ---- browse-query-v1 ---------------------------------------------
+      entity_create: entityCreate,
+      entity_select: entitySelect,
+      entity_update: entityUpdate,
+      entity_delete: entityDelete,
+      entity_toggle: entityToggle,
+      entity_select_note: entitySelect,
+      entity_update_note: entityUpdate,
+      entity_delete_note: entityDelete,
+      entity_create_note: entityCreate,
+      entity_toggle_note: entityToggle,
       browse_open: {
         description:
           'Open an app view/mode. destination must be one of: ' + DESTINATIONS.join(', ') +
@@ -231,37 +230,37 @@ export class WebmcpService {
           }
           switch (dest as Destination) {
             case 'quick-switcher':
-              if (!this.quickSwitcherOpen) this.store.dispatch(NoteActions.openQuickSwitcher());
+              if (!this.quickSwitcherSnap()) this.store.dispatch(NoteActions.openQuickSwitcher());
               break;
             case 'shortcuts':
-              if (!this.shortcutsOpen) this.store.dispatch(NoteActions.openShortcuts());
+              if (!this.shortcutsSnap()) this.store.dispatch(NoteActions.openShortcuts());
               break;
             case 'focus-mode':
-              if (!this.focusMode) this.store.dispatch(NoteActions.toggleFocusMode());
+              if (!this.focusModeSnap()) this.store.dispatch(NoteActions.toggleFocusMode());
               break;
             case 'workspace-export':
-              if (!this.workspaceExportOpen) this.store.dispatch(NoteActions.openWorkspaceExport());
+              if (!this.workspaceExportSnap()) this.store.dispatch(NoteActions.openWorkspaceExport());
               break;
             case 'workspace-import':
-              if (!this.workspaceImportOpen) this.store.dispatch(NoteActions.openWorkspaceImport());
+              if (!this.workspaceImportSnap()) this.store.dispatch(NoteActions.openWorkspaceImport());
               break;
             case 'editor':
-              if (this.quickSwitcherOpen) this.store.dispatch(NoteActions.closeQuickSwitcher());
-              if (this.shortcutsOpen) this.store.dispatch(NoteActions.closeShortcuts());
-              if (this.workspaceExportOpen) this.store.dispatch(NoteActions.closeWorkspaceExport());
-              if (this.workspaceImportOpen) this.store.dispatch(NoteActions.closeWorkspaceImport());
-              if (this.txtExportOpen) this.store.dispatch(NoteActions.closeTxtExport());
-              if (this.focusMode) this.store.dispatch(NoteActions.toggleFocusMode());
+              if (this.quickSwitcherSnap()) this.store.dispatch(NoteActions.closeQuickSwitcher());
+              if (this.shortcutsSnap()) this.store.dispatch(NoteActions.closeShortcuts());
+              if (this.workspaceExportSnap()) this.store.dispatch(NoteActions.closeWorkspaceExport());
+              if (this.workspaceImportSnap()) this.store.dispatch(NoteActions.closeWorkspaceImport());
+              if (this.txtExportSnap()) this.store.dispatch(NoteActions.closeTxtExport());
+              if (this.focusModeSnap()) this.store.dispatch(NoteActions.toggleFocusMode());
               break;
           }
           return {
             ok: true,
             destination: dest,
-            focusMode: this.focusMode,
-            quickSwitcherOpen: this.quickSwitcherOpen,
-            shortcutsOpen: this.shortcutsOpen,
-            workspaceExportOpen: this.workspaceExportOpen,
-            workspaceImportOpen: this.workspaceImportOpen,
+            focusMode: this.focusModeSnap(),
+            quickSwitcherOpen: this.quickSwitcherSnap(),
+            shortcutsOpen: this.shortcutsSnap(),
+            workspaceExportOpen: this.workspaceExportSnap(),
+            workspaceImportOpen: this.workspaceImportSnap(),
           };
         },
       },
@@ -279,7 +278,7 @@ export class WebmcpService {
             return { ok: false, error: 'query exceeds 200 characters' };
           }
           this.store.dispatch(NoteActions.setSearchQuery({ query }));
-          return { ok: true, query, matches: this.filtered.length };
+          return { ok: true, query, matches: this.filteredSnap().length };
         },
       },
 
@@ -299,7 +298,7 @@ export class WebmcpService {
             return { ok: false, error: 'format must be one of: ' + EXPORT_FORMATS.join(', ') };
           }
           if (format === 'txt') {
-            if (!this.selectedNoteId) return { ok: false, error: 'no note is open to export' };
+            if (!this.selectedSnap()) return { ok: false, error: 'no note is open to export' };
             this.store.dispatch(NoteActions.openTxtExport());
           } else {
             this.store.dispatch(NoteActions.openWorkspaceExport());

@@ -83,7 +83,40 @@
 
   function insertChecklist() {
     if (!selectedNote) return;
-    store.addChecklistBlock(selectedNote.id);
+    const block = store.addChecklistBlock(selectedNote.id);
+    queueMicrotask(() => {
+      const input = document.querySelector<HTMLInputElement>(
+        `[data-checklist-input="${block.id}"]`
+      );
+      input?.focus();
+    });
+  }
+
+  function onChecklistItemKeydown(
+    e: KeyboardEvent,
+    blockId: string,
+    itemId: string,
+    itemIndex: number
+  ) {
+    if (e.key !== 'Enter' || !selectedNote) return;
+    e.preventDefault();
+    const block = selectedNote.checklists.find((b) => b.id === blockId);
+    if (!block) return;
+    if (itemIndex === block.items.length - 1) {
+      const newItem = store.addChecklistItem(selectedNote.id, blockId);
+      queueMicrotask(() => {
+        document.querySelector<HTMLInputElement>(
+          `[data-checklist-input="${blockId}"][data-item-id="${newItem.id}"]`
+        )?.focus();
+      });
+    } else {
+      const next = block.items[itemIndex + 1];
+      queueMicrotask(() => {
+        document.querySelector<HTMLInputElement>(
+          `[data-checklist-input="${blockId}"][data-item-id="${next.id}"]`
+        )?.focus();
+      });
+    }
   }
 
   function getFolderPaths(): { id: string | null; path: string }[] {
@@ -116,6 +149,13 @@
       }
     }
     titleError = '';
+  });
+
+  $effect(() => {
+    if (typeof document === 'undefined') return;
+    const onSelectionChange = () => updateToolbarState();
+    document.addEventListener('selectionchange', onSelectionChange);
+    return () => document.removeEventListener('selectionchange', onSelectionChange);
   });
 </script>
 
@@ -282,6 +322,8 @@
           oninput={onEditorInput}
           onselect={updateToolbarState}
           onkeyup={updateToolbarState}
+          onmouseup={updateToolbarState}
+          tabindex="0"
           role="textbox"
           aria-multiline="true"
           aria-label="Note body"
@@ -316,7 +358,7 @@
           </div>
           {#if block.items.length > 0}
             <ul class="space-y-1">
-              {#each block.items as item (item.id)}
+              {#each block.items as item, itemIndex (item.id)}
                 <li class="flex items-center gap-2 group">
                   <input
                     type="checkbox"
@@ -330,10 +372,13 @@
                     <input
                       type="text"
                       value={item.text}
+                      data-checklist-input={block.id}
+                      data-item-id={item.id}
                       class="flex-1 text-sm bg-transparent border-none outline-none
                         {item.done ? 'line-through text-slate-400' : 'text-slate-700'}
                         placeholder-slate-400"
-                      oninput={(e) => store.updateChecklistItem(selectedNote.id, block.id, item.id, e.target.value)}
+                      oninput={(e) => store.updateChecklistItem(selectedNote.id, block.id, item.id, (e.target as HTMLInputElement).value)}
+                      onkeydown={(e) => onChecklistItemKeydown(e, block.id, item.id, itemIndex)}
                       placeholder="Checklist item..."
                     />
                     <button

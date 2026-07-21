@@ -43,7 +43,18 @@ export interface WebMcpBridge {
   saveProject: (name: string) => boolean;
   loadProject: (id: string) => boolean;
   deleteProject: (id: string) => boolean;
+  // artifact-transfer-v1 (same paths as the header Export/Import/Copy controls;
+  // never returns raw file / blob / base64 contents in tool results)
+  openExportPreview: () => void;
+  triggerExportPng: () => void;
+  triggerImport: () => void;
+  copyProjectJson: () => void;
+  projectByteLength: () => number;
+  projectAnnotationCount: () => number;
 }
+
+const ARTIFACT_EXPORT_FORMATS = ['json', 'png'] as const;
+const ARTIFACT_IMPORT_MODES = ['project-json'] as const;
 
 type Result = Record<string, unknown>;
 type Handler = (args: Record<string, unknown>) => Result;
@@ -157,6 +168,51 @@ export function registerWebMcp(bridge: WebMcpBridge) {
     return { ok, operation: 'delete', id, count: bridge.listProjects().length };
   };
 
+  // ---- artifact-transfer-v1 (prefix "artifact") --------------------------
+  // Export/import/copy drive the SAME surfaces as the visible header controls.
+  // The file picker (import) and Blob download / clipboard contents stay with
+  // Playwright, so tool results never carry raw file/blob/base64 content — they
+  // report the operation outcome plus non-content metadata only.
+  const artifactExport: Handler = (args) => {
+    const format = String(args.format ?? 'json');
+    if (!(ARTIFACT_EXPORT_FORMATS as readonly string[]).includes(format)) {
+      return { ok: false, error: `unknown export format: ${format}`, allowed: ARTIFACT_EXPORT_FORMATS };
+    }
+    if (!bridge.imageLoaded()) {
+      return { ok: false, error: 'no image loaded; nothing to export' };
+    }
+    if (format === 'png') {
+      bridge.triggerExportPng();
+      return { ok: true, operation: 'export', format: 'png', triggered: true, annotations: bridge.projectAnnotationCount() };
+    }
+    // json — open the live preview panel (the same surface the header button opens)
+    bridge.openExportPreview();
+    return { ok: true, operation: 'export', format: 'json', previewOpened: true, schemaVersion: 'markupflow-project-v1', annotations: bridge.projectAnnotationCount(), byteLength: bridge.projectByteLength() };
+  };
+
+  const artifactImport: Handler = (args) => {
+    const mode = String(args.mode ?? 'project-json');
+    if (!(ARTIFACT_IMPORT_MODES as readonly string[]).includes(mode)) {
+      return { ok: false, error: `unknown import mode: ${mode}`, allowed: ARTIFACT_IMPORT_MODES };
+    }
+    // The JSON file itself is chosen through the OS file picker (Playwright's
+    // responsibility); we open the same picker the Import project button uses.
+    bridge.triggerImport();
+    return { ok: true, operation: 'import', mode, fileChooserOpened: true };
+  };
+
+  const artifactCopy: Handler = (args) => {
+    const format = String(args.format ?? 'json');
+    if (format !== 'json') {
+      return { ok: false, error: `copy supports format json only, got: ${format}` };
+    }
+    if (!bridge.imageLoaded()) {
+      return { ok: false, error: 'no image loaded; nothing to copy' };
+    }
+    bridge.copyProjectJson();
+    return { ok: true, operation: 'copy', format: 'json', copied: true, byteLength: bridge.projectByteLength() };
+  };
+
   const TOOLS: { name: string; description: string; handler: Handler }[] = [
     { name: 'editor_select', description: 'Select an annotation object by id (or pass id=null to clear). Same path as clicking a Layer Panel row.', handler: editorSelect },
     { name: 'editor_add', description: `Add an annotation of args.object_type (one of ${EDITOR_OBJECT_TYPES.join(', ')}) at the default placement position. Same store command as keyboard placement; drawing coordinates are not accepted.`, handler: editorAdd },
@@ -168,12 +224,15 @@ export function registerWebMcp(bridge: WebMcpBridge) {
     { name: 'entity_select', description: 'Open a saved project by id, restoring its image and annotations. Same path as the Open button.', handler: entitySelect },
     { name: 'entity_update', description: 'Re-save the current workspace into an existing project by id. Same path as the Update button.', handler: entityUpdate },
     { name: 'entity_delete', description: 'Delete a saved project by id. Requires confirm=true.', handler: entityDelete },
+    { name: 'artifact_export', description: `Export the workspace. format=${ARTIFACT_EXPORT_FORMATS.join('|')}: png triggers the same client-side PNG flatten+download as Export PNG; json opens the live Export project JSON preview. No raw file/blob/base64 is returned.`, handler: artifactExport },
+    { name: 'artifact_import', description: `Import a project. mode=${ARTIFACT_IMPORT_MODES.join('|')}: opens the same JSON file picker as the Import project button. The file content is read by the picker (Playwright), never passed through this tool.`, handler: artifactImport },
+    { name: 'artifact_copy', description: 'Copy the live-compiled project JSON to the clipboard (same path as Copy project JSON) and report the byte length. Clipboard contents are not returned.', handler: artifactCopy },
   ];
 
   const w = window as unknown as Record<string, unknown>;
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
-    modules: ['structured-editor-v1', 'entity-collection-v1'],
+    modules: ['structured-editor-v1', 'entity-collection-v1', 'artifact-transfer-v1'],
     tools: TOOLS.map((t) => t.name),
   });
   w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));

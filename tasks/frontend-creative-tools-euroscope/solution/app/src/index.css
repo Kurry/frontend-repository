@@ -3,13 +3,15 @@
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono", Menlo,
+    Consolas, monospace;
 
   --color-scope-bg1: #ffffff;
   --color-scope-bg2: #f5f5f5;
   --color-scope-bg3: #e5e5e5;
   --color-scope-fg1: #171717;
   --color-scope-fg2: #525252;
-  --color-scope-fg3: #d4d4d4;
+  --color-scope-fg3: #a3a3a3;
   --color-scope-accent: #2563eb;
   --color-scope-accent2: #60a5fa;
   --color-scope-info: #eff6ff;
@@ -28,11 +30,108 @@ body {
   font-family: var(--font-sans);
 }
 
-/* thin scrollbar for the icon grid */
-.scope-scroll::-webkit-scrollbar {
+/* thin scrollbar for previews and the icon grid */
+.scope-scroll::-webkit-scrollbar,
+pre::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
-.scope-scroll::-webkit-scrollbar-thumb {
+.scope-scroll::-webkit-scrollbar-thumb,
+pre::-webkit-scrollbar-thumb {
   background: var(--color-scope-bg3);
   border-radius: 4px;
+}
+
+/* ---- motion ------------------------------------------------------------ */
+
+/* Step bodies swap in place with a brief eased fade-and-rise. */
+@keyframes step-in-kf {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.step-in {
+  animation: step-in-kf 240ms ease-out both;
+}
+
+/* The Patched result generated confirmation fades and rises on entry. */
+@keyframes confirm-in-kf {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.confirm-in {
+  animation: confirm-in-kf 280ms ease-out both;
+}
+
+/* Command palette overlay: brief opacity + scale entry, smooth exit. */
+@keyframes palette-open-kf {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.palette-opening {
+  animation: palette-open-kf 200ms ease-out both;
+}
+.palette-closing {
+  animation: palette-open-kf 160ms ease-in reverse both;
+}
+
+@keyframes fade-in-kf {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.fade-in {
+  animation: fade-in-kf 200ms ease-out both;
+}
+
+/* ---- reduced motion ---------------------------------------------------- */
+/* With prefers-reduced-motion set, every transition/animation is removed and
+   state changes apply instantly; functionality is untouched. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---- baseline interactive affordances ----------------------------------- */
+
+@layer base {
+  /* Every keyboard-focusable control gets a visible focus ring unless a
+     component supplies its own (utilities can override this base rule). */
+  :focus-visible {
+    outline: 2px solid var(--color-scope-accent);
+    outline-offset: 1px;
+  }
+
+  /* Native inputs keep a legible selection colour. */
+  ::selection {
+    background: rgba(37, 99, 235, 0.25);
+  }
 }

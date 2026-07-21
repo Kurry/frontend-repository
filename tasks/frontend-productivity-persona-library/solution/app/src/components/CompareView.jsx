@@ -24,13 +24,13 @@ export default function CompareView() {
   const second = personas.find((p) => p.id === slots[1])
   return (
     <main className="compare-view view-shell solo-view" id="main-content">
-      <header className="view-heading"><div><p className="eyebrow">SIDE-BY-SIDE</p><h1>Compare personas</h1><p>Inspect identity, instructions, and trait deltas from the same live records.</p></div></header>
+      <header className="view-heading"><div><p className="eyebrow">SIDE-BY-SIDE</p><h1>Compare Personas</h1><p>Inspect identity, instructions, and trait deltas from the same live records.</p></div></header>
       <div className="compare-selectors panel">
         {[0, 1].map((index) => <Select key={index} id={`comparison-slot-${index}`} labelText={`Persona ${index + 1}`} value={slots[index] || ''} onChange={(e) => setSlot(index, e.target.value)}><SelectItem value="" text="Choose a persona" /><SelectItemGroup label="Personas">{personas.map((p) => <SelectItem key={p.id} value={p.id} text={p.name} />)}</SelectItemGroup></Select>)}
       </div>
       <div className="comparison-dashboard">
         <section className="trait-comparison panel">
-          <div className="panel-heading"><div><p className="eyebrow">TRAIT MATRIX</p><h2>Profile overlay</h2></div></div>
+          <div className="panel-heading"><div><p className="eyebrow">TRAIT MATRIX</p><h2>Profile Overlay</h2></div></div>
           <TraitRadar primary={first?.traits} secondary={second?.traits} primaryName={first?.name || 'Persona 1'} secondaryName={second?.name || 'Persona 2'} />
           <div className="paired-traits">
             {TRAITS.map((trait) => {

@@ -72,12 +72,15 @@ function HistoryPanel() {
   return <>
     <div className="panel-heading"><div><div className="eyebrow">Session timeline</div><h2>Query history</h2></div><span className="fine">{state.history.length}</span></div>
     {selected > 0 && <div className="context-bar"><span>{selected} selected</span><Button size="sm" kind="ghost" renderIcon={TrashCan} onClick={confirmDelete}>Delete selected</Button><Button size="sm" kind="ghost" renderIcon={Close} onClick={() => useAppStore.setState({ selectedHistory: [] })}>Clear selection</Button></div>}
-    {!state.history.length ? <RailEmpty icon={Time} text="Executed queries appear here, newest first." /> : <div className="history-list">
-      {state.history.map((item) => <div key={item.id} className="history-item" role="button" tabIndex={0} onClick={() => state.rerunCaptured(item)} onKeyDown={(event) => event.key === 'Enter' && state.rerunCaptured(item)}>
-        <div className="history-line" onClick={(e) => e.stopPropagation()}><Checkbox id={`history-${item.id}`} hideLabel labelText={`Select ${item.raw || 'all documents'}`} checked={state.selectedHistory.includes(item.id)} onChange={() => state.toggleHistory(item.id)} /><div className="min-w-0 flex-1" onClick={() => state.rerunCaptured(item)}><div className="history-query">{item.raw || 'All documents'}</div><div className="fine">{formatTime(item.timestamp)} · {item.count} results</div></div></div>
-        {!!item.filters.length && <div className="mini-chips">{item.filters.map((f, i) => <span className="mini-chip" key={i}>{f.kind}:{f.value}</span>)}</div>}
-      </div>)}
-    </div>}
+    {!state.history.length ? <RailEmpty icon={Time} text="Executed queries appear here, newest first." /> : <ul className="history-list" role="list" aria-label="Query history">
+      {state.history.map((item) => <li key={item.id} className="history-item" role="listitem">
+        <div className="history-line" role="button" tabIndex={0} onClick={() => state.rerunCaptured(item)} onKeyDown={(event) => event.key === 'Enter' && state.rerunCaptured(item)}>
+          <div onClick={(e) => e.stopPropagation()}><Checkbox id={`history-${item.id}`} hideLabel labelText={`Select ${item.raw || 'all documents'}`} checked={state.selectedHistory.includes(item.id)} onChange={() => state.toggleHistory(item.id)} /></div>
+          <div className="min-w-0 flex-1"><div className="history-query">{item.raw || 'All documents'}</div><div className="fine">{formatTime(item.timestamp)} · {item.count} results</div></div>
+        </div>
+        {!!item.filters.length && <div className="mini-chips" role="button" tabIndex={0} onClick={() => state.rerunCaptured(item)} onKeyDown={(event) => event.key === 'Enter' && state.rerunCaptured(item)}>{item.filters.map((f, i) => <span className="mini-chip" key={i}>{f.kind}:{f.value}</span>)}</div>}
+      </li>)}
+    </ul>}
   </>
 }
 
@@ -139,7 +142,7 @@ function IndexPanel() {
     <div className="panel-heading"><div><div className="eyebrow">Corpus health</div><h2>Index management</h2></div><Button hasIconOnly size="sm" kind="ghost" renderIcon={Add} iconDescription="Add document" onClick={() => useAppStore.setState({ addOpen: true })} /></div>
     <div className="stat-grid"><div className="stat"><span className="fine">Documents</span><strong>{stats.total}</strong></div><div className={`stat ${stats.stale ? 'warn' : ''}`}><span className="fine">Stale</span><strong>{stats.stale}</strong></div><div className="stat"><span className="fine">Distinct terms</span><strong>{stats.distinctTerms}</strong></div><div className="stat"><span className="fine">Last build</span><strong className="!text-xs !mt-2">{formatTime(state.indexBuiltAt)}</strong></div></div>
     <div className={`status-strip ${run?.status === 'running' ? '' : stats.stale ? 'warning' : 'success'}`}>{run?.status === 'running' ? <><span className="status-dot" /> Indexing {complete}/{run.steps.length}</> : run?.status === 'paused' ? <><Pause size={16} /> Paused at {run.current + 1}/{run.steps.length}</> : stats.stale ? <><WarningAlt size={16} /> {stats.stale} documents need indexing</> : <><CheckmarkFilled size={16} /> Index current · {stats.total} documents</>}</div>
-    <div className="index-actions"><Button size="sm" renderIcon={Play} disabled={run?.status === 'running' || run?.status === 'paused'} onClick={state.startIndex}>Index now</Button>{run?.status === 'running' && <Button size="sm" kind="tertiary" renderIcon={Pause} onClick={state.pauseIndex}>Pause</Button>}{run?.status === 'paused' && <Button size="sm" kind="tertiary" renderIcon={Play} onClick={state.resumeIndex}>Resume</Button>}</div>
+    <div className="index-actions"><Button size="sm" renderIcon={Play} disabled={run?.status === 'running' || run?.status === 'paused'} onClick={state.startIndex}>Index now</Button>{run?.status === 'running' && <Button size="sm" kind="tertiary" renderIcon={Pause} onClick={state.pauseIndex}>Pause</Button>}{run?.status === 'paused' && <Button size="sm" kind="tertiary" renderIcon={Play} onClick={state.resumeIndex}>Resume</Button>}{run?.status === 'failed' && <Button size="sm" kind="danger" renderIcon={Restart} onClick={state.retryStep}>Retry failed step</Button>}</div>
     {run && <div className="run-box"><div className="run-rollup"><span><strong>{complete}/{run.steps.length}</strong>ingested</span><span><strong>{Math.round(((run.elapsed || Date.now() - run.startedAt) / 1000) * 10) / 10}s</strong>elapsed</span><span><strong>{failed}</strong>failed</span></div><div className="steps">{run.steps.map((step) => <div className={`step ${step.status}`} key={step.id}><span className="status-dot" /><span className="doc-row-title">{step.title}<br /><span className="fine">{step.status === 'retrying' ? `waiting ${step.retryIn}s · retry ${step.attempts + 1} of 3` : step.error || `${step.status}${step.attempts ? ` · attempt ${step.attempts}` : ''}`}</span></span>{step.status === 'failed' && <Button size="sm" kind="ghost" renderIcon={Restart} onClick={state.retryStep}>Retry</Button>}</div>)}</div><div className="p-2"><Select size="sm" id="timeline-filter" labelText="Timeline status" value={state.timelineFilter} onChange={(e) => useAppStore.setState({ timelineFilter: e.target.value })}><SelectItem value="all" text="All events" />{['running','retrying','failed','complete'].map((status) => <SelectItem key={status} value={status} text={status} />)}</Select></div><div className="timeline">{filteredEvents.slice().reverse().map((event) => <div key={event.id} className="event">{formatTime(event.time)} · {event.text}</div>)}</div></div>}
     {selected > 0 && <div className="context-bar"><span>{selected} selected</span><Button size="sm" kind="ghost" renderIcon={WarningAlt} onClick={() => state.markStale(state.selectedDocuments)}>Mark stale</Button><Button size="sm" kind="ghost" renderIcon={TrashCan} onClick={() => window.confirm(`Delete ${selected} selected document${selected === 1 ? '' : 's'}?`) && state.deleteDocuments(state.selectedDocuments)}>Delete selected</Button></div>}
     {!state.documents.length ? <RailEmpty icon={DataBase} text="No documents in collection." /> : <div className="document-list" role="list" aria-label="Indexed documents">{state.documents.map((doc) => <div className="doc-row" role="listitem" key={doc.id}><Checkbox id={`select-${doc.id}`} hideLabel labelText={`Select ${doc.title}`} checked={state.selectedDocuments.includes(doc.id)} onChange={() => state.toggleDocument(doc.id)} /><span className="doc-row-title" title={doc.title}>{doc.title}</span>{!state.indexedIds.includes(doc.id) && <span className="stale-dot" title="Stale" />}</div>)}</div>}
@@ -165,7 +168,7 @@ function SearchWorkspace() {
         <Search size="lg" labelText="Search the knowledge library" placeholder="" value={state.activeRaw} onChange={(e) => state.setRaw(e.target.value)} autoComplete="off" />
         <Button type="submit" renderIcon={SearchIcon}>Search library</Button>
       </form>
-      <p className="syntax-help">Filter the corpus with <code>tag:react</code> <code>type:guide</code> or <code>before:2026-01-01</code></p>
+      <p className="syntax-help">Filter the corpus with <code>tag:react</code> <code>type:guide</code> or <code>before:2026-01-01</code>. Press <kbd>⌘K</kbd> or <kbd>Ctrl+K</kbd> for commands.</p>
       {state.hasSearched && <ResultControls visible={visible} />}
       {!state.hasSearched ? <WelcomeState /> : <Results visible={visible} />}
     </section>
@@ -190,15 +193,15 @@ function Results({ visible }) {
   const state = useAppStore()
   const groups = selectTopicGroups(visible.items)
   if (!visible.items.length) return <div className="empty-state"><FolderOpen size={30} /><h3>No documents matched</h3><p className="muted">Remove a filter or lower the minimum score to widen this result set.</p><Button kind="tertiary" size="sm" renderIcon={Reset} onClick={state.clearNarrowing}>Clear filters and threshold</Button></div>
-  if (state.grouped) return <div className="results-list">{Object.entries(groups).map(([name, items]) => <section className="cluster" key={name}><button className="cluster-header" onClick={() => state.toggleGroup(name)} aria-expanded={!state.collapsedGroups[name]}><span>{name} <span className="fine">· {items.length} results</span></span>{state.collapsedGroups[name] ? <ChevronRight /> : <ChevronDown />}</button>{!state.collapsedGroups[name] && <div className="cluster-body">{items.map((item, i) => <ResultCard item={item} index={i} key={item.id} />)}</div>}</section>)}</div>
-  return <div className="results-list">{visible.items.map((item, index) => <ResultCard key={item.id} item={item} index={index} />)}</div>
+  if (state.grouped) return <ul className="results-list" role="list" aria-label="Search results">{Object.entries(groups).map(([name, items]) => <li key={name} className="cluster-item" role="listitem"><section className="cluster"><button className="cluster-header" onClick={() => state.toggleGroup(name)} aria-expanded={!state.collapsedGroups[name]}><span>{name} <span className="fine">· {items.length} results</span></span>{state.collapsedGroups[name] ? <ChevronRight /> : <ChevronDown />}</button>{!state.collapsedGroups[name] && <ul className="cluster-body" role="list">{items.map((item, i) => <li key={item.id} role="listitem"><ResultCard item={item} index={i} /></li>)}</ul>}</section></li>)}</ul>
+  return <ul className="results-list" role="list" aria-label="Search results">{visible.items.map((item, index) => <li key={item.id} role="listitem"><ResultCard item={item} index={index} /></li>)}</ul>
 }
 
 function ResultCard({ item, index }) {
   const state = useAppStore()
   const open = state.disclosures[item.id]
   return <article className={`result-card ${state.selectedResult === index ? 'selected' : ''}`} style={{ '--accent-opacity': Math.max(.15, item.score), animationDelay: `${Math.min(index, 12) * 40}ms`, viewTransitionName: `result-${item.id}` }} data-result-id={item.id}>
-    <div className="card-main" role="button" tabIndex={0} onClick={() => state.openDetail(item.id)} onKeyDown={(e) => e.key === 'Enter' && state.openDetail(item.id)} aria-label={`Open ${item.title}`}><div className="card-top"><div className="card-copy"><h3 className="card-title" title={item.title}>{item.title}</h3><div className="meta-row"><Tag size="sm" type="cool-gray">{item.type}</Tag>{item.tags.slice(0,3).map((tag) => <Tag className="topic-tag" size="sm" key={tag}>{tag}</Tag>)}{item.feedback !== 'none' && <span className="feedback-chip">Feedback: {item.feedback}</span>}</div></div><span className="score-badge" aria-label={`Similarity ${item.score.toFixed(2)}`}>{item.score.toFixed(2)}</span></div><p className="snippet"><HighlightedText text={item.snippet} term={item.highlight} /></p></div>
+    <div className="card-main" role="button" tabIndex={0} onClick={() => state.openDetail(item.id)} onKeyDown={(e) => e.key === 'Enter' && state.openDetail(item.id)} aria-label={`Open ${item.title}`}><div className="card-top"><div className="card-copy"><h3 className="card-title" title={item.title}>{truncateTitle(item.title)}</h3><div className="meta-row"><Tag size="sm" type="cool-gray">{item.type}</Tag>{item.tags.slice(0,3).map((tag) => <Tag className="topic-tag" size="sm" key={tag}>{tag}</Tag>)}{item.feedback !== 'none' && <span className="feedback-chip">Feedback: {item.feedback}</span>}</div></div><span className="score-badge" aria-label={`Similarity ${item.score.toFixed(2)}`}>{item.score.toFixed(2)}</span></div><p className="snippet"><HighlightedText text={item.snippet} term={item.highlight} /></p></div>
     <div className="card-actions"><button className={`why-button ${open ? 'open' : ''}`} aria-expanded={!!open} onClick={() => state.toggleDisclosure(item.id)}><ChevronDown size={15} /> Why this ranks</button><div className="feedback-actions"><button className={`icon-control ${item.feedback === 'up' ? 'active' : ''}`} aria-label={`Mark ${item.title} relevant`} onClick={() => state.setFeedback(item.id, item.feedback === 'up' ? 'none' : 'up')}><ThumbsUp size={16} /></button><button className={`icon-control ${item.feedback === 'down' ? 'active' : ''}`} aria-label={`Mark ${item.title} not relevant`} onClick={() => state.setFeedback(item.id, item.feedback === 'down' ? 'none' : 'down')}><ThumbsDown size={16} /></button></div></div>
     {open && <div className="explanation"><div className="fine">Matched terms and weighted contribution</div>{item.contributions.length ? item.contributions.map((term) => <div className="term-row" key={term.term}><span>{term.term}</span><span className="term-track"><span className="term-fill" style={{ width: `${Math.max(2, term.normalized * 100)}%` }} /></span><span className="font-mono">{term.value.toFixed(2)}</span></div>) : <p className="fine">No direct term contribution.</p>}<div className="fine mt-3">Feedback adjustment: {item.adjustment > 0 ? '+' : ''}{item.adjustment.toFixed(2)}</div></div>}
   </article>
@@ -209,7 +212,7 @@ function DetailPanel() {
   const doc = state.documents.find((item) => item.id === state.detailId)
   const related = useMemo(() => doc ? rankDocuments({ documents: state.documents.filter((item) => item.id !== doc.id), indexedIds: state.documents.filter((item) => item.id !== doc.id).map((item) => item.id), query: `${doc.title} ${doc.tags.join(' ')}`, filters: [], threshold: 0, feedback: {} }).items.slice(0,3) : [], [doc, state.documents])
   if (!doc) return null
-  return <aside className="detail-panel" aria-label="Document detail"><div className="detail-head"><div className="detail-topline"><span className="eyebrow !text-green-100">Document detail</span><button className="icon-control" onClick={state.closeDetail} aria-label="Close document detail"><Close /></button></div><div className="breadcrumbs">{state.breadcrumbs.map((id, index) => { const item = state.documents.find((d) => d.id === id); return <React.Fragment key={`${id}-${index}`}><button className="breadcrumb" onClick={() => state.goBreadcrumb(index)}>{item?.title.slice(0,22)}</button>{index < state.breadcrumbs.length - 1 && <ChevronRight size={12} />}</React.Fragment> })}</div><h2>{doc.title}</h2></div><div className="detail-body"><div className="meta-row"><Tag type="green">{doc.type}</Tag>{doc.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}<Button hasIconOnly size="sm" kind="ghost" renderIcon={TrashCan} iconDescription="Delete document" onClick={() => { if (window.confirm('Delete document?')) { state.deleteDocuments([doc.id]); state.closeDetail() } }} className="ml-auto" /></div><p className="full-body">{doc.body}</p><section className="related-list"><div className="eyebrow">Continue exploring</div><h3>Related documents</h3>{related.map((item) => <button className="related-row" key={item.id} onClick={() => state.openDetail(item.id)}><span><strong>{item.title}</strong><br/><span className="fine">{item.type} · {item.tags.slice(0,2).join(', ')}</span></span><span className="related-score">{item.score.toFixed(2)}</span></button>)}</section></div></aside>
+  return <aside className="detail-panel" aria-label="Document detail"><div className="detail-head"><div className="detail-topline"><span className="eyebrow !text-green-100">Document detail</span><button className="icon-control" onClick={state.closeDetail} aria-label="Close document detail"><Close /></button></div><div className="breadcrumbs">{state.breadcrumbs.map((id, index) => { const item = state.documents.find((d) => d.id === id); const label = item?.title ? truncateTitle(item.title, 22) : 'Document'; return <React.Fragment key={`${id}-${index}`}><button className="breadcrumb" title={item?.title} onClick={() => state.goBreadcrumb(index)}>{label}</button>{index < state.breadcrumbs.length - 1 && <ChevronRight size={12} />}</React.Fragment> })}</div><h2>{doc.title}</h2></div><div className="detail-body"><div className="meta-row"><Tag type="green">{doc.type}</Tag>{doc.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}<Button hasIconOnly size="sm" kind="ghost" renderIcon={TrashCan} iconDescription="Delete document" onClick={() => { if (window.confirm('Delete document?')) { state.deleteDocuments([doc.id]); state.closeDetail() } }} className="ml-auto" /></div><p className="full-body">{doc.body}</p><section className="related-list"><div className="eyebrow">Continue exploring</div><h3>Related documents</h3>{related.map((item) => <button className="related-row" key={item.id} onClick={() => state.openDetail(item.id)}><span><strong>{item.title}</strong><br/><span className="fine">{item.type} · {item.tags.slice(0,2).join(', ')}</span></span><span className="related-score">{item.score.toFixed(2)}</span></button>)}</section></div></aside>
 }
 
 
@@ -218,57 +221,93 @@ function useFocusRestorer(isOpen, blocked = false) {
   const wasOpen = useRef(false)
   const blockedRef = useRef(blocked)
   blockedRef.current = blocked
-  // Captured during render (before commit/effects) so it runs ahead of Carbon's
-  // Modal child effect, which moves focus into the dialog once it mounts open.
-  // Capturing this in a useEffect here would fire after that child effect and
-  // record a node inside the modal instead of the control that opened it.
   if (isOpen && !wasOpen.current) previous.current = document.activeElement
   wasOpen.current = isOpen
   useEffect(() => {
-    // Only the isOpen transition should trigger a restore attempt - `blocked` is
-    // read fresh (via ref, not as a dependency) at that moment. `blocked` cycling
-    // back to false later (e.g. Import closing) must NOT re-fire this effect and
-    // replay a stale restore against whatever opened Export in an earlier session.
     if (!isOpen && previous.current && !blockedRef.current) { const el = previous.current; setTimeout(() => el.focus(), 10) }
   }, [isOpen])
 }
+
+function useOverlayFocusTrap(isOpen, onClose, containerRef) {
+  useEffect(() => {
+    if (!isOpen) return undefined
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopPropagation()
+        onClose()
+        return
+      }
+      if (event.key !== 'Tab') return
+      const root = containerRef.current?.closest('.cds--modal-container, .palette, [role="dialog"]') || containerRef.current
+      if (!root) return
+      const focusables = root.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')
+      if (!focusables.length) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault()
+        last.focus()
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault()
+        first.focus()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown, true)
+    return () => document.removeEventListener('keydown', handleKeyDown, true)
+  }, [isOpen, onClose, containerRef])
+}
+
+const truncateTitle = (value, max = 80) => value.length > max ? `${value.slice(0, max)}…` : value
 function SaveSearchModal() {
   const state = useAppStore()
+  const modalRef = useRef(null)
+  const close = () => useAppStore.setState({ saveOpen: false })
   useFocusRestorer(state.saveOpen)
+  useOverlayFocusTrap(state.saveOpen, close, modalRef)
   const schema = SavedSearchSchema.superRefine((value, ctx) => { if (state.savedSearches.some((item) => item.name.toLowerCase() === value.name.toLowerCase())) ctx.addIssue({ code:'custom', path:['name'], message:'name must be unique' }) })
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(schema), mode:'onChange', defaultValues:{ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold } })
   useEffect(() => { if (state.saveOpen) reset({ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold }) }, [state.saveOpen, state.activeQuery, state.filters, state.threshold, reset])
-  return <Modal open={state.saveOpen} modalHeading="Save search" primaryButtonText="Save search" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => useAppStore.setState({ saveOpen:false })} onRequestSubmit={handleSubmit(state.saveSearch)}><div className="modal-copy"><TextInput id="saved-name" labelText="Search name" {...register('name')} invalid={!!errors.name} invalidText={errors.name?.message} /><div className="p-4 bg-gray-50 text-sm"><div><strong>Query</strong> {state.activeQuery || 'All documents'}</div><div><strong>Threshold</strong> {state.threshold.toFixed(2)}</div><div><strong>Filters</strong> {state.filters.map((f) => `${f.kind}:${f.value}`).join(', ') || 'None'}</div></div></div></Modal>
+  return <Modal open={state.saveOpen} modalHeading="Save search" primaryButtonText="Save search" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.saveSearch)}><div className="modal-copy" ref={modalRef}><TextInput id="saved-name" labelText="Search name" {...register('name')} invalid={!!errors.name} invalidText={errors.name?.message || 'name is required'} aria-invalid={!!errors.name} aria-describedby={errors.name ? 'saved-name-error' : undefined} /><div className="p-4 bg-gray-50 text-sm"><div><strong>Query</strong> {state.activeQuery || 'All documents'}</div><div><strong>Threshold</strong> {state.threshold.toFixed(2)}</div><div><strong>Filters</strong> {state.filters.map((f) => `${f.kind}:${f.value}`).join(', ') || 'None'}</div></div></div></Modal>
 }
 
 function AddDocumentModal() {
   const state = useAppStore()
+  const modalRef = useRef(null)
+  const close = () => useAppStore.setState({ addOpen: false })
   useFocusRestorer(state.addOpen)
+  useOverlayFocusTrap(state.addOpen, close, modalRef)
   const { register, control, handleSubmit, reset, formState:{ errors, isValid } } = useForm({ resolver:zodResolver(DocumentSchema), mode:'onChange', defaultValues:{ title:'', body:'', type:'guide', tags:[] } })
   useEffect(() => { if (state.addOpen) reset({ title:'', body:'', type:'guide', tags:[] }) }, [state.addOpen, reset])
-  return <Modal open={state.addOpen} modalHeading="Add document" primaryButtonText="Add document" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => useAppStore.setState({ addOpen:false })} onRequestSubmit={handleSubmit(state.addDocument)}><div className="modal-copy"><TextInput id="doc-title" labelText="Title" {...register('title')} invalid={!!errors.title} invalidText={errors.title?.message} /><TextArea id="doc-body" labelText="Body" rows={6} {...register('body')} invalid={!!errors.body} invalidText={errors.body?.message} /><div className="form-row"><Select id="doc-type" labelText="Type" {...register('type')} invalid={!!errors.type} invalidText={errors.type?.message}>{['guide','reference','prompt','checklist','paper','note'].map((type) => <SelectItem value={type} text={type} key={type} />)}</Select><Controller control={control} name="tags" render={({ field }) => <TextInput id="doc-tags" labelText="Tags, comma separated" value={field.value.join(', ')} onChange={(e) => field.onChange(e.target.value.split(',').map((tag) => tag.trim()).filter(Boolean))} onBlur={field.onBlur} invalid={!!errors.tags} invalidText={errors.tags?.message || errors.tags?.root?.message} />} /></div></div></Modal>
+  return <Modal open={state.addOpen} modalHeading="Add document" primaryButtonText="Add document" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.addDocument)}><div className="modal-copy" ref={modalRef}><TextInput id="doc-title" labelText="Title" {...register('title')} invalid={!!errors.title} invalidText={errors.title?.message} /><TextArea id="doc-body" labelText="Body" rows={6} {...register('body')} invalid={!!errors.body} invalidText={errors.body?.message} /><div className="form-row"><Select id="doc-type" labelText="Type" {...register('type')} invalid={!!errors.type} invalidText={errors.type?.message}>{['guide','reference','prompt','checklist','paper','note'].map((type) => <SelectItem value={type} text={type} key={type} />)}</Select><Controller control={control} name="tags" render={({ field }) => <TextInput id="doc-tags" labelText="Tags, comma separated" value={field.value.join(', ')} onChange={(e) => field.onChange(e.target.value.split(',').map((tag) => tag.trim()).filter(Boolean))} onBlur={field.onBlur} invalid={!!errors.tags} invalidText={errors.tags?.message || errors.tags?.root?.message} />} /></div></div></Modal>
 }
 
 const ImportFormSchema = z.object({ packageText: z.string().trim().min(1, 'package is required') })
 function ImportModal() {
   const state = useAppStore()
+  const modalRef = useRef(null)
+  const close = () => useAppStore.setState({ importOpen: false })
   useFocusRestorer(state.importOpen)
+  useOverlayFocusTrap(state.importOpen, close, modalRef)
   const [serverError, setServerError] = React.useState('')
   const { register, handleSubmit, setValue, reset, formState:{ errors, isValid } } = useForm({ resolver:zodResolver(ImportFormSchema), mode:'onChange', defaultValues:{ packageText:'' } })
   useEffect(() => { if (state.importOpen) { reset({ packageText:'' }); setServerError('') } }, [state.importOpen, reset])
   const submit = ({ packageText }) => { const result = state.importPackage(packageText); if (!result.ok) setServerError(result.error) }
   const file = async (event) => { const picked = event.target.files?.[0]; if (picked) setValue('packageText', await picked.text(), { shouldValidate:true }) }
-  return <Modal open={state.importOpen} modalHeading="Import library package" primaryButtonText="Import package" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => useAppStore.setState({ importOpen:false })} onRequestSubmit={handleSubmit(submit)}><div className="modal-copy"><p className="muted">A valid package replaces the current documents and saved searches. Imported documents remain stale until indexing completes.</p><label className="cds--label" htmlFor="package-file">Choose JSON file</label><input id="package-file" type="file" accept="application/json,.json" onChange={file} /><TextArea id="package-text" labelText="Package JSON" rows={10} {...register('packageText')} invalid={!!errors.packageText || !!serverError} invalidText={errors.packageText?.message || serverError} /></div></Modal>
+  return <Modal open={state.importOpen} modalHeading="Import library package" primaryButtonText="Import package" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(submit)}><div className="modal-copy" ref={modalRef}><p className="muted">A valid package replaces the current documents and saved searches. Imported documents remain stale until indexing completes.</p><label className="cds--label" htmlFor="package-file">Choose JSON file</label><input id="package-file" type="file" accept="application/json,.json" onChange={file} /><TextArea id="package-text" labelText="Package JSON" rows={10} {...register('packageText')} invalid={!!errors.packageText || !!serverError} invalidText={errors.packageText?.message || serverError} /></div></Modal>
 }
 
 function ExportModal() {
   const state = useAppStore()
+  const modalRef = useRef(null)
+  const close = () => useAppStore.setState({ exportOpen: false })
   useFocusRestorer(state.exportOpen, state.importOpen)
+  useOverlayFocusTrap(state.exportOpen, close, modalRef)
   const value = state.exportTab === 'report' ? state.getReport() : state.getPackage()
   const text = stringifyArtifact(value)
   const copy = async () => { await navigator.clipboard.writeText(text); state.notify(`${state.exportTab === 'report' ? 'Search report' : 'Library package'} copied`) }
   const download = () => { const blob = new Blob([text], { type:'application/json' }); const url=URL.createObjectURL(blob); const link=document.createElement('a'); link.href=url; link.download=state.exportTab === 'report' ? 'semantic-search-report.json' : 'semantic-library-package.json'; link.click(); URL.revokeObjectURL(url); state.notify('JSON download started') }
-  return <Modal open={state.exportOpen} modalHeading="Export workspace" passiveModal onRequestClose={() => useAppStore.setState({ exportOpen:false })}><div className="export-tabs" role="tablist"><button className={`export-tab ${state.exportTab === 'report' ? 'active' : ''}`} role="tab" aria-selected={state.exportTab === 'report'} onClick={() => useAppStore.setState({ exportTab:'report', exportGeneratedAt:new Date().toISOString() })}>Search report</button><button className={`export-tab ${state.exportTab === 'package' ? 'active' : ''}`} role="tab" aria-selected={state.exportTab === 'package'} onClick={() => useAppStore.setState({ exportTab:'package', exportGeneratedAt:new Date().toISOString() })}>Library package</button></div><div className="export-meta"><span>{state.exportTab === 'report' ? `${value.results.length} ranked results` : `${value.documents.length} documents · ${value.savedSearches.length} saved searches`}</span><span>Schema v1</span></div><pre className="json-preview" aria-label="JSON export preview">{text}</pre><div className="flex flex-wrap gap-2 mt-4"><Button renderIcon={Download} onClick={download}>{state.exportTab === 'report' ? 'Download report' : 'Download package'}</Button><Button kind="tertiary" renderIcon={Copy} onClick={copy}>{state.exportTab === 'report' ? 'Copy report' : 'Copy package'}</Button>{state.exportTab === 'package' && <Button kind="ghost" renderIcon={Upload} onClick={() => useAppStore.setState({ exportOpen:false, importOpen:true })}>Import package</Button>}</div></Modal>
+  return <Modal open={state.exportOpen} modalHeading="Export workspace" passiveModal onRequestClose={close}><div className="export-tabs" ref={modalRef} role="tablist"><button className={`export-tab ${state.exportTab === 'report' ? 'active' : ''}`} role="tab" aria-selected={state.exportTab === 'report'} onClick={() => useAppStore.setState({ exportTab:'report', exportGeneratedAt:new Date().toISOString() })}>Search report</button><button className={`export-tab ${state.exportTab === 'package' ? 'active' : ''}`} role="tab" aria-selected={state.exportTab === 'package'} onClick={() => useAppStore.setState({ exportTab:'package', exportGeneratedAt:new Date().toISOString() })}>Library package</button></div><div className="export-meta"><span>{state.exportTab === 'report' ? `${value.results.length} ranked results` : `${value.documents.length} documents · ${value.savedSearches.length} saved searches`}</span><span>Schema v1</span></div><pre className="json-preview" aria-label="JSON export preview">{text}</pre><div className="flex flex-wrap gap-2 mt-4"><Button renderIcon={Download} onClick={download}>{state.exportTab === 'report' ? 'Download report' : 'Download package'}</Button><Button kind="tertiary" renderIcon={Copy} onClick={copy}>{state.exportTab === 'report' ? 'Copy report' : 'Copy package'}</Button>{state.exportTab === 'package' && <Button kind="ghost" renderIcon={Upload} onClick={() => useAppStore.setState({ exportOpen:false, importOpen:true })}>Import package</Button>}</div></Modal>
 }
 
 function CommandPalette() {
@@ -318,7 +357,15 @@ function useKeyboardNavigation() {
   useEffect(() => {
     const handler = (event) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); state.setPalette(!state.paletteOpen); return }
-      if (event.key === 'Escape') { if (state.detailId) state.closeDetail(); if (state.railOpen) useAppStore.setState({railOpen:false}); return }
+      if (event.key === 'Escape') {
+        if (state.exportOpen) { useAppStore.setState({ exportOpen: false }); return }
+        if (state.saveOpen) { useAppStore.setState({ saveOpen: false }); return }
+        if (state.addOpen) { useAppStore.setState({ addOpen: false }); return }
+        if (state.importOpen) { useAppStore.setState({ importOpen: false }); return }
+        if (state.detailId) state.closeDetail()
+        if (state.railOpen) useAppStore.setState({ railOpen: false })
+        return
+      }
       if (state.paletteOpen || state.exportOpen || state.saveOpen || state.addOpen || state.importOpen) return
       if (['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName)) return
       const results = state.getVisible().items
@@ -351,8 +398,7 @@ function registerWebMCP() {
       else if(['tag','type','before'].includes(args.kind)){const filters=state.filters.filter((filter)=>filter.kind!==args.kind);state.runQuery(`${state.activeQuery} ${filters.map((f)=>`${f.kind}:${f.value}`).join(' ')}`,{parsed:{query:state.activeQuery,filters,invalid:[]},threshold:state.threshold,record:false})}
       return {resultCount:useAppStore.getState().getVisible().items.length}
     }
-    if(name==='browse_sort'||name==='browse_set_locale')return {ok:true}
-    if(name==='browse_set_theme')return {theme:'light'}
+    if(name==='browse_sort')return {ok:true}
     if(name==='entity_create'){
       if(args.title){const checked=DocumentSchema.safeParse({title:args.title,body:args.body,type:args.type,tags:args.tags||[]});if(!checked.success)throw new Error(`${checked.error.issues[0].path.join('.')}: ${checked.error.issues[0].message}`);state.addDocument(checked.data)}
       else if(args['saved-search-name']){const payload={name:args['saved-search-name'].trim(),query:state.activeQuery,filters:state.filters,threshold:state.threshold};const checked=SavedSearchSchema.safeParse(payload);if(!checked.success)throw new Error(`${checked.error.issues[0].path.join('.')}: ${checked.error.issues[0].message}`);if(state.savedSearches.some((item)=>item.name.toLowerCase()===payload.name.toLowerCase()))throw new Error('saved-search-name must be unique');state.saveSearch(payload)}
@@ -374,9 +420,9 @@ function registerWebMCP() {
     if(name==='artifact_copy'){state.openExport('report');return {visible:true,requiresClipboardInteraction:true}}
     return {ok:true}
   }
-  const toolNames=['browse_open','browse_search','browse_apply_filter','browse_clear_filter','browse_sort','browse_set_locale','browse_set_theme','entity_create','entity_select','entity_update','entity_delete','entity_toggle','session_start','session_pause','session_resume','artifact_export','artifact_copy']
+  const toolNames=['browse_open','browse_search','browse_apply_filter','browse_clear_filter','browse_sort','entity_create','entity_select','entity_update','entity_delete','entity_toggle','session_start','session_pause','session_resume','artifact_export','artifact_copy']
   const descriptions={
-    browse_open:'Open a declared Atlas workspace destination.', browse_search:'Run a semantic document query.', browse_apply_filter:'Apply a declared search or timeline filter.', browse_clear_filter:'Clear a declared filter.', browse_sort:'Sort results by similarity descending.', browse_set_locale:'Set the bounded interface locale.', browse_set_theme:'Set the bounded interface theme.',
+    browse_open:'Open a declared Atlas workspace destination.', browse_search:'Run a semantic document query.', browse_apply_filter:'Apply a declared search or timeline filter.', browse_clear_filter:'Clear a declared filter.', browse_sort:'Sort results by similarity descending.',
     entity_create:'Create a validated document or saved search.', entity_select:'Select a declared document or collection item.', entity_update:'Update bounded document fields or relevance feedback.', entity_delete:'Delete confirmed document entities.', entity_toggle:'Toggle feedback or declared selection state.',
     session_start:'Start the reindex-run demo.', session_pause:'Pause the active reindex run.', session_resume:'Resume the paused or failed reindex run.', artifact_export:'Open the search-report-json export.', artifact_copy:'Open the report so clipboard copy can be observed.',
   }
@@ -391,5 +437,5 @@ export default function App() {
   const state = useAppStore()
   useKeyboardNavigation()
   useEffect(registerWebMCP, [])
-  return <div className="app-shell"><Header /><div className={`workspace ${state.detailId ? 'has-detail' : ''}`}><Rail /><SearchWorkspace />{state.detailId ? <DetailPanel /> : <div />}</div><SaveSearchModal /><AddDocumentModal /><ImportModal /><ExportModal />{state.paletteOpen && <CommandPalette />}{state.toast && <div className="toast-wrap"><ToastNotification kind={state.toast.kind} title={state.toast.message} timeout={0} onCloseButtonClick={() => useAppStore.setState({toast:null})} /></div>}<div className="sr-only" aria-live="polite">{state.liveMessage}</div></div>
+  return <div className="app-shell"><Header /><div className={`workspace ${state.detailId ? 'has-detail' : ''}`}><SearchWorkspace /><Rail />{state.detailId ? <DetailPanel /> : null}</div><SaveSearchModal /><AddDocumentModal /><ImportModal /><ExportModal />{state.paletteOpen && <CommandPalette />}{state.toast && <div className="toast-wrap"><ToastNotification kind={state.toast.kind} title={state.toast.message} timeout={0} onCloseButtonClick={() => useAppStore.setState({toast:null})} /></div>}<div className="sr-only" aria-live="polite" aria-atomic="true">{state.liveMessage}</div></div>
 }

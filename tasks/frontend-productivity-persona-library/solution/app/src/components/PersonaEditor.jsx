@@ -6,6 +6,7 @@ import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import { Button, DismissibleTag, Modal, Select, SelectItem, Slider, TextArea, TextInput } from '@carbon/react'
 import { Add, Close, ListBulleted, TextBold, TextItalic } from '@carbon/icons-react'
+import { restoreFocus } from '../focus'
 import { ROLES, TONES, TRAITS, useAppStore } from '../store'
 import { editorDefaults, personaSchema } from '../schema'
 import TraitRadar from './TraitRadar'
@@ -50,7 +51,7 @@ export default function PersonaEditor() {
   const defaults = useMemo(() => editorDefaults(persona), [persona, editorOpen])
   const {
     control, register, setValue, getValues, reset, handleSubmit, trigger,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({ resolver: zodResolver(personaSchema), defaultValues: defaults, mode: 'onChange' })
   const constraints = useFieldArray({ control, name: 'constraints' })
   const examples = useFieldArray({ control, name: 'examples' })
@@ -104,10 +105,14 @@ export default function PersonaEditor() {
     if (persona) updatePersona(persona.id, submitted)
     else createPersona(submitted)
     closeEditor()
+    restoreFocus()
     window.setTimeout(() => { saving.current = false }, 300)
   }, () => { saving.current = false })
 
-  const valid = personaSchema.safeParse(values).success && Object.keys(traitInputErrors).length === 0
+  const requestClose = () => {
+    closeEditor()
+    restoreFocus()
+  }
   const tags = values?.tags || []
   const traits = values?.traits || {}
 
@@ -118,9 +123,9 @@ export default function PersonaEditor() {
       modalLabel="Persona editor"
       primaryButtonText={persona ? 'Save changes' : 'Create persona'}
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!valid || saving.current}
+      primaryButtonDisabled={saving.current || !isValid || Object.keys(traitInputErrors).length > 0}
       onRequestSubmit={() => { syncActiveVariant(); trigger().then((ok) => ok && save()) }}
-      onRequestClose={() => { document.activeElement?.blur(); closeEditor(); }}
+      onRequestClose={requestClose}
       size="lg"
       selectorPrimaryFocus="#persona-name"
       className="persona-editor-modal"
@@ -206,7 +211,7 @@ export default function PersonaEditor() {
                 const displayValue = traitDrafts[trait] ?? traits?.[trait] ?? ''
                 return (
                   <div className="trait-control" key={trait}>
-                    <div className="trait-label-row"><label htmlFor={`trait-${trait}`}>{pretty(trait)}</label><input id={`trait-${trait}-number`} aria-label={`${pretty(trait)} numeric value`} className={error || inputError ? 'trait-number error' : 'trait-number'} type="text" inputMode="numeric" value={displayValue} onChange={(e) => {
+                    <div className="trait-label-row"><label htmlFor={`trait-${trait}`} id={`trait-${trait}-label`}>{pretty(trait)}</label><input id={`trait-${trait}-number`} aria-labelledby={`trait-${trait}-label`} aria-label={`${pretty(trait)} numeric value`} className={error || inputError ? 'trait-number error' : 'trait-number'} type="text" inputMode="numeric" value={displayValue} onChange={(e) => {
                       const raw = e.target.value
                       setTraitDrafts((current) => ({ ...current, [trait]: raw }))
                       let message = ''
@@ -216,7 +221,7 @@ export default function PersonaEditor() {
                       setTraitInputErrors((current) => { const next = { ...current }; if (message) next[trait] = message; else delete next[trait]; return next })
                       if (!message) setValue(`traits.${trait}`, Number(raw), { shouldValidate: true, shouldDirty: true })
                     }} /></div>
-                    <Slider id={`trait-${trait}`} labelText="" aria-label={`${pretty(trait)} slider`} hideTextInput min={0} max={100} step={1} value={value} onChange={({ value: next }) => {
+                    <Slider id={`trait-${trait}`} labelText={pretty(trait)} aria-labelledby={`trait-${trait}-label`} hideTextInput min={0} max={100} step={1} value={value} onChange={({ value: next }) => {
                       setTraitDrafts((current) => ({ ...current, [trait]: String(next) }))
                       setTraitInputErrors((current) => { const updated = { ...current }; delete updated[trait]; return updated })
                       setValue(`traits.${trait}`, Number(next), { shouldValidate: true, shouldDirty: true })

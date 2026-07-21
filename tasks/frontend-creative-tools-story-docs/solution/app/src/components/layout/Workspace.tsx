@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { StoryboardNav } from './StoryboardNav';
@@ -7,34 +7,41 @@ import { NotificationsDrawer, AccountDrawer } from './Drawers';
 import { ExportDrawer } from '../features/ExportDrawer';
 import { CommandPalette } from '../features/CommandPalette';
 import { ImportModal } from '../features/ImportModal';
+import { VersionHistoryPanel } from '../features/VersionHistoryPanel';
 import { Toast } from '../common/Toast';
 import { isCommandPaletteOpenStore } from '@/store/ui';
 import { initWebMCP } from '@/webmcp';
 
 export function Workspace() {
-
   useEffect(() => {
     initWebMCP();
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault();
-            isCommandPaletteOpenStore.set(true);
-        }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        isCommandPaletteOpenStore.set(!isCommandPaletteOpenStore.get());
+      }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-gray-900 font-sans">
+    <div className="min-h-screen bg-[#fdfdfa] text-gray-900">
+      <a
+        href="#scene-board"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[90] focus:rounded-xl focus:bg-yellow-400 focus:px-4 focus:py-2 focus:text-sm focus:font-bold focus:text-yellow-950"
+      >
+        Skip to scene board
+      </a>
+
       <Header />
       <Sidebar />
 
-      <main className="pt-14 lg:pl-64 min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 storyboard-page">
-            <StoryboardNav />
-            <SceneGrid />
+      <main id="scene-board" className="min-h-screen pt-16 lg:pl-64">
+        <div className="storyboard-page mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <StoryboardNav />
+          <SceneGrid />
         </div>
       </main>
 
@@ -42,6 +49,7 @@ export function Workspace() {
       <AccountDrawer />
       <ExportDrawer />
       <ImportModal />
+      <VersionHistoryPanel />
       <CommandPalette />
       <Toast />
     </div>

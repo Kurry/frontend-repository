@@ -1,14 +1,11 @@
 <script lang="ts">
   import { ClockCounterClockwise, Certificate, WarningOctagon, Note, ArrowsClockwise, Funnel } from 'phosphor-svelte';
   import { consoleStore } from '../console-store.svelte';
+  import { formatTimestamp } from '../format';
 
   const label: Record<string, string> = {
     'all': 'All activity', 're-run': 'Re-runs', rejection: 'Rejections', certificate: 'Certificates', note: 'Notes'
   };
-
-  function formatTime(value: string) {
-    return new Intl.DateTimeFormat('en', { month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false }).format(new Date(value));
-  }
 </script>
 
 <section class="timeline surface" aria-labelledby="timeline-title">
@@ -20,7 +17,13 @@
     <label>
       <Funnel size={13} />
       <span class="sr-only">Timeline entry type</span>
-      <select bind:value={consoleStore.timelineFilter} aria-label="Filter timeline by entry type">
+      <select
+        value={consoleStore.timelineFilter}
+        aria-label="Filter timeline by entry type"
+        onchange={(event) => {
+          consoleStore.timelineFilter = event.currentTarget.value as typeof consoleStore.timelineFilter;
+        }}
+      >
         {#each Object.entries(label) as [value, text]}<option {value}>{text}</option>{/each}
       </select>
     </label>
@@ -37,7 +40,7 @@
             {:else}<ArrowsClockwise size={17} weight="bold" />{/if}
           </span>
           <div><strong>{entry.type}</strong><p>{entry.summary}</p></div>
-          <time datetime={entry.timestamp}>{formatTime(entry.timestamp)} UTC</time>
+          <time datetime={entry.timestamp}>{formatTimestamp(entry.timestamp)} UTC</time>
         </article>
       {/each}
     {:else}

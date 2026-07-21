@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted, computed } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useAppStore } from '../store'
 import {
   DialogRoot,
@@ -40,12 +40,18 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 }
 
+const onOpenPalette = () => {
+  isOpen.value = true
+}
+
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
+  window.addEventListener('scribblespace:open-palette', onOpenPalette)
 })
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('scribblespace:open-palette', onOpenPalette)
 })
 
 const placeAt = () => {
@@ -81,8 +87,10 @@ watch(isOpen, (val) => {
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 bg-black/40 z-[60] transition-opacity duration-300" />
       <DialogContent
-        class="fixed top-[20%] left-1/2 transform -translate-x-1/2 bg-white rounded-xl shadow-xl w-[480px] z-[60] overflow-hidden"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl w-[min(480px,calc(100vw-24px))] max-h-[min(420px,calc(100vh-48px))] z-[60] overflow-hidden flex flex-col"
+        :trap-focus="true"
       >
+         <DialogTitle class="sr-only">Command palette</DialogTitle>
          <ComboboxRoot
             v-model:search-term="query"
             class="flex flex-col"

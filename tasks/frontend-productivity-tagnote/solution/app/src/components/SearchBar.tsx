@@ -41,16 +41,16 @@ export const SearchBar = component$<SearchBarProps>(({ query, placeholder }) => 
       </div>
       <div class="scrollbar-hide mt-3 flex gap-2 overflow-x-auto pb-1">
         <button onClick$={() => query.value = 'tag:family'} class="flex-shrink-0 rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] hover:bg-[#D4E0F0]">
-          tag:family
+          Tag:Family
         </button>
         <button onClick$={() => query.value = 'tag:todo'} class="flex-shrink-0 rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] hover:bg-[#D4E0F0]">
-          tag:todo
+          Tag:Todo
         </button>
         <button onClick$={() => query.value = 'done:open'} class="flex-shrink-0 rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] hover:bg-[#D4E0F0]">
-          done:open
+          Done:Open
         </button>
         <button onClick$={() => query.value = 'done:done'} class="flex-shrink-0 rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] hover:bg-[#D4E0F0]">
-          done:done
+          Done:Done
         </button>
       </div>
     </div>

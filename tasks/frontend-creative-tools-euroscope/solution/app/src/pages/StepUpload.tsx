@@ -1,11 +1,17 @@
 import { createSignal } from "solid-js";
 import Alert from "../components/Alert";
 import Button from "../components/Button";
-import { ArrowRight, Check } from "../components/Icon";
+import { ArrowRight, Check, Upload } from "../components/Icon";
 import { goNext, setFileName, state } from "../store";
 
 export default function StepUpload() {
-  const [name, setName] = createSignal(state.fileName);
+  const [dragging, setDragging] = createSignal(false);
+  let fileRef: HTMLInputElement | undefined;
+
+  const acceptFile = (f: File | undefined) => {
+    if (!f) return;
+    setFileName(f.name);
+  };
 
   return (
     <>
@@ -36,26 +42,62 @@ export default function StepUpload() {
 
         <div class="flex items-center gap-2 rounded-md bg-scope-info px-3 py-2 text-sm text-scope-fg2">
           <span class="text-scope-infofg">
-            <Check size={16} />
+            <Check size={16} label="Sample loaded" />
           </span>
           <span>
-            Loaded sample: <span class="font-medium text-scope-fg1">{name()}</span>
+            Loaded sample:{" "}
+            <span class="font-medium text-scope-fg1">{state.fileName}</span>
           </span>
         </div>
 
-        <input
-          type="file"
-          accept=".exe"
-          aria-label="Select EuroScope executable"
-          class="text-sm text-scope-fg2 file:mr-3 file:h-[27px] file:cursor-pointer file:rounded-md file:border-2 file:border-scope-bg2 file:bg-scope-bg2 file:px-2 file:text-sm hover:file:border-scope-bg3"
-          onChange={(e) => {
-            const f = e.currentTarget.files?.[0];
-            if (f) {
-              setName(f.name);
-              setFileName(f.name);
+        <div
+          classList={{
+            "flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border-2 border-dashed px-4 py-5 text-center transition-colors duration-150":
+              true,
+            "border-scope-accent bg-scope-info": dragging(),
+            "border-scope-bg3 bg-scope-bg2/40 hover:border-scope-accent2 hover:bg-scope-bg2/70":
+              !dragging(),
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragging(false);
+            acceptFile(e.dataTransfer?.files?.[0]);
+          }}
+          onClick={() => fileRef?.click()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              fileRef?.click();
             }
           }}
-        />
+          role="button"
+          tabindex="0"
+          aria-label="Drop a EuroScope executable here, or activate to browse"
+        >
+          <span class="text-scope-fg2">
+            <Upload size={20} />
+          </span>
+          <p class="text-sm font-medium text-scope-fg1">
+            Drop your EuroScope.exe here
+          </p>
+          <p class="text-xs text-scope-fg2">or click to browse — .exe only</p>
+          <input
+            ref={fileRef}
+            type="file"
+            accept=".exe"
+            aria-label="Select EuroScope executable"
+            class="hidden"
+            onChange={(e) => {
+              acceptFile(e.currentTarget.files?.[0]);
+              e.currentTarget.value = "";
+            }}
+          />
+        </div>
         <p class="text-xs text-scope-fg2">
           Optional. Keep the loaded sample to explore the patcher without a file
           of your own.
@@ -63,7 +105,7 @@ export default function StepUpload() {
       </div>
 
       <div class="flex justify-end">
-        <Button variant="primary" class="w-[110px]" onClick={() => goNext()}>
+        <Button variant="primary" class="w-[120px]" onClick={() => goNext()}>
           <span>Continue</span>
           <ArrowRight />
         </Button>

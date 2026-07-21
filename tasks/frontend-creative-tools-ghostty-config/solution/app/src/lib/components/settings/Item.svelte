@@ -6,6 +6,7 @@
     import Badge from "../Badge.svelte";
     import {searchState} from "$lib/stores/search.svelte";
     import {setSetting} from "$lib/contexts";
+    import {registry} from "$lib/settings/registry";
 
     interface Props {
         name?: string;
@@ -25,6 +26,15 @@
 
     const {name = "", note = "", platform, since, description, settingId, children, onReset, isNonDefault = false, inline = true, themeBadge}: Props = $props();
     const labelId = $derived(settingId ? `${settingId}-label` : undefined);
+
+    // Only widgets whose primary control is a labelable element (input/select/button) get a
+    // real <label for> association and a controlId; group-style controls (sliders, palettes,
+    // pill groups, …) keep aria-labelledby instead, and must not leak a shared id into the
+    // multiple inputs they render.
+    const LABELABLE_WIDGETS = new Set(["text", "number", "dropdown", "switch", "color", "repeatable-text", "duration"]);
+    const widgetType = $derived(settingId ? (registry[settingId as keyof typeof registry] as {widget?: {type?: string}} | undefined)?.widget?.type : undefined);
+    const isLabelable = $derived(widgetType === undefined || LABELABLE_WIDGETS.has(widgetType));
+    const controlId = $derived(settingId && isLabelable ? `control-${settingId}` : undefined);
     const tooltipAttachment = createTooltipAttachment("Reset to default");
 
 
@@ -88,7 +98,10 @@
 
     // Give the setting context so that child components can access the setting info if needed
     // svelte-ignore state_referenced_locally
-    setSetting({name, note, platform, since, description: description || "", labelId});
+    setSetting({
+        name, note, platform, since, description: description || "", labelId, controlId,
+        settingKey: settingId ? registry[settingId as keyof typeof registry]?.key : undefined
+    });
 </script>
 
 <div
@@ -101,7 +114,12 @@
     <div class="row">
         {#if name}
         <div class="row-left">
-            <span id={labelId} class="setting-name">{name}</span>
+            {#if controlId}
+                <label id={labelId} class="setting-name" for={controlId}>{name}</label>
+            {:else}
+                <span id={labelId} class="setting-name">{name}</span>
+            {/if}
+            <!-- controlId is intentionally undefined for group-style widgets via the context -->
             {#if infoBadges.length > 0 || (isNonDefault && onReset)}
                 <div class="setting-extra">
                     {#each infoBadges as badge (badge.label)}

@@ -20,6 +20,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatListModule } from '@angular/material/list';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -63,6 +66,9 @@ import { NgxEchartsModule } from 'ngx-echarts';
     MatDatepickerModule,
     MatNativeDateModule,
     MatDividerModule,
+    MatCheckboxModule,
+    MatTooltipModule,
+    MatListModule,
     NgxEchartsModule.forRoot({
       echarts: () => import('echarts'),
     }),

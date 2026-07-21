@@ -95,12 +95,37 @@ export function computeDiff(leftText = '', rightText = '', options = {}) {
 }
 
 export function relativeTime(timestamp) {
-  const delta = Date.now() - new Date(timestamp).getTime();
-  const days = Math.max(0, Math.floor(delta / 86400000));
-  if (days === 0) return 'today';
+  const delta = Math.max(0, Date.now() - new Date(timestamp).getTime());
+  const minutes = Math.floor(delta / 60000);
+  if (minutes < 2) return 'just now';
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
   if (days === 1) return '1 day ago';
   if (days < 30) return `${days} days ago`;
   const months = Math.floor(days / 30);
-  return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+  if (months < 12) return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+  const years = Math.floor(months / 12);
+  return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+}
+
+export function absoluteTime(timestamp) {
+  const date = new Date(timestamp);
+  const pad = (value) => String(value).padStart(2, '0');
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())} UTC`;
+}
+
+// Single timestamp formatter used by every surface (pickers, history rows,
+// blame tooltips, graph, export previews) so formatting never diverges.
+export function stampLabel(timestamp, mode = 'relative') {
+  return mode === 'absolute' ? absoluteTime(timestamp) : relativeTime(timestamp);
+}
+
+// Single counter formatter used by the summary strip and export previews.
+export function counterLabel(value, { sign = true } = {}) {
+  if (value > 0) return `+${value}`;
+  if (value < 0) return `−${Math.abs(value)}`;
+  return sign ? '+0' : '0';
 }
 

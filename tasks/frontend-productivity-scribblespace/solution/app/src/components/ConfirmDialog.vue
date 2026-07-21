@@ -47,7 +47,8 @@ const handleCancel = () => {
       <DialogOverlay v-motion="motionConfigOverlay" class="fixed inset-0 bg-black/40 z-50 transition-opacity duration-300" />
       <DialogContent
         v-motion="motionConfigContent"
-        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-[400px] z-50"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-[min(400px,calc(100vw-24px))] z-50"
+        :trap-focus="true"
       >
         <DialogTitle class="text-xl font-bold text-gray-900 mb-2">Delete Selected</DialogTitle>
         <DialogDescription class="text-gray-600 mb-6">

@@ -62,7 +62,7 @@ function defaultFilters(){ return { check:null, checkOutcome:'fail', criterion:n
 
 export const useAuditStore = defineStore('audit', {
   state: () => ({
-    records: seedRecords(), activeView:'queue', selectedSlug:null, selectedReviewer:null,
+    records: seedRecords(), activeView:'queue', selectedSlug:null, lastSelectedSlug:null, selectedReviewer:null,
     search:'', filters:defaultFilters(), sort:{ key:'lastActivity', direction:'desc' },
     disclosure:{}, runs:{}, batch:{ active:false, paused:false, slugs:[], index:0 },
     exportHistory:[], exportFormat:'json', packageTimestamp:now(), importOpen:false, importError:'',
@@ -102,8 +102,14 @@ export const useAuditStore = defineStore('audit', {
   actions: {
     notify(message){ this.toast=message; this.liveMessage=message; setTimeout(()=>{ if(this.toast===message)this.toast=null },3200) },
     markMutation(record, type, detail){ record.touched=true; record.lastActivity=now(); record.timeline.push(event(type,detail,record.lastActivity)); this.packageTimestamp=record.lastActivity; this.rollupPulse++ },
-    setView(view){ this.activeView=view; if(view!=='task-detail')this.selectedSlug=null; if(view!=='reviewer-detail')this.selectedReviewer=null; this.mobileNav=false },
-    openTask(slug){ this.selectedSlug=slug; this.activeView='task-detail'; this.mobileNav=false },
+    setView(view){
+      if(this.activeView==='task-detail' && this.selectedSlug) this.lastSelectedSlug=this.selectedSlug
+      this.activeView=view
+      if(view!=='task-detail') this.selectedSlug=null
+      if(view!=='reviewer-detail') this.selectedReviewer=null
+      this.mobileNav=false
+    },
+    openTask(slug){ this.selectedSlug=slug; this.lastSelectedSlug=slug; this.activeView='task-detail'; this.mobileNav=false },
     openReviewer(reviewer){ this.selectedReviewer=reviewer; this.activeView='reviewer-detail' },
     sortBy(key){ if(this.sort.key===key)this.sort.direction=this.sort.direction==='asc'?'desc':'asc'; else this.sort={key,direction:'asc'} },
     clearFilters(){ this.filters=defaultFilters(); this.search='' },
@@ -173,12 +179,15 @@ export const useAuditStore = defineStore('audit', {
     resumeBatch(){this.batch.paused=false;const slug=this.batch.slugs[this.batch.index];if(slug)this.resumeRun(slug)},
     saveCriterion(slug,criterion,verdict,rationale=''){
       const record=this.records.find(r=>r.slug===slug); if(!record?.firstRunCompleted)return {ok:false,error:'criterion-verdict: checks must run first'}
+      let next
       if(verdict==='fail'){
         const parsed=CriterionFailVerdictSchema.safeParse({criterion,verdict:'fail',rationale})
         if(!parsed.success)return {ok:false,error:firstZodError(parsed.error)}
-        record.criteria[criterion]={verdict:'fail',rationale:parsed.data.rationale}
-      } else if(verdict==='pass') record.criteria[criterion]={verdict:'pass',rationale:null}
+        next={verdict:'fail',rationale:parsed.data.rationale}
+      } else if(verdict==='pass') next={verdict:'pass',rationale:null}
       else return {ok:false,error:'criterion-verdict: choose pass or fail'}
+      // Replace the criteria map so queue rows / getters always re-render the pass count.
+      record.criteria={...record.criteria,[criterion]:next}
       const anyFail=CRITERIA.some(c=>record.criteria[c].verdict==='fail'); const allPass=CRITERIA.every(c=>record.criteria[c].verdict==='pass'); const checksPass=CHECKS.every(c=>record.checkResults[c].status==='pass')
       if(anyFail && !['escalated','resolved','re-audited'].includes(record.stage))this.changeStage(record,'held')
       else if(allPass && checksPass){if(record.stage==='re-audited'||record.fixesApplied)this.changeStage(record,'resolved');else this.changeStage(record,'admitted')}
@@ -215,7 +224,8 @@ export const useAuditStore = defineStore('audit', {
       }
     },
     markdown(){
-      const p=this.buildPackage(); const lines=['# Audit Report','',`Exported: ${p.exportedAt}`,'','## Dataset summary','',`| Admitted | Held | Escalated | Resolved | Total |`,`| ---: | ---: | ---: | ---: | ---: |`,`| ${p.datasetSummary.admitted} | ${p.datasetSummary.held} | ${p.datasetSummary.escalated} | ${p.datasetSummary.resolved} | ${p.datasetSummary.total} |`,'','## Check pass rates','','| Check | Passes | Fails | Pass rate |','| --- | ---: | ---: | ---: |',...p.checkPassRates.map(x=>`| ${x.check} | ${x.passes} | ${x.fails} | ${x.passRate}% |`),'','## Criterion failure ranking','','| Criterion | Failures |','| --- | ---: |',...p.criterionFailureRanking.map(x=>`| ${x.criterion} | ${x.failures} |`),'','## Reviewer activity','','| Reviewer | Entries | Approve | Approve with caveats | Needs edit | Reject |','| --- | ---: | ---: | ---: | ---: | ---: |',...p.reviewerActivity.map(x=>`| ${x.reviewer} | ${x.entryCount} | ${x.verdictMix.Approve} | ${x.verdictMix['Approve with caveats']} | ${x.verdictMix['Needs edit']} | ${x.verdictMix.Reject} |`),'','## Task appendix','']
+      const fmtHuman=t=>new Intl.DateTimeFormat('en',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(t))
+      const p=this.buildPackage(); const lines=['# Audit Report','',`Exported: ${fmtHuman(p.exportedAt)}`,'','## Dataset summary','',`| Admitted | Held | Escalated | Resolved | Total |`,`| ---: | ---: | ---: | ---: | ---: |`,`| ${p.datasetSummary.admitted} | ${p.datasetSummary.held} | ${p.datasetSummary.escalated} | ${p.datasetSummary.resolved} | ${p.datasetSummary.total} |`,'','## Check pass rates','','| Check | Passes | Fails | Pass rate |','| --- | ---: | ---: | ---: |',...p.checkPassRates.map(x=>`| ${x.check} | ${x.passes} | ${x.fails} | ${x.passRate}% |`),'','## Criterion failure ranking','','| Criterion | Failures |','| --- | ---: |',...p.criterionFailureRanking.map(x=>`| ${x.criterion} | ${x.failures} |`),'','## Reviewer activity','','| Reviewer | Entries | Approve | Approve with caveats | Needs edit | Reject |','| --- | ---: | ---: | ---: | ---: | ---: |',...p.reviewerActivity.map(x=>`| ${x.reviewer} | ${x.entryCount} | ${x.verdictMix.Approve} | ${x.verdictMix['Approve with caveats']} | ${x.verdictMix['Needs edit']} | ${x.verdictMix.Reject} |`),'','## Task appendix','']
       if(!p.tasks.length)lines.push('_Audited records will appear here after a run, verdict, feedback entry, fix, escalation, or resolution._')
       p.tasks.forEach(t=>{lines.push(`### ${t.slug}`,'',`- Stage: ${t.stage}`,`- Checks: ${t.checks.map(c=>`${c.check}=${c.status}`).join(', ')}`);if(t.failedCriteria.length){lines.push('- Failed criteria:');t.failedCriteria.forEach(c=>lines.push(`  - ${c.criterion}: ${c.rationale}`))}else lines.push('- Failed criteria: none');if(t.feedback.length){lines.push('- Feedback:');t.feedback.forEach(f=>lines.push(`  - ${f.reviewer} — ${f.verdict}: ${f.findings}`))}else lines.push('- Feedback: none');if(t.escalation)lines.push(`- Escalation: ${t.escalation.category} — ${t.escalation.summary}`);if(t.resolution)lines.push(`- Resolution: ${t.resolution.note}`);lines.push('')})
       return lines.join('\n')
@@ -229,7 +239,26 @@ export const useAuditStore = defineStore('audit', {
       for(const imported of p.tasks){
         let record=next.find(r=>r.slug===imported.slug)
         if(!record){const repo=REPOSITORIES.find(x=>imported.slug.startsWith(x.replace('/','-')))||REPOSITORIES[0];record=seedRecords()[0];record={...record,slug:imported.slug,repository:repo};next.push(record)}
-        record.stage=imported.stage;record.checkResults=Object.fromEntries(imported.checks.map(x=>[x.check,{status:x.status,violation:x.status==='fail'?violations[x.check]:null}]));record.firstRunCompleted=imported.checks.some(x=>x.status!=='not-run');record.criteria=Object.fromEntries(CRITERIA.map(c=>{const fail=imported.failedCriteria.find(x=>x.criterion===c);return [c,fail?{verdict:'fail',rationale:fail.rationale}:{verdict:record.firstRunCompleted?'pass':null,rationale:null}]}));record.feedback=imported.feedback.map(x=>({...x,at:p.exportedAt}));record.escalation=imported.escalation||null;record.resolution=imported.resolution||null;record.touched=true;record.lastActivity=p.exportedAt;record.stageHistory=[{stage:imported.stage,at:p.exportedAt}];record.timeline=[event('package-imported','Task reconstructed from Audit Package JSON.',p.exportedAt)]
+        record.stage=imported.stage
+        record.checkResults=Object.fromEntries(imported.checks.map(x=>[x.check,{status:x.status,violation:x.status==='fail'?violations[x.check]:null}]))
+        record.firstRunCompleted=imported.checks.some(x=>x.status!=='not-run')
+        // Package only carries failedCriteria. Unlisted criteria stay unreviewed (null),
+        // except admitted/resolved stages which require all ten criteria to have passed.
+        const allPassedStages=['admitted','resolved']
+        record.criteria=Object.fromEntries(CRITERIA.map(c=>{
+          const fail=imported.failedCriteria.find(x=>x.criterion===c)
+          if(fail)return [c,{verdict:'fail',rationale:fail.rationale}]
+          if(allPassedStages.includes(imported.stage))return [c,{verdict:'pass',rationale:null}]
+          return [c,{verdict:null,rationale:null}]
+        }))
+        record.feedback=imported.feedback.map(x=>({...x,at:p.exportedAt}))
+        record.escalation=imported.escalation||null
+        record.resolution=imported.resolution||null
+        record.fixesApplied=imported.stage==='re-audited'||imported.stage==='resolved'
+        record.touched=true
+        record.lastActivity=p.exportedAt
+        record.stageHistory=[{stage:imported.stage,at:p.exportedAt}]
+        record.timeline=[event('package-imported','Task reconstructed from Audit Package JSON.',p.exportedAt)]
       }
       this.records=next;this.exportHistory=p.exportHistory;this.packageTimestamp=p.exportedAt;this.importError='';this.importOpen=false;this.notify('Audit package imported');return {ok:true}
     }

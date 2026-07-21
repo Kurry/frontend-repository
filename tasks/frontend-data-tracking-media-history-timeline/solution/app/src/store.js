@@ -23,6 +23,14 @@ export const importDiagnosticAtom = atom("");
 export const undoHistoryAtom = atom([]);
 export const redoHistoryAtom = atom([]);
 
+// Session personalization (in-memory only — reload resets to seeded state)
+export const sessionDefaultWindowAtom = atom(null);
+export const paperToneAtom = atom('cool'); // 'cool' | 'warm' | 'slate'
+export const densityAtom = atom('cozy');   // 'cozy' | 'compact'
+
+// Last-mutation feedback chip
+export const lastMutationAtom = atom(null); // { kind, label, at }
+
 // Selectors
 export const filteredEventsAtom = atom((get) => {
   const events = get(eventsAtom);
@@ -63,6 +71,25 @@ export const categoryTallyAtom = atom((get) => {
   return tally;
 });
 
+// Helpers
+// Expand the visible year window minimally so `year` falls inside it.
+// Guarantees a valid create/edit is immediately visible in Library + stage.
+export const expandWindowToYear = (get, set, year) => {
+  const w = get(yearWindowAtom);
+  if (year >= w.from && year <= w.to) return;
+  const from = Math.max(MT_DATA.yearMin, Math.min(w.from, year));
+  const to = Math.min(MT_DATA.yearMax, Math.max(w.to, year));
+  set(yearWindowAtom, { from, to });
+};
+
+export const fullSpanAtom = atom(null, (get, set) => {
+  set(yearWindowAtom, { from: MT_DATA.yearMin, to: MT_DATA.yearMax });
+});
+
+export const saveSessionDefaultAtom = atom(null, (get, set) => {
+  set(sessionDefaultWindowAtom, { ...get(yearWindowAtom) });
+});
+
 // Mutators with History Support
 const eventsSnapshot = (get) => ({ scope: 'events', events: get(eventsAtom) });
 const timelineSnapshot = (get) => ({
@@ -100,26 +127,33 @@ export const importTimelineAtom = atom(null, (get, set, timeline) => {
   set(yearWindowAtom, timeline.yearWindow);
   set(activeCategoriesAtom, timeline.activeCategories);
   set(searchAtom, timeline.search);
+  set(lastMutationAtom, { kind: 'import', label: `${timeline.events.length} events`, at: Date.now() });
 });
 
 export const addEventAtom = atom(null, (get, set, event) => {
   const newEvent = { ...event, id: `u_${Date.now()}_${Math.random()}` };
   pushHistory(get, set, [...get(eventsAtom), newEvent]);
+  expandWindowToYear(get, set, newEvent.year);
+  set(lastMutationAtom, { kind: 'added', label: newEvent.title, at: Date.now() });
 });
 
 export const updateEventAtom = atom(null, (get, set, updatedEvent) => {
   const current = get(eventsAtom);
   const newEvents = current.map(e => e.id === updatedEvent.id ? updatedEvent : e);
   pushHistory(get, set, newEvents);
+  expandWindowToYear(get, set, updatedEvent.year);
+  set(lastMutationAtom, { kind: 'updated', label: updatedEvent.title, at: Date.now() });
 });
 
 export const deleteEventAtom = atom(null, (get, set, eventId) => {
   const current = get(eventsAtom);
+  const removed = current.find(e => e.id === eventId);
   const newEvents = current.filter(e => e.id !== eventId);
   pushHistory(get, set, newEvents);
   if (get(selectedEventIdAtom) === eventId) {
     set(selectedEventIdAtom, null);
   }
+  set(lastMutationAtom, { kind: 'deleted', label: removed ? removed.title : '', at: Date.now() });
 });
 
 export const bulkSetCategoryAtom = atom(null, (get, set, { eventIds, categoryId }) => {
@@ -131,6 +165,7 @@ export const bulkSetCategoryAtom = atom(null, (get, set, { eventIds, categoryId 
     return e;
   });
   pushHistory(get, set, newEvents);
+  set(lastMutationAtom, { kind: 'bulk-category', label: `${eventIds.length} events`, at: Date.now() });
 });
 
 export const bulkDeleteAtom = atom(null, (get, set, eventIds) => {
@@ -140,6 +175,7 @@ export const bulkDeleteAtom = atom(null, (get, set, eventIds) => {
   if (eventIds.includes(get(selectedEventIdAtom))) {
     set(selectedEventIdAtom, null);
   }
+  set(lastMutationAtom, { kind: 'bulk-delete', label: `${eventIds.length} events`, at: Date.now() });
 });
 
 export const undoAtom = atom(null, (get, set) => {
@@ -150,6 +186,7 @@ export const undoAtom = atom(null, (get, set) => {
   set(undoHistoryAtom, undo.slice(0, -1));
   set(redoHistoryAtom, [...get(redoHistoryAtom), currentSnapshotFor(get, previous)]);
   restoreTimelineSnapshot(set, previous);
+  set(lastMutationAtom, { kind: 'undo', label: '', at: Date.now() });
 });
 
 export const redoAtom = atom(null, (get, set) => {
@@ -160,6 +197,7 @@ export const redoAtom = atom(null, (get, set) => {
   set(redoHistoryAtom, redo.slice(0, -1));
   set(undoHistoryAtom, [...get(undoHistoryAtom), currentSnapshotFor(get, next)]);
   restoreTimelineSnapshot(set, next);
+  set(lastMutationAtom, { kind: 'redo', label: '', at: Date.now() });
 });
 
 export const resetFiltersAtom = atom(null, (get, set) => {

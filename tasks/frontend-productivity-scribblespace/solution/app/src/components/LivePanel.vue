@@ -51,7 +51,8 @@ const statusBadge = computed(() => {
          <button v-if="stream.status !== 'active' && stream.status !== 'caught-up'" class="btn-sm" @click="store.streamStart()">Start Stream</button>
          <button v-if="stream.status === 'active'" class="btn-sm text-amber-700 border-amber-300" @click="store.streamPause()">Pause</button>
          <button v-if="stream.status === 'active' || stream.status === 'paused'" class="btn-sm text-red-700 border-red-300" @click="store.streamDisconnect()">Disconnect</button>
-         <button v-if="stream.status === 'disconnected'" class="btn-sm text-blue-700 border-blue-300" @click="handleReconnect">Reconnect</button>
+         <button v-if="stream.status === 'disconnected' || stream.status === 'replaying'" class="btn-sm text-blue-700 border-blue-300" @click="handleReconnect">Reconnect</button>
+         <button v-if="stream.status === 'caught-up'" class="btn-sm text-gray-700 border-gray-300" disabled>Caught up</button>
          <button class="btn-sm border-purple-300 text-purple-700" @click="store.streamDeliverOutOfOrder()">Simulate OOO</button>
        </div>
     </div>

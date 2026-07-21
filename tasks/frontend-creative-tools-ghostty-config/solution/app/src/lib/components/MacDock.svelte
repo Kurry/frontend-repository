@@ -1,5 +1,6 @@
 <script lang="ts">
     import FloatingTerminal from "$lib/components/FloatingTerminal.svelte";
+    import DockTerminal from "$lib/components/chrome/DockTerminal.svelte";
     import app from "$lib/stores/state.svelte";
 
     import appIcon from "$lib/images/icon.webp";
@@ -42,7 +43,13 @@
 
         <div class="dock-separator" role="separator"></div>
 
-        <!-- Ghostty terminal preview -->
+        <!-- The dock hosts the live interactive terminal preview: it re-themes with every
+             color/font/cursor edit, and clicking into it gives a full interactive shell. -->
+        <DockTerminal />
+
+        <div class="dock-separator" role="separator"></div>
+
+        <!-- Ghostty terminal window -->
         <button
             type="button"
             class="dock-item dock-btn"
@@ -87,10 +94,9 @@
 }
 
 .dock {
-    height: var(--dock-height);
     pointer-events: all;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     gap: 16px;
     padding: 8px 14px;
     background: rgba(255, 255, 255, 0.15);
@@ -168,5 +174,16 @@
     background: rgba(255, 255, 255, 0.2);
     align-self: center;
     margin: 0 12px;
+}
+
+@media (max-width: 400px) {
+    .dock {
+        gap: 8px;
+        padding: 6px 10px;
+    }
+
+    .dock-separator {
+        margin: 0 2px;
+    }
 }
 </style>

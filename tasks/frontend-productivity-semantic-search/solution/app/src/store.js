@@ -66,7 +66,7 @@ export function rankDocuments({ documents, indexedIds, query, filters, feedback 
     const coverage = queryTerms.length ? contributions.length / queryTerms.length : 1
     const semantic = queryTerms.length ? Math.min(0.94, 0.06 + Math.log1p(raw) * 0.14 * coverage + coverage * 0.12) : 0.35
     const mark = feedback[doc.id] || 'none'
-    const adjustment = mark === 'up' ? 0.18 : mark === 'down' ? -0.18 : 0
+    const adjustment = mark === 'up' ? 0.28 : mark === 'down' ? -0.28 : 0
     const score = round(semantic + adjustment)
     const highlight = contributions.sort((a, b) => b.value - a.value)[0]?.term || queryTerms[0] || doc.tags[0]
     const sentences = doc.body.match(/[^.!?]+[.!?]+/g) || [doc.body]
@@ -92,8 +92,16 @@ export function rankDocuments({ documents, indexedIds, query, filters, feedback 
 
 const initialDocs = seedDocuments()
 const initialIndexed = initialDocs.map((doc) => doc.id)
-let indexTimer = null
+let indexTimeout = null
+let indexInterval = null
 let toastTimer = null
+
+const clearIndexTimers = () => {
+  if (indexTimeout) clearTimeout(indexTimeout)
+  if (indexInterval) clearInterval(indexInterval)
+  indexTimeout = null
+  indexInterval = null
+}
 
 const snapshot = (state) => ({
   documents: state.documents,
@@ -158,8 +166,15 @@ export const useAppStore = create((set, get) => ({
     get().runQuery(raw, { parsed: { query: item.query, filters: item.filters, invalid: [] }, threshold: item.threshold })
   },
   setThreshold: (value) => {
-    set({ threshold: Number(value), exportGeneratedAt: now() })
-    set({ liveMessage: `${get().getVisible().items.length} results` })
+    const count = rankDocuments({
+      documents: get().documents,
+      indexedIds: get().indexedIds,
+      query: get().activeQuery,
+      filters: get().filters,
+      threshold: Number(value),
+      feedback: get().feedbackByQuery[queryKey(get().activeQuery, get().filters)] || {},
+    }).items.length
+    set({ threshold: Number(value), exportGeneratedAt: now(), liveMessage: `Threshold ${Number(value).toFixed(2)} · ${count} results` })
   },
   removeFilter: (index) => {
     const state = get()
@@ -203,7 +218,11 @@ export const useAppStore = create((set, get) => ({
     get().notify('Saved search deleted')
   },
   toggleHistory: (id) => set((state) => ({ selectedHistory: state.selectedHistory.includes(id) ? state.selectedHistory.filter((x) => x !== id) : [...state.selectedHistory, id] })),
-  deleteSelectedHistory: () => set((state) => ({ history: state.history.filter((item) => !state.selectedHistory.includes(item.id)), selectedHistory: [] })),
+  deleteSelectedHistory: () => {
+    const count = get().selectedHistory.length
+    set((state) => ({ history: state.history.filter((item) => !state.selectedHistory.includes(item.id)), selectedHistory: [] }))
+    get().notify(`Deleted ${count} histor${count === 1 ? 'y entry' : 'y entries'}`)
+  },
   toggleDocument: (id) => set((state) => ({ selectedDocuments: state.selectedDocuments.includes(id) ? state.selectedDocuments.filter((x) => x !== id) : [...state.selectedDocuments, id] })),
   addDocument: (payload) => {
     get().pushUndo('Add document')
@@ -282,12 +301,23 @@ export const useAppStore = create((set, get) => ({
     get().advanceIndex()
   },
   advanceIndex: () => {
-    if (indexTimer) clearTimeout(indexTimer)
+    clearIndexTimers()
     const state = get(); const run = state.indexRun
     if (!run || run.status !== 'running') return
-    const nextIndex = run.steps.findIndex((step) => !['complete'].includes(step.status))
+    const nextIndex = run.steps.findIndex((step) => step.status !== 'complete')
     if (nextIndex < 0) {
-      set((s) => ({ indexedIds: s.documents.map((doc) => doc.id), indexBuiltAt: now(), indexRun: { ...s.indexRun, status: 'complete', current: s.indexRun.steps.length, elapsed: Date.now() - s.indexRun.startedAt, events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'complete', text: 'Index run completed' }] }, liveMessage: `Indexed ${s.documents.length} documents` }))
+      set((s) => ({
+        indexedIds: s.documents.map((doc) => doc.id),
+        indexBuiltAt: now(),
+        indexRun: {
+          ...s.indexRun,
+          status: 'complete',
+          current: s.indexRun.steps.length,
+          elapsed: Date.now() - s.indexRun.startedAt,
+          events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'complete', text: 'Index run completed' }],
+        },
+        liveMessage: `Indexed ${s.documents.length} documents`,
+      }))
       get().notify(`Indexed ${get().documents.length} documents`)
       return
     }
@@ -296,32 +326,79 @@ export const useAppStore = create((set, get) => ({
     const attempts = step.attempts + 1
     const runningSteps = run.steps.map((item, i) => i === nextIndex ? { ...item, status: 'running', attempts, startedAt: item.startedAt || now() } : item)
     set({ indexRun: { ...run, current: nextIndex, steps: runningSteps, elapsed: Date.now() - run.startedAt, events: [...run.events, { id: `event-${Date.now()}-${nextIndex}`, time: now(), status: 'running', text: `${step.title} · attempt ${attempts}` }] } })
-    indexTimer = setTimeout(() => {
+    indexTimeout = setTimeout(() => {
       const latest = get(); if (latest.indexRun?.status !== 'running') return
       const numericId = Number(step.id.replace(/\D/g, '').slice(-3) || 0)
-      const failureLimit = numericId > 0 && numericId % 94 === 0 ? 3 : numericId > 0 && numericId % 47 === 0 ? 1 : 0
-      const shouldFail = attempts <= failureLimit
-      if (shouldFail) {
-        if (attempts < 3) {
-          const wait = 2
-          set((s) => ({ indexRun: { ...s.indexRun, steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, status: 'retrying', retryIn: wait, error: 'Transient tokenizer timeout' } : item), events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'retrying', text: `${step.title} · waiting before retry ${attempts + 1} of 3` }] } }))
-          let remaining = wait
-          indexTimer = setInterval(() => {
-            remaining -= 1
-            if (remaining <= 0) { clearInterval(indexTimer); get().advanceIndex() }
-            else set((s) => ({ indexRun: { ...s.indexRun, steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, retryIn: remaining } : item) } }))
-          }, 1000)
-        } else {
-          set((s) => ({ indexRun: { ...s.indexRun, status: 'failed', steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, status: 'failed', error: 'Tokenizer timeout after 3 attempts' } : item), events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'failed', text: `${step.title} failed after 3 attempts` }] }, liveMessage: `${step.title} failed` }))
-        }
-      } else {
-        set((s) => ({ indexedIds: [...new Set([...s.indexedIds, step.id])], indexRun: { ...s.indexRun, steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, status: 'complete', completedAt: now(), error: null } : item), events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'complete', text: `${step.title} indexed` }] } }))
-        get().advanceIndex()
+      const autoRetries = numericId > 0 && numericId % 94 === 0 ? 2 : numericId > 0 && numericId % 47 === 0 ? 1 : 0
+      const needsManualRetry = numericId > 0 && numericId % 94 === 0 && attempts === 3 && !step.manualRetryUsed
+      if (autoRetries > 0 && attempts <= autoRetries) {
+        const wait = 2
+        set((s) => ({
+          indexRun: {
+            ...s.indexRun,
+            steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, status: 'retrying', retryIn: wait, error: 'Transient tokenizer timeout' } : item),
+            events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'retrying', text: `${step.title} · waiting before retry ${attempts + 1} of 3` }],
+          },
+          liveMessage: `${step.title} retrying in ${wait}s`,
+        }))
+        let remaining = wait
+        indexInterval = setInterval(() => {
+          remaining -= 1
+          if (remaining <= 0) {
+            clearIndexTimers()
+            get().advanceIndex()
+          } else {
+            set((s) => ({
+              indexRun: { ...s.indexRun, steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, retryIn: remaining } : item) },
+              liveMessage: `${step.title} retrying in ${remaining}s`,
+            }))
+          }
+        }, 1000)
+        return
       }
+      if (needsManualRetry) {
+        set((s) => ({
+          indexRun: {
+            ...s.indexRun,
+            status: 'failed',
+            steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, status: 'failed', error: 'Tokenizer timeout after 3 attempts' } : item),
+            events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'failed', text: `${step.title} failed after 3 attempts` }],
+          },
+          liveMessage: `${step.title} failed — use Retry to continue`,
+        }))
+        return
+      }
+      set((s) => ({
+        indexedIds: [...new Set([...s.indexedIds, step.id])],
+        indexRun: {
+          ...s.indexRun,
+          steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, status: 'complete', completedAt: now(), error: null, retryIn: null } : item),
+          events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'complete', text: `${step.title} indexed` }],
+        },
+      }))
+      get().advanceIndex()
     }, 28 + Math.floor(Math.random() * 34))
   },
-  pauseIndex: () => { if (get().indexRun?.status === 'running') { clearTimeout(indexTimer); set((s) => ({ indexRun: { ...s.indexRun, status: 'paused' } })) } },
-  resumeIndex: () => { if (['paused', 'failed'].includes(get().indexRun?.status)) { set((s) => ({ indexRun: { ...s.indexRun, status: 'running', steps: s.indexRun.steps.map((step, i) => i === s.indexRun.current && step.status === 'failed' ? { ...step, status: 'pending', error: null } : step) } })); get().advanceIndex() } },
+  pauseIndex: () => {
+    if (get().indexRun?.status === 'running') {
+      clearIndexTimers()
+      set((s) => ({ indexRun: { ...s.indexRun, status: 'paused' } }))
+    }
+  },
+  resumeIndex: () => {
+    if (['paused', 'failed'].includes(get().indexRun?.status)) {
+      set((s) => ({
+        indexRun: {
+          ...s.indexRun,
+          status: 'running',
+          steps: s.indexRun.steps.map((step, i) => step.status === 'failed'
+            ? { ...step, status: 'pending', error: null, attempts: 0, manualRetryUsed: true, retryIn: null }
+            : step),
+        },
+      }))
+      get().advanceIndex()
+    }
+  },
   retryStep: () => get().resumeIndex(),
 }))
 

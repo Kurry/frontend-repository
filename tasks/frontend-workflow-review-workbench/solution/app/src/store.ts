@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createSeedBundles } from './seed';
-import { deriveConstraint, deriveHero, isTrialValid, safeId } from './domain';
+import { deriveConstraint, deriveHero, deterministicRerunId, deterministicTimestamp, isTrialValid, safeId } from './domain';
 import { reviewPackageSchema, type ReviewPackage } from './schemas';
 import type {
   DiffState,
@@ -81,7 +81,7 @@ function normalizeAfterConstraintChange(bundle: ReviewBundle) {
   return null;
 }
 
-function scheduleAdvance(slug: string, gateName: GateName, delay = 650) {
+function scheduleAdvance(slug: string, gateName: GateName, delay = 1600) {
   window.setTimeout(() => useReviewStore.getState().advanceRerun(slug, gateName), delay);
 }
 
@@ -239,23 +239,27 @@ export const useReviewStore = create<StoreState>((set, get) => ({
     const existing = bundle?.reruns[gateName];
     if (existing && ['running', 'paused'].includes(existing.status)) return;
     const names = ['provision harness', 'collect trials', 'evaluate checks', 'publish result'] as const;
+    const runId = deterministicRerunId(slug, gateName);
     const session = {
       gateName,
       status: 'running' as const,
-      runId: safeId('rerun'),
+      runId,
       currentStep: 0,
-      steps: names.map((name, index) => ({ name, status: index === 0 ? 'running' as const : 'pending' as const, attempt: index === 0 ? 1 : 0, maxAttempts: 3, timestamp: null, output: null, error: null, backoff: 0 })),
+      steps: names.map((name, index) => ({ name, status: index === 0 ? 'running' as const : 'pending' as const, attempt: index === 0 ? 1 : 0, maxAttempts: 3, timestamp: null as string | null, output: null as string | null, error: null as string | null, backoff: 0 })),
     };
-    set((state) => ({ bundles: updateBundle(state.bundles, slug, (next) => {
-      next.reruns[gateName] = session;
-      next.timeline.unshift(event('re-run', `${gateName} re-run started`));
-      next.timeline.unshift(event('re-run-step', `${gateName}: provision harness running (attempt 1)`));
-    }) }));
-    scheduleAdvance(slug, gateName);
+    set((state) => ({
+      bundles: updateBundle(state.bundles, slug, (next) => {
+        next.reruns[gateName] = session;
+        next.timeline.unshift(event('re-run', `${gateName} re-run started`));
+        next.timeline.unshift(event('re-run-step', `${gateName}: provision harness running (attempt 1)`));
+      }),
+      ui: { ...state.ui, announcement: `${gateName} re-run started.` },
+    }));
+    scheduleAdvance(slug, gateName, 1800);
   },
   advanceRerun: (slug, gateName) => {
     let shouldContinue = false;
-    let delay = 1200;
+    let delay = 1800;
     let announcement = '';
     set((state) => ({ bundles: updateBundle(state.bundles, slug, (bundle) => {
       const session = bundle.reruns[gateName];
@@ -265,7 +269,8 @@ export const useReviewStore = create<StoreState>((set, get) => ({
         step.backoff -= 1;
         if (step.backoff > 0) {
           shouldContinue = true;
-          delay = 1000;
+          delay = 1100;
+          announcement = `${gateName}: waiting ${step.backoff}s before retry ${step.attempt + 1} of ${step.maxAttempts}.`;
           return;
         }
         step.attempt += 1;
@@ -273,6 +278,7 @@ export const useReviewStore = create<StoreState>((set, get) => ({
         step.error = null;
         bundle.timeline.unshift(event('re-run-step', `${gateName}: ${step.name} running (attempt ${step.attempt})`));
         shouldContinue = true;
+        announcement = `${gateName}: ${step.name} retry ${step.attempt} of ${step.maxAttempts}.`;
         return;
       }
       if (step.status !== 'running') return;
@@ -289,15 +295,16 @@ export const useReviewStore = create<StoreState>((set, get) => ({
           return;
         }
         step.status = 'waiting';
-        step.backoff = 2;
+        step.backoff = 3;
         bundle.timeline.unshift(event('re-run-step', `${gateName}: ${step.name} waiting before retry ${step.attempt + 1} of ${step.maxAttempts}`));
         shouldContinue = true;
-        delay = 1000;
+        delay = 1100;
+        announcement = `${gateName}: waiting ${step.backoff}s before retry ${step.attempt + 1} of ${step.maxAttempts}.`;
         return;
       }
       step.status = 'complete';
-      step.timestamp = new Date().toISOString();
-      step.output = `${step.name} completed with checkpoint ${session.runId.slice(-6)}.`;
+      step.timestamp = deterministicTimestamp(slug, gateName, session.currentStep);
+      step.output = `${step.name} completed with checkpoint ${session.runId.slice(-12)}.`;
       bundle.timeline.unshift(event('re-run-step', `${gateName}: ${step.name} complete`));
       if (session.currentStep < session.steps.length - 1) {
         session.currentStep += 1;
@@ -311,28 +318,38 @@ export const useReviewStore = create<StoreState>((set, get) => ({
       session.status = 'complete';
       const gate = bundle.gates.find((item) => item.name === gateName)!;
       const oldStatus = gate.status;
-      const rerunCount = bundle.timeline.filter((entry) => entry.kind === 'gate-status' && entry.label.startsWith(gateName)).length;
+      const emberQuartz = bundle.slug === 'ember-relay-router' && gateName === 'Difficulty — Quartz-Mini';
       if (gateName.startsWith('Difficulty')) {
         const model = gateName.endsWith('Sable-4') ? 'Sable-4' : 'Quartz-Mini';
         const modelTrials = bundle.trials.filter((trial) => trial.model === model);
-        const invalid = modelTrials.find((trial) => !isTrialValid(trial));
-        if (invalid && !(bundle.slug === 'ember-relay-router' && model === 'Quartz-Mini')) {
-          invalid.checks.forEach((check) => {
-            if (['answer-determinacy', 'refusals', 'low-timeout'].includes(check.name)) check.outcome = 'pass';
-          });
+        if (!emberQuartz) {
+          const invalid = modelTrials.find((trial) => !isTrialValid(trial));
+          if (invalid) {
+            invalid.checks.forEach((check) => {
+              if (['answer-determinacy', 'refusals', 'low-timeout'].includes(check.name)) check.outcome = 'pass';
+            });
+          }
+          gate.validTrials = modelTrials.filter(isTrialValid).length;
+          gate.totalTrials = modelTrials.length;
+          gate.score = 0.83;
+          gate.status = gate.validTrials >= 3 && (gate.score ?? 0) >= 0.8 ? 'pass' : gate.validTrials < 3 ? 'inconclusive' : 'fail';
+          gate.summary = `${model} now measures ${gate.score.toFixed(2)} with ${gate.validTrials} of ${gate.totalTrials} valid trials.`;
+        } else {
+          // Spec: completed Quartz-Mini re-run gathers additional trial evidence but leaves inconclusive (< 3 valid).
+          gate.validTrials = 2;
+          gate.totalTrials = modelTrials.length;
+          gate.score = 0.78;
+          gate.status = 'inconclusive';
+          gate.summary = `Quartz-Mini re-collected trials; still only 2 of ${gate.totalTrials} are valid (score ${gate.score.toFixed(2)}), so the gate remains inconclusive.`;
+          gate.reasons = ['At least three valid trials are required.', 'Re-run gathered additional evidence but validity stayed below the bar.'];
         }
-        gate.validTrials = modelTrials.filter(isTrialValid).length;
-        gate.totalTrials = modelTrials.length;
-        if (bundle.slug === 'ember-relay-router' && model === 'Quartz-Mini') { gate.score = 0.78; } else { gate.score = Math.min(0.94, 0.83 + rerunCount * 0.01); }
-        gate.status = gate.validTrials >= 3 && gate.score >= 0.8 ? 'pass' : gate.validTrials < 3 ? 'inconclusive' : 'fail';
-        gate.summary = `${model} now measures ${gate.score.toFixed(2)} with ${gate.validTrials} of ${gate.totalTrials} valid trials.`;
       } else if (gateName === 'Oracle') {
-        gate.score = 0.92 + rerunCount * 0.01;
+        gate.score = 0.92;
         gate.status = 'pass';
         gate.summary = `Oracle comprehensiveness now measures ${gate.score.toFixed(2)}, above the 0.90 bar.`;
       } else {
         gate.status = 'pass';
-        gate.summary = `${gateName} passed after fresh evidence was published from run ${session.runId.slice(-6)}.`;
+        gate.summary = `${gateName} passed after fresh evidence was published from run ${session.runId.slice(-12)}.`;
       }
       bundle.timeline.unshift(event('gate-status', `${gateName} changed from ${oldStatus} to ${gate.status}`));
       normalizeAfterConstraintChange(bundle);

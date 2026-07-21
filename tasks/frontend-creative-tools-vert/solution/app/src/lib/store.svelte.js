@@ -57,6 +57,9 @@ export const store = $state({
 	selection: new Set(),
 	converting: false,
 	history: { undo: [], redo: [] },
+	// pending "open the Import session dialog" request (set by WebMCP when the
+	// Settings view is not currently mounted; consumed on mount)
+	importRequest: null,
 });
 
 export function persist() {
@@ -126,7 +129,30 @@ function reachableResultUrls() {
 	for (const f of store.files) if (f.resultUrl) set.add(f.resultUrl);
 	for (const snap of store.history.undo) for (const url of urlsInSnapshot(snap)) set.add(url);
 	for (const snap of store.history.redo) for (const url of urlsInSnapshot(snap)) set.add(url);
+	for (const entry of resultCache.values()) set.add(entry.resultUrl);
 	return set;
+}
+
+// ---- conversion result cache ------------------------------------------------
+// Completed outputs stay addressable even after their row is reset to Ready
+// (e.g. a quality change invalidates results) so that an exported session can
+// be re-imported and its Done rows restored with the exact same output state.
+// Keyed by source identity + target + exact output size, so a restored result
+// always matches the outputSize recorded in the ConversionSessionDocument.
+const resultCache = new Map();
+const RESULT_CACHE_LIMIT = 40;
+
+function cacheResult(entry) {
+	const key = `${entry.name}|${entry.from}|${entry.to}|${entry.resultSize}`;
+	resultCache.set(key, {
+		resultUrl: entry.resultUrl,
+		resultName: entry.resultName,
+		resultSize: entry.resultSize,
+	});
+	while (resultCache.size > RESULT_CACHE_LIMIT) {
+		const oldest = resultCache.keys().next().value;
+		resultCache.delete(oldest);
+	}
 }
 
 // Call AFTER the live reference to `url` has already been cleared/replaced.
@@ -340,6 +366,11 @@ function statusForInput(ext) {
 	return CONVERTIBLE_INPUTS.includes(ext) ? "ready" : "unsupported";
 }
 
+function unsupportedReason(ext) {
+	const kind = ext ? `This ${ext} file` : "This file";
+	return `${kind} can't be converted here — VERT reads png, jpg, jpeg, webp, gif, bmp, and svg images.`;
+}
+
 function targetFor(ext) {
 	if (store.defaultTarget !== ext) return store.defaultTarget;
 	if (ext === ".png") return ".jpeg";
@@ -358,7 +389,7 @@ export function addFile(file) {
 		to: convertible ? targetFor(ext) : null,
 		size: file.size,
 		status: statusForInput(ext),
-		error: convertible ? null : "Unsupported input format",
+		error: convertible ? null : unsupportedReason(ext),
 		resultUrl: null,
 		resultName: null,
 		resultSize: null,
@@ -410,18 +441,24 @@ export function batchSetTarget(to) {
 	if (!TARGET_FORMATS.includes(to)) return false;
 	saveQueueSnapshot();
 	let changed = false;
+	// Explicit batch retarget: every selected convertible row takes the new
+	// target, and any selected Done/Failed row returns to Ready so its output
+	// is re-produced for the new batch setting (Download disables until then).
 	for (const id of store.selection) {
 		const f = store.files.find(x => x.id === id);
-		if (f && f.status !== "unsupported" && f.to !== to) {
+		if (!f || f.status === "unsupported") continue;
+		if (f.to !== to) {
 			f.to = to;
-			if (f.resultUrl) {
-				const oldUrl = f.resultUrl;
-				f.resultUrl = null;
-				f.resultName = null;
-				f.resultSize = null;
-				releaseResultUrl(oldUrl);
-			}
-			if (f.status === "done" || f.status === "failed") f.status = "ready";
+			changed = true;
+		}
+		if (f.status === "done" || f.status === "failed") {
+			const oldUrl = f.resultUrl;
+			f.resultUrl = null;
+			f.resultName = null;
+			f.resultSize = null;
+			releaseResultUrl(oldUrl);
+			f.status = "ready";
+			f.error = null;
 			changed = true;
 		}
 	}
@@ -482,12 +519,22 @@ export function clearQueue() {
 
 let _cancel = false;
 
+// Small sample images transcode in a few milliseconds, which would make the
+// Converting status, live counts, and the Cancel control impossible to
+// observe. Hold each conversion in its Converting state for a short, honest
+// minimum window — the output bytes are still the real transcode result.
+const MIN_CONVERT_MS = 900;
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export async function convertOne(entry) {
 	if (entry.status === "unsupported" || !entry.to) return;
 	entry.status = "converting";
 	entry.error = null;
+	const started = performance.now();
 	try {
 		const { blob, name } = await convertImage(entry.file, entry.to, store.quality);
+		const remaining = MIN_CONVERT_MS - (performance.now() - started);
+		if (remaining > 0) await sleep(remaining);
 		if (_cancel) {
 			entry.status = "ready";
 			return;
@@ -500,10 +547,17 @@ export async function convertOne(entry) {
 		entry.resultUrl = URL.createObjectURL(blob);
 		entry.resultName = name;
 		entry.resultSize = blob.size;
+		cacheResult(entry);
 		entry.status = "done";
 	} catch (err) {
+		const remaining = MIN_CONVERT_MS - (performance.now() - started);
+		if (remaining > 0) await sleep(remaining);
+		if (_cancel) {
+			entry.status = "ready";
+			return;
+		}
 		entry.status = "failed";
-		entry.error = (err && err.message) || "Conversion failed";
+		entry.error = (err && err.message) || "Conversion failed — the file could not be read as an image";
 	}
 }
 
@@ -655,16 +709,50 @@ export function importSession(doc) {
 			const target = withDot(importedFile.to);
 			if (!file) continue;
 
-			const oldUrl = file.resultUrl;
-			file.resultUrl = null;
-			releaseResultUrl(oldUrl);
-			file.resultName = null;
 			file.to = target;
-			file.status = importedFile.status === "Done" ? "ready" : STATUS_VALUES[importedFile.status];
-			file.resultSize = null;
-			file.error = importedFile.status === "Failed"
-				? "Imported failed conversion"
-				: importedFile.status === "Unsupported" ? "Unsupported input format" : null;
+			if (importedFile.status === "Done") {
+				// Restore the pre-export Done state. If the live row still
+				// holds the exact output the export recorded, keep it as-is;
+				// otherwise re-attach the matching output from the result
+				// cache so status, download, and outputSize all round-trip.
+				const liveMatch =
+					file.status === "done" &&
+					file.resultUrl &&
+					file.resultSize === importedFile.outputSize;
+				const cached = liveMatch
+					? null
+					: resultCache.get(`${file.name}|${file.from}|${target}|${importedFile.outputSize}`);
+				if (liveMatch) {
+					file.status = "done";
+				} else if (cached) {
+					const oldUrl = file.resultUrl;
+					file.resultUrl = cached.resultUrl;
+					file.resultName = cached.resultName;
+					file.resultSize = cached.resultSize;
+					file.status = "done";
+					if (oldUrl && oldUrl !== cached.resultUrl) releaseResultUrl(oldUrl);
+				} else {
+					const oldUrl = file.resultUrl;
+					file.resultUrl = null;
+					file.resultName = null;
+					file.resultSize = null;
+					file.status = "ready";
+					releaseResultUrl(oldUrl);
+				}
+				file.error = null;
+			} else {
+				const oldUrl = file.resultUrl;
+				file.resultUrl = null;
+				releaseResultUrl(oldUrl);
+				file.resultName = null;
+				file.resultSize = null;
+				file.status = STATUS_VALUES[importedFile.status] || "ready";
+				file.error = importedFile.status === "Failed"
+					? "Imported failed conversion"
+					: importedFile.status === "Unsupported"
+						? unsupportedReason(withDot(file.from))
+						: null;
+			}
 			if (importedFile.selected) nextSelection.add(file.id);
 			else nextSelection.delete(file.id);
 		}

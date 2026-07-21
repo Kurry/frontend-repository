@@ -2,21 +2,23 @@
   <div class="collab-wrap">
     <h2 class="collab-title">Collaboration scenario</h2>
     <p class="collab-desc">
-      Simulate two users editing a shared caption offline and merging their changes.
-      Changes are tracked by Yjs CRDT — both authors' edits converge without data loss.
+      Co-edit the shared caption with a simulated peer. Go offline to queue changes from both
+      authors by stable operation identity, then go online to merge: non-conflicting edits from
+      either author converge in any delivery order, and a true conflict asks you to choose
+      instead of silently overwriting.
     </p>
 
     <!-- Connection controls -->
     <div class="conn-bar">
-      <button class="pill-btn" :class="{ secondary: isOnline }" @click="toggleOnline">
-        {{ isOnline ? '🔴 Go offline' : '🟢 Go online' }}
+      <button type="button" class="pill-btn conn-btn" :class="{ secondary: isOnline }" @click="toggleOnline">
+        <span aria-hidden="true">{{ isOnline ? '🔴' : '🟢' }}</span> {{ isOnline ? 'Go offline' : 'Go online' }}
       </button>
       <span class="conn-status" :class="isOnline ? 'online' : 'offline'" role="status" aria-live="polite">
-        {{ isOnline ? 'Online — changes sync immediately' : 'Offline — changes queued locally' }}
+        {{ isOnline ? 'Online — changes sync immediately' : `Offline — ${pendingOps.length} change(s) queued` }}
       </span>
     </div>
 
-    <!-- Shared editor -->
+    <!-- Editors -->
     <div class="editors-row">
       <div class="editor-col">
         <label class="editor-label" for="shared-editor">Shared editor (you)</label>
@@ -24,10 +26,11 @@
           id="shared-editor"
           class="shared-editor"
           v-model="localText"
-          @input="onLocalInput"
-          placeholder="Type your caption here…"
           rows="4"
+          placeholder="Type your caption here…"
           aria-label="Shared editor"
+          :disabled="!!conflict"
+          @input="onLocalInput"
         />
       </div>
       <div class="editor-col">
@@ -36,13 +39,14 @@
           id="peer-editor"
           class="shared-editor peer"
           v-model="peerText"
-          @input="onPeerInput"
-          placeholder="Peer types here (simulated)…"
           rows="4"
+          placeholder="Peer types here (simulated)…"
           aria-label="Peer editor"
+          :disabled="!!conflict"
+          @input="onPeerInput"
         />
-        <button class="pill-btn ghost" style="margin-top:8px;font-size:12px;" @click="simulatePeerEdit">
-          Simulate peer edit
+        <button type="button" class="pill-btn ghost peer-btn" :disabled="!!conflict" @click="simulatePeerEdit">
+          <span aria-hidden="true">🤖</span> Simulate peer edit
         </button>
       </div>
     </div>
@@ -51,28 +55,32 @@
     <div v-if="!isOnline && pendingOps.length > 0" class="queue-box" role="status" aria-live="polite">
       <div class="queue-title">Queued operations ({{ pendingOps.length }})</div>
       <div v-for="op in pendingOps" :key="op.id" class="queue-item">
-        <span class="queue-author">{{ op.author }}</span>: "{{ op.preview }}"
+        <span class="queue-id">{{ op.id }}</span>
+        <span class="queue-author">{{ op.author }}</span>: “{{ op.preview }}”
       </div>
     </div>
 
-    <!-- Conflict UI -->
-    <div v-if="conflict" class="conflict-box">
-      <div class="conflict-title">⚠ Merge conflict detected</div>
+    <!-- Conflict resolution -->
+    <div v-if="conflict" class="conflict-box" role="dialog" aria-labelledby="conflict-title">
+      <h3 id="conflict-title" class="conflict-title">⚠️ Merge conflict detected</h3>
+      <p class="conflict-desc">
+        Both authors changed the same part of the caption while offline. Choose how to resolve it:
+      </p>
       <div class="conflict-options">
         <div class="conflict-choice">
-          <div class="conflict-label">Keep your version:</div>
-          <div class="conflict-text">{{ conflict.local }}</div>
-          <button class="pill-btn" @click="resolveConflict('local')">Use mine</button>
+          <div class="conflict-label">Keep your version</div>
+          <div class="conflict-text">{{ conflict.mine }}</div>
+          <button type="button" class="pill-btn conflict-btn" @click="resolveConflict('mine')">Use mine</button>
         </div>
         <div class="conflict-choice">
-          <div class="conflict-label">Keep peer version:</div>
-          <div class="conflict-text">{{ conflict.peer }}</div>
-          <button class="pill-btn secondary" @click="resolveConflict('peer')">Use theirs</button>
+          <div class="conflict-label">Keep peer version</div>
+          <div class="conflict-text">{{ conflict.theirs }}</div>
+          <button type="button" class="pill-btn secondary conflict-btn" @click="resolveConflict('theirs')">Use theirs</button>
         </div>
         <div class="conflict-choice">
-          <div class="conflict-label">Merge both:</div>
+          <div class="conflict-label">Keep both changes</div>
           <div class="conflict-text">{{ conflict.merged }}</div>
-          <button class="pill-btn ghost" @click="resolveConflict('merged')">Merge</button>
+          <button type="button" class="pill-btn ghost conflict-btn" @click="resolveConflict('merged')">Merge</button>
         </div>
       </div>
     </div>
@@ -80,261 +88,359 @@
     <!-- Converged result -->
     <div class="result-box" role="status" aria-live="polite">
       <div class="result-label">Shared content</div>
-      <div class="result-text">{{ sharedContent }}</div>
-      <button class="pill-btn" style="margin-top:12px;" @click="applyToCanvas">Apply to canvas</button>
+      <div class="result-text" data-testid="shared-content">{{ sharedContent || '—' }}</div>
+      <button type="button" class="pill-btn apply-btn" @click="applyToCanvas">
+        <span aria-hidden="true">🖼️</span> Apply to canvas
+      </button>
     </div>
 
     <!-- Operation log -->
     <div class="log-box" aria-live="polite">
       <div class="log-title">Operation log</div>
       <div v-if="opLog.length === 0" class="log-empty">No operations yet</div>
-      <div v-for="entry in opLog.slice().reverse()" :key="entry.id" class="log-entry">
+      <div v-for="entry in opLogReversed" :key="entry.id" class="log-entry">
         <span class="log-time">{{ entry.time }}</span>
-        <span :class="'log-author-' + entry.author.toLowerCase().split(' ')[0]">{{ entry.author }}</span>:
-        {{ entry.message }}
+        <span :class="'log-author-' + entry.kind">{{ entry.author }}</span>: {{ entry.message }}
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import * as Y from 'yjs'
 import { useCanvasStore } from '../stores/canvas'
+import { useAnnouncer } from '../stores/announcer'
 
 const canvasStore = useCanvasStore()
+const announcer = useAnnouncer()
 
-// Yjs documents for two simulated peers
-const localDoc = new Y.Doc()
-const peerDoc = new Y.Doc()
+// The converged caption lives in a Yjs text; queued offline operations are
+// applied to it through Yjs transactions on reconnect.
+const doc = new Y.Doc()
+const sharedYText = doc.getText('shared')
 
-const localYText = localDoc.getText('caption')
-const peerYText = peerDoc.getText('caption')
+interface QueuedOp {
+  id: string           // stable operation identity — re-delivery is a no-op
+  author: 'You' | 'Peer'
+  base: string         // shared content when this offline session started
+  value: string        // this author's draft at queue time
+  preview: string
+}
 
-function loadCollabState() {
+interface ConflictRegion { start: number; end: number; insert: string }
+interface ConflictState {
+  mine: string
+  theirs: string
+  merged: string
+  resolve: (choice: 'mine' | 'theirs' | 'merged') => void
+}
+
+function loadShared(): string {
   try {
-    const saved = window.localStorage.getItem('ff_collab_state')
-    if (saved) return JSON.parse(saved) as { localText: string; peerText: string; sharedContent: string }
-  } catch {}
-  return { localText: '', peerText: '', sharedContent: '' }
+    return window.localStorage.getItem('ff_collab_shared') ?? ''
+  } catch { return '' }
+}
+function persistShared(value: string) {
+  try { window.localStorage.setItem('ff_collab_shared', value) } catch {}
 }
 
-const savedState = loadCollabState()
-const restoredText = savedState.sharedContent || savedState.localText || savedState.peerText
-if (restoredText) {
-  localYText.insert(0, restoredText)
-  peerYText.insert(0, restoredText)
-}
+const restored = loadShared()
+if (restored) sharedYText.insert(0, restored)
 
 const isOnline = ref(true)
-const localText = ref(restoredText)
-const peerText = ref(restoredText)
-const pendingOps = ref<{ id: string; author: string; update: Uint8Array; preview: string }[]>([])
-const opLog = ref<{ id: string; time: string; author: string; message: string }[]>([])
-const conflict = ref<{ local: string; peer: string; merged: string } | null>(null)
+const sharedContent = ref(restored)
+const localText = ref(restored)
+const peerText = ref(restored)
+const pendingOps = ref<QueuedOp[]>([])
+const conflict = ref<ConflictState | null>(null)
+const opLog = ref<{ id: string; time: string; author: string; kind: string; message: string }[]>([])
+const appliedOpIds = new Set<string>()
+let opSeq = 0
+let offlineBase = restored
 
-const sharedContent = ref(restoredText)
-let offlineBase = restoredText
-
-watch([localText, peerText, sharedContent], () => {
-  try {
-    window.localStorage.setItem('ff_collab_state', JSON.stringify({
-      localText: localText.value,
-      peerText: peerText.value,
-      sharedContent: sharedContent.value,
-    }))
-  } catch {}
-})
+const opLogReversed = computed(() => opLog.value.slice().reverse())
 
 function timestamp() {
   const now = new Date()
-  return `${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}:${now.getSeconds().toString().padStart(2,'0')}`
+  return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`
 }
 
-function addLog(author: string, message: string) {
-  opLog.value.push({ id: crypto.randomUUID(), time: timestamp(), author, message })
-  if (opLog.value.length > 50) opLog.value = opLog.value.slice(-50)
+function addLog(author: string, kind: string, message: string) {
+  opLog.value.push({ id: `log-${++opSeq}`, time: timestamp(), author, kind, message })
+  if (opLog.value.length > 60) opLog.value = opLog.value.slice(-60)
 }
 
-function syncPeerToLocal() {
-  const update = Y.encodeStateAsUpdate(peerDoc)
-  Y.applyUpdate(localDoc, update)
-}
-function syncLocalToPeer() {
-  const update = Y.encodeStateAsUpdate(localDoc)
-  Y.applyUpdate(peerDoc, update)
-}
-
-function replaceText(target: Y.Text, value: string) {
-  target.delete(0, target.length)
-  target.insert(0, value)
+function setShared(value: string) {
+  doc.transact(() => {
+    sharedYText.delete(0, sharedYText.length)
+    sharedYText.insert(0, value)
+  })
+  sharedContent.value = sharedYText.toString()
+  persistShared(sharedContent.value)
 }
 
-function reconnectQueuedChanges() {
-  const localVal = localText.value
-  const peerVal = peerText.value
+// ---- diff helpers ----------------------------------------------------------
 
-  if (localVal && peerVal && localVal === peerVal) {
-    conflict.value = {
-      local: localVal,
-      peer: peerVal,
-      merged: localVal,
+function diffRegion(base: string, next: string): ConflictRegion {
+  let start = 0
+  while (start < base.length && start < next.length && base[start] === next[start]) start++
+  let endB = base.length
+  let endN = next.length
+  while (endB > start && endN > start && base[endB - 1] === next[endN - 1]) { endB--; endN-- }
+  return { start, end: endB, insert: next.slice(start, endN) }
+}
+
+function applyRegion(content: string, region: ConflictRegion): string {
+  const start = Math.min(region.start, content.length)
+  const end = Math.min(region.end, content.length)
+  return content.slice(0, start) + region.insert + content.slice(end)
+}
+
+function regionsOverlap(a: ConflictRegion, b: ConflictRegion): boolean {
+  // Two different inserts at the exact same spot are genuinely ambiguous
+  // (both authors wrote different text in the same place) → conflict.
+  const aIsInsert = a.end <= a.start
+  const bIsInsert = b.end <= b.start
+  if (aIsInsert && bIsInsert) {
+    return a.start === b.start && a.insert !== b.insert
+  }
+  // An insert that lands inside — or exactly on a boundary of — a replace/delete
+  // span is genuinely ambiguous (is the new text inside the edited span or just
+  // outside it?), so surface a conflict instead of silently auto-merging. The
+  // strict `<` interval test below would miss the shared-boundary case.
+  if (aIsInsert) return a.start >= b.start && a.start <= b.end
+  if (bIsInsert) return b.start >= a.start && b.start <= a.end
+  return a.start < b.end && b.start < a.end
+}
+
+/**
+ * Apply several edit regions to a string in canonical order (position, then
+ * text) with index shifting — deterministic regardless of delivery order.
+ * Adjacent word inserts get a space so merged text reads naturally.
+ */
+function applyRegions(content: string, regions: ConflictRegion[]): string {
+  const sorted = regions.slice().sort((a, b) => a.start - b.start || a.insert.localeCompare(b.insert))
+  let out = content
+  let shift = 0
+  let prevEnd = -1
+  let prevInsert = ''
+  let prevIsInsert = false
+  for (const r of sorted) {
+    let ins = r.insert
+    const start = Math.min(r.start + shift, out.length)
+    const end = Math.min(r.end + shift, out.length)
+    const isInsert = r.end <= r.start
+    // A readable space only joins two adjacent word inserts — never an insert
+    // abutting a replace/delete, which would inject a spurious character.
+    if (prevIsInsert && isInsert && prevInsert && ins && start === prevEnd && !/\s$/.test(prevInsert) && !/^\s/.test(ins)) {
+      ins = ' ' + ins
     }
-    addLog('System', 'Conflict detected — user resolution required')
-    return
+    out = out.slice(0, start) + ins + out.slice(end)
+    shift += ins.length - (r.end - r.start)
+    prevEnd = start + ins.length
+    prevInsert = ins
+    prevIsInsert = isInsert
   }
-
-  const mergeBase = offlineBase && (localVal.startsWith(offlineBase) || peerVal.startsWith(offlineBase))
-    ? offlineBase
-    : ''
-  const localDelta = mergeBase && localVal.startsWith(mergeBase)
-    ? localVal.slice(mergeBase.length)
-    : localVal
-  const peerDelta = mergeBase && peerVal.startsWith(mergeBase)
-    ? peerVal.slice(mergeBase.length)
-    : peerVal
-  const merged = mergeBase
-    ? mergeBase + localDelta + peerDelta
-    : localDelta + peerDelta
-
-  localDoc.transact(() => replaceText(localYText, merged))
-  peerDoc.transact(() => replaceText(peerYText, merged))
-  localText.value = merged
-  peerText.value = merged
-  sharedContent.value = merged
-  conflict.value = null
-  addLog('System', `Converged: "${merged.slice(0,40)}"`)
+  return out
 }
 
-function mergeAndResolve() {
-  const localVal = localYText.toString()
-  const peerVal = peerYText.toString()
-
-  if (localVal === peerVal) {
-    sharedContent.value = localVal
-    conflict.value = null
-    addLog('System', `Converged: "${localVal.slice(0,40)}"`)
-    return
+/**
+ * Both authors can converge on the exact same edit (same span, same text);
+ * `regionsOverlap` correctly treats that as non-conflicting, but applying it
+ * twice would duplicate the text. Collapse identical regions into one.
+ */
+function dedupeRegions(regions: ConflictRegion[]): ConflictRegion[] {
+  const out: ConflictRegion[] = []
+  for (const r of regions) {
+    if (!out.some(o => o.start === r.start && o.end === r.end && o.insert === r.insert)) {
+      out.push(r)
+    }
   }
-
-  // Check for non-trivial conflict (both changed from a common base)
-  if (localVal && peerVal && localVal !== peerVal) {
-    const merged = localVal + ' | ' + peerVal
-    conflict.value = { local: localVal, peer: peerVal, merged }
-    addLog('System', 'Conflict detected — user resolution required')
-    return
-  }
-
-  // One side is empty or they match
-  sharedContent.value = localVal || peerVal
-  conflict.value = null
+  return out
 }
 
-function resolveConflict(choice: 'local' | 'peer' | 'merged') {
-  if (!conflict.value) return
-  const chosen = conflict.value[choice]
+// ---- online path -----------------------------------------------------------
 
-  // Apply chosen value to both docs
-  localDoc.transact(() => { localYText.delete(0, localYText.length); localYText.insert(0, chosen) })
-  peerDoc.transact(() => { peerYText.delete(0, peerYText.length); peerYText.insert(0, chosen) })
-
-  localText.value = chosen
-  peerText.value = chosen
-  sharedContent.value = chosen
-  conflict.value = null
-  addLog('System', `Conflict resolved (${choice}): "${chosen.slice(0,40)}"`)
+function applyAuthorChange(author: 'You' | 'Peer', draft: string) {
+  if (draft === sharedContent.value) return
+  setShared(draft)
+  localText.value = draft
+  peerText.value = draft
+  addLog(author, author === 'You' ? 'you' : 'peer', `Edited shared caption → “${draft.slice(0, 40)}${draft.length > 40 ? '…' : ''}”`)
 }
 
 function onLocalInput() {
-  const val = localText.value
-  localDoc.transact(() => {
-    localYText.delete(0, localYText.length)
-    localYText.insert(0, val)
-  })
-
+  // Resolve the open conflict first — live edits would race the frozen choices.
+  if (conflict.value) return
   if (isOnline.value) {
-    syncLocalToPeer()
-    peerText.value = peerYText.toString()
-    mergeAndResolve()
-    addLog('You', `Typed: "${val.slice(0,30)}"`)
+    applyAuthorChange('You', localText.value)
   } else {
-    const update = Y.encodeStateAsUpdate(localDoc)
-    pendingOps.value.push({
-      id: crypto.randomUUID(),
-      author: 'You',
-      update,
-      preview: val.slice(0, 30),
-    })
-    addLog('You (offline)', `Queued: "${val.slice(0,30)}"`)
+    queueOp('You', localText.value)
   }
 }
 
 function onPeerInput() {
-  const val = peerText.value
-  peerDoc.transact(() => {
-    peerYText.delete(0, peerYText.length)
-    peerYText.insert(0, val)
-  })
-
+  if (conflict.value) return
   if (isOnline.value) {
-    syncPeerToLocal()
-    localText.value = localYText.toString()
-    mergeAndResolve()
-    addLog('Peer', `Typed: "${val.slice(0,30)}"`)
+    applyAuthorChange('Peer', peerText.value)
   } else {
-    const update = Y.encodeStateAsUpdate(peerDoc)
-    pendingOps.value.push({
-      id: crypto.randomUUID(),
-      author: 'Peer',
-      update,
-      preview: val.slice(0, 30),
-    })
-    addLog('Peer (offline)', `Queued: "${val.slice(0,30)}"`)
+    queueOp('Peer', peerText.value)
+  }
+}
+
+// ---- offline queue ----------------------------------------------------------
+
+function queueOp(author: 'You' | 'Peer', draft: string) {
+  // One op per author per offline session: re-queueing updates the same
+  // stable identity rather than stacking duplicates.
+  const existing = pendingOps.value.find(o => o.author === author)
+  if (existing) {
+    existing.value = draft
+    existing.preview = draft.slice(0, 40)
+    addLog(author, author === 'You' ? 'you' : 'peer', `Queued update ${existing.id}: “${existing.preview}”`)
+  } else {
+    const opId = `${author.toLowerCase()}-${++opSeq}`
+    pendingOps.value.push({ id: opId, author, base: offlineBase, value: draft, preview: draft.slice(0, 40) })
+    addLog(author, author === 'You' ? 'you' : 'peer', `Queued ${opId}: “${draft.slice(0, 40)}”`)
+  }
+}
+
+// ---- reconnect merge ---------------------------------------------------------
+
+function reconnect() {
+  const ops = pendingOps.value.filter(op => !appliedOpIds.has(op.id))
+  let content = sharedContent.value
+
+  const yours = ops.filter(o => o.author === 'You')
+  const theirs = ops.filter(o => o.author === 'Peer')
+
+  // Collapse each author's queued ops into one effective edit against the base.
+  const effective = (list: QueuedOp[]): { region: ConflictRegion; value: string } | null => {
+    if (list.length === 0) return null
+    const first = list[0]
+    const last = list[list.length - 1]
+    return { region: diffRegion(first.base, last.value), value: last.value }
+  }
+  const mine = effective(yours)
+  const their = effective(theirs)
+
+  const finish = (final: string, note: string) => {
+    setShared(final)
+    localText.value = final
+    peerText.value = final
+    for (const op of ops) appliedOpIds.add(op.id)
+    // Drop exactly the ops we applied; anything queued after this reconnect
+    // started (e.g. mid-conflict) stays in the queue instead of being lost.
+    pendingOps.value = pendingOps.value.filter(op => !appliedOpIds.has(op.id))
+    addLog('System', 'system', note)
+    announcer.announce(note)
+  }
+
+  if (mine && their && regionsOverlap(mine.region, their.region)) {
+    // Genuine conflict: surface the explicit choice instead of overwriting.
+    const mineOnly = applyRegion(content, mine.region)
+    const theirsOnly = applyRegion(content, their.region)
+    // Merge keeps both edits, canonically ordered (same result in either
+    // delivery order) with a readable join between adjacent inserts.
+    const merged = applyRegions(content, [mine.region, their.region])
+    conflict.value = {
+      mine: mineOnly,
+      theirs: theirsOnly,
+      merged,
+      resolve: choice => {
+        const chosen = choice === 'mine' ? mineOnly : choice === 'theirs' ? theirsOnly : merged
+        finish(chosen, `Conflict resolved (${choice === 'mine' ? 'use mine' : choice === 'theirs' ? 'use theirs' : 'merged'}): “${chosen.slice(0, 40)}”`)
+        conflict.value = null
+      },
+    }
+    // Leave the queued ops in place (unmarked) until the user resolves: the
+    // resolve callback's finish() marks them applied and clears the queue. That
+    // way going offline before choosing doesn't silently discard the edits — the
+    // conflict stays visible and a later reconnect re-detects it.
+    addLog('System', 'system', 'Conflict detected — choose Use mine, Use theirs, or Merge')
+    announcer.announce('Merge conflict detected — choose Use mine, Use theirs, or Merge.')
+    return
+  }
+
+  // Non-conflicting: apply in canonical order (position, then author) so either
+  // delivery order converges to the same content. Re-delivery of an already
+  // applied operation identity is a no-op. Identical edits from both authors are
+  // collapsed so the same change is applied once, not duplicated.
+  const regions = dedupeRegions([
+    ...(mine ? [mine.region] : []),
+    ...(their ? [their.region] : []),
+  ])
+
+  if (regions.length > 0) {
+    content = applyRegions(content, regions)
+    finish(content, `Converged ${regions.length} queued change(s): “${content.slice(0, 40)}${content.length > 40 ? '…' : ''}”`)
+  } else {
+    pendingOps.value = []
+    addLog('System', 'system', 'No pending changes to apply')
+  }
+}
+
+function resolveConflict(choice: 'mine' | 'theirs' | 'merged') {
+  conflict.value?.resolve(choice)
+}
+
+function toggleOnline() {
+  isOnline.value = !isOnline.value
+  if (isOnline.value) {
+    addLog('System', 'system', `Going online — delivering ${pendingOps.value.length} queued operation(s)`)
+    reconnect()
+  } else {
+    offlineBase = sharedContent.value
+    // Don't clear an unresolved merge conflict: the user must still choose a
+    // resolution, and dropping it here would discard the queued edits silently.
+    addLog('System', 'system', 'Went offline — edits will be queued by stable operation identity')
+    announcer.announce('Offline — edits will be queued.')
   }
 }
 
 const peerPhrases = [
-  'Check out this feature!',
-  'Amazing screenshot 🚀',
-  'Built with FrameFlick',
-  'Design made simple',
-  'Share your creations',
+  'Shot on FrameFlick ✨',
+  'Shipping this look today',
+  'Made with one click',
+  'Design, dressed up',
+  'From screenshot to shareable',
 ]
 let peerPhraseIdx = 0
 
 function simulatePeerEdit() {
+  if (conflict.value) return
   const phrase = peerPhrases[peerPhraseIdx % peerPhrases.length]
   peerPhraseIdx++
   peerText.value = phrase
   onPeerInput()
 }
 
-function toggleOnline() {
-  isOnline.value = !isOnline.value
-  if (isOnline.value) {
-    addLog('System', `Going online — applying ${pendingOps.value.length} queued op(s)`)
-    pendingOps.value = []
-    reconnectQueuedChanges()
-    addLog('System', 'Sync complete')
-  } else {
-    offlineBase = sharedContent.value || localText.value || peerText.value
-    addLog('System', 'Went offline — changes will be queued')
-  }
-}
-
 function applyToCanvas() {
   canvasStore.captionText = sharedContent.value
-  addLog('System', 'Applied to canvas')
+  canvasStore.showingBefore = false
+  addLog('System', 'system', 'Applied shared content to the canvas caption')
+  announcer.announce('Shared content applied to the canvas caption.')
 }
 </script>
 
 <style scoped>
 .collab-wrap {
-  max-width: 820px;
+  max-width: 840px;
 }
-.collab-title { font-size: 16px; font-weight: 800; color: #713F12; margin-bottom: 8px; }
-.collab-desc { max-width: 68ch; font-size: 14px; color: #92400e; margin-bottom: 24px; line-height: 1.5; }
-
+.collab-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #713F12;
+  margin-bottom: 8px;
+}
+.collab-desc {
+  max-width: 68ch;
+  font-size: 14px;
+  color: #92400e;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
 .conn-bar {
   display: flex;
   align-items: center;
@@ -342,87 +448,125 @@ function applyToCanvas() {
   margin-bottom: 24px;
   padding: 12px 16px;
   background: #fff8ee;
-  border: 1.5px solid #f3d89a;
-  border-radius: 12px;
+  border: 1px solid #f3d89a;
+  border-radius: 8px;
 }
-.conn-status { font-size: 13px; font-weight: 600; }
-.conn-status.online { color: #16a34a; }
-.conn-status.offline { color: #dc2626; }
+.conn-btn { min-height: 48px; }
+.conn-status { font-size: 13px; font-weight: 700; }
+.conn-status.online { color: #166534; }
+.conn-status.offline { color: #b91c1c; }
 
 .editors-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 16px;
   margin-bottom: 20px;
 }
 .editor-col { display: flex; flex-direction: column; }
-.editor-label { font-size: 12px; font-weight: 700; letter-spacing: 0; color: #713F12; margin-bottom: 8px; }
+.editor-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #713F12;
+  margin-bottom: 8px;
+}
 .shared-editor {
   width: 100%;
   padding: 12px;
   border: 2px solid #92400e;
-  border-radius: 10px;
+  border-radius: 8px;
   font-size: 14px;
   color: #713F12;
   background: #fffbf0;
   resize: vertical;
   font-family: inherit;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
-.shared-editor:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.28); }
-.shared-editor.peer { border-color: #bfdbfe; background: #eff6ff; }
-.shared-editor.peer:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96,165,250,0.2); }
+.shared-editor:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.28); }
+.shared-editor.peer { border-color: #93c5fd; background: #eff6ff; }
+.peer-btn { margin-top: 8px; align-self: flex-start; }
 
 .queue-box {
   background: #fef3c7;
-  border: 1.5px solid #fcd34d;
-  border-radius: 10px;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 16px;
 }
-.queue-title { font-size: 12px; font-weight: 700; color: #92400e; margin-bottom: 8px; }
+.queue-title { font-size: 12px; font-weight: 800; color: #92400e; margin-bottom: 8px; }
 .queue-item { font-size: 12px; color: #713F12; padding: 4px 0; border-bottom: 1px solid #fde68a; }
 .queue-item:last-child { border-bottom: none; }
+.queue-id {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  background: #fde68a;
+  border-radius: 4px;
+  padding: 2px 6px;
+  margin-right: 8px;
+}
 .queue-author { font-weight: 700; }
 
 .conflict-box {
   background: #fef2f2;
   border: 2px solid #fca5a5;
-  border-radius: 12px;
+  border-radius: 8px;
   padding: 16px;
   margin-bottom: 20px;
 }
-.conflict-title { font-size: 14px; font-weight: 800; color: #dc2626; margin-bottom: 12px; }
+.conflict-title { font-size: 16px; font-weight: 800; color: #b91c1c; margin-bottom: 8px; }
+.conflict-desc { font-size: 13px; color: #713F12; margin-bottom: 12px; line-height: 1.4; }
 .conflict-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .conflict-choice { display: flex; flex-direction: column; gap: 8px; }
-.conflict-label { font-size: 12px; font-weight: 700; color: #92400e; letter-spacing: 0; }
-.conflict-text { font-size: 12px; color: #713F12; background: #fff; border: 1px solid #fca5a5; border-radius: 8px; padding: 8px; min-height: 36px; }
+.conflict-label { font-size: 12px; font-weight: 800; color: #92400e; }
+.conflict-text {
+  font-size: 12px;
+  color: #713F12;
+  background: #fff;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 8px;
+  min-height: 40px;
+  word-break: break-word;
+  flex: 1;
+}
+.conflict-btn { min-height: 44px; }
 
 .result-box {
   background: #f0fdf4;
-  border: 2px solid #86efac;
-  border-radius: 12px;
+  border: 1px solid #86efac;
+  border-radius: 8px;
   padding: 16px;
   margin-bottom: 20px;
 }
-.result-label { font-size: 12px; font-weight: 700; letter-spacing: 0; color: #166534; margin-bottom: 8px; }
-.result-text { font-size: 16px; font-weight: 600; color: #14532d; min-height: 24px; word-break: break-word; }
+.result-label { font-size: 12px; font-weight: 800; color: #166534; margin-bottom: 8px; }
+.result-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #14532d;
+  min-height: 24px;
+  word-break: break-word;
+  margin-bottom: 12px;
+}
 
 .log-box {
   background: #fff8ee;
-  border: 1.5px solid #f3d89a;
-  border-radius: 12px;
+  border: 1px solid #f3d89a;
+  border-radius: 8px;
   padding: 16px;
   max-height: 200px;
   overflow-y: auto;
 }
-.log-title { font-size: 12px; font-weight: 700; letter-spacing: 0; color: #713F12; margin-bottom: 8px; }
-.log-empty { font-size: 12px; color: #713F12; }
-.log-entry { font-size: 12px; color: #713F12; padding: 3px 0; }
-.log-time { color: #713F12; margin-right: 8px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.log-title { font-size: 12px; font-weight: 800; color: #713F12; margin-bottom: 8px; }
+.log-empty { font-size: 12px; color: #92400e; }
+.log-entry { font-size: 12px; color: #713F12; padding: 4px 0; line-height: 1.4; }
+.log-time {
+  color: #92400e;
+  margin-right: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+}
 .log-author-you { font-weight: 700; color: #713F12; }
-.log-author-peer { font-weight: 700; color: #3b82f6; }
-.log-author-system { font-weight: 700; color: #16a34a; }
+.log-author-peer { font-weight: 700; color: #1d4ed8; }
+.log-author-system { font-weight: 700; color: #166534; }
 
 @media (max-width: 600px) {
   .editors-row,

@@ -130,6 +130,7 @@ export const LabelsPackageSchema = z.object({
 
 export function validateMetadata(metadata, fields) {
   for (const field of fields) {
+    if (!Object.hasOwn(metadata, field.name)) continue;
     const value = metadata[field.name];
     if (field.kind === 'text' && typeof value !== 'string') return `${field.name} must be text`;
     if (field.kind === 'number' && (typeof value !== 'number' || !Number.isFinite(value))) return `${field.name} must be a finite number`;

@@ -36,8 +36,9 @@
 </div>
 
 <style>
-  .stage-strip { min-width:670px; display:grid; grid-template-columns:repeat(5, 1fr); gap:.35rem; }
-  .stage-segment { position:relative; display:flex; align-items:center; gap:.38rem; min-height:2.8rem; padding:.5rem .6rem; color:var(--status); background:var(--status-bg); border:1px solid var(--status-border); border-radius:.55rem; font-size:.67rem; font-weight:800; white-space:nowrap; cursor:pointer; transition:transform .15s ease, filter .18s ease, box-shadow .18s ease; }
+  .stage-strip { width:100%; min-width:0; display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:.35rem; }
+  .stage-segment { position:relative; display:flex; align-items:center; gap:.38rem; min-height:2.8rem; min-width:0; padding:.5rem .45rem; color:var(--status); background:var(--status-bg); border:1px solid var(--status-border); border-radius:.55rem; font-size:.62rem; font-weight:800; cursor:pointer; transition:transform .15s ease, filter .18s ease, box-shadow .18s ease; }
+  .stage-segment > span:last-child { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .stage-segment:not(:disabled):hover { filter:brightness(.98); box-shadow:0 4px 12px rgba(30,45,70,.1); transform:translateY(-1px); }
   .stage-segment.selected::after { content:""; position:absolute; left:.55rem; right:.55rem; bottom:.2rem; height:2px; border-radius:2px; background:var(--status); }
   .stage-icon { flex:none; display:grid; place-items:center; }
@@ -46,5 +47,19 @@
   .compact { min-width:0; gap:.22rem; }
   .compact .stage-segment { min-width:0; min-height:1.85rem; justify-content:center; padding:.28rem .22rem; border-radius:.35rem; }
   .compact .stage-segment span:last-child { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-  @media (max-width:700px) { .stage-strip:not(.compact) { min-width:620px; } }
+  @media (max-width:700px) {
+    .stage-strip:not(.compact) {
+      display:flex;
+      overflow-x:auto;
+      gap:.35rem;
+      padding-bottom:.15rem;
+      scroll-snap-type:x proximity;
+    }
+    .stage-strip:not(.compact) .stage-segment {
+      flex:0 0 6.5rem;
+      min-width:6.5rem;
+      scroll-snap-align:start;
+    }
+    .stage-segment { min-height:44px; font-size:.58rem; padding:.4rem .35rem; }
+  }
 </style>

@@ -1,381 +1,379 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { RootState, store } from './store';
-import { setTheme, setActiveView, setSidebarOpen, setFilterRole, setFilterStatus, setSortCriteria, setExportDrawerOpen, setExportPreviewTab } from './store/uiSlice';
-import { addUser, deleteUser, deleteUsers, updateUsersStatus, updateUsersRole, setUsers, User } from './store/usersSlice';
+import { motion, AnimatePresence } from 'motion/react';
 import { useReactTable, getCoreRowModel, getPaginationRowModel, flexRender, ColumnDef } from '@tanstack/react-table';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { motion, AnimatePresence } from 'motion/react';
+import {
+  HomeIcon, UsersIcon, CubeIcon, ArrowsRightLeftIcon, ShoppingCartIcon, UserGroupIcon,
+  ChatBubbleLeftRightIcon, PhotoIcon, DocumentTextIcon, PencilSquareIcon, TagIcon,
+  ChartBarIcon, MegaphoneIcon, PuzzlePieceIcon, WrenchScrewdriverIcon, Cog6ToothIcon,
+  ChevronRightIcon, MagnifyingGlassIcon, SunIcon, MoonIcon, BellIcon, Bars3Icon, XMarkIcon,
+  PlusIcon, PencilIcon, TrashIcon, ArrowDownTrayIcon, ClipboardDocumentIcon, CheckCircleIcon,
+  ExclamationTriangleIcon, InformationCircleIcon, BanknotesIcon, Square3Stack3DIcon,
+  ClockIcon, ClipboardDocumentListIcon, ChartPieIcon, ShieldCheckIcon, BoltIcon,
+  ArrowTrendingUpIcon, TicketIcon, CircleStackIcon,
+} from '@heroicons/react/24/outline';
 
-// === SCHEMAS ===
-const userSchema = z.object({
-  firstName: z.string().min(1, "First name is required").max(40, "First name must be at most 40 characters"),
-  lastName: z.string().min(1, "Last name is required").max(40, "Last name must be at most 40 characters"),
-  email: z.string().email("Invalid email format (must contain @ and domain)"),
-  phone: z.string().regex(/^\d{7,15}$/, "Phone must be 7-15 digits").optional().or(z.literal('')),
-  notes: z.string().max(280, "Notes must be at most 280 characters").optional(),
-  temporaryPassword: z.string().min(8, "Temporary password must be at least 8 characters"),
-  accountSegment: z.enum(['Internal', 'Partner', 'External']),
-  status: z.enum(['Active', 'Invited', 'Suspended']),
-  role: z.enum(['Admin', 'Manager', 'Member', 'Viewer']),
-  sendInvitation: z.boolean().optional(),
-});
-type UserFormValues = z.infer<typeof userSchema>;
+import { RootState, store } from './store';
+import {
+  setTheme, toggleTheme, setAccent, setActiveView, setSidebarOpen, setExpandedGroup,
+  setFilterRole, setFilterStatus, setSearch, setSort, setExportOpen, setExportTab, setDensity,
+  setSelection, toggleSelection, clearSelection, setEditingId, pushToast, dismissToast,
+  setConfirm, setLastMutation, resetFilters, type ViewKey,
+} from './store/uiSlice';
+import {
+  addUser, updateUser, patchUsers, deleteUser, deleteUsers, updateUsersStatus, updateUsersRole,
+  setUsers,
+} from './store/usersSlice';
+import {
+  User, ROLES, STATUSES, SEGMENTS, SortKey, userCreateSchema, userEditSchema, UserCreateValues, UserEditValues, filterUsersForKpis,
+  computeKpis, sortUsers, buildCsv, buildSession, importSessionJson, importUsersCsv,
+  makeUserFromCreate, relativeTime, OV, CSV_HEADER,
+} from './data';
+import { ColumnChart, LineChart, DonutChart, Radial, Uptime, Spark, TooltipPortal } from './charts';
 
-// === HEADER ===
+const AV = (n: number) => `./assets/avatar-${n}.jpg`;
+const Avatar = ({ n, name, lg }: { n: number; name: string; lg?: boolean }) => (
+  <span className={`av ${lg ? 'lg' : ''}`}><img src={AV(n)} alt={`${name} profile avatar`} loading="lazy" /></span>
+);
+
+// ============================================================ Popover
+function Popover({ open, onClose, up, right, width, triggerRef, children, label }:
+  { open: boolean; onClose: () => void; up?: boolean; right?: boolean; width?: number; triggerRef: React.RefObject<HTMLElement | null>; children: React.ReactNode; label: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopPropagation(); onClose(); triggerRef.current?.focus(); } };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [open, onClose, triggerRef]);
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <div className="pop-backdrop" onClick={onClose} aria-hidden="true" />
+          <motion.div ref={ref} role="menu" aria-label={label}
+            className={`pop ${up ? 'up' : ''} ${right ? 'right' : ''}`}
+            style={{ width: width || 14 * 16, left: right ? undefined : 0 }}
+            initial={{ opacity: 0, scale: 0.94, y: up ? 8 : -8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.94, y: up ? 8 : -8 }}
+            transition={{ duration: 0.16 }}>
+            {children}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// ============================================================ Header
 function Header() {
   const dispatch = useDispatch();
-  const theme = useSelector((state: RootState) => state.ui.theme);
-  const sidebarOpen = useSelector((state: RootState) => state.ui.sidebarOpen);
+  const { theme, sidebarOpen, search, lastMutation } = useSelector((s: RootState) => s.ui);
+  const [notif, setNotif] = useState(false);
+  const [prof, setProf] = useState(false);
+  const notifRef = useRef<HTMLButtonElement>(null);
+  const profRef = useRef<HTMLButtonElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === '/' && document.activeElement?.tagName !== 'INPUT' && document.activeElement?.tagName !== 'TEXTAREA') {
+        e.preventDefault(); dispatch(setActiveView('all-users')); setTimeout(() => searchRef.current?.focus(), 0);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [dispatch]);
+
+  const notifRows = [
+    { n: 1, t: 'New message', b: 'Ada: did you get the export?' },
+    { n: 2, t: 'Reminder', b: 'Governance review at 10:00' },
+    { n: 3, t: 'New payment', b: '$2,500 from Margaret Hamilton' },
+    { n: 4, t: 'New payment', b: '$1,900 from Grace Hopper' },
+  ];
 
   return (
-    <header className="span-12 flex items-center gap-3">
-      <label
-        htmlFor="my-drawer"
-        className="btn btn-square btn-ghost drawer-button drawer-button-desktop-hidden"
-        aria-label="Open sidebar"
-        onClick={() => dispatch(setSidebarOpen(!sidebarOpen))}
-      >
-        <svg data-src="./assets/icons/bars-3.svg" className="icon-sm" />
+    <header className="utilbar">
+      <button className="icon-btn hamburger" aria-label="Open navigation" aria-expanded={sidebarOpen}
+        onClick={() => dispatch(setSidebarOpen(!sidebarOpen))}><Bars3Icon className="icon-md" /></button>
+      <span className="page-title">Dashboard</span>
+      {lastMutation && <span className="mutation-chip" aria-live="polite"><span className="dot" />{lastMutation}</span>}
+      <div className="search">
+        <MagnifyingGlassIcon className="si" />
+        <input ref={searchRef} type="search" value={search} aria-label="Search users"
+          onFocus={() => dispatch(setActiveView('all-users'))}
+          onChange={(e) => { dispatch(setSearch(e.target.value)); }}
+          placeholder="Search users" autoComplete="off" />
+      </div>
+      <label className="icon-btn theme-toggle" aria-label="Toggle theme" title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}>
+        <input type="checkbox" className="sr-only" checked={theme === 'light'}
+          onChange={() => dispatch(toggleTheme())} aria-label="Toggle light and dark theme" />
+        <span className="ic"><AnimatePresence initial={false}>
+          {theme === 'dark'
+            ? <motion.span key="moon" initial={{ opacity: 0, rotate: -90 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0, rotate: 90 }} transition={{ duration: 0.2 }}><MoonIcon className="icon-md" /></motion.span>
+            : <motion.span key="sun" initial={{ opacity: 0, rotate: -90 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0, rotate: 90 }} transition={{ duration: 0.2 }}><SunIcon className="icon-md" /></motion.span>}
+        </AnimatePresence></span>
       </label>
-      <div className="grow">
-        <h1 className="page-title">Dashboard</h1>
-      </div>
-      <div>
-        <input type="text" placeholder="Search" className="input input-sm search-pill" aria-label="Search" />
-      </div>
-      <label className="btn btn-circle btn-sm btn-ghost swap swap-rotate" aria-label="Toggle theme">
-        <input
-          type="checkbox"
-          className="hidden"
-          checked={theme === 'light'}
-          onChange={() => dispatch(setTheme(theme === 'light' ? 'dark' : 'light'))}
-        />
-        <div className="relative w-6 h-6 flex items-center justify-center">
-          <AnimatePresence mode="wait" initial={false}>
-            {theme === 'dark' ? (
-              <motion.svg key="moon" initial={{ opacity: 0, rotate: -90 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0, rotate: 90 }} transition={{ duration: 0.2 }} className="icon-sm fill-current absolute" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" /></motion.svg>
-            ) : (
-              <motion.svg key="sun" initial={{ opacity: 0, rotate: -90 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0, rotate: 90 }} transition={{ duration: 0.2 }} className="icon-sm fill-current absolute" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" /></motion.svg>
-            )}
-          </AnimatePresence>
-        </div>
-      </label>
-      <div className="relative">
-        <button type="button" className="btn btn-circle btn-sm btn-ghost" aria-label="Open notifications" data-popovertarget="header-notifications-dropdown" style={{anchorName: '--header-notifications-anchor'} as React.CSSProperties}>
-          <div className="indicator">
-            <span className="status indicator-item status-error" />
-            <svg data-src="./assets/icons/bell.svg" className="icon-sm" />
-          </div>
+      <div className="pop-anchor">
+        <button ref={notifRef} className="icon-btn" aria-label="Open notifications" aria-haspopup="menu" aria-expanded={notif} onClick={() => { setNotif((v) => !v); setProf(false); }}>
+          <BellIcon className="icon-md" /><span className="bell-dot" aria-hidden="true" />
         </button>
-        <ul className="menu dropdown rounded-box bg-base-100 shadow-lg popover-menu" data-popover="auto" id="header-notifications-dropdown" style={{positionAnchor: '--header-notifications-anchor'} as React.CSSProperties}>
-          <li>
-            <button type="button" className="inert-nav gap-3">
-              <div className="avatar">
-                <div className="avatar-sm rounded-full">
-                  <img src="./assets/avatar-1.jpg" alt="Alice avatar" />
-                </div>
-              </div>
-              <span><b>New message</b><br />Alice: Hi, did you get my files?</span>
-            </button>
-          </li>
-        </ul>
+        <Popover open={notif} onClose={() => setNotif(false)} right width={300} triggerRef={notifRef} label="Notifications">
+          <ul>
+            {notifRows.map((r) => (
+              <li key={r.n}><button type="button" className="pop-row gap" role="menuitem">
+                <Avatar n={r.n} name={`Notification ${r.n}`} /><span><b>{r.t}</b><br /><span style={{ color: 'var(--muted)' }}>{r.b}</span></span>
+              </button></li>
+            ))}
+          </ul>
+        </Popover>
       </div>
-      <div className="relative">
-        <button type="button" className="avatar btn btn-sm btn-circle btn-ghost" aria-label="Open profile menu" data-popovertarget="header-profile-dropdown" style={{anchorName: '--header-profile-anchor'} as React.CSSProperties}>
-          <div className="avatar-md rounded-full">
-            <img src="./assets/avatar-5.jpg" alt="Current user avatar" />
-          </div>
+      <div className="pop-anchor">
+        <button ref={profRef} className="icon-btn" aria-label="Open profile menu" aria-haspopup="menu" aria-expanded={prof} onClick={() => { setProf((v) => !v); setNotif(false); }}>
+          <Avatar n={5} name="Current user" />
         </button>
-        <ul className="menu dropdown rounded-box bg-base-100 shadow-lg popover-menu" data-popover="auto" id="header-profile-dropdown" style={{positionAnchor: '--header-profile-anchor'} as React.CSSProperties}>
-          <li><button type="button" className="inert-nav">Profile</button></li>
-          <li><button type="button" className="inert-nav">Inbox <span className="badge badge-xs">12</span></button></li>
-          <li><button type="button" className="inert-nav">Settings</button></li>
-          <li><button type="button" className="inert-nav text-error mt-2 border-t border-base-200">Logout</button></li>
-        </ul>
+        <Popover open={prof} onClose={() => setProf(false)} right width={200} triggerRef={profRef} label="Profile menu">
+          <ul>
+            {['Profile', 'Inbox', 'Settings', 'Logout'].map((m) => (
+              <li key={m}><button type="button" className="pop-row" role="menuitem">{m}{m === 'Inbox' && <span className="badge badge-xs badge-accent">12</span>}</button></li>
+            ))}
+          </ul>
+        </Popover>
       </div>
     </header>
   );
 }
 
-// === SIDEBAR ===
+// ============================================================ Sidebar
+const GROUPS: { key: string; label: string; icon: any; items?: { key: ViewKey; label: string }[]; badge?: string }[] = [
+  { key: 'users', label: 'Users', icon: UsersIcon, items: [
+    { key: 'all-users', label: 'All Users' }, { key: 'add-user', label: 'Add User' },
+    { key: 'roles', label: 'Roles' }, { key: 'permissions', label: 'Permissions' },
+    { key: 'user-logs', label: 'User Logs' }, { key: 'user-stats', label: 'User Stats' },
+    { key: 'user-payments', label: 'User Payments' }, { key: 'user-products', label: 'User Products' },
+  ] },
+  { key: 'products', label: 'Products', icon: CubeIcon, items: [{ key: 'user-products', label: 'Catalog' }] },
+  { key: 'transactions', label: 'Transactions', icon: ArrowsRightLeftIcon, items: [{ key: 'user-payments', label: 'Ledger' }] },
+  { key: 'orders', label: 'Orders', icon: ShoppingCartIcon, items: [{ key: 'user-logs', label: 'Order history' }] },
+  { key: 'customers', label: 'Customers', icon: UserGroupIcon, items: [{ key: 'user-stats', label: 'Segments' }] },
+  { key: 'messages', label: 'Messages', icon: ChatBubbleLeftRightIcon, badge: '12', items: [{ key: 'user-logs', label: 'Threads' }] },
+  { key: 'media', label: 'Media', icon: PhotoIcon, items: [{ key: 'user-products', label: 'Library' }] },
+  { key: 'pages', label: 'Pages', icon: DocumentTextIcon, items: [{ key: 'user-logs', label: 'Drafts' }] },
+  { key: 'blog', label: 'Blog', icon: PencilSquareIcon, items: [{ key: 'user-logs', label: 'Posts' }] },
+  { key: 'promotions', label: 'Promotions', icon: TagIcon, items: [{ key: 'user-stats', label: 'Campaigns' }] },
+  { key: 'analytics', label: 'Analytics', icon: ChartBarIcon, items: [{ key: 'operations-overview', label: 'Overview' }] },
+  { key: 'marketing', label: 'Marketing', icon: MegaphoneIcon, items: [{ key: 'user-stats', label: 'Funnel' }] },
+  { key: 'plugins', label: 'Plugins', icon: PuzzlePieceIcon, items: [{ key: 'user-products', label: 'Installed' }] },
+  { key: 'tools', label: 'Tools', icon: WrenchScrewdriverIcon, items: [{ key: 'user-logs', label: 'Console' }] },
+  { key: 'settings', label: 'Settings', icon: Cog6ToothIcon, items: [{ key: 'permissions', label: 'Preferences' }] },
+];
+
 function Sidebar() {
   const dispatch = useDispatch();
-  const activeView = useSelector((state: RootState) => state.ui.activeView);
-
-  const handleNav = (view: any) => {
-    dispatch(setActiveView(view));
-    dispatch(setSidebarOpen(false));
-  };
-
+  const { activeView, expandedGroup, sidebarOpen, accent } = useSelector((s: RootState) => s.ui);
+  const [acct, setAcct] = useState(false);
+  const acctRef = useRef<HTMLButtonElement>(null);
+  const openGroup = (k: string) => dispatch(setExpandedGroup(k));
+  const go = (v: ViewKey) => { dispatch(setActiveView(v)); dispatch(setSidebarOpen(false)); };
   return (
-    <aside className="drawer-side z-50">
-      <label htmlFor="my-drawer" aria-label="close sidebar" className="drawer-overlay" onClick={() => dispatch(setSidebarOpen(false))}></label>
-      <nav className="menu bg-base-200 text-base-content min-h-full w-72 p-4 flex flex-col pt-0 gap-6">
-        <div className="sticky top-0 bg-base-200 py-4 z-10 flex items-center gap-3">
-          <div className="avatar">
-            <div className="w-8 rounded-full bg-primary text-primary-content grid place-items-center font-bold">
-              PT
-            </div>
-          </div>
-          <span className="text-lg font-bold">Pineapple Tech</span>
+    <>
+      <div className={`mobile-overlay ${sidebarOpen ? 'open' : ''}`} onClick={() => dispatch(setSidebarOpen(false))} aria-hidden="true" />
+      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`} aria-label="Primary navigation">
+        <div className="sidebar-brand"><span className="brand-mark">PT</span> Pineapple Tech</div>
+        <div className="sidebar-scroll">
+          <button className={`nav-top ${activeView === 'operations-overview' ? 'active' : ''}`} onClick={() => go('operations-overview')}>
+            <HomeIcon className="icon-md" /> Dashboard
+          </button>
+          {GROUPS.map((g) => {
+            const open = expandedGroup === g.key;
+            const Icon = g.icon;
+            return (
+              <div className={`nav-group ${open ? 'open' : ''}`} key={g.key}>
+                <button className="nav-group-head" aria-expanded={open} onClick={() => openGroup(g.key)}>
+                  <Icon className="icon-md" style={{ opacity: 0.7 }} /> {g.label}
+                  {g.badge ? <span className="count">{g.badge}</span> : <ChevronRightIcon className="icon-sm chev" />}
+                </button>
+                <div className="nav-items"><div>
+                  {g.items?.map((it) => (
+                    <button key={it.key + it.label} className={`nav-item ${activeView === it.key ? 'active' : ''}`} onClick={() => go(it.key)}>{it.label}</button>
+                  ))}
+                </div></div>
+              </div>
+            );
+          })}
         </div>
-
-        <ul className="menu menu-md rounded-box flex-1">
-          <li>
-            <button type="button" className={activeView === 'operations-overview' ? 'active' : ''} onClick={() => handleNav('operations-overview')}>
-              <svg data-src="./assets/icons/squares-2x2.svg" className="icon-sm opacity-50" aria-hidden="true" /> Dashboard
+        <div className="account-footer">
+          <div className="pop-anchor">
+            <button ref={acctRef} className="account-btn" aria-haspopup="menu" aria-expanded={acct} onClick={() => setAcct((v) => !v)}>
+              <span style={{ position: 'relative' }}><Avatar n={6} name="Ari Lane" /><span className="online-dot" aria-hidden="true" /></span>
+              <span className="account-meta"><b>Ari Lane</b><span>Admin</span></span>
+              <ChevronRightIcon className="icon-sm chev" style={{ marginLeft: 'auto', transform: 'rotate(-90deg)' }} />
             </button>
-          </li>
-
-          <li>
-            <h2 className="menu-title flex items-center gap-2"><svg data-src="./assets/icons/users.svg" className="icon-sm opacity-50" aria-hidden="true" /> Users</h2>
-            <ul>
-              <li><button type="button" className={activeView === 'all-users' ? 'active' : ''} onClick={() => handleNav('all-users')}>All Users</button></li>
-              <li><button type="button" className={activeView === 'add-user' ? 'active' : ''} onClick={() => handleNav('add-user')}>Add User</button></li>
-            </ul>
-          </li>
-        </ul>
-      </nav>
-    </aside>
+            <Popover open={acct} onClose={() => setAcct(false)} up right width={220} triggerRef={acctRef} label="Account menu">
+              <ul>
+                {[['Profile settings', Cog6ToothIcon], ['Activity log', ClipboardDocumentListIcon], ['Docs', DocumentTextIcon], ['Sign out', ArrowDownTrayIcon]].map(([label, Ic]: any) => (
+                  <li key={label}><button type="button" className="pop-row" role="menuitem"><Ic className="icon-sm" /> {label}</button></li>
+                ))}
+              </ul>
+            </Popover>
+          </div>
+          <div style={{ display: 'flex', gap: '.3rem', padding: '.5rem .2rem 0' }} role="group" aria-label="Accent color">
+            {(['teal', 'amber', 'sky', 'rose'] as const).map((a) => (
+              <button key={a} type="button" aria-label={`${a} accent`} aria-pressed={accent === a} onClick={() => dispatch(setAccent(a))}
+                style={{ width: '1.3rem', height: '1.3rem', borderRadius: '50%', border: accent === a ? '2px solid var(--color-base-content)' : '1px solid var(--bd)', background: `var(--c-${a})`, cursor: 'pointer' }} />
+            ))}
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }
 
-// === OPERATIONS OVERVIEW ===
-function OperationsOverview() {
+// ============================================================ shared derived hook
+function useFiltered() {
+  const users = useSelector((s: RootState) => s.users.data);
+  const { filterRole, filterStatus, search, sort } = useSelector((s: RootState) => s.ui);
+  return useMemo(() => {
+    let r = users;
+    if (filterRole) r = r.filter((u) => u.role === filterRole);
+    if (filterStatus) r = r.filter((u) => u.status === filterStatus);
+    if (search.trim()) { const q = search.trim().toLowerCase(); r = r.filter((u) => `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(q)); }
+    return sortUsers(r, sort);
+  }, [users, filterRole, filterStatus, search, sort]);
+}
+
+function useRoleStatusFiltered() {
+  const users = useSelector((s: RootState) => s.users.data);
+  const { filterRole, filterStatus } = useSelector((s: RootState) => s.ui);
+  return useMemo(() => filterUsersForKpis(users, filterRole, filterStatus), [users, filterRole, filterStatus]);
+}
+
+// ============================================================ KPI strip
+function KpiStrip({ users }: { users: User[] }) {
+  const k = computeKpis(users);
   return (
-    <div className="view-operations-overview span-12 grid grid-cols-1 gap-6 pb-6">
-      <div className="mosaic-grid">
-        <section className="card bg-base-100 shadow-sm border border-base-200 card-dash-main col-span-1 lg:col-span-8">
-          <div className="card-body">
-            <h2 className="card-title flex items-center justify-between">
-              Revenue Outlook
-            </h2>
-            <p className="text-base-content/60">Daily booked revenue across storefront, invoices, and subscriptions</p>
-            <div className="mt-4 flex items-end gap-4">
-              <div className="text-4xl font-bold">$1.2M</div>
-              <div className="text-success flex items-center gap-1 font-medium mb-1"><svg data-src="./assets/icons/arrow-trending-up.svg" className="icon-sm" /> +14.2%</div>
-            </div>
-            <div className="mt-8 chart-tall">
-              <tc-line className="chart-line-main" values="[120,180,150,220,190,280,240,310,290,380,350,420,380,450,410,480,440,510]" labels='["Jan 1","Jan 3","Jan 5","Jan 7","Jan 9","Jan 11","Jan 13","Jan 15","Jan 17","Jan 19","Jan 21","Jan 23","Jan 25","Jan 27","Jan 29","Jan 31","Feb 2","Feb 4"]' shape-radius={4} />
-            </div>
-          </div>
-        </section>
-      </div>
+    <div className="kpi-strip" role="group" aria-label="User KPIs">
+      <div className="kpi"><div className="k-label">Total</div><div className="k-val">{k.total}</div><Spark values={[6, 7, 7, 8, 9, 9, k.total]} /></div>
+      <div className="kpi"><div className="k-label">Active</div><div className="k-val">{k.active}</div><Spark values={[4, 5, 5, 6, 6, 6, k.active]} /></div>
+      <div className="kpi"><div className="k-label">Paying</div><div className="k-val">{k.paying}</div><Spark values={[3, 3, 4, 4, 5, 5, k.paying]} color="var(--c-sky)" /></div>
+      <div className="kpi"><div className="k-label">Suspended</div><div className="k-val err">{k.suspended}</div><Spark values={[1, 1, 2, 2, 2, 2, k.suspended]} color="var(--c-rose)" /></div>
     </div>
   );
 }
 
-// === ALL USERS ===
+// ============================================================ All Users
 function AllUsers() {
   const dispatch = useDispatch();
-  const users = useSelector((state: RootState) => state.users.data);
-  const { filterRole, filterStatus, sortCriteria } = useSelector((state: RootState) => state.ui);
+  const users = useSelector((s: RootState) => s.users.data);
+  const { filterRole, filterStatus, sort, selection, density } = useSelector((s: RootState) => s.ui);
+  const filtered = useFiltered();
+  const kpiUsers = useRoleStatusFiltered();
+  const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+  useEffect(() => {
+    const next: Record<string, boolean> = {};
+    selection.forEach((id) => { if (filtered.some((u) => u.id === id)) next[id] = true; });
+    setRowSelection(next);
+  }, [selection, filtered]);
 
-  const [rowSelection, setRowSelection] = useState({});
+  const columns = useMemo<ColumnDef<User>[]>(() => [
+    { id: 'select', header: ({ table }) => (
+      <input type="checkbox" aria-label="Select all rows" className="check-box"
+        checked={table.getIsAllPageRowsSelected()} onChange={table.getToggleAllPageRowsSelectedHandler()} /> ),
+      cell: ({ row }) => (
+        <input type="checkbox" aria-label={`Select ${row.original.firstName} ${row.original.lastName}`} className="check-box"
+          checked={row.getIsSelected()} onChange={() => dispatch(toggleSelection(row.original.id))} /> ),
+    },
+    { header: 'User', accessorFn: (r) => `${r.firstName} ${r.lastName}`, cell: (info) => {
+      const u = info.row.original;
+      return <div className="name-cell"><Avatar n={u.avatar} name={`${u.firstName} ${u.lastName}`} /><div className="name-text"><b>{info.getValue() as string}</b><small>{u.email}</small></div></div>;
+    } },
+    { header: 'Role', accessorKey: 'role', cell: (i) => <span className="badge badge-ghost">{i.getValue() as string}</span> },
+    { header: 'Status', accessorKey: 'status', cell: (i) => {
+      const v = i.getValue() as string; const cls = v === 'Active' ? 'badge-success' : v === 'Invited' ? 'badge-warning' : 'badge-error';
+      return <span className={`badge ${cls}`}>{v}</span>;
+    } },
+    { header: 'Payments', accessorKey: 'payments', cell: (i) => `$${(i.getValue() as number).toLocaleString()}` },
+    { header: 'Products', accessorKey: 'products' },
+    { header: 'Last active', accessorKey: 'lastActive', cell: (i) => relativeTime(i.getValue() as string) },
+    { id: 'actions', header: '', cell: ({ row }) => (
+      <div className="row-act">
+        <button className="btn btn-ghost btn-sm" aria-label={`Edit ${row.original.firstName}`} onClick={() => dispatch(setEditingId(row.original.id))}><PencilIcon className="icon-sm" /></button>
+        <button className="btn btn-ghost btn-sm" style={{ color: 'var(--color-error)' }} aria-label={`Delete ${row.original.firstName}`}
+          onClick={() => dispatch(setConfirm({ open: true, title: 'Delete user', body: `Delete ${row.original.firstName} ${row.original.lastName}? This removes them from the list, KPIs, and export previews.`, ids: [row.original.id] }))}>
+          <TrashIcon className="icon-sm" /></button>
+      </div>
+    ) },
+  ], [dispatch, filtered]);
 
-  const columns = useMemo<ColumnDef<User>[]>(
-    () => [
-      {
-        id: 'select',
-        header: ({ table }) => (
-          <input
-            type="checkbox"
-            className="checkbox checkbox-sm"
-            checked={table.getIsAllPageRowsSelected()}
-            onChange={table.getToggleAllPageRowsSelectedHandler()}
-            aria-label="Select all rows"
-          />
-        ),
-        cell: ({ row }) => (
-          <input
-            type="checkbox"
-            className="checkbox checkbox-sm"
-            checked={row.getIsSelected()}
-            onChange={row.getToggleSelectedHandler()}
-            aria-label={`Select row for ${row.original.firstName} ${row.original.lastName}`}
-          />
-        ),
-      },
-      {
-        header: 'User',
-        accessorFn: row => `${row.firstName} ${row.lastName}`,
-        cell: info => (
-          <div>
-            <div className="font-bold">{info.getValue() as string}</div>
-            <div className="text-sm opacity-50">{info.row.original.email}</div>
-          </div>
-        )
-      },
-      {
-        header: 'Role',
-        accessorKey: 'role',
-        cell: info => <span className="badge badge-ghost badge-sm">{info.getValue() as string}</span>
-      },
-      {
-        header: 'Status',
-        accessorKey: 'status',
-        cell: info => {
-          const val = info.getValue() as string;
-          let badgeClass = 'badge-ghost';
-          if (val === 'Active') badgeClass = 'badge-success';
-          if (val === 'Invited') badgeClass = 'badge-warning';
-          if (val === 'Suspended') badgeClass = 'badge-error';
-          return <span className={`badge badge-sm ${badgeClass}`}>{val}</span>;
-        }
-      },
-      {
-        header: 'Payments',
-        accessorKey: 'payments',
-        cell: info => `$${(info.getValue() as number).toLocaleString()}`
-      },
-      {
-        header: 'Products',
-        accessorKey: 'products',
-      },
-      {
-        header: 'Last Active',
-        accessorKey: 'lastActive',
-        cell: info => new Date(info.getValue() as string).toLocaleDateString()
-      },
-      {
-        id: 'actions',
-        cell: ({ row }) => (
-          <div className="flex items-center gap-2">
-            <button className="btn btn-sm btn-ghost btn-circle text-error" aria-label="Delete user" onClick={() => dispatch(deleteUsers([row.original.id]))}>
-              <svg data-src="./assets/icons/trash.svg" className="icon-sm" />
-            </button>
-          </div>
-        )
-      }
-    ],
-    [dispatch]
-  );
+  const table = useReactTable({ data: filtered, columns, state: { rowSelection }, enableRowSelection: true,
+    onRowSelectionChange: (up) => {
+      const next = typeof up === 'function' ? up(rowSelection) : up;
+      dispatch(setSelection(Object.keys(next).filter((k) => next[k])));
+    }, getCoreRowModel: getCoreRowModel(), getPaginationRowModel: getPaginationRowModel(), initialState: { pagination: { pageSize: 8 } } });
 
-  const filteredUsers = useMemo(() => {
-    let result = users;
-    if (filterRole) result = result.filter(u => u.role === filterRole);
-    if (filterStatus) result = result.filter(u => u.status === filterStatus);
-
-    result = [...result].sort((a, b) => {
-      if (sortCriteria === 'newest') return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
-      if (sortCriteria === 'highest-spend') return b.payments - a.payments;
-      if (sortCriteria === 'name-az') return a.firstName.localeCompare(b.firstName);
-      return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
-    });
-    return result;
-  }, [users, filterRole, filterStatus, sortCriteria]);
-
-  const table = useReactTable({
-    data: filteredUsers,
-    columns,
-    state: { rowSelection },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-  });
-
-  const selectedCount = Object.keys(rowSelection).length;
+  const selCount = selection.length;
+  const applyStatus = (st: string) => { if (!st || !selCount) return; dispatch(updateUsersStatus({ ids: selection, status: st as any })); dispatch(pushToast({ kind: 'success', title: 'Status changed', body: `${selCount} user(s) set to ${st}` })); dispatch(setLastMutation(`Status → ${st} (${selCount})`)); };
+  const applyRole = (rl: string) => { if (!rl || !selCount) return; dispatch(updateUsersRole({ ids: selection, role: rl as any })); dispatch(pushToast({ kind: 'success', title: 'Role changed', body: `${selCount} user(s) set to ${rl}` })); dispatch(setLastMutation(`Role → ${rl} (${selCount})`)); };
 
   return (
-    <div className="span-12 view-users">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold">All Users</h2>
-          <p className="text-sm opacity-70">Manage your team members and their account permissions.</p>
-        </div>
-        <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}>Add User</button>
+    <div className="span-12">
+      <div className="ctxbar" style={{ padding: 0, marginBottom: '.4rem' }}>
+        <div><div className="crumbs"><h1>All Users</h1></div><p style={{ color: 'var(--muted)', margin: '.1rem 0 0', fontSize: '.85rem' }}>Manage team members and their account permissions.</p></div>
+        <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> Add user</button>
       </div>
-
-      <div className="stats shadow mb-6 w-full overflow-hidden">
-        <div className="stat">
-          <div className="stat-title">Total</div>
-          <div className="stat-value">{filteredUsers.length}</div>
-        </div>
-        <div className="stat">
-          <div className="stat-title">Active</div>
-          <div className="stat-value">{filteredUsers.filter(u => u.status === 'Active').length}</div>
-        </div>
-        <div className="stat">
-          <div className="stat-title">Paying</div>
-          <div className="stat-value">{filteredUsers.filter(u => u.payments > 0).length}</div>
-        </div>
-        <div className="stat text-error">
-          <div className="stat-title text-error">Suspended</div>
-          <div className="stat-value">{filteredUsers.filter(u => u.status === 'Suspended').length}</div>
-        </div>
-      </div>
-
-      <div className="bg-base-100 border border-base-200 rounded-box">
-        <div className="p-4 border-b border-base-200 flex flex-wrap gap-4 items-center justify-between">
-          <div className="flex gap-4">
-            <select className="select select-sm select-bordered" aria-label="Filter role" value={filterRole} onChange={e => dispatch(setFilterRole(e.target.value))}>
-              <option value="">All Roles</option>
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="Member">Member</option>
-              <option value="Viewer">Viewer</option>
-            </select>
-            <select className="select select-sm select-bordered" aria-label="Filter status" value={filterStatus} onChange={e => dispatch(setFilterStatus(e.target.value))}>
-              <option value="">All Statuses</option>
-              <option value="Active">Active</option>
-              <option value="Invited">Invited</option>
-              <option value="Suspended">Suspended</option>
-            </select>
-            <select className="select select-sm select-bordered" aria-label="Sort users" value={sortCriteria} onChange={e => dispatch(setSortCriteria(e.target.value as any))}>
-              <option value="newest">Newest</option>
-              <option value="highest-spend">Highest spend</option>
-              <option value="name-az">Name A-Z</option>
-            </select>
+      <div style={{ marginBottom: '1rem' }}><KpiStrip users={kpiUsers} /></div>
+      <div className="card">
+        <div className="toolbar">
+          <select className="select" style={{ width: 'auto' }} aria-label="Filter by role" value={filterRole} onChange={(e) => dispatch(setFilterRole(e.target.value))}>
+            <option value="">All roles</option>{ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+          <select className="select" style={{ width: 'auto' }} aria-label="Filter by status" value={filterStatus} onChange={(e) => dispatch(setFilterStatus(e.target.value))}>
+            <option value="">All statuses</option>{STATUSES.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+          <select className="select" style={{ width: 'auto' }} aria-label="Sort users" value={sort} onChange={(e) => dispatch(setSort(e.target.value as SortKey))}>
+            <option value="newest">Newest</option><option value="last-active">Last active</option>
+            <option value="highest-spend">Highest spend</option><option value="name-az">Name A-Z</option>
+          </select>
+          <div className="density-toggle" role="group" aria-label="Row density">
+            <button className={density === 'comfortable' ? 'on' : ''} aria-pressed={density === 'comfortable'} onClick={() => dispatch(setDensity('comfortable'))} title="Comfortable density">Comfortable</button>
+            <button className={density === 'compact' ? 'on' : ''} aria-pressed={density === 'compact'} onClick={() => dispatch(setDensity('compact'))} title="Compact density">Compact</button>
           </div>
-          {selectedCount > 0 && (
-            <div className="flex gap-2">
-              <span className="text-sm opacity-70 self-center">{selectedCount} selected</span>
-              <button className="btn btn-sm text-error" onClick={() => {
-                const ids = table.getSelectedRowModel().flatRows.map(r => r.original.id);
-                dispatch(deleteUsers(ids));
-                setRowSelection({});
-              }}>Delete</button>
+          <div className="spacer" />
+          {selCount > 0 && (
+            <div className="bulkbar">
+              <span className="badge badge-accent">{selCount} selected</span>
+              <select className="select" style={{ width: 'auto' }} aria-label="Change status for selected" value="" onChange={(e) => applyStatus(e.target.value)}>
+                <option value="">Change status…</option>{STATUSES.map((r) => <option key={r} value={r}>{r}</option>)}
+              </select>
+              <select className="select" style={{ width: 'auto' }} aria-label="Change role for selected" value="" onChange={(e) => applyRole(e.target.value)}>
+                <option value="">Change role…</option>{ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+              </select>
+              <button className="btn btn-outline btn-sm" onClick={() => dispatch(setExportOpen(true))}><ArrowDownTrayIcon className="icon-sm" /> Export</button>
+              <button className="btn btn-error btn-sm" onClick={() => dispatch(setConfirm({ open: true, title: 'Delete selected users', body: `Delete ${selCount} selected user(s)? This cannot be undone.`, ids: [...selection] }))}><TrashIcon className="icon-sm" /> Delete</button>
             </div>
           )}
         </div>
 
-        {filteredUsers.length === 0 ? (
-          <div className="p-8 text-center text-opacity-50">
-            No users found matching the criteria. Please try a different filter or add a user.
+        {filtered.length === 0 ? (
+          <div className="empty"><UsersIcon className="e-ico" /><h3>No users match these filters</h3>
+            <p>Try clearing the search or filters, or add a new user to the directory.</p>
+            <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> Add user</button>
           </div>
         ) : (
-          <div className="overflow-x-auto w-full">
-            <table className="table table-zebra w-full">
-              <thead>
-                {table.getHeaderGroups().map(headerGroup => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map(header => (
-                      <th key={header.id}>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
+          <div className={`table-wrap ${density === 'compact' ? 'density-compact' : ''}`}>
+            <table className="tbl tbl-zebra">
+              <thead>{table.getHeaderGroups().map((hg) => (
+                <tr key={hg.id}>{hg.headers.map((h) => <th key={h.id}>{h.isPlaceholder ? null : flexRender(h.column.columnDef.header, h.getContext())}</th>)}</tr>
+              ))}</thead>
               <tbody>
-                <AnimatePresence>
-                  {table.getRowModel().rows.map(row => (
-                    <motion.tr
-                      key={row.original.id}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.9 }}
-                      layout
-                    >
-                      {row.getVisibleCells().map(cell => (
-                        <td key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      ))}
+                <AnimatePresence initial={false}>
+                  {table.getRowModel().rows.map((row) => (
+                    <motion.tr key={row.original.id} className={row.getIsSelected() ? 'selected' : ''} layout transition={{ duration: 0.3 }}
+                      initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0, scaleY: 0.8 }} style={{ overflow: 'hidden' }}>
+                      {row.getVisibleCells().map((cell) => <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>)}
                     </motion.tr>
                   ))}
                 </AnimatePresence>
@@ -383,412 +381,628 @@ function AllUsers() {
             </table>
           </div>
         )}
+
+        {filtered.length > 0 && (
+          <div className="pager">
+            <span className="info">Showing {table.getRowModel().rows.length} of {filtered.length} users · page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}</span>
+            <div className="pages">
+              <button disabled={!table.getCanPreviousPage()} onClick={() => table.previousPage()} aria-label="Previous page">‹</button>
+              {Array.from({ length: table.getPageCount() }).map((_, i) => <button key={i} className={i === table.getState().pagination.pageIndex ? 'on' : ''} onClick={() => table.setPageIndex(i)} aria-label={`Page ${i + 1}`}>{i + 1}</button>)}
+              <button disabled={!table.getCanNextPage()} onClick={() => table.nextPage()} aria-label="Next page">›</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-// === ADD USER FORM ===
-function AddUserForm() {
+// ============================================================ Add / Edit form
+const CONTRACT_RULES = (v: any) => [
+  ['firstName 1–40 chars', !!v.firstName?.trim() && v.firstName.trim().length <= 40],
+  ['lastName 1–40 chars', !!v.lastName?.trim() && v.lastName.trim().length <= 40],
+  ['email has a domain dot', /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email || '')],
+  ['phone 7–15 digits (optional)', !v.phone?.trim() || /^\d{7,15}$/.test(v.phone.trim())],
+  ['notes ≤ 280 chars (optional)', !v.notes || v.notes.length <= 280],
+  ['temporary password ≥ 8 chars', !!(v.temporaryPassword && v.temporaryPassword.length >= 8)],
+  ['role in closed enum', ROLES.includes(v.role)],
+  ['status in closed enum', STATUSES.includes(v.status)],
+];
+
+function UserForm() {
   const dispatch = useDispatch();
-  const [successMsg, setSuccessMsg] = useState('');
-
-  const { register, handleSubmit, formState: { errors } } = useForm<UserFormValues>({
-    resolver: zodResolver(userSchema),
-    defaultValues: {
-      accountSegment: 'Internal',
-      status: 'Active',
-      role: 'Member',
-      sendInvitation: true,
-    }
+  const editingId = useSelector((s: RootState) => s.ui.editingId);
+  const editing = useSelector((s: RootState) => s.users.data.find((u) => u.id === editingId));
+  const isEdit = !!editing;
+  const [live, setLive] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const formSchema = isEdit ? userEditSchema : userCreateSchema;
+  const { register, handleSubmit, watch, formState: { errors, isValid }, reset } = useForm<UserCreateValues | UserEditValues>({
+    resolver: zodResolver(formSchema), mode: 'onChange',
+    defaultValues: isEdit ? {
+      firstName: editing!.firstName, lastName: editing!.lastName, email: editing!.email, phone: editing!.phone || '',
+      notes: editing!.notes || '', temporaryPassword: '', accountSegment: 'Internal', status: editing!.status, role: editing!.role,
+      sendInvitation: false, enable2FA: false, productAccess: true, permissions: ['read'],
+    } : { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'] },
   });
+  useEffect(() => {
+    reset(isEdit ? {
+      firstName: editing!.firstName, lastName: editing!.lastName, email: editing!.email, phone: editing!.phone || '',
+      notes: editing!.notes || '', temporaryPassword: '', accountSegment: 'Internal', status: editing!.status, role: editing!.role,
+      sendInvitation: false, enable2FA: false, productAccess: true, permissions: ['read'],
+    } : { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'] });
+  }, [isEdit, editingId, editing, reset]);
 
-  const onSubmit = (data: UserFormValues) => {
-    const newUser = {
-      id: Date.now().toString(),
-      firstName: data.firstName,
-      lastName: data.lastName,
-      email: data.email,
-      phone: data.phone || undefined,
-      notes: data.notes || undefined,
-      status: data.status,
-      role: data.role,
-      payments: 0,
-      products: 0,
-      lastActive: new Date().toISOString(),
-    };
-    dispatch(addUser(newUser));
-    setSuccessMsg(`User ${data.firstName} ${data.lastName} added successfully!`);
-    setTimeout(() => {
+  const vals = watch();
+  const rules = CONTRACT_RULES(vals);
+  useEffect(() => {
+    if (Object.keys(errors).length) setLive(`Validation errors: ${Object.keys(errors).map((k) => (errors as any)[k]?.message || k).join('; ')}`);
+    else setLive('');
+  }, [errors]);
+
+  const onSubmit = (data: UserCreateValues) => {
+    if (submitting) return; // double-submit guard
+    setSubmitting(true);
+    if (isEdit) {
+      dispatch(updateUser({ ...editing!, firstName: data.firstName.trim(), lastName: data.lastName.trim(), email: data.email.trim(),
+        phone: data.phone?.trim() || undefined, notes: data.notes?.trim() || undefined, role: data.role, status: data.status }));
+      dispatch(pushToast({ kind: 'success', title: 'User updated', body: `${data.firstName} ${data.lastName} saved across all views` }));
+      dispatch(setLastMutation(`Updated ${data.firstName}`));
       dispatch(setActiveView('all-users'));
-    }, 1500);
+    } else {
+      dispatch(addUser(makeUserFromCreate(data)));
+      dispatch(pushToast({ kind: 'success', title: 'User added', body: `${data.firstName} ${data.lastName} added to the directory` }));
+      dispatch(setLastMutation(`Created ${data.firstName}`));
+      setTimeout(() => dispatch(setActiveView('all-users')), 700);
+    }
+    setTimeout(() => setSubmitting(false), 400);
   };
+  const cancel = () => { dispatch(setActiveView('all-users')); };
+
+  const Err = ({ k }: { k: keyof UserCreateValues }) => (errors as any)[k] ? <span className="field-error" id={`${k}-error`} role="alert">{(errors as any)[k].message}</span> : null;
+  const inv = (k: keyof UserCreateValues) => !!(errors as any)[k];
 
   return (
-    <div className="span-12 view-add-user max-w-4xl mx-auto w-full pb-8">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold">Add User</h2>
-          <p className="text-sm opacity-70">Create a new user and set their access level.</p>
-        </div>
-        <button className="btn btn-ghost" onClick={() => dispatch(setActiveView('all-users'))}>Cancel</button>
+    <div className="span-12">
+      <div className="ctxbar" style={{ padding: 0 }}>
+        <div><div className="crumbs"><h1>{isEdit ? 'Edit user' : 'Add user'}</h1></div>
+          <p style={{ color: 'var(--muted)', margin: '.1rem 0 0', fontSize: '.85rem' }}>The submit payload is the API-shaped UserCreate body the directory would accept.</p></div>
+        <button className="btn btn-ghost" onClick={cancel}>Cancel</button>
       </div>
-
-      <div aria-live="polite" className="sr-only">
-        {successMsg && successMsg}
-        {Object.keys(errors).length > 0 && "There are validation errors in the form."}
+      <div aria-live="polite" className="sr-only">{live}</div>
+      <div className="form-layout">
+        <form key={isEdit ? `edit-${editingId}` : 'add-user'} onSubmit={handleSubmit(onSubmit)} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div className="card"><div className="card-body">
+            <h3 className="card-title">Profile</h3>
+            <div className="field-grid" style={{ marginTop: '1rem' }}>
+              <div className="field"><label htmlFor="firstName">First name <span className="req">*</span></label>
+                <input id="firstName" className={`input ${inv('firstName') ? 'err' : ''}`} autoComplete="given-name" aria-invalid={inv('firstName')} aria-describedby={inv('firstName') ? 'firstName-error' : undefined} {...register('firstName')} /><Err k="firstName" /></div>
+              <div className="field"><label htmlFor="lastName">Last name <span className="req">*</span></label>
+                <input id="lastName" className={`input ${inv('lastName') ? 'err' : ''}`} autoComplete="family-name" aria-invalid={inv('lastName')} aria-describedby={inv('lastName') ? 'lastName-error' : undefined} {...register('lastName')} /><Err k="lastName" /></div>
+              <div className="field"><label htmlFor="email">Email <span className="req">*</span></label>
+                <input id="email" type="email" className={`input ${inv('email') ? 'err' : ''}`} autoComplete="email" aria-invalid={inv('email')} aria-describedby={inv('email') ? 'email-error' : undefined} {...register('email')} /><Err k="email" /></div>
+              <div className="field"><label htmlFor="phone">Phone</label>
+                <input id="phone" className={`input ${inv('phone') ? 'err' : ''}`} autoComplete="tel" aria-invalid={inv('phone')} aria-describedby={inv('phone') ? 'phone-error' : undefined} {...register('phone')} /><Err k="phone" /></div>
+              <div className="field" style={{ gridColumn: '1 / -1' }}><label htmlFor="notes">Notes</label>
+                <textarea id="notes" rows={2} className={`textarea ${inv('notes') ? 'err' : ''}`} aria-invalid={inv('notes')} aria-describedby={inv('notes') ? 'notes-error' : undefined} {...register('notes')} /><Err k="notes" /></div>
+            </div>
+          </div></div>
+          <div className="card"><div className="card-body">
+            <h3 className="card-title">Access</h3>
+            <div className="field-grid" style={{ marginTop: '1rem' }}>
+              <div className="field"><label htmlFor="temporaryPassword">Temporary password {!isEdit && <span className="req">*</span>}</label>
+                <input id="temporaryPassword" type="password" className={`input ${inv('temporaryPassword') ? 'err' : ''}`} autoComplete="new-password" aria-invalid={inv('temporaryPassword')} aria-describedby={inv('temporaryPassword') ? 'temporaryPassword-error' : undefined} {...register('temporaryPassword')} /><Err k="temporaryPassword" /></div>
+              <div className="field"><label htmlFor="accountSegment">Account segment <span className="req">*</span></label>
+                <select id="accountSegment" className="select" {...register('accountSegment')}>{SEGMENTS.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
+              <div className="field"><label className="switch" style={{ marginTop: '.4rem' }}><span className={`track ${vals.sendInvitation ? 'on' : ''}`} /><input type="checkbox" className="sr-only" {...register('sendInvitation')} /> Send invitation email</label></div>
+            </div>
+          </div></div>
+          <div className="card"><div className="card-body">
+            <h3 className="card-title">Account settings</h3>
+            <div className="field-grid" style={{ marginTop: '1rem' }}>
+              <div className="field"><label htmlFor="status">Status <span className="req">*</span></label>
+                <select id="status" className="select" {...register('status')}>{STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
+              <div className="field"><label htmlFor="role">Role <span className="req">*</span></label>
+                <select id="role" className="select" {...register('role')}>{ROLES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
+              <div className="field"><label className="switch"><span className={`track ${vals.enable2FA ? 'on' : ''}`} /><input type="checkbox" className="sr-only" {...register('enable2FA')} /> Require 2FA</label></div>
+              <div className="field"><label className="switch"><span className={`track ${vals.productAccess ? 'on' : ''}`} /><input type="checkbox" className="sr-only" {...register('productAccess')} /> Product access</label></div>
+            </div>
+          </div></div>
+          <div className="card"><div className="card-body">
+            <h3 className="card-title">Permissions</h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem' }}>
+              {['read', 'write', 'export', 'admin'].map((p) => (
+                <label key={p} className="check"><input type="checkbox" value={p} {...register('permissions')} /> {p}</label>
+              ))}
+            </div>
+          </div></div>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.6rem' }}>
+            <button type="button" className="btn btn-ghost" onClick={cancel}>Cancel</button>
+            <button type="submit" className="btn btn-primary" disabled={!isValid || submitting}>{isEdit ? 'Save changes' : 'Create user'}</button>
+          </div>
+        </form>
+        <aside className="card" aria-label="Field contract checklist"><div className="card-body">
+          <h3 className="card-title"><ShieldCheckIcon className="ico" /> Field contract</h3>
+          <p className="card-sub">Each rule lights up as the payload becomes valid.</p>
+          <ul className="contract" style={{ marginTop: '.8rem' }}>
+            {rules.map(([label, ok]) => <li key={label as string} className={ok ? 'ok' : ''}><span className="ck">{ok ? '✓' : ''}</span>{label}</li>)}
+          </ul>
+        </div></aside>
       </div>
-
-      {successMsg && (
-        <div className="alert alert-success mb-6 shadow-sm">
-          <span>{successMsg}</span>
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <section className="card bg-base-100 shadow-sm border border-base-200">
-          <div className="card-body">
-            <h3 className="card-title text-lg border-b border-base-200 pb-2">Profile</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="form-control">
-                <label className="label" htmlFor="firstName"><span className="label-text">First Name *</span><span className="sr-only">Required</span></label>
-                <input id="firstName" type="text" className={`input input-bordered ${errors.firstName ? 'input-error' : ''}`} {...register('firstName')} aria-invalid={!!errors.firstName} aria-describedby={errors.firstName ? 'firstName-error' : undefined} />
-                {errors.firstName && <span id="firstName-error" className="text-error text-xs mt-1">{errors.firstName.message}</span>}
-              </div>
-              <div className="form-control">
-                <label className="label" htmlFor="lastName"><span className="label-text">Last Name *</span><span className="sr-only">Required</span></label>
-                <input id="lastName" type="text" className={`input input-bordered ${errors.lastName ? 'input-error' : ''}`} {...register('lastName')} aria-invalid={!!errors.lastName} aria-describedby={errors.lastName ? 'lastName-error' : undefined} />
-                {errors.lastName && <span id="lastName-error" className="text-error text-xs mt-1">{errors.lastName.message}</span>}
-              </div>
-              <div className="form-control">
-                <label className="label" htmlFor="email"><span className="label-text">Email *</span><span className="sr-only">Required</span></label>
-                <input id="email" type="email" className={`input input-bordered ${errors.email ? 'input-error' : ''}`} {...register('email')} aria-invalid={!!errors.email} aria-describedby={errors.email ? 'email-error' : undefined} />
-                {errors.email && <span id="email-error" className="text-error text-xs mt-1">{errors.email.message}</span>}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="card bg-base-100 shadow-sm border border-base-200">
-          <div className="card-body">
-            <h3 className="card-title text-lg border-b border-base-200 pb-2">Access</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              <div className="form-control">
-                <label className="label" htmlFor="temporaryPassword"><span className="label-text">Temporary Password *</span><span className="sr-only">Required</span></label>
-                <input id="temporaryPassword" type="password" className={`input input-bordered ${errors.temporaryPassword ? 'input-error' : ''}`} {...register('temporaryPassword')} aria-invalid={!!errors.temporaryPassword} aria-describedby={errors.temporaryPassword ? 'temporaryPassword-error' : undefined} />
-                {errors.temporaryPassword && <span id="temporaryPassword-error" className="text-error text-xs mt-1">{errors.temporaryPassword.message}</span>}
-              </div>
-              <div className="form-control">
-                <label className="label" htmlFor="accountSegment"><span className="label-text">Account Segment *</span></label>
-                <select id="accountSegment" className={`select select-bordered ${errors.accountSegment ? 'select-error' : ''}`} {...register('accountSegment')}>
-                  <option value="Internal">Internal</option>
-                  <option value="Partner">Partner</option>
-                  <option value="External">External</option>
-                </select>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <div className="flex justify-end gap-4 mt-8">
-          <button type="button" className="btn btn-ghost" onClick={() => dispatch(setActiveView('all-users'))}>Cancel</button>
-          <button type="submit" className="btn btn-primary">Create User</button>
-        </div>
-      </form>
     </div>
   );
 }
 
-// === EXPORT DRAWER ===
+// ============================================================ extra views
+function ExtraView({ title, kind }: { title: string; kind: 'roles' | 'permissions' | 'logs' | 'stats' | 'payments' | 'products' }) {
+  const users = useSelector((s: RootState) => s.users.data);
+  const [q, setQ] = useState('');
+  const rows = users.filter((u) => `${u.firstName} ${u.lastName} ${u.email}`.toLowerCase().includes(q.toLowerCase()));
+  return (
+    <div className="span-12">
+      <div className="ctxbar" style={{ padding: 0 }}><div className="crumbs"><h1>{title}</h1></div></div>
+      <div className="card">
+        <div className="toolbar"><input className="input" style={{ width: '14rem', maxWidth: '60vw' }} value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Filter ${title.toLowerCase()}`} aria-label={`Filter ${title}`} autoComplete="off" /></div>
+        <div className="table-wrap"><table className="tbl">
+          <thead><tr>
+            {kind === 'roles' && <><th>User</th><th>Role</th><th>Status</th><th>Segment</th></>}
+            {kind === 'permissions' && <><th>User</th><th>Role</th><th>2FA</th><th>Product access</th></>}
+            {kind === 'logs' && <><th>User</th><th>Event</th><th>When</th></>}
+            {kind === 'stats' && <><th>User</th><th>Products</th><th>Payments</th><th>Last active</th></>}
+            {kind === 'payments' && <><th>User</th><th>Payments</th><th>Status</th></>}
+            {kind === 'products' && <><th>User</th><th>Products</th><th>Email</th></>}
+          </tr></thead>
+          <tbody>
+            {rows.length === 0 ? <tr><td colSpan={4} className="empty">No records match this filter.</td></tr> :
+              rows.map((u) => <tr key={u.id}>
+                {kind === 'roles' && <><td>{u.firstName} {u.lastName}</td><td><span className="badge badge-ghost">{u.role}</span></td><td>{u.status}</td><td>Internal</td></>}
+                {kind === 'permissions' && <><td>{u.firstName} {u.lastName}</td><td>{u.role}</td><td>{u.role === 'Admin' ? 'Required' : 'Off'}</td><td>Granted</td></>}
+                {kind === 'logs' && <><td>{u.firstName} {u.lastName}</td><td>session.login</td><td>{relativeTime(u.lastActive)}</td></>}
+                {kind === 'stats' && <><td>{u.firstName} {u.lastName}</td><td>{u.products}</td><td>${u.payments.toLocaleString()}</td><td>{relativeTime(u.lastActive)}</td></>}
+                {kind === 'payments' && <><td>{u.firstName} {u.lastName}</td><td>${u.payments.toLocaleString()}</td><td>{u.status}</td></>}
+                {kind === 'products' && <><td>{u.firstName} {u.lastName}</td><td>{u.products}</td><td>{u.email}</td></>}
+              </tr>)}
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================ Operations Overview
+function Overview() {
+  const dispatch = useDispatch();
+  const k = computeKpis(useSelector((s: RootState) => s.users.data));
+  const Card = ({ title, sub, link, span, inverse, icon: Icon, children }: any) => (
+    <section className={`card ${inverse ? 'card-inverse' : ''} ${span}`}>
+      <div className="card-body">
+        <div className="card-title">{Icon && <Icon className="ico" />}{title}{link && <button className="card-link" onClick={() => dispatch(setActiveView('operations-overview'))}>{link}</button>}</div>
+        {sub && <p className="card-sub">{sub}</p>}
+        {children}
+      </div>
+    </section>
+  );
+  const prog = (label: string, v: number) => (
+    <div style={{ marginBottom: '.7rem' }}><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem' }}><span>{label}</span><span>{v}%</span></div><div className="progress"><i style={{ width: `${v}%` }} /></div></div>
+  );
+  return (
+    <div className="span-12">
+      <div className="ctxbar" style={{ padding: 0 }}>
+        <div className="crumbs"><button onClick={() => dispatch(setActiveView('operations-overview'))}>Dashboard</button><span className="sep">›</span><h1>Operations Overview</h1></div>
+        <div style={{ display: 'flex', gap: '.5rem' }}>
+          <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> New product</button>
+          <button className="btn" onClick={() => dispatch(setExportOpen(true))}><ArrowDownTrayIcon className="icon-sm" /> Export session</button>
+          <button className="btn"><ShieldCheckIcon className="icon-sm" /> System health</button>
+        </div>
+      </div>
+      <div className="kpi-strip" style={{ margin: '1rem 0 1.5rem' }}>
+        <div className="kpi"><div className="k-label">Revenue</div><div className="k-val">$842K</div><div className="k-chip up">▲ 12.8% vs prior period</div></div>
+        <div className="kpi"><div className="k-label">Orders</div><div className="k-val">18.2K</div><div className="k-chip">624 awaiting fulfillment</div></div>
+        <div className="kpi"><div className="k-label">Active users</div><div className="k-val">{k.active * 4700} </div><div className="k-chip up">▲ new this month</div></div>
+        <div className="kpi"><div className="k-label">Support SLA</div><div className="k-val">94.2%</div><div className="k-chip">7 high-priority threads</div></div>
+      </div>
+      <div className="grid12" style={{ padding: 0 }}>
+        <Card title="Revenue and demand" sub="Commerce revenue, product demand, and checkout activity" icon={ChartBarIcon} span="span-8" link="Open sales analytics">
+          <div style={{ marginTop: '1rem' }}><ColumnChart values={OV.revenue} labels={OV.revenueLabels} showAvg /></div>
+          <div className="stat-row" style={{ marginTop: '.8rem' }}><div><div className="stat-big">$842K</div><span className="card-sub">Revenue</span></div><div><div className="stat-big">18.2K</div><span className="card-sub">Orders</span></div><div><div className="stat-big">4.8%</div><span className="card-sub">Checkout lift</span></div></div>
+        </Card>
+        <Card title="Order status" sub="Current order volume by fulfillment stage" icon={ShoppingCartIcon} span="span-4">
+          <div style={{ marginTop: '1rem' }}><DonutChart data={OV.orderStatus} /></div>
+          <div className="stat-row" style={{ marginTop: '.6rem', flexDirection: 'column', gap: '.3rem' }}><div>Delivered <b>5,492</b></div><div>In Progress <b>1,820</b></div></div>
+        </Card>
+
+        <Card title="Recent commerce activity" icon={ClipboardDocumentListIcon} span="span-8" link="All orders">
+          <div className="table-wrap" style={{ marginTop: '1rem' }}><table className="tbl">
+            <thead><tr><th>Record</th><th>Customer</th><th>Status</th><th>Amount</th><th></th></tr></thead>
+            <tbody>
+              {[['Order #12092', 'Mina Park', 'Refund review', 'badge-warning', '$124,735'], ['Transaction #TRX-8842', 'Arman Bell', 'Paid', 'badge-success', '$8,180'], ['Return #RET-221', 'Nora Quinn', 'Received', 'badge-ghost', '$640'], ['Checkout #CHK-492', 'Tessa Cole', 'Abandoned', 'badge-error', '$420']].map((r) => (
+                <tr key={r[0]}><td>{r[0]}</td><td>{r[1]}</td><td><span className={`badge ${r[3]}`}>{r[2]}</span></td><td>{r[4]}</td><td>Open</td></tr>
+              ))}
+            </tbody>
+          </table></div>
+        </Card>
+        <Card title="Governance and risk" sub="Payment, data access, security, and compliance posture" icon={ShieldCheckIcon} span="span-4">
+          <div style={{ display: 'grid', placeItems: 'center', margin: '1rem 0' }}><Radial value={91} /></div>
+          {prog('Gateway verification', 96)}{prog('Admin permission review', 84)}{prog('Webhook signing coverage', 78)}
+        </Card>
+
+        <Card title="Priority queue" icon={ExclamationTriangleIcon} span="span-6" link="7 queued">
+          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '.6rem' }}>
+            {[['Refund review: order #PBS-248', 'Accidental 248 PlayStation 5 order', 'Support'], ['Media processor backlog', '5K derivatives waiting', 'Ops'], ['Plugin updates', '6 updates available', 'Platform'], ['Warehouse cutoff risk', 'West dock needs labels', 'Orders']].map((q) => (
+              <div key={q[0]} style={{ display: 'flex', alignItems: 'center', gap: '.6rem', padding: '.5rem', borderRadius: '.5rem', background: 'var(--wash)' }}>
+                <span className="badge badge-ghost">{q[2]}</span><div style={{ minWidth: 0 }}><b style={{ fontSize: '.82rem' }}>{q[0]}</b><div className="card-sub" style={{ marginTop: 0 }}>{q[1]}</div></div>
+              </div>
+            ))}
+          </div>
+        </Card>
+        <Card title="Revenue run rate" sub="Daily booked revenue across storefront, invoices, and subscriptions" icon={BoltIcon} span="span-6" inverse>
+          <span className="badge" style={{ background: 'rgba(255,255,255,.2)', color: '#fff', marginTop: '.8rem', display: 'inline-flex' }}>$1.04M forecast</span>
+          <div style={{ marginTop: '.6rem' }}><ColumnChart values={OV.revenue.map((v) => v * 0.9)} labels={OV.revenueLabels} color="rgba(255,255,255,.55)" /></div>
+          <div className="stat-row" style={{ marginTop: '.6rem' }}><div><div className="stat-big">$842K</div><span className="muted">Booked</span></div><div><div className="stat-big">$187K</div><span className="muted">Pipeline</span></div></div>
+        </Card>
+
+        <Card title="Acquisition mix" sub="Sessions by top marketing channel" icon={ChartPieIcon} span="span-4"><div style={{ marginTop: '1rem' }}><DonutChart data={OV.acquisition} size={150} /></div></Card>
+        <Card title="Marketing performance" sub="Email and automation revenue movement" icon={MegaphoneIcon} span="span-4"><div style={{ marginTop: '1rem' }}><LineChart values={OV.marketing} color="var(--color-info)" /></div><div className="stat-row" style={{ marginTop: '.6rem' }}><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>42.6%</div><span className="card-sub">Open rate</span></div><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>$118K</div><span className="card-sub">Attributed</span></div></div></Card>
+        <Card title="Promotions health" icon={TagIcon} span="span-4"><div style={{ marginTop: '1rem' }}>{prog('Coupon margin', 72)}{prog('Gift card redemption', 56)}{prog('Fraud pressure', 11)}{prog('Offer health', 88)}</div></Card>
+
+        <Card title="Infrastructure uptime" sub="Last 24 hours across public services" icon={CircleStackIcon} span="span-4"><div style={{ marginTop: '1rem' }}><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem' }}><span>Storefront</span><span>100%</span></div><Uptime series={OV.uptimeStore} /><div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '.8rem', marginTop: '.6rem' }}><span>API</span><span>99.9%</span></div><Uptime series={OV.uptimeApi} /></div></Card>
+        <Card title="Satisfaction" sub="Retention, refunds, satisfaction, and service workload" icon={BanknotesIcon} span="span-4"><div style={{ display: 'grid', placeItems: 'center', margin: '1rem 0' }}><Radial value={86} /></div><div style={{ fontSize: '.82rem' }}><div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Net revenue retention</span><b>112%</b></div><div style={{ display: 'flex', justifyContent: 'space-between' }}><span>Refund pressure</span><b>3.8%</b></div><div style={{ display: 'flex', justifyContent: 'space-between' }}><span>VIP escalations</span><b>14</b></div></div></Card>
+        <Card title="Inventory pressure" icon={CubeIcon} span="span-4"><div style={{ marginTop: '1rem' }}>{prog('Low stock', 42)}{prog('Oversold', 7)}{prog('Healthy stock', 88)}</div></Card>
+
+        <Card title="Plugin and tool status" icon={PuzzlePieceIcon} span="span-6" link="Plugins">
+          <div className="table-wrap" style={{ marginTop: '1rem' }}><table className="tbl"><thead><tr><th>Component</th><th>Status</th><th>Signal</th></tr></thead><tbody>
+            {[['Fraud Shield', 'Active', 'badge-success', '426 coupon blocks'], ['Media Optimizer', 'Update', 'badge-warning', 'Backlog impact'], ['Backup Vault', 'Active', 'badge-success', 'Last snapshot 18m ago'], ['Import queue', 'Ready', 'badge-info', '3 validated files']].map((r) => (
+              <tr key={r[0]}><td>{r[0]}</td><td><span className={`badge ${r[2]}`}>{r[1]}</span></td><td>{r[3]}</td></tr>
+            ))}
+          </tbody></table></div>
+        </Card>
+        <Card title="Fulfillment throughput" sub="Packed, shipped, returned, and delayed order movement" icon={ArrowsRightLeftIcon} span="span-6"><div style={{ marginTop: '1rem' }}><LineChart values={OV.fulfillment} color="var(--color-info)" /></div><div className="stat-row" style={{ marginTop: '.6rem' }}><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>9,482</div><span className="card-sub">Packed</span></div><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>624</div><span className="card-sub">Queued</span></div><div><div className="stat-big" style={{ fontSize: '1.3rem' }}>118</div><span className="card-sub">Returns</span></div></div></Card>
+
+        <Card title="Automation coverage" sub="Campaigns, refunds, imports, and fulfillment handled automatically" icon={BoltIcon} span="span-4"><div style={{ marginTop: '1rem' }}>{prog('Email flows', 82)}{prog('Scheduled jobs', 68)}</div></Card>
+        <Card title="Security watch" icon={ShieldCheckIcon} span="span-4">
+          <div style={{ marginTop: '1rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem' }}><span className="ping-dot" style={{ background: 'var(--color-success)' }} /><b>1,284</b> blocked attempts</div>
+            <div className="card-sub">-8% from yesterday</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', marginTop: '.8rem' }}><span className="ping-dot" style={{ background: 'var(--color-error)' }} /><b>4</b> risky sessions</div>
+            <div className="card-sub">3 need review · 1 suspicious</div>
+          </div>
+        </Card>
+        <Card title="Cash movement" icon={BanknotesIcon} span="span-4">
+          <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '.7rem', fontSize: '.85rem' }}>
+            <div style={{ display: 'flex', gap: '.6rem' }}><b>In</b><div><b>$428K captured</b><div className="card-sub" style={{ marginTop: 0 }}>Card, wallet, invoice</div></div></div>
+            <div style={{ display: 'flex', gap: '.6rem' }}><b>Hold</b><div><b>$22K under review</b><div className="card-sub" style={{ marginTop: 0 }}>Gateway disputes</div></div></div>
+            <div style={{ display: 'flex', gap: '.6rem' }}><b>Out</b><div><b>$18K refunds</b><div className="card-sub" style={{ marginTop: 0 }}>Approved returns</div></div></div>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// ============================================================ Export drawer
 function ExportDrawer() {
   const dispatch = useDispatch();
-  const { exportDrawerOpen, exportPreviewTab } = useSelector((state: RootState) => state.ui);
-  const users = useSelector((state: RootState) => state.users.data);
-  const [importDraft, setImportDraft] = useState('');
+  const { exportOpen, exportTab } = useSelector((s: RootState) => s.ui);
+  const users = useSelector((s: RootState) => s.users.data);
+  const ui = useSelector((s: RootState) => s.ui);
   const [importMode, setImportMode] = useState(false);
-  const [msg, setMsg] = useState('');
+  const [draft, setDraft] = useState('');
+  const [msg, setMsg] = useState<{ kind: 'success' | 'error'; text: string } | null>(null);
+  const [printView, setPrintView] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const lastFocus = useRef<HTMLElement | null>(null);
+  const kpis = computeKpis(filterUsersForKpis(users, ui.filterRole, ui.filterStatus));
 
-  const sessionJson = useMemo(() => {
-    const kpis = {
-      total: users.length,
-      active: users.filter(u => u.status === 'Active').length,
-      paying: users.filter(u => u.payments > 0).length,
-      suspended: users.filter(u => u.status === 'Suspended').length,
-    };
-    return JSON.stringify({ schemaVersion: 'pineapple-admin-analytics-v1', kpis, users }, null, 2);
-  }, [users]);
+  const doc = useMemo(() => buildSession(users, { role: ui.filterRole, status: ui.filterStatus, sort: ui.sort, theme: ui.theme, activeView: ui.activeView }),
+    [users, ui.filterRole, ui.filterStatus, ui.sort, ui.theme, ui.activeView]);
+  const json = useMemo(() => JSON.stringify(doc, null, 2), [doc]);
+  const csv = useMemo(() => buildCsv(users), [users]);
+  const text = exportTab === 'json' ? json : csv;
 
-  const usersCsv = useMemo(() => {
-    if (users.length === 0) return 'id,firstName,lastName,email,role,status,payments,products,lastActive\n';
-    const header = Object.keys(users[0]).join(',');
-    const rows = users.map(u => Object.values(u).map(v => `"${v}"`).join(','));
-    return [header, ...rows].join('\n');
-  }, [users]);
-
-  const handleCopy = () => {
-    const text = exportPreviewTab === 'json' ? sessionJson : usersCsv;
-    navigator.clipboard.writeText(text);
-    setMsg('Copied to clipboard');
-    setTimeout(() => setMsg(''), 2000);
-  };
-
-  const handleImport = () => {
-    try {
-      if (exportPreviewTab === 'json') {
-        const parsed = JSON.parse(importDraft);
-        if (parsed.schemaVersion === 'pineapple-admin-analytics-v1' && Array.isArray(parsed.users)) {
-          dispatch(setUsers(parsed.users));
-          setMsg('Import successful');
-          setImportDraft('');
-        } else {
-          setMsg('Import error: Invalid schemaVersion or missing users array');
-        }
-      } else {
-        const lines = importDraft.trim().split('\n');
-        if (lines.length > 0) {
-          const headers = lines[0].split(',');
-          const newUsers: User[] = lines.slice(1).map(line => {
-            const values = line.split(',').map(v => v.replace(/^"|"$/g, ''));
-            const obj: any = {};
-            headers.forEach((h, i) => { obj[h] = values[i] });
-            return {
-              ...obj,
-              payments: Number(obj.payments) || 0,
-              products: Number(obj.products) || 0,
-            } as User;
-          });
-          dispatch(setUsers(newUsers));
-          setMsg('Import successful');
-          setImportDraft('');
-        }
-      }
-    } catch (e: any) {
-      setMsg(`Import error: ${e.message}`);
-    }
-  };
-
-  return (
-    <div className={`drawer drawer-end ${exportDrawerOpen ? 'drawer-open' : ''} z-50 fixed inset-0 pointer-events-none`}>
-      <input type="checkbox" className="drawer-toggle" checked={exportDrawerOpen} readOnly />
-      <div className="drawer-side pointer-events-auto">
-        <label aria-label="close sidebar" className="drawer-overlay" onClick={() => dispatch(setExportDrawerOpen(false))}></label>
-        <div className="menu bg-base-200 text-base-content min-h-full w-96 p-0 flex flex-col">
-          <div className="p-4 border-b border-base-300 flex justify-between items-center bg-base-100">
-            <h2 className="text-xl font-bold">Export / Import</h2>
-            <button className="btn btn-sm btn-ghost btn-circle" onClick={() => dispatch(setExportDrawerOpen(false))} aria-label="Close drawer">
-              <svg data-src="./assets/icons/x-mark.svg" className="icon-sm" />
-            </button>
-          </div>
-
-          <div className="p-4 flex gap-2 border-b border-base-300 bg-base-100">
-            <button className={`btn btn-sm ${exportPreviewTab === 'json' ? 'btn-neutral' : 'btn-ghost'}`} onClick={() => dispatch(setExportPreviewTab('json'))}>Session JSON</button>
-            <button className={`btn btn-sm ${exportPreviewTab === 'csv' ? 'btn-neutral' : 'btn-ghost'}`} onClick={() => dispatch(setExportPreviewTab('csv'))}>Users CSV</button>
-          </div>
-
-          <div aria-live="polite" className="sr-only">{msg}</div>
-
-          {msg && (
-            <div className="p-4 bg-base-100">
-              <div className={`alert ${msg.includes('error') ? 'alert-error' : 'alert-success'} shadow-sm text-sm`}>
-                {msg}
-              </div>
-            </div>
-          )}
-
-          <div className="flex-1 overflow-auto p-4 flex flex-col gap-4 bg-base-100">
-            <div className="flex justify-between items-center">
-              <h3 className="font-bold">{importMode ? 'Paste Import Data' : 'Preview'}</h3>
-              <button className="btn btn-xs btn-outline" onClick={() => setImportMode(!importMode)}>
-                {importMode ? 'Cancel Import' : 'Import Mode'}
-              </button>
-            </div>
-
-            {importMode ? (
-              <textarea
-                className="textarea textarea-bordered w-full flex-1 font-mono text-xs"
-                placeholder={`Paste ${exportPreviewTab.toUpperCase()} here...`}
-                value={importDraft}
-                onChange={e => setImportDraft(e.target.value)}
-              />
-            ) : (
-              <pre className="bg-base-200 p-4 rounded-box overflow-auto flex-1 text-xs font-mono">
-                {exportPreviewTab === 'json' ? sessionJson : usersCsv}
-              </pre>
-            )}
-          </div>
-
-          <div className="p-4 border-t border-base-300 bg-base-200 flex gap-2">
-            {importMode ? (
-              <button className="btn btn-primary flex-1" onClick={handleImport} disabled={!importDraft}>Import Data</button>
-            ) : (
-              <>
-                <button className="btn btn-outline flex-1" onClick={handleCopy}>Copy</button>
-                <button className="btn btn-primary flex-1">Download</button>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// === WEBMCP BINDER ===
-function WebMCPBinder() {
-  const dispatch = useDispatch();
-
+  // open/close effects: focus trap + restore + escape
   useEffect(() => {
-    (window as any).webmcp_list_tools = () => {
-      return [
-        { name: "browse_open", description: "Open a destination view" },
-        { name: "browse_apply_filter", description: "Filter the list" },
-        { name: "browse_clear_filter", description: "Clear filters" },
-        { name: "browse_sort", description: "Sort the list" },
-        { name: "browse_set_theme", description: "Set the UI theme" },
-        { name: "entity_create", description: "Create a user" },
-        { name: "entity_update", description: "Update user properties" },
-        { name: "entity_delete", description: "Delete a user" },
-        { name: "artifact_export", description: "Export session data" },
-        { name: "artifact_import", description: "Import session data" },
-        { name: "artifact_copy", description: "Copy artifact to clipboard" }
-      ];
-    };
-
-    (window as any).webmcp_invoke_tool = async (name: string, args: any) => {
-      try {
-        switch (name) {
-          case 'browse_open':
-            if (args.destinations && args.destinations[0]) {
-              dispatch(setActiveView(args.destinations[0]));
-            }
-            return { result: "Success" };
-          case 'browse_apply_filter':
-            if (args.filters) {
-              if (args.filters.role !== undefined) dispatch(setFilterRole(args.filters.role));
-              if (args.filters.status !== undefined) dispatch(setFilterStatus(args.filters.status));
-            }
-            return { result: "Success" };
-          case 'browse_clear_filter':
-            dispatch(setFilterRole(''));
-            dispatch(setFilterStatus(''));
-            return { result: "Success" };
-          case 'browse_sort':
-            if (args.sorts && args.sorts[0]) dispatch(setSortCriteria(args.sorts[0]));
-            return { result: "Success" };
-          case 'browse_set_theme':
-            if (args.themes && args.themes[0]) dispatch(setTheme(args.themes[0]));
-            return { result: "Success" };
-          case 'entity_create':
-            if (args.entity === 'user' && args.entity_fields) {
-              dispatch(addUser({
-                id: Date.now().toString(),
-                firstName: args.entity_fields.firstName || args.entity_fields.name?.split(' ')[0] || 'Unknown',
-                lastName: args.entity_fields.lastName || args.entity_fields.name?.split(' ').slice(1).join(' ') || 'Unknown',
-                email: args.entity_fields.email || 'unknown@example.com',
-                role: args.entity_fields.role || 'User',
-                status: args.entity_fields.status || 'Active',
-                payments: args.entity_fields.payments || 0,
-                products: args.entity_fields.products || 0,
-                lastActive: new Date().toISOString(),
-              }));
-            }
-            return { result: "Success" };
-          case 'entity_update':
-            if (args.entity === 'user' && args.entity_fields && args.target_id) {
-              if (args.entity_fields.role) dispatch(updateUsersRole({ ids: [args.target_id], role: args.entity_fields.role }));
-              if (args.entity_fields.status) dispatch(updateUsersStatus({ ids: [args.target_id], status: args.entity_fields.status }));
-            }
-            return { result: "Success" };
-          case 'entity_delete':
-            if (args.entity === 'user' && args.target_id && args.confirm === true) {
-              dispatch(deleteUser(args.target_id));
-            }
-            return { result: "Success" };
-          case 'artifact_export': {
-            const users = store.getState().users.data;
-            if (args.export_formats && args.export_formats[0] === 'json') {
-               return { result: JSON.stringify({ schemaVersion: 'pineapple-admin-analytics-v1', users }) };
-            }
-            return { result: "CSV Export Not fully implemented in tool string return" };
-          }
-          case 'artifact_import':
-            if (args.import_modes && args.import_modes[0] === 'session-json' && args.content) {
-              const parsed = JSON.parse(args.content);
-              dispatch(setUsers(parsed.users));
-            }
-            return { result: "Success" };
-          default:
-            return { error: `Unknown tool: ${name}` };
-        }
-      } catch (err: any) {
-        return { error: err.message };
+    if (exportOpen) { lastFocus.current = document.activeElement as HTMLElement; }
+    else { setImportMode(false); setDraft(''); setMsg(null); lastFocus.current?.focus?.(); }
+  }, [exportOpen]);
+  useEffect(() => {
+    if (!exportOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { dispatch(setExportOpen(false)); return; }
+      if (e.key === 'Tab' && drawerRef.current) {
+        const f = drawerRef.current.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
+        if (!f.length) return; const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
       }
     };
-  }, [dispatch]);
+    document.addEventListener('keydown', onKey);
+    setTimeout(() => drawerRef.current?.querySelector<HTMLElement>('button')?.focus(), 60);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [exportOpen, dispatch]);
 
-  return null;
-}
-
-// === ARIA LIVE ===
-function AriaLivePolite() {
-  const users = useSelector((state: RootState) => state.users.data);
-  const [msg, setMsg] = useState('');
-  const [prevCount, setPrevCount] = useState(users.length);
-
-  useEffect(() => {
-    if (users.length > prevCount) {
-      setMsg('User successfully added.');
-    } else if (users.length < prevCount) {
-      setMsg('User successfully deleted.');
-    }
-    setPrevCount(users.length);
-  }, [users.length]);
-
-  return (
-    <div aria-live="polite" className="sr-only">
-      {msg}
-    </div>
-  );
-}
-
-// === APP ROOT ===
-export default function App() {
-  const activeView = useSelector((state: RootState) => state.ui.activeView);
-  const sidebarOpen = useSelector((state: RootState) => state.ui.sidebarOpen);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    const theme = localStorage.getItem("theme");
-    if (theme === "light") {
-      dispatch(setTheme("light"));
-    }
-  }, [dispatch]);
+  const copy = async () => {
+    try { await navigator.clipboard.writeText(text); } catch { /* ignore */ }
+    setMsg({ kind: 'success', text: `Copied ${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} to clipboard` });
+    dispatch(pushToast({ kind: 'success', title: 'Copied to clipboard', body: `${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} preview copied` }));
+  };
+  const download = () => {
+    const blob = new Blob([text], { type: exportTab === 'json' ? 'application/json' : 'text/csv' });
+    const url = URL.createObjectURL(blob); const a = document.createElement('a');
+    const fname = exportTab === 'json' ? 'session.json' : 'users.csv';
+    a.href = url; a.download = fname; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    dispatch(pushToast({ kind: 'info', title: 'Download started', body: `${fname} download started` }));
+  };
+  const doImport = () => {
+    const res = exportTab === 'json' ? importSessionJson(draft) : importUsersCsv(draft);
+    if (!res.ok) { setMsg({ kind: 'error', text: `Import failed: ${res.message}` }); dispatch(pushToast({ kind: 'error', title: 'Import failed', body: res.message })); return; }
+    dispatch(setUsers(res.users));
+    if (res.applied) { dispatch(setFilterRole(res.applied.role || '')); dispatch(setFilterStatus(res.applied.status || '')); dispatch(setSort(res.applied.sort || 'newest')); dispatch(setTheme(res.applied.theme || 'dark')); if (res.applied.activeView) dispatch(setActiveView(res.applied.activeView as any)); }
+    setMsg({ kind: 'success', text: `Imported ${res.users.length} user(s). All Users, KPIs, and previews now match.` });
+    dispatch(pushToast({ kind: 'success', title: 'Import successful', body: `${res.users.length} user(s) restored` }));
+    setDraft(''); setImportMode(false);
+  };
 
   return (
     <>
-      <WebMCPBinder />
-      <AriaLivePolite />
-      <div className={`drawer lg:drawer-open dashboard-shell bg-base-200 ${sidebarOpen ? 'drawer-open' : ''}`}>
-        <input id="my-drawer" type="checkbox" className="drawer-toggle" checked={sidebarOpen} readOnly aria-label="Toggle sidebar" />
-        <main className="drawer-content bg-base-100 main-canvas">
-          <div className="dashboard-grid">
-            <Header />
-            {activeView === 'operations-overview' && <OperationsOverview />}
-            {activeView === 'all-users' && <AllUsers />}
-            {activeView === 'add-user' && <AddUserForm />}
+      <div className={`drawer-overlay ${exportOpen ? 'open' : ''}`} onClick={() => dispatch(setExportOpen(false))} aria-hidden="true" />
+      <div ref={drawerRef} className={`export-drawer ${exportOpen ? 'open' : ''}`} role="dialog" aria-modal="true" aria-label="Export and import session" aria-hidden={!exportOpen}>
+        <div className="export-head">
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>{importMode ? 'Import session' : 'Export session'}</h2>
+          <button className="btn btn-ghost btn-circle" aria-label="Close export drawer" onClick={() => dispatch(setExportOpen(false))}><XMarkIcon className="icon-md" /></button>
+        </div>
+        <div className="export-tabs" role="tablist" aria-label="Export format">
+          <button role="tab" aria-selected={exportTab === 'json'} className={`btn btn-sm ${exportTab === 'json' ? 'btn-neutral' : 'btn-ghost'}`} onClick={() => dispatch(setExportTab('json'))}>Session JSON</button>
+          <button role="tab" aria-selected={exportTab === 'csv'} className={`btn btn-sm ${exportTab === 'csv' ? 'btn-neutral' : 'btn-ghost'}`} onClick={() => dispatch(setExportTab('csv'))}>Users CSV</button>
+          <div style={{ flex: 1 }} />
+          <button className="btn btn-sm btn-ghost" onClick={() => setImportMode((v) => !v)}>{importMode ? 'Back to preview' : 'Import session'}</button>
+        </div>
+        {!importMode && (
+          <div className="export-summary" aria-label="Export summary">
+            <div className="es"><b>{users.length}</b><span>users</span></div>
+            <div className="es"><b>{kpis.total}</b><span>KPI total</span></div>
+            <div className="es"><b>{kpis.active}</b><span>active</span></div>
+            <div className="es"><b>{kpis.suspended}</b><span>suspended</span></div>
+            <div className="es" style={{ marginLeft: 'auto' }}><span>exported {new Date(doc.exportedAt).toLocaleTimeString()}</span></div>
           </div>
-        </main>
-        <Sidebar />
+        )}
+        <div aria-live="polite" className="sr-only">{msg?.text}</div>
+        {msg && <div style={{ padding: '.6rem 1.2rem 0' }}><div className={`toast ${msg.kind}`} style={{ position: 'static', width: 'auto' }}><span>{msg.text}</span></div></div>}
+        <div className="export-body">
+          {importMode ? (
+            <>
+              <p className="card-sub">Paste {exportTab === 'json' ? 'Session JSON' : 'Users CSV'} text. Malformed or contract-violating input is rejected and leaves the directory unchanged.</p>
+              <textarea className="textarea" style={{ flex: 1, fontFamily: 'var(--ff-mono)', fontSize: '.72rem' }} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={`Paste ${exportTab === 'json' ? 'Session JSON' : 'Users CSV'} here`} aria-label="Import payload" />
+            </>
+          ) : (
+            <>
+              {!printView ? <pre className="export-pre" tabIndex={0}>{text}</pre>
+                : <div className="export-pre" style={{ whiteSpace: 'normal' }}><b>Session summary</b> — {users.length} users · total {kpis.total} · active {kpis.active} · paying {kpis.paying} · suspended {kpis.suspended} · sort {ui.sort} · theme {ui.theme} · view {ui.activeView}.</div>}
+              <button className="btn btn-sm btn-outline" onClick={() => { setPrintView((v) => !v); if (!printView) setTimeout(() => window.print(), 50); }}><DocumentTextIcon className="icon-sm" /> {printView ? 'Hide summary' : 'Print / share summary'}</button>
+            </>
+          )}
+        </div>
+        <div className="export-foot">
+          {importMode ? (
+            <button className="btn btn-primary" style={{ flex: 1 }} disabled={!draft.trim()} onClick={doImport}>Import data</button>
+          ) : (
+            <>
+              <button className="btn btn-outline" style={{ flex: 1 }} onClick={copy}><ClipboardDocumentIcon className="icon-sm" /> Copy</button>
+              <button className="btn btn-primary" style={{ flex: 1 }} onClick={download}><ArrowDownTrayIcon className="icon-sm" /> Download {exportTab === 'json' ? 'JSON' : 'CSV'}</button>
+            </>
+          )}
+        </div>
       </div>
-      <ExportDrawer />
+    </>
+  );
+}
 
-      <button
-        className="fixed bottom-4 right-4 btn btn-circle btn-primary shadow-lg"
-        onClick={() => dispatch(setExportDrawerOpen(true))}
-        aria-label="Open export drawer"
-      >
-        <svg data-src="./assets/icons/arrow-down-tray.svg" className="icon-sm" />
-      </button>
+// ============================================================ Toasts
+function Toasts() {
+  const dispatch = useDispatch();
+  const toasts = useSelector((s: RootState) => s.ui.toasts);
+  const scheduledRef = useRef(new Set<string>());
+  useEffect(() => {
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    toasts.forEach((t) => {
+      if (scheduledRef.current.has(t.id)) return;
+      scheduledRef.current.add(t.id);
+      timers.push(setTimeout(() => {
+        scheduledRef.current.delete(t.id);
+        dispatch(dismissToast(t.id));
+      }, 3800));
+    });
+    return () => { timers.forEach(clearTimeout); };
+  }, [toasts, dispatch]);
+  useEffect(() => {
+    const live = new Set(toasts.map((t) => t.id));
+    scheduledRef.current.forEach((id) => { if (!live.has(id)) scheduledRef.current.delete(id); });
+  }, [toasts]);
+  const Icon = (k: string) => k === 'success' ? <CheckCircleIcon className="icon-md t-ico" style={{ color: 'var(--color-success)' }} /> : k === 'error' ? <ExclamationTriangleIcon className="icon-md t-ico" style={{ color: 'var(--color-error)' }} /> : <InformationCircleIcon className="icon-md t-ico" style={{ color: 'var(--color-info)' }} />;
+  return (
+    <div className="toast-stack" aria-live="polite" aria-atomic="false">
+      <AnimatePresence>
+        {toasts.map((t) => (
+          <motion.div key={t.id} className={`toast ${t.kind}`} role="status"
+            initial={{ opacity: 0, x: 320 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 320 }} transition={{ duration: 0.3 }}>
+            {Icon(t.kind)}<div><div className="t-title">{t.title}</div>{t.body && <div className="t-body">{t.body}</div>}</div>
+            <button className="btn btn-ghost btn-xs" style={{ marginLeft: 'auto' }} aria-label="Dismiss notification" onClick={() => dispatch(dismissToast(t.id))}><XMarkIcon className="icon-sm" /></button>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ============================================================ Confirm dialog
+function ConfirmDialog() {
+  const dispatch = useDispatch();
+  const { confirm, selection } = useSelector((s: RootState) => s.ui);
+  const close = () => dispatch(setConfirm({ open: false, title: '', body: '', ids: [] }));
+  const confirmDel = () => {
+    const ids = confirm.ids; const n = ids.length;
+    dispatch(deleteUsers(ids)); dispatch(clearSelection());
+    dispatch(pushToast({ kind: 'success', title: `${n} user(s) deleted`, body: 'Removed from list, KPIs, and export previews' }));
+    dispatch(setLastMutation(`Deleted ${n}`)); close();
+  };
+  useEffect(() => {
+    if (!confirm.open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', onKey); return () => document.removeEventListener('keydown', onKey);
+  }, [confirm.open]);
+  if (!confirm.open) return null;
+  return (
+    <div className="modal-backdrop" role="alertdialog" aria-modal="true" aria-label={confirm.title} onClick={close}>
+      <motion.div className="modal" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} onClick={(e) => e.stopPropagation()}>
+        <h3>{confirm.title}</h3><p>{confirm.body}</p>
+        <div className="actions"><button className="btn btn-ghost" onClick={close}>Cancel</button><button className="btn btn-error" onClick={confirmDel} autoFocus>Delete</button></div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ============================================================ WebMCP
+const VIEW_DESTS = ['operations-overview', 'all-users', 'add-user', 'roles', 'permissions', 'user-logs', 'user-stats', 'user-payments', 'user-products', 'export-drawer'];
+function WebMCPBinder() {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    const w: any = window;
+    w.webmcp_session_info = () => ({ contract: 'zto-webmcp-v1', modules: ['browse-query-v1', 'entity-collection-v1', 'artifact-transfer-v1'], version: 'pineapple-admin-analytics-v1' });
+    w.webmcp_list_tools = () => [
+      { name: 'browse_open', description: 'Open a destination view', params: { destinations: VIEW_DESTS } },
+      { name: 'browse_search', description: 'Filter the All Users list by search text', params: { query: 'string' } },
+      { name: 'browse_apply_filter', description: 'Apply role/status filters', params: { filters: { role: ROLES, status: STATUSES } } },
+      { name: 'browse_clear_filter', description: 'Clear role/status/search filters' },
+      { name: 'browse_sort', description: 'Sort the list', params: { sorts: ['last-active', 'newest', 'highest-spend', 'name-az'] } },
+      { name: 'browse_set_theme', description: 'Set the UI theme', params: { themes: ['light', 'dark'] } },
+      { name: 'entity_create', description: 'Create a user (validated against UserCreate contract)', params: { entity: ['user'], entity_fields: 'UserCreate' } },
+      { name: 'entity_select', description: 'Set row selection', params: { entity: ['user'], target_ids: 'string[]' } },
+      { name: 'entity_update', description: 'Update a user by id', params: { entity: ['user'], target_id: 'string', entity_fields: 'partial user' } },
+      { name: 'entity_delete', description: 'Delete a user (requires confirm=true)', params: { entity: ['user'], target_id: 'string', confirm: true } },
+      { name: 'artifact_export', description: 'Open export drawer on a format tab', params: { export_formats: ['json', 'csv'] } },
+      { name: 'artifact_import', description: 'Import pasted text', params: { import_modes: ['session-json', 'users-csv'], content: 'string' } },
+      { name: 'artifact_copy', description: 'Copy the active preview to clipboard', params: { export_formats: ['json', 'csv'] } },
+    ];
+    w.webmcp_invoke_tool = async (name: string, args: any = {}) => {
+      try {
+        const st = store.getState();
+        switch (name) {
+          case 'browse_open': {
+            const d = (args.destinations && args.destinations[0]) || args.destination;
+            if (!VIEW_DESTS.includes(d)) return { error: `destination must be one of ${VIEW_DESTS.join(', ')}` };
+            if (d === 'export-drawer') dispatch(setExportOpen(true)); else dispatch(setActiveView(d));
+            return { result: `opened ${d}` };
+          }
+          case 'browse_search': dispatch(setActiveView('all-users')); dispatch(setSearch(String(args.query ?? ''))); return { result: 'search applied' };
+          case 'browse_apply_filter':
+            if (args.filters) { if (args.filters.role !== undefined) dispatch(setFilterRole(args.filters.role)); if (args.filters.status !== undefined) dispatch(setFilterStatus(args.filters.status)); }
+            return { result: 'filters applied' };
+          case 'browse_clear_filter': dispatch(resetFilters()); return { result: 'filters cleared' };
+          case 'browse_sort': { const s = (args.sorts && args.sorts[0]) || args.sort; if (!['last-active', 'newest', 'highest-spend', 'name-az'].includes(s)) return { error: 'invalid sort' }; dispatch(setSort(s)); return { result: `sorted ${s}` }; }
+          case 'browse_set_theme': { const t = (args.themes && args.themes[0]) || args.theme; if (t !== 'light' && t !== 'dark') return { error: 'theme must be light or dark' }; dispatch(setTheme(t)); return { result: `theme ${t}` }; }
+          case 'entity_create': {
+            if (args.entity && args.entity !== 'user') return { error: 'entity must be user' };
+            const f = args.entity_fields || {};
+            const parsed = userCreateSchema.safeParse({ ...f, temporaryPassword: f.temporaryPassword || 'password1', accountSegment: f.accountSegment || 'Internal', status: f.status || 'Active', role: f.role || 'Member' });
+            if (!parsed.success) return { error: parsed.error.issues.map((i) => `${i.path.join('.')}: ${i.message}`).join('; ') };
+            dispatch(addUser(makeUserFromCreate(parsed.data)));
+            dispatch(pushToast({ kind: 'success', title: 'User added', body: `${parsed.data.firstName} ${parsed.data.lastName} (via MCP)` }));
+            return { result: `created user ${parsed.data.firstName} ${parsed.data.lastName}` };
+          }
+          case 'entity_select': {
+            const ids = args.target_ids || (args.target_id ? [args.target_id] : []);
+            const valid = ids.filter((id: string) => st.users.data.some((u) => u.id === id));
+            if (valid.length !== ids.length) return { error: 'one or more target ids not found' };
+            dispatch(setSelection(valid)); return { result: `selected ${valid.length} row(s)` };
+          }
+          case 'entity_update': {
+            const id = args.target_id; if (!id || !st.users.data.some((u) => u.id === id)) return { error: 'target_id not found' };
+            const f = args.entity_fields || {}; const patch: any = {};
+            if (f.name) { const [fn, ...rest] = String(f.name).split(' '); patch.firstName = fn; patch.lastName = rest.join(' ') || patch.lastName; }
+            if (f.firstName !== undefined) patch.firstName = f.firstName; if (f.lastName !== undefined) patch.lastName = f.lastName;
+            if (f.email !== undefined) patch.email = f.email; if (f.role !== undefined) { if (!ROLES.includes(f.role)) return { error: 'invalid role' }; patch.role = f.role; }
+            if (f.status !== undefined) { if (!STATUSES.includes(f.status)) return { error: 'invalid status' }; patch.status = f.status; }
+            if (f.payments !== undefined) patch.payments = Number(f.payments); if (f.products !== undefined) patch.products = Number(f.products);
+            if (f['last-active'] !== undefined || f.lastActive !== undefined) patch.lastActive = f['last-active'] || f.lastActive;
+            dispatch(patchUsers({ ids: [id], patch })); return { result: `updated user ${id}` };
+          }
+          case 'entity_delete': {
+            const id = args.target_id; if (!id || !st.users.data.some((u) => u.id === id)) return { error: 'target_id not found' };
+            if (args.confirm !== true) return { error: 'delete requires confirm=true' };
+            dispatch(deleteUser(id)); dispatch(pushToast({ kind: 'success', title: 'User deleted', body: 'Removed via MCP' })); return { result: `deleted user ${id}` };
+          }
+          case 'artifact_export': {
+            const fmt = (args.export_formats && args.export_formats[0]) || args.format || 'json';
+            if (fmt !== 'json' && fmt !== 'csv') return { error: 'format must be json or csv' };
+            dispatch(setExportTab(fmt)); dispatch(setExportOpen(true));
+            const k = computeKpis(filterUsersForKpis(st.users.data, st.ui.filterRole, st.ui.filterStatus));
+            return { result: `export preview set to ${fmt === 'json' ? 'Session JSON' : 'Users CSV'}: ${st.users.data.length} users, kpi total ${k.total}` };
+          }
+          case 'artifact_import': {
+            const mode = (args.import_modes && args.import_modes[0]) || args.mode || (exportTabGuess(args.content) );
+            const content = String(args.content ?? '');
+            const res = mode === 'users-csv' ? importUsersCsv(content) : importSessionJson(content);
+            if (!res.ok) return { error: res.message };
+            dispatch(setUsers(res.users));
+            if (res.applied) {
+              dispatch(setFilterRole(res.applied.role || ''));
+              dispatch(setFilterStatus(res.applied.status || ''));
+              dispatch(setSort(res.applied.sort || 'newest'));
+              dispatch(setTheme(res.applied.theme || 'dark'));
+              if (res.applied.activeView) dispatch(setActiveView(res.applied.activeView as any));
+            }
+            return { result: `imported ${res.users.length} user(s) via ${mode}` };
+          }
+          case 'artifact_copy': {
+            const fmt = (args.export_formats && args.export_formats[0]) || st.ui.exportTab;
+            const t = fmt === 'csv' ? buildCsv(st.users.data) : JSON.stringify(buildSession(st.users.data, { role: st.ui.filterRole, status: st.ui.filterStatus, sort: st.ui.sort, theme: st.ui.theme, activeView: st.ui.activeView }), null, 2);
+            try { await navigator.clipboard.writeText(t); } catch { /* ignore */ }
+            dispatch(pushToast({ kind: 'success', title: 'Copied to clipboard', body: `${fmt === 'csv' ? 'Users CSV' : 'Session JSON'} copied (via MCP)` }));
+            return { result: `copied ${fmt} preview (${t.length} chars)` };
+          }
+          default: return { error: `unknown tool ${name}` };
+        }
+      } catch (e: any) { return { error: e?.message || String(e) }; }
+    };
+    return () => { delete w.webmcp_session_info; delete w.webmcp_list_tools; delete w.webmcp_invoke_tool; };
+  }, [dispatch]);
+  return null;
+}
+function exportTabGuess(content: string) { return String(content || '').trim().startsWith('[') || String(content || '').trim().startsWith('{') ? 'session-json' : 'users-csv'; }
+
+// ============================================================ App root
+export default function App() {
+  const dispatch = useDispatch();
+  const { theme, accent, activeView } = useSelector((s: RootState) => s.ui);
+  useEffect(() => { document.documentElement.setAttribute('data-theme', theme); }, [theme]);
+  useEffect(() => { document.documentElement.setAttribute('data-accent', accent); }, [accent]);
+  const view = () => {
+    switch (activeView) {
+      case 'all-users': return <AllUsers />;
+      case 'add-user': case 'edit-user': return <UserForm />;
+      case 'roles': return <ExtraView title="Roles" kind="roles" />;
+      case 'permissions': return <ExtraView title="Permissions" kind="permissions" />;
+      case 'user-logs': return <ExtraView title="User Logs" kind="logs" />;
+      case 'user-stats': return <ExtraView title="User Stats" kind="stats" />;
+      case 'user-payments': return <ExtraView title="User Payments" kind="payments" />;
+      case 'user-products': return <ExtraView title="User Products" kind="products" />;
+      default: return <Overview />;
+    }
+  };
+  return (
+    <>
+      <WebMCPBinder />
+      <TooltipPortal />
+      <div className="shell">
+        <Sidebar />
+        <div className="main-canvas">
+          <Header />
+          <div className="grid12">{view()}</div>
+        </div>
+      </div>
+      <button className="fab" aria-label="Open export drawer" onClick={() => dispatch(setExportOpen(true))}><ArrowDownTrayIcon className="icon-md" /></button>
+      <ExportDrawer />
+      <Toasts />
+      <ConfirmDialog />
     </>
   );
 }

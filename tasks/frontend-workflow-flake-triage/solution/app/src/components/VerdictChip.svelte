@@ -5,6 +5,7 @@
   let { verdict, compact = false }: { verdict: Verdict; compact?: boolean } = $props();
 </script>
 
+{#key verdict}
 <span class:compact class={`verdict-chip ${verdict}`} data-verdict={verdict}>
   {#if verdict === 'keep'}
     <IconCircleCheckFilled size={compact ? 12 : 14} aria-hidden="true" />
@@ -15,6 +16,7 @@
   {/if}
   {verdict}
 </span>
+{/key}
 
 <style>
   .verdict-chip {
@@ -31,6 +33,11 @@
     line-height: 1;
     text-transform: capitalize;
     transition: color 220ms ease, background-color 220ms ease, border-color 220ms ease, transform 220ms ease;
+    animation: verdict-swap 240ms cubic-bezier(.22,.61,.36,1);
+  }
+  @keyframes verdict-swap {
+    from { opacity: .35; transform: scale(.94); }
+    to { opacity: 1; transform: scale(1); }
   }
   .verdict-chip.compact {
     min-width: 58px;

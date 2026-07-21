@@ -30,7 +30,11 @@ export default function Alert(props: {
     <div class={`rounded-lg border p-3 flex flex-col gap-1.5 ${skin.box}`}>
       <div class="flex items-center gap-2">
         <span class={skin.icon}>
-          {props.type === "info" ? <Information size={20} /> : <Warning size={20} />}
+          {props.type === "info" ? (
+            <Information size={20} label={`${skin.title} icon`} />
+          ) : (
+            <Warning size={20} label={`${skin.title} icon`} />
+          )}
         </span>
         <h2 class="text-scope-fg1 text-base font-medium">{skin.title}</h2>
       </div>

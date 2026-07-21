@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { Button, Search, Select, SelectItem, ToastNotification, Toggle } from '@carbon/react'
 import { Book, Chemistry, Compare, Download, Filter, Redo, Undo } from '@carbon/icons-react'
+import { captureFocus } from './focus'
 import { ROLES, useAppStore } from './store'
 import LibraryView from './components/LibraryView'
 import TestBenchView from './components/TestBenchView'
@@ -39,7 +40,7 @@ function AppToolbar() {
         <Button className="mobile-filter" kind="ghost" size="md" hasIconOnly renderIcon={Filter} iconDescription="Open tag filters" onClick={() => setUI({ filtersOpen: true })} />
         <Button kind="ghost" size="md" hasIconOnly renderIcon={Undo} iconDescription="Undo" disabled={!undoCount} onClick={undo} />
         <Button kind="ghost" size="md" hasIconOnly renderIcon={Redo} iconDescription="Redo" disabled={!redoCount} onClick={redo} />
-        <Button kind="tertiary" size="md" renderIcon={Download} onClick={() => setUI({ exportOpen: true })}>Export</Button>
+        <Button kind="tertiary" size="md" renderIcon={Download} onClick={() => { captureFocus(); setUI({ exportOpen: true, exportRestoreFocus: true }) }}>Export</Button>
       </div>
     </header>
   )
@@ -82,6 +83,7 @@ export default function App() {
       <DetailAndPoll />
       <ExportDrawer />
       <ToastRegion />
+      <div className="mobile-nav-spacer" aria-hidden="true" />
       <div className="sr-only" aria-live="polite" aria-atomic="true">{announce}</div>
     </div>
   )

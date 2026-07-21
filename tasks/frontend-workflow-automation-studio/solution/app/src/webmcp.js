@@ -40,7 +40,13 @@ function ok(message, extra = {}) { return { ok: true, message, visible_postcondi
 function fail(message) { throw new Error(message) }
 
 const handlers = {
-  browse_open: ({ destination }) => { useStudio.getState().setView(destination); return ok(`Opened ${destination}`) },
+  browse_open: ({ destination }) => {
+    if (!destinations.includes(destination)) fail(`Unknown destination: ${destination}`)
+    const state = useStudio.getState()
+    state.setUi({ scheduleOpen: false, newScriptModal: false, paletteOpen: false, historyOpen: false })
+    state.setView(destination)
+    return ok(`Opened ${destination}`)
+  },
   browse_search: ({ query }) => { useStudio.getState().setUi({ paletteOpen: true, paletteQuery: query, paletteIndex: 0 }); return ok(`Command palette shows results for ${query}`) },
   browse_apply_filter: ({ filter, value }) => {
     if (filter === 'timeline-status') useStudio.getState().setTimelineFilter(String(value))
@@ -63,10 +69,11 @@ const handlers = {
   editor_update_property: args => {
     const state = useStudio.getState(); const prop = args.property
     if (args.object_type === 'script') {
+      if (args.id && args.id !== state.selectedScriptId) state.selectScript(args.id)
       const key = prop === 'target-url' ? 'target_url' : prop
-      // Enforce the declared bounds so a tool never accepts values the UI's schema rejects.
       if (key === 'target_url') { const parsed = newScriptSchema.shape.target_url.safeParse(args.value); if (!parsed.success) fail(parsed.error.issues[0].message) }
       if (key === 'name') { const parsed = newScriptSchema.shape.name.safeParse(args.value); if (!parsed.success) fail(parsed.error.issues[0].message) }
+      if (!state.selectedScriptId) fail('No script is selected')
       state.updateScriptMeta(key, args.value)
     }
     else if (args.object_type === 'step') {
@@ -111,7 +118,15 @@ const handlers = {
   editor_set_content: ({ property, value }) => { useStudio.getState().setPlayground({ [property === 'mock-html' ? 'playgroundHtml' : 'playgroundSelector']: value }); useStudio.getState().setView('playground'); return ok(`Updated ${property}`) },
   editor_switch_mode: ({ mode, version }) => { if (mode === 'version-preview') useStudio.getState().previewVersion(version); else if (mode === 'diff') useStudio.getState().setView('runs'); else useStudio.getState().previewVersion(null); return ok(`Switched to ${mode}`) },
   editor_preview: ({ preview, version }) => { if (preview === 'version') { useStudio.getState().setView('step-editor'); useStudio.getState().previewVersion(version) } else { useStudio.getState().setView('export'); useStudio.getState().setUi({ exportTab: preview === 'definition-json' ? 'definition' : 'report' }) } return ok(`Opened ${preview} preview`) },
-  session_start: ({ script_id, trigger = 'manual' }) => { const started = useStudio.getState().startRun(script_id || useStudio.getState().selectedScriptId, trigger); if (!started) fail('Run could not start: another run is active or the script has no steps'); return ok('Run started and is visibly streaming') },
+  session_start: ({ script_id, trigger = 'manual' }) => {
+    const state = useStudio.getState()
+    const id = script_id || state.selectedScriptId
+    if (!id) fail('Run could not start: no script is selected')
+    if (script_id && script_id !== state.selectedScriptId) state.selectScript(script_id)
+    const started = state.startRun(id, trigger)
+    if (!started) fail('Run could not start: another run is active or the script has no steps')
+    return ok('Run started and is visibly streaming')
+  },
   session_pause: () => { useStudio.getState().pauseRun(); return ok('Active run is paused') },
   session_resume: () => { useStudio.getState().resumeRun(); return ok('Active run resumed from its checkpoint') },
   session_restart: () => { useStudio.getState().restartRun(); return ok('Active run restarted') },

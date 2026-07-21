@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FileUploaderDropContainer, Modal, TextArea } from '@carbon/react'
@@ -25,13 +25,16 @@ export default function ImportModal({ launcherButtonRef }) {
   const setChrome = useStudioStore((state) => state.setChrome)
   const replaceLibrary = useStudioStore((state) => state.replaceLibrary)
   const showToast = useStudioStore((state) => state.showToast)
+  const [submitError, setSubmitError] = useState('')
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    setError,
     trigger,
-    formState: { errors, isValid },
+    getValues,
+    formState: { errors },
   } = useForm({
     resolver: zodResolver(importSchema),
     mode: 'onChange',
@@ -39,8 +42,24 @@ export default function ImportModal({ launcherButtonRef }) {
   })
 
   useEffect(() => {
-    if (!open) reset({ documentText: '' })
+    if (!open) {
+      reset({ documentText: '' })
+      setSubmitError('')
+    }
   }, [open, reset])
+
+  useEffect(() => {
+    if (!open) return undefined
+    function onKeyDown(event) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopPropagation()
+        close()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown, true)
+    return () => window.removeEventListener('keydown', onKeyDown, true)
+  }, [open])
 
   function close() {
     setChrome({ importModalOpen: false })
@@ -53,9 +72,28 @@ export default function ImportModal({ launcherButtonRef }) {
       replaceLibrary(document.entries)
       close()
       showToast('success', 'Library imported', `${document.entries.length} prompts restored from the validated document.`)
-    } catch (error) {
-      showToast('error', 'Import failed', 'The document contains invalid schema properties.')
+    } catch {
+      const message = 'Library JSON does not match the Template Forms schema.'
+      setSubmitError(message)
+      setError('documentText', { type: 'manual', message })
+      showToast('error', 'Import failed', message)
     }
+  }
+
+  async function attemptImport() {
+    const valid = await trigger()
+    if (!valid) {
+      const fieldError = importSchema.safeParse({ documentText: getValues('documentText') }).error?.issues.find((issue) => issue.path[0] === 'documentText')
+      const message = fieldError?.message
+        || (getValues('documentText')?.trim()
+          ? 'Library JSON does not match the Template Forms schema.'
+          : 'Library JSON is required. Paste JSON or choose a file.')
+      setSubmitError(message)
+      setError('documentText', { type: 'manual', message })
+      showToast('error', 'Import rejected', message)
+      return
+    }
+    handleSubmit(confirm)()
   }
 
   async function addFile(_event, { addedFiles }) {
@@ -67,16 +105,14 @@ export default function ImportModal({ launcherButtonRef }) {
   }
 
   return (
-    <Modal focusTrap={true}
+    <Modal
       open={open}
       modalHeading="Import library JSON"
       modalLabel="Validated replacement"
       primaryButtonText="Replace library"
       secondaryButtonText="Cancel"
-      primaryButtonDisabled={!isValid}
-      onRequestSubmit={handleSubmit(confirm)}
+      onRequestSubmit={attemptImport}
       onRequestClose={close}
-      launcherButtonRef={launcherButtonRef}
       size="md"
     >
       <p className="modal-copy">Importing a conforming Template Forms document replaces the current in-memory library. Invalid files leave it unchanged.</p>
@@ -93,8 +129,8 @@ export default function ImportModal({ launcherButtonRef }) {
         labelText={<>Library document <span className="required-mark" aria-hidden="true">*</span></>}
         rows={10}
         placeholder={'{\n  "schemaVersion": 1,\n  "product": "Template Forms",\n  ...\n}'}
-        invalid={Boolean(errors.documentText)}
-        invalidText={errors.documentText?.message}
+        invalid={Boolean(errors.documentText || submitError)}
+        invalidText={errors.documentText?.message || submitError}
         {...register('documentText')}
       />
     </Modal>

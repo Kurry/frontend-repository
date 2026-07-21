@@ -37,46 +37,81 @@ function findTrial(trialId) {
   return allTrials.find((item) => item.trial.id === trialId);
 }
 
+function ensureOpenTrial(trialId) {
+  const found = findTrial(trialId);
+  if (!found) return null;
+  useReviewStore.getState().openTrial(found.trial.id, found.task.id);
+  return found;
+}
+
 function navigate(destination, args = {}) {
-  const store = useReviewStore.getState();
-  if (destination === "task-list") store.backToTasks();
+  if (destination === "task-list") {
+    useReviewStore.getState().backToTasks();
+    return {
+      ok: true,
+      destination,
+      visible: true,
+      view: useReviewStore.getState().view,
+    };
+  }
   if (destination === "task-detail") {
-    const taskId = args.taskId || store.activeTaskId;
+    const taskId = args.taskId || useReviewStore.getState().activeTaskId;
     if (!getTask(taskId))
       return {
         ok: false,
         field: "taskId",
         error: "taskId must name a seeded task",
       };
-    store.selectTask(taskId);
+    useReviewStore.getState().selectTask(taskId);
+    return {
+      ok: true,
+      destination,
+      visible: true,
+      view: useReviewStore.getState().view,
+      taskId,
+    };
   }
   if (destination === "review-workspace") {
-    const found = findTrial(args.trialId || store.activeTrialId);
+    const trialId = args.trialId || useReviewStore.getState().activeTrialId;
+    const found = ensureOpenTrial(trialId);
     if (!found)
       return {
         ok: false,
         field: "trialId",
         error: "trialId must name a seeded trial",
       };
-    store.selectTask(found.task.id);
-    store.openTrial(found.trial.id);
-  }
-  if (
-    [
-      "agent-trajectory-pane",
-      "scorer-trajectory-pane",
-      "verdict-table",
-      "export-drawer",
-      "import-surface",
-      "command-palette",
-    ].includes(destination) &&
-    !store.activeTrialId
-  )
+    const state = useReviewStore.getState();
     return {
-      ok: false,
-      field: "destination",
-      error: "Open a trial before this destination",
+      ok: true,
+      destination,
+      visible: true,
+      view: state.view,
+      trialId: state.activeTrialId,
+      taskId: state.activeTaskId,
     };
+  }
+
+  const needsTrial = [
+    "agent-trajectory-pane",
+    "scorer-trajectory-pane",
+    "verdict-table",
+    "export-drawer",
+    "import-surface",
+    "command-palette",
+  ].includes(destination);
+  if (needsTrial) {
+    let state = useReviewStore.getState();
+    if (!state.activeTrialId && args.trialId) ensureOpenTrial(args.trialId);
+    state = useReviewStore.getState();
+    if (!state.activeTrialId)
+      return {
+        ok: false,
+        field: "destination",
+        error: "Open a trial before this destination",
+      };
+  }
+
+  const store = useReviewStore.getState();
   if (destination === "agent-trajectory-pane") store.setFocusedPane("agent");
   if (destination === "scorer-trajectory-pane") store.setFocusedPane("scorer");
   if (destination === "verdict-table")
@@ -90,7 +125,14 @@ function navigate(destination, args = {}) {
   if (destination === "export-drawer") store.openOverlay("export");
   if (destination === "import-surface") store.openOverlay("import");
   if (destination === "command-palette") store.openOverlay("palette");
-  return { ok: true, destination, visible: true };
+  const after = useReviewStore.getState();
+  return {
+    ok: true,
+    destination,
+    visible: true,
+    view: after.view,
+    trialId: after.activeTrialId,
+  };
 }
 
 function applyFilter(args) {
@@ -322,7 +364,15 @@ const definitions = [
           field: "criterionId",
           error: "criterionId must exist in the active trial",
         });
-      useReviewStore.getState().selectCriterion(criterionId);
+      const ok = useReviewStore
+        .getState()
+        .selectCriterion(criterionId, { toggle: false });
+      if (!ok)
+        return result({
+          ok: false,
+          field: "criterionId",
+          error: "Unable to select criterion in the active trial",
+        });
       const { ui } = active();
       return result({
         ok: true,
@@ -435,6 +485,8 @@ const definitions = [
     },
     execute: ({ format }) => {
       const store = useReviewStore.getState();
+      if (!store.activeTrialId)
+        return result({ ok: false, error: "Open a trial before copy" });
       store.setExportTab(format === "review-package-json" ? "json" : "memo");
       store.openOverlay("export");
       return result({
@@ -442,6 +494,7 @@ const definitions = [
         format,
         previewVisible: true,
         clipboardActionRequired: true,
+        trialId: store.activeTrialId,
       });
     },
   },

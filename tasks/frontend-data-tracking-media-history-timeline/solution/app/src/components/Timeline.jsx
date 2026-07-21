@@ -43,51 +43,40 @@ export function Timeline() {
   const span = yearWindow.to - yearWindow.from;
   const pixelsPerYear = width / span;
 
-  useEffect(() => {
-    const handleFullSpan = () => {
-      setYearWindow({ from: MT_DATA.yearMin, to: MT_DATA.yearMax });
-    };
-    window.addEventListener('full-span', handleFullSpan);
-    return () => window.removeEventListener('full-span', handleFullSpan);
-  }, [setYearWindow]);
+  const clampWindow = (from, to) => {
+    let f = from;
+    let t = to;
+    const s = t - f;
+    if (f < MT_DATA.yearMin) {
+      f = MT_DATA.yearMin;
+      t = f + s;
+    }
+    if (t > MT_DATA.yearMax) {
+      t = MT_DATA.yearMax;
+      f = t - s;
+    }
+    return { from: Math.round(f), to: Math.round(t) };
+  };
+
+  const panBy = (yearDelta) => {
+    setYearWindow(clampWindow(yearWindow.from + yearDelta, yearWindow.to + yearDelta));
+  };
+
+  const zoomAboutMidpoint = (factor) => {
+    const mid = (yearWindow.from + yearWindow.to) / 2;
+    const totalSpan = MT_DATA.yearMax - MT_DATA.yearMin;
+    const targetSpan = Math.max(50, Math.min(span * factor, totalSpan));
+    setYearWindow(clampWindow(mid - targetSpan / 2, mid + targetSpan / 2));
+  };
 
   const handleWheel = (e) => {
     e.preventDefault();
     if (width <= 0 || span <= 0) return;
     if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
       const dx = e.deltaX || e.deltaY;
-      const yearDelta = (dx / width) * span;
-      let newFrom = yearWindow.from + yearDelta;
-      let newTo = yearWindow.to + yearDelta;
-
-      if (newFrom < MT_DATA.yearMin) {
-        newFrom = MT_DATA.yearMin;
-        newTo = newFrom + span;
-      }
-      if (newTo > MT_DATA.yearMax) {
-        newTo = MT_DATA.yearMax;
-        newFrom = newTo - span;
-      }
-
-      setYearWindow({ from: Math.round(newFrom), to: Math.round(newTo) });
+      panBy((dx / width) * span);
     } else {
-      const zoom = e.deltaY > 0 ? 1.12 : 0.9;
-      const mid = (yearWindow.from + yearWindow.to) / 2;
-      const totalSpan = MT_DATA.yearMax - MT_DATA.yearMin;
-      const targetSpan = Math.max(50, Math.min(span * zoom, totalSpan));
-      let newFrom = mid - targetSpan / 2;
-      let newTo = mid + targetSpan / 2;
-
-      if (newFrom < MT_DATA.yearMin) {
-        newFrom = MT_DATA.yearMin;
-        newTo = newFrom + targetSpan;
-      }
-      if (newTo > MT_DATA.yearMax) {
-        newTo = MT_DATA.yearMax;
-        newFrom = newTo - targetSpan;
-      }
-
-      setYearWindow({ from: Math.round(newFrom), to: Math.round(newTo) });
+      zoomAboutMidpoint(e.deltaY > 0 ? 1.12 : 0.9);
     }
   };
 
@@ -99,6 +88,14 @@ export function Timeline() {
     }
   }, [yearWindow, width, span]);
 
+  const onKeyDown = (e) => {
+    if (width <= 0 || span <= 0) return;
+    if (e.key === 'ArrowLeft') { e.preventDefault(); panBy(-span * 0.05); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); panBy(span * 0.05); }
+    else if (e.key === 'ArrowUp' || e.key === '+' || e.key === '=') { e.preventDefault(); zoomAboutMidpoint(0.85); }
+    else if (e.key === 'ArrowDown' || e.key === '-' || e.key === '_') { e.preventDefault(); zoomAboutMidpoint(1.18); }
+  };
+
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, from: 0, to: 0 });
 
@@ -106,27 +103,16 @@ export function Timeline() {
     if (e.target.closest('button')) return;
     setIsDragging(true);
     setDragStart({ x: e.clientX, from: yearWindow.from, to: yearWindow.to });
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch (err) { /* pointer capture unsupported — drag still works via bubbling */ }
   };
 
   const onPointerMove = (e) => {
     if (!isDragging || width <= 0 || span <= 0) return;
     const dx = e.clientX - dragStart.x;
     const yearDelta = -(dx / width) * span;
-
-    let newFrom = dragStart.from + yearDelta;
-    let newTo = dragStart.to + yearDelta;
-
-    if (newFrom < MT_DATA.yearMin) {
-      newFrom = MT_DATA.yearMin;
-      newTo = newFrom + span;
-    }
-    if (newTo > MT_DATA.yearMax) {
-      newTo = MT_DATA.yearMax;
-      newFrom = newTo - span;
-    }
-
-    setYearWindow({ from: Math.round(newFrom), to: Math.round(newTo) });
+    setYearWindow(clampWindow(dragStart.from + yearDelta, dragStart.to + yearDelta));
   };
 
   const onPointerUp = (e) => {
@@ -134,7 +120,7 @@ export function Timeline() {
     setIsDragging(false);
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch(e) {}
+    } catch (err) { /* ignore */ }
   };
 
   const ticks = [];
@@ -147,6 +133,8 @@ export function Timeline() {
     }
   }
 
+  const compact = width < 700;
+
   return (
     <div
       ref={containerRef}
@@ -155,8 +143,10 @@ export function Timeline() {
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
+      onKeyDown={onKeyDown}
       tabIndex={0}
-      aria-label="Interactive media history timeline"
+      role="application"
+      aria-label="Interactive media history timeline. Arrow keys pan the year window; plus and minus zoom."
     >
       <div className="absolute top-[72%] left-0 right-0 h-0.5 bg-gray-300"></div>
 
@@ -173,7 +163,7 @@ export function Timeline() {
             style={{ left, width: bandWidth, background: era.color }}
             aria-label={`${era.label} era`}
           >
-            <span className="absolute left-2 top-2 max-w-[calc(100%-1rem)] truncate text-[11px] font-semibold uppercase tracking-wide text-gray-500">
+            <span className="absolute left-2 top-2 max-w-[calc(100%-1rem)] truncate text-xs font-semibold text-gray-500">
               {era.label}
             </span>
           </div>
@@ -205,6 +195,10 @@ export function Timeline() {
           const color = cat ? cat.color : '#000';
           const isActive = selectedId === ev.id;
 
+          // Keep the label box inside the stage so it never clips past the viewport edge.
+          const labelAbsLeft = Math.min(Math.max(x + 14, 4), Math.max(4, width - 148));
+          const labelOffset = labelAbsLeft - x;
+
           return (
             <motion.div
               key={ev.id}
@@ -221,7 +215,9 @@ export function Timeline() {
               ></div>
               <button
                 type="button"
-                className={`w-6 h-6 rounded-full border-2 bg-white flex items-center justify-center -translate-x-1/2 -translate-y-1/2 transition-all ${isActive ? 'scale-125 shadow-lg border-[var(--c-focus)]' : 'border-gray-200 hover:scale-110 shadow-sm hover:shadow-md'}`}
+                className={`w-6 h-6 rounded-full border-2 bg-white flex items-center justify-center -translate-x-1/2 -translate-y-1/2 transition-all duration-150 ${isActive
+                  ? 'scale-125 shadow-lg border-[var(--c-brand)]'
+                  : 'border-gray-300 shadow-sm hover:scale-125 hover:border-[var(--c-brand)] hover:shadow-lg hover:ring-4 hover:ring-cyan-600/20 active:scale-95'}`}
                 onClick={(e) => { e.stopPropagation(); setSelectedId(ev.id); }}
                 aria-label={`${ev.title}, ${formatYear(ev.year)}`}
                 tabIndex={0}
@@ -229,11 +225,16 @@ export function Timeline() {
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
               </button>
 
-              <div className={`absolute top-0 left-4 whitespace-nowrap pointer-events-none transition-opacity ${isActive ? 'opacity-100 z-10' : 'opacity-0 group-hover:opacity-100'}`}>
-                <div className="bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs shadow-sm border border-gray-100 font-medium">
-                  {ev.title}
+              {(!compact || isActive) && (
+                <div
+                  className={`absolute top-0 pointer-events-none transition-opacity z-10 ${isActive ? 'opacity-100' : 'opacity-90 group-hover:opacity-100'}`}
+                  style={{ left: labelOffset }}
+                >
+                  <div className={`bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs shadow-sm border font-medium max-w-[140px] truncate ${isActive ? 'border-[var(--c-brand)] text-[var(--c-ink)]' : 'border-gray-100'}`}>
+                    {ev.title}
+                  </div>
                 </div>
-              </div>
+              )}
             </motion.div>
           );
         })}

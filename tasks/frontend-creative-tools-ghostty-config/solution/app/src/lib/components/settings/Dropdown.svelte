@@ -370,6 +370,7 @@
 
 <div class="dropdown" bind:this={rootEl}>
     <button
+        id={setting?.controlId}
         aria-labelledby={setting?.labelId}
         class="trigger"
         class:open={isOpen}

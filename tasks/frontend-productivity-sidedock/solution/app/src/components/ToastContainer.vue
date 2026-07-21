@@ -9,7 +9,9 @@ const store = useSidedockStore()
     <div
       v-for="toast in store.toasts"
       :key="toast.id"
-      class="toast px-4 py-2.5 rounded-lg shadow-lg text-sm font-medium pointer-events-auto transition-all animate-slide-up"
+      class="toast px-4 py-2 rounded-lg shadow-lg text-sm font-medium pointer-events-auto transition-all animate-slide-up"
+      :role="toast.type === 'error' || toast.type === 'warning' ? 'alert' : 'status'"
+      :aria-live="toast.type === 'error' || toast.type === 'warning' ? 'assertive' : 'polite'"
       :style="{
         background: toast.type === 'success' ? '#059669' : toast.type === 'warning' ? '#D97706' : toast.type === 'error' ? '#DC2626' : 'var(--color-text-primary)',
         color: 'white',

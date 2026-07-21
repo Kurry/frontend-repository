@@ -50,9 +50,12 @@
     const label = store.exportTab === 'json' ? 'Nest JSON' : 'Markdown vault';
     if (success) {
       copied = true;
+      copyFailed = false;
       liveMessage = `${label} copied to clipboard`;
       setTimeout(() => { copied = false; }, 1600);
     } else {
+      copied = false;
+      copyFailed = true;
       liveMessage = `Failed to copy ${label} to clipboard`;
     }
   }
@@ -103,6 +106,7 @@
       role="dialog"
       aria-modal="true"
       aria-label="Export Nest"
+      tabindex="-1"
       onkeydown={onKeydown}
     >
       <div class="flex items-center justify-between px-4 py-3 border-b border-slate-200 flex-shrink-0">
@@ -132,20 +136,22 @@
         <pre class="text-xs font-mono whitespace-pre text-slate-800 leading-relaxed">{previewText}</pre>
       </div>
 
-      <div class="flex items-center gap-2 px-4 py-3 border-t border-slate-200 flex-shrink-0">
+      <div class="flex items-center gap-2 px-4 py-3 border-t border-slate-200 flex-shrink-0 flex-wrap">
         <button class="px-3 py-2 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white transition cursor-pointer" onclick={copy}>
           {copied ? 'Copied!' : 'Copy'}
         </button>
         <button class="px-3 py-2 text-sm font-medium rounded-lg bg-slate-200 hover:bg-slate-300 text-slate-700 transition cursor-pointer" onclick={download}>
           Download
         </button>
+        {#if liveMessage}
+          <p class="text-sm {copyFailed ? 'text-red-700' : 'text-green-700'}" role="status" aria-live="polite">{liveMessage}</p>
+        {/if}
         <div class="flex-1"></div>
         <button class="px-3 py-2 text-sm font-medium rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition cursor-pointer" onclick={() => { store.exportOpen = false; store.importOpen = true; }}>
           Import Nest
         </button>
       </div>
 
-      <div class="sr-only" role="status" aria-live="polite">{liveMessage}</div>
     </div>
   </div>
 {/if}

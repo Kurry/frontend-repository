@@ -30,6 +30,7 @@ import {
   selectTriageStats,
   sourceCount,
   sourceFiles,
+  stripCredentialMaterial,
   useAppStore,
 } from './store/useAppStore'
 import { registerWebMCP } from './lib/webmcp'
@@ -43,6 +44,36 @@ const titleReason = (reason) => ({
 }[reason] || reason)
 const formatDate = (value) => new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value))
 const formatTime = (value) => value ? new Intl.DateTimeFormat('en', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(new Date(value)) : '—'
+const Icon = ({ as: Comp, label, ...props }) => <Comp aria-label={label} role="img" title={label} {...props} />
+
+function useDialogFocus(open, onOpenChange) {
+  const restoreFocus = useAppStore((state) => state.restoreFocus)
+  return (value) => {
+    onOpenChange(value)
+    if (!value) restoreFocus()
+  }
+}
+
+function FocusTrap({ open, children }) {
+  const ref = useRef(null)
+  useEffect(() => {
+    if (!open || !ref.current) return undefined
+    const root = ref.current
+    const focusables = () => [...root.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter((el) => !el.disabled)
+    const onKeyDown = (event) => {
+      if (event.key !== 'Tab') return
+      const items = focusables()
+      if (!items.length) return
+      const first = items[0]
+      const last = items.at(-1)
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+    }
+    root.addEventListener('keydown', onKeyDown)
+    return () => root.removeEventListener('keydown', onKeyDown)
+  }, [open])
+  return <div ref={ref}>{children}</div>
+}
 
 function Button({ variant = 'outline', size = '', className = '', children, ...props }) {
   return <button className={cx('btn', `btn-${variant}`, size && `btn-${size}`, className)} {...props}>{children}</button>
@@ -71,21 +102,24 @@ function TopBar() {
   const setConnectionsOpen = useAppStore((state) => state.setConnectionsOpen)
   const setCommandOpen = useAppStore((state) => state.setCommandOpen)
   const setMobileNavOpen = useAppStore((state) => state.setMobileNavOpen)
+  const theme = useAppStore((state) => state.theme)
+  const toggleTheme = useAppStore((state) => state.toggleTheme)
   return (
     <header className="topbar">
       <div className="brand-wrap">
-        <Button className="icon-mobile btn-icon" variant="ghost" onClick={() => setMobileNavOpen(true)} aria-label="Open navigation"><SidebarSimple size={20} /></Button>
-        <div className="brand-mark"><BracketsCurly size={21} weight="bold" /></div>
-        <div><div className="brand-title">TaskFoundry</div><div className="brand-subtitle">Evaluation task console</div></div>
+        <Button className="icon-mobile btn-icon" variant="ghost" onClick={() => setMobileNavOpen(true)} aria-label="Open navigation"><SidebarSimple size={20} aria-hidden /></Button>
+        <div className="brand-mark"><BracketsCurly size={21} weight="bold" aria-hidden /></div>
+        <div><h1 className="brand-title">TaskFoundry</h1><div className="brand-subtitle">Evaluation task console</div></div>
       </div>
       <div className="top-actions">
         <ModeChip />
+        <Button variant="ghost" size="sm" onClick={toggleTheme} aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}>{theme === 'dark' ? 'Light' : 'Dark'}</Button>
         <div className="status-pair" aria-label="Connection status" aria-live="polite">
-          <span className={cx('connection-chip', githubStatus === 'connected' && 'connected')}><GithubLogo size={13} /> GitHub {githubStatus === 'connected' ? 'ready' : 'off'}</span>
-          <span className={cx('connection-chip', aiStatus === 'connected' && 'connected')}><Robot size={13} /> AI {aiStatus === 'connected' ? 'ready' : 'off'}</span>
+          <span className={cx('connection-chip', githubStatus === 'connected' && 'connected')}><GithubLogo size={13} aria-hidden /> GitHub {githubStatus === 'connected' ? 'ready' : 'off'}</span>
+          <span className={cx('connection-chip', aiStatus === 'connected' && 'connected')}><Robot size={13} aria-hidden /> AI {aiStatus === 'connected' ? 'ready' : 'off'}</span>
         </div>
-        <Button variant="outline" className="keyboard-btn" onClick={() => setCommandOpen(true)}><Command size={14} /> Search <span className="mono tiny">⌘K</span></Button>
-        <Button variant="primary" onClick={() => setConnectionsOpen(true)}><Plug size={15} /> Connections</Button>
+        <Button variant="outline" className="keyboard-btn" onClick={() => setCommandOpen(true)}><Command size={14} aria-hidden /> Search <span className="mono tiny">⌘K</span></Button>
+        <Button variant="primary" onClick={() => setConnectionsOpen(true)}><Plug size={15} aria-hidden /> Connections</Button>
       </div>
       <Coachmark kind="connections" title="Connect when you’re ready" className="coachmark-connection">The whole factory works on fixtures now. Add credentials here later to switch the same controls to live data.</Coachmark>
     </header>
@@ -126,6 +160,7 @@ function ConnectionStatus({ status, connectedText }) {
 function ConnectionsPanel() {
   const open = useAppStore((state) => state.connectionsOpen)
   const setOpen = useAppStore((state) => state.setConnectionsOpen)
+  const handleOpenChange = useDialogFocus(open, setOpen)
   const store = useAppStore()
   const [showGithub, setShowGithub] = useState(false)
   const [showAI, setShowAI] = useState(false)
@@ -137,10 +172,11 @@ function ConnectionsPanel() {
   const submitAI = ai.handleSubmit(async ({ aiBaseUrl, aiApiKey }) => { store.setAiBaseUrl(aiBaseUrl); store.setCredential('aiApiKey', aiApiKey); await store.connectAI() })
 
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
+    <Dialog.Root open={open} onOpenChange={handleOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="dialog-overlay" />
-        <Dialog.Content className="sheet" aria-describedby="connections-description">
+        <Dialog.Overlay className="dialog-overlay" onClick={() => handleOpenChange(false)} />
+        <Dialog.Content className="sheet" aria-describedby="connections-description" onInteractOutside={() => handleOpenChange(false)} onEscapeKeyDown={() => handleOpenChange(false)}>
+          <FocusTrap open={open}>
           <div className="sheet-head">
             <div><Dialog.Title className="sheet-title">Connections</Dialog.Title><Dialog.Description id="connections-description" className="sheet-description">Credentials stay in memory for this tab only. Reloading clears both keys and returns to demo data.</Dialog.Description></div>
             <Dialog.Close asChild><Button variant="ghost" className="btn-icon" aria-label="Close Connections"><X size={18} /></Button></Dialog.Close>
@@ -176,6 +212,7 @@ function ConnectionsPanel() {
           <section className="card card-pad" style={{ marginTop: 15 }}>
             <div className="credential-head"><div><div className="credential-name"><Sparkle size={18} /> Coachmarks</div><p className="field-help" style={{ marginTop: 5 }}>Restore the first-run tips across Connections, Triage, and Runs.</p></div><Button variant="outline" size="sm" onClick={() => { store.resetCoachmarks(); store.toast('Tips reset', 'All three coachmarks are visible again.') }}><ArrowClockwise size={13} /> Reset tips</Button></div>
           </section>
+          </FocusTrap>
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
@@ -249,7 +286,7 @@ function CandidatesView() {
           <label className="switch-field"><Switch.Root className="switch-root" checked={filters.requireIssue} onCheckedChange={(requireIssue) => setFilters({ requireIssue })} aria-label="Require linked issue"><Switch.Thumb className="switch-thumb" /></Switch.Root> Require linked issue</label>
         </div>
         <ActiveChips filters={filters} clear={clearFilters} setFilter={setFilters} />
-        {loaded.length ? <><div className="pr-list">{loaded.map((pr, index) => <button key={pr.number} className={cx('pr-row', selectedPr === pr.number && 'active')} style={{ animationDelay: `${index * 25}ms` }} onClick={() => selectPr(repo.name, pr.number)}><span className="pr-num">#{pr.number}</span><span className="pr-title">{pr.title}</span><span className="pr-meta"><Clock size={12} />{formatDate(pr.merged_at).replace(', 2026', '')}</span><span className="pr-meta">{pr.linkedIssue ? <><LinkSimple size={12} /> Issue</> : <><XCircle size={12} /> No issue</>}</span><span className="pr-meta"><FileCode size={12} /> {pr.files.length} / {sourceCount(pr)} src</span></button>)}</div><div className="list-footer"><span>Loaded {loaded.length} of {filtered.length} matching PRs</span>{loaded.length < filtered.length && <Button variant="outline" size="sm" onClick={() => loadMore(repo.name)}>Load next page <ArrowRight size={12} /></Button>}</div></> : <div className="empty-state"><div className="empty-icon"><Funnel size={20} /></div><h3>No pull requests match</h3><p>Active filters: source files {filters.min ?? 'any'}–{filters.max ?? 'any'}{filters.requireIssue ? ', linked issue required' : ''}. Clear them to restore the full list.</p><Button variant="outline" onClick={clearFilters}>Clear filters</Button></div>}
+        {loaded.length ? <><div className="pr-list">{loaded.map((pr, index) => <button key={pr.number} className={cx('pr-row', selectedPr === pr.number && 'active')} style={{ animationDelay: `${index * 25}ms` }} onClick={() => selectPr(repo.name, pr.number)}><span className="pr-num">#{pr.number}</span><span className="pr-title">{pr.title}</span><span className="pr-meta"><Clock size={12} aria-hidden />{formatDate(pr.merged_at)}</span><span className="pr-meta">{pr.linkedIssue ? <><LinkSimple size={12} aria-hidden /> Issue</> : <><XCircle size={12} aria-hidden /> No issue</>}</span><span className="pr-meta"><FileCode size={12} aria-hidden /> {pr.files.length} changed</span><span className="pr-meta">{sourceCount(pr)} source files</span></button>)}</div><div className="list-footer"><span>Loaded {loaded.length} of {filtered.length} matching PRs</span>{loaded.length < filtered.length && <Button variant="outline" size="sm" onClick={() => loadMore(repo.name)}>Load next page <ArrowRight size={12} aria-hidden /></Button>}</div></> : <div className="empty-state"><div className="empty-icon"><Funnel size={20} aria-hidden /></div><h3>No pull requests match</h3><p>Active filters: source files {filters.min ?? 'any'}–{filters.max ?? 'any'}{filters.requireIssue ? ', linked issue required' : ''}. Clear them to restore the full list.</p><Button variant="outline" onClick={clearFilters}>Clear filters</Button></div>}
         {detailPr && <PrDetail repo={repo} pr={detailPr} />}
       </section>
     </div>
@@ -262,10 +299,12 @@ function ReasonBadge({ reason, count }) {
 
 function RejectDialog({ repo, pr }) {
   const [open, setOpen] = useState(false)
+  const handleOpenChange = useDialogFocus(open, setOpen)
+  const triggerRef = useRef(null)
   const triage = useAppStore((state) => state.triagePr)
   const form = useForm({ resolver: zodResolver(rejectActionSchema), defaultValues: { reason: '' } })
-  const submit = form.handleSubmit(({ reason }) => { triage(repo, pr.number, 'rejected', reason); setOpen(false); form.reset() })
-  return <Dialog.Root open={open} onOpenChange={(value) => { setOpen(value); if (!value) form.reset() }}><Dialog.Trigger asChild><Button variant="ghost" size="sm"><XCircle size={13} /> Reject PR</Button></Dialog.Trigger><Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><Dialog.Content className="dialog-center" aria-describedby="reject-description"><div className="dialog-head"><div><Dialog.Title className="dialog-title">Reject PR #{pr.number}</Dialog.Title><Dialog.Description id="reject-description" className="dialog-description">Choose one closed reason. The payload is stored with the card and reflected in board stats.</Dialog.Description></div><Dialog.Close asChild><Button className="btn-icon" variant="ghost" aria-label="Close reject reason chooser"><X size={17} /></Button></Dialog.Close></div><form onSubmit={submit} noValidate><label className="field" style={{ marginTop: 16 }}><span className="field-label">Reject reason</span><select className={cx('select', form.formState.errors.reason && 'error')} aria-invalid={!!form.formState.errors.reason} aria-describedby="reject-error" {...form.register('reason')}><option value="">Choose a reject reason</option>{rejectReasons.map((reason) => <option key={reason} value={reason}>{titleReason(reason)}</option>)}</select>{form.formState.errors.reason && <span id="reject-error" className="field-error">reason: {form.formState.errors.reason.message}</span>}</label><div className="dialog-actions"><Dialog.Close asChild><Button type="button" variant="ghost">Cancel</Button></Dialog.Close><Button type="submit" variant="danger">Reject PR</Button></div></form></Dialog.Content></Dialog.Portal></Dialog.Root>
+  const submit = form.handleSubmit(({ reason }) => { triage(repo, pr.number, 'rejected', reason); handleOpenChange(false); form.reset() })
+  return <Dialog.Root open={open} onOpenChange={(value) => { if (value && triggerRef.current) useAppStore.setState({ focusReturnEl: triggerRef.current }); handleOpenChange(value); if (!value) form.reset() }}><Dialog.Trigger asChild><Button ref={triggerRef} variant="ghost" size="sm"><XCircle size={13} aria-hidden /> Reject PR</Button></Dialog.Trigger><Dialog.Portal><Dialog.Overlay className="dialog-overlay" onClick={() => handleOpenChange(false)} /><Dialog.Content className="dialog-center" aria-describedby="reject-description" onInteractOutside={() => handleOpenChange(false)} onEscapeKeyDown={() => handleOpenChange(false)}><FocusTrap open={open}><div className="dialog-head"><div><Dialog.Title className="dialog-title">Reject PR #{pr.number}</Dialog.Title><Dialog.Description id="reject-description" className="dialog-description">Choose one closed reason. The payload is stored with the card and reflected in board stats.</Dialog.Description></div><Dialog.Close asChild><Button className="btn-icon" variant="ghost" aria-label="Close reject reason chooser"><X size={17} aria-hidden /></Button></Dialog.Close></div><form onSubmit={submit} noValidate><label className="field" style={{ marginTop: 16 }}><span className="field-label">Reject reason</span><select className={cx('select', form.formState.errors.reason && 'error')} aria-invalid={!!form.formState.errors.reason} aria-describedby="reject-error" {...form.register('reason')}><option value="">Choose a reject reason</option>{rejectReasons.map((reason) => <option key={reason} value={reason}>{titleReason(reason)}</option>)}</select>{form.formState.errors.reason && <span id="reject-error" className="field-error">reason: {form.formState.errors.reason.message}</span>}</label><div className="dialog-actions"><Dialog.Close asChild><Button type="button" variant="ghost">Cancel</Button></Dialog.Close><Button type="submit" variant="danger">Reject PR</Button></div></form></FocusTrap></Dialog.Content></Dialog.Portal></Dialog.Root>
 }
 
 function TriageCard({ item, column }) {
@@ -280,8 +319,8 @@ function TriageCard({ item, column }) {
     const result = startRun(item.repo, item.pr.number)
     if (!result.ok) toast('Pipeline blocked', result.error)
   }
-  return <article className="triage-card">
-    <div className="triage-card-meta"><span className="mono">{item.repo.split('/')[1]} · #{item.pr.number}</span><span>{sourceCount(item.pr)} src</span></div>
+  return <article className="triage-card" data-repo={item.repo} data-pr-number={item.pr.number}>
+    <div className="triage-card-meta"><span className="mono">{item.repo.split('/')[1]} · #{item.pr.number}</span><span>{sourceCount(item.pr)} source files</span></div>
     <h3 className="triage-card-title">{item.pr.title}</h3>
     <div className="triage-card-meta"><span>{item.language}</span><span>{item.pr.linkedIssue ? `Issue #${item.pr.linkedIssue.number}` : 'No linked issue'}</span></div>
     {placement?.reason && <div style={{ marginTop: 8 }}><ReasonBadge reason={placement.reason} /></div>}
@@ -308,7 +347,7 @@ function TriageView() {
     <div className="board">{columns.map((column) => {
       let items = candidates.filter((item) => (triage[cardId(item.repo, item.pr.number)]?.column || 'inbox') === column)
       if (column === 'rejected' && rejectFilter !== 'all') items = items.filter((item) => triage[cardId(item.repo, item.pr.number)]?.reason === rejectFilter)
-      return <section className="board-column" key={column}><div className="column-head"><div className="column-name">{column === 'inbox' ? <Rows size={15} /> : column === 'accepted' ? <CheckCircle size={15} /> : <XCircle size={15} />}{column[0].toUpperCase() + column.slice(1)} <span className="count-badge">{items.length}</span></div>{column === 'rejected' && <label><span className="sr-only">Filter rejected cards by reason</span><select className="select reject-filter" value={rejectFilter} onChange={(event) => setRejectFilter(event.target.value)}><option value="all">All reasons</option>{rejectReasons.map((reason) => <option key={reason} value={reason}>{titleReason(reason)}</option>)}</select></label>}</div><div className="triage-list">{items.map((item) => <TriageCard key={cardId(item.repo, item.pr.number)} item={item} column={column} />)}{!items.length && <div className="empty-state" style={{ padding: 22 }}><p>{column === 'rejected' && rejectFilter !== 'all' ? `No cards rejected for ${titleReason(rejectFilter)}.` : `No cards in ${column}.`}</p></div>}</div></section>
+      return <section className="board-column" key={column}><div className="column-head"><div className="column-name">{column === 'inbox' ? <Rows size={15} aria-hidden /> : column === 'accepted' ? <CheckCircle size={15} aria-hidden /> : <XCircle size={15} aria-hidden />}{column[0].toUpperCase() + column.slice(1)} <span className="count-badge">{items.length}</span></div>{column === 'rejected' && <div className="reject-filter-row" role="group" aria-label="Filter rejected cards by reason"><button type="button" className={cx('reject-filter-btn', rejectFilter === 'all' && 'active')} onClick={() => setRejectFilter('all')}><span className={cx('reason-badge', 'reason-docs-only')}>All reasons</span></button>{rejectReasons.map((reason) => <button type="button" key={reason} className={cx('reject-filter-btn', rejectFilter === reason && 'active')} onClick={() => setRejectFilter(reason)} aria-label={`Filter ${titleReason(reason)}`}><ReasonBadge reason={reason} /></button>)}</div>}</div><div className="triage-list">{items.map((item) => <TriageCard key={cardId(item.repo, item.pr.number)} item={item} column={column} />)}{!items.length && <div className="empty-state" style={{ padding: 22 }}><p>{column === 'rejected' && rejectFilter !== 'all' ? `No cards rejected for ${titleReason(rejectFilter)}. Accept candidates from Inbox or change the reason filter.` : column === 'rejected' ? 'No cards in rejected. Reject candidates from Inbox with a precise reason to populate this column.' : column === 'accepted' ? 'No cards in accepted. Accept strong candidates from Inbox to queue pipeline runs.' : 'No cards in inbox. Every seeded pull request starts here before triage.'}</p></div>}</div></section>
     })}</div>
   </div>
 }
@@ -333,25 +372,30 @@ function downloadFile(filename, text, type = 'text/plain') {
 function CopyButton({ text, label = 'Copy' }) {
   const toast = useAppStore((state) => state.toast)
   const [copied, setCopied] = useState(false)
+  const safeText = stripCredentialMaterial(text)
   const copy = async () => {
-    await navigator.clipboard.writeText(text)
+    await navigator.clipboard.writeText(safeText)
     setCopied(true)
     toast('Copied', `${label} is on the clipboard.`)
     setTimeout(() => setCopied(false), 1800)
   }
-  return <Button variant="outline" size="sm" onClick={copy}>{copied ? <Check size={12} /> : <Copy size={12} />}{copied ? 'Copied' : label}</Button>
+  return <Button variant="outline" size="sm" onClick={copy}>{copied ? <Check size={12} aria-hidden /> : <Copy size={12} aria-hidden />}{copied ? 'Copied' : label}</Button>
 }
 
-function PackageViewer({ bundle, onBack }) {
+const bundleKeys = ['schemaVersion', 'repo', 'pr_number', 'base_sha', 'language', 'difficulty', 'source_file_count', 'created_at', 'instruction', 'task_config', 'patch_note']
+
+function PackageViewer({ bundle, onBack, showReexport = false }) {
   if (!bundle) return null
-  const exportBundle = () => downloadFile(`${bundle.repo.replace('/', '-')}-pr-${bundle.pr_number}.task-package.json`, JSON.stringify(bundle, null, 2), 'application/json')
+  const exportBundle = () => downloadFile(`${bundle.repo.replace('/', '-')}-pr-${bundle.pr_number}.task-package.json`, stripCredentialMaterial(JSON.stringify(bundle, null, 2)), 'application/json')
+  const bundleJson = stripCredentialMaterial(JSON.stringify(bundle, null, 2))
   return <section className="package-viewer" aria-label={`Task package for ${bundle.repo} PR ${bundle.pr_number}`}>
-    <div className="package-hero"><div>{onBack && <Button variant="ghost" size="sm" onClick={onBack} style={{ color: '#dafa9e', paddingLeft: 0 }}><ArrowLeft size={13} /> Library</Button>}<div className="eyebrow" style={{ color: '#dafa9e', marginTop: onBack ? 6 : 0 }}><Package size={12} /> TaskPackageBundle</div><h3>{bundle.repo} · PR #{bundle.pr_number}</h3><p>schemaVersion: {bundle.schemaVersion} · created {formatDate(bundle.created_at)}</p></div><div className="package-actions"><CopyButton text={JSON.stringify(bundle, null, 2)} label="Copy bundle" /><Button variant="dark" size="sm" onClick={exportBundle}><DownloadSimple size={13} /> Download bundle</Button></div></div>
-    <div className="package-body"><Tabs.Root defaultValue="instruction"><Tabs.List className="tabs-list"><Tabs.Trigger className="tab" value="instruction">Instruction</Tabs.Trigger><Tabs.Trigger className="tab" value="config">Task config</Tabs.Trigger><Tabs.Trigger className="tab" value="metadata">Metadata</Tabs.Trigger><Tabs.Trigger className="tab" value="patch">Patch note</Tabs.Trigger></Tabs.List>
-      <Tabs.Content className="part" value="instruction"><div className="part-head"><span className="part-label">instruction.md · Generated in this run</span><div className="part-actions"><CopyButton text={bundle.instruction} /><Button variant="outline" size="sm" onClick={() => downloadFile(`pr-${bundle.pr_number}-instruction.md`, bundle.instruction)}><DownloadSimple size={12} /> Download</Button></div></div><pre className="code-block">{bundle.instruction}</pre></Tabs.Content>
-      <Tabs.Content className="part" value="config"><div className="part-head"><span className="part-label">task.toml · Validated config</span><div className="part-actions"><CopyButton text={bundle.task_config} /><Button variant="outline" size="sm" onClick={() => downloadFile(`pr-${bundle.pr_number}-task.toml`, bundle.task_config)}><DownloadSimple size={12} /> Download</Button></div></div><pre className="code-block">{bundle.task_config}</pre></Tabs.Content>
+    <div className="package-hero"><div>{onBack && <Button variant="ghost" size="sm" onClick={onBack} style={{ color: '#dafa9e', paddingLeft: 0 }}><ArrowLeft size={13} aria-hidden /> Library</Button>}<div className="eyebrow" style={{ color: '#dafa9e', marginTop: onBack ? 6 : 0 }}><Package size={12} aria-hidden /> TaskPackageBundle</div><h3>{bundle.repo} · PR #{bundle.pr_number}</h3><p>schemaVersion: {bundle.schemaVersion} · created {formatDate(bundle.created_at)}</p></div><div className="package-actions"><CopyButton text={bundleJson} label="Copy bundle" /><Button variant="dark" size="sm" onClick={exportBundle}><DownloadSimple size={13} aria-hidden /> Download bundle</Button>{showReexport && <Button variant="outline" size="sm" onClick={exportBundle}><CloudArrowDown size={13} aria-hidden /> Re-export bundle</Button>}</div></div>
+    <div className="package-body"><Tabs.Root defaultValue="instruction"><Tabs.List className="tabs-list"><Tabs.Trigger className="tab" value="instruction">Instruction</Tabs.Trigger><Tabs.Trigger className="tab" value="config">Task config</Tabs.Trigger><Tabs.Trigger className="tab" value="metadata">Metadata</Tabs.Trigger><Tabs.Trigger className="tab" value="patch">Patch note</Tabs.Trigger><Tabs.Trigger className="tab" value="bundle">Bundle JSON</Tabs.Trigger></Tabs.List>
+      <Tabs.Content className="part" value="instruction"><div className="part-head"><span className="part-label">instruction.md · Generated in this run</span><div className="part-actions"><CopyButton text={bundle.instruction} /><Button variant="outline" size="sm" onClick={() => downloadFile(`pr-${bundle.pr_number}-instruction.md`, stripCredentialMaterial(bundle.instruction))}><DownloadSimple size={12} aria-hidden /> Download</Button></div></div><pre className="code-block">{bundle.instruction}</pre></Tabs.Content>
+      <Tabs.Content className="part" value="config"><div className="part-head"><span className="part-label">task.toml · Validated config</span><div className="part-actions"><CopyButton text={bundle.task_config} /><Button variant="outline" size="sm" onClick={() => downloadFile(`pr-${bundle.pr_number}-task.toml`, stripCredentialMaterial(bundle.task_config))}><DownloadSimple size={12} aria-hidden /> Download</Button></div></div><pre className="code-block">{bundle.task_config}</pre></Tabs.Content>
       <Tabs.Content className="part" value="metadata"><div className="part-head"><span className="part-label">Package metadata</span><CopyButton text={JSON.stringify({ schemaVersion: bundle.schemaVersion, repo: bundle.repo, pr_number: bundle.pr_number, base_sha: bundle.base_sha, language: bundle.language, difficulty: bundle.difficulty, source_file_count: bundle.source_file_count, created_at: bundle.created_at }, null, 2)} /></div><div className="metadata-grid"><div className="metadata-item"><span>Repository</span><strong>{bundle.repo}</strong></div><div className="metadata-item"><span>Pull request</span><strong>#{bundle.pr_number}</strong></div><div className="metadata-item"><span>Language</span><strong>{bundle.language}</strong></div><div className="metadata-item"><span>Difficulty</span><strong>{bundle.difficulty}</strong></div><div className="metadata-item"><span>Source files</span><strong>{bundle.source_file_count}</strong></div><div className="metadata-item"><span>Base commit SHA</span><strong className="mono">{bundle.base_sha}</strong></div></div></Tabs.Content>
       <Tabs.Content className="part" value="patch"><div className="part-head"><span className="part-label">Bug-patch placeholder</span><CopyButton text={bundle.patch_note} /></div><div className="patch-note">{bundle.patch_note}</div></Tabs.Content>
+      <Tabs.Content className="part" value="bundle"><div className="part-head"><span className="part-label">TaskPackageBundle keys</span><CopyButton text={bundleJson} label="Copy JSON" /></div><div className="bundle-keys">{bundleKeys.map((key) => <div className="bundle-key-row" key={key}><span>{key}</span><strong>{typeof bundle[key] === 'string' && bundle[key].length > 48 ? `${bundle[key].slice(0, 48)}…` : String(bundle[key])}</strong></div>)}</div><pre className="code-block" style={{ marginTop: 10 }}>{bundleJson}</pre></Tabs.Content>
     </Tabs.Root></div>
   </section>
 }
@@ -393,8 +437,8 @@ function BatchComposer() {
   const accepted = repositories.flatMap((repo) => repo.prs.map((pr) => ({ repo: repo.name, pr }))).filter((item) => triage[cardId(item.repo, item.pr.number)]?.column === 'accepted')
   const launch = async () => { const result = await start(); if (!result.ok) setError(result.error); else setError('') }
   return <section className="card batch-card"><div className="list-head"><div><div className="eyebrow" style={{ marginBottom: 4 }}><Queue size={12} /> Sequential batch</div><h2 className="section-title">Batch composer</h2><div className="subtle tiny" style={{ marginTop: 3 }}>Queue at least 2 accepted PRs. Each item runs to one final outcome.</div></div><Button variant="primary" disabled={queue.length < 2 || batch?.status === 'running'} onClick={launch}><Play size={13} /> Start batch · {queue.length}</Button></div><div className="accepted-strip">{accepted.map((item) => { const queued = queue.some((entry) => cardId(entry.repo, entry.prNumber) === cardId(item.repo, item.pr.number)); return <button key={cardId(item.repo, item.pr.number)} className={cx('queue-item', queued && 'queued')} onClick={() => toggle(item.repo, item.pr.number)}><span>{queued ? <CheckCircle size={13} weight="fill" /> : <Plus size={13} />}</span>{item.repo.split('/')[1]} #{item.pr.number}</button> })}</div>{error && <p className="field-error" style={{ marginTop: 8 }}>{error}</p>}
-    {batch && <div style={{ marginTop: 14 }}><div className="list-footer"><strong>Overall progress</strong><span>{batch.completed} of {batch.total} complete</span></div><div className="progress-track" style={{ marginTop: 7 }}><div className="progress-fill" style={{ width: `${(batch.completed / batch.total) * 100}%` }} /></div><div className="batch-items">{batch.items.map((item) => <div className="batch-row" key={cardId(item.repo, item.prNumber)}><strong>{item.repo} #{item.prNumber}</strong><span>{item.stage}</span><span className={cx('status', `status-${item.status === 'queued' ? 'pending' : item.status === 'complete' ? 'complete' : 'running'}`)}>{item.outcome || item.status}</span></div>)}</div></div>}
-    {report && <div style={{ marginTop: 14 }}><div className="list-head"><div><h3 className="section-title">BatchRunReport</h3><div className="subtle tiny">Every queued PR appears in exactly one bucket.</div></div><Button variant="outline" size="sm" onClick={() => downloadFile(`batch-report-${Date.now()}.json`, JSON.stringify(report, null, 2), 'application/json')}><DownloadSimple size={12} /> Download report</Button></div><div className="report-grid">{['packaged', 'trivial', 'failed', 'skipped'].map((key) => <div className="report-bucket" key={key}><strong>{report[key]}</strong><span className="tiny">{key}</span></div>)}</div></div>}
+    {batch && <div style={{ marginTop: 14 }}><div className="list-footer"><strong>Overall progress</strong><span>{batch.completed} of {batch.total} complete · {Math.round(((batch.progress ?? batch.completed) / batch.total) * 100)}%</span></div><div className="progress-track" style={{ marginTop: 7 }} aria-label="Batch progress"><div className="progress-fill" style={{ width: `${Math.min(100, ((batch.progress ?? batch.completed) / batch.total) * 100)}%` }} /></div><div className="batch-items">{batch.items.map((item) => <div className="batch-row" key={cardId(item.repo, item.prNumber)}><strong>{item.repo} #{item.prNumber}</strong><span>{item.stage}</span><span className={cx('status', `status-${item.status === 'queued' ? 'pending' : item.status === 'complete' ? 'complete' : 'running'}`)}>{item.outcome || item.status}</span></div>)}</div></div>}
+    {report && <div style={{ marginTop: 14 }}><div className="list-head"><div><h3 className="section-title">BatchRunReport</h3><div className="subtle tiny">Every queued PR appears in exactly one bucket.</div></div><Button variant="outline" size="sm" onClick={() => downloadFile(`batch-report-${Date.now()}.json`, stripCredentialMaterial(JSON.stringify(report, null, 2)), 'application/json')}><DownloadSimple size={12} aria-hidden /> Download report</Button></div><div className="report-grid">{['packaged', 'trivial', 'failed', 'skipped'].map((key) => <div className="report-bucket" key={key}><strong>{report[key]}</strong><span className="tiny">{key}</span></div>)}</div></div>}
   </section>
 }
 
@@ -441,7 +485,10 @@ function ImportBundle() {
 
 function DeletePackage({ bundle }) {
   const remove = useAppStore((state) => state.deletePackage)
-  return <AlertDialog.Root><AlertDialog.Trigger asChild><Button variant="danger"><Trash size={13} /> Delete package</Button></AlertDialog.Trigger><AlertDialog.Portal><AlertDialog.Overlay className="dialog-overlay" /><AlertDialog.Content className="dialog-center"><AlertDialog.Title className="dialog-title">Delete this package?</AlertDialog.Title><AlertDialog.Description className="dialog-description">This removes exactly {bundle.repo} PR #{bundle.pr_number} created {formatDate(bundle.created_at)}. Export it first if you need a recoverable copy.</AlertDialog.Description><div className="dialog-actions"><AlertDialog.Cancel asChild><Button variant="ghost">Cancel</Button></AlertDialog.Cancel><AlertDialog.Action asChild><Button variant="danger" onClick={() => remove(bundle)}>Delete package</Button></AlertDialog.Action></div></AlertDialog.Content></AlertDialog.Portal></AlertDialog.Root>
+  const triggerRef = useRef(null)
+  const [open, setOpen] = useState(false)
+  const handleOpenChange = useDialogFocus(open, setOpen)
+  return <AlertDialog.Root open={open} onOpenChange={(value) => { if (value && triggerRef.current) useAppStore.setState({ focusReturnEl: triggerRef.current }); handleOpenChange(value) }}><AlertDialog.Trigger asChild><Button ref={triggerRef} variant="danger"><Trash size={13} aria-hidden /> Delete package</Button></AlertDialog.Trigger><AlertDialog.Portal><AlertDialog.Overlay className="dialog-overlay" onClick={() => handleOpenChange(false)} /><AlertDialog.Content className="dialog-center" onEscapeKeyDown={() => handleOpenChange(false)}><FocusTrap open={open}><AlertDialog.Title className="dialog-title">Delete this package?</AlertDialog.Title><AlertDialog.Description className="dialog-description">This removes exactly {bundle.repo} PR #{bundle.pr_number} created {formatDate(bundle.created_at)}. Export it first if you need a recoverable copy.</AlertDialog.Description><div className="dialog-actions"><AlertDialog.Cancel asChild><Button variant="ghost">Cancel</Button></AlertDialog.Cancel><AlertDialog.Action asChild><Button variant="danger" onClick={() => { remove(bundle); handleOpenChange(false) }}>Delete package</Button></AlertDialog.Action></div></FocusTrap></AlertDialog.Content></AlertDialog.Portal></AlertDialog.Root>
 }
 
 function LibraryView() {
@@ -451,20 +498,26 @@ function LibraryView() {
   const filters = useAppStore((state) => state.libraryFilters)
   const setFilters = useAppStore((state) => state.setLibraryFilters)
   const clearFilters = useAppStore((state) => state.clearLibraryFilters)
+  const compareIds = useAppStore((state) => state.compareIds)
+  const toggleCompare = useAppStore((state) => state.toggleCompare)
+  const clearCompare = useAppStore((state) => state.clearCompare)
   const repos = [...new Set(packages.map((item) => item.repo))]
   const languages = [...new Set(packages.map((item) => item.language))]
   const active = Object.entries(filters).filter(([, value]) => value !== 'all')
   const filtered = packages.filter((item) => (filters.repo === 'all' || item.repo === filters.repo) && (filters.difficulty === 'all' || item.difficulty === filters.difficulty) && (filters.language === 'all' || item.language === filters.language))
-  if (selected) return <div className="view"><div className="page-head"><div><div className="eyebrow"><Archive size={12} /> Package library</div><h1 className="page-title">Inspect the portable artifact.</h1></div><DeletePackage bundle={selected} /></div><PackageViewer bundle={selected} onBack={() => useAppStore.setState({ selectedPackage: null })} /></div>
-  return <div className="view"><div className="page-head"><div><div className="eyebrow"><Archive size={12} /> Persistent library</div><h1 className="page-title">Keep the work that runs produced.</h1><p className="page-description">Every entry is the exact validated bundle stored at completion or import, ready to reopen and re-export.</p></div><ImportBundle /></div>
-    <div className="card library-tools"><label className="field filter-field"><span className="field-label">Repository</span><select className="select" value={filters.repo} onChange={(event) => setFilters({ repo: event.target.value })}><option value="all">All repositories</option>{repos.map((repo) => <option key={repo} value={repo}>{repo}</option>)}</select></label><label className="field filter-field"><span className="field-label">Difficulty</span><select className="select" value={filters.difficulty} onChange={(event) => setFilters({ difficulty: event.target.value })}><option value="all">All difficulties</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></label><label className="field filter-field"><span className="field-label">Language</span><select className="select" value={filters.language} onChange={(event) => setFilters({ language: event.target.value })}><option value="all">All languages</option>{languages.map((language) => <option key={language} value={language}>{language}</option>)}</select></label><div className="chip-row" style={{ flex: 1 }}>{active.map(([key, value]) => <span className="chip" key={key}>{key}: {value}<button aria-label={`Remove ${key} filter`} onClick={() => setFilters({ [key]: 'all' })}><X size={11} /></button></span>)}</div></div>
-    {filtered.length ? <div className="card library-list">{filtered.map((bundle) => <button className="library-row" key={`${bundle.repo}-${bundle.pr_number}-${bundle.created_at}`} onClick={() => select(bundle)}><span className="library-primary"><span className="package-icon"><Package size={16} weight="fill" /></span><span><span className="library-name">{bundle.repo}</span><span className="library-sub">Pull request #{bundle.pr_number}</span></span></span><span className={cx('difficulty', `difficulty-${bundle.difficulty}`)}>{bundle.difficulty}</span><span className="subtle tiny">{bundle.language}</span><span className="subtle tiny">{formatDate(bundle.created_at)}</span><span style={{ justifySelf: 'end' }}><ArrowRight size={15} /></span></button>)}</div> : <div className="empty-state"><div className="empty-icon"><Archive size={20} /></div><h3>No packages match</h3><p>Active filters: {active.map(([key, value]) => `${key} = ${value}`).join(', ')}. Clear filters to return to the full persistent library.</p><Button variant="outline" onClick={clearFilters}>Clear filters</Button></div>}
+  const compared = compareIds.map((id) => packages.find((item) => `${item.repo}#${item.pr_number}#${item.created_at}` === id)).filter(Boolean)
+  if (selected) return <div className="view"><div className="page-head"><div><div className="eyebrow"><Archive size={12} aria-hidden /> Package library</div><h1 className="page-title">Inspect the portable artifact.</h1></div><DeletePackage bundle={selected} /></div><PackageViewer bundle={selected} onBack={() => useAppStore.setState({ selectedPackage: null })} showReexport /></div>
+  return <div className="view"><div className="page-head"><div><div className="eyebrow"><Archive size={12} aria-hidden /> Persistent library</div><h1 className="page-title">Keep the work that runs produced.</h1><p className="page-description">Every entry is the exact validated bundle stored at completion or import, ready to reopen and re-export.</p></div><ImportBundle /></div>
+    <div className="card library-tools"><label className="field filter-field"><span className="field-label">Repository</span><select className="select" value={filters.repo} onChange={(event) => setFilters({ repo: event.target.value })}><option value="all">All repositories</option>{repos.map((repo) => <option key={repo} value={repo}>{repo}</option>)}</select></label><label className="field filter-field"><span className="field-label">Difficulty</span><select className="select" value={filters.difficulty} onChange={(event) => setFilters({ difficulty: event.target.value })}><option value="all">All difficulties</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option></select></label><label className="field filter-field"><span className="field-label">Language</span><select className="select" value={filters.language} onChange={(event) => setFilters({ language: event.target.value })}><option value="all">All languages</option>{languages.map((language) => <option key={language} value={language}>{language}</option>)}</select></label><div className="chip-row" style={{ flex: 1 }}>{active.map(([key, value]) => <span className="chip" key={key}>{key}: {value}<button aria-label={`Remove ${key} filter`} onClick={() => setFilters({ [key]: 'all' })}><X size={11} aria-hidden /></button></span>)}</div></div>
+    {compared.length > 0 && <section className="compare-panel" aria-label="Package comparison"><div className="list-head"><div><h2 className="section-title">Compare packages</h2><div className="subtle tiny">Select up to two library entries to compare instruction length and difficulty side by side.</div></div><Button variant="ghost" size="sm" onClick={clearCompare}>Clear compare</Button></div><div className="compare-grid">{compared.map((bundle) => <div className="compare-card" key={`${bundle.repo}-${bundle.pr_number}`}><strong>{bundle.repo} · #{bundle.pr_number}</strong><div style={{ marginTop: 6 }}>{bundle.difficulty} · {bundle.source_file_count} source files</div><div className="subtle tiny" style={{ marginTop: 6 }}>{bundle.instruction.length} chars instruction</div></div>)}</div></section>}
+    {filtered.length ? <div className="card library-list">{filtered.map((bundle) => { const id = `${bundle.repo}#${bundle.pr_number}#${bundle.created_at}`; const comparing = compareIds.includes(id); return <div className="library-row-wrap" key={id}><button className="library-row" onClick={() => select(bundle)}><span className="library-primary"><span className="package-icon"><Package size={16} weight="fill" aria-hidden /></span><span><span className="library-name">{bundle.repo}</span><span className="library-sub">Pull request #{bundle.pr_number}</span></span></span><span className={cx('difficulty', `difficulty-${bundle.difficulty}`)}>{bundle.difficulty}</span><span className="subtle tiny">{bundle.language}</span><span className="subtle tiny">{formatDate(bundle.created_at)}</span><span style={{ justifySelf: 'end' }}><ArrowRight size={15} aria-hidden /></span></button><Button variant={comparing ? 'primary' : 'ghost'} size="sm" className="compare-toggle" onClick={() => toggleCompare(bundle)}>{comparing ? 'Compared' : 'Compare'}</Button></div> })}</div> : <div className="empty-state"><div className="empty-icon"><Archive size={20} aria-hidden /></div><h3>No packages match</h3><p>Active filters: {active.length ? active.map(([key, value]) => `${key} = ${value}`).join(', ') : 'none'}. Clear filters to return to the full persistent library, or import a TaskPackageBundle JSON to add one.</p><Button variant="outline" onClick={clearFilters}>Clear filters</Button></div>}
   </div>
 }
 
 function CommandPalette() {
   const open = useAppStore((state) => state.commandOpen)
   const setOpen = useAppStore((state) => state.setCommandOpen)
+  const handleOpenChange = useDialogFocus(open, setOpen)
   const repositories = useAppStore((state) => state.repositories)
   const packages = useAppStore((state) => state.packages)
   const [query, setQuery] = useState('')
@@ -472,18 +525,18 @@ function CommandPalette() {
     const listener = (event) => { if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') { event.preventDefault(); setOpen(!useAppStore.getState().commandOpen) } }
     window.addEventListener('keydown', listener)
     return () => window.removeEventListener('keydown', listener)
-  }, [])
+  }, [setOpen])
   useEffect(() => { if (!open) setQuery('') }, [open])
   const lower = query.toLowerCase()
   const repoResults = repositories.filter((repo) => repo.name.toLowerCase().includes(lower)).slice(0, 4)
   const prResults = repositories.flatMap((repo) => repo.prs.map((pr) => ({ repo, pr }))).filter(({ pr }) => String(pr.number).includes(lower) || pr.title.toLowerCase().includes(lower)).slice(0, 6)
   const packageResults = packages.filter((item) => item.repo.toLowerCase().includes(lower) || String(item.pr_number).includes(lower)).slice(0, 5)
-  const choose = (fn) => { fn(); setOpen(false) }
-  return <Dialog.Root open={open} onOpenChange={setOpen}><Dialog.Portal><Dialog.Overlay className="dialog-overlay" /><Dialog.Content className="palette" aria-describedby={undefined}><Dialog.Title className="sr-only">Search TaskFoundry</Dialog.Title><div className="palette-search"><MagnifyingGlass size={18} /><input autoFocus className="palette-input" value={query} onChange={(event) => setQuery(event.target.value)} aria-label="Search repositories, pull requests, and packages" /><span className="palette-esc">Esc</span></div><div className="palette-results">{[
+  const choose = (fn) => { fn(); handleOpenChange(false) }
+  return <Dialog.Root open={open} onOpenChange={handleOpenChange}><Dialog.Portal><Dialog.Overlay className="dialog-overlay" onClick={() => handleOpenChange(false)} /><Dialog.Content className="palette" aria-describedby={undefined} onInteractOutside={() => handleOpenChange(false)} onEscapeKeyDown={() => handleOpenChange(false)}><FocusTrap open={open}><Dialog.Title className="sr-only">Search TaskFoundry</Dialog.Title><div className="palette-search"><MagnifyingGlass size={18} aria-hidden /><input autoFocus className="palette-input" value={query} onChange={(event) => setQuery(event.target.value)} aria-label="Search repositories, pull requests, and packages" /><span className="palette-esc">Esc</span></div><div className="palette-results">{[
       ['Repositories', repoResults, (repo) => repo.name, (repo) => repo.language, Database, (repo) => () => useAppStore.getState().selectRepo(repo.name)],
       ['Pull requests', prResults, ({ pr }) => `#${pr.number} · ${pr.title}`, ({ repo }) => repo.name, GithubLogo, ({ repo, pr }) => () => useAppStore.getState().selectPr(repo.name, pr.number)],
       ['Library packages', packageResults, (item) => `${item.repo} · PR #${item.pr_number}`, (item) => `${item.difficulty} · ${item.language}`, Package, (item) => () => useAppStore.getState().selectPackage(item)],
-    ].map(([label, items, primary, secondary, Icon, action]) => items.length > 0 && <section className="palette-group" key={label}><div className="palette-label">{label}</div>{items.map((item, index) => <button className="palette-item" key={`${label}-${index}`} onClick={() => choose(action(item))}><span className="palette-item-icon"><Icon size={14} /></span><span><div className="palette-item-title">{primary(item)}</div><div className="palette-item-sub">{secondary(item)}</div></span></button>)}</section>)}{!repoResults.length && !prResults.length && !packageResults.length && <div className="empty-state"><h3>No results</h3><p>Search by repository, PR number or title, or package metadata.</p></div>}</div></Dialog.Content></Dialog.Portal></Dialog.Root>
+    ].map(([label, items, primary, secondary, Icon, action]) => items.length > 0 && <section className="palette-group" key={label}><div className="palette-label">{label}</div>{items.map((item, index) => <button className="palette-item" key={`${label}-${index}`} onClick={() => choose(action(item))}><span className="palette-item-icon"><Icon size={14} aria-hidden /></span><span><div className="palette-item-title">{primary(item)}</div><div className="palette-item-sub">{secondary(item)}</div></span></button>)}</section>)}{!repoResults.length && !prResults.length && !packageResults.length && <div className="empty-state"><h3>No results</h3><p>Search by repository, PR number or title, or package metadata.</p></div>}</div></FocusTrap></Dialog.Content></Dialog.Portal></Dialog.Root>
 }
 
 function Toasts() {
@@ -499,6 +552,27 @@ function AppView() {
 
 export default function App() {
   const announcement = useAppStore((state) => state.announcement)
+  const theme = useAppStore((state) => state.theme)
+  const activeView = useAppStore((state) => state.activeView)
+  const triage = useAppStore((state) => state.triage)
+  const triagePr = useAppStore((state) => state.triagePr)
   useEffect(() => { registerWebMCP() }, [])
-  return <div className="app-shell"><TopBar /><Sidebar /><main className="main"><AppView /></main><ConnectionsPanel /><CommandPalette /><Toasts /><div className="sr-only" aria-live="assertive" aria-atomic="true">{announcement}</div></div>
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+  }, [theme])
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (activeView !== 'triage' || event.metaKey || event.ctrlKey || event.altKey) return
+      const focused = document.activeElement?.closest('.triage-card')
+      if (!focused) return
+      const repo = focused.getAttribute('data-repo')
+      const prNumber = Number(focused.getAttribute('data-pr-number'))
+      if (!repo || !prNumber) return
+      if (event.key.toLowerCase() === 'a') { event.preventDefault(); triagePr(repo, prNumber, 'accepted') }
+      if (event.key.toLowerCase() === 'r') { event.preventDefault(); triagePr(repo, prNumber, 'rejected', 'too-few-files') }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [activeView, triage, triagePr])
+  return <div className={cx('app-shell', theme === 'dark' && 'theme-dark')}><TopBar /><Sidebar /><main className="main"><AppView /></main><ConnectionsPanel /><CommandPalette /><Toasts /><div className="sr-only" aria-live="assertive" aria-atomic="true">{announcement}</div></div>
 }

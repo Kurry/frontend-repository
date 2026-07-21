@@ -1,6 +1,6 @@
 <template>
-  <div class="presets-section">
-    <h2 class="panel-title">Saved presets</h2>
+  <div class="presets-section panel-card">
+    <h2 class="panel-title">Saved presets <span class="count-badge" data-testid="preset-count">{{ presetsStore.presets.length }}</span></h2>
 
     <!-- Save new preset -->
     <div class="save-row">
@@ -9,107 +9,153 @@
         id="preset-name"
         v-model="newName"
         class="text-input"
+        :class="{ invalid: nameError }"
         placeholder="Preset name…"
+        maxlength="60"
+        :aria-invalid="Boolean(nameError)"
+        aria-describedby="preset-name-msg"
         @keyup.enter="savePreset"
-        maxlength="40"
       />
-      <button class="pill-btn" style="width:100%;margin-top:8px;" @click="savePreset" :disabled="!newName.trim()">
-        Save current
-      </button>
+      <div
+        id="preset-name-msg"
+        class="name-msg"
+        :class="nameError ? 'error-msg' : 'hint-msg'"
+        role="alert"
+        aria-live="polite"
+      >{{ nameError ?? 'Up to 40 characters; names are unique.' }}</div>
+      <button
+        type="button"
+        class="pill-btn save-btn"
+        :disabled="Boolean(nameError) || saving"
+        @click="savePreset"
+      >Save preset</button>
     </div>
-    <div v-if="saveError" class="error-msg" role="alert">{{ saveError }}</div>
-    <div v-if="saveSuccess" class="success-msg" role="status" aria-live="polite">{{ saveSuccess }}</div>
+    <transition name="fade-slide">
+      <div v-if="saveError" class="error-msg fade-in" role="alert">{{ saveError }}</div>
+    </transition>
+    <transition name="fade-slide">
+      <div v-if="saveSuccess" class="success-msg" role="status">{{ saveSuccess }}</div>
+    </transition>
 
     <!-- Preset list -->
     <div v-if="presetsStore.presets.length === 0" class="empty-msg">
-      No presets yet
+      No presets yet — dial in a look and save it here.
     </div>
-    <ul v-else class="preset-list">
+    <TransitionGroup v-else tag="ul" class="preset-list" name="list">
       <li v-for="preset in presetsStore.presets" :key="preset.id" class="preset-item">
-        <span class="preset-name">{{ preset.name }}</span>
+        <span class="preset-name" :title="preset.name">{{ preset.name }}</span>
         <div class="preset-actions">
-          <button class="pill-btn ghost" style="padding:8px 12px;font-size:11px;" @click="applyPreset(preset)">Apply</button>
-          <button class="pill-btn danger" style="padding:8px 12px;font-size:11px;" @click="deletePending = preset">Del</button>
+          <button type="button" class="pill-btn ghost mini-btn" @click="applyPreset(preset)">Apply</button>
+          <button type="button" class="pill-btn danger mini-btn" @click="openDelete(preset)">Del</button>
         </div>
       </li>
-    </ul>
+    </TransitionGroup>
 
-    <div
+    <ConfirmDialog
       v-if="deletePending"
-      class="confirm-dialog"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="delete-preset-title"
-      tabindex="-1"
-      @keydown.esc="deletePending = null"
-    >
-      <h3 id="delete-preset-title">Delete preset?</h3>
-      <p>This permanently deletes “{{ deletePending.name }}”.</p>
-      <div class="confirm-actions">
-        <button class="pill-btn ghost" @click="deletePending = null">Cancel</button>
-        <button class="pill-btn danger" @click="confirmDelete">Delete</button>
-      </div>
-    </div>
+      label-id="delete-preset-title"
+      title="Delete preset?"
+      :body="`This permanently deletes “${deletePending.name}”. This action cannot be undone.`"
+      confirm-label="Delete"
+      @confirm="confirmDelete"
+      @cancel="deletePending = null"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { usePresetsStore } from '../stores/presets'
+import type { Preset } from '../stores/presets'
 import { useCanvasStore } from '../stores/canvas'
+import { useHistoryStore } from '../stores/history'
+import { useAnnouncer } from '../stores/announcer'
+import { validatePresetName } from '../utils/recipe'
+import ConfirmDialog from './ConfirmDialog.vue'
 
 const presetsStore = usePresetsStore()
 const canvasStore = useCanvasStore()
+const history = useHistoryStore()
+const announcer = useAnnouncer()
+
 const newName = ref('')
 const saveError = ref('')
 const saveSuccess = ref('')
-const deletePending = ref<(typeof presetsStore.presets)[0] | null>(null)
+const saving = ref(false)
+const deletePending = ref<Preset | null>(null)
 
 let successTimer: ReturnType<typeof setTimeout> | null = null
 
+// Proactive inline validation: the message names the name field before any
+// submit attempt, and Save preset stays disabled until the name is valid.
+const nameError = computed(() =>
+  validatePresetName(newName.value, presetsStore.presets.map(p => p.name))
+)
+
+watch(nameError, err => {
+  if (err) announcer.announce(err)
+})
+
 function savePreset() {
+  if (saving.value) return
   saveError.value = ''
-  saveSuccess.value = ''
-  const name = newName.value.trim()
-  if (!name) { saveError.value = 'Enter a preset name'; return }
-  const result = presetsStore.addPreset(name, canvasStore.getSettings() as Record<string, unknown>)
-  if (!result.ok) { saveError.value = result.error ?? 'Error'; return }
+  const err = nameError.value
+  if (err) {
+    saveError.value = err
+    announcer.announce(err)
+    return
+  }
+  saving.value = true // double-activation guard: exactly one record per save
+  const savedName = newName.value.trim()
+  const result = presetsStore.addPreset(newName.value, canvasStore.getSettings())
+  saving.value = false
+  if (!result.ok) {
+    saveError.value = result.error ?? 'Could not save the preset.'
+    announcer.announce(saveError.value)
+    return
+  }
   newName.value = ''
-  saveSuccess.value = 'Preset saved!'
+  saveSuccess.value = `Preset “${savedName}” saved.`
+  announcer.announce(`Preset “${savedName}” saved.`)
   if (successTimer) clearTimeout(successTimer)
-  successTimer = setTimeout(() => { saveSuccess.value = '' }, 2000)
+  successTimer = setTimeout(() => { saveSuccess.value = '' }, 2200)
 }
 
-function applyPreset(preset: typeof presetsStore.presets[0]) {
-  canvasStore.applySettings(preset.settings as Parameters<typeof canvasStore.applySettings>[0])
+function applyPreset(preset: Preset) {
+  history.markDiscrete()
+  canvasStore.applySettings(preset.settings)
+  canvasStore.showingBefore = false
+  announcer.announce(`Preset “${preset.name}” applied.`)
+}
+
+function openDelete(preset: Preset) {
+  deletePending.value = preset
 }
 
 function confirmDelete() {
   if (!deletePending.value) return
+  const name = deletePending.value.name
   presetsStore.deletePreset(deletePending.value.id)
   deletePending.value = null
+  announcer.announce(`Preset “${name}” deleted.`)
 }
-
-function onEscape(event: KeyboardEvent) {
-  if (event.key === 'Escape') deletePending.value = null
-}
-
-onMounted(() => window.addEventListener('keydown', onEscape))
-onBeforeUnmount(() => window.removeEventListener('keydown', onEscape))
 </script>
 
 <style scoped>
-.presets-section {}
-.panel-title {
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0;
-  color: #a16207;
-  margin-bottom: 12px;
-}
-.save-row { display: flex; flex-direction: column; gap: 0; }
+.save-row { display: flex; flex-direction: column; gap: 4px; }
+.save-btn { width: 100%; margin-top: 8px; }
+.name-msg { font-size: 11px; margin-top: 4px; }
+.hint-msg { color: #92400e; }
+.text-input.invalid { border-color: #ef4444; }
 .empty-msg { font-size: 12px; color: #713F12; text-align: center; padding: 12px 0; }
-.preset-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; list-style: none; }
+.preset-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  list-style: none;
+  padding: 0;
+}
 .preset-item {
   display: flex;
   align-items: center;
@@ -119,19 +165,59 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onEscape))
   border-radius: 8px;
   padding: 8px 12px;
   gap: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.preset-name { font-size: 12px; font-weight: 600; color: #713F12; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.preset-item:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(113, 63, 18, 0.12); }
+.preset-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #713F12;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .preset-actions { display: flex; gap: 4px; flex-shrink: 0; }
-.error-msg { color: #ef4444; font-size: 11px; margin-top: 4px; }
-.success-msg { color: #22c55e; font-size: 11px; margin-top: 4px; }
-.confirm-dialog {
-  margin-top: 12px;
-  padding: 16px;
-  border: 2px solid #92400e;
-  border-radius: 12px;
-  background: #fff8ee;
+.mini-btn { min-height: 44px; padding: 8px 12px; font-size: 11px; }
+.count-badge {
+  display: inline-block;
+  min-width: 24px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #FDE047;
+  color: #713F12;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
 }
-.confirm-dialog h3 { font-size: 16px; margin-bottom: 8px; }
-.confirm-dialog p { font-size: 14px; line-height: 1.5; }
-.confirm-actions { display: flex; gap: 8px; margin-top: 12px; }
+
+/* List enter / exit animation */
+.list-enter-active { transition: opacity 0.25s ease, transform 0.25s ease; }
+.list-leave-active { transition: opacity 0.22s ease, transform 0.22s ease; }
+.list-enter-from { opacity: 0; transform: translateY(-8px) scale(0.97); }
+.list-leave-to { opacity: 0; transform: translateX(24px); }
+.list-move { transition: transform 0.22s ease; }
+
+.fade-slide-enter-active,
+.fade-slide-leave-active { transition: opacity 0.2s ease, transform 0.2s ease; }
+.fade-slide-enter-from,
+.fade-slide-leave-to { opacity: 0; transform: translateY(-4px); }
+.fade-in { animation: feedback-in 0.2s ease-out; }
+@keyframes feedback-in {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .list-enter-active,
+  .list-leave-active,
+  .list-move,
+  .fade-slide-enter-active,
+  .fade-slide-leave-active,
+  .preset-item { transition: none; }
+  .list-enter-from,
+  .list-leave-to { opacity: 1; transform: none; }
+  .fade-in { animation: none; }
+  .preset-item:hover { transform: none; }
+}
 </style>

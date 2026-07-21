@@ -10,7 +10,7 @@ import { clearToast } from '../../store/note.actions';
   template: `
     @if (message()) {
       <div class="toast" role="status" aria-live="polite">
-        <span class="toast-icon">{{ icon() }}</span>
+        <span class="toast-icon" aria-hidden="true">{{ icon() }}</span>
         {{ message() }}
       </div>
     }

@@ -19,14 +19,14 @@ function saved(_,actions){const res=store.saveCriterion(props.task.slug,props.cr
 <template>
   <div class="border-b border-[#e5e8e1] py-3 last:border-0">
     <div class="flex flex-wrap items-center gap-2">
-      <button class="min-w-0 flex-1 text-left text-[13px] font-bold" type="button" :aria-expanded="open" @click="open=!open">
-        <span class="flex items-center gap-2"><CaretDown :class="['shrink-0 transition-transform',open&&'rotate-180']" :size="15"/> <span class="break-all">{{ criterion }}</span></span>
+      <button class="min-h-11 min-w-0 flex-1 text-left text-[13px] font-bold" type="button" :aria-expanded="String(open)" :aria-controls="`guidance-${criterion}`" @click="open=!open">
+        <span class="flex items-center gap-2"><CaretDown :class="['shrink-0 transition-transform duration-200',open&&'rotate-180']" :size="15" aria-hidden="true"/> <span class="break-all">{{ criterion }}</span></span>
       </button>
-      <span v-if="current.verdict" :class="['check-pill',current.verdict==='pass'?'check-pass':'check-fail']" @click="current.verdict==='fail'&&(failing=!failing)">{{ current.verdict }}</span>
-      <NButton size="tiny" :disabled="!task.firstRunCompleted" :type="current.verdict==='pass'?'primary':'default'" @click="pass">Pass</NButton>
-      <NButton size="tiny" :disabled="!task.firstRunCompleted" :type="current.verdict==='fail'?'error':'default'" @click="failing=true">Fail</NButton>
+      <button v-if="current.verdict" type="button" :class="['check-pill',current.verdict==='pass'?'check-pass':'check-fail']" :aria-label="`${criterion} verdict ${current.verdict}`" @click="current.verdict==='fail'&&(failing=!failing)">{{ current.verdict }}</button>
+      <NButton class="verdict-btn" size="small" :disabled="!task.firstRunCompleted" :type="current.verdict==='pass'?'primary':'default'" @click="pass">Pass</NButton>
+      <NButton class="verdict-btn" size="small" :disabled="!task.firstRunCompleted" :type="current.verdict==='fail'?'error':'default'" @click="failing=true">Fail</NButton>
     </div>
-    <Transition name="expand"><p v-if="open" class="ml-6 mt-2 text-xs leading-5 text-muted">{{ GUIDANCE[criterion] }}</p></Transition>
+    <Transition name="expand"><p v-if="open" :id="`guidance-${criterion}`" class="ml-6 mt-2 text-xs leading-5 text-muted">{{ GUIDANCE[criterion] }}</p></Transition>
     <p v-if="current.verdict==='fail' && !failing" class="ml-6 mt-2 rounded-lg bg-[#fff5f1] p-2 text-xs text-[#84392c]">{{ current.rationale }}</p>
     <Form v-if="failing" v-slot="{ meta }" :validation-schema="toTypedSchema(CriterionFailVerdictSchema)" :initial-values="{criterion,verdict:'fail',rationale:current.rationale||''}" class="ml-6 mt-3" @submit="saved">
       <Field name="criterion" type="hidden"/><Field name="verdict" type="hidden"/>

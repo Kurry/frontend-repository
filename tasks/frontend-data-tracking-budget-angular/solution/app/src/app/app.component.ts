@@ -1,6 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { firstValueFrom } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { animate, style, transition, trigger } from '@angular/animations';
 import * as BudgetActions from './store/budget.actions';
 import {
   selectBudgetsByCategory,
@@ -14,6 +17,7 @@ import {
 } from './store/budget.selectors';
 import { periodLabel } from './models/models';
 import { downloadTextFile, generateCsvExport, generateJsonExport } from './export/export.component';
+import { ExpenseDialogComponent, ExpenseDialogResult } from './expenses/expense-dialog.component';
 
 declare global {
   interface Window {
@@ -29,6 +33,24 @@ const CONTRACT_VERSION = 'zto-webmcp-v1';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
+  animations: [
+    trigger('drawer', [
+      transition(':enter', [
+        style({ transform: 'translateX(100%)', opacity: 0 }),
+        animate('220ms cubic-bezier(0.2,0.7,0.2,1)', style({ transform: 'translateX(0)', opacity: 1 })),
+      ]),
+      transition(':leave', [
+        animate('180ms ease-in', style({ transform: 'translateX(100%)', opacity: 0 })),
+      ]),
+    ]),
+    trigger('backdrop', [
+      transition(':enter', [style({ opacity: 0 }), animate('200ms ease-out', style({ opacity: 1 }))]),
+      transition(':leave', [animate('160ms ease-in', style({ opacity: 0 }))]),
+    ]),
+    trigger('viewFade', [
+      transition(':enter', [style({ opacity: 0, transform: 'translateY(6px)' }), animate('200ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))]),
+    ]),
+  ],
 })
 export class AppComponent implements OnInit {
   title = 'Budget';
@@ -37,9 +59,11 @@ export class AppComponent implements OnInit {
   displayName$;
   canUndo$;
   canRedo$;
+  drawerOpen = false;
+  showShortcuts = false;
   periodLabel = periodLabel;
 
-  constructor(private store: Store) {
+  constructor(private store: Store, private dialog: MatDialog, private snackBar: MatSnackBar) {
     this.view$ = this.store.select(selectView);
     this.period$ = this.store.select(selectPeriod);
     this.displayName$ = this.store.select(selectDisplayName);
@@ -51,8 +75,66 @@ export class AppComponent implements OnInit {
     this.registerWebMcp();
   }
 
+  @HostListener('window:keydown', ['$event'])
+  onKey(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement | null;
+    const tag = target?.tagName;
+    const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || target?.isContentEditable;
+    if (event.key === 'Escape' && this.drawerOpen) {
+      this.drawerOpen = false;
+      return;
+    }
+    if (typing) return;
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z' && !event.shiftKey) {
+      event.preventDefault();
+      this.undo();
+      return;
+    }
+    if ((event.ctrlKey || event.metaKey) && (event.key.toLowerCase() === 'y' || (event.key.toLowerCase() === 'z' && event.shiftKey))) {
+      event.preventDefault();
+      this.redo();
+      return;
+    }
+    if (event.key.toLowerCase() === 'e' && !event.ctrlKey && !event.metaKey) {
+      this.toggleExport();
+      return;
+    }
+    if (event.key.toLowerCase() === 'a' && !event.ctrlKey && !event.metaKey) {
+      this.openAddDialog();
+      return;
+    }
+  }
+
   setView(view: 'dashboard' | 'expenses' | 'settings' | 'export'): void {
+    if (view === 'export') {
+      this.drawerOpen = true;
+      return;
+    }
     this.store.dispatch(BudgetActions.setView({ view }));
+  }
+
+  toggleExport(): void {
+    this.drawerOpen = !this.drawerOpen;
+  }
+
+  closeDrawer(): void {
+    this.drawerOpen = false;
+  }
+
+  openAddDialog(): void {
+    const ref = this.dialog.open(ExpenseDialogComponent, { width: '360px', data: { mode: 'add' } });
+    ref.afterClosed().subscribe((result: ExpenseDialogResult | undefined) => {
+      if (!result) return;
+      this.store.dispatch(
+        BudgetActions.addExpense({
+          value: result.value,
+          datetime: result.datetime,
+          categoryId: result.categoryId,
+          counterparty: result.counterparty,
+        })
+      );
+      this.snackBar.open('Expense added', undefined, { duration: 2000 });
+    });
   }
 
   previousPeriod(): void {
@@ -71,6 +153,26 @@ export class AppComponent implements OnInit {
     this.store.dispatch(BudgetActions.redo());
   }
 
+  ripple(event: MouseEvent): void {
+    const host = event.currentTarget as HTMLElement;
+    const rect = host.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const ink = document.createElement('span');
+    ink.className = 'ripple-ink';
+    ink.style.width = ink.style.height = `${size}px`;
+    ink.style.left = `${event.clientX - rect.left - size / 2}px`;
+    ink.style.top = `${event.clientY - rect.top - size / 2}px`;
+    host.appendChild(ink);
+    window.setTimeout(() => ink.remove(), 520);
+  }
+
+  private async postcondition(extra: Record<string, unknown> = {}): Promise<Record<string, unknown>> {
+    const view = await firstValueFrom(this.store.select(selectView));
+    const period = await firstValueFrom(this.store.select(selectPeriod));
+    const rows = await firstValueFrom(this.store.select(selectFilteredExpensesSorted));
+    return { visiblePostcondition: { view, period, visibleExpenseCount: rows.length, ...extra } };
+  }
+
   private registerWebMcp(): void {
     const tools = [
       {
@@ -85,6 +187,16 @@ export class AppComponent implements OnInit {
             counterparty: { type: 'string', description: 'Merchant / counterparty name' },
           },
           required: ['value', 'datetime', 'categoryId'],
+          additionalProperties: false,
+        },
+      },
+      {
+        name: 'expense_select',
+        description: 'Toggle selection of an expense row (same action as the row checkbox on Expenses).',
+        inputSchema: {
+          type: 'object',
+          properties: { id: { type: 'string' } },
+          required: ['id'],
           additionalProperties: false,
         },
       },
@@ -164,7 +276,7 @@ export class AppComponent implements OnInit {
       },
       {
         name: 'artifact_export',
-        description: 'Open the Export view and download the Budget report in the requested format. Same action as the Download button.',
+        description: 'Open the Export drawer and download the Budget report in the requested format. Same action as the Download button.',
         inputSchema: {
           type: 'object',
           properties: { format: { type: 'string', enum: ['csv', 'json'] } },
@@ -174,7 +286,7 @@ export class AppComponent implements OnInit {
       },
       {
         name: 'artifact_import',
-        description: 'Open the Export view import mode. File bytes are not passed via WebMCP; use the visible file input to complete the import.',
+        description: 'Open the Export drawer import mode. File bytes are not passed via WebMCP; use the visible file input or paste box to complete the import.',
         inputSchema: {
           type: 'object',
           properties: { mode: { type: 'string', enum: ['budget-json'] } },
@@ -222,7 +334,14 @@ export class AppComponent implements OnInit {
               counterparty: String(args['counterparty'] ?? ''),
             })
           );
-          return { ok: true };
+          return { ok: true, ...(await this.postcondition({ createdFor: args['datetime'] })) };
+        }
+        case 'expense_select': {
+          const selected = await firstValueFrom(this.store.select((s: any) => s.budget.selectedExpenseIds as string[]));
+          const id = String(args['id']);
+          const next = selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id];
+          this.store.dispatch(BudgetActions.setSelection({ ids: next }));
+          return { ok: true, selected: next, ...(await this.postcondition()) };
         }
         case 'expense_update': {
           const expenses = await firstValueFrom(this.store.select(selectFilteredExpensesSorted));
@@ -239,11 +358,11 @@ export class AppComponent implements OnInit {
               counterparty: args['counterparty'] !== undefined ? String(args['counterparty']) : existing.counterparty,
             })
           );
-          return { ok: true };
+          return { ok: true, ...(await this.postcondition()) };
         }
         case 'expense_delete': {
           this.store.dispatch(BudgetActions.deleteExpense({ id: String(args['id']) }));
-          return { ok: true };
+          return { ok: true, ...(await this.postcondition()) };
         }
         case 'add_expense_form_validate': {
           const errors: string[] = [];
@@ -269,15 +388,19 @@ export class AppComponent implements OnInit {
               counterparty: String(args['counterparty'] ?? ''),
             })
           );
-          return { ok: true };
+          return { ok: true, ...(await this.postcondition()) };
         }
         case 'add_expense_form_cancel':
         case 'add_expense_form_reset':
           return { ok: true };
         case 'browse_open': {
           const destination = String(args['destination']) as 'dashboard' | 'expenses' | 'settings' | 'export';
-          this.store.dispatch(BudgetActions.setView({ view: destination }));
-          return { ok: true, view: destination };
+          if (destination === 'export') {
+            this.drawerOpen = true;
+          } else {
+            this.store.dispatch(BudgetActions.setView({ view: destination }));
+          }
+          return { ok: true, ...(await this.postcondition({ view: destination })) };
         }
         case 'browse_apply_filter': {
           const month = Number(args['month']);
@@ -288,7 +411,7 @@ export class AppComponent implements OnInit {
         }
         case 'artifact_export': {
           const format = String(args['format']) as 'csv' | 'json';
-          this.store.dispatch(BudgetActions.setView({ view: 'export' }));
+          this.drawerOpen = true;
           if (format === 'csv') {
             const csv = await generateCsvExport(this.store, false);
             downloadTextFile(csv, 'expenses.csv', 'text/csv');
@@ -296,12 +419,12 @@ export class AppComponent implements OnInit {
             const json = await generateJsonExport(this.store);
             downloadTextFile(json, 'budget-document.json', 'application/json');
           }
-          return { ok: true, format };
+          return { ok: true, format, ...(await this.postcondition()) };
         }
         case 'artifact_import': {
           const mode = String(args['mode'] ?? 'budget-json');
-          this.store.dispatch(BudgetActions.setView({ view: 'export' }));
-          return { ok: true, mode };
+          this.drawerOpen = true;
+          return { ok: true, mode, ...(await this.postcondition()) };
         }
         case 'artifact_copy': {
           const json = await generateJsonExport(this.store);

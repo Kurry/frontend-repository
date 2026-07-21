@@ -19,7 +19,7 @@ export function ArtifactDrawers() {
   const importPackage = useReviewStore((state) => state.importPackage);
   const setAnnouncement = useReviewStore((state) => state.setAnnouncement);
   const preview = useMemo(() => ui.exportFormat === 'json' ? reviewPackageJson(bundles, ui.exportGeneratedAt) : portfolioSummaryMarkdown(bundles, ui.exportGeneratedAt), [bundles, ui.exportFormat, ui.exportGeneratedAt]);
-  const { control, handleSubmit, setError, reset, formState: { errors, isSubmitting } } = useForm<{ packageText: string }>({ resolver: zodResolver(importFormSchema), defaultValues: { packageText: ui.importDraft } });
+  const { control, handleSubmit, setError, clearErrors, reset, formState: { errors, isSubmitting } } = useForm<{ packageText: string }>({ resolver: zodResolver(importFormSchema), defaultValues: { packageText: ui.importDraft } });
   useEffect(() => setExportPreviewText(preview), [preview, setExportPreviewText]);
   useEffect(() => { if (ui.importOpen) reset({ packageText: ui.importDraft }); }, [ui.importOpen, ui.importDraft, reset]);
 
@@ -38,6 +38,7 @@ export function ArtifactDrawers() {
     anchor.download = ui.exportFormat === 'json' ? 'review-certification-package.json' : 'review-summary.md';
     anchor.click();
     URL.revokeObjectURL(url);
+    setAnnouncement('Export download started.');
     notifications.show({ title: 'Download started', message: anchor.download, color: 'teal', icon: <IconDownload size={16} /> });
   };
   const submitImport = ({ packageText }: { packageText: string }) => {
@@ -47,11 +48,23 @@ export function ArtifactDrawers() {
       setError('packageText', { message: result.error });
       return;
     }
+    setAnnouncement('Certification package imported.');
     notifications.show({ title: 'Package imported', message: 'Portfolio and bundle session facets now match the imported document.', color: 'teal', icon: <IconCheck size={16} /> });
   };
   return (
     <>
-      <Drawer opened={ui.exportOpen} transitionProps={{ transition: 'slide-left', duration: 250 }} onClose={() => setExportOpen(false)} position="right" size="min(760px, 94vw)" title={<div><Text className="eyebrow">LIVE STORE ARTIFACT</Text><Title order={2}>Export Certification Package</Title></div>} overlayProps={{ backgroundOpacity: 0.35, blur: 2 }}>
+      <Drawer
+        opened={ui.exportOpen}
+        transitionProps={{ transition: 'slide-left', duration: 250 }}
+        onClose={() => setExportOpen(false)}
+        position="right"
+        size="min(760px, 94vw)"
+        title={<div><Text className="eyebrow">Live Store Artifact</Text><Title order={2}>Export Certification Package</Title></div>}
+        overlayProps={{ backgroundOpacity: 0.35, blur: 2 }}
+        closeButtonProps={{ 'aria-label': 'Close export drawer' }}
+        trapFocus
+        returnFocus
+      >
         <Stack gap="md" className="export-drawer-content">
           <SegmentedControl fullWidth value={ui.exportFormat} onChange={(value) => setExportFormat(value as 'json' | 'markdown')} data={[{ value: 'json', label: 'Review Package JSON' }, { value: 'markdown', label: 'Review Summary Markdown' }]} />
           <Group justify="space-between"><Text size="sm" c="dimmed">Preview regenerates from live session state.</Text><Text size="xs" fw={700}>{preview.length.toLocaleString()} characters</Text></Group>
@@ -59,11 +72,57 @@ export function ArtifactDrawers() {
           <Group justify="flex-end"><Button variant="default" leftSection={<IconClipboard size={16} />} onClick={copy}>Copy</Button><Button leftSection={<IconDownload size={16} />} onClick={download}>Download</Button></Group>
         </Stack>
       </Drawer>
-      <Modal opened={ui.importOpen} transitionProps={{ transition: 'pop', duration: 250 }} onClose={() => setImportOpen(false)} size="lg" title={<div><Text className="eyebrow">REVIEW PACKAGE JSON</Text><Title order={2}>Import Certification Package</Title></div>} overlayProps={{ backgroundOpacity: 0.4, blur: 2 }}>
+      <Modal
+        opened={ui.importOpen}
+        transitionProps={{ transition: 'pop', duration: 250 }}
+        onClose={() => setImportOpen(false)}
+        size="lg"
+        title={<div><Text className="eyebrow">Review Package JSON</Text><Title order={2}>Import Certification Package</Title></div>}
+        overlayProps={{ backgroundOpacity: 0.4, blur: 2 }}
+        closeButtonProps={{ 'aria-label': 'Close import dialog' }}
+        trapFocus
+        returnFocus
+        withinPortal
+      >
         <form onSubmit={handleSubmit(submitImport)} className="import-form">
           <Text size="sm" c="dimmed">Paste a complete <code>review-certification/v1</code> document. Invalid attempts do not mutate the portfolio.</Text>
-          <div className="artifact-preview" style={{ margin: '16px 0', padding: 0, overflow: 'hidden' }}><Controller name="packageText" control={control} render={({ field }) => <Textarea {...field} mt="md" classNames={{ input: 'import-textarea' }} styles={{ input: { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', border: 0, background: 'transparent' } }}  minRows={14} maxRows={20} label="packageText" placeholder={'{\n  "schemaVersion": "review-certification/v1",\n  …\n}'} error={errors.packageText?.message} onChange={(event) => { field.onChange(event); setImportDraft(event.currentTarget.value); }} />} />
-          </div><Group justify="flex-end" mt="md"><Button type="button" variant="default" leftSection={<IconClipboard size={16} />} onClick={() => navigator.clipboard.writeText(ui.importDraft)}>Copy</Button><Button type="button" variant="default" onClick={() => setImportOpen(false)}>Cancel</Button><Button type="submit" loading={isSubmitting} leftSection={<IconFileImport size={16} />}>Import certification package</Button></Group>
+          <Group mt="md" mb="xs" justify="space-between">
+            <SegmentedControl value="json" data={[{ value: 'json', label: 'Review Package JSON' }]} />
+            <Text size="xs" fw={700}>{ui.importDraft.length.toLocaleString()} characters</Text>
+          </Group>
+          <div className="artifact-preview import-preview" style={{ margin: '0 0 16px', padding: 0, overflow: 'auto' }}>
+            <Controller
+              name="packageText"
+              control={control}
+              render={({ field }) => (
+                <Textarea
+                  {...field}
+                  classNames={{ input: 'import-textarea' }}
+                  styles={{ input: { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace', border: 0, background: 'transparent', minHeight: 280 } }}
+                  minRows={14}
+                  maxRows={20}
+                  label="packageText"
+                  placeholder={'{\n  "schemaVersion": "review-certification/v1",\n  …\n}'}
+                  error={errors.packageText?.message}
+                  onChange={(event) => { field.onChange(event); setImportDraft(event.currentTarget.value); }}
+                />
+              )}
+            />
+          </div>
+          <Group justify="flex-end" mt="md">
+            <Button type="button" variant="default" leftSection={<IconClipboard size={16} />} onClick={() => navigator.clipboard.writeText(ui.importDraft)}>Copy</Button>
+            <Button type="button" variant="default" leftSection={<IconDownload size={16} />} onClick={() => {
+              const blob = new Blob([ui.importDraft || '{}'], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const anchor = document.createElement('a');
+              anchor.href = url;
+              anchor.download = 'import-draft.json';
+              anchor.click();
+              URL.revokeObjectURL(url);
+            }}>Download</Button>
+            <Button type="button" variant="default" onClick={() => setImportOpen(false)}>Cancel</Button>
+            <Button type="submit" loading={isSubmitting} leftSection={<IconFileImport size={16} />}>Import Certification Package</Button>
+          </Group>
         </form>
       </Modal>
     </>
@@ -73,5 +132,10 @@ export function ArtifactDrawers() {
 export function ArtifactButtons() {
   const setExportOpen = useReviewStore((state) => state.setExportOpen);
   const setImportOpen = useReviewStore((state) => state.setImportOpen);
-  return <Group gap="xs"><Button variant="default" leftSection={<IconFileImport size={16} />} onClick={() => setImportOpen(true)}>Import certification package</Button><Button leftSection={<IconPackageExport size={16} />} onClick={() => setExportOpen(true)}>Export certification package</Button></Group>;
+  return (
+    <Group gap="xs">
+      <Button variant="default" leftSection={<IconFileImport size={16} />} onClick={() => setImportOpen(true)}>Import Certification Package</Button>
+      <Button leftSection={<IconPackageExport size={16} />} onClick={() => setExportOpen(true)}>Export Certification Package</Button>
+    </Group>
+  );
 }

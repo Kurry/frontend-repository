@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -18,7 +18,7 @@ import { Button, Badge, Card, EmptyState, Select, ToastStack } from './component
 import { cn, downloadText, formatTime } from './lib/utils'
 import { createTaskSchema, repositoryIds, taskManifestSchema } from './lib/schemas'
 import {
-  acceptedTasks, EVENT_STATUSES, isAccepted, repositoryRollup, STAGES,
+  EVENT_STATUSES, isAccepted, repositoryRollup, STAGES,
   useFactoryStore, VERDICTS,
 } from './store/factoryStore'
 
@@ -32,19 +32,37 @@ const VERDICT_COLORS = {
 const LANG_COLORS = ['#2c6e56', '#6d9f71', '#93ba78', '#cfb45c', '#8073b3']
 
 function statusIcon(status, size = 13) {
-  if (status === 'complete') return <IconCheck className="status-icon" size={size} stroke={2.5} />
-  if (status === 'running') return <IconLoader2 className="status-icon running-spin" size={size} />
-  if (status === 'failed') return <IconX className="status-icon" size={size} stroke={2.5} />
-  if (status === 'skipped') return <IconPlayerSkipForward className="status-icon" size={size} />
-  return <IconCircleDashed className="status-icon" size={size} />
+  if (status === 'complete') return <IconCheck className="status-icon" size={size} stroke={2.5} aria-hidden />
+  if (status === 'running') return <IconLoader2 className="status-icon running-spin" size={size} aria-hidden />
+  if (status === 'failed') return <IconX className="status-icon" size={size} stroke={2.5} aria-hidden />
+  if (status === 'skipped') return <IconPlayerSkipForward className="status-icon" size={size} aria-hidden />
+  return <IconCircleDashed className="status-icon" size={size} aria-hidden />
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text)
+    return true
+  } catch {
+    const area = document.createElement('textarea')
+    area.value = text
+    area.setAttribute('readonly', '')
+    area.style.position = 'fixed'
+    area.style.left = '-9999px'
+    document.body.appendChild(area)
+    area.select()
+    const ok = document.execCommand('copy')
+    area.remove()
+    return ok
+  }
 }
 
 function StageStrip({ stages }) {
   return (
-    <div className="stage-strip" aria-label="Pipeline stages">
+    <div className="stage-strip" aria-label="Factory stages">
       {stages.map((stage) => (
         <div
-          className={cn('stage-cell', `stage-${stage.status}`)}
+          className={cn('stage-cell', `stage-${stage.status}`, stage.status === 'running' && 'stage-pulse')}
           key={stage.name}
           title={`${stage.name}: ${stage.status}, attempt ${stage.attemptCount}${stage.completedAt ? ` · completed ${formatTime(stage.completedAt)} UTC` : stage.startedAt ? ` · started ${formatTime(stage.startedAt)} UTC` : ''}`}
           aria-label={`${stage.name} stage, ${stage.status}, attempt ${stage.attemptCount}${stage.completedAt ? `, completed ${formatTime(stage.completedAt)} UTC` : ''}`}
@@ -67,6 +85,8 @@ function AppSidebar() {
   const setCreateDialogOpen = useFactoryStore((s) => s.setCreateDialogOpen)
   const mobileNavOpen = useFactoryStore((s) => s.mobileNavOpen)
   const runningCount = useFactoryStore((s) => s.runningIds.length)
+  const theme = useFactoryStore((s) => s.theme)
+  const setTheme = useFactoryStore((s) => s.setTheme)
   const nav = [
     { id: 'repositories', label: 'Repositories', icon: IconDatabase },
     { id: 'timeline', label: 'Timeline', icon: IconHistory },
@@ -75,18 +95,37 @@ function AppSidebar() {
   return (
     <aside className={cn('sidebar', mobileNavOpen && 'mobile-open')} aria-label="Primary navigation">
       <div className="brand">
-        <div className="brand-mark"><IconBinaryTree size={20} /></div>
+        <div className="brand-mark"><IconBinaryTree size={20} aria-hidden /></div>
         <div className="brand-copy"><strong>Forgebeam</strong><span>Task factory / ops</span></div>
       </div>
       <p className="nav-label">Workspace</p>
       <nav className="nav-list">
         {nav.map(({ id, label, icon: Icon }) => (
-          <button key={id} className={cn('nav-item', (activeView === id || (id === 'repositories' && ['repository-pipeline', 'task-detail'].includes(activeView))) && 'active')} onClick={() => navigate(id)}>
-            <Icon size={18} /><span>{label}</span>
+          <button
+            key={id}
+            type="button"
+            className={cn('nav-item', (activeView === id || (id === 'repositories' && ['repository-pipeline', 'task-detail'].includes(activeView))) && 'active')}
+            onClick={() => navigate(id)}
+            onMouseEnter={(e) => e.currentTarget.classList.add('is-hovered')}
+            onMouseLeave={(e) => e.currentTarget.classList.remove('is-hovered')}
+          >
+            <Icon size={18} aria-hidden /><span>{label}</span>
           </button>
         ))}
       </nav>
-      <Button className="create-sidebar" onClick={() => setCreateDialogOpen(true)}><IconPlus size={17} />Create task</Button>
+      <Button
+        className="create-sidebar"
+        onClick={() => setCreateDialogOpen(true)}
+        onMouseEnter={(e) => e.currentTarget.classList.add('is-hovered')}
+        onMouseLeave={(e) => e.currentTarget.classList.remove('is-hovered')}
+      >
+        <IconPlus size={17} aria-hidden />Create task
+      </Button>
+      <div className="pref-row">
+        <button type="button" className={cn('pref-chip', theme === 'light' && 'active')} onClick={() => setTheme('light')} aria-pressed={theme === 'light'}>Light</button>
+        <button type="button" className={cn('pref-chip', theme === 'dark' && 'active')} onClick={() => setTheme('dark')} aria-pressed={theme === 'dark'}>Dark</button>
+      </div>
+      <p className="offline-badge" title="Client-only factory runs without a network round-trip"><IconServer size={12} aria-hidden /> Offline-ready · local session</p>
       <div className="sidebar-spacer" />
       <div className="factory-status">
         <div><span className="live-dot" />Factory online</div>
@@ -104,9 +143,9 @@ function MobileHeader() {
     <>
       {mobileNavOpen && <button className="mobile-scrim" aria-label="Close navigation" onClick={() => setMobileNavOpen(false)} />}
       <header className="mobile-header">
-        <button className="icon-button" aria-label="Open navigation" onClick={() => setMobileNavOpen(true)}><IconMenu2 size={18} /></button>
-        <div className="mobile-brand"><span className="brand-mark"><IconBinaryTree size={16} /></span>Forgebeam</div>
-        <button className="icon-button" aria-label="Create task" onClick={() => setCreateDialogOpen(true)}><IconPlus size={18} /></button>
+        <button className="icon-button" aria-label="Open navigation" onClick={() => setMobileNavOpen(true)}><IconMenu2 size={18} aria-hidden /></button>
+        <div className="mobile-brand"><span className="brand-mark"><IconBinaryTree size={16} aria-hidden /></span>Forgebeam</div>
+        <button className="icon-button" aria-label="Create task" onClick={() => setCreateDialogOpen(true)}><IconPlus size={18} aria-hidden /></button>
       </header>
     </>
   )
@@ -198,11 +237,11 @@ function PipelineView() {
             <thead><tr><th style={{ width: 66 }}>PR</th><th style={{ width: 280 }}>Merged change</th><th style={{ width: 82 }}>Files</th><th style={{ width: 130 }}>Issue / result</th><th>Factory stages</th></tr></thead>
             <tbody>
               {prs.map((pr) => (
-                <tr key={pr.id} className={cn('pipeline-row', pr.fresh && 'fresh')} tabIndex={0} onClick={() => openTask(repoId, pr.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openTask(repoId, pr.id) } }} aria-label={`Open pull request ${pr.number}, ${pr.title}`}>
+                <tr key={pr.id} className={cn('pipeline-row', pr.fresh && 'fresh')} role="button" tabIndex={0} onClick={() => openTask(repoId, pr.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openTask(repoId, pr.id) } }} aria-label={`Open pull request ${pr.number}, ${pr.title}`}>
                   <td><span className="pr-number">#{pr.number}</span></td>
-                  <td><span className="pr-title" title={pr.title}>{pr.title}</span><div className="pr-sub">{isAccepted(pr) && <Badge variant="success"><IconCircleCheck size={11} />Accepted</Badge>}</div></td>
-                  <td><span className="file-count"><IconFileCode size={13} />{pr.fileCount}</span></td>
-                  <td>{pr.linkedIssue ? <Badge variant="neutral"><IconExternalLink size={10} />{pr.linkedIssue}</Badge> : <span className="no-issue"><IconMinus size={11} />No linked issue</span>}{pr.rejectionReason && <div style={{ marginTop: 5 }}><Badge variant="danger">{pr.rejectionReason}</Badge></div>}</td>
+                  <td><span className="pr-title" title={pr.title}>{pr.title}</span><div className="pr-sub">{isAccepted(pr) && <Badge variant="success"><IconCircleCheck size={11} aria-hidden />Accepted</Badge>}</div></td>
+                  <td><span className="file-count"><IconFileCode size={13} aria-hidden />{pr.fileCount}</span></td>
+                  <td>{pr.linkedIssue ? <Badge variant="neutral"><IconExternalLink size={10} aria-hidden />{pr.linkedIssue}</Badge> : <span className="no-issue"><IconMinus size={11} aria-hidden />No linked issue</span>}{pr.rejectionReason && <div style={{ marginTop: 5 }}><Badge variant="danger">{pr.rejectionReason}</Badge></div>}</td>
                   <td><StageStrip stages={pr.stages} /></td>
                 </tr>
               ))}
@@ -225,13 +264,15 @@ function CheckCard({ pr, type, title, description }) {
     <Card className="check-card">
       <div className="check-card-main">
         <div className="check-card-head">
-          <div className="check-identity"><div className={cn('check-icon', check.status)}>{passing ? <IconCircleCheck size={19} /> : failing ? <IconCircleX size={19} /> : <IconClock size={19} />}</div><div><h3>{title}</h3><p>{description}</p></div></div>
+          <div className="check-identity"><div className={cn('check-icon', check.status)}>{passing ? <IconCircleCheck size={19} aria-hidden /> : failing ? <IconCircleX size={19} aria-hidden /> : <IconClock size={19} aria-hidden />}</div><div><h3>{title}</h3><p>{description}</p></div></div>
           <Badge variant={passing ? 'success' : failing ? 'danger' : 'neutral'}>{check.status}</Badge>
         </div>
         <div className="check-attempt">Attempt {check.attemptCount}</div>
       </div>
-      <button className={cn('log-toggle', open && 'open')} onClick={() => toggleLog(key)} aria-expanded={open} aria-controls={`log-${key}`}><span><IconTerminal2 size={13} style={{ verticalAlign: -2, marginRight: 6 }} />Log excerpt</span><IconChevronDown size={15} /></button>
-      <div className={cn('log-disclosure', open && 'open')} id={`log-${key}`}><div><pre>{check.log}</pre></div></div>
+      <button type="button" className={cn('log-toggle', open && 'open')} onClick={() => toggleLog(key)} aria-expanded={open} aria-controls={`log-${key}`}><span><IconTerminal2 size={13} style={{ verticalAlign: -2, marginRight: 6 }} aria-hidden />Log excerpt</span><IconChevronDown size={15} aria-hidden /></button>
+      <div className={cn('log-disclosure', open && 'open')} id={`log-${key}`} hidden={!open} aria-hidden={!open}>
+        {open ? <div><pre className="log-code">{check.log}</pre></div> : null}
+      </div>
     </Card>
   )
 }
@@ -244,8 +285,8 @@ function TrialPanel({ pr }) {
   const needsReview = pr.trials.some((trial) => trial.verdict === 'bad-success')
   return (
     <>
-      {needsReview && <div className="review-banner" role="status"><IconAlertTriangle size={18} /><div><strong>Needs review</strong>At least one trial reached a bad-success outcome. Inspect the behavior before promoting this task.</div></div>}
-      <div className="section-head"><div><h2>Trial analysis</h2><p>{pr.trials.length} agent attempts classified by outcome quality</p></div>{filter && <Button variant="ghost" size="sm" onClick={() => setFilter(null)}><IconX size={14} />Clear filter</Button>}</div>
+      {needsReview && <div className="review-banner" role="status" aria-live="polite"><IconAlertTriangle size={18} aria-hidden /><div><strong>Needs review</strong>At least one trial reached a bad-success outcome. Inspect the behavior before promoting this task.</div></div>}
+      <div className="section-head"><div><h2>Trial analysis</h2><p>{pr.trials.length} agent attempts classified by outcome quality</p></div>{filter && <Button variant="ghost" size="sm" onClick={() => setFilter(null)}><IconX size={14} aria-hidden />Clear filter</Button>}</div>
       <Card className="trial-card">
         <div className="distribution" aria-label="Trial verdict distribution">
           {VERDICTS.filter((verdict) => counts[verdict] > 0).map((verdict) => <button key={verdict} className={cn('dist-segment', filter === verdict && 'active', filter && filter !== verdict && 'dimmed', `verdict-${verdict}`)} style={{ width: `${counts[verdict] / pr.trials.length * 100}%` }} onClick={() => setFilter(filter === verdict ? null : verdict)} title={`${verdict}: ${counts[verdict]}`} aria-label={`Filter ${verdict}, ${counts[verdict]} trials`} />)}
@@ -264,12 +305,19 @@ function TrialPanel({ pr }) {
 function ManifestPanel({ pr }) {
   const getManifest = useFactoryStore((s) => s.getManifest)
   const addToast = useFactoryStore((s) => s.addToast)
+  const [copied, setCopied] = useState(false)
   const manifest = getManifest(pr)
   const text = JSON.stringify(manifest, null, 2)
   const copy = async () => {
     taskManifestSchema.parse(manifest)
-    await navigator.clipboard.writeText(text)
+    const ok = await copyText(text)
+    if (!ok) {
+      addToast('Could not copy task manifest to clipboard', 'error')
+      return
+    }
+    setCopied(true)
     addToast('Task manifest copied to clipboard', 'success')
+    window.setTimeout(() => setCopied(false), 1800)
   }
   const download = () => {
     taskManifestSchema.parse(manifest)
@@ -279,8 +327,8 @@ function ManifestPanel({ pr }) {
     <>
       <div className="section-head"><div><h2>Task manifest</h2><p>Validated export for this accepted task</p></div></div>
       <Card className="manifest-card">
-        <div className="manifest-head"><div className="manifest-title"><IconCode size={17} /><strong>task-manifest</strong><span className="format-label">JSON · schema v1</span></div><div className="manifest-actions"><Button size="sm" variant="secondary" onClick={copy}><IconClipboard size={14} />Copy</Button><Button size="sm" variant="secondary" onClick={download}><IconDownload size={14} />Download task-manifest.json</Button></div></div>
-        <pre className="manifest-code">{text}</pre>
+        <div className="manifest-head"><div className="manifest-title"><IconCode size={17} aria-hidden /><strong>task-manifest</strong><span className="format-label">JSON · schema v1</span></div><div className="manifest-actions"><Button size="sm" variant="secondary" onClick={copy}>{copied ? <IconCheck size={14} aria-hidden /> : <IconClipboard size={14} aria-hidden />}{copied ? 'Copied' : 'Copy'}</Button><Button size="sm" variant="secondary" onClick={download}><IconDownload size={14} aria-hidden />Download task-manifest.json</Button></div></div>
+        <pre className="manifest-code" data-manifest-text={text}>{text}</pre>
       </Card>
     </>
   )
@@ -316,11 +364,18 @@ function TaskDetailView() {
 
 function exportAllAccepted() {
   const state = useFactoryStore.getState()
-  const manifests = acceptedTasks(state).map((pr) => state.getManifest(pr)).filter(Boolean)
-  manifests.forEach((manifest) => taskManifestSchema.parse(manifest))
-  downloadText('accepted-task-manifests.json', JSON.stringify(manifests, null, 2))
-  state.addToast(`${manifests.length} accepted task manifest${manifests.length === 1 ? '' : 's'} exported`, 'success')
-  return manifests.length
+  const manifests = state.listAcceptedManifests()
+  const validated = manifests.flatMap((manifest) => {
+    const parsed = taskManifestSchema.safeParse(manifest)
+    return parsed.success ? [parsed.data] : []
+  })
+  if (!validated.length) {
+    state.addToast('No valid accepted manifests to export', 'error')
+    return 0
+  }
+  downloadText('accepted-task-manifests.json', JSON.stringify(validated, null, 2))
+  state.addToast(`${validated.length} accepted task manifest${validated.length === 1 ? '' : 's'} exported`, 'success')
+  return validated.length
 }
 
 function TimelineView() {
@@ -341,12 +396,21 @@ function TimelineView() {
 
 function AnalyticsTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
-  return <div className="chart-tooltip"><p>{label || payload[0].name}</p><strong>{payload[0].value} task{payload[0].value === 1 ? '' : 's'}</strong></div>
+  const value = payload[0].value
+  const name = label || payload[0].name || payload[0].payload?.week || payload[0].payload?.name
+  return (
+    <div className="chart-tooltip" role="tooltip" data-testid="chart-tooltip">
+      <p>{name}</p>
+      <strong>{value} task{value === 1 ? '' : 's'}</strong>
+    </div>
+  )
 }
 
 function AnalyticsView() {
   const repositories = useFactoryStore((s) => s.repositories)
   const pullRequests = useFactoryStore((s) => s.pullRequests)
+  const [hoverTip, setHoverTip] = useState(null)
+  const [parallax, setParallax] = useState(0)
   const tasks = useMemo(() => Object.values(pullRequests).flat().filter(isAccepted), [pullRequests])
   const weekly = useMemo(() => {
     const weeks = [
@@ -358,13 +422,71 @@ function AnalyticsView() {
   }, [tasks])
   const languages = useMemo(() => repositories.map((repo) => ({ name: repo.language, value: tasks.filter((task) => task.repository === repo.id).length })).filter((item) => item.value > 0), [repositories, tasks])
   const difficulty = ['Easy', 'Medium', 'Hard'].map((name) => ({ name, tasks: tasks.filter((task) => task.difficulty === name).length }))
+  useEffect(() => {
+    const onScroll = () => setParallax(Math.min(28, window.scrollY * 0.08))
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  const tipProps = {
+    content: <AnalyticsTooltip />,
+    isAnimationActive: false,
+    wrapperStyle: { zIndex: 40, outlineEvents: 'none' },
+    allowEscapeViewBox: { x: true, y: true },
+  }
   return (
-    <div className="page">
-      <div className="page-header"><div><p className="page-eyebrow"><IconChartHistogram size={14} />Factory intelligence</p><h1 className="page-title">Task analytics</h1><p className="page-subtitle">Accepted-task throughput, source language mix, and generated difficulty. Values update as runs complete.</p></div><div className="header-actions"><Button variant="secondary" onClick={exportAllAccepted}><IconDownload size={15} />Export accepted tasks</Button></div></div>
+    <div className="page analytics-page">
+      <div className="page-header" style={{ transform: `translateY(${parallax}px)` }}>
+        <div>
+          <p className="page-eyebrow"><IconChartHistogram size={14} aria-hidden />Factory intelligence</p>
+          <h1 className="page-title">Task analytics</h1>
+          <p className="page-subtitle">Accepted-task throughput, source language mix, and generated difficulty. Values update as runs complete.</p>
+        </div>
+        <div className="header-actions"><Button variant="secondary" onClick={exportAllAccepted}><IconDownload size={15} aria-hidden />Export accepted tasks</Button></div>
+      </div>
+      {hoverTip && <div className="chart-hover-banner" role="status" aria-live="polite">{hoverTip}</div>}
       <div className="charts-grid">
-        <Card className="chart-card wide"><div className="chart-head"><h2>Tasks per week</h2><p>Accepted task output over the last five factory weeks</p></div><div className="chart-wrap"><ResponsiveContainer width="100%" height="100%"><LineChart data={weekly} margin={{ top: 10, right: 18, bottom: 0, left: -18 }}><CartesianGrid stroke="#e8ece8" vertical={false} /><XAxis dataKey="week" tick={{ fontSize: 10, fill: '#68756e' }} tickLine={false} axisLine={false} /><YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#68756e' }} tickLine={false} axisLine={false} /><Tooltip content={<AnalyticsTooltip />} /><Line type="monotone" dataKey="tasks" stroke="#245f4a" strokeWidth={2.5} dot={{ fill: '#bbec63', stroke: '#245f4a', strokeWidth: 2, r: 4 }} activeDot={{ r: 6 }} animationDuration={350} /></LineChart></ResponsiveContainer></div></Card>
-        <Card className="chart-card"><div className="chart-head"><h2>Language distribution</h2><p>Accepted tasks by primary repository language</p></div><div className="chart-wrap chart-wrap-pie"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={languages} dataKey="value" nameKey="name" innerRadius="52%" outerRadius="78%" paddingAngle={3}>{languages.map((entry, index) => <Cell key={entry.name} fill={LANG_COLORS[index % LANG_COLORS.length]} />)}</Pie><Tooltip content={<AnalyticsTooltip />} /></PieChart></ResponsiveContainer></div><div className="chart-legend">{languages.map((item, index) => <span key={item.name}><i style={{ background: LANG_COLORS[index % LANG_COLORS.length] }} />{item.name} · {item.value}</span>)}</div></Card>
-        <Card className="chart-card"><div className="chart-head"><h2>Difficulty histogram</h2><p>Generated task complexity inferred from source scope</p></div><div className="chart-wrap"><ResponsiveContainer width="100%" height="100%"><BarChart data={difficulty} margin={{ top: 10, right: 8, bottom: 0, left: -24 }}><CartesianGrid stroke="#e8ece8" vertical={false} /><XAxis dataKey="name" tick={{ fontSize: 10, fill: '#68756e' }} tickLine={false} axisLine={false} /><YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#68756e' }} tickLine={false} axisLine={false} /><Tooltip content={<AnalyticsTooltip />} cursor={{ fill: '#f0f3f0' }} /><Bar dataKey="tasks" fill="#6d9f71" radius={[6, 6, 2, 2]} animationDuration={350} /></BarChart></ResponsiveContainer></div></Card>
+        <Card className="chart-card wide">
+          <div className="chart-head"><h2>Tasks per week</h2><p>Accepted task output over the last five factory weeks</p></div>
+          <div className="chart-wrap" onMouseLeave={() => setHoverTip(null)}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={weekly} margin={{ top: 10, right: 18, bottom: 0, left: -18 }} onMouseMove={(state) => { const point = state?.activePayload?.[0]; if (point) setHoverTip(`${state.activeLabel}: ${point.value} tasks`) }}>
+                <CartesianGrid stroke="#e8ece8" vertical={false} />
+                <XAxis dataKey="week" tick={{ fontSize: 10, fill: '#68756e' }} tickLine={false} axisLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#68756e' }} tickLine={false} axisLine={false} />
+                <Tooltip {...tipProps} />
+                <Line type="monotone" dataKey="tasks" stroke="#245f4a" strokeWidth={2.5} dot={{ fill: '#bbec63', stroke: '#245f4a', strokeWidth: 2, r: 5 }} activeDot={{ r: 7 }} animationDuration={80} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+        <Card className="chart-card">
+          <div className="chart-head"><h2>Language distribution</h2><p>Accepted tasks by primary repository language</p></div>
+          <div className="chart-wrap chart-wrap-pie" onMouseLeave={() => setHoverTip(null)}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={languages} dataKey="value" nameKey="name" innerRadius="52%" outerRadius="78%" paddingAngle={3} onMouseEnter={(_, index) => { const item = languages[index]; if (item) setHoverTip(`${item.name}: ${item.value} tasks`) }}>
+                  {languages.map((entry, index) => <Cell key={entry.name} fill={LANG_COLORS[index % LANG_COLORS.length]} />)}
+                </Pie>
+                <Tooltip {...tipProps} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="chart-legend">{languages.map((item, index) => <span key={item.name}><i style={{ background: LANG_COLORS[index % LANG_COLORS.length] }} />{item.name} · {item.value}</span>)}</div>
+        </Card>
+        <Card className="chart-card">
+          <div className="chart-head"><h2>Difficulty histogram</h2><p>Generated task complexity inferred from source scope</p></div>
+          <div className="chart-wrap" onMouseLeave={() => setHoverTip(null)}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={difficulty} margin={{ top: 10, right: 8, bottom: 0, left: -24 }} onMouseMove={(state) => { const point = state?.activePayload?.[0]; if (point) setHoverTip(`${point.payload.name}: ${point.value} tasks`) }}>
+                <CartesianGrid stroke="#e8ece8" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 10, fill: '#68756e' }} tickLine={false} axisLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 10, fill: '#68756e' }} tickLine={false} axisLine={false} />
+                <Tooltip {...tipProps} cursor={{ fill: '#f0f3f0' }} />
+                <Bar dataKey="tasks" fill="#6d9f71" radius={[6, 6, 2, 2]} animationDuration={80} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
       </div>
     </div>
   )
@@ -375,36 +497,99 @@ function CreateTaskDialog() {
   const setOpen = useFactoryStore((s) => s.setCreateDialogOpen)
   const startRun = useFactoryStore((s) => s.startRun)
   const repositories = useFactoryStore((s) => s.repositories)
+  const setCreateDraft = useFactoryStore((s) => s.setCreateDraft)
   const { register, handleSubmit, control, reset, watch, formState: { errors, isValid, isSubmitting } } = useForm({
     resolver: zodResolver(createTaskSchema), mode: 'onChange', reValidateMode: 'onChange',
-    defaultValues: { repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+    defaultValues: useFactoryStore.getState().createDraft,
   })
   useEffect(() => {
-    const resetHandler = () => reset({ repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' })
+    if (open) reset(useFactoryStore.getState().createDraft)
+  }, [open, reset])
+  useEffect(() => {
+    const resetHandler = () => {
+      const blank = { repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' }
+      setCreateDraft(blank)
+      reset(blank)
+    }
     window.addEventListener('factory:reset-form', resetHandler)
     return () => window.removeEventListener('factory:reset-form', resetHandler)
-  }, [reset])
-  const submit = (data) => startRun(data)
-  const cancel = () => { setOpen(false); reset() }
+  }, [reset, setCreateDraft])
+  useEffect(() => {
+    const subscription = watch((values) => {
+      setCreateDraft({
+        repository: values.repository || 'quartz-orm',
+        pullRequestNumber: values.pullRequestNumber || '',
+        minFiles: values.minFiles || '2',
+        maxFiles: values.maxFiles || '20',
+      })
+    })
+    return () => subscription.unsubscribe()
+  }, [watch, setCreateDraft])
+  const submit = (data) => {
+    startRun(data)
+    const blank = { repository: data.repository, pullRequestNumber: '', minFiles: String(data.minFiles), maxFiles: String(data.maxFiles) }
+    setCreateDraft(blank)
+    reset(blank)
+  }
+  const cancel = () => setOpen(false)
   const prValue = watch('pullRequestNumber')
+  const [portalMounted, setPortalMounted] = useState(open)
+  useEffect(() => {
+    if (open) {
+      setPortalMounted(true)
+      return undefined
+    }
+    const timer = window.setTimeout(() => setPortalMounted(false), 230)
+    return () => window.clearTimeout(timer)
+  }, [open])
   return (
-    <Dialog.Root open={open} onOpenChange={(next) => { setOpen(next); if (!next) reset() }}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="dialog-overlay" />
-        <Dialog.Content className="dialog-content" aria-describedby="create-task-description">
+    <Dialog.Root open={open} onOpenChange={(next) => setOpen(next)}>
+      {portalMounted ? <Dialog.Portal forceMount>
+        <Dialog.Overlay className="dialog-overlay" onClick={() => setOpen(false)} />
+        <Dialog.Content
+          className="dialog-content"
+          aria-describedby="create-task-description"
+          onPointerDownOutside={() => setOpen(false)}
+          onInteractOutside={() => setOpen(false)}
+          onEscapeKeyDown={() => setOpen(false)}
+        >
           <form onSubmit={handleSubmit(submit)} noValidate>
-            <div className="dialog-head"><div className="dialog-headline"><div><Dialog.Title asChild><h2>Create benchmark task</h2></Dialog.Title><Dialog.Description id="create-task-description">Start a simulated factory run from a merged pull request. One retry is included so resume behavior is observable.</Dialog.Description></div><Dialog.Close asChild><button className="icon-button" type="button" aria-label="Close create task dialog"><IconX size={17} /></button></Dialog.Close></div></div>
+            <div className="dialog-head"><div className="dialog-headline"><div><Dialog.Title asChild><h2>Create benchmark task</h2></Dialog.Title><Dialog.Description id="create-task-description">Start a simulated factory run from a merged pull request. One retry is included so resume behavior is observable. You can leave this dialog mid-draft and return — draft fields stay in session memory.</Dialog.Description></div><Dialog.Close asChild><button className="icon-button" type="button" aria-label="Close create task dialog"><IconX size={17} aria-hidden /></button></Dialog.Close></div></div>
             <div className="form-body">
-              <div className="field"><label htmlFor="repository">Repository</label><Controller control={control} name="repository" render={({ field }) => <Select value={field.value} onValueChange={field.onChange} ariaLabel="Repository" options={repositories.map((repo) => ({ value: repo.id, label: repo.name }))} />} /><p className="field-error" id="repository-error">{errors.repository?.message}</p></div>
-              <div className="field"><label htmlFor="pullRequestNumber">Pull-request number</label><input id="pullRequestNumber" className="field-input" inputMode="numeric" placeholder="e.g. 247" aria-invalid={!!errors.pullRequestNumber} aria-describedby="pullRequestNumber-error" {...register('pullRequestNumber')} /><p className="field-error" id="pullRequestNumber-error">{errors.pullRequestNumber?.message || (!prValue ? 'Pull-request number is required' : '')}</p></div>
-              <div className="bounds-grid"><div className="field"><label htmlFor="minFiles">Minimum file bound</label><input id="minFiles" className="field-input" inputMode="numeric" aria-invalid={!!errors.minFiles} aria-describedby="minFiles-error" {...register('minFiles')} /><p className="field-error" id="minFiles-error">{errors.minFiles?.message}</p></div><div className="field"><label htmlFor="maxFiles">Maximum file bound</label><input id="maxFiles" className="field-input" inputMode="numeric" aria-invalid={!!errors.maxFiles} aria-describedby="maxFiles-error" {...register('maxFiles')} /><p className="field-error" id="maxFiles-error">{errors.maxFiles?.message}</p></div></div>
-              <div className="form-note"><IconInfoCircle size={15} />Bounds apply to source files only. Accepted range: 1–500, with the minimum no greater than the maximum.</div>
+              <div className="field"><label htmlFor="repository">Repository</label><Controller control={control} name="repository" render={({ field }) => <Select value={field.value} onValueChange={field.onChange} ariaLabel="Repository" options={repositories.map((repo) => ({ value: repo.id, label: repo.name }))} />} /><p className="field-error" id="repository-error" role={errors.repository ? 'alert' : undefined} aria-live="polite">{errors.repository?.message}</p></div>
+              <div className="field"><label htmlFor="pullRequestNumber">Pull-request number</label><input id="pullRequestNumber" className="field-input" inputMode="numeric" placeholder="e.g. 247" aria-invalid={!!errors.pullRequestNumber} aria-describedby="pullRequestNumber-error" {...register('pullRequestNumber')} /><p className="field-error" id="pullRequestNumber-error" role={errors.pullRequestNumber || !prValue ? 'alert' : undefined} aria-live="polite">{errors.pullRequestNumber?.message || (!prValue ? 'Pull-request number is required' : '')}</p></div>
+              <div className="bounds-grid"><div className="field"><label htmlFor="minFiles">Minimum file bound</label><input id="minFiles" className="field-input" inputMode="numeric" aria-invalid={!!errors.minFiles} aria-describedby="minFiles-error" {...register('minFiles')} /><p className="field-error" id="minFiles-error" role={errors.minFiles ? 'alert' : undefined} aria-live="polite">{errors.minFiles?.message}</p></div><div className="field"><label htmlFor="maxFiles">Maximum file bound</label><input id="maxFiles" className="field-input" inputMode="numeric" aria-invalid={!!errors.maxFiles} aria-describedby="maxFiles-error" {...register('maxFiles')} /><p className="field-error" id="maxFiles-error" role={errors.maxFiles ? 'alert' : undefined} aria-live="polite">{errors.maxFiles?.message}</p></div></div>
+              <div className="form-note"><IconInfoCircle size={15} aria-hidden />Bounds apply to source files only. Accepted range: 1–500, with the minimum no greater than the maximum.</div>
             </div>
-            <div className="dialog-actions"><Button type="button" variant="secondary" onClick={cancel}>Cancel</Button><Button type="submit" disabled={!isValid || isSubmitting}><IconSparkles size={15} />Start pipeline run</Button></div>
+            <div className="dialog-actions"><Button type="button" variant="secondary" onClick={cancel}>Cancel</Button><Button type="submit" disabled={!isValid || isSubmitting}><IconSparkles size={15} aria-hidden />Start pipeline run</Button></div>
           </form>
         </Dialog.Content>
-      </Dialog.Portal>
+      </Dialog.Portal> : null}
     </Dialog.Root>
+  )
+}
+
+function OnboardingTour() {
+  const step = useFactoryStore((s) => s.onboardingStep)
+  const setStep = useFactoryStore((s) => s.setOnboardingStep)
+  const setCreateDialogOpen = useFactoryStore((s) => s.setCreateDialogOpen)
+  const navigate = useFactoryStore((s) => s.navigate)
+  if (step < 0 || step > 2) return null
+  const copy = [
+    { title: 'Welcome to Forgebeam', body: 'Browse seeded repositories, then open a pipeline register to inspect factory stages.', action: 'Next', run: () => setStep(1) },
+    { title: 'Create a run', body: 'Use Create task to start a simulated pipeline. Drafts survive view switches.', action: 'Open create', run: () => { setCreateDialogOpen(true); setStep(2) } },
+    { title: 'Read the signals', body: 'Timeline and Analytics update from the same session state when a run is accepted.', action: 'Go to analytics', run: () => { navigate('analytics'); setStep(-1) } },
+  ][step]
+  return (
+    <div className="onboarding-card" role="dialog" aria-label="Factory onboarding">
+      <div className="onboarding-progress">Guided setup · {step + 1} / 3</div>
+      <strong>{copy.title}</strong>
+      <p>{copy.body}</p>
+      <div className="onboarding-actions">
+        <Button size="sm" variant="ghost" onClick={() => setStep(-1)}>Skip</Button>
+        <Button size="sm" onClick={copy.run}>{copy.action}</Button>
+      </div>
+    </div>
   )
 }
 
@@ -453,7 +638,12 @@ function registerWebMcp() {
     },
     browse_clear_filter: ({ filter }) => { const state = useFactoryStore.getState(); filter === 'trial-verdict' ? state.setTrialFilter(null) : state.setTimelineFilter(null); return { ok: true, filter } },
     browse_sort: ({ order }) => { useFactoryStore.getState().setPipelineSort(order); return { ok: true, order } },
-    browse_set_locale: () => unavailable('Locale selection'), browse_set_theme: () => unavailable('Theme selection'),
+    browse_set_locale: () => unavailable('Locale selection'),
+    browse_set_theme: ({ theme }) => {
+      const next = theme === 'dark' ? 'dark' : 'light'
+      useFactoryStore.getState().setTheme(next)
+      return { ok: true, theme: next }
+    },
     form_validate: (args) => { const result = createTaskSchema.safeParse({ ...args, minFiles: String(args.minFiles), maxFiles: String(args.maxFiles) }); return result.success ? { ok: true, valid: true } : { ok: false, valid: false, errors: result.error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message })) } },
     form_submit: (args) => { const parsed = createTaskSchema.safeParse({ ...args, minFiles: String(args.minFiles), maxFiles: String(args.maxFiles) }); if (!parsed.success) return handlers.form_validate(args); const id = useFactoryStore.getState().startRun(parsed.data); return { ok: !!id, started: !!id, pullRequestNumber: parsed.data.pullRequestNumber } },
     form_advance: (args) => handlers.form_submit(args),
@@ -463,7 +653,11 @@ function registerWebMcp() {
     artifact_copy: async () => {
       const state = useFactoryStore.getState(); const pr = state.pullRequests[state.selectedRepositoryId]?.find((item) => item.id === state.selectedPrId); const manifest = state.getManifest(pr)
       if (!manifest) throw new Error('Select an accepted task first')
-      await navigator.clipboard.writeText(JSON.stringify(manifest, null, 2)); state.addToast('Task manifest copied to clipboard', 'success'); return { ok: true, format: 'task-manifest', copied: true }
+      const text = JSON.stringify(manifest, null, 2)
+      const copied = await copyText(text)
+      if (!copied) return { ok: false, format: 'task-manifest', copied: false, error: 'Clipboard copy failed' }
+      state.addToast('Task manifest copied to clipboard', 'success')
+      return { ok: true, format: 'task-manifest', copied: true }
     },
     artifact_export: ({ scope }) => {
       const state = useFactoryStore.getState()
@@ -484,9 +678,48 @@ export default function App() {
   const activeView = useFactoryStore((s) => s.activeView)
   const toasts = useFactoryStore((s) => s.toasts)
   const dismissToast = useFactoryStore((s) => s.dismissToast)
+  const theme = useFactoryStore((s) => s.theme)
+  const navigate = useFactoryStore((s) => s.navigate)
+  const setCreateDialogOpen = useFactoryStore((s) => s.setCreateDialogOpen)
   useEffect(() => registerWebMcp(), [])
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+  }, [theme])
+  useEffect(() => {
+    const markIcons = () => {
+      document.querySelectorAll('.app-shell svg:not([aria-label]):not([aria-hidden])').forEach((svg) => {
+        svg.setAttribute('aria-hidden', 'true')
+        svg.setAttribute('focusable', 'false')
+      })
+    }
+    markIcons()
+    const root = document.querySelector('.app-shell')
+    if (!root) return undefined
+    const observer = new MutationObserver(markIcons)
+    observer.observe(root, { childList: true, subtree: true })
+    return () => observer.disconnect()
+  }, [activeView])
+  useEffect(() => {
+    let chord = ''
+    const onKey = (event) => {
+      if (event.target?.closest?.('input, textarea, [contenteditable=true]')) return
+      if (event.key === 'g') {
+        chord = 'g'
+        return
+      }
+      if (chord === 'g') {
+        if (event.key === 't') navigate('timeline')
+        if (event.key === 'a') navigate('analytics')
+        if (event.key === 'r') navigate('repositories')
+        if (event.key === 'c') setCreateDialogOpen(true)
+        chord = ''
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [navigate, setCreateDialogOpen])
   return (
-    <div className="app-shell">
+    <div className={cn('app-shell', `theme-${theme}`)}>
       <AppSidebar /><MobileHeader />
       <main className="main">
         {activeView === 'repositories' && <RepositoriesView />}
@@ -495,6 +728,7 @@ export default function App() {
         {activeView === 'timeline' && <TimelineView />}
         {activeView === 'analytics' && <AnalyticsView />}
       </main>
+      <OnboardingTour />
       <CreateTaskDialog />
       <ToastStack toasts={toasts} onDismiss={dismissToast} />
     </div>

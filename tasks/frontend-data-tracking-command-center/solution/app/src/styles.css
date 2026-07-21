@@ -278,11 +278,72 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible, input:focus-vis
 .sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
 
 @keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
 @keyframes dialog-in { from { opacity: 0; transform: translateY(-8px) scale(.98); } to { opacity: 1; transform: none; } }
+@keyframes dialog-out { to { opacity: 0; transform: translateY(-8px) scale(.98); } }
 @keyframes drawer-in { from { opacity: .7; transform: translateX(40px); } to { opacity: 1; transform: none; } }
+@keyframes drawer-out { to { opacity: .5; transform: translateX(48px); } }
 @keyframes row-in { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: none; } }
 @keyframes feed-in { from { opacity: 0; transform: translateY(-18px); } to { opacity: 1; transform: none; } }
 @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 35%, transparent); } 50% { box-shadow: 0 0 0 5px transparent; } }
+
+.overlay-exit { animation: fade-out 170ms ease-in forwards; }
+.modal-exit { animation: dialog-out 170ms ease-in forwards; }
+.palette-exit { animation: dialog-out 150ms ease-in forwards; }
+.popover-exit { animation: dialog-out 140ms ease-in forwards; }
+.drawer-exit { animation: drawer-out 190ms ease-in forwards; }
+
+.density-toggle { min-height: 32px; display: inline-flex; align-items: center; gap: 7px; padding: 0 11px; color: #c6c6c6; background: transparent; border: 1px solid #566276; border-radius: 999px; cursor: pointer; font-size: 12px; transition: background 160ms ease, border-color 160ms ease, color 160ms ease; }
+.density-toggle:hover { color: #fff; background: #293244; }
+.density-toggle[aria-pressed="true"] { color: #d0e2ff; background: #102d57; border-color: #4589ff; }
+
+[data-density="compact"] .agent-summary { min-height: 56px; padding-block: 3px; }
+[data-density="compact"] .agent-avatar { width: 30px; height: 30px; font-size: 10px; }
+[data-density="compact"] .agent-progress { display: none; }
+[data-density="compact"] .feed-item { grid-template-columns: 26px minmax(0, 1fr); gap: 8px; padding-block: 7px; }
+[data-density="compact"] .feed-icon { width: 24px; height: 24px; }
+[data-density="compact"] .feed-icon svg { width: 13px; height: 13px; }
+[data-density="compact"] .feed-description { font-size: 11px; }
+[data-density="compact"] .feed-body { gap: 4px; }
+
+.accent-row { display: flex; align-items: center; gap: 10px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.accent-label { margin-right: auto; color: var(--text-muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.accent-swatch { width: 26px; height: 26px; background: var(--swatch); border: 2px solid transparent; border-radius: 50%; cursor: pointer; transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease; }
+.accent-swatch:hover { transform: scale(1.12); }
+.accent-swatch.selected { border-color: var(--text); box-shadow: 0 0 0 2px var(--app-surface-raised), 0 0 0 4px var(--swatch); }
+
+[data-accent="teal"] { --brand: #007d79; --brand-dark: #005d5d; --brand-soft: #d9fbfb; }
+[data-accent="violet"] { --brand: #8a3ffc; --brand-dark: #6929c4; --brand-soft: #f6f2ff; }
+[data-theme="night"][data-accent="teal"] { --brand: #3ddbd9; --brand-dark: #82cfff; --brand-soft: #022b2b; }
+[data-theme="night"][data-accent="violet"] { --brand: #be95ff; --brand-dark: #d4bbff; --brand-soft: #2a1a4a; }
+
+.summary-card { width: min(100%, 640px); }
+.summary-body { padding: 20px 24px 4px; }
+.summary-stamp { margin: 0 0 16px; color: var(--text-muted); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
+.summary-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
+.summary-kpis > div { display: flex; flex-direction: column; gap: 4px; padding: 12px; background: var(--app-surface-subtle); border-top: 3px solid var(--brand); }
+.summary-kpis span { color: var(--text-muted); font-size: 10px; text-transform: uppercase; }
+.summary-kpis strong { font-size: 18px; font-weight: 500; }
+.summary-kpis em { font-style: normal; font-size: 11px; font-weight: 600; }
+.summary-kpis .positive { color: var(--success); }
+.summary-kpis .negative { color: var(--danger); }
+.summary-body h3 { margin: 14px 0 8px; font-size: 13px; font-weight: 600; }
+.summary-empty, .summary-schedule { margin: 4px 0 10px; color: var(--text-secondary); font-size: 12px; line-height: 1.5; }
+
+.shortcuts-card { width: min(100%, 420px); }
+.shortcut-list { display: grid; gap: 4px; margin: 0; padding: 16px 24px 24px; list-style: none; }
+.shortcut-list li { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 9px 4px; border-bottom: 1px solid var(--border); font-size: 12px; }
+.shortcut-list li:last-child { border-bottom: 0; }
+.shortcut-list kbd { padding: 3px 8px; color: var(--text-secondary); background: var(--app-surface-subtle); border: 1px solid var(--border-strong); border-radius: 4px; font-size: 11px; font-family: inherit; white-space: nowrap; }
+
+.select-all.cds--checkbox-wrapper { margin-right: 6px; }
+
+@media print {
+  body * { visibility: hidden; }
+  .summary-card, .summary-card * { visibility: visible; }
+  .summary-card { position: fixed; inset: 0; width: 100%; max-height: none; overflow: visible; border: 0; box-shadow: none; }
+  .summary-card .modal-actions, .summary-card .modal-heading .cds--tooltip-trigger__wrapper { display: none; }
+}
 
 @media (max-width: 1220px) {
   .app-header { align-items: flex-start; }
@@ -346,6 +407,13 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible, input:focus-vis
   .feed-scroll { height: 500px; }
   .suggestion-chip, .filter-chip { min-height: 44px; }
   .clear-filter { min-height: 44px; padding-inline: 8px; }
+  .agent-actions .cds--btn { min-height: 44px; }
+  .agent-select { width: 44px; min-height: 44px; }
+  .agent-select .cds--checkbox-wrapper { min-height: 44px; display: grid; place-items: center; }
+  .night-badge { min-height: 44px; min-width: 44px; }
+  .density-toggle { min-height: 44px; }
+  .jump-latest { min-height: 44px; }
+  .feed-item { padding-block: 14px; }
   .time-grid { grid-template-columns: 1fr; }
   .modal-heading, .drawer-heading { padding: 18px 16px; }
   .form-stack { padding: 18px 16px; }

@@ -11,7 +11,8 @@ import {
   addEventAtom,
   updateEventAtom,
   deleteEventAtom,
-  importTimelineAtom
+  importTimelineAtom,
+  expandWindowToYear
 } from './store.js';
 import { MT_DATA } from './data.js';
 import { formatImportError, historyEventSchema, timelinePackSchema } from './validation.js';
@@ -59,7 +60,9 @@ export function initWebMCP() {
           else if (destination === "export-drawer") store.set(exportDrawerOpenAtom, true);
           else if (destination === "event-detail") {
             const id = args.id ?? store.get(selectedEventIdAtom) ?? store.get(eventsAtom)[0]?.id;
-            if (!id || !store.get(eventsAtom).some(event => event.id === id)) return { success: false, error: "Event not found" };
+            const target = id ? store.get(eventsAtom).find(event => event.id === id) : null;
+            if (!target) return { success: false, error: "Event not found" };
+            expandWindowToYear(store.get, store.set, target.year);
             store.set(modeAtom, "explore");
             store.set(selectedEventIdAtom, id);
           } else return { success: false, error: "Unknown destination" };
@@ -104,9 +107,11 @@ export function initWebMCP() {
         }
         case "entity_select": {
           if (args.entity === "event" && args.id) {
-            if (!store.get(eventsAtom).some(event => event.id === args.id)) {
+            const target = store.get(eventsAtom).find(event => event.id === args.id);
+            if (!target) {
               return { success: false, error: "Event not found" };
             }
+            expandWindowToYear(store.get, store.set, target.year);
             store.set(modeAtom, "explore");
             store.set(selectedEventIdAtom, args.id);
             return { success: true };

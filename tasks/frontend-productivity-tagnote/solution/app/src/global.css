@@ -4,9 +4,11 @@
   --color-primary: #E6EEF7;
   --color-secondary: #FFCC00;
   --color-accent: #007AFF;
+  --color-accent-strong: #0056B3;
   --color-background: #F5F5F7;
   --color-text-primary: #1D1D1E;
   --color-link: #007AFF;
+  --color-on-accent: #FFFFFF;
 }
 
 * {
@@ -24,10 +26,23 @@ body {
 
 button:focus-visible,
 input:focus-visible,
+textarea:focus-visible,
+[contenteditable="true"]:focus-visible,
 a:focus-visible,
 [role="button"]:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+.btn-primary {
+  background: var(--color-accent-strong);
+  color: var(--color-on-accent);
+  border-radius: 1000px;
+  box-shadow: none;
+}
+
+.btn-primary:hover {
+  background: #004999;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
@@ -47,4 +62,133 @@ a:focus-visible,
 
 .shake {
   animation: shake 0.3s ease-in-out;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translate(-50%, 8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes toast-out {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to { opacity: 0; transform: translate(-50%, 8px); }
+}
+
+.toast-enter {
+  animation: toast-in 0.2s ease-out forwards;
+}
+
+.toast-exit {
+  animation: toast-out 0.25s ease-in forwards;
+}
+
+@keyframes note-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes note-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-8px) scale(0.98); }
+}
+
+.note-enter {
+  animation: note-in 0.25s ease-out forwards;
+}
+
+.note-exit {
+  animation: note-out 0.22s ease-in forwards;
+}
+
+@keyframes tray-up {
+  from { opacity: 0; transform: translate(-50%, 12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes tray-down {
+  from { opacity: 1; transform: translate(-50%, 0); }
+  to { opacity: 0; transform: translate(-50%, 12px); }
+}
+
+.bulk-tray-enter {
+  animation: tray-up 0.22s ease-out forwards;
+}
+
+.bulk-tray-exit {
+  animation: tray-down 0.2s ease-in forwards;
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes modal-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.96); }
+}
+
+.modal-backdrop-enter {
+  animation: modal-in 0.2s ease-out forwards;
+}
+
+.modal-backdrop-exit {
+  animation: modal-out 0.2s ease-in forwards;
+}
+
+.modal-panel-enter {
+  animation: modal-in 0.2s ease-out forwards;
+}
+
+.modal-panel-exit {
+  animation: modal-out 0.2s ease-in forwards;
+}
+
+.note-bubble {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.note-bubble:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+button,
+.tag-chip,
+.note-bubble {
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+.composer-surface strong {
+  font-weight: 600;
+}
+
+.composer-surface em {
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shake,
+  .toast-enter,
+  .toast-exit,
+  .note-enter,
+  .note-exit,
+  .bulk-tray-enter,
+  .bulk-tray-exit,
+  .modal-backdrop-enter,
+  .modal-backdrop-exit,
+  .modal-panel-enter,
+  .modal-panel-exit {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  button,
+  .tag-chip,
+  .note-bubble {
+    transition: none !important;
+  }
 }

@@ -6,9 +6,10 @@
           <mat-form-field class="full-width">
             <mat-label>Display name</mat-label>
             <input matInput type="text" formControlName="displayName" name="displayName" />
+            <mat-error *ngIf="displayNameError() as err">{{ err }}</mat-error>
           </mat-form-field>
           <div class="reporting-currency">Reporting currency: USD</div>
-          <button mat-button color="primary" type="submit">Save</button>
+          <button mat-flat-button color="primary" type="submit">Save display name</button>
         </form>
 
         <form [formGroup]="thresholdForm" (ngSubmit)="saveThreshold()" class="threshold-form">
@@ -22,7 +23,7 @@
               {{ thresholdForm.controls.thresholdPercent.getError('threshold') }}
             </mat-error>
           </mat-form-field>
-          <button mat-button color="primary" type="submit">Save threshold</button>
+          <button mat-flat-button color="primary" type="submit">Save threshold</button>
         </form>
       </div>
     </mat-tab>
@@ -34,9 +35,10 @@
           <mat-form-field class="full-width">
             <mat-label>Category name</mat-label>
             <input matInput type="text" name="newCategoryName" [(ngModel)]="newCategoryName" (keyup.enter)="addCategory()" />
+            <mat-error *ngIf="addCategoryError() as err">{{ err }}</mat-error>
           </mat-form-field>
           <div class="add-actions">
-            <button mat-button color="primary" (click)="addCategory()">Add</button>
+            <button mat-flat-button color="primary" (click)="addCategory()">Add category</button>
           </div>
         </mat-card>
 
@@ -47,14 +49,67 @@
             </mat-expansion-panel-header>
             <mat-form-field class="full-width">
               <mat-label>Category name</mat-label>
-              <input matInput type="text" name="editingName" [(ngModel)]="editingName" />
+              <input matInput type="text" name="editingName-{{ c.id }}" [(ngModel)]="editingName" />
+              <mat-error *ngIf="editCategoryError() as err">{{ err }}</mat-error>
             </mat-form-field>
             <div class="panel-actions">
-              <button mat-button color="primary" (click)="saveEdit(c.id)">Update</button>
-              <button mat-button color="warn" (click)="deleteCategory(c.id)">Delete</button>
+              <button mat-flat-button color="primary" (click)="saveEdit(c.id)">Update</button>
+              <button mat-flat-button color="warn" (click)="deleteCategory(c.id)">Delete</button>
             </div>
           </mat-expansion-panel>
         </mat-accordion>
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Recurring">
+      <div class="recurring-panel">
+        <mat-card class="rule-form-card">
+          <h2>{{ editingRuleKey ? 'Edit recurring rule' : 'Add recurring rule' }}</h2>
+          <form [formGroup]="ruleForm" (ngSubmit)="saveRule()" class="rule-form">
+            <mat-form-field class="full-width">
+              <mat-label>Name</mat-label>
+              <input matInput type="text" formControlName="name" />
+              <mat-error *ngIf="ruleFieldError('name') as err">{{ err }}</mat-error>
+            </mat-form-field>
+            <mat-form-field class="full-width">
+              <mat-label>Amount</mat-label>
+              <input matInput type="number" step="0.01" formControlName="value" />
+              <mat-error *ngIf="ruleFieldError('value') as err">{{ err }}</mat-error>
+            </mat-form-field>
+            <mat-form-field class="full-width">
+              <mat-label>Category</mat-label>
+              <mat-select formControlName="categoryId">
+                <mat-option *ngFor="let c of categories$ | async" [value]="c.id">{{ c.name }}</mat-option>
+              </mat-select>
+              <mat-error *ngIf="ruleFieldError('categoryId') as err">{{ err }}</mat-error>
+            </mat-form-field>
+            <mat-form-field class="full-width">
+              <mat-label>Day of month</mat-label>
+              <input matInput type="number" min="1" max="28" step="1" formControlName="dayOfMonth" />
+              <mat-error *ngIf="ruleFieldError('dayOfMonth') as err">{{ err }}</mat-error>
+            </mat-form-field>
+            <div class="rule-actions">
+              <button mat-flat-button color="primary" type="submit">{{ editingRuleKey ? 'Update rule' : 'Add rule' }}</button>
+              <button mat-button type="button" *ngIf="editingRuleKey" (click)="resetRuleForm()">Cancel</button>
+            </div>
+          </form>
+        </mat-card>
+
+        <ng-container *ngIf="recurringRules$ | async as rules">
+          <p class="empty-state" *ngIf="rules.length === 0">No recurring rules yet. Add one above to generate a repeating expense each period.</p>
+          <mat-list class="rule-list">
+            <mat-list-item *ngFor="let r of rules" class="rule-item">
+              <span matListItemTitle class="rule-title">{{ r.name }}</span>
+              <span matListItemLine class="rule-detail">
+                ${{ r.value.toFixed(2) }} &middot; {{ ruleCategoryName(categories$ | async, r.categoryId) }} &middot; day {{ r.dayOfMonth }}
+              </span>
+              <span class="rule-actions-inline">
+                <button mat-icon-button (click)="startEditRule(r)" aria-label="Edit recurring rule"><span class="material-symbols-outlined">edit</span></button>
+                <button mat-icon-button (click)="deleteRule(r.key)" aria-label="Delete recurring rule"><span class="material-symbols-outlined">delete</span></button>
+              </span>
+            </mat-list-item>
+          </mat-list>
+        </ng-container>
       </div>
     </mat-tab>
   </mat-tab-group>

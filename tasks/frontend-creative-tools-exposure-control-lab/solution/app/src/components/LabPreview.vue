@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full h-full overflow-hidden flex items-center justify-center" role="img" aria-label="Live exposure preview">
+  <div ref="previewRoot" class="relative w-full h-full overflow-hidden flex items-center justify-center" role="img" aria-label="Live exposure preview">
     <div class="absolute inset-0 z-50 pointer-events-none noise-layer" aria-hidden="true">
       <div
         class="absolute inset-0 mix-blend-multiply bg-[url('/assets/iso-noise.jpg')] bg-[length:200px_200px] bg-center"
@@ -38,16 +38,75 @@
         />
       </div>
 
-      <div class="absolute inset-0 z-30 w-[100vw] h-[105vh] bg-[url('/assets/background.jpg')] bg-cover bg-center depth-plate"
+      <div class="absolute inset-0 z-30 overflow-hidden depth-plate"
            :style="{ filter: 'blur(' + blurAmount + 'px)', transition: transitionStyle }"
            aria-hidden="true">
+        <img src="/assets/background.jpg" alt="" class="absolute inset-0 w-full h-full object-cover block scale-[1.05]" width="1600" height="1000" />
       </div>
+    </div>
+
+    <!-- Split A/B before-after divider (bonus aid): drag or arrow-key the
+         handle to reveal the original unedited capture on the left. -->
+    <div v-if="splitEnabled" class="absolute inset-0 z-[55] pointer-events-none overflow-hidden"
+         :style="{ clipPath: `inset(0 ${100 - splitPos}% 0 0)` }" aria-hidden="true">
+      <div class="absolute inset-0" :style="{ filter: BASELINE_FILTER }">
+        <div class="absolute inset-0 z-40 overflow-hidden" :style="{ filter: 'blur(' + BASELINE_BLUR + 'px)' }">
+          <img :src="`/assets/motion-06.jpg`" alt="" class="absolute inset-0 w-full h-full object-cover block" width="1600" height="1000" />
+        </div>
+        <div class="absolute inset-0 z-30 overflow-hidden" :style="{ filter: 'blur(' + BASELINE_BLUR + 'px)' }">
+          <img src="/assets/background.jpg" alt="" class="absolute inset-0 w-full h-full object-cover block scale-[1.05]" width="1600" height="1000" />
+        </div>
+      </div>
+      <span class="absolute top-3 left-3 px-2 py-1 rounded bg-black/60 text-white text-[10px] tracking-[0.14em] font-medium">ORIGINAL</span>
+      <span class="absolute top-3 right-3 px-2 py-1 rounded bg-black/60 text-white text-[10px] tracking-[0.14em] font-medium">EDIT</span>
+    </div>
+    <div
+      v-if="splitEnabled"
+      class="absolute top-0 bottom-0 z-[56] w-1 bg-white/80 pointer-events-auto cursor-ew-resize"
+      :style="{ left: `calc(${splitPos}% - 2px)` }"
+      role="slider"
+      tabindex="0"
+      aria-label="Before/after split position"
+      aria-valuemin="5"
+      aria-valuemax="95"
+      :aria-valuenow="Math.round(splitPos)"
+      @pointerdown="startSplitDrag"
+      @pointermove="dragSplit"
+      @pointerup="splitDragging = false"
+      @pointercancel="splitDragging = false"
+      @keydown.left.prevent="splitPos = Math.max(5, splitPos - 5)"
+      @keydown.right.prevent="splitPos = Math.min(95, splitPos + 5)"
+    >
+      <span class="absolute top-1/2 left-1/2 w-8 h-8 rounded-full bg-white text-black flex items-center justify-center text-[13px] font-semibold shadow-lg select-none" style="transform: translate(-50%, -50%)" aria-hidden="true">⇔</span>
+    </div>
+
+    <!-- Preview usability aids: exposure warning + stop-delta caption (kept
+         clear of the top-right help trigger and the bottom-center brand chip) -->
+    <div class="absolute bottom-[60px] right-3 md:right-6 z-[60] flex flex-col items-end gap-1.5 pointer-events-none">
+      <button
+        class="pointer-events-auto px-2.5 py-1 rounded-full bg-black/55 text-white text-[11px] font-medium tracking-wide transition-colors hover:bg-black/75 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+        :class="splitEnabled ? 'bg-primary/90 hover:bg-primary' : ''"
+        :aria-pressed="splitEnabled"
+        @click="splitEnabled = !splitEnabled"
+      >
+        {{ splitEnabled ? 'Exit split A/B' : 'Split A/B' }}
+      </button>
+      <span
+        v-if="!store.beforeHold && exposureWarning"
+        class="px-2.5 py-1 rounded-full text-[11px] font-medium shadow transition-opacity duration-300"
+        :class="exposureWarning.over ? 'bg-amber-400/95 text-black' : 'bg-sky-300/95 text-black'"
+      >
+        {{ exposureWarning.text }}
+      </span>
+      <span class="px-2.5 py-1 rounded-full bg-black/55 text-white text-[11px] font-medium tabular-nums">
+        Δ {{ deltaCaption }} stops vs baseline
+      </span>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useStore } from '../store.js'
 import { shutterStops, computeToneAdjustments, computeTextureClarityAdjustments } from '../domain.js'
 import { usePreferredReducedMotion } from '@vueuse/core'
@@ -73,6 +132,44 @@ const MAX_BLUR = 20
 const BASE_APERTURE = 16
 const BASE_SHUTTER = 60
 
+// Fixed rendering of the original capture used by the Split A/B divider:
+// baseline stops, no develop edits, no vignette/grain/ISO noise.
+const BASELINE_FILTER = `brightness(${BASE_BRIGHTNESS}%) contrast(100%) saturate(1)`
+const BASELINE_BLUR = Math.max(0.2, MAX_BLUR / Math.pow(BASE_APERTURE, 1.1))
+
+// --- Split A/B divider state (in-memory only) -------------------------------
+const splitEnabled = ref(false)
+const splitPos = ref(50)
+const splitDragging = ref(false)
+const previewRoot = ref(null)
+
+function startSplitDrag(event) {
+  splitDragging.value = true
+  event.target.setPointerCapture?.(event.pointerId)
+  dragSplit(event)
+}
+function dragSplit(event) {
+  if (!splitDragging.value || !previewRoot.value) return
+  const rect = previewRoot.value.getBoundingClientRect()
+  const pct = ((event.clientX - rect.left) / rect.width) * 100
+  splitPos.value = Math.max(5, Math.min(95, pct))
+}
+
+// --- Exposure aids ----------------------------------------------------------
+const deltaCaption = computed(() => {
+  const d = store.beforeHold ? 0 : store.ev + store.light.exposure * 0.02
+  const rounded = Math.round(d * 10) / 10
+  return (rounded >= 0 ? '+' : '−') + Math.abs(rounded).toFixed(1)
+})
+
+const exposureWarning = computed(() => {
+  const v = store.displayEV
+  if (v > 1.5) return { over: true, text: '▲ Overexposed — narrow aperture, speed up shutter, or lower ISO' }
+  if (v < -1.5) return { over: false, text: '▼ Underexposed — widen aperture, slow the shutter, or raise ISO' }
+  return null
+})
+
+// --- Live preview pipeline ---------------------------------------------------
 const activeFrameIndex = computed(() => {
   const shutterForFrame = store.beforeHold ? BASE_SHUTTER : store.shutter
   const idx = shutterStops.indexOf(shutterForFrame)

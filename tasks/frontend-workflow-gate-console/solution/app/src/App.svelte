@@ -13,7 +13,9 @@
   import EventTimeline from './lib/components/EventTimeline.svelte';
   import GateRegistry from './lib/components/GateRegistry.svelte';
   import ModalLayer from './lib/components/ModalLayer.svelte';
+  import NoteForm from './lib/components/NoteForm.svelte';
   import { registerWebMCP } from './lib/webmcp';
+  import { formatTimestamp } from './lib/format';
 
   $effect(() => {
     document.documentElement.classList.toggle('dark', consoleStore.theme === 'dark');
@@ -22,6 +24,16 @@
 
   onMount(() => {
     if (!registerWebMCP()) setTimeout(registerWebMCP, 800);
+    const decorateIcons = () => {
+      document.querySelectorAll('svg:not([aria-label]):not([aria-labelledby])').forEach((svg) => {
+        svg.setAttribute('aria-hidden', 'true');
+        svg.removeAttribute('role');
+      });
+    };
+    decorateIcons();
+    const observer = new MutationObserver(decorateIcons);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
   });
 
   const selectedRecordedGateFailures = $derived(consoleStore.selectedStage.gates.filter((gate) => gate.state === 'fail'));
@@ -31,9 +43,7 @@
   );
 
   function formatSubmitted(value: string) {
-    return new Intl.DateTimeFormat('en', {
-      month:'short', day:'2-digit', hour:'2-digit', minute:'2-digit', hour12:false, timeZone:'UTC'
-    }).format(new Date(value));
+    return formatTimestamp(value);
   }
 
   function selectRunKey(event: KeyboardEvent, runId: string) {
@@ -157,12 +167,12 @@
             <div class="run-meta">
               <span><GitBranch size={13} />{consoleStore.selectedRun.branch}</span>
               <span><Hash size={13} />{consoleStore.selectedRun.commit}</span>
-              <span>Submitted {new Date(consoleStore.selectedRun.submittedAt).toLocaleString('en', { timeZone:'UTC' })} UTC</span>
+              <span>Submitted {formatSubmitted(consoleStore.selectedRun.submittedAt)} UTC</span>
             </div>
           </div>
           <div class="run-detail-actions">
-            <button type="button" class="action" onclick={() => consoleStore.openImport()}><UploadSimple size={16} weight="bold" /> Import</button>
-            <button type="button" class="action primary" onclick={() => consoleStore.openExport()}><BracketsCurly size={16} weight="bold" /> Export</button>
+            <button type="button" class="action" onclick={() => consoleStore.openImport()}><UploadSimple size={16} weight="bold" aria-hidden="true" /> Import acceptance package</button>
+            <button type="button" class="action primary" onclick={() => consoleStore.openExport()}><BracketsCurly size={16} weight="bold" aria-hidden="true" /> Export acceptance package</button>
           </div>
         </section>
 
@@ -272,6 +282,9 @@
   </div>
 
   {#if consoleStore.modal}<ModalLayer />{/if}
+  {#if consoleStore.noteFormGateId}
+    <NoteForm gateId={consoleStore.noteFormGateId} />
+  {/if}
 
   <div class="live-region" aria-live="polite" aria-atomic="true">
     {#if consoleStore.toast}
@@ -294,6 +307,7 @@
   .brand div span { margin-top:.02rem; color:#8fa6b9; font-size:.57rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; }
   nav { display:flex; align-items:center; gap:.25rem; padding:.24rem; background:#0e2135; border:1px solid #24394e; border-radius:.65rem; }
   nav button { display:flex; align-items:center; gap:.4rem; min-height:2.15rem; padding:.4rem .7rem; color:#8fa4b8; background:transparent; border:0; border-radius:.45rem; font-size:.7rem; font-weight:750; cursor:pointer; transition:background-color .18s, color .18s; }
+  nav button:focus-visible { outline:2px solid #56d9ec; outline-offset:2px; box-shadow:0 0 0 3px rgba(86,217,236,.35); }
   nav button:hover { color:#dceaf4; background:#152b40; }
   nav button.active { color:white; background:#1c384f; box-shadow:0 2px 7px rgba(0,0,0,.2); }
   .header-actions { display:flex; align-items:center; justify-content:flex-end; gap:.42rem; }
@@ -441,9 +455,13 @@
     .suite-outcome { flex-wrap:wrap; }
     .suite-outcome > span:first-child { width:100%; }
     .stage-controls { display:grid; grid-template-columns:1fr 1fr; }
-    .stage-controls .whatif-toggle { grid-column:1 / -1; }
+    .stage-controls .whatif-toggle { grid-column:1 / -1; min-height:44px; }
     .stage-controls .action { width:100%; }
     .gate-register { margin:.7rem; }
     .stage-foot { padding:.6rem .7rem; }
+    .run-tools { grid-template-columns:1fr; }
+    .search-field, .sort-field { min-height:44px; }
+    .search-field input, .sort-field select { font-size:.78rem; }
+    nav button { min-height:44px; min-width:44px; }
   }
 </style>

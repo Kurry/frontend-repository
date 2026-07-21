@@ -14,6 +14,7 @@ import {
 import {
   serializeWorkspace, parseWorkspace, flattenNoteToText, validateTxtFilename,
 } from '../../store/workspace';
+import { DialogFocusService, trapFocus } from '../../services/dialog-focus.service';
 
 @Component({
   selector: 'app-workspace-dialog',
@@ -23,6 +24,7 @@ import {
     @if (exportOpen()) {
       <div class="overlay-backdrop" (click)="closeExport()" role="presentation">
         <div class="overlay-panel ws-panel" (click)="$event.stopPropagation()"
+             (keydown)="onDialogKeydown($event, 'export')"
              role="dialog" aria-modal="true" aria-labelledby="ws-export-title">
           <div class="ws-header">
             <h2 id="ws-export-title">Export workspace</h2>
@@ -45,6 +47,7 @@ import {
     @if (importOpen()) {
       <div class="overlay-backdrop" (click)="closeImport()" role="presentation">
         <div class="overlay-panel ws-panel" (click)="$event.stopPropagation()"
+             (keydown)="onDialogKeydown($event, 'import')"
              role="dialog" aria-modal="true" aria-labelledby="ws-import-title">
           <div class="ws-header">
             <h2 id="ws-import-title">Import workspace</h2>
@@ -73,6 +76,7 @@ import {
     @if (txtOpen()) {
       <div class="overlay-backdrop" (click)="closeTxt()" role="presentation">
         <div class="overlay-panel ws-panel ws-panel-sm" (click)="$event.stopPropagation()"
+             (keydown)="onDialogKeydown($event, 'txt')"
              role="dialog" aria-modal="true" aria-labelledby="txt-export-title">
           <div class="ws-header">
             <h2 id="txt-export-title">Export as .txt</h2>
@@ -131,6 +135,7 @@ import {
 })
 export class WorkspaceDialogComponent {
   private store = inject(Store);
+  private dialogFocus = inject(DialogFocusService);
 
   @ViewChild('exportFirst') exportFirst?: ElementRef<HTMLElement>;
   @ViewChild('importFirst') importFirst?: ElementRef<HTMLElement>;
@@ -153,21 +158,15 @@ export class WorkspaceDialogComponent {
     JSON.stringify(serializeWorkspace(this.notes(), this.selectedNoteId()), null, 2)
   );
 
-  private opener: HTMLElement | null = null;
   private prevExport = false;
   private prevImport = false;
   private prevTxt = false;
 
   constructor() {
-    // Focus management: move focus into each dialog on open, restore to opener on close.
     effect(() => {
       const e = this.exportOpen(), i = this.importOpen(), t = this.txtOpen();
       const anyNowOpen = e || i || t;
       const anyWasOpen = this.prevExport || this.prevImport || this.prevTxt;
-
-      if (anyNowOpen && !anyWasOpen) {
-        this.opener = document.activeElement as HTMLElement | null;
-      }
 
       if (t && !this.prevTxt) {
         const n = this.selectedNote();
@@ -184,13 +183,21 @@ export class WorkspaceDialogComponent {
           (this.exportFirst || this.importFirst || this.txtFirst)?.nativeElement.focus();
         }, 40);
       } else if (anyWasOpen) {
-        const opener = this.opener;
-        setTimeout(() => opener?.focus?.(), 0);
-        this.opener = null;
+        this.dialogFocus.restore();
       }
 
       this.prevExport = e; this.prevImport = i; this.prevTxt = t;
     });
+  }
+
+  onDialogKeydown(event: KeyboardEvent, which: 'export' | 'import' | 'txt'): void {
+    const panel = event.currentTarget as HTMLElement;
+    trapFocus(panel, event);
+    if (event.key === 'Escape') {
+      if (which === 'export') this.closeExport();
+      else if (which === 'import') this.closeImport();
+      else this.closeTxt();
+    }
   }
 
   closeExport() { this.store.dispatch(closeWorkspaceExport()); }

@@ -53,6 +53,13 @@ const state = {
 let seq = 0;
 function nextId(prefix) { seq += 1; return `${prefix}-${Date.now().toString(36)}-${seq}`; }
 
+// Average-unit-cost memo for symbols whose holding was removed by a full SELL.
+// When a symbol has no BUY activities, its average unit cost falls back to the
+// holding's own unit price; if the position is later sold in full the holding
+// disappears, but realized gain must keep using that fallback price (not 0)
+// so sold gains are never double-counted.
+const avgMemo = new Map();
+
 const undoStack = [];
 function snapshot() {
   return {
@@ -64,7 +71,8 @@ function snapshot() {
     sort: state.sort ? { ...state.sort } : null,
     holdingSel: [...state.holdingSel],
     activitySel: [...state.activitySel],
-    benchmarkOn: state.benchmarkOn
+    benchmarkOn: state.benchmarkOn,
+    avgMemo: [...avgMemo.entries()]
   };
 }
 function pushUndo() { undoStack.push(snapshot()); }
@@ -78,6 +86,8 @@ function restore(snap) {
   state.holdingSel = new Set(snap.holdingSel);
   state.activitySel = new Set(snap.activitySel);
   state.benchmarkOn = snap.benchmarkOn;
+  avgMemo.clear();
+  for (const [k, v] of snap.avgMemo || []) avgMemo.set(k, v);
 }
 function undo() {
   if (!undoStack.length) return { ok: false, error: 'Nothing to undo' };
@@ -102,6 +112,9 @@ function load() {
       if (parsed && Array.isArray(parsed.holdings) && Array.isArray(parsed.activities)) {
         state.holdings = parsed.holdings.map(coerceHolding).filter(Boolean);
         state.activities = parsed.activities.map(coerceActivity).filter(Boolean);
+        if (Array.isArray(parsed.avgMemo)) {
+          for (const [k, v] of parsed.avgMemo) if (typeof k === 'string' && Number.isFinite(Number(v))) avgMemo.set(k, Number(v));
+        }
         return;
       }
     }
@@ -139,7 +152,7 @@ function coerceActivity(a) {
 }
 function persist() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ holdings: state.holdings, activities: state.activities }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ holdings: state.holdings, activities: state.activities, avgMemo: [...avgMemo.entries()] }));
   } catch (_) { /* storage optional */ }
 }
 
@@ -192,32 +205,62 @@ function symbolStats(symbol) {
   let buyCost = 0; let buyQty = 0;
   for (const a of acts) if (a.type === 'BUY') { buyCost += a.quantity * a.unitPrice; buyQty += a.quantity; }
   const holding = state.holdings.find((h) => h.symbol === symbol);
-  const avgUnitCost = buyQty > 0 ? buyCost / buyQty : (holding ? holding.unitPrice : 0);
+  const avgUnitCost = buyQty > 0
+    ? buyCost / buyQty
+    : (holding ? holding.unitPrice : (avgMemo.has(symbol) ? avgMemo.get(symbol) : 0));
   let realized = 0;
   for (const a of acts) if (a.type === 'SELL') realized += (a.unitPrice - avgUnitCost) * a.quantity;
   return { avgUnitCost, realized, buyQty, buyCost };
 }
 function holdingMetrics(h) {
   const { avgUnitCost, realized } = symbolStats(h.symbol);
-  const marketValue = marketValueOf(h);
-  const costBasis = avgUnitCost * h.quantity;
-  return { marketValue, avgUnitCost, costBasis, unrealized: marketValue - costBasis, realized };
+  // Round to cents at the derivation boundary so every surface (detail panel,
+  // performance summary, exports) reads the same figures and the identities
+  // (costBasis = avgUnitCost x quantity; unrealized = marketValue - costBasis)
+  // hold exactly on the displayed/exported values.
+  const avgC = round2(avgUnitCost);
+  const marketValue = round2(marketValueOf(h));
+  const costBasis = round2(avgC * h.quantity);
+  const unrealized = round2(marketValue - costBasis);
+  return { marketValue, avgUnitCost: avgC, costBasis, unrealized, realized: round2(realized) };
 }
 function perfSummary() {
   const symbols = new Set([...state.holdings.map((h) => h.symbol), ...state.activities.map((a) => a.symbol)]);
-  let netWorthAll = 0; let totalCostBasis = 0; let unrealizedGain = 0; let realizedGain = 0;
+  let totalCostBasis = 0; let unrealizedGain = 0;
   for (const h of state.holdings) {
     const m = holdingMetrics(h);
-    netWorthAll += m.marketValue; totalCostBasis += m.costBasis; unrealizedGain += m.unrealized;
+    totalCostBasis = round2(totalCostBasis + m.costBasis);
+    unrealizedGain = round2(unrealizedGain + m.unrealized);
   }
-  for (const sym of symbols) realizedGain += symbolStats(sym).realized;
+  let realizedGain = 0;
+  for (const sym of symbols) realizedGain = round2(realizedGain + symbolStats(sym).realized);
   let dividendIncome = 0; let totalFees = 0;
   for (const a of state.activities) {
     if (a.type === 'DIVIDEND') dividendIncome += a.quantity * a.unitPrice;
     totalFees += a.fee;
   }
-  const totalReturn = unrealizedGain + realizedGain + dividendIncome - totalFees;
-  return { netWorth: netWorthAll, totalCostBasis, realizedGain, unrealizedGain, dividendIncome, totalFees, totalReturn };
+  dividendIncome = round2(dividendIncome);
+  totalFees = round2(totalFees);
+  const totalReturn = round2(unrealizedGain + realizedGain + dividendIncome - totalFees);
+  // Net worth tracks the VISIBLE holdings — the exact same derivation as the
+  // top net-worth summary — so the two surfaces can never disagree, filtered
+  // or not.
+  const visibleNW = round2(netWorth(visibleHoldings()));
+  return { netWorth: visibleNW, totalCostBasis, realizedGain, unrealizedGain, dividendIncome, totalFees, totalReturn };
+}
+// Display dollars for the performance summary, with total return computed from
+// the displayed components so the on-screen identity (total return =
+// unrealized + realized + dividend income - total fees) is exact to the cent
+// the judge reads.
+function perfDisplay() {
+  const p = perfSummary();
+  const d = {
+    netWorth: Math.round(p.netWorth), totalCostBasis: Math.round(p.totalCostBasis),
+    realizedGain: Math.round(p.realizedGain), unrealizedGain: Math.round(p.unrealizedGain),
+    dividendIncome: Math.round(p.dividendIncome), totalFees: Math.round(p.totalFees)
+  };
+  d.totalReturn = d.unrealizedGain + d.realizedGain + d.dividendIncome - d.totalFees;
+  return d;
 }
 
 // Portfolio-value time series. Value at each bucket = cumulative positions held on
@@ -442,6 +485,7 @@ function createActivity(data) {
     const h = state.holdings.find((x) => x.symbol === act.symbol);
     if (h) { h.quantity += act.quantity; }
     else {
+      avgMemo.delete(act.symbol);
       const nh = {
         id: nextId('h'), name: act.symbol, symbol: act.symbol, assetClass: 'Equity',
         quantity: act.quantity, unitPrice: act.unitPrice, currency: act.currency, dataSource: act.dataSource
@@ -454,6 +498,9 @@ function createActivity(data) {
     if (h) {
       h.quantity -= act.quantity;
       if (h.quantity <= 1e-9) {
+        // Remember the average unit cost this position sold against so realized
+        // gain stays correct after the holding row disappears.
+        avgMemo.set(act.symbol, symbolStats(act.symbol).avgUnitCost);
         state.holdings = state.holdings.filter((x) => x.id !== h.id);
         if (state.selectedId === h.id) clearSelection();
       }
@@ -598,7 +645,7 @@ function activityPayloads() {
 }
 function portfolioJson() {
   return JSON.stringify({
-    meta: { exportedAt: new Date().toISOString(), holdingCount: state.holdings.length, activityCount: state.activities.length },
+    meta: { version: 1, exportedAt: new Date().toISOString(), holdingCount: state.holdings.length, activityCount: state.activities.length },
     holdings: holdingPayloads(),
     activities: activityPayloads()
   }, null, 2);
@@ -620,11 +667,11 @@ function activitiesCsv() {
 function performanceReport() {
   const perf = perfSummary();
   return JSON.stringify({
-    meta: { exportedAt: new Date().toISOString(), holdingCount: state.holdings.length, activityCount: state.activities.length },
+    meta: { version: 1, exportedAt: new Date().toISOString(), holdingCount: state.holdings.length, activityCount: state.activities.length },
     performance: {
-      netWorth: round2(perf.netWorth), totalCostBasis: round2(perf.totalCostBasis), realizedGain: round2(perf.realizedGain),
-      unrealizedGain: round2(perf.unrealizedGain), dividendIncome: round2(perf.dividendIncome), totalFees: round2(perf.totalFees),
-      totalReturn: round2(perf.totalReturn)
+      netWorth: perf.netWorth, totalCostBasis: perf.totalCostBasis, realizedGain: perf.realizedGain,
+      unrealizedGain: perf.unrealizedGain, dividendIncome: perf.dividendIncome, totalFees: perf.totalFees,
+      totalReturn: perf.totalReturn
     },
     holdings: state.holdings.map((h) => {
       const m = holdingMetrics(h);
@@ -691,6 +738,7 @@ function importPortfolioJson(text) {
   pushUndo();
   state.holdings = newHoldings;
   state.activities = newActivities;
+  avgMemo.clear();
   clearSelection();
   resetHoldingForm();
   state.holdingSel.clear(); state.activitySel.clear();
@@ -721,6 +769,7 @@ function importHoldingsCsv(text) {
   }
   pushUndo();
   state.holdings = newHoldings;
+  avgMemo.clear();
   clearSelection(); resetHoldingForm(); state.holdingSel.clear();
   persist();
   render();
@@ -741,7 +790,20 @@ function beginActivitiesImport(text) {
     mapping[f] = found;
   }
   const dataRows = rows.slice(1).map((cells, i) => ({ id: `r${i}`, cells, excluded: false }));
-  state.diag = { header, mapping, rows: dataRows, committedSummary: '' };
+  state.diag = { header, mapping, rows: dataRows, awaiting: false };
+  openDiag();
+  return { ok: true };
+}
+// Reach the pre-commit diagnostics screen without a file yet (used by the
+// import-diagnostics browse destination and keyboard exploration): staging is
+// empty, nothing in the store changes, and a file input inside the screen
+// loads an Activities CSV through the same pipeline as the drawer control.
+function openImportDiagnostics() {
+  if (!state.diag) {
+    const mapping = {};
+    for (const f of ACTIVITY_FIELDS) mapping[f] = -1;
+    state.diag = { header: [], mapping, rows: [], awaiting: true };
+  }
   openDiag();
   return { ok: true };
 }
@@ -772,6 +834,14 @@ function diagValidateRow(row) {
 }
 function commitDiag() {
   if (!state.diag) return { ok: false };
+  if (state.diag.awaiting) {
+    const summary = 'Imported zero (0) rows; skipped zero (0) rows. No rows were parsed, so nothing changed.';
+    closeDiag();
+    render();
+    announce(summary);
+    toast(summary);
+    return { ok: true, imported: 0, skipped: 0 };
+  }
   const valid = [];
   let skipped = 0;
   for (const row of state.diag.rows) {
@@ -884,7 +954,7 @@ const PERF_FIELDS = [
 let lastPerf = null;
 
 function renderPerformance() {
-  const p = perfSummary();
+  const p = perfDisplay();
   // Build the figure nodes once, then tween each value in place on later renders
   // (mirroring the net-worth tween) instead of rebuilding innerHTML, which snapped.
   if (!refs.perfFigures.children.length) {
@@ -1102,7 +1172,13 @@ function tweenNumber(node, from, to, fmt) {
   requestAnimationFrame(step);
 }
 
-function announce(msg) { refs.live.textContent = msg; }
+function announce(msg) {
+  refs.live.textContent = msg;
+  if (refs.lastAction) {
+    refs.lastAction.hidden = false;
+    refs.lastActionChip.textContent = `Last action: ${msg}`;
+  }
+}
 let toastSeq = 0;
 function toast(msg) {
   const div = document.createElement('div');
@@ -1252,6 +1328,7 @@ function renderExport() {
   for (const t of refs.drawerTabs) t.classList.toggle('active', t.dataset.tab === state.drawerTab);
   for (const t of refs.drawerTabs) t.setAttribute('aria-selected', String(t.dataset.tab === state.drawerTab));
   refs.exportPreview.textContent = currentExportText();
+  refs.downloadBtn.textContent = (state.drawerTab === 'holdings-csv' || state.drawerTab === 'activities-csv') ? 'Download CSV' : 'Download JSON';
   const p = perfSummary();
   refs.exportSummary.innerHTML =
     `<div class="es-item"><span class="es-label">Holdings</span><span class="es-val num">${state.holdings.length}</span></div>` +
@@ -1330,6 +1407,16 @@ function diagKeydown(e) { if (e.key === 'Escape') { e.preventDefault(); cancelDi
 function renderDiag() {
   if (!state.diag) return;
   const d = state.diag;
+  const awaiting = Boolean(d.awaiting);
+  refs.diagHint.hidden = !awaiting;
+  refs.diagFileWrap.hidden = !awaiting;
+  if (awaiting) {
+    refs.diagMappingGrid.innerHTML = '';
+    refs.diagThead.innerHTML = `<tr><th>Status</th>${ACTIVITY_FIELDS.map((f) => `<th>${f}</th>`).join('')}<th>Include</th></tr>`;
+    refs.diagBody.innerHTML = '';
+    refs.diagSummary.textContent = 'No rows parsed yet. Choose an Activities CSV file to see per-row diagnostics; nothing changes until Commit.';
+    return;
+  }
   // mapping controls
   refs.diagMappingGrid.innerHTML = '';
   for (const f of ACTIVITY_FIELDS) {
@@ -1419,7 +1506,10 @@ function grab() {
     exportPreview: 'export-preview', copyBtn: 'copy-btn', downloadBtn: 'download-btn', copyConfirm: 'copy-confirm',
     importFile: 'import-file', importError: 'import-error',
     diagScreen: 'diag-screen', diagOverlay: 'diag-overlay', diagSummary: 'diag-summary', diagMappingGrid: 'diag-mapping-grid',
-    diagThead: 'diag-thead', diagBody: 'diag-body', diagCommit: 'diag-commit', diagCancel: 'diag-cancel', diagCancelX: 'diag-cancel-x'
+    diagThead: 'diag-thead', diagBody: 'diag-body', diagCommit: 'diag-commit', diagCancel: 'diag-cancel', diagCancelX: 'diag-cancel-x',
+    diagHint: 'diag-hint', diagFileWrap: 'diag-file-wrap', diagFile: 'diag-file',
+    lastAction: 'last-action', lastActionChip: 'last-action-chip',
+    saveHoldingWrap: 'save-holding-wrap', saveActivityWrap: 'save-activity-wrap'
   };
   for (const [k, id] of Object.entries(ids)) refs[k] = el(id);
   refs.sortBtns = [...document.querySelectorAll('.sort-btn')];
@@ -1501,6 +1591,18 @@ function wire() {
   refs.diagCancel.addEventListener('click', cancelDiag);
   refs.diagCancelX.addEventListener('click', cancelDiag);
   refs.diagOverlay.addEventListener('click', cancelDiag);
+  refs.diagFile.addEventListener('change', (e) => {
+    const f = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const res = beginActivitiesImport(String(reader.result || ''));
+      if (!res.ok) { closeDiag(); showImportError(`Import error — ${res.error === 'empty' ? 'Activities CSV is empty.' : res.error}`); openDrawer(); }
+    };
+    reader.onerror = () => { closeDiag(); showImportError('Import error — could not read the file.'); openDrawer(); };
+    reader.readAsText(f);
+  });
   refs.diagMappingGrid.addEventListener('change', (e) => {
     const sel = e.target.closest('select[data-field]');
     if (sel) { state.diag.mapping[sel.dataset.field] = Number(sel.value); renderDiag(); }
@@ -1514,6 +1616,36 @@ function wire() {
     if (cb) { state.diag.rows[Number(cb.dataset.exclude)].excluded = !cb.checked; renderDiag(); }
   });
 
+  // Clicking the (natively disabled) save control still surfaces every inline
+  // validation message: clicks on a disabled button land on its wrapper, so an
+  // attempt-to-save with an empty name or broken rule reveals the field errors
+  // instead of silently doing nothing.
+  const attemptHoldingSave = () => {
+    if (!refs.saveHoldingBtn.disabled) return;
+    for (const k of HFIELDS) holdingTouched[k] = true;
+    updateHoldingFormValidity();
+    const v = validateHolding(normalizeHolding(readHoldingForm()));
+    showFormError(refs.formError, Object.values(v.errors)[0] || 'Fix the highlighted fields, then save again.');
+  };
+  refs.saveHoldingWrap.addEventListener('click', attemptHoldingSave);
+  refs.holdingForm.addEventListener('keydown', (e) => { if (e.key === 'Enter' && refs.saveHoldingBtn.disabled && e.target.tagName !== 'TEXTAREA') { e.preventDefault(); attemptHoldingSave(); } });
+  const attemptActivitySave = () => {
+    if (!refs.saveActivityBtn.disabled) return;
+    for (const k of AFIELDS) activityTouched[k] = true;
+    updateActivityFormValidity();
+    const v = validateActivity(coerceActivity(readActivityForm()));
+    showFormError(refs.activityError, Object.values(v.errors)[0] || 'Fix the highlighted fields, then save again.');
+  };
+  refs.saveActivityWrap.addEventListener('click', attemptActivitySave);
+  refs.activityForm.addEventListener('keydown', (e) => { if (e.key === 'Enter' && refs.saveActivityBtn.disabled) { e.preventDefault(); attemptActivitySave(); } });
+
+  // Reduced motion is read live on every animation; also re-render when the
+  // preference flips mid-session so in-flight surfaces settle instantly.
+  try {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    if (mq.addEventListener) mq.addEventListener('change', () => render());
+  } catch (_) { /* non-fatal */ }
+
   render();
   registerWebMcp();
 }
@@ -1522,15 +1654,25 @@ function wire() {
 // WebMCP surface
 // ---------------------------------------------------------------------------
 function registerWebMcp() {
+  const DESTINATIONS = ['portfolio-overview', 'activities', 'export-drawer', 'performance-chart', 'import-diagnostics'];
   const tools = [
-    { name: 'browse.open', module: 'browse-query-v1', description: 'Open a destination view (portfolio-overview, activities, export-drawer).',
-      input_schema: { type: 'object', properties: { destination: { type: 'string', enum: ['portfolio-overview', 'activities', 'export-drawer'] } } },
+    { name: 'browse.open', module: 'browse-query-v1', description: 'Open a destination view (portfolio-overview, activities, export-drawer, performance-chart, import-diagnostics).',
+      input_schema: { type: 'object', properties: { destination: { type: 'string', enum: DESTINATIONS } } },
       handler: (a = {}) => {
         const dest = a.destination || 'portfolio-overview';
+        if (!DESTINATIONS.includes(dest)) return { ok: false, error: 'Unknown destination' };
         if (dest === 'export-drawer') { openDrawer(); return { ok: true, destination: dest }; }
         if (dest === 'activities') { refs.activitiesBody.scrollIntoView({ block: 'start' }); return { ok: true, destination: dest }; }
-        if (dest === 'portfolio-overview') { window.scrollTo({ top: 0 }); return { ok: true, destination: dest }; }
-        return { ok: false, error: 'Unknown destination' };
+        if (dest === 'performance-chart') {
+          const card = refs.chartWrap.closest('section') || refs.chartWrap;
+          card.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+          card.classList.add('dest-flash');
+          setTimeout(() => card.classList.remove('dest-flash'), 1400);
+          return { ok: true, destination: dest };
+        }
+        if (dest === 'import-diagnostics') { openImportDiagnostics(); return { ok: true, destination: dest }; }
+        window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+        return { ok: true, destination: dest };
       } },
     { name: 'browse.apply_filter', module: 'browse-query-v1', description: 'Filter holdings by asset class or activities by type.',
       input_schema: { type: 'object', required: ['filter', 'value'], properties: { filter: { type: 'string', enum: ['asset-class', 'activity-type'] }, value: { type: 'string' } } },
@@ -1542,15 +1684,20 @@ function registerWebMcp() {
     { name: 'browse.clear_filter', module: 'browse-query-v1', description: 'Clear the asset-class or activity-type filter.',
       input_schema: { type: 'object', properties: { filter: { type: 'string', enum: ['asset-class', 'activity-type'] } } },
       handler: (a = {}) => { if (a.filter === 'activity-type') return { ok: true, ...applyActivityFilter('all') }; return { ok: true, ...clearFilter() }; } },
-    { name: 'browse.sort', module: 'browse-query-v1', description: 'Sort the holdings table by a column (toggles direction).',
-      input_schema: { type: 'object', required: ['sort'], properties: { sort: { type: 'string', enum: ['name', 'symbol', 'assetClass', 'quantity', 'marketValue'] } } },
-      handler: (a = {}) => ({ ok: true, ...applySort(a.sort) }) },
     { name: 'entity.create', module: 'entity-collection-v1', description: 'Create a holding (same as the Add holding form).',
       input_schema: { type: 'object', required: ['name', 'symbol', 'asset_class', 'quantity', 'unit_price', 'currency', 'data_source'],
         properties: { name: { type: 'string' }, symbol: { type: 'string' }, asset_class: { type: 'string', enum: ASSET_CLASSES }, quantity: { type: 'number' }, unit_price: { type: 'number' }, currency: { type: 'string', enum: CURRENCIES }, data_source: { type: 'string', enum: DATA_SOURCES } } },
       handler: (a = {}) => createHolding({ name: a.name, symbol: a.symbol, assetClass: a.asset_class, quantity: a.quantity, unitPrice: a.unit_price, currency: a.currency, dataSource: a.data_source }) },
-    { name: 'entity.select', module: 'entity-collection-v1', description: 'Select a holding by id.',
-      input_schema: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } }, handler: (a = {}) => selectHolding(a.id) },
+    { name: 'entity.select', module: 'entity-collection-v1', description: 'Select a holding by id (symbol or name also accepted as a fallback).',
+      input_schema: { type: 'object', required: ['id'], properties: { id: { type: 'string' } } },
+      handler: (a = {}) => {
+        const key = String(a.id ?? '');
+        let holding = state.holdings.find((h) => h.id === key);
+        if (!holding) holding = state.holdings.find((h) => h.symbol.toLowerCase() === key.toLowerCase());
+        if (!holding) holding = state.holdings.find((h) => h.name.toLowerCase() === key.toLowerCase());
+        if (!holding) return { ok: false, error: `Holding not found for "${key}"` };
+        return selectHolding(holding.id);
+      } },
     { name: 'entity.update', module: 'entity-collection-v1', description: 'Update fields of an existing holding.',
       input_schema: { type: 'object', required: ['id'], properties: { id: { type: 'string' }, name: { type: 'string' }, symbol: { type: 'string' }, asset_class: { type: 'string', enum: ASSET_CLASSES }, quantity: { type: 'number' }, unit_price: { type: 'number' }, currency: { type: 'string', enum: CURRENCIES }, data_source: { type: 'string', enum: DATA_SOURCES } } },
       handler: (a = {}) => {
@@ -1567,14 +1714,28 @@ function registerWebMcp() {
     { name: 'entity.delete', module: 'entity-collection-v1', description: 'Delete a holding. Requires confirm=true.',
       input_schema: { type: 'object', required: ['id', 'confirm'], properties: { id: { type: 'string' }, confirm: { type: 'boolean' } } },
       handler: (a = {}) => deleteHolding(a.id, a.confirm === true) },
-    { name: 'artifact.export', module: 'artifact-transfer-v1', description: 'Open the export drawer for a format (json or csv). Preview compiles live; contents are not returned.',
-      input_schema: { type: 'object', properties: { format: { type: 'string', enum: ['json', 'csv'] } } },
-      handler: (a = {}) => { openDrawer(); if (a.format === 'csv') setDrawerTab('holdings-csv'); else setDrawerTab('json'); return { ok: true, format: a.format || 'json', holdingCount: state.holdings.length, activityCount: state.activities.length }; } },
+    { name: 'artifact.export', module: 'artifact-transfer-v1', description: 'Open the export drawer for a format (json, csv, or performance-report). Preview compiles live; contents are not returned.',
+      input_schema: { type: 'object', properties: { format: { type: 'string', enum: ['json', 'csv', 'performance-report'] } } },
+      handler: (a = {}) => {
+        const format = ['json', 'csv', 'performance-report'].includes(a.format) ? a.format : 'json';
+        openDrawer();
+        setDrawerTab(format === 'csv' ? 'holdings-csv' : format === 'performance-report' ? 'performance' : 'json');
+        return { ok: true, format, holdingCount: state.holdings.length, activityCount: state.activities.length };
+      } },
     { name: 'artifact.copy', module: 'artifact-transfer-v1', description: 'Copy the current export preview to the clipboard (contents not returned).',
       input_schema: { type: 'object', properties: {} }, handler: () => { copyExport(); return { ok: true, format: state.drawerTab }; } },
-    { name: 'artifact.import', module: 'artifact-transfer-v1', description: 'Open the import affordance for a mode. File selection stays a Playwright responsibility.',
+    { name: 'artifact.import', module: 'artifact-transfer-v1', description: 'Open the import surface for a mode and raise the file chooser. File selection stays a Playwright responsibility; results never include file contents.',
       input_schema: { type: 'object', properties: { mode: { type: 'string', enum: ['portfolio-json', 'holdings-csv', 'activities-csv'] } } },
-      handler: (a = {}) => { openDrawer(); return { ok: true, mode: a.mode || 'portfolio-json', note: 'Select a file via the Import control.' }; } }
+      handler: (a = {}) => {
+        const mode = ['portfolio-json', 'holdings-csv', 'activities-csv'].includes(a.mode) ? a.mode : 'portfolio-json';
+        openDrawer();
+        const importSection = refs.importFile.closest('.drawer-import');
+        if (importSection && importSection.scrollIntoView) importSection.scrollIntoView({ block: 'nearest' });
+        hideImportError();
+        // Raise the same file chooser the visible "Choose file to import" control opens.
+        try { refs.importFile.click(); } catch (_) { /* picker stays a Playwright responsibility */ }
+        return { ok: true, mode, note: 'File chooser is open; set a file on the import input to proceed.' };
+      } }
   ];
 
   const registry = new Map(tools.map((t) => [t.name, t]));

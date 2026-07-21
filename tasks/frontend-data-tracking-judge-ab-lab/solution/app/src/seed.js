@@ -70,8 +70,9 @@ export function makeResult(trialIndex, label, extraOffset = 0) {
 export const seedTrials = Array.from({ length: 12 }, (_, index) => {
   const taskName = TASKS[Math.floor(index / 3)]
   const results = Object.fromEntries(seedLabels.map((label) => [label.name, makeResult(index, label)]))
-  // A deliberate full-agreement control for the designed no-flips state.
-  if (index === 0) results['Rubric v2'].criteria = structuredClone(results.Baseline.criteria)
+  // A deliberate full-agreement control for the designed no-flips state
+  // (kept on the last trial so early rows always carry flips to explore).
+  if (index === 11) results['Rubric v2'].criteria = structuredClone(results.Baseline.criteria)
   return {
     id: `trial-${String(index + 1).padStart(3, '0')}`,
     taskName,

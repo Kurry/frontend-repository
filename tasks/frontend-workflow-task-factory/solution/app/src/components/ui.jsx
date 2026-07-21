@@ -20,7 +20,7 @@ export function Select({ value, onValueChange, placeholder, options, ariaLabel }
     <SelectPrimitive.Root value={value} onValueChange={onValueChange}>
       <SelectPrimitive.Trigger className="select-trigger" aria-label={ariaLabel}>
         <SelectPrimitive.Value placeholder={placeholder} />
-        <SelectPrimitive.Icon><IconChevronDown size={16} /></SelectPrimitive.Icon>
+        <SelectPrimitive.Icon><IconChevronDown size={16} aria-hidden /></SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
       <SelectPrimitive.Portal>
         <SelectPrimitive.Content className="select-content" position="popper" sideOffset={5}>
@@ -51,12 +51,12 @@ export function EmptyState({ title, description, onClear }) {
 
 export function ToastStack({ toasts, onDismiss }) {
   return (
-    <div className="toast-stack" role="region" aria-label="Notifications">
+    <div className="toast-stack" role="region" aria-label="Notifications" aria-live="polite" aria-relevant="additions text">
       {toasts.map((toast) => (
-        <div key={toast.id} className={cn('toast', `toast-${toast.kind}`)} role="status">
-          <span className="toast-dot" />
+        <div key={toast.id} className={cn('toast', `toast-${toast.kind}`)} role="status" aria-live="polite">
+          <span className="toast-dot" aria-hidden="true" />
           <p>{toast.message}</p>
-          <button aria-label="Dismiss notification" onClick={() => onDismiss(toast.id)}><IconX size={16} /></button>
+          <button aria-label="Dismiss notification" onClick={() => onDismiss(toast.id)}><IconX size={16} aria-hidden /></button>
         </div>
       ))}
     </div>

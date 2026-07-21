@@ -152,7 +152,10 @@ class TaskStore {
   searchQuery = $state('');
   activeTagFilters = $state([]);
   toasts = $state([]);
+  liveMessage = $state('');
   showTagManager = $state(false);
+  editTaskId = $state(null);
+  groveImportMode = $state(false);
   moveToSourceId = $state(null);
   showGrovePanel = $state(false);
   grovePanelFormat = $state('grove-json');
@@ -192,12 +195,20 @@ class TaskStore {
 
   // --- Toasts ---
 
+  announce(message) {
+    this.liveMessage = '';
+    queueMicrotask(() => {
+      this.liveMessage = message;
+    });
+  }
+
   addToast(message) {
     const id = generateId();
     this.toasts = [...this.toasts, { id, message }];
+    this.announce(message);
     setTimeout(() => {
       this.toasts = this.toasts.filter(t => t.id !== id);
-    }, 2500);
+    }, 3000);
   }
 
   // --- CRUD ---
@@ -304,12 +315,25 @@ class TaskStore {
     return true;
   }
 
+  _recomputeParentCompletion(nodeId) {
+    const result = findParent(this.tasks, nodeId);
+    if (!result?.parent) return;
+    const parent = result.parent;
+    parent.completed = completionPercent(parent) >= 100;
+    this._recomputeParentCompletion(parent.id);
+  }
+
+  _touchTasks() {
+    this.tasks = JSON.parse(JSON.stringify(this.tasks));
+  }
+
   toggleComplete(nodeId) {
     const node = findNode(this.tasks, nodeId);
-    if (!node) return;
-    if (!isLeaf(node)) return; // parents auto-computed
+    if (!node || !isLeaf(node)) return;
     node.completed = !node.completed;
     node.status = node.completed ? 'done' : 'todo';
+    this._recomputeParentCompletion(nodeId);
+    this._touchTasks();
     this._save();
   }
 
@@ -324,13 +348,21 @@ class TaskStore {
   // --- Reorder ---
 
   moveUp(nodeId) {
-    this.tasks = this._moveSibling(this.tasks, nodeId, -1);
+    const next = this._moveSibling(this.tasks, nodeId, -1);
+    if (next === this.tasks) return false;
+    this.tasks = next;
     this._save();
+    this.addToast('Task moved up');
+    return true;
   }
 
   moveDown(nodeId) {
-    this.tasks = this._moveSibling(this.tasks, nodeId, 1);
+    const next = this._moveSibling(this.tasks, nodeId, 1);
+    if (next === this.tasks) return false;
+    this.tasks = next;
     this._save();
+    this.addToast('Task moved down');
+    return true;
   }
 
   _moveSibling(nodes, nodeId, delta) {
@@ -419,11 +451,12 @@ class TaskStore {
       color: color || TAG_COLORS[this.tags.length % TAG_COLORS.length]
     });
     if (!parsed.success) {
-      this.addToast(parsed.error.issues[0]?.message || 'Tag is invalid');
+      const msg = parsed.error.issues.map(i => i.message).join(', ');
+      this.announce(msg);
       return false;
     }
     if (this.tags.some(t => t.name.toLowerCase() === parsed.data.name.toLowerCase())) {
-      this.addToast('Tag already exists');
+      this.announce('name must be unique among tags');
       return false;
     }
     this.tags = [...this.tags, {

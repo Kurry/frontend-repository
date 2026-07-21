@@ -119,8 +119,8 @@ const showImportMenu = ref(false)
         </button>
       </div>
       <p id="bookmark-url-help" class="field-help">Include a complete address, such as https://example.com</p>
-      <p v-if="errors.url" id="bookmark-url-error" class="field-error" role="alert">{{ errors.url }}</p>
-      <p v-if="errors.title" id="bookmark-title-error" class="field-error" role="alert">{{ errors.title }}</p>
+      <p v-if="errors.url" id="bookmark-url-error" class="field-error" role="alert" aria-live="assertive">{{ errors.url }}</p>
+      <p v-if="errors.title" id="bookmark-title-error" class="field-error" role="alert" aria-live="assertive">{{ errors.title }}</p>
       
       <div class="flex items-center gap-2">
         <button
@@ -158,44 +158,43 @@ const showImportMenu = ref(false)
     <!-- Import/Export controls -->
     <div class="flex items-center gap-2 mt-2 pt-2 border-t" style="border-color: var(--color-border);">
       <div class="relative">
-        <button type="button" @click="showImportMenu = !showImportMenu" class="btn-secondary text-xs inline-flex items-center" style="font-size: 12px; padding: 8px 12px;">
+        <button type="button" @click="showImportMenu = !showImportMenu" class="btn-secondary text-xs inline-flex items-center toolbar-btn">
           Import
         </button>
         <div v-if="showImportMenu" class="absolute left-0 top-full mt-1 bg-white border rounded shadow-lg z-10 p-2 flex flex-col gap-2" style="border-color: var(--color-border);">
-          <label for="file-import" class="btn-secondary text-xs cursor-pointer inline-flex items-center" style="font-size: 12px; padding: 4px 10px; white-space: nowrap;">
+          <label for="file-import" class="btn-secondary text-xs cursor-pointer inline-flex items-center import-file-label">
             Import bookmarks file
-            <input
-              id="file-import"
-              type="file"
-              accept=".html,.htm,.json"
-              class="hidden"
-              aria-label="Import bookmarks"
-              @change="handleImport"
-            />
           </label>
-          <button type="button" @click="store.showImportPackageModal = true; showImportMenu = false" class="btn-secondary text-xs inline-flex items-center text-left" style="font-size: 12px; padding: 4px 10px; white-space: nowrap;">
+          <input
+            id="file-import"
+            type="file"
+            accept=".html,.htm,.json"
+            class="sr-only"
+            @change="handleImport"
+          />
+          <button type="button" @click="store.showImportPackageModal = true; showImportMenu = false" class="btn-secondary text-xs inline-flex items-center text-left menu-btn">
             Import SideDock package
           </button>
         </div>
       </div>
       <div class="relative">
-        <button type="button" @click="showExportMenu = !showExportMenu" class="btn-secondary text-xs inline-flex items-center" style="font-size: 12px; padding: 8px 12px;">
+        <button type="button" @click="showExportMenu = !showExportMenu" class="btn-secondary text-xs inline-flex items-center toolbar-btn">
           Export
         </button>
         <div v-if="showExportMenu" class="absolute left-0 top-full mt-1 bg-white border rounded shadow-lg z-10 p-2 flex flex-col gap-2" style="border-color: var(--color-border);">
-          <button type="button" @click="store.exportBookmarks('current'); showExportMenu = false" class="btn-secondary text-xs inline-flex items-center text-left" style="font-size: 12px; padding: 4px 10px; white-space: nowrap;">
+          <button type="button" @click="store.exportBookmarks('current'); showExportMenu = false" class="btn-secondary text-xs inline-flex items-center text-left menu-btn">
             Export bookmarks
           </button>
-          <button type="button" @click="store.exportBookmarks('all'); showExportMenu = false" class="btn-secondary text-xs inline-flex items-center text-left" style="font-size: 12px; padding: 4px 10px; white-space: nowrap;">
+          <button type="button" @click="store.exportBookmarks('all'); showExportMenu = false" class="btn-secondary text-xs inline-flex items-center text-left menu-btn">
             Export all
           </button>
-          <button type="button" @click="store.showExportPackageModal = true; showExportMenu = false" class="btn-secondary text-xs inline-flex items-center text-left" style="font-size: 12px; padding: 4px 10px; white-space: nowrap;">
+          <button type="button" @click="store.showExportPackageModal = true; showExportMenu = false" class="btn-secondary text-xs inline-flex items-center text-left menu-btn">
             Export SideDock package
           </button>
         </div>
       </div>
       <div class="flex-1"></div>
-      <button type="button" @click="store.load10000Items()" class="btn-secondary text-xs inline-flex items-center" style="font-size: 11px; padding: 4px 8px; color: var(--color-accent);">
+      <button type="button" @click="store.load10000Items()" class="btn-secondary text-xs inline-flex items-center toolbar-btn" style="color: var(--color-accent);">
         Load 10,000 items
       </button>
     </div>
@@ -221,9 +220,26 @@ const showImportMenu = ref(false)
 .field-label small { color: var(--secondary-text); font-weight: 400; }
 .field-label input, .field-label select { width: 100%; min-width: 0; }
 .field-help { margin: 0; color: var(--secondary-text); font-size: 12px; }
-.field-error { margin: 0; color: #B42318; font-size: 13px; font-weight: 600; }
+.field-error { margin: 0; color: #B42318; font-size: 14px; font-weight: 600; }
 .folder-options { display: flex; align-items: end; gap: 8px; }
 .folder-options .field-label { flex: 1; }
+.toolbar-btn, .menu-btn, .import-file-label {
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 14px;
+  white-space: nowrap;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 @media (max-width: 520px) {
   .bookmark-fields { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .bookmark-fields button { grid-column: 1 / -1; width: 100%; min-height: 44px; }

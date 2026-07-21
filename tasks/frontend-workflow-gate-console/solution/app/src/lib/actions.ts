@@ -1,41 +1,68 @@
 export function focusTrap(node: HTMLElement) {
-  const focusableElements = 'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select, [tabindex]:not([tabindex="-1"])';
-  let firstFocusableElement: HTMLElement;
-  let lastFocusableElement: HTMLElement;
+  const focusableSelector = [
+    'a[href]',
+    'button:not([disabled])',
+    'textarea:not([disabled])',
+    'input:not([disabled]):not([type="hidden"])',
+    'select:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+  ].join(', ');
 
-  function updateElements() {
-    const focusableContent = node.querySelectorAll<HTMLElement>(focusableElements);
-    if (focusableContent.length === 0) return;
-    const activeFocusables = Array.from(focusableContent).filter(el => !el.hasAttribute('disabled') && el.tabIndex !== -1);
-    if (activeFocusables.length === 0) return;
-    firstFocusableElement = activeFocusables[0];
-    lastFocusableElement = activeFocusables[activeFocusables.length - 1];
+  function getFocusable(): HTMLElement[] {
+    return Array.from(node.querySelectorAll<HTMLElement>(focusableSelector)).filter((element) => {
+      if (element.hasAttribute('disabled') || element.getAttribute('aria-hidden') === 'true') return false;
+      if (element.tabIndex < 0) return false;
+      const style = window.getComputedStyle(element);
+      if (style.visibility === 'hidden' || style.display === 'none') return false;
+      return element.getClientRects().length > 0;
+    });
   }
 
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key !== 'Tab') return;
+  function focusFirst() {
+    const focusables = getFocusable();
+    (focusables[0] ?? node).focus();
+  }
 
-    updateElements();
-    if (!firstFocusableElement || !lastFocusableElement) return;
-
-    if (e.shiftKey) {
-      if (document.activeElement === firstFocusableElement) {
-        lastFocusableElement.focus();
-        e.preventDefault();
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key !== 'Tab') return;
+    const focusables = getFocusable();
+    if (focusables.length === 0) {
+      event.preventDefault();
+      node.focus();
+      return;
+    }
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement as HTMLElement | null;
+    if (event.shiftKey) {
+      if (active === first || !node.contains(active)) {
+        event.preventDefault();
+        last.focus();
       }
-    } else {
-      if (document.activeElement === lastFocusableElement) {
-        firstFocusableElement.focus();
-        e.preventDefault();
-      }
+      return;
+    }
+    if (active === last || !node.contains(active)) {
+      event.preventDefault();
+      first.focus();
     }
   }
 
+  function handleFocusIn(event: FocusEvent) {
+    const target = event.target as Node | null;
+    if (target && node.contains(target)) return;
+    event.stopPropagation();
+    event.preventDefault();
+    focusFirst();
+  }
+
+  if (!node.hasAttribute('tabindex')) node.tabIndex = -1;
   node.addEventListener('keydown', handleKeydown);
+  document.addEventListener('focusin', handleFocusIn, true);
 
   return {
     destroy() {
       node.removeEventListener('keydown', handleKeydown);
+      document.removeEventListener('focusin', handleFocusIn, true);
     }
   };
 }

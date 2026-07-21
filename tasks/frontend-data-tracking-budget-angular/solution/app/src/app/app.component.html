@@ -8,39 +8,74 @@
       <button mat-icon-button aria-label="Redo" [disabled]="!(canRedo$ | async)" (click)="redo()">
         <span class="material-symbols-outlined">redo</span>
       </button>
+      <button mat-icon-button aria-label="Export and import" (click)="toggleExport()" class="ripple-host" (mousedown)="ripple($event)">
+        <span class="material-symbols-outlined">import_export</span>
+      </button>
     </div>
     <div class="period-nav" *ngIf="period$ | async as period">
-      <button mat-icon-button aria-label="Previous period" (click)="previousPeriod()">‹</button>
+      <button mat-icon-button aria-label="Previous period" (click)="previousPeriod()" class="ripple-host" (mousedown)="ripple($event)">‹</button>
       <span class="period-label">{{ periodLabel(period) }}</span>
-      <button mat-icon-button aria-label="Next period" (click)="nextPeriod()">›</button>
+      <button mat-icon-button aria-label="Next period" (click)="nextPeriod()" class="ripple-host" (mousedown)="ripple($event)">›</button>
     </div>
   </header>
 
   <main class="content">
     <ng-container [ngSwitch]="view$ | async">
-      <app-dashboard *ngSwitchCase="'dashboard'"></app-dashboard>
-      <app-expenses *ngSwitchCase="'expenses'"></app-expenses>
-      <app-settings *ngSwitchCase="'settings'"></app-settings>
-      <app-export *ngSwitchCase="'export'"></app-export>
+      <app-dashboard *ngSwitchCase="'dashboard'" [@viewFade]></app-dashboard>
+      <app-expenses *ngSwitchCase="'expenses'" [@viewFade]></app-expenses>
+      <app-settings *ngSwitchCase="'settings'" [@viewFade]></app-settings>
     </ng-container>
   </main>
 
-  <nav class="bottom-nav" *ngIf="view$ | async as view">
-    <button class="nav-item" [class.active]="view === 'dashboard'" (click)="setView('dashboard')">
-      <span class="nav-glyph">&#8962;</span>
+  <button
+    class="add-fab ripple-host"
+    aria-label="Add expense"
+    (click)="openAddDialog()"
+    (mousedown)="ripple($event)"
+    mat-fab
+  >
+    <span class="material-symbols-outlined">add</span>
+  </button>
+
+  <div class="shortcuts-chip">
+    <button class="shortcuts-toggle" (click)="showShortcuts = !showShortcuts" [attr.aria-expanded]="showShortcuts" aria-label="Keyboard shortcuts">
+      <span class="material-symbols-outlined">keyboard</span>
+    </button>
+    <div class="shortcuts-list" *ngIf="showShortcuts" role="dialog" aria-label="Keyboard shortcuts">
+      <strong>Shortcuts</strong>
+      <span><kbd>A</kbd> Add expense</span>
+      <span><kbd>E</kbd> Export / Import</span>
+      <span><kbd>Ctrl</kbd>+<kbd>Z</kbd> Undo</span>
+      <span><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> Redo</span>
+      <span><kbd>Esc</kbd> Close drawer</span>
+    </div>
+  </div>
+
+  <nav class="bottom-nav" *ngIf="view$ | async as view" aria-label="Primary">
+    <button class="nav-item ripple-host" [class.active]="view === 'dashboard'" [attr.aria-current]="view === 'dashboard' ? 'page' : null" (click)="setView('dashboard')" (mousedown)="ripple($event)">
+      <span class="material-symbols-outlined nav-glyph">home</span>
       <span>Dashboard</span>
     </button>
-    <button class="nav-item" [class.active]="view === 'expenses'" (click)="setView('expenses')">
-      <span class="nav-glyph">&#9776;</span>
+    <button class="nav-item ripple-host" [class.active]="view === 'expenses'" [attr.aria-current]="view === 'expenses' ? 'page' : null" (click)="setView('expenses')" (mousedown)="ripple($event)">
+      <span class="material-symbols-outlined nav-glyph">receipt_long</span>
       <span>Expenses</span>
     </button>
-    <button class="nav-item" [class.active]="view === 'settings'" (click)="setView('settings')">
-      <span class="nav-glyph">&#9881;</span>
+    <button class="nav-item ripple-host" [class.active]="view === 'settings'" [attr.aria-current]="view === 'settings' ? 'page' : null" (click)="setView('settings')" (mousedown)="ripple($event)">
+      <span class="material-symbols-outlined nav-glyph">settings</span>
       <span>Settings</span>
     </button>
-    <button class="nav-item" [class.active]="view === 'export'" (click)="setView('export')">
-      <span class="nav-glyph material-symbols-outlined">import_export</span>
-      <span>Export</span>
-    </button>
   </nav>
+
+  <div class="drawer-backdrop" *ngIf="drawerOpen" [@backdrop] (click)="closeDrawer()"></div>
+  <aside class="export-drawer-panel" *ngIf="drawerOpen" [@drawer] role="dialog" aria-modal="true" aria-label="Export and import">
+    <div class="drawer-head">
+      <h2 class="display-face">Export &amp; Import</h2>
+      <button mat-icon-button aria-label="Close export drawer" (click)="closeDrawer()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <app-export></app-export>
+    </div>
+  </aside>
 </div>

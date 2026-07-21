@@ -27,10 +27,13 @@ onUnmounted(() => {
 
 const placeAt = () => ({ x: props.canvasCenter.x - 100, y: props.canvasCenter.y - 75 })
 
-const handleAddShape = (kind: 'rectangle' | 'circle' | 'arrow') => {
+const handleAddShape = (kind: 'rectangle' | 'circle' | 'arrow', e: MouseEvent) => {
+  e.stopPropagation()
+  e.preventDefault()
+  if (!showShapeMenu.value) return
+  showShapeMenu.value = false
   const pos = placeAt()
   store.addObject({ kind, x: pos.x, y: pos.y })
-  showShapeMenu.value = false
   shapeButtonRef.value?.focus()
 }
 
@@ -39,7 +42,7 @@ const objectCount = computed(() => store.activeBoard?.objects.length || 0)
 
 <template>
   <div
-    class="flex flex-wrap items-center gap-2 px-3 py-2 bg-white/95 shadow-md w-full rounded-xl border border-gray-200"
+    class="flex flex-nowrap items-center gap-2 px-3 py-2 bg-white/95 shadow-md w-full rounded-xl border border-gray-200 overflow-x-auto"
     role="toolbar"
     aria-label="Canvas tools"
   >
@@ -95,7 +98,7 @@ const objectCount = computed(() => store.activeBoard?.objects.length || 0)
           type="button"
           role="menuitem"
           class="w-full px-4 text-left hover:bg-[#EAE6F7] text-[14px] min-h-[44px] text-gray-900"
-          @click="handleAddShape(kind as any)"
+          @click.stop.prevent="handleAddShape(kind as any, $event)"
         >
           {{ kind === 'rectangle' ? 'Rectangle' : kind === 'circle' ? 'Circle' : 'Arrow' }}
         </button>

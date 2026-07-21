@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { MantineProvider } from '@mantine/core';
 import { useAtomValue, useSetAtom, useAtom } from 'jotai';
-import { modeAtom, selectedEventIdAtom, filteredEventsAtom, filterDrawerOpenAtom, aboutModalOpenAtom, exportDrawerOpenAtom } from './store.js';
+import { modeAtom, selectedEventIdAtom, filteredEventsAtom, filterDrawerOpenAtom, aboutModalOpenAtom, exportDrawerOpenAtom, paperToneAtom, densityAtom } from './store.js';
 import { Header } from './components/Header.jsx';
 import { Timeline } from './components/Timeline.jsx';
 import { Scrubber } from './components/Scrubber.jsx';
 import { Library } from './components/Library.jsx';
 import { EventForm } from './components/EventForm.jsx';
 import { FiltersDrawer, AboutModal, ExportDrawer, DetailPanel } from './components/Overlays.jsx';
+import { Toast } from './components/Toast.jsx';
 
 export default function App() {
   const mode = useAtomValue(modeAtom);
@@ -19,6 +20,24 @@ export default function App() {
   const [exportOpen, setExportOpen] = useAtom(exportDrawerOpenAtom);
 
   const [editingEvent, setEditingEvent] = useState(null);
+
+  const paperTone = useAtomValue(paperToneAtom);
+  const density = useAtomValue(densityAtom);
+
+  useEffect(() => {
+    const tones = {
+      warm: { '--c-paper': '#f7f3ea', '--c-paper-dark': '#efe8da', '--c-stage': '#efe9dc', '--c-stage-fade': '#faf7f0' },
+      slate: { '--c-paper': '#e9edf2', '--c-paper-dark': '#dde3ea', '--c-stage': '#dbe2ea', '--c-stage-fade': '#f2f5f8' },
+    };
+    const root = document.documentElement;
+    ['--c-paper', '--c-paper-dark', '--c-stage', '--c-stage-fade'].forEach(v => root.style.removeProperty(v));
+    const vars = tones[paperTone];
+    if (vars) Object.entries(vars).forEach(([k, v]) => root.style.setProperty(k, v));
+  }, [paperTone]);
+
+  useEffect(() => {
+    document.documentElement.dataset.density = density;
+  }, [density]);
 
   useEffect(() => {
     if (mode !== 'library') setEditingEvent(null);
@@ -33,6 +52,8 @@ export default function App() {
         setSelectedId(null);
       }
       if (mode === 'explore' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight') && selectedId && !aboutOpen && !filterOpen && !exportOpen) {
+        const timelineStage = document.querySelector('#timeline-main [role="application"]');
+        if (timelineStage && (timelineStage === document.activeElement || timelineStage.contains(document.activeElement))) return;
         const target = e.target;
         const isTyping = target instanceof HTMLElement && (
           target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
@@ -69,6 +90,7 @@ export default function App() {
         <FiltersDrawer />
         <AboutModal />
         <ExportDrawer />
+        <Toast />
       </div>
     </MantineProvider>
   );

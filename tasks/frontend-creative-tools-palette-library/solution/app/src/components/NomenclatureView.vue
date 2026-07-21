@@ -1,107 +1,66 @@
 <template>
-  <div class="max-w-5xl mx-auto px-4 py-8">
-    <div v-if="sortedAndDedupedSwatches.length === 0" class="py-12 text-center font-serif text-gray-500">
-      No colors found for the selected filter. Try adjusting your search or restoring palettes.
-    </div>
+  <section class="max-w-6xl mx-auto px-4 py-10" aria-label="Nomenclature view">
+    <EmptyState v-if="store.nomenclatureRows.length === 0" />
 
-    <div v-else class="flex flex-col gap-2">
-      <div class="grid grid-cols-12 gap-4 pb-2 border-b border-gray-200 font-mono text-xs text-gray-500 uppercase tracking-widest">
-        <div class="col-span-1">Swatch</div>
-        <div class="col-span-2">Hex</div>
-        <div class="col-span-3">Name</div>
-        <div class="col-span-3">Notes</div>
-        <div class="col-span-3">Source</div>
+    <div v-else>
+      <div class="hidden md:grid grid-cols-[3.5rem_6rem_1.2fr_1.4fr_1fr] gap-4 pb-2 border-b border-ink font-mono text-[10px] tracking-[0.24em] uppercase text-ink-soft">
+        <span>Swatch</span>
+        <span>Hex</span>
+        <span>Historical Name</span>
+        <span>Notes</span>
+        <span>Source</span>
       </div>
 
-      <div
-        v-for="(item, index) in sortedAndDedupedSwatches"
-        :key="item.hex + index"
-        class="grid grid-cols-12 gap-4 items-center py-2 hover:bg-gray-50 group transition-colors"
-      >
-        <div class="col-span-1">
+      <TransitionGroup name="fade" tag="div">
+        <div
+          v-for="row in store.nomenclatureRows"
+          :key="row.hex.toLowerCase()"
+          class="grid grid-cols-[3.5rem_1fr] md:grid-cols-[3.5rem_6rem_1.2fr_1.4fr_1fr] gap-x-4 gap-y-1 items-center py-2.5 border-b border-rule transition-colors duration-200 hover:bg-parchment"
+        >
           <button
-            @click="copyHex(item.hex, index)"
-            class="w-8 h-8 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 relative"
-            :style="{ backgroundColor: item.hex }"
-            :aria-label="`Copy hex ${item.hex}`"
+            type="button"
+            class="relative w-9 h-9 rounded-full border border-ink/30 swatch-surface hover:outline hover:outline-2 hover:outline-offset-2 hover:outline-ink"
+            :style="{ backgroundColor: store.displayHex(row.hex) }"
+            :aria-label="`Copy swatch ${row.hex}`"
+            @click="copy(row.hex)"
           >
-            <span class="absolute inset-0 m-auto w-full text-center text-xs text-white opacity-0 group-focus:opacity-100 transition-opacity drop-shadow">Copy</span>
-            <span
-              v-if="store.copyFeedback === `nom-${index}`"
-              class="absolute top-0 -right-16 h-6 leading-6 bg-black text-white text-xs px-2 py-0.5 rounded shadow z-10 whitespace-nowrap"
-              aria-live="polite"
-            >Copied</span>
+            <CopiedChip :hex="row.hex" :show="store.copyFeedback === row.hex.toLowerCase()" class="left-11 top-1/2 -translate-y-1/2" />
+          </button>
+
+          <span class="font-mono text-xs uppercase tracking-wider">{{ row.hex }}</span>
+
+          <span class="font-serif italic text-base leading-snug">{{ colorName(row.hex).name }}</span>
+
+          <span class="font-serif text-sm text-ink-soft leading-snug hidden md:block">{{ colorName(row.hex).note }}</span>
+
+          <button
+            type="button"
+            class="justify-self-start md:justify-self-auto font-sans text-sm font-medium underline decoration-rule decoration-2 underline-offset-4 transition-colors hover:text-oxblood hover:decoration-oxblood text-left min-h-11 md:min-h-0 flex items-center"
+            :aria-label="`Open ${row.paletteName} in the editor`"
+            @click="store.openDetail(row.paletteId)"
+          >
+            {{ row.paletteName }}
           </button>
         </div>
-        <div class="col-span-2 font-mono text-sm uppercase">
-          {{ item.hex }}
-        </div>
-        <div class="col-span-3 font-serif italic text-base">
-          {{ colorName(item.hex) }}
-        </div>
-        <div class="col-span-3 font-sans text-sm text-gray-600">
-          Historical pigment equivalent.
-        </div>
-        <div class="col-span-3 font-sans text-sm font-medium">
-          {{ item.paletteName }}
-        </div>
-      </div>
+      </TransitionGroup>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
-import { computed } from 'vue';
 import { usePaletteStore } from '../stores/palette';
-import { oaColorName } from '../../vendor/oa-color-library.js';
+import { oaColorName } from '../lib/oaColorNames.js';
+import { writeClipboard } from '../composables/useDialog';
+import CopiedChip from './CopiedChip.vue';
+import EmptyState from './EmptyState.vue';
+
 const store = usePaletteStore();
 
-function hueSortValue(hex) {
-  let h = hex.replace('#', '');
-  if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
-  let r = parseInt(h.substring(0,2),16) / 255;
-  let g = parseInt(h.substring(2,4),16) / 255;
-  let b = parseInt(h.substring(4,6),16) / 255;
-  let max = Math.max(r,g,b), min = Math.min(r,g,b);
-  let l = (max + min) / 2;
-  if (max === min) return 1000 + (1 - l) * 100;
-  let d = max - min;
-  let s = d / (1 - Math.abs(2*l - 1));
-  let hue;
-  if (max === r) hue = ((g - b) / d + (g < b ? 6 : 0)) / 6;
-  else if (max === g) hue = ((b - r) / d + 2) / 6;
-  else hue = ((r - g) / d + 4) / 6;
-  if (s < 0.12 || l < 0.12) return 1000 + (1 - l) * 100;
-  return hue * 360;
-}
+const colorName = (hex) => oaColorName(hex);
 
-const sortedAndDedupedSwatches = computed(() => {
-  const swatches = store.allSwatches;
-  const sorted = [...swatches].sort((a, b) => hueSortValue(a.hex) - hueSortValue(b.hex));
-  const seen = new Set();
-  const deduped = [];
-  for (const item of sorted) {
-    const lower = item.hex.toLowerCase();
-    if (!seen.has(lower)) {
-      seen.add(lower);
-      deduped.push(item);
-    }
-  }
-  return deduped;
-});
-
-function copyHex(hex, index) {
-  navigator.clipboard.writeText(hex).then(() => {
-    store.copyFeedback = `nom-${index}`;
-    setTimeout(() => {
-      if (store.copyFeedback === `nom-${index}`) {
-        store.copyFeedback = null;
-      }
-    }, 1000);
-  });
-}
-
-function colorName(hex) {
-  return oaColorName(hex).name;
+async function copy(hex) {
+  const copied = await writeClipboard(hex);
+  if (copied) store.copyHex(hex, hex.toLowerCase());
+  else store.announce('Clipboard unavailable — the hex was not copied.');
 }
 </script>

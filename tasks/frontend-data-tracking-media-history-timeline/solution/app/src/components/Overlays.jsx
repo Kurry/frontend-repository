@@ -4,16 +4,16 @@ import {
   filterDrawerOpenAtom, aboutModalOpenAtom, exportDrawerOpenAtom,
   activeCategoriesAtom, searchAtom, yearWindowAtom,
   eventsAtom, selectedEventIdAtom, filteredEventsAtom, importTimelineAtom, importDiagnosticAtom, resetFiltersAtom,
-  exportDrawerTabAtom
+  exportDrawerTabAtom, sessionDefaultWindowAtom, saveSessionDefaultAtom, paperToneAtom, densityAtom
 } from '../store.js';
-import { Drawer, Modal, Button, TextInput, Checkbox, Tabs, Textarea, ActionIcon, NumberInput } from '@mantine/core';
+import { Drawer, Modal, Button, TextInput, Checkbox, Tabs, Textarea, ActionIcon, NumberInput, Select } from '@mantine/core';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { MT_DATA } from '../data.js';
 import { timelinePackSchema } from '../validation.js';
-import { IconCopy, IconArrowLeft, IconArrowRight, IconX } from '@tabler/icons-react';
+import { IconCopy, IconCheck, IconArrowLeft, IconArrowRight, IconX } from '@tabler/icons-react';
 
 const timelineImportFormSchema = z.object({
   importText: z.string().min(1, 'Import document: Timeline JSON is required').transform((text, context) => {
@@ -43,6 +43,10 @@ export function FiltersDrawer() {
   const [activeCats, setActiveCats] = useAtom(activeCategoriesAtom);
   const [yearWindow, setYearWindow] = useAtom(yearWindowAtom);
   const resetFilters = useSetAtom(resetFiltersAtom);
+  const [sessionDefault, setSessionDefault] = useAtom(sessionDefaultWindowAtom);
+  const saveDefault = useSetAtom(saveSessionDefaultAtom);
+  const [paperTone, setPaperTone] = useAtom(paperToneAtom);
+  const [density, setDensity] = useAtom(densityAtom);
 
   const toggleCat = (id) => {
     const next = new Set(activeCats);
@@ -102,6 +106,45 @@ export function FiltersDrawer() {
           </div>
         </div>
         <Button variant="outline" color="cyan" fullWidth onClick={() => resetFilters()}>Reset filters</Button>
+
+        <div className="pt-4 border-t border-gray-100">
+          <div className="text-sm font-medium mb-1">My default window</div>
+          <p className="text-xs text-gray-500 mb-2">
+            {sessionDefault
+              ? `${formatYear(sessionDefault.from)} – ${formatYear(sessionDefault.to)} (saved this session)`
+              : 'None saved yet — remembered for this session only.'}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="default" size="xs" onClick={() => saveDefault()}>Save current window as default</Button>
+            <Button variant="default" size="xs" disabled={!sessionDefault} onClick={() => sessionDefault && setYearWindow({ ...sessionDefault })}>Apply my default</Button>
+            <Button variant="subtle" size="xs" disabled={!sessionDefault} onClick={() => setSessionDefault(null)}>Clear</Button>
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-gray-100">
+          <div className="text-sm font-medium mb-2">Atmosphere & density</div>
+          <div className="flex flex-col gap-3">
+            <Select
+              label="Paper tone"
+              data={[
+                { value: 'cool', label: 'Cool paper' },
+                { value: 'warm', label: 'Warm paper' },
+                { value: 'slate', label: 'Slate paper' },
+              ]}
+              value={paperTone}
+              onChange={v => setPaperTone(v || 'cool')}
+            />
+            <Select
+              label="Row density"
+              data={[
+                { value: 'cozy', label: 'Cozy rows' },
+                { value: 'compact', label: 'Compact rows' },
+              ]}
+              value={density}
+              onChange={v => setDensity(v || 'cozy')}
+            />
+          </div>
+        </div>
       </div>
     </Drawer>
   );
@@ -117,10 +160,23 @@ export function AboutModal() {
         <ul className="list-disc pl-5 space-y-1">
           <li>Drag the stage to pan event pins along the axis.</li>
           <li>Scroll to zoom the year window; hold Shift (or use horizontal scroll) to scrub time.</li>
-          <li>Use the dual-handle scrubber to set from / to years.</li>
-          <li>Open Filters for categories, search, and exact year bounds.</li>
+          <li>Use the dual-handle scrubber to set from / to years; Full span fits the whole corpus.</li>
           <li>Click a pin for detail; use Previous / Next or ← / → among filtered events. Escape closes panels.</li>
         </ul>
+        <h3 className="font-semibold text-base">How to filter</h3>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Toggle any of the twelve categories — an event shows when at least one of its categories is active.</li>
+          <li>Type in Search to match titles, places, summaries, and details live.</li>
+          <li>Set exact From / To years, or drag the scrubber; the stage, Library, and category tally recompute together.</li>
+          <li>Reset filters restores every category, clears the search, and returns to the default year window.</li>
+        </ul>
+        <h3 className="font-semibold text-base">Keyboard</h3>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>Focus the stage, then use ← / → to pan the year window and + / − to zoom.</li>
+          <li>Ctrl/Cmd+Z undoes and Ctrl/Cmd+Shift+Z redoes the last mutation.</li>
+        </ul>
+        <h3 className="font-semibold text-base">Make it yours</h3>
+        <p>Save the current window as your session default and apply it any time, or switch paper tone and row density under Filters — remembered for this session only.</p>
         <h3 className="font-semibold text-base">Notes</h3>
         <p>Event text is illustrative for product density — not a scholarly corpus. Years before 1 CE use negative integers (e.g. −3200).</p>
       </div>
@@ -203,14 +259,30 @@ export function ExportDrawer() {
   const csvString = [csvHeaders.join(','), ...csvRows].join('\n');
 
   const copyToClipboard = async (text) => {
-    setCopyStatus(null);
+    let ok = false;
     try {
       await navigator.clipboard.writeText(text);
-      setCopyStatus('copied');
+      ok = true;
     } catch {
-      setCopyStatus('failed');
+      ok = false;
     }
-    setTimeout(() => setCopyStatus(null), 3000);
+    if (!ok) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+      } catch {
+        ok = false;
+      }
+    }
+    setCopyStatus(ok ? 'copied' : 'failed');
+    window.setTimeout(() => setCopyStatus(null), 2500);
   };
 
   const handleImport = handleSubmit(({ importText: data }) => {
@@ -255,12 +327,23 @@ export function ExportDrawer() {
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-500">{events.length} events · {formatYear(Math.round(yearWindow.from))} to {formatYear(Math.round(yearWindow.to))}</span>
             <div className="flex gap-2">
-              {copyStatus && (
-                <span className={`text-sm font-medium self-center ${copyStatus === 'copied' ? 'text-green-600' : 'text-red-600'}`} aria-live="polite">
-                  {copyStatus === 'copied' ? 'Copied' : 'Copy failed'}
-                </span>
-              )}
-              <Button size="xs" variant="default" leftSection={<IconCopy size={14}/>} onClick={() => copyToClipboard(jsonString)}>Copy</Button>
+              <span className="text-sm font-medium self-center min-h-[1.25rem]" aria-live="polite">
+                <AnimatePresence>
+                  {copyStatus && (
+                    <motion.span
+                      key={copyStatus}
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.18 }}
+                      className={copyStatus === 'copied' ? 'text-green-600' : 'text-red-600'}
+                    >
+                      {copyStatus === 'copied' ? 'Copied' : 'Copy failed'}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </span>
+              <Button size="xs" variant="default" leftSection={copyStatus === 'copied' ? <IconCheck size={14} aria-hidden /> : <IconCopy size={14} aria-hidden />} onClick={() => copyToClipboard(jsonString)}>{copyStatus === 'copied' ? 'Copied' : 'Copy'}</Button>
               <Button size="xs" color="cyan" component="a" href={`data:text/json;charset=utf-8,${encodeURIComponent(jsonString)}`} download="timeline-pack.json">Download JSON</Button>
             </div>
           </div>
@@ -271,12 +354,23 @@ export function ExportDrawer() {
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-500">Events CSV format</span>
             <div className="flex gap-2">
-              {copyStatus && (
-                <span className={`text-sm font-medium self-center ${copyStatus === 'copied' ? 'text-green-600' : 'text-red-600'}`} aria-live="polite">
-                  {copyStatus === 'copied' ? 'Copied' : 'Copy failed'}
-                </span>
-              )}
-              <Button size="xs" variant="default" leftSection={<IconCopy size={14}/>} onClick={() => copyToClipboard(csvString)}>Copy</Button>
+              <span className="text-sm font-medium self-center min-h-[1.25rem]" aria-live="polite">
+                <AnimatePresence>
+                  {copyStatus && (
+                    <motion.span
+                      key={copyStatus}
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.18 }}
+                      className={copyStatus === 'copied' ? 'text-green-600' : 'text-red-600'}
+                    >
+                      {copyStatus === 'copied' ? 'Copied' : 'Copy failed'}
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </span>
+              <Button size="xs" variant="default" leftSection={copyStatus === 'copied' ? <IconCheck size={14} aria-hidden /> : <IconCopy size={14} aria-hidden />} onClick={() => copyToClipboard(csvString)}>{copyStatus === 'copied' ? 'Copied' : 'Copy'}</Button>
               <Button size="xs" color="cyan" component="a" href={`data:text/csv;charset=utf-8,${encodeURIComponent(csvString)}`} download="timeline-events.csv">Download CSV</Button>
             </div>
           </div>
@@ -284,10 +378,20 @@ export function ExportDrawer() {
         </Tabs.Panel>
 
         <Tabs.Panel value="import" pt="xs">
-          <Button component="label" variant="default" size="xs" className="mb-3">
+          <input
+            id="import-file-input"
+            type="file"
+            accept="application/json,.json"
+            className="sr-only"
+            onChange={handleImportFile}
+            aria-label="Choose Timeline JSON file"
+          />
+          <label
+            htmlFor="import-file-input"
+            className="inline-flex items-center justify-center h-9 px-3 rounded-lg border border-gray-300 bg-white text-sm font-medium cursor-pointer select-none hover:bg-gray-50 hover:border-gray-400 active:scale-[0.98] transition mb-3"
+          >
             Choose Timeline JSON file
-            <input type="file" accept="application/json,.json" hidden onChange={handleImportFile} />
-          </Button>
+          </label>
           <Textarea
             label="Paste Timeline JSON"
             placeholder='{"version":1,"document":"media-history-timeline",...}'
@@ -296,7 +400,20 @@ export function ExportDrawer() {
             {...register('importText')}
             error={importError || importErrors.importText?.message}
           />
-          {importError && <div className="text-sm text-red-600 mt-1" aria-live="polite">{importError}</div>}
+          <div className="text-sm text-red-600 mt-1" role="alert" aria-live="assertive">
+            <AnimatePresence>
+              {importError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  {importError}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
           <div className="mt-4">
             <Button color="cyan" onClick={handleImport} disabled={!importText.trim()}>Import timeline</Button>
           </div>
@@ -344,16 +461,16 @@ export function DetailPanel() {
     >
       <div className="p-4 border-b border-gray-100 flex justify-between items-center shrink-0">
         <ActionIcon variant="subtle" color="gray" onClick={() => setSelectedId(null)} aria-label="Close detail">
-          <IconX size={20} />
+          <IconX size={20} aria-hidden />
         </ActionIcon>
         <div className="flex gap-2">
-          <ActionIcon variant="default" onClick={goPrev} aria-label="Previous event"><IconArrowLeft size={16} /></ActionIcon>
-          <ActionIcon variant="default" onClick={goNext} aria-label="Next event"><IconArrowRight size={16} /></ActionIcon>
+          <ActionIcon variant="default" onClick={goPrev} aria-label="Previous event"><IconArrowLeft size={16} aria-hidden /></ActionIcon>
+          <ActionIcon variant="default" onClick={goNext} aria-label="Next event"><IconArrowRight size={16} aria-hidden /></ActionIcon>
         </div>
       </div>
 
       <div className="p-6 overflow-auto flex-1">
-        <div className="text-xs font-semibold text-gray-500 tracking-wider uppercase mb-2">
+        <div className="text-xs font-semibold text-gray-500 tracking-wide mb-2">
           {formatYear(ev.year)} · {ev.place}
         </div>
         <h2 className="font-serif font-bold text-2xl leading-tight mb-2">{ev.title}</h2>
@@ -376,7 +493,7 @@ export function DetailPanel() {
 
         {ev.mediaRefs && ev.mediaRefs.length > 0 && (
           <div className="mt-8 pt-6 border-t border-gray-100">
-            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Media References</h4>
+            <h3 className="text-sm font-semibold text-gray-500 mb-3">Media references</h3>
             <ul className="text-sm space-y-1 text-gray-600 list-disc pl-4">
               {ev.mediaRefs.map(r => (
                 <li key={r}>{r}</li>

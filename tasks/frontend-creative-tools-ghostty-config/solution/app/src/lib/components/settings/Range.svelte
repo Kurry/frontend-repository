@@ -9,11 +9,12 @@
         step?: number;
         value: string; // flat-store string; parsed to a number internally via numberCodec
         showLabels?: boolean;
+        showInput?: boolean; // companion number field: typed out-of-bound values clamp + show an inline message
     }
 
     // why is eslint like this smh
     // eslint-disable-next-line prefer-const
-    let {value = $bindable(""), min, max, step = 1, showLabels = true}: RangeProps = $props();
+    let {value = $bindable(""), min, max, step = 1, showLabels = true, showInput = false}: RangeProps = $props();
 
     // html refs
     let track: HTMLDivElement | undefined = $state();
@@ -78,10 +79,52 @@
             commit(parseFloat(max.toFixed(maxDecimalPlaces)));
         }
     }
+
+    // Companion input: typing an out-of-bound value clamps into range AND shows an inline
+    // message naming the setting and its accepted bounds — the generated config never sees
+    // the malformed value.
+    let rangeWarning = $state("");
+    let warningTimer: ReturnType<typeof setTimeout> | undefined;
+
+    function handleInputEntry(event: Event) {
+        const target = event.target as HTMLInputElement;
+        const raw = target.value.trim();
+        if (raw === "") return;
+        const parsed = parseFloat(raw);
+        if (Number.isNaN(parsed)) {
+            rangeWarning = `${setting?.settingKey ?? "value"} must be a number from ${min} to ${max}`;
+        }
+        else if (parsed < min || parsed > max) {
+            rangeWarning = `${setting?.settingKey ?? "value"} must be between ${min} and ${max} (typed ${parsed})`;
+            commit(parseFloat(Math.min(max, Math.max(min, parsed)).toFixed(maxDecimalPlaces)));
+        }
+        else {
+            rangeWarning = "";
+            commit(parseFloat(parsed.toFixed(maxDecimalPlaces)));
+        }
+        clearTimeout(warningTimer);
+        warningTimer = setTimeout(() => {rangeWarning = "";}, 5000);
+    }
 </script>
 
 
 <div class="slider-setting">
+    {#if showInput}
+        <div class="slider-input-row">
+            <label class="sr-only" for={`${setting?.labelId ?? "slider"}-input`}>{setting?.name ?? "Value"}</label>
+            <input
+                id={`${setting?.labelId ?? "slider"}-input`}
+                class="slider-input"
+                type="text"
+                inputmode="decimal"
+                value={Number.isInteger(step) ? num.toString() : num.toFixed(maxDecimalPlaces)}
+                onchange={handleInputEntry}
+                onblur={(event) => {(event.currentTarget as HTMLInputElement).value = Number.isInteger(step) ? num.toString() : num.toFixed(maxDecimalPlaces);}}
+                aria-invalid={rangeWarning ? "true" : undefined}
+            />
+        </div>
+    {/if}
+    {#if rangeWarning}<p class="range-warning" role="alert">{rangeWarning}</p>{/if}
     <div
         aria-labelledby={setting?.labelId} class="slider"
         role="slider"
@@ -205,5 +248,49 @@
 
 .thumb.dragging {
     background: hsl(270, 7%, 75%);
+}
+
+.slider-input-row {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.slider-input {
+    width: 56px;
+    background: var(--bg-level-2);
+    border: 1px solid var(--border-input);
+    border-radius: var(--radius-level-5);
+    color: inherit;
+    text-align: right;
+    padding: 2px 6px 3px;
+    font-size: 0.85rem;
+    outline: none;
+}
+
+.slider-input:focus {
+    background: var(--bg-input-focus);
+    outline: var(--border-input-focus);
+}
+
+.range-warning {
+    margin: -2px 0 0;
+    width: 100%;
+    text-align: right;
+    color: var(--color-danger);
+    font-size: 0.72rem;
+    font-weight: 500;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
 }
 </style>

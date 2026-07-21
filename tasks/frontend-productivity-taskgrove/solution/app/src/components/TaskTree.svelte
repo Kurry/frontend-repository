@@ -1,6 +1,13 @@
 <script>
+  import autoAnimate from '@formkit/auto-animate';
   import { store } from '../lib/store.svelte.js';
   import TaskNode from './TaskNode.svelte';
+
+  let treeEl = $state(null);
+
+  $effect(() => {
+    if (treeEl) autoAnimate(treeEl);
+  });
 
   const visibleTasks = $derived(store.visibleTasks);
   const searchQuery = $derived(store.searchQuery);
@@ -8,7 +15,6 @@
   const hasSearch = $derived(searchQuery && searchQuery.trim().length > 0);
   const hasTagFilter = $derived(tagFilterSet.size > 0);
 
-  // Check if any nodes match current filters
   function anyNodeMatches(nodes) {
     for (const node of nodes) {
       if (hasSearch && !subtreeHasMatch(node, searchQuery)) continue;
@@ -31,7 +37,7 @@
   const hasVisibleResults = $derived(anyNodeMatches(visibleTasks));
 </script>
 
-<div class="task-tree">
+<div class="task-tree" bind:this={treeEl}>
   {#if visibleTasks.length === 0}
     <div class="empty-state">
       <div style="font-size: 32px; margin-bottom: 8px;">🌱</div>
@@ -42,7 +48,15 @@
     <div class="empty-state">
       <div style="font-size: 24px; margin-bottom: 8px;">🔎</div>
       <div style="font-size: 12px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 4px;">No results</div>
-      <div style="font-size: 10px; color: var(--color-muted);">No tasks match your current search or filter.</div>
+      <div style="font-size: 10px; color: var(--color-muted);">
+        {#if hasTagFilter && hasSearch}
+          No tasks match your current tag filters and search query.
+        {:else if hasTagFilter}
+          No tasks match your current tag filters.
+        {:else}
+          No tasks match your current search query.
+        {/if}
+      </div>
     </div>
   {:else}
     {#each visibleTasks as task (task.id)}

@@ -30,7 +30,7 @@ export const SEED_EXPENSES: Expense[] = [
   { id: 'e6', value: 257.15, datetime: '2020-03-15', categoryId: 'entertainment', counterparty: 'Rocky bowling', period: marPeriod },
   { id: 'e7', value: 263.60, datetime: '2020-03-17', categoryId: 'transport', counterparty: 'Gas station', period: marPeriod },
   { id: 'e8', value: 169.33, datetime: '2020-03-24', categoryId: 'food', counterparty: 'Mcdonalds', period: marPeriod },
-  { id: 'e9', value: 266.33, datetime: '2020-03-25', categoryId: 'food', counterparty: 'Mcdonalds', period: marPeriod },
+  { id: 'e9', value: 266.33, datetime: '2020-03-12', categoryId: 'food', counterparty: 'Mcdonalds', period: marPeriod },
   { id: 'e10', value: 92.31, datetime: '2020-03-30', categoryId: 'shopping', counterparty: 'Wallmart', period: marPeriod },
   { id: 'e11', value: 45.20, datetime: '2020-02-05', categoryId: 'food', counterparty: 'Kfc', period: febPeriod },
   { id: 'e12', value: 120.00, datetime: '2020-02-10', categoryId: 'shopping', counterparty: 'Kaufland', period: febPeriod },

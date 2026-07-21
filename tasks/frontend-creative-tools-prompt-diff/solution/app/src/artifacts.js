@@ -1,4 +1,4 @@
-import { computeDiff } from './diff.js';
+import { computeDiff, counterLabel, stampLabel } from './diff.js';
 
 export function selectedVersions(state, prompt) {
   const selectedIds = state.historySelection[prompt.id] || [];
@@ -46,14 +46,16 @@ export function buildHistoryReport(state) {
   const prompt = state.prompts.find((item) => item.id === state.selectedPromptId);
   if (!prompt) return '';
   const pack = buildVersionPackage(state);
+  const stampMode = state.prefs?.stampMode || 'relative';
   const lines = [`# ${prompt.title}`, '', `Version history · ${prompt.versions.length} records`, ''];
-  [...prompt.versions].sort((a, b) => b.versionNumber - a.versionNumber).forEach((version) => {
-    lines.push(`## v${version.versionNumber} · ${version.author}`, '', `- Timestamp: ${version.timestamp}`, `- Kind: ${version.kind}`, `- Change note: ${version.changeNote}`, '');
+  [...prompt.versions].sort((a, b) => b.versionNumber - a.versionNumber).forEach((version, index) => {
+    lines.push(`## v${version.versionNumber} · ${version.author}${index === 0 ? ' · Head' : ''}`, '', `- Timestamp: ${stampLabel(version.timestamp, stampMode)}`, `- Kind: ${version.kind}`, `- Change note: ${version.changeNote}`, '');
   });
-  lines.push('## Current comparison', '', `- Lines added: ${pack.counters.linesAdded}`, `- Lines removed: ${pack.counters.linesRemoved}`, `- Net token delta: ${pack.counters.netTokenDelta >= 0 ? '+' : ''}${pack.counters.netTokenDelta}`, '');
+  lines.push('## Current comparison', '', `- Base: v${prompt.versions.find((version) => version.versionId === pack.baseVersionId)?.versionNumber ?? '—'} · Compare: v${prompt.versions.find((version) => version.versionId === pack.compareVersionId)?.versionNumber ?? '—'}`, `- Lines added: ${counterLabel(pack.counters.linesAdded)}`, `- Lines removed: ${counterLabel(-pack.counters.linesRemoved)}`, `- Net token delta: ${counterLabel(pack.counters.netTokenDelta)}`, '');
   const sessionMerge = state.mergedHeads[prompt.id];
   if (sessionMerge) {
-    lines.push('## Merge resolutions', '');
+    const mergeVersion = prompt.versions.find((version) => version.versionId === sessionMerge.mergeVersionId);
+    lines.push('## Merge resolutions', '', `- Merge head: v${mergeVersion?.versionNumber ?? '—'}${mergeVersion ? ` · ${stampLabel(mergeVersion.timestamp, stampMode)}` : ''}`, '');
     sessionMerge.resolutions.forEach((resolution) => lines.push(`- ${resolution.regionId}: ${resolution.resolution}${resolution.resolution === 'edit-manually' ? ` — ${resolution.manualText}` : ''}`));
     lines.push('');
   }

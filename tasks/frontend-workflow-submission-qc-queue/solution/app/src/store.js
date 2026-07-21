@@ -131,6 +131,7 @@ export const useQcStore = defineStore('qc', {
     undoStack: [],
     redoStack: [],
     palette: { open: false, query: '', activeIndex: 0 },
+    paletteOpener: null,
     toast: { visible: false, message: '', tone: 'success', key: 0 },
     locale: 'en',
     theme: 'dark',
@@ -138,6 +139,7 @@ export const useQcStore = defineStore('qc', {
     exportFormat: 'json',
     copyConfirmed: false,
     nextFinding: 300,
+    mutationEpoch: 0,
   }),
   getters: {
     activeSubmission: (state) => state.submissions.find((s) => s.id === state.activeSubmissionId) || null,
@@ -172,6 +174,7 @@ export const useQcStore = defineStore('qc', {
     contributorSubmissions: (state) => (name) => state.submissions.filter((s) => s.contributor_name === name),
     contributorTimeline: (state) => (name) => state.submissions.filter((s) => s.contributor_name === name).flatMap((s) => s.history.map((h) => ({ ...h, submission: s.title }))).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)),
     packageObject(state) {
+      void state.mutationEpoch
       const queueSummary = { total: state.submissions.length, stages: { submitted: 0, 'in-review': 0, 'needs-revision': 0, approved: 0 }, payout_states: { pending: 0, held: 0, released: 0 } }
       state.submissions.forEach((s) => { queueSummary.stages[s.stage]++; queueSummary.payout_states[s.payout_state]++ })
       return {
@@ -192,6 +195,7 @@ export const useQcStore = defineStore('qc', {
     },
     jsonPreview() { return JSON.stringify(this.packageObject, null, 2) },
     markdownPreview(state) {
+      void state.mutationEpoch
       const q = this.queueSummary
       const lines = ['# Arcfield quality-control report', '', `Exported: ${now()}`, '', '## Queue summary', '', `- Total submissions: ${q.total}`, `- Stages: submitted ${q.stages.submitted}, in-review ${q.stages['in-review']}, needs-revision ${q.stages['needs-revision']}, approved ${q.stages.approved}`, `- Payouts: pending ${q.payout_states.pending}, held ${q.payout_states.held}, released ${q.payout_states.released}`, '']
       state.submissions.forEach((s) => {
@@ -214,62 +218,66 @@ export const useQcStore = defineStore('qc', {
     openView(view) { this.activeView = view; if (view !== 'detail') this.activeSubmissionId = null; this.palette.open = false; this.closeDialogs() },
     openContributor(name) { this.drawerContributor = name; this.palette.open = false },
     clearFilters() { this.filters = { stage: null, tier: null, contributor: null } },
-    setFilter(name, value) { if (name in this.filters) this.filters[name] = value || null },
+    setFilter(name, value) {
+      if (!(name in this.filters)) return
+      this.filters = { ...this.filters, [name]: value || null }
+    },
     setSort(value) { this.sort = value === 'asc' ? 'asc' : 'desc' },
-    setProfileRange(range) { this.profileRange = range },
+    setProfileRange(range) { this.profileRange = Array.isArray(range) ? [...range] : range },
     toggleSelected(id) { this.selectedIds = this.selectedIds.includes(id) ? this.selectedIds.filter((x) => x !== id) : [...this.selectedIds, id] },
     selectVisible(ids) { const allSelected = ids.length && ids.every((id) => this.selectedIds.includes(id)); this.selectedIds = allSelected ? this.selectedIds.filter((id) => !ids.includes(id)) : [...new Set([...this.selectedIds, ...ids])] },
     clearSelection() { this.selectedIds = [] },
+    bump() { this.mutationEpoch += 1 },
     snapshot(label) { this.undoStack.push({ label, submissions: clone(this.submissions) }); if (this.undoStack.length > 40) this.undoStack.shift(); this.redoStack = [] },
-    undo() { if (!this.undoStack.length) return false; const entry = this.undoStack.pop(); this.redoStack.push({ label: entry.label, submissions: clone(this.submissions) }); this.submissions = entry.submissions; this.notify(`Undid ${entry.label}`, 'neutral'); return true },
-    redo() { if (!this.redoStack.length) return false; const entry = this.redoStack.pop(); this.undoStack.push({ label: entry.label, submissions: clone(this.submissions) }); this.submissions = entry.submissions; this.notify(`Redid ${entry.label}`, 'neutral'); return true },
+    undo() { if (!this.undoStack.length) return false; const entry = this.undoStack.pop(); this.redoStack.push({ label: entry.label, submissions: clone(this.submissions) }); this.submissions = entry.submissions; this.bump(); this.notify(`Undid ${entry.label}`, 'neutral'); return true },
+    redo() { if (!this.redoStack.length) return false; const entry = this.redoStack.pop(); this.undoStack.push({ label: entry.label, submissions: clone(this.submissions) }); this.submissions = entry.submissions; this.bump(); this.notify(`Redid ${entry.label}`, 'neutral'); return true },
     addFinding(submissionId, payload) {
       const sub = this.submissions.find((s) => s.id === submissionId); if (!sub) return false
       this.snapshot('add finding')
       sub.findings.unshift({ id: `f-${this.nextFinding++}`, tier: payload.tier, category: payload.category, description: payload.description.trim(), evidence: (payload.evidence || '').trim(), status: 'open' })
-      sub.updated_at = now(); this.dialogs.add = false; this.notify('Finding added to the review record'); return true
+      sub.updated_at = now(); this.bump(); this.dialogs.add = false; this.notify('Finding added to the review record'); return true
     },
     overrideFinding(submissionId, findingId, payload) {
       const sub = this.submissions.find((s) => s.id === submissionId); const item = sub?.findings.find((f) => f.id === findingId); if (!item || item.status !== 'open') return false
-      this.snapshot('override finding'); item.status = 'overridden'; item.override_justification = payload.justification.trim(); sub.updated_at = now(); this.dialogs.override = false; this.notify('Finding overridden — gate recalculated'); return true
+      this.snapshot('override finding'); item.status = 'overridden'; item.override_justification = payload.justification.trim(); sub.updated_at = now(); this.bump(); this.dialogs.override = false; this.notify('Finding overridden — gate recalculated'); return true
     },
     retierFinding(submissionId, findingId, tier) {
       if (!['blocker', 'major', 'minor'].includes(tier)) return false
       const sub = this.submissions.find((s) => s.id === submissionId); const item = sub?.findings.find((f) => f.id === findingId)
       if (!item || item.status !== 'open' || item.tier === tier) return false
-      this.snapshot('re-tier finding'); item.tier = tier; sub.updated_at = now(); this.notify(`Finding changed to ${tier}`); return true
+      this.snapshot('re-tier finding'); item.tier = tier; sub.updated_at = now(); this.bump(); this.notify(`Finding changed to ${tier}`); return true
     },
     removeFinding(submissionId, findingId) {
       const sub = this.submissions.find((s) => s.id === submissionId); const index = sub?.findings.findIndex((f) => f.id === findingId) ?? -1
       if (!sub || index < 0) return false
-      this.snapshot('remove finding'); sub.findings.splice(index, 1); sub.updated_at = now(); this.notify('Finding removed'); return true
+      this.snapshot('remove finding'); sub.findings.splice(index, 1); sub.updated_at = now(); this.bump(); this.notify('Finding removed'); return true
     },
     requestRevision(submissionId, payload) {
       const sub = this.submissions.find((s) => s.id === submissionId); if (!sub) return false
-      this.snapshot('request revision'); sub.stage = 'needs-revision'; sub.payout_state = sub.payout_state === 'released' ? 'released' : 'held'; sub.updated_at = now(); sub.history.unshift(history('revision-requested', sub.updated_at, payload.summary.trim())); this.dialogs.revision = false; this.notify('Revision requested and timeline updated'); return true
+      this.snapshot('request revision'); sub.stage = 'needs-revision'; sub.payout_state = sub.payout_state === 'released' ? 'released' : 'held'; sub.updated_at = now(); sub.history.unshift(history('revision-requested', sub.updated_at, payload.summary.trim())); this.bump(); this.dialogs.revision = false; this.notify('Revision requested and timeline updated'); return true
     },
     markRevised(submissionId) {
       const sub = this.submissions.find((s) => s.id === submissionId); if (!sub || sub.stage !== 'needs-revision') return false
-      this.snapshot('mark revised'); sub.stage = 'in-review'; sub.updated_at = now(); sub.history.unshift(history('in-review', sub.updated_at, 'Contributor revision returned to in-review.')); this.notify('Submission moved back to in-review'); return true
+      this.snapshot('mark revised'); sub.stage = 'in-review'; sub.updated_at = now(); sub.history.unshift(history('in-review', sub.updated_at, 'Contributor revision returned to in-review.')); this.bump(); this.notify('Submission moved back to in-review'); return true
     },
     approve(submissionId) {
       const sub = this.submissions.find((s) => s.id === submissionId); if (!sub || sub.stage !== 'in-review' || sub.findings.some((f) => f.status === 'open' && f.tier === 'blocker')) return false
-      this.snapshot('approve submission'); sub.stage = 'approved'; sub.payout_state = 'released'; sub.updated_at = now(); sub.history.unshift(history('approved', sub.updated_at, 'Approved and payout released.')); this.notify('Submission approved — payout released'); return true
+      this.snapshot('approve submission'); sub.stage = 'approved'; sub.payout_state = 'released'; sub.updated_at = now(); sub.history.unshift(history('approved', sub.updated_at, 'Approved and payout released.')); this.bump(); this.notify('Submission approved — payout released'); return true
     },
     updateSubmission(id, field, value) {
       const sub = this.submissions.find((s) => s.id === id); if (!sub) return false
       if (field === 'stage' && !['submitted', 'in-review', 'needs-revision', 'approved'].includes(value)) return false
       if (field === 'payout-state' && !['pending', 'held', 'released'].includes(value)) return false
       if (field === 'stage' && value === 'approved' && (sub.stage !== 'in-review' || sub.findings.some((f) => f.status === 'open' && f.tier === 'blocker'))) return false
-      this.snapshot('update submission'); if (field === 'stage') { sub.stage = value; sub.history.unshift(history(value, now(), `Stage changed to ${value}.`)) } else sub.payout_state = value; sub.updated_at = now(); return true
+      this.snapshot('update submission'); if (field === 'stage') { sub.stage = value; sub.history.unshift(history(value, now(), `Stage changed to ${value}.`)) } else sub.payout_state = value; sub.updated_at = now(); this.bump(); return true
     },
     bulkMove() {
       const affected = this.submissions.filter((s) => this.selectedIds.includes(s.id) && s.stage === 'submitted'); if (!affected.length) { this.notify('No submitted rows in selection', 'neutral'); return false }
-      this.snapshot('bulk move to in-review'); affected.forEach((sub) => { sub.stage = 'in-review'; sub.updated_at = now(); sub.history.unshift(history('in-review', sub.updated_at, 'Moved to in-review by bulk action.')) }); this.notify(`${affected.length} submission${affected.length === 1 ? '' : 's'} moved to in-review`); return true
+      this.snapshot('bulk move to in-review'); affected.forEach((sub) => { sub.stage = 'in-review'; sub.updated_at = now(); sub.history.unshift(history('in-review', sub.updated_at, 'Moved to in-review by bulk action.')) }); this.bump(); this.notify(`${affected.length} submission${affected.length === 1 ? '' : 's'} moved to in-review`); return true
     },
     bulkHold() {
       const affected = this.submissions.filter((s) => this.selectedIds.includes(s.id) && s.payout_state !== 'released' && s.payout_state !== 'held'); if (!affected.length) { this.notify('Selected payouts already held or released', 'neutral'); return false }
-      this.snapshot('bulk hold payout'); affected.forEach((sub) => { sub.payout_state = 'held'; sub.updated_at = now() }); this.notify(`${affected.length} payout${affected.length === 1 ? '' : 's'} placed on hold`); return true
+      this.snapshot('bulk hold payout'); affected.forEach((sub) => { sub.payout_state = 'held'; sub.updated_at = now() }); this.bump(); this.notify(`${affected.length} payout${affected.length === 1 ? '' : 's'} placed on hold`); return true
     },
     notify(message, tone = 'success') { this.toast = { visible: true, message, tone, key: this.toast.key + 1 }; const key = this.toast.key; setTimeout(() => { if (this.toast.key === key) this.toast.visible = false }, 2800) },
     toggleDisclosure(id) { this.disclosureState[id] = !this.disclosureState[id] },
@@ -278,9 +286,10 @@ export const useQcStore = defineStore('qc', {
       this.recheck = { submissionId, running: true, visible: true, progress: 0, completed: false, steps: names.map((name) => ({ name, status: 'pending' })) }
       names.forEach((_, index) => setTimeout(() => {
         if (this.recheck.submissionId !== submissionId || !this.recheck.running) return
-        this.recheck.steps[index].status = 'complete'; this.recheck.progress = Math.round(((index + 1) / names.length) * 100)
+        this.recheck.steps[index] = { ...this.recheck.steps[index], status: 'complete' }
+        this.recheck.progress = Math.round(((index + 1) / names.length) * 100)
         if (index === names.length - 1) { this.recheck.running = false; this.recheck.completed = true }
-      }, 650 * (index + 1)))
+      }, 900 * (index + 1)))
     },
     async copyExport() {
       await navigator.clipboard.writeText(this.exportPreview)
