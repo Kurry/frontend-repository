@@ -21,6 +21,14 @@ Surfaces:
   solution/app/README.md        <- render_oracle_readme(slug, modules) using
                                    corpuscheck schemas/webmcp-assignments.json
                                    module lists
+  solution/app/e2e.playwright.config.mjs
+                                <- corpuscheck canonical/e2e/e2e.playwright.config.mjs
+  solution/app/e2e.spec.mjs     <- canonical prefix from corpuscheck
+                                   canonical/e2e/oracle.e2e.mjs (prefix-synced;
+                                   task-specific tests after the END CANONICAL
+                                   REGION marker are preserved verbatim)
+  solution/app/package.json     <- ensures the canonical e2e command and a
+                                   single compatible @playwright/test dependency
   [judge] cwd                   <- enforced to "/logs/verifier" in every
                                    tests/<dim>/<dim>.toml
   [[judge.mcp_servers]] block   <- corpuscheck canonical/mcp/reward_mcp_servers.toml
@@ -86,7 +94,92 @@ def desired_files(task: Path, sources: dict, modules: dict) -> dict[Path, bytes]
         out[task / "solution/app/README.md"] = pkg.render_oracle_readme(
             task.name, modules[task.name]
         ).encode()
+    if (task / "solution/app").is_dir():
+        out[task / "solution/app/e2e.playwright.config.mjs"] = (
+            canon / "e2e/e2e.playwright.config.mjs"
+        ).read_bytes()
     return out
+
+
+E2E_MARKER = "// ==== END CANONICAL REGION"
+CANONICAL_E2E_SCRIPT = "playwright test -c e2e.playwright.config.mjs"
+DEFAULT_PLAYWRIGHT_TEST_VERSION = "^1.61.0"
+
+
+def desired_e2e_prefix() -> bytes:
+    """Canonical region of solution/app/e2e.spec.mjs (everything through the
+    marker line). The file is PREFIX-checked, not byte-identical: task-specific
+    criterion tests are appended after the marker and are never propagated."""
+    src = (canonical_dir() / "e2e/oracle.e2e.mjs").read_bytes()
+    return src
+
+
+def sync_e2e_file(task: Path, check: bool) -> Path | None:
+    """Ensure solution/app/e2e.spec.mjs starts with the canonical region.
+    Preserves any content after the marker. Returns the path if it would
+    change (check) or was changed (write)."""
+    target = task / "solution/app/e2e.spec.mjs"
+    if not (task / "solution/app").is_dir():
+        return None
+    prefix = desired_e2e_prefix()
+    existing = target.read_bytes() if target.exists() else b""
+    if existing.startswith(prefix):
+        return None
+    # keep the task-added tail if a previous canonical region exists
+    marker = E2E_MARKER.encode()
+    idx = existing.find(marker)
+    if idx != -1:
+        nl = existing.find(b"\n", idx)
+        tail = existing[nl + 1 :] if nl != -1 else b""
+    else:
+        if existing and not check:
+            raise ValueError(
+                f"refusing to overwrite unmarked task-owned e2e suite: {target}"
+            )
+        tail = b""
+    if not check:
+        target.write_bytes(prefix + tail)
+    return target
+
+
+def sync_e2e_package(task: Path, check: bool) -> Path | None:
+    """Ensure each oracle can execute the canonical e2e suite.
+
+    Preserve task-owned test:e2e commands under their existing name and add a
+    test:e2e:canonical sibling. Apps without a task-owned command use test:e2e
+    directly. Existing @playwright/test versions are never replaced; when an
+    app already carries the full playwright package, use that same version spec
+    to avoid loading two incompatible Playwright minors.
+    """
+    target = task / "solution/app/package.json"
+    if not target.is_file():
+        return None
+
+    original = target.read_text()
+    package = json.loads(original)
+    scripts = package.setdefault("scripts", {})
+    existing_e2e = scripts.get("test:e2e")
+    if existing_e2e is None:
+        scripts["test:e2e"] = CANONICAL_E2E_SCRIPT
+    elif existing_e2e != CANONICAL_E2E_SCRIPT:
+        scripts["test:e2e:canonical"] = CANONICAL_E2E_SCRIPT
+
+    dev_dependencies = package.setdefault("devDependencies", {})
+    if "@playwright/test" not in dev_dependencies:
+        dependencies = package.get("dependencies", {})
+        playwright_version = (
+            dev_dependencies.get("playwright")
+            or dependencies.get("playwright")
+            or DEFAULT_PLAYWRIGHT_TEST_VERSION
+        )
+        dev_dependencies["@playwright/test"] = playwright_version
+
+    desired = json.dumps(package, indent=2, ensure_ascii=False) + "\n"
+    if desired == original:
+        return None
+    if not check:
+        target.write_text(desired)
+    return target
 
 
 def fix_mcp_servers_block(task: Path, check: bool) -> list[Path]:
@@ -156,6 +249,12 @@ def propagate(slugs: list[str], check: bool = False, root: Path | None = None) -
             drift.append(str(toml.relative_to(repo_root)))
         for toml in fix_judge_cwd(task, check):
             drift.append(str(toml.relative_to(repo_root)))
+        e2e_changed = sync_e2e_file(task, check)
+        if e2e_changed is not None:
+            drift.append(str(e2e_changed.relative_to(repo_root)))
+        package_changed = sync_e2e_package(task, check)
+        if package_changed is not None:
+            drift.append(str(package_changed.relative_to(repo_root)))
 
     verb = "would change" if check else "updated"
     print(f"{verb}: {len(drift)} files across {len(tasks)} tasks")
