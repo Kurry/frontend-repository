@@ -9,7 +9,7 @@ import {
   createEditor, defineDocChangeHandler, union, type Editor,
 } from 'prosekit/core';
 
-const BODY_MAX = 20000;
+const BODY_MAX = 100000;
 
 function plainToHtml(body: string): string {
   if (!body.trim()) return '<p></p>';
@@ -166,8 +166,7 @@ export class ProseBodyEditorComponent implements AfterViewInit, OnDestroy {
   private emitChange(): void {
     if (!this.editor || this.suppressEmit) return;
     const html = this.editor.getDocHTML().trim();
-    const plainLen = htmlToPlain(html).length;
-    if (plainLen > BODY_MAX) {
+    if (html.length > BODY_MAX) {
       this.bodyError.emit(`Body must be ${BODY_MAX} characters or fewer.`);
       return;
     }
