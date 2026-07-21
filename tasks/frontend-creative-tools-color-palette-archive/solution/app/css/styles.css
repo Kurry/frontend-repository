@@ -949,9 +949,9 @@ textarea.ed-input { border: 1px solid rgba(var(--ink), 0.4); resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
-    animation-duration: 0.001s !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001s !important;
+    animation: none !important;
+
+    transition: none !important;
   }
   [data-reveal] { opacity: 1; transform: none; }
 }

@@ -131,7 +131,7 @@ export function renderEditor() {
       </div>
       <div class="ed-field">
         <label for="ed-period">Period</label>
-        <select id="ed-period" class="ed-select js-draft" data-field="period" aria-describedby="err-period">
+        <select id="ed-period" autocomplete="off" class="ed-select js-draft" data-field="period" aria-describedby="err-period">
           <option value="">Choose a period…</option>
           ${periodOptions}
         </select>
@@ -181,14 +181,14 @@ export function renderEditor() {
 
     <div class="ed-footer">
       <label class="ed-fav-toggle">
-        <input type="checkbox" id="ed-favorite" ${draft.favorite ? 'checked' : ''}>
+        <input type="checkbox" id="ed-favorite" autocomplete="off" ${draft.favorite ? 'checked' : ''}>
         <span>★ Favorite</span>
       </label>
       <span class="ed-footer-spacer"></span>
       ${!isNew ? `<button type="button" class="btn btn--ghost" id="ed-duplicate">Duplicate</button>` : ''}
       ${!isNew ? `<button type="button" class="btn btn--ghost btn--danger" id="ed-delete">Delete palette</button>` : ''}
       <button type="button" class="btn btn--solid" id="ed-save">${isNew ? 'Create palette' : 'Save palette'}</button>
-      <button type="button" class="btn btn--ghost" id="ed-cancel">Cancel</button>
+      <button type="button" class="btn btn--ghost" id="ed-cancel">Cancel edit</button>
     </div>`;
 
   renderSwatchRows();
