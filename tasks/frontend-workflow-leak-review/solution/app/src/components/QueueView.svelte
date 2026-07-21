@@ -1,19 +1,10 @@
 <script>
-  import { createForm } from 'felte';
-  import { validator } from '@felte/validator-zod';
-  import { Alert, Range, Select } from 'flowbite-svelte';
+  import { Alert } from 'flowbite-svelte';
   import { ArrowRight, Info, MagnifyingGlass, SlidersHorizontal } from 'phosphor-svelte';
-  import { filterSchema } from '../lib/schemas.js';
   import StatusChip from './StatusChip.svelte';
   import RollupStrip from './RollupStrip.svelte';
 
   let { state } = $props();
-
-  const { form: filterForm } = createForm({
-    initialValues: { reviewState: 'all' },
-    extend: validator({ schema: filterSchema }),
-    onSubmit: ({ reviewState }) => state.setReviewFilter(reviewState)
-  });
 
   const filterOptions = [
     { value: 'all', name: 'All review states' },
@@ -37,16 +28,16 @@
   }
 </script>
 
-<div class="space-y-5">
+<div class="space-y-5 view-enter">
   <section class="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
     <div>
       <p class="eyebrow">Contamination triage</p>
       <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-ink-950 sm:text-3xl">Submission queue</h1>
       <p class="mt-1 max-w-2xl text-sm text-slate-600">Similarity signals are ranked for review. Decisions remain explicitly human-confirmed.</p>
     </div>
-    <div class="flex items-center gap-2 rounded-lg border border-line bg-white/70 px-3 py-2 text-xs font-semibold text-slate-600">
+    <div class="flex min-h-11 items-center gap-2 rounded-lg border border-line bg-white/70 px-3 py-2 text-xs font-semibold text-slate-600">
       <span class="size-2 rounded-full bg-teal-500 shadow-[0_0_0_4px_rgba(22,139,134,.12)]"></span>
-      {state.submissions.length} submissions · all rows shown
+      {state.visibleSubmissions.length} of {state.submissions.length} submissions shown
     </div>
   </section>
 
@@ -60,20 +51,24 @@
             <p class="eyebrow"><SlidersHorizontal aria-hidden="true" size={13} class="mr-1 inline" />Live sensitivity</p>
             <h2 id="threshold-heading" class="mt-1 text-base font-extrabold">Review threshold</h2>
           </div>
-          <output for="threshold" class="tabular rounded-lg border border-signal-500/25 bg-signal-500/10 px-3 py-1.5 text-lg font-black text-signal-600">{state.threshold.toFixed(2)}</output>
+          <output for="threshold" class="tabular rounded-lg border border-signal-700/30 bg-signal-700/10 px-3 py-1.5 text-lg font-black text-signal-700">{state.threshold.toFixed(2)}</output>
         </div>
-        <label for="threshold" class="sr-only">Review threshold</label>
-        <Range
+        <label for="threshold" class="mb-2 block text-sm font-extrabold text-ink-900">Threshold value</label>
+        <input
           id="threshold"
+          type="range"
           min="0.50"
           max="0.95"
           step="0.01"
           value={state.threshold}
           oninput={(event) => state.setThreshold(event.currentTarget.value)}
-          
-          class="accent-signal-500"
+          class="h-3 w-full cursor-pointer accent-[#d95732]"
+          aria-valuemin={0.5}
+          aria-valuemax={0.95}
+          aria-valuenow={state.threshold}
+          aria-valuetext={state.threshold.toFixed(2)}
         />
-        <div class="mt-1 flex justify-between text-[10px] font-bold text-slate-500"><span>0.50 broader</span><span>0.95 stricter</span></div>
+        <div class="mt-1 flex justify-between text-[10px] font-bold text-slate-600"><span>0.50 broader</span><span>0.95 stricter</span></div>
       </div>
 
       <Alert color="warning" class="!mb-0 !rounded-xl !border !border-amber-300 !bg-amber-50 !text-amber-950">
@@ -90,31 +85,34 @@
     <div class="flex flex-col gap-3 border-b border-line/80 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
       <div>
         <h2 id="queue-table-heading" class="text-base font-extrabold">Ranked signals</h2>
-        <p class="text-xs text-slate-500">Score band colors rebase against the live threshold.</p>
+        <p class="text-xs text-slate-600">Score band colors rebase against the live threshold.</p>
       </div>
       <div class="flex flex-col gap-2 min-[500px]:flex-row">
         <div class="relative block">
-          <label for="search" class="sr-only">Search submissions</label>
-          <MagnifyingGlass aria-hidden="true" class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+          <label for="search" class="mb-1 block text-xs font-extrabold text-ink-900">Search submissions</label>
+          <MagnifyingGlass aria-hidden="true" class="pointer-events-none absolute left-3 top-[2.05rem] text-slate-400" size={16} />
           <input id="search"
-            class="w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 min-[500px]:w-56"
+            class="min-h-11 w-full rounded-lg border border-slate-300 bg-white py-2 pl-9 pr-3 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 min-[500px]:w-56"
             type="search"
             value={state.searchQuery}
             oninput={(event) => state.searchQuery = event.currentTarget.value}
             placeholder="Search task or submitter"
           />
         </div>
-        <form use:filterForm >
-          <label for="reviewState" class="sr-only">Review state</label>
-          <Select id="reviewState"
+        <div>
+          <label for="reviewState" class="mb-1 block text-xs font-extrabold text-ink-900">Review state</label>
+          <select
+            id="reviewState"
             name="reviewState"
-            items={filterOptions}
+            class="min-h-11 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 min-[500px]:min-w-48"
             value={state.reviewFilter}
             onchange={(event) => state.setReviewFilter(event.currentTarget.value)}
-            classes={{ select: '!rounded-lg !border-slate-300 !bg-white !py-2 !text-sm focus:!border-teal-500 focus:!ring-teal-500' }}
-            
-          />
-        </form>
+          >
+            {#each filterOptions as option}
+              <option value={option.value}>{option.name}</option>
+            {/each}
+          </select>
+        </div>
       </div>
     </div>
 
@@ -132,7 +130,7 @@
         <tbody>
           {#each state.visibleSubmissions as submission (submission.id)}
             <tr
-              class={`group cursor-pointer border-b border-line/60 bg-white/40 transition-colors hover:bg-teal-50/70 focus:bg-teal-50/70 focus:outline-none ${state.leavingSubmissionId === submission.id ? 'row-leave' : ''}`}
+              class={`group cursor-pointer border-b border-line/60 bg-white/40 transition-colors duration-200 hover:bg-teal-50/70 focus:bg-teal-50/70 focus:outline-none ${state.leavingSubmissionId === submission.id ? 'row-leave' : ''} ${state.lastChangedSubmissionId === submission.id ? 'chip-pop' : ''}`}
               tabindex="0"
               role="button"
               aria-label={`Open ${submission.task} by ${submission.submitter}, similarity ${submission.similarity.toFixed(2)}, ${submission.reviewState}`}
@@ -146,7 +144,7 @@
               </td>
               <td class="px-4 py-3.5">
                 <p class="font-bold text-ink-900">{submission.task}</p>
-                <p class="mt-0.5 font-mono text-[10px] text-slate-400">{submission.id}</p>
+                <p class="mt-0.5 font-mono text-[10px] text-slate-500">{submission.id}</p>
               </td>
               <td class="px-4 py-3.5 text-sm text-slate-600">{submission.submitter}</td>
               <td class="px-4 py-3.5"><StatusChip state={submission.reviewState} animate={state.lastChangedSubmissionId === submission.id} /></td>
@@ -159,10 +157,10 @@
                 <p class="mt-3 font-extrabold text-ink-900">
                   {state.reviewFilter === 'review-triggered' ? 'Nothing currently needs review' : 'No submissions match this view'}
                 </p>
-                <p class="mt-1 text-sm text-slate-500">
+                <p class="mt-1 text-sm text-slate-600">
                   {state.reviewFilter === 'review-triggered' ? 'Every flagged submission has been decided, or the current threshold flags none.' : 'Clear the filter or search to restore the full queue.'}
                 </p>
-                <button class="interactive mt-4 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold hover:border-teal-500 hover:text-teal-700" onclick={() => { state.setReviewFilter('all'); state.searchQuery = ''; }}>Clear queue filters</button>
+                <button class="interactive mt-4 min-h-11 rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-bold hover:border-teal-500 hover:text-teal-700" onclick={() => { state.setReviewFilter('all'); state.searchQuery = ''; }}>Clear queue filters</button>
               </td>
             </tr>
           {/each}
