@@ -306,7 +306,7 @@
     try {
       var blob = new Blob([text], { type: type }); var url = URL.createObjectURL(blob);
       var a = document.createElement("a"); a.href = url; a.download = name;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      document.body.appendChild(a); a.click();
       setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     } catch (e) {}
   }
