@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button, Modal, TextInput } from '@carbon/react'
 import { Add, Archive, Close, Merge, TagEdit, TrashCan, Undo } from '@carbon/icons-react'
+import { captureFocus } from '../focus'
 import { useAppStore, visiblePersonas } from '../store'
 import { bulkTagSchema } from '../schema'
 import PersonaCard from './PersonaCard'
@@ -22,7 +23,7 @@ function FacetRail() {
 
   return (
     <aside className={`facet-rail ${filtersOpen ? 'open' : ''}`} aria-label="Tag facets">
-      <div className="facet-title"><div><span>DISCOVER</span><h2>Tags</h2></div><Button className="facet-close" kind="ghost" size="sm" hasIconOnly renderIcon={Close} iconDescription="Close filters" onClick={() => useAppStore.getState().setUI({ filtersOpen: false })} /></div>
+      <div className="facet-title"><div><span>DISCOVER</span><p className="facet-heading" id="facet-tags-heading">Tags</p></div><Button className="facet-close" kind="ghost" size="sm" hasIconOnly renderIcon={Close} iconDescription="Close filters" onClick={() => useAppStore.getState().setUI({ filtersOpen: false })} /></div>
       <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
       <li><button className={!filters.tag ? 'facet-entry active' : 'facet-entry'} onClick={() => setFilters({ tag: null })}><span>All tags</span><b>{candidates.length}</b></button></li>
       {entries.map(([tag, count]) => (
@@ -82,23 +83,26 @@ export default function LibraryView() {
 
   return (
     <main className="library-view view-shell" id="main-content">
-      <FacetRail />
       <section className="library-main">
         <header className="view-heading">
-          <div><p className="eyebrow">PERSONA COLLECTION</p><h1>{filters.archived ? 'Archived personas' : 'Your persona library'}</h1><p>{visible.length} of {personas.filter((p) => p.archived === filters.archived).length} personas · shared traits, prompts, and iterations</p></div>
-          <div className="heading-actions"><Button kind="tertiary" renderIcon={Merge} onClick={() => setUI({ composeOpen: true })}>Compose</Button><Button renderIcon={Add} onClick={() => openEditor(null)}>New Persona</Button></div>
+          <div><p className="eyebrow">PERSONA COLLECTION</p><h1>{filters.archived ? 'Archived Personas' : 'Your Persona Library'}</h1><p>{visible.length} of {personas.filter((p) => p.archived === filters.archived).length} personas · shared traits, prompts, and iterations</p></div>
+          <div className="heading-actions"><Button kind="tertiary" renderIcon={Merge} onClick={() => { captureFocus(); setUI({ composeOpen: true }) }}>Compose</Button><Button renderIcon={Add} onClick={() => openEditor(null)}>New Persona</Button></div>
         </header>
         {visible.length ? (
-          <div className="persona-grid">{visible.map((persona, index) => <PersonaCard key={persona.id} index={index} persona={persona} />)}</div>
+          <>
+            <h2 className="grid-section-title">Persona Cards</h2>
+            <div className="persona-grid">{visible.map((persona, index) => <PersonaCard key={persona.id} index={index} persona={persona} />)}</div>
+          </>
         ) : (
           <div className="empty-state">
             <div className="empty-orbit"><span /></div>
-            <h2>{personas.length ? 'No personas match these filters' : 'Your library is ready for its first persona'}</h2>
+            <h2>{personas.length ? 'No Personas Match These Filters' : 'Your Library Is Ready for Its First Persona'}</h2>
             <p>{personas.length ? `Active filters: ${filterNames.join(', ') || 'none'}.` : 'Create or import a persona to begin building your team.'}</p>
             {personas.length ? <Button kind="tertiary" onClick={clearFilters}>Clear filters</Button> : <Button renderIcon={Add} onClick={() => openEditor(null)}>Create persona</Button>}
           </div>
         )}
       </section>
+      <FacetRail />
       <BulkTray />
     </main>
   )

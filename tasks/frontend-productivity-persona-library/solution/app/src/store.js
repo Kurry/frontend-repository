@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { captureFocus } from './focus'
 
 export const ROLES = ['Coder', 'Writer', 'Analyst', 'Reviewer']
 export const TONES = ['formal', 'neutral', 'casual', 'assertive']
@@ -167,7 +168,7 @@ export const useAppStore = create((set, get) => ({
   poll: { open: false, personaId: null, votes: [], running: false, round: 0, message: '' },
   undoStack: [],
   redoStack: [],
-  ui: { editorOpen: false, editorId: null, composeOpen: false, exportOpen: false, exportTab: 'pack', attacherOpen: false, detailId: null, toast: null, filtersOpen: false },
+  ui: { editorOpen: false, editorId: null, composeOpen: false, exportOpen: false, exportTab: 'pack', exportRestoreFocus: false, attacherOpen: false, detailId: null, toast: null, filtersOpen: false },
   announce: '',
 
   setView: (activeView) => set({ activeView }),
@@ -178,7 +179,7 @@ export const useAppStore = create((set, get) => ({
     set((s) => ({ ui: { ...s.ui, toast: { id: uid('toast'), message } }, announce: message }))
   },
   clearToast: () => set((s) => ({ ui: { ...s.ui, toast: null } })),
-  openEditor: (id = null) => set((s) => ({ ui: { ...s.ui, editorOpen: true, editorId: id } })),
+  openEditor: (id = null) => { captureFocus(); set((s) => ({ ui: { ...s.ui, editorOpen: true, editorId: id } })) },
   closeEditor: () => set((s) => ({ ui: { ...s.ui, editorOpen: false, editorId: null } })),
   toggleFlip: (id) => set((s) => ({ flippedIds: s.flippedIds.includes(id) ? s.flippedIds.filter((x) => x !== id) : [...s.flippedIds, id] })),
   toggleSelected: (id) => set((s) => ({ selectedIds: s.selectedIds.includes(id) ? s.selectedIds.filter((x) => x !== id) : [...s.selectedIds, id] })),
@@ -215,7 +216,7 @@ export const useAppStore = create((set, get) => ({
     const payload = toPayload(source)
     payload.name = `${source.name} (copy)`
     payload.activeIteration = null
-    const cloneId = get().createPersona(payload, { blended: source.blended, blendSources: source.blendSources })
+    const cloneId = get().createPersona(payload, { blended: source.blended, blendSources: source.blendSources, archived: false })
     get().toast(`${payload.name} cloned`)
     return cloneId
   },
@@ -302,8 +303,9 @@ export const useAppStore = create((set, get) => ({
     return run ? { testBench: { ...s.testBench, personaId: run.personaId, scenarioId: run.scenarioId, transcript: run.transcript, status: run.stopped ? 'stopped' : 'complete', target: '' } } : s
   }),
 
-  openDetail: (id) => set((s) => ({ ui: { ...s.ui, detailId: id } })),
+  openDetail: (id) => { captureFocus(); set((s) => ({ ui: { ...s.ui, detailId: id } })) },
   startPoll: (personaId) => {
+    captureFocus()
     const persona = get().personas.find((p) => p.id === personaId)
     if (!persona || persona.iterations.length < 2) {
       set((s) => ({ poll: { ...s.poll, message: 'At least two iterations are needed to start a poll.' }, announce: 'At least two iterations are needed to start a poll.' }))

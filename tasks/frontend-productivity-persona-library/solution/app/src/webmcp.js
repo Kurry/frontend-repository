@@ -56,14 +56,33 @@ const definitions = [
   { name: 'session_trigger_demo', description: 'Trigger the bounded Test Bench or iteration-poll demo.', inputSchema: objectSchema({ demo: stringEnum(['test-bench-run', 'iteration-poll']), personaId: { type: 'string' } }, ['demo']), execute: ({ demo, personaId }) => { const s = useAppStore.getState(); if (demo === 'iteration-poll') { if (!personaId) return fail('personaId is required for iteration-poll'); s.openDetail(personaId); return s.startPoll(personaId) ? ok('Iteration poll started; watch votes arrive.') : fail('At least two iterations are required') } const p = s.personas.find((x) => x.id === (personaId || s.testBench.personaId)); if (!p) return fail('Attach or name a persona first'); s.setTestPersona(p.id); s.setView('test-bench'); s.startRun(generateResponse(p, SCENARIOS.find((x) => x.id === s.testBench.scenarioId))); return ok('Test Bench demo started.') } },
   ...['pause', 'resume', 'restart', 'advance', 'connect', 'disconnect'].map((operation) => ({ name: `session_${operation}`, description: `${operation} is declared but not applicable to this deterministic local simulation.`, inputSchema: objectSchema(), execute: () => fail(`${operation} is not applicable; use start or stop.`) })),
 
-  { name: 'artifact_export', description: 'Open the live export drawer for a bounded format.', inputSchema: objectSchema({ format: stringEnum(['persona-pack-json', 'comparison-report-text']) }, ['format']), execute: ({ format }) => { useAppStore.getState().setUI({ exportOpen: true, exportTab: format === 'persona-pack-json' ? 'pack' : 'report' }); return ok(`Opened visible ${format} export. Contents remain in the UI.`) } },
-  { name: 'artifact_copy', description: 'Prepare a bounded export for user-observed clipboard copying.', inputSchema: objectSchema({ format: stringEnum(['persona-pack-json', 'comparison-report-text']) }, ['format']), execute: ({ format }) => { const s = useAppStore.getState(); s.setUI({ exportOpen: true, exportTab: format === 'persona-pack-json' ? 'pack' : 'report' }); s.toast('Export ready to copy'); return ok('Export is visible and ready; clipboard contents require UI observation.') } },
+  { name: 'artifact_export', description: 'Open the live export drawer for a bounded format.', inputSchema: objectSchema({ format: stringEnum(['persona-pack-json', 'comparison-report-text']) }, ['format']), execute: ({ format }) => { useAppStore.getState().setUI({ exportOpen: true, exportRestoreFocus: false, exportTab: format === 'persona-pack-json' ? 'pack' : 'report' }); return ok(`Opened visible ${format} export. Contents remain in the UI.`) } },
+  { name: 'artifact_copy', description: 'Prepare a bounded export for user-observed clipboard copying.', inputSchema: objectSchema({ format: stringEnum(['persona-pack-json', 'comparison-report-text']) }, ['format']), execute: ({ format }) => { const s = useAppStore.getState(); s.setUI({ exportOpen: true, exportRestoreFocus: false, exportTab: format === 'persona-pack-json' ? 'pack' : 'report' }); s.toast('Export ready to copy'); return ok('Export is visible and ready; clipboard contents require UI observation.') } },
   { name: 'artifact_import', description: 'Import is not enabled for this in-memory seeded workspace.', inputSchema: objectSchema({ mode: stringEnum(['persona-pack-json']) }, ['mode']), execute: () => fail('Import is unavailable; no file or content was accepted.') },
-  { name: 'artifact_print_preview', description: 'Open the comparison report as the bounded print-preview source.', inputSchema: objectSchema(), execute: () => { useAppStore.getState().setUI({ exportOpen: true, exportTab: 'report' }); return ok('Comparison report opened for visible preview.') } },
-  { name: 'artifact_convert', description: 'Switch between the two live export representations.', inputSchema: objectSchema({ mode: stringEnum(['persona-pack-json', 'comparison-report-text']) }, ['mode']), execute: ({ mode }) => { useAppStore.getState().setUI({ exportOpen: true, exportTab: mode === 'persona-pack-json' ? 'pack' : 'report' }); return ok(`Visible artifact converted to ${mode}.`) } },
+  { name: 'artifact_print_preview', description: 'Open the comparison report as the bounded print-preview source.', inputSchema: objectSchema(), execute: () => { useAppStore.getState().setUI({ exportOpen: true, exportRestoreFocus: false, exportTab: 'report' }); return ok('Comparison report opened for visible preview.') } },
+  { name: 'artifact_convert', description: 'Switch between the two live export representations.', inputSchema: objectSchema({ mode: stringEnum(['persona-pack-json', 'comparison-report-text']) }, ['mode']), execute: ({ mode }) => { useAppStore.getState().setUI({ exportOpen: true, exportRestoreFocus: false, exportTab: mode === 'persona-pack-json' ? 'pack' : 'report' }); return ok(`Visible artifact converted to ${mode}.`) } },
 ]
 
+function invokeDefinition(name, args = {}) {
+  const definition = definitions.find((item) => item.name === name)
+  if (!definition) throw new Error(`Unknown WebMCP tool: ${name}`)
+  const result = definition.execute(args)
+  if (result.isError) throw new Error(result.content[0].text)
+  return { ok: true, message: result.content[0].text }
+}
+
 export function registerWebMCP() {
+  if (!window.webmcp_session_info) {
+    window.webmcp_action_contract = 'zto-webmcp-v1'
+    window.webmcp_session_info = () => ({
+      contractVersion: 'zto-webmcp-v1',
+      modules: ['browse-query-v1', 'entity-collection-v1', 'command-session-v1', 'artifact-transfer-v1'],
+      toolNames: definitions.map((definition) => definition.name),
+    })
+    window.webmcp_list_tools = () => definitions.map(({ name, description, inputSchema }) => ({ name, description, inputSchema }))
+    window.webmcp_invoke_tool = async (name, args = {}) => invokeDefinition(name, args)
+  }
+
   let attempts = 0
   const register = () => {
     attempts += 1
