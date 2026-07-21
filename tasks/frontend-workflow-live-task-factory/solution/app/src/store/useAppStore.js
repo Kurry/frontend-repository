@@ -13,7 +13,14 @@ import {
   sourceCount,
   sourceFiles,
 } from '../lib/fixtures'
-import { addRepositorySchema, batchReportSchema, chatCompletionsRequestSchema, taskPackageSchema } from '../lib/schemas'
+import {
+  addRepositorySchema,
+  aiConnectionSchema,
+  batchReportSchema,
+  chatCompletionsRequestSchema,
+  githubConnectionSchema,
+  taskPackageSchema,
+} from '../lib/schemas'
 
 export const cardId = (repo, prNumber) => `${repo}#${prNumber}`
 const initialPlacements = Object.fromEntries(allFixturePrs.map(({ repo, pr }) => [cardId(repo, pr.number), { column: 'inbox', reason: null }]))
@@ -31,7 +38,7 @@ function stripCredentialMaterial(value) {
   if (typeof value !== 'string') return value
   return value
     .replace(/ghp_[A-Za-z0-9_]+/g, '[redacted-github-token]')
-    .replace(/sk-[A-Za-z0-9_]+/g, '[redacted-ai-key]')
+    .replace(/(?<![A-Za-z0-9])sk-[A-Za-z0-9_-]+/g, '[redacted-ai-key]')
 }
 
 const stageTemplate = () => [
