@@ -30,6 +30,7 @@ import { useFocusTrap } from './focus-trap'
 
 const store = useStudioStore()
 const toast = useToast()
+const announcement = ref('')
 
 // Phosphor renders bare <svg> icons. Decorative icons are explicitly hidden
 // from assistive tech; icons that carry meaning on their own get a label in
@@ -80,6 +81,7 @@ const aggregations = [
 const editingCriterion = computed(() => store.activeRubric?.criteria.find((item) => item.id === store.ui.editingId) || null)
 
 function notify(summary, detail, severity = 'success') {
+  announcement.value = `${summary}. ${detail}`
   toast.add({ severity, summary, detail, life: 2800 })
 }
 function handleImported() {
@@ -326,6 +328,7 @@ function onShortcut(event) {
 <template>
   <div class="studio-shell">
     <Toast position="top-right" />
+    <div class="sr-only" role="status" aria-live="polite" aria-atomic="true">{{ announcement }}</div>
     <a class="skip-link" href="#studio-main">Skip to rubric canvas</a>
 
     <div v-if="store.ui.railOpen" class="rail-scrim" @click="store.ui.railOpen = false" />

@@ -45,6 +45,16 @@ button:focus-visible, a:focus-visible, .p-focus, .p-inputtext:focus, .p-textarea
   outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent) !important;
   outline-offset: 2px;
 }
+.p-toggleswitch:has(.p-toggleswitch-input:focus-visible) .p-toggleswitch-slider {
+  outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent) !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 18%, transparent) !important;
+}
+.p-select:has(input:focus-visible), .p-select[role="combobox"]:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 45%, transparent) !important;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 15%, transparent) !important;
+}
 .p-button:not(.p-button-secondary):not(.p-button-danger) { background: var(--primary); border-color: var(--primary); }
 .p-button:not(.p-button-secondary):not(.p-button-danger):hover { background: var(--primary-dark); border-color: var(--primary-dark); box-shadow: 0 5px 13px rgba(85,71,215,.2); }
 .p-button { border-radius: 9px; font-weight: 650; }
@@ -63,6 +73,7 @@ button:focus-visible, a:focus-visible, .p-focus, .p-inputtext:focus, .p-textarea
 
 .skip-link { position: fixed; z-index: 3000; top: -50px; left: 12px; padding: 9px 13px; border-radius: 8px; background: var(--ink); color: white; text-decoration: none; }
 .skip-link:focus { top: 12px; }
+.sr-only { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
 .studio-shell { min-height: 100vh; background: var(--canvas); }
 .library-rail { position: fixed; inset: 0 auto 0 0; z-index: 40; width: 280px; display: flex; flex-direction: column; background: #fbfbfd; border-right: 1px solid #dde0e7; }
 .rail-brand { min-height: 72px; display: flex; align-items: center; gap: 11px; padding: 0 18px; border-bottom: 1px solid var(--line); }
@@ -303,6 +314,8 @@ kbd { font-family: var(--font-mono); }
 .form-dialog { margin: auto 10px 10px auto !important; }
 .p-dialog-mask:has(.form-dialog) .p-dialog { pointer-events: auto; max-height: calc(100vh - 20px); }
 .form-dialog .p-dialog-content { overflow-y: auto; }
+.submit-help { margin-right: auto; max-width: 280px; color: #777b88; font-size: .7rem; line-height: 1.35; }
+.submit-pending { opacity: .48; filter: saturate(.55); }
 
 /* Local display face for headings and brand surfaces. */
 h1, h2, .rail-brand strong, .view-switcher button, .section-kicker, .bump-callout strong { font-family: var(--font-display); }
