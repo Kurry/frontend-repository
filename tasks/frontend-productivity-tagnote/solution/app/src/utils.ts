@@ -1,4 +1,5 @@
-import type { AppState, Note } from './types';
+import type { AppState, Note, NoteMark } from './types';
+import { renderFormattedText } from './marks';
 
 export function parseTags(text: string): string[] {
   const tagSet = new Set<string>();
@@ -38,19 +39,20 @@ function escapeHtml(str: string): string {
     .replace(/"/g, '&quot;');
 }
 
-export function renderNoteText(text: string): string {
-  // First escape the entire text
-  let escaped = escapeHtml(text);
-  // Then replace escaped URLs with clickable links
+function injectLinks(html: string, text: string): string {
   const urls = extractUrls(text);
+  let result = html;
   for (const url of urls) {
     const escapedUrl = escapeHtml(url);
-    escaped = escaped.replace(
-      escapedUrl,
-      `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="text-[var(--color-link)] underline break-all">${escapedUrl}</a>`
-    );
+    const linkHtml = `<a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer" class="text-[var(--color-link)] underline break-all">${escapedUrl}</a>`;
+    result = result.replace(escapedUrl, linkHtml);
   }
-  return escaped;
+  return result;
+}
+
+export function renderNoteText(text: string, marks: NoteMark[] = []): string {
+  const formatted = renderFormattedText(text, marks);
+  return injectLinks(formatted, text);
 }
 
 export function formatDate(ts: number): string {
