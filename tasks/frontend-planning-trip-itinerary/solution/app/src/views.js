@@ -172,11 +172,11 @@ function planView() {
 }
 function hero() {
   const s = st();
-  const titleInput = h("input", { class: "title-input", type: "text", value: s.tripTitle || "Trip to the French Riviera - Cote d'Azur", "aria-label": "Trip title", maxlength: "80",
+  const titleInput = h("input", { id: "trip-title-input", class: "title-input", type: "text", value: s.tripTitle || "Trip to the French Riviera - Cote d'Azur", maxlength: "80",
     oninput: (e) => { s.tripTitle = e.target.value; },
     onblur: (e) => { s.tripTitle = e.target.value.trim() || "Trip to the French Riviera - Cote d'Azur"; e.target.value = s.tripTitle; S.emit(); } });
   const avs = h("div", { class: "avatars", "aria-label": "Four travellers" },
-    ...EXP_PAYERS.map((p, i) => h("span", { class: "av", title: p, style: { background: ["var(--d0)", "var(--d4)", "var(--d1)", "var(--d3)"][i] } }, p[0])));
+    ...EXP_PAYERS.map((p, i) => h("span", { class: "av", title: p, style: { background: ["var(--d0)", "var(--d4)", "var(--d1)", "var(--d3)"][i], color: "#fff", textShadow: "0 1px 2px rgba(0,0,0,0.4)" } }, p[0])));
   const card = h("div", { class: "card" }, titleInput,
     h("div", { class: "meta-row" }, h("span", { html: icon.calendar, "aria-hidden": "true" }), h("span", {}, "7/5 – 7/11 · 2025"), avs));
   return h("section", { class: "hero", "aria-label": "Trip cover and title" },
@@ -195,7 +195,7 @@ function explore() {
     { kind: "garden", t: "Jardin Exotique d'Eze" }, { kind: "beach", t: "Plage de la Garoupe" },
   ];
   return h("section", { "aria-label": "Explore suggestions" },
-    h("div", { class: "section-head" }, h("h2", { class: "display" }, "Explore"),
+    h("div", { class: "section-head" }, h("h1", { class: "display" }, "Explore"),
       h("button", { class: "btn coral", type: "button", style: { marginLeft: "auto" }, html: icon.search + "<span>Browse all</span>", onclick: () => toast("Browse all", "The full guide catalogue opens in the connected app; this demo keeps you in the planner.", "info") })),
     h("div", { class: "cards-row" }, ...cards.map((c) =>
       h("button", { class: "sugg", type: "button", onclick: () => toast("Guide preview", "“" + c.t + "” opens in the connected app; no outbound navigation here.", "info") },
@@ -391,7 +391,7 @@ function budgetView() {
   else if (s.budgetTab === "ingest") body = ingestTab();
   else body = reportsTab();
   return h("div", { class: "workspace" },
-    h("div", { class: "section-head", style: { marginTop: 0 } }, h("h2", { class: "display" }, "Budget"),
+    h("div", { class: "section-head", style: { marginTop: 0 } }, h("h1", { class: "display" }, "Budget"),
       h("span", { class: "count-pill" }, "Live across ledger, charts, and reports"),
       h("div", { style: { marginLeft: "auto", display: "flex", gap: "8px", alignItems: "center" } },
         h("span", { class: "eyebrow", style: { textTransform: "none" } }, "Show as"), curToggle)),
@@ -542,7 +542,8 @@ function spreadsheetTab() {
       }
       td.addEventListener("click", () => { ssActive = { r: ri, c: ci }; ssEditing = false; S.emit(); setFocus(`cell-${ri}-${ci}`); });
       td.addEventListener("dblclick", () => { ssActive = { r: ri, c: ci }; ssEditing = true; S.emit(); setFocus(`cell-${ri}-${ci}`); });
-      td.addEventListener("keydown", (e) => cellKeydown(e, ri, ci, rows.length, cols.length));
+      td.addEventListener("keydown", (e) => { if (e.key === "Enter" && !ssEditing) { e.preventDefault(); ssEditing = true; S.emit(); setFocus(`cell-${ri}-${ci}`); } else { cellKeydown(e, ri, ci, rows.length, cols.length); } });
+      td.id = `cell-${ri}-${ci}`;
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
@@ -785,7 +786,7 @@ function notesView() {
   if (extrasTab === "notes") body = notesEditor();
   else if (extrasTab === "packing") body = packingView();
   else body = customFieldsView();
-  return h("div", { class: "workspace" }, h("div", { class: "section-head", style: { marginTop: 0 } }, h("h2", { class: "display" }, "Notes & extras"), h("div", { style: { marginLeft: "auto" } }, seg)), body);
+  return h("div", { class: "workspace" }, h("div", { class: "section-head", style: { marginTop: 0 } }, h("h1", { class: "display" }, "Notes & extras"), h("div", { style: { marginLeft: "auto" } }, seg)), body);
 }
 function notesEditor() {
   const s = st();
@@ -924,8 +925,8 @@ export function openStopForm(stop) {
   const submit = h("button", { class: "btn primary", type: "button", text: editing ? "Save stop" : "Add stop", disabled: "true" });
   const cancel = h("button", { class: "btn", type: "button", text: "Cancel" });
   submit.addEventListener("click", () => {
-    if (submit.disabled || submit.dataset.busy) return; submit.dataset.busy = "1";
-    if (!validate(true)) { submit.dataset.busy = ""; return; }
+    if (submit.disabled || submit.dataset.busy) return; submit.dataset.busy = "1"; submit.disabled = true; submit.disabled = true;
+    if (!validate(true)) { submit.dataset.busy = ""; submit.disabled = false; return; }
     const data = collect();
     if (editing) { S.updateStop(stop.id, data); for (const cf of s.customFields) if (cf._val !== "" && cf._val != null) S.setCustomValue("stop:" + stop.id, cf.id, cf.type === "number" ? Number(cf._val) : cf._val); toast("Stop updated", data.title + " was updated across the plan, map, and exports.", "ok"); }
     else { const ns = S.addStop(data); for (const cf of s.customFields) if (cf._val !== "" && cf._val != null) S.setCustomValue("stop:" + ns.id, cf.id, cf.type === "number" ? Number(cf._val) : cf._val); lastAddedStop = ns.id; setFocus("row-" + ns.id); toast("Stop added", data.title + " was added to " + dayLabel(data.day) + ".", "ok"); }
@@ -985,8 +986,8 @@ export function openExpenseForm(exp) {
   const submit = h("button", { class: "btn primary", type: "button", text: editing ? "Save expense" : "Add expense", disabled: "true" });
   const cancel = h("button", { class: "btn", type: "button", text: "Cancel" });
   submit.addEventListener("click", () => {
-    if (submit.disabled || submit.dataset.busy) return; submit.dataset.busy = "1";
-    if (!validate()) { submit.dataset.busy = ""; return; }
+    if (submit.disabled || submit.dataset.busy) return; submit.dataset.busy = "1"; submit.disabled = true;
+    if (!validate()) { submit.dataset.busy = ""; submit.disabled = false; return; }
     const data = collect();
     if (editing) { S.updateExpense(exp.id, data); toast("Expense updated", data.description + " updated; ledger, charts, and balances recomputed.", "ok"); }
     else { S.addExpense(data); setFocus("wstab-ledger"); toast("Expense added", data.description + " added to the ledger.", "ok"); }
@@ -1023,8 +1024,8 @@ export function openExport() {
 
 export function openImport() {
   const errBox = h("div", { class: "err-msg", role: "alert", style: "display:none" });
-  const ta = h("textarea", { class: "input", rows: "10", style: { fontFamily: "var(--mono)", fontSize: "12px" }, "aria-label": "Paste trip JSON to import", placeholder: "Paste a trip JSON document, or choose a file below." });
-  const file = h("input", { type: "file", accept: "application/json,.json", "aria-label": "Choose a trip JSON file", style: { fontSize: "12.5px" } });
+  const ta = h("textarea", { id: "import-json-ta", class: "input", rows: "10", style: { fontFamily: "var(--mono)", fontSize: "12px" }, placeholder: "Paste a trip JSON document, or choose a file below." });
+  const file = h("input", { id: "import-json-file", type: "file", accept: "application/json,.json", style: { fontSize: "12.5px" } });
   file.addEventListener("change", () => { const f = file.files[0]; if (!f) return; const rd = new FileReader(); rd.onload = () => { ta.value = String(rd.result || ""); }; rd.readAsText(f); });
   const doImport = () => {
     let obj;
