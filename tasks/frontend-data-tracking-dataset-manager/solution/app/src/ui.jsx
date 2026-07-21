@@ -98,9 +98,8 @@ export function SelectField({ id, label, error, hint, required, children, classN
  * dismiss one layer at a time and focus returns to the opener. */
 const overlayStack = []
 export function useOverlayBehavior(ref, onClose, { initialFocus = true } = {}) {
-  const returnFocus = useRef(null)
+  const returnFocus = useRef(typeof document === 'undefined' ? null : document.activeElement)
   useEffect(() => {
-    returnFocus.current = document.activeElement
     const entry = { onClose }
     overlayStack.push(entry)
     if (initialFocus) {
@@ -129,9 +128,12 @@ export function useOverlayBehavior(ref, onClose, { initialFocus = true } = {}) {
       const i = overlayStack.indexOf(entry)
       if (i >= 0) overlayStack.splice(i, 1)
       const opener = returnFocus.current
-      window.setTimeout(() => {
-        if (opener?.focus && document.contains(opener)) opener.focus()
-      }, 0)
+      window.requestAnimationFrame(() => {
+        // React StrictMode replays effect cleanup while the overlay remains mounted.
+        // Restore focus only after a real teardown has removed the overlay.
+        if (ref.current?.isConnected) return
+        if (opener?.focus && document.contains(opener)) opener.focus({ preventScroll: true })
+      })
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 }
