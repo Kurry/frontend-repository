@@ -63,10 +63,11 @@ export default function MegaMenu() {
 
   return (
     <div
-      className={`fixed inset-0 z-30 bg-black/50 backdrop-blur-sm flex justify-end ${closing ? 'backdrop-out' : 'backdrop-in'}`}
+      className={`fixed inset-0 z-[50] bg-black/50 backdrop-blur-sm flex justify-end ${closing ? 'backdrop-out' : 'backdrop-in'}`}
       aria-modal="true"
       role="dialog"
       aria-label="Site menu"
+      onMouseDown={(event) => { if (event.target === event.currentTarget) requestClose(); }}
     >
       <div
         ref={menuRef}

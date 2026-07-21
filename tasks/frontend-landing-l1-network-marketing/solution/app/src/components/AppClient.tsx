@@ -5,6 +5,7 @@ import Header from './Header';
 import Hero from './Hero';
 import WhyRidge from './WhyRidge';
 import GetStarted from './GetStarted';
+import LandingChapters from './LandingChapters';
 import GlobalEvents from './GlobalEvents';
 import EventsManager from './EventsManager';
 import ContactForm from './ContactForm';
@@ -30,6 +31,7 @@ export default function AppClient() {
         <Hero />
         <WhyRidge />
         <GetStarted />
+        <LandingChapters />
         <GlobalEvents />
         <ContactForm />
       </main>
