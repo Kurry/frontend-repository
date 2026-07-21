@@ -1,27 +1,23 @@
-// WebMCP surface for the LetterDrop oracle.
+// WebMCP surface for the LetterDrop oracle — contract zto-webmcp-v1.
 //
-// Contract zto-webmcp-v1. Every tool drives the SAME run-lifecycle functions
-// and view controls a human uses — the real Zustand store actions that the
-// on-screen "Start game" / "Pause" / "Resume" / "Play again" buttons and the
-// Game / History / Achievements tabs are wired to. No tool fakes a success
-// state the UI could not otherwise reach, and no tool batches or replays tile
-// taps. Exposed on window as webmcp_session_info / webmcp_list_tools /
-// webmcp_invoke_tool.
+// Every tool drives the SAME store actions and view/export controls a human
+// uses: the real "Start game" / "Pause" / "Resume" / "Play again" buttons and
+// the Game / History / Achievements tabs (command-session-v1, browse-query-v1),
+// and the real Export Run / Export History / Copy / Import surfaces
+// (artifact-transfer-v1). No tool fakes a success state the UI could not reach,
+// and no tool batches or replays tile taps. Tool results carry a *fresh*
+// visibleState read synchronously from the store after the action so the
+// reported state always matches the rendered app (no stale lag). Artifact
+// results never include the JSON body — per the contract, file bytes and
+// clipboard contents stay Playwright's responsibility; import only makes the
+// import surface visible and hands control back for the file upload.
 
 import { useGameStore } from "../store/gameStore";
 
 const CONTRACT_VERSION = "zto-webmcp-v1";
 
-// ---- command-session-v1 (session_operations) -------------------------------
-// start | pause | resume | restart — the real run-lifecycle controls.
-
-const SESSION_OPERATIONS = ["start", "pause", "resume", "restart"] as const;
-type SessionOperation = (typeof SESSION_OPERATIONS)[number];
-
 function clickByAriaLabel(label: string): boolean {
-  const btn = document.querySelector<HTMLButtonElement>(
-    `button[aria-label="${label}"]`,
-  );
+  const btn = document.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`);
   if (btn && !btn.disabled) {
     btn.click();
     return true;
@@ -29,141 +25,195 @@ function clickByAriaLabel(label: string): boolean {
   return false;
 }
 
-function sessionSnapshot() {
+// Fresh, accurate projection of the rendered app — read straight from the
+// store, which Zustand updates synchronously, so it reflects the action that
+// just ran rather than a previous frame.
+function visibleState() {
   const s = useGameStore.getState();
   return {
+    phase: s.isGameOver ? "gameover" : s.isPaused ? "paused" : s.gameStarted ? "running" : "idle",
+    currentView: s.currentView,
+    score: s.score,
+    streak: s.streak,
+    multiplier: s.multiplier,
+    tierIndex: s.difficulty,
+    tierName: `Tier ${s.difficulty + 1}`,
+    tilesOnBoard: s.tiles.length,
+    selectedLetters: s.selectedWord.map((t) => t.letter).join(""),
     gameStarted: s.gameStarted,
     isPaused: s.isPaused,
     isGameOver: s.isGameOver,
-    score: s.score,
-    tilesCleared: s.tilesCleared,
+    checkpointAvailable: s.checkpoint !== null,
+    settingsOpen: s.settingsOpen,
+    exportPreviewOpen: s.exportPreview !== null,
+    importSurfaceVisible: s.importSurfaceVisible,
+    historyCount: s.matchHistory.length,
   };
 }
 
+// ---- command-session-v1 ----------------------------------------------------
+const SESSION_OPERATIONS = ["start", "pause", "resume", "restart"] as const;
+type SessionOperation = (typeof SESSION_OPERATIONS)[number];
+
 function sessionOperate(args: Record<string, unknown>) {
-  const operation = String(
-    args.operation ?? args.session_operation ?? args.action ?? "",
-  ) as SessionOperation;
-  if (!SESSION_OPERATIONS.includes(operation)) {
-    return { ok: false, error: `unknown session operation: ${operation}` };
+  const operation = String(args.operation ?? args.session_operation ?? args.action ?? "") as SessionOperation;
+  if (!(SESSION_OPERATIONS as readonly string[]).includes(operation)) {
+    return { ok: false, error: `unknown session operation: ${operation}`, visibleState: visibleState() };
   }
-  const store = useGameStore.getState();
-
+  let activated = false;
   switch (operation) {
-    case "start": {
-      // Prefer the real on-screen "Start game" button (resets the RAF frame
-      // refs in App); fall back to the identical store action it invokes.
-      if (!clickByAriaLabel("Start game")) store.startGame();
+    case "start":
+      activated = clickByAriaLabel("Start game");
       break;
-    }
-    case "pause": {
-      if (!clickByAriaLabel("Pause")) store.pauseGame();
+    case "pause":
+      activated = clickByAriaLabel("Pause");
       break;
-    }
-    case "resume": {
-      if (!clickByAriaLabel("Resume")) store.resumeGame();
+    case "resume":
+      activated = clickByAriaLabel("Resume");
       break;
-    }
-    case "restart": {
-      // Same path as the App's handleRestart / Game Over "Play again":
-      // reset the run, then start a fresh one.
-      store.resetGame();
-      store.startGame();
+    case "restart":
+      activated = clickByAriaLabel("Play again");
       break;
-    }
   }
-
-  return { ok: true, operation, state: sessionSnapshot() };
+  if (!activated) {
+    return { ok: false, error: `${operation} is not available in the current visible state`, visibleState: visibleState() };
+  }
+  return { ok: true, operation, visibleState: visibleState() };
 }
 
 // ---- browse-query-v1 -------------------------------------------------------
-// destinations: game-board | match-history | achievements — drives the real
-// view tabs (setView), the same function the on-screen tabs call.
-
-const DESTINATION_TO_VIEW: Record<string, "game" | "history" | "achievements" | "settings"> = {
+const DESTINATION_TO_VIEW: Record<string, "game" | "history" | "achievements"> = {
   "game-board": "game",
   "match-history": "history",
   achievements: "achievements",
-  settings: "settings",
 };
 
 function browseOpen(args: Record<string, unknown>) {
   const destination = String(args.destination ?? args.section ?? "");
   const view = DESTINATION_TO_VIEW[destination];
-  if (!view) return { ok: false, error: `unknown destination: ${destination}` };
+  if (!view) {
+    return { ok: false, error: `unknown destination: ${destination} (allowed: game-board, match-history, achievements)`, visibleState: visibleState() };
+  }
   useGameStore.getState().setView(view);
-  return { ok: true, destination, currentView: useGameStore.getState().currentView };
+  return { ok: true, destination, visibleState: visibleState() };
 }
 
 // ---- artifact-transfer-v1 --------------------------------------------------
-// artifact_operations: export | import | copy
-
 const ARTIFACT_OPERATIONS = ["export", "import", "copy"] as const;
 type ArtifactOperation = (typeof ARTIFACT_OPERATIONS)[number];
 
-function artifactOperate(args: Record<string, unknown>) {
+async function artifactOperate(args: Record<string, unknown>) {
   const operation = String(args.operation ?? args.artifact_operation ?? args.action ?? "") as ArtifactOperation;
-  if (!ARTIFACT_OPERATIONS.includes(operation)) {
-    return { ok: false, error: `unknown artifact operation: ${operation}` };
+  if (!(ARTIFACT_OPERATIONS as readonly string[]).includes(operation)) {
+    return { ok: false, error: `unknown artifact operation: ${operation}`, visibleState: visibleState() };
   }
-  
-  // Simulate user actions that would normally interact with files or clipboard.
-  // In a test environment, these just return success assuming the mock harness
-  // provides the actual file contents (due to the WebMCP contract preventing raw files).
+  const store = useGameStore.getState();
+  const format = String(args.format ?? args.mode ?? "");
+
   if (operation === "export") {
-    return { ok: true, operation, message: "Export triggered" };
-  } else if (operation === "import") {
-    return { ok: true, operation, message: "Import triggered" };
-  } else if (operation === "copy") {
-    return { ok: true, operation, message: "Copy triggered" };
+    if (format === "history-json") {
+      store.openExportHistory();
+    } else if (format === "run-json" || format === "") {
+      const opened = store.openExportRun();
+      if (!opened) {
+        return { ok: false, error: "no finished run to export yet — finish a run first", visibleState: visibleState() };
+      }
+    } else {
+      return { ok: false, error: `unknown export format: ${format} (allowed: run-json, history-json)`, visibleState: visibleState() };
+    }
+    const st = useGameStore.getState();
+    return { ok: true, operation, format: format || "run-json", previewVisible: st.exportPreview !== null, visibleState: visibleState() };
   }
+
+  if (operation === "copy") {
+    const st0 = useGameStore.getState();
+    if (!st0.exportPreview) {
+      return { ok: false, error: "copy is unavailable until an export preview is open", visibleState: visibleState() };
+    }
+    const copied = await useGameStore.getState().copyExport();
+    return { ok: copied, operation, copied, visibleState: visibleState() };
+  }
+
+  // import — raw bytes cannot cross WebMCP, so we make the import surface
+  // visible and operable, then hand the file upload back to Playwright. We do
+  // NOT claim the import succeeded.
+  if (format && format !== "run-json" && format !== "history-json") {
+    return { ok: false, error: `unknown import mode: ${format} (allowed: run-json, history-json)`, visibleState: visibleState() };
+  }
+  store.setView("history");
+  useGameStore.setState({ importSurfaceVisible: true });
+  return {
+    ok: true,
+    operation,
+    importSurfaceVisible: true,
+    note: "Import control is now visible and focused; supply the file via the file input (Playwright upload). Raw file bytes are not accepted over WebMCP.",
+    visibleState: visibleState(),
+  };
 }
 
 // ---- registry --------------------------------------------------------------
-
-type Handler = (args: Record<string, unknown>) => unknown;
+type Handler = (args: Record<string, unknown>) => unknown | Promise<unknown>;
 
 const TOOLS: { name: string; description: string; handler: Handler }[] = [
   {
-    name: "command-session-operate",
-    description:
-      "Drive the run lifecycle. args.operation is one of start | pause | resume | restart, invoking the same store actions the Start game / Pause / Resume / Play again controls use.",
-    handler: sessionOperate,
+    name: "session.start",
+    description: "Start a run through the visible Start game control.",
+    handler: () => sessionOperate({ operation: "start" }),
   },
   {
-    name: "browse-open",
+    name: "session.pause",
+    description: "Pause the active run through the visible Pause control.",
+    handler: () => sessionOperate({ operation: "pause" }),
+  },
+  {
+    name: "session.resume",
+    description: "Resume the paused run through the visible Resume control.",
+    handler: () => sessionOperate({ operation: "resume" }),
+  },
+  {
+    name: "session.restart",
+    description: "Restart after Game Over through the visible Play again control.",
+    handler: () => sessionOperate({ operation: "restart" }),
+  },
+  {
+    name: "browse.open",
     description:
-      "Switch the visible view via the real tab control. args.destination is one of game-board | match-history | achievements | settings.",
+      "Switch the visible view via the real tab control. args.destination is one of game-board | match-history | achievements. Returns a fresh visibleState.",
     handler: browseOpen,
   },
   {
-    name: "artifact-operate",
-    description:
-      "Drive artifact transfer operations. args.operation is one of export | import | copy.",
-    handler: artifactOperate,
+    name: "artifact.export",
+    description: "Open the visible export preview for args.format run-json or history-json; no JSON is returned.",
+    handler: (args) => artifactOperate({ ...args, operation: "export" }),
+  },
+  {
+    name: "artifact.import",
+    description: "Reveal and focus the visible Import control for args.mode run-json or history-json; raw bytes remain Playwright-only.",
+    handler: (args) => artifactOperate({ ...args, operation: "import" }),
+  },
+  {
+    name: "artifact.copy",
+    description: "Copy from the currently visible export preview and report the settled clipboard result without returning its contents.",
+    handler: (args) => artifactOperate({ ...args, operation: "copy" }),
   },
 ];
 
 export function initWebMcp() {
   const w = window as unknown as Record<string, unknown>;
-  // Read-only debug/testing hook (not a WebMCP tool): lets a test harness
-  // read live tile positions so it can aim REAL pointer clicks at falling
-  // tiles. It performs no mutations and creates no success path of its own.
-  w.__letterdrop_debug_state = () => useGameStore.getState();
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
     modules: ["command-session-v1", "browse-query-v1", "artifact-transfer-v1"],
     tools: TOOLS.map((t) => t.name),
+    visibleState: visibleState(),
   });
-  w.webmcp_list_tools = () =>
-    TOOLS.map((t) => ({ name: t.name, description: t.description }));
-  w.webmcp_invoke_tool = (name: string, args: Record<string, unknown> = {}) => {
+  w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));
+  w.webmcp_invoke_tool = async (name: string, args: Record<string, unknown> = {}) => {
     const tool = TOOLS.find((t) => t.name === name);
     if (!tool) return { ok: false, error: `unknown tool: ${name}` };
     try {
-      return tool.handler(args || {});
+      return await tool.handler(args || {});
     } catch (err) {
-      return { ok: false, error: String(err) };
+      return { ok: false, error: String(err), visibleState: visibleState() };
     }
   };
 }

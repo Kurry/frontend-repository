@@ -1,340 +1,218 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useGameStore } from '../store/gameStore';
-import { MatchRecord } from '../game/types';
+import { GameResult } from '../game/types';
+import { parseImport, formatDuration, formatEndedAt } from '../game/io';
+
+const INK = '#0052A3';
+const ERROR = '#B42318';
+
+const btnSecondary: React.CSSProperties = {
+  color: INK,
+  border: 'none',
+  borderRadius: '1000px',
+  padding: '10px 16px',
+  fontSize: '14px',
+  fontWeight: 600,
+  cursor: 'pointer',
+  minHeight: '44px',
+};
 
 const MatchHistory: React.FC = () => {
-  const matchHistory = useGameStore(state => state.matchHistory);
-  const addToast = useGameStore(state => state.addToast);
-  const [previewData, setPreviewData] = useState<string | null>(null);
+  const matchHistory = useGameStore((s) => s.matchHistory);
+  const addToast = useGameStore((s) => s.addToast);
+  const importRuns = useGameStore((s) => s.importRuns);
+  const openExportHistory = useGameStore((s) => s.openExportHistory);
+  const openExportRun = useGameStore((s) => s.openExportRun);
+  const importSurfaceVisible = useGameStore((s) => s.importSurfaceVisible);
+
   const [importError, setImportError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  
+  const importBtnRef = useRef<HTMLButtonElement>(null);
+  const errorId = 'history-import-error';
+
+  // The WebMCP import handler cannot pass file bytes (contract restriction), so
+  // it makes the import surface visible and hands control back to Playwright;
+  // reflect that by focusing the Import control so the surface is operable.
   useEffect(() => {
-    if (previewData && dialogRef.current && !dialogRef.current.open) {
-      dialogRef.current.showModal();
-    } else if (!previewData && dialogRef.current && dialogRef.current.open) {
-      dialogRef.current.close();
+    if (importSurfaceVisible && importBtnRef.current) {
+      importBtnRef.current.focus();
     }
-  }, [previewData]);
+  }, [importSurfaceVisible]);
 
-  const handleExportHistory = () => {
-    const historyExport = {
-      format: 'letterdrop-history-v1',
-      schemaVersion: 1,
-      runs: matchHistory
-    };
-    setPreviewData(JSON.stringify(historyExport, null, 2));
-  };
-
-  const handleExportRun = (run: MatchRecord) => {
-    setPreviewData(JSON.stringify(run, null, 2));
-  };
-
-  const copyToClipboard = () => {
-    if (previewData) {
-      navigator.clipboard.writeText(previewData);
-      addToast('Copied', 'success');
-    }
-  };
-
-  const downloadFile = () => {
-    if (!previewData) return;
-    const blob = new Blob([previewData], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `letterdrop-export-${Date.now()}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const triggerImport = () => {
+    setImportError(null);
+    fileInputRef.current?.click();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setImportError(null);
     const file = e.target.files?.[0];
+    if (fileInputRef.current) fileInputRef.current.value = '';
     if (!file) return;
 
     const reader = new FileReader();
+    reader.onerror = () => setImportError('File is invalid: the file could not be read.');
     reader.onload = (event) => {
-      try {
-        const text = event.target?.result as string;
-        const json = JSON.parse(text);
-        
-        if (json.format === 'letterdrop-game-v1' && json.schemaVersion === 1) {
-           useGameStore.getState().importHistory([json]);
-           addToast('Run imported successfully', 'success');
-        } else if (json.format === 'letterdrop-history-v1' && json.schemaVersion === 1 && Array.isArray(json.runs)) {
-           useGameStore.getState().importHistory(json.runs);
-           addToast('History imported successfully', 'success');
-        } else {
-           setImportError('File is invalid. format or schemaVersion does not match.');
-        }
-      } catch (err) {
-        setImportError('File is invalid JSON.');
+      const text = typeof event.target?.result === 'string' ? event.target.result : '';
+      const decision = parseImport(text);
+      if (!decision.ok || !decision.runs || !decision.mode) {
+        setImportError(decision.error || 'File is invalid.');
+        return;
       }
-      
-      // Reset input
-      if (fileInputRef.current) {
-         fileInputRef.current.value = '';
-      }
+      importRuns(decision.runs, decision.mode);
+      addToast(
+        decision.mode === 'history'
+          ? `History imported (${decision.runs.length} ${decision.runs.length === 1 ? 'run' : 'runs'})`
+          : 'Run imported',
+        'success',
+      );
     };
     reader.readAsText(file);
   };
 
+  // The hidden file input is rendered once per visible branch (only one branch
+  // is mounted at a time) so `fileInputRef` always points at a live node — both
+  // the empty-state Import button and the populated-header Import button call
+  // `triggerImport`, which clicks this input. Mounting it only in the empty
+  // state previously left the populated header's Import button pointing at a
+  // null ref, so its file picker never opened.
+  const hiddenInput = (
+    <input
+      type="file"
+      accept=".json,application/json"
+      style={{ display: 'none' }}
+      ref={fileInputRef}
+      onChange={handleFileChange}
+      aria-hidden="true"
+      tabIndex={-1}
+    />
+  );
+
+  const importControl = (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+      <button
+        ref={importBtnRef}
+        className="ld-btn-secondary"
+        onClick={triggerImport}
+        aria-label="Import run or history JSON"
+        aria-describedby={importError ? errorId : undefined}
+        style={btnSecondary}
+      >
+        Import
+      </button>
+      {importError && (
+        <p id={errorId} role="alert" style={{ color: ERROR, fontSize: '13px', fontWeight: 600, margin: 0, textAlign: 'center' }}>
+          {importError}
+        </p>
+      )}
+    </div>
+  );
+
   if (matchHistory.length === 0) {
     return (
-      <div
-        style={{
-          padding: '32px 20px',
-          textAlign: 'center',
-          color: '#86868B',
-        }}
-      >
-        <div style={{ fontSize: '40px', marginBottom: '12px' }}>📋</div>
-        <h2 style={{ fontSize: '17px', fontWeight: 600, color: '#1D1D1E', marginBottom: '4px' }}>
+      <div style={{ padding: '32px 20px', textAlign: 'center', color: '#6B6B70' }}>
+        {hiddenInput}
+        <div aria-hidden="true" style={{ fontSize: '40px', marginBottom: '12px' }}>📋</div>
+        <h2 style={{ fontSize: '17px', fontWeight: 600, color: '#1D1D1E', marginBottom: '6px' }}>
           No games yet
         </h2>
-        <div style={{ fontSize: '15px', color: '#4F4F55' }}>
-          Complete a game to see your match history here
-        </div>
-        
-        <div style={{ marginTop: '24px' }}>
-            <input 
-              type="file" 
-              accept=".json" 
-              style={{ display: 'none' }} 
-              ref={fileInputRef} 
-              onChange={handleFileChange} 
-            />
-            <button 
-              className="ld-btn-secondary" 
-              onClick={() => fileInputRef.current?.click()}
-              style={{
-                color: '#007AFF',
-                border: '1px solid #66798B',
-                borderRadius: '1000px',
-                padding: '10px 24px',
-                fontSize: '15px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                minHeight: '48px',
-              }}
-            >
-              Import
-            </button>
-            {importError && (
-              <div style={{ color: '#FF3B30', fontSize: '13px', marginTop: '8px', fontWeight: 600 }}>
-                {importError}
-              </div>
-            )}
-        </div>
+        <p style={{ fontSize: '15px', color: '#4F4F55', margin: '0 0 20px' }}>
+          Finish a run and it will appear here, most recent first. Or import a previously exported
+          LetterDrop JSON to restore it.
+        </p>
+        {importControl}
       </div>
     );
   }
 
   return (
-    <div style={{ padding: '16px 20px' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h2
-          style={{
-            fontSize: '17px',
-            fontWeight: 600,
-            color: '#1D1D1E',
-          }}
-        >
-          Match history
-        </h2>
+    <div style={{ padding: '16px 18px' }}>
+      {hiddenInput}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+        <h2 style={{ fontSize: '17px', fontWeight: 700, color: '#1D1D1E', margin: 0 }}>Match history</h2>
         <div style={{ display: 'flex', gap: '8px' }}>
-          <button 
-            className="ld-btn-secondary" 
-            onClick={handleExportHistory}
-            style={{
-              color: '#007AFF',
-              border: '1px solid #66798B',
-              borderRadius: '1000px',
-              padding: '6px 12px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
+          <button className="ld-btn-secondary" onClick={() => openExportHistory()} aria-label="Export History" style={{ ...btnSecondary, padding: '10px 14px' }}>
             Export History
           </button>
-          
-          <input 
-            type="file" 
-            accept=".json" 
-            style={{ display: 'none' }} 
-            ref={fileInputRef} 
-            onChange={handleFileChange} 
-          />
-          <button 
-            className="ld-btn-secondary" 
-            onClick={() => fileInputRef.current?.click()}
-            style={{
-              color: '#007AFF',
-              border: '1px solid #66798B',
-              borderRadius: '1000px',
-              padding: '6px 12px',
-              fontSize: '13px',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
+          <button ref={importBtnRef} className="ld-btn-secondary" onClick={triggerImport} aria-label="Import run or history JSON" aria-describedby={importError ? errorId : undefined} style={{ ...btnSecondary, padding: '10px 14px' }}>
             Import
           </button>
         </div>
       </div>
-      
-      {importError && (
-        <div style={{ color: '#FF3B30', fontSize: '13px', marginBottom: '12px', fontWeight: 600 }}>
-          {importError}
-        </div>
-      )}
-      <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px', listStyle: 'none' }}>
-        {matchHistory.map((record, index) => {
-          const minutes = Math.floor(record.durationSec / 60);
-          const seconds = record.durationSec % 60;
-          const date = new Date(record.endedAt);
-          const dateStr = date.toLocaleDateString();
 
-          return (
-            <li
-              key={index}
-              style={{
-                backgroundColor: '#FFFFFF',
-                borderRadius: '6px',
-                padding: '12px 16px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                boxShadow: '0 1px 2px rgba(0,0,0,0.08)',
-              }}
-            >
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{ fontWeight: 700, fontSize: '20px', color: '#007AFF' }}>
-                  {record.score}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  <div style={{ fontSize: '13px', color: '#4F4F55' }}>
-                    {record.tilesCleared} tiles
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#5F5F65' }}>
-                    {record.playerName}
-                  </div>
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '13px', color: '#4F4F55' }}>
-                    {minutes}m {seconds}s
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#5F5F65' }}>
-                    {dateStr}
-                  </div>
-                </div>
-                <button
-                  className="ld-btn-secondary"
-                  onClick={() => handleExportRun(record)}
-                  aria-label="Export Run"
-                  style={{
-                    color: '#007AFF',
-                    border: '1px solid #66798B',
-                    borderRadius: '1000px',
-                    padding: '4px 10px',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                  }}
-                >
-                  Export
-                </button>
-              </div>
-            </li>
-          );
-        })}
+      {importError && (
+        <p id={errorId} role="alert" style={{ color: ERROR, fontSize: '13px', fontWeight: 600, margin: '0 0 12px' }}>
+          {importError}
+        </p>
+      )}
+
+      <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px', listStyle: 'none', margin: 0, padding: 0 }}>
+        {matchHistory.map((record, index) => (
+          <HistoryRow key={`${record.endedAt}-${record.score}-${index}`} record={record} index={index} onExport={openExportRun} />
+        ))}
       </ul>
-      
-      <dialog 
-        ref={dialogRef}
-        onClose={() => setPreviewData(null)}
-        style={{
-          border: 'none',
-          borderRadius: '8px',
-          padding: '24px',
-          maxWidth: '500px',
-          width: '90%',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-        }}
-      >
-        <h3 style={{ fontSize: '17px', fontWeight: 600, marginBottom: '16px' }}>Export Preview</h3>
-        <pre style={{
-          backgroundColor: '#F5F5F7',
-          padding: '12px',
-          borderRadius: '6px',
-          fontSize: '13px',
-          overflowX: 'auto',
-          maxHeight: '300px',
-          marginBottom: '16px',
-          whiteSpace: 'pre-wrap',
-          wordWrap: 'break-word'
-        }}>
-          {previewData}
-        </pre>
-        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-          <button 
-            className="ld-btn-secondary"
-            onClick={() => dialogRef.current?.close()}
-            style={{
-              color: '#4F4F55',
-              backgroundColor: '#E6EEF7',
-              border: 'none',
-              borderRadius: '1000px',
-              padding: '8px 16px',
-              fontSize: '14px',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            Close
-          </button>
-          <button 
-            className="ld-btn-secondary"
-            onClick={copyToClipboard}
-            style={{
-              color: '#007AFF',
-              border: '1px solid #66798B',
-              borderRadius: '1000px',
-              padding: '8px 16px',
-              fontSize: '14px',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            Copy
-          </button>
-          <button 
-            className="ld-btn-primary"
-            onClick={downloadFile}
-            style={{
-              color: '#FEFEFE',
-              backgroundColor: '#007AFF',
-              border: 'none',
-              borderRadius: '1000px',
-              padding: '8px 16px',
-              fontSize: '14px',
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            Download
-          </button>
-        </div>
-      </dialog>
     </div>
   );
 };
+
+const HistoryRow: React.FC<{ record: GameResult; index: number; onExport: (r: GameResult) => void }> = ({ record, index, onExport }) => (
+  <li
+    className={index === 0 ? 'ld-row-in' : undefined}
+    style={{
+      backgroundColor: '#FFFFFF',
+      borderRadius: '10px',
+      padding: '12px 14px',
+      boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+      border: '1px solid #EAEEF3',
+    }}
+  >
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', minWidth: 0 }}>
+        <div style={{ fontWeight: 800, fontSize: '24px', color: INK, fontVariantNumeric: 'tabular-nums', lineHeight: 1 }}>
+          {record.score}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
+          <span style={{ fontSize: '13px', color: '#1D1D1E', fontWeight: 600 }}>
+            {record.tilesCleared} tiles cleared
+          </span>
+          <span style={{ fontSize: '13px', color: '#4F4F55' }}>
+            Tier {record.tierReached} • {formatDuration(record.durationSec)}
+          </span>
+          <span style={{ fontSize: '12px', color: '#6B6B70', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {record.playerName} • {formatEndedAt(record.endedAt)}
+          </span>
+        </div>
+      </div>
+      <button
+        className="ld-btn-secondary"
+        onClick={() => onExport(record)}
+        aria-label={`Export run scoring ${record.score}`}
+        style={{ ...btnSecondary, padding: '9px 14px', fontSize: '13px', flexShrink: 0 }}
+      >
+        Export
+      </button>
+    </div>
+    {record.words.length > 0 && (
+      <div style={{ marginTop: '8px', display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+        {record.words.map((w, i) => (
+          <span
+            key={i}
+            style={{
+              backgroundColor: '#E6EEF7',
+              color: INK,
+              borderRadius: '6px',
+              padding: '2px 8px',
+              fontSize: '12px',
+              fontWeight: 600,
+              fontVariantNumeric: 'tabular-nums',
+            }}
+          >
+            {w.word} +{w.points}
+          </span>
+        ))}
+      </div>
+    )}
+  </li>
+);
 
 export default MatchHistory;

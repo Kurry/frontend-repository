@@ -230,7 +230,15 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ width, height, onTileClick }) =
   const handleClick = useCallback(
     (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
       const state = useGameStore.getState();
-      if (!state.gameStarted || state.isPaused || state.isGameOver) return;
+      if (state.isGameOver) return; // the Game Over overlay owns input now
+      if (!state.gameStarted) {
+        useGameStore.getState().registerIllegalCanvasAction('Press Start game to begin');
+        return;
+      }
+      if (state.isPaused) {
+        useGameStore.getState().registerIllegalCanvasAction('Paused — press Resume to play');
+        return;
+      }
 
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -258,8 +266,8 @@ const GameCanvas: React.FC<GameCanvasProps> = ({ width, height, onTileClick }) =
       // ABOVE the tile's current center (the tile's recent position) than
       // below it, and select the closest matching tile rather than whichever
       // happens to come last in the array.
-      const HIT_MARGIN = 8;
-      const FALL_GRACE = 30;
+      const HIT_MARGIN = 12;
+      const FALL_GRACE = 44;
       const half = TILE_SIZE / 2;
 
       let bestTile: (typeof state.tiles)[number] | null = null;

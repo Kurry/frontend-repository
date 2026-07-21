@@ -1,8 +1,13 @@
 import React from 'react';
 import { useGameStore } from '../store/gameStore';
 
+// The toast region is a single polite live region that never takes focus and
+// never blocks interaction (pointer-events: none). Every transient confirmation
+// — valid-word score, Bomb/Slow, Board Cleared!, achievement unlock, Saved,
+// Copied, and the settings inline save message — flows through here so assistive
+// tech announces them, and each one fades out on its own.
 const Toast: React.FC = () => {
-  const toasts = useGameStore(state => state.toasts);
+  const toasts = useGameStore((s) => s.toasts);
 
   if (toasts.length === 0) return null;
 
@@ -16,7 +21,7 @@ const Toast: React.FC = () => {
         top: '16px',
         left: '50%',
         transform: 'translateX(-50%)',
-        zIndex: 1000,
+        zIndex: 1200,
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
@@ -26,34 +31,27 @@ const Toast: React.FC = () => {
         maxWidth: '360px',
       }}
     >
-      {toasts.map((toast, index) => {
+      {toasts.map((toast) => {
         let bgColor = '#1D1D1E';
-        let textColor = '#FEFEFE';
-
-        if (toast.type === 'success') {
-          bgColor = '#34C759';
-        } else if (toast.type === 'error') {
-          bgColor = '#FF3B30';
-        } else if (toast.type === 'power') {
-          bgColor = '#FF9500';
-        } else if (toast.type === 'achievement') {
-          bgColor = '#AF52DE';
-        }
+        if (toast.type === 'success') bgColor = '#248A3D';
+        else if (toast.type === 'error') bgColor = '#C81E1E';
+        else if (toast.type === 'power') bgColor = '#B25000';
+        else if (toast.type === 'achievement') bgColor = '#7A2FA8';
 
         return (
           <div
             key={toast.id}
             style={{
               backgroundColor: bgColor,
-              color: textColor,
+              color: '#FEFEFE',
               padding: '10px 20px',
               borderRadius: '1000px',
               fontSize: '14px',
               fontWeight: 600,
-              animation: 'fadeInUp 0.3s ease-out',
-              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.22)',
               textAlign: 'center',
               maxWidth: '100%',
+              animation: toast.leaving ? 'ld-fade-out 0.32s ease-in forwards' : 'ld-fade-in 0.28s ease-out',
             }}
           >
             {toast.message}
