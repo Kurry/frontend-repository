@@ -48,6 +48,11 @@ export const useLibraryStore = create((set, get) => ({
   newPromptId: null,
   sortColumn: 'created',
   sortDirection: 'desc',
+  theme: 'light',
+  density: 'comfortable',
+  onboardingStep: 0,
+  onboardingComplete: false,
+  draftPrompt: null,
 
   setSearchQuery: (searchQuery) => set({ searchQuery }),
   setTechniqueFilter: (techniqueFilter) => set({ techniqueFilter }),
@@ -55,6 +60,12 @@ export const useLibraryStore = create((set, get) => ({
   setExportFormat: (exportFormat) => set({ exportFormat }),
   setMobileActionsOpen: (mobileActionsOpen) => set({ mobileActionsOpen }),
   setSort: (col) => set((state) => ({ sortColumn: col, sortDirection: state.sortColumn === col && state.sortDirection === 'asc' ? 'desc' : 'asc' })),
+  setTheme: (theme) => set({ theme }),
+  setDensity: (density) => set({ density }),
+  setOnboardingStep: (onboardingStep) => set({ onboardingStep }),
+  completeOnboarding: () => set({ onboardingComplete: true, onboardingStep: 0 }),
+  setDraftPrompt: (draftPrompt) => set({ draftPrompt }),
+  clearDraftPrompt: () => set({ draftPrompt: null }),
 
   toggleSelected: (id) => set((state) => ({
     selectedIds: state.selectedIds.includes(id)
