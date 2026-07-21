@@ -6,6 +6,27 @@ const uid = (prefix) => `${prefix}-${globalThis.crypto?.randomUUID?.() || `${Dat
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const activeRuns = new Set()
 
+// Focus management for dialogs/drawers: the element that was focused when a
+// surface opened is restored when that surface closes. Captured synchronously
+// inside the store setter (i.e. inside the click handler), before any modal
+// focus management moves focus away.
+const openerStack = []
+const captureOpener = () => {
+  if (typeof document === 'undefined') return
+  openerStack.push(document.activeElement)
+}
+const restoreOpener = () => {
+  const element = openerStack.pop()
+  if (!element || typeof element.focus !== 'function') return
+  if (typeof document !== 'undefined' && !document.contains(element)) return
+  // Double-rAF so Carbon's modal teardown finishes before we reclaim focus.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      try { element.focus({ preventScroll: true }) } catch { /* opener may be gone */ }
+    })
+  })
+}
+
 const initialDomain = {
   board: { id: 'board-promptops', name: 'PromptOps Execution Board' },
   cards: Object.fromEntries(seededCards.map((card) => [card.id, clone(card)])),
@@ -36,6 +57,11 @@ const updateCardRecord = (cards, cardId, updater) => {
   return { ...cards, [cardId]: updater(card) }
 }
 
+const columnBreached = (state, columnId, ids) => {
+  const limit = state.wipLimits[columnId]
+  return limit !== null && limit !== undefined && ids.length > limit
+}
+
 export const useBoardStore = create((set, get) => ({
   ...clone(initialDomain),
   filterAssignee: 'all',
@@ -44,9 +70,13 @@ export const useBoardStore = create((set, get) => ({
   undoStack: [],
   redoStack: [],
   backoffs: {},
+  runsCompleted: 0,
   announcement: 'Board ready.',
   toast: null,
   createColumn: null,
+  createFormErrors: {},
+  createFormSeed: null,
+  createOpenToken: 0,
   detailId: null,
   promptPanelId: null,
   exportOpen: false,
@@ -57,10 +87,42 @@ export const useBoardStore = create((set, get) => ({
   setFilterAssignee: (filterAssignee) => set({ filterAssignee }),
   setSearch: (search) => set({ search }),
   clearFilters: () => set({ filterAssignee: 'all', search: '' }),
-  setCreateColumn: (createColumn) => set({ createColumn }),
-  setDetailId: (detailId) => set({ detailId }),
-  setPromptPanelId: (promptPanelId) => set({ promptPanelId }),
-  setExportOpen: (exportOpen) => set({ exportOpen, importError: exportOpen ? get().importError : '' }),
+  setCreateFormErrors: (createFormErrors) => set({ createFormErrors: createFormErrors || {} }),
+  setCreateFormSeed: (createFormSeed) => set({ createFormSeed }),
+
+  setCreateColumn: (createColumn) => {
+    const was = get().createColumn
+    if (!was && createColumn) captureOpener()
+    if (createColumn) {
+      set({
+        createColumn,
+        createFormErrors: {},
+        createOpenToken: get().createOpenToken + 1,
+      })
+    } else {
+      set({ createColumn: null, createFormErrors: {}, createFormSeed: null })
+      if (was) restoreOpener()
+    }
+  },
+  setDetailId: (detailId) => {
+    const was = get().detailId
+    if (!was && detailId) captureOpener()
+    set({ detailId })
+    if (was && !detailId) restoreOpener()
+  },
+  setPromptPanelId: (promptPanelId) => {
+    const was = get().promptPanelId
+    if (!was && promptPanelId) captureOpener()
+    set({ promptPanelId })
+    if (was && !promptPanelId) restoreOpener()
+  },
+  setExportOpen: (exportOpen) => {
+    const was = get().exportOpen
+    if (!was && exportOpen) captureOpener()
+    set({ exportOpen, importError: exportOpen ? get().importError : '' })
+    if (was && !exportOpen) restoreOpener()
+  },
+
   setExportFormat: (exportFormat) => set({ exportFormat }),
   setImportDraft: (importDraft) => set({ importDraft, importError: '' }),
   setImportError: (importError) => set({ importError }),
@@ -92,8 +154,7 @@ export const useBoardStore = create((set, get) => ({
     get().notify('success', 'Card created', `${newCard.title} was added to ${targetName}.`)
     get().announce(`Card ${newCard.title} created.`)
 
-    const limit = state.wipLimits[payload.column]
-    if (limit !== null && limit !== undefined && nextOrder[payload.column].length > limit) {
+    if (columnBreached(state, payload.column, nextOrder[payload.column])) {
       get().announce(`WIP limit breached in ${targetName}.`)
     }
 
@@ -112,6 +173,7 @@ export const useBoardStore = create((set, get) => ({
     const nextCards = updateCardRecord(state.cards, cardId, (card) => ({ ...card, ...allowed }))
     set(historyCommit(state, { cards: nextCards }))
     get().notify('success', 'Card saved', `${allowed.title} is up to date.`)
+    get().announce(`Card ${allowed.title} updated.`)
     return true
   },
 
@@ -129,6 +191,7 @@ export const useBoardStore = create((set, get) => ({
     const nextOrder = Object.fromEntries(Object.entries(state.order).map(([column, ids]) => [column, ids.filter((id) => id !== cardId)]))
     set(historyCommit(state, { cards: nextCards, order: nextOrder, selection: state.selection.filter((id) => id !== cardId), detailId: null }))
     get().notify('success', 'Card deleted', `${card.title} was removed.`)
+    get().announce(`Card ${card.title} deleted.`)
     return true
   },
 
@@ -150,9 +213,14 @@ export const useBoardStore = create((set, get) => ({
     const targetName = columns.find((column) => column.id === targetColumn)?.name
     get().announce(`${card.title} moved to ${targetName}, position ${position + 1}.`)
 
-    const limit = state.wipLimits[targetColumn]
-    if (limit !== null && limit !== undefined && nextOrder[targetColumn].length > limit) {
+    if (columnBreached(state, targetColumn, nextOrder[targetColumn])) {
       get().announce(`WIP limit breached in ${targetName}.`)
+    }
+    if (sourceColumn !== targetColumn
+      && columnBreached(state, sourceColumn, state.order[sourceColumn])
+      && !columnBreached(state, sourceColumn, nextOrder[sourceColumn])) {
+      const sourceName = columns.find((column) => column.id === sourceColumn)?.name
+      get().announce(`WIP limit cleared in ${sourceName}.`)
     }
 
     return true
@@ -185,7 +253,11 @@ export const useBoardStore = create((set, get) => ({
     const nextCards = { ...state.cards }
     selected.forEach((id) => { nextCards[id] = { ...nextCards[id], column: targetColumn } })
     set(historyCommit(state, { order: nextOrder, cards: nextCards, selection: [] }))
-    get().announce(`${selected.length} cards moved to ${columns.find((column) => column.id === targetColumn)?.name}.`)
+    const targetName = columns.find((column) => column.id === targetColumn)?.name
+    get().announce(`${selected.length} cards moved to ${targetName}.`)
+    if (columnBreached(state, targetColumn, nextOrder[targetColumn])) {
+      get().announce(`WIP limit breached in ${targetName}.`)
+    }
     return true
   },
 
@@ -255,6 +327,12 @@ export const useBoardStore = create((set, get) => ({
     return true
   },
 
+  // Simulated execution. The seeded failing card (see failurePlans in
+  // data.js) fails its planned sub-item on attempts 1 and 2 — each failure
+  // shows a retrying state with attempt counter and a live backoff countdown —
+  // then the run reaches a failed state with a Retry control. Activating
+  // Retry resumes from exactly the failed sub-item; the third attempt
+  // succeeds and the run completes.
   runCard: async (cardId, forceRestart = false) => {
     if (activeRuns.has(cardId)) return false
     let card = get().cards[cardId]
@@ -287,15 +365,16 @@ export const useBoardStore = create((set, get) => ({
         await delay(700)
 
         const plan = failurePlans[cardId]
-        if (plan?.taskId === currentTask.id && attempt <= plan.failAttempts) {
-          if (attempt >= plan.maxAttempts) {
+        const plansFailure = plan && plan.taskId === currentTask.id && attempt <= plan.failAttempts
+        if (plansFailure) {
+          if (attempt >= plan.failAttempts) {
             throw new Error(`${currentTask.title} failed after ${attempt} attempts.`)
           }
           for (let seconds = 2; seconds >= 1; seconds -= 1) {
             set((state) => ({
               cards: updateCardRecord(state.cards, cardId, (value) => ({ ...value, status: 'retrying', tasks: value.tasks.map((item, taskIndex) => taskIndex === index ? { ...item, status: 'retrying' } : item) })),
               backoffs: { ...state.backoffs, [cardId]: { taskId: currentTask.id, seconds, nextAttempt: attempt + 1, maxAttempts: plan.maxAttempts } },
-              announcement: `Waiting ${seconds} seconds before retry ${attempt + 1} of ${plan.maxAttempts}.`,
+              announcement: `Waiting ${seconds}s before retry ${attempt + 1} of ${plan.maxAttempts}.`,
             }))
             await delay(1000)
           }
@@ -320,19 +399,20 @@ export const useBoardStore = create((set, get) => ({
       }
       set((state) => ({
         cards: updateCardRecord(state.cards, cardId, (value) => ({ ...value, status: 'complete' })),
+        runsCompleted: state.runsCompleted + 1,
         announcement: `${state.cards[cardId]?.title} completed all task items.`,
       }))
       get().notify('success', 'Execution complete', `${get().cards[cardId]?.title} completed successfully.`)
       return true
     } catch (error) {
       set((state) => {
-        const card = state.cards[cardId]
-        const activeIndex = card?.tasks.findIndex((t) => t.status !== 'complete') ?? -1
+        const failedCard = state.cards[cardId]
+        const activeIndex = failedCard?.tasks.findIndex((item) => item.status !== 'complete') ?? -1
         return {
           cards: updateCardRecord(state.cards, cardId, (value) => ({
             ...value,
             status: 'failed',
-            tasks: value.tasks.map((t, i) => i === activeIndex ? { ...t, status: 'failed', error: error.message } : t)
+            tasks: value.tasks.map((item, taskIndex) => taskIndex === activeIndex ? { ...item, status: 'failed', error: error.message } : item),
           })),
           announcement: `Execution failed: ${error.message}`,
         }
@@ -343,17 +423,23 @@ export const useBoardStore = create((set, get) => ({
       activeRuns.delete(cardId)
     }
   },
+
+  // Resume from the failed sub-item. The failed task keeps its attempt count
+  // so the next attempt is the third one; already-complete sub-items are
+  // never re-run.
   retryCard: (cardId) => {
     const card = get().cards[cardId]
-    if (card?.status === 'failed') {
+    if (!card) return false
+    if (card.status === 'failed') {
       set((state) => ({
         cards: updateCardRecord(state.cards, cardId, (value) => ({
           ...value,
           status: 'pending',
           tasks: value.tasks.map((task) => task.status === 'failed'
-            ? { ...task, status: 'pending', attempts: 0, error: undefined }
+            ? { ...task, status: 'pending', error: undefined }
             : task),
         })),
+        announcement: `Retrying ${card.title} from the failed task item.`,
       }))
     }
     return get().runCard(cardId, false)
