@@ -5,6 +5,12 @@ import {
   nearestStop
 } from './domain.js'
 
+function roundClamped(val, min, max) {
+  const n = Number(val)
+  if (!Number.isFinite(n)) return null
+  return clamp(Math.round(n), min, max)
+}
+
 const CONTRACT_VERSION = 'zto-webmcp-v1'
 const MODULES = [
   'command-session-v1',
@@ -73,6 +79,7 @@ export function registerWebMCP(store) {
     }
     const props = args.properties || {}
     const applied = []
+    try {
     store.mutate('webmcp_editor_update_property', () => {
       for (const [key, val] of Object.entries(props)) {
         if (key === 'stop' && val && typeof val === 'object') {
@@ -80,20 +87,20 @@ export function registerWebMCP(store) {
           if (typeof val.shutter === 'number') { store.shutter = nearestStop(shutterStops, val.shutter); applied.push(`shutter=${store.shutter}`) }
           if (typeof val.iso === 'number') { store.iso = nearestStop(isoStops, val.iso); applied.push(`iso=${store.iso}`) }
         } else if (key === 'brightness' || key === 'exposure') {
-          store.light.exposure = clamp(Math.round(Number(val)), -100, 100)
+          const exposureVal = roundClamped(val, -100, 100); if (exposureVal === null) throw new Error('invalid numeric value'); store.light.exposure = exposureVal
           applied.push(`light.exposure=${store.light.exposure}`)
         } else if (key in store.light) {
-          store.light[key] = clamp(Math.round(Number(val)), -100, 100)
+          const lightVal = roundClamped(val, -100, 100); if (lightVal === null) throw new Error('invalid numeric value'); store.light[key] = lightVal
           applied.push(`light.${key}=${store.light[key]}`)
         } else if (key in store.effects) {
           const min = (key === 'vignette' || key === 'grain') ? 0 : -100
-          store.effects[key] = clamp(Math.round(Number(val)), min, 100)
+          const effectVal = roundClamped(val, min, 100); if (effectVal === null) throw new Error('invalid numeric value'); store.effects[key] = effectVal
           applied.push(`effects.${key}=${store.effects[key]}`)
         } else if (key === 'look') {
           store.activeLook = (val === null || ['Punch', 'Matte', 'Golden', 'Mono'].includes(val)) ? val : store.activeLook
           applied.push(`look=${store.activeLook}`)
         } else if (key === 'aperture') {
-          store.aperture = nearestStop(apertureStops, Number(val)); applied.push(`aperture=${store.aperture}`)
+          const apertureVal = Number(val); if (!Number.isFinite(apertureVal)) throw new Error('invalid numeric value'); store.aperture = nearestStop(apertureStops, apertureVal); applied.push(`aperture=${store.aperture}`)
         } else if (key === 'shutter') {
           store.shutter = nearestStop(shutterStops, Number(val)); applied.push(`shutter=${store.shutter}`)
         } else if (key === 'iso') {
@@ -101,6 +108,9 @@ export function registerWebMCP(store) {
         }
       }
     })
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'invalid numeric value' }
+    }
     store.editorSelected = 'exposure'
     return {
       ok: true,

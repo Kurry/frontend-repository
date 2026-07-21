@@ -1,10 +1,14 @@
-/* Oswald is bundled locally from @fontsource (npm) -- no CDN imports, so the
-   lab renders its condensed display face even fully offline. */
-@import '@fontsource/oswald/latin-300.css';
-@import '@fontsource/oswald/latin-400.css';
-@import '@fontsource/oswald/latin-500.css';
-@import '@fontsource/oswald/latin-600.css';
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Oswald', 'Arial Narrow', system-ui, sans-serif;
+  --color-primary: #ef3e23;
+  --color-panel: rgba(205, 208, 195, 0.9);
+  --color-bg: #1a1d20;
+  --color-dial: #5b6770;
+  --color-text-light: #cdd0c3;
+}
+
 
 @theme {
   --font-sans: 'Oswald', system-ui, sans-serif;

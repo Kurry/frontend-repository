@@ -301,7 +301,8 @@ let helpTriggerEl = null
 // transition-[opacity,transform] reliably animates both properties.
 const helpPanelStyle = computed(() => {
   if (store.helpOpen) {
-    return { transform: 'translateY(-50%) translateX(0)', opacity: 1, pointerEvents: 'auto' }
+    const openX = window.innerWidth >= 768 ? 'translateX(0)' : 'translateX(-50%)'
+    return { transform: `translateY(-50%) ${openX}`, opacity: 1, pointerEvents: 'auto' }
   }
   const hiddenX = window.innerWidth >= 768 ? 'translateX(580px)' : 'translateX(-50%) translateX(24px)'
   return { transform: `translateY(-50%) ${hiddenX}`, opacity: 0, pointerEvents: 'none' }

@@ -31,7 +31,7 @@
       <div class="relative flex md:flex-row flex-col items-center justify-center md:w-[180px] md:h-[100px] w-[72px] h-[140px]" data-control="aperture">
         <button type="button"
                 class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-down.svg')] md:bg-[url('/assets/arrow.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:28px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:order-1"
-                @click="stepAperture('down')"
+                @click="(e) => guardedClick(e, () => stepAperture('down'))"
                 @pointerdown="beginHold($event, 'down', stepAperture)"
                 @pointerup="endHold"
                 @pointerleave="endHold"
@@ -50,7 +50,7 @@
         </div>
         <button type="button"
                 class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-up.svg')] md:bg-[url('/assets/arrow-up.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:30px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:-order-1"
-                @click="stepAperture('up')"
+                @click="(e) => guardedClick(e, () => stepAperture('up'))"
                 @pointerdown="beginHold($event, 'up', stepAperture)"
                 @pointerup="endHold"
                 @pointerleave="endHold"
@@ -68,7 +68,7 @@
       <div class="relative flex md:flex-row flex-col items-center justify-center md:w-[180px] md:h-[100px] w-[72px] h-[140px]" data-control="shutter">
         <button type="button"
                 class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-down.svg')] md:bg-[url('/assets/arrow.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:28px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:order-1"
-                @click="stepShutter('down')"
+                @click="(e) => guardedClick(e, () => stepShutter('down'))"
                 @pointerdown="beginHold($event, 'down', stepShutter)"
                 @pointerup="endHold"
                 @pointerleave="endHold"
@@ -87,7 +87,7 @@
         </div>
         <button type="button"
                 class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-up.svg')] md:bg-[url('/assets/arrow-up.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:30px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:-order-1"
-                @click="stepShutter('up')"
+                @click="(e) => guardedClick(e, () => stepShutter('up'))"
                 @pointerdown="beginHold($event, 'up', stepShutter)"
                 @pointerup="endHold"
                 @pointerleave="endHold"
@@ -105,7 +105,7 @@
       <div class="relative flex md:flex-row flex-col items-center justify-center md:w-[180px] md:h-[100px] w-[72px] h-[140px]" data-control="iso">
         <button type="button"
                 class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-down.svg')] md:bg-[url('/assets/arrow.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:28px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:order-1"
-                @click="stepIso('down')"
+                @click="(e) => guardedClick(e, () => stepIso('down'))"
                 @pointerdown="beginHold($event, 'down', stepIso)"
                 @pointerup="endHold"
                 @pointerleave="endHold"
@@ -124,7 +124,7 @@
         </div>
         <button type="button"
                 class="relative z-10 w-full md:w-10 h-[30px] md:h-[100px] bg-[url('/assets/arrow-mob-up.svg')] md:bg-[url('/assets/arrow-up.svg')] bg-no-repeat bg-center bg-cover md:bg-[length:30px] transition-opacity duration-300 cursor-pointer disabled:cursor-default focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary max-md:-order-1"
-                @click="stepIso('up')"
+                @click="(e) => guardedClick(e, () => stepIso('up'))"
                 @pointerdown="beginHold($event, 'up', stepIso)"
                 @pointerup="endHold"
                 @pointerleave="endHold"
@@ -217,11 +217,14 @@ function stepIso(dir) {
 // stop lists, so a held stepper at an edge simply stops advancing.
 let holdTimeout = null
 let holdInterval = null
+let suppressClick = false
 
 function beginHold(event, dir, stepFn) {
   if (event.button !== undefined && event.button !== 0) return
+  suppressClick = false
   endHold()
   holdTimeout = setTimeout(() => {
+    suppressClick = true
     holdInterval = setInterval(() => stepFn(dir), 130)
   }, 450)
 }
@@ -229,6 +232,11 @@ function beginHold(event, dir, stepFn) {
 function endHold() {
   if (holdTimeout) { clearTimeout(holdTimeout); holdTimeout = null }
   if (holdInterval) { clearInterval(holdInterval); holdInterval = null }
+}
+
+function guardedClick(event, fn, ...args) {
+  if (suppressClick) { event.preventDefault(); suppressClick = false; return }
+  fn(...args)
 }
 
 onBeforeUnmount(endHold)
