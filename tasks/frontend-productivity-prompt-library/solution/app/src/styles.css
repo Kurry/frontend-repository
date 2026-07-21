@@ -71,7 +71,13 @@ button,
 .cds--text-area,
 .cds--select-input,
 .cds--search-input {
-  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 120ms ease;
+  transition: background-color 90ms ease, border-color 90ms ease, box-shadow 90ms ease, transform 90ms ease;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [class*="cds--"] {
+    transition-duration: 90ms !important;
+  }
 }
 
 button:active:not(:disabled),
@@ -1343,6 +1349,8 @@ button:active:not(:disabled),
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+    animation: none !important;
+    transition: none !important;
   }
 }
 
