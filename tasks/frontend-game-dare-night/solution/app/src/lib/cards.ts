@@ -107,3 +107,39 @@ export function shuffleArray<T>(array: T[]): T[] {
   }
   return shuffled;
 }
+
+// Weight a card for the active intensity. "Wild decks favor Wild-tagged cards"
+// etc. A card is "Wild-tagged" when its category or intensity is Wild. Weights
+// are deliberately skewed so the bias is observable within the first handful of
+// draws, while every card in the selected categories stays drawable.
+function intensityWeight(card: Card, intensity: Intensity): number {
+  const wildTagged = card.category === 'Wild' || card.intensity === 'Wild';
+  if (intensity === 'Mild') {
+    if (card.intensity === 'Mild') return 6;
+    if (card.intensity === 'Spicy') return 2;
+    return wildTagged ? 1 : 1;
+  }
+  if (intensity === 'Spicy') {
+    if (card.intensity === 'Spicy') return 6;
+    if (card.intensity === 'Mild') return 2;
+    return wildTagged ? 3 : 2;
+  }
+  // Wild intensity: Wild-tagged cards dominate the front of the deck.
+  if (wildTagged) return 9;
+  if (card.intensity === 'Spicy') return 2;
+  return 1;
+}
+
+// Weighted sampling WITHOUT replacement (Efraimidis–Spirakis). Each card keeps a
+// single copy in the deck so exhaustion (and the required auto-reshuffle + "Deck
+// reshuffled" confirmation) is reachable within one category's worth of draws,
+// while the ordering still visibly favours the selected intensity.
+export function weightedShuffle(cards: Card[], intensity: Intensity): Card[] {
+  const keyed = cards.map((card) => {
+    const w = Math.max(1, intensityWeight(card, intensity));
+    const key = Math.pow(Math.random(), 1 / w);
+    return { card, key };
+  });
+  keyed.sort((a, b) => b.key - a.key);
+  return keyed.map((k) => k.card);
+}

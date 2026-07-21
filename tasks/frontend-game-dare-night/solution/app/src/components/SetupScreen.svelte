@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { type Category, type Intensity } from '../lib/cards';
+  import { Plus, X, Trophy, DownloadSimple, CopySimple, UploadSimple, PlayCircle, Timer, Target } from 'phosphor-svelte';
+  import type { Card, Category, Intensity } from '../lib/cards';
   import CustomCards from './CustomCards.svelte';
 
   interface Props {
     bestRecord: { name: string; points: number } | null;
     selectedCategories: Category[];
     selectedIntensity: Intensity;
-    customCards: import('../lib/cards').Card[];
+    customCards: Card[];
     timerEnabled: boolean;
     showDeleteConfirm: string | null;
     playerNames: string[];
@@ -15,6 +16,7 @@
     categoryError: string;
     startAttempted: boolean;
     canStart: boolean;
+    hasCheckpoint: boolean;
     onNewPlayerInput: (v: string) => void;
     onAddPlayer: (name: string) => void;
     onRemovePlayer: (index: number) => void;
@@ -25,201 +27,173 @@
     onStartGame: () => void;
     onToggleTimer: () => void;
     onAddCustomCard: (data: { prompt: string; category: Category; intensity: Intensity }) => void;
-    onDeleteCustomCard: (id: string) => void;
     onShowDeleteConfirm: (id: string | null) => void;
-    onExportSession?: () => void;
-    onCopySession?: () => void;
-    onImportSession?: (e: Event) => void;
-    hasCheckpoint?: boolean;
-    onResumeSavedSession?: () => void;
+    onExportSession: () => void;
+    onCopySession: () => void;
+    onImportSession: () => void;
+    onImportFile?: (e: Event) => void;
+    onResumeSavedSession: () => void;
   }
-
   let {
-    bestRecord,
-    selectedCategories,
-    selectedIntensity,
-    customCards,
-    timerEnabled,
-    showDeleteConfirm,
-    playerNames,
-    newPlayerInput,
-    playerError,
-    categoryError,
-    startAttempted,
-    canStart,
-    onNewPlayerInput,
-    onAddPlayer,
-    onRemovePlayer,
-    onUpdatePlayerName,
-    onToggleCategory,
-    onSetCategories,
-    onUpdateIntensity,
-    onStartGame,
-    onToggleTimer,
-    onAddCustomCard,
-    onDeleteCustomCard,
-    onShowDeleteConfirm,
-    onExportSession,
-    onCopySession,
-    onImportSession,
-    hasCheckpoint,
-    onResumeSavedSession,
+    bestRecord, selectedCategories, selectedIntensity, customCards, timerEnabled, showDeleteConfirm,
+    playerNames, newPlayerInput, playerError, categoryError, startAttempted, canStart, hasCheckpoint,
+    onNewPlayerInput, onAddPlayer, onRemovePlayer, onUpdatePlayerName, onToggleCategory, onSetCategories,
+    onUpdateIntensity, onStartGame, onToggleTimer, onAddCustomCard, onShowDeleteConfirm,
+    onExportSession, onCopySession, onImportSession, onResumeSavedSession,
   }: Props = $props();
 
   const categories: Category[] = ['Icebreaker', 'Truth', 'Dare', 'Wild'];
   const intensities: Intensity[] = ['Mild', 'Spicy', 'Wild'];
 
-  let validPlayers = $derived(playerNames.filter(n => n.trim()));
+  const catColor: Record<Category, { sel: string; idle: string }> = {
+    Icebreaker: { sel: 'bg-blue-500 text-white', idle: 'bg-white text-gray-800 border-2 border-gray-300 hover:border-blue-400' },
+    Truth: { sel: 'bg-teal-500 text-white', idle: 'bg-white text-gray-800 border-2 border-gray-300 hover:border-teal-400' },
+    Dare: { sel: 'bg-orange-500 text-white', idle: 'bg-white text-gray-800 border-2 border-gray-300 hover:border-orange-400' },
+    Wild: { sel: 'bg-fuchsia-500 text-white', idle: 'bg-white text-gray-800 border-2 border-gray-300 hover:border-fuchsia-400' },
+  };
+  const intColor: Record<Intensity, { sel: string; idle: string }> = {
+    Mild: { sel: 'bg-green-500 text-white', idle: 'bg-white text-gray-800 border-2 border-gray-300 hover:border-green-400' },
+    Spicy: { sel: 'bg-amber-500 text-white', idle: 'bg-white text-gray-800 border-2 border-gray-300 hover:border-amber-400' },
+    Wild: { sel: 'bg-red-500 text-white', idle: 'bg-white text-gray-800 border-2 border-gray-300 hover:border-red-400' },
+  };
 
-  function getCategoryButtonClass(cat: Category, isSelected: boolean): string {
-    const colorMap: Record<Category, { selected: string; unselected: string }> = {
-      'Icebreaker': { selected: 'bg-blue-500 text-white shadow-md', unselected: 'bg-white text-gray-700 border-2 border-gray-300 hover:border-blue-300' },
-      'Truth': { selected: 'bg-teal-500 text-white shadow-md', unselected: 'bg-white text-gray-700 border-2 border-gray-300 hover:border-teal-300' },
-      'Dare': { selected: 'bg-orange-500 text-white shadow-md', unselected: 'bg-white text-gray-700 border-2 border-gray-300 hover:border-orange-300' },
-      'Wild': { selected: 'bg-fuchsia-500 text-white shadow-md', unselected: 'bg-white text-gray-700 border-2 border-gray-300 hover:border-fuchsia-300' },
-    };
-    const colors = colorMap[cat];
-    return `px-4 py-2 rounded-full text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black ${isSelected ? colors.selected : colors.unselected}`;
-  }
+  let validPlayers = $derived(playerNames.map(n => n.trim()).filter(Boolean));
+  let rosterFull = $derived(validPlayers.length >= 8);
+  let newTrimmed = $derived(newPlayerInput.trim());
+  let addDisabled = $derived(
+    newTrimmed.length < 1 || newTrimmed.length > 20 || rosterFull ||
+    validPlayers.map(n => n.toLowerCase()).includes(newTrimmed.toLowerCase())
+  );
+  // Live inline error for the Add field so an invalid entry is never only a
+  // silently-disabled button (criterion 1.38 / 4.n1 / edge-case duplicate).
+  let addError = $derived(
+    newPlayerInput.length === 0 ? '' :
+    newTrimmed.length < 1 ? 'Field name is required — enter 1 to 20 characters' :
+    newTrimmed.length > 20 ? 'Field name must be 1 to 20 characters' :
+    (newTrimmed.length > 0 && validPlayers.map(n => n.toLowerCase()).includes(newTrimmed.toLowerCase())) ? `Field name must be unique — "${newTrimmed}" is already in the roster` : ''
+  );
 
-  function getIntensityButtonClass(intensity: Intensity, isSelected: boolean): string {
-    const colorMap: Record<Intensity, { selected: string; unselected: string }> = {
-      'Mild': { selected: 'bg-green-500 text-white shadow-md', unselected: 'bg-white text-gray-700 border-2 border-gray-300 hover:border-green-300' },
-      'Spicy': { selected: 'bg-amber-500 text-white shadow-md', unselected: 'bg-white text-gray-700 border-2 border-gray-300 hover:border-amber-300' },
-      'Wild': { selected: 'bg-red-500 text-white shadow-md', unselected: 'bg-white text-gray-700 border-2 border-gray-300 hover:border-red-300' },
-    };
-    const colors = colorMap[intensity];
-    return `flex-1 px-4 py-3 rounded-full text-sm font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black ${isSelected ? colors.selected : colors.unselected}`;
-  }
-
-  function isCatSelected(cat: Category): boolean {
-    return selectedCategories.includes(cat);
+  function fieldIssue(value: string): string {
+    const t = value.trim();
+    if (value.length > 0 && t.length < 1) return 'Field name is required — enter 1 to 20 characters';
+    if (value.length > 0 && t.length > 20) return 'Field name must be 1 to 20 characters';
+    return '';
   }
 </script>
 
-<div class="min-h-screen p-6 flex flex-col items-center" style="background-color: var(--color-bg);">
+<div class="min-h-screen p-5 flex flex-col items-center" style="background-color: var(--color-bg);">
   <div class="w-full max-w-lg mx-auto">
     <!-- Header -->
-    <div class="text-center mb-8 mt-4">
-      <h1 class="text-4xl font-bold mb-2" style="color: var(--color-accent);">Dare Night</h1>
-      <p class="inline-block rounded-full px-3 py-1 text-sm" style="color: var(--color-link); background-color: var(--color-accent);">A pass-the-device party game for friends</p>
-      {#if bestRecord}
-        <div class="mt-3 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-black text-sm">
-          <span aria-hidden="true">🏆</span>
-          <span><strong>Dare Night record:</strong> {bestRecord.name} — {bestRecord.points} pts</span>
-        </div>
-      {/if}
-    </div>
+    <header class="text-center mb-5 mt-5">
+      <h1 class="text-4xl font-bold mb-2.5" style="color: var(--color-accent);">Dare Night</h1>
+      <p class="inline-block rounded-full px-5 py-1 text-sm" style="color: var(--color-link); background-color: var(--color-accent);">A pass-the-device party game for friends</p>
+      <div class="mt-2.5 flex flex-wrap items-center justify-center gap-2.5">
+        <span class="inline-flex items-center gap-2.5 rounded-full px-5 py-1 text-sm font-semibold bg-white text-black">
+          <Target size={16} weight="bold" aria-hidden="true" /> First to 10
+        </span>
+        {#if bestRecord}
+          <span class="inline-flex items-center gap-2.5 rounded-full px-5 py-1 text-sm bg-white text-black">
+            <Trophy size={16} weight="fill" aria-hidden="true" />
+            <span><strong>Dare Night record:</strong> {bestRecord.name} — {bestRecord.points} pts</span>
+          </span>
+        {/if}
+      </div>
+    </header>
 
-    <!-- Player Setup -->
-    <div class="bg-white rounded-xl p-6 mb-6 shadow-lg">
-      <h2 class="text-lg font-semibold mb-4" style="color: var(--color-accent);">Players (2–8)</h2>
+    <!-- Players -->
+    <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg">
+      <h2 class="text-lg font-semibold mb-2.5" style="color: var(--color-accent);">Players (2–8)</h2>
 
-      <div class="space-y-2 mb-4">
+      <div class="space-y-2.5 mb-2.5">
         {#each playerNames as name, index}
           <div>
             <label class="block text-xs font-medium text-gray-700 mb-1" for="player-{index}">Player {index + 1} name</label>
-          <div class="flex items-center gap-2">
-            <input
-              id="player-{index}"
-              type="text"
-              class="min-w-0 flex-1 px-4 py-2 rounded-full border-2 border-gray-500 text-sm focus:outline-none focus:border-black transition-colors"
-              placeholder="Player {index + 1} name"
-              value={playerNames[index]}
-              oninput={(e) => { onUpdatePlayerName(index, (e.currentTarget as HTMLInputElement).value); }}
-              maxlength="20"
-            />
-            {#if playerNames.length > 2}
-              <button
-                class="p-2 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors focus:outline-none focus:ring-2 focus:ring-red-300"
-                onclick={() => onRemovePlayer(index)}
-                aria-label="Remove player"
-              >
-                ✕
-              </button>
-            {/if}
-          </div>
+            <div class="flex items-center gap-2.5">
+              <input
+                id="player-{index}"
+                type="text"
+                class="min-w-0 flex-1 px-5 py-2.5 rounded-full border-2 text-sm transition-colors {fieldIssue(name) ? 'border-red-500' : 'border-gray-500'}"
+                placeholder="Player {index + 1} name"
+                value={playerNames[index]}
+                oninput={(e) => onUpdatePlayerName(index, (e.currentTarget as HTMLInputElement).value)}
+              />
+              {#if playerNames.length > 2}
+                <button class="p-2.5 rounded-full text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" onclick={() => onRemovePlayer(index)} aria-label={`Remove player ${index + 1}`}><X size={18} weight="bold" /></button>
+              {/if}
+            </div>
+            {#if fieldIssue(name)}<p class="text-red-600 text-xs mt-1" role="alert">{fieldIssue(name)}</p>{/if}
           </div>
         {/each}
       </div>
 
-      {#if playerNames.length < 8}
-        <label class="block text-xs font-medium text-gray-700 mb-1" for="add-player">Another player</label>
-        <div class="flex gap-2 mb-2 min-w-0">
-          <input
-            id="add-player"
-            type="text"
-            class="min-w-0 flex-1 px-4 py-2 rounded-full border-2 border-gray-500 text-sm focus:outline-none focus:border-black transition-colors"
-            placeholder="Add another player..."
-            value={newPlayerInput}
-            oninput={(e) => onNewPlayerInput((e.currentTarget as HTMLInputElement).value)}
-            onkeydown={(e) => { if (e.key === 'Enter') onAddPlayer(newPlayerInput); }}
-            maxlength="20"
-          />
-          <button
-            class="px-5 py-2 rounded-full text-white font-semibold text-sm transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black shadow-md"
-            style="background-color: var(--color-accent);"
-            onclick={() => onAddPlayer(newPlayerInput)}
-          >
-            Add
-          </button>
-        </div>
+      <!-- Add row (always visible; refused with an explanation when the roster is full) -->
+      <label class="block text-xs font-medium text-gray-700 mb-1" for="add-player">Another player</label>
+      <div class="flex gap-2.5 mb-2.5 min-w-0">
+        <input
+          id="add-player"
+          type="text"
+          class="min-w-0 flex-1 px-5 py-2.5 rounded-full border-2 text-sm transition-colors {newPlayerInput.length > 0 && (newTrimmed.length > 20) ? 'border-red-500' : 'border-gray-500'}"
+          placeholder={rosterFull ? 'Roster full (8 max)' : 'Add another player…'}
+          value={newPlayerInput}
+          oninput={(e) => onNewPlayerInput((e.currentTarget as HTMLInputElement).value)}
+          onkeydown={(e) => { if (e.key === 'Enter' && !addDisabled) onAddPlayer(newPlayerInput); }}
+          disabled={rosterFull}
+        />
+        <button
+          class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-white font-semibold text-sm transition-all hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
+          style="background-color: var(--color-accent);"
+          onclick={() => onAddPlayer(newPlayerInput)}
+          disabled={addDisabled}
+        >
+          <Plus size={18} weight="bold" aria-hidden="true" /> Add
+        </button>
+      </div>
+      {#if rosterFull}
+        <p class="text-gray-600 text-xs" role="status">Roster is full — Dare Night supports up to 8 players.</p>
+      {:else if addError}
+        <p class="text-red-600 text-xs" role="alert">{addError}</p>
       {/if}
 
       {#if playerError}
-        <p class="text-red-500 text-xs mt-2" role="alert">{playerError}</p>
+        <p class="text-red-600 text-xs mt-2.5" role="alert">{playerError}</p>
       {/if}
-    </div>
+    </section>
 
-    <!-- Category Toggles -->
-    <div class="bg-white rounded-xl p-6 mb-6 shadow-lg">
-      <div class="flex items-center justify-between gap-3 mb-4">
+    <!-- Categories -->
+    <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg">
+      <div class="flex items-center justify-between gap-2.5 mb-2.5">
         <div>
           <h2 class="text-lg font-semibold" style="color: var(--color-accent);">Categories</h2>
           <p class="text-xs text-gray-600">{selectedCategories.length} selected</p>
         </div>
-        {#if selectedCategories.length > 0}
-          <button
-            class="px-4 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-            onclick={() => onSetCategories([])}
-          >
-            Clear all
-          </button>
-        {:else}
-          <button
-            class="px-4 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-            onclick={() => onSetCategories([...categories])}
-          >
-            Select all
-          </button>
-        {/if}
+        <button class="px-5 py-2.5 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all hover:bg-gray-50" onclick={() => onSetCategories(selectedCategories.length > 0 ? [] : [...categories])}>
+          {selectedCategories.length > 0 ? 'Clear all' : 'Select all'}
+        </button>
       </div>
-      <div class="flex flex-wrap gap-2 mb-2">
+      <div class="flex flex-wrap gap-2.5 mb-2.5">
         {#each categories as cat}
           <button
-            class={getCategoryButtonClass(cat, isCatSelected(cat))}
+            class="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 {catColor[cat][selectedCategories.includes(cat) ? 'sel' : 'idle']}"
             onclick={() => onToggleCategory(cat)}
-            aria-pressed={isCatSelected(cat)}
+            aria-pressed={selectedCategories.includes(cat)}
           >
             {cat}
           </button>
         {/each}
       </div>
       {#if selectedCategories.length === 0}
-        <p class="text-red-600 text-xs mt-2" role="alert">Select at least one category</p>
+        <p class="text-red-600 text-xs mt-2.5" role="alert">Select at least one category to build a deck.</p>
       {/if}
-      {#if categoryError}
-        <p class="text-red-500 text-xs mt-2" role="alert">{categoryError}</p>
-      {/if}
-    </div>
+      {#if categoryError}<p class="text-red-600 text-xs mt-2.5" role="alert">{categoryError}</p>{/if}
+    </section>
 
-    <!-- Intensity Selector -->
-    <div class="bg-white rounded-xl p-6 mb-6 shadow-lg">
-      <h2 class="text-lg font-semibold mb-4" style="color: var(--color-accent);">Intensity</h2>
-      <div class="flex gap-2">
+    <!-- Intensity -->
+    <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg">
+      <h2 class="text-lg font-semibold mb-2.5" style="color: var(--color-accent);">Intensity</h2>
+      <div class="flex gap-2.5">
         {#each intensities as intensity}
           <button
-            class={getIntensityButtonClass(intensity, selectedIntensity === intensity)}
+            class="flex-1 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 {intColor[intensity][selectedIntensity === intensity ? 'sel' : 'idle']}"
             onclick={() => onUpdateIntensity(intensity)}
             aria-pressed={selectedIntensity === intensity}
           >
@@ -227,88 +201,58 @@
           </button>
         {/each}
       </div>
-    </div>
+      <p class="text-xs text-gray-600 mt-2.5">Wild intensity weights the deck toward Wild-tagged cards.</p>
+    </section>
 
-    <!-- Timer Toggle -->
-    <div class="bg-white rounded-xl p-6 mb-6 shadow-lg">
-      <h2 class="text-lg font-semibold mb-4" style="color: var(--color-accent);">Round timer</h2>
-      <div class="flex items-center justify-between">
-        <p class="text-gray-600 text-sm">15-second countdown per card</p>
-        <button
-          class="timer-switch relative inline-flex w-14 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-          style={timerEnabled ? 'background-color: var(--color-accent);' : 'background-color: #6B7280;'}
-          onclick={onToggleTimer}
-          role="switch"
-          aria-checked={timerEnabled}
-          aria-label="Round timer"
-        >
-          <span
-            class="absolute top-3 left-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-200"
-            style={timerEnabled ? 'transform: translateX(28px);' : ''}
-          ></span>
+    <!-- Timer -->
+    <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg">
+      <h2 class="text-lg font-semibold mb-2.5" style="color: var(--color-accent);">Round timer</h2>
+      <div class="flex items-center justify-between gap-2.5">
+        <p class="inline-flex items-center gap-2.5 text-gray-700 text-sm"><Timer size={18} weight="bold" aria-hidden="true" /> 15-second countdown per card</p>
+        <button class="timer-switch relative inline-flex w-[50px] rounded-full transition-colors duration-200" style={timerEnabled ? 'background-color: var(--color-accent);' : 'background-color: #6B7280;'} onclick={onToggleTimer} role="switch" aria-checked={timerEnabled} aria-label="Round timer">
+          <span class="absolute top-2.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-200" style={timerEnabled ? 'transform: translateX(26px);' : ''}></span>
         </button>
       </div>
-    </div>
+    </section>
 
-    <!-- Custom Cards Section -->
-    <div class="bg-white rounded-xl p-6 mb-6 shadow-lg">
-      <CustomCards
-        customCards={customCards}
-        showDeleteConfirm={showDeleteConfirm}
-        onAddCard={(data) => onAddCustomCard(data)}
-        onDeleteCard={(id) => onDeleteCustomCard(id)}
-        onShowDeleteConfirm={(id) => onShowDeleteConfirm(id)}
-      />
-    </div>
+    <!-- Custom cards -->
+    <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg">
+      <CustomCards {customCards} {showDeleteConfirm} onAddCard={onAddCustomCard} onShowDeleteConfirm={onShowDeleteConfirm} />
+    </section>
 
-    <!-- Session controls -->
-    <div class="mb-6 flex flex-wrap justify-center gap-3">
-      <button
-        class="px-6 py-2 rounded-full text-sm font-medium bg-black text-white border-2 border-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black shadow-md hover:bg-gray-800"
-        onclick={onExportSession}
-      >
-        Export Session
-      </button>
-      <button
-        class="px-6 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black shadow-md hover:bg-gray-50"
-        onclick={onCopySession}
-      >
-        Copy Session JSON
-      </button>
-      <label class="px-6 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black cursor-pointer shadow-md hover:bg-gray-50">
-        Import Session
-        <input type="file" accept=".json" class="hidden" onchange={onImportSession} />
-      </label>
-    </div>
+    <!-- Session transfer -->
+    <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg">
+      <h2 class="text-lg font-semibold mb-2.5" style="color: var(--color-accent);">Session</h2>
+      <div class="flex flex-wrap gap-2.5">
+        <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold bg-black text-white border-2 border-black transition-all hover:bg-gray-800" onclick={onExportSession}><DownloadSimple size={18} weight="bold" aria-hidden="true" /> Export Session</button>
+        <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-black border-2 border-black transition-all hover:bg-gray-50" onclick={onCopySession}><CopySimple size={18} weight="bold" aria-hidden="true" /> Copy Session JSON</button>
+        <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-black border-2 border-black transition-all hover:bg-gray-50" onclick={onImportSession}><UploadSimple size={18} weight="bold" aria-hidden="true" /> Import Session</button>
+      </div>
+    </section>
 
-    <!-- Start Button -->
+    <!-- Start / Resume -->
     <button
-      class="w-full px-8 py-4 rounded-full text-lg font-bold text-white transition-all shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg"
+      class="w-full inline-flex items-center justify-center gap-2.5 px-10 py-5 rounded-full text-lg font-bold text-white transition-all shadow-lg hover:shadow-xl active:scale-[0.98] {!canStart ? 'opacity-40 cursor-not-allowed' : ''}"
       style="background-color: var(--color-accent);"
-      disabled={!canStart}
+      aria-disabled={!canStart}
       onclick={onStartGame}
     >
-      Start game
+      <PlayCircle size={20} weight="bold" aria-hidden="true" /> Start game
     </button>
 
-    <!-- Resume Saved Session Button -->
     {#if hasCheckpoint}
-      <div class="mt-4">
-        <button
-          class="w-full px-8 py-4 rounded-full text-lg font-bold bg-white text-black border-2 border-black transition-all shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-          onclick={onResumeSavedSession}
-        >
-          Resume Saved Session
+      <div class="mt-5 rounded-[10px] bg-white p-5 shadow-lg">
+        <p class="text-xs text-gray-600 mb-2.5">We found a saved checkpoint from your last session. Resume it to pick up the same players, scores, and current turn — or start a brand new game above.</p>
+        <button class="w-full inline-flex items-center justify-center gap-2.5 px-10 py-5 rounded-full text-lg font-bold bg-white text-black border-2 border-black transition-all shadow-md hover:shadow-xl active:scale-[0.98]" onclick={onResumeSavedSession}>
+          <PlayCircle size={20} weight="bold" aria-hidden="true" /> Resume Saved Session
         </button>
       </div>
     {/if}
+
     {#if !canStart && startAttempted}
-      <p class="text-center text-red-600 text-xs mt-2 font-medium" role="alert">
-        {#if validPlayers.length < 2}
-          Add at least 2 players to start
-        {:else if selectedCategories.length === 0}
-          Select at least one category to start
-        {/if}
+      <p class="text-center text-red-600 text-xs mt-2.5 font-medium" role="alert">
+        {#if validPlayers.length < 2}Add at least 2 unique player names to start.
+        {:else if selectedCategories.length === 0}Select at least one category to start.{/if}
       </p>
     {/if}
   </div>

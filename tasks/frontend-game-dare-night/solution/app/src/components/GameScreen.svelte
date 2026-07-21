@@ -1,15 +1,17 @@
 <script lang="ts">
+  import { flip } from 'svelte/animate';
+  import { fly, scale } from 'svelte/transition';
+  import {
+    Cards, Check, SkipForward, ArrowCounterClockwise, Trophy, ArrowClockwise,
+    ChartBar, DownloadSimple, CopySimple, FloppyDisk, PlayCircle, Target, X,
+  } from 'phosphor-svelte';
   import type { Card } from '../lib/cards';
   import type { LiveEvent, StreamStatus } from '../lib/stream';
+  import { motionMs } from '../lib/motion';
   import Scoreboard from './Scoreboard.svelte';
   import LiveEventPanel from './LiveEventPanel.svelte';
 
-  interface ScoreEntry {
-    name: string;
-    points: number;
-    forfeits: number;
-  }
-
+  interface ScoreEntry { name: string; points: number; forfeits: number }
   interface Props {
     players: string[];
     currentPlayer: string;
@@ -21,6 +23,7 @@
     timerEnabled: boolean;
     timeLeft: number;
     bestRecord: { name: string; points: number } | null;
+    hasCheckpoint: boolean;
     streamStatus: StreamStatus;
     appliedEvents: LiveEvent[];
     bonuses: { name: string; bonus: number }[];
@@ -28,6 +31,7 @@
     deliveredCount: number;
     totalEvents: number;
     duplicatesIgnored: number;
+    turnLogCount: number;
     onDrawCard: () => void;
     onDone: () => void;
     onSkip: () => void;
@@ -37,268 +41,172 @@
     onStreamPause: () => void;
     onStreamReconnect: () => void;
     onStreamDeliverOutOfOrder: () => void;
-    onExportSession?: () => void;
-    onCopySession?: () => void;
-    onSaveProgress?: () => void;
-    turnLogCount?: number;
+    onExportSession: () => void;
+    onCopySession: () => void;
+    onSaveProgress: () => void;
+    onResumeSavedSession: () => void;
   }
-
   let {
-    players,
-    currentPlayer,
-    winner,
-    sortedScores,
-    currentCard,
-    canUndo,
-    reshuffleMessage,
-    timerEnabled,
-    timeLeft,
-    bestRecord,
-    streamStatus,
-    appliedEvents,
-    bonuses,
-    offeredEvent,
-    deliveredCount,
-    totalEvents,
-    duplicatesIgnored,
-    onDrawCard,
-    onDone,
-    onSkip,
-    onUndo,
-    onNewGame,
-    onStreamStart,
-    onStreamPause,
-    onStreamReconnect,
-    onStreamDeliverOutOfOrder,
-    onExportSession,
-    onCopySession,
-    onSaveProgress,
-    turnLogCount = 0,
+    players, currentPlayer, winner, sortedScores, currentCard, canUndo, reshuffleMessage,
+    timerEnabled, timeLeft, bestRecord, hasCheckpoint, streamStatus, appliedEvents, bonuses,
+    offeredEvent, deliveredCount, totalEvents, duplicatesIgnored, turnLogCount,
+    onDrawCard, onDone, onSkip, onUndo, onNewGame, onStreamStart, onStreamPause,
+    onStreamReconnect, onStreamDeliverOutOfOrder, onExportSession, onCopySession,
+    onSaveProgress, onResumeSavedSession,
   }: Props = $props();
 
   let showScoreboard = $state(false);
-  let closeScoreboard = () => { showScoreboard = false; };
 
-  function getCategoryBadgeClass(category: string): string {
-    const cls: Record<string, string> = {
-      'Icebreaker': 'bg-blue-500 text-white',
-      'Truth': 'bg-teal-500 text-white',
-      'Dare': 'bg-orange-500 text-white',
-      'Wild': 'bg-fuchsia-500 text-white',
-    };
-    return cls[category] ?? 'bg-gray-500 text-white';
+  function categoryBadge(category: string): string {
+    const m: Record<string, string> = { Icebreaker: 'bg-blue-500 text-white', Truth: 'bg-teal-500 text-white', Dare: 'bg-orange-500 text-white', Wild: 'bg-fuchsia-500 text-white' };
+    return m[category] ?? 'bg-gray-500 text-white';
   }
-
-  function getIntensityBadgeClass(intensity: string): string {
-    const cls: Record<string, string> = {
-      'Mild': 'bg-green-500 text-white',
-      'Spicy': 'bg-amber-500 text-white',
-      'Wild': 'bg-red-500 text-white',
-    };
-    return cls[intensity] ?? 'bg-gray-500 text-white';
-  }
-
-  function handleKeydown(event: KeyboardEvent) {
-    if (event.key === 'Escape' && showScoreboard) {
-      closeScoreboard();
-    }
+  function intensityBadge(intensity: string): string {
+    const m: Record<string, string> = { Mild: 'bg-green-500 text-white', Spicy: 'bg-amber-500 text-white', Wild: 'bg-red-500 text-white' };
+    return m[intensity] ?? 'bg-gray-500 text-white';
   }
 </script>
 
-<svelte:window onkeydown={handleKeydown} />
+<svelte:window onkeydown={(e: KeyboardEvent) => { if (e.key === 'Escape' && showScoreboard) showScoreboard = false; }} />
 
-<div class="min-h-screen p-4 flex flex-col" style="background-color: var(--color-bg);">
+<div class="min-h-screen p-5 flex flex-col gap-5" style="background-color: var(--color-bg);">
   <!-- Header -->
-  <div class="flex items-center justify-between mb-4 max-w-lg mx-auto w-full">
-    <button
-      class="px-4 py-2 rounded-full bg-white text-sm font-medium border-2 border-black hover:bg-gray-50 transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2"
-      onclick={onNewGame}
-    >
-      Start new game
+  <header class="flex items-center justify-between gap-2.5 max-w-lg mx-auto w-full">
+    <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white text-sm font-semibold border-2 border-black hover:bg-gray-50 transition-colors" onclick={onNewGame}>
+      <ArrowClockwise size={18} weight="bold" aria-hidden="true" /> Start new game
     </button>
-    <div class="flex items-center gap-2">
-      {#if bestRecord}
-        <span class="text-xs text-black hidden sm:inline"><span aria-hidden="true">🏆</span> {bestRecord.name}: {bestRecord.points}</span>
-      {/if}
-      <button
-        class="px-4 py-2 rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2"
-        style="background-color: var(--color-accent); color: var(--color-text-inverse);"
-        onclick={() => { showScoreboard = !showScoreboard; }}
-      >
-        View scores
+    <div class="flex items-center gap-2.5">
+      <span class="inline-flex items-center gap-2.5 rounded-full px-2.5 py-1 text-xs font-semibold bg-white text-black"><Target size={14} weight="bold" aria-hidden="true" /> First to 10</span>
+      {#if bestRecord}<span class="hidden sm:inline-flex items-center gap-2.5 text-xs text-black"><Trophy size={14} weight="fill" aria-hidden="true" /> {bestRecord.name}: {bestRecord.points}</span>{/if}
+      <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold transition-colors" style="background-color: var(--color-accent); color: var(--color-text-inverse);" onclick={() => { showScoreboard = !showScoreboard; }}>
+        <ChartBar size={18} weight="bold" aria-hidden="true" /> View scores
       </button>
     </div>
-  </div>
+  </header>
 
-  <!-- Current Player -->
-  <div class="text-center mb-4 max-w-lg mx-auto w-full">
+  <!-- Turn / Winner indicator -->
+  <div class="text-center max-w-lg mx-auto w-full">
     {#if winner}
       <p class="text-black text-sm mb-1">Game finished</p>
-      <h2 class="text-2xl font-bold" style="color: var(--color-accent);" role="status" aria-live="polite">Winner — {winner}</h2>
+      <h2 class="text-2xl font-bold" style="color: var(--color-accent);">{winner}'s turn is over</h2>
     {:else}
       <p class="text-black text-sm mb-1">Current turn</p>
       <h2 class="text-2xl font-bold" style="color: var(--color-accent);">{currentPlayer}'s turn</h2>
     {/if}
   </div>
 
-  <!-- Reshuffle Message -->
   {#if reshuffleMessage}
-    <div class="text-center mb-2 max-w-lg mx-auto w-full">
-      <span class="inline-block px-4 py-1 rounded-full text-white text-sm font-medium" style="background-color: var(--color-accent);">
-        <span aria-hidden="true">🔄</span> Deck reshuffled!
+    <div class="text-center max-w-lg mx-auto w-full" role="status" aria-live="polite">
+      <span class="inline-flex items-center gap-2.5 px-5 py-1 rounded-full text-white text-sm font-semibold" style="background-color: var(--color-accent);">
+        <Cards size={16} weight="bold" aria-hidden="true" /> Deck reshuffled
       </span>
     </div>
   {/if}
 
-  <!-- Card Area -->
-  <div class="flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full">
+  <!-- Inline progress readout (re-sorts with FLIP on standings change — 1.20 / 3.4) -->
+  <section class="max-w-lg mx-auto w-full bg-white rounded-[10px] p-5 shadow-lg" aria-label="Scoreboard progress toward 10">
+    <div class="flex items-center justify-between mb-2.5">
+      <h2 class="text-base font-semibold" style="color: var(--color-accent);">Standings</h2>
+      <span class="text-xs text-gray-600">{winner ? `${winner} wins` : 'progress to 10'}</span>
+    </div>
+    <ol class="space-y-2.5">
+      {#each sortedScores as entry, i (entry.name)}
+        <li animate:flip={{ duration: motionMs(300) }} class="rounded-[10px] p-2.5 {entry.name === winner ? 'bg-amber-100 ring-2 ring-amber-400' : entry.name === currentPlayer ? 'bg-cyan-50 ring-2 ring-cyan-300' : 'bg-gray-50'}">
+          <div class="flex items-center justify-between gap-2.5 mb-1">
+            <span class="text-sm font-semibold truncate {entry.name === winner ? 'text-amber-800' : 'text-black'}">
+              <span class="text-gray-400 mr-1">{i + 1}.</span>{entry.name}
+              {#if entry.name === winner}<Trophy size={14} weight="fill" class="inline -mt-0.5" aria-hidden="true" /> Winner{/if}
+              {#if entry.name === currentPlayer && !winner}<span class="ml-1 text-xs text-cyan-700">(turn)</span>{/if}
+            </span>
+            <span class="text-sm tabular-nums"><strong class="text-green-600">{entry.points}</strong><span class="text-gray-400">/10</span> · <span class="text-red-500">{entry.forfeits}</span> skip</span>
+          </div>
+          <div class="h-2.5 rounded-full bg-gray-200 overflow-hidden" role="progressbar" aria-valuenow={entry.points} aria-valuemin={0} aria-valuemax={10} aria-label={`${entry.name} points`}>
+            <div class="h-full rounded-full transition-[width] duration-300" style="width: {Math.min(100, entry.points * 10)}%; background-color: {entry.name === winner ? '#F59E0B' : 'var(--color-accent)'};"></div>
+          </div>
+        </li>
+      {/each}
+    </ol>
+  </section>
+
+  <!-- Card area / Winner banner -->
+  <section class="flex-1 flex flex-col items-center justify-center max-w-lg mx-auto w-full">
     {#if winner}
-      <div class="bg-white rounded-xl p-10 mb-6 text-center shadow-2xl w-full" style="border: 3px solid var(--color-accent);">
-        <span class="text-5xl" aria-hidden="true">🏆</span>
-        <p class="text-2xl font-bold mt-3" style="color: var(--color-accent);">{winner} wins Dare Night!</p>
-        <p class="text-black mt-2">First to 10</p>
+      <div class="winner-pop bg-white rounded-[10px] p-5 mb-5 text-center shadow-2xl w-full" style="border: 3px solid var(--color-accent);" role="status" aria-live="polite" aria-atomic="true">
+        <Trophy size={48} weight="fill" class="mx-auto" style="color: var(--color-accent);" aria-hidden="true" />
+        <p class="text-2xl font-bold mt-2.5" style="color: var(--color-accent);">{winner} wins Dare Night!</p>
+        <p class="text-black mt-2.5">First to 10 — a decided outcome from play.</p>
       </div>
     {:else if currentCard}
-      <!-- Card Display -->
       {#key currentCard.id}
-        <div
-          class="card-flip bg-white rounded-xl p-8 shadow-2xl w-full mb-6 min-h-[200px] flex flex-col items-center justify-center relative"
-          style="border-radius: 10px;"
-        >
-          <!-- Category Badge -->
-          <div class="flex items-center gap-2 mb-4">
-            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide {getCategoryBadgeClass(currentCard.category)}">
-              {currentCard.category}
-            </span>
-            <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide {getIntensityBadgeClass(currentCard.intensity)}">
-              {currentCard.intensity}
-            </span>
+        <div class="card-flip bg-white rounded-[10px] p-5 shadow-2xl w-full mb-5 min-h-[200px] flex flex-col items-center justify-center relative">
+          <div class="flex items-center gap-2.5 mb-2.5">
+            <span class="px-2.5 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-wide {categoryBadge(currentCard.category)}">{currentCard.category}</span>
+            <span class="px-2.5 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-wide {intensityBadge(currentCard.intensity)}">{currentCard.intensity}</span>
           </div>
-
-          <!-- Prompt Text -->
-          <p class="text-lg font-medium text-center leading-relaxed" style="color: var(--color-text-primary); font-size: 18px;">
-            {currentCard.prompt}
-          </p>
+          <p class="text-lg font-medium text-center leading-relaxed" style="color: var(--color-text-primary); font-size: 18px;">{currentCard.prompt}</p>
         </div>
       {/key}
 
-      <!-- Timer -->
       {#if timerEnabled}
-        <div class="text-center mb-4">
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full" style="background-color: var(--color-accent);">
-            <span class="text-sm text-white font-medium" aria-hidden="true">⏱️</span>
-            <span class="text-lg font-bold {timeLeft <= 5 ? 'timer-warning' : ''}" style="color: var(--color-text-inverse);">
-              {timeLeft}s
-            </span>
+        <div class="text-center mb-5">
+          <div class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full" style="background-color: var(--color-accent);">
+            <span class="text-lg font-bold tabular-nums {timeLeft <= 5 ? 'timer-warning' : ''}" style="color: var(--color-text-inverse);" aria-live="off">{timeLeft}s</span>
           </div>
         </div>
       {/if}
 
-      <!-- Action Buttons -->
-      <div class="flex gap-3 w-full max-w-xs">
-        <button
-          class="flex-1 px-6 py-4 rounded-full font-bold text-black text-base bg-white border-2 border-black transition-all shadow-md hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-          onclick={onSkip}
-        >
-          Skip
-        </button>
-        <button
-          class="flex-1 px-6 py-4 rounded-full font-bold text-white text-base transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-          style="background-color: var(--color-accent);"
-          onclick={onDone}
-        >
-          Done
-        </button>
+      <div class="flex gap-2.5 w-full max-w-xs">
+        <button class="flex-1 inline-flex items-center justify-center gap-2.5 px-5 py-5 rounded-full font-bold text-black text-base bg-white border-2 border-black transition-all shadow-md hover:shadow-xl active:scale-[0.98]" onclick={onSkip}><SkipForward size={20} weight="bold" aria-hidden="true" /> Skip</button>
+        <button class="flex-1 inline-flex items-center justify-center gap-2.5 px-5 py-5 rounded-full font-bold text-white text-base transition-all shadow-lg hover:shadow-xl active:scale-[0.98]" style="background-color: var(--color-accent);" onclick={onDone}><Check size={20} weight="bold" aria-hidden="true" /> Done</button>
       </div>
     {:else}
-      <!-- No Card - Draw Prompt -->
       <div class="flex flex-col items-center justify-center py-10 w-full">
-        <div class="bg-white/20 rounded-xl p-10 mb-6 text-center">
-          <span class="text-5xl" aria-hidden="true">🃏</span>
-          <p class="text-black mt-3 text-sm">Tap to draw your next card</p>
+        <div class="bg-white/30 rounded-[10px] p-5 mb-5 text-center">
+          <Cards size={44} weight="duotone" class="mx-auto" style="color: var(--color-accent);" aria-hidden="true" />
+          <p class="text-black mt-2.5 text-sm">Select Draw card to reveal the next card for {currentPlayer}.</p>
         </div>
-        <button
-          class="px-10 py-4 rounded-full font-bold text-white text-lg transition-all shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black"
-          style="background-color: var(--color-accent);"
-          onclick={onDrawCard}
-        >
-          Draw card
-        </button>
+        <button class="inline-flex items-center gap-2.5 px-10 py-5 rounded-full font-bold text-white text-lg transition-all shadow-lg hover:shadow-xl active:scale-[0.98]" style="background-color: var(--color-accent);" onclick={onDrawCard}><Cards size={22} weight="bold" aria-hidden="true" /> Draw card</button>
       </div>
     {/if}
+  </section>
+
+  <!-- Undo -->
+  {#if canUndo && !winner}
+    <div class="text-center max-w-lg mx-auto w-full">
+      <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-black border-2 border-black transition-colors hover:bg-gray-50" onclick={onUndo}><ArrowCounterClockwise size={18} weight="bold" aria-hidden="true" /> Undo last turn</button>
+    </div>
+  {/if}
+
+  <!-- Session controls -->
+  <div class="flex gap-2.5 justify-center max-w-lg mx-auto w-full flex-wrap">
+    <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-colors hover:opacity-90" style="background-color: #1a202c;" onclick={onExportSession}><DownloadSimple size={18} weight="bold" aria-hidden="true" /> Export Session</button>
+    <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-black border-2 border-black transition-colors hover:bg-gray-50" onclick={onCopySession}><CopySimple size={18} weight="bold" aria-hidden="true" /> Copy Session JSON</button>
+    <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold text-white transition-colors hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed" style="background-color: #1a202c;" onclick={onSaveProgress} disabled={turnLogCount === 0 || !!winner} aria-disabled={turnLogCount === 0 || !!winner}><FloppyDisk size={18} weight="bold" aria-hidden="true" /> Save Progress</button>
   </div>
 
-  <!-- Undo Button -->
-  <div class="text-center pb-4 max-w-lg mx-auto w-full">
-    {#if canUndo && !winner}
-      <button
-        class="px-6 py-2 rounded-full text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
-        style="background-color: white; color: black; border: 2px solid black;"
-        onclick={onUndo}
-      >
-        <span aria-hidden="true">↩</span> Undo last turn
-      </button>
-    {/if}
+  {#if hasCheckpoint}
+    <div class="text-center max-w-lg mx-auto w-full">
+      <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full text-sm font-semibold bg-white text-black border-2 border-black transition-colors hover:bg-gray-50" onclick={onResumeSavedSession}><PlayCircle size={18} weight="bold" aria-hidden="true" /> Resume Saved Session</button>
+      <p class="text-xs text-black/70 mt-1">Restore your last saved checkpoint.</p>
+    </div>
+  {/if}
+
+  <!-- Live event feed -->
+  <div class="max-w-lg mx-auto w-full">
+    <LiveEventPanel status={streamStatus} {appliedEvents} {bonuses} {offeredEvent} {deliveredCount} {totalEvents} {duplicatesIgnored} onStart={onStreamStart} onPause={onStreamPause} onReconnect={onStreamReconnect} onDeliverOutOfOrder={onStreamDeliverOutOfOrder} />
   </div>
 
-  <!-- Session Controls -->
-  <div class="flex gap-4 justify-center pb-6 max-w-lg mx-auto w-full flex-wrap">
-    <button
-      class="px-6 py-2 rounded-full text-sm font-medium text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black shadow-md"
-      style="background-color: #1a202c;"
-      onclick={onExportSession}
-    >
-      Export Session
-    </button>
-    <button
-      class="px-6 py-2 rounded-full text-sm font-medium bg-white text-black border-2 border-black transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400"
-      onclick={onCopySession}
-    >
-      Copy Session JSON
-    </button>
-    <button
-      class="px-6 py-2 rounded-full text-sm font-medium text-white transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-      style="background-color: #1a202c;"
-      onclick={onSaveProgress}
-      disabled={turnLogCount === 0 || !!winner}
-    >
-      Save Progress
-    </button>
-  </div>
-
-  <!-- Live Event Feed -->
-  <div class="max-w-lg mx-auto w-full pb-6">
-    <LiveEventPanel
-      status={streamStatus}
-      appliedEvents={appliedEvents}
-      bonuses={bonuses}
-      offeredEvent={offeredEvent}
-      deliveredCount={deliveredCount}
-      totalEvents={totalEvents}
-      duplicatesIgnored={duplicatesIgnored}
-      onStart={onStreamStart}
-      onPause={onStreamPause}
-      onReconnect={onStreamReconnect}
-      onDeliverOutOfOrder={onStreamDeliverOutOfOrder}
-    />
-  </div>
-
-  <!-- Scoreboard Slide-over -->
+  <!-- Scoreboard slide-over -->
   {#if showScoreboard}
-    <div class="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-labelledby="scoreboard-title">
-      <button class="absolute inset-0 bg-black/30" onclick={closeScoreboard} aria-label="Close scoreboard"></button>
-      <div class="relative w-full max-w-sm bg-white rounded-l-xl shadow-2xl p-6 overflow-y-auto z-50">
-        <div class="flex items-center justify-between mb-6">
+    <div class="fixed inset-0 z-40 flex justify-end" role="dialog" aria-modal="true" aria-labelledby="scoreboard-title" transition:scale={{ start: 0.98, duration: motionMs(180) }}>
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <button class="absolute inset-0 dialog-backdrop" style="background-color: rgba(0,0,0,0.35);" onclick={() => (showScoreboard = false)} aria-label="Close scoreboard"></button>
+      <div class="relative w-full max-w-sm bg-white rounded-l-[10px] shadow-2xl p-5 overflow-y-auto z-50">
+        <div class="flex items-center justify-between mb-5">
           <h2 id="scoreboard-title" class="text-xl font-semibold" style="color: var(--color-accent);">Scoreboard</h2>
-          <button
-            class="p-2 rounded-full text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
-            onclick={closeScoreboard}
-            aria-label="Close scoreboard"
-          >
-            ✕
-          </button>
+          <button class="p-2.5 rounded-full text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors" onclick={() => (showScoreboard = false)} aria-label="Close scoreboard"><X size={18} weight="bold" /></button>
         </div>
-        <Scoreboard sortedScores={sortedScores} {winner} />
+        <Scoreboard {sortedScores} {winner} />
       </div>
     </div>
   {/if}

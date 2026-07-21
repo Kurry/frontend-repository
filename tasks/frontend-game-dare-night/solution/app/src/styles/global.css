@@ -7,13 +7,13 @@
   --color-text-inverse: #FFFFFF;
   --color-accent: #010101;
   --color-link: #AEEBF4;
-  
+
   /* Category colors */
   --color-icebreaker: #3B82F6;
   --color-truth: #14B8A6;
   --color-dare: #F97316;
   --color-wild: #D946EF;
-  
+
   /* Intensity colors */
   --color-mild: #22C55E;
   --color-spicy: #F59E0B;
@@ -47,7 +47,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   min-height: 48px;
 }
 
@@ -65,11 +66,29 @@ button:not(:disabled):active {
   filter: brightness(0.9);
 }
 
+/* A single, high-contrast, keyboard-only focus indicator on EVERY interactive
+   control (buttons, text inputs, selects, textareas, links, switch and dialog
+   triggers). Components must NOT set focus:outline-none, so this rule is never
+   overridden — criterion 4.10 / accessibility 1.n2. */
 button:focus-visible,
 input:focus-visible,
-select:focus-visible {
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible,
+[role="switch"]:focus-visible,
+[role="dialog"]:focus-visible,
+[tabindex]:focus-visible {
   outline: 3px solid #000000;
   outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(52, 205, 227, 0.55);
+}
+
+/* Panels and cards share the spec's 10px corner radius regardless of which
+   rounded-* utility the markup carries. */
+div.bg-white.rounded-xl,
+div.bg-white.rounded-lg,
+div.bg-white.rounded-2xl {
+  border-radius: 10px;
 }
 
 .timer-switch {
@@ -77,12 +96,7 @@ select:focus-visible {
   min-height: 48px;
 }
 
-div.bg-white.rounded-xl,
-div.bg-white.rounded-lg {
-  border-radius: 10px;
-}
-
-/* Toast animation */
+/* ---- Motion: enter/exit keyframes ---- */
 @keyframes slideIn {
   from {
     transform: translateY(-20px);
@@ -97,9 +111,11 @@ div.bg-white.rounded-lg {
 @keyframes fadeOut {
   from {
     opacity: 1;
+    transform: translateY(0);
   }
   to {
     opacity: 0;
+    transform: translateY(-12px);
   }
 }
 
@@ -108,35 +124,99 @@ div.bg-white.rounded-lg {
 }
 
 .toast-exit {
-  animation: fadeOut 0.3s ease-out;
+  animation: fadeOut 0.3s ease-out forwards;
 }
 
-/* Card flip animation */
+/* Card flip-and-fade reveal (spec: ~0.2–0.4s, triggered by Draw card). */
 @keyframes cardFlip {
   0% {
-    transform: rotateY(90deg) scale(0.9);
+    transform: perspective(800px) rotateY(90deg) scale(0.92);
     opacity: 0;
   }
   100% {
-    transform: rotateY(0deg) scale(1);
+    transform: perspective(800px) rotateY(0deg) scale(1);
     opacity: 1;
   }
 }
 
 .card-flip {
-  animation: cardFlip 0.4s ease-out;
+  animation: cardFlip 0.35s ease-out;
 }
 
-/* Pulse animation for timer */
+/* Countdown pulse as the timer nears zero. */
 @keyframes pulse-red {
   0%, 100% {
-    color: #EF4444;
+    color: #FFFFFF;
+    transform: scale(1);
   }
   50% {
-    color: #FCA5A5;
+    color: #FFE4E6;
+    transform: scale(1.12);
   }
 }
 
 .timer-warning {
   animation: pulse-red 0.5s ease-in-out infinite;
+}
+
+/* Winner banner celebration: a short, one-shot pop tied to the finishing press. */
+@keyframes winnerPop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.winner-pop {
+  animation: winnerPop 0.5s ease-out;
+}
+
+/* Dialog fade-and-scale enter/exit. */
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes backdropIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.dialog-panel {
+  animation: dialogIn 0.22s ease-out;
+}
+
+.dialog-backdrop {
+  animation: backdropIn 0.18s ease-out;
+}
+
+/* ---- Reduced motion: replace every animation/transition with an instant change. ----
+   CSS keyframes (card flip, toasts, dialog, timer pulse, winner pop) collapse to a
+   single frame; svelte transitions/FLIP/confetti are guarded in JS via motionMs(). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  button:not(:disabled):hover,
+  button:not(:disabled):active {
+    transform: none;
+  }
 }
