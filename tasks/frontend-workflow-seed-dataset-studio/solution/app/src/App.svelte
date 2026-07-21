@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { fade } from 'svelte/transition';
   import { createForm } from '@tanstack/svelte-form';
   import {
     ArrowCounterClockwise, CaretUpDown, Check, CheckCircle, Copy, DownloadSimple,
@@ -10,7 +9,7 @@
   import Modal from './lib/components/Modal.svelte';
   import { studio, type Seed, type Status } from './lib/studio.svelte';
   import {
-    DatasetStudioPackageSchema, FoilUpsertSchema, HarvestPendingJustificationSchema,
+    FoilUpsertSchema, HarvestPendingJustificationSchema,
     NegativeCriterionSchema, PositiveCriterionSchema, RejectSeedSchema,
     negativeClasses, rejectClasses, failureModes, repositories,
     type FoilUpsert
@@ -38,6 +37,9 @@
   let harvestResult = $derived(HarvestPendingJustificationSchema.safeParse({ justification: harvestJustification }));
   let importTouched = $state(false);
   let previousGateCount = $state(-1);
+  let animatingBadges = $state<Record<string, string>>({});
+  let previousStatuses = $state<Record<string, Status>>({});
+  let copyFlash = $state('');
 
   const rejectForm = createForm(() => ({
     defaultValues: { rejectClass: '', justification: '' },
@@ -65,6 +67,39 @@
     previousGateCount = count;
   });
 
+  $effect(() => {
+    // Keep selection toolbar in sync with the visible filter slice.
+    void studio.search;
+    void studio.filters.status;
+    void studio.filters.language;
+    void studio.filters.repository;
+    void studio.filters.difficulty;
+    studio.reconcileSelection();
+  });
+
+  $effect(() => {
+    let changed = false;
+    const next = { ...previousStatuses };
+    for (const seed of studio.seeds) {
+      if (next[seed.id] !== seed.status) {
+        if (next[seed.id]) {
+          const id = seed.id;
+          animatingBadges = { ...animatingBadges, [id]: seed.status };
+          setTimeout(() => {
+            if (animatingBadges[id]) {
+              const copy = { ...animatingBadges };
+              delete copy[id];
+              animatingBadges = copy;
+            }
+          }, 320);
+        }
+        next[seed.id] = seed.status;
+        changed = true;
+      }
+    }
+    if (changed) previousStatuses = next;
+  });
+
   function fieldIssue(result: any, field: string) {
     if (result.success) return '';
     return result.error.issues.find((issue: any) => issue.path[0] === field)?.message ?? '';
@@ -72,9 +107,18 @@
 
   function positiveIssue(record: any, field: string) { return fieldIssue(PositiveCriterionSchema.safeParse(record), field); }
   function negativeIssue(record: any, field: string) { return fieldIssue(NegativeCriterionSchema.safeParse(record), field); }
-  function countRepoStatus(repository: string, status: Status) { return studio.seeds.filter((seed) => seed.repository === repository && seed.status === status).length; }
+  function countRepoStatus(repository: string, status: Status) { return studio.visibleSeeds.filter((seed) => seed.repository === repository && seed.status === status).length; }
   function pretty(value: string) { return value.replaceAll('-', ' '); }
   function selectedDrafts() { return studio.selectedIds.filter((id) => studio.seeds.find((seed) => seed.id === id)?.status === 'draft'); }
+  function markAuthoredTitle(seed: Seed, gate: string[]) {
+    if (seed.status === 'authored') return 'Seed is already authored';
+    if (seed.status === 'rejected') return 'Rejected seeds cannot be marked authored until triage is undone';
+    if (gate.length > 0) return `Unmet conditions: ${gate.join(', ')}`;
+    return 'Package gate clear — ready to mark authored';
+  }
+  function badgeClass(seed: Seed) {
+    return `badge ${seed.status}${animatingBadges[seed.id] ? ' animate' : ''}`;
+  }
 
   function openReject(ids: string[], mode: 'single' | 'batch') {
     studio.rejectTargetIds = ids;
@@ -153,7 +197,9 @@
       document.execCommand('copy');
       area.remove();
     }
+    copyFlash = confirmation;
     studio.showToast(confirmation);
+    setTimeout(() => { if (copyFlash === confirmation) copyFlash = ''; }, 1800);
   }
 
   function copyPreview() {
@@ -258,7 +304,16 @@
       return result('Workflow submitted', { operation: args.operation, seedIds: ids });
     });
     register('form_cancel', 'Cancel an open studio form.', { operation: { type: 'string', enum: ['reject-seed', 'batch-reject', 'export-package'] } }, ['operation'], ({ operation }) => { studio.rejectOpen = false; studio.foilEditorOpen = false; studio.importOpen = false; if (operation === 'export-package') studio.exportOpen = false; return result('Form cancelled', { operation }); });
-    register('session_start', 'Start the harvest-run demo for one seed.', { seedId: seedProp, demo: { type: 'string', enum: ['harvest-run', 'harvest-step-retry'] } }, ['seedId', 'demo'], ({ seedId, demo }) => { const seed = studio.seeds.find((item) => item.id === seedId); if (seed) studio.startHarvest(seed); return result('Harvest session start requested', { seedId, demo }); });
+    register('session_start', 'Start the harvest-run or harvest-step-retry demo for one seed.', { seedId: seedProp, demo: { type: 'string', enum: ['harvest-run', 'harvest-step-retry'] } }, ['seedId', 'demo'], ({ seedId, demo }) => {
+      const seed = studio.seeds.find((item) => item.id === seedId); if (!seed) return result('Seed not found');
+      studio.openSeed(seedId);
+      if (demo === 'harvest-step-retry') {
+        const failed = seed.authoring.harvest.steps.findIndex((step) => step.status === 'failed');
+        if (failed >= 0) studio.retryHarvest(seed, failed);
+        else studio.startHarvest(seed, { forceFailReproduce: true });
+      } else studio.startHarvest(seed, { forceFailReproduce: true });
+      return result('Harvest session start requested', { seedId, demo });
+    });
     register('session_pause', 'Pause a running harvest at its current step.', { seedId: seedProp }, ['seedId'], ({ seedId }) => { const seed = studio.seeds.find((item) => item.id === seedId); if (seed) studio.pauseHarvest(seed); return result('Harvest pause requested', { seedId }); });
     register('session_resume', 'Resume a paused harvest from its current step.', { seedId: seedProp }, ['seedId'], ({ seedId }) => { const seed = studio.seeds.find((item) => item.id === seedId); if (seed) studio.resumeHarvest(seed); return result('Harvest resume requested', { seedId }); });
     const artifactProps = { seedId: seedProp, format: { type: 'string', enum: ['package-manifest-json', 'dataset-snapshot-json', 'commit-hash'] } };
@@ -275,7 +330,7 @@
   <a href="#main" class="skip-link">Skip to main content</a>
 <header class="topbar">
     <div class="brand">
-      <div class="brand-mark"><ListChecks size={19} weight="bold" /></div>
+      <div class="brand-mark" aria-hidden="true"><ListChecks size={19} weight="bold" /></div>
       <div><h1>Seed Dataset Studio</h1><p>Investigation benchmark factory</p></div>
     </div>
     <nav class="view-switch" aria-label="Studio views">
@@ -283,21 +338,21 @@
       <button class:active={studio.activeView === 'workbench'} disabled={!studio.activeSeed} onclick={() => studio.activeView = 'workbench'}>Workbench</button>
     </nav>
     <div class="top-actions">
-      {#if studio.lastTriage}<button class="button small" aria-label="Undo triage" onclick={() => studio.undoTriage()}><ArrowCounterClockwise size={14} /><span class="label-text">Undo triage</span></button>{/if}
-      <button class="button small" aria-label="Import package" onclick={() => { studio.importOpen = true; studio.importError = ''; importTouched = false; }}><UploadSimple size={14} /><span class="label-text">Import package</span></button>
-      <button class="button small primary" aria-label="Export center" onclick={() => studio.openExport()}><PackageIcon size={14} /><span class="label-text">Export center</span></button>
+      {#if studio.lastTriage}<button class="button small" aria-label="Undo triage" onclick={() => studio.undoTriage()}><ArrowCounterClockwise size={14} aria-hidden="true" /><span class="label-text">Undo triage</span></button>{/if}
+      <button class="button small" aria-label="Import package" onclick={() => { studio.importOpen = true; studio.importError = ''; importTouched = false; }}><UploadSimple size={14} aria-hidden="true" /><span class="label-text">Import package</span></button>
+      <button class="button small primary" aria-label="Export center" onclick={() => studio.openExport()}><PackageIcon size={14} aria-hidden="true" /><span class="label-text">Export center</span></button>
     </div>
   </header>
 
-  <main id="main" class="main" in:fade={{ duration: 250 }}>
+  <main id="main" class="main">
     {#if studio.activeView === 'queue'}
       <section class="view" aria-label="Seed queue">
-        <div class="stats-panel card">
+        <aside class="stats-panel card" aria-label="Dataset rollup">
           <div class="stats-head">
-            <div><div class="section-kicker">Live dataset snapshot</div><h2 class="section-title">{studio.seeds.length} total seeds</h2></div>
-            <p>All rollups update from session state</p>
+            <div><div class="section-kicker">Live dataset snapshot</div><h2 class="section-title">{studio.visibleSeeds.length === studio.seeds.length ? `${studio.seeds.length} total seeds` : `${studio.visibleSeeds.length} of ${studio.seeds.length} seeds`}</h2></div>
+            <p>{studio.activeFilterParts.length ? 'Rollups mirror the filtered matching slice' : 'All rollups update from session state'}</p>
           </div>
-          <div class="stats-scroll" role="region" aria-label="Dataset Statistics" id="stats-rollup">
+          <div class="stats-scroll" id="stats-rollup">
             <div class="stat-group">
               <p class="stat-group-title">Status distribution</p>
               <div class="status-grid">
@@ -336,10 +391,10 @@
               </div>
             </div>
           </div>
-        </div>
+        </aside>
 
         <div class="queue-toolbar card">
-          <div class="search-wrap"><MagnifyingGlass size={15} /><input class="control" class:active={studio.search.length > 0} aria-label="Search seed id or title" placeholder="Search seed id or title…" bind:value={studio.search} /></div>
+          <div class="search-wrap"><MagnifyingGlass size={15} aria-hidden="true" /><input class="control" class:active={studio.search.length > 0} aria-label="Search seed id or title" placeholder="Search seed id or title…" bind:value={studio.search} /></div>
           <select class="control" class:active={!!studio.filters.status} aria-label="Filter by status" bind:value={studio.filters.status}><option value="">All statuses</option>{#each statusOrder as status}<option value={status}>{pretty(status)}</option>{/each}</select>
           <select class="control" class:active={!!studio.filters.language} aria-label="Filter by language" bind:value={studio.filters.language}><option value="">All languages</option>{#each studio.languages as language}<option value={language}>{language}</option>{/each}</select>
           <select class="control" class:active={!!studio.filters.repository} aria-label="Filter by repository" bind:value={studio.filters.repository}><option value="">All repositories</option>{#each repositories as repository}<option value={repository}>{repository}</option>{/each}</select>
@@ -349,11 +404,11 @@
         </div>
 
         {#if studio.savedFilters.length}
-          <div class="saved-row"><span class="saved-label">Saved filters</span>{#each studio.savedFilters as saved}<button class="chip" onclick={() => studio.applySaved(saved.id)}>{saved.name}<span class="remove" role="button" tabindex="0" aria-label={`Remove saved filter ${saved.name}`} onclick={(event) => { event.stopPropagation(); studio.removeSaved(saved.id); }} onkeydown={(event) => { if (event.key === 'Enter') studio.removeSaved(saved.id); }}><X size={10} /></span></button>{/each}</div>
+          <div class="saved-row"><span class="saved-label">Saved filters</span>{#each studio.savedFilters as saved}<button class="chip" onclick={() => studio.applySaved(saved.id)}>{saved.name}<span class="remove" role="button" tabindex="0" aria-label={`Remove saved filter ${saved.name}`} onclick={(event) => { event.stopPropagation(); studio.removeSaved(saved.id); }} onkeydown={(event) => { if (event.key === 'Enter') studio.removeSaved(saved.id); }}><X size={10} aria-hidden="true" /></span></button>{/each}</div>
         {/if}
 
         <div class="active-summary">
-          <Funnel size={13} />
+          <Funnel size={13} aria-hidden="true" />
           <strong>{studio.visibleSeeds.length} matching seeds</strong>
           <span>{studio.activeFilterParts.length ? studio.activeFilterParts.join(' · ') : 'No active filters'}</span>
           {#if studio.activeFilterParts.length}<button onclick={() => studio.clearFilters()}>Clear all</button>{/if}
@@ -373,7 +428,7 @@
                     <tr class:selected={studio.selectedIds.includes(seed.id)} tabindex="0" onclick={(event) => { if (!(event.target as HTMLElement).closest('button,input')) studio.openSeed(seed.id); }} onkeydown={(event) => { if (event.key === 'Enter') studio.openSeed(seed.id); }}>
                       <td><input type="checkbox" aria-label={`Select ${seed.id}`} checked={studio.selectedIds.includes(seed.id)} disabled={seed.status !== 'draft'} onchange={() => studio.toggleSelection(seed.id)} /></td>
                       <td class="seed-id" title={seed.id}>{seed.id}</td><td>{seed.repository}</td><td>{seed.language}</td><td>{seed.kind}</td><td class="title-cell" title={seed.title}>{seed.title}</td>
-                      <td><span class="badge {seed.status}">{pretty(seed.status)}</span>{#if seed.rejectClass}<span class="sr-only">Reject class {seed.rejectClass}</span>{/if}</td><td><span class="badge {seed.difficulty}">{seed.difficulty}</span></td><td title={seed.deferenceProfile}>{seed.deferenceProfile}</td><td class="commit" title={seed.pinnedCommit}>{seed.pinnedCommit.slice(0, 10)}</td>
+                      <td><span class={badgeClass(seed)}>{pretty(seed.status)}</span>{#if seed.rejectClass}<span class="sr-only">Reject class {seed.rejectClass}</span>{/if}</td><td><span class="badge {seed.difficulty}">{seed.difficulty}</span></td><td title={seed.deferenceProfile}>{seed.deferenceProfile}</td><td class="commit" title={seed.pinnedCommit}>{seed.pinnedCommit.slice(0, 10)}</td>
                       <td><div class="row-actions">{#if seed.status === 'draft'}<button class="row-button" onclick={() => studio.accept([seed.id], true)}>Accept</button><button class="row-button" onclick={() => openReject([seed.id], 'single')}>Reject</button>{:else}<button class="row-button" onclick={() => studio.openSeed(seed.id)}>Open</button>{/if}</div></td>
                     </tr>
                   {/each}
@@ -391,23 +446,23 @@
       <section class="view" aria-label={`Authoring workbench for ${seed.id}`}>
         <div class="workbench-head card">
           <div>
-            <div class="workbench-id"><h2>{seed.id}</h2><span class="badge {seed.status}">{pretty(seed.status)}</span><span class="badge {seed.difficulty}">{seed.difficulty}</span></div>
+            <div class="workbench-id"><h2>{seed.id}</h2><span class={badgeClass(seed)}>{pretty(seed.status)}</span><span class="badge {seed.difficulty}">{seed.difficulty}</span></div>
             <input class="workbench-title" aria-label="Seed title" title={seed.title} bind:value={seed.title} />
             <div class="meta-row"><span>{seed.repository}</span><span>{seed.language}</span><span>{seed.kind}</span><span>Deference: {seed.deferenceProfile}</span><span>Failure: {seed.failureModel}</span>{#if seed.rejectClass}<span>Reject class: {seed.rejectClass}</span>{/if}</div>
-            <div class="meta-row"><span><GitCommit size={12} aria-hidden="true" />Pinned commit</span><span class="full-commit">{seed.pinnedCommit}</span><button class="button small" onclick={() => copyText(seed.pinnedCommit, 'Full commit hash copied')}><Copy size={12} aria-hidden="true" />Copy commit</button></div>
+            <div class="meta-row"><span><GitCommit size={12} aria-hidden="true" />Pinned commit</span><span class="full-commit">{seed.pinnedCommit}</span><button class="button small" onclick={() => copyText(seed.pinnedCommit, 'Full commit hash copied')}>{#if copyFlash === 'Full commit hash copied'}<Check size={12} aria-hidden="true" />Copied{:else}<Copy size={12} aria-hidden="true" />Copy commit{/if}</button></div>
           </div>
           <div class="head-actions">
-            <button class="button" onclick={() => { studio.saveAuthoring(seed); }} disabled={seed.status === 'rejected'}><FloppyDisk size={14} />Save workbench</button>
-            <button class="button" onclick={() => studio.openExport(seed.id)} disabled={seed.status !== 'authored'}><PackageIcon size={14} />Export package</button>
-            <button class="button primary" disabled={gate.length > 0 || seed.status === 'authored' || seed.status === 'rejected'} onclick={() => studio.markAuthored(seed)} title={gate.length > 0 ? `Unmet conditions: ${gate.join(', ')}` : 'Package gate clear'}><CheckCircle size={14} aria-hidden="true" />Mark authored</button>
+            <button class="button" onclick={() => { studio.saveAuthoring(seed); }} disabled={seed.status === 'rejected'}><FloppyDisk size={14} aria-hidden="true" />Save workbench</button>
+            <button class="button" onclick={() => studio.openExport(seed.id)} disabled={seed.status !== 'authored'}><PackageIcon size={14} aria-hidden="true" />Export package</button>
+            <button class="button primary" disabled={gate.length > 0 || seed.status === 'authored' || seed.status === 'rejected'} onclick={() => studio.markAuthored(seed)} title={markAuthoredTitle(seed, gate)} aria-describedby="package-gate"><CheckCircle size={14} aria-hidden="true" />Mark authored</button>
           </div>
-          {#if seed.status === 'rejected'}<div class="rejected-banner"><WarningCircle size={17} weight="fill" />This seed is rejected as {seed.rejectClass}. Authoring panes are read-only until triage is undone.</div>{/if}
+          {#if seed.status === 'rejected'}<div class="rejected-banner"><WarningCircle size={17} weight="fill" aria-hidden="true" />This seed is rejected as {seed.rejectClass}. Authoring panes are read-only until triage is undone.</div>{/if}
         </div>
 
-        <div class="gate card" class:unmet={gate.length > 0} class:clear={gate.length === 0}>
-          <div class="gate-icon">{#if gate.length}<WarningCircle size={18} />{:else}<CheckCircle size={18} weight="fill" />{/if}</div>
-          <div class="gate-copy"><strong>{gate.length ? 'Package gate blocked' : 'Package gate clear'}</strong><span>{gate.length ? `${gate.length} condition${gate.length === 1 ? '' : 's'} remain` : 'Ready to mark authored'}</span></div>
-          <div class="gate-items">{#each gate as condition (condition)}<span class="gate-item">○ {condition}</span>{/each}{#if !gate.length}<span class="all-clear">All authoring conditions are satisfied</span>{/if}</div>
+        <div id="package-gate" class="gate card" class:unmet={gate.length > 0} class:clear={gate.length === 0}>
+          <div class="gate-icon" aria-hidden="true">{#if gate.length}<WarningCircle size={18} />{:else}<CheckCircle size={18} weight="fill" />{/if}</div>
+          <div class="gate-copy"><strong>{gate.length ? 'Package gate blocked' : seed.status === 'authored' ? 'Already authored' : seed.status === 'rejected' ? 'Rejected — authoring locked' : 'Package gate clear'}</strong><span>{gate.length ? `${gate.length} condition${gate.length === 1 ? '' : 's'} remain` : seed.status === 'authored' ? 'Seed is already marked authored' : seed.status === 'rejected' ? 'Undo triage to re-enable authoring' : 'Ready to mark authored'}</span></div>
+          <div class="gate-items">{#each gate as condition (condition)}<span class="gate-item">○ {condition}</span>{/each}{#if !gate.length && seed.status !== 'authored' && seed.status !== 'rejected'}<span class="all-clear">All authoring conditions are satisfied</span>{/if}</div>
         </div>
 
         <nav class="pane-nav" aria-label="Workbench panes">{#each ['question','positive','negative','foils','golden'] as pane}<button class="button small" onclick={() => paneJump(pane)}>{pretty(pane)}</button>{/each}</nav>
@@ -415,23 +470,9 @@
           <div id="pane-question" class="pane card">
             <div class="pane-head"><div><h3>Question</h3><p>Frame the investigation without leaking the solution.</p></div><span class="section-kicker">Required</span></div>
             <fieldset disabled={seed.status === 'rejected'} style="border:0;padding:0;margin:0">
-              <div class="field"><label for="question-text">Investigation question</label><textarea id="question-text" class="control" class:error={!seed.authoring.questionText.trim()} rows="6" bind:value={seed.authoring.questionText}></textarea>{#if !seed.authoring.questionText.trim()}<span class="field-error">questionText is required to mark authored</span>{/if}</div>
+              <div class="field"><label for="question-text">Investigation question</label><textarea id="question-text" class="control" class:error={!seed.authoring.questionText.trim()} rows="6" bind:value={seed.authoring.questionText}></textarea>{#if !seed.authoring.questionText.trim()}<span class="field-error" role="alert">questionText is required to mark authored</span>{/if}</div>
               <div class="field"><span class="label">Under-specification checklist</span><div class="checklist">{#each checklistLabels as label, index}<label class="check-row"><input type="checkbox" bind:checked={seed.authoring.checklist[index]} />{label}</label>{/each}</div></div>
             </fieldset>
-          </div>
-
-          <div id="pane-foils" class="pane card">
-            <div class="pane-head"><div><h3>Foils <span class="badge unset">{seed.authoring.foils.length}</span></h3><p>Deliberately wrong answers with explicit failure expectations.</p></div><button class="button small" disabled={seed.status === 'rejected'} onclick={() => openFoil(seed, null)}><Plus size={13} aria-hidden="true" />Add foil</button></div>
-            <div class="foil-list">
-              {#each seed.authoring.foils as foil, index (index)}
-                {@const dangling = studio.danglingIds(seed, foil)}
-                <article class="foil" class:warning={dangling.length > 0}>
-                  <div class="foil-top"><span class="foil-number">F{index + 1}</span><p class="foil-answer">{foil.answerText}</p><div class="foil-actions"><button class="icon-button" aria-label={`Edit foil ${index + 1}`} disabled={seed.status === 'rejected'} onclick={() => openFoil(seed, index)}><FloppyDisk size={13} /></button><button class="icon-button" aria-label={`Delete foil ${index + 1}`} disabled={seed.status === 'rejected'} onclick={() => studio.deleteFoil(seed, index)}><Trash size={13} /></button></div></div>
-                  <div class="foil-meta"><span>{foil.failureMode}</span><span>cap {foil.correctnessCap}%</span><span>expects fail:</span>{#each foil.expectsFailIds as id}<button class="id-chip" class:dangling={dangling.includes(id)} onclick={() => studio.jumpToCriterion(id)}>{id}</button>{/each}</div>
-                  {#if dangling.length}<div class="warning-copy"><WarningCircle size={13} />Dangling expectsFailIds: {dangling.join(', ')}. Edit this foil to remove or remap the missing id.</div>{/if}
-                </article>
-              {:else}<div class="empty" role="alert" style="padding:26px"><div><strong>No foils authored</strong><span>Add at least three API-valid foils to pass the package gate.</span></div></div>{/each}
-            </div>
           </div>
 
           <div id="pane-positive" class="pane card">
@@ -439,9 +480,9 @@
             <fieldset disabled={seed.status === 'rejected'} style="border:0;padding:0;margin:0"><div class="criteria-list">
               {#each seed.authoring.positiveCriteria as criterion (criterion.id)}
                 <article id={`criterion-${criterion.id.replace('.','-')}`} class="criterion" class:locked={criterion.id === '1.4'} class:highlight={studio.highlightedCriterion === criterion.id} aria-label={criterion.id === '1.4' ? 'Locked runtime-evidence criterion 1.4' : `Positive criterion ${criterion.id}`}>
-                  <div class="criterion-top"><span class="criterion-id">{criterion.id}</span><input class="control" class:error={!!positiveIssue(criterion,'name')} aria-label={`${criterion.id} name`} maxlength="80" bind:value={criterion.name} /><input class="control weight" class:error={!!positiveIssue(criterion,'weight')} aria-label={`${criterion.id} weight`} type="number" min="0.5" max="5" step="0.5" bind:value={criterion.weight} /><button class="icon-button" aria-label={`Delete criterion ${criterion.id}`} disabled={criterion.id === '1.4'} title={criterion.id === '1.4' ? 'The runtime-evidence gate cannot be deleted' : 'Delete criterion'} onclick={() => studio.deletePositive(seed, criterion.id)}>{#if criterion.id === '1.4'}<LockSimple size={13} />{:else}<Trash size={13} />{/if}</button></div>
+                  <div class="criterion-top"><input class="control criterion-id" class:error={!!positiveIssue(criterion,'id')} aria-label={`${criterion.id} id`} value={criterion.id} disabled={criterion.id === '1.4'} title={criterion.id === '1.4' ? 'Criterion 1.4 id is locked' : 'Edit criterion id'} onchange={(event) => { const next = (event.currentTarget as HTMLInputElement).value.trim(); if (!studio.renameCriterion(seed, 'positive', criterion.id, next)) (event.currentTarget as HTMLInputElement).value = criterion.id; }} /><input class="control" class:error={!!positiveIssue(criterion,'name')} aria-label={`${criterion.id} name`} maxlength="80" bind:value={criterion.name} /><input class="control weight" class:error={!!positiveIssue(criterion,'weight')} aria-label={`${criterion.id} weight`} type="number" min="0.5" max="5" step="0.5" bind:value={criterion.weight} /><button class="icon-button" aria-label={criterion.id === '1.4' ? 'Locked criterion 1.4 cannot be deleted' : `Delete criterion ${criterion.id}`} disabled={criterion.id === '1.4'} title={criterion.id === '1.4' ? 'The runtime-evidence gate cannot be deleted' : 'Delete criterion'} onclick={() => studio.deletePositive(seed, criterion.id)}>{#if criterion.id === '1.4'}<LockSimple size={13} aria-hidden="true" />{:else}<Trash size={13} aria-hidden="true" />{/if}</button></div>
                   <textarea class="control" class:error={!!positiveIssue(criterion,'description')} aria-label={`${criterion.id} description`} maxlength="2000" bind:value={criterion.description}></textarea>
-                  {#if positiveIssue(criterion,'name')}<div class="field-error">name: {positiveIssue(criterion,'name')}</div>{/if}{#if positiveIssue(criterion,'weight')}<div class="field-error">weight: {positiveIssue(criterion,'weight')}</div>{/if}{#if positiveIssue(criterion,'description')}<div class="field-error">description: {positiveIssue(criterion,'description')}</div>{/if}
+                  {#if positiveIssue(criterion,'name')}<div class="field-error" role="alert">name: {positiveIssue(criterion,'name')}</div>{/if}{#if positiveIssue(criterion,'weight')}<div class="field-error" role="alert">weight: {positiveIssue(criterion,'weight')}</div>{/if}{#if positiveIssue(criterion,'description')}<div class="field-error" role="alert">description: {positiveIssue(criterion,'description')}</div>{/if}
                   {#if criterion.id === '1.4'}<div class="locked-note"><LockSimple size={11} weight="fill" aria-hidden="true" />Locked runtime-evidence gate · requires execution at {seed.pinnedCommit}</div>{/if}
                 </article>
               {/each}
@@ -454,13 +495,27 @@
               {#each seed.authoring.negativeCriteria as criterion (criterion.id)}
                 {@const linked = seed.authoring.foils.map((foil,index) => foil.expectsFailIds.includes(criterion.id) ? index + 1 : null).filter(Boolean)}
                 <article id={`criterion-${criterion.id.replace('.','-')}`} class="criterion negative" class:highlight={studio.highlightedCriterion === criterion.id}>
-                  <div class="criterion-top"><span class="criterion-id">{criterion.id}</span><input class="control" class:error={!!negativeIssue(criterion,'name')} aria-label={`${criterion.id} name`} maxlength="80" bind:value={criterion.name} /><select class="control criterion-select" aria-label={`${criterion.id} class`} bind:value={criterion.class}>{#each negativeClasses as value}<option value={value}>{value}</option>{/each}</select><button class="icon-button" aria-label={`Delete criterion ${criterion.id}`} onclick={() => studio.deleteNegative(seed, criterion.id)}><Trash size={13} /></button></div>
+                  <div class="criterion-top"><input class="control criterion-id" class:error={!!negativeIssue(criterion,'id')} aria-label={`${criterion.id} id`} value={criterion.id} onchange={(event) => { const next = (event.currentTarget as HTMLInputElement).value.trim(); if (!studio.renameCriterion(seed, 'negative', criterion.id, next)) (event.currentTarget as HTMLInputElement).value = criterion.id; }} /><input class="control" class:error={!!negativeIssue(criterion,'name')} aria-label={`${criterion.id} name`} maxlength="80" bind:value={criterion.name} /><select class="control criterion-select" aria-label={`${criterion.id} class`} bind:value={criterion.class}>{#each negativeClasses as value}<option value={value}>{value}</option>{/each}</select><button class="icon-button" aria-label={`Delete criterion ${criterion.id}`} onclick={() => studio.deleteNegative(seed, criterion.id)}><Trash size={13} aria-hidden="true" /></button></div>
                   <textarea class="control" class:error={!!negativeIssue(criterion,'description')} aria-label={`${criterion.id} description`} maxlength="2000" bind:value={criterion.description}></textarea>
                   <div class="criterion-links"><span class="against">Matching this criterion counts against the answer.</span>{#if linked.length}<span>Referenced by foil {linked.join(', ')}</span>{:else}<span>No foil references yet</span>{/if}</div>
-                  {#if negativeIssue(criterion,'name')}<div class="field-error">name: {negativeIssue(criterion,'name')}</div>{/if}{#if negativeIssue(criterion,'description')}<div class="field-error">description: {negativeIssue(criterion,'description')}</div>{/if}
+                  {#if negativeIssue(criterion,'name')}<div class="field-error" role="alert">name: {negativeIssue(criterion,'name')}</div>{/if}{#if negativeIssue(criterion,'description')}<div class="field-error" role="alert">description: {negativeIssue(criterion,'description')}</div>{/if}
                 </article>
               {:else}<div class="empty" role="alert" style="padding:24px"><span>No negative criteria yet.</span></div>{/each}
             </div></fieldset>
+          </div>
+
+          <div id="pane-foils" class="pane card">
+            <div class="pane-head"><div><h3>Foils <span class="badge unset">{seed.authoring.foils.length}</span></h3><p>Deliberately wrong answers with explicit failure expectations.</p></div><button class="button small" disabled={seed.status === 'rejected'} onclick={() => openFoil(seed, null)}><Plus size={13} aria-hidden="true" />Add foil</button></div>
+            <div class="foil-list">
+              {#each seed.authoring.foils as foil, index (index)}
+                {@const dangling = studio.danglingIds(seed, foil)}
+                <article class="foil" class:warning={dangling.length > 0}>
+                  <div class="foil-top"><span class="foil-number" aria-hidden="true">F{index + 1}</span><p class="foil-answer">{foil.answerText}</p><div class="foil-actions"><button class="icon-button" aria-label={`Edit foil ${index + 1}`} disabled={seed.status === 'rejected'} onclick={() => openFoil(seed, index)}><FloppyDisk size={13} aria-hidden="true" /></button><button class="icon-button" aria-label={`Delete foil ${index + 1}`} disabled={seed.status === 'rejected'} onclick={() => studio.deleteFoil(seed, index)}><Trash size={13} aria-hidden="true" /></button></div></div>
+                  <div class="foil-meta"><span>{foil.failureMode}</span><span>cap {foil.correctnessCap}%</span><span>expects fail:</span>{#each foil.expectsFailIds as id}<button class="id-chip" class:dangling={dangling.includes(id)} onclick={() => studio.jumpToCriterion(id)}>{id}</button>{/each}</div>
+                  {#if dangling.length}<div class="warning-copy"><WarningCircle size={13} aria-hidden="true" />Dangling expectsFailIds: {dangling.join(', ')}. Edit this foil to remove or remap the missing id.</div>{/if}
+                </article>
+              {:else}<div class="empty" role="alert" style="padding:26px"><div><strong>No foils authored</strong><span>Add at least three API-valid foils to pass the package gate.</span></div></div>{/each}
+            </div>
           </div>
 
           <div id="pane-golden" class="pane card">
@@ -474,10 +529,10 @@
             </fieldset>
           </div>
 
-          <div id="pane-timeline" class="pane card" role="region" aria-label="Seed Timeline">
+          <aside id="pane-timeline" class="pane card" aria-label="Seed timeline">
             <div class="pane-head"><div><h3>Lifecycle timeline</h3><p>Status, authoring, harvest, and export events in session order.</p></div><select class="control timeline-filter" aria-label="Filter timeline by event type" bind:value={seed.timelineFilter}><option value="all">All events</option><option value="transition">Transitions</option><option value="triage">Triage</option><option value="save">Saves</option><option value="harvest">Harvest</option><option value="export">Exports</option></select></div>
-            <div class="timeline">{#if seed.timeline.length === 0}<div class="empty" role="alert" style="padding:25px"><span>No events are recorded for this seed.</span></div>{:else}{#each timelineFor(seed) as entry, i (entry.id)}<div class="timeline-entry {entry.type}"><span class="timeline-dot"></span><strong>{entry.label}</strong><time datetime={entry.timestamp}>{new Date(entry.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}</time></div>{:else}<div class="empty" style="padding:25px"><span>No {seed.timelineFilter} events matched. Try clearing the filter.</span></div>{/each}{/if}</div>
-          </div>
+            <div class="timeline">{#if seed.timeline.length === 0}<div class="empty" role="alert" style="padding:25px"><span>No events are recorded for this seed.</span></div>{:else}{#each timelineFor(seed) as entry, i (entry.id)}<div class="timeline-entry {entry.type}"><span class="timeline-dot" aria-hidden="true"></span><strong>{entry.label}</strong><time datetime={entry.timestamp}>{new Date(entry.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})}</time></div>{:else}<div class="empty" style="padding:25px"><span>No {seed.timelineFilter} events matched. Try clearing the filter.</span></div>{/each}{/if}</div>
+          </aside>
         </div>
       </section>
     {/if}
@@ -510,7 +565,7 @@
   <Modal open={studio.exportOpen} title="Export center" description="All three artifacts are compiled live from the current session state." onclose={() => studio.exportOpen = false}>
     <div class="export-tabs" role="tablist" aria-label="Export formats"><button class:active={studio.exportTab === 'manifest'} role="tab" aria-selected={studio.exportTab === 'manifest'} onclick={() => studio.exportTab = 'manifest'}>Package manifest JSON</button><button class:active={studio.exportTab === 'snapshot'} role="tab" aria-selected={studio.exportTab === 'snapshot'} onclick={() => studio.exportTab = 'snapshot'}>Dataset snapshot JSON</button><button class:active={studio.exportTab === 'studio'} role="tab" aria-selected={studio.exportTab === 'studio'} onclick={() => studio.exportTab = 'studio'}>Dataset studio package JSON</button></div>
     <pre class="preview" aria-label={`${studio.exportTab} JSON preview`}>{studio.preview(studio.exportTab)}</pre>
-    <div class="export-foot"><span class="seed-name">{studio.exportTab === 'manifest' ? `Generated for ${studio.activeSeed?.id ?? 'no selected seed'}` : `${studio.seeds.length} live seeds · ${studio.rollup.byStatus.authored} authored packages`}</span><button class="button" onclick={copyPreview}><Copy size={13} />Copy {studio.exportTab === 'manifest' ? 'manifest' : studio.exportTab === 'snapshot' ? 'snapshot' : 'studio package'}</button><button class="button primary" onclick={downloadPreview}><DownloadSimple size={13} />Download {studio.exportTab === 'manifest' ? 'manifest' : studio.exportTab === 'snapshot' ? 'snapshot' : 'studio package'}</button></div>
+    <div class="export-foot"><span class="seed-name">{studio.exportTab === 'manifest' ? `Generated for ${studio.activeSeed?.id ?? 'no selected seed'}` : `${studio.seeds.length} live seeds · ${studio.globalRollup.byStatus.authored} authored packages`}</span><button class="button" onclick={copyPreview}>{#if copyFlash.includes('copied') || copyFlash.includes('Copied')}<Check size={13} aria-hidden="true" />{:else}<Copy size={13} aria-hidden="true" />{/if}Copy {studio.exportTab === 'manifest' ? 'manifest' : studio.exportTab === 'snapshot' ? 'snapshot' : 'studio package'}</button><button class="button primary" onclick={downloadPreview}><DownloadSimple size={13} aria-hidden="true" />Download {studio.exportTab === 'manifest' ? 'manifest' : studio.exportTab === 'snapshot' ? 'snapshot' : 'studio package'}</button></div>
   </Modal>
 
   <Modal open={studio.importOpen} title="Import package" description="Paste or choose a DatasetStudioPackage JSON document. Invalid data never mutates the studio." onclose={() => studio.importOpen = false}>
@@ -521,6 +576,6 @@
     </form>
   </Modal>
 
-  {#if studio.toast}<div class="toast" role="status"><CheckCircle size={15} weight="fill" />{studio.toast}</div>{/if}
+  {#if studio.toast}<div class="toast" class:toast-leave={studio.toastLeaving} role="status"><CheckCircle size={15} weight="fill" aria-hidden="true" />{studio.toast}</div>{/if}
   <div class="sr-only" aria-live="polite" aria-atomic="true">{studio.ariaMessage}</div>
 </div>

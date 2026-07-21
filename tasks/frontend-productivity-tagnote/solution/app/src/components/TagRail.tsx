@@ -38,9 +38,9 @@ export const TagRail = component$<TagRailProps>(
                   onClick$={() => {
                     activeTag.value = isActive ? null : tag;
                   }}
-                  class={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
+                  class={`tag-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-accent)] ${
                     isActive
-                      ? 'bg-[var(--color-accent)] text-white'
+                      ? 'btn-primary text-white'
                       : 'bg-[var(--color-primary)] text-[var(--color-accent)] hover:bg-[#D4E0F0]'
                   }`}
                 >

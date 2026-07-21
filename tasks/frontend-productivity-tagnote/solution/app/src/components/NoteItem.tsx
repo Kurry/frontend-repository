@@ -48,7 +48,7 @@ export const NoteItem = component$<NoteItemProps>(
 
     return (
       <div
-        class={`group relative rounded-[7px] bg-white p-4 shadow-none transition-shadow hover:shadow-md ${
+        class={`note-bubble group relative rounded-[7px] bg-white p-4 shadow-none transition-shadow hover:shadow-md note-enter ${
           note.done ? 'opacity-60' : ''
         }`}
       >
@@ -86,7 +86,7 @@ export const NoteItem = component$<NoteItemProps>(
               class={`text-[17px] leading-relaxed text-[var(--color-text-primary)] ${
                 note.done ? 'text-gray-400 line-through' : ''
               }`}
-              dangerouslySetInnerHTML={renderNoteText(note.text)}
+              dangerouslySetInnerHTML={renderNoteText(note.text, note.marks ?? [])}
             />
 
             {note.file && (
@@ -101,7 +101,7 @@ export const NoteItem = component$<NoteItemProps>(
               {note.tags.map((tag) => (
                 <span
                   key={tag}
-                  class="inline-flex items-center rounded-full bg-[var(--color-primary)] px-2.5 py-0.5 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]"
+                  class="tag-chip inline-flex items-center rounded-full bg-[var(--color-primary)] px-2.5 py-0.5 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]"
                 >
                   #{tag}
                 </span>

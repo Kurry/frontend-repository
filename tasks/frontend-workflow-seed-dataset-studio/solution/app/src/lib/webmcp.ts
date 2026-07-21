@@ -169,8 +169,17 @@ export function initWebMCP() {
 
   // command-session-v1
   (window as any).webmcp_session_start = (id: string) => {
+    if (!studio.activeSeed) throw new Error('No active seed');
     if (id === 'harvest-run') {
-       studio.startHarvest(studio.activeSeed!); return true;
+      return studio.startHarvest(studio.activeSeed, { forceFailReproduce: true });
+    }
+    if (id === 'harvest-step-retry') {
+      const failed = studio.activeSeed.authoring.harvest.steps.findIndex((step) => step.status === 'failed');
+      if (failed >= 0) {
+        studio.retryHarvest(studio.activeSeed, failed);
+        return true;
+      }
+      return studio.startHarvest(studio.activeSeed, { forceFailReproduce: true });
     }
     return false;
   };

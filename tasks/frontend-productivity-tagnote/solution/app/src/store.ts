@@ -1,7 +1,6 @@
 import type { AppState, HistoryBranch, HistoryEntry, HistoryState, Note } from './types';
 import { generateId, getAllTags } from './utils';
 
-const STORAGE_KEY = 'tagnote-state';
 const MAX_HISTORY = 50;
 
 function emptyState(): AppState {
@@ -13,35 +12,17 @@ function cloneState(state: AppState): AppState {
 }
 
 export function loadState(): AppState {
-  if (typeof localStorage === 'undefined') return emptyState();
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw) as AppState;
-      if (Array.isArray(parsed.notes) && Array.isArray(parsed.todoTags)) {
-        return parsed;
-      }
-    }
-  } catch {
-    // ignore
-  }
   return emptyState();
 }
 
-export function saveState(state: AppState): void {
-  if (typeof localStorage === 'undefined') return;
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // ignore
-  }
+export function saveState(_state: AppState): void {
+  // good-app: in-memory only — no browser storage
 }
 
 export function createInitialHistory(): HistoryState {
-  const present = loadState();
   return {
     past: [],
-    present,
+    present: emptyState(),
     future: [],
     branchId: generateId(),
     branches: [],
@@ -87,7 +68,6 @@ export function pushHistoryAndPresent(
     label,
   };
   const past = [...history.past, entry].slice(-MAX_HISTORY);
-  saveState(newState);
   return {
     ...history,
     past,
@@ -106,7 +86,6 @@ export function undo(history: HistoryState): HistoryState {
     timestamp: Date.now(),
     label: 'Redo point',
   };
-  saveState(prev.state);
   return {
     ...history,
     past,
@@ -124,7 +103,6 @@ export function redo(history: HistoryState): HistoryState {
     timestamp: Date.now(),
     label: 'Undo point',
   };
-  saveState(next.state);
   return {
     ...history,
     past: [...history.past, past],
@@ -155,7 +133,6 @@ export function jumpToPastSnapshot(history: HistoryState, index: number): Histor
     ...entry,
     state: cloneState(entry.state),
   }));
-  saveState(selected.state);
   return {
     ...history,
     past,
@@ -186,7 +163,6 @@ export function jumpToFutureSnapshot(history: HistoryState, index: number): Hist
     ...entry,
     state: cloneState(entry.state),
   }));
-  saveState(selected.state);
   return {
     ...history,
     past,
@@ -201,7 +177,6 @@ export function applyBranch(history: HistoryState, branch: HistoryBranch): Histo
     timestamp: Date.now(),
     label: 'Before branch apply',
   };
-  saveState(branch.state);
   return {
     ...history,
     past: [...history.past, past],
@@ -348,16 +323,16 @@ export function filterBySearch(notes: Note[], query: string, todoTags: string[] 
   return notes.filter((n) => {
     let match = true;
     for (const token of tokens) {
-       if (token.startsWith('tag:')) {
-           const t = token.slice(4);
-           if (!n.tags.includes(t)) match = false;
-       } else if (token === 'done:open') {
-           if (n.done || !n.tags.some((t) => todoTags.includes(t))) match = false;
-       } else if (token === 'done:done') {
-           if (!n.done || !n.tags.some((t) => todoTags.includes(t))) match = false;
-       } else {
-           if (!n.text.toLowerCase().includes(token) && !n.tags.some((t) => t.includes(token))) match = false;
-       }
+      if (token.startsWith('tag:')) {
+        const t = token.slice(4);
+        if (!n.tags.includes(t)) match = false;
+      } else if (token === 'done:open') {
+        if (n.done || !n.tags.some((t) => todoTags.includes(t))) match = false;
+      } else if (token === 'done:done') {
+        if (!n.done || !n.tags.some((t) => todoTags.includes(t))) match = false;
+      } else if (!n.text.toLowerCase().includes(token) && !n.tags.some((t) => t.includes(token))) {
+        match = false;
+      }
     }
     return match;
   });
@@ -371,8 +346,6 @@ export function filterByDate(notes: Note[], dateKey: string): Note[] {
   });
 }
 
-// Shared with the bulk-selection pruning task so "visible" always means the
-// same thing to the note list and to what bulk actions are allowed to touch.
 export interface VisibleNotesFilters {
   showArchived: boolean;
   activeTag: string | null;
@@ -403,7 +376,7 @@ export function bulkArchive(state: AppState, noteIds: string[]): AppState {
   const ids = new Set(noteIds);
   return {
     ...state,
-    notes: state.notes.map(n => ids.has(n.id) ? { ...n, archived: true } : n)
+    notes: state.notes.map((n) => (ids.has(n.id) ? { ...n, archived: true } : n)),
   };
 }
 
@@ -411,7 +384,7 @@ export function bulkPin(state: AppState, noteIds: string[]): AppState {
   const ids = new Set(noteIds);
   return {
     ...state,
-    notes: state.notes.map(n => ids.has(n.id) ? { ...n, pinned: true } : n)
+    notes: state.notes.map((n) => (ids.has(n.id) ? { ...n, pinned: true } : n)),
   };
 }
 
@@ -419,6 +392,6 @@ export function bulkDelete(state: AppState, noteIds: string[]): AppState {
   const ids = new Set(noteIds);
   return {
     ...state,
-    notes: state.notes.filter(n => !ids.has(n.id))
+    notes: state.notes.filter((n) => !ids.has(n.id)),
   };
 }

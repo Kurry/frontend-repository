@@ -1,12 +1,13 @@
 import { create } from 'zustand';
 import { seedDatasets, seedRuns, seedTrials } from './seed';
-import { exportSchema, sanitizeJobConfig } from './schemas';
+import { exportSchema, makeJobConfigSchema, sanitizeJobConfig } from './schemas';
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const stamp = () => new Date().toISOString();
 const phaseOrder = ['data', 'fineTune', 'evaluation'];
 let sequence = 1050;
 let lastSubmissionAt = 0;
+let tickCounter = 0;
 
 const event = (runId, phase, status, message) => ({
   id: `${runId}-e-${Date.now()}-${Math.random().toString(16).slice(2, 6)}`,
@@ -19,7 +20,7 @@ export const getEligibleCheckpoints = (runs) => [...new Set(runs.filter((r) => r
 function phaseTemplate(key, status, config, runId) {
   const title = key === 'data' ? 'Data generation' : key === 'fineTune' ? 'Fine-tuning' : 'Evaluation';
   const checkpoint = `${config.model}-ft-${runId.replace('run-', '')}`;
-  const count = key === 'evaluation' ? (config.repetitions ?? 3) : key === 'fineTune' ? config.count : config.count;
+  const count = key === 'evaluation' ? (config.repetitions ?? 3) : config.count;
   return {
     key, title, status, dataset: config.dataset,
     model: key === 'evaluation' && config.jobType === 'Fine-tune' ? checkpoint : config.model,
@@ -63,6 +64,12 @@ function appendEvaluationTrials(trialData, run, phase) {
   return trialData.map((x, i) => i === existingIndex ? { ...x, trials: [...x.trials, ...newTrials] } : x);
 }
 
+function runUsesDataset(run, datasetName) {
+  if (!datasetName) return true;
+  if (run.config?.dataset === datasetName) return true;
+  return run.phases.some((p) => p.dataset === datasetName);
+}
+
 export const usePipelineStore = create((set, get) => ({
   runs: clone(seedRuns),
   datasets: clone(seedDatasets),
@@ -75,34 +82,45 @@ export const usePipelineStore = create((set, get) => ({
   highlightedPhase: null,
   submissionOpen: false,
   mobileNavOpen: false,
+  density: 'comfortable',
   formDraft: { jobType: 'Fine-tune', dataset: '', model: '', count: 5, cluster: 'aurora', autoEvaluate: true },
   comparison: ['quill-2b-ft-1027', 'ember-ft-1031'],
   resultSort: { key: 'mean', dir: 'desc' },
   drilldown: null,
   alerts: [],
-  setView: (activeView) => set({ activeView, mobileNavOpen: false, selectedRunId: null }),
+  importError: null,
+  setView: (activeView) => set({ activeView, mobileNavOpen: false, selectedRunId: null, drilldown: null }),
   setMobileNav: (mobileNavOpen) => set({ mobileNavOpen }),
-  openSubmission: () => set({ submissionOpen: true }),
+  setDensity: (density) => set({ density }),
+  openSubmission: () => set({ submissionOpen: true, selectedRunId: null, drilldown: null, importError: null }),
   closeSubmission: () => set({ submissionOpen: false }),
   setFormDraft: (formDraft) => set({ formDraft }),
-  selectRun: (selectedRunId) => set({ selectedRunId, highlightedPhase: null, timelinePhase: 'all', timelineStatus: 'all' }),
-  setDatasetFilter: (datasetFilter) => set({ datasetFilter, activeView: 'pipeline', mobileNavOpen: false }),
+  selectRun: (selectedRunId) => set({ selectedRunId, highlightedPhase: null, timelinePhase: 'all', timelineStatus: 'all', submissionOpen: false }),
+  setDatasetFilter: (datasetFilter) => set({ datasetFilter, activeView: 'pipeline', mobileNavOpen: false, selectedRunId: null }),
   setTimelinePhase: (timelinePhase) => set({ timelinePhase }),
   setTimelineStatus: (timelineStatus) => set({ timelineStatus }),
   setHighlightedPhase: (highlightedPhase) => set({ highlightedPhase }),
   setComparison: (index, model) => set((s) => ({ comparison: s.comparison.map((x, i) => i === index ? model : x) })),
   setResultSort: (key, dir) => set({ resultSort: { key, dir } }),
-  setDrilldown: (drilldown) => set({ drilldown }),
+  setDrilldown: (drilldown) => set({ drilldown, submissionOpen: false }),
   dismissAlert: (id) => set((s) => ({ alerts: s.alerts.filter((a) => a.id !== id) })),
   pushAlert: (message, color = 'indigo') => set((s) => ({ alerts: [...s.alerts, { id: `${Date.now()}-${Math.random()}`, message, color }] })),
-  submitJob: (raw) => {
+  clearImportError: () => set({ importError: null }),
+  submitJob: (raw, opts = {}) => {
     const state = get();
     const submittedAt = Date.now();
-    if (state.submitting || submittedAt - lastSubmissionAt < 750) return null;
+    if (!opts.force && (state.submitting || submittedAt - lastSubmissionAt < 600)) return null;
     lastSubmissionAt = submittedAt;
     const config = sanitizeJobConfig(raw, getEligibleDatasets(state.runs), getEligibleCheckpoints(state.runs));
     const run = buildRun(config);
-    set((s) => ({ runs: [run, ...s.runs], submissionOpen: false, activeView: 'pipeline', submitting: false, alerts: [...s.alerts, { id: `submit-${run.id}`, message: `${run.id} submitted to ${config.cluster}`, color: 'indigo' }] }));
+    set((s) => ({
+      runs: [run, ...s.runs],
+      submissionOpen: false,
+      activeView: 'pipeline',
+      selectedRunId: null,
+      submitting: false,
+      alerts: [...s.alerts, { id: `submit-${run.id}`, message: `${run.id} submitted to ${config.cluster}`, color: 'indigo' }],
+    }));
     return run;
   },
   pausePhase: (runId, phaseKey) => set((s) => ({
@@ -121,14 +139,89 @@ export const usePipelineStore = create((set, get) => ({
     }),
     alerts: [...s.alerts, { id: `resume-${Date.now()}`, message: `${runId} resumed`, color: 'indigo' }],
   })),
-  retryPhase: (runId, phaseKey) => set((s) => ({
-    runs: s.runs.map((run) => run.id !== runId ? run : {
-      ...run,
-      phases: run.phases.map((p) => p.key === phaseKey && p.status === 'Failed' ? { ...p, status: 'Running', paused: false, startedAt: stamp(), retryRemaining: 0, autoRetry: false } : p),
-      events: [...run.events, event(runId, phaseKey, 'Running', 'Manual retry resumed from checkpoint')],
-    }),
-    alerts: [...s.alerts, { id: `retry-${Date.now()}`, message: `${runId} retrying from checkpoint`, color: 'indigo' }],
-  })),
+  retryPhase: (runId, phaseKey) => set((s) => {
+    let found = false;
+    const runs = s.runs.map((run) => {
+      if (run.id !== runId) return run;
+      return {
+        ...run,
+        phases: run.phases.map((p) => {
+          if (p.key !== phaseKey || p.status !== 'Failed') return p;
+          found = true;
+          return {
+            ...p,
+            status: 'Running',
+            paused: false,
+            startedAt: stamp(),
+            retryRemaining: 0,
+            autoRetry: false,
+            attempt: Math.min(p.maxAttempts, (p.attempt || 1) + 1),
+          };
+        }),
+        events: [...run.events, event(runId, phaseKey, 'Running', 'Manual retry resumed from checkpoint')],
+      };
+    });
+    if (!found) return s;
+    return {
+      runs,
+      alerts: [...s.alerts, { id: `retry-${Date.now()}`, message: `${runId} retrying from checkpoint`, color: 'indigo' }],
+    };
+  }),
+  importJobConfig: (text) => {
+    let parsed;
+    try { parsed = JSON.parse(text); } catch {
+      set({ importError: 'Import rejected: payload is not valid JSON. Fix the file and try again.' });
+      return false;
+    }
+    // Accept either a single job-config or an export envelope.
+    if (parsed && parsed.schemaVersion === 1 && Array.isArray(parsed.runs)) {
+      const restored = [];
+      for (const item of parsed.runs) {
+        const body = {
+          jobType: item.jobType,
+          dataset: item.dataset,
+          model: item.model,
+          count: item.count,
+          cluster: item.cluster,
+          benchmark: item.benchmark,
+          repetitions: item.repetitions,
+          autoEvaluate: item.autoEvaluate,
+        };
+        const eligibleDatasets = getEligibleDatasets(get().runs);
+        const eligibleCheckpoints = getEligibleCheckpoints(get().runs);
+        const check = makeJobConfigSchema(eligibleDatasets, eligibleCheckpoints).safeParse(body);
+        if (!check.success) {
+          set({ importError: `Import rejected: run ${item.runId ?? '(unknown)'} failed schema validation. Fix the payload and try again.` });
+          return false;
+        }
+        restored.push(sanitizeJobConfig(body, eligibleDatasets, eligibleCheckpoints));
+      }
+      const runs = restored.map((config) => buildRun(config));
+      set((s) => ({
+        runs: [...runs, ...s.runs],
+        importError: null,
+        activeView: 'pipeline',
+        alerts: [...s.alerts, { id: `import-${Date.now()}`, message: `Imported ${runs.length} job config(s)`, color: 'green' }],
+      }));
+      return true;
+    }
+    const eligibleDatasets = getEligibleDatasets(get().runs);
+    const eligibleCheckpoints = getEligibleCheckpoints(get().runs);
+    const check = makeJobConfigSchema(eligibleDatasets, eligibleCheckpoints).safeParse(parsed);
+    if (!check.success) {
+      set({ importError: 'Import rejected: job-config does not match the required field contract. Fix required fields and try again.' });
+      return false;
+    }
+    const config = sanitizeJobConfig(parsed, eligibleDatasets, eligibleCheckpoints);
+    const run = buildRun(config);
+    set((s) => ({
+      runs: [run, ...s.runs],
+      importError: null,
+      activeView: 'pipeline',
+      alerts: [...s.alerts, { id: `import-${run.id}`, message: `Imported ${run.id} from job-config`, color: 'green' }],
+    }));
+    return true;
+  },
   exportRuns: () => {
     const payload = {
       schemaVersion: 1,
@@ -137,11 +230,12 @@ export const usePipelineStore = create((set, get) => ({
         ...run.config,
         phaseStatuses: run.phases.map((p) => ({ phase: p.key, status: p.status })),
       })),
-      generatedAt: stamp(),
+      generatedAt: new Date().toISOString(),
     };
     return exportSchema.parse(payload);
   },
   tick: () => set((state) => {
+    tickCounter += 1;
     let trialData = state.trialData;
     const alerts = [...state.alerts];
     const runs = state.runs.map((run) => {
@@ -156,11 +250,14 @@ export const usePipelineStore = create((set, get) => ({
           return { ...p, retryRemaining: remaining, autoRetry: remaining > 0 };
         }
         if (p.status !== 'Running' || p.paused) return p;
+        // Slow cadence so pause/resume and countdowns stay observable.
+        if (p.key === 'fineTune' && tickCounter % 2 !== 0) return p;
+        if (p.key === 'evaluation' && tickCounter % 2 !== 0) return p;
         changed = true;
         nextCost += p.key === 'data' ? .07 : p.key === 'fineTune' ? .22 : .11;
         if (p.key === 'data') {
           const target = p.count * 100;
-          const current = Math.min(target, p.current + 23);
+          const current = Math.min(target, p.current + 8);
           if (current >= target) {
             nextEvents = [...nextEvents, event(run.id, p.key, 'Complete', `${current.toLocaleString()} tasks generated`)];
             alerts.push({ id: `done-${run.id}-${p.key}`, message: `${run.id} data generation completed`, color: 'green' });
@@ -183,7 +280,7 @@ export const usePipelineStore = create((set, get) => ({
         const scores = [...p.scores, score];
         if (current >= p.count) {
           const completed = { ...p, current, scores, status: 'Complete', completedAt: stamp(), output: `report://${run.id}`, cost: p.cost + .11 };
-          nextEvents = [...nextEvents, event(run.id, p.key, 'Complete', `Evaluation completed with mean ${(scores.reduce((a,b)=>a+b,0)/scores.length).toFixed(3)}`)];
+          nextEvents = [...nextEvents, event(run.id, p.key, 'Complete', `Evaluation completed with mean ${(scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(3)}`)];
           trialData = appendEvaluationTrials(trialData, run, completed);
           alerts.push({ id: `done-${run.id}-${p.key}`, message: `${run.id} evaluation completed`, color: 'green' });
           return completed;
@@ -203,8 +300,14 @@ export const usePipelineStore = create((set, get) => ({
     });
     return { runs, trialData, alerts };
   }),
+  filteredRuns: () => {
+    const s = get();
+    return s.datasetFilter ? s.runs.filter((r) => runUsesDataset(r, s.datasetFilter)) : s.runs;
+  },
 }));
 
 export function buildExportText() {
   return JSON.stringify(usePipelineStore.getState().exportRuns(), null, 2);
 }
+
+export { runUsesDataset };

@@ -48,6 +48,29 @@ button {
   padding: 8px 12px;
 }
 
+/* Compact controls in the rail / panels must not inherit the 48px a11y floor */
+button.compact,
+button.stroke-button,
+button.color-swatch,
+button.tool-button,
+button.preset-button,
+button.header-action,
+button.project-action,
+button.layer-action {
+  min-height: 0;
+}
+
+button.compact,
+button.preset-button {
+  padding: 3px 4px;
+  min-height: 22px;
+}
+
+button.stroke-button.compact {
+  padding: 3px 2px;
+  min-height: 22px;
+}
+
 .app-header {
   padding: 8px 16px;
   gap: 12px;
@@ -71,6 +94,43 @@ button {
 .header-action.is-active {
   border-color: var(--color-accent);
   box-shadow: inset 0 0 0 1px var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 22%, var(--color-bg));
+  color: var(--color-text-primary);
+}
+
+.header-action:hover {
+  background: var(--color-surface);
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+}
+
+.header-action.is-active:hover {
+  filter: brightness(1.12);
+}
+
+.header-action.is-disabled,
+.header-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Smooth theme recolor across every themed surface */
+.app-shell,
+.app-header,
+.app-status,
+.tool-panel,
+.layer-panel,
+.canvas-region,
+.header-action,
+.project-action,
+.layer-action,
+.tool-button,
+.color-swatch,
+.stroke-button,
+.layer-row-inner,
+.export-preview-dialog,
+.export-preview-body {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease;
 }
 
 .destructive-action {
@@ -87,6 +147,27 @@ button {
 
 .tool-panel {
   padding: 12px;
+}
+
+@media (min-width: 1024px) {
+  .tool-panel {
+    width: 88px;
+    flex: 0 0 88px;
+    padding: 8px 6px;
+  }
+  .layer-panel {
+    width: 272px;
+    flex: 0 0 272px;
+  }
+  .tool-button {
+    width: auto;
+    height: auto;
+  }
+  .color-swatch,
+  .custom-color-input {
+    width: 22px;
+    height: 22px;
+  }
 }
 
 .canvas-region {
@@ -257,6 +338,146 @@ button {
 
 .drop-indicator {
   border-top: 2px solid var(--color-accent);
+}
+
+/* Layer drag drop indicator (accent border on the target row) */
+.layer-row-outer.drop-target::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: -2px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent);
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Observable row exit animation on delete */
+.layer-row-exit {
+  animation: layer-row-exit 0.24s ease forwards;
+  pointer-events: none;
+}
+@keyframes layer-row-exit {
+  from { opacity: 1; transform: translateX(0); max-height: 64px; }
+  to   { opacity: 0; transform: translateX(24px); max-height: 0; }
+}
+
+/* Inline import validation banner */
+.import-error-banner {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: min(560px, 92vw);
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid #f87171;
+  background: #3a1f24;
+  color: #fecaca;
+  font-size: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.import-error-dismiss {
+  min-height: 0;
+  padding: 2px 6px;
+  border: 1px solid #f87171;
+  border-radius: 6px;
+  background: transparent;
+  color: #fecaca;
+}
+
+/* Copy confirmation toast */
+.copy-toast {
+  position: fixed;
+  left: 50%;
+  top: 64px;
+  transform: translateX(-50%);
+  z-index: 80;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+/* Live-compiled Export project JSON preview dialog */
+.export-preview-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.55);
+}
+.export-preview-dialog {
+  width: min(720px, 96vw);
+  max-height: 84vh;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5);
+}
+.export-preview-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.export-preview-head h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.export-preview-hint {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+}
+.export-preview-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  margin: 0;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre;
+  tab-size: 2;
+}
+.export-preview-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Respect reduced motion: strip animations and transitions entirely */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 @media (max-width: 340px) {

@@ -35,11 +35,13 @@ function validateImportedAnnotation(ann: any, index: number): string | null {
   if (!IMPORT_STROKE_WIDTHS.includes(ann.strokeWidth)) return `annotations[${index}].strokeWidth: must be one of ${IMPORT_STROKE_WIDTHS.join(', ')}`;
 
   if (['rectangle', 'oval', 'blur', 'pixelate', 'spotlight', 'highlighter'].includes(ann.type)) {
-    if (typeof ann.x2 !== 'number' || typeof ann.y2 !== 'number' || ann.x2 - ann.x <= 0 || ann.y2 - ann.y <= 0) {
-      return `annotations[${index}].width/height: must be positive`;
+    if (typeof ann.width !== 'number' || ann.width <= 0 || typeof ann.height !== 'number' || ann.height <= 0) {
+      return `annotations[${index}].width/height: must be positive numbers for type ${ann.type}`;
     }
   } else if (ann.type === 'line' || ann.type === 'arrow') {
-    if (typeof ann.x2 !== 'number' || typeof ann.y2 !== 'number') return `annotations[${index}].x2/y2: required numbers`;
+    if (typeof ann.x2 !== 'number' || typeof ann.y2 !== 'number') return `annotations[${index}].x2/y2: required numbers for type ${ann.type}`;
+  } else if (ann.type === 'loupe') {
+    if (typeof ann.cx !== 'number' || typeof ann.cy !== 'number') return `annotations[${index}].cx/cy: required numbers for type loupe`;
   } else if (ann.type === 'text') {
     if (typeof ann.text !== 'string') return `annotations[${index}].text: required string`;
     if (!IMPORT_TEXT_STYLES.includes(ann.textStyle)) return `annotations[${index}].textStyle: must be one of ${IMPORT_TEXT_STYLES.join(', ')}`;
@@ -48,6 +50,85 @@ function validateImportedAnnotation(ann: any, index: number): string | null {
     }
   }
   return null;
+}
+
+// Convert a validated imported annotation (which carries the contract's per-type
+// geometry field names — width/height, x2/y2, or cx/cy) into the internal model
+// (which stores every shape's second corner as x2/y2 and the loupe source as x/y).
+function normalizeImportedAnnotation(ann: any): Annotation {
+  const base: Annotation = {
+    id: String(ann.id),
+    type: ann.type,
+    x: Number(ann.x),
+    y: Number(ann.y),
+    color: String(ann.color),
+    strokeWidth: ann.strokeWidth,
+  };
+  if (['rectangle', 'oval', 'blur', 'pixelate', 'spotlight', 'highlighter'].includes(ann.type)) {
+    base.x2 = base.x + Math.abs(Number(ann.width));
+    base.y2 = base.y + Math.abs(Number(ann.height));
+    if (ann.type === 'highlighter') base.highlightColor = base.color;
+    if (ann.type === 'blur') base.blurRadius = 8;
+    if (ann.type === 'pixelate') base.pixelSize = 8;
+  } else if (ann.type === 'line' || ann.type === 'arrow') {
+    base.x2 = Number(ann.x2);
+    base.y2 = Number(ann.y2);
+  } else if (ann.type === 'loupe') {
+    base.x = Number(ann.cx);
+    base.y = Number(ann.cy);
+    base.x2 = base.x;
+    base.y2 = base.y;
+    base.loupeZoom = 2;
+  } else if (ann.type === 'text') {
+    base.text = String(ann.text);
+    base.textStyle = ann.textStyle;
+    base.fontSize = Number(ann.fontSize);
+  }
+  return base;
+}
+
+// Serialize one internal annotation to the MarkupFlowProject Annotation contract
+// form: only the documented field names, with per-type geometry expressed under
+// the contract's names (width/height, x2/y2, or cx/cy). Used by the live Export
+// preview, Download, Copy, and the artifact WebMCP tools so every surface shares
+// one compiled, store-derived payload.
+function serializeAnnotation(ann: Annotation): Record<string, unknown> {
+  const out: Record<string, unknown> = {
+    id: ann.id,
+    type: ann.type,
+    x: ann.x,
+    y: ann.y,
+    color: ann.color,
+    strokeWidth: ann.strokeWidth,
+  };
+  const w = Math.abs((ann.x2 ?? ann.x) - ann.x);
+  const h = Math.abs((ann.y2 ?? ann.y) - ann.y);
+  switch (ann.type) {
+    case 'rectangle':
+    case 'oval':
+    case 'blur':
+    case 'pixelate':
+    case 'spotlight':
+    case 'highlighter':
+      out.width = w;
+      out.height = h;
+      break;
+    case 'line':
+    case 'arrow':
+      out.x2 = ann.x2;
+      out.y2 = ann.y2;
+      break;
+    case 'loupe':
+      out.cx = ann.x;
+      out.cy = ann.y;
+      break;
+    case 'text':
+      out.text = ann.text ?? '';
+      out.textStyle = ann.textStyle ?? 'plain';
+      out.fontSize = ann.fontSize ?? 16;
+      break;
+  }
+  return out;
 }
 
 function ToolButton(props: { 
@@ -60,11 +141,11 @@ function ToolButton(props: {
   const isActive = () => props.activeTool === props.tool;
   return (
     <button
-      class={`tool-button flex flex-col items-center justify-center gap-1 px-2 py-2 rounded-lg 
-        transition-all duration-150 min-w-[56px] min-h-[56px] text-xs font-medium
+      class={`tool-button flex flex-col items-center justify-center gap-0.5 px-1 py-1.5 lg:py-1 rounded-lg
+        transition-all duration-150 min-w-[52px] min-h-[52px] lg:min-w-0 lg:min-h-0 text-[11px] font-medium
         focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]
-        ${isActive() 
-          ? 'bg-[var(--color-accent)] text-white shadow-lg' 
+        ${isActive()
+          ? 'bg-[var(--color-accent)] text-white shadow-lg hover:brightness-110 hover:shadow-xl'
           : 'bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-surface)] hover:text-[var(--color-text-primary)]'
         }`}
       onClick={props.onClick}
@@ -72,8 +153,9 @@ function ToolButton(props: {
       aria-label={props.label}
       aria-pressed={isActive()}
     >
-      <span class="text-lg leading-none" aria-hidden="true">{isActive() ? '✓ ' : ''}{props.icon}</span>
-      <span class="text-[10px] leading-tight">{props.label}</span>
+      <span class="text-base lg:text-sm leading-none" aria-hidden="true">{isActive() ? '✓' : ''}{props.icon}</span>
+      <span class="hidden lg:block text-[8px] leading-[1.05] text-center">{props.label.split(' ').slice(-1)[0]}</span>
+      <span class="lg:hidden text-[10px] leading-tight">{props.label}</span>
     </button>
   );
 }
@@ -83,7 +165,7 @@ function ColorSwatch(props: { color: string; active: boolean; onClick: () => voi
     <button
       class={`color-swatch w-12 h-12 rounded-md border-2 transition-all duration-150
         focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]
-        ${props.active ? 'border-white scale-110 shadow-lg' : 'border-transparent hover:border-[var(--color-border)]'}`}
+        ${props.active ? 'border-white scale-110 shadow-lg hover:brightness-110 hover:scale-[1.15]' : 'border-transparent hover:border-[var(--color-border)] hover:scale-105'}`}
       style={{ 'background-color': props.color }}
       onClick={props.onClick}
       aria-label={`Select color ${props.color}`}
@@ -108,6 +190,7 @@ function LayerRow(props: {
   onMove: (direction: -1 | 1) => void;
   isDragOver: boolean;
   isDragging: boolean;
+  isExiting: boolean;
 }) {
   const typeLabel = () => {
     const labels: Record<string, string> = {
@@ -127,64 +210,68 @@ function LayerRow(props: {
 
   return (
     <div
-      class={`flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer transition-all duration-150
-        border group
-        ${props.isSelected 
-          ? 'bg-[var(--color-accent)]/20 border-[var(--color-accent)]' 
-          : 'bg-transparent border-transparent hover:bg-[var(--color-surface)]'
-        }
-        ${props.isDragOver ? '!border-t-2 !border-t-[var(--color-accent)]' : ''}
-        ${props.isDragging ? 'opacity-50 shadow-xl scale-[1.02]' : ''}`}
+      class={`layer-row-outer relative transition-colors duration-150
+        ${props.isDragOver ? 'drop-target' : ''}
+        ${props.isExiting ? 'layer-row-exit' : ''}`}
       draggable={true}
       onDragStart={(e) => props.onDragStart(e, props.index)}
       onDragOver={(e) => { e.preventDefault(); props.onDragOver(e, props.index); }}
       onDrop={(e) => props.onDrop(e, props.index)}
       onDragEnd={(e) => props.onDragEnd(e)}
-      onClick={props.onSelect}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          props.onSelect();
-        }
-      }}
-      tabIndex={0}
-      role="listitem"
-      aria-label={`Layer ${props.index + 1}: ${typeLabel()}`}
     >
-      <div class="w-3 h-3 rounded-sm flex-shrink-0" style={{ 'background-color': props.annotation.color }} />
-      <span class="layer-number text-xs text-[var(--color-text-secondary)] tabular-nums">#{props.index + 1}</span>
-      <span class="flex-1 text-sm text-[var(--color-text-primary)] truncate select-none">
-        {typeLabel()}
-        {props.annotation.type === 'text' && props.annotation.text ? `: "${props.annotation.text.slice(0, 15)}"` : ''}
-      </span>
-      <button
-        class="layer-action text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-        onClick={(e) => { e.stopPropagation(); props.onMove(-1); }}
-        disabled={props.index === 0}
-        aria-label={`Move ${typeLabel()} up`}
-        title="Move up"
+      <div
+        class={`layer-row-inner flex items-center gap-2 px-3 py-2 rounded-lg cursor-pointer
+          transition-all duration-150 border group
+          ${props.isSelected
+            ? 'bg-[var(--color-accent)]/20 border-[var(--color-accent)]'
+            : 'bg-transparent border-transparent hover:bg-[var(--color-surface)] hover:border-[var(--color-border)]'
+          }
+          ${props.isDragging ? 'opacity-50 shadow-xl scale-[1.02]' : ''}`}
+        onClick={props.onSelect}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            props.onSelect();
+          }
+        }}
+        tabIndex={0}
+        role="listitem"
+        aria-label={`Layer ${props.index + 1}: ${typeLabel()}`}
       >
-        ↑
-      </button>
-      <button
-        class="layer-action text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-        onClick={(e) => { e.stopPropagation(); props.onMove(1); }}
-        disabled={props.index === props.count - 1}
-        aria-label={`Move ${typeLabel()} down`}
-        title="Move down"
-      >
-        ↓
-      </button>
-      <button
-        class="layer-action opacity-70 group-hover:opacity-100 px-2 py-1 text-xs text-red-300 
-          hover:text-red-200 rounded transition-all duration-150
-          focus:outline-none focus:opacity-100 focus:ring-1 focus:ring-red-400"
-        onClick={(e) => { e.stopPropagation(); props.onDelete(); }}
-        aria-label={`Delete ${typeLabel()}`}
-        title={`Delete ${typeLabel()}`}
-      >
-        ✕
-      </button>
+        <div class="w-3 h-3 rounded-sm flex-shrink-0 ring-1 ring-black/20" style={{ 'background-color': props.annotation.color }} />
+        <span class="layer-number text-xs text-[var(--color-text-secondary)] tabular-nums">#{props.index + 1}</span>
+        <span class="flex-1 text-sm text-[var(--color-text-primary)] truncate select-none">
+          {typeLabel()}
+          {props.annotation.type === 'text' && props.annotation.text ? `: "${props.annotation.text.slice(0, 15)}"` : ''}
+        </span>
+        <button
+          class="layer-action text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)]"
+          onClick={(e) => { e.stopPropagation(); props.onMove(-1); }}
+          disabled={props.index === 0}
+          aria-label={`Move ${typeLabel()} up`}
+          title="Move up"
+        >
+          ↑
+        </button>
+        <button
+          class="layer-action text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)]"
+          onClick={(e) => { e.stopPropagation(); props.onMove(1); }}
+          disabled={props.index === props.count - 1}
+          aria-label={`Move ${typeLabel()} down`}
+          title="Move down"
+        >
+          ↓
+        </button>
+        <button
+          class="layer-action text-red-300 hover:text-red-100 hover:bg-red-500/20
+            focus:outline-none focus:ring-1 focus:ring-red-400"
+          onClick={(e) => { e.stopPropagation(); props.onDelete(); }}
+          aria-label={`Delete ${typeLabel()}`}
+          title={`Delete ${typeLabel()}`}
+        >
+          ✕
+        </button>
+      </div>
     </div>
   );
 }
@@ -220,8 +307,21 @@ export default function App() {
   const [editingTextId, setEditingTextId] = createSignal<string | null>(null);
   const [statusMessage, setStatusMessage] = createSignal('Ready');
   const [snapshotNameValue, setSnapshotNameValue] = createSignal('');
-  const [viewMode, setViewMode] = createSignal<'edit' | 'preview'>('edit');
+  const [snapshotNameError, setSnapshotNameError] = createSignal('');
+  // Snapshot name validation mirrors the Saved projects field contract (trimmed non-empty,
+  // at most 80 characters): the Save control disables for empty or over-limit names and the
+  // over-limit error is surfaced inline as the user types.
+  const snapshotTrimmed = () => snapshotNameValue().trim();
+  const snapshotTooLong = () => snapshotTrimmed().length > 80;
+  const snapshotShownError = () => (snapshotTooLong() ? 'Snapshot name must be at most 80 characters' : snapshotNameError());
+  const [importError, setImportError] = createSignal('');
+  const [showExportPreview, setShowExportPreview] = createSignal(false);
+  const [copyToast, setCopyToast] = createSignal(false);
+  const [exitingLayerIds, setExitingLayerIds] = createSignal<Set<string>>(new Set());
   const [theme, setTheme] = createSignal<'dark' | 'light'>('dark');
+  let copyToastTimer: ReturnType<typeof setTimeout> | undefined;
+  let importErrorTimer: ReturnType<typeof setTimeout> | undefined;
+  const layerDeleteTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   const projectForm = createForm(() => ({
     defaultValues: { name: '' },
@@ -234,6 +334,9 @@ export default function App() {
       }
     },
     validators: {
+      onChange: z.object({
+        name: z.string().min(1, 'Project name is required').max(80, 'Project name must be at most 80 characters'),
+      }),
       onSubmit: z.object({
         name: z.string().min(1, 'Project name is required').max(80, 'Project name must be at most 80 characters'),
       })
@@ -267,7 +370,120 @@ export default function App() {
   const canUndo = createMemo(() => state.undoStack.length > 0);
   const canRedo = createMemo(() => state.redoStack.length > 0);
 
+  const prefersReducedMotion = () =>
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Live-compiled MarkupFlowProject payload derived from the store. Every export
+  // surface (preview panel, Download, Copy, artifact WebMCP) reads this same memo
+  // so the would-be request body always reflects the current image + annotations.
+  const compileProject = createMemo(() => ({
+    schemaVersion: 'markupflow-project-v1' as const,
+    imageDataUrl: state.imageDataUrl ?? '',
+    imageWidth: state.imageWidth,
+    imageHeight: state.imageHeight,
+    annotations: state.annotations.map(serializeAnnotation),
+  }));
+  const compileProjectText = createMemo(() => JSON.stringify(compileProject(), null, 2));
+
+  const flashCopyToast = () => {
+    setCopyToast(true);
+    if (copyToastTimer) clearTimeout(copyToastTimer);
+    copyToastTimer = setTimeout(() => setCopyToast(false), 1600);
+  };
+
+  const flashImportError = (message: string) => {
+    setImportError(message);
+    if (importErrorTimer) clearTimeout(importErrorTimer);
+    importErrorTimer = setTimeout(() => setImportError(''), 6000);
+  };
+
   const announce = (message: string) => setStatusMessage(message);
+
+  const copyProjectJsonToClipboard = () => {
+    if (!state.imageDataUrl) return;
+    const text = compileProjectText();
+    const done = () => { announce('Project JSON copied to clipboard'); flashCopyToast(); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        done();
+      });
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      done();
+    }
+  };
+
+  // Shared import path used by both the visible Import project control and the
+  // artifact_import WebMCP tool: open a JSON file picker and restore on success.
+  const openImportPicker = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/json';
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      if (!target.files || !target.files[0]) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        try {
+          const content = JSON.parse(ev.target?.result as string);
+          if (content.schemaVersion !== 'markupflow-project-v1') {
+            flashImportError('Import failed: schemaVersion must be exactly markupflow-project-v1');
+            announce('Import failed: invalid schemaVersion');
+            return;
+          }
+          if (!content.imageDataUrl || !content.imageDataUrl.startsWith('data:image/')) {
+            flashImportError('Import failed: imageDataUrl must begin with data:image/');
+            announce('Import failed: invalid imageDataUrl');
+            return;
+          }
+          if (typeof content.imageWidth !== 'number' || content.imageWidth <= 0 || typeof content.imageHeight !== 'number' || content.imageHeight <= 0) {
+            flashImportError('Import failed: imageWidth and imageHeight must be positive numbers');
+            announce('Import failed: imageWidth/imageHeight must be positive numbers');
+            return;
+          }
+          if (!Array.isArray(content.annotations)) {
+            flashImportError('Import failed: annotations must be an array');
+            announce('Import failed: annotations must be an array');
+            return;
+          }
+          for (let i = 0; i < content.annotations.length; i++) {
+            const geometryError = validateImportedAnnotation(content.annotations[i], i);
+            if (geometryError) {
+              flashImportError(`Import failed: ${geometryError}`);
+              announce(`Import failed: ${geometryError}`);
+              return;
+            }
+          }
+          store.setImage(content.imageDataUrl, content.imageWidth, content.imageHeight);
+          store.setAnnotations(content.annotations.map(normalizeImportedAnnotation));
+          const img = new Image();
+          img.onload = () => {
+            setLoadedImage(img);
+            setTimeout(renderFullCanvas, 200);
+            announce('Project JSON imported');
+            setImportError('');
+          };
+          img.src = content.imageDataUrl;
+        } catch (err) {
+          flashImportError('Import failed: invalid JSON — the file could not be parsed');
+          announce('Import failed: invalid JSON');
+        }
+      };
+      reader.readAsText(target.files[0]);
+    };
+    input.click();
+  };
 
   const combineChanges = (local: string, remote: string) => {
     const parts = [local.trim(), remote.trim()].filter(Boolean);
@@ -921,7 +1137,7 @@ export default function App() {
       listAnnotations: () => state.annotations.map((a) => ({ id: a.id, type: a.type })),
       selectedId: () => state.selectedAnnotationId,
       imageLoaded: () => Boolean(state.imageDataUrl),
-      viewMode: () => viewMode(),
+      viewMode: () => state.viewMode,
       listProjects: () => state.savedProjects.map((p) => ({ id: p.id, name: p.name })),
       placeAnnotation: (tool) => placeAnnotationAtDefault(tool),
       selectAnnotation: (id) => {
@@ -941,7 +1157,7 @@ export default function App() {
         updateSelectedAnnotation({ [key]: value } as Partial<Annotation>);
         return true;
       },
-      setViewMode: (mode) => { setViewMode(mode); announce(`${mode === 'edit' ? 'Edit' : 'Preview'} view active`); },
+      setViewMode: (mode) => { store.setViewMode(mode); announce(`${mode === 'edit' ? 'Edit' : 'Preview'} view active`); },
       renderPreview: () => renderFullCanvas(),
       saveProject: (name) => store.saveProject(name),
       loadProject: (id) => openProjectById(id),
@@ -950,6 +1166,12 @@ export default function App() {
         store.deleteProject(id);
         return true;
       },
+      openExportPreview: () => { if (state.imageDataUrl) setShowExportPreview(true); },
+      triggerExportPng: () => handleExportPNG(),
+      triggerImport: () => openImportPicker(),
+      copyProjectJson: () => copyProjectJsonToClipboard(),
+      projectByteLength: () => compileProjectText().length,
+      projectAnnotationCount: () => state.annotations.length,
     });
   });
 
@@ -995,22 +1217,27 @@ export default function App() {
         </div>
         <div class="flex items-center gap-2">
           <button
-            class={`header-action ${viewMode() === 'edit' ? 'is-active' : ''}`}
-            onClick={() => { setViewMode('edit'); announce('Edit view active'); }}
-            aria-pressed={viewMode() === 'edit'}
+            class={`header-action ${state.viewMode === 'edit' ? 'is-active' : ''}`}
+            onClick={() => { store.setViewMode('edit'); announce('Edit view active'); }}
+            aria-pressed={state.viewMode === 'edit'}
           >
             Open edit view
           </button>
           <button
-            class={`header-action ${viewMode() === 'preview' ? 'is-active' : ''}`}
-            onClick={() => { setViewMode('preview'); announce('Preview view active'); }}
-            aria-pressed={viewMode() === 'preview'}
+            class={`header-action ${state.viewMode === 'preview' ? 'is-active' : ''}`}
+            onClick={() => { store.setViewMode('preview'); announce('Preview view active'); }}
+            aria-pressed={state.viewMode === 'preview'}
           >
             Open preview view
           </button>
           <button
             class="header-action"
             onClick={() => {
+              // Cancel every pending animated layer delete so none can fire after the reset
+              // and push a bogus undo snapshot against the emptied workspace.
+              for (const timer of layerDeleteTimers.values()) clearTimeout(timer);
+              layerDeleteTimers.clear();
+              setExitingLayerIds(new Set<string>());
               store.clearState();
               setLoadedImage(null);
               setSharedContent('');
@@ -1032,69 +1259,15 @@ export default function App() {
             {theme() === 'dark' ? 'Use light theme' : 'Use dark theme'}
           </button>
           <button
-            class="px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-            onClick={() => {
-              const input = document.createElement('input');
-              input.type = 'file';
-              input.accept = 'application/json';
-              input.onchange = (e) => {
-                const target = e.target as HTMLInputElement;
-                if (!target.files || !target.files[0]) return;
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                  try {
-                    const content = JSON.parse(e.target?.result as string);
-                    if (content.schemaVersion !== 'markupflow-project-v1') {
-                      announce('Import failed: invalid schemaVersion');
-                      return;
-                    }
-                    if (!content.imageDataUrl || !content.imageDataUrl.startsWith('data:image/')) {
-                      announce('Import failed: invalid imageDataUrl');
-                      return;
-                    }
-                    if (typeof content.imageWidth !== 'number' || content.imageWidth <= 0 || typeof content.imageHeight !== 'number' || content.imageHeight <= 0) {
-                      announce('Import failed: imageWidth/imageHeight must be positive numbers');
-                      return;
-                    }
-                    if (!Array.isArray(content.annotations)) {
-                      announce('Import failed: annotations must be an array');
-                      return;
-                    }
-                    for (let i = 0; i < content.annotations.length; i++) {
-                      const geometryError = validateImportedAnnotation(content.annotations[i], i);
-                      if (geometryError) {
-                        announce(`Import failed: ${geometryError}`);
-                        return;
-                      }
-                    }
-                    store.setImage(content.imageDataUrl, content.imageWidth, content.imageHeight);
-                    store.setAnnotations(content.annotations);
-                    const img = new Image();
-                    img.onload = () => {
-                      setLoadedImage(img);
-                      setTimeout(renderFullCanvas, 200);
-                      announce('Project JSON imported');
-                    };
-                    img.src = content.imageDataUrl;
-                  } catch (err) {
-                    announce('Import failed: invalid JSON');
-                  }
-                };
-                reader.readAsText(target.files[0]);
-              };
-              input.click();
-            }}
+            class="header-action"
+            onClick={() => openImportPicker()}
             aria-label="Import project"
           >
             Import project
           </button>
 
           <button
-            class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
-              focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]
-              ${!canUndo() 
-                ? 'bg-[var(--color-surface)] text-[var(--color-text-secondary)]/40 cursor-not-allowed opacity-50' 
-                : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)]'}`}
+            class={`header-action ${!canUndo() ? 'is-disabled' : ''}`}
             onClick={() => { store.undo(); setTimeout(() => renderFullCanvas(), 20); }}
             disabled={!canUndo()}
             aria-label="Undo"
@@ -1102,11 +1275,7 @@ export default function App() {
             ↩ Undo
           </button>
           <button
-            class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
-              focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]
-              ${!canRedo() 
-                ? 'bg-[var(--color-surface)] text-[var(--color-text-secondary)]/40 cursor-not-allowed opacity-50' 
-                : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)]'}`}
+            class={`header-action ${!canRedo() ? 'is-disabled' : ''}`}
             onClick={() => { store.redo(); setTimeout(() => renderFullCanvas(), 20); }}
             disabled={!canRedo()}
             aria-label="Redo"
@@ -1118,43 +1287,48 @@ export default function App() {
             onSubmit={(e) => {
               e.preventDefault();
               const name = snapshotNameValue();
-              if (name && name.length <= 80) {
-                if (store.saveSnapshot(name)) {
-                  announce(`Snapshot ${name} saved`);
-                  setSnapshotNameValue('');
-                }
-              } else if (!name) {
-                announce('Snapshot name field is required');
-              } else {
-                announce('Snapshot name field must be at most 80 characters');
+              const trimmed = name.trim();
+              if (!trimmed) {
+                setSnapshotNameError('Snapshot name is required');
+                return;
+              }
+              if (trimmed.length > 80) {
+                setSnapshotNameError('Snapshot name must be at most 80 characters');
+                return;
+              }
+              setSnapshotNameError('');
+              if (store.saveSnapshot(name)) {
+                announce(`Snapshot ${name} saved`);
+                setSnapshotNameValue('');
               }
             }}
-            class="flex items-center gap-1 bg-[var(--color-surface)] rounded-lg p-1 border border-[var(--color-border)]"
+            class="relative flex items-center gap-1 bg-[var(--color-bg)] border border-[var(--color-border)] rounded-lg p-0.5"
           >
             <input
               name="snapshotName"
               placeholder="Snapshot name"
               value={snapshotNameValue()}
-              onInput={(e) => setSnapshotNameValue(e.currentTarget.value)}
-              class="bg-transparent text-sm text-[var(--color-text-primary)] px-2 py-0.5 w-32 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] rounded"
+              onInput={(e) => { setSnapshotNameValue(e.currentTarget.value); if (snapshotNameError()) setSnapshotNameError(''); }}
+              class={`bg-transparent text-sm text-[var(--color-text-primary)] px-2 py-0.5 w-32 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] rounded ${snapshotShownError() ? 'border border-red-500' : ''}`}
               aria-label="Snapshot name"
+              aria-invalid={!!snapshotShownError()}
+              aria-describedby={snapshotShownError() ? 'snapshot-name-error' : undefined}
             />
             <button
               type="submit"
-              class={`px-2 py-0.5 rounded-md text-xs font-medium transition-all duration-150
-                focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] disabled:opacity-50 disabled:cursor-not-allowed`}
-              disabled={snapshotNameValue().trim().length === 0}
+              class={`header-action ${snapshotTrimmed().length === 0 || snapshotTooLong() ? 'is-disabled' : ''}`}
+              disabled={snapshotTrimmed().length === 0 || snapshotTooLong()}
               aria-label="Save snapshot"
             >
               Save snapshot
             </button>
+            <Show when={snapshotShownError()}>
+              <p id="snapshot-name-error" class="absolute left-0 top-full mt-1 z-50 whitespace-nowrap rounded-md border border-red-500 bg-[var(--color-surface)] px-2 py-1 text-[10px] text-red-400" role="alert" aria-live="polite">{snapshotShownError()}</p>
+            </Show>
           </form>
+
           <button
-            class={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-150
-              focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]
-              ${state.compareMode
-                ? 'bg-[var(--color-accent)] text-white shadow-lg'
-                : 'bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)]'}`}
+            class={`header-action ${state.compareMode ? 'is-active' : ''}`}
             onClick={() => {
               setState('compareMode', !state.compareMode);
               announce(`Compare ${state.compareMode ? 'active' : 'inactive'}`);
@@ -1167,56 +1341,19 @@ export default function App() {
           </button>
 
           <button
-            class="px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => {
-              if (!state.imageDataUrl) return;
-              const json = JSON.stringify({
-                schemaVersion: 'markupflow-project-v1',
-                imageDataUrl: state.imageDataUrl,
-                imageWidth: state.imageWidth,
-                imageHeight: state.imageHeight,
-                annotations: state.annotations
-              }, null, 2);
-              const blob = new Blob([json], { type: 'application/json' });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = 'markupflow-project.json';
-              document.body.appendChild(a);
-              a.click();
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-              announce('Export project JSON');
-            }}
+            class="header-action"
+            onClick={() => { if (state.imageDataUrl) setShowExportPreview(true); }}
             disabled={!state.imageDataUrl}
             aria-label="Export project JSON"
+            aria-haspopup="dialog"
+            aria-expanded={showExportPreview()}
           >
             Export project JSON
           </button>
 
           <button
-            class="px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-surface)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-border)] transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
-            onClick={() => {
-              if (!state.imageDataUrl) return;
-              const json = JSON.stringify({
-                schemaVersion: 'markupflow-project-v1',
-                imageDataUrl: state.imageDataUrl,
-                imageWidth: state.imageWidth,
-                imageHeight: state.imageHeight,
-                annotations: state.annotations
-              }, null, 2);
-              navigator.clipboard.writeText(json)
-                .then(() => announce('Project JSON copied to clipboard'))
-                .catch(() => {
-                  const ta = document.createElement('textarea');
-                  ta.value = json;
-                  document.body.appendChild(ta);
-                  ta.select();
-                  document.execCommand('copy');
-                  document.body.removeChild(ta);
-                  announce('Project JSON copied to clipboard');
-                });
-            }}
+            class="header-action"
+            onClick={() => copyProjectJsonToClipboard()}
             disabled={!state.imageDataUrl}
             aria-label="Copy project JSON"
           >
@@ -1238,26 +1375,25 @@ export default function App() {
       {/* Main content */}
       <div class="app-layout flex flex-1 overflow-hidden flex-col lg:flex-row">
         {/* Toolbar */}
-        <aside class={`tool-panel flex flex-row lg:flex-col gap-2 p-3 bg-[var(--color-surface)] border-b lg:border-b-0 lg:border-r border-[var(--color-border)] 
-          overflow-x-auto overflow-y-hidden lg:overflow-x-hidden lg:overflow-y-auto 
-          lg:w-[88px] flex-shrink-0 items-start ${viewMode() === 'preview' ? 'preview-hidden' : ''}`}>
-          
+        <nav aria-label="Annotation tools" class={`tool-panel flex flex-row lg:flex-col gap-2 lg:gap-1.5 p-2 bg-[var(--color-surface)] border-b lg:border-b-0 lg:border-r border-[var(--color-border)]
+          overflow-x-auto overflow-y-hidden lg:overflow-x-hidden lg:overflow-y-auto
+          lg:w-[88px] flex-shrink-0 items-start ${state.viewMode === 'preview' ? 'preview-hidden' : ''}`}>
+
           {/* Shapes section */}
-          <div class="flex flex-row lg:flex-col gap-1 flex-shrink-0">
-            <h2 class="toolbar-heading hidden lg:block text-[11px] font-semibold text-[var(--color-text-secondary)] tracking-wider px-1 mb-1">Shapes</h2>
+          <div class="tool-section flex flex-row lg:grid lg:grid-cols-2 gap-1 flex-shrink-0">
+            <h2 class="toolbar-heading hidden lg:block col-span-2 text-[10px] font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Shapes</h2>
             <ToolButton tool="rectangle" label="Draw rectangle" icon="▭" activeTool={state.activeTool} onClick={() => activateTool('rectangle')} />
             <ToolButton tool="oval" label="Draw oval" icon="◯" activeTool={state.activeTool} onClick={() => activateTool('oval')} />
             <ToolButton tool="line" label="Draw line" icon="╱" activeTool={state.activeTool} onClick={() => activateTool('line')} />
             <ToolButton tool="arrow" label="Draw arrow" icon="➜" activeTool={state.activeTool} onClick={() => activateTool('arrow')} />
           </div>
 
-          {/* Separator */}
-          <div class="hidden lg:block w-full h-px bg-[var(--color-border)] my-1 flex-shrink-0" />
+          <div class="hidden lg:block w-full h-px bg-[var(--color-border)] flex-shrink-0" />
           <div class="lg:hidden w-px h-10 bg-[var(--color-border)] mx-1 flex-shrink-0" />
 
           {/* Effects section */}
-          <div class="flex flex-row lg:flex-col gap-1 flex-shrink-0">
-            <h2 class="toolbar-heading hidden lg:block text-[11px] font-semibold text-[var(--color-text-secondary)] tracking-wider px-1 mb-1">Effects</h2>
+          <div class="tool-section flex flex-row lg:grid lg:grid-cols-2 gap-1 flex-shrink-0">
+            <h2 class="toolbar-heading hidden lg:block col-span-2 text-[10px] font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Effects</h2>
             <ToolButton tool="text" label="Add text" icon="T" activeTool={state.activeTool} onClick={() => activateTool('text')} />
             <ToolButton tool="blur" label="Apply blur" icon="◌" activeTool={state.activeTool} onClick={() => activateTool('blur')} />
             <ToolButton tool="pixelate" label="Apply pixelate" icon="▦" activeTool={state.activeTool} onClick={() => activateTool('pixelate')} />
@@ -1266,21 +1402,20 @@ export default function App() {
             <ToolButton tool="highlighter" label="Add highlighter" icon="▬" activeTool={state.activeTool} onClick={() => activateTool('highlighter')} />
           </div>
 
-          {/* Separator */}
-          <div class="hidden lg:block w-full h-px bg-[var(--color-border)] my-1 flex-shrink-0" />
+          <div class="hidden lg:block w-full h-px bg-[var(--color-border)] flex-shrink-0" />
           <div class="lg:hidden w-px h-10 bg-[var(--color-border)] mx-1 flex-shrink-0" />
 
           {/* Style section */}
-          <div class="flex flex-row lg:flex-col gap-1 flex-wrap flex-shrink-0">
-            <h2 class="toolbar-heading hidden lg:block text-[11px] font-semibold text-[var(--color-text-secondary)] tracking-wider px-1 mb-1">Style</h2>
-            
+          <div class="tool-section flex flex-col gap-1 flex-shrink-0 w-full lg:w-auto">
+            <h2 class="toolbar-heading hidden lg:block text-[10px] font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Style</h2>
+
             {/* Color swatches */}
-            <div class="flex flex-row lg:flex-col gap-1 flex-wrap">
+            <div class="flex flex-row lg:grid lg:grid-cols-3 gap-1 flex-wrap">
               <For each={COLOR_SWATCHES}>
                 {(color) => (
-                  <ColorSwatch 
-                    color={color} 
-                    active={state.activeColor === color} 
+                  <ColorSwatch
+                    color={color}
+                    active={state.activeColor === color}
                     onClick={() => {
                       store.setActiveColor(color);
                       updateSelectedAnnotation({ color });
@@ -1288,13 +1423,11 @@ export default function App() {
                   />
                 )}
               </For>
-              {/* Custom color */}
-              <label class="custom-color-control relative flex flex-col items-center gap-1">
-                <span class="text-[10px] text-[var(--color-text-secondary)]">Custom color</span>
+              <label class="custom-color-control relative flex flex-col items-center justify-center gap-0.5">
                 <input
                   type="color"
                   value={state.activeColor}
-                  class="custom-color-input w-12 h-12 rounded-md cursor-pointer"
+                  class="custom-color-input w-7 h-7 lg:w-full lg:h-7 rounded-md cursor-pointer"
                   onInput={(e) => {
                     store.setActiveColor(e.target.value);
                     updateSelectedAnnotation({ color: e.target.value });
@@ -1305,63 +1438,56 @@ export default function App() {
             </div>
 
             {/* Stroke width */}
-            <div class="flex flex-row lg:flex-col gap-1 mt-1">
+            <div class="grid grid-cols-3 gap-1">
               {(['thin', 'medium', 'thick'] as StrokeWidth[]).map((sw) => (
                 <button
-                  class={`stroke-button px-2 py-1 rounded text-[11px] font-medium transition-all duration-150
+                  class={`stroke-button compact px-1 py-1 rounded text-[10px] font-medium transition-all duration-150
                     focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)]
-                    ${state.activeStrokeWidth === sw 
-                      ? 'bg-[var(--color-accent)] text-white' 
-                      : 'bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'}`}
+                    ${state.activeStrokeWidth === sw
+                      ? 'bg-[var(--color-accent)] text-white hover:brightness-110'
+                      : 'bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]'}`}
                   onClick={() => {
                     store.setActiveStrokeWidth(sw);
                     updateSelectedAnnotation({ strokeWidth: sw });
                   }}
                   aria-label={`Use ${sw} stroke`}
+                  aria-pressed={state.activeStrokeWidth === sw}
                 >
-                  {state.activeStrokeWidth === sw ? '✓ ' : ''}Use {sw}
+                  {state.activeStrokeWidth === sw ? '✓' : ''}{sw[0].toUpperCase()}
                 </button>
               ))}
             </div>
 
             {/* Copy / Paste Style */}
-            <div class="flex flex-row lg:flex-col gap-1 mt-1">
+            <div class="grid grid-cols-2 gap-1">
               <button
-                class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
-                onClick={() => {
-                  store.copyStyle();
-                  announce('Style copied');
-                }}
+                class="compact px-1 py-1 rounded text-[10px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => { store.copyStyle(); announce('Style copied'); }}
                 disabled={!state.selectedAnnotationId}
                 aria-label="Copy style"
               >
-                Copy style
+                Copy
               </button>
               <button
-                class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={() => {
-                  store.pasteStyle();
-                  announce('Style pasted');
-                  setTimeout(() => renderFullCanvas(), 20);
-                }}
+                class="compact px-1 py-1 rounded text-[10px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)] disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => { store.pasteStyle(); announce('Style pasted'); setTimeout(() => renderFullCanvas(), 20); }}
                 disabled={!state.copiedStyleBuffer || !state.selectedAnnotationId}
                 aria-label="Paste style"
               >
-                Paste style
+                Paste
               </button>
             </div>
           </div>
 
-          {/* Separator */}
-          <div class="hidden lg:block w-full h-px bg-[var(--color-border)] my-1 flex-shrink-0" />
+          <div class="hidden lg:block w-full h-px bg-[var(--color-border)] flex-shrink-0" />
           <div class="lg:hidden w-px h-10 bg-[var(--color-border)] mx-1 flex-shrink-0" />
 
           {/* Presets section */}
-          <div class="flex flex-row lg:flex-col gap-1 flex-wrap flex-shrink-0">
-            <h2 class="toolbar-heading hidden lg:block text-[11px] font-semibold text-[var(--color-text-secondary)] tracking-wider px-1 mb-1">Presets</h2>
+          <div class="tool-section flex flex-col gap-1 flex-shrink-0 w-full lg:w-auto">
+            <h2 class="toolbar-heading hidden lg:block text-[10px] font-semibold uppercase text-[var(--color-text-secondary)] tracking-wider px-0.5">Presets</h2>
 
             <button
-              class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              class="preset-button compact px-1 py-1 rounded text-[10px] font-medium leading-tight transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
               onClick={() => {
                 if (!state.imageDataUrl) return;
                 const width = state.imageWidth;
@@ -1385,7 +1511,7 @@ export default function App() {
             </button>
 
             <button
-              class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              class="preset-button compact px-1 py-1 rounded text-[10px] font-medium leading-tight transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
               onClick={() => {
                 if (!state.imageDataUrl) return;
                 const width = state.imageWidth;
@@ -1419,7 +1545,7 @@ export default function App() {
             </button>
 
             <button
-              class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              class="preset-button compact px-1 py-1 rounded text-[10px] font-medium leading-tight transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
               onClick={() => {
                 if (!state.imageDataUrl) return;
                 const width = state.imageWidth;
@@ -1442,7 +1568,7 @@ export default function App() {
             </button>
 
             <button
-              class="px-2 py-1 rounded text-[11px] font-medium transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+              class="preset-button compact px-1 py-1 rounded text-[10px] font-medium leading-tight transition-all duration-150 focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] bg-[var(--color-bg)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-surface)]"
               onClick={() => {
                 if (!state.imageDataUrl) return;
                 const width = state.imageWidth;
@@ -1464,7 +1590,7 @@ export default function App() {
               Spotlight focus
             </button>
           </div>
-        </aside>
+        </nav>
 
         {/* Canvas area */}
         <main class="canvas-region flex-1 overflow-auto p-4 flex items-center justify-center bg-[var(--color-bg)] relative"
@@ -1528,11 +1654,11 @@ export default function App() {
           }>
             <div
               class="canvas-wrapper relative shadow-2xl rounded-lg overflow-hidden"
-              style={{ width: `${canvasWidth()}px`, "aspect-ratio": `${canvasWidth()} / ${canvasHeight()}` }}
+              style={{ width: `${canvasWidth()}px`, "max-width": "100%", "aspect-ratio": `${canvasWidth()} / ${canvasHeight()}` }}
             >
               <canvas
                 ref={canvasRef}
-                class="base-canvas block"
+                class="base-canvas block w-full h-full"
                 style={{ "image-rendering": "auto" }}
                 role="img"
                 aria-label="Loaded image with rendered annotations"
@@ -1697,9 +1823,29 @@ export default function App() {
                       store.setSelectedAnnotation(ann.id === state.selectedAnnotationId ? null : ann.id);
                     }}
                     onDelete={() => {
-                      store.deleteAnnotation(ann.id);
-                      announce(`${ann.type} annotation deleted`);
-                      setTimeout(() => renderFullCanvas(), 20);
+                      const id = ann.id;
+                      const kind = ann.type;
+                      const remove = () => {
+                        layerDeleteTimers.delete(id);
+                        // Bail out if the annotation is already gone (e.g. the workspace was
+                        // reset while the exit animation was pending) — otherwise we would push
+                        // a bogus undo snapshot and mutate history after the reset.
+                        if (!state.annotations.some((a) => a.id === id)) {
+                          setExitingLayerIds(prev => { const next = new Set(prev); next.delete(id); return next; });
+                          return;
+                        }
+                        store.deleteAnnotation(id);
+                        setExitingLayerIds(prev => { const next = new Set(prev); next.delete(id); return next; });
+                        announce(`${kind} annotation deleted`);
+                        setTimeout(() => renderFullCanvas(), 20);
+                      };
+                      if (prefersReducedMotion()) { remove(); return; }
+                      // Each pending delete is tracked independently so deleting several rows in
+                      // quick succession removes every one of them instead of cancelling the earlier ones.
+                      setExitingLayerIds(prev => new Set(prev).add(id));
+                      const pending = layerDeleteTimers.get(id);
+                      if (pending) clearTimeout(pending);
+                      layerDeleteTimers.set(id, setTimeout(remove, 240));
                     }}
                     onDragStart={handleLayerDragStart}
                     onDragOver={handleLayerDragOver}
@@ -1708,6 +1854,7 @@ export default function App() {
                     onMove={(direction) => moveLayer(i(), direction)}
                     isDragOver={dragOverIndex() === i() && dragLayerIndex() !== null && dragLayerIndex() !== i()}
                     isDragging={dragLayerIndex() === i()}
+                    isExiting={exitingLayerIds().has(ann.id)}
                   />
                 )}
               </For>
@@ -1743,7 +1890,7 @@ export default function App() {
           </section>
 
           {/* Versions Panel */}
-          <section class="versions-panel border-t border-[var(--color-border)] p-3 flex-shrink-0 max-h-40 overflow-y-auto" aria-labelledby="versions-heading">
+          <section class="versions-panel border-t border-[var(--color-border)] p-3 flex-shrink-0 max-h-56 overflow-y-auto" aria-labelledby="versions-heading">
             <h3 id="versions-heading" class="text-xs font-bold text-[var(--color-text-primary)] mb-2">Versions</h3>
             <Show when={state.versions.length > 0} fallback={
               <p class="text-[10px] text-[var(--color-text-secondary)] text-center py-2">No versions saved. Save a snapshot to see it here.</p>
@@ -1784,7 +1931,13 @@ export default function App() {
             >
               <projectForm.Field
                 name="name"
-                children={(field) => (
+                children={(field) => {
+                  const value = (field().state.value ?? '').toString();
+                  const trimmed = value.trim();
+                  const tooLong = trimmed.length > 80;
+                  const derivedError = tooLong ? 'Project name must be at most 80 characters' : '';
+                  const shownError = field().state.meta.errors[0]?.message || derivedError;
+                  return (
                   <div class="mb-2">
                     <label class="text-[10px] text-[var(--color-text-secondary)] block mb-1" for={field().name}>Project name</label>
                     <div class="flex gap-2 mb-1">
@@ -1794,29 +1947,27 @@ export default function App() {
                         value={field().state.value}
                         onInput={(e) => field().handleChange(e.target.value)}
                         onBlur={field().handleBlur}
-                        class={`project-name-input flex-1 min-w-0 bg-[var(--color-bg)] text-[var(--color-text-primary)] text-xs px-2 rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] ${field().state.meta.errors.length > 0 ? 'border border-red-500' : ''}`}
+                        class={`project-name-input flex-1 min-w-0 bg-[var(--color-bg)] text-[var(--color-text-primary)] text-xs px-2 rounded-md focus:outline-none focus:ring-1 focus:ring-[var(--color-accent)] ${shownError ? 'border border-red-500' : ''}`}
                         placeholder="Annotation project"
+                        aria-invalid={!!shownError}
+                        aria-describedby={shownError ? 'project-name-error' : undefined}
                       />
-                      <projectForm.Subscribe
-                        selector={(state) => state.canSubmit}
-                        children={(canSubmit) => (
-                          <button
-                            type="submit"
-                            class="project-action bg-[var(--color-primary)] text-white rounded-md px-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50"
-                            disabled={!canSubmit()}
-                          >
-                            Save project
-                          </button>
-                        )}
-                      />
+                      <button
+                        type="submit"
+                        class="project-action bg-[var(--color-primary)] text-white rounded-md px-2 text-xs focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled={trimmed.length === 0 || tooLong}
+                      >
+                        Save project
+                      </button>
                     </div>
-                    <Show when={field().state.meta.errors.length > 0}>
-                      <div class="text-[10px] text-red-500 mt-0.5" role="alert" aria-live="polite">
-                        {field().state.meta.errors[0]?.message}
+                    <Show when={shownError}>
+                      <div id="project-name-error" class="text-[10px] text-red-400 mt-0.5" role="alert" aria-live="polite">
+                        {shownError}
                       </div>
                     </Show>
                   </div>
-                )}
+                  );
+                }}
               />
             </form>
             <div class="saved-project-list space-y-1" role="list" aria-label="Saved projects" ref={(el) => {
@@ -2011,13 +2162,13 @@ export default function App() {
                   </div>
                 </div>
               </Show>
-              <Show when={state.offlineQueue.length > 0 && !mergeConflict()}>
-                <p class="text-[10px] text-yellow-400 mt-1">
-                  {state.offlineQueue.length} pending change(s)
+              <Show when={state.collaborationState === 'offline' && !mergeConflict()}>
+                <p class="text-[10px] text-yellow-400 mt-1" role="status" aria-live="polite">
+                  Offline — {state.offlineQueue.length} pending change{state.offlineQueue.length === 1 ? '' : 's'} will sync when you go online
                 </p>
               </Show>
               <Show when={state.collaborationState === 'syncing'}>
-                <p class="text-[10px] text-green-400 mt-1 animate-pulse">
+                <p class="text-[10px] text-green-400 mt-1 animate-pulse motion-reduce:animate-none">
                   Syncing...
                 </p>
               </Show>
@@ -2025,6 +2176,83 @@ export default function App() {
           </div>
         </aside>
       </div>
+
+      {/* Inline import validation banner (names the offending field/rule) */}
+      <Show when={importError()}>
+        <div
+          class="import-error-banner"
+          role="alert"
+          aria-live="assertive"
+        >
+          <span class="flex-1">{importError()}</span>
+          <button
+            class="import-error-dismiss"
+            onClick={() => setImportError('')}
+            aria-label="Dismiss import error"
+          >
+            ✕
+          </button>
+        </div>
+      </Show>
+
+      {/* Brief auto-dismissing Copy project JSON confirmation */}
+      <Show when={copyToast()}>
+        <div class="copy-toast" role="status" aria-live="polite">Project JSON copied</div>
+      </Show>
+
+      {/* Live-compiled Export project JSON preview dialog */}
+      <Show when={showExportPreview()}>
+        <div
+          class="export-preview-backdrop"
+          role="presentation"
+          onClick={() => setShowExportPreview(false)}
+        >
+          <div
+            class="export-preview-dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="export-preview-title"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div class="export-preview-head">
+              <h2 id="export-preview-title">Export project JSON</h2>
+              <button
+                class="header-action"
+                onClick={() => setShowExportPreview(false)}
+                aria-label="Close export preview"
+              >
+                Close
+              </button>
+            </div>
+            <p class="export-preview-hint">
+              Read-only preview compiled live from the workspace. Download saves a client-side .json Blob; Copy writes the same text to the clipboard.
+            </p>
+            <pre class="export-preview-body" aria-label="Compiled project JSON" tabindex={0}>{compileProjectText()}</pre>
+            <div class="export-preview-actions">
+              <button
+                class="header-action"
+                onClick={() => {
+                  const blob = new Blob([compileProjectText()], { type: 'application/json' });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = 'markupflow-project.json';
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                  announce('Project JSON downloaded');
+                }}
+              >
+                Download project JSON
+              </button>
+              <button class="header-action" onClick={() => copyProjectJsonToClipboard()}>
+                Copy project JSON
+              </button>
+            </div>
+          </div>
+        </div>
+      </Show>
     </div>
   );
 }

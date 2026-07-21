@@ -117,9 +117,14 @@ button:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 3px s
 .workspace-status .hero-banner { max-width: 420px; }
 .breadcrumb { margin-top: 18px; min-height: 34px; display: flex; align-items: center; gap: 3px; overflow-x: auto; white-space: nowrap; background: #f1f5f4; border: 1px solid var(--line); border-radius: 9px; padding: 5px 8px; }
 .breadcrumb span { display: inline-flex; align-items: center; gap: 3px; }
-.breadcrumb button { border: 0; background: transparent; color: #36534e; font-size: 12px; font-weight: 650; padding: 4px 6px; border-radius: 6px; cursor: pointer; }
-.breadcrumb button:hover { background: #dfeae8; color: var(--teal-deep); }
+.breadcrumb button, .breadcrumb-link { border: 0; background: transparent; color: #36534e; font-size: 12px; font-weight: 650; padding: 4px 6px; border-radius: 6px; cursor: pointer; text-decoration: none; }
+.breadcrumb button:hover, .breadcrumb-link:hover { background: #dfeae8; color: var(--teal-deep); }
 .breadcrumb [aria-current='page'] { color: var(--ink); font-weight: 850; }
+.live-region { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.calibration-markers { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.calibration-markers span { background: #eef5f3; border: 1px solid var(--line); border-radius: 999px; padding: 4px 8px; font-size: 11px; color: var(--muted); }
+.calibration-markers strong { color: var(--ink); }
+.calibration-overall { flex-wrap: wrap; }
 .workspace-layout { display: grid; grid-template-columns: 235px minmax(0, 1fr); align-items: start; }
 .step-rail { position: sticky; top: 68px; min-height: calc(100vh - 68px); padding: 22px 15px 24px clamp(16px, 2.4vw, 32px); background: #eaf0ee; border-right: 1px solid var(--line); }
 .step-rail-heading { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
@@ -305,11 +310,13 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
 
 @media (max-width: 1024px) {
   .workspace-layout { grid-template-columns: 1fr; }
-  .step-rail { position: static; min-height: 0; padding: 12px 14px; border-right: 0; border-bottom: 1px solid var(--line); overflow-x: hidden; width: 100%; box-sizing: border-box; flex-wrap: wrap; }
+  .step-rail { position: static; min-height: 0; padding: 12px 14px; border-right: 0; border-bottom: 1px solid var(--line); overflow-x: hidden; width: 100%; max-width: 100%; box-sizing: border-box; }
   .step-rail-heading { display: none; }
-  .step-buttons { flex-direction: row; flex-wrap: wrap; gap: 4px; }
-  .step-button { grid-template-columns: 26px max-content; width: auto; flex: 0 0 auto; padding: 7px; }
+  .step-buttons { flex-direction: row; flex-wrap: wrap; gap: 6px; width: 100%; max-width: 100%; }
+  .step-button { grid-template-columns: 26px max-content; width: auto; max-width: 100%; flex: 0 1 auto; padding: 8px 10px; min-height: 44px; }
   .step-button.active { transform: translateY(2px); }
+  .timeline-button { width: auto; max-width: 100%; margin-top: 8px; border-top: 0; padding-top: 8px; }
+  .rail-note { display: none; }
   .inspector-grid { grid-template-columns: 1fr; display: flex; flex-direction: column; }
   .inspector-pane + .inspector-pane { border-left: 0; border-top: 1px solid var(--line); }
   .criteria-pane, .reasoning-pane, .answer-pane { scroll-margin-top: 130px; }
@@ -317,6 +324,11 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
   .constraint-panel { position: static; }
   .workspace-title-line { grid-template-columns: max-content 1fr; }
   .workspace-status { grid-column: 2; justify-content: flex-start; }
+  .portfolio-table-wrap table { min-width: 0; width: 100%; }
+  .gate-chip-row { min-width: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  button, .mantine-Button-root, .mantine-Select-input, .gate-chip-button, .breadcrumb-link, .step-button {
+    min-height: 44px;
+  }
 }
 
 @media (max-width: 768px) {
@@ -385,15 +397,20 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monos
 .status-chip { transition: background 0.25s ease, color 0.25s ease, transform 0.18s ease; }
 
 @media (max-width: 768px) {
-  button, .mantine-Button-root, .mantine-Select-input, .mantine-TextInput-input, .mantine-Textarea-input {
+  button, .mantine-Button-root, .mantine-Select-input, .mantine-TextInput-input, .mantine-Textarea-input, .gate-chip-button, .breadcrumb-link, .step-button, .calibration-cell {
     min-height: 44px;
   }
   .step-rail {
-    flex-wrap: wrap; /* allow wrapping instead of overflowing */
+    overflow-x: hidden;
+    max-width: 100%;
   }
   .step-buttons {
-    flex-wrap: wrap; /* allow step buttons to wrap */
+    flex-wrap: wrap;
     min-width: unset;
+    width: 100%;
+  }
+  .topbar-actions .mantine-Button-root {
+    min-height: 44px;
   }
 }
 

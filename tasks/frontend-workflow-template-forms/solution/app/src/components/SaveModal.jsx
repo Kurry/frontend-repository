@@ -37,6 +37,19 @@ export default function SaveModal({ launcherButtonRef }) {
     }
   }, [open, reset, technique, trigger])
 
+  useEffect(() => {
+    if (!open) return undefined
+    function onKeyDown(event) {
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        event.stopPropagation()
+        close()
+      }
+    }
+    window.addEventListener('keydown', onKeyDown, true)
+    return () => window.removeEventListener('keydown', onKeyDown, true)
+  }, [open])
+
   function close() {
     setChrome({ saveModalOpen: false })
     requestAnimationFrame(() => launcherButtonRef.current?.focus())
@@ -63,7 +76,7 @@ export default function SaveModal({ launcherButtonRef }) {
   }
 
   return (
-    <Modal focusTrap={true}
+    <Modal
       open={open}
       modalHeading="Save prompt to library"
       modalLabel={techniqueById[technique].name}
@@ -72,8 +85,8 @@ export default function SaveModal({ launcherButtonRef }) {
       primaryButtonDisabled={!isValid || submitting}
       onRequestSubmit={handleSubmit(confirm)}
       onRequestClose={close}
-      launcherButtonRef={launcherButtonRef}
       preventCloseOnClickOutside={false}
+      shouldSubmitOnEnter
       size="sm"
     >
       <p className="modal-copy">Give this prompt a clear name so it is easy to find and reuse later.</p>

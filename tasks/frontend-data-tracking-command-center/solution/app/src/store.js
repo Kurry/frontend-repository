@@ -172,8 +172,13 @@ export const useCommandStore = create((set, get) => ({
   exportFormat: 'json',
   paletteOpen: false,
   nightOpen: false,
+  summaryOpen: false,
+  shortcutsOpen: false,
   importError: '',
   announcement: '',
+  density: 'comfortable',
+  accent: 'blue',
+  lastSimulateIndex: -1,
 
   setView: (activeView, options = {}) => {
     const allowed = ['dashboard', 'total-prompts-detail', 'active-agents-detail', 'evaluations-run-detail', 'cost-this-month-detail']
@@ -190,6 +195,10 @@ export const useCommandStore = create((set, get) => ({
   setExportFormat: (exportFormat) => set({ exportFormat }),
   setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
   setNightOpen: (nightOpen) => set({ nightOpen }),
+  setSummaryOpen: (summaryOpen) => set({ summaryOpen }),
+  setShortcutsOpen: (shortcutsOpen) => set({ shortcutsOpen }),
+  setDensity: (density) => set({ density: density === 'compact' ? 'compact' : 'comfortable' }),
+  setAccent: (accent) => set({ accent: ['blue', 'teal', 'violet'].includes(accent) ? accent : 'blue' }),
   announce: (announcement) => set({ announcement }),
   markArtifactAction: (lastAction, announcement) => set({ lastAction, announcement }),
 
@@ -291,6 +300,7 @@ export const useCommandStore = create((set, get) => ({
 
   toggleExpanded: (id, force) => set((state) => ({ agents: state.agents.map((agent) => agent.id === id ? { ...agent, expanded: typeof force === 'boolean' ? force : !agent.expanded } : agent) })),
   toggleSelected: (id, force) => set((state) => ({ agents: state.agents.map((agent) => agent.id === id ? { ...agent, selected: typeof force === 'boolean' ? force : !agent.selected } : agent) })),
+  setAllSelected: (force) => set((state) => ({ agents: state.agents.map((agent) => ({ ...agent, selected: Boolean(force) })) })),
   clearSelection: () => set((state) => ({ agents: state.agents.map((agent) => ({ ...agent, selected: false })) })),
 
   openAgentFromEvent: (id, relatedName) => {
@@ -326,11 +336,16 @@ export const useCommandStore = create((set, get) => ({
       { type: 'prompt', description: 'New optimization prompt was created', status: 'success', metricKey: 'total-prompts' },
       { type: 'evaluation', description: 'Adversarial evaluation finished at 94.1%', status: 'success', metricKey: 'evaluations-run' },
       { type: 'evaluation', description: 'Latency evaluation exceeded its threshold', status: 'error', metricKey: 'evaluations-run' },
+      { type: 'prompt', description: 'Retrieval grounding prompt was revised', status: 'info', metricKey: 'total-prompts' },
     ]
     const agent = state.agents[Math.floor(Math.random() * Math.max(state.agents.length, 1))]
     if (agent) choices.push({ type: 'agent', description: `${agent.name} reported a new status update`, status: agent.state === 'error' ? 'error' : 'info', resourceId: agent.id, relatedName: agent.name })
-    const event = makeEvent(choices[Math.floor(Math.random() * choices.length)])
-    set((current) => ({ events: appendEvent(current.events, event), announcement: 'A new activity event was added.' }))
+    let index = Math.floor(Math.random() * choices.length)
+    if (choices.length > 1 && index === state.lastSimulateIndex % choices.length) index = (index + 1) % choices.length
+    const event = makeEvent(choices[index])
+    // Simulated activity is a new mutating action: it clears the redo stack,
+    // matching the Undo/Redo contract for post-undo mutations.
+    set((current) => ({ events: appendEvent(current.events, event), redoStack: [], lastSimulateIndex: index, announcement: 'A new activity event was added.' }))
     return event.id
   },
 

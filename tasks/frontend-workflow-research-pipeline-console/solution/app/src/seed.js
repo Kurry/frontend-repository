@@ -56,25 +56,25 @@ export const seedRuns = [
   {
     id: 'run-1034', label: 'Orbit reasoning tune', createdAt: isoAgo(70), cost: 9.31,
     config: { jobType: 'Fine-tune', dataset: 'Orbit-6K', model: 'quartz-3b', count: 7, cluster: 'cinder', autoEvaluate: true },
-    phases: [phase('data','Complete','Orbit-6K','quartz-3b','cinder',{count:9}), phase('fineTune','Running','Orbit-6K','quartz-ft-1034','cinder',{count:7,current:2,loss:[{epoch:1,loss:1.34},{epoch:2,loss:.96}]}), phase('evaluation','Pending','Orbit-6K','quartz-ft-1034','cinder',{count:3})],
+    phases: [phase('data','Complete','Orbit-6K','quartz-3b','cinder',{count:9}), phase('fineTune','Running','Orbit-6K','quartz-ft-1034','cinder',{count:12,current:1,loss:[{epoch:1,loss:1.34}]}), phase('evaluation','Pending','Orbit-6K','quartz-ft-1034','cinder',{count:3})],
     events: events('1034', [['data','Complete','Generation complete',60],['fineTune','Running','Fine-tune allocated to cinder',25]]),
   },
   {
     id: 'run-1036', label: 'Prism benchmark pass', createdAt: isoAgo(60), cost: 12.64,
     config: { jobType: 'Evaluate', dataset: 'Prism-9K', model: 'lumen-ft-0998', count: 6, cluster: 'basalt', benchmark: 'Cartographer', repetitions: 6 },
-    phases: [phase('data','Complete','Prism-9K','lumen-2b','basalt',{count:14}), phase('fineTune','Complete','Prism-9K','lumen-ft-0998','basalt',{count:5}), phase('evaluation','Running','Prism-9K','lumen-ft-0998','basalt',{count:6,current:2,scores:[.72,.75]})],
+    phases: [phase('data','Complete','Prism-9K','lumen-2b','basalt',{count:14}), phase('fineTune','Complete','Prism-9K','lumen-ft-0998','basalt',{count:5}), phase('evaluation','Running','Prism-9K','lumen-ft-0998','basalt',{count:10,current:1,scores:[.72]})],
     events: events('1036', [['data','Complete','Dataset available',160],['fineTune','Complete','Checkpoint available',80],['evaluation','Running','Six-trial evaluation started',10]]),
   },
   {
     id: 'run-1038', label: 'Mosaic recovery test', createdAt: isoAgo(45), cost: 6.28,
     config: { jobType: 'Fine-tune', dataset: 'Mosaic-4K', model: 'atlas-mini', count: 8, cluster: 'aurora', autoEvaluate: false },
-    phases: [phase('data','Complete','Mosaic-4K','atlas-mini','aurora',{count:8}), phase('fineTune','Failed','Mosaic-4K','mosaic-ft-1038','aurora',{count:8,current:3,attempt:3,maxAttempts:3,retryRemaining:8,autoRetry:true,errorCategory:'Worker preemption',errorSummary:'Training worker lost after epoch 3; checkpoint retained.'}), phase('evaluation','Pending','Mosaic-4K','mosaic-ft-1038','aurora',{count:3})],
+    phases: [phase('data','Complete','Mosaic-4K','atlas-mini','aurora',{count:8}), phase('fineTune','Failed','Mosaic-4K','mosaic-ft-1038','aurora',{count:8,current:3,attempt:2,maxAttempts:3,retryRemaining:12,autoRetry:true,errorCategory:'Worker preemption',errorSummary:'Training worker lost after epoch 3; checkpoint retained. Use Retry from checkpoint after backoff ends.'}), phase('evaluation','Pending','Mosaic-4K','mosaic-ft-1038','aurora',{count:3})],
     events: events('1038', [['data','Complete','Generation complete',40],['fineTune','Running','Training attempt 1 started',30],['fineTune','Failed','Worker preempted; checkpoint saved',4],['fineTune','Failed','Retry budget entering backoff',1]]),
   },
   {
     id: 'run-1042', label: 'Nova data forge', createdAt: isoAgo(12), cost: 2.18,
     config: { jobType: 'Data generation', dataset: 'Nova-Synth', model: 'lumen-2b', count: 16, cluster: 'cinder' },
-    phases: [phase('data','Running','Nova-Synth','lumen-2b','cinder',{count:16,current:386}), phase('fineTune','Pending','Nova-Synth','lumen-2b','cinder',{count:6}), phase('evaluation','Pending','Nova-Synth','lumen-2b','cinder',{count:3})],
+    phases: [phase('data','Running','Nova-Synth','lumen-2b','cinder',{count:20,current:120}), phase('fineTune','Pending','Nova-Synth','lumen-2b','cinder',{count:6}), phase('evaluation','Pending','Nova-Synth','lumen-2b','cinder',{count:3})],
     events: events('1042', [['data','Running','Generation started on cinder',12]]),
   },
   {

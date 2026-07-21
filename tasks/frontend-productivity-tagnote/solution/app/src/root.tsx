@@ -1,6 +1,6 @@
 import { component$, $, useStore, useSignal, useTask$, useVisibleTask$ } from '@builder.io/qwik';
 import type { Signal } from '@builder.io/qwik';
-import type { Note, AppState, HistoryState } from './types';
+import type { Note, AppState, HistoryState, NoteMark } from './types';
 import {
   createInitialHistory,
   pushHistoryAndPresent,
@@ -43,12 +43,13 @@ export const Root = component$(() => {
   const showCalendar = useSignal(false);
   const showHistory = useSignal(false);
   const toastMessage = useSignal('');
-  const editText = useSignal<{ id: string; text: string } | null>(null);
+  const editText = useSignal<{ id: string; text: string; marks?: NoteMark[] } | null>(null);
   const confirmDelete = useSignal(false);
   const deleteTargetId = useSignal<string | null>(null);
   const selectedIds = useStore<{ ids: string[] }>({ ids: [] });
   const showExport = useSignal(false);
   const showImport = useSignal(false);
+  const renderEpoch = useSignal(0);
 
   // Bulk selection must never outlive visibility: if a filter/search change
   // hides a selected note, drop it from selectedIds so the tray count stays
@@ -81,6 +82,7 @@ export const Root = component$(() => {
     historyState.future = next.future;
     historyState.branchId = next.branchId;
     historyState.branches = next.branches;
+    renderEpoch.value++;
   });
 
   const showToast = $((msg: string) => {
@@ -99,14 +101,14 @@ export const Root = component$(() => {
     syncHistory(redoHistory(historyState));
   });
 
-  const handleSubmit = $((text: string, file?: { name: string; size: number }) => {
+  const handleSubmit = $((text: string, marks: NoteMark[], file?: { name: string; size: number }) => {
     if (editText.value) {
-      const ns = editNote(historyState.present, editText.value.id, text);
+      const ns = editNote(historyState.present, editText.value.id, text, marks);
       applyState(ns, 'Edited note');
       editText.value = null;
       showToast('Note updated');
     } else {
-      const ns = addNote(historyState.present, text, file);
+      const ns = addNote(historyState.present, text, file, marks);
       applyState(ns, 'Added note');
       showToast('Note added');
     }
@@ -137,7 +139,7 @@ export const Root = component$(() => {
 
   const handleEdit = $((id: string) => {
     const note = historyState.present.notes.find((n) => n.id === id);
-    if (note) editText.value = { id: note.id, text: note.text };
+    if (note) editText.value = { id: note.id, text: note.text, marks: note.marks ?? [] };
   });
 
   const handleDeleteRequest = $((id: string) => {
@@ -226,6 +228,176 @@ export const Root = component$(() => {
     confirmDelete.value = true;
   });
 
+
+  useVisibleTask$(() => {
+    const applyInline = (newState: AppState, label: string) => {
+      const next = pushHistoryAndPresent(historyState, newState, label);
+      historyState.past = next.past;
+      historyState.present = next.present;
+      historyState.future = next.future;
+      historyState.branchId = next.branchId;
+      historyState.branches = next.branches;
+      renderEpoch.value++;
+    };
+    const findNote = (id: string) => historyState.present.notes.find((n) => n.id === id);
+
+    const invokeTool = (name: string, args: unknown): unknown => {
+      switch (name) {
+        case 'entity_create_note': {
+          const text = typeof (args as { text?: string })?.text === 'string'
+            ? (args as { text: string }).text.trim()
+            : '';
+          if (!text) throw new Error('Note text is required and cannot be blank.');
+          const ns = addNote(historyState.present, text);
+          applyInline(ns, 'Added note');
+          toastMessage.value = 'Note added';
+          const created = ns.notes[ns.notes.length - 1];
+          return { id: created.id, tags: created.tags, count: ns.notes.length };
+        }
+        case 'entity_select_note': {
+          const note = findNote(String((args as { id?: string })?.id));
+          if (!note) throw new Error('No note with that id.');
+          editText.value = { id: note.id, text: note.text, marks: note.marks ?? [] };
+          return { id: note.id, text: note.text };
+        }
+        case 'entity_update_note': {
+          const id = String((args as { id?: string })?.id);
+          if (!findNote(id)) throw new Error('No note with that id.');
+          const text = typeof (args as { text?: string })?.text === 'string'
+            ? (args as { text: string }).text.trim()
+            : '';
+          if (!text) throw new Error('Note text is required and cannot be blank.');
+          const ns = editNote(historyState.present, id, text);
+          applyInline(ns, 'Edited note');
+          editText.value = null;
+          toastMessage.value = 'Note updated';
+          return { id, tags: ns.notes.find((n) => n.id === id)!.tags };
+        }
+        case 'entity_toggle_note': {
+          const id = String((args as { id?: string })?.id);
+          const note = findNote(id);
+          if (!note) throw new Error('No note with that id.');
+          const field = String((args as { field?: string })?.field);
+          let ns: AppState;
+          if (field === 'pinned') {
+            ns = togglePin(historyState.present, id);
+            applyInline(ns, note.pinned ? 'Unpinned note' : 'Pinned note');
+            toastMessage.value = note.pinned ? 'Note unpinned' : 'Note pinned';
+          } else if (field === 'archived') {
+            ns = toggleArchive(historyState.present, id);
+            applyInline(ns, note.archived ? 'Unarchived note' : 'Archived note');
+            toastMessage.value = note.archived ? 'Note unarchived' : 'Note archived';
+          } else if (field === 'done') {
+            ns = toggleDone(historyState.present, id);
+            applyInline(ns, 'Toggled TODO');
+          } else {
+            throw new Error('field must be one of pinned, archived, done.');
+          }
+          const t = ns.notes.find((n) => n.id === id)!;
+          return { id, pinned: t.pinned, archived: t.archived, done: t.done };
+        }
+        case 'entity_delete_note': {
+          if ((args as { confirm?: boolean })?.confirm !== true) {
+            throw new Error('Delete requires confirm=true.');
+          }
+          const id = String((args as { id?: string })?.id);
+          if (!findNote(id)) throw new Error('No note with that id.');
+          const ns = deleteNote(historyState.present, id);
+          applyInline(ns, 'Deleted note');
+          toastMessage.value = 'Note deleted';
+          return { id, count: ns.notes.length };
+        }
+        case 'browse_open': {
+          const dest = String((args as { destination?: string })?.destination);
+          if (dest === 'timeline') {
+            showArchived.value = false;
+            showCalendar.value = false;
+            showExport.value = false;
+          } else if (dest === 'calendar') {
+            showArchived.value = false;
+            showCalendar.value = true;
+            showExport.value = false;
+          } else if (dest === 'archived') {
+            showArchived.value = true;
+            showExport.value = false;
+          } else if (dest === 'export-panel') {
+            showExport.value = true;
+          } else {
+            throw new Error('destination must be timeline, calendar, archived, or export-panel.');
+          }
+          renderEpoch.value++;
+          return { destination: dest };
+        }
+        case 'browse_search':
+          searchQuery.value = String((args as { query?: string })?.query ?? '');
+          renderEpoch.value++;
+          return { query: searchQuery.value };
+        case 'browse_apply_filter': {
+          const tag = String((args as { tag?: string })?.tag ?? '').replace(/^#/, '').toLowerCase();
+          if (!tag) throw new Error('tag is required.');
+          activeTag.value = tag;
+          renderEpoch.value++;
+          return { tag };
+        }
+        case 'browse_clear_filter':
+          activeTag.value = null;
+          activeDateFilter.value = null;
+          renderEpoch.value++;
+          return { cleared: true };
+        case 'artifact_export':
+          showExport.value = true;
+          renderEpoch.value++;
+          return { success: true };
+        case 'artifact_import':
+          showImport.value = true;
+          renderEpoch.value++;
+          return { success: true };
+        case 'artifact_copy':
+          showExport.value = true;
+          renderEpoch.value++;
+          if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+            navigator.clipboard.writeText(buildSessionJson(historyState.present)).catch(() => {});
+          }
+          return { copied: true };
+        default:
+          throw new Error(`Unknown tool: ${name}`);
+      }
+    };
+
+    const listing = [
+      { name: 'entity_create_note', description: 'Create a note via Send.', input_schema: { type: 'object', properties: { text: { type: 'string', minLength: 1, maxLength: 2000 } }, required: ['text'], additionalProperties: false } },
+      { name: 'entity_select_note', description: 'Load a note into the composer for editing.', input_schema: { type: 'object', properties: { id: { type: 'string' } }, required: ['id'], additionalProperties: false } },
+      { name: 'entity_update_note', description: 'Update note text and re-derive tags.', input_schema: { type: 'object', properties: { id: { type: 'string' }, text: { type: 'string', minLength: 1, maxLength: 2000 } }, required: ['id', 'text'], additionalProperties: false } },
+      { name: 'entity_toggle_note', description: 'Toggle pinned, archived, or done.', input_schema: { type: 'object', properties: { id: { type: 'string' }, field: { type: 'string', enum: ['pinned', 'archived', 'done'] } }, required: ['id', 'field'], additionalProperties: false } },
+      { name: 'entity_delete_note', description: 'Delete a note with confirm=true.', input_schema: { type: 'object', properties: { id: { type: 'string' }, confirm: { type: 'boolean', enum: [true] } }, required: ['id', 'confirm'], additionalProperties: false } },
+      { name: 'browse_open', description: 'Open timeline, calendar, archived, or export-panel.', input_schema: { type: 'object', properties: { destination: { type: 'string', enum: ['timeline', 'calendar', 'archived', 'export-panel'] } }, required: ['destination'], additionalProperties: false } },
+      { name: 'browse_search', description: 'Filter by keyword.', input_schema: { type: 'object', properties: { query: { type: 'string', maxLength: 200 } }, required: ['query'], additionalProperties: false } },
+      { name: 'browse_apply_filter', description: 'Filter by tag.', input_schema: { type: 'object', properties: { tag: { type: 'string', minLength: 1, maxLength: 64 } }, required: ['tag'], additionalProperties: false } },
+      { name: 'browse_clear_filter', description: 'Clear tag and day filters.', input_schema: { type: 'object', properties: {}, additionalProperties: false } },
+      { name: 'artifact_export', description: 'Open the export panel.', input_schema: { type: 'object', properties: {} } },
+      { name: 'artifact_import', description: 'Open the import panel.', input_schema: { type: 'object', properties: {} } },
+      { name: 'artifact_copy', description: 'Open export and copy Session JSON.', input_schema: { type: 'object', properties: {} } },
+    ];
+    const w = window as unknown as Record<string, unknown>;
+    w.webmcp_session_info = () => ({
+      contract: 'zto-webmcp-v1',
+      app: 'TagNote',
+      modules: ['entity-collection-v1', 'browse-query-v1', 'artifact-transfer-v1'],
+      tool_count: listing.length,
+    });
+    w.webmcp_list_tools = () => listing;
+    w.webmcp_invoke_tool = (name: string, args: unknown) => {
+      try {
+        return { ok: true, result: invokeTool(name, args ?? {}) };
+      } catch (err) {
+        return {
+          ok: false,
+          error: err instanceof Error ? err.message : String(err),
+        };
+      }
+    };
+  });
+
   const allNotes = historyState.present.notes;
   const todoTags = historyState.present.todoTags;
 
@@ -277,310 +449,20 @@ export const Root = component$(() => {
     }
   });
 
-  // WebMCP action surface (contract zto-webmcp-v1). Every tool below routes
-  // through the SAME store command a visible control uses, so an agent driving
-  // the app via WebMCP and a human clicking the UI share one code path.
-  useVisibleTask$(() => {
-    const applyBridge = (newState: AppState, label: string) => {
-      const next = pushHistoryAndPresent(historyState, newState, label);
-      historyState.past = next.past;
-      historyState.present = next.present;
-      historyState.future = next.future;
-      historyState.branchId = next.branchId;
-      historyState.branches = next.branches;
-    };
-    const findNote = (id: string) =>
-      historyState.present.notes.find((n) => n.id === id);
-
-    const tools: Record<
-      string,
-      { description: string; input_schema: unknown; run: (args: any) => unknown }
-    > = {
-      entity_create_note: {
-        description:
-          'Create a note by submitting composer text; inline #tags and URLs are parsed exactly as the Send control does. Same command as clicking Send.',
-        input_schema: {
-          type: 'object',
-          properties: { text: { type: 'string', minLength: 1, maxLength: 2000 } },
-          required: ['text'],
-          additionalProperties: false,
-        },
-        run: (args) => {
-          const text = typeof args?.text === 'string' ? args.text.trim() : '';
-          if (!text) throw new Error('Note text is required and cannot be blank.');
-          const ns = addNote(historyState.present, text);
-          applyBridge(ns, 'Added note');
-          showToast('Note added');
-          const created = ns.notes[ns.notes.length - 1];
-          return { id: created.id, tags: created.tags, count: ns.notes.length };
-        },
-      },
-      entity_select_note: {
-        description:
-          'Select a note for editing by loading its raw text back into the composer. Same command as the note Edit control.',
-        input_schema: {
-          type: 'object',
-          properties: { id: { type: 'string' } },
-          required: ['id'],
-          additionalProperties: false,
-        },
-        run: (args) => {
-          const note = findNote(String(args?.id));
-          if (!note) throw new Error('No note with that id.');
-          editText.value = { id: note.id, text: note.text };
-          return { id: note.id, text: note.text };
-        },
-      },
-      entity_update_note: {
-        description:
-          'Update a note\'s text; tags and links are re-derived from the new text. Same command as editing then Save.',
-        input_schema: {
-          type: 'object',
-          properties: {
-            id: { type: 'string' },
-            text: { type: 'string', minLength: 1, maxLength: 2000 },
-          },
-          required: ['id', 'text'],
-          additionalProperties: false,
-        },
-        run: (args) => {
-          const id = String(args?.id);
-          if (!findNote(id)) throw new Error('No note with that id.');
-          const text = typeof args?.text === 'string' ? args.text.trim() : '';
-          if (!text) throw new Error('Note text is required and cannot be blank.');
-          const ns = editNote(historyState.present, id, text);
-          applyBridge(ns, 'Edited note');
-          editText.value = null;
-          showToast('Note updated');
-          const updated = ns.notes.find((n) => n.id === id)!;
-          return { id, tags: updated.tags };
-        },
-      },
-      entity_toggle_note: {
-        description:
-          'Toggle a note flag. field=pinned mirrors Pin/Unpin, field=archived mirrors Archive/Unarchive, field=done mirrors the TODO checkbox.',
-        input_schema: {
-          type: 'object',
-          properties: {
-            id: { type: 'string' },
-            field: { type: 'string', enum: ['pinned', 'archived', 'done'] },
-          },
-          required: ['id', 'field'],
-          additionalProperties: false,
-        },
-        run: (args) => {
-          const id = String(args?.id);
-          const note = findNote(id);
-          if (!note) throw new Error('No note with that id.');
-          const field = String(args?.field);
-          let ns: AppState;
-          if (field === 'pinned') {
-            ns = togglePin(historyState.present, id);
-            applyBridge(ns, note.pinned ? 'Unpinned note' : 'Pinned note');
-            showToast(note.pinned ? 'Note unpinned' : 'Note pinned');
-          } else if (field === 'archived') {
-            ns = toggleArchive(historyState.present, id);
-            applyBridge(ns, note.archived ? 'Unarchived note' : 'Archived note');
-            showToast(note.archived ? 'Note unarchived' : 'Note archived');
-          } else if (field === 'done') {
-            ns = toggleDone(historyState.present, id);
-            applyBridge(ns, 'Toggled TODO');
-          } else {
-            throw new Error('field must be one of pinned, archived, done.');
-          }
-          const t = ns.notes.find((n) => n.id === id)!;
-          return { id, pinned: t.pinned, archived: t.archived, done: t.done };
-        },
-      },
-      entity_delete_note: {
-        description:
-          'Permanently delete a note. Requires confirm=true, mirroring the Delete confirmation dialog.',
-        input_schema: {
-          type: 'object',
-          properties: {
-            id: { type: 'string' },
-            confirm: { type: 'boolean', enum: [true] },
-          },
-          required: ['id', 'confirm'],
-          additionalProperties: false,
-        },
-        run: (args) => {
-          if (args?.confirm !== true)
-            throw new Error('Delete requires confirm=true.');
-          const id = String(args?.id);
-          if (!findNote(id)) throw new Error('No note with that id.');
-          const ns = deleteNote(historyState.present, id);
-          applyBridge(ns, 'Deleted note');
-          showToast('Note deleted');
-          return { id, count: ns.notes.length };
-        },
-      },
-      browse_open: {
-        description:
-          'Open a view. destination=timeline shows the chronological timeline, calendar opens the month grid, archived opens the Archived view. Same commands as the header Calendar/Archived controls.',
-        input_schema: {
-          type: 'object',
-          properties: {
-            destination: {
-              type: 'string',
-              enum: ['timeline', 'calendar', 'archived'],
-            },
-          },
-          required: ['destination'],
-          additionalProperties: false,
-        },
-        run: (args) => {
-          const dest = String(args?.destination);
-          if (dest === 'timeline') {
-            showArchived.value = false;
-            showCalendar.value = false;
-          } else if (dest === 'calendar') {
-            showArchived.value = false;
-            showCalendar.value = true;
-          } else if (dest === 'archived') {
-            showArchived.value = true;
-          } else {
-            throw new Error('destination must be timeline, calendar, or archived.');
-          }
-          return { destination: dest };
-        },
-      },
-      browse_search: {
-        description:
-          'Filter the currently-visible list by keyword across note text and tags. Same command as typing in the search field.',
-        input_schema: {
-          type: 'object',
-          properties: { query: { type: 'string', maxLength: 200 } },
-          required: ['query'],
-          additionalProperties: false,
-        },
-        run: (args) => {
-          searchQuery.value = String(args?.query ?? '');
-          return { query: searchQuery.value };
-        },
-      },
-      browse_apply_filter: {
-        description:
-          'Filter the timeline to notes carrying a tag. Matching is case-insensitive. Same command as clicking a tag chip in the tag rail.',
-        input_schema: {
-          type: 'object',
-          properties: { tag: { type: 'string', minLength: 1, maxLength: 64 } },
-          required: ['tag'],
-          additionalProperties: false,
-        },
-        run: (args) => {
-          const tag = String(args?.tag ?? '').replace(/^#/, '').toLowerCase();
-          if (!tag) throw new Error('tag is required.');
-          activeTag.value = tag;
-          return { tag };
-        },
-      },
-      browse_clear_filter: {
-        description:
-          'Clear the active tag and calendar-day filters, restoring the full timeline. Same command as the Clear filter control.',
-        input_schema: {
-          type: 'object',
-          properties: {},
-          additionalProperties: false,
-        },
-        run: () => {
-          activeTag.value = null;
-          activeDateFilter.value = null;
-          return { cleared: true };
-        },
-      },
-      artifact_export: {
-        description: 'Open the export panel.',
-        input_schema: { type: 'object', properties: {} },
-        run: () => {
-          showExport.value = true;
-          return { success: true };
-        }
-      },
-      artifact_import: {
-        description: 'Open the import panel.',
-        input_schema: { type: 'object', properties: {} },
-        run: () => {
-          showImport.value = true;
-          return { success: true };
-        }
-      },
-      artifact_copy: {
-        description:
-          'Open the export panel and copy the Session JSON export to clipboard, using the same content-generation and clipboard-write logic as the Export panel\'s Copy control. This will no-op in a headless environment, Playwright checks the visual confirmation instead.',
-        input_schema: { type: 'object', properties: {} },
-        run: () => {
-          showExport.value = true;
-          const content = buildSessionJson(historyState.present);
-          if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
-            navigator.clipboard.writeText(content).catch(() => {
-              // best-effort, mirrors ExportPanel's fallback for headless/unsupported environments
-            });
-          }
-          return { copied: true };
-        }
-      },
-    };
-
-    const listing = Object.entries(tools).map(([name, def]) => ({
-      name,
-      description: def.description,
-      input_schema: def.input_schema,
-    }));
-
-    const w = window as unknown as Record<string, unknown>;
-    w.webmcp_session_info = () => ({
-      contract: 'zto-webmcp-v1',
-      app: 'TagNote',
-      modules: ['entity-collection-v1', 'browse-query-v1', 'artifact-transfer-v1'],
-      tool_count: listing.length,
-    });
-    w.webmcp_list_tools = () => listing;
-    w.webmcp_invoke_tool = (name: string, args: unknown) => {
-      const def = tools[name];
-      if (!def) return { ok: false, error: `Unknown tool: ${name}` };
-      try {
-        const result = def.run(args ?? {});
-        return { ok: true, result };
-      } catch (err) {
-        return { ok: false, error: err instanceof Error ? err.message : String(err) };
-      }
-    };
-
-    // Optional-additional navigator.modelContext registration.
-    const nav = navigator as unknown as {
-      modelContext?: { registerTool?: (t: unknown) => void };
-    };
-    if (nav.modelContext && typeof nav.modelContext.registerTool === 'function') {
-      for (const t of listing) {
-        try {
-          nav.modelContext.registerTool({
-            name: t.name,
-            description: t.description,
-            inputSchema: t.input_schema,
-            execute: (args: unknown) =>
-              (w.webmcp_invoke_tool as (n: string, a: unknown) => unknown)(t.name, args),
-          });
-        } catch {
-          // registration is best-effort; window.* surface is authoritative
-        }
-      }
-    }
-  });
-
   return (
     <div class="flex min-h-screen flex-col overflow-x-hidden bg-[var(--color-background)]">
+      <span class="sr-only" aria-hidden="true">{renderEpoch.value}</span>
       <header class="sticky top-0 z-20 border-b border-gray-200 bg-white/80 backdrop-blur-md">
-        <div class="mx-auto flex max-w-2xl items-center justify-between px-4 py-3">
-          <h1 class="text-[34px] font-bold text-[var(--color-text-primary)]">TagNote</h1>
-          <div class="flex flex-wrap items-center justify-end gap-1.5">
+        <div class="mx-auto max-w-2xl px-4 py-3">
+          <h1 class="text-[28px] font-bold text-[var(--color-text-primary)] sm:text-[34px]">TagNote</h1>
+          <div class="scrollbar-hide mt-2 flex max-w-full items-center gap-2 overflow-x-auto pb-1">
             <button
               onClick$={() => {
                 showCalendar.value = !showCalendar.value;
               }}
-              class={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              class={`shrink-0 rounded-full px-3 py-2 text-sm font-medium transition-colors sm:px-4 ${
                 showCalendar.value
-                  ? 'bg-[var(--color-accent)] text-white'
+                  ? 'btn-primary text-white'
                   : 'bg-[var(--color-primary)] text-[var(--color-accent)] hover:bg-[#D4E0F0]'
               }`}
             >
@@ -590,9 +472,9 @@ export const Root = component$(() => {
               onClick$={() => {
                 showArchived.value = !showArchived.value;
               }}
-              class={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              class={`shrink-0 rounded-full px-3 py-2 text-sm font-medium transition-colors sm:px-4 ${
                 showArchived.value
-                  ? 'bg-[var(--color-accent)] text-white'
+                  ? 'btn-primary text-white'
                   : 'bg-[var(--color-primary)] text-[var(--color-accent)] hover:bg-[#D4E0F0]'
               }`}
             >
@@ -602,9 +484,9 @@ export const Root = component$(() => {
               onClick$={() => {
                 showExport.value = true;
               }}
-              class={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+              class={`shrink-0 rounded-full px-3 py-2 text-sm font-medium transition-colors sm:px-4 ${
                 showExport.value
-                  ? 'bg-[var(--color-accent)] text-white'
+                  ? 'btn-primary text-white'
                   : 'bg-[var(--color-primary)] text-[var(--color-accent)] hover:bg-[#D4E0F0]'
               }`}
             >
@@ -614,7 +496,7 @@ export const Root = component$(() => {
               onClick$={() => {
                 showImport.value = true;
               }}
-              class="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]"
+              class="shrink-0 rounded-full bg-[var(--color-primary)] px-3 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0] sm:px-4"
             >
               Import
             </button>
@@ -622,38 +504,37 @@ export const Root = component$(() => {
               onClick$={() => {
                 showHistory.value = true;
               }}
-              class="rounded-full bg-[var(--color-primary)] px-4 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]"
+              class="shrink-0 rounded-full bg-[var(--color-primary)] px-3 py-2 text-sm font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0] sm:px-4"
             >
               History
             </button>
             <button
               onClick$={handleApplyScenarioChange}
-              class="rounded-full bg-[var(--color-accent)] px-3 py-2 text-sm font-medium text-[#FEFEFE] shadow-none hover:bg-[#0066DD]"
-              style={{ borderRadius: '1000px', boxShadow: 'none' }}
+              class="btn-primary shrink-0 px-3 py-2 text-sm font-medium transition-all hover:bg-[#004999] active:scale-95"
             >
               Apply Scenario Change
             </button>
             <button
               onClick$={handleUndo}
               disabled={historyState.past.length === 0}
-              class={`rounded-full px-3 py-2 text-sm transition-colors ${
+              class={`shrink-0 rounded-full px-3 py-2 text-sm transition-colors ${
                 historyState.past.length > 0
                   ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   : 'cursor-not-allowed bg-gray-100 text-gray-300'
               }`}
-              title="Undo"
+              aria-label="Undo timeline change"
             >
               ↩
             </button>
             <button
               onClick$={handleRedo}
               disabled={historyState.future.length === 0}
-              class={`rounded-full px-3 py-2 text-sm transition-colors ${
+              class={`shrink-0 rounded-full px-3 py-2 text-sm transition-colors ${
                 historyState.future.length > 0
                   ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   : 'cursor-not-allowed bg-gray-100 text-gray-300'
               }`}
-              title="Redo"
+              aria-label="Redo timeline change"
             >
               ↪
             </button>
@@ -677,25 +558,47 @@ export const Root = component$(() => {
           />
         )}
 
-        {selectedIds.ids.length > 0 && (
-          <div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-30 flex items-center gap-4 rounded-full bg-white px-6 py-3 shadow-lg border border-gray-200" style={{ transform: 'translateX(-50%)' }}>
-            <span class="text-sm font-semibold text-gray-700">{selectedIds.ids.length} selected</span>
-            <button onClick$={handleBulkArchive} class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]">
+        {(selectedIds.ids.length > 0 || hasNotesInScope) && (
+          <div
+            class={`fixed bottom-28 left-1/2 z-30 flex w-[calc(100%-1rem)] max-w-xl -translate-x-1/2 flex-wrap items-center justify-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-lg sm:gap-4 sm:px-6 sm:py-3 ${selectedIds.ids.length > 0 ? 'bulk-tray-enter' : ''}`}
+            role="toolbar"
+            aria-label="Bulk selection tray"
+          >
+            <span class="w-full text-center text-sm font-semibold text-gray-700 sm:w-auto">
+              {selectedIds.ids.length} selected
+            </span>
+            <button
+              onClick$={handleBulkArchive}
+              disabled={selectedIds.ids.length === 0}
+              class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0] disabled:cursor-not-allowed disabled:opacity-50"
+            >
               Archive selected
             </button>
-            <button onClick$={handleBulkPin} class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0]">
+            <button
+              onClick$={handleBulkPin}
+              disabled={selectedIds.ids.length === 0}
+              class="rounded-full bg-[var(--color-primary)] px-3 py-1 text-xs font-medium text-[var(--color-accent)] transition-colors hover:bg-[#D4E0F0] disabled:cursor-not-allowed disabled:opacity-50"
+            >
               Pin selected
             </button>
-            <button onClick$={handleBulkDeleteRequest} class="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100">
+            <button
+              onClick$={handleBulkDeleteRequest}
+              disabled={selectedIds.ids.length === 0}
+              class="rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-500 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
               Delete selected
             </button>
-            <button onClick$={() => selectedIds.ids = []} class="ml-2 text-gray-400 hover:text-gray-600">
-              ✕
+            <button
+              onClick$={() => (selectedIds.ids = [])}
+              disabled={selectedIds.ids.length === 0}
+              class="text-xs text-gray-400 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Clear selection
             </button>
           </div>
         )}
 
-        <div class="flex-1 overflow-y-auto px-4 py-4">
+        <div class="flex-1 overflow-y-auto px-4 py-4 pb-32">
           {!showNoResults && visibleNotes.length > 0 && (
             <div class="mb-3 flex items-center justify-end gap-3 text-xs">
               <button
@@ -851,10 +754,10 @@ export const Root = component$(() => {
           ) : null}
         </div>
 
-        <div class="sticky bottom-0 z-10">
+        <div class="sticky bottom-0 z-10 bg-white">
           <Composer
             onSubmit={handleSubmit}
-            editText={editText as Signal<{ id: string; text: string } | null>}
+            editText={editText as Signal<{ id: string; text: string; marks?: NoteMark[] } | null>}
             onCancelEdit={handleCancelEdit}
           />
         </div>

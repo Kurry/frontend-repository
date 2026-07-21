@@ -1,16 +1,14 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import { MotionPlugin } from '@vueuse/motion'
-import App from './App.vue'
-import './style.css'
-import { registerWebMCP } from './webmcp'
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import App from './App.vue';
+import './style.css';
+import { registerWebMCP } from './webmcp';
 
-const app = createApp(App)
-const pinia = createPinia()
-app.use(pinia)
-app.use(MotionPlugin)
+document.title = 'The O&A Palette Library — Palette Library';
 
-app.mount('#app')
+const app = createApp(App);
+app.use(createPinia());
+app.mount('#app');
 
-// Register WebMCP after app and store mount so it can access Pinia
-registerWebMCP()
+// Register WebMCP after mount so handlers can drive the same Pinia store the UI reads.
+registerWebMCP();

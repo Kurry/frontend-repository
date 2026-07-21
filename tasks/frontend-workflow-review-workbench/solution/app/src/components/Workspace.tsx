@@ -29,7 +29,19 @@ function Breadcrumb({ bundle }: { bundle: ReviewBundle }) {
   ];
   return (
     <nav className="breadcrumb" aria-label="Review selection breadcrumb">
-      {segments.map((segment, index) => <span key={`${segment.label}-${index}`}><button type="button" onClick={segment.action} aria-current={index === segments.length - 1 ? 'page' : undefined}>{segment.label}</button>{index < segments.length - 1 && <IconChevronRight size={13} />}</span>)}
+      {segments.map((segment, index) => (
+        <span key={`${segment.label}-${index}`}>
+          <a
+            href={`#${segment.label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}
+            className="breadcrumb-link"
+            onClick={(event) => { event.preventDefault(); segment.action(); }}
+            aria-current={index === segments.length - 1 ? 'page' : undefined}
+          >
+            {segment.label}
+          </a>
+          {index < segments.length - 1 && <IconChevronRight size={13} aria-hidden="true" />}
+        </span>
+      ))}
     </nav>
   );
 }
@@ -73,7 +85,8 @@ export default function Workspace() {
 
   const renderPanel = () => {
     if (panel === 'Timeline') return <Timeline bundle={bundle} />;
-    if (activeStep && locked && panel !== 'Audit') return <LockedStep stepName={activeStep} blockedBy={firstIncompleteBefore!} />;
+    // Gate board and trial inspector stay reachable for evidence / re-run; step completion controls remain locked below.
+    if (activeStep && locked && panel !== 'Audit' && panel !== 'Gate') return <LockedStep stepName={activeStep} blockedBy={firstIncompleteBefore!} />;
     if (panel === 'Resolve') return <FixList bundle={bundle} />;
     if (panel === 'Gate') return <GateBoard bundle={bundle} />;
     if (panel === 'Audit') return <TrialInspector bundle={bundle} />;
@@ -90,7 +103,7 @@ export default function Workspace() {
           <div><Text className="eyebrow">TASK BUNDLE</Text><Title order={1}>{bundle.slug}</Title><Text size="sm" c="dimmed">{bundle.description}</Text></div>
           <div className="workspace-status"><HeroBanner state={deriveHero(bundle)} />{bundle.recommendation ? <Badge size="lg" leftSection={<IconShieldCheck size={15} />}>{bundle.recommendation}</Badge> : <Badge variant="outline" size="lg">Recommendation unset</Badge>}{bundle.overrideJustification && <Badge size="lg" color="orange">Override</Badge>}</div>
         </div>
-        <Group mt="md" gap="xs">{bundle.stopEarlyFlags.map((flag) => <FlagBadge key={flag} flag={flag} />)}<Badge variant="outline">{completionCount(bundle)}/5 reviewer steps</Badge>{bundle.reviewerSteps.at(-1)?.done && <Badge className="bundled-badge" leftSection={<IconPackage size={13} />}>Bundled</Badge>}</Group>
+        <Group mt="md" gap="xs">{bundle.stopEarlyFlags.map((flag) => <FlagBadge key={flag} flag={flag} />)}<Badge variant="outline">{completionCount(bundle)} of 5 reviewer steps complete</Badge>{bundle.reviewerSteps.at(-1)?.done && <Badge className="bundled-badge" leftSection={<IconPackage size={13} />}>Bundled</Badge>}</Group>
         <Breadcrumb bundle={bundle} />
       </header>
       <div className="workspace-layout">

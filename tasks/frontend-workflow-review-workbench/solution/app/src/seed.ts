@@ -192,6 +192,14 @@ function makeBundle(profile: (typeof PROFILES)[number]): ReviewBundle {
     case 'ember':
       setGate(gates, 'Difficulty — Quartz-Mini', 'inconclusive', 'Only 2 of 4 Quartz-Mini trials are valid; at least 3 are required.', 0.78, 2);
       fixItems = standardFixes(profile.slug, profile.subject, 'Difficulty — Quartz-Mini');
+      fixItems[0] = fix(
+        profile.slug,
+        1,
+        'FIX',
+        `Close the uncovered Difficulty — Quartz-Mini boundary for ${profile.subject} and document every neighboring adversarial branch the scorer must observe before certification`,
+        `Evidence for ${profile.subject} misses the closest adversarial branch.`,
+        'Difficulty — Quartz-Mini',
+      );
       break;
     case 'fixable-oracle':
       setGate(gates, 'Oracle', 'fail', 'Oracle comprehensiveness is 0.84, below the required 0.90 bar.', 0.84);
