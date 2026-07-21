@@ -68,13 +68,13 @@ const driftlinePrs = [
 ]
 
 const loomPrs = [
-  pr(2, 'Rust', 88, 'Add snapshot isolation to range reads', 7, { day: 19 }),
+  pr(2, 'Rust', 88, 'Add snapshot isolation to range reads', 12, { day: 19 }),
   pr(2, 'Rust', 84, 'Fix compaction boundaries for sparse pages', 5, { day: 17 }),
   pr(2, 'Rust', 81, 'Support deterministic query planning', 9, { day: 14 }),
   pr(2, 'Rust', 79, 'Refine WAL recovery diagnostics', 4, { noIssue: true, day: 11 }),
   pr(2, 'Rust', 76, 'Document storage engine invariants', 0, { docsOnly: true, day: 8 }),
   pr(2, 'Rust', 73, 'Fix cursor lifetime accounting', 3, { day: 5 }),
-  pr(2, 'Rust', 71, 'Add prefix compression for index keys', 12, { day: 3 }),
+  pr(2, 'Rust', 71, 'Add prefix compression for index keys', 7, { day: 3 }),
   pr(2, 'Rust', 69, 'Improve transaction conflict traces', 6, { day: 1 }),
   pr(2, 'Rust', 64, 'Support checksummed manifest frames', 8, { day: 20 }),
 ]

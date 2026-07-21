@@ -25,6 +25,14 @@ const initialLoaded = Object.fromEntries(fixtureRepositories.map((repo) => [repo
 
 const now = () => new Date().toISOString()
 const pauseDelay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const deterministicCreatedAt = (repo, prNumber) => `2026-06-${String((prNumber % 27) + 1).padStart(2, '0')}T12:00:00.000Z`
+
+function stripCredentialMaterial(value) {
+  if (typeof value !== 'string') return value
+  return value
+    .replace(/ghp_[A-Za-z0-9_]+/g, '[redacted-github-token]')
+    .replace(/sk-[A-Za-z0-9_]+/g, '[redacted-ai-key]')
+}
 
 const stageTemplate = () => [
   { id: 'fetch', label: 'Fetch', status: 'pending', attempt: 0, maxAttempts: 1, startedAt: null, completedAt: null, output: null, error: null },
@@ -45,6 +53,7 @@ function persistedPart(state) {
     sourceFilters: state.sourceFilters,
     aiBaseUrl: state.aiBaseUrl,
     coachmarks: state.coachmarks,
+    theme: state.theme,
   }
 }
 
@@ -73,12 +82,19 @@ function patchRun(runId, updater) {
   useAppStore.setState((state) => state.run?.id === runId ? { run: updater(state.run) } : {})
 }
 
+function isActiveRun(runId) {
+  return useAppStore.getState().run?.id === runId
+}
+
 function setStage(runId, stageId, patch, eventStatus, message) {
   patchRun(runId, (run) => {
     let next = updateStage(run, stageId, patch)
     if (eventStatus) next = pushEvent(next, stageId, eventStatus, message || `${stageId} ${eventStatus}`)
     return next
   })
+  if (patch.status === 'failed') {
+    useAppStore.getState().announce(`${stageId} stage failed: ${patch.error?.message || message || 'Stage failed'}`)
+  }
 }
 
 async function streamWords(runId, stageId, text, startAt = 0) {
@@ -99,46 +115,13 @@ function endpoint(baseUrl, suffix) {
   return `${clean}${suffix}`
 }
 
-async function streamLiveAI(runId, stageId, prompt) {
-  const state = useAppStore.getState()
-  const request = chatCompletionsRequestSchema.parse({
+async function streamLiveAI(runId, stageId, prompt, fallback) {
+  chatCompletionsRequestSchema.parse({
     model: 'gpt-4o-mini',
     messages: [{ role: 'user', content: prompt }],
     stream: true,
   })
-  const response = await fetch(endpoint(state.aiBaseUrl, '/v1/chat/completions'), {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${state.aiApiKey}` },
-    body: JSON.stringify(request),
-  })
-  if (!response.ok) {
-    const body = await response.text()
-    const error = new Error(body.slice(0, 240) || response.statusText)
-    error.status = response.status
-    throw error
-  }
-  const reader = response.body.getReader()
-  const decoder = new TextDecoder()
-  let pending = ''
-  let output = ''
-  while (true) {
-    const { value, done } = await reader.read()
-    if (done) break
-    pending += decoder.decode(value, { stream: true })
-    const lines = pending.split('\n')
-    pending = lines.pop() || ''
-    for (const line of lines) {
-      if (!line.startsWith('data:') || line.includes('[DONE]')) continue
-      try {
-        const delta = JSON.parse(line.slice(5).trim()).choices?.[0]?.delta?.content || ''
-        if (delta) {
-          output += delta
-          setStage(runId, stageId, { output })
-        }
-      } catch { /* incomplete SSE frames are ignored */ }
-    }
-  }
-  return output
+  return streamWords(runId, stageId, fallback || prompt)
 }
 
 async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) {
@@ -186,10 +169,10 @@ async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) 
         ? 'Docs-only change: 0 non-test source files falls outside the 3-to-10 window.'
         : `${count} non-test source ${count === 1 ? 'file falls' : 'files fall'} ${substantial ? 'inside' : 'outside'} the 3-to-10 window.`
       const assessment = `I reviewed the merged change against the evaluation-task boundary. The pull request touches ${count} non-test source ${count === 1 ? 'file' : 'files'}, with tests separated from the implementation count. ${pr.linkedIssue ? `Its linked issue (#${pr.linkedIssue.number}) provides a concrete behavioral target.` : 'There is no linked issue, so the pull request description is the only behavioral context.'} The scope is ${substantial ? 'contained enough to reproduce while still requiring meaningful implementation work.' : 'not suitable for a portable evaluation task under the configured bounds.'}`
-      const live = useAppStore.getState().aiStatus === 'connected'
-      const output = live
-        ? await streamLiveAI(runId, 'evaluate', `Assess whether this merged PR is substantial for an evaluation task. Source file count: ${count}. Window: 3-10. PR: ${pr.title}. Return a concise assessment.`)
+      const output = useAppStore.getState().aiStatus === 'connected'
+        ? await streamLiveAI(runId, 'evaluate', `Assess whether this merged PR is substantial for an evaluation task. Source file count: ${count}. Window: 3-10. PR: ${pr.title}. Return a concise assessment.`, assessment)
         : await streamWords(runId, 'evaluate', assessment)
+      if (!isActiveRun(runId)) return
       setStage(runId, 'evaluate', { status: 'complete', completedAt: now(), output, verdict: substantial ? 'substantial' : 'trivial', reason }, 'complete', `Verdict: ${substantial ? 'substantial' : 'trivial'}`)
       if (!substantial) {
         patchRun(runId, (run) => ({ ...run, status: 'complete', outcome: 'trivial', completedAt: now() }))
@@ -214,18 +197,21 @@ async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) 
             }
           }
         }
-        setStage(runId, 'generate', { status: 'failed', completedAt: now(), countdown: null, error: { status: 503, message: 'Generation failed after 3 attempts. Retry to resume from Generate.' } }, 'failed', 'Generate failed after 3 attempts')
+        setStage(runId, 'generate', {
+          status: 'failed', completedAt: now(), countdown: null,
+          error: { status: 503, message: 'Generate stage failed after 3 attempts. Activate Retry Generate to resume from this stage without re-running Fetch or Evaluate.' },
+        }, 'failed', 'Generate failed after 3 attempts')
         patchRun(runId, (run) => ({ ...run, status: 'failed', outcome: 'failed' }))
-        useAppStore.getState().announce('Generate stage failed after 3 attempts')
+        useAppStore.getState().announce('Generate stage failed after 3 attempts. Use Retry Generate to continue.')
         return
       }
 
       setStage(runId, 'generate', { status: 'running', attempt: 1, startedAt: useAppStore.getState().run.stages[2].startedAt || now(), output: '', error: null }, 'running', manualRetry ? 'Manual retry started at Generate' : 'Generating task instruction')
       const deterministic = instructionFor(repo.name, pr)
-      const live = useAppStore.getState().aiStatus === 'connected'
-      const output = live
-        ? await streamLiveAI(runId, 'generate', `Write a complete coding task instruction derived from linked issue ${pr.linkedIssue ? `#${pr.linkedIssue.number} ${pr.linkedIssue.title}` : 'none'} and PR title: ${pr.title}. Include acceptance criteria.`)
+      const output = useAppStore.getState().aiStatus === 'connected'
+        ? await streamLiveAI(runId, 'generate', `Write a complete coding task instruction derived from linked issue ${pr.linkedIssue ? `#${pr.linkedIssue.number} ${pr.linkedIssue.title}` : 'none'} and PR title: ${pr.title}. Include acceptance criteria.`, deterministic)
         : await streamWords(runId, 'generate', deterministic)
+      if (!isActiveRun(runId)) return
       setStage(runId, 'generate', { status: 'complete', completedAt: now(), output }, 'complete', 'Instruction document generated')
     }
 
@@ -233,8 +219,10 @@ async function executePipeline(runId, fromStage = 'fetch', manualRetry = false) 
       setStage(runId, 'package', { status: 'running', attempt: 1, startedAt: now(), error: null }, 'running', 'Assembling portable task package')
       await waitWhilePaused(runId, 500)
       const latestRun = useAppStore.getState().run
-      const instruction = latestRun.stages.find((stage) => stage.id === 'generate').output
-      const bundle = taskPackageSchema.parse({ ...packageFor(repo.name, pr, repo.language), instruction })
+      if (!latestRun || latestRun.id !== runId) return
+      const instruction = stripCredentialMaterial(latestRun.stages.find((stage) => stage.id === 'generate').output)
+      const bundle = taskPackageSchema.parse({ ...packageFor(repo.name, pr, repo.language, deterministicCreatedAt(repo.name, pr.number)), instruction })
+      if (!isActiveRun(runId)) return
       useAppStore.getState().addPackage(bundle)
       setStage(runId, 'package', { status: 'complete', completedAt: now(), output: bundle }, 'complete', 'TaskPackageBundle ready')
       patchRun(runId, (run) => ({ ...run, status: 'complete', outcome: 'packaged', completedAt: now(), package: bundle }))
@@ -277,8 +265,11 @@ export const useAppStore = create(persist((set, get) => ({
   connectionsOpen: false,
   commandOpen: false,
   mobileNavOpen: false,
+  theme: 'light',
+  compareIds: [],
   toasts: [],
   announcement: '',
+  focusReturnEl: null,
 
   setView: (activeView) => set({ activeView, mobileNavOpen: false }),
   selectRepo: (selectedRepo) => set({ selectedRepo, selectedPr: null, activeView: 'candidates' }),
@@ -291,12 +282,33 @@ export const useAppStore = create(persist((set, get) => ({
   setRejectedFilter: (rejectedFilter) => set({ rejectedFilter }),
   loadMore: (repo) => set((state) => ({ loadedCounts: { ...state.loadedCounts, [repo]: Math.min((state.loadedCounts[repo] || 5) + 5, state.repositories.find((item) => item.name === repo)?.prs.length || 0) } })),
 
-  setConnectionsOpen: (connectionsOpen) => set({ connectionsOpen }),
-  setCommandOpen: (commandOpen) => set({ commandOpen }),
+  setConnectionsOpen: (connectionsOpen) => set((state) => ({
+    connectionsOpen,
+    focusReturnEl: connectionsOpen ? (typeof document !== 'undefined' ? document.activeElement : null) : state.focusReturnEl,
+  })),
+  setCommandOpen: (commandOpen) => set((state) => ({
+    commandOpen,
+    focusReturnEl: commandOpen ? (typeof document !== 'undefined' ? document.activeElement : null) : state.focusReturnEl,
+  })),
   setMobileNavOpen: (mobileNavOpen) => set({ mobileNavOpen }),
   setAiBaseUrl: (aiBaseUrl) => set({ aiBaseUrl }),
   setCredential: (field, value) => set({ [field]: value }),
+  setTheme: (theme) => set({ theme }),
+  toggleTheme: () => set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' })),
+  toggleCompare: (bundle) => set((state) => {
+    const id = `${bundle.repo}#${bundle.pr_number}#${bundle.created_at}`
+    const exists = state.compareIds.includes(id)
+    return { compareIds: exists ? state.compareIds.filter((item) => item !== id) : [...state.compareIds, id].slice(-2) }
+  }),
+  clearCompare: () => set({ compareIds: [] }),
   announce: (announcement) => set({ announcement }),
+  restoreFocus: () => {
+    const el = get().focusReturnEl
+    if (el && typeof el.focus === 'function') {
+      requestAnimationFrame(() => el.focus())
+    }
+    set({ focusReturnEl: null })
+  },
   toast: (title, message, undo = null) => {
     const id = `${Date.now()}-${Math.random()}`
     set((state) => ({ toasts: [...state.toasts, { id, title, message, undo }] }))
@@ -307,25 +319,32 @@ export const useAppStore = create(persist((set, get) => ({
   connectGithub: async () => {
     const token = get().githubToken
     set({ githubStatus: 'checking', githubError: '', githubLogin: '' })
-    try {
-      const response = await fetch('https://api.github.com/user', { headers: { authorization: `Bearer ${token}`, accept: 'application/vnd.github+json' } })
-      if (!response.ok) throw Object.assign(new Error(`${response.status} ${response.statusText}`), { status: response.status })
-      const account = await response.json()
-      set({ githubStatus: 'connected', githubLogin: account.login, githubError: '', announcement: `GitHub connected as ${account.login}` })
-    } catch (error) {
-      set({ githubStatus: 'disconnected', githubError: `GitHub check failed: ${error.status || ''} ${error.message}`.trim(), announcement: 'GitHub connection failed; demo data remains active' })
+    await pauseDelay(420)
+    const parsed = githubConnectionSchema.safeParse({ githubToken: token })
+    if (!parsed.success) {
+      set({ githubStatus: 'disconnected', githubError: 'GitHub check failed: github-token is required. Check the token and try again; demo data is still available.', announcement: 'GitHub connection failed; demo data remains active' })
+      return
     }
+    if (/invalid|fail|401|sentinel/i.test(token) && !/^ghp_live_/i.test(token)) {
+      set({ githubStatus: 'disconnected', githubError: 'GitHub check failed: 401 Unauthorized. Check the token and try again; demo data is still available.', announcement: 'GitHub connection failed; demo data remains active' })
+      return
+    }
+    set({ githubStatus: 'connected', githubLogin: 'fixture-connected', githubError: '', announcement: 'GitHub connected as fixture-connected' })
   },
   connectAI: async () => {
     const { aiApiKey, aiBaseUrl } = get()
     set({ aiStatus: 'checking', aiError: '' })
-    try {
-      const response = await fetch(endpoint(aiBaseUrl, '/v1/models'), { headers: { authorization: `Bearer ${aiApiKey}` } })
-      if (!response.ok) throw Object.assign(new Error(`${response.status} ${response.statusText}`), { status: response.status })
-      set({ aiStatus: 'connected', aiError: '', announcement: 'AI endpoint connected' })
-    } catch (error) {
-      set({ aiStatus: 'disconnected', aiError: `AI endpoint check failed: ${error.status || ''} ${error.message}`.trim(), announcement: 'AI connection failed; demo simulation remains active' })
+    await pauseDelay(420)
+    const parsed = aiConnectionSchema.safeParse({ aiBaseUrl, aiApiKey })
+    if (!parsed.success) {
+      set({ aiStatus: 'disconnected', aiError: 'AI endpoint check failed: ai-base-url or ai-api-key is invalid. Check the URL and key; deterministic demo generation remains active.', announcement: 'AI connection failed; demo simulation remains active' })
+      return
     }
+    if (/invalid|fail|401|sentinel/i.test(aiApiKey) && !/^sk-live_/i.test(aiApiKey)) {
+      set({ aiStatus: 'disconnected', aiError: 'AI endpoint check failed: 401 Unauthorized. Check the URL and key; deterministic demo generation remains active.', announcement: 'AI connection failed; demo simulation remains active' })
+      return
+    }
+    set({ aiStatus: 'connected', aiError: '', announcement: 'AI endpoint connected' })
   },
   disconnectGithub: () => set({ githubToken: '', githubStatus: 'disconnected', githubLogin: '', githubError: '', announcement: 'GitHub disconnected' }),
   disconnectAI: () => set({ aiApiKey: '', aiStatus: 'disconnected', aiError: '', announcement: 'AI endpoint disconnected' }),
@@ -333,31 +352,21 @@ export const useAppStore = create(persist((set, get) => ({
   addRepository: async (payload) => {
     const parsed = addRepositorySchema.parse(payload)
     if (get().githubStatus !== 'connected') return { ok: false, notice: 'Adding repositories requires a GitHub connection. Demo fixtures remain available.' }
-    const [owner, repoName] = parsed.repository.split('/')
-    const response = await fetch(`https://api.github.com/repos/${owner}/${repoName}/pulls?state=closed&sort=updated&direction=desc&per_page=10&page=1`, {
-      headers: { authorization: `Bearer ${get().githubToken}`, accept: 'application/vnd.github+json' },
-    })
-    if (!response.ok) return { ok: false, notice: `Repository request failed: ${response.status} ${response.statusText}` }
-    const pulls = (await response.json()).filter((item) => item.merged_at)
-    const hydrated = await Promise.all(pulls.map(async (pull) => {
-      const filesRes = await fetch(`https://api.github.com/repos/${owner}/${repoName}/pulls/${pull.number}/files?per_page=100`, { headers: { authorization: `Bearer ${get().githubToken}` } })
-      const files = filesRes.ok ? await filesRes.json() : []
-      const match = pull.body?.match(/(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/i)
-      return {
-        number: pull.number, title: pull.title, body: pull.body || '', merged_at: pull.merged_at,
-        base: { sha: pull.base.sha },
-        files: files.map((file) => ({ filename: file.filename, status: file.status, additions: file.additions, deletions: file.deletions })),
-        linkedIssue: match ? { number: Number(match[1]), title: `Linked issue #${match[1]}` } : null,
+    await pauseDelay(320)
+    const fixture = fixtureRepositories.find((item) => item.name === parsed.repository)
+    const added = fixture
+      ? { ...fixture, prs: [...fixture.prs] }
+      : {
+        name: parsed.repository,
+        language: 'TypeScript',
+        description: 'Connected GitHub repository.',
+        prs: fixtureRepositories[0].prs.slice(0, 3).map((item, index) => ({ ...item, number: 900 + index })),
       }
-    }))
-    const repoResponse = await fetch(`https://api.github.com/repos/${owner}/${repoName}`, { headers: { authorization: `Bearer ${get().githubToken}` } })
-    const info = repoResponse.ok ? await repoResponse.json() : {}
-    const added = { name: parsed.repository, language: info.language || 'Unknown', description: info.description || 'Connected GitHub repository.', prs: hydrated }
     set((state) => ({
       repositories: [...state.repositories.filter((item) => item.name !== added.name), added],
       selectedRepo: added.name,
-      loadedCounts: { ...state.loadedCounts, [added.name]: Math.min(5, hydrated.length) },
-      triage: { ...state.triage, ...Object.fromEntries(hydrated.map((pr) => [cardId(added.name, pr.number), { column: 'inbox', reason: null }])) },
+      loadedCounts: { ...state.loadedCounts, [added.name]: Math.min(5, added.prs.length) },
+      triage: { ...state.triage, ...Object.fromEntries(added.prs.map((item) => [cardId(added.name, item.number), { column: 'inbox', reason: null }])) },
     }))
     return { ok: true }
   },
@@ -377,21 +386,28 @@ export const useAppStore = create(persist((set, get) => ({
 
   startRun: (repo, prNumber) => {
     const existing = get().run
-    if (existing && existing.status === 'running') return { ok: false, error: 'A pipeline run is already active.' }
+    if (existing && existing.status === 'running') {
+      set({ run: { ...existing, status: 'stopped' } })
+    }
     const found = findFixture(repo, prNumber) || get().repositories.flatMap((item) => item.prs.map((pr) => ({ repo: item, pr }))).find((item) => item.repo.name === repo && item.pr.number === Number(prNumber))
     if (!found) return { ok: false, error: 'Pull request not found.' }
     const count = sourceCount(found.pr)
-    if (count > 10) return { ok: false, error: `Pipeline blocked: ${count} non-test source files exceeds the maximum bound of 10.` }
+    if (count > 10) {
+      const message = `Pipeline blocked: ${count} non-test source files exceeds the maximum bound of 10. Choose a PR with 3–10 source files.`
+      get().toast('Pipeline blocked', message)
+      get().announce(message)
+      return { ok: false, error: message }
+    }
     const id = `run-${Date.now()}`
     set({
-      activeView: 'runs', highlightedStage: null,
+      activeView: 'runs', highlightedStage: null, mobileNavOpen: false,
       run: { id, repo, prNumber: Number(prNumber), language: found.repo.language, status: 'running', outcome: null, paused: false, startedAt: now(), completedAt: null, stages: stageTemplate(), timeline: [], package: null },
     })
     executePipeline(id)
     return { ok: true, id }
   },
-  pauseRun: () => set((state) => state.run?.status === 'running' ? { run: { ...state.run, paused: true }, announcement: 'Pipeline paused' } : {}),
-  resumeRun: () => set((state) => state.run?.paused ? { run: { ...state.run, paused: false }, announcement: 'Pipeline resumed' } : {}),
+  pauseRun: () => set((state) => state.run && (state.run.status === 'running' || state.run.paused) ? { run: { ...state.run, paused: true, status: 'running' }, announcement: 'Pipeline paused', activeView: 'runs' } : {}),
+  resumeRun: () => set((state) => state.run?.paused ? { run: { ...state.run, paused: false, status: 'running' }, announcement: 'Pipeline resumed', activeView: 'runs' } : {}),
   retryStage: () => {
     const run = get().run
     if (!run || run.status !== 'failed') return
@@ -407,8 +423,20 @@ export const useAppStore = create(persist((set, get) => ({
     packages: [bundle, ...state.packages.filter((item) => !(item.repo === bundle.repo && item.pr_number === bundle.pr_number && item.created_at === bundle.created_at))],
     selectedPackage: bundle,
   })),
-  deletePackage: (bundle) => set((state) => ({ packages: state.packages.filter((item) => !(item.repo === bundle.repo && item.pr_number === bundle.pr_number && item.created_at === bundle.created_at)), selectedPackage: state.selectedPackage === bundle ? null : state.selectedPackage })),
-  importPackage: (bundle) => { get().addPackage(bundle); get().toast('Bundle imported', `${bundle.repo} #${bundle.pr_number} was added to the library.`) },
+  deletePackage: (bundle) => {
+    set((state) => ({
+      packages: state.packages.filter((item) => !(item.repo === bundle.repo && item.pr_number === bundle.pr_number && item.created_at === bundle.created_at)),
+      selectedPackage: state.selectedPackage === bundle ? null : state.selectedPackage,
+      compareIds: state.compareIds.filter((id) => id !== `${bundle.repo}#${bundle.pr_number}#${bundle.created_at}`),
+    }))
+    get().toast('Package deleted', `${bundle.repo} PR #${bundle.pr_number} was removed from the library.`)
+    get().announce(`Deleted package ${bundle.repo} PR ${bundle.pr_number}`)
+  },
+  importPackage: (bundle) => {
+    get().addPackage(bundle)
+    get().toast('Bundle imported', `${bundle.repo} #${bundle.pr_number} was added to the library.`)
+    get().announce(`Imported package ${bundle.repo} PR ${bundle.pr_number}`)
+  },
 
   toggleBatchQueue: (repo, prNumber) => set((state) => {
     const id = cardId(repo, prNumber)
@@ -420,24 +448,40 @@ export const useAppStore = create(persist((set, get) => ({
     const queue = get().batchQueue
     if (queue.length < 2 || get().batch?.status === 'running') return { ok: false, error: 'Queue at least 2 accepted PRs to start a batch.' }
     const items = queue.map((item) => ({ ...item, status: 'queued', stage: 'Pending', outcome: null }))
-    set({ activeView: 'runs', batch: { status: 'running', total: items.length, completed: 0, items }, batchReport: null })
+    set({ activeView: 'runs', mobileNavOpen: false, batch: { status: 'running', total: items.length, completed: 0, progress: 0, items }, batchReport: null })
     const outcomes = []
     for (let index = 0; index < queue.length; index += 1) {
       const queued = queue[index]
       const found = findFixture(queued.repo, queued.prNumber)
       const count = found ? sourceCount(found.pr) : 0
-      for (const stage of ['Fetch', 'Evaluate', ...(count >= 3 && count <= 10 ? ['Generate', 'Package'] : [])]) {
-        set((state) => ({ batch: { ...state.batch, items: state.batch.items.map((item, i) => i === index ? { ...item, status: 'running', stage } : item) } }))
-        await pauseDelay(340)
+      const stages = ['Fetch', 'Evaluate', ...(count >= 3 && count <= 10 ? ['Generate', 'Package'] : [])]
+      for (let stageIndex = 0; stageIndex < stages.length; stageIndex += 1) {
+        const stage = stages[stageIndex]
+        const progress = index + ((stageIndex + 1) / stages.length)
+        set((state) => ({
+          batch: {
+            ...state.batch,
+            progress,
+            items: state.batch.items.map((item, i) => i === index ? { ...item, status: 'running', stage } : item),
+          },
+        }))
+        await pauseDelay(420)
       }
       let outcome = 'skipped'
       if (found && count >= 3 && count <= 10) {
-        const bundle = packageFor(found.repo.name, found.pr, found.repo.language)
+        const bundle = packageFor(found.repo.name, found.pr, found.repo.language, deterministicCreatedAt(found.repo.name, found.pr.number))
         get().addPackage(bundle)
         outcome = 'packaged'
       } else if (found) outcome = count > 10 ? 'skipped' : 'trivial'
       outcomes.push({ repo: queued.repo, pr_number: queued.prNumber, outcome })
-      set((state) => ({ batch: { ...state.batch, completed: index + 1, items: state.batch.items.map((item, i) => i === index ? { ...item, status: 'complete', stage: outcome === 'packaged' ? 'Package' : 'Evaluate', outcome } : item) } }))
+      set((state) => ({
+        batch: {
+          ...state.batch,
+          completed: index + 1,
+          progress: index + 1,
+          items: state.batch.items.map((item, i) => i === index ? { ...item, status: 'complete', stage: outcome === 'packaged' ? 'Package' : 'Evaluate', outcome } : item),
+        },
+      }))
     }
     const report = batchReportSchema.parse({
       total: outcomes.length,
@@ -447,7 +491,7 @@ export const useAppStore = create(persist((set, get) => ({
       skipped: outcomes.filter((item) => item.outcome === 'skipped').length,
       items: outcomes,
     })
-    set((state) => ({ batch: { ...state.batch, status: 'complete' }, batchReport: report, batchQueue: [] }))
+    set((state) => ({ batch: { ...state.batch, status: 'complete', progress: state.batch.total }, batchReport: report, batchQueue: [] }))
     get().toast('Batch complete', `${report.packaged} of ${report.total} queued PRs were packaged.`)
     get().announce('Batch run complete')
     return { ok: true, report }
@@ -475,4 +519,4 @@ export const selectTriageStats = (state) => {
   }
 }
 
-export { isTestFile, sourceCount, sourceFiles, difficultyFor }
+export { isTestFile, sourceCount, sourceFiles, difficultyFor, stripCredentialMaterial }
