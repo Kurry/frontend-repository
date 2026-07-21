@@ -75,7 +75,7 @@ button:focus, [role="button"]:focus, input:focus, select:focus, textarea:focus {
   min-height: 2.25rem; border-radius: .55rem; padding: .48rem .75rem;
   border: 1px solid #cbd5e2; background: white; color: #1a2940;
   font-size: .78rem; font-weight: 700; cursor: pointer;
-  transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, transform .12s ease;
+  transition: background-color .09s ease, border-color .09s ease, box-shadow .09s ease, transform .09s ease;
 }
 .action:hover { background: #f3f7fb; border-color: #9dafc3; box-shadow: 0 5px 12px rgba(25,43,70,.09); }
 .action:active { transform: translateY(1px) scale(.99); }
@@ -106,9 +106,9 @@ button:focus, [role="button"]:focus, input:focus, select:focus, textarea:focus {
 .dark .severity-S2 { background: #34260f; color: #f5bd59; border-color: #76551d; }
 .dark .severity-S3 { background: #122c38; color: #8ed2e4; border-color: #31596a; }
 
-.banner-enter { animation: banner-in .28s ease both; }
-.toast-enter { animation: toast-in .28s ease both; }
-.timeline-enter { animation: timeline-in .32s ease both; }
+.banner-enter { animation: banner-in .09s ease both; }
+.toast-enter { animation: toast-in .09s ease both; }
+.timeline-enter { animation: timeline-in .09s ease both; }
 
 @keyframes banner-in {
   from { opacity: 0; transform: translateY(-10px); }

@@ -15,7 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { AnimatePresence, motion } from 'motion/react'
 import { getSelectedScript, statusLabel, useStudio } from './store'
-import { newScriptSchema, paramSchemas, scheduleSchema, stepTypes, typeLabels, validateStep } from './schemas'
+import { newScriptSchema, paramSchemas, runReportSchema, scheduleSchema, stepTypes, typeLabels, validateStep } from './schemas'
 import './webmcp'
 
 const viewItems = [
@@ -516,9 +516,9 @@ function definitionFor(script) {
 function reportFor(script) {
   const run = script?.runs.at(-1)
   if (!run) return { run: null }
-  return { run: { id: run.id, trigger: run.trigger, start_time: run.start_time, duration: run.duration, totals: run.totals,
+  return runReportSchema.parse({ run: { id: run.id, trigger: run.trigger, start_time: run.start_time, duration: run.duration, totals: run.totals,
     steps: run.steps.map(step => ({ order: step.order, type: step.type, status: step.status, attempts: step.attempts, ...(step.error_reason ? { error_reason: step.error_reason } : {}), ...(step.extracted_name ? { extracted_name: step.extracted_name, extracted_value: step.extracted_value } : {}) })),
-    timeline_summary: run.timeline.map(event => ({ step: event.step, status: event.status, timestamp: event.timestamp })) } }
+  } })
 }
 
 function ExportView() {

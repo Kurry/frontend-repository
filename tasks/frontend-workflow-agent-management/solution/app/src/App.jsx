@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import {
   Button,
   Dropdown,
   InlineNotification,
   Modal,
-  MultiSelect,
   OverflowMenu,
   OverflowMenuItem,
   ProgressBar,
@@ -56,7 +55,6 @@ import {
   createUniqueAgentSchema,
   importFormSchema,
   parseFleetText,
-  timelineFilterSchema,
 } from './schemas'
 import { registerWebMCP } from './webmcp'
 import { trapFocus } from './focus'
@@ -77,7 +75,6 @@ const TYPE_LABELS = { aster: 'Aster', boreal: 'Boreal', cinder: 'Cinder' }
 const EDITOR_LABELS = { codedeck: 'Codedeck', nimbus: 'Nimbus', quill: 'Quill', vector: 'Vector', none: 'None' }
 const STATUS_LABELS = { idle: 'Idle', running: 'Running', paused: 'Paused', error: 'Error', offline: 'Offline' }
 const STATUS_TAG_TYPES = { idle: 'green', running: 'blue', paused: 'cyan', error: 'red', offline: 'gray' }
-const FILTER_ITEMS = STATUSES.map((id) => ({ id, label: STATUS_LABELS[id] }))
 const TYPE_ITEMS = Object.entries(TYPE_LABELS).map(([id, label]) => ({ id, label }))
 const EDITOR_ITEMS = Object.entries(EDITOR_LABELS).map(([id, label]) => ({ id, label }))
 
@@ -114,19 +111,21 @@ function StatusFilterControl() {
   const statusFilters = useFleetStore((state) => state.statusFilters)
   const setFilters = useFleetStore((state) => state.setFilters)
   return (
-    <div className="status-filter" aria-label="Filter agents by status">
-      <MultiSelect
-        id="fleet-status-filter"
-        key={statusFilters.join('|') || 'all'}
-        items={FILTER_ITEMS}
-        itemToString={(item) => item?.label || ''}
-        selectedItems={FILTER_ITEMS.filter((item) => statusFilters.includes(item.id))}
-        onChange={({ selectedItems }) => setFilters(selectedItems.map((item) => item.id))}
-        label={statusFilters.length ? `${statusFilters.length} statuses` : 'All statuses'}
-        titleText="Status filter"
-        size="sm"
-      />
-    </div>
+    <fieldset className="status-filter">
+      <legend>Status filter</legend>
+      <span className="filter-summary">{statusFilters.length ? `${statusFilters.length} selected` : 'All statuses'}</span>
+      <div className="filter-options">
+        {STATUSES.map((status) => (
+          <label key={status}>
+            <input type="checkbox" checked={statusFilters.includes(status)} onChange={(event) => {
+              const next = event.target.checked ? [...statusFilters, status] : statusFilters.filter((item) => item !== status)
+              setFilters(next)
+            }} />
+            <span>{STATUS_LABELS[status]}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
   )
 }
 
@@ -143,7 +142,7 @@ function ActionToolbar() {
         <Button size="sm" kind="tertiary" renderIcon={Upload} onClick={store.openImport}>Import fleet</Button>
       </div>
       <div className="toolbar-secondary">
-        <Button hasIconOnly size="sm" kind="ghost" renderIcon={Undo} iconDescription="Undo registry mutation" tooltipPosition="bottom" disabled={!store.undoStack.length} onClick={store.undo} />
+        <Button hasIconOnly size="sm" kind="ghost" renderIcon={Undo} iconDescription="Undo registry mutation" tooltipPosition="bottom" disabled={!store.undoStack.length && !store.exitingAgentId} onClick={store.undo} />
         <Button hasIconOnly size="sm" kind="ghost" renderIcon={Redo} iconDescription="Redo registry mutation" tooltipPosition="bottom" disabled={!store.redoStack.length} onClick={store.redo} />
         <div className="toolbar-divider" aria-hidden="true" />
         <Button size="sm" kind="ghost" renderIcon={Pause} disabled={!canPause} onClick={store.pauseSelected}>Pause All</Button>
@@ -218,7 +217,7 @@ function AgentTable() {
         <TableBody>
           {filtered.map((agent) => {
             return (
-              <TableRow key={agent.id} className={`agent-row ${agent.isNew ? 'new-agent-row' : ''} ${store.detailAgentId === agent.id ? 'is-selected' : ''}`} onClick={() => store.selectAgent(agent.id)} tabIndex={0} onKeyDown={(event) => { if (event.currentTarget === event.target && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); store.selectAgent(agent.id) } }}>
+              <TableRow key={agent.id} className={`agent-row ${agent.isNew ? 'new-agent-row' : ''} ${store.exitingAgentId === agent.id ? 'agent-row-exit' : ''} ${store.detailAgentId === agent.id ? 'is-selected' : ''}`} onClick={() => store.selectAgent(agent.id)} tabIndex={0} onKeyDown={(event) => { if (event.currentTarget === event.target && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); store.selectAgent(agent.id) } }}>
                 <TableCell className="checkbox-cell" onClick={(event) => event.stopPropagation()}><label className="row-checkbox"><input id={`select-${agent.id}`} type="checkbox" aria-label={`Select ${agent.name}`} checked={store.selectedIds.includes(agent.id)} onChange={(event) => store.toggleSelection(agent.id, event.target.checked)} /><span className="sr-only">{`Select ${agent.name}`}</span></label></TableCell>
                 <TableCell><div className="agent-identity"><span className={`agent-mark type-${agent.agentType}`}>{agent.name.slice(0, 1)}</span><div><strong>{agent.name}</strong><CurrentWork agent={agent} /></div></div></TableCell>
                 <TableCell><span className="type-label">{TYPE_LABELS[agent.agentType]}</span></TableCell>
@@ -258,10 +257,10 @@ function AgentModal() {
     mode: 'onChange',
     defaultValues: { name: '', agentType: '', editorIntegration: '', accessKey: '' },
   })
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!modal || modal.mode === 'remove') return
     reset(current ? { name: current.name, agentType: current.agentType, editorIntegration: current.editorIntegration, accessKey: current.accessKey } : { name: '', agentType: '', editorIntegration: '', accessKey: '' })
-    setTimeout(() => trigger(), 0)
+    void trigger()
   }, [modal?.mode, modal?.agentId, current?.name, current?.agentType, current?.editorIntegration, current?.accessKey, reset, trigger])
   if (!open) return null
   const onSubmit = (payload) => isEdit ? updateAgent(current.id, payload) : registerAgent(payload)
@@ -290,7 +289,7 @@ function RemoveModal() {
   const closeModal = useFleetStore((state) => state.closeModal)
   const removeAgent = useFleetStore((state) => state.removeAgent)
   if (modal?.mode !== 'remove' || !target) return null
-  return <Modal danger open modalHeading={`Remove ${target.name}?`} primaryButtonText="Remove agent" secondaryButtonText="Cancel" onRequestClose={closeModal} onSecondarySubmit={closeModal} onRequestSubmit={() => { removeAgent(target.id); closeModal() }}><p>This explicitly removes the agent, its timeline, and its run state from the live registry. You can undo this mutation afterward.</p></Modal>
+  return <Modal danger open modalHeading={`Remove ${target.name}?`} primaryButtonText="Remove agent" secondaryButtonText="Cancel" onRequestClose={closeModal} onSecondarySubmit={closeModal} onRequestSubmit={() => { if (removeAgent(target.id)) closeModal() }}><p>This explicitly removes the agent, its timeline, and its run state from the live registry. You can undo this mutation afterward.</p></Modal>
 }
 
 function ConfigurationTab({ agent }) {
@@ -312,13 +311,13 @@ function HistoryTab({ agent }) {
   const filter = useFleetStore((state) => state.timelineFilter)
   const setFilter = useFleetStore((state) => state.setTimelineFilter)
   const highlightStep = useFleetStore((state) => state.highlightStep)
-  const { control, reset } = useForm({ resolver: zodResolver(timelineFilterSchema), defaultValues: { kind: filter } })
-  useEffect(() => reset({ kind: filter }), [filter, reset])
   const items = [...agent.timeline].reverse().filter((event) => filter === 'all' || event.kind === filter).slice(0, 10)
-  const kindItems = TIMELINE_KINDS.map((id) => ({ id, label: id === 'all' ? 'All events' : `${id.slice(0, 1).toUpperCase()}${id.slice(1)}` }))
   return (
     <div className="tab-content fade-in history-tab">
-      <Controller name="kind" control={control} render={({ field }) => <Dropdown id={`timeline-filter-${agent.id}`} size="sm" titleText="Timeline event kind" label="Filter timeline" items={kindItems} itemToString={(item) => item?.label || ''} selectedItem={kindItems.find((item) => item.id === field.value)} onChange={({ selectedItem }) => { field.onChange(selectedItem.id); setFilter(selectedItem.id) }} />} />
+      <label className="timeline-filter-label" htmlFor={`timeline-filter-${agent.id}`}>Timeline event kind</label>
+      <select id={`timeline-filter-${agent.id}`} className="timeline-filter-select" value={filter} onChange={(event) => setFilter(event.target.value)}>
+        {TIMELINE_KINDS.map((kind) => <option key={kind} value={kind}>{kind === 'all' ? 'All events' : `${kind.slice(0, 1).toUpperCase()}${kind.slice(1)}`}</option>)}
+      </select>
       {filter !== 'all' && <Button className="clear-timeline" size="sm" kind="ghost" onClick={() => setFilter('all')}>Clear filter</Button>}
       <ol className="timeline-list">
         {items.map((event) => (
@@ -418,6 +417,9 @@ function ExportModal() {
   const close = useFleetStore((state) => state.closeExport)
   const copy = useFleetStore((state) => state.copyExport)
   const download = useFleetStore((state) => state.downloadExport)
+  const changeHint = useFleetStore((state) => state.exportChangeHint)
+  const agents = useFleetStore((state) => state.agents)
+  const rollup = getRollup(agents)
   const containerRef = useRef(null)
   useOverlayFocusTrap(open, containerRef)
   if (!open) return null
@@ -425,9 +427,14 @@ function ExportModal() {
     <Modal className="export-modal" open modalHeading="Export fleet" modalLabel="Live fleet snapshot" onRequestClose={close} size="lg" primaryButtonText="Close" onRequestSubmit={close} selectorPrimaryFocus=".json-preview">
       <div ref={containerRef}>
         <p className="modal-intro">This API-shaped document is compiled from the current registry, timelines, and run state.</p>
+        <p className="export-change-hint" role="status">{changeHint}</p>
+        <section className="print-summary" aria-label="Printable fleet summary">
+          <div><span>Fleet total</span><strong>{rollup.total}</strong></div>
+          {STATUSES.map((status) => <div key={status}><span>{STATUS_LABELS[status]}</span><strong>{rollup[status]}</strong></div>)}
+        </section>
         <div className="export-meta"><span>fleet-json</span><span>{new Blob([text]).size.toLocaleString()} bytes</span></div>
         <pre className="json-preview" tabIndex={0} aria-label="Fleet JSON preview">{text}</pre>
-        <div className="modal-actions-row"><Button size="sm" renderIcon={Copy} onClick={copy}>Copy</Button><Button size="sm" kind="tertiary" renderIcon={Download} onClick={download}>Download</Button></div>
+        <div className="modal-actions-row"><Button size="sm" kind="ghost" onClick={() => window.print()}>Print summary</Button><Button size="sm" renderIcon={Copy} onClick={copy}>Copy</Button><Button size="sm" kind="tertiary" renderIcon={Download} onClick={download}>Download</Button></div>
       </div>
     </Modal>
   )
@@ -470,11 +477,17 @@ function CommandPalette() {
     ...store.agents.map((agent) => ({ id: `jump-${agent.id}`, label: `Jump to ${agent.name}`, hint: `${TYPE_LABELS[agent.agentType]} · ${STATUS_LABELS[agent.status]}`, icon: Settings, run: () => store.selectAgent(agent.id) })),
     { id: 'register', label: 'Register Agent', hint: 'Create API payload', icon: Add, run: store.openRegister },
     { id: 'export', label: 'Export fleet', hint: 'Open live JSON', icon: Export, run: store.openExport },
-    { id: 'undo', label: 'Undo', hint: store.undoStack.length ? 'Restore previous registry' : 'Nothing to undo', icon: Undo, disabled: !store.undoStack.length, run: store.undo },
+    { id: 'undo', label: 'Undo', hint: store.exitingAgentId ? 'Cancel pending removal' : store.undoStack.length ? 'Restore previous registry' : 'Nothing to undo', icon: Undo, disabled: !store.undoStack.length && !store.exitingAgentId, run: store.undo },
     { id: 'redo', label: 'Redo', hint: store.redoStack.length ? 'Reapply registry mutation' : 'Nothing to redo', icon: Redo, disabled: !store.redoStack.length, run: store.redo },
   ]
   const query = store.paletteQuery.trim().toLocaleLowerCase()
-  const visible = commands.filter((command) => command.label.toLocaleLowerCase().includes(query))
+  const fuzzyMatch = (label) => {
+    if (!query) return true
+    let cursor = 0
+    for (const character of label.toLocaleLowerCase()) if (character === query[cursor]) cursor += 1
+    return cursor === query.length
+  }
+  const visible = commands.filter((command) => command.label.toLocaleLowerCase().includes(query) || fuzzyMatch(command.label))
   const moveCommandFocus = (event, offset) => {
     const buttons = [...document.querySelectorAll('.command-list button:not(:disabled)')]
     if (!buttons.length) return

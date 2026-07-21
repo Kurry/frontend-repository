@@ -107,7 +107,7 @@
 </article>
 
 <style>
-  .gate-row { background:white; border-bottom:1px solid #e0e6ee; transition:background-color .18s, box-shadow .18s; }
+  .gate-row { background:white; border-bottom:1px solid #e0e6ee; transition:background-color .09s, box-shadow .09s; }
   .gate-row:first-child { border-radius:.7rem .7rem 0 0; }
   .gate-row:last-child { border-bottom:0; border-radius:0 0 .7rem .7rem; }
   .gate-row:hover { background:#f8fbfd; }

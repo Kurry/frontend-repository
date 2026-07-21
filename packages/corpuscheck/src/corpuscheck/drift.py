@@ -62,6 +62,9 @@ def _expected_files(slug: str, task_dir: Path | None = None) -> dict[str, bytes]
         "tests/webmcp_stdio_server.mjs": (
             canon / "mcp/webmcp_stdio_server.mjs"
         ).read_bytes(),
+        "tests/playwright_rm_config.json": (
+            canon / "mcp/playwright_rm_config.json"
+        ).read_bytes(),
         "environment/Dockerfile": dockerfile.encode(),
     }
     description = (source_metadata().get(slug) or {}).get("description")

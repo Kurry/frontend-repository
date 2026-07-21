@@ -127,10 +127,15 @@ export function Library({ onEdit }) {
       >
         {sortedEvents.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-500">
-            <p className="mb-4">No events match this range and filters.</p>
-            <Button variant="outline" color="cyan" onClick={() => resetFilters()}>
-              Reset filters
-            </Button>
+            <p className="mb-4">No events match this range and filters. Try resetting filters or create a new event.</p>
+            <Group>
+              <Button variant="outline" color="cyan" onClick={() => resetFilters()}>
+                Reset filters
+              </Button>
+              <Button color="cyan" onClick={() => onEdit(null)}>
+                Add event
+              </Button>
+            </Group>
           </div>
         ) : (
           <div

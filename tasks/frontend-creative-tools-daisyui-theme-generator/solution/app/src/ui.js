@@ -640,6 +640,9 @@ export function initUI() {
       refreshThemeLists();
       refreshEditorControls();
     }
+    if (event === 'tokens') {
+      refreshEditorControls();
+    }
     updateSurfaces();
   });
 
@@ -760,9 +763,23 @@ function wireEditor() {
   document.addEventListener('focusin', (e) => {
     if (e.target.matches?.('[data-color]')) colorPending = snapshotState();
   });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.activeElement && document.activeElement.matches('[data-color]')) {
+      e.preventDefault();
+      document.activeElement.blur();
+    }
+  });
   document.addEventListener('input', (e) => {
     const el = e.target.closest?.('[data-color]');
-    if (el) setColor(el.dataset.color, el.value);
+    if (el) {
+      const wasBuiltin = activeTheme().builtin;
+      setColor(el.dataset.color, el.value);
+      if (wasBuiltin && colorPending) {
+        const snap = snapshotState();
+        colorPending.customs = snap.customs;
+        colorPending.activeId = snap.activeId;
+      }
+    }
   });
   document.addEventListener('change', (e) => {
     const el = e.target.closest?.('[data-color]');
