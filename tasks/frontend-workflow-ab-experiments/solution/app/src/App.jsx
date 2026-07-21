@@ -28,6 +28,13 @@ const statusLabel = value => value.charAt(0).toUpperCase() + value.slice(1)
 const fmtDate = value => value ? new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(value)) : 'Not started'
 const truncate = value => value.length > 60 ? `${value.slice(0, 60)}…` : value
 
+function useRestoreLauncherOnUnmount(launcherButtonRef) {
+  useEffect(() => () => {
+    const launcher = launcherButtonRef.current
+    window.setTimeout(() => launcher?.isConnected && launcher.focus(), 0)
+  }, [launcherButtonRef])
+}
+
 function App() {
   const store = useStudio()
   const modalLauncherRef = useRef(null)
@@ -144,7 +151,7 @@ function ExperimentRow({ experiment, rememberLauncher, rememberPanelLauncher }) 
   const current = Math.min(...letters.map(letter => experiment.progress[letter] || 0))
   const total = experiment.minimumSampleSize
   const open = event => { if (['completed', 'decided', 'running', 'paused'].includes(experiment.status)) { rememberPanelLauncher(event); state.selectExperiment(experiment.id) } }
-  return <tr className={experiment.isNew ? 'new-row' : ''} onDoubleClick={() => state.selectExperiment(experiment.id)}>
+  return <tr className={experiment.isNew ? 'new-row' : ''} onDoubleClick={open}>
     <td className="check-cell"><Checkbox id={`select-${experiment.id}`} labelText={`Select ${experiment.name}`} hideLabel checked={selected} onChange={() => state.toggleSelected(experiment.id)} /></td>
     <td><button className="experiment-name" onClick={open} title={experiment.name}>{truncate(experiment.name)}</button><span className="experiment-id">{experiment.id}</span></td>
     <td><div className="variant-stack">{experiment.variants.map((variant, index) => <span key={`${experiment.id}-${index}`}><i style={{ background: COLORS[index] }}>{LETTERS[index]}</i>{variant.title}</span>)}</div></td>
@@ -295,6 +302,7 @@ function InspectorTab({ experiment }) {
 }
 
 function DesignerModal({ launcherButtonRef }) {
+  useRestoreLauncherOnUnmount(launcherButtonRef)
   const state = useStudio()
   const existing = state.designer === 'new' ? null : state.experiments.find(item => item.id === state.designer)
   const defaults = existing ? { name: existing.name, hypothesis: existing.hypothesis, successMetric: existing.successMetric, minimumSampleSize: existing.minimumSampleSize, variants: existing.variants.map(variant => ({ ...variant, temperature: Number(variant.temperature), trafficAllocation: Number(variant.trafficAllocation) })) } : defaultExperiment
@@ -307,7 +315,7 @@ function DesignerModal({ launcherButtonRef }) {
   const [previewInput, setPreviewInput] = useState('Explain the key idea clearly and concisely.')
   const submit = payload => { const result = state.saveExperiment(payload); if (!result.ok) setError('root', { message: result.error }) }
   const runPreview = () => setPreviewResults((values.variants || []).map((variant, index) => ({ letter: LETTERS[index], title: variant.title, model: variant.model, latency: 590 + index * 161 + previewInput.length, tokens: 104 + index * 29 + Math.round(previewInput.length / 3), text: `${variant.title} via ${variant.model}: ${previewInput} — this ${index % 2 ? 'evidence-aware, detailed' : 'direct, compact'} response uses ${variant.promptId}.` })))
-  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} modalHeading={existing ? 'Edit Experiment' : 'New Experiment'} modalLabel="ExperimentUpsert · API-shaped design" primaryButtonText={existing ? 'Save Changes' : 'Create Experiment'} secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || total !== 100 || isSubmitting} onRequestClose={state.closeDesigner} onRequestSubmit={handleSubmit(submit)} size="lg" className="designer-modal">
+  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} selectorPrimaryFocus="#experiment-name" modalHeading={existing ? 'Edit Experiment' : 'New Experiment'} modalLabel="ExperimentUpsert · API-shaped design" primaryButtonText={existing ? 'Save Changes' : 'Create Experiment'} secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || total !== 100 || isSubmitting} onRequestClose={state.closeDesigner} onRequestSubmit={handleSubmit(submit)} size="lg" className="designer-modal">
     <div className="modal-intro">Configure 2–4 ordered variants. Every valid submission is the exact experiment API request body.</div>
     {errors.root && <div className="form-error global" aria-live="polite">{errors.root.message}</div>}
     <div className="form-grid two"><TextInput id="experiment-name" labelText="Experiment name" invalid={!!errors.name} invalidText={errors.name?.message} {...register('name')} /><Select id="success-metric" labelText="Success metric" invalid={!!errors.successMetric} invalidText={errors.successMetric?.message} {...register('successMetric')}>{state.criteria.map(criterion => <SelectItem key={criterion.id} value={criterion.name} text={criterion.label || criterion.name} />)}</Select></div>
@@ -322,26 +330,29 @@ function DesignerModal({ launcherButtonRef }) {
 }
 
 function CriterionModal({ launcherButtonRef }) {
+  useRestoreLauncherOnUnmount(launcherButtonRef)
   const state = useStudio()
   const { register, handleSubmit, setError, formState: { errors, isValid } } = useForm({ resolver: zodResolver(criterionSchema), mode: 'onChange', defaultValues: { name: '', description: '', passThreshold: 75 } })
   const submit = payload => { const result = state.addCriterion(payload); if (!result.ok) setError(result.error.includes('unique') ? 'name' : 'root', { message: result.error }) }
-  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} modalHeading="New Scoring Criterion" modalLabel="CriterionUpsert · reusable judge" primaryButtonText="Create Criterion" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => state.setField('criterionOpen', false)} onRequestSubmit={handleSubmit(submit)}>
+  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} selectorPrimaryFocus="#criterion-name" modalHeading="New Scoring Criterion" modalLabel="CriterionUpsert · reusable judge" primaryButtonText="Create Criterion" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => state.setField('criterionOpen', false)} onRequestSubmit={handleSubmit(submit)}>
     {errors.root && <div className="form-error global" aria-live="polite">{errors.root.message}</div>}<TextInput id="criterion-name" labelText="Criterion name" invalid={!!errors.name} invalidText={errors.name?.message} {...register('name')} /><TextArea id="criterion-description" labelText="Description" rows={4} invalid={!!errors.description} invalidText={errors.description?.message} {...register('description')} /><NumberInput id="pass-threshold" label="Pass threshold" min={0} max={100} invalid={!!errors.passThreshold} invalidText={errors.passThreshold?.message} {...register('passThreshold')} />
   </Modal>
 }
 
 function DecisionModal({ launcherButtonRef }) {
+  useRestoreLauncherOnUnmount(launcherButtonRef)
   const state = useStudio()
   const experiment = state.experiments.find(item => item.id === state.decisionFor)
   const { register, handleSubmit, watch, setError, formState: { errors, isValid } } = useForm({ resolver: zodResolver(decisionSchema), mode: 'onChange', defaultValues: { choice: 'declare-winner', winnerVariant: '', rationale: '' } })
   const choice = watch('choice')
   const submit = payload => { const normalized = { ...payload, winnerVariant: payload.choice === 'declare-winner' ? payload.winnerVariant || null : null }; const result = state.decide(experiment.id, normalized); if (!result.ok) setError('root', { message: result.error }) }
-  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} danger modalHeading="Record Experiment Decision" modalLabel="DecisionUpsert · permanent lock" primaryButtonText="Confirm Decision" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => state.setField('decisionFor', null)} onRequestSubmit={handleSubmit(submit)}>
+  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} selectorPrimaryFocus="#decision-choice" danger modalHeading="Record Experiment Decision" modalLabel="DecisionUpsert · permanent lock" primaryButtonText="Confirm Decision" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => state.setField('decisionFor', null)} onRequestSubmit={handleSubmit(submit)}>
     <div className="decision-warning"><Locked size={18} /><span>This action locks editing and outlier flags. Decisions are excluded from undo.</span></div>{errors.root && <div className="form-error global" aria-live="polite">{errors.root.message}</div>}<Select id="decision-choice" labelText="Decision choice" invalid={!!errors.choice} invalidText={errors.choice?.message} {...register('choice')}><SelectItem value="declare-winner" text="Declare winner" /><SelectItem value="inconclusive" text="Inconclusive" /><SelectItem value="stop-early" text="Stop early" /></Select>{choice === 'declare-winner' && <Select id="winner-variant" labelText="Winner variant" invalid={!!errors.winnerVariant} invalidText={errors.winnerVariant?.message} {...register('winnerVariant')}><SelectItem value="" text="Choose a variant" />{experiment.variants.map((variant, index) => <SelectItem key={LETTERS[index]} value={LETTERS[index]} text={`Variant ${LETTERS[index]} — ${variant.title}`} />)}</Select>}<TextArea id="decision-rationale" labelText="Decision rationale" rows={5} invalid={!!errors.rationale} invalidText={errors.rationale?.message} {...register('rationale')} />
   </Modal>
 }
 
 function ReportModal({ launcherButtonRef }) {
+  useRestoreLauncherOnUnmount(launcherButtonRef)
   const state = useStudio()
   const [generatedAt, setGeneratedAt] = useState(Date.now())
   const [importError, setImportError] = useState('')
@@ -358,6 +369,7 @@ function ReportModal({ launcherButtonRef }) {
 }
 
 function ConfirmDialog({ launcherButtonRef }) {
+  useRestoreLauncherOnUnmount(launcherButtonRef)
   const state = useStudio()
   const confirm = state.confirm
   const isDelete = confirm.type === 'delete'
