@@ -57,6 +57,13 @@ export function registerWebMcp(store) {
       else return fail('The declared destination requires a valid bounded entity value.')
       return ok(`Opened ${destination}`)
     } },
+    { name: 'browse_search', description: 'Search the live submission queue without changing filters, selection, or navigation.', inputSchema: object({ query: { type: 'string', minLength: 1, maxLength: 200 } }, ['query']), run: ({ query }) => {
+      const needle = query.trim().toLowerCase()
+      const matches = store.submissions
+        .filter((submission) => [submission.id, submission.title, submission.contributor_name].some((value) => value.toLowerCase().includes(needle)))
+        .map(({ id, title, contributor_name, stage, payout_state }) => ({ id, title, contributor_name, stage, payout_state }))
+      return { success: true, query, count: matches.length, submissions: matches }
+    } },
     { name: 'browse_apply_filter', description: 'Apply one bounded queue or profile filter.', inputSchema: object({ filter: enumSchema(['stage', 'tier', 'contributor', 'date-range']), value: { oneOf: [{ type: 'string' }, { type: 'array', items: { type: 'string', format: 'date' }, minItems: 2, maxItems: 2 }] } }, ['filter', 'value']), run: ({ filter, value }) => {
       if (filter === 'stage' && stageValues.includes(value)) store.setFilter('stage', value)
       else if (filter === 'tier' && tierValues.includes(value)) store.setFilter('tier', value)

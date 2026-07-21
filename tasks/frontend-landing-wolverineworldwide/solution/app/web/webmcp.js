@@ -17,6 +17,23 @@
   ];
   const CONSENT_FIELDS = ["necessary", "analytics", "marketing", "functional"];
   const app = () => window.NorthstarApp;
+  const objectSchema = (properties = {}, required = []) => ({ type: "object", properties, required, additionalProperties: false });
+  const consentSchema = objectSchema(Object.fromEntries(CONSENT_FIELDS.map((field) => [field, { type: "string", enum: ["true", "false"] }])));
+  const TOOL_INPUT_SCHEMAS = {
+    "browse.open": objectSchema({ destination: { type: "string", enum: DESTINATIONS } }, ["destination"]),
+    "browse.search": objectSchema({ query: { type: "string", minLength: 1, maxLength: 200 } }, ["query"]),
+    "entity.create": objectSchema({ fields: objectSchema({ title: { type: "string", enum: TITLES }, pinned: { type: "string", const: "true" } }, ["title"]) }, ["fields"]),
+    "entity.select": objectSchema({ id: { type: "string", enum: TITLES } }, ["id"]),
+    "entity.delete": objectSchema({ id: { type: "string", enum: TITLES }, confirm: { type: "boolean", const: true } }, ["id", "confirm"]),
+    "entity.toggle": objectSchema({ id: { type: "string", enum: TITLES }, field: { type: "string", enum: ["pinned"] } }, ["id"]),
+    "form.validate": { ...objectSchema({ fields: consentSchema }, ["fields"]), default: { fields: { necessary: "true", analytics: "false", marketing: "false", functional: "false" } } },
+    "form.submit": objectSchema({ fields: consentSchema }, ["fields"]),
+    "form.cancel": objectSchema(),
+    "form.reset": objectSchema(),
+    "artifact.import": objectSchema({ mode: { type: "string", enum: ["paste", "file"] } }, ["mode"]),
+    "artifact.export": objectSchema({ format: { type: "string", enum: ["json", "markdown"] } }, ["format"]),
+    "artifact.copy": objectSchema(),
+  };
 
   function bounded(value, label, max = 200) {
     if (typeof value !== "string" || !value.length || value.length > max) throw new Error(`${label} must be a non-empty string of at most ${max} characters`);
@@ -174,7 +191,7 @@
   ];
 
   const byName = new Map(tools.map((tool) => [tool.name, tool]));
-  const listed = () => tools.map(({ name, module, description }) => ({ name, module, description }));
+  const listed = () => tools.map(({ name, module, description }) => ({ name, module, description, inputSchema: TOOL_INPUT_SCHEMAS[name] }));
   window.webmcp_session_info = () => ({ contract_version: CONTRACT_VERSION, app: "northstar-collective-home", modules: MODULES, tools: tools.map((tool) => tool.name) });
   window.webmcp_list_tools = listed;
   window.webmcp_invoke_tool = async (name, args = {}) => {

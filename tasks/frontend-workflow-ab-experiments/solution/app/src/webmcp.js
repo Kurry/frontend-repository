@@ -54,9 +54,29 @@ const entityInput = {
   confirm: { type: 'boolean' },
 }
 
+const formValidateTool = tool('form_validate', 'Validate declared fields in the active workflow.', formInput, ['workflow'])
+formValidateTool.inputSchema.default = {
+  workflow: 'new-criterion-form',
+  values: { name: 'Quality', description: 'Responses satisfy the declared quality bar.', passThreshold: 80 },
+}
+const formSubmitTool = tool('form_submit', 'Submit the active declared form workflow.', formInput, ['workflow'])
+formSubmitTool.inputSchema.default = {
+  workflow: 'experiment-designer',
+  values: {
+    name: 'Schema round-trip experiment',
+    hypothesis: 'A structured prompt improves response quality.',
+    successMetric: 'factual-accuracy',
+    minimumSampleSize: 10,
+    variants: [
+      { title: 'Control', promptId: 'prompt-concise-v3', model: 'Larkspur-2', temperature: 0.5, trafficAllocation: 50 },
+      { title: 'Treatment', promptId: 'prompt-evidence-v2', model: 'Meridian-XL', temperature: 0.5, trafficAllocation: 50 },
+    ],
+  },
+}
+
 const tools = [
-  tool('form_validate', 'Validate declared fields in the active workflow.', formInput, ['workflow']),
-  tool('form_submit', 'Submit the active declared form workflow.', formInput, ['workflow']),
+  formValidateTool,
+  formSubmitTool,
   tool('form_cancel', 'Cancel the active form workflow.'),
   tool('session_start', 'Start an experiment run.', { experimentId: { type: 'string' } }, ['experimentId']),
   tool('session_pause', 'Pause an experiment run.', { experimentId: { type: 'string' } }, ['experimentId']),

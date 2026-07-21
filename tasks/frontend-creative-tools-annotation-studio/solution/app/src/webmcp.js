@@ -279,6 +279,9 @@ export function registerWebMCP() {
   window.__corvidWebMCPRegistered = true;
 
   const tools = TOOL_DEFS.map(([name, description, inputSchema]) => ({ name, description, inputSchema }));
+  const entitySelect = tools.find((tool) => tool.name === 'entity_select');
+  const firstItemId = Object.keys(store().items)[0];
+  if (entitySelect && firstItemId) entitySelect.inputSchema.properties.id.default = firstItemId;
 
   window.webmcp_session_info = () => ({
     contract_version: 'zto-webmcp-v1',
