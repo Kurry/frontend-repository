@@ -26,11 +26,11 @@ const seededNoise = (seed) => {
   return x - Math.floor(x);
 };
 
-function makeResults(promptIds, seed = 1) {
+function makeResults(promptIds, seed = 1, base = 63) {
   return promptIds.flatMap((promptId, promptIndex) => {
     const prompt = PROMPTS.find((item) => item.id === promptId);
     return MODELS.map((model, modelIndex) => {
-      const score = Math.max(42, Math.min(98, Math.round(63 + modelIndex * 8 + seededNoise(seed + promptIndex * 7 + modelIndex) * 24)));
+      const score = Math.max(8, Math.min(98, Math.round(base + modelIndex * 8 + seededNoise(seed + promptIndex * 7 + modelIndex) * 24)));
       const latencyMs = Math.round(580 + modelIndex * 290 + seededNoise(seed * 2 + promptIndex * 5 + modelIndex) * 1350);
       const tokens = Math.round(240 + seededNoise(seed * 3 + promptIndex * 9 + modelIndex) * 720);
       return {
@@ -64,10 +64,10 @@ function summarizeRun(results) {
   };
 }
 
-function makeHistory(promptIds, suiteIndex) {
+function makeHistory(promptIds, suiteIndex, base) {
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(Date.UTC(2026, 6, 12 + index, 20 + suiteIndex, 15));
-    const results = makeResults(promptIds, suiteIndex * 100 + index + 1);
+    const results = makeResults(promptIds, suiteIndex * 100 + index + 1, base);
     return {
       id: `seed-run-${suiteIndex}-${index}`,
       startedAt: date.toISOString(),
@@ -78,16 +78,19 @@ function makeHistory(promptIds, suiteIndex) {
   });
 }
 
+// Base scores place the three seeded suites in distinct average bands so the
+// green (80-100), yellow (60-79), and red (<60) badge treatments are all
+// visible on first load: customer care ~ high, engineering ~ mid, grounding ~ low.
 const seedDefinitions = [
-  { id: 'suite-customer', name: 'Customer care quality', promptIds: ['p-summary', 'p-policy', 'p-tone', 'p-extract', 'p-research'] },
-  { id: 'suite-engineering', name: 'Engineering copilot', promptIds: ['p-code', 'p-sql', 'p-summary', 'p-research', 'p-long', 'p-extract'] },
-  { id: 'suite-grounding', name: 'Grounded generation', promptIds: ['p-policy', 'p-extract', 'p-research', 'p-summary', 'p-tone', 'p-long', 'p-sql'] },
+  { id: 'suite-customer', name: 'Customer care quality', base: 66, promptIds: ['p-summary', 'p-policy', 'p-tone', 'p-extract', 'p-research'] },
+  { id: 'suite-engineering', name: 'Engineering copilot', base: 51, promptIds: ['p-code', 'p-sql', 'p-summary', 'p-research', 'p-long', 'p-extract'] },
+  { id: 'suite-grounding', name: 'Grounded generation', base: 34, promptIds: ['p-policy', 'p-extract', 'p-research', 'p-summary', 'p-tone', 'p-long', 'p-sql'] },
 ];
 
 const seededSuites = seedDefinitions.map((suite, index) => {
-  const runs = makeHistory(suite.promptIds, index + 1);
+  const runs = makeHistory(suite.promptIds, index + 1, suite.base);
   const latest = runs.at(-1);
-  return { ...suite, nightMode: false, runs, runCount: 7, lastRunAt: latest.finishedAt, averageScore: latest.averageScore };
+  return { id: suite.id, name: suite.name, promptIds: suite.promptIds, nightMode: false, runs, runCount: 7, baseRunCount: 7, lastRunAt: latest.finishedAt, averageScore: latest.averageScore };
 });
 
 const initialState = {
@@ -112,7 +115,13 @@ const initialState = {
   activeRun: null,
   toasts: [],
   ariaMessage: '',
+  modelFilter: null,
+  prefsOpen: false,
+  prefs: { density: 'comfortable', accent: 'indigo', defaultSort: 'promptTitle' },
+  dialogOpener: null,
 };
+
+const rememberOpener = () => (typeof document !== 'undefined' ? document.activeElement : null);
 
 function mutation(set, get, updater) {
   const previous = clone(get().suites);
@@ -122,18 +131,24 @@ function mutation(set, get, updater) {
 
 export const useEvalStore = create((set, get) => ({
   ...initialState,
-  selectSuite: (id) => set({ selectedSuiteId: id, selectedResultId: null, sidebarOpen: false }),
+  selectSuite: (id) => set((state) => ({ selectedSuiteId: id, selectedResultId: null, sidebarOpen: false, modelFilter: null, sort: { key: state.prefs.defaultSort, direction: 'asc' } })),
   setMainView: (view) => set({ mainView: view }),
   setSort: (key) => set((state) => ({ sort: { key, direction: state.sort.key === key && state.sort.direction === 'asc' ? 'desc' : 'asc' } })),
   selectResult: (rowId) => set({ selectedResultId: rowId }),
+  setModelFilter: (model) => set((state) => ({ modelFilter: state.modelFilter === model ? null : model })),
+  setPrefsOpen: (prefsOpen) => set({ prefsOpen }),
+  setPrefs: (patch) => set((state) => ({
+    prefs: { ...state.prefs, ...patch },
+    sort: patch.defaultSort && patch.defaultSort !== state.prefs.defaultSort ? { key: patch.defaultSort, direction: 'asc' } : state.sort,
+  })),
   closeDetail: () => set({ selectedResultId: null }),
   toggleDisclosure: (rowId) => set((state) => ({ disclosureOpen: { ...state.disclosureOpen, [rowId]: !state.disclosureOpen[rowId] } })),
-  openSuiteModal: (mode = 'create', suiteId = null) => set({ suiteModal: { open: true, mode, suiteId } }),
+  openSuiteModal: (mode = 'create', suiteId = null) => set({ suiteModal: { open: true, mode, suiteId }, dialogOpener: rememberOpener() }),
   closeSuiteModal: () => set({ suiteModal: { open: false, mode: 'create', suiteId: null } }),
   createSuite: (payload) => {
     const data = suiteSchema.parse(payload);
     const id = `suite-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-    mutation(set, get, (suites) => [...suites, { id, ...data, nightMode: false, runs: [], runCount: 0, lastRunAt: null, averageScore: null }]);
+    mutation(set, get, (suites) => [...suites, { id, ...data, nightMode: false, runs: [], runCount: 0, baseRunCount: 0, lastRunAt: null, averageScore: null }]);
     set({ selectedSuiteId: id, suiteModal: { open: false, mode: 'create', suiteId: null } });
     get().pushToast('Suite created', `${data.name} is ready to run.`);
     return id;
@@ -144,7 +159,7 @@ export const useEvalStore = create((set, get) => ({
     set({ suiteModal: { open: false, mode: 'create', suiteId: null } });
     get().pushToast('Suite updated', `${data.name} was saved.`);
   },
-  requestDelete: (id) => set({ deleteModal: { open: true, suiteId: id } }),
+  requestDelete: (id) => set({ deleteModal: { open: true, suiteId: id }, dialogOpener: rememberOpener() }),
   closeDelete: () => set({ deleteModal: { open: false, suiteId: null } }),
   deleteSuite: (id) => {
     const deleted = get().suites.find((suite) => suite.id === id);
@@ -166,15 +181,15 @@ export const useEvalStore = create((set, get) => ({
     const next = future[0];
     set({ suites: clone(next), future: future.slice(1), history: [...get().history, clone(suites)].slice(-30), selectedSuiteId: next.some((suite) => suite.id === selectedSuiteId) ? selectedSuiteId : (next.at(-1)?.id || null), selectedResultId: null });
   },
-  openNightModal: () => set({ nightModalOpen: true }),
+  openNightModal: () => set({ nightModalOpen: true, dialogOpener: rememberOpener() }),
   closeNightModal: () => set({ nightModalOpen: false }),
   saveNightWindow: (payload) => set({ nightWindow: payload, nightModalOpen: false }),
   toggleNightMode: (id) => set((state) => ({ suites: state.suites.map((suite) => suite.id === id ? { ...suite, nightMode: !suite.nightMode } : suite) })),
-  openExport: (tab = 'json') => set({ exportOpen: true, exportTab: tab, copied: false }),
+  openExport: (tab = 'json') => set({ exportOpen: true, exportTab: tab, copied: false, dialogOpener: rememberOpener() }),
   closeExport: () => set({ exportOpen: false, copied: false }),
   setExportTab: (tab) => set({ exportTab: tab, copied: false }),
   setCopied: (copied) => set({ copied }),
-  openImport: () => set({ importOpen: true }),
+  openImport: () => set({ importOpen: true, dialogOpener: rememberOpener() }),
   closeImport: () => set({ importOpen: false }),
   setSidebarOpen: (open) => set({ sidebarOpen: open }),
   setTimelineFilter: (filter) => set({ timelineFilter: filter }),
@@ -322,7 +337,13 @@ async function executeStep(index, token, forceRecovery = false) {
     useEvalStore.getState().appendLog({ stepIndex: index, status: lineIndex === logLines.length - 1 ? 'complete' : 'running', message });
   }
   const active = useEvalStore.getState().activeRun;
-  const shouldExhaust = active.runOrdinal % 5 === 0 && index === 2 && !forceRecovery;
+  // Every run shows one transient gateway hiccup on step 2 that recovers on
+  // retry. From the second run of a suite within this session onward, the
+  // final step exhausts its retries so operators can exercise the failed
+  // state and the manual Retry control; the first run of any suite always
+  // completes cleanly end to end.
+  const sessionRunIndex = active.runOrdinal - (active.baseOrdinal ?? 0);
+  const shouldExhaust = sessionRunIndex >= 2 && index === active.steps.length - 1 && !forceRecovery;
   const shouldRetryOnce = index === 1 && attempt === 1 && !forceRecovery;
   if (shouldRetryOnce || shouldExhaust) {
     useEvalStore.getState().appendLog({ stepIndex: index, status: 'waiting', message: `Model gateway returned a transient 503 on attempt ${attempt}` });
@@ -337,6 +358,7 @@ async function executeStep(index, token, forceRecovery = false) {
     }
     useEvalStore.getState().patchStep(index, { status: 'failed', retryIn: null, error: 'Model gateway remained unavailable after 3 attempts.' });
     useEvalStore.getState().patchRun({ status: 'failed' });
+    window.clearInterval(elapsedTimer);
     useEvalStore.getState().appendEvent({ stepIndex: index, status: 'failed', label: `${current.title} failed after 3 attempts` });
     useEvalStore.getState().setAriaMessage(`Evaluation step failed: ${current.title}. Manual retry is available.`);
     return;
@@ -372,7 +394,8 @@ export function startRunCommand(suiteId = useEvalStore.getState().selectedSuiteI
     const prompt = PROMPTS.find((item) => item.id === promptId);
     return { id: `${runnerToken}-step-${index}`, promptId, title: prompt.title, status: 'pending', attempts: 0, startedAt: null, finishedAt: null, outputs: [], error: null, retryIn: null };
   });
-  state.beginRun({ id: runnerToken, suiteId, status: 'running', paused: false, currentStep: 0, startedAt, finishedAt: null, elapsedMs: 0, steps, logs: [], events: [{ id: `${Date.now()}`, at: startedAt, stepIndex: null, status: 'pending', label: 'Suite run queued' }], producedResults: [], runOrdinal: (suite.runCount || suite.runs.length) + 1 });
+  const baseOrdinal = suite.baseRunCount ?? (suite.runCount || suite.runs.length);
+  state.beginRun({ id: runnerToken, suiteId, status: 'running', paused: false, currentStep: 0, startedAt, finishedAt: null, elapsedMs: 0, steps, logs: [], events: [{ id: `${Date.now()}`, at: startedAt, stepIndex: null, status: 'pending', label: 'Suite run queued' }], producedResults: [], runOrdinal: (suite.runCount || suite.runs.length) + 1, baseOrdinal });
   window.clearInterval(elapsedTimer);
   elapsedTimer = window.setInterval(() => {
     const current = useEvalStore.getState().activeRun;

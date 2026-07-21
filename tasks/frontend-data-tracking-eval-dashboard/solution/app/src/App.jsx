@@ -49,6 +49,8 @@ import {
   Compare,
   List,
   Export,
+  SettingsAdjust,
+  FilterEdit,
 } from '@carbon/icons-react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -56,15 +58,17 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   Legend,
   Line,
   LineChart,
+  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, MotionConfig, motion, useReducedMotion } from 'motion/react';
 import { exportDocumentSchema, importSchema, nightWindowSchema, suiteSchema } from './schemas';
 import {
   MODEL_COLORS,
@@ -117,14 +121,34 @@ function StatusPill({ status }) {
   return <span className={`status-pill status-${status}`}><Icon size={14} aria-hidden="true" />{status}</span>;
 }
 
-function useDialogFocus(open, close, ref) {
-  const triggerRef = useRef(null);
+// Shared dialog behavior: close on Escape (capture phase so component-level
+// handlers can't swallow it) and return focus to the control that opened the
+// dialog (recorded in the store at open time).
+function useDialogEscape(open, close) {
   useEffect(() => {
     if (!open) return undefined;
-    triggerRef.current = document.activeElement;
+    const opener = useEvalStore.getState().dialogOpener;
+    const handleKey = (event) => {
+      if (event.key === 'Escape') {
+        event.stopPropagation();
+        close();
+      }
+    };
+    document.addEventListener('keydown', handleKey, true);
+    return () => {
+      document.removeEventListener('keydown', handleKey, true);
+      if (opener && document.contains(opener)) opener.focus?.();
+    };
+  }, [open, close]);
+}
+
+// Drawer variant: additionally moves focus into the panel and traps Tab.
+function useDialogFocus(open, close, ref) {
+  useDialogEscape(open, close);
+  useEffect(() => {
+    if (!open) return undefined;
     const frame = requestAnimationFrame(() => ref.current?.focus());
     const handleKey = (event) => {
-      if (event.key === 'Escape') close();
       if (event.key === 'Tab' && ref.current) {
         const nodes = [...ref.current.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter((node) => !node.disabled);
         if (!nodes.length) return;
@@ -134,13 +158,34 @@ function useDialogFocus(open, close, ref) {
         else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
       }
     };
-    document.addEventListener('keydown', handleKey);
+    document.addEventListener('keydown', handleKey, true);
     return () => {
       cancelAnimationFrame(frame);
-      document.removeEventListener('keydown', handleKey);
-      triggerRef.current?.focus?.();
+      document.removeEventListener('keydown', handleKey, true);
     };
-  }, [open, close, ref]);
+  }, [open, ref]);
+}
+
+// Keeps a Carbon modal mounted briefly after `open` flips false so the
+// closing opacity+scale animation can play before unmount (instant under
+// prefers-reduced-motion).
+function useModalLifecycle(open, ms = 260) {
+  const reduced = useReducedMotion();
+  const [phase, setPhase] = useState(open ? 'open' : 'closed');
+  useEffect(() => {
+    if (open) {
+      setPhase('open');
+      return undefined;
+    }
+    if (reduced) {
+      setPhase('closed');
+      return undefined;
+    }
+    setPhase((current) => (current === 'open' ? 'closing' : current));
+    const timeout = window.setTimeout(() => setPhase((current) => (current === 'closing' ? 'closed' : current)), ms);
+    return () => window.clearTimeout(timeout);
+  }, [open, ms, reduced]);
+  return phase;
 }
 
 function Header() {
@@ -164,13 +209,17 @@ function Header() {
         </div>
       </div>
       <div className="toolbar" role="toolbar" aria-label="Evaluation actions">
+        <span className="prefs-wrap">
+          <IconButton size="sm" kind="ghost" label="Display preferences" id="prefs-toggle" aria-expanded={state.prefsOpen} onClick={() => state.setPrefsOpen(!state.prefsOpen)} title="Display preferences for this session"><SettingsAdjust /></IconButton>
+          <PrefsPopover />
+        </span>
         <Button size="sm" kind="ghost" renderIcon={Undo} onClick={state.undo} disabled={!state.history.length} title="Undo (Ctrl+Z)">Undo</Button>
         <Button size="sm" kind="ghost" renderIcon={Redo} onClick={state.redo} disabled={!state.future.length} title="Redo (Ctrl+Shift+Z)">Redo</Button>
         <Button size="sm" kind="ghost" renderIcon={Settings} onClick={state.openNightModal} className="night-window-button">
           {state.nightWindow ? `${state.nightWindow.startTime}–${state.nightWindow.endTime}` : 'Night Window'}
         </Button>
         <Button size="sm" kind="ghost" renderIcon={Upload} onClick={state.openImport} disabled={!selected}>Import results</Button>
-        <Button size="sm" kind="ghost" renderIcon={Export} onClick={() => state.openExport('json')} disabled={!selected}>Export results</Button>
+        <Button size="sm" kind="ghost" renderIcon={Export} onClick={() => state.openExport('json')} disabled={!selected} title="Export results (Ctrl+E)">Export results</Button>
         <Button size="sm" kind="secondary" renderIcon={Compare} onClick={() => state.setMainView(state.mainView === 'results' ? 'comparison' : 'results')} disabled={!selected}>
           {state.mainView === 'results' ? 'Compare models' : 'Results view'}
         </Button>
@@ -180,6 +229,53 @@ function Header() {
         <Button size="sm" kind="primary" renderIcon={Play} onClick={handleRun} disabled={!selected || Boolean(runBusy)}>{runBusy ? 'Running…' : 'Run Suite'}</Button>
       </div>
     </header>
+  );
+}
+
+const ACCENTS = [
+  { key: 'indigo', label: 'Indigo', swatch: '#5b5bd6' },
+  { key: 'teal', label: 'Teal', swatch: '#0f8c79' },
+  { key: 'amber', label: 'Amber', swatch: '#b45309' },
+];
+
+function PrefsPopover() {
+  const state = useEvalStore();
+  const panelRef = useRef(null);
+  useEffect(() => {
+    if (!state.prefsOpen) return undefined;
+    const onKey = (event) => { if (event.key === 'Escape') useEvalStore.getState().setPrefsOpen(false); };
+    const onDown = (event) => {
+      const button = document.getElementById('prefs-toggle');
+      if (panelRef.current?.contains(event.target) || button?.contains(event.target)) return;
+      useEvalStore.getState().setPrefsOpen(false);
+    };
+    document.addEventListener('keydown', onKey, true);
+    document.addEventListener('mousedown', onDown);
+    return () => {
+      document.removeEventListener('keydown', onKey, true);
+      document.removeEventListener('mousedown', onDown);
+    };
+  }, [state.prefsOpen]);
+  if (!state.prefsOpen) return null;
+  return (
+    <div className="prefs-popover" ref={panelRef} role="dialog" aria-label="Display preferences">
+      <div><span className="eyebrow">Session preferences</span><p className="prefs-hint">These choices persist for this session and reset on reload.</p></div>
+      <Select id="pref-density" labelText="Table density" size="sm" value={state.prefs.density} onChange={(event) => state.setPrefs({ density: event.target.value })}>
+        <SelectItem value="comfortable" text="Comfortable" />
+        <SelectItem value="compact" text="Compact" />
+      </Select>
+      <Select id="pref-default-sort" labelText="Default sort column" size="sm" value={state.prefs.defaultSort} onChange={(event) => state.setPrefs({ defaultSort: event.target.value })}>
+        {COLUMNS.map((column) => <SelectItem key={column.key} value={column.key} text={column.label} />)}
+      </Select>
+      <fieldset className="accent-fieldset">
+        <legend>Accent color</legend>
+        <div className="accent-row">
+          {ACCENTS.map((accent) => (
+            <button key={accent.key} type="button" className="accent-swatch" style={{ background: accent.swatch }} aria-pressed={state.prefs.accent === accent.key} aria-label={`${accent.label} accent`} title={`${accent.label} accent`} onClick={() => state.setPrefs({ accent: accent.key })} />
+          ))}
+        </div>
+      </fieldset>
+    </div>
   );
 }
 
@@ -197,8 +293,8 @@ function PassRateSparkline({ runs }) {
   return (
     <span className="suite-sparkline" title={`Pass-rate trend across last ${points.length} runs, now ${latest}%`} aria-label={`Pass-rate trend, currently ${latest} percent`}>
       <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden="true" focusable="false">
-        <polyline points={coords.join(' ')} fill="none" stroke="#5b5bd6" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
-        <circle cx={(w).toFixed(1)} cy={(h - (points.at(-1) / 100) * h).toFixed(1)} r="2" fill="#5b5bd6" />
+        <polyline points={coords.join(' ')} fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
+        <circle cx={(w).toFixed(1)} cy={(h - (points.at(-1) / 100) * h).toFixed(1)} r="2" fill="currentColor" />
       </svg>
       <em>{latest}% pass</em>
     </span>
@@ -230,21 +326,32 @@ function SuiteCard({ suite }) {
   );
 }
 
-function Sidebar() {
+function SidebarInner() {
   const state = useEvalStore();
-  const content = (
+  const [filter, setFilter] = useState('');
+  const query = filter.trim().toLowerCase();
+  const visibleSuites = query ? state.suites.filter((suite) => suite.name.toLowerCase().includes(query)) : state.suites;
+  return (
     <>
       <div className="sidebar-heading">
-        <div><span className="eyebrow">Workspace</span><h2>Evaluation suites</h2><p>{state.suites.length} suites</p></div>
+        <div><span className="eyebrow">Workspace</span><h2>Evaluation suites</h2><p>{query ? `${visibleSuites.length} of ${state.suites.length} suites` : `${state.suites.length} suites`}</p></div>
         <IconButton className="mobile-close" label="Close suite navigation" kind="ghost" onClick={() => state.setSidebarOpen(false)}><Close /></IconButton>
       </div>
       <Button className="new-suite-button" kind="primary" renderIcon={Add} onClick={() => state.openSuiteModal('create')}>New Suite</Button>
+      <div className="suite-filter-wrap">
+        <TextInput id="suite-filter" labelText="Filter suites" hideLabel placeholder="Filter suites by name" value={filter} onChange={(event) => setFilter(event.target.value)} size="sm" />
+      </div>
       <div className="suite-list" aria-label="Evaluation suites">
-        {state.suites.map((suite) => <SuiteCard key={suite.id} suite={suite} />)}
+        {visibleSuites.length ? visibleSuites.map((suite) => <SuiteCard key={suite.id} suite={suite} />) : <p className="muted-empty">No suites match “{filter.trim()}”.</p>}
       </div>
       <div className="sidebar-footer"><span className="health-dot" />All evaluation services available</div>
     </>
   );
+}
+
+function Sidebar() {
+  const state = useEvalStore();
+  const content = <SidebarInner />;
   return (
     <>
       <aside className="sidebar desktop-sidebar">{content}</aside>
@@ -260,6 +367,7 @@ function Sidebar() {
 function SuiteModal() {
   const state = useEvalStore();
   const modal = state.suiteModal;
+  const phase = useModalLifecycle(modal.open);
   const suite = state.suites.find((item) => item.id === modal.suiteId);
   const form = useForm({
     resolver: zodResolver(suiteSchema),
@@ -267,15 +375,20 @@ function SuiteModal() {
     defaultValues: { name: suite?.name || '', promptIds: suite?.promptIds || [] },
   });
   useEffect(() => { form.trigger(); }, []);
-  useEffect(() => {
-    const onKey = (event) => { if (event.key === 'Escape') useEvalStore.getState().closeSuiteModal(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, []);
-  const submit = form.handleSubmit((value) => modal.mode === 'edit' ? state.updateSuite(modal.suiteId, value) : state.createSuite(value));
+  useDialogEscape(modal.open, state.closeSuiteModal);
+  const submitted = useRef(false);
+  useEffect(() => { if (modal.open) submitted.current = false; }, [modal.open]);
+  const submit = form.handleSubmit((value) => {
+    if (submitted.current) return;
+    submitted.current = true;
+    if (modal.mode === 'edit') state.updateSuite(modal.suiteId, value);
+    else state.createSuite(value);
+  });
+  if (phase === 'closed') return null;
   return (
     <Modal
-      open={modal.open}
+      open
+      className={phase === 'closing' ? 'modal-closing' : ''}
       modalHeading={modal.mode === 'edit' ? 'Edit evaluation suite' : 'Create evaluation suite'}
       modalLabel="Suite request"
       primaryButtonText={modal.mode === 'edit' ? 'Save Suite' : 'Submit'}
@@ -314,31 +427,31 @@ function SuiteModal() {
 
 function DeleteModal() {
   const state = useEvalStore();
+  const phase = useModalLifecycle(state.deleteModal.open);
   const suite = state.suites.find((item) => item.id === state.deleteModal.suiteId);
-  useEffect(() => {
-    if (!state.deleteModal.open) return undefined;
-    const onKey = (event) => { if (event.key === 'Escape') useEvalStore.getState().closeDelete(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [state.deleteModal.open]);
+  const lastName = useRef('');
+  useEffect(() => { if (suite?.name) lastName.current = suite.name; }, [suite?.name]);
+  useDialogEscape(state.deleteModal.open, state.closeDelete);
+  if (phase === 'closed') return null;
   return (
-    <Modal open={state.deleteModal.open} danger modalHeading="Delete evaluation suite?" primaryButtonText="Delete Suite" secondaryButtonText="Cancel" onRequestClose={state.closeDelete} onSecondarySubmit={state.closeDelete} onRequestSubmit={() => state.deleteSuite(state.deleteModal.suiteId)} size="xs">
-      <p>This removes <strong>{suite?.name}</strong> and its run history from this session. You can restore it with Undo.</p>
+    <Modal open className={phase === 'closing' ? 'modal-closing' : ''} danger modalHeading="Delete evaluation suite?" primaryButtonText="Delete Suite" secondaryButtonText="Cancel" onRequestClose={state.closeDelete} onSecondarySubmit={state.closeDelete} onRequestSubmit={() => state.deleteSuite(state.deleteModal.suiteId)} size="xs">
+      <p>This removes <strong>{suite?.name || lastName.current}</strong> and its run history from this session. You can restore it with Undo.</p>
     </Modal>
   );
 }
 
 function NightWindowModal() {
   const state = useEvalStore();
+  const phase = useModalLifecycle(state.nightModalOpen);
   const form = useForm({ resolver: zodResolver(nightWindowSchema), mode: 'onChange', defaultValues: state.nightWindow || { startTime: '22:00', endTime: '23:30' } });
   useEffect(() => {
-    const onKey = (event) => { if (event.key === 'Escape') useEvalStore.getState().closeNightModal(); };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, []);
+    if (state.nightModalOpen) form.reset(useEvalStore.getState().nightWindow || { startTime: '22:00', endTime: '23:30' });
+  }, [state.nightModalOpen, form]);
+  useDialogEscape(state.nightModalOpen, state.closeNightModal);
   const submit = form.handleSubmit(state.saveNightWindow);
+  if (phase === 'closed') return null;
   return (
-    <Modal open={state.nightModalOpen} modalHeading="Configure Night Window" modalLabel="Automation schedule" primaryButtonText="Save Window" secondaryButtonText="Cancel" primaryButtonDisabled={!form.formState.isValid} onRequestClose={state.closeNightModal} onSecondarySubmit={state.closeNightModal} onRequestSubmit={submit} size="xs">
+    <Modal open className={phase === 'closing' ? 'modal-closing' : ''} modalHeading="Configure Night Window" modalLabel="Automation schedule" primaryButtonText="Save Window" secondaryButtonText="Cancel" primaryButtonDisabled={!form.formState.isValid} onRequestClose={state.closeNightModal} onSecondarySubmit={state.closeNightModal} onRequestSubmit={submit} size="xs">
       <p className="modal-intro">Scheduled suites run within a same-day UTC window.</p>
       <form onSubmit={submit} className="time-form">
         <TextInput id="night-start" labelText="Night start time" type="time" {...form.register('startTime')} invalid={Boolean(form.formState.errors.startTime)} invalidText={form.formState.errors.startTime?.message} aria-describedby={form.formState.errors.startTime ? 'night-start-error-msg' : undefined} />
@@ -360,8 +473,8 @@ function EmptyWorkspace() {
   );
 }
 
-function Metric({ label, value, accent }) {
-  return <div className="metric"><span>{label}</span><strong className={accent ? 'accent' : ''}>{value}</strong></div>;
+function Metric({ label, value, accent, tone }) {
+  return <div className="metric"><span>{label}</span><strong className={[accent ? 'accent' : '', tone ? `score-text-${tone}` : ''].filter(Boolean).join(' ')}>{value}</strong></div>;
 }
 
 function chartAverages(results) {
@@ -378,6 +491,7 @@ function ChartTooltip({ active, payload }) {
 }
 
 function Charts({ suite, results }) {
+  const state = useEvalStore();
   const latest = getLatestRun(suite);
   const averages = useMemo(() => chartAverages(results), [results]);
   const trend = suite.runs.slice(-7).map((run) => ({ date: new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(new Date(run.finishedAt)), score: run.averageScore }));
@@ -387,7 +501,7 @@ function Charts({ suite, results }) {
   return (
     <section className="chart-strip" aria-label="Score charts">
       <article className="panel chart-panel">
-        <div className="panel-heading"><div><span className="eyebrow">Latest run</span><h2>Average score by model</h2></div><ScoreBadge score={latest?.averageScore} label={`${latest?.averageScore} avg`} /></div>
+        <div className="panel-heading"><div><span className="eyebrow">Latest run</span><h2>Average score by model</h2><p className="panel-hint">Click a bar to filter the results table · dashed line marks the 70 pass threshold{state.modelFilter ? ` · ${state.modelFilter}` : ''}</p></div><ScoreBadge score={latest?.averageScore} label={`${latest?.averageScore} avg`} /></div>
         <div className="chart-box">
           <span className="axis-label">Average score</span>
           <ResponsiveContainer width="100%" height="100%">
@@ -395,8 +509,11 @@ function Charts({ suite, results }) {
               <CartesianGrid stroke="#e7e5df" vertical={false} />
               <XAxis dataKey="model" tick={{ fontSize: 11, fill: '#625f59' }} axisLine={false} tickLine={false} />
               <YAxis width={42} domain={[0, 100]} tick={{ fontSize: 11, fill: '#77736c' }} axisLine={false} tickLine={false} />
+              <ReferenceLine y={70} stroke="#b9888c" strokeDasharray="4 4" />
               <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(91,91,214,.07)' }} />
-              <Bar dataKey="score" radius={[5, 5, 0, 0]} isAnimationActive={false} />
+              <Bar dataKey="score" radius={[5, 5, 0, 0]} isAnimationActive={false} cursor="pointer" onClick={(entry) => { const model = entry?.model || entry?.payload?.model; if (model) state.setModelFilter(model); }}>
+                {averages.map((entry) => <Cell key={entry.model} fill={entry.fill} opacity={state.modelFilter && state.modelFilter !== entry.model ? 0.28 : 1} />)}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -440,7 +557,8 @@ function sortRows(results, sort) {
 
 function ResultsTable({ suite, results, live }) {
   const state = useEvalStore();
-  const rows = useMemo(() => sortRows(results, state.sort), [results, state.sort]);
+  const filtered = useMemo(() => (state.modelFilter ? results.filter((row) => row.model === state.modelFilter) : results), [results, state.modelFilter]);
+  const rows = useMemo(() => sortRows(filtered, state.sort), [filtered, state.sort]);
   if (!results.length && live) {
     return (
       <section className="results-empty live-empty">
@@ -464,10 +582,13 @@ function ResultsTable({ suite, results, live }) {
     <section className="panel results-panel">
       <div className="panel-heading results-heading">
         <div><span className="eyebrow">{live ? 'Live output' : 'Latest output'}</span><h2>Evaluation results</h2></div>
-        <div className="results-summary"><span>{results.length} responses</span><span>{results.filter((row) => row.passFail === 'pass').length} passing</span></div>
+        <div className="results-summary">
+          <span>{filtered.length} responses</span><span>{filtered.filter((row) => row.passFail === 'pass').length} passing</span>
+          {state.modelFilter && <button type="button" className="filter-chip" onClick={() => state.setModelFilter(null)} title="Clear the model filter"><FilterEdit size={12} aria-hidden="true" />{state.modelFilter}<span className="chip-clear" aria-hidden="true">×</span></button>}
+        </div>
       </div>
       <TableContainer className="results-table-wrap">
-        <Table size="lg" useZebraStyles={false} aria-label="Evaluation results">
+        <Table size={state.prefs.density === 'compact' ? 'sm' : 'lg'} useZebraStyles={false} aria-label="Evaluation results">
           <TableHead>
             <TableRow>
               {COLUMNS.map((column) => (
@@ -481,7 +602,7 @@ function ResultsTable({ suite, results, live }) {
           </TableHead>
           <TableBody>
             {rows.map((row, index) => (
-              <TableRow key={row.rowId} className="result-row" style={{ '--row-delay': live ? `${(index % MODELS.length) * 80}ms` : '0ms' }} onClick={() => state.selectResult(row.rowId)} tabIndex={0} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); state.selectResult(row.rowId); } }} aria-label={`Open details for ${row.promptTitle}, ${row.model}, score ${row.score}`}>
+              <TableRow key={row.rowId} className="result-row" style={{ '--row-delay': `${Math.min(index, 16) * 80}ms` }} onClick={() => state.selectResult(row.rowId)} tabIndex={0} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); state.selectResult(row.rowId); } }} aria-label={`Open details for ${row.promptTitle}, ${row.model}, score ${row.score}`}>
                 <TableCell><span className="prompt-cell" title={row.promptTitle}>{truncateTitle(row.promptTitle)}</span></TableCell>
                 <TableCell><span className="model-dot" style={{ background: MODEL_COLORS[row.model] }} />{row.model}</TableCell>
                 <TableCell><strong className="table-score">{row.score}</strong></TableCell>
@@ -566,10 +687,26 @@ function RunInspector({ run }) {
 
 function DetailPanel({ row }) {
   const state = useEvalStore();
+  const reduced = useReducedMotion();
   const open = Boolean(state.disclosureOpen[row.rowId]);
+  const [rowCopied, setRowCopied] = useState(false);
+  useEffect(() => { setRowCopied(false); }, [row.rowId]);
+  const copyRow = () => {
+    const { rowId, ...record } = row;
+    navigator.clipboard.writeText(JSON.stringify(record, null, 2)).then(() => {
+      setRowCopied(true);
+      window.setTimeout(() => setRowCopied(false), 2400);
+    }).catch(() => state.pushToast('Copy unavailable', 'Clipboard permission was not granted.'));
+  };
   return (
-    <motion.aside className="detail-panel" initial={{ x: '100%', opacity: 0.5 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0.5 }} transition={{ duration: 0.32, ease: 'easeOut' }} aria-label="Result detail">
-      <div className="detail-top"><div><span className="eyebrow">Result detail</span><h2>{row.promptTitle}</h2></div><IconButton label="Close result detail" kind="ghost" onClick={state.closeDetail}><Close /></IconButton></div>
+    <motion.aside className="detail-panel" initial={reduced ? false : { x: '100%', opacity: 0.5 }} animate={{ x: 0, opacity: 1 }} exit={reduced ? undefined : { x: '100%', opacity: 0.5 }} transition={{ duration: 0.32, ease: 'easeOut' }} aria-label="Result detail">
+      <div className="detail-top">
+        <div><span className="eyebrow">Result detail</span><h2>{row.promptTitle}</h2></div>
+        <div className="detail-top-actions">
+          <Button size="sm" kind="ghost" renderIcon={rowCopied ? CheckmarkFilled : Copy} className={rowCopied ? 'row-copied' : ''} onClick={copyRow} title="Copy this result record as JSON">{rowCopied ? 'Copied' : 'Copy row JSON'}</Button>
+          <IconButton label="Close result detail" kind="ghost" onClick={state.closeDetail}><Close /></IconButton>
+        </div>
+      </div>
       <div className="detail-metrics"><div><span>Model</span><strong><i className="model-dot" style={{ background: MODEL_COLORS[row.model] }} />{row.model}</strong></div><div><span>Score</span><strong>{row.score}/100</strong></div><div><span>Outcome</span><PassBadge value={row.passFail} /></div></div>
       <div className="detail-section"><h3>Full prompt</h3><p>{row.promptText}</p></div>
       <div className="detail-section response"><h3>Model response</h3><p>{row.response}</p></div>
@@ -586,14 +723,15 @@ function DetailPanel({ row }) {
 function ExportDrawer() {
   const state = useEvalStore();
   const ref = useRef(null);
+  const reduced = useReducedMotion();
   useDialogFocus(state.exportOpen, state.closeExport, ref);
   const document = compileExportDocument(state);
   const json = JSON.stringify(document, null, 2);
   const csv = compileCsv(state);
   return (
     <AnimatePresence>
-      {state.exportOpen && <motion.div className="drawer-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={state.closeExport}>
-        <motion.aside ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="export-title" className="drawer" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ duration: 0.26, ease: 'easeOut' }} onMouseDown={(event) => event.stopPropagation()}>
+      {state.exportOpen && <motion.div className="drawer-scrim" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduced ? undefined : { opacity: 0 }} onMouseDown={state.closeExport}>
+        <motion.aside ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="export-title" className="drawer" initial={reduced ? false : { x: '100%' }} animate={{ x: 0 }} exit={reduced ? undefined : { x: '100%' }} transition={{ duration: 0.26, ease: 'easeOut' }} onMouseDown={(event) => event.stopPropagation()}>
           <div className="drawer-header"><div><span className="eyebrow">Live session artifact</span><h2 id="export-title">Export results</h2><p>{document?.suite.name} · {document?.results.length || 0} result records</p></div><IconButton label="Close export results" kind="ghost" onClick={state.closeExport}><Close /></IconButton></div>
           <div className="drawer-body">
             <Tabs selectedIndex={state.exportTab === 'json' ? 0 : 1} onChange={({ selectedIndex }) => state.setExportTab(selectedIndex === 0 ? 'json' : 'csv')}>
@@ -616,6 +754,7 @@ function ExportDrawer() {
 function ImportDrawer() {
   const state = useEvalStore();
   const ref = useRef(null);
+  const reduced = useReducedMotion();
   useDialogFocus(state.importOpen, state.closeImport, ref);
   const form = useForm({ resolver: zodResolver(importSchema), mode: 'onChange', defaultValues: { document: '' } });
   const submit = form.handleSubmit((value) => {
@@ -635,14 +774,14 @@ function ImportDrawer() {
   };
   return (
     <AnimatePresence>
-      {state.importOpen && <motion.div className="drawer-scrim" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={state.closeImport}>
-        <motion.aside ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="import-title" className="drawer import-drawer" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ duration: 0.26 }} onMouseDown={(event) => event.stopPropagation()}>
+      {state.importOpen && <motion.div className="drawer-scrim" initial={reduced ? false : { opacity: 0 }} animate={{ opacity: 1 }} exit={reduced ? undefined : { opacity: 0 }} onMouseDown={state.closeImport}>
+        <motion.aside ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="import-title" className="drawer import-drawer" initial={reduced ? false : { x: '100%' }} animate={{ x: 0 }} exit={reduced ? undefined : { x: '100%' }} transition={{ duration: 0.26 }} onMouseDown={(event) => event.stopPropagation()}>
           <div className="drawer-header"><div><span className="eyebrow">Round-trip results</span><h2 id="import-title">Import results</h2><p>Replace the selected suite’s latest run.</p></div><IconButton label="Close import results" kind="ghost" onClick={state.closeImport}><Close /></IconButton></div>
           <form className="drawer-body import-form" onSubmit={submit}>
             <InlineNotification lowContrast hideCloseButton kind="info" title="Validated before replacement" subtitle="The current results remain unchanged if any required result field is invalid." />
             <FileUploaderButton labelText="Choose exported JSON" buttonKind="tertiary" accept={['.json', 'application/json']} onChange={onFile} />
             <span className="or-divider">or paste the exported document</span>
-            <TextArea id="import-document" labelText="Import JSON" placeholder={'{\n  "version": 1,\n  ...\n}'} rows={18} {...form.register('document')} invalid={Boolean(form.formState.errors.document)} invalidText={form.formState.errors.document?.message} />
+            <TextArea id="import-document" labelText="Import JSON" placeholder={'{\n  "version": 1,\n  ...\n}'} rows={18} {...form.register('document')} invalid={Boolean(form.formState.errors.document)} invalidText={form.formState.errors.document?.message} aria-describedby={form.formState.errors.document ? 'import-document-error-msg' : undefined} />
           </form>
           <div className="drawer-footer"><Button kind="ghost" onClick={state.closeImport}>Cancel</Button><Button kind="primary" renderIcon={Upload} onClick={submit} disabled={!form.formState.isValid}>Import results</Button></div>
         </motion.aside>
@@ -653,7 +792,18 @@ function ImportDrawer() {
 
 function Toasts() {
   const state = useEvalStore();
-  return <div className="toast-stack" aria-label="Notifications">{state.toasts.map((toast) => <motion.div key={toast.id} initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}><ToastNotification lowContrast kind="success" title={toast.title} subtitle={toast.subtitle} timeout={0} onClose={() => state.dismissToast(toast.id)} /></motion.div>)}</div>;
+  const reduced = useReducedMotion();
+  return (
+    <div className="toast-stack" aria-label="Notifications">
+      <AnimatePresence>
+        {state.toasts.map((toast) => (
+          <motion.div key={toast.id} initial={reduced ? false : { opacity: 0, x: 36 }} animate={{ opacity: 1, x: 0 }} exit={reduced ? undefined : { opacity: 0, x: 36 }} transition={{ duration: 0.26, ease: 'easeOut' }}>
+            <ToastNotification lowContrast kind="success" title={toast.title} subtitle={toast.subtitle} timeout={0} onClose={() => state.dismissToast(toast.id)} />
+          </motion.div>
+        ))}
+      </AnimatePresence>
+    </div>
+  );
 }
 
 function Workspace() {
@@ -669,14 +819,14 @@ function Workspace() {
     <main className="main-content">
       <div className="workspace-title">
         <div><span className="eyebrow">Evaluation overview</span><h2>{suite.name}</h2><p>{pluralize(suite.promptIds.length, 'prompt')} · Latest run {formatDateTime(suite.lastRunAt)}</p></div>
-        <div className="overview-metrics"><Metric label="Average" value={suite.averageScore ?? '—'} accent /><Metric label="Pass rate" value={latest?.results.length ? `${Math.round((latest.passCount / latest.results.length) * 100)}%` : '—'} /><Metric label="Total tokens" value={latest?.totalTokens?.toLocaleString() || '—'} /></div>
+        <div className="overview-metrics"><Metric label="Average" value={suite.averageScore ?? '—'} tone={typeof suite.averageScore === 'number' ? (suite.averageScore >= 80 ? 'high' : suite.averageScore >= 60 ? 'mid' : 'low') : null} /><Metric label="Pass rate" value={latest?.results.length ? `${Math.round((latest.passCount / latest.results.length) * 100)}%` : '—'} /><Metric label="Total tokens" value={latest?.totalTokens?.toLocaleString() || '—'} /></div>
       </div>
       <Charts suite={suite} results={latest?.results || []} />
       <div className={`content-grid ${run ? 'with-run' : ''}`}>
         <div className="result-region">{state.mainView === 'comparison' ? (results.length ? <ComparisonTable results={results} /> : <ResultsTable suite={suite} results={results} live={live} />) : <ResultsTable suite={suite} results={results} live={live} />}</div>
         {run && <RunInspector run={run} />}
       </div>
-      <AnimatePresence>{selectedRow && <DetailPanel row={selectedRow} />}</AnimatePresence>
+      <AnimatePresence>{selectedRow && <DetailPanel key={selectedRow.rowId} row={selectedRow} />}</AnimatePresence>
     </main>
   );
 }
@@ -684,27 +834,40 @@ function Workspace() {
 export default function App() {
   const state = useEvalStore();
   useEffect(() => {
+    const isTypingTarget = (target) => target instanceof HTMLElement && (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable);
     const handleShortcut = (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
+      if (!(event.ctrlKey || event.metaKey)) return;
+      const key = event.key.toLowerCase();
+      if (key === 'z' && !isTypingTarget(event.target)) {
         event.preventDefault();
         if (event.shiftKey) useEvalStore.getState().redo(); else useEvalStore.getState().undo();
+      }
+      if (key === 'e' && !isTypingTarget(event.target)) {
+        const current = useEvalStore.getState();
+        const dialogOpen = current.suiteModal.open || current.deleteModal.open || current.nightModalOpen || current.exportOpen || current.importOpen;
+        if (!dialogOpen && current.selectedSuiteId) {
+          event.preventDefault();
+          current.openExport('json');
+        }
       }
     };
     window.addEventListener('keydown', handleShortcut);
     return () => window.removeEventListener('keydown', handleShortcut);
   }, []);
   return (
-    <div className="app-shell">
-      <Header />
-      <Sidebar />
-      <Workspace />
-      {state.suiteModal.open && <SuiteModal key={`${state.suiteModal.mode}-${state.suiteModal.suiteId || 'new'}`} />}
-      <DeleteModal />
-      {state.nightModalOpen && <NightWindowModal key={state.nightWindow?.startTime || 'new'} />}
-      <ExportDrawer />
-      <ImportDrawer />
-      <Toasts />
-      <div className="sr-only" aria-live="assertive">{state.ariaMessage}</div>
-    </div>
+    <MotionConfig reducedMotion="user">
+      <div className="app-shell" data-accent={state.prefs.accent} data-density={state.prefs.density}>
+        <Header />
+        <Sidebar />
+        <Workspace />
+        <SuiteModal key={`${state.suiteModal.mode}-${state.suiteModal.suiteId || 'new'}`} />
+        <DeleteModal />
+        <NightWindowModal />
+        <ExportDrawer />
+        <ImportDrawer />
+        <Toasts />
+        <div className="sr-only" aria-live="assertive">{state.ariaMessage}</div>
+      </div>
+    </MotionConfig>
   );
 }
