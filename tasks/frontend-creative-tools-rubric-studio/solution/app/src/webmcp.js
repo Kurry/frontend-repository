@@ -13,6 +13,7 @@ export function registerWebMCP(store) {
     { name: 'editor_update_property', description: 'Update one declared editor property through the same store commands as the UI.', inputSchema: schema({ objectType: enumString(['criterion', 'labelled-case', 'sample-verdict']), id: { type: 'string' }, property: enumString(['id', 'name', 'description', 'type', 'likert-min', 'likert-max', 'weight', 'importance', 'version', 'judge-model', 'aggregation-mode', 'include', 'pass-threshold', 'verdict']), value: {}, version: { type: 'string' } }, ['objectType', 'property', 'value']) },
     { name: 'editor_switch_mode', description: 'Switch the visible editor mode.', inputSchema: schema({ mode: enumString(['criteria', 'tune', 'preview']) }, ['mode']) },
     { name: 'editor_preview', description: 'Open the sample submission preview panel.', inputSchema: schema() },
+    { name: 'browse_search', description: 'Search the in-memory rubric catalog without changing the active rubric or visible studio view.', inputSchema: schema({ query: { type: 'string' } }, ['query']), annotations: { readOnlyHint: true } },
     { name: 'browse_open', description: 'Open one bounded rubric or studio destination.', inputSchema: schema({ destination: enumString(destinations) }, ['destination']) },
     { name: 'artifact_import', description: 'Open the package JSON import surface. File and artifact contents remain browser-driven.', inputSchema: schema({ mode: enumString(['package-json']) }, ['mode']) },
     { name: 'artifact_export', description: 'Open an export format preview without returning artifact contents.', inputSchema: schema({ format: enumString(formats) }, ['format']) },
@@ -66,7 +67,17 @@ export function registerWebMCP(store) {
       return ok(`${store.pendingChange.kind} bump required before updating ${property}`, { versionGateOpen: true, pendingKind: store.pendingChange.kind })
     },
     editor_switch_mode({ mode }) { return store.setView(mode) ? ok(`Switched to ${mode}`, { activeView: mode }) : { ok: false, message: 'Invalid mode' } },
-    editor_preview() { store.setView('preview'); return ok('Preview panel opened', { activeView: 'preview' }) },
+    editor_preview() {
+      store.setView('preview')
+      return ok('Preview panel opened', { activeView: 'preview' })
+    },
+    browse_search({ query }) {
+      const needle = String(query || '').trim().toLowerCase()
+      const results = store.rubrics
+        .filter((rubric) => !needle || `${rubric.slug} ${rubric.name} ${rubric.version}`.toLowerCase().includes(needle))
+        .map(({ slug, name, version }) => ({ slug, name, version }))
+      return ok(`Found ${results.length} matching rubrics`, { results })
+    },
     browse_open({ destination }) {
       if (rubricDestinations.includes(destination)) return store.selectRubric(destination) ? ok(`Opened ${destination}`, { activeRubric: destination }) : { ok: false, message: `Destination ${destination} is not present in the current imported package` }
       if (destination === 'tune-view') store.setView('tune')
@@ -81,11 +92,13 @@ export function registerWebMCP(store) {
     artifact_copy({ format }) { store.ui.exportTab = format; store.openExport(); return ok(`${format} opened for browser clipboard interaction`, { exportOpen: true, format }) },
   }
 
-  const invoke = async ({ name, arguments: args = {} } = {}) => {
+  const invoke = async (request = {}, suppliedArguments = {}) => {
+    const name = typeof request === 'string' ? request : request?.name
+    const args = typeof request === 'string' ? suppliedArguments : request?.arguments || suppliedArguments
     if (!handlers[name]) return { ok: false, message: `Unknown tool ${name}` }
     try { return await handlers[name](args) } catch (error) { return { ok: false, message: error?.message || 'Tool invocation failed' } }
   }
-  window.webmcp_session_info = () => ({ contractVersion: 'zto-webmcp-v1', app: 'Rubric Studio', modules: ['structured-editor-v1', 'browse-query-v1', 'artifact-transfer-v1'] })
+  window.webmcp_session_info = () => ({ contract_version: 'zto-webmcp-v1', app: 'Rubric Studio', modules: ['structured-editor-v1', 'browse-query-v1', 'artifact-transfer-v1'] })
   window.webmcp_list_tools = () => ({ tools })
   window.webmcp_invoke_tool = invoke
   window.webmcp = { sessionInfo: window.webmcp_session_info, listTools: window.webmcp_list_tools, invokeTool: invoke }

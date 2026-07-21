@@ -142,7 +142,7 @@ const submit = handleSubmit((values) => emit('submitted', CriterionSchema.parse(
       <div class="dialog-actions">
         <span v-if="!canSubmit" id="criterion-submit-help" class="submit-help" role="status">Complete the required fields and resolve validation errors to add this criterion.</span>
         <Button type="button" label="Cancel" severity="secondary" text @click="emit('close')" />
-        <Button type="submit" :label="mode === 'add' ? 'Add criterion' : 'Continue to version'" :aria-describedby="!canSubmit ? 'criterion-submit-help' : undefined" :data-incomplete="!canSubmit || undefined" :class="{ 'submit-pending': !canSubmit }" />
+        <Button type="submit" :label="mode === 'add' ? 'Add criterion' : 'Continue to version'" :disabled="!canSubmit" :aria-describedby="!canSubmit ? 'criterion-submit-help' : undefined" :data-incomplete="!canSubmit || undefined" :class="{ 'submit-pending': !canSubmit }" />
       </div>
     </form>
   </Dialog>

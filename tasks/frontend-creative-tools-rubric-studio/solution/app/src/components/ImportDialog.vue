@@ -8,13 +8,26 @@ import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import { useStudioStore } from '../store'
 import { useFocusTrap } from '../focus-trap'
+import { RubricPackageSchema, formatZodError } from '../schemas'
 
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close', 'imported'])
 const store = useStudioStore()
 useFocusTrap(computed(() => props.open))
 const packageError = ref('')
-const formSchema = toTypedSchema(z.object({ json: z.string().trim().min(1, 'Package JSON is required; paste an exported package') }))
+const packageSourceSchema = z.string().trim().min(1, 'Package JSON is required; paste an exported package').superRefine((source, ctx) => {
+  if (!source) return
+  let parsed
+  try {
+    parsed = JSON.parse(source)
+  } catch (error) {
+    ctx.addIssue({ code: 'custom', message: `Package JSON parse error: ${error.message}` })
+    return
+  }
+  const result = RubricPackageSchema.safeParse(parsed)
+  if (!result.success) ctx.addIssue({ code: 'custom', message: formatZodError(result.error) })
+})
+const formSchema = toTypedSchema(z.object({ json: packageSourceSchema }))
 const { defineField, errors, meta, handleSubmit, resetForm, validate } = useForm({ validationSchema: formSchema, initialValues: { json: '' }, validateOnMount: true })
 const [json, jsonAttrs] = defineField('json', { validateOnModelUpdate: true })
 watch(() => props.open, async (open) => {
