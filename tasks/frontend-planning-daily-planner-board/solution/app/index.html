@@ -48,7 +48,7 @@
       <button class="btn today-btn" type="button" id="today-btn" data-act="go-today" aria-label="Go to today, July 18">Today</button>
       <div class="board-head-spacer"></div>
       <button class="btn" type="button" id="rollover-btn" data-act="rollover-open" aria-label="Rollover incomplete tasks to July 18">Rollover incomplete</button>
-      <button class="btn warn" type="button" id="conflicts-btn" data-act="conflicts-toggle" hidden aria-label="Schedule conflicts: 0">Conflicts</button>
+      <button class="btn warn" type="button" id="conflicts-btn" data-act="conflicts-toggle" aria-label="Schedule conflicts: 0" aria-expanded="false">Conflicts (0)</button>
       <button class="btn" type="button" id="export-btn" data-act="open-export" aria-label="Export planner artifacts">Export</button>
       <button class="btn" type="button" id="undo-btn" data-act="undo" aria-label="Undo" disabled>Undo</button>
       <button class="btn" type="button" id="redo-btn" data-act="redo" aria-label="Redo" disabled>Redo</button>
@@ -110,7 +110,7 @@
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
     <div class="modal-title" id="edit-modal-title">Edit task</div>
     <form id="edit-form" novalidate>
-      <label class="fld"><span class="fld-label">Title</span><input type="text" id="edit-title" name="title" autocomplete="off" maxlength="140" aria-describedby="edit-title-err"></label>
+      <label class="fld"><span class="fld-label">Title</span><input type="text" id="edit-title" name="title" autocomplete="off" aria-describedby="edit-title-err"></label>
       <div class="fld-err" id="edit-title-err" hidden>Title is required</div>
       <div class="fld-grid">
         <label class="fld"><span class="fld-label">Day</span>

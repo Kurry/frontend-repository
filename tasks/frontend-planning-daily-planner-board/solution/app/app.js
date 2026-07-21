@@ -660,12 +660,11 @@
     if (t.id === newlyAddedId) { card.classList.add("entering"); newlyAddedId = null; }
     card.dataset.id = t.id;
 
-    var chk = el("button", "chk");
-    chk.type = "button";
+    var chk = el("input", "chk");
+    chk.type = "checkbox";
     chk.dataset.act = "toggle";
-    chk.setAttribute("aria-label", (t.done ? "Mark task incomplete: " : "Complete task: ") + t.title);
-    chk.setAttribute("aria-pressed", String(t.done));
-    chk.appendChild(el("span", "box"));
+    chk.checked = t.done;
+    chk.setAttribute("aria-label", "Complete task: " + t.title);
     card.appendChild(chk);
 
     var body = el("div", "task-body");
@@ -793,7 +792,7 @@
 
     var ti = el("input", "add-title");
     ti.type = "text"; ti.placeholder = "Task title"; ti.name = "title"; ti.autocomplete = "off";
-    ti.maxLength = 140; ti.value = draft.title;
+    ti.value = draft.title;
     ti.setAttribute("aria-label", "Task title for July " + date);
     ti.setAttribute("aria-describedby", "add-title-err-" + date);
     form.appendChild(ti);
@@ -854,6 +853,7 @@
     var cancel = el("button", "btn sm", "Cancel"); cancel.type = "button"; cancel.dataset.act = "add-cancel";
     actions.appendChild(submit); actions.appendChild(cancel);
     form.appendChild(actions);
+    updateAddFormValidity(form, false);
     addWrap.appendChild(form);
     col.appendChild(addWrap);
 
@@ -942,11 +942,11 @@
     btn.setAttribute("aria-label", "Schedule conflicts: " + pairs.length);
     btn.setAttribute("aria-expanded", String(!pop.hidden));
     if (!pairs.length) {
-      btn.hidden = true;
-      pop.hidden = true;
+      var emptyList = byId("conflict-list");
+      emptyList.textContent = "";
+      emptyList.appendChild(el("div", "conflict-empty", "No schedule conflicts"));
       return;
     }
-    btn.hidden = false;
     if (!pop.hidden) {
       var list = byId("conflict-list");
       list.textContent = "";
@@ -977,6 +977,9 @@
     } else {
       tray.hidden = true;
     }
+    ["bulk-complete", "bulk-move", "bulk-delete"].forEach(function (id) {
+      byId(id).disabled = state.selected.length === 0;
+    });
   }
 
   function updateUndoRedoButtons() {
@@ -1025,25 +1028,27 @@
 
   // ---------- export canvas ----------
   function refreshExportPreviews(pulse) {
+    var changedSinceCompile = stale;
     var ics = byId("out-ics"), json = byId("out-json");
     if (ics) ics.value = generateICS();
     if (json) json.value = generateJSON();
     var status = byId("export-status");
     if (status) {
       var n = state.tasks.length;
-      status.textContent = "Live · " + n + (n === 1 ? " task" : " tasks") + " · compiled just now";
+      status.textContent = "Live · " + n + (n === 1 ? " task" : " tasks") +
+        (changedSinceCompile ? " · recompiled after board changes" : " · compiled just now");
       if (pulse && !reducedMotion()) {
         status.classList.remove("pulse");
         void status.offsetWidth;
         status.classList.add("pulse");
       }
     }
+    setStale(false);
   }
   function openExport() {
     var err = byId("import-err"); if (err) err.hidden = true;
     var inJson = byId("in-json"); if (inJson) inJson.value = "";
     openOverlay("export-overlay", byId("export-btn"));
-    setStale(false);
     refreshExportPreviews(false);
   }
   function closeExport() { closeOverlay("export-overlay"); }
@@ -1147,6 +1152,7 @@
     var n = subtaskRows().length;
     byId("edit-subtask-count").textContent = n + "/12";
     byId("edit-add-subtask").disabled = n >= 12;
+    updateEditValidity(false);
   }
   function readSubtaskEditor() {
     return subtaskRows().map(function (row) {
@@ -1176,29 +1182,47 @@
     ["edit-title-err", "edit-day-err", "edit-channel-err", "edit-planned-err", "edit-start-err", "edit-notes-err", "edit-subtasks-err"]
       .forEach(function (eid) { byId(eid).hidden = true; });
     openOverlay("modal-overlay", opener);
+    updateEditValidity(false);
     byId("edit-title").focus();
   }
   function closeEdit() { closeOverlay("modal-overlay"); }
-  function saveEdit() {
-    if (!editingId) return;
-    var fields = {
+  function editFields() {
+    return {
       title: byId("edit-title").value,
       day: byId("edit-day").value,
       channel: byId("edit-channel").value,
       plannedTime: byId("edit-planned").value.trim(),
       startTime: byId("edit-start").value.trim(),
       notes: byId("edit-notes").value,
-      subtasks: readSubtaskEditor()
+      subtasks: readSubtaskEditor().filter(function (s) { return s.title.trim() !== ""; })
     };
-    // Empty editor rows are placeholders, not subtasks. Validate the retained
-    // rows so title-length errors cannot be erased by the count cleanup.
-    var kept = fields.subtasks.filter(function (s) { return s.title.trim() !== ""; });
-    fields.subtasks = kept;
+  }
+  function taskFieldErrors(fields) {
     var errs = validateTaskFields(fields, false);
-    // blanks mean "clear the field" for optional inputs, never an error
     if (fields.plannedTime === "") delete errs.plannedTime;
     if (fields.startTime === "") delete errs.startTime;
     if (fields.notes.trim() === "") delete errs.notes;
+    return errs;
+  }
+  function updateEditValidity(showErrors) {
+    if (!byId("edit-save")) return;
+    var fields = editFields();
+    var errs = taskFieldErrors(fields);
+    byId("edit-save").disabled = Object.keys(errs).length > 0;
+    if (!showErrors) return;
+    setFieldError("edit-title", "edit-title-err", errs.title, !!errs.title);
+    setFieldError("edit-day", "edit-day-err", errs.day, !!errs.day);
+    setFieldError("edit-channel", "edit-channel-err", errs.channel, !!errs.channel);
+    setFieldError("edit-planned", "edit-planned-err", errs.plannedTime, !!errs.plannedTime);
+    setFieldError("edit-start", "edit-start-err", errs.startTime, !!errs.startTime);
+    setFieldError("edit-notes", "edit-notes-err", errs.notes, !!errs.notes);
+    byId("edit-subtasks-err").hidden = !errs.subtasks;
+    if (errs.subtasks) byId("edit-subtasks-err").textContent = errs.subtasks;
+  }
+  function saveEdit() {
+    if (!editingId) return;
+    var fields = editFields();
+    var errs = taskFieldErrors(fields);
     setFieldError("edit-title", "edit-title-err", errs.title, !!errs.title);
     setFieldError("edit-day", "edit-day-err", errs.day, !!errs.day);
     setFieldError("edit-channel", "edit-channel-err", errs.channel, !!errs.channel);
@@ -1259,10 +1283,8 @@
       else input.removeAttribute("aria-invalid");
     }
   }
-  function handleAddSubmit(form) {
-    if (form.dataset.lock) return; // double-activation guard: exactly one task per burst
-    var date = parseInt(form.dataset.day, 10);
-    var fields = {
+  function addFormFields(form) {
+    return {
       title: form.querySelector(".add-title").value,
       day: form.querySelector(".add-day").value,
       channel: form.querySelector(".add-channel").value,
@@ -1270,10 +1292,23 @@
       startTime: form.querySelector(".add-start").value.trim(),
       notes: form.querySelector(".add-notes").value
     };
-    var errs = validateTaskFields(fields, false);
-    if (fields.plannedTime === "") delete errs.plannedTime;
-    if (fields.startTime === "") delete errs.startTime;
-    if (fields.notes.trim() === "") delete errs.notes;
+  }
+  function updateAddFormValidity(form, showErrors) {
+    var date = parseInt(form.dataset.day, 10);
+    var fields = addFormFields(form);
+    var errs = taskFieldErrors(fields);
+    form.querySelector("button[type='submit']").disabled = Object.keys(errs).length > 0;
+    if (!showErrors) return;
+    setAddFormError(form, "title", date, errs.title);
+    setAddFormError(form, "planned", date, errs.plannedTime);
+    setAddFormError(form, "start", date, errs.startTime);
+    setAddFormError(form, "notes", date, errs.notes);
+  }
+  function handleAddSubmit(form) {
+    if (form.dataset.lock) return; // double-activation guard: exactly one task per burst
+    var date = parseInt(form.dataset.day, 10);
+    var fields = addFormFields(form);
+    var errs = taskFieldErrors(fields);
 
     setAddFormError(form, "title", date, errs.title);
     setAddFormError(form, "planned", date, errs.plannedTime);
@@ -1527,6 +1562,7 @@
       }
       else if (t.classList.contains("add-start")) { draft.start = t.value; setAddFormError(form, "start", day, (t.value.trim() !== "" && !startTimeParts(t.value)) ? "Start time must look like 9:00 am or 2:30 pm" : ""); }
       else if (t.classList.contains("add-notes")) { draft.notes = t.value; setAddFormError(form, "notes", day, t.value.length > 500 ? "Notes must be 500 characters or fewer" : ""); }
+      updateAddFormValidity(form, true);
     });
     byId("columns").addEventListener("change", function (e) {
       var t = e.target;
@@ -1536,6 +1572,7 @@
       var draft = addDrafts[day] || (addDrafts[day] = { open: true, title: "", day: day, channel: "work", planned: "", start: "", notes: "" });
       if (t.classList.contains("add-day")) draft.day = parseInt(t.value, 10);
       else if (t.classList.contains("add-channel")) draft.channel = t.value;
+      updateAddFormValidity(form, true);
     });
 
     // inline add-form submit
@@ -1565,6 +1602,8 @@
     byId("edit-notes").addEventListener("input", function () {
       byId("edit-notes-count").textContent = byId("edit-notes").value.length + "/500";
     });
+    byId("edit-form").addEventListener("input", function () { updateEditValidity(true); });
+    byId("edit-form").addEventListener("change", function () { updateEditValidity(true); });
 
     // overlay backdrops close on outside click
     OVERLAYS.forEach(function (id) {
