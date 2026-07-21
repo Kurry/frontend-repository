@@ -325,7 +325,23 @@ function el(tag, attrs = {}, children = []) {
   }
   return node;
 }
-function txt(node, value) { if (node.textContent !== value) node.textContent = value; }
+function txt(node, value) {
+  if (node.textContent !== value) {
+    node.textContent = value;
+    if (node.getAttribute('role') === 'alert' && value) announce(value);
+
+    if (node.getAttribute('role') === 'alert' && node.id) {
+      const field = document.querySelector(`[aria-describedby~="${node.id}"]`);
+      if (field) {
+        if (!value) {
+          field.removeAttribute('aria-invalid');
+        } else {
+          field.setAttribute('aria-invalid', 'true');
+        }
+      }
+    }
+  }
+}
 
 function copyText(text) {
   // Clipboard may reject in headless contexts; fall back to a hidden textarea +
@@ -362,7 +378,10 @@ function download(filename, text, mime) {
 
 const liveRegion = el('div', { id: 'live', class: 'sr-only', 'aria-live': 'polite', 'aria-atomic': 'true' });
 document.body.appendChild(liveRegion);
-function announce(msg) { txt(liveRegion, ''); requestAnimationFrame(() => txt(liveRegion, msg)); }
+function announce(msg) {
+  if (liveRegion.textContent !== '') liveRegion.textContent = '';
+  requestAnimationFrame(() => { liveRegion.textContent = msg; });
+}
 
 let toastStack = null;
 function toast(msg) {
@@ -874,7 +893,7 @@ function buildSiteModal() {
   const nameErr = el('div', { class: 'err-msg', id: 'err-site-name', role: 'alert' });
   const domainInput = el('input', { id: 'domain', type: 'text', 'aria-describedby': 'err-domain' });
   const domainErr = el('div', { class: 'err-msg', id: 'err-domain', role: 'alert' });
-  const tzSelect = el('select', { id: 'timezone' }, [
+  const tzSelect = el('select', { id: 'timezone', 'aria-describedby': 'err-timezone' }, [
     el('option', { value: '', text: 'Select a timezone' }),
     el('option', { value: 'UTC', text: 'UTC' }),
     el('option', { value: 'America/New_York', text: 'America/New_York' }),
@@ -933,7 +952,7 @@ function buildSiteModal() {
 function buildGoalModal() {
   const nameInput = el('input', { id: 'goal-name', type: 'text', 'aria-describedby': 'err-goal-name' });
   const nameErr = el('div', { class: 'err-msg', id: 'err-goal-name', role: 'alert' });
-  const typeSelect = el('select', { id: 'goal-type' }, [
+  const typeSelect = el('select', { id: 'goal-type', 'aria-describedby': 'err-goal-type' }, [
     el('option', { value: '', text: 'Select a type' }),
     el('option', { value: 'event', text: 'event' }),
     el('option', { value: 'page', text: 'page' }),
