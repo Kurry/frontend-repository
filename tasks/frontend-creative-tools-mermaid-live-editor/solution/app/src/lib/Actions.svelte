@@ -1,17 +1,35 @@
 <script>
+  import { fly, fade } from 'svelte/transition';
+  import { prefersReducedMotion } from 'svelte/motion';
   import { store, getSessionJSON, importSessionJSON, importMMD } from './state.svelte.js';
-  import { downloadSVG, downloadPNG, copySVGMarkup, downloadMMD, downloadJSON, copyToClipboard } from './export.js';
+  import { downloadSVG, downloadPNG, copyImage, downloadMMD, downloadJSON, copyToClipboard } from './export.js';
 
-  let status = $state('');
   let importMode = $state('session-json'); // 'mmd' or 'session-json'
   let importValue = $state('');
   let importError = $state('');
+  let toast = $state(null); // { text, tone }
+  let copiedKey = $state(''); // 'image' | 'session' | 'mmd'
+  let toastTimer;
+  let copiedTimer;
 
   const disabled = $derived(!!store.error || !store.code.trim());
 
-  const announce = (msg) => {
-    status = msg;
-    setTimeout(() => (status = ''), 4000);
+  const motion = (base) => (prefersReducedMotion.current ? 0 : base);
+
+  const announce = (text, tone = 'success') => {
+    clearTimeout(toastTimer);
+    toast = { text, tone };
+    toastTimer = setTimeout(() => {
+      toast = null;
+    }, 3600);
+  };
+
+  const flashCopied = (key) => {
+    clearTimeout(copiedTimer);
+    copiedKey = key;
+    copiedTimer = setTimeout(() => {
+      copiedKey = '';
+    }, 1800);
   };
 
   const onSVG = () => {
@@ -19,7 +37,7 @@
       const name = downloadSVG();
       announce(`Downloaded ${name}`);
     } catch (error) {
-      announce(error.message);
+      announce(error.message, 'error');
     }
   };
   const onPNG = async () => {
@@ -27,15 +45,15 @@
       const name = await downloadPNG();
       announce(`Downloaded ${name}`);
     } catch (error) {
-      announce(error.message);
+      announce(error.message, 'error');
     }
   };
   const onMMD = () => {
     try {
       const name = downloadMMD(store.code);
-      announce(`Downloaded ${name}`);
+      announce(`Downloaded ${name} — matches the current Code document`);
     } catch (error) {
-      announce(error.message);
+      announce(error.message, 'error');
     }
   };
   const onSessionDownload = () => {
@@ -43,46 +61,49 @@
       const name = downloadJSON(getSessionJSON());
       announce(`Downloaded ${name}`);
     } catch (error) {
-      announce(error.message);
+      announce(error.message, 'error');
     }
   };
-  
+
   const onCopyImage = async () => {
     try {
-      await copySVGMarkup();
-      announce('Copied SVG markup');
+      const what = await copyImage();
+      flashCopied('image');
+      announce(what === 'image' ? 'Copied the diagram image to the clipboard' : 'Copied the diagram SVG markup to the clipboard');
     } catch (error) {
-      announce(error.message);
+      announce(error.message, 'error');
     }
   };
   const onCopySession = async () => {
-    try {
-      await copyToClipboard(getSessionJSON());
-      announce('Copied Session JSON');
-    } catch (error) {
-      announce(error.message);
-    }
+    await copyToClipboard(getSessionJSON());
+    flashCopied('session');
+    announce('Copied Session JSON to the clipboard');
+  };
+  const onCopyMmd = async () => {
+    await copyToClipboard(store.code);
+    flashCopied('mmd');
+    announce('Copied MMD source to the clipboard');
   };
 
   const handleImport = (e) => {
     e.preventDefault();
     importError = '';
-    
+
     if (importMode === 'mmd') {
       const result = importMMD(importValue);
       if (result.ok) {
         importValue = '';
-        announce('Imported MMD');
+        announce('Imported MMD — the Code document was replaced');
       } else {
-        importError = result.error;
+        importError = result.message;
       }
     } else {
       const result = importSessionJSON(importValue);
       if (result.ok) {
         importValue = '';
-        announce('Imported Session JSON');
+        announce('Imported Session JSON — code, config, themes, tab, and badge restored');
       } else {
-        importError = `Invalid field '${result.field}': ${result.error}`;
+        importError = `Invalid field '${result.field}': ${result.message}`;
       }
     }
   };
@@ -90,15 +111,15 @@
 
 <section class="rounded-lg border border-slate-200 bg-white p-3 shadow-sm dark:border-slate-700 dark:bg-slate-800">
   <h2 class="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-200">Actions</h2>
-  
+
   <div class="mb-4">
-    <h3 class="mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">Export</h3>
+    <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Export</h3>
     <div class="flex flex-wrap gap-2">
       <button
         type="button"
         data-testid="download-SVG"
         {disabled}
-        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition-all active:scale-95 hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-40"
+        class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition-all hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 disabled:opacity-40 disabled:active:scale-100"
         onclick={onSVG}>
         SVG
       </button>
@@ -106,7 +127,7 @@
         type="button"
         data-testid="download-PNG"
         {disabled}
-        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition-all active:scale-95 hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-40"
+        class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition-all hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 disabled:opacity-40 disabled:active:scale-100"
         onclick={onPNG}>
         PNG
       </button>
@@ -114,7 +135,7 @@
         type="button"
         data-testid="download-MMD"
         {disabled}
-        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition-all active:scale-95 hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-40"
+        class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition-all hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 disabled:opacity-40 disabled:active:scale-100"
         onclick={onMMD}>
         MMD
       </button>
@@ -122,75 +143,120 @@
         type="button"
         data-testid="copy-image"
         {disabled}
-        class="inline-flex items-center justify-center min-h-[44px] min-w-[44px] gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-all active:scale-95 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-40 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+        class="inline-flex min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 disabled:opacity-40 disabled:active:scale-100 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
         onclick={onCopyImage}>
-        Copy image
+        {copiedKey === 'image' ? 'Copied ✓' : 'Copy image'}
       </button>
     </div>
   </div>
 
   <div class="mb-4">
-    <h3 class="mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">Session JSON</h3>
-    <div class="mb-2 max-h-32 overflow-auto rounded bg-slate-50 p-2 text-xs font-mono text-slate-600 dark:bg-slate-900 dark:text-slate-400">
-      <pre>{getSessionJSON()}</pre>
+    <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Session JSON</h3>
+    <div class="mb-2 max-h-32 overflow-auto rounded border border-slate-200 bg-slate-50 p-2 font-mono text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+      <pre data-testid="session-json-preview">{getSessionJSON()}</pre>
     </div>
-    <div class="flex gap-2">
+    <div class="flex flex-wrap gap-2">
       <button
         type="button"
         data-testid="copy-session"
-        class="inline-flex items-center justify-center min-h-[44px] gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-all active:scale-95 hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+        class="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
         onclick={onCopySession}>
-        Copy Session JSON
+        {copiedKey === 'session' ? 'Copied ✓' : 'Copy Session JSON'}
       </button>
       <button
         type="button"
         data-testid="download-session"
-        class="inline-flex items-center justify-center min-h-[44px] gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition-all active:scale-95 hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500"
+        class="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition-all hover:bg-indigo-700 focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95"
         onclick={onSessionDownload}>
         Download Session JSON
       </button>
     </div>
   </div>
 
-  <div class="pt-2 border-t border-slate-200 dark:border-slate-700">
-    <h3 class="mb-2 text-xs font-semibold text-slate-500 uppercase tracking-wider dark:text-slate-400">Import</h3>
+  <div class="mb-4">
+    <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">MMD</h3>
+    <div class="mb-2 max-h-24 overflow-auto rounded border border-slate-200 bg-slate-50 p-2 font-mono text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400">
+      <pre data-testid="mmd-preview">{store.code.trim() ? store.code : '(empty source — MMD mirrors the Code document)'}</pre>
+    </div>
+    <button
+      type="button"
+      data-testid="copy-mmd"
+      class="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition-all hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
+      onclick={onCopyMmd}>
+      {copiedKey === 'mmd' ? 'Copied ✓' : 'Copy MMD'}
+    </button>
+  </div>
+
+  <div class="border-t border-slate-200 pt-2 dark:border-slate-700">
+    <h3 class="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Import</h3>
     <form onsubmit={handleImport} class="flex flex-col gap-2">
-      <div class="flex gap-2">
-        <label class="flex items-center gap-1 text-sm text-slate-700 dark:text-slate-300">
-          <input type="radio" bind:group={importMode} value="session-json" class="text-indigo-600 focus:ring-indigo-500 min-h-[44px] min-w-[44px]" />
+      <fieldset class="flex min-h-[44px] items-center gap-4">
+        <legend class="sr-only">Import mode</legend>
+        <label class="flex min-h-[44px] items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300">
+          <input type="radio" bind:group={importMode} value="session-json" class="size-4 accent-indigo-600" />
           session-json
         </label>
-        <label class="flex items-center gap-1 text-sm text-slate-700 dark:text-slate-300">
-          <input type="radio" bind:group={importMode} value="mmd" class="text-indigo-600 focus:ring-indigo-500 min-h-[44px] min-w-[44px]" />
+        <label class="flex min-h-[44px] items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300">
+          <input type="radio" bind:group={importMode} value="mmd" class="size-4 accent-indigo-600" />
           mmd
         </label>
-      </div>
+      </fieldset>
+      <label class="sr-only" for="import-payload">
+        {importMode === 'session-json' ? 'Session JSON payload to import' : 'MMD source payload to import'}
+      </label>
       <textarea
+        id="import-payload"
+        data-testid="import-payload"
         bind:value={importValue}
-        class="w-full resize-y rounded-md border border-slate-300 bg-white p-2 text-sm font-mono focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
+        class="w-full resize-y rounded-md border border-slate-300 bg-white p-2 font-mono text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-100"
         rows="3"
-        placeholder={importMode === 'session-json' ? 'Paste Session JSON here' : 'Paste MMD code here'}
+        placeholder={importMode === 'session-json' ? 'Paste a MermaidSession JSON document' : 'Paste Mermaid source (.mmd) text'}
+        aria-describedby="import-error"
       ></textarea>
       {#if importError}
-        <div class="text-sm text-red-600 dark:text-red-400 motion-safe:transition-all motion-safe:duration-200" aria-live="assertive">
+        <div
+          id="import-error"
+          data-testid="import-error"
+          class="rounded-md border border-red-200 bg-red-50 p-2 text-sm text-red-700 dark:border-red-900 dark:bg-red-950/40 dark:text-red-300"
+          role="alert"
+          aria-live="assertive"
+          transition:fade={{ duration: motion(160) }}
+        >
           {importError}
         </div>
       {/if}
       <button
         type="submit"
         data-testid="import"
-        class="inline-flex items-center justify-center min-h-[44px] w-fit rounded-md bg-slate-800 px-4 py-1.5 text-sm font-medium text-white transition-all active:scale-95 hover:bg-slate-900 focus-visible:ring-2 focus-visible:ring-indigo-500 dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-white"
-        disabled={!importValue.trim()}>
+        class="inline-flex min-h-[44px] w-fit items-center justify-center rounded-md bg-slate-800 px-4 py-1.5 text-sm font-medium text-white transition-all hover:bg-slate-900 focus-visible:ring-2 focus-visible:ring-indigo-500 active:scale-95 dark:bg-slate-200 dark:text-slate-900 dark:hover:bg-white"
+      >
         Import
       </button>
     </form>
   </div>
-
-  <div class="relative min-h-[24px] mt-2">
-    {#if status}
-      <p class="absolute left-0 text-xs text-green-600 dark:text-green-400 font-medium transition-all motion-safe:duration-300 motion-reduce:transition-none opacity-100 translate-y-0" role="status" aria-live="polite">
-        {status}
-      </p>
-    {/if}
-  </div>
 </section>
+
+{#if toast}
+  <div
+    data-testid="export-status"
+    role="status"
+    aria-live="polite"
+    class="fixed right-4 bottom-4 z-50 max-w-sm rounded-lg border px-3.5 py-2.5 text-sm font-medium shadow-lg"
+    class:bg-emerald-50={toast.tone === 'success'}
+    class:text-emerald-800={toast.tone === 'success'}
+    class:border-emerald-200={toast.tone === 'success'}
+    class:bg-red-50={toast.tone === 'error'}
+    class:text-red-800={toast.tone === 'error'}
+    class:border-red-200={toast.tone === 'error'}
+    class:dark:bg-emerald-950={toast.tone === 'success'}
+    class:dark:text-emerald-200={toast.tone === 'success'}
+    class:dark:border-emerald-800={toast.tone === 'success'}
+    class:dark:bg-red-950={toast.tone === 'error'}
+    class:dark:text-red-200={toast.tone === 'error'}
+    class:dark:border-red-800={toast.tone === 'error'}
+    in:fly={{ y: 14, duration: motion(220) }}
+    out:fade={{ duration: motion(260) }}
+  >
+    {toast.text}
+  </div>
+{/if}

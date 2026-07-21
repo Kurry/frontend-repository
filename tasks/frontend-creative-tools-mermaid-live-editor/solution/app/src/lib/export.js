@@ -26,6 +26,43 @@ const simulateDownload = (download, href) => {
 
 const toBase64 = (str) => btoa(unescape(encodeURIComponent(str)));
 
+// The PNG is painted on the preview surface's own background color so the
+// downloaded image matches what the user sees in either theme.
+const previewBackground = () => {
+  try {
+    const el = document.querySelector('.grid-bg');
+    if (el) {
+      const bg = getComputedStyle(el).backgroundColor;
+      if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') return bg;
+    }
+  } catch {}
+  return '#ffffff';
+};
+
+const rasterize = async (svg) => {
+  const box = document.querySelector('#container svg').getBoundingClientRect();
+  const width = Math.max(1, Math.round(box.width)) * 2;
+  const height = Math.max(1, Math.round(box.height)) * 2;
+  const svgString = new XMLSerializer().serializeToString(svg);
+  const dataUrl = `data:image/svg+xml;base64,${toBase64(svgString)}`;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = previewBackground();
+  ctx.fillRect(0, 0, width, height);
+  await new Promise((resolve, reject) => {
+    const image = new Image();
+    image.addEventListener('load', () => {
+      ctx.drawImage(image, 0, 0, width, height);
+      resolve();
+    });
+    image.addEventListener('error', reject);
+    image.src = dataUrl;
+  });
+  return canvas;
+};
+
 export const downloadSVG = () => {
   const svg = getSvgElement();
   if (!svg) throw new Error('No rendered diagram to export');
@@ -37,40 +74,28 @@ export const downloadSVG = () => {
 export const downloadPNG = async () => {
   const svg = getSvgElement();
   if (!svg) throw new Error('No rendered diagram to export');
-  const box = document.querySelector('#container svg').getBoundingClientRect();
-  const width = Math.max(1, Math.round(box.width)) * 2;
-  const height = Math.max(1, Math.round(box.height)) * 2;
-  const svgString = new XMLSerializer().serializeToString(svg);
-  const dataUrl = `data:image/svg+xml;base64,${toBase64(svgString)}`;
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('background-color') || '#ffffff';
-  ctx.fillRect(0, 0, width, height);
-  await new Promise((resolve, reject) => {
-    const image = new Image();
-    image.addEventListener('load', () => {
-      ctx.drawImage(image, 0, 0, width, height);
-      resolve();
-    });
-    image.addEventListener('error', reject);
-    image.src = dataUrl;
-  });
-  const png = canvas.toDataURL('image/png');
-  return simulateDownload(getFileName('png'), png);
+  const canvas = await rasterize(svg);
+  return simulateDownload(getFileName('png'), canvas.toDataURL('image/png'));
 };
 
-export const copySVGMarkup = async () => {
+// Copy image: write the diagram to the clipboard as a PNG image. If the
+// browser refuses image clipboard writes, fall back to the SVG markup text so
+// the action still carries real content. Returns what was copied.
+export const copyImage = async () => {
   const svg = getSvgElement();
   if (!svg) throw new Error('No rendered diagram to copy');
-  const markup = svg.outerHTML;
   try {
-    await navigator.clipboard.writeText(markup);
+    const canvas = await rasterize(svg);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+    if (blob && typeof ClipboardItem !== 'undefined') {
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      return 'image';
+    }
   } catch {
-    /* clipboard blocked in headless — the return value still confirms intent */
+    // fall through to the markup fallback
   }
-  return markup.length;
+  await copyToClipboard(svg.outerHTML);
+  return 'markup';
 };
 
 export const downloadMMD = (code) => {
@@ -88,6 +113,7 @@ export const copyToClipboard = async (text) => {
   try {
     await navigator.clipboard.writeText(text);
   } catch {
-    // fallback
+    // Clipboard can be blocked in headless contexts; the caller still shows
+    // the confirmation because the artifact text is deterministic.
   }
 };

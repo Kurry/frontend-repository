@@ -2,6 +2,12 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@theme {
+  /* JetBrains Mono is bundled locally via @fontsource — no CDN involved. */
+  --font-mono:
+    'JetBrains Mono', ui-monospace, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+}
+
 :root {
   color-scheme: light;
 }
@@ -38,7 +44,66 @@ body {
   background-size: 24px 24px;
 }
 
+/* Keep large diagrams inside the preview region — the pane scrolls, never the page. */
+.grid-bg svg {
+  max-width: 100%;
+  max-height: 100%;
+  height: auto;
+}
+
+/* Code editors use the bundled JetBrains Mono. */
+.cm-editor {
+  font-family: var(--font-mono);
+}
+.cm-editor .cm-search-panel {
+  font-family: var(--font-mono);
+}
+
 .diagram-source {
-  font-family: ui-monospace, 'SF Mono', 'Fira Code', Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   tab-size: 2;
+}
+
+/* Fresh render cross-fades in (skipped entirely under reduced motion). */
+@media (prefers-reduced-motion: no-preference) {
+  .preview-enter {
+    animation: preview-in 240ms ease-out;
+  }
+  @keyframes preview-in {
+    from {
+      opacity: 0.35;
+      transform: scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .badge-pop {
+    animation: badge-pop 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  @keyframes badge-pop {
+    0% {
+      transform: scale(0.7);
+      opacity: 0.4;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+/* Honor prefers-reduced-motion everywhere: transitions and animations
+   collapse to instant state changes. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

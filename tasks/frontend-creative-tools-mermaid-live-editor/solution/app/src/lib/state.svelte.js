@@ -1,9 +1,8 @@
-import { DEFAULT_CODE, DEFAULT_CONFIG, parse } from './mermaid.js';
-import { mermaidConfigSchema, mermaidSessionSchema } from './schemas.js';
+import { DEFAULT_CODE, DEFAULT_CONFIG, parse, detectDiagramType } from './mermaid.js';
+import { mermaidConfigSchema, mermaidSessionSchema, formatZodError } from './schemas.js';
 
 const CODE_STORE_KEY = 'codeStore';
 const THEME_KEY = 'mermaid-editor-theme';
-const FIRST_RUN_KEY = 'mermaid-first-run';
 
 const readJSON = (key, fallback) => {
   try {
@@ -25,12 +24,12 @@ const seed = readJSON(CODE_STORE_KEY, { ...defaultState });
 
 export const store = $state({
   code: seed.code,
-  mermaid: seed.mermaid, // valid mermaid config string
-  lastValidMermaid: seed.mermaid, // track last valid config
-  configError: undefined, // undefined or string message
+  mermaid: seed.mermaid, // config document text the Config pane edits
+  lastValidMermaid: seed.mermaid, // last config that passed the field contract
+  configError: undefined, // undefined or field-named message
   editorMode: seed.editorMode === 'config' ? 'config' : 'code',
-  diagramType: undefined,
-  error: undefined, // string message when the source fails to parse
+  diagramType: detectDiagramType(seed.code) ?? 'flowchart', // closed enum id
+  error: undefined, // parser message when the source fails to parse
   theme: (() => {
     try {
       return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light';
@@ -39,20 +38,14 @@ export const store = $state({
     }
   })(),
   renderCount: 0,
-  firstRun: (() => {
-    try {
-      return !localStorage.getItem(FIRST_RUN_KEY);
-    } catch {
-      return true;
-    }
-  })()
+  renderMs: 0,
+  // The quick-tour banner shows on every page load until dismissed; it is
+  // deliberately not persisted so a fresh load always introduces the tool.
+  firstRun: true
 });
 
 export const dismissCoachmark = () => {
   store.firstRun = false;
-  try {
-    localStorage.setItem(FIRST_RUN_KEY, 'done');
-  } catch {}
 };
 
 const persist = () => {
@@ -67,14 +60,25 @@ const persist = () => {
 let revalidateTimer;
 
 const doRevalidate = async () => {
-  if (!store.code.trim()) {
-    store.diagramType = undefined;
+  const code = store.code;
+  if (!code.trim()) {
+    // Empty source: no parser error banner — the preview pane shows its
+    // empty-source message and exports stay disabled. The badge, status bar,
+    // and Session JSON deliberately keep the last VALID diagram type: the
+    // MermaidSession contract requires a closed-enum diagramType, so clearing
+    // it would force the session export to fall back to a fabricated
+    // 'flowchart' while the badge shows nothing — keeping the last valid type
+    // leaves badge, status bar, and session mutually consistent.
     store.error = undefined;
     return;
   }
   try {
-    const { diagramType } = await parse(store.code);
-    store.diagramType = diagramType;
+    const { diagramType: parsedType } = await parse(code);
+    // Prefer the type mermaid actually parsed (it ignores leading %% comment
+    // lines, so the badge tracks the rendered diagram even when the first
+    // line is a comment), then the first-line detector, then the last valid
+    // type as a final fallback.
+    store.diagramType = parsedType ?? detectDiagramType(code) ?? store.diagramType;
     store.error = undefined;
   } catch (error) {
     store.error = error instanceof Error ? error.message : String(error);
@@ -98,20 +102,23 @@ export const setCode = (code) => {
 export const setConfig = (configStr) => {
   try {
     const parsed = JSON.parse(configStr);
-    mermaidConfigSchema.parse(parsed); // will throw if invalid
+    mermaidConfigSchema.parse(parsed); // throws when the field contract fails
     store.mermaid = configStr;
     store.lastValidMermaid = configStr;
     store.configError = undefined;
   } catch (e) {
-    store.mermaid = configStr; // keep it in state so editor doesn't lose it
+    // Keep the typed text in the pane, but never apply an invalid config:
+    // the preview keeps rendering with the last valid configuration.
+    store.mermaid = configStr;
     if (e instanceof SyntaxError) {
-      store.configError = "Invalid JSON";
+      store.configError = `config document: not valid JSON (${e.message})`;
     } else {
-      store.configError = e.errors?.[0]?.message || String(e);
+      const { field, message } = formatZodError(e);
+      store.configError = field === 'document' ? message : `${field}: ${message}`;
     }
   }
   persist();
-  revalidate(); // Re-render with lastValidMermaid (done in Preview)
+  revalidate();
 };
 
 export const setEditorMode = (mode) => {
@@ -119,20 +126,25 @@ export const setEditorMode = (mode) => {
   persist();
 };
 
+// The header theme toggle recolors the rendered diagram by writing the
+// matching Mermaid Config theme into the config document — the same document
+// the Config tab edits and the renderer reads.
 export const applyMermaidTheme = () => {
+  const theme = store.theme === 'dark' ? 'dark' : 'default';
+  let config;
   try {
-    const config = JSON.parse(store.lastValidMermaid);
-    config.theme = store.theme === 'dark' ? 'dark' : 'default';
-    const newConfigStr = JSON.stringify(config, null, 2);
-    store.mermaid = newConfigStr;
-    store.lastValidMermaid = newConfigStr;
-    store.configError = undefined;
+    config = JSON.parse(store.lastValidMermaid);
+    if (typeof config !== 'object' || config === null || Array.isArray(config)) {
+      config = { theme };
+    }
   } catch {
-    const newConfigStr = JSON.stringify({ theme: store.theme === 'dark' ? 'dark' : 'default' }, null, 2);
-    store.mermaid = newConfigStr;
-    store.lastValidMermaid = newConfigStr;
-    store.configError = undefined;
+    config = { theme };
   }
+  config.theme = theme;
+  const newConfigStr = JSON.stringify(config, null, 2);
+  store.mermaid = newConfigStr;
+  store.lastValidMermaid = newConfigStr;
+  store.configError = undefined;
   persist();
 };
 
@@ -150,59 +162,71 @@ export const toggleTheme = () => setTheme(store.theme === 'dark' ? 'light' : 'da
 
 export const loadSample = (sample) => setCode(sample.code);
 
+// MermaidSession export package — always the full field contract with the
+// session's live values.
 export const getSessionJSON = () => {
-  return JSON.stringify({
-    schemaVersion: 'mermaid-session-v1',
-    code: store.code,
-    config: JSON.parse(store.lastValidMermaid),
-    appTheme: store.theme,
-    activeTab: store.editorMode,
-    diagramType: store.diagramType
-  }, null, 2);
+  let config;
+  try {
+    config = JSON.parse(store.lastValidMermaid);
+  } catch {
+    config = { theme: 'default' };
+  }
+  return JSON.stringify(
+    {
+      schemaVersion: 'mermaid-session-v1',
+      code: store.code,
+      config,
+      appTheme: store.theme,
+      activeTab: store.editorMode,
+      diagramType: store.diagramType ?? 'flowchart'
+    },
+    null,
+    2
+  );
 };
 
 export const importSessionJSON = (jsonStr) => {
+  let parsed;
   try {
-    const parsed = JSON.parse(jsonStr);
-    mermaidSessionSchema.parse(parsed);
-    
-    // update all state atomically
-    store.code = parsed.code;
-    store.mermaid = JSON.stringify(parsed.config, null, 2);
-    store.lastValidMermaid = store.mermaid;
-    store.configError = undefined;
-    store.theme = parsed.appTheme;
-    store.editorMode = parsed.activeTab;
-    store.diagramType = parsed.diagramType;
-    
-    document.documentElement.classList.toggle('dark', store.theme === 'dark');
-    persist();
-    
-    try {
-      localStorage.setItem(THEME_KEY, store.theme);
-    } catch {}
-    
-    store.renderCount += 1;
-    revalidate();
-    return { ok: true };
+    parsed = JSON.parse(jsonStr);
   } catch (e) {
-    if (e instanceof SyntaxError) {
-       return { ok: false, error: "Invalid JSON", field: "document" };
-    }
-    const err = e.errors?.[0];
-    return { ok: false, error: err?.message || String(e), field: err?.path?.[0] || 'document' };
+    return { ok: false, field: 'document', message: `malformed JSON (${e.message})` };
   }
+  try {
+    mermaidSessionSchema.parse(parsed);
+  } catch (e) {
+    // Contract failed: nothing in the workspace is mutated.
+    return { ok: false, ...formatZodError(e) };
+  }
+
+  // Contract passed — restore every facet together, atomically.
+  store.code = parsed.code;
+  store.mermaid = JSON.stringify(parsed.config, null, 2);
+  store.lastValidMermaid = store.mermaid;
+  store.configError = undefined;
+  store.theme = parsed.appTheme;
+  store.editorMode = parsed.activeTab;
+  store.diagramType = parsed.diagramType;
+
+  document.documentElement.classList.toggle('dark', store.theme === 'dark');
+  persist();
+  try {
+    localStorage.setItem(THEME_KEY, store.theme);
+  } catch {}
+
+  store.renderCount += 1;
+  revalidate();
+  return { ok: true };
 };
 
 export const importMMD = (mmdStr) => {
-  if (!mmdStr.trim()) {
-    store.code = '';
-    store.renderCount += 1;
-    persist();
-    revalidate();
-    return { ok: true };
-  }
-  setCode(mmdStr);
+  const text = String(mmdStr ?? '');
+  // Empty or whitespace-only payloads behave exactly like clearing Code:
+  // the workspace stays stable with the empty-source treatment.
+  store.code = text.trim() ? text : '';
+  store.renderCount += 1;
+  persist();
+  revalidate();
   return { ok: true };
 };
 
