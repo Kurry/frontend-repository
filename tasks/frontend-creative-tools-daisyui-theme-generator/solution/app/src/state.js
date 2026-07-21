@@ -160,18 +160,20 @@ export function ensureEditable() {
   copy.generatedAt = new Date().toISOString();
   state.customs.push(copy);
   state.activeId = copy.id;
-  syncHash();
-  notify('structure');
   return copy;
 }
 
 // Live token mutation WITHOUT history push (used while dragging a color
 // picker; pushHistoryFor() bookends the gesture).
 export function setToken(mutate) {
+  const forked = activeTheme().builtin;
   const t = ensureEditable();
   mutate(t);
   syncHash();
-  notify('tokens');
+  // A built-in edit creates a list row and changes the active selection. Do
+  // the structural render only after the mutation so controls never repaint
+  // from the pristine fork and become stale while state contains the edit.
+  notify(forked ? 'structure' : 'tokens');
   return t;
 }
 
