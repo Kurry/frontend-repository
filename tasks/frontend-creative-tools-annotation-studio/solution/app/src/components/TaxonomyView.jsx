@@ -23,7 +23,7 @@ function TaxonomyForm({ open, editing, onClose, openerRef }) {
   const defaults = useMemo(() => editing ? {
     name: editing.name, color: editing.color, icon: editing.icon, shortcut: editing.shortcut, attributes: editing.attributes,
   } : { name: '', color: PALETTE[0], icon: 'Tag', shortcut: '', attributes: [] }, [editing]);
-  const { register, handleSubmit, control, watch, reset, setError, formState: { errors, isValid } } = useForm({ resolver: zodResolver(schema), mode: 'onChange', defaultValues: defaults });
+  const { register, handleSubmit, control, watch, reset, setError, setValue, formState: { errors, isValid } } = useForm({ resolver: zodResolver(schema), mode: 'onChange', defaultValues: defaults });
   const { fields, append, remove } = useFieldArray({ control, name: 'attributes' });
   const [iconQuery, setIconQuery] = useState('');
   const attributeRows = watch('attributes') || [];
@@ -85,7 +85,7 @@ function MetadataForm({ open, onClose, openerRef }) {
     <ModalHeader title="New metadata field" label="Metadata field builder" closeModal={onClose} />
     <ModalBody hasForm><form id="metadata-form" className="modal-form" onSubmit={handleSubmit(submit)}>
       <TextInput id="metadata-name" labelText="Name" invalid={Boolean(errors.name)} invalidText={errors.name?.message} {...register('name')} />
-      <Controller name="kind" control={control} render={({ field }) => <Select id="metadata-kind" labelText="Kind" value={field.value} onChange={(e) => field.onChange(e.target.value)} invalid={Boolean(errors.kind)} invalidText={errors.kind?.message}><SelectItem value="text" text="Text" /><SelectItem value="number" text="Number" /><SelectItem value="select" text="Select" /><SelectItem value="checkbox" text="Checkbox" /></Select>} />
+      <Controller name="kind" control={control} render={({ field }) => <Select id="metadata-kind" labelText="Kind" value={field.value} onChange={(e) => { const next = e.target.value; field.onChange(next); if (next !== 'select') setValue('options', [], { shouldValidate: true }); }} invalid={Boolean(errors.kind)} invalidText={errors.kind?.message}><SelectItem value="text" text="Text" /><SelectItem value="number" text="Number" /><SelectItem value="select" text="Select" /><SelectItem value="checkbox" text="Checkbox" /></Select>} />
       <div>
         <Controller name="options" control={control} render={({ field }) => <TextInput id="metadata-options" labelText="Options (comma separated)" disabled={kind !== 'select'} value={(field.value || []).join(', ')} invalid={Boolean(errors.options)} invalidText={errors.options?.message} onChange={(e) => field.onChange(e.target.value.split(',').map((v) => v.trim()).filter(Boolean))} />} />
         {needsOptions && <p className="field-error">Options: a select field needs at least one non-empty option.</p>}
