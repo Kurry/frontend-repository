@@ -55,7 +55,7 @@ button { font-family: inherit; cursor: pointer; }
 .the-nav__item {
   background: none; border: 0; color: var(--color-light);
   font-family: "IBM Plex Mono", sans-serif; font-size: 1rem; line-height: 2rem;
-  opacity: .8; transition: opacity .65s cubic-bezier(.33,1,.68,1);
+  opacity: .8; transition: opacity .65s cubic-bezier(.33,1,.68,1); text-transform: uppercase;
 }
 @media (hover: hover) { .the-nav__item:hover { opacity: 1; } }
 .the-nav__item.is-active { opacity: 1; }
