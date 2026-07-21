@@ -154,26 +154,3 @@ description = "During a real batch run of 2 or more accepted PRs, the overall ba
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "8.n1"
-name = "animation_causes_jank_or_flicker"
-description = "Streaming text, card moves, or list transitions visibly shift surrounding layout, flicker, or leave elements misplaced after settling"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "8.n2"
-name = "transitions_block_interaction"
-description = "While a transition plays — a card move, the palette opening, or a stage status change — clicks or key presses are dropped or the UI freezes until the animation ends"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "8.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

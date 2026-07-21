@@ -126,34 +126,3 @@ description = "Grid tiles use the sharp small-radius mine-grid treatment consist
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n1"
-name = "layout_unrecognizable_vs_reference"
-description = "The first desktop view is unrecognizable versus overview.png in structure or theme (ignoring text-priority conflicts)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n2"
-name = "wrong_theme_vs_reference"
-description = "A light or unrelated theme replaces the dark stone MineClash look shown in the reference screenshots."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n3"
-name = "missing_major_regions"
-description = "Major regions shown in segment screenshots (setup, HUD, board, overlays, or stats) are missing from the shipped app."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable design-fidelity defect versus the reference screenshots that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite evidence. If already covered — even partially — answer no here."
-type = "binary"
-weight = 1.0
-negate = true

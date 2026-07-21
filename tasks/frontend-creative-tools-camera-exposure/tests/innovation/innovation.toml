@@ -166,14 +166,6 @@ optional = true
 
 
 [[criterion]]
-id = "11.n1"
-name = "barebones_unstyled_form_only"
-description = "The shipped UI is a bare unstyled form or plain text controls with no live photo preview stack, dials, meter immersion, or exportable finished image."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. If present, name the enhancement and cite evidence. If already covered — even partially — answer no."

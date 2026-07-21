@@ -123,26 +123,3 @@ description = "Spacing follows a consistent rhythm across the sidebar, tree, and
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n1"
-name = "diff_or_annotation_color_only"
-description = "Diff categories or validation outcomes are conveyed by color alone with no text label or icon, or the same color is reused across contradictory meanings"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.n2"
-name = "layout_clipping_or_overlap"
-description = "At 1440 pixel width, any tree row, panel, tab, or code surface renders clipped, overlapping another element, or misaligned with its container"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

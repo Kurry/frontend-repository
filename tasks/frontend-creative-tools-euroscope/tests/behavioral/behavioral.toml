@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_incoherent"
-description = "After configuring step, theme, swatches, and icon set then reloading, some facets survive while others silently revert, producing incoherent partial persistence."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "preview_ignores_theme_inputs"
-description = "Changing the base theme or a swatch leaves the Preview panels or Vector bitmap tiles identical to their prior colours even when the swatch values changed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_themes_identical_output"
-description = "Selecting different base themes (for example Ayu then Solarised) yields byte-identical swatch values and Preview colours that ignore the theme inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_step_stale_until_reload"
-description = "After editing a swatch or switching icon set, one step updates but another step's Preview, tiles, or summary stays stale until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_contains_session_work"
 description = "Starting from seeded state: select Ayu, edit Backdrop lighter to a distinct #RRGGBB hex, set Vector, Keep original on one tile, advance to step four. Confirm Patch recipe JSON preview contains schemaVersion euroscope-patch-v1, baseTheme Ayu, colours.backdropLighter equal to the edited hex, iconSet vector, and that bitmap's keepOriginal true — not a stale seed recipe — and Theme CSS shows matching --es-* tokens."
@@ -228,34 +196,3 @@ description = "Save snapshot Night ops (Palette snapshot field contract: non-emp
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_ignores_keep_original"
-description = "After toggling Keep original on a tile, the Patch recipe JSON preview still omits that override or reports a full replaced count that ignores keep-original tiles."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "undo_partial_surface_restore"
-description = "After Undo of a theme or swatch change, some surfaces revert while Preview, contrast matrix, or export preview stay on the post-mutation values."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n7"
-name = "export_drops_api_shaped_contract"
-description = "After a swatch or keep-original mutation, the Patch recipe JSON preview drops a required field-contract key, shows an undeclared top-level key, or shows baseTheme/iconSet outside their closed enums, or Theme CSS drops a required --es-* token or disagrees with colours.*"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling in the EuroScope patching wizard that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot). If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

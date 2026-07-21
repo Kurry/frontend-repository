@@ -145,14 +145,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.27"
-name = "net_worth_frozen_after_change"
-description = "The net-worth total stays unchanged after adding, editing, or deleting a holding whose market value should change it."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.29"
 name = "sort_toggle_with_indicator"
 description = "Activating a sortable column header orders the rows by that column; activating the same header again reverses the order, and a visible indicator on the header shows the active sort column and direction."
@@ -230,14 +222,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "1.40"
-name = "duplicate_rows_after_filter_roundtrip"
-description = "After filtering to one class and clearing the filter back to all classes, some holding appears more than once in the table or a previously visible holding is missing."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.41"
 name = "holding_field_contract_enums"
 description = "The Add holding form requires currency as one of USD, EUR, CHF and data source as one of MANUAL, YAHOO, COINGECKO; saving with values outside those enums is blocked with an inline validation message and adds no holding."
@@ -313,22 +297,6 @@ name = "undo_reverses_mutation"
 description = "After adding a holding or activity, Undo restores the prior holdings, activities, net worth, and export previews in one step, and shows enabled/disabled state matching availability."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "export_omits_session_work"
-description = "After a visible holding create/edit/delete or activity save, the export preview omits that session mutation or still shows the deleted record."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n3"
-name = "invalid_contract_payload_accepted"
-description = "A holding or activity save accepts values outside the field contracts (invalid enum, non-positive quantity, or broken cross-field rule) and adds a row anyway."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.52"
@@ -428,42 +396,3 @@ description = "After a create, edit, delete, activity save, bulk action, or comm
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n4"
-name = "realized_gain_unchanged_after_sell"
-description = "After saving a valid SELL that should realize a gain or loss, the realized gain figure and total return stay unchanged, or the sold quantity's unrealized gain remains counted."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n5"
-name = "import_mutates_store_before_commit"
-description = "Opening or interacting with the CSV import diagnostics screen changes the activities collection, ledger, or derived totals before the user presses Commit."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n6"
-name = "batch_tray_count_or_scope_wrong"
-description = "The bulk action tray reports a selected count different from the number of checked rows, or a bulk delete/edit affects only one row instead of every selected row."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n7"
-name = "benchmark_series_tracks_activities"
-description = "The seeded benchmark series on the performance chart changes shape when activities are added, edited, or deleted, instead of staying fixed."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in its core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

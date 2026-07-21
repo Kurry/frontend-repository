@@ -163,46 +163,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "Beyond the required triage-to-export pipeline, the studio shows no optional enhancement such as dataset health charts, keyboard-first triage, or a manifest diff preview."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_or_copied"
-description = "Interactions and visuals feel generic or templated rather than belonging to a code-question dataset factory studio."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n3"
-name = "experience_lacks_polish_guidance_story"
-description = "The studio lacks polish, guidance, or a readable product narrative around seed triage and package export."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n4"
-name = "interface_is_flat_and_static"
-description = "Queue, rollup, and workbench surfaces feel flat and static with no optional immersion beyond required motion."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "effort_stops_at_mvp"
-description = "The build stops at the minimum triage and export deliverable with no visible effort in optional innovation space."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

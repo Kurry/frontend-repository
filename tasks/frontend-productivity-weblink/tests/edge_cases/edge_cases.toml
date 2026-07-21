@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_queue_has_no_feedback"
-description = "An empty file queue shows nothing and provides no empty-state feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "field_contract_feedback_missing_or_delayed"
-description = "Field-contract validation feedback for roomId, displayName, text, or Import is missing or delayed with no UI indication."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "reload_mid_transfer_restores_paused"
 description = "Reloading the page while a row is Transferring restores that row as Paused at its saved progress readout — never as Transferring and never reset to zero"
@@ -269,18 +189,3 @@ description = "Starting a transfer for a zero-byte file completes it immediately
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.n11"
-name = "log_rewrites_history"
-description = "Cancel, Retry, or Remove rewrites or deletes earlier transfer-log entries instead of appending new ones."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

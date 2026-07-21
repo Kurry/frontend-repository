@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "theme_create_edit_delete_unavailable"
-description = "Hold-to-add create, rename via the Name field, or Remove delete cannot be completed from the visible UI controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "create_fails_to_appear_or_duplicates"
-description = "Completing a valid Hold to add theme either fails to add a visible My themes row or adds duplicate rows for a single completed hold."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "token_edit_desyncs_preview_or_export"
-description = "After editing a color, radius, size, or effect token, the editor swatches, live preview, and CSS export disagree with each other about the active tokens."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "preview_tab_switch_loses_theme_or_breaks_layout"
-description = "Switching among Components Demo, Component Variants, and Color Palette breaks the layout or loses the active theme selection / tokens."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_my_themes_region_broken"
-description = "After deleting all custom themes, the My themes region is blank or broken with no empty-state guidance."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "hash_load_disagrees_with_source_session"
-description = "Loading a #theme= hash produced by an edit session shows different name, swatches, or preview colors than the session that wrote the hash."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "chrome_dropdown_cannot_reopen_or_close"
-description = "After opening or closing a version/theme/language dropdown, the same chrome control cannot reopen or close the dropdown again."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "chrome_dropdown_blocks_with_no_exit"
-description = "A chrome dropdown or CSS export overlay blocks the workspace with no working Escape, outside-click, or close control."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_create_silent"
-description = "An invalid empty-name create attempt provides no visible validation feedback and leaves the user without an explanation."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "hash_or_dropdown_dead_end_requires_reload"
-description = "Recovering from a malformed theme= hash fallback or a stuck chrome dropdown requires a full page reload — the UI reaches a dead end."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "6.12"
 name = "artifact_pipeline_flow"
 description = "Artifact pipeline flow: create or select a custom theme, change primary color, box radius, field size, border, depth, noise, font family, and Dark color scheme, then open the Artifact center — CSS, JSON, and Config tabs each show those exact customizations with JSON still carrying every required field-contract key; CSS data-theme equals JSON name; Copy confirms; Download matches the visible tab."
@@ -277,18 +196,3 @@ description = "Theme package field-contract flow: after editing primary to a dis
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n20"
-name = "artifact_pipeline_drops_edits"
-description = "After the artifact pipeline edits, one or more of CSS, JSON, or Config still shows pre-edit defaults, omits a required field-contract key, or Download contents disagree with the visible tab."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

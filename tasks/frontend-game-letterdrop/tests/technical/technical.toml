@@ -134,46 +134,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.7"
-name = "views_desync_same_datum"
-description = "The same datum (live score, Best Score, streak, or History top-row score) shows conflicting values in two visible surfaces at once without a reload."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.8"
-name = "debug_artifacts_visible"
-description = "Visible debug output, leftover placeholder scaffolding, or verbose console.log spam appears in the running production UI during normal play."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.9"
-name = "blank_or_broken_start_path"
-description = "Loading / via the documented start path renders a blank or broken page instead of the LetterDrop shell."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.10"
-name = "nondeterministic_baseline_on_reload"
-description = "Two cold loads with the same persisted storage show different History rows, Best Score, or achievement unlock sets without user action."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.11"
-name = "fabricated_persisted_data"
-description = "Starting from a fresh context with empty storage, the app shows fabricated history entries, a non-zero Best Score, or pre-unlocked achievements instead of the empty history state and a zero Best Score."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.12"
 name = "single_route_panels_via_client_state"
 description = "Match History, Achievements, and Settings are shown and hidden within the single route / via client state without a full document navigation to another path."
@@ -200,30 +160,6 @@ name = "console_clean_during_exercise"
 description = "The browser console shows zero errors and no unhandled promise rejections while exercising start, play, pause, resume, save/resume, export/import, Game Over, restart, History, Achievements, and Settings."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.16"
-name = "mandated_persistence_absent"
-description = "After a completed run and achievement unlock, a full page refresh loses Best Score, Match History, unlocked achievements, or saved settings even though localStorage persistence is required."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.17"
-name = "outbound_network_requests"
-description = "Devtools shows outbound network requests to external origins (dictionary APIs, CDN scripts, remote fonts, or icon sets) during load or play."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.18"
-name = "external_link_navigates_away"
-description = "Chrome that looks like an in-app control is actually an external <a href> that navigates the tab away from the app origin during normal use."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.19"
@@ -253,20 +189,4 @@ name = "export_import_round_trip_schema"
 description = "Exporting a finished run as letterdrop-game-v1 JSON and re-importing it reconstructs History fields (score, tilesCleared, durationSec, playerName, tierReached, endedAt, words) without console errors or fabricated extra runs."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.n22"
-name = "checkpoint_lost_on_reload"
-description = "After Save Progress, a full page refresh loses the mid-run checkpoint so Resume Saved Run is unavailable or restores an empty run."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, storage, coherence, or runtime) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence. If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true
 

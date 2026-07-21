@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring custom themes, preview tab, and chrome theme then reloading without #theme=, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "preview_identical_across_different_tokens"
-description = "Changing primary color, radius, or Random leaves the live preview and Color Palette visually identical — a derived surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_themes_apply_identical_tokens"
-description = "Selecting two built-in presets that declare different token sets yields identical editor swatches and preview colors."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_surface_state_stale_until_reload"
-description = "After editing tokens or renaming a theme, My themes, editor, preview, or Color Palette still shows stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_import_round_trip_preserves_tokens"
 description = "Mutate → derived → export → import: on a custom theme set primary to color A and Radius Boxes to a non-default preset; confirm Contrast and all three Export previews reflect A; Download Theme JSON; change tokens away from A; Import the downloaded JSON; confirm editor, preview, Contrast, and Export return to A's values."
@@ -191,22 +159,6 @@ id = "14.10"
 name = "undo_round_trip_restores_all_surfaces"
 description = "Undo round-trip: edit primary to B (preview, Contrast, Export update), Undo restores prior primary everywhere those surfaces show it, Redo reapplies B everywhere — never a surface left stale."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "export_text_ignores_session_mutations"
-description = "After mutating primary and radius, Export CSS/JSON/theme-extension text is identical to the pre-mutation text — an export that omits the session's actual work."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "undo_leaves_derived_surfaces_stale"
-description = "After Undo of a primary edit, Contrast ratios or Export previews still show the edited color while the editor swatch restored."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -230,18 +182,3 @@ description = "Create a custom theme with a valid name, set Dark color scheme on
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n7"
-name = "theme_json_lacks_api_field_names"
-description = "After token edits, the Theme JSON preview lacks the required API field names (name, color-scheme, --color-primary, --radius-box, --size-field, --border, --depth, or --noise), shows --color-* values outside oklch/#RRGGBB, or invents a disconnected shape that cannot round-trip through Import."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

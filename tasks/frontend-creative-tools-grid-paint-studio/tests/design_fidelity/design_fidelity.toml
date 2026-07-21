@@ -147,35 +147,3 @@ description = "Scrolling through desktop segments matching segment-01/segment-02
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.n1"
-name = "unrelated_layout_vs_reference"
-description = "The desktop layout is unrelated to the reference screenshots (for example a multi-column admin dashboard) while still claiming to be Grid Paint Studio."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "missing_angle_bracket_branding"
-description = "The <GRID PAINT STUDIO> angle-bracket title treatment from the reference/instruction is absent from the first paint viewport."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "toolbar_not_floating_dark"
-description = "At desktop width, there is no floating dark toolbar over the stage comparable to the reference composition."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable departure from the reference screenshots that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0
-

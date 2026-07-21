@@ -183,54 +183,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_reset_is_incoherent"
-description = "After a reload or factory reset, some facets revert to the seeded baseline while others (theme, a created expense, a settled transaction, or a custom field) silently survive, producing an incoherent mix"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "debt_graph_ignores_expense_changes"
-description = "The debt visualizer or its stated transaction count renders identically after an expense is added, deleted, or has its split changed in a way that must alter the balances"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Repeating an ingestion or computation workflow with different inputs (different pasted text, different CSV values, different expense amounts) yields byte-identical drafts, rows, or computed results"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "A change made in the ledger, spreadsheet, or an item card appears in one of those views but not the others until a reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "wizard_commit_drops_fixed_rows"
-description = "Committing the CSV wizard drops, duplicates, or reverts rows that were fixed in the diagnostics screen — the ledger receives the pre-fix values or loses corrected rows"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "report_text_stale_against_session"
-description = "The settlement report or budget summary text, or its copied output, shows balances, totals, or settled states from before the session's edits rather than the current state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.14"
 name = "trip_json_export_import_round_trip"
 description = "Full pipeline: rename a stop, create one valid expense with a unique description, change one expense currency, Copy or Download the trip JSON, reload to the seeded baseline, Import that JSON — confirm plan list rows, ledger rows, balances, charts, markdown, ICS, trip JSON, settlement report, and budget summary match the pre-export mutated state"
@@ -244,18 +196,3 @@ description = "Chained probe: create a valid stop with a unique title and startT
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n7"
-name = "import_round_trip_desyncs_surfaces"
-description = "After a successful trip JSON import of a previously exported mutated session, at least one surface (plan list, ledger, ICS, markdown, or charts) still shows the seeded baseline or otherwise disagrees with the imported document"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

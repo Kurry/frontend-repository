@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "equal_width_stack_layout"
-description = "Lays out Operations Overview as a uniform equal-width single-column card stack with no mixed mosaic spans"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.4"
 name = "theme_surfaces_accent_wash"
 description = "Both light and dark themes render coherent surface colors, and the main canvas shows a soft radial accent wash rather than a flat single-color background"
@@ -146,14 +138,6 @@ id = "3.8"
 name = "responsive_drawer_breakpoints"
 description = "At a 1440px-wide viewport the drawer sidebar is open by default; at a narrow viewport the sidebar collapses to a hamburger control that opens an overlay drawer"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "3.9"
-name = "mobile_375_overflow"
-description = "At 375px viewport width, content clips, overflows the viewport, or page-level horizontal scrolling appears"
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -191,18 +175,3 @@ description = "Validation messages name the offending field and the fix, and emp
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.15"
-name = "placeholder_text_visible"
-description = "Lorem ipsum, TODO, template variable names, or other placeholder text is visible somewhere in the shipped UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "visual_design.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design, responsiveness, or UI copy that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, viewport, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

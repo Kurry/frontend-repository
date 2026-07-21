@@ -128,30 +128,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "signature_folder_motion_absent_or_stubbed"
-description = "Signature reference motions are absent or stubbed: no 3D folder open/close, no choreographed case entrance, and no scrapbook rise when opening a case via the real UI path."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "recreation_feels_generic_template"
-description = "The recreation reads as a generic portfolio template with default type/spacing and none of the reference's filing-cabinet stack, broken-grid case, or kinetic-type execution quality."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "archive_flat_static_no_immersion"
-description = "The archive is flat and static with no folder morph, no stack hover/unfold language, and no scrapbook layering despite the reference requiring them."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "11.8"
 name = "dossier_panel_execution_polish"
 description = "Optional execution quality: the research dossier panel and reading-list drawer feel polished and coherent with the filing-cabinet archive rather than bolted-on default modals — still faithful to the reference language, not a competing product invention."

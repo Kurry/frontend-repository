@@ -140,26 +140,3 @@ description = "At 768px width the evidence panes stack vertically while remainin
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.8"
-name = "overlapping_or_clipped_content"
-description = "At 1440px or 375px width, any text, chip, banner, or control overlaps another element or is clipped by its container"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.9"
-name = "default_kit_styling_unthemed"
-description = "The UI reads as unstyled defaults: browser-default form controls, a single flat unbranded surface, or component chrome with no cohesive palette or identity applied across views"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

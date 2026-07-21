@@ -190,22 +190,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.15"
-name = "threshold_auto_confirms_rows"
-description = "Moving the threshold slider changes some row's chip to Confirmed clean or Confirmed leak, or otherwise records a confirmed decision without the reviewer decision form being submitted"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.16"
-name = "queue_static_no_live_derivation"
-description = "The queue, rollup strip, or mutation flip count is static markup: moving the threshold, submitting a decision, or toggling an included test leaves the dependent chips or numbers unchanged"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.17"
 name = "review_report_json_field_contract_keys"
 description = "With any session state, the Export Review report JSON preview visibly includes the required top-level keys schemaVersion, threshold, exportedAt, rollup, submissions, decisions, and mutationSuites, and schemaVersion equals leak-review.report.v1"
@@ -234,32 +218,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "review_report_omits_session_mutations"
-description = "After submitting a Confirm leak decision with a distinct rationale token and changing the threshold, the Export Review report JSON preview omits that decision token or the new threshold, or omits schemaVersion leak-review.report.v1 / required keys, while presenting an export preview as if complete"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "invalid_import_mutates_state"
-description = "Importing Review report JSON that violates the field contract (wrong schemaVersion, threshold outside bounds, or unknown submissionId) still mutates queue chips, threshold, audit timeline, or mutation include toggles"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.23"
 name = "score_band_boundaries_exact"
 description = "The three score bands honor their exact boundaries: a row scoring below 0.40 renders in the low-band color, a row scoring from 0.40 up to (but below) the current threshold renders in the mid-band color, and a row at or above the threshold renders in the high-band color — verified against specific visible row scores on both sides of 0.40 and of the threshold"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

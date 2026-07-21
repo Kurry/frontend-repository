@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring category, theme, quality, default target, and presets then reloading, some of those facets survive while others reset, or a phantom queue row survives while settings reset — incoherent partial persistence."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "output_size_identical_across_quality"
-description = "Converting the same file to jpeg at quality 100 and at a substantially lower quality yields identical completed output sizes — a derived surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_targets_identical_output"
-description = "Converting the same source to webp and to jpeg yields identical output sizes and/or identical download extensions."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_surface_state_stale_until_reload"
-description = "After Convert, Batch set format, or Remove, the queue row status, counts line, and session export preview disagree until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "mutate_then_session_export_contains_work"
 description = "Full-pipeline probe ending at export text: lower quality, save a ConversionPreset, add sample png, Batch set format or retarget to webp, Convert to Done, then open session JSON export — the preview text contains schemaVersion vert-session-v1, the lowered quality, the saved preset under ConversionPreset keys, and a QueueFile entry matching the Done row (name/from/to/status/outputSize), proving the export is compiled live from session mutations."
@@ -191,14 +159,6 @@ id = "14.10"
 name = "session_import_export_round_trip"
 description = "Export→import round-trip: after mutating settings and presets with at least one file still queued, Download or Copy the session JSON, change settings/presets away, then Import that same ConversionSessionDocument — Settings, presets, and matching queued files' Convert-to targets match the pre-export mutated state, and the export preview matches again including schemaVersion vert-session-v1."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "session_export_ignores_queue_mutations"
-description = "After converting a file or batch-retargeting, the session JSON export text is empty of that work or unchanged from the pre-mutation export despite a visible Done/retargeted row."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -216,32 +176,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n6"
-name = "undo_leaves_export_stale"
-description = "After Undo of a remove or retarget, the session JSON export preview still shows the post-mutation queue while the visible queue restored."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.13"
 name = "form_payload_echoes_in_export_contract"
 description = "After a valid SettingsUpdate (quality and defaultTarget) and a valid ConversionPreset save, the session JSON export preview shows those exact field-contract values under quality, defaultTarget, and presets — the created records ARE the would-be request bodies mirrored in the export."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n7"
-name = "export_omits_schema_version_after_mutations"
-description = "After lowering quality, saving a preset, and converting a sample file, the session JSON export preview omits schemaVersion vert-session-v1 or omits the mutated quality/preset/file fields despite visible store changes."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

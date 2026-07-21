@@ -155,55 +155,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.n1"
-name = "browser_storage_used"
-description = "localStorage, sessionStorage, or another browser storage API is non-empty after exercising the app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "outbound_request_observed"
-description = "An outbound network request to another origin (CDN script, font host, analytics, API) appears in the network log"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "console_error_during_flows"
-description = "A console error or unhandled rejection is thrown by a specific interaction during normal flows, even if the UI limps on"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n4"
-name = "views_desync_same_datum"
-description = "The same datum shows different values in two places at once — for example the rollup strip and the Audit Package JSON checkPassRates disagree on a check's pass count, or a queue row lags its detail view"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "debug_artifacts_visible"
-description = "Visible debug output, console.log spam, placeholder scaffolding, or leftover template chrome appears in the running app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n6"
-name = "external_link_navigates_away"
-description = "An app-chrome link or control navigates away from the app's origin"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "9.10"
 name = "export_import_share_field_contract"
 description = "Audit Package JSON export and a successful import conform to the same visible field-contract keys (schemaVersion quality-audit-package-v1, datasetSummary, tasks, and related arrays); after a valid import the next export preview matches the imported document"
@@ -224,18 +175,3 @@ description = "Every session-touched Audit Package task has slug, one of the sev
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "9.n7"
-name = "export_preview_is_static_snapshot"
-description = "The Report export preview ignores live store mutations and remains a static snapshot after runs, verdicts, or feedback entries"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console line) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

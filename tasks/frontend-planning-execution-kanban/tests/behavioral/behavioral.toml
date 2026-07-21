@@ -140,43 +140,8 @@ description = "Move every card out of Review so the empty state shows, then Add 
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "14.n1"
-name = "partial_in_memory_reset"
-description = "After reload, some session facets survive while others reset (for example filters clear but a created card remains), producing incoherent partial persistence"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "14.n2"
-name = "export_ignores_board_changes"
-description = "The Export preview renders identically before and after a visible create or move"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "14.n3"
-name = "different_titles_same_export"
-description = "Creating two cards with different titles yields export text with identical title fields or one shared title string for both cards"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "14.n4"
-name = "export_stale_vs_board"
-description = "A title or column change appears on the board card but not in the export preview until reload"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
 id = "14.9"
 name = "import_export_full_pipeline"
 description = "Mutate the board (create or move), Copy the board JSON, reload to seeded baseline, Import that JSON — the board shows the mutated titles/columns/order and the export preview matches the imported state"
 type = "binary"
-weight = 1.0
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0

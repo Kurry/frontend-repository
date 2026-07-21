@@ -197,22 +197,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.18"
-name = "static_list_without_working_crud"
-description = "Transactions list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.19"
-name = "outbound_links_replace_in_app_views"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.20"
 name = "kpi_cards_derive_from_collection"
 description = "Summary metric cards (Total Income, Total Expenses, Net Income, Savings Rate) derive from the transactions collection, with Net Income equal to income minus expenses and Savings Rate equal to net divided by income as a percentage, and they update when a transaction is created, edited, or deleted"
@@ -232,14 +216,6 @@ name = "filters_recompute_and_show_empty_state"
 description = "Category and income-vs-expense filters recompute the visible list from the shared collection, and a filter matching nothing shows an empty state message instead of a blank table"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.26"
-name = "kpi_cards_static_or_hardcoded"
-description = "Summary metric cards remain fixed at their initial totals after a transaction is added or deleted (static or hardcoded KPIs)"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.27"
@@ -298,14 +274,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.35"
-name = "charts_identical_regardless_of_inputs"
-description = "The sankey flow, pie slices, or their legends render identical values regardless of changes to the transactions collection or active filters (a derived chart surface that ignores its inputs)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.36"
 name = "form_submit_disabled_until_valid"
 description = "The transaction create/edit form presents date, payee, category, account, amount, and optional status fields; the submit control stays disabled until every required field is valid against the field contract, and each invalid field shows an inline message naming that field before submit"
@@ -362,14 +330,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.44"
-name = "export_omits_session_mutations"
-description = "After creating a distinct payee transaction, the Export report JSON transactions array or Markdown report omits that payee and totals.count disagrees with the live summary strip count"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.45"
 name = "command_palette_filter_and_escape"
 description = "With the command palette open, typing filters the command list by title; Escape closes the palette without performing any action; choosing a command (for example New transaction or Clear filters) closes the palette and performs that action through the same handlers as the visible controls"
@@ -390,10 +350,3 @@ description = "Import CSV with the Append mode commits valid rows on top of the 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

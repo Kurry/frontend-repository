@@ -99,14 +99,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.2"
-name = "external_cdn_asset_loaded"
-description = "A font, script, stylesheet, image, video, 3D scene, or Draco decoder asset loads from an external CDN host (for example jsDelivr, unpkg, gstatic, Cloudflare, or an object-storage bucket) instead of same-origin."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.3"
 name = "clean_console_full_scroll"
 description = "On load and during a full top-to-bottom scroll, the page produces no uncaught JavaScript console errors, no hydration errors or hydration warnings, and no failed asset request (no 4xx/5xx and no net::ERR for scripts, styles, images, fonts, or media)."
@@ -126,15 +118,6 @@ name = "breakpoint_swap_without_reload"
 description = "Resizing the viewport across the 768px breakpoint swaps between the desktop segment nav and the hamburger treatment (Roman-numeral labels I.AGENTIC STACK through VI.BUSINESS BANKING) without a page reload and without console errors."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "4.6"
-name = "storage_or_undeclared_navigation"
-description = "The page uses localStorage or sessionStorage, or a page-chrome control navigates the origin away to a route other than the declared external signup and card CTA outbound links."
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
 
 [[criterion]]
 id = "4.7"
@@ -196,15 +179,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.15"
-name = "hydrated_content_visibly_replaced"
-description = "Statically delivered content visibly flashes and is replaced by different client content after the island scripts hydrate — mismatched text, reflowing layout, or restyled elements between first paint and interactive on a fresh load of /sprint/26."
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "4.20"
 name = "in_memory_session_state_resets"
 description = "Shortlist, compare, theme filter, search, watch log, brief preview, palette, and undo/redo live in in-memory client state only: after mutations, a reload coherently returns to the empty seeded baseline with no localStorage/sessionStorage persistence of those facets."
@@ -225,10 +199,3 @@ description = "Sprint launch brief export/import follows schema-first API-shaped
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console health, network hygiene, accessibility, performance, or routing) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console or network log) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

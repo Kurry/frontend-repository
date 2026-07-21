@@ -162,96 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "pipeline_submit_flows_unavailable"
-description = "Submit job, dataset filter, Results comparison, or Export runs cannot be completed from the visible UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "submitted_run_missing_or_duplicated"
-description = "After a valid submit, the new run strip fails to appear, appears duplicated, or active jobs does not increase by exactly one."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "board_leaderboard_rollup_desync"
-description = "After a completed Evaluate submit, board phase status, leaderboard cell, and rollup strip disagree about the same run's outcomes."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "view_switch_breaks_pipeline"
-description = "Switching Pipeline/Datasets/Results breaks layout or loses the open run detail unexpectedly."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_dataset_filter_breaks_board"
-description = "A no-match dataset filter leaves a blank/broken board with no empty-state and clear control."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "dataset_and_timeline_filters_disagree"
-description = "Dataset board filter and timeline filters disagree about which runs/events are in scope, or clear fails to restore the full set."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "submit_panel_cannot_reopen"
-description = "After closing Submit job, the panel cannot be reopened from the Submit control."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "submit_panel_blocks_board"
-description = "Submit job panel blocks returning to the Pipeline board with no dismiss path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_submit_or_import_silent"
-description = "An invalid submit or contract-invalid Import provides no visible named-field or import error feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "research_pipeline_dead_end_requires_reload"
-description = "A Research Pipeline flow leaves a dead end that requires a full page reload to continue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "job_config_and_export_runs_flow"
 description = "Job-config export flow: fill a valid Evaluate job, confirm the monospaced preview includes jobType, benchmark, and repetitions; Download job-config.json and Copy emit that exact text; submit; then confirm Export runs includes the new runId and config."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

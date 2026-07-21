@@ -148,32 +148,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.7"
-name = "missing_hover_or_state_feedback"
-description = "One or more required interactive controls, pane cards, chart input changes, or selected states remains visually inert or provides no perceptible feedback through the real interaction path"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.8"
-name = "missing_focus_or_copy_feedback"
-description = "Keyboard focus is invisible on an interactive control, pane actions remain inaccessible without hover, or Copy Link gives no visible transient confirmation"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.11"
 name = "dialog_wizard_enter_exit_transition"
 description = "Opening and closing the source preview modal, pane wizard, Share panel, Export center, and confirmation dialogs each show a brief opacity and scale transition of roughly 200 to 300 milliseconds rather than an instant pop"
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

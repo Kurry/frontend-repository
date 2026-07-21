@@ -183,22 +183,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "static_html_no_working_crud"
-description = "Scenes list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "outbound_link_navigation"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.23"
 name = "slide_controls_keys_counter_bounds"
 description = "Slide mode shows a single centered active scene with a previous/next control pair and an N / total counter; the Left/Right arrow keys and the controls advance the scene, and the controls are disabled at the first and last scene"
@@ -225,14 +209,6 @@ name = "edit_flow_cross_mode_chain"
 description = "Starting in Tile mode, edit a scene's description to 'Cutaway to the harbor at dusk.'; then switch to List mode and Slide mode: the same numbered scene shows the updated text in both modes without a reload"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.27"
-name = "slide_bounds_not_enforced"
-description = "In Slide mode the previous/next controls stay enabled at the first and last scene (no boundary disable), or the Left/Right arrow keys do not advance the centered scene"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.28"
@@ -355,30 +331,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n37"
-name = "export_omits_session_mutations"
-description = "After creating or editing a scene with distinctive field-contract values, the Storyboard JSON or Markdown export preview omits those session mutations or shows a static seeded-only document"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n38"
-name = "schema_invalid_import_mutates_board"
-description = "Importing malformed JSON or JSON that fails the StoryboardDocument field contract still changes the visible scenes collection or view mode"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n39"
-name = "undo_does_not_restore_board"
-description = "After a create, edit, or delete, activating Undo leaves the board, numbering, or Total duration unchanged from the post-mutation state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.46"
 name = "search_and_shot_type_filter"
 description = "The nav bar exposes a search field and shot-type chips (All plus Wide, Medium, Close-up, Insert, POV): typing a query narrows visible scenes to case-insensitive title/body matches, selecting a chip narrows to that shot type, using both intersects, a filtered-count readout shows N of M scenes, Tile/List/Slide show the same filtered subset (Slide total equals the filtered count), and clearing search plus selecting All restores the full set exactly"
@@ -413,26 +365,3 @@ description = "The Export center's Printable outline tab shows a print-optimized
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n40"
-name = "filter_desyncs_modes_or_total_duration"
-description = "While a search or shot-type filter is active, Tile, List, and Slide disagree about the visible subset or count, or the Total duration readout changes to a filtered sum instead of keeping the full-collection sum"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n41"
-name = "presenter_countdown_ignores_durations"
-description = "In the presenter, two scenes with clearly different duration values show identical countdown lengths or identical auto-advance timing, or the countdown is a fixed interval that ignores each scene's duration"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

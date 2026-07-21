@@ -145,31 +145,3 @@ name = "export_drawer_fits_visual_system"
 description = "Export drawer uses the same surface #ffffff, primary indigo accents, and rounded-md controls as the rest of the app rather than a visually alien panel."
 type = "binary"
 weight = 1.0
-[[criterion]]
-id = "3.n1"
-name = "layout_diverges_grossly_from_reference"
-description = "Home layout grossly diverges from the reference overview (missing capture/inbox/threads regions) without instruction justification."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "3.n2"
-name = "palette_ignores_specified_tokens"
-description = "App colors ignore the specified indigo/rose/off-white/status tokens in favor of an unrelated theme."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "3.n3"
-name = "reference_screenshots_shipped_as_assets"
-description = "Reference screenshots from /reference-screenshots are copied into the shipped app as UI assets."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

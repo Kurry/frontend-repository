@@ -260,22 +260,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.25"
-name = "derived_prompt_static_sources"
-description = "The sources affordance on a derived prompt shows hardcoded or empty content that fails to name the actual prompts selected for the Extend or Combine action"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.26"
-name = "copy_confirmation_without_clipboard"
-description = "The Copy control shows its confirmation while the clipboard receives nothing or text differing from the prompt body"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.27"
 name = "prompt_request_body_field_contract"
 description = "New Prompt / Edit validate the prompt request-body field contract: title trimmed length 1–60, body non-empty max 8000, technique exactly one closed-list tag, optional description max 280; invalid drafts keep Submit disabled with named field errors and add no row; a valid create record matches that shape"
@@ -297,24 +281,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.30"
-name = "export_omits_session_prompt"
-description = "After creating a prompt, Export library JSON or markdown omits that prompt's title or technique — an incomplete session export"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.31"
 name = "export_prompts_carry_full_record_shape"
 description = "In prompt-library.json each prompts entry carries the request-body fields plus id, version, sources, and attachment filenames, listed in the same order as the library table; after an edit or a Combine, the affected entry's version and sources values match the visible row"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

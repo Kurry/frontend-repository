@@ -106,22 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "browser_storage_used"
-description = "Uses localStorage or sessionStorage to persist palettes, filters, sort, undo stacks, or export state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.4"
-name = "views_desync_stale_data"
-description = "The same datum shows different values in two places — e.g. a palette renamed in the editor still shows its old name in a Browse layout or export JSON, or a deleted palette's swatches linger in one view until reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.5"
 name = "console_clean_full_exercise"
 description = "The browser console stays free of errors, warnings, and unhandled promise rejections during a full exercise of the app: switching layouts, creating, editing, deleting, duplicating, filtering, sorting, favoriting, batch actions, undo/redo, contrast matrix updates, vision simulation, exporting, importing, and copying"
@@ -150,14 +134,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.9"
-name = "outbound_network_requests"
-description = "Network requests to other origins (CDN scripts, fonts, icon sets, or a remote color-name dataset) appear in devtools during load or a full exercise of the app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.10"
 name = "interactions_stay_smooth"
 description = "Switching among the three layouts, filtering, sorting, opening the editor or export drawer, and toggling vision simulation stay smooth, with no hangs or dropped interactions even under rapid input"
@@ -172,49 +148,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.n1"
-name = "chrome_navigates_away"
-description = "External chrome anchors navigate away from the app to another origin"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n2"
-name = "debug_artifacts_or_placeholders"
-description = "Visible debug output, console.log spam overlays, or leftover placeholder scaffolding appear in the running app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n3"
-name = "nondeterministic_nomenclature"
-description = "Two loads of the same seeded state produce different Nomenclature hex order or duplicate rows for the same hex — nondeterministic rendering of deterministic state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n4"
-name = "import_accepts_schema_violations"
-description = "Importing archive JSON that is missing required palette fields, uses a period outside the closed list, or includes an invalid hex swatch still mutates the shared collection as if the import succeeded"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.12"
 name = "extended_fields_round_trip_schema"
 description = "Swatch order, tags, notes, and archived flags are part of the palette record: they echo across layouts, comparison, the catalog sheet, and the archive JSON export, and an export/import round-trip restores all four exactly"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

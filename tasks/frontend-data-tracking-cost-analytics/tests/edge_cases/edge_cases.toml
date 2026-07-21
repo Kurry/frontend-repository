@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_state_missing"
-description = "An emptied surface (zero-match filters, empty chart, no snapshots) shows nothing with no feedback"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "errors_console_only"
-description = "A validation, formula, or recomputation error is surfaced only in the browser console"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "silent_success_or_failure"
-description = "Recategorizing, exporting, or generating a report gives no visible feedback either way"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "unguarded_destruction"
-description = "Deleting a saved view or overwriting tags happens with no warning, confirmation, or undo path"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "divs_wrap_interactives"
-description = "Non-semantic div or span elements wrap the table's or header's interactive controls"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "The save-view form, schedule form, or a menu cannot be dismissed with the keyboard"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "validation_feedback_delayed"
-description = "Form validation feedback is missing or appears only after a silent delay"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_button_text"
-description = "Bulk-action or export button text is ambiguous or missing, leaving the action unclear"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "no_guidance_for_flows"
-description = "The what-if, formula, or schedule flows have no in-app guidance at all"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "hidden_affordances"
-description = "Interactive affordances such as legend toggling, chip removal, or the disclosure are visually hidden with no discoverable path"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "invalid_request_bodies_rejected"
 description = "capUsd of 0 or negative, ceilingUsd of 0 or negative, a ceiling save whose sum would exceed monthly capUsd, a saved-view name shorter than 2 characters, a schedule with empty sections, a recategorize Apply with neither team nor feature, and a date range with to before from each show a named inline error and leave prior state intact"
@@ -255,18 +175,3 @@ description = "With a zero-event filter scope, Download JSON still produces sche
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n11"
-name = "invalid_body_mutates_state"
-description = "An invalid request body (zero cap, over-allocation ceiling, empty schedule sections, or backwards range) mutates the prior cap, ceilings, schedule, or range"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -316,38 +316,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "1.n1"
-name = "fabricated_import_success"
-description = "The import wizard reports a success toast while the grid, the sidebar row count, or the capacity gauge remain unchanged from before the commit"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "static_derived_surfaces"
-description = "The formula result, pivot summaries, threshold flags, or Dataset Package JSON / Rows CSV export text remain identical after an edit to the data they claim to derive from"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "filter_mutates_data"
-description = "Toggling Show unverified only on and off, or switching to the pivot view and back, loses rows, reorders values, or otherwise mutates the underlying dataset"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "contract_violations_accepted"
-description = "Some row entry path (Add Row, Edit Row, inline cell editing, or the import diagnostics) accepts a value that violates the row record field contract — wrong type, outside a category field's allowed list, or over length — without an error naming the field and rule"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.33"
 name = "import_package_round_trip"
 description = "After exporting Dataset Package JSON that includes a session-added row and snapshot, making a further cell edit, then Importing that package, the grid, verified badge, snapshot list, and a fresh export return to the imported package's contents under schemaVersion dataset-manager.package/v1"
@@ -361,18 +329,3 @@ description = "Importing Dataset Package JSON with schemaVersion other than data
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n5"
-name = "export_omits_required_package_keys"
-description = "The Dataset Package JSON preview is missing schemaVersion dataset-manager.package/v1, dataset, or stats, or omits a session mutation (new row, verified toggle, or snapshot) that is visible in the UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "core_features.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

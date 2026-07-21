@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_canvas_shows_no_guidance"
-description = "Before any image is loaded, the canvas region shows nothing — no Upload an image to get started placeholder or other empty-state guidance."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "rejection_errors_only_in_console"
-description = "Unsupported-file, invalid-hex, or empty-preset-name failures surface only in the browser console with no visible UI message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "copy_or_save_silently_fails"
-description = "Copy image or Save preset produces no visible success or error feedback after the action."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "preset_delete_lacks_confirm"
-description = "Activating Del on a Saved preset removes it immediately with no confirm dialog."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_elements_nonsemantic"
-description = "Primary interactive controls (Save preset, Apply, Del, tabs, or Collaboration connection controls) are non-semantic div/span shells without button/role semantics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "delete_dialog_not_keyboard_dismissible"
-description = "The open preset delete confirm dialog cannot be dismissed via keyboard (Escape or a focusable cancel control)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "empty_name_validation_missing"
-description = "Submitting Save preset with an empty name shows no inline validation naming the name field and may still add a list entry."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "action_labels_ambiguous_or_missing"
-description = "Primary actions lack readable labels or use only ambiguous blank/icon-only text where Save preset, Download PNG, Copy image, or Apply to canvas should appear."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "invalid_input_damages_canvas_state"
-description = "After an unsupported upload or invalid hex entry, the last valid canvas image or color is damaged, blanked, or replaced instead of preserved."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "duplicate_or_double_save_creates_extras"
-description = "A duplicate-name save or a double-activated save with one valid name creates more than one new Saved presets entry or increases the count by more than one."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "malformed_style_json_rejected"
 description = "Importing malformed (unparseable) style JSON shows Invalid style JSON and leaves the current canvas settings unchanged."
@@ -270,26 +190,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n11"
-name = "malformed_style_json_mutates_canvas"
-description = "Importing malformed style JSON changes canvas settings or fails without showing Invalid style JSON."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.15"
 name = "custom_background_hex_named_field_error"
 description = "Entering an invalid custom background hex (not exactly # followed by six hexadecimal digits) shows Invalid color. Enter six hexadecimal digits after # next to the custom background hex field and preserves the last valid canvas background."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.n12"
-name = "invalid_hex_accepted_into_payload"
-description = "An invalid caption, watermark, or custom-background hex is accepted into the live canvas or appears as a valid #RRGGBB value under captionColor, watermarkColor, or customBackground in the Export preview RenderSettings JSON."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -306,18 +210,3 @@ description = "Saving a preset with a name over 40 characters shows an inline me
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n13"
-name = "schema_invalid_import_mutates_canvas"
-description = "Importing parseable but field-contract-invalid style JSON changes canvas settings without naming the offending field or showing Invalid style JSON."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

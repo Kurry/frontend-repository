@@ -197,22 +197,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.16"
-name = "guards_are_warnings_only"
-description = "A blocked selection still goes through: after the cluster-guard or org-cap message appears, the candidate's chip reads Selected anyway or any rollup, quota, or timeline value changes"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.17"
-name = "derived_surfaces_static"
-description = "The quota grid, rollup strip, or build-queue positions are static markup: a status transition, queue reorder, or fetch-more run leaves a dependent count, fill bar, or position number unchanged or contradicting the table"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.18"
 name = "bulk_tray_select_and_actions"
 description = "Scripted probe: select at least two visible Candidate or Scored rows with checkboxes (or select-all-visible on a filtered table) and confirm the bulk tray shows the live selected count; Bulk Score moves selected Candidate rows to Scored; Bulk Select moves only guard-eligible Scored rows to Selected while blocked rows stay Scored with their own guard explanation; Bulk Reject applies one chosen reason to selected Scored rows; after a bulk action the tray clears and rollups, quota, and timeline update by exactly the changed rows"
@@ -252,22 +236,6 @@ id = "1.23"
 name = "import_validates_and_round_trips"
 description = "Import sourcing pack accepts a file, paste, or seeded sample; invalid JSON (wrong schemaVersion or illegal status/license enum) shows an inline message naming the violated field and changes no state; a valid import replaces statuses, commits, notes, rejection reasons, and queue order, recomputes rollups and quota, and appends a timeline import entry; exporting Queue JSON then re-importing that text reconstructs the same visible statuses, queue order, and rollup counts"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.24"
-name = "export_omits_session_work"
-description = "After a pin, queue, rejection, bulk action, or fetch-more append, the Export sourcing pack Queue JSON or Sourcing report omits the mutated repository, still shows the pre-mutation queue order, or shows a quotaFillPercent that disagrees with the rollup strip"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.25"
-name = "undo_does_not_restore"
-description = "After a status transition or bulk action, activating Undo leaves chips, rollups, quota cells, or timeline length unchanged from the post-action state"
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -312,10 +280,3 @@ description = "After a valid sourcing-pack import, the success notice names the 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

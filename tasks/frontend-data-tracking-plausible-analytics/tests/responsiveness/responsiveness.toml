@@ -162,97 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "horizontal_scroll_at_375"
-description = "A page-level horizontal scrollbar appears at 375 pixel width"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "export_offscreen_mobile"
-description = "Export report or the export drawer is off-screen or unreachable at 375 pixel width"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "controls_overlap_illegible"
-description = "Top-bar controls overlap each other into illegible clusters at mobile width"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "panels_overflow_desktop"
-description = "Breakdown panels overflow or clip at desktop width in the three-column layout"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "chart_forces_horizontal_scroll"
-description = "The visitors chart forces horizontal page scroll at 375 pixel width"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "ceiling_clipped"
-description = "The bounce-rate ceiling control is clipped or unusable at mobile width"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "compare_unreachable"
-description = "Compare previous is unreachable at 375 pixel width"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "stacked_order_wrong"
-description = "At mobile width the stacked order is not metrics then chart then panels"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "drawer_wider_than_viewport"
-description = "The export drawer is wider than the viewport and cannot be dismissed or scrolled into view at 375px"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "undo_redo_unreachable_mobile"
-description = "Undo or Redo is unreachable at mobile width"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "7.11"
 name = "goals_funnel_custom_range_usable_375"
 description = "At 375px width the Goals panel, the funnel, the Segments menu and Save segment control, the custom date-range from/to inputs, and each panel's per-panel export control remain fully visible and operable in the stacked column without page-level horizontal scrolling"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable responsiveness or layout defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

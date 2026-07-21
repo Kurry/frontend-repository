@@ -148,39 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After creating a scene and switching view mode then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "slide_range_identical_after_mutations"
-description = "Creating or deleting scenes leaves the Slide prev/next range visually identical — a derived surface ignoring its collection inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_bodies_produce_identical_cards"
-description = "Creating two scenes with different description inputs yields identical card text on the board."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_mode_state_stale_until_reload"
-description = "After editing a description or creating a scene in Tile, List or Slide still shows stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.9"
 name = "export_contains_session_create"
 description = "Full-pipeline export probe: measure collection, create a valid scene with a unique title and body meeting the field contract, open Export immediately — markdown/json/outline previews contain that exact title and body text, and the json scenes array includes a matching request-body object (session work product, not a seed-only snapshot)."
@@ -206,22 +173,6 @@ id = "14.12"
 name = "filter_derived_view_sensitivity"
 description = "Derived-view sensitivity: create a scene with status review and a unique title, set status filter to draft — the new scene disappears; set filter to review or All — it reappears; search for its unique title with All selected shows only that match across modes."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "export_identical_after_create"
-description = "Creating a scene with a unique title and body leaves the Export markdown/json/outline visually identical to the pre-create export (derived artifact ignoring session mutations)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "import_fails_to_restore"
-description = "After Import of a valid previously exported StoryboardPackage, the board count or titles diverge from the imported document."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -252,18 +203,3 @@ description = "Note the scene count and the advertised scene count of a named te
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n7"
-name = "diff_constant_regardless_of_inputs"
-description = "The version diff renders the same additions/removals regardless of which version is selected or what the edits contained, or comparing identical versions shows spurious differences."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

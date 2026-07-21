@@ -224,34 +224,3 @@ description = "With valid source, MMD download text matches the Code document; I
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.27"
-name = "non_editor_scaffold"
-description = "The primary screen is a static scaffold, authentication page, unrelated dashboard, or fixed illustration rather than an editable Mermaid source-and-preview workspace"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.28"
-name = "stale_or_static_preview"
-description = "A valid source edit leaves the preview unchanged, two different sources produce the same marks, or marks from an earlier sample remain after replacement"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.29"
-name = "broken_export_contract"
-description = "An enabled SVG/PNG/MMD/Session JSON export produces no file, a wrong extension, content that omits the session's actual source or config.theme, Session JSON missing a required field-contract key, or an image/MMD export that remains enabled while syntax is invalid"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable core-feature defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

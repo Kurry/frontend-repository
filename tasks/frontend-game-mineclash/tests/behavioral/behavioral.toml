@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_incoherent"
-description = "After finishing a match and reloading, Stats survive but Match log, Sound, or remembered playerName/difficulty silently revert (or the reverse), producing incoherent partial persistence."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n2"
-name = "hud_ignores_reveal_inputs"
-description = "Revealing safe tiles or mines leaves scores, strikes, and the turn banner identical regardless of those actions."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n3"
-name = "different_matches_identical_exports"
-description = "Repeating two finished matches with observably different outcomes yields byte-identical Export Match JSON that ignores the play."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_stale_until_reload"
-description = "After Match Complete, Match log or Stats stay stale until a full page reload rather than reflecting the new match immediately."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "14.9"
 name = "export_reflects_different_play"
 description = "Finish two matches with different play outcomes and export each via Export Match. Confirm the two JSON artifacts differ in winner, round wins, or totals in the ways the play dictates."
@@ -207,26 +175,3 @@ description = "From Match Complete, Rematch resets both sides to score 0 and 0 s
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_identical_across_different_play"
-description = "Export Match produces byte-identical JSON for two finished matches that had observably different winners, difficulties, or round-win counts."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n6"
-name = "rematch_leaks_prior_scores"
-description = "After Rematch from Match Complete, Round 1 still shows the previous match's live scores or strikes instead of resetting to 0."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

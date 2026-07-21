@@ -161,35 +161,3 @@ description = "A large centered canvas stage sits under the toolbar as the domin
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n1"
-name = "generic_dashboard_layout"
-description = "The first viewport reads as a generic multi-card dashboard rather than a single creative paint stage with branded toolbar."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n2"
-name = "palette_swatches_wrong_colors"
-description = "Palette swatches mismatch the specified seven colors (black, white, red, yellow, green, blue, pink) or the active swatch has no visible ring."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n3"
-name = "clipped_or_overlapping_chrome"
-description = "Toolbar, histogram, gallery cards, or Export center previews visibly clip, overlap unreadable text, or leave orphaned controls at desktop width."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "visual_design.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable visual design defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0
-

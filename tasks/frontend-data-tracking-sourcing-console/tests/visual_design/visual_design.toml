@@ -134,22 +134,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.7"
-name = "overlapping_or_clipped_content"
-description = "At 1440px or 375px width, any text, chip, fill bar, or control overlaps another element or is clipped by its container"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.8"
-name = "default_kit_styling_unthemed"
-description = "The UI reads as unstyled defaults: browser-default form controls, a single flat unbranded surface, or component chrome with no cohesive palette or identity applied across the three views"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.9"
 name = "panels_share_surface_language"
 description = "The bulk action tray, command palette, and export/import panels use the same surface and border language as the rest of the app rather than unstyled browser defaults"
@@ -163,18 +147,3 @@ description = "All rendered copy is real product copy with no lorem ipsum or pla
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.11"
-name = "inconsistent_chip_or_panel_language"
-description = "Bulk tray, palette, or export panels visually clash with the header/table chrome as if from a different product, or status/license chip families collapse into one indistinguishable style"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

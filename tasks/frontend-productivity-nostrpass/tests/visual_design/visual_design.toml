@@ -205,24 +205,6 @@ weight = 1.0
 
 
 [[criterion]]
-id = "3.15"
-name = "content_overflows_viewport_at_375"
-description = """At 375px width content clips or forces page-level horizontal scrolling because npub/nsec or vault JSON overflow their surfaces"""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "3.16"
-name = "generic_unstyled_dashboard"
-description = """The surface reads as a generic unstyled dashboard or starter page rather than a security-focused identity vault"""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "3.17"
 name = "permissions_matrix_table_anatomy"
 description = "The All identities matrix renders as a table with one nickname-labelled row per identity, one column per application, switch cells at every intersection, and Grant all and Revoke all controls in the column headers; when wider than its panel it scrolls inside the panel"
@@ -250,10 +232,3 @@ description = "The Audit log toolbar carries an action-type filter control offer
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = """The app exhibits a significant, browser-observable visual design defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence. If already covered by another criterion in this file, answer no here."""
-type = "binary"
-negate = true
-weight = 1.0

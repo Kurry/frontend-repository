@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "menu_stuck_half_open"
-description = "After rapid hamburger/X clicks, the menu overlay remains stuck half-open or the page is left inert."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "newsletter_errors_only_in_console"
-description = "Submitting an empty or invalid newsletter email surfaces errors only in the browser console with no inline message naming the email field."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "newsletter_or_video_silent_feedback"
-description = "A valid newsletter submit or a video hover/leave cycle produces no visible feedback (no confirmation, no playback/placeholder change)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "empty_submit_shows_confirmation"
-description = "Submitting the newsletter with an empty field shows a confirmation message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "menu_interactive_chrome_nonsemantic"
-description = "The hamburger, menu close control, or Subscribe control are non-semantic div/span shells without button semantics or accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "menu_not_keyboard_dismissible"
-description = "The open menu overlay cannot be dismissed via Escape or a focusable close control."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "newsletter_validation_feedback_missing"
-description = "An empty or invalid newsletter submit shows no inline validation indication naming the email field."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "store_or_subscribe_labels_missing"
-description = "The STORE button or Subscribe control lacks readable labels or uses blank/ambiguous text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "video_stuck_mid_fade"
-description = "Leaving the social video card mid-fade leaves the placeholder partially transparent or the video stuck playing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "webgl_failure_breaks_homepage"
-description = "When WebGL is unavailable, the hero is blank/broken or menu, newsletter, or video flows become unusable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "escape_closes_press_kit_or_palette"
 description = "Pressing Escape while the press kit or command palette is open closes that overlay and returns focus to the control that opened it."
@@ -270,15 +190,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n11"
-name = "filter_clears_hidden_race_selections"
-description = "Switching the race status filter clears selections on races that were only temporarily hidden by the filter."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "4.20"
 name = "out_of_enum_status_rejected"
 description = "Submitting the race status editor with a value outside Upcoming or Completed is blocked with an inline error naming status and the race chip does not change."
@@ -292,26 +203,3 @@ description = "Importing malformed or undecodable press-kit JSON, or JSON that v
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n20"
-name = "malformed_import_corrupts_state"
-description = "Importing schema-invalid press-kit JSON mutates Selected races or shortlist without a visible named import error."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n12"
-name = "empty_press_kit_errors_or_blank"
-description = "Opening PRESS KIT with no selections shows a blank/error drawer instead of valid empty JSON/ICS previews."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

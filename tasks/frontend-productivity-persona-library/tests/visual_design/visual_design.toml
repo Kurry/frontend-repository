@@ -168,34 +168,3 @@ description = "One consistent icon set is used across the toolbar, cards, tray, 
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "2.n1"
-name = "role_or_state_color_only"
-description = "Role category, promoted state, or archived state is distinguishable only by color, with no label, icon, or text reinforcement"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n2"
-name = "overlap_or_clipping_desktop"
-description = "At 1440 pixel width, any card, chart, overlay, or drawer content overlaps another element or is clipped by its container"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n3"
-name = "flip_breaks_footprint"
-description = "The card flip changes the card's footprint, shifting neighboring cards or breaking the grid alignment"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "visual_design.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

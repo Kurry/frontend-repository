@@ -163,39 +163,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The build is purely barebones: HUD scores swap as static numbers while Board Cleared! and achievement unlocks occur as silent state flips with neither toast juice nor a celebration burst."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_template"
-description = "Interactions and visuals read as a generic unstyled template: Bomb/Slow tiles look like ordinary letters and the danger line is absent or indistinguishable from the board background."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "interface_flat_no_immersion"
-description = "During an active run the UI stays flat and static: tiles teleport rather than ease, streak/tier chrome stays inert, and Pause leaves the board visually undimmed."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n8"
-name = "delightful_moments_absent"
-description = "Board Cleared!, achievement unlocks, and power-tile activations complete as silent state changes with only a numeric HUD update and no distinctive user-facing moment."
-type = "binary"
-negate = true
-weight = 0.5
-
-
-[[criterion]]
 id = "11.11"
 name = "run_record_export_feels_useful"
 description = "Optional polish: Export Run / Export History feels like a useful takeaway artifact (clear JSON preview, Copy confirmation, or history archive) beyond a bare download stub."

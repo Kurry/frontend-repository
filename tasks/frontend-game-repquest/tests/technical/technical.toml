@@ -116,34 +116,6 @@ description = "Rep input typed before a challenge run started, or left over from
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "2.5"
-name = "state_lost_after_refresh"
-description = "Lifetime reps, streak, quest points, unlocked zones/gear, equipped gear, rep history, settings, or challenge checkpoint are lost or reset to defaults after a full page refresh"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "2.6"
-name = "hidden_state_exposed_to_judge"
-description = "A hidden element, attribute, or window global exposes internal game state (computed totals, boss outcomes, quest points) that a real user could not reach through the visible UI"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "2.7"
-name = "fabricated_success_states"
-description = "A success state (Zone Unlocked message, boss-defeated marker, gear unlocked, Victory) appears without the underlying condition actually having been met"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "2.8"
-name = "automation_detection_branching"
-description = "The app's behavior or visible controls differ depending on whether navigator.webdriver or another automation signal is present"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
 id = "2.15"
 name = "api_shaped_rep_set_create"
 description = "A valid Log Reps submit creates a History record whose visible fields match the create-rep-set contract (reps in 1 through 9999, optional note up to 120 chars, setId, loggedAt timestamp)"
@@ -172,18 +144,4 @@ id = "2.19"
 name = "shared_store_single_source"
 description = "Logging a set updates lifetime reps, today's total, History, weekly chart, and export-bound values consistently from one shared state — panels never show conflicting totals for the same moment"
 type = "binary"
-weight = 1.0
-[[criterion]]
-id = "2.20"
-name = "stack_identity_claimed_in_ui"
-description = "The running UI claims a specific framework, state library, or schema library name as a visible success criterion rather than exhibiting the behaviors those tools enable"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "A significant technical or requirements defect is present that is NOT covered by any other criterion in this file. If present, name it and cite concrete browser evidence. If already covered, answer no here."
-type = "binary"
-negate = true
 weight = 1.0

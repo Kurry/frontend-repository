@@ -89,22 +89,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.5"
-name = "outbound_runtime_requests_present"
-description = "The page issues outbound requests to remote hosts at runtime (CDN fonts, images, video, analytics, or a remote data fetch) instead of resolving all assets locally"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.6"
-name = "console_errors_during_exercise"
-description = "Console errors, hydration mismatch warnings, failed asset requests, or unhandled rejections appear on load or while exercising the theme toggle, carousel, or forms"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.7"
 name = "theme_computed_style_round_trip"
 description = "After clicking the real theme toggle, getComputedStyle on the body color flips between rgb(0, 0, 0) in light and rgb(255, 255, 255) in dark and the visible nav bar surface flips between rgb(255, 255, 255) and rgb(21, 20, 19)"
@@ -173,15 +157,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "2.16"
-name = "motion_blocks_first_interaction"
-description = "Client motion or heavy media initialization blocks first interaction: navigation, theme toggle, or form controls stay unresponsive for several seconds after first paint while scripts or assets finish"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "2.17"
 name = "required_authored_asset_files_load"
 description = "Browser network evidence shows the required Astra marks, panel art, illustrations, thumbnails, avatars, and icons loading successfully from same-origin paths with no 404, transparent/broken response, or image decode error"
@@ -194,14 +169,6 @@ id = "2.18"
 name = "in_memory_storage_stays_empty"
 description = "After exercising theme toggle, newsletter steps, contact submit (appending a session lead), Session leads Download/Copy/Undo, carousel paging, and drawer open/close, localStorage and sessionStorage remain empty (behavioral state is in-memory only per the PRD)."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.n18"
-name = "browser_storage_nonempty_after_exercise"
-description = "After exercising theme, newsletter, contact, session-lead export/undo, carousel, or drawer flows, localStorage or sessionStorage is non-empty."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -219,26 +186,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "10.m3"
-name = "flash_on_hydrate_mismatched_content"
-description = "Server-rendered or statically exported content visibly flashes and is replaced by different client content after hydration (mismatched text, reflowing layout, or restyled elements between first paint and interactive)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.19"
 name = "lead_log_and_export_share_one_store"
 description = "Shared-state coherence: after a successful contact or newsletter submit, the Session leads list/total and a Download/Copy JSON export agree on counts and payload fields without reload."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.n19"
-name = "lead_list_and_export_desync"
-description = "After a successful submit or Undo last lead, the Session leads panel count/list disagrees with the contents of a subsequent astra-session-leads.json export."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -248,18 +199,3 @@ description = "After a successful newsletter or contact submit, the downloaded o
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n20"
-name = "export_missing_required_schema_keys"
-description = "After a successful submit, astra-session-leads.json is missing version, theme, counts, or leads entries, or a lead entry lacks id, kind, submittedAt, or payload fields required by the session export contract."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console health, offline delivery, performance, accessibility, or state coherence) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, console output, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

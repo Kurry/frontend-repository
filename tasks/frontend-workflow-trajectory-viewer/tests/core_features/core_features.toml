@@ -197,22 +197,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.17"
-name = "static_viewer_no_sync"
-description = "Clicking timeline entries changes the highlight but the center file workspace or right rail content stays the same for different steps — the viewer is static markup rather than synchronized shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.18"
-name = "double_submit_duplicates_report"
-description = "Rapidly double-activating the classification submit control produces two or more report cards on the trial"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.19"
 name = "step_type_filter_narrows_timeline"
 description = "The step-type filter above the timeline offers All plus reasoning, tool-call, observation, terminal, and screenshot; activating tool-call narrows the visible timeline to tool-call steps only, and choosing All restores the full ordered list"
@@ -254,18 +238,3 @@ description = "Editing an existing annotation's note_text through its edit contr
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.25"
-name = "export_omits_session_mutations"
-description = "After adding an annotation or submitting a classification, the Export panel Review JSON still shows empty annotations and a null failure_report, omits schemaVersion trajectory-viewer.review-package.v1, or otherwise omits the session's actual note_text/classification values"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

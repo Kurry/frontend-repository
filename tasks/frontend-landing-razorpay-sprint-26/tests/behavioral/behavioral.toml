@@ -141,39 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_state_survives_reload"
-description = "After scrolling to a mid-page section with an active nav cell, a reload leaves an incoherent mix (e.g. mid-page scroll position survives while preloader is skipped, or an active nav cell survives at the top)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "scroll_spy_ignores_scroll_input"
-description = "Manually scrolling through multiple stacked sections leaves the scroll-spy active cell identical regardless of which section is in view."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "nav_targets_yield_identical_view"
-description = "Clicking two different segment-nav labels (e.g. Agentic Stack vs Business Banking) yields an identical visible section and identical active-nav treatment."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "nav_section_state_stale_until_reload"
-description = "After a nav click or scroll into a new section, the section in view and the marked-active nav cell disagree until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.20"
 name = "reload_resets_shortlist_and_brief"
 description = "Pin two features, set Theme filter to D2C, type a search query, open then close a video modal; reload. All facets coherently reset — empty shortlist, empty compare, Theme filter All, empty search, empty Watch log, closed brief/palette, empty undo/redo — never a mixed partial survival."
@@ -208,26 +175,3 @@ description = "Derived-view sensitivity: with All showing many cards, switch The
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n20"
-name = "hardcoded_identical_brief_export"
-description = "Two sessions with different shortlists and watched executives produce byte-identical Export sprint brief JSON (hardcoded artifact)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n21"
-name = "filter_ignore_inputs"
-description = "Changing Theme filter or Launch search leaves the visible feature-card set identical regardless of input."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

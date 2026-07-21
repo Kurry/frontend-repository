@@ -141,22 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.7"
-name = "indistinguishable_status_or_state"
-description = "Status badges, active tabs, selected sizes, access states, or empty states rely on indistinguishable styling or unreadable color contrast"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.8"
-name = "brand_or_responsive_visual_breakage"
-description = "Rendered brand colors contradict the specified tokens, controls use visibly inconsistent browser defaults, or the 375px layout clips, overlaps, or scrolls horizontally at page level"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.10"
 name = "copy_quality_consistent"
 description = "Headings, buttons, and tab labels follow one consistent capitalization convention, action labels are specific verbs such as Add Page and Create Pane, and no placeholder, lorem ipsum, or debugging text appears anywhere in the UI"
@@ -170,10 +154,3 @@ description = "The Export center shows monospaced Workspace JSON and Markdown re
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable visual-design defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

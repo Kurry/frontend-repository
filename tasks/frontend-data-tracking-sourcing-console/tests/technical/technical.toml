@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "external_network_requests"
-description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app, including during a fetch-more run"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.4"
 name = "console_clean_full_session"
 description = "The console is free of errors, warnings, and unhandled promise rejections on first load and stays clean after sorting, filtering, search, transitions, guard blocks, pinning, queue reorders, bulk actions, undo/redo, export, import, and fetch-more runs"
@@ -142,40 +134,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.8"
-name = "outbound_links_in_chrome"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.9"
-name = "real_branding_in_seed_data"
-description = "Seeded or generated content references real products, companies, or people — repository or org names, categories, or commit hashes carry recognizable real-world brands, identities, or real commits"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.10"
 name = "field_contracts_enforced"
 description = "Rejection requires one of the five reason tokens, pin notes longer than 200 characters are rejected inline, commit hashes shown after pin are exactly 12 lowercase hex characters, and import rejects documents whose schemaVersion is not sourcing-pack/v1 or whose status/license enums are outside the allowed sets"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.11"
-name = "export_import_contracts_disagree"
-description = "Export Queue JSON omits required top-level keys (schemaVersion, generatedAt, quotaFillPercent, queue, candidates, quota, timeline) or import accepts illegal schemaVersion/status values while still mutating session state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

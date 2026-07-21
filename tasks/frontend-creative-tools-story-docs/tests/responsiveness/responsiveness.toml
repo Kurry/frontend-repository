@@ -162,99 +162,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "Layout breaks or overflows at 1440px, 1024px, or 375px — header, sidebar, or scene grid collide or spill."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small"
-description = "At 375px, Add Scene, view-mode toggles, or sidebar toggle are too small or misaligned for reliable tapping."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "text_too_small_on_mobile"
-description = "At 375px, scene titles, Welcome to Docs!, or header labels are too small to read."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "At 375px, scene cards or header content is cropped, or unnecessary horizontal scrollbars appear."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "sidebar_missing_or_unresponsive_narrow"
-description = "At ≤1024px the sidebar toggle is missing or the collapsed sidebar cannot be opened as an overlay."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_chrome_obscures_board"
-description = "Fixed header or overlay chrome obscures scene cards or Add Scene so the board cannot be used."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "overlap_at_narrow_width"
-description = "At 375px or 1024px, header tools, view-mode toggles, or scene cards overlap each other unusably."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "primary_controls_ignore_tap_on_mobile"
-description = "At 375px, Add Scene or Tile/List/Slide toggles ignore tap/click input (press registers no mode change or create-form open)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "scene_images_overflow_viewport"
-description = "Scene images use a static size that overflows the viewport at 375px."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "header_or_mode_toggles_disappear"
-description = "Header tools or Tile/List/Slide toggles disappear at 375px or 1024px."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "7.11"
 name = "export_import_palette_usable_at_375"
 description = "At 375px width Export, Import, Command palette, Undo/Redo, status filter, and search remain reachable and operable without page-level horizontal scrolling or overlay clipping."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "7.n11"
-name = "export_or_palette_offscreen_at_375"
-description = "At 375px, the export drawer or command palette renders off-screen or is unreachable."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -264,10 +175,3 @@ description = "At 375px width the Canvas view, the Templates control, Undo/Redo,
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

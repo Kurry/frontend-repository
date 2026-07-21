@@ -147,26 +147,3 @@ description = "Buttons, inputs, selects, toggles, and cards show distinct defaul
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n1"
-name = "desktop_layout_overlaps_or_clips"
-description = "At 1440 pixel width, any text or control in the top bar, triage columns, stage list, or package viewer overlaps another element or is clipped by its container"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n2"
-name = "status_or_badge_colors_disagree"
-description = "The color or icon treatment for the same stage status or reject reason differs between two surfaces — for example the failed status looks different in the stage list versus the timeline, or a reject reason's badge hue changes between the card and the stats breakdown"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

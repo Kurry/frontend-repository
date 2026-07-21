@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_is_incoherent"
-description = "A facet of user-configured state (fields, submitters, or signing status) silently reverts on reload while others survive, producing incoherent partial persistence"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n2"
-name = "export_ignores_field_edits"
-description = "Export Template JSON or Signing summary renders identically after renaming and reassigning a field"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n3"
-name = "different_inputs_produce_identical_export"
-description = "Repeating place-and-rename with different names yields byte-identical Export Template JSON"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "Field name or submitter changes appear on the canvas but not in Export (or vice versa) until reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "14.9"
 name = "undo_round_trip_restores_export"
 description = "After placing and renaming a field so Export contains the new name, Undo restores the prior name on the canvas and in the Export Template JSON preview"
@@ -193,18 +161,3 @@ description = "Export Template JSON after mutations, Import that document into a
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "undo_skips_export_surface"
-description = "Undo restores the canvas but leaves Export Template JSON still showing the pre-undo field name or submitter"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

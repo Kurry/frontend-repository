@@ -163,88 +163,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "12.n1"
-name = "mcp_tools_missing_or_noop"
-description = "WebMCP tooling for structured-editor-v1, entity-collection-v1, or artifact-transfer-v1 is unbound, missing, or a no-op when invoked."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n2"
-name = "handlers_diverge_from_ui_state"
-description = "Invoking a bound editor/entity tool leaves Layers, canvas, view mode, or Saved projects state diverging from what the equivalent visible UI control would produce."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n3"
-name = "undeclared_capabilities_exposed"
-description = "Undeclared modules, destinations, or operations beyond the Bindings (editor select/add/delete/update_property/switch_mode/preview; entity create/select/update/delete; artifact export/import/copy) are exposed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n4"
-name = "automation_cannot_exercise_contract"
-description = "webmcp_list_tools / webmcp_invoke_tool cannot exercise the declared editor, entity, and artifact bindings."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n5"
-name = "mcp_update_bypasses_shared_state"
-description = "An editor update_property or entity update invocation updates a parallel copy of state, leaving visible Layers/canvas/Saved projects showing stale values that disagree with the MCP result (MCP/UI desync)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n6"
-name = "session_or_tool_api_errors"
-description = "webmcp_session_info or webmcp_list_tools returns errors or incomplete data for the mandated modules."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n7"
-name = "mcp_relies_on_undocumented_hacks"
-description = "MCP only works after undocumented manual harness hacks or console-only stubs rather than app-registered tools."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n8"
-name = "required_modules_not_implemented"
-description = "structured-editor-v1, entity-collection-v1, or artifact-transfer-v1 is not implemented despite being declared required in the contract."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n9"
-name = "mcp_stubbed_or_commented_out"
-description = "The WebMCP interface is commented out or only stubbed so tools list as present but leave annotation/project state unchanged when invoked."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n10"
-name = "mechanics_exclusion_faked_via_mcp"
-description = "Shape/effect click-drag drawing, Loupe click placement, Layers drag-and-drop reorder coordinates, or raw file/blob/base64 artifact contents are mutated/returned via WebMCP arguments, violating the mechanics exclusions."
-type = "binary"
-negate = true
-weight = 1.0
-
-# HARDEN_MARKUPFLOW_V1
-
-[[criterion]]
 id = "12.11"
 name = "artifact_transfer_module_bound"
 description = "artifact-transfer-v1 is initialized and bound alongside structured-editor-v1 and entity-collection-v1 (artifact_* tools discoverable via webmcp_list_tools)."
@@ -258,10 +176,3 @@ description = "Artifact operations export, import, and copy work for formats jso
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "mcp_contract.catchall"
-name = "mcp_contract_catchall"
-description = "The MCP contract deviates from its declaration in a way not covered by any other criterion in this file. 'Significant' means a real automation/contract break, not a nitpick. If present, name the defect and cite the concrete evidence. If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

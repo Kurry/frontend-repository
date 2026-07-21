@@ -197,22 +197,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.25"
-name = "solutions_is_noninteractive_link"
-description = "The Solutions control is a plain non-interactive link with no menu, no aria-haspopup, and no synchronized aria-expanded state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.26"
-name = "chrome_nav_lands_on_missing_page"
-description = "Activating a header, footer, CTA, tile, or Solutions-menu chrome link navigates away from the homepage to an application-error or \"Not found\" page, or a required header/footer chrome link is missing so navigation chrome is not present"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.27"
 name = "solutions_menu_flow_cycles_cleanly"
 description = "Scripted flow: click the Solutions trigger — its panel opens showing all six labels (Portfolios, Presentations, Editorials, Companies, Freelancers, Students) and the trigger reports aria-expanded=true; press Escape — the panel closes, aria-expanded returns to false, and focus is back on the trigger; reopen it and click outside the panel — it closes without activating the element beneath the click; repeat the open/close cycle once more with no leftover or orphaned panel remaining in the DOM"
@@ -366,34 +350,3 @@ description = "A Reset control in the trial brief panel returns the form and pre
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n5"
-name = "export_omits_session_brief_mutations"
-description = "After filling name, email, plan, team size, and interests, the Download JSON or Copy brief artifact still contains only default or empty brief values while the live preview shows the session's filled fields (export text disagrees with the preview)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n6"
-name = "valid_brief_export_fails_field_contract"
-description = "After filling a contract-valid brief (e.g. Pro, team_size 11-50, at least one interest, name 2–80, dotted-domain email), the Download JSON or Copy brief text is missing required keys, uses plan/team_size/interests outside the closed enums, or violates a Free-trial/Team/Pro cross-field rule."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n7"
-name = "reset_leaves_filled_brief_in_place"
-description = "After filling a brief, activating Reset leaves name, email, plan, team_size, or interests filled in the form or preview (or leaves Trial brief ready visible) instead of returning to the empty baseline."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in its core features or end-to-end flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

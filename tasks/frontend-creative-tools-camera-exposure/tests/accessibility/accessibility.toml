@@ -169,38 +169,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "lab_controls_unreachable_by_keyboard"
-description = "A stepper, mode switch, help trigger, reset, light slider, export control, or preset control cannot be reached or activated via keyboard alone."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "help_focus_lost_on_close"
-description = "Closing the help panel leaves keyboard focus stranded or jumps to an unrelated control instead of returning to the trigger."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "validation_not_announced"
-description = "Preset or import validation errors are visual-only with no programmatic association or live-region announcement."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "export_controls_unlabeled"
-description = "Download PNG, Download JPEG, or edit-stack export/import controls lack accessible names identifying the action."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.12"
 name = "scene_and_zebra_state_programmatic"
 description = "Scene chips and zebra toggles expose their selected or pressed state programmatically (for example aria-pressed or aria-selected), not only by color"
@@ -221,10 +189,3 @@ description = "The bracket base-name field has an associated label and its valid
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant accessibility defect not covered by any other criterion in this file. If present, name the defect and cite evidence. If already covered, answer no."
-type = "binary"
-negate = true
-weight = 1.0

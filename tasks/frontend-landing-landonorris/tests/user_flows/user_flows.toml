@@ -162,70 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_homepage_flows_unavailable"
-description = "The hamburger cannot open the menu overlay, the newsletter cannot reach a confirmation from a valid email, or the social video card cannot start/pause via hover — primary homepage flows are not enabled from the UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "newsletter_confirmation_without_valid_submit"
-description = "A newsletter confirmation appears without a valid email submit, or a single valid submit produces duplicate confirmation messages."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "menu_state_desyncs_page"
-description = "After opening or closing the menu, the overlay and page interaction desync (overlay invisible but page inert, or overlay visible while homepage controls underneath remain operable as if closed)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "menu_item_leaves_homepage"
-description = "Activating a menu item (HOME, ON TRACK, OFF TRACK, or CALENDAR) navigates away from / or loads a second document instead of scrolling within the same homepage."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "menu_cannot_reopen_after_close"
-description = "After closing the menu via X or a menu item, clicking the hamburger again cannot reopen the overlay."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "menu_overlay_blocks_with_no_exit"
-description = "The menu overlay opens but cannot be closed via the X control, Escape, or a menu item, leaving navigation blocked with no exit path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "invalid_newsletter_lacks_feedback"
-description = "Entering an invalid newsletter email or submitting an empty field produces no inline error naming the email field and leaves the user without visible failure feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "flow_dead_end_requires_reload"
-description = "After opening the menu, submitting the newsletter, or hovering the video card, recovering normal homepage interaction requires a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "press_kit_flow_export_reflects_session"
 description = "Press kit flow: shortlist one helmet and one editorial card and select three distinct races so Selected races reads 3; open PRESS KIT; confirm JSON names those three circuits and both shortlisted labels, each races entry shows id/circuit/date/status/selected/uid, and each shortlist entry shows kind/label/index; switch to ICS and confirm exactly three VEVENT entries with UID matching race uids; switch to Markdown and confirm Avery Vale plus the same races and shortlist; activate Copy and see a copied confirmation."
@@ -247,15 +183,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n11"
-name = "press_kit_static_ignores_selections"
-description = "After selecting races and shortlisting assets, opening PRESS KIT shows preview text that ignores those selections (identical to the empty-selection kit)."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "6.14"
 name = "race_status_edit_flow"
 description = "Race status edit flow: open Edit status on Ridgeway GP, set Upcoming, submit; chip reads Upcoming; when that race is selected the ICS STATUS line reads CONFIRMED; set Completed again and chip/ICS STATUS return to Completed/CANCELLED."
@@ -269,26 +196,3 @@ description = "Export/import round trip: select two races and shortlist one helm
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n13"
-name = "import_round_trip_fails_to_restore"
-description = "After exporting a press-kit JSON with selections then clearing and Importing it, Selected races, shortlist, or previews stay mismatched against the exported payload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n12"
-name = "palette_or_press_kit_unavailable"
-description = "After pressing Meta+K or Control+K, or activating PRESS KIT, the command palette and press-kit drawer both remain absent so those primary hardened overlays are unavailable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

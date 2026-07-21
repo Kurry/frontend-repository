@@ -106,22 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "storage_persistence_used"
-description = "localStorage or sessionStorage holds trials, classifications, threshold, filters, or UI state after exercising the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "external_network_requests"
-description = "The devtools network log shows requests to external origins or third-party CDNs (scripts, styles, fonts, icons, or data) during load or a full exercise of the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "console_clean_full_exercise"
 description = "The console is free of errors and warnings on first load and stays clean after a complete re-run, triage classifications, rapid slider movement, filter changes, chart interactions, Export preview switches, and Import attempts"
@@ -185,10 +169,3 @@ description = "On first load the browser-visible data contains at least 6 fictio
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

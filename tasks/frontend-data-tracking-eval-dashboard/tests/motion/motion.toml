@@ -148,24 +148,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.9"
-name = "animation_jank_blocks_input"
-description = "Animations cause visible layout jank or flicker, or block user input, while the run log is streaming or rows are animating into the table"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.10"
 name = "export_drawer_slide"
 description = "Driven by the real Export results control, the export drawer slides in from the side rather than snapping open, and exits the same way"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

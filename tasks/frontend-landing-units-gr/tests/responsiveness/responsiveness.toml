@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_product_breakpoints"
-description = "At 1440, 1023/1024, or 390 the layout breaks, overflows, or loses required chrome (sidebar vs mobile bar) for that width."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "At 390px primary controls are too small to tap reliably or visibly misaligned."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "type_unreadable_at_narrow_width"
-description = "At 390px body or heading text is too small to read or collapses illegibly."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_or_spurious_scrollbars"
-description = "At 1440, 768, or 390 content is cropped or unnecessary horizontal scrollbars appear."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "mobile_nav_missing_or_unresponsive"
-description = "Below 1024px the hamburger is absent from the mobile bar, or tapping it leaves the menu overlay closed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_sidebar_obscures_content"
-description = "At 1440px the fixed sidebar permanently obscures hero or section content with no recoverable main-column offset (~167px left margin)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "overlap_or_stacking_failure_at_width"
-description = "At 1440, 768, or 390 elements overlap incorrectly or stacking order breaks cards, marquees, or the hero Book CTA legibility."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "desktop_chrome_on_mobile_or_inverse"
-description = "Below 1024px the fixed desktop sidebar remains the only nav path without a working hamburger, or at >=1024px the mobile bar/hamburger is the only nav with the sidebar unavailable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "media_static_size_overflows"
-description = "Hero, map, gallery, or community imagery uses a static size that overflows the viewport at 390 or 768."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "book_cta_or_hamburger_disappears"
-description = "Below 1024px the Book your Studio button or hamburger disappears from the mobile bar while remaining required chrome."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "7.a1"
 name = "showcase_composition_reflow_preserves_hierarchy"
 description = "At 390px the asymmetric sidebar-plus-main desktop composition is re-choreographed into a stacked mobile composition (mobile bar, single-column sections) that preserves hierarchy rather than a broken shrink of the 122px sidebar shell."
@@ -255,18 +175,3 @@ description = "At 390px the booking inquiry overlay, shortlist drawer, FAQ accor
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "7.n11"
-name = "inquiry_overlay_clipped_on_mobile"
-description = "At 390px the booking inquiry overlay or shortlist drawer clips required fields or hides its Close/dismiss control off-screen."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

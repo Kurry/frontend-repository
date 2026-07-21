@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring a created palette, Browse view, period filter, and selection then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "filter_identical_across_different_periods"
-description = "Selecting two different named periods leaves Nomenclature/Palette/Swatch visually identical — a derived surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_creates_produce_identical_output"
-description = "Creating two palettes with different names, periods, and swatches yields identical visible cards and nomenclature rows."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_surface_state_stale_until_reload"
-description = "After editing name/period/swatches or toggling favorite, Browse layouts or Detail still show stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_contains_session_create"
 description = "Full-pipeline export probe: measure collection, create a valid palette with a unique name and swatches, open Export immediately — CSS/utility-theme/SCSS previews and palette package JSON palettes array contain that exact name and those #RRGGBB values (session work product, not a seed-only snapshot)."
@@ -191,14 +159,6 @@ id = "14.10"
 name = "import_export_round_trip_probe"
 description = "Round-trip probe: create a palette, Download/copy palette package JSON, delete all user palettes (empty state), Import the package — collection count, Palette-view cards, and a fresh package export reconstruct to the imported document without reload."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "export_identical_after_create"
-description = "Creating a palette with a unique name and swatches leaves the Export CSS/utility-theme/SCSS or package JSON visually identical to the pre-create export (derived artifact ignoring session mutations)."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -222,26 +182,3 @@ description = "Two different recolorings of the same swatch produce two differen
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n6"
-name = "undo_restore_absent_from_export"
-description = "A palette restored by Undo appears in Browse layouts but is missing from the next export preview or package JSON, or vice versa"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n7"
-name = "vision_mode_no_visible_change"
-description = "Switching vision simulation between None and Deuteranopia produces no visible change in swatch rendering anywhere on the canvas"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

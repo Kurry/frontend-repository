@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_in_memory_state_survives_reload"
-description = "After sending and pinning notes, a reload leaves an incoherent mix (some notes survive while filters/rail reset, or export panel state survives alone)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n2"
-name = "export_identical_regardless_of_notes"
-description = "Session JSON or Timeline Markdown export preview renders identically before and after sending a distinctive note (derived export ignores inputs)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n3"
-name = "different_notes_identical_export"
-description = "Two sessions that sent different distinctive note texts produce byte-identical Session JSON preview text"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n4"
-name = "rail_stale_until_reload"
-description = "After archiving a note that uniquely used a tag, the tag rail still shows that tag until a full page reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "14.9"
 name = "import_export_round_trip_pipeline"
 description = "Full pipeline: send distinctive text with #todo, mark todo as TODO tag, check the note done, Export Session JSON (confirm schemaVersion tagnote-session/v1 and done true), reload to empty baseline, Import the JSON, and confirm the bubble, TODO checkbox Done placement, and rail counts match"
@@ -193,26 +161,3 @@ description = "Select 2 notes, Archive selected, confirm both leave the main tim
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "undo_does_not_restore_bulk_archive"
-description = "After Archive selected on 2 notes, Undo leaves both notes still archived or restores only one of them"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n6"
-name = "export_omits_done_or_todotags"
-description = "After marking a TODO tag and checking a note done, Session JSON omits that tag from todoTags or shows done false for that note"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

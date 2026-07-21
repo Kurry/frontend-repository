@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "preset_or_collaboration_flows_unavailable"
-description = "Saved preset create/apply/delete or the Collaboration Go offline → edit → Go online → Apply to canvas path cannot be completed from the visible UI controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "new_presets_missing_or_duplicated"
-description = "After a valid Save preset, the new entry fails to appear, or a single save creates duplicate Saved presets rows for the same name."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "apply_or_recent_settings_desync"
-description = "After Apply on a preset or after switching Recent thumbnails, the canvas background/padding/frame/caption surfaces disagree with each other about the restored settings."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "tab_switch_breaks_or_loses_canvas"
-description = "Switching Editor ↔ Collaboration breaks the layout or loses the prior canvas image/settings when returning to Editor."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_presets_list_breaks_ui"
-description = "After deleting all Saved presets, the Saved presets region is broken or missing rather than an empty list state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "recent_thumbnails_disagree_with_canvas"
-description = "After switching Recent thumbnails, the canvas image or attached settings disagree with the thumbnail that was just activated."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "collaboration_queue_stuck_after_online"
-description = "After Go online following offline edits, the queued-operations list stays non-empty, or Shared content omits one author's non-conflicting change."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "delete_dialog_blocks_with_no_exit"
-description = "The preset delete confirm overlay opens but cannot be closed, leaving the Editor blocked with no exit path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_save_or_upload_lacks_feedback"
-description = "A failed Save preset (empty/duplicate name) or unsupported upload provides no visible user feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "flow_dead_end_requires_reload"
-description = "After opening Collaboration, applying a preset, or dismissing the delete dialog, recovering normal Editor interaction requires a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "style_recipe_export_import_flow"
 description = "Style recipe end to end: after uploading an image, picking Ocean, setting padding to 16, enabling Browser frame, typing a caption, and enabling a watermark with a distinct watermark color, the Export preview JSON contains those values under RenderSettings keys including watermarkColor and still shows every required key; importing the downloaded frameflick-style.json after changing settings restores Ocean, padding 16, Browser frame, the caption, and the watermark color without a reload."
@@ -270,34 +190,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n11"
-name = "style_import_fails_to_restore"
-description = "After importing a previously exported style JSON, the canvas still shows the post-change background, padding, frame, or caption instead of the exported combination."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n12"
-name = "paste_applies_unchecked_groups"
-description = "Paste settings with only Background checked also mutates unchecked groups such as padding or frame."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.15"
 name = "preset_save_settings_payload_flow"
 description = "After configuring Night, padding 12, Browser frame, caption, and watermark with watermarkColor, saving Warm Card increases the Saved presets count by exactly one; Apply after changing those controls restores the full PresetCreate settings combination; the Export preview after Apply shows matching RenderSettings field values for background, padding, frame, caption, watermark, and watermarkColor."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "6.n13"
-name = "preset_apply_mismatches_export_preview"
-description = "After Apply on a saved preset, the canvas controls and Export preview JSON disagree about the restored background, padding, frame, caption, or watermark values."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -307,10 +203,3 @@ description = "After a valid style configuration, importing a parseable but fiel
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -162,54 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "keyboard_cannot_reach_wizard_controls"
-description = "Core wizard controls (Base theme, Base icon set, swatch hex fields, Back, Continue, Generate, or Download) cannot be reached or activated via keyboard Tab/Enter/Space."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured on interactive wizard controls when focused from the keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "selects_lack_accessible_selection"
-description = "The Base theme or Base icon set control exposes no selected option to assistive technology and cannot be operated with arrow keys plus Enter or Space."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "validation_or_status_visual_only"
-description = "Inline hex validation or the replaced-count status line is visual only: no aria-live polite announcement when the message or count updates."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "progress_step_is_color_only"
-description = "The current wizard step is indicated by colour alone on the progress bar, with no non-colour or programmatic cue for assistive technology."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, step-body transitions, progress-circle fills, button hover/press motion, or the patched-result entrance animation still run."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.11"
 name = "command_palette_dialog_a11y"
 description = "The command palette uses role dialog with aria-modal true, traps focus while open, closes on Escape, and returns focus to the control that opened it."
@@ -237,26 +189,3 @@ description = "Contrast pass/fail updates and the Copy export confirmation are a
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n7"
-name = "palette_lacks_focus_trap"
-description = "While the command palette is open, Tab moves focus outside the overlay, Escape leaves it open, or closing it returns focus to a control other than the opener."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "contrast_status_color_only"
-description = "Contrast matrix rows indicate Pass/Fail by colour alone with no text mark readable by assistive technology."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

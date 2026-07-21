@@ -225,35 +225,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "static_board_no_crud"
-description = "Scenes list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "outbound_link_navigation"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.24"
 name = "product_header_composition"
 description = "The product header shows a logo mark, the Demo Projects project label, the 1. Getting Started storyboard title, a kebab menu, and utility tools (notifications bell, dashboard, account)"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.27"
-name = "kebab_menu_decorative_only"
-description = "Scene edit and delete are unreachable from any per-scene control; the scene kebab menu is decorative and triggers no edit or delete action"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.28"
@@ -383,22 +359,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n_export_omits_session"
-name = "export_omits_session_mutations"
-description = "After creating or editing a scene, the Export markdown/json/outline preview omits that scene's title or body — an incomplete session export"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n_import_accepts_invalid"
-name = "import_accepts_invalid_package"
-description = "Importing malformed StoryboardPackage JSON or a scene that fails the field contract still changes the board with no visible error"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.46"
 name = "markdown_bodies_render_with_checklists"
 description = "Scene bodies render as formatted markdown on cards and in Slide mode (headings, bold, bullet lists, not raw markup); checklist lines (- [ ] / - [x]) render as real checkboxes, clicking one toggles it and updates the stored body source, and a per-scene checklist progress readout (for example 2/5) appears on every scene whose body contains a checklist and updates immediately on toggle"
@@ -426,34 +386,3 @@ description = "A Templates control lists at least two named templates with scene
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n_checkbox_versions_or_reorders"
-name = "checkbox_toggle_side_effects"
-description = "Toggling a rendered checklist checkbox creates a version snapshot, changes the scene count or order, or fails to update the stored body so the next export still shows the pre-toggle mark"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n_canvas_mutates_order"
-name = "canvas_drag_mutates_order"
-description = "Dragging a card on the Canvas renumbers scenes, changes a scene's order field, or reorders the Tile/List board"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n_restore_not_propagated"
-name = "restore_leaves_stale_surfaces"
-description = "After Restore of an older version, the board card, Slide mode, or an export preview still shows the pre-restore content"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core functionality or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

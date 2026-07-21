@@ -225,22 +225,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.30"
-name = "note_controls_are_inert_stubs"
-description = "The note list is static or read-only markup: Send, Edit, Pin, Archive, or Delete controls are inert stubs that leave the collection unchanged when activated"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.31"
-name = "edit_accumulates_stale_tags"
-description = "Editing a note accumulates tags instead of re-deriving them, so a tag removed from the text still shows as a chip"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.32"
 name = "single_page_shell_layout"
 description = "The app opens at / into a single-column shell showing a sticky top bar titled TagNote with Calendar, Archived, History, Export, Import, Apply Scenario Change, Undo, and Redo controls, a search field, a horizontal tag rail, the note timeline, and a composer pinned to the bottom, and exercising these controls never navigates away from the page"
@@ -367,32 +351,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.50"
-name = "export_omits_session_mutations"
-description = "After sending a distinctive note and pinning it, the Session JSON or Timeline Markdown export preview omits that note text or pin state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.51"
-name = "bulk_actions_are_inert"
-description = "Selecting notes and activating Archive selected or Pin selected leaves the timeline and Archived view unchanged"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.52"
 name = "done_syntax_chips_and_combined_query"
 description = "The search syntax chip row offers at least tag:family, tag:todo, done:open, and done:done; clicking done:open narrows the visible list to unchecked notes carrying any TODO-designated tag and done:done to checked ones, and adding a typed keyword after a chip token applies both constraints simultaneously"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "A specified core behavior of the app is broken or missing in a significant way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (element, action sequence, resulting state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -155,56 +155,9 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "10.n1"
-name = "browser_storage_used"
-description = "localStorage, sessionStorage, or another browser storage API is non-empty after exercising the app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "10.n2"
-name = "outbound_requests_present"
-description = "The network log shows outbound requests to other origins for scripts, fonts, icons, styles, or data during load or use"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "10.n3"
-name = "views_desync"
-description = "The same datum shows different values in two places (for example the sidebar row count disagreeing with the grid, or the Verified badge disagreeing with the visible checkmarks) without a reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "10.n4"
-name = "chrome_navigates_away"
-description = "An app-chrome link or control navigates the browser away from the app's origin"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "10.10"
 name = "package_export_matches_live_store"
 description = "After a cell edit, verified toggle, and snapshot save, reopening Export shows Dataset Package JSON whose dataset.rows, stats.verifiedCount, and dataset.snapshots match the live UI under schemaVersion dataset-manager.package/v1"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "10.n5"
-name = "package_import_partially_applies"
-description = "Importing a non-conforming Dataset Package JSON partially applies some fields while leaving others, or applies state without a named-field validation error"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "technical.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network entry) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

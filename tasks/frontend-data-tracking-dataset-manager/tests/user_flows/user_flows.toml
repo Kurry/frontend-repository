@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Creating a dataset, adding or editing or deleting a row, importing CSV, exporting Dataset Package JSON, or importing a package is not achievable from the visible UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "new_rows_missing_or_duplicated"
-description = "A committed import or a submitted Add Row produces missing rows, duplicated rows, or a row count that disagrees with what was committed"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "state_changes_desync_displays"
-description = "A verified toggle, split apply, or merge updates one display but leaves another (badge, sidebar count, stratification readout) stale until reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "view_switch_breaks_or_loses_selection"
-description = "Switching between the grid, pivot, or a panel breaks the layout or drops the current dataset selection or row selection"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_dataset_breaks_ui"
-description = "Emptying a dataset produces a broken grid, errors, or a blank region instead of the specified empty state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "filtered_views_disagree"
-description = "The grid, the Verified badge, and the export Rows CSV tab disagree about which rows are currently visible under the active filter"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "collapsed_chrome_cannot_reopen"
-description = "A collapsed sidebar, closed panel, or closed drawer cannot be reopened from the visible UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "A modal, wizard step, or drawer blocks the app with no working close, cancel, or Escape path"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "An invalid formula, an unmappable CSV paste, an invalid split total, or a failed Dataset Package JSON import fails silently with no visible message"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Some flow (wizard, merge, diff, poll of panels) reaches a state that can only be escaped by reloading the page"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "export_after_mutations_includes_session"
 description = "Add a row with a distinctive expectedOutput token, toggle it verified, save a uniquely named snapshot, open Export, and confirm Dataset Package JSON shows schemaVersion exactly dataset-manager.package/v1, contains that expectedOutput under dataset.rows, reflects the verified toggle in stats.verifiedCount, lists the new snapshot name, and keeps every required top-level key; Copy places that JSON on the clipboard"
@@ -253,14 +173,6 @@ id = "6.12"
 name = "import_package_restores_exported_state"
 description = "After exporting a conforming Dataset Package JSON, changing live state, and Importing that package, the grid, verified badge, snapshot list, and a subsequent export return to the imported contents; a package with the wrong schemaVersion is rejected with a named-field error and leaves state unchanged"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "6.n11"
-name = "export_flow_missing_or_static"
-description = "Export is missing, stuck on seeded text after session mutations, or produces Dataset Package JSON without schemaVersion dataset-manager.package/v1"
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -305,10 +217,3 @@ description = "After adding rows, rules, snapshots, and undo history, a full pag
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

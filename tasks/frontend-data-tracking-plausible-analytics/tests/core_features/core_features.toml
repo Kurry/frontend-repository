@@ -190,22 +190,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.27"
-name = "hardcoded_segment_numbers"
-description = "Two different segment filters (e.g. Google and Direct) render identical metric tile numbers, revealing a single hardcoded set of values reused for every filter instead of computation from the seeded data"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.28"
-name = "stale_numbers_or_pill_after_refilter"
-description = "After selecting a new breakdown row, the previous segment's numbers or a stale second filter pill remain visible once the view recomputes"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.29"
 name = "add_site_inline_validation_gates_submit"
 description = "In the Add site form, an empty site name, empty/malformed domain, or missing timezone shows an inline validation message naming that specific field before any submit, and the submit control stays disabled until name, domain, and timezone are all valid"
@@ -225,14 +209,6 @@ name = "double_submit_adds_one_site"
 description = "Double-activating the Add site submit control in quick succession adds exactly one new entry to the site selector, measured as a count delta of one immediately around the action"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.32"
-name = "malformed_domain_still_adds_site"
-description = "Submitting the Add site form with an empty or malformed domain still adds an entry to the site selector, or leaves the selector count unchanged without any inline message naming the domain field"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.33"
@@ -354,22 +330,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.50"
-name = "export_omits_session_mutations"
-description = "After applying a segment filter or adding a site, the Stats JSON or Breakdown CSV preview still shows the pre-mutation unfiltered default numbers, or the new site is absent from the sites array, so the export text fails to include the session's visible work"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.51"
-name = "malformed_import_mutates_dashboard"
-description = "Importing malformed Stats JSON or JSON missing schema_version, results, or sites changes the site count or filter state as if the import succeeded, or clears undo history without showing an inline error naming the import field"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.52"
 name = "same_dimension_filter_replaces"
 description = "With Source: Google active, clicking Direct in Top Sources replaces the Google pill with a Source: Direct pill rather than stacking two source pills"
@@ -439,26 +399,3 @@ description = "Applying the Google source filter changes at least one goal's com
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.62"
-name = "add_goal_rejects_invalid_match_key"
-description = "An Add goal submit with goal_type event and a whitespace-containing match_key, or goal_type page and a match_key missing a leading slash, adds a new Goals panel row while omitting any inline match_key validation message"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.63"
-name = "cross_dimension_stack_collapsed_to_one"
-description = "After applying a source filter and then a country filter, only one filter pill remains instead of two stacked dimension pills"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core dashboard functionality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

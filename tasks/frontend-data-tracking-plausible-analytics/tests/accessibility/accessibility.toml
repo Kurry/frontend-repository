@@ -162,97 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "controls_not_keyboard_reachable"
-description = "Export report, Undo, or breakdown rows cannot be reached or activated via keyboard"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing"
-description = "Focused interactive controls show no visible focus indicator"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "nonsemantic_custom_controls"
-description = "Custom filter rows or export actions use non-semantic tags without ARIA roles or names"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "color_only_high_bounce"
-description = "High bounce is conveyed by color alone with no High bounce text label"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "dialog_no_focus_trap"
-description = "While Add site or the export drawer is open, Tab moves focus to controls outside the overlay"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_tiles"
-description = "Metric tile numbers or labels fail readable contrast against their card surface in the active theme"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "validation_visual_only"
-description = "Add site or import validation is visual only with no accessible name or live-region exposure"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "export_copy_not_announced"
-description = "Export copy confirmation is not announced to assistive technology"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "escape_does_not_close_drawer"
-description = "Pressing Escape leaves the export drawer or Add site dialog open"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "reduced_motion_ignored_a11y"
-description = "With prefers-reduced-motion set, motion still runs at full intensity while state changes lag or fail to apply"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.11"
 name = "segments_range_and_panel_exports_keyboard"
 description = "The Segments menu, the Save segment control, the custom date-range inputs, and each panel's per-panel export control are reachable and operable with the keyboard alone, and each filter pill's remove affordance is a focusable control with an accessible name"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

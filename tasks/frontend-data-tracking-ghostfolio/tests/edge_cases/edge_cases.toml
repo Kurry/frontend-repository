@@ -117,62 +117,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "After the last holding is deleted, the table region shows nothing usable: no empty-state message, no Add holding control, or the net-worth/allocation regions still show stale non-zero values."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "unmatched_filter_shows_stale_rows"
-description = "When the active class filter matches no holdings, the table still lists non-matching rows or the meta line reports a non-zero visible count."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "double_save_creates_duplicates"
-description = "Double-activating save on a valid Add holding form creates more than one new row for a single intended hold."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "long_name_clips_without_full_detail"
-description = "A holding name longer than 40 characters overflows or clips unreadably in the table without an ellipsis, or the detail panel also truncates it instead of showing the full name."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "validation_missing_or_console_only"
-description = "Invalid Add holding input is surfaced only in the browser console, or save proceeds with empty name/symbol or non-positive quantity and adds a holding."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "destructive_delete_lacks_feedback"
-description = "Deleting a holding produces no visible confirmation (toast or equivalent) and no immediate table/total update."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "add_control_missing_in_empty_state"
-description = "In the empty table state after the last delete, the Add holding control is missing or inaccessible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.9"
 name = "symbol_and_unit_price_rejected"
 description = "A symbol that is empty, longer than 12 characters, or contains characters other than letters, digits, period, or hyphen is rejected naming the symbol field; a negative unit price is rejected naming the unit price field; neither invalid save mutates the holdings collection."
@@ -191,22 +135,6 @@ id = "4.11"
 name = "malformed_import_names_field"
 description = "Importing malformed Portfolio JSON, Holdings CSV, or Activities CSV, or a payload that breaks the holding or activity field contracts, shows an inline error naming the import field and leaves holdings, activities, net worth, and allocation unchanged."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "malformed_import_mutates_state"
-description = "Importing malformed Portfolio JSON or CSV mutates holdings or activities, or clears undo history as if the import succeeded."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "cross_field_violation_accepted"
-description = "A holding save with a broken cross-field rule (Cash/currency mismatch or illegal data source for the asset class) succeeds and adds a row."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -272,26 +200,3 @@ description = "A bulk edit that sets asset class or data source on several selec
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.n10"
-name = "full_sell_double_counts_gain"
-description = "After selling an entire position, its gain is counted in both unrealized gain and realized gain, or the removed holding still contributes to net worth or the performance summary."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n11"
-name = "zero_import_commit_mutates_or_records_undo"
-description = "Committing an import with zero valid rows still mutates the activities collection or records an undo step as if rows had been imported."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

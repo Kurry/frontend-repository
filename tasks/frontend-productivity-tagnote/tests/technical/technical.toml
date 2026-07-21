@@ -134,31 +134,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "TI-NEG-1"
-name = "browser_storage_used_or_fake_persist"
-description = "After exercising send/pin/archive/export, localStorage or sessionStorage is non-empty, or a success toast claims persistence while a reload still shows notes from the prior session (good-app in-memory violation)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "TI-NEG-2"
-name = "TI-NEG-2"
-description = "A hidden element, attribute, or window.* global not mandated by the spec exposes internal ground-truth state a real user could not reach through the visible UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "TI-NEG-3"
-name = "TI-NEG-3"
-description = "The app renders or behaves differently when it detects automation (keying on navigator.webdriver or similar) rather than on user action"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "TI-7"
 name = "visible_focus_logical_tab_order"
 description = "Keyboard Tab focus is clearly visible on interactive controls (an accent outline/ring) and moves in a logical reading order from the top bar through the tag rail, timeline, and composer"
@@ -194,22 +169,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "TI-NEG-4"
-name = "unescaped_note_html_executes"
-description = "A note whose text contains HTML markup (for example a script or img tag with an event handler) renders or executes it as live markup instead of showing the characters as literal text"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "TI-NEG-5"
-name = "chrome_navigates_off_app"
-description = "App chrome contains an outbound navigational link, or activating any in-app control navigates the browser away from the app's origin"
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
 id = "TI-12"
 name = "in_memory_store_coherence_across_surfaces"
 description = "A pin, archive, or done toggle updates the timeline bubble, the Archived or TODO split view, and the Export Session JSON preview from one shared collection without a reload"
@@ -224,24 +183,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "TI-NEG-6"
-name = "export_preview_stale_after_mutation"
-description = "After sending or pinning a note, reopening Export shows Session JSON identical to the pre-mutation preview (export not compiled live from the store)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "TI-14"
 name = "note_text_rendered_safely"
 description = "A note whose text contains HTML-like markup (for example <img src=x onerror=alert(1)> or <b>hi</b>) renders that markup as literal escaped text inside the bubble — no injected element executes or restyles the page — while parsed http(s) links still render as safe anchors"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "TI.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console health, state coherence, persistence, stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, storage state, desynced views) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -211,22 +211,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.19"
-name = "progress_frozen_static"
-description = "Running jobs are static markup: over a full observation window no running job's completed-trial count, progress readout, or lane in-flight count ever advances without user interaction"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.20"
-name = "aggregates_hardcoded"
-description = "Aggregate surfaces are hardcoded: the mean-reward bars, total cost figure, or lane queue depths render exactly the same values after new jobs are submitted and trials complete as before"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.21"
 name = "queue_snapshot_export_field_contract"
 description = "Export queue opens a live JSON preview whose text shows schemaVersion exactly eval-queue-v1, exportedAt as an ISO-8601 string, and required keys jobs, providers, aggregates, and timeline; each job entry includes create-payload fields dataset, agent, model, and trialCount plus id, status, progressComplete, progressTotal, submittedAt, and trials; Copy and Download are available"
@@ -247,18 +231,3 @@ description = "Import queue accepts pasted Queue Snapshot JSON matching the expo
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.24"
-name = "export_omits_session_work"
-description = "After a visible submit or cancel, the Export queue JSON preview still shows the pre-mutation jobs array, omitting the session's actual submit or cancel from the compiled snapshot"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

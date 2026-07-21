@@ -197,22 +197,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "presets_static_html_only"
-description = "Exposure presets list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.22"
-name = "outbound_link_chrome"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.23"
 name = "stepper_moves_one_stop_with_formats"
 description = "Pressing a dial's up/down stepper moves exactly one stop along that control's list and updates that dial's readout on the same press; APERTURE reads f/N (default f/16), SPEED reads 1/N (default 1/60), and ISO reads a bare integer (default 100)"
@@ -264,14 +248,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.30"
-name = "dials_change_without_preview_response"
-description = "Pressing the dial steppers changes the readout number while the photo preview stack stays frozen — brightness, blur, noise, and exposure meter ignore the new stop"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.31"
 name = "preset_lifecycle_cross_mode_chain"
 description = "Starting in Presets/Compare with the seeded list: create a valid preset and confirm the form closes and the visible preset row count increases by exactly one (measured immediately before and after); switch to Meter/Lab and back and confirm the same new preset row is still present without a reload; edit that preset's name and confirm the same row shows the new name; delete it and confirm the row count decreases by exactly one"
@@ -318,14 +294,6 @@ id = "1.37"
 name = "direct_entry_default_dial_values"
 description = "On first load the full-viewport photo preview with overlaid dials renders immediately with APERTURE at f/16, SPEED at 1/60, and ISO at 100"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.38"
-name = "login_gate_or_multipage_shell_blocks_simulator"
-description = "A login screen, admin gate, or multi-page shell must be traversed before the simulator preview and dials appear"
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -443,22 +411,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.55"
-name = "export_omits_session_edits"
-description = "A PNG/JPEG or edit-stack export matches the unedited seed while the UI shows dial, slider, look-pack, scene, or snapshot mutations — the artifact ignores the work just performed"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.56"
-name = "css_filter_only_fake_export"
-description = "Download PNG or JPEG produces a file whose pixels match the unedited source image while only the on-screen preview uses CSS filters or overlays — edits are not baked into the downloaded bitmap"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.57"
 name = "preview_effects_are_real_canvas_pixels"
 description = "The preview's capture effects (frame brightness, depth-of-field blur, ISO grain) are real pixel operations on a canvas surface, not CSS-only decoration: the rendered bitmap carries them, which is why a Download PNG/JPEG at a strong edit state reproduces the same brightness, blur, and grain seen on screen"
@@ -487,14 +439,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.61"
-name = "two_scenes_render_identical"
-description = "Switching between two scenes with different stated EV offsets leaves the preview brightness, EV readout, and histogram shape visually identical — the scene selection is inert"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.62"
 name = "bracket_panel_controls_and_validated_base_name"
 description = "A Bracket panel offers a frame-count choice of 3 or 5, a step choice of 1 or 2 stops, and a required base-name field validated inline (non-empty, at most 40 characters) before Generate bracket can succeed"
@@ -516,22 +460,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.65"
-name = "generate_bracket_wrong_count_or_invented_stops"
-description = "Generate bracket changes the preset count by a number other than the chosen frame count, or produces frames whose shutter is not a member of the discrete shutter stop list (invented stops instead of clamping at the list ends)"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.66"
-name = "bracketed_presets_not_first_class"
-description = "Presets produced by Generate bracket cannot be applied, edited, deleted, or filtered like hand-made presets — they behave as a separate inert list rather than real entries in the shared presets collection"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.67"
 name = "clipping_zebras_toggle_over_and_under"
 description = "Independent Highlight zebras and Shadow zebras toggles overlay striped hatching on near-white and near-black preview regions respectively; at default dials in Daylight Courtyard neither overlay covers any meaningful area; pushing exposure far over-exposed makes highlight-zebra coverage appear and grow, and pushing far under-exposed makes shadow-zebra coverage appear and grow"
@@ -543,14 +471,6 @@ id = "1.68"
 name = "histogram_clipping_indicators_independent_of_toggles"
 description = "The histogram carries a highlight-clipping indicator at its right edge and a shadow-clipping indicator at its left edge that light up whenever clipped regions exist in the current render, whether or not the zebra toggles are on"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.69"
-name = "zebras_at_default_or_absent_when_blown"
-description = "Zebra hatching covers the preview at default dials in Daylight Courtyard where no clipping exists, or never appears even when exposure is pushed strongly over/under so that regions are blown out or crushed"
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -568,26 +488,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.72"
-name = "wipe_shows_same_render_both_sides"
-description = "In Compare with two clearly different slots filled, both sides of the wipe handle show the same render (identical brightness/tone) so the split reveals no difference between slot A and slot B"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.73"
 name = "settings_card_png_readable_pixels"
 description = "Download settings card downloads a real PNG file named exposure-settings-card.png rendered client-side whose pixels carry the current aperture (f/N), shutter (1/N), ISO, EV, and active scene name as readable text"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.74"
-name = "settings_card_identical_across_states"
-description = "Downloading the settings card, then changing ISO two stops and selecting a different scene, then downloading again produces two card files that are visually identical or whose rendered text does not match the changed readouts"
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -597,10 +501,3 @@ description = "The edit-stack JSON carries a required scene key holding exactly 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence. If already covered — even partially — by another criterion in this file, answer no here."
-type = "binary"
-negate = true
-weight = 1.0

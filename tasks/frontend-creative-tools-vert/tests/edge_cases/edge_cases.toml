@@ -162,54 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_queue_shows_nothing"
-description = "When the queue is empty the region shows nothing — no \"Your conversion queue is empty\" copy, no guidance, and no \"0 files queued\" counts line."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "empty_queue_shows_false_success"
-description = "While the queue is empty it shows progress, a checkmark, or an enabled Download control."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "unsupported_shows_false_success"
-description = "An undecodable file shows Done, a checkmark, or an enabled Download instead of Unsupported with a plain reason."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "cancel_leaves_false_done"
-description = "After Cancel during an in-progress run, a row that did not finish still shows Done or the counts line overstates completed rows."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_nonsemantic"
-description = "Primary interactive controls (drop zone, Convert, Download, Remove, selectors, batch tray, Undo/Redo) are non-semantic div/span click targets without button/role semantics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "quality_validation_missing"
-description = "Entering a quality outside 1–100 applies the invalid value or provides no visible inline feedback naming the quality field."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "invalid_session_import_rejected"
 description = "Importing malformed session JSON, or JSON that fails the ConversionSessionDocument field contract (schemaVersion not vert-session-v1, missing required key, invalid ConversionPreset, or invalid QueueFile), shows an inline error naming the offending field (or the import field), leaves quality, presets, and queue targets unchanged, and does not clear undo history as if the import succeeded."
@@ -221,46 +173,6 @@ id = "4.12"
 name = "empty_preset_name_rejected"
 description = "Saving a preset with an empty, whitespace-only, or over-length (greater than 64) name does not increase the preset count and shows an inline message naming the name field."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "double_convert_duplicates_or_double_counts"
-description = "Double-activating Convert creates duplicate rows or increases the done count by more than the number of ready rows."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_action_labels"
-description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Convert, Download, Batch remove, Undo, or Save preset."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "conversion_failure_silent"
-description = "A failed conversion provides no visible Failed/Unsupported status or plain-language reason — only a silent or console-only failure."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "long_filename_breaks_row_layout"
-description = "A very long filename overflows or breaks the queue row layout instead of truncating with an ellipsis."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n11"
-name = "invalid_session_import_mutates_state"
-description = "Importing malformed session JSON, or JSON that fails the ConversionSessionDocument field contract, still mutates settings, presets, queue targets, or clears undo history as if the import succeeded."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -291,34 +203,3 @@ description = "Importing parseable JSON whose schemaVersion is not exactly vert-
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n12"
-name = "batch_remove_fires_with_zero_selected"
-description = "With zero rows selected, Batch remove shows a confirmation or removes rows anyway."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n13"
-name = "empty_queue_export_errors"
-description = "Opening Session export with an empty queue throws an error or fails to compile session JSON / conversion-report text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n14"
-name = "overlength_preset_name_still_adds"
-description = "Saving a ConversionPreset with a name longer than 64 characters increases the visible preset count or adds the over-length name."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

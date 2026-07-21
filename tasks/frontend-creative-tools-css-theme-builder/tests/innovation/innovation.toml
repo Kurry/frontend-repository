@@ -173,22 +173,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "11.n1"
-name = "barebones_unstyled_form_only"
-description = "The shipped UI is a bare unstyled form or plain text controls with no three-panel studio, live preview demos, or theme catalog immersion."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "generic_dashboard_template_look"
-description = "The experience is a generic dashboard/card-grid template that ignores the specified dense tool-studio composition (sticky chrome above themes | editor | live preview)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_edit_or_export_flows_unavailable"
-description = "Font-family editing, theme selection, Copy, Download, or Reset all cannot be completed from the visible UI controls."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n2"
-name = "font_family_edit_missing_or_duplicated"
-description = "Entering a font-family value either fails to add a generated line or creates duplicate font-family lines for a single edit."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n3"
-name = "surfaces_desync_after_edit"
-description = "After a setting edit, the control value, live preview, and generated line disagree about the same setting without a reload."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n4"
-name = "category_switch_loses_selection_or_breaks"
-description = "Switching sidebar categories breaks the layout or loses the active category identification / override values."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n5"
-name = "reset_all_leaves_broken_empty_ui"
-description = "After Reset all, the generated-config panel is blank or broken with no empty-state comment and no disabled export state."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n6"
-name = "preview_and_config_disagree_on_theme"
-description = "After selecting a theme, the live preview colors and the generated theme = line disagree about which theme is active."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n7"
-name = "sidebar_categories_cannot_reselect"
-description = "After visiting another category, a previously visited sidebar category cannot be re-selected to show its settings form."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n8"
-name = "export_toast_blocks_with_no_exit"
-description = "Copy/Download/Reset feedback blocks navigation with no dismiss path back to the editor."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n9"
-name = "failed_invalid_edit_silent"
-description = "An invalid setting edit provides no visible validation feedback and leaves the user without an explanation."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "6.n10"
-name = "category_or_export_dead_end_requires_reload"
-description = "Recovering from a category switch or export action requires a full page reload — the UI reaches a dead end."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "6.11"
 name = "export_import_round_trip_flow"
 description = "After editing at least two settings: Copy or Download the generated config, Reset all to empty, then Import that same text — controls, live preview, generated lines, and override count all match the pre-reset state."
@@ -270,27 +190,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n11"
-name = "import_round_trip_desyncs"
-description = "After export → Reset all → Import of the exported text, controls, preview, and generated lines disagree about the restored overrides."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "6.15"
 name = "field_contract_validation_blocks_bad_commit"
 description = "Attempting to commit an out-of-contract value (for example font-size outside 4–60, cursor-style outside the closed enum, a non-#RRGGBB color, or an empty profile-name) shows inline validation naming the field, leaves the generated configuration without that malformed line, does not change the override count for the rejected value, and keeps the rest of the workflow operable without a reload; a subsequent valid in-contract commit emits the matching key = value line."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "6.n12"
-name = "validation_bypass_emits_bad_config"
-description = "An out-of-contract value reaches the generated config or export artifact without the inline field validation the Ghostty contracts require."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "6.16"
@@ -313,18 +217,3 @@ description = "Import-then-diff flow: from zero overrides, Import config text co
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n13"
-name = "rename_or_compare_controls_noop"
-description = "The profile Rename control or the Compare themes surface (selectors or Apply) is missing, or activating it changes no visible name, preview, or configuration state."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

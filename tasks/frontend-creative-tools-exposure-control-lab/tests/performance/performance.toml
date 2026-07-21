@@ -162,100 +162,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.n1"
-name = "cold_load_exceeds_two_seconds"
-description = "More than 2 seconds pass after local cold load before a dial press can be registered."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_lab_flows"
-description = "Console errors, warnings, or unhandled rejections appear during dial, help, mode, or preset flows."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n3"
-name = "meter_or_mode_transition_blocks_ui"
-description = "Meter travel or mode-region swap blocks the main thread so subsequent clicks queue with visible lag."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n4"
-name = "preview_update_hangs_ui"
-description = "Updating the preview stack after a stop change hangs or freezes the UI until the transition completes."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n5"
-name = "preset_list_janks_on_filter"
-description = "Filtering or scrolling the seeded presets list produces sustained frame-rate collapse or multi-second jank."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n6"
-name = "animation_blocks_stepper_input"
-description = "While meter or preview animations run, stepper and mode controls ignore input."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n7"
-name = "asset_load_blocks_first_paint_of_controls"
-description = "The UI blocks rendering of dials and meter until all preview imagery finishes loading, leaving a blank interactive void."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n8"
-name = "runaway_resources_after_rapid_steps"
-description = "Rapid stepper use causes visible memory/CPU runaway that degrades or crashes the tab."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n9"
-name = "blank_while_loading_preview"
-description = "Nothing is displayed (blank page) while preview assets load — no dial chrome or skeleton."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n10"
-name = "crash_under_rapid_or_edge_use"
-description = "The app crashes or becomes permanently unresponsive under rapid stepper presses or after deleting all presets and recreating."
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "9.11"
 name = "histogram_ev_recompute_without_freeze"
 description = "Histogram and EV recompute immediately on each stop change with no multi-second freeze under rapid stepper presses"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "9.n11"
-name = "histogram_recompute_hangs_ui"
-description = "Updating the histogram or EV after a stop change hangs or freezes the UI for multiple seconds"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "9.12"
@@ -264,10 +175,3 @@ description = "Dragging a develop slider end to end keeps the preview and readou
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

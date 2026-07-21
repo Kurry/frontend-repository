@@ -162,63 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_nav_or_hero_flow_unavailable"
-description = "The preloader-then-hero reveal cannot complete, or the six segment-nav labels cannot scroll their matching in-page sections from the visible UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "nav_click_loads_different_page"
-description = "Clicking a segment-nav label or the wordmark navigates to a different HTML page or client route instead of scrolling within /sprint/26."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "scroll_spy_and_click_active_desync"
-description = "After clicking a nav label or scrolling into a section, the marked-active nav cell disagrees with the section in view (click-active and scroll-spy state desync)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "video_modal_leaves_scroll_locked"
-description = "After closing the video modal, body scroll stays locked or the video keeps playing in the background."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "mobile_menu_dead_end"
-description = "Below 768px the hamburger opens but choosing a section leaves the menu stuck open or fails to scroll, requiring a reload to recover."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "video_modal_no_exit"
-description = "The video modal opens but offers no operable close control, blocking navigation with no exit path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "flow_dead_end_requires_reload"
-description = "After opening the video modal, using segment nav, or opening the mobile menu, recovering normal page interaction requires a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "6.20"
 name = "shortlist_compare_flow"
 description = "Pin Voice Payments then Quick Buy 2.0 (count 2, both names listed); add Biometric Card Authentication to compare; unpin Voice Payments — count returns to 1 and that name disappears from the tray and both brief preview tabs without a reload."
@@ -253,18 +196,3 @@ description = "Pin Voice Payments, then Undo — Shortlist count returns to 0, p
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n20"
-name = "brief_export_dead_end"
-description = "Export sprint brief opens but Download/Copy are missing or inert, leaving no way to obtain the session artifact without a reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

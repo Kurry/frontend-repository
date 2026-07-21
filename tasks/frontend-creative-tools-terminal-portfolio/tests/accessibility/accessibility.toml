@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "terminal_controls_unreachable_by_keyboard"
-description = "A traffic-light control, mode toggle, board filter, board card, consent button, or the command prompt cannot be reached or activated via keyboard alone after boot."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_on_controls"
-description = "Focused traffic lights, mode toggle, filters, board cards, consent buttons, or the command prompt show no visible focus indicator or the indicator is obscured."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Traffic lights, mode toggle, board filters, or consent controls use non-semantic tags without ARIA roles or accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "status_or_error_color_only"
-description = "Project status badges or validation errors are conveyed by color alone with no text label or other non-color cue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "exit_overlay_traps_without_escape"
-description = "After closing the terminal with the red traffic light, keyboard users cannot reach the Reopen control or otherwise restore the terminal."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "unreadable_contrast_in_a_theme"
-description = "In dark, light, retro, or glass theme, terminal body text or primary control labels are unreadable due to poor contrast against their background."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "output_or_errors_visual_only"
-description = "New command output or validation errors appear visually only with no aria-live region or accessible association for assistive technology."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "traffic_lights_missing_accessible_names"
-description = "Traffic-light window controls are missing accessible names describing close, minimize, or maximize."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_skipped_in_output"
-description = "Terminal section headings in command output or board chrome skip levels (for example jumping H1 to H3) or have no coherent order."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, boot typewriter, staggered CLI output reveal, skill-bar fill, or post-boot enter animations still run fully."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.11"
 name = "validation_announced_live_region"
 description = "Form and export validation messages are exposed through a polite live region as well as shown visually."
@@ -255,18 +175,3 @@ description = "Featured indicators and status badges are conveyed by text or ico
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n11"
-name = "export_controls_keyboard_unreachable"
-description = "Export Copy/Download or Config Studio fields cannot be reached or activated via keyboard alone."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

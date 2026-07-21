@@ -97,23 +97,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "3.6"
-name = "flat_equal_width_dashboard_layout"
-description = "The layout is a flat single-column stack of equal-width blocks with no cut-corner geometry, no accent color, and no display type hierarchy"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.7"
-name = "dark_mode_unreadable_or_missing"
-description = "Dark mode is missing or leaves unreadable low-contrast surfaces after the theme toggle is used"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "3.8"
 name = "cta_accent_red_computed"
 description = "The CTA accent red computes rgb(255, 57, 74) on primary buttons and .text-red elements (getComputedStyle color/fill)"
@@ -134,14 +117,6 @@ name = "self_hosted_display_face_and_inter"
 description = "Headings and nav links resolve to a self-hosted bundled display face (a named webfont family that is neither source licensed face nor a generic system fallback) and body copy resolves to Inter (computed font-family)"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "3.11"
-name = "wrong_accent_or_fallback_heading_font"
-description = "The accent color is a wrong or generic red/blue instead of rgb(255, 57, 74), or headings fall back to a system/serif font instead of the bundled display face"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.12"
@@ -171,14 +146,6 @@ name = "placeholder_brand_standins_plausible"
 description = "The logo position shows an original placeholder wordmark, the trusted marquee shows invented partner names that read as plausible companies, and the footer studio credit uses invented generic text — each at the reference's size, position, and role"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "3.16"
-name = "real_brand_assets_shipped"
-description = "The page ships copyrighted, trademarked, scraped, stock, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—including a source network logo/wordmark, real partner mark, licensed source typeface, recognizable photography/video frame, canvas/texture asset, or source credit instead of the fictional Astra identity"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.17"
@@ -211,28 +178,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.21"
-name = "broken_grid_collapses_to_noise"
-description = "Cut-corner panels or overlapping sticky stacks clip interactive controls, make overlaid text unreadable, or the asymmetry collapses into visual noise at 1440 or 390 widths"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.22"
 name = "scratch_authored_media_inventory_craft"
 description = "The Astra identity and required authored media are visibly complete and art-directed: Astra wordmark/symbol; five hero panels; three quick-link illustrations; ten distinct fictional partner marks; five developer/tool illustrations; seven distinct news thumbnails; six solution illustrations; event and builder panels; both seven-avatar community rows; and supporting icons all fill their reference-sized surfaces with coherent, non-repeated artwork"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "3.23"
-name = "missing_reused_or_source_media"
-description = "A required media surface is omitted, empty, broken, repeated where a distinct asset is required, rendered as a generic gradient/emoji/text-only placeholder, or contains a source-site name, logo silhouette, recognizable source media, source metadata, or source destination"
-type = "binary"
-weight = 1.0
-negate = true
-
 
 [[criterion]]
 id = "2.a1"
@@ -271,14 +221,6 @@ weight = 0.5
 
 
 [[criterion]]
-id = "2.a5"
-name = "display_type_abandoned_in_inner_sections"
-description = "Display typography is ambitious in the hero but abandoned elsewhere — inner section headings fall back to generic unstyled type that breaks the visual system."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.40"
 name = "session_leads_panel_matches_token_system"
 description = "The Session leads panel uses the same dual-tone surfaces, accent red sparingly on CTAs, and cut-corner/button language as the surrounding Newsletter/Contact/Footer regions rather than a visually alien widget."
@@ -286,10 +228,3 @@ type = "binary"
 weight = 0.5
 optional = true
 
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

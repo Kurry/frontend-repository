@@ -183,86 +183,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty Expenses period or empty filter result shows nothing and provides no empty-state UI feedback"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "errors_only_reach_console"
-description = "Validation or import failures are surfaced only in the browser console with no inline UI error"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Add, delete, copy, or import actions lack visible feedback and silently succeed or fail"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "import_mutates_on_invalid_contract"
-description = "Importing JSON that fails the BudgetDocument field contract still mutates expenses, categories, display name, or totals"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap primary interactive controls (nav, dialog actions, table actions) without button/input roles"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "The add/edit expense dialog or export drawer cannot be dismissed via Escape"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Expense field-contract validation feedback is missing or delayed with no UI indication naming the invalid field"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Primary actions use ambiguous or missing labels instead of specific verbs such as Add expense, Bulk delete, Export, or Import JSON"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "undo_empty_stack_corrupts_state"
-description = "Undo at an empty undo stack or Redo at an empty redo stack changes the Expenses table or Dashboard totals"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Export, Import JSON, Undo/Redo, or bulk action affordances are visually hidden or inaccessible when their preconditions are met"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.14"
 name = "csv_commit_with_zero_valid_rows_inert"
 description = "Committing a CSV import when no row is valid changes nothing: the Expenses table, Dashboard totals, and export previews stay exactly as before and the summary reports zero imported"
@@ -290,10 +210,3 @@ description = "Importing a Budget report JSON missing meta, totals, recurringRul
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

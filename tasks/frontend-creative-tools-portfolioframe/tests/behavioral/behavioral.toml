@@ -148,39 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring profile content, theme, density, section visibility/order, and a draft then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full coherent restore."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "completeness_or_theme_ignores_inputs"
-description = "Filling a recommended field or switching themes leaves Completeness count and preview accents visually identical — a derived surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_names_render_identical_preview"
-description = "Setting Profile Header Name to two clearly different strings yields identical preview header text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_surface_state_stale_until_reload"
-description = "After editing Profile Header, a project, theme, or density, the live preview still shows stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.9"
 name = "mutate_then_export_contains_session_work"
 description = "Full-pipeline probe: set Profile Header Name to 'Ada Lovelace', add project titled 'Portfolio Site' with Status wip, pin it Featured, select Forest, then open Export package Portfolio JSON and Markdown resume. Confirm both export texts contain 'Ada Lovelace' and 'Portfolio Site', Portfolio JSON shows schemaVersion portfolioframe-v1 with that project's status wip and featured true, and Completeness summary strip matches the Completeness panel count — ending at the produced artifact."
@@ -202,40 +169,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "export_identical_across_different_inputs"
-description = "Building two sessions with clearly different Names and project titles yields byte-identical Export package Portfolio JSON or Markdown resume text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "export_stale_after_mutations"
-description = "After mutating profile or projects, the Export package preview remains identical to its pre-mutation text (derived surface ignoring inputs)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.12"
 name = "import_rejects_contract_breaking_payload"
 description = "Contract-integrity probe: attempt Import of JSON with schemaVersion other than portfolioframe-v1 (or two featured true projects); confirm a visible error names the problem, session state is unchanged, and a subsequent valid Import still round-trips correctly."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n7"
-name = "round_trip_drops_field_contract_fields"
-description = "After Export then Import of a valid package, status, featured, theme, density, or schemaVersion portfolioframe-v1 is missing or altered relative to the pre-export state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

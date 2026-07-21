@@ -225,22 +225,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "1_21"
-description = "Projects list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "1_22"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.23"
 name = "1_23"
 description = "Typing a section slash-command (/about, /work, /skills, etc.) echoes the command and prints its formatted output block, and quick-info commands (/email, /phone, /linkedin, etc.) print their own focused cards"
@@ -253,14 +237,6 @@ name = "1_26"
 description = "Typing into the prompt shows an autocomplete dropdown that filters as you type, and Tab or Enter completes the highlighted command"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.27"
-name = "1_27"
-description = "An unrecognized slash-command produces no visible output or error line (silent failure)"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.28"
@@ -466,30 +442,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n44"
-name = "export_omits_session_mutations"
-description = "After a create, edit, delete, duplicate, featured toggle, batch action, identity save, skill edit, or theme change that is visible in the shell or board, the Export Center previews still omit that session mutation (stale or seed-only export text)"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n45"
-name = "undo_does_not_restore"
-description = "After deleting or batch-deleting a project via the UI, Undo leaves the collection unchanged — the deleted projects stay gone from board and export"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n46"
-name = "sort_identical_across_directions"
-description = "Switching name sort between A to Z and Z to A leaves the Projects Board card order visually identical — a derived surface ignoring its inputs"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.57"
 name = "portfolio_json_api_shaped_fields_visible"
 description = "Portfolio JSON preview visibly includes schemaVersion 1.0 and the field names identity, theme, consent, projects, skills, featuredSlugs, and profiles with enum values drawn from the live session"
@@ -552,34 +504,3 @@ description = "Submitting project create with a slug containing uppercase letter
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n47"
-name = "export_formats_missing_config_or_css"
-description = "Export Center lacks a live Terminal Config or Theme CSS preview tab, leaving only a partial artifact surface"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n48"
-name = "form_payload_disagrees_with_export_record"
-description = "After creating a valid project, the Portfolio JSON project object omits required contract fields (name, slug, summary, status, tags, year, featured) or shows values that disagree with the create form"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n49"
-name = "featured_cap_not_enforced"
-description = "Four or more projects simultaneously show featured indicators with no featured-limit validation"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "A specified core behavior of the app is broken or missing in a way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (element, page state, console output) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

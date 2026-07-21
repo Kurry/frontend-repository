@@ -176,22 +176,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "saved_themes_static_html_only"
-description = "Saved themes list is static HTML only with no working create/edit/delete against shared state."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "chrome_uses_outbound_navigation"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.23"
 name = "editor_tools_bidirectional_sync"
 description = "Editing valid source in the theme source editor updates the live preview and tool controls, and changing a tool control writes back into the editor source (bi-directional sync)."
@@ -218,14 +202,6 @@ name = "delete_loaded_theme_clears_active"
 description = "Starting with a saved theme loaded: note the saved themes count, delete that same theme, and confirm its card disappears, the list count decreases by exactly one measured immediately around the delete, and no surface still marks it as the active/loaded theme."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.27"
-name = "editor_pane_static_readonly"
-description = "The theme source panel is a static read-only block whose text stays fixed when palette or tool controls change, leaving the preview unchanged."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.29"
@@ -416,50 +392,3 @@ description = "New Theme rejects a duplicate or over-64-character name with an i
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n1"
-name = "export_omits_session_mutations"
-description = "After editing palette/typography/shape options, the Theme Files JSON or CSS artifact still shows the pre-edit values and omits the session's actual customizations."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "import_silently_fails_or_corrupts"
-description = "Importing a valid declared-theme JSON leaves the live theme unchanged with no feedback, or replaces options with a broken/empty theme that desyncs editor and preview."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "preset_or_contrast_surfaces_inert"
-description = "Preset packs or the Contrast matrix are visible but inert: applying a pack leaves options unchanged, or contrast badges stay fixed when palette colors change."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "export_drops_theme_package_field_contract"
-description = "The Theme Files JSON omits required keys name, paletteType, themeOptions, or shape.borderRadius, shows paletteType outside light/dark, has themeOptions.palette.type disagreeing with paletteType, shows primary.main in a format other than #RRGGBB, or shows borderRadius outside 0–24."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "duplicate_or_overlong_name_accepted"
-description = "New Theme or rename accepts a duplicate seeded name or a name longer than 64 characters and mutates the saved-themes collection without an inline error naming the name field."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

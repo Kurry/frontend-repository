@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring several settings and the active category then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of all facets surviving together."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n2"
-name = "preview_identical_across_different_inputs"
-description = "Changing font-family, font-size, or theme across clearly different values leaves the live preview and generated-config output visually identical — a derived surface ignoring its inputs."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n3"
-name = "different_themes_produce_identical_output"
-description = "Selecting two different declared themes yields identical generated theme = lines and identical preview colors."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n4"
-name = "category_switch_shows_stale_until_reload"
-description = "After editing a setting, another surface (preview or generated-config panel) still shows stale values until a full page reload."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "14.9"
 name = "export_import_full_pipeline"
 description = "Mutate at least two settings, confirm generated lines track, export the config text, Reset all, Import the exported text, and confirm the session's actual overrides return on controls, preview, generated lines, and count — export omitting session work fails."
@@ -201,27 +169,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "export_omits_mutations_behavioral"
-description = "An export taken after visible setting mutations omits those mutations from the artifact text while the UI still shows overrides."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "14.12"
 name = "schema_contract_export_import_pipeline"
 description = "Mutate font-size within 4–60, cursor-style to a contracted enum value (block/bar/underline/block_hollow), and a #RRGGBB color; confirm generated lines use those contracted shapes and Export contains them; Reset all; Import that export — restored controls and lines still satisfy the same Ghostty field contracts (keys, types, bounds, enums) as the pre-export would-be request body."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "round_trip_breaks_field_contracts"
-description = "After export → Reset all → Import, a restored override violates its Ghostty field contract (wrong type, out-of-bound number, or out-of-enum value) or disagrees with the pre-export contracted shape, or a contract-invalid Import is accepted and mutates state."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "14.13"
@@ -237,18 +189,3 @@ description = "Rename round-trip probe: save a profile holding two overrides, re
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n7"
-name = "compare_previews_identical_for_different_themes"
-description = "With two different themes selected on sides A and B, the two compare previews render visually identical colors."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

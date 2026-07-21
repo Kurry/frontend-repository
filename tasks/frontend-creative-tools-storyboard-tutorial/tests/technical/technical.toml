@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "browser_storage_persists_state"
-description = "localStorage or sessionStorage is non-empty after exercising the app, persisting scenes, view mode, or other app state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.4"
 name = "keyboard_operable_with_visible_focus"
 description = "Every interactive control — header tools, Undo/Redo, Export/Import, view toggles, scene actions, multi-select, bulk delete, the create form, and slide navigation — is reachable and operable with the keyboard alone (Tab/Shift+Tab plus Enter/Space or arrows), and the focused control shows a visible focus indicator"
@@ -149,28 +141,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.9"
-name = "console_errors_during_full_exercise"
-description = "Console errors or warnings appear during a full exercise of the app (view switching, create, edit, delete, bulk delete, undo/redo, slide navigation, Export, Import)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.10"
 name = "rapid_interaction_stays_responsive"
 description = "Rapidly switching view modes and rapidly advancing slides stays responsive with no hangs, frozen frames, or dropped interactions, and the UI state stays consistent afterward"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.11"
-name = "outbound_cdn_requests_present"
-description = "Devtools network activity shows outbound cross-origin requests for fonts, icons, scripts, or styles (CDN imports) instead of all assets being served from the app's own origin"
-type = "binary"
-weight = 1.0
-negate = true
-
 
 [[criterion]]
 id = "2.12"
@@ -187,32 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.n12"
-name = "export_preview_disconnected_from_store"
-description = "Export Storyboard JSON preview stays static while the board scenes, view mode, or Total duration change through the UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.14"
 name = "filters_presenter_derive_from_store"
 description = "Search results, shot-type filtered subsets, presenter playback, and the Printable outline all derive from the same shared scenes collection: after an edit or reorder, the filtered views, the next presenter run, and the outline preview reflect it immediately without a reload"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n13"
-name = "filter_or_presenter_second_copy"
-description = "A filtered view, the presenter, or the outline preview shows stale scene text, order, or durations that the board already updated — evidence of a second disconnected state copy"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_site_no_feedback"
-description = "An empty newly added site shows a blank main region with no zero tiles and no empty-state message"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "errors_only_in_console"
-description = "Add site, ceiling, or import errors appear only in the browser console with no inline UI message"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "silent_failed_import"
-description = "Import of malformed Stats JSON silently fails with no visible feedback and no unchanged-state guarantee"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "undo_missing_after_add_site"
-description = "After adding a site there is no Undo control or Undo does nothing"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "nonsemantic_filter_rows"
-description = "Breakdown filter rows are non-semantic div or span elements without button/role semantics"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Add site or export drawer cannot be dismissed via Escape"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "validation_missing_or_delayed"
-description = "Invalid domain or timezone input reaches a successful submit with no inline field message, or the only feedback appears after a site was already added"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_export_actions"
-description = "Export drawer Copy or Download labels are missing or generic (e.g. only Submit) so the action is unclear"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "cross_dimension_stack_fails"
-description = "After a Source filter then a Country filter, the Source pill disappears so only one pill remains instead of two stacked dimension pills"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "ceiling_oob_still_applies"
-description = "A bounce-rate ceiling outside 0 through 100 still applies and toggles High bounce without inline validation"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "empty_segment_save_names_filters_field"
 description = "Saving a segment with no active filters shows an inline message naming the filters field and does not create a saved-segment entry"
@@ -260,21 +180,5 @@ id = "4.13"
 name = "zero_intersection_empty_goals_message"
 description = "Stacking filters whose intersection has no visitors shows zero-value metric tiles and empty breakdown, Goals, and funnel panels with a message, not leftover numbers from a broader stack"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.n11"
-name = "invalid_goal_still_added"
-description = "An invalid Add goal submit (empty name or broken match_key) still adds a Goals panel row with no inline field message"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

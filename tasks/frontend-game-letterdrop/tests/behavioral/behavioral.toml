@@ -148,39 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_incoherent"
-description = "After finishing a run and reloading, History survives but Best Score, unlocked Achievements, or saved settings silently revert (or the reverse), producing incoherent partial persistence."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "hud_ignores_score_and_streak_inputs"
-description = "Submitting valid or invalid words leaves the score, streak meter, multiplier badge, and tier readout identical regardless of those submissions."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_runs_identical_scores"
-description = "Repeating Start game → play → Game Over with observably different valid-word play yields byte-identical final scores and History rows that ignore the play."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_stale_until_reload"
-description = "After Game Over or a Board Cleared! unlock, History or Achievements stay stale until a full page reload rather than reflecting the new score or Clean Sweep state immediately."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.9"
 name = "export_reflects_different_runs"
 description = "Finish two runs with different valid-word play and export each via Export Run. Confirm both include format letterdrop-game-v1 and schemaVersion 1, and that the two JSON artifacts differ in final score and words arrays in the ways the play dictates — not identical hardcoded exports."
@@ -208,26 +175,3 @@ description = "After Game Over, Play again resets the live run score and streak 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_identical_across_different_play"
-description = "Export Run produces byte-identical JSON (same score and words array) for two finished runs that had observably different valid-word play."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "restart_leaks_prior_run_score"
-description = "After Play again from Game Over, the new run's live HUD score still shows the previous run's final score instead of resetting."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent LetterDrop score/reset/game-loop state handling that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot). If already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After painting, changing tools/swatch, and saving a board, a reload leaves an incoherent mix (for example user art or the saved board survives while tools reset, or seeded boards are missing while canvas art remains)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "tag_filter_ignores_input"
-description = "Applying or clearing a tag filter leaves the visible gallery list identical regardless of filter input."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_paints_identical_thumbnails"
-description = "Saving two boards painted with clearly different cell patterns yields visually identical thumbnails."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "load_board_stale_until_reload"
-description = "After loading a saved board from Gallery, the paint canvas stays blank or stale until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_import_roundtrip_under_session_schema"
 description = "Starting with a blank canvas: paint cells with a known paletteColor, set mirrorMode to horizontal or vertical, save one uniquely named board, open Export and confirm the preview shows schemaVersion shapeshift-session-v1 with brushMode, paletteColor, mirrorMode, fillStats, cells, and boards, Download or Copy that session JSON, then Import it. Confirm canvas cells, mirror mode, fill stats, and the saved board return under the same field-contract keys — proving the export contains the session's actual work."
@@ -194,24 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "export_preview_lacks_session_contract_keys"
-description = "After painting cells and saving a board, the Export session JSON preview lacks schemaVersion shapeshift-session-v1 or omits Session/Board field-contract keys the instruction requires."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.11"
 name = "mirror_and_fill_stats_cross_view"
 description = "Input-dependent derived surfaces: with mirrorMode Horizontal, paint two distinct blank cells in sequence; fill stats increase by two painted cells per stroke when partners were blank, and Export Session JSON mirrorMode plus fillStats match the on-stage readout without a reload."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

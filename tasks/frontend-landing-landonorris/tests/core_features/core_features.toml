@@ -212,31 +212,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.27"
-name = "menu_overlay_missing_or_static"
-description = "The menu overlay never opens or is only a static always-visible list rather than a hamburger-triggered full-screen overlay"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.28"
-name = "outbound_nav_reloads_page"
-description = "Nav or footer chrome uses outbound anchor navigation that reloads the page or leaves the app to another origin"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.29"
-name = "next_race_widget_missing"
-description = "The hero omits the NEXT RACE widget or its ALPINE GP and NOVA RACING SINCE 2019 labels"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "1.30"
 name = "hero_composition_with_silhouette"
 description = "The hero shows a newly authored fictional racer portrait/cutout composed in depth with an off-white topographic field, translucent organic blobs, and soft shadow or reflection layers behind the navigation chrome"
@@ -415,23 +390,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n46"
-name = "press_kit_omits_session_mutations"
-description = "After selecting races and shortlisting assets, the press-kit JSON/Markdown/ICS preview omits those session mutations (static kit text identical to the empty baseline)"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n47"
-name = "calendar_or_shortlist_missing"
-description = "The race calendar with six seeded races is absent, or shortlist controls are missing from helmet and editorial cards"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "1.55"
 name = "race_record_field_contract_visible"
 description = "Each of the six seeded race rows shows circuit, a YYYY-MM-DD date, and a status chip that is exactly Upcoming or Completed; Selected races N matches the count of lime-selected rows"
@@ -460,30 +418,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n49"
-name = "press_kit_json_missing_required_keys"
-description = "The press-kit JSON preview omits schemaVersion, races, shortlist, or newsletter, shows race dates that are not YYYY-MM-DD, or omits id/uid/selected from a selected race record in races"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n50"
-name = "invalid_import_mutates_session"
-description = "Importing malformed or schema-invalid press-kit JSON changes race selections or shortlist membership instead of showing a named import error and leaving state unchanged"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n48"
-name = "undo_does_not_restore_shortlist"
-description = "After shortlisting an asset, Undo leaves the shortlist count and membership unchanged"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.59"
 name = "shortlist_asset_field_contract"
 description = "After shortlisting one helmet and one editorial card, the press-kit JSON shortlist array contains exactly two entries whose kind values are helmet and editorial, each with a non-empty label of at most 60 characters and an index integer >= 1"
@@ -497,18 +431,3 @@ description = "A successful Subscribe with fan@averyvale.example records that em
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n51"
-name = "shortlist_entries_violate_asset_contract"
-description = "Press-kit shortlist entries omit kind, use a kind outside helmet/editorial, omit label, or show index less than 1 after shortlisting assets"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core homepage features or flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

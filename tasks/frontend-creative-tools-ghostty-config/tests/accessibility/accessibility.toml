@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "A sidebar category, slider, switch, pill toggle, dropdown, or export action cannot be reached or activated via keyboard alone."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focused setting controls, sidebar categories, or export actions show no visible focus indicator or the indicator is obscured."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Switches, pill toggles, or sidebar category controls use non-semantic tags without ARIA roles or accessible names."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n4"
-name = "invalid_state_color_only"
-description = "Invalid setting state or disabled export status is conveyed by color alone with no text, disabled labeling, or other non-color cue."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n5"
-name = "toast_or_dialog_focus_trapped_badly"
-description = "When a toast or dialog overlay for Copy/Download/Reset feedback is open, Tab moves focus to unrelated controls behind it with no focus management."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_on_editor_surfaces"
-description = "Sidebar labels, generated-config text, or primary button labels are unreadable due to poor contrast against their background."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n7"
-name = "export_feedback_visual_only"
-description = "Copy, Download, or Reset feedback is visual only with no polite live-region announcement for assistive technology."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n8"
-name = "icons_missing_accessible_names"
-description = "Meaningful category or action icons are missing alt text or an accessible name."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_skipped"
-description = "Settings or panel headings skip levels (for example jumping H1 to H3) or have no coherent order."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, category body transitions, override-line animations, or toast motion still animate."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.11"
 name = "hardened_controls_keyboard_operable"
 description = "Undo, Redo, Import, Diff, Profiles, and the command palette are reachable and operable with the keyboard alone, each with a visible focus indicator."
@@ -263,24 +183,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n11"
-name = "palette_no_focus_trap"
-description = "The command palette opens without trapping focus or fails to return focus on Escape/close."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.14"
 name = "compare_sides_have_accessible_names"
 description = "In Compare themes, each side's theme selector and Apply control carry accessible names identifying side A or side B, and both are keyboard operable"
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

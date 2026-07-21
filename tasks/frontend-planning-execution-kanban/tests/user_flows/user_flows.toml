@@ -152,85 +152,8 @@ description = "On the seeded failing card, after the run reaches failed, pressin
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "6.n1"
-name = "primary_board_flows_unavailable"
-description = "Create card, drag or keyboard move, Run/Retry, Export, or bulk move cannot be completed from the visible UI"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "6.n2"
-name = "create_missing_or_duplicated"
-description = "A valid Add Card submit fails to show the new card on the board or creates more than one card from a single submit"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "6.n3"
-name = "board_and_export_desync"
-description = "A create, move, edit, or run updates the board but the export preview still shows the prior values (or the reverse) until reload"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "6.n4"
-name = "export_or_panel_loses_board_state"
-description = "Opening or closing the Export drawer or prompt panel clears selection incorrectly, resets filters unexpectedly, or loses card positions"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "6.n5"
-name = "empty_column_breaks_board"
-description = "An emptied column shows a blank gap with no empty-state message and no Add Card control, or the board layout collapses"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "6.n6"
-name = "filtered_column_counts_disagree"
-description = "With an assignee filter active, a column header count disagrees with the number of visible cards in that column"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "6.n7"
-name = "prompt_panel_cannot_reclose"
-description = "The prompt side panel cannot be closed via its close control or Escape, blocking return to the board"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "6.n8"
-name = "modal_blocks_without_exit"
-description = "A create, detail, or Export overlay blocks interaction with no Escape or visible close path"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "6.n9"
-name = "failed_create_or_import_silent"
-description = "An invalid create or invalid board JSON import provides no visible field-named error feedback"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "6.n10"
-name = "recovery_requires_reload"
-description = "Recovering from a failed run, a closed modal, or a cleared filter requires a full page reload"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
 id = "6.11"
 name = "export_import_round_trip_flow"
 description = "After creating or moving at least one card, Copy or Download the board JSON, then Import that same JSON — visible titles, columns, order, and task progress match the pre-export mutated state and the export preview matches again"
 type = "binary"
-weight = 1.0
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0

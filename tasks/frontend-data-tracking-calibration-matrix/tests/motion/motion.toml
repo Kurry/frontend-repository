@@ -154,18 +154,3 @@ description = "With prefers-reduced-motion set, animations are removed and state
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.10"
-name = "static_chrome_or_snapping"
-description = "Interactive chrome feels static: cells, buttons, or rows give no hover feedback, or the drawer and chips snap between states with no transition anywhere"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

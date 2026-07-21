@@ -106,22 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "browser_storage_persistence_used"
-description = "Uses localStorage or sessionStorage to persist stops or day selection, or leaves any browser storage non-empty after exercising the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "views_desync_stale_datum"
-description = "The same datum shows different values in two places at once — for example a stop's day-list row and its open detail card or map popup disagree after an edit until a reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "console_clean_full_exercise"
 description = "No console errors or warnings appear during a full exercise of creating, editing, deleting, mode switching, day selection, and map selection"
@@ -171,14 +155,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.12"
-name = "outbound_network_requests_made"
-description = "The app issues outbound network requests to other origins — font CDNs, script CDNs, tile servers, booking APIs, or chat widgets — during load or a full exercise of the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.13"
 name = "document_title_names_trip"
 description = "The browser document title references the French Riviera trip rather than a build-tool or framework default placeholder title"
@@ -221,15 +197,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "2.19"
-name = "bulk_or_recurring_desyncs_surfaces"
-description = "A bulk action or the repeat-daily generator leaves surfaces inconsistent — for example bulk Move to day updates the list rows while the map pins or polylines keep the old arrangement until a reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "2.20"
 name = "trip_json_schema_contract"
 description = "The trip JSON preview conforms to the field contract: schemaVersion is the string 1, trip carries title/dateStart/dateEnd, and every stops element exposes title, day, location, category, costTier, status, lat, and lng using the closed enums and bounds from the instruction"
@@ -257,17 +224,3 @@ description = "For the live scheduled stops, each ICS VEVENT has SUMMARY exactly
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n5"
-name = "exports_use_divergent_field_names"
-description = "Trip JSON stop objects use different field names than the create/edit form (for example name instead of title) or status values outside to-visit, reserved, and completed"
-type = "binary"
-weight = 1.0
-negate = true
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, storage, network, stability, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network request, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

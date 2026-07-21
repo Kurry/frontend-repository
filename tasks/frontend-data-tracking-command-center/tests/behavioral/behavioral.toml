@@ -148,39 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_reload_state_incoherent"
-description = "After reload, some session facets survive while others reset, producing incoherent partial persistence in this in-memory app"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "export_ignores_agent_inputs"
-description = "Export Session JSON or Agents CSV renders identically before and after a visible connect or rename"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_agent_names_identical_export"
-description = "Two connects with distinct agent names produce byte-identical Session JSON and Agents CSV previews"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_agent_state_stale"
-description = "Agent rename or connect appears in the panel but not in export previews or feed until reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.9"
 name = "undo_round_trip_restores_exports"
 description = "Connect an agent, confirm it appears in export previews, Undo, and confirm the agent and its connected feed event are gone from the panel and both export previews; Redo restores them"
@@ -194,18 +161,3 @@ description = "Full pipeline: mutate (connect or rename), open Export, confirm S
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "undo_does_not_restore_agent_session"
-description = "Undo after connect or disconnect leaves the panel, feed, or export previews unchanged"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

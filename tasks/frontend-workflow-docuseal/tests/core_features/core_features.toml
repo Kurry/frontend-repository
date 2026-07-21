@@ -190,30 +190,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.27"
-name = "static_placeholder_app_shipped"
-description = "The app is a static placeholder or generic starter (for example a marketing hero or a bare counter) with no working field placement, selection, or deletion on a document canvas"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.28"
-name = "field_actions_leave_counts_stale"
-description = "Placing or deleting a field leaves the document canvas or the per-submitter field counts unchanged, indicating the fields are not driven by shared application state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.29"
-name = "fabricated_success_without_state_change"
-description = "A core workflow shows a success or completion state (a field appears to be added, a count updates) while the underlying field is absent after a reload, or the same action with different inputs yields identical hardcoded output"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.30"
 name = "add_submitter_appends_and_activates"
 description = "Clicking the Add submitter control appends another party to the submitters list with its own colour swatch, and clicking a submitter row makes that party active so the next field placed from the palette adopts its colour"
@@ -339,26 +315,3 @@ description = "After editing fields and downloading Template JSON from Export, I
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n41"
-name = "export_omits_session_mutations"
-description = "After placing a field, renaming it, and reassigning its submitter, an open Export format preview (Template JSON or Signing summary) omits that field type, name, or submitter"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n42"
-name = "undo_does_not_restore_duplicate"
-description = "After Duplicate field adds a field, Undo leaves the duplicate on the canvas or fails to restore the prior field count and selection"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

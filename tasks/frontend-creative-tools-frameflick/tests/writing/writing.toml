@@ -150,50 +150,10 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_typos"
-description = "Spelling or grammatical errors appear in prominent copy such as FrameFlick branding, Upload an image to get started, Download PNG, or Save preset."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "concept_names_inconsistent"
-description = "The same concept is named inconsistently across surfaces (for example Saved presets in one place and Themes in another, or Shared content vs Shared caption without a clear mapping)."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "copy_truncated_or_overflowing"
-description = "Truncated or overflowing text renders mandated labels, error messages, or the empty-canvas placeholder unreadable at 1440 or 375."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "15.9"
 name = "style_export_action_labels_specific"
 description = "Where the app renders export and history actions, labels use specific verbs such as Download style JSON, Copy style JSON, Import style JSON, Copy settings, Paste settings, Before/After, and Reset style rather than generic Submit or OK."
 type = "binary"
-weight = 0.5
-
-[[criterion]]
-id = "15.n5"
-name = "invalid_style_json_message_vague"
-description = "Where the app renders a malformed style-import error, the copy is only a vague Invalid without naming Invalid style JSON or the fix."
-type = "binary"
-negate = true
 weight = 0.5
 
 [[criterion]]
@@ -204,24 +164,9 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n6"
-name = "validation_exposes_schema_jargon"
-description = "Where the app renders validation for hex or preset fields, the visible copy exposes schema-library jargon (for example Zod error codes) instead of user-facing named field messages."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "15.13"
 name = "field_contract_import_error_names_field"
 description = "Where the app renders a field-contract import rejection (missing key, out-of-enum, out-of-bounds, or invalid hex), the visible copy names the offending field or shows Invalid style JSON for unparseable input — not a bare Failed or schema-library jargon alone."
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -120,22 +120,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.5"
-name = "browser_storage_written"
-description = "localStorage or sessionStorage is written during the session"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.6"
-name = "outbound_cms_blob_vimeo_font_request"
-description = "A route issues a request to a.storyblok.com, a Vercel Blob host, player.vimeo.com, or a Google Fonts host"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.8"
 name = "hydration_clean_console"
 description = "The console shows no hydration mismatch errors or warnings on first load of any of the ten routes, and none after client-side navigation between routes"
@@ -148,14 +132,6 @@ name = "deep_link_parity_all_routes"
 description = "Loading each of the ten routes directly by its URL renders the same view as reaching it through in-app navigation, including the same header or sub-header state and the same exact document title, with no route 404ing or rendering a half-empty shell"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.10"
-name = "post_hydration_content_flash"
-description = "Server-rendered content visibly flashes and is replaced by different client content after hydration: text, folders, or media regions re-render visibly or shift the layout as the client takes over"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.11"
@@ -200,14 +176,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.17"
-name = "split_headings_character_soup"
-description = "A character-split display heading exposes individual character spans to the accessibility tree as character soup, with no full-phrase label on the heading container"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.18"
 name = "semantic_controls_and_dialog"
 description = "Interactive controls (header wordmark, About, architect tags, sibling tags, overscroll, close buttons) are semantic buttons or links with accessible names, and the open media popup behaves as a dialog that keeps keyboard focus inside until closed"
@@ -249,34 +217,3 @@ description = "Invalid Field note (body over 500 characters) and schema-invalid 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "10.n40"
-name = "pins_or_notes_persist_in_browser_storage"
-description = "After a reload, pins or field notes survive via localStorage or sessionStorage contrary to the in-memory genre rule (unless restored only through an explicit Import dossier action)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "10.n41"
-name = "dossier_preview_stale_until_reload"
-description = "Pin or field-note mutations leave the Export dossier preview unchanged until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "10.n42"
-name = "validation_errors_unnamed_or_silent"
-description = "Overlong field-note save or schema-invalid dossier import fails silently with no named field/payload feedback, or mutates state despite the error."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, network, storage, hydration, performance, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

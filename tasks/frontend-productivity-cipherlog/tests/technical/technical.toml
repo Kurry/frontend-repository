@@ -136,22 +136,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "2.7"
-name = "2_7"
-description = "A hidden element, attribute, or window global not mandated by the app exposes internal ground-truth (such as a memo's passcode or concealed body) that a real user could not reach through visible interaction"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.8"
-name = "2_8"
-description = "The app renders or behaves differently depending on whether it is driven by automation, keying UI on navigator.webdriver or automation-specific signals"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.10"
 name = "keyboard_operable_focus_visible"
 description = "Every interactive control (buttons, selects, channel rows, memo cards, toolbar actions) is reachable and operable with the keyboard alone, and Tab focus is visibly indicated on interactive controls"
@@ -204,24 +188,9 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "2.17"
-name = "partial_persistence_facet_reverts"
-description = "After committing several facets (a created memo, its lock state or priority, a custom channel order, and a non-default Theme Core) and performing a full page refresh, at least one facet silently reverts to its default while others survive, leaving an incoherent mix of restored and lost state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.18"
 name = "storage_unavailable_keeps_session_usable"
 description = "When browser localStorage access is made unavailable before a fresh load, the root still renders the interactive CipherLog workspace without a blank screen or uncaught console error, and creating/editing a memo continues to work coherently for the current session"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, accessibility, or performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

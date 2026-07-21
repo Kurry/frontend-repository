@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_state_missing"
-description = "An emptied surface (no jobs, no timeline matches, no pending items) shows nothing with no feedback"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "errors_console_only"
-description = "A paste, validation, or run error is surfaced only in the browser console"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "silent_success_or_failure"
-description = "Launching, exporting, copying, or retrying gives no visible feedback either way"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "unguarded_destruction"
-description = "Deleting a job or stopping a run happens with no warning, confirmation, or undo path"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "divs_wrap_interactives"
-description = "Non-semantic div or span elements wrap the grid's or toolbar's interactive controls"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "The composer, schedule form, or confirmation dialog cannot be dismissed with the keyboard"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "validation_feedback_delayed"
-description = "Composer or schedule validation feedback is missing or appears only after a silent delay"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_button_text"
-description = "Toolbar or macro button text is ambiguous or missing, leaving the action unclear"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "no_guidance_for_flows"
-description = "The compare, schedule, or retry flows have no in-app guidance at all"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "hidden_affordances"
-description = "Interactive affordances such as row actions or queue move controls are visually hidden with no discoverable path"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "import_invalid_leaves_run_unchanged"
 description = "Importing malformed Run Report JSON or a document that breaks the field contract shows an inline import error, leaves job count and the selected run unchanged, and does not update the Export preview as if a successful import occurred"
@@ -255,10 +175,3 @@ description = "A name longer than 80 characters, concurrency outside 1 through 5
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

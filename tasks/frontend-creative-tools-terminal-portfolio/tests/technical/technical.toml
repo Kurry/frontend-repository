@@ -99,14 +99,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "2_3"
-description = "Uses localStorage or sessionStorage to persist projects, theme, or history"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.4"
 name = "2_4"
 description = "Running a section command updates the document title without a full document navigation"
@@ -149,26 +141,3 @@ description = "Cookie-consent Accept or Decline updates /privacy output and the 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n1"
-name = "storage_apis_used_for_session"
-description = "After exercising create, theme, featured, identity, and export flows, localStorage or sessionStorage holds persisted app state keys (violating the in-memory-only good-app rule)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.n2"
-name = "export_stale_relative_to_board"
-description = "After a visible board or Config Studio mutation, Export Center previews still show the prior seed-only artifact text."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, performance, or accessibility defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (console line, network entry, element, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

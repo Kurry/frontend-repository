@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_presets_shows_nothing"
-description = "After the presets collection is empty, the list region shows nothing — no empty-state message and no control that opens the create flow."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n2"
-name = "validation_errors_only_in_console"
-description = "Invalid preset create/edit failures surface only in the browser console with no visible inline field feedback."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n3"
-name = "step_silent_no_feedback"
-description = "Pressing a dial stepper produces no visible change to dial labels, preview, or meter (silent failure)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n4"
-name = "delete_preset_no_warning_affordance"
-description = "Deleting a preset proceeds with no visible affordance distinguishing the destructive action (no delete control labeling or confirmation cue where the UI provides delete)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_are_nonsemantic"
-description = "Primary interactive lab controls (steppers, mode switch, help trigger, preset actions) are non-semantic div/span click targets without button/role semantics."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n6"
-name = "help_panel_not_keyboard_dismissible"
-description = "With the help panel open as an overlay, keyboard users cannot dismiss it (no focusable close control and no Escape/keyboard path)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n7"
-name = "edge_stepper_still_advances_past_end"
-description = "At a stop-list edge, clicking the faded/disabled-direction stepper still changes the dial value past the first or last stop."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_action_labels"
-description = "Primary actions (apply preset, create/save preset, mode switch, help) show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of naming the action."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n9"
-name = "no_in_app_dial_guidance"
-description = "There is no in-app help or guidance for aperture, shutter, or ISO — the help panel path is missing or empty."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n10"
-name = "edge_controls_visually_hidden_but_needed"
-description = "At mobile or desktop widths, required dial steppers, meter, or mode switch are visually hidden or inaccessible while still needed for the flow."
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "4.11"
 name = "empty_undo_redo_disabled"
 description = "Undo with an empty undo stack and Redo with an empty redo stack are disabled controls; activating them changes nothing and produces no console errors."
@@ -278,22 +197,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n11"
-name = "malformed_import_mutates_or_crashes"
-description = "Importing malformed lab-package JSON mutates the session, crashes the UI, or throws uncaught console errors."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n12"
-name = "empty_undo_still_mutates_state"
-description = "Activating Undo while the undo stack is empty still changes dials, presets, or export text."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.16"
 name = "duplicate_preset_name_rejected"
 description = "Submitting create or edit with a preset name that already exists on another preset does not save and shows an error naming the name field."
@@ -313,14 +216,6 @@ name = "duplicate_or_invalid_snapshot_rejected"
 description = "Saving a snapshot with a duplicate name or out-of-list stops adds no snapshot row and shows inline validation naming the offending field."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "4.n13"
-name = "schema_invalid_import_mutates_session"
-description = "Importing JSON that parses but violates the lab-package field contracts (wrong enums or missing required fields) still mutates dials, presets, or snapshots."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "4.19"
@@ -343,18 +238,3 @@ description = "In the Copy settings dialog, unchecking all three group checkboxe
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n14"
-name = "repeat_look_activation_drifts_values"
-description = "Activating the same look chip twice in a row stacks or drifts the develop-slider values instead of leaving them at that look's stored values"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

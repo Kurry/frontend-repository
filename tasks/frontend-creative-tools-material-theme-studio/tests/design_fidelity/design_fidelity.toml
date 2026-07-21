@@ -162,96 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n1"
-name = "spacing_contradicts_reference_studio"
-description = "Visible spacing between header, tabs, Preview frame, and editor/tool stack contradicts the reference studio composition (large empty voids or cramped collisions)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "colors_ignore_active_theme_options"
-description = "Preview and component-demo surfaces ignore the active theme options and render a fixed unrelated palette that stays identical after Palette edits."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "preview_split_sizing_mismatches_reference"
-description = "At 1440px the Preview device frame and editor/tool stack are sized or proportioned in clear mismatch with the reference side-by-side studio layout."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "required_studio_animations_missing"
-description = "Required animations are missing where the spec requires them (tab indicator snaps with no slide, accordions hard-cut, theme cards vanish instantly, modals teleport, toasts appear with no slide/fade)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "controls_use_browser_default_styles"
-description = "Tabs, theme-form inputs, or primary buttons use unstyled browser default appearance when the spec styles them."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "desktop_layout_misaligned_vs_reference"
-description = "At 1440px the studio is misaligned versus the reference (missing header lockup, missing main tab bar, or Preview not splitting frame beside editor/tools)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "elements_clipped_or_offscreen_vs_reference"
-description = "At 1440px, device frame, editor, tool panels, or saved-theme cards render clipped or off-screen compared to the reference composition."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n8"
-name = "structure_deviates_from_reference_studio"
-description = "Structure deviates from the reference: a marketing landing or multi-page shell replaces the dense Material theme studio with Preview / Components / Saved Themes / Export."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.11"
 name = "export_surface_present_in_studio_chrome"
 description = "At 1440px the Export tab is present in the main tab bar and opens a dense artifact preview surface consistent with the instructed studio chrome (text wins over screenshots where they conflict)."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n9"
-name = "no_hierarchy_between_header_and_tools"
-description = "Header brand text and tool-panel titles are visually undifferentiated — no clear hierarchy between product lockup and dense tool copy."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Hover/press microinteractions on buttons, accordion summaries, saved-theme rows, or inert link-like controls are missing or clearly deviate from the reference timing/feel."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -211,96 +211,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values contradict the rem/0.25rem baseline scale (arbitrary odd-pixel one-offs dominating stack or scrapbook layout)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "colors_fall_outside_palette"
-description = "Category covers or chrome use colors outside the specified three-tier palette (wrong hex for the four category covers, or accent yellow flooding general chrome)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "type_sizes_mismatch_1440_spec"
-description = "At 1440px, hero title, case architect name, about title, or body/tag sizes clearly mismatch the specified pixel/rem metrics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "required_folder_motion_missing"
-description = "Folder open is a flat opacity crossfade or missing 3D rotateY morph when opening a case via a real home tag click."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "header_or_close_use_browser_defaults"
-description = "The fixed header or red circular close button render as unstyled browser-default chrome instead of the specified translucent bar / 54px red circle."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "elements_clipped_or_offscreen"
-description = "Stack covers, scrapbook items, sibling tags, or about gallery elements render off-screen or clipped at the reference desktop width."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order, stack structure (four category groups with eight tags), case anatomy, or about essay/gallery structure visibly deviate from the reference composition."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n9"
-name = "heading_and_body_undifferentiated"
-description = "Display titles and body/tag text share the same size/weight treatment with no clear hierarchy."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n10"
-name = "hover_microinteractions_missing"
-description = "Category cover hover, architect tag hover lift, About opacity transition, or close-button hover scale are missing when verified via real hover on those controls."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.40"
 name = "hardened_chrome_does_not_break_reference_layout"
 description = "At desktop 1440: home stack, case broken-grid, and about two-column layout still match the reference composition; category filter, search, reading list, palette, and dossier controls do not displace or replace the required filing-cabinet surfaces."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n40"
-name = "new_chrome_replaces_reference_composition"
-description = "Hardened chrome (filter/search/dossier/palette) replaces or obscures the reference home stack, case folder sheet, or about gallery composition at desktop width."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

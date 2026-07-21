@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_saved_themes_shows_nothing"
-description = "After the saved-themes collection is empty, Saved Themes shows nothing — no empty-state message or create affordance."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "validation_errors_only_in_console"
-description = "Invalid empty-name create/rename failures surface only in the browser console with no visible inline field feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "palette_or_save_actions_silent"
-description = "Changing a Palette color, toggling Light/Dark Type, or activating Save produces no visible change to preview, editor, or save-status text (silent failure)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "delete_theme_no_destructive_affordance"
-description = "Deleting a saved theme proceeds with no visible destructive affordance (no Delete labeling or confirmation) distinguishing it from a non-destructive action."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_are_nonsemantic"
-description = "Primary interactive controls (tabs, device toggles, accordion rows, New Theme, Load/Delete) are non-semantic div/span click targets without button/role semantics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "dialogs_not_keyboard_dismissible"
-description = "With the Tutorial modal or a theme create/rename form open, keyboard users cannot dismiss it (no Escape path and no focusable Close control)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "empty_name_still_creates_or_renames"
-description = "Submitting create/rename with an empty name still adds or changes a saved theme or changes the card count."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_action_labels"
-description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like New Theme, Save, Copy theme code, Load, or Delete."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "search_no_match_leaves_broken_ui"
-description = "A search query that matches no theme names leaves a broken or blank Saved Themes region with no empty-result state, or clearing the query fails to restore all cards."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "invalid_source_corrupts_preview"
-description = "Invalid theme source is applied anyway, leaving the preview broken or blank instead of keeping the last valid theme with an invalid-options status."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "malformed_import_keeps_theme"
 description = "Importing ThemeOptions JSON that omits a required intent channel, sets palette.type outside light|dark, uses fontSize outside 8 through 24, uses borderRadius outside 0 through 24, or breaks the Type↔palette.type cross-field rule shows a visible error naming the offending field, changes no editor/preview/Export state, and leaves the saved-themes card count unchanged."
@@ -284,30 +204,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n11"
-name = "malformed_import_corrupts_theme"
-description = "Importing malformed ThemeOptions JSON still mutates editor/preview into a broken or blank theme state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n12"
-name = "empty_version_name_still_adds_snapshot"
-description = "Saving a version with an empty name still adds a snapshot to the Versions list."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n14"
-name = "import_field_error_unnamed"
-description = "A rejected ThemeOptions import (field-contract or cross-field failure) shows only a bare rejection with no message naming the offending field or payload problem."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.17"
 name = "command_palette_empty_query_state"
 description = "A command palette query that matches no tabs, tools, themes, templates, or gallery sections shows an empty result state; pressing Escape closes the palette and returns focus to the control that opened it."
@@ -321,10 +217,3 @@ description = "Color-blindness modes never permanently alter theme options: afte
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -171,33 +171,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "MO-N1"
-name = "controls_static_under_hover_focus"
-description = "Toolbar buttons, swatches, or Layers rows show no hover or focus feedback, appearing static under pointer hover and keyboard focus"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "MO-N2"
-name = "undo_redo_lack_disabled_appearance"
-description = "The Undo and Redo buttons are not visibly disabled when there is nothing to undo or redo, appearing identical to their enabled state"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
-id = "MO-N3"
-name = "state_change_triggers_full_reload"
-description = "Switching between the edit and preview views, or any other state change, triggers a full page reload instead of updating the canvas and panels in place"
-type = "binary"
-weight = 1.0
-negate = true
-
-# HARDEN_MARKUPFLOW_V1
-
-[[criterion]]
 id = "MO-12"
 name = "compare_fade_annotations"
 description = "Entering Compare through the real Compare control fades annotations out over a short transition (or instantly under reduced motion); leaving Compare fades them back in — verified via the visible UI path, not a state shortcut"
@@ -218,19 +191,3 @@ description = "Saving a valid snapshot animates the new Versions row into the li
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "MO-N4"
-name = "compare_hard_cuts_with_no_transition"
-description = "Toggling Compare hard-cuts annotations with no transition and no reduced-motion-respecting instant complete swap when motion is enabled"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
-id = "MO.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

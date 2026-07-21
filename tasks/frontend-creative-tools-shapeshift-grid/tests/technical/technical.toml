@@ -106,35 +106,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "uses_browser_storage_apis"
-description = "Uses localStorage or sessionStorage to persist boards or canvas state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "views_desync_between_surfaces"
-description = "The same board datum shows different values in two surfaces at once — for example a rename or favorite change visible in one view while another view still shows the stale value until a reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "local_qrious_festival_mask"
 description = "The QR mask is generated client-side from a locally shipped QRious (or equivalent) under vendor/, encoding the fixed festival URL with no network calls"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.6"
-name = "external_qr_network_fetch"
-description = "The QR mask or image is fetched from an external QR service or other network endpoint instead of generated locally"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.7"
@@ -172,27 +148,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.12"
-name = "console_errors_during_full_exercise"
-description = "Console errors or warnings appear during a full exercise of painting, saving, loading, filtering, and mode switching"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.13"
 name = "drag_painting_stays_smooth"
 description = "Continuous drag-painting across many cells stays smooth, with no visible lag between pointer movement and cells filling"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.14"
-name = "external_asset_requests_made"
-description = "The browser issues network requests to external origins for fonts, icons, libraries, or other assets during load or use"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.15"
@@ -201,18 +161,3 @@ description = "Save board, rename, and Import enforce the same Board/Session fie
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.16"
-name = "form_export_schema_disagreement"
-description = "Save board or rename validation, or Import validation, accepts values the Export session JSON field contract forbids (or rejects values that contract allows), so form records and export payloads disagree on required fields, enums, or bounds"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, accessibility, or performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network request, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

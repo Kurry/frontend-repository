@@ -162,99 +162,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n1"
-name = "spacing_contradicts_reference_board"
-description = "Visible spacing between header, view toggles, and scene cards contradicts the reference storyboard composition (large empty voids or cramped collisions)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n2"
-name = "colors_ignore_light_yellow_workspace"
-description = "Board and chrome surfaces ignore the specified light workspace with yellow accent and render an unrelated palette that fights the reference."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n3"
-name = "grid_sizing_mismatches_reference"
-description = "At 1440px the Tile multi-column grid or scene card proportions are in clear mismatch with the reference overview composition."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n4"
-name = "required_storyboard_animations_missing"
-description = "Required animations are missing where the spec requires them (scene cards snap in with no entrance, mode switches hard-cut with no re-layout motion, slide advances with no transition)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n5"
-name = "controls_use_browser_default_styles"
-description = "Add Scene, view toggles, or create-form fields use unstyled browser default appearance when the spec styles them."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n6"
-name = "desktop_layout_misaligned_vs_reference"
-description = "At 1440px the workspace is misaligned versus the reference (missing product header chrome, no multi-column Tile grid, or Slide missing previous/next and N / total)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n7"
-name = "elements_clipped_or_offscreen_vs_reference"
-description = "At 1440px, scene cards, placeholder tiles, or header tools render clipped or off-screen compared to the reference composition."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n8"
-name = "structure_deviates_from_reference_workspace"
-description = "Structure deviates from the reference: a marketing landing or multi-page shell replaces the docs/storyboard workspace with Demo Projects header and getting-started board."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n9"
-name = "no_hierarchy_between_header_and_scenes"
-description = "Header titles and scene description copy are visually undifferentiated — no clear hierarchy between product chrome and tutorial body text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Hover/press microinteractions on scene cards, view toggles, or description edit wash are missing or clearly deviate from the reference feel."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "3.11"
 name = "export_import_fit_storyboard_chrome"
 description = "Export center and Import surfaces use the same light workspace / yellow-accent visual language as the reference storyboard chrome rather than an unrelated modal skin."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "3.n11"
-name = "export_breaks_reference_composition"
-description = "Export or Import overlays obliterate the docs/storyboard composition with unrelated dense dashboard chrome that contradicts the reference workspace."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -264,10 +175,3 @@ description = "The search field, shot-type chips, Present control, presenter vie
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

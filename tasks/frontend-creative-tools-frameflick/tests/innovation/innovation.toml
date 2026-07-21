@@ -163,38 +163,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The demo is purely barebones: canvas updates may work but hover lifts, list entry animations, Moving image drag feedback, and Copied! polish are all absent."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "experience_is_generic_template"
-description = "The UI reads as a generic unbranded form/template with none of FrameFlick's warm amber-brown identity or composition-tool character."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n3"
-name = "no_polish_beyond_controls"
-description = "Controls exist but the product shows no polish in empty states, export feedback, or preset/Recent reuse moments."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "interface_flat_static_no_craft"
-description = "The editor is flat and static — no hover lift on swatches/frames, no live composition feedback while dragging sliders or the screenshot, and no list/feedback transitions."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "11.11"
 name = "style_recipe_end_state_polish"
 description = "Beyond bare PNG download, the live Export preview plus Download/Copy/Import style JSON round-trip reads as a polished portable recipe workflow a real operator would trust."

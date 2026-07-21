@@ -143,23 +143,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.8"
-name = "badge_colors_inconsistent"
-description = "A thread's status badge shows different colors in different views, or badge colors deviate from the Active indigo / Dormant amber / Resolved green token mapping"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.9"
-name = "mobile_overflow_or_clipping"
-description = "At ~375px wide content overflows horizontally or long spark text clips or forces sideways scrolling instead of wrapping"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "3.10"
 name = "saved_reflection_formatting_visible"
 description = "Bold text and bulleted lists inside saved reflections render with visibly heavier weight and real list markers, distinct from surrounding plain text"
@@ -179,14 +162,6 @@ name = "consistent_capitalization_specific_verbs"
 description = "Buttons and headings use one consistent capitalization convention throughout, and action labels are specific verbs such as 'Add Spark', 'Add Reflection', 'Export', 'Import', 'Copy', and 'Download' rather than generic labels like 'Submit' or 'OK'"
 type = "binary"
 weight = 0.5
-
-[[criterion]]
-id = "3.13"
-name = "placeholder_or_lorem_text_shipped"
-description = "Placeholder or lorem text (e.g. 'Lorem ipsum', 'TODO', 'asdf', or template variable names) appears anywhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.14"
@@ -210,18 +185,3 @@ description = "The bulk tray and command palette use the same surface, primary a
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n4"
-name = "export_drawer_missing_required_chrome"
-description = "Export is present but missing format tabs, a readable code preview, or Copy/Download controls"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

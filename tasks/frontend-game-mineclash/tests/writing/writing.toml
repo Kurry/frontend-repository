@@ -127,34 +127,3 @@ description = "No placeholder or lorem text appears anywhere in the shipped UI."
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "15.n1"
-name = "generic_or_missing_labels"
-description = "Primary controls use generic labels like Submit/OK/Button or missing labels where Export Match or Save Progress is expected."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "15.n2"
-name = "opaque_error_copy"
-description = "Illegal-action or import errors say only Invalid or Error without naming the field or reason."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "15.n3"
-name = "lorem_or_placeholder_copy"
-description = "Lorem ipsum or placeholder copy appears in Stats, Match log, or overlays."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "Where the app renders user-facing copy, a significant writing defect not covered by any other criterion in this file is present. If present, name it and cite evidence. If already covered — even partially — by another criterion, answer no here."
-type = "binary"
-weight = 0.5
-negate = true

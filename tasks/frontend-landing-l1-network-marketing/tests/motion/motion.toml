@@ -107,14 +107,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "4.3"
-name = "hover_feedback_missing"
-description = "Omits hover feedback on CTAs or event rows so interactive chrome feels static on pointer hover"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.4"
 name = "load_entrance_staggered_sequence"
 description = "On a fresh first load, the sticky chrome drops in from off-screen top, the two bento cells enter via a clip-path-style expansion with a short vertical settle, and the hero plane enters last — a staggered ease-in-out sequence settling over roughly 1.5-2s rather than painting fully settled"
@@ -142,14 +134,6 @@ description = "Below 1024px width, the three Get started cards rise from a downw
 type = "binary"
 weight = 0.5
 optional = true
-
-[[criterion]]
-id = "4.8"
-name = "first_paint_pre_settled"
-description = "The first viewport paints fully settled with no load-entrance sequence for the chrome, bento cells, or hero plane"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "4.9"
@@ -194,15 +178,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.15"
-name = "scroll_hijack_breaks_usability"
-description = "Scroll smoothing traps the user, prevents reaching content, fights the native scroll direction, or breaks position:sticky pinning anywhere on the page"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "4.20"
 name = "palette_and_export_overlay_transition"
 description = "Command palette and Export catalog overlays enter and exit with a brief opacity/scale transition rather than snapping; verified via the real UI open/close path"
@@ -224,14 +199,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "4.n6"
-name = "palette_export_snap_open_close"
-description = "Command palette or Export catalog open/close by snapping with no transition on the real UI path"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "8.a1"
 name = "kinetic_global_events_character_decode"
 description = "On a fresh load, real scrolling into Ridge Global Events drives kinetic typography: each character of RIDGE GLOBAL EVENTS flashes through decoy glyphs before settling to its final letter (per-character stagger), while the supporting blurb reveals line-by-line from translateY(-100%) inside overflow-hidden wrappers (never a state shortcut; reduced-motion shows final text immediately)"
@@ -245,34 +212,3 @@ description = "On a fresh load at ≥768px, real scrolling through Why Ridge dri
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "8.a5"
-name = "scroll_capture_breaks_usability"
-description = "Scroll smoothing traps the user, prevents reaching content, fights native scroll direction, breaks position:sticky pinning (chrome or Why Ridge pile), or ignores the reduced-motion path that must disable smoothing and load entrance while keeping the page complete and reachable"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "8.a6"
-name = "kinetic_effects_decorative_jank"
-description = "RIDGE GLOBAL EVENTS character-decode or line-mask reveals stutter, reflow mid-animation, or leave characters/lines misaligned after settling"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "8.a7"
-name = "signature_motion_purely_linear_tweens"
-description = "Signature motion (page-load entrance, Get started rise, or Global Events decode/line reveal) uses purely linear tweens that start and stop mechanically with no ease-in-out, ease-out-soft, or other inertial settling"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

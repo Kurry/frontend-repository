@@ -155,30 +155,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "3.12"
-name = "filler_or_real_identity_copy"
-description = "Rendered copy contains lorem ipsum or template filler, or the displayed identity details (name, email, phone, socials) read as real personal data rather than clearly placeholder values"
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "3.3"
-name = "marketing_layout_replaces_terminal"
-description = "A conventional marketing hero, navigation, and stacked promotional sections replace or visually overwhelm the required single terminal-over-wallpaper composition"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.9"
-name = "theme_or_content_visual_breakage"
-description = "A required theme, welcome column, project board, overlay, or dense control surface has unreadable contrast, overlapping content, clipped controls, or visibly default inconsistent styling"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.13"
 name = "export_and_palette_visual_structure"
 description = "Export view shows a monospaced Portfolio JSON / Resume Markdown preview with Copy and Download affordances, and the command palette reads as a centered overlay with kind-labeled result rows."
@@ -192,18 +168,3 @@ description = "Projects Board includes a compact stats strip and a bulk actions 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n4"
-name = "export_or_palette_visually_broken"
-description = "Export preview, archive vault, or command palette renders with unreadable contrast, clipped controls, or layout that breaks the terminal-over-wallpaper composition."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable visual-design defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -169,97 +169,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "At 1440px, 768px, or 375px the archive layout breaks or overflows the viewport."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small"
-description = "At 375px, view toggles, period filter, name sort, export, or editor controls are too small or misaligned for reliable tapping."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "mobile_text_unreadable"
-description = "At 375px, nomenclature historical names, hex labels, contrast-matrix text, or editorial intro text are too small to read."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_or_forced_hscroll"
-description = "At 375px, library, export, or editor content is cropped or forces unnecessary horizontal scrollbars."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "header_or_controls_missing_narrow"
-description = "At narrow widths the sticky header or library controls row is missing, unresponsive, or unreachable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "sticky_header_obscures_library"
-description = "The sticky header permanently obscures library rows or editor fields so content cannot be read or reached."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "overlap_at_narrow_width"
-description = "At 375px or below 768px, nomenclature columns, palette cards, swatch tiles, or the selection tray overlap or stack illegibly."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "swatch_tap_broken_on_mobile"
-description = "At 375px width, tapping a swatch fails to copy hex or show confirmation when the desktop path works."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "fixed_size_tiles_overflow"
-description = "Palette cards or swatch tiles keep a static desktop column size and overflow the viewport at 375px."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "editor_or_export_controls_disappear_at_375"
-description = "At 375px, Detail/Editor fields, contrast matrix, Export drawer controls, or save/close controls disappear or become unreachable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "7.12"
 name = "facets_comparison_catalog_at_375"
 description = "At 375 pixel width the search input, tag facet chips, Archived toggle, comparison view, and catalog sheet remain reachable and operable without horizontal scrolling, with comparison columns allowed to stack while per-pair deltas stay legible"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

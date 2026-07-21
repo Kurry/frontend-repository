@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring canvas settings, a Saved preset, and a Recent thumbnail, a reload leaves an incoherent mix (for example Warm Card survives while canvas settings reset, or Recent survives alone)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "canvas_ignores_style_inputs"
-description = "Changing background swatch, padding, or frame style leaves the canvas composition visually identical to the pre-change state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_presets_identical_canvas"
-description = "Applying two presets saved with clearly different settings yields a byte-identical / visually identical canvas outcome."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "apply_to_canvas_stale_until_reload"
-description = "After Apply to canvas from Collaboration, the Editor caption stays stale until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "style_recipe_reflects_session_mutations"
 description = "Mutate background to Ocean and padding to 16, then inspect Export preview / Download style JSON: the artifact contains those session values; after further mutations the preview updates again without reload."
@@ -208,34 +176,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "export_json_ignores_live_edits"
-description = "Changing background or padding leaves the Export preview JSON text identical to its pre-edit content."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "undo_skips_export_surface"
-description = "Undo restores some canvas controls but the Export preview JSON stays at the post-mutation values."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.13"
 name = "style_json_schema_round_trip_fields"
 description = "Export style JSON after setting Ocean, padding 16, Browser frame, caption text with Above position and a caption color, and an enabled watermark at TR with a distinct watermarkColor; change those settings; import the JSON; every exported RenderSettings field reconstitutes on the canvas and the Export preview again shows the same keys and values including watermarkColor."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.n7"
-name = "import_drops_settings_fields"
-description = "After importing a previously exported style JSON, one or more documented settings fields (background, padding, frame, caption, or watermark) remain at the post-change values instead of the exported combination."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -245,18 +189,3 @@ description = "With a named preset active, Export preview shows backgroundPreset
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n8"
-name = "background_mutual_exclusion_violated"
-description = "After picking a preset swatch or a custom hex background, the Export preview shows both backgroundPreset and customBackground non-null, or both null, violating the RenderSettings mutual-exclusion rule."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

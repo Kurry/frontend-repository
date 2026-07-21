@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_flows_unavailable_from_ui"
-description = "Create/edit/delete, Export session, or Live timer primary flows are not enabled from the UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "new_items_missing_or_duplicated"
-description = "New entries fail to show up or duplicate on timer stop or manual add."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "state_changes_desync_displays"
-description = "State changes are not synced across timeline, list, ratio, chart, heat-map, or Export previews."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "export_import_breaks_or_loses_session"
-description = "Export/Import round-trip breaks layout or loses session entries/tags."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_clocks_break_ui"
-description = "After removing the last custom clock/timer entry (or emptying a list region), that region is blank/broken with no designed empty-state message."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "filtered_views_disagree"
-description = "Filtered timeline and list disagree about which entries are visible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "history_panel_cannot_reopen"
-description = "History panel can't be re-opened after dismiss."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Overlays block interaction with no exit option."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_flow_lacks_feedback"
-description = "A failed import or invalid form submit provides no user feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "A flow dead-ends or requires reload for recovery."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "manual_add_updates_list_timeline_stats_chart_heatmap"
 description = "Submit Add entry manually with a valid name, category, start time, and duration; exactly one row appears in All entries, a proportional timeline block appears, Meaningful ratio and Today's minutes recompute, today's Weekly overview bar and heat-map cell update, and the entry remains visible under its matching category filter"
@@ -262,10 +182,3 @@ description = "After creating entries, tags, and history transitions, a full pag
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

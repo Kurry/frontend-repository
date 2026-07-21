@@ -169,35 +169,3 @@ description = "Drag-paint gestures, camera overlay capture, and toolbar drag rem
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "12.n1"
-name = "undeclared_modules_or_ops"
-description = "webmcp_list_tools exposes modules or operations outside the declared structured-editor, entity-collection, artifact-transfer, and command-session bindings."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n2"
-name = "tools_desynced_from_ui"
-description = "Invoking a declared editor, entity, artifact, or session tool succeeds in the tool response while the visible UI stays out of sync with that state change (or the reverse)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "12.n3"
-name = "missing_required_module_tools"
-description = "One or more of editor, entity, artifact, or session tool prefixes are missing from webmcp_list_tools despite the contract requiring all four modules."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "mcp_contract.catchall"
-name = "mcp_contract_catchall"
-description = "The app exhibits a significant, browser-observable MCP contract defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0
-

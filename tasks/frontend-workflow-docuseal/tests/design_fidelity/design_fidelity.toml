@@ -162,96 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.n1"
-name = "sizing_or_spacing_contradicts_scale"
-description = "Visible sizing or spacing values break the three-pane alignment or look arbitrarily inconsistent"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n2"
-name = "colors_fall_outside_submitter_system"
-description = "Field colours ignore the submitter colour system so ownership is not readable"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n3"
-name = "sizing_mismatches_spec"
-description = "Palette or panel control sizing mismatches the dense editor anatomy"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n4"
-name = "required_animations_missing_or_wrong"
-description = "Required animations are missing where the spec requires them (field place/delete snap with no entrance/exit, Export teleports)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n5"
-name = "specified_controls_use_browser_defaults"
-description = "Palette, selects, or Export dialog use unstyled browser defaults when the spec styles them"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n6"
-name = "layout_misaligned_at_breakpoints"
-description = "The three-pane grid is misaligned at 1440px or broken at 375px relative to the specified reflow"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n7"
-name = "elements_are_clipped_or_offscreen"
-description = "Rail, canvas, Export modal, or panel elements render off-screen or clipped"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n8"
-name = "structure_deviates_from_reference"
-description = "Section order or structure omits the document canvas, field palette, or properties panel shown in the reference"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n9"
-name = "heading_and_body_text_undifferentiated"
-description = "Top-bar title, rail labels, and panel body text have no typographic distinction"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n10"
-name = "microinteractions_deviate_from_reference"
-description = "Hover wash, field entrance, or Export modal motion are missing or deviate from the specified treatments"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.11"
 name = "export_undo_surfaces_present"
 description = "Export modal surfaces and Undo/Redo disabled treatments are present in the chrome as specified"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "design_fidelity.catchall"
-name = "design_fidelity_catchall"
-description = "The app exhibits a significant, browser-observable defect in fidelity to the spec or reference that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

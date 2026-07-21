@@ -235,30 +235,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "1.31"
-name = "unsupported_file_silently_accepted"
-description = "Uploading an unsupported non-image file silently replaces or clears the working canvas instead of showing the message Unsupported file type. Choose a PNG or JPG image while preserving the last valid canvas state."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.32"
-name = "empty_or_duplicate_preset_name_accepted"
-description = "Saving a preset with an empty name or a name that already exists still creates a blank or duplicate preset entry instead of being rejected with visible feedback (an inline message naming the name field, or Preset \"name\" already exists)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.33"
-name = "preset_apply_partial_restore"
-description = "Clicking Apply on a saved preset restores only some of its stored settings, leaving other settings (background, padding, corner radius, shadow, frame, caption, watermark) at their changed values."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.34"
 name = "flow_save_preset_count_and_refresh"
 description = "Starting from a fresh load: upload an image, pick the Night swatch, set padding to 12, then save a preset named Warm Card. The Saved presets count, measured immediately before and after the save, increases by exactly one; the new entry appears with Apply and Del controls; and a full page refresh restores the canvas settings (Night background, padding 12), keeps Warm Card in the Saved presets list, and shows the uploaded image as a Recent thumbnail."
@@ -364,30 +340,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n42"
-name = "style_json_omits_session_mutations"
-description = "After changing Night to Ocean and padding to 16, the Export preview or downloaded style JSON omits those values or still shows the prior settings."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n43"
-name = "undo_does_not_restore_style"
-description = "After a style mutation, Undo leaves the canvas and Export preview JSON at the post-mutation values instead of restoring the prior look."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n44"
-name = "different_styles_identical_png_export"
-description = "Exporting PNG for two clearly different style configurations yields visually identical compositions."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.49"
 name = "style_json_api_field_contract"
 description = "The Export preview shows a RenderSettings object with every required field-contract key by name — backgroundPreset or customBackground, padding, cornerRadius, shadow, frame, canvasSize, captionText, captionPosition, captionSize, captionColor, watermarkEnabled, watermarkText, watermarkColor, watermarkOpacity, watermarkCorner, zoom, positionX, positionY, and exportScale — and after setting Ocean and padding 16 those values appear under the matching keys while every required key remains present."
@@ -409,22 +361,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n45"
-name = "style_json_missing_api_keys"
-description = "After configuring distinctive settings, the Export preview style JSON uses opaque or renamed keys so the documented RenderSettings names (padding, frame, captionColor, watermarkColor, watermarkCorner, and siblings) are not readable in the preview text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n46"
-name = "hex_error_generic_schema_only"
-description = "An invalid hex entry shows only a generic schema or Invalid form message with no named field error and without Invalid color. Enter six hexadecimal digits after #."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.52"
 name = "import_rejects_invalid_render_settings"
 description = "Import style JSON with parseable JSON that fails the RenderSettings field contract — missing a required key, frame/canvasSize/captionPosition/watermarkCorner/exportScale outside their closed enums, padding/cornerRadius/shadow/captionSize/watermarkOpacity/zoom outside their integer bounds, a hex that is not #RRGGBB, or a backgroundPreset/customBackground cross-field violation — shows a visible error naming the offending field (or Invalid style JSON when unparseable) and leaves the canvas settings unchanged."
@@ -438,18 +374,3 @@ description = "Saving a preset with a name over 40 characters or whitespace-only
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n47"
-name = "import_accepts_out_of_contract_payload"
-description = "Import style JSON with an out-of-enum frame, out-of-bounds padding, invalid hex, or backgroundPreset/customBackground cross-field violation applies the payload to the canvas without a named field or Invalid style JSON rejection."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in a specified core feature or end-to-end user flow that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, resulting page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

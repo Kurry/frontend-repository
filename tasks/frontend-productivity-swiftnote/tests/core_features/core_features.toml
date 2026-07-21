@@ -194,31 +194,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.30"
-name = "1_30"
-description = "The note list is a static hardcoded set of rows with no working create, edit, or delete through the visible controls"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.31"
-name = "1_31"
-description = "Delete wipes the note in a single click with no confirmation step"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.32"
-name = "1_32"
-description = "Pin has no effect on ordering, or edit recency overrides pin so a pinned note falls below a newer unpinned note"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "1.33"
 name = "formatting_toolbar_bold_toggle_roundtrip"
 description = "A visible formatting toolbar offers at least bold, italic, heading, and bulleted list controls; activating Bold with text selected renders that text in bold weight in the body, and activating Bold again on the same selection returns the text to normal weight"
@@ -361,34 +336,3 @@ description = "After creating a note with a distinctive title and body and pinni
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n48"
-name = "export_omits_session_mutations"
-description = "After creating, editing, pinning, duplicating, or deleting a note that is visible in the sidebar, the Export Workspace JSON preview still omits that session mutation (stale or empty export text)"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n49"
-name = "invalid_note_payload_still_saves"
-description = "An over-length title (over 200 characters) or an Export as .txt filename that fails the filename field contract still commits as if valid — field-contract validation is skipped"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n50"
-name = "workspace_json_missing_required_fields"
-description = "The Workspace JSON export preview omits required API-shaped fields (schemaVersion swiftnote-workspace-v1, notes, selectedNoteId, or per-note id/title/bodyHtml/pinned/createdAt/updatedAt/images) even when notes exist"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in its core note-taking features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

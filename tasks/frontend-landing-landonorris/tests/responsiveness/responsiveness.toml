@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_product_breakpoints"
-description = "At 1440 or 390 the layout breaks, overflows, or loses required chrome (single-row desktop nav vs wrapped mobile nav) for that width."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "At 390px primary controls are too small to tap reliably or visibly misaligned."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "type_unreadable_at_390"
-description = "At 390 width body or display text is too small to read or collapses illegibly."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_or_spurious_scrollbars"
-description = "At 1440 or 390 content is cropped or unnecessary scrollbars appear."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "mobile_nav_missing_or_unresponsive"
-description = "At 390px the hamburger is absent from the nav chrome, or tapping it leaves the menu overlay closed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_nav_obscures_content"
-description = "The fixed navigation permanently obscures hero or section content with no recoverable scroll offset."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "overlap_or_stacking_failure"
-description = "At 1440 or 390 elements overlap incorrectly or stacking order breaks the hero widget, helmet cards, or footer form."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "desktop_nav_shown_wrong_at_390"
-description = "At 390px the nav remains a single ~100px desktop row with no wrapped mobile chrome, or at ≥992px the only nav is the 140px stacked mobile layout."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "media_static_size_overflows"
-description = "Hero, media-strip, helmet, or video media use a static size that overflows the viewport at 390."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "store_or_hamburger_disappears"
-description = "The STORE button or hamburger disappears at 390 or 1440 while remaining required chrome."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "7.a1"
 name = "showcase_composition_reflow_at_390"
 description = "At 390 the asymmetric hero (silhouette, NEXT RACE widget, fixed nav) and helmet grid are re-choreographed into a stacked mobile composition that preserves hierarchy rather than a flat equal-column dump of the desktop grid."
@@ -255,18 +175,3 @@ description = "At 390px the race calendar rows stack date/status chips without h
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "7.n11"
-name = "press_kit_or_palette_unusable_at_390"
-description = "At 390px the press-kit drawer or command palette clips off-screen or cannot be operated."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

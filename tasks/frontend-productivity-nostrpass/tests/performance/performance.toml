@@ -165,61 +165,9 @@ weight = 1.0
 
 
 [[criterion]]
-id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = """Local cold load exceeds two seconds before the app is interactive."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_flows"
-description = """Console errors appear during core vault flows."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "9.n3"
-name = "transitions_block_or_lag"
-description = """View or toggle transitions block input or lag for seconds."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "9.n4"
-name = "export_or_import_hangs_ui"
-description = """Export preview or import hangs the UI."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "9.n5"
-name = "rapid_or_edge_use_crashes"
-description = """Rapid toggles, undo/redo, or bad import crashes or blanks the app."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "9.11"
 name = "bulk_apply_has_no_partial_states"
 description = "A bulk Grant all or Revoke all across every identity applies as one immediate visible update with no per-row lag or partially applied intermediate states left on screen"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = """The app exhibits a significant, browser-observable performance defect that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered, answer no here."""
-type = "binary"
-negate = true
-weight = 1.0

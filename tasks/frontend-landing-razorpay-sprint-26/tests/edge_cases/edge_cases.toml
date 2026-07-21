@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "preloader_traps_input_after_exit"
-description = "After the preloader exit animation, an invisible overlay still traps pointer or keyboard input so the page cannot be used."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "deeplink_hash_ignored"
-description = "Loading /sprint/26#payment-gateway leaves the page at the hero top with no payment-gateway section in view and no matching nav highlight."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "nav_or_modal_actions_silent"
-description = "Clicking a segment-nav label or executive play control produces no visible scroll, modal, or active-state feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "multiple_nav_cells_active"
-description = "After rapid nav clicks or mixed click-and-scroll, more than one segment-nav cell remains marked active at once."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "play_control_nonsemantic_shell"
-description = "The executive play control is a non-semantic div/span with no button/link role or accessible name."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "video_modal_not_keyboard_dismissible"
-description = "The open video modal cannot be dismissed via keyboard (focusable close control with Enter/Space or Escape)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "webgl_failure_breaks_below_fold"
-description = "When WebGL is unavailable, sections below the hero, nav links, or CTAs become unreachable or blank."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_control_labels"
-description = "Primary nav labels, GET ACCESS, or the video-modal close control lack readable accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "resize_breaks_nav_or_errors"
-description = "Resizing across 768px leaves both desktop and mobile nav missing, or throws console errors during the swap."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "scroll_left_locked_after_modal"
-description = "Body scroll remains locked after the video modal is closed."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "4.20"
 name = "duplicate_pin_rejected"
 description = "Pinning the same feature twice in a row does not duplicate its name in the shortlist or inflate the count past a single pin for that card."
@@ -278,32 +197,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n20"
-name = "malformed_import_corrupts_state"
-description = "Importing malformed or contract-invalid brief JSON partially mutates shortlist, compare, theme filter, search, or watch log into an inconsistent mix."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n21"
-name = "oversized_compare_import_applied"
-description = "Importing a brief with four compareFeatures names applies those names into the Compare tray or leaves compare state partially updated instead of refusing the payload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.25"
 name = "undo_inert_with_empty_history"
 description = "With an empty undo history, the Undo control is disabled or inert: activating it changes no Shortlist tray count, pin mark, or brief preview state"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

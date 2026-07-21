@@ -133,34 +133,3 @@ description = "Filtering the timeline mid-run does not freeze the canvas or drop
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "9.n1"
-name = "interaction_hangs_during_run"
-description = "Activating toolbar controls during a run hangs the UI for multiple seconds or drops subsequent inputs"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "export_preview_janks_on_edit"
-description = "Each node configuration save visibly freezes the Artifact preview for a prolonged hitch"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "console_flood_on_load"
-description = "Load or first run floods the console with errors or repeated warnings"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

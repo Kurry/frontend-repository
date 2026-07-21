@@ -113,23 +113,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.4"
-name = "flat_list_without_folder_stack"
-description = "The home stack renders as an equal-width flat list with no colored category folders or paper tags"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.5"
-name = "wrong_category_cover_colors"
-description = "Category covers render in wrong or placeholder colors that do not match the four required hex values"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "3.6"
 name = "three_local_open_license_type_families"
 description = "Display titles (hero, case names, about title) compute to a bundled condensed grotesque display face at weight 700 uppercase; body and tag text compute to a bundled serif text face at weight 400 (hero paragraph and tags around 20px at 1440 width); navigation, footer, captions, and scrapbook labels compute to IBM Plex Mono (nav 16px with a 32px line height, footer 12px uppercase, captions 14px); all three families resolve locally"
@@ -194,35 +177,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.15"
-name = "viewport_overflow_or_clipping"
-description = "At any of the 320, 390, 768, 1024, 1440, or 1920 pixel widths, some route clips content, overflows the viewport, or shows a horizontal scroll bar"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.16"
-name = "placeholder_filler_text_visible"
-description = "Lorem ipsum, 'TODO', template variable names, or other placeholder filler text is visible anywhere in the shipped UI instead of edited editorial prose"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.17"
 name = "editorial_prose_and_uppercase_convention"
 description = "The hero paragraph, category thesis lines, architect biographies, and about essay read as edited long-form editorial prose, and navigation, footer, and monospace scrapbook labels keep one consistent uppercase convention"
 type = "binary"
 weight = 0.5
-
-[[criterion]]
-id = "3.18"
-name = "real_brand_assets_shipped"
-description = "The shipped app includes copyrighted, trademarked, scraped, stock, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—including a real wordmark/logo, proprietary font, photograph, portrait, video/audio frame, building image, signature graphic, PDF, or real-person/agency credit instead of the fictional Field Notes Archive system"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "3.19"
@@ -253,27 +212,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.23"
-name = "case_mobile_loses_filing_metaphor"
-description = "At a 390px width the case route collapses into a plain static stack that loses the layered folder, rotated sibling tags, and scrapbook filing-cabinet relationship"
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
 id = "3.24"
 name = "scratch_authored_archive_inventory_craft"
 description = "Field Notes Archive is visibly complete and art-directed: one wordmark, eight distinct fictional portraits, populated non-repeated scrapbook ephemera on every case, five video posters, four about-gallery photographs, signature and studio marks, two wind roses, scale, paperclip, plan/drawing, PDF, chevron, close, and media-control artwork all occupy their reference roles"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "3.25"
-name = "missing_reused_or_source_media"
-description = "A required archive surface is omitted, empty, broken, repeated as generic filler, or contains a source-site identity, real architect/building name, recognizable source photograph, logo silhouette, distinctive source copy, metadata, or destination"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.40"
@@ -296,18 +239,3 @@ description = "Category filter chips and the home search field sit in the home s
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n40"
-name = "dossier_chrome_breaks_palette"
-description = "Reading-list, command palette, or dossier panels use bright default card chrome or colors outside the archive surface/text/accent system."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

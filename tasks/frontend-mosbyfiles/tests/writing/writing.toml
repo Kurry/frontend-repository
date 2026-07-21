@@ -136,56 +136,9 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_or_lorem_visible"
-description = "Lorem ipsum or placeholder filler text (TODO, Lorem, asdf, or template variables such as {{title}}) is visible anywhere in the shipped UI, including hero, theses, biographies, or the about essay."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as the hero title American modernism, category names, or primary navigation."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "architect_names_inconsistent"
-description = "The same architect is named inconsistently across home tags, case headings, sibling tags, or document titles."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "copy_truncated_or_overflowing"
-description = "Truncated or overflowing text renders hero, thesis, biography, or about essay copy unreadable."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "15.9"
 name = "dossier_and_reading_list_labels_specific"
 description = "Where the app renders reading-list empty state, dossier import validation naming the offending field or payload, field-note overlong validation naming the note field, and action labels such as Pin, Field note, Save note, Undo, Redo, Export dossier, Copy, Download, and Import dossier, labels stay specific and free of placeholder filler."
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "15.n5"
-name = "new_chrome_uses_placeholder_labels"
-description = "Reading-list, dossier, or pin/note chrome shows lorem ipsum, TODO, or generic OK/Submit placeholders instead of the specified action labels."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

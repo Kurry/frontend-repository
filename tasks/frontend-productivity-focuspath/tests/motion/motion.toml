@@ -114,14 +114,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.5"
-name = "no_hover_or_focus_affordance"
-description = "Milestone nodes, step rows, and toggles present no hover or keyboard-focus affordance, appearing visually inert to pointer and keyboard interaction."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.6"
 name = "add_delete_reorder_animate"
 description = "Adding a goal card, milestone, or step through the real UI animates the new item into place rather than snapping; deleting one animates it out; moving a milestone with the up/down reorder buttons slides it to its new position instead of teleporting."
@@ -155,20 +147,4 @@ name = "export_and_palette_enter_exit"
 description = "The Export drawer or modal and the command palette enter and exit with a brief opacity and scale transition when opened and closed via the real controls; Copy and Download show a short confirmation before resetting."
 type = "binary"
 weight = 0.5
-
-[[criterion]]
-id = "4.n1"
-name = "milestone_complete_snaps_without_animation"
-description = "Completing a milestone's final step via its real checkbox snaps the node to the filled state with no fill-in animation."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "motion.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true
 

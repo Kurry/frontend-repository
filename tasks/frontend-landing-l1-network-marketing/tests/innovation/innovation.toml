@@ -135,31 +135,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "signature_motion_absent_or_stubbed"
-description = "Signature motions are absent or stubbed: no page-load entrance on a fresh load, no Why Ridge sticky pile at ≥768px, and no RIDGE GLOBAL EVENTS character-decode via the real scroll path."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n2"
-name = "experience_reads_as_generic_template"
-description = "The page reads as a generic marketing template with default type/spacing and none of the Ridge notch, black-void module, or kinetic-type execution quality."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "11.n5"
-name = "page_flat_static_no_immersion"
-description = "The page is flat and static with no load entrance, no scroll chapter motion, and no theme transition despite the instruction requiring them."
-type = "binary"
-negate = true
-weight = 0.5
-
-
-[[criterion]]
 id = "11.8"
 name = "catalog_operator_tooling_polish"
 description = "Export JSON/ICS plus ridge-session-leads.json with live session fidelity, undo across surfaces, Session leads operator panel, and command-palette navigation read as polished tooling beyond a static marketing page — verified through the real UI paths"

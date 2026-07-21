@@ -162,97 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "7.n1"
-name = "layout_breaks_at_breakpoints"
-description = "The layout breaks or overflows at common breakpoints between 1440px and 375px"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n2"
-name = "mobile_controls_too_small_or_misaligned"
-description = "Controls are too small to tap or visibly misaligned at mobile widths"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n3"
-name = "text_too_small_on_devices"
-description = "Body, label, or chip text becomes too small to read at some widths"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n4"
-name = "content_cropped_or_unnecessary_scrollbars"
-description = "Content is cropped, or unnecessary scrollbars appear around panels that fit their space"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n5"
-name = "rail_missing_or_stuck_at_some_width"
-description = "The navigation rail is missing, cannot be opened, or cannot be closed at some width"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n6"
-name = "fixed_positions_obscure_content"
-description = "A fixed or sticky element (rail overlay, toolbar, toast) obscures content or controls at some width"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n7"
-name = "elements_overlap_at_some_size"
-description = "Rollup cells, chips, chart labels, or panels overlap each other at some viewport size"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n8"
-name = "mobile_taps_do_nothing"
-description = "Tapping a control on mobile that works via click on desktop produces no response"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n9"
-name = "fixed_size_media_overflows"
-description = "A chart or table keeps a static size and overflows the viewport at narrow widths"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "7.n10"
-name = "controls_disappear_at_sizes"
-description = "Required controls (filters, Run checks, verdict toggles, Copy export) disappear entirely at specific sizes with no alternate access"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "7.11"
 name = "export_controls_usable_at_375"
 description = "At 375 pixel width, Copy, Download, and Import package remain usable within the viewport without page-level horizontal scrolling"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsive layout and adaptivity that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

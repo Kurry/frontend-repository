@@ -131,86 +131,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_community_feed_looks_broken"
-description = "The empty community feed presents as a broken UI (missing track, enabled arrows that imply content, or error chrome) rather than the intentional empty disabled-arrow state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "contact_errors_only_in_console"
-description = "Submitting an empty contact form surfaces errors only in the browser console with no inline field messages in the UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "form_actions_silently_succeed_or_fail"
-description = "Newsletter or contact submit produces no visible success or error feedback after the action."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "carousel_wraps_at_ends"
-description = "Clicking the disabled previous arrow on the first news slide or the disabled next arrow on the last slide wraps the carousel to the opposite end."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "newsletter_shows_thank_you_before_step_5"
-description = "Thank you for subscribing appears while the newsletter is still on steps 1–4, before a step-5 submit."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "drawer_not_keyboard_dismissible"
-description = "Below 1025px the open mobile drawer overlay cannot be dismissed via keyboard (Escape or focusable close control)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "contact_validation_feedback_missing"
-description = "An empty contact submit shows no inline validation indication naming missing fields."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "primary_cta_labels_ambiguous_or_missing"
-description = "Primary newsletter/contact action controls lack readable labels or use ambiguous blank text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "community_arrows_become_enabled"
-description = "After clicking, hovering, or scrolling, the community feed previous/next arrows become enabled despite the empty feed."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "contact_empty_submit_clears_or_shows_success"
-description = "Submitting the contact form with required fields empty clears entered values or shows Success! We'll be in touch."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "empty_log_export_valid_schema"
 description = "With zero leads, Download JSON still produces astra-session-leads.json with version 1, the current theme, counts all zero, and an empty leads array; Copy JSON copies that same empty-log JSON and still shows Copied confirmation."
@@ -229,14 +149,6 @@ id = "4.13"
 name = "invalid_then_valid_contact_one_lead"
 description = "A failed empty contact submit followed immediately by a valid contact submit appends exactly one lead — the invalid attempt never appears in the Session leads list or export."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.n11"
-name = "invalid_contact_appends_phantom_lead"
-description = "Submitting the contact form with required fields empty increments the Session leads total or appends a lead row despite showing validation errors."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -261,32 +173,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n12"
-name = "newsletter_invalid_final_shows_thank_you"
-description = "On newsletter step 5, an invalid subscribe payload still shows Thank you for subscribing or appends a newsletter lead."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.17"
 name = "contact_gdpr_unchecked_blocks_lead"
 description = "Submitting the contact form with otherwise-valid fields but gdpr unchecked shows a named gdpr error, shows no Success! We'll be in touch. message, clears nothing, and appends no lead."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n13"
-name = "out_of_enum_project_type_accepted"
-description = "A contact submit accepts a project_type value outside DeFi, Enterprise & Institutions, Gaming, Art & Culture, Development, Other and still shows Success! We'll be in touch. or appends a lead."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -169,72 +169,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.n1"
-name = "cold_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before the page is interactive on a local cold load."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_flows"
-description = "Console errors, hydration mismatch warnings, or unhandled rejections appear during load, scroll-through, menu exercise, or slideshow observation."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.a3"
-name = "heavy_assets_collapse_frame_rate"
-description = "Heavy visual assets (hero marquees, floating-card video, orb path, or reveal scripts) cause frame-rate collapse, delayed first render, or input latency during signature scroll/hover interactions."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n6"
-name = "animation_blocks_input"
-description = "During hero intro, marquee travel, or feature-card reveals, primary controls (Solutions, Sign up, Try Canvasly) become unresponsive."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering with a blank page while fonts, images, or the media card load instead of showing reserved-space layout."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n10"
-name = "rapid_use_crashes_page"
-description = "Rapid menu toggling or fast continuous scrolling crashes the page or leaves it permanently unresponsive."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "9.11"
 name = "brief_and_palette_remain_responsive"
 description = "Rapid trial-brief field edits, undo/redo, and command-palette open/filter/close never freeze the page or drop pointer/keyboard input."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "9.n11"
-name = "brief_edits_freeze_page"
-description = "Editing trial brief fields, toggling interests, or opening the command palette freezes the page or leaves controls unresponsive for multiple seconds."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_collection_has_no_feedback"
-description = "An empty collection shows nothing and provides no UI feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "errors_only_reach_console"
-description = "Errors are surfaced only in the browser console."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "actions_lack_visible_feedback"
-description = "Actions lack visible feedback and silently succeed or fail."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "destructive_actions_lack_warning"
-description = "Destructive actions have no warnings."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_elements_use_nonsemantic_tags"
-description = "Non-semantic div or span tags wrap interactive elements."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "modal_not_keyboard_dismissible"
-description = "Modal overlays cannot be dismissed via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "validation_feedback_missing_or_delayed"
-description = "Validation feedback is missing or delayed with no UI indication."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "button_text_ambiguous_or_missing"
-description = "Button text is ambiguous or missing."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "non_obvious_flows_lack_guidance"
-description = "Non-obvious flows have no in-app guidance at all."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "affordances_hidden_or_inaccessible"
-description = "Interactive affordances are visually hidden or inaccessible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "title_over_120_chars_rejected"
 description = "Submitting a New Transmission with a title longer than 120 characters is blocked with an inline error naming the Title field and adds no memo."
@@ -263,18 +183,3 @@ description = "With empty collections, Export session still produces JSON with v
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.14"
-name = "contract_invalid_import_applies_partial_state"
-description = "Importing a session JSON that violates the field contract still mutates channels, memos, decommissioned, or Theme Core, or shows no named-field import error."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

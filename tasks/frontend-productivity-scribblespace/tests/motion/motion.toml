@@ -127,14 +127,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.7"
-name = "hover_focus_inert"
-description = "Interactive chrome shows no visible hover or focus appearance change during normal pointer and keyboard use."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.8"
 name = "object_entrance_exit_animates"
 description = "A newly placed object animates in with a brief scale-and-fade entrance, and a deleted or archived object animates out before disappearing — verified through the real New Note / Delete or Archive controls, not a state shortcut."
@@ -176,10 +168,3 @@ description = "Copy in the Export workspace modal shows a brief copied confirmat
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or interaction feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

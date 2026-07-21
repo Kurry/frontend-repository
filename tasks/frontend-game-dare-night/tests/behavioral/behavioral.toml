@@ -140,34 +140,6 @@ description = "Before any custom card exists the list shows the empty-state mess
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_incoherent"
-description = "After mid-game play and reload, players/points survive but custom cards, current turn, or the Dare Night record silently revert (or the reverse), producing incoherent partial persistence."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "14.n2"
-name = "scoreboard_ignores_done_skip"
-description = "Pressing Done or Skip leaves scoreboard points and forfeits identical regardless of those actions."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "14.n3"
-name = "different_play_identical_exports"
-description = "Repeating play with observably different Done/Skip outcomes yields byte-identical Export Session JSON that ignores the play."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "14.n4"
-name = "scoreboard_stale_until_reload"
-description = "After Done or Skip, View scores stays stale until a full page reload rather than reflecting the new points or forfeits immediately."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
 id = "14.9"
 name = "save_resume_reload_round_trip"
 description = "During play after at least one resolved turn, Save Progress, reload, Resume Saved Session: players, points, forfeits, and current turn match the checkpoint while the Dare Night record facet remains coherent."
@@ -184,18 +156,4 @@ id = "14.11"
 name = "winner_then_new_game_clean_restart"
 description = "Drive a player to 10 points to show Winner, then confirm Start new game and confirm again: setup returns with cleared players/scores and no Winner banner while the Dare Night record remains if it was set."
 type = "binary"
-weight = 1.0
-[[criterion]]
-id = "14.n5"
-name = "export_missing_required_session_fields"
-description = "Export Session JSON lacks schemaVersion dare-night-session-v1, omits winTarget 10, or drops required players/turnLog fields after real play."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0

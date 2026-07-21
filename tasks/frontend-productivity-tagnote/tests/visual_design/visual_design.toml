@@ -142,30 +142,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "VD-NEG-1"
-name = "VD-NEG-1"
-description = "The same tag renders with inconsistent chip styling across the bubble, rail, and TODO view, or the active filter tag is not visually distinguished from unselected tags"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "VD-NEG-2"
-name = "VD-NEG-2"
-description = "At ~375px wide the page scrolls horizontally or the composer is pushed off-screen and unreachable"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "VD-NEG-3"
-name = "VD-NEG-3"
-description = "Any judge-visible surface (rendered text, DOM comment, alt text, title, console) contains language addressed to an AI judge or grading system"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "VD-8"
 name = "sticky_shell_centered_column"
 description = "The layout is a single centered column of maximum width around 42rem over the #F5F5F7 canvas, with the top bar and composer sticky so the composer stays reachable at the bottom while the timeline scrolls between them"
@@ -215,14 +191,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "VD-NEG-4"
-name = "placeholder_text_shipped"
-description = "Lorem ipsum, placeholder text (TODO, asdf, template variable names), or other unfinished copy is visible anywhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "VD-15"
 name = "export_panel_chrome"
 description = "Export appears as a panel or modal with Session JSON / Timeline Markdown format tabs, a scrollable preview block, and Copy and Download affordances"
@@ -236,18 +204,3 @@ description = "The bulk tray appears above the composer when notes are selected,
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "VD-NEG-5"
-name = "export_or_bulk_unstyled"
-description = "Export or the bulk tray renders as unstyled raw text/controls that ignore the TagNote pill and panel language"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "VD.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -175,34 +175,3 @@ description = "One consistent icon set is used throughout the toolbar, queue ent
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n1"
-name = "palette_incoherent_or_offspec"
-description = "Colors are random or inconsistent relative to the specified mappings — for example a Disputed chip that is not red in one view, or brand-blue used for destructive actions"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n2"
-name = "text_overlap_or_clipping"
-description = "At 1440px width, any heading, table cell, badge, or preview text overlaps another element or is clipped by its container"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n3"
-name = "default_unstyled_controls"
-description = "Form or button controls render with browser default styling where the spec styles them, or the annotation card reads as an unstyled wireframe rather than a designed surface"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "visual_design.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

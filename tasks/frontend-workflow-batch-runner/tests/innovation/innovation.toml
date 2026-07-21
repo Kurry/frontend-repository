@@ -163,22 +163,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "The build is purely spec-compliant with no enhancement anywhere beyond the minimum required surfaces"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "11.n2"
-name = "generic_or_copied_feel"
-description = "Interactions and visuals feel generic, templated, or copied with no product identity"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."

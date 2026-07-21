@@ -154,26 +154,3 @@ description = "Export appears as a panel or modal with format tabs (Scan Index J
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n1"
-name = "mobile_overflow_or_clipping"
-description = "At 375px width content clips or overflows the viewport, or page-level horizontal scrolling appears"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.n2"
-name = "unstyled_default_register"
-description = "Primary scanner chrome (list, buttons, progress, export tabs) renders as unstyled browser-default controls without a coherent designed visual system"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable visual design defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

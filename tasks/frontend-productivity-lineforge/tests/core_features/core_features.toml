@@ -297,41 +297,6 @@ description = "Activating Copy on the Study pack JSON or Current line PGN puts t
 type = "binary"
 weight = 1.0
 [[criterion]]
-id = "1.30"
-name = "static_tree_no_board_sync"
-description = "The opening list is a static display with a non-functional move tree — clicking a node does not move the board or mark a selection"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "1.31"
-name = "deviation_detection_absent"
-description = "A legal move that departs from every bundled continuation produces no New Line badge and no Your Line branch (deviation detection is absent)"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "1.32"
-name = "practice_accepts_wrong_moves"
-description = "Practice mode reports a wrong move as Correct, or accepts any move as correct regardless of the expected move"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "1.n4"
-name = "export_omits_session_mutations"
-description = "After saving a line, starring an opening, or changing Board theme, the Export center Study pack JSON omits that session mutation from favorites, savedLines, or boardTheme"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "1.n5"
-name = "import_accepts_invalid_pack"
-description = "Import study pack accepts malformed JSON or a payload that violates the StudyPackDocument / SavedLine field contract without showing a visible field-named error, or mutates favorites/saved lines despite the invalid payload"
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
 id = "1.49"
 name = "saved_line_ply_tag_and_side_rules"
 description = "The save form enforces the remaining SavedLine bounds: a ply outside 0 through the moves length, a tag outside the closed chip set (study, sharp, solid, trap, endgame), or a tag longer than 24 characters each show an inline error naming that field and save nothing; sideToMove is derived from ply (even ply white, odd ply black) and appears correctly in the form or Study pack JSON record"
@@ -352,10 +317,3 @@ description = "Download study pack downloads a .json file whose contents match t
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

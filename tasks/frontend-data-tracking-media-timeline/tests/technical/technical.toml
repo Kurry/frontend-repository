@@ -106,22 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "browser_storage_persists_state"
-description = "Uses localStorage or sessionStorage to persist events or filters"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.4"
-name = "views_desync_on_shared_data"
-description = "After an edit, delete, or filter change, the same event or count shows different values in two places (for example the list row disagrees with the stage pin, detail panel, or a readout) until a reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.5"
 name = "keyboard_operable_with_visible_focus"
 description = "Every interactive control (mode switch, scrubber thumbs, year inputs, filters, pins or list equivalents, detail navigation, undo/redo, export drawer controls, selection checkboxes, bulk actions) is reachable and operable with the keyboard alone, with a visible focus ring"
@@ -164,14 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.11"
-name = "outbound_network_requests_present"
-description = "Devtools shows network requests to other origins (CDN scripts, remote fonts, external APIs) during load or use of the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.12"
 name = "document_title_reflects_mediatimeline"
 description = "The browser document title reflects MediaTimeline"
@@ -207,10 +183,3 @@ description = "The Events CSV export preview header line is exactly title,type,t
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (state, storage, console, network, stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network request, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

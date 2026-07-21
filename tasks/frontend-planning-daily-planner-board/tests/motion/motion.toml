@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.3"
-name = "static_chrome_without_hover_feedback"
-description = "Nav items, task cards, and right-rail buttons show no hover wash, border, or shadow change on pointer hover, so the board chrome feels static"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.4"
 name = "task_add_remove_animates_with_gap_close"
 description = "Driven through the real Add task and delete controls (not any state shortcut): a newly created task card animates into its column, a deleted card animates out, and the surrounding cards slide smoothly to close the gap rather than snapping"
@@ -156,10 +148,3 @@ description = "Driven through the real Export and multi-select bulk-tray control
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, gesture, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

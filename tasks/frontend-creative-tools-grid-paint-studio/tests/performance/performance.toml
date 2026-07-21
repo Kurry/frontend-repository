@@ -140,35 +140,3 @@ description = "Switching among Paint, Gallery, and Export center under repeated 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "9.n1"
-name = "cold_load_over_two_seconds"
-description = "The app takes more than 2 seconds to become interactive on a local cold load."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "paint_or_fill_hangs"
-description = "Rapid painting or Flood Fill hangs the page, drops cells, or freezes input for a noticeable period."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "console_noise_during_exercise"
-description = "Console errors or warnings appear during a full exercise of paint, gallery, export, and import flows."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0
-

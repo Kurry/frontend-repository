@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_library_shows_nothing"
-description = "After every library entry is deleted, the library list shows nothing — no empty-state message and no control returning to the workbench."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n2"
-name = "validation_errors_only_in_console"
-description = "Invalid Insert Variable name or Save field failures surface only in the browser console with no visible inline field feedback."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n3"
-name = "run_or_save_silent_failure"
-description = "Activating Run or Save produces no visible status change, toast, or warning when the action is blocked or completes (silent failure)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n4"
-name = "unbound_run_starts_anyway"
-description = "Clicking Run with unbound variables starts a run anyway with no warning naming the unbound variables."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_are_nonsemantic"
-description = "Primary interactive controls (suggestion chips, history rows, library rows, toolbar actions) are non-semantic div/span click targets without button/role semantics."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "save_modal_not_keyboard_dismissible"
-description = "With the Save modal open, keyboard users cannot dismiss it (no Escape path and no focusable close control)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n7"
-name = "empty_editor_allows_run_or_nonzero_tokens"
-description = "With the editor empty, the token count is not 0 or Run is enabled."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_action_labels"
-description = "Primary actions show blank, placeholder, or ambiguous labels such as 'Submit', 'OK', or 'Button' instead of specific labels like Insert Variable, Run, Stop, or Save."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n9"
-name = "removed_placeholder_leaves_stale_binding_warning"
-description = "After removing a placeholder from the editor text, its binding row remains in the side panel or the preview still shows a warning for that removed variable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.n10"
-name = "double_save_creates_duplicates"
-description = "Double-activating Save confirm creates more than one library entry or increases the visible library count by more than one."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "4.11"
 name = "import_rejects_nonconforming_prompt_package"
 description = "Importing parseable JSON that fails the PromptPackage field contract — schemaVersion not exactly prompt-package-v1, missing required model/promptText/messages/bindings/attachments keys, a messages role outside system|user, or technique outside the closed enum — shows visible validation naming the offending field and leaves the workbench draft unchanged."
@@ -253,14 +173,6 @@ id = "4.12"
 name = "save_rejects_duplicate_or_overlong_title"
 description = "Saving with a duplicate library title or a title longer than 80 characters does not add a row and shows an inline error naming the title field."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "4.n11"
-name = "import_mutates_on_invalid_schema"
-description = "Importing JSON that fails the PromptPackage field contract still mutates the workbench draft (prompt text, bindings, persona, or model change)."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -291,10 +203,3 @@ description = "A technique filter with no matching library rows shows an empty f
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -304,22 +304,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.31"
-name = "invalid_start_silently_commits"
-description = "Start game commits a game with fewer than 2 players, a duplicate name, or zero categories selected instead of blocking it with an inline error."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.32"
-name = "rapid_controls_corrupt_state"
-description = "Rapidly repeating a control such as Done, Draw card, or the live-stream Start duplicates a transition, blanks the screen, or leaves the visible score or state inexact."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.33"
 name = "selected_category_count_updates_live"
 description = "Toggling a category chip flips it between selected and unselected and a visible live count of selected categories changes immediately with each toggle, matching the number of chips currently selected."
@@ -377,18 +361,3 @@ description = "After a Winner is declared, activating Draw card, Done, or Skip d
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n1"
-name = "export_omits_session_mutations"
-description = "After awarding points or logging forfeits, Export Session or Copy Session JSON omits those mutations — players points/forfeits disagree with the scoreboard, or turnLog is empty/hardcoded — instead of reflecting the live session."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

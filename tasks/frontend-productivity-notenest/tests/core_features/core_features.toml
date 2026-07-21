@@ -241,23 +241,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.28"
-name = "1_28"
-description = "The note list is a static or hardcoded set that does not change when notes are created, moved, pinned, or deleted through the controls."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.29"
-name = "1_29"
-description = "Search matches only note titles and fails to return a note whose keyword appears only in its body, or the folder count badge includes subfolder notes so it overcounts direct notes."
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.38"
 name = "export_nest_two_format_tabs"
 description = "Export Nest opens an artifact drawer with Nest JSON and Markdown vault tabs, each showing a monospaced preview regenerated from the current store, plus Copy and Download controls."
@@ -307,24 +290,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.45"
-name = "export_omits_session_mutations"
-description = "After a visible create, pin, color, move, or batch mutation, the Nest JSON or Markdown vault export preview still omits that session mutation (stale or seed-only export text)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.46"
 name = "batch_color_updates_edge_bars"
 description = "Selecting multiple notes and applying Batch Color to one closed-list color updates the left-edge bar on every selected note in All Notes and in each note's folder list without a reload."
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

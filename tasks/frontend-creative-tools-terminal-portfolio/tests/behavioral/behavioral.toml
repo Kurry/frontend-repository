@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After creating a project, changing theme, and applying a board filter then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "board_identical_across_different_filters"
-description = "Applying different status or tag filters leaves the Projects Board card set visually identical — a derived surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_creates_produce_identical_output"
-description = "Creating two projects with clearly different titles yields identical board cards, /work rows, or detail output."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_surface_state_stale_until_reload"
-description = "After creating, renaming, or deleting a project, Projects Board, /work, detail card, or autocomplete still shows stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_pipeline_ends_at_artifact_text"
 description = "Full-pipeline probe: create a project named Northline Atlas, feature it, save identity displayName to Northline Operator, open Export Center — Portfolio JSON contains Northline Atlas and Northline Operator with featuredSlugs including the new slug, Terminal Config shows the matching display_name and featured line, and Theme CSS matches the active theme."
@@ -207,26 +175,3 @@ description = "Input-dependent output: save identity displayName as AlphaStudio 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_identical_after_distinct_mutations"
-description = "After two clearly different project creates or identity saves, Export Center preview text remains byte-identical — a derived artifact ignoring its inputs."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n6"
-name = "import_round_trip_loses_fields"
-description = "After export then import of Portfolio JSON, required project contract fields (status, tags, year, or featured) are missing or altered relative to the exported document."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

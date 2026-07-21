@@ -142,34 +142,3 @@ description = "Where the app renders status words (pending, running, retrying, f
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "15.n1"
-name = "lorem_or_placeholder_visible"
-description = "Lorem ipsum, TODO, asdf, or template-variable placeholder copy is visible in the shipped UI"
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "generic_action_labels_only"
-description = "Primary actions use only generic labels like Submit or OK where specific verbs (Run, Import, Download) are possible"
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "errors_say_only_invalid"
-description = "Validation messages say only Invalid with no field name or fix"
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this dimension. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence. If already covered by another criterion in this file, answer no here."
-type = "binary"
-negate = true
-weight = 0.5

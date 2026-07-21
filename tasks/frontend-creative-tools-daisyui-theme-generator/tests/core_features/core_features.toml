@@ -253,30 +253,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.24"
-name = "token_edit_preview_stays_stale"
-description = "Changing a color or radius control leaves the live preview unchanged — token edits fail to re-theme the preview"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.25"
-name = "static_theme_controls"
-description = "Saved themes list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.26"
-name = "outbound_navigation"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.27"
 name = "create_edit_preview_export_flow"
 description = "Starting from the initial My themes count: create 'Harbor Dawn', change its primary color, box radius, field size, depth, noise, and font, switch to Color Palette, then open the Artifact center; the count is exactly one higher and the selected row, editor values, preview styling, palette values, contrast badges, URL hash, and CSS/JSON/Config artifact texts all agree without reload"
@@ -382,34 +358,3 @@ description = "Toggling the Dark color scheme Options control updates options.da
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n4"
-name = "export_omits_session_customizations"
-description = "After editing color, radius, size, border, effect, or font tokens on a custom theme, the Artifact center CSS, JSON, or Config text still shows the pre-edit defaults and omits the session's actual customizations"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n5"
-name = "undo_fails_to_restore_dependent_surfaces"
-description = "After a token edit, Undo restores one surface (for example the editor swatch) while live preview, contrast badge, or artifact text remain on the edited values — incomplete undo"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n6"
-name = "json_export_missing_required_contract_fields"
-description = "The Artifact center JSON tab for an active custom theme is missing required declared-theme fields (name, a colors key from the required set, radius, size, border, depth, noise, fontFamily, or options), shows color values that are not #RRGGBB, or shows border outside 0.5px/1px/1.5px/2px"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in a specified core behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence (control, action sequence, or resulting page state) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

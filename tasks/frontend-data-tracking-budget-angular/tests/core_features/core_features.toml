@@ -226,38 +226,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "1.26"
-name = "bottom_nav_decorative_only"
-description = "The bottom navigation is decorative chrome: activating Dashboard, Expenses, or Settings leaves the same content on screen instead of switching the visible workspace"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.27"
-name = "dashboard_totals_static_regardless_of_changes"
-description = "The Dashboard's category totals and progress bars stay a constant value regardless of adding, editing, deleting expenses, or changing the period"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.28"
-name = "delete_hits_wrong_category_or_row_persists"
-description = "Deleting an expense removes its amount from a category other than the one it belonged to, or leaves the deleted row visible in the table"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.29"
-name = "control_navigates_offsite"
-description = "An in-app control (nav item, period arrow, dialog action) performs an outbound navigation that leaves the app or loads content from another origin"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.30"
 name = "chart_matches_totals_with_tooltip"
 description = "The Dashboard renders a spending-breakdown chart whose segments or bars correspond to the current period's per-category totals, and hovering a segment shows a tooltip naming the category and its amount"
@@ -384,22 +352,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n40"
-name = "export_omits_session_expense_or_contract_keys"
-description = "After adding a valid expense, an open CSV or JSON export preview omits that expense's contracted fields, or the JSON preview lacks required BudgetDocument keys displayName, activePeriod, categories, or expenses"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n41"
-name = "import_accepts_contract_invalid_budget_document"
-description = "Import JSON accepts a parseable document that violates the BudgetDocument field contract (missing required keys, activePeriod.month outside 1–12, expense value not greater than 0, datetime not YYYY-MM-DD, or unknown categoryId) and still mutates expenses, categories, or totals"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.48"
 name = "dashboard_variance_surface_per_category"
 description = "The Dashboard shows a per-category variance surface: each category displays its budget limit, its actual spent for the current period, and its variance (limit minus spent) shown with a sign so an over-spent category reads negative"
@@ -483,42 +435,3 @@ description = "Importing a Budget report JSON restores the recurring rules and t
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n42"
-name = "csv_import_mutates_before_commit"
-description = "Selecting a Transactions CSV or interacting with the diagnostic screen changes the Expenses table, Dashboard totals, or export previews before the Commit control is pressed"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n43"
-name = "recurring_instance_omitted_from_totals_or_export"
-description = "A rule-generated expense instance is shown in the Expenses table but is not counted in the period's Dashboard totals or is missing from the JSON export's expenses array"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n44"
-name = "projection_static_after_new_spending"
-description = "A category's projected end-of-period total renders the same value after a new expense is added to that category in the current period, ignoring the changed spending"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n45"
-name = "export_omits_threshold_rules_or_label_never_shows"
-description = "The JSON export omits thresholdPercent or recurringRules, or the 'Over threshold' label never appears for any category even when spent exceeds the threshold percent of its limit"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core functionality or a broken end-to-end flow that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, action sequence) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

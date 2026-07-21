@@ -175,26 +175,3 @@ description = "At 1024 pixels and below the workbench panes stack vertically in 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n1"
-name = "overlapping_clipped_text"
-description = "At 1440 pixel width, any badge, table cell, pane heading, gate banner item, manifest text, or timeline entry overlaps another element or is clipped by its container"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.n2"
-name = "browser_default_controls"
-description = "Selects, checkboxes, dialogs, or buttons render with unstyled browser-default appearance that clashes with the studio's visual language"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

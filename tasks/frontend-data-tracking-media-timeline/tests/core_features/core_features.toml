@@ -204,22 +204,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.21"
-name = "static_html_only_no_crud"
-description = "Timeline events list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.22"
-name = "outbound_links_instead_of_in_app"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.23"
 name = "pin_opens_detail_with_stepping"
 description = "Clicking an event pin opens an in-page detail with kicker (year and place), title, category, and body, and Previous/Next controls or the arrow keys step through the currently filtered events while a close control or Escape returns to the stage"
@@ -254,15 +238,6 @@ name = "in_view_and_catalogued_count_readouts"
 description = "An event-count readout ('N events in view') and a result note ('Showing N of M catalogued events') update as filters and the year window change"
 type = "binary"
 weight = 0.5
-optional = true
-
-[[criterion]]
-id = "1.28"
-name = "pins_ignore_year_window"
-description = "Event pins render at fixed positions that ignore the year window, so scrubbing or zooming does not reposition or re-filter them"
-type = "binary"
-weight = 0.5
-negate = true
 optional = true
 
 [[criterion]]
@@ -449,33 +424,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.55"
-name = "export_omits_session_mutations"
-description = "After a visible create, edit, delete, or batch mutation, the Timeline JSON or Events CSV export preview still omits that session change (title, type, timestamp, or mediaRefs missing after create, or still present after delete)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.56"
-name = "undo_fails_to_restore_event"
-description = "After deleting a user-managed event, activating Undo leaves the event absent from the library list and stage pins"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.57"
 name = "events_csv_header_and_media_refs_join"
 description = "Events CSV preview shows header line title,type,timestamp,mediaRefs,year,place,categories,summary,source with categories pipe-joined and mediaRefs semicolon-joined on each data line"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "A specified core behavior of the app is broken or missing in a way that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

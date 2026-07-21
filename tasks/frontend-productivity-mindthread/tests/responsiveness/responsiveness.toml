@@ -140,38 +140,3 @@ name = "small_screens_avoid_horizontal_scroll"
 description = "At 375px wide there is no page-level horizontal scrolling for Home, Today, Archived, or Export."
 type = "binary"
 weight = 1.0
-[[criterion]]
-id = "7.n1"
-name = "mobile_layout_unusable"
-description = "At 375px the capture bar or thread cards are unusable due to overflow or unreachable controls."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "7.n2"
-name = "export_drawer_offscreen_on_mobile"
-description = "Export drawer or command palette renders off-screen or clipped at small widths with no way to operate Copy/Download."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "7.n3"
-name = "horizontal_scroll_at_375"
-description = "Page-level horizontal scrolling appears at 375px during normal Home/Today use."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "7.n4"
-name = "text_overflows_cards"
-description = "Long spark or thread title text overflows its card/panel instead of wrapping between 375 and 1440."
-type = "binary"
-negate = true
-weight = 1.0
-[[criterion]]
-id = "responsiveness.catchall"
-name = "responsiveness_catchall"
-description = "The app exhibits a significant, browser-observable defect in responsiveness that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

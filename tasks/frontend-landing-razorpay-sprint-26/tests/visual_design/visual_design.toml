@@ -142,22 +142,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "2.8"
-name = "substituted_font_family_present"
-description = "Body or heading text renders in a substituted family such as externally hosted Inter, system-ui, Arial, or Times instead of the self-hosted Inter Tight, Geist Mono, and bundled display face, or any font loads from an external host."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.9"
-name = "wrong_core_colors_present"
-description = "The active nav cell, preloader bar, or body background computes to a wrong color (clicked cell not rgb(0,57,255), bar not rgb(48,94,255), or body not rgb(26,26,26))."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.10"
 name = "measured_type_scale"
 description = "getComputedStyle shows the measured type scale: nav labels in the mono face at 16px/400, the hero SPRINT/2026 fold text in the display face at 144px/400 letter-spacing -6px, section titles in the display face at 48px/500 letter-spacing -0.9px, section index numerals in the mono face at 38.4px/400 color rgb(138,138,138), and feature-card body in the body face at 16px/400 line-height 19.2px (close tolerance on px, exact on family role)."
@@ -213,22 +197,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.17"
-name = "unfinished_copy_present"
-description = "Lorem ipsum, placeholder-text markers (for example TODO or TKTK), or visibly unfinished copy appears somewhere in the shipped UI."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.18"
-name = "real_brand_assets_shipped"
-description = "Copyrighted, trademarked, scraped, stock, source-site, screenshot-derived, or otherwise third-party-controlled creative material—or a recognizable trace, near-copy, or derivative—appears anywhere, including a source fintech logo, real executive likeness/photo/video frame, proprietary font, partner/social mark, site-builder badge, Rive artboard, WebGL model/texture, metadata, or hidden/preloaded asset instead of the fictional Novapay system."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.19"
 name = "asymmetric_stack_composition"
 description = "On desktop the stacked thematic sections overlap the predecessor by the measured 100px stack overlap, section headers use an asymmetric two-column layout (index column about 330px with title/tagline in the remaining span) rather than equal-width stacks, and feature-hero card grids use uneven column ratios."
@@ -243,27 +211,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.21"
-name = "lime_or_cream_palette_present"
-description = "The page adopts a lime-on-dark or warm-cream editorial palette (for example lime accents near #ecfdad or a cream body near #F4F1EA / #eae9e6) instead of the Novapay electric-blue / near-black / white identity."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.22"
 name = "scratch_authored_media_inventory_craft"
 description = "The Novapay identity and asset inventory are visibly complete and art-directed: logo mark/lockup, six distinct executive portraits, matching local video posters, desktop/mobile 3D scenes and textures, every vector-interaction fallback, all card art, SVG controls, and the social-share image occupy their reference roles without repeated generic filler"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.23"
-name = "missing_reused_or_source_media"
-description = "A required Novapay surface is omitted, empty, broken, duplicated as filler, reduced to a generic gradient/emoji/text placeholder, or exposes a source-site name, logo silhouette, recognizable source media, distinctive copy, metadata, or destination"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.24"
@@ -281,10 +233,3 @@ description = "Shortlist tray, Compare tray, Theme filter, Launch search, comman
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

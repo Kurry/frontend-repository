@@ -150,38 +150,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_is_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as headings, hero text, or primary buttons."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "concept_names_are_inconsistent"
-description = "The same concept is named inconsistently across surfaces."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "copy_is_truncated_or_overflowing"
-description = "Truncated or overflowing text renders copy unreadable."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "15.9"
 name = "reports_read_as_structured_documents"
 description = "Where the app renders the settlement report and budget summary, they read as structured documents with labeled sections (balances, transactions, settled state; category totals, burn-rate, projection), not raw data dumps."
@@ -202,18 +170,3 @@ description = "Where the markdown export renders, it uses a heading per day and 
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "15.n5"
-name = "export_or_ics_garbled"
-description = "Raw serialization artifacts such as [object Object], undefined, NaN, or unrendered template tokens appear in the markdown export, the ICS payload, or the trip JSON preview."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

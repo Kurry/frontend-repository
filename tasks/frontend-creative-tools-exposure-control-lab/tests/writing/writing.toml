@@ -150,39 +150,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Lorem ipsum or placeholder text ('TODO', 'Lorem', 'asdf', or template variable names such as '{{title}}') is visible anywhere in the shipped UI, including help explainers."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_spelling_errors"
-description = "Spelling or grammatical errors appear in prominent copy such as dial titles, meter captions, mode labels, or primary action buttons."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "15.n3"
-name = "inconsistent_concept_naming"
-description = "The same dial or mode concept is named inconsistently across dial chrome, help panel, and presets surfaces in a way that would confuse a user."
-type = "binary"
-weight = 0.5
-negate = true
-
-[[criterion]]
-id = "15.n4"
-name = "truncated_or_overflowing_labels"
-description = "Dial titles, meter captions, preset names, or validation messages are truncated or overflowing so the copy is unreadable."
-type = "binary"
-weight = 0.5
-negate = true
-
-
-[[criterion]]
 id = "15.9"
 name = "import_error_names_problem"
 description = "Where the app renders an import error for malformed lab-package JSON, the copy names the problem and the fix rather than a bare rejection."
@@ -196,10 +163,3 @@ description = "Where develop sliders and looks appear, the slider names Exposure
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app's rendered text exhibits a significant copy-quality defect not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

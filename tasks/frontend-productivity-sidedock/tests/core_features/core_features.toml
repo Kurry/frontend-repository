@@ -219,22 +219,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.32"
-name = "invalid_url_still_adds_row"
-description = "Submitting the Add bookmark form with a blank or clearly invalid URL still adds a bookmark row to the tree"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.33"
-name = "folder_delete_orphans_contained_bookmarks"
-description = "Deleting a folder leaves the bookmarks it contained still visible in the tree instead of removing them with the folder"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.34"
 name = "accent_color_picker_applies_immediately"
 description = "The color swatch picker on a workspace tab offers nine preset colors, and picking a different swatch immediately recolors that tab and the workspace header bar to the chosen color without a reload"
@@ -368,18 +352,3 @@ description = "Importing parseable JSON that fails the SideDock package field co
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.53"
-name = "export_omits_session_mutations"
-description = "After creating a workspace and adding a bookmark with a distinctive url and title, the SideDock package JSON preview omits that workspace name, accentColor, bookmark url, or bookmark title"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -162,46 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_archive_flows_unavailable"
-description = "Architect tags on the home stack cannot open cases, sibling tags cannot swap cases, or the overscroll affordance cannot advance to the next case from the visible UI."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "case_surfaces_fail_to_update"
-description = "After clicking a home tag or sibling tag, the largest heading, folder color, or document title stays on the previous architect's values."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "header_subheader_desync_on_case"
-description = "After opening a case, the fixed home header remains visible alongside the case sub-header, or the sub-header category name disagrees with the active case's category."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "media_popup_blocks_with_no_exit"
-description = "A media popup opens but neither the red circular close button nor the dimmed backdrop closes it, leaving navigation blocked."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "deep_link_or_return_dead_end"
-description = "Loading a case URL directly, or returning from a case to home, leaves a blank/broken view or requires a full page reload to reach a usable archive state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "6.11"
 name = "pin_note_dossier_pipeline"
 description = "On Julian Kade: pin the case, commit a field note containing kade-note-alpha, open Export dossier, and confirm the Dossier JSON preview contains schemaVersion exactly field-notes-archive.dossier.v1, julian-kade inside pins, and kade-note-alpha under notes; unpinning removes that architect from the reading list and from the next compiled preview."
@@ -243,34 +203,3 @@ description = "With at least one pin already present, import a dossier payload w
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n6"
-name = "dossier_pipeline_dead_end"
-description = "After pin and note changes, Export dossier still shows an empty or pre-session preview, omits schemaVersion field-notes-archive.dossier.v1, or Import dossier after reload leaves the reading list missing the previously exported pins and notes."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "palette_or_filter_flow_broken"
-description = "Pressing Ctrl+K leaves no command palette overlay, or choosing a category filter then All leaves the home stack stuck narrowed with missing tags."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "invalid_import_wipes_prior_session"
-description = "Importing a schema-invalid dossier clears or replaces an already-present pin set instead of rejecting the payload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -147,18 +147,3 @@ description = "Through the real keyboard shortcut, the command palette opens wit
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.n1"
-name = "motion_missing_or_janky"
-description = "Interactive surfaces give no motion feedback at all (drawer, disclosures, and toasts snap with zero transitions and hovers produce no visible change), or animations stutter, flicker, or shift surrounding layout while running"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

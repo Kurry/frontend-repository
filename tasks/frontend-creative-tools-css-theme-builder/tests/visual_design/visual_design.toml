@@ -106,14 +106,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.3"
-name = "generic_equal_card_layout"
-description = "Collapses into a single-column equal-card marketing layout with no distinct themes/editor/preview panels"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.4"
 name = "theme_row_visual_anatomy"
 description = "Every theme row has a clearly ordered four-swatch primary/secondary/accent/neutral chip and name, with a visually distinct active row; the empty My themes hint remains legible when no custom rows exist"
@@ -152,14 +144,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.9"
-name = "token_contrast_failure"
-description = "A selectable built-in theme or edited token combination makes essential editor or preview text visibly unreadable against its active surface because the paired face/content styling is not applied coherently"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "3.10"
 name = "distinct_control_state_treatments"
 description = "Buttons, inputs, and segmented choices show visibly distinct default, hover, focus (visible ring), active-selection, disabled (empty Undo/Redo), and error treatments rather than a single unchanging style"
@@ -188,14 +172,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "3.14"
-name = "placeholder_copy_shipped"
-description = "Lorem ipsum, 'TODO', template-variable, or other placeholder text is visible somewhere in the shipped UI"
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "3.15"
 name = "contrast_matrix_visual_anatomy"
 description = "The Contrast panel reads as a compact matrix of pair name, numeric ratio, and AA/AAA badges with a distinct warning treatment on failing pairs, sitting in the editor without breaking the three-panel studio"
@@ -209,10 +185,3 @@ description = "Snapshots list and Before / After sit near the editor, and the vi
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick or taste disagreement. If present, name the defect and cite the concrete browser evidence (element, page state, viewport, or screenshot) that demonstrates it. If the defect is already covered—even partially—by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

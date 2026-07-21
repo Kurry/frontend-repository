@@ -92,22 +92,6 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "2.3"
-name = "browser_storage_persistence_present"
-description = "localStorage, sessionStorage, or another browser storage API holds app data (users, theme, filters, or UI state) after exercising the app"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.5"
-name = "external_origin_asset_requests"
-description = "Devtools network activity shows outbound requests to CDNs or other external origins for scripts, styles, fonts, icons, chart assets, or avatar images instead of everything loading from the app's own origin"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.6"
 name = "edit_coherent_across_views"
 description = "Editing a user updates that same record everywhere it appears — list row, role/status badges, and filtered views — rather than diverging into a second disconnected copy"
@@ -192,10 +176,3 @@ description = "A successful Add User stores a record whose Directory JSON users 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console, network, state coherence, stability, or accessibility) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network request, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

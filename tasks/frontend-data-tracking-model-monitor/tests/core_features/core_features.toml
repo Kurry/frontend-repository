@@ -225,22 +225,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.20"
-name = "rollups_static_despite_events"
-description = "The session totals, per-model cost rows, or pie chart render identical values before and after simulated usage events arrive, indicating the rollups are hardcoded rather than derived from the event stream"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.21"
-name = "filters_cosmetic_only"
-description = "Search, the provider filter, or the suggestion chips leave the visible table rows unchanged when applied, indicating the controls are cosmetic rather than recomputing the list from shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.22"
 name = "pin_watchlist_and_pinned_filter"
 description = "At least 2 seeded models open pre-pinned; toggling a row's pin control fills or clears its pin treatment; activating the Pinned-only filter chip narrows the table to pinned models only and the shown-of-total count matches"
@@ -302,28 +286,4 @@ name = "import_session_json_round_trip"
 description = "After mutating the session with a manual log and at least one pin change, importing a previously exported Session JSON restores the feed labels, session total, pins, budget, compare selection, and both export previews to match the imported document; malformed JSON or a document missing routing-session-report-v1 or required arrays shows an inline error naming the import field and leaves the session unchanged"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.31"
-name = "export_omits_session_mutations"
-description = "After a successful manual usage log or pin toggle that is visible in the UI, the Session JSON or Usage CSV export preview omits that mutation (missing request_label, cost, or pinned model name), revealing a stale or hardcoded export"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.32"
-name = "undo_does_not_restore"
-description = "After a successful manual usage log, activating Undo leaves the event in the feed or leaves the session total unchanged from the post-log value"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true
 

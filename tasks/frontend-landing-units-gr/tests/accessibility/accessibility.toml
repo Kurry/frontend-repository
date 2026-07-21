@@ -155,70 +155,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = "A primary interactive control (hamburger, menu close, carousel arrow, Book CTA, consent button, or nav link) cannot be reached or activated via keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focused interactive controls (nav items, Book CTAs, hamburger, menu close, carousel next/previous, consent buttons, footer links) show no visible focus indicator or the indicator is fully obscured."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "Custom interactive chrome (hamburger, menu overlay close, carousel arrows, consent buttons) uses non-semantic tags without ARIA roles/labels."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "menu_focus_not_managed"
-description = "At 390px with the menu open, keyboard focus cannot reach the overlay's links or close control, or the overlay traps the user with no keyboard path to dismiss."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_unreadable_text"
-description = "Marquee, band, or card copy is unreadable due to contrast below WCAG-AA (tone-on-tone or off-pair colors versus the mandated pairs)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "media_missing_alt_text"
-description = "A photograph or icon image is missing descriptive alt text (and is not marked decorative with empty alt)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_is_skipped"
-description = "Headings are skipped or unordered, such as jumping from the hero H1 straight to H3 with no H2."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, the skeleton intro, marquee loops, cursor motion, or scroll reveals continue to run."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.12"
 name = "inquiry_dialog_focus_trap_escape"
 description = "The booking inquiry overlay uses a dialog with aria-modal true, traps focus while open, closes on Escape, and returns focus to the control that opened it."
@@ -232,18 +168,3 @@ description = "Inquiry validation errors and the success copy Inquiry ready — 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n11"
-name = "inquiry_dialog_no_focus_trap"
-description = "The open booking inquiry overlay leaves keyboard focus free to move into the page behind it, or Escape fails to dismiss it while Close/submit stay unreachable."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

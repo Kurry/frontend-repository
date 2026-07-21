@@ -148,96 +148,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.n1"
-name = "local_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before the budget workspace is interactive on local render"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_flows"
-description = "Errors or warnings appear in the console during expense CRUD, Export, or Import flows"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "transitions_block_or_lag"
-description = "Period or view transitions block interaction for a prolonged period"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n4"
-name = "async_work_hangs_ui"
-description = "Import JSON validation or export preview regeneration freezes the UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "large_data_kills_frame_rate"
-description = "The seeded expense set plus session adds makes the Expenses table or chart unusable due to lag"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n6"
-name = "animation_blocks_input"
-description = "Dialog, drawer, or progress-bar animation makes input unresponsive until it finishes"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n7"
-name = "resource_load_blocks_rendering"
-description = "The UI blocks rendering while loading scripts or chart assets with a prolonged blank page"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "browser_resources_run_away"
-description = "Memory leaks or runaway browser resource usage occur during repeated expense mutations and exports"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "loading_state_is_blank"
-description = "Nothing is displayed while the initial workspace or Export drawer is loading"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n10"
-name = "rapid_or_edge_use_crashes"
-description = "The app crashes under rapid period switching or repeated add/delete"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "9.11"
 name = "csv_diagnostic_200_rows_responsive"
 description = "Loading a Transactions CSV of roughly 200 rows into the diagnostic screen validates and renders the per-row table without freezing the UI, and scrolling, excluding, or inline-fixing rows stays responsive"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

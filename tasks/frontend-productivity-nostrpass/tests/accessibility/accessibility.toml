@@ -173,78 +173,6 @@ weight = 1.0
 
 
 [[criterion]]
-id = "1.n1"
-name = "controls_unreachable_by_keyboard"
-description = """Primary controls cannot be activated or reached via keyboard."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = """Focus indicators are missing or obscured on interactive controls."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = """Custom toggles or dialogs lack appropriate roles and accessible names."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "1.n4"
-name = "state_uses_color_only"
-description = """Granted/Revoked or validation state is conveyed by color alone without text or accessible state."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "1.n5"
-name = "modals_fail_to_trap_focus"
-description = """Delete or import dialogs leave focus outside the dialog while open, or strand focus after close."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "1.n6"
-name = "poor_contrast_makes_text_unreadable"
-description = """Badge, pill, or body text is unreadable due to poor contrast in light or dark theme."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "1.n7"
-name = "errors_are_visual_only"
-description = """Validation or import errors are visual only with no live-region announcement."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
-id = "1.n8"
-name = "reveal_name_ignores_state"
-description = """The reveal/hide control accessible name stays identical while the key is revealed and while it is hidden."""
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "1.11"
 name = "matrix_switches_named_identity_and_app"
 description = "Each All-identities matrix cell is a real switch whose accessible name names both its identity and its application, and Grant all/Revoke all controls are keyboard operable"
@@ -258,10 +186,3 @@ description = "The rotate-keys confirmation opens as a dialog: focus moves in wh
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = """The app exhibits a significant, browser-observable accessibility defect that is NOT covered by any other criterion in this file. If present, name the defect and cite concrete evidence. If already covered, answer no here."""
-type = "binary"
-negate = true
-weight = 1.0

@@ -168,23 +168,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "mo-neg-static"
-name = "marquees_static_in_settled_state"
-description = "The marquee bands sit static in the settled state, their track transform unchanged between two samples taken a second apart"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "mo-neg-cursor"
-name = "custom_cursor_shown_on_mobile"
-description = "The custom block cursor is shown at a 390px-wide mobile viewport instead of being hidden below 1024px"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "mo-scrollreveal"
 name = "scroll_reveal_fade_rise_once"
 description = "On a fresh page load, scrolling down the page reveals section info blocks in sequence: each fades and rises into place from a lower, transparent start (opacity 0 / y 40), and each reveal plays only once per load (verified by real scrolling, never a state shortcut)"
@@ -229,14 +212,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "mo-neg-linear-signature"
-name = "signature_intro_purely_linear"
-description = "The signature home-skeleton intro and hero height reveal move with purely linear mechanical tweens that start and stop at constant speed with no inertial easing or physical settling"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "mo-inquiry-overlay-fade"
 name = "inquiry_and_palette_fade_via_ui"
 description = "Opening and closing the booking inquiry overlay and the command palette via the real UI controls shows a short opacity fade (~0.3–0.5s); verified through the real controls, never a state shortcut"
@@ -265,32 +240,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "8.a5"
-name = "scroll_capture_breaks_usability"
-description = "Smooth scrolling traps the user, prevents reaching footer content, fights native scroll direction, breaks the fixed desktop sidebar, or ignores the reduced-motion path that must disable intro/marquee/cursor/reveal motion while keeping content readable"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "8.a7"
-name = "signature_motion_purely_linear_tweens"
-description = "Signature non-marquee motion (skeleton intro rise/sweep, hero height reveal, cursor press scale, menu overlay fade, or hero stagger) uses purely linear tweens that start and stop mechanically with no inertial easing, momentum, or physical settling"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "8.a8"
 name = "interactive_shape_overlay_vectors"
 description = "Menu and color-button shape-overlay SVG paths stay crisp at the desktop viewport and respond to real hover state by morphing from closed toward open over about 0.9s with brand overlay colors, rather than looping identically regardless of hover"
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "motion.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

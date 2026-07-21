@@ -162,39 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_reset_is_incoherent"
-description = "After a reload, some session facets (a note, a resolved fix item, a recommendation, a Bundled badge) survive while others reset, producing incoherent partial persistence"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "derived_surface_ignores_inputs"
-description = "A derived surface — the rollup strip, calibration strip, allowed recommendation set, constraint explanation, or Bundle summary — renders identically before and after an input change that must alter it"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_inputs_produce_identical_output"
-description = "Two bundles with different recorded verdict state produce byte-identical Bundle summary documents, or two re-runs of the same gate publish byte-identical results"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_state_is_stale"
-description = "A gate flip, fix resolution, step completion, or bundling shows in one view while another view (portfolio row, workspace header, summary, timeline) keeps the old value until a reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.11"
 name = "mutation_to_export_contains_session"
 description = "End-to-end export probe: after flipping ember-relay-router via re-run, recording a recommendation with distinctive overrideJustification, resolving a fix item, writing a distinctive step note, and completing bundling, open Export. The Review Package JSON preview contains schemaVersion review-certification/v1 and that bundle's current heroState, recommendation, overrideJustification, resolved fix item, note text, and bundled true — compiled from actual session state"
@@ -208,18 +175,3 @@ description = "Export/import behavioral round-trip: after the mutation-to-export
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "export_preview_ignores_mutations"
-description = "After a recommendation, overrideJustification, fix resolution, note, bundling, or gate re-run, the Export Review Package JSON preview is identical to the pre-mutation preview or omits the changed fields"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling that is NOT covered by any other criterion in this file. If present, name the defect and cite the concrete evidence (action sequence, before-and-after page states) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

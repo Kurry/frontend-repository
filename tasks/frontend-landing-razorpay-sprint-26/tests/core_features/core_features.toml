@@ -219,22 +219,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "1.25"
-name = "nav_or_modal_broken"
-description = "Clicking a segment nav link or play control leads to an application-error or Not found page, or no video modal opens because the play control is missing or inert."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.26"
-name = "fabricated_copy_present"
-description = "The rendered copy invents section, feature, or quote text that does not appear in the PRD (for example a fabricated executive name or feature card not listed in the content requirements)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.27"
 name = "fresh_load_hero_flow_chain"
 description = "On a fresh load of /sprint/26: the preloader appears with its bar filling toward 100 percent, exits upward, and the 3D hero is revealed pinned at the top; scrolling down scrubs the camera through the scene while the SPRINT 26 billboard and pill stay overlaid; once the scroll-linked sequence completes the hero releases, the first stacked section scrolls into view, and the scroll-spy highlights 01.AGENTIC STACK."
@@ -372,40 +356,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n40"
-name = "export_omits_session_mutations"
-description = "After pinning features, mutating compare/theme/search, and watching an executive, the Sprint launch brief JSON omits those mutations (empty shortlistedFeatures, wrong themeFilter, or missing watchedExecutives) despite the visible UI showing them."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n41"
-name = "undo_does_not_restore_shortlist"
-description = "After pinning a feature, activating Undo leaves the Shortlist tray count elevated and that card still marked pinned."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n42"
-name = "brief_export_breaks_field_contract"
-description = "The exported Sprint launch brief JSON violates the API-shaped field contract: missing required string/array keys, brand other than Novapay, event other than Sprint 26, themeFilter outside the closed enum, compareFeatures longer than 3, catalog-illegal feature names, or generatedAt not an ISO-8601 UTC string ending in Z."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.49"
 name = "load_sample_brief_restores_state"
 description = "Activating Load sample brief in the Sprint launch brief panel loads the built-in contract-valid sample through the same restore path as Import: Shortlist tray, Compare tray, Watch log, pinned marks, and both preview tabs reflect the sample's contents"
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core feature behavior that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

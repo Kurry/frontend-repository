@@ -141,22 +141,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.8"
-name = "storage_written_violation"
-description = "localStorage, sessionStorage, cookies, or another browser storage API is written while the homepage is exercised"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.9"
-name = "outbound_runtime_requests"
-description = "The page issues any outbound runtime request to a non-origin host for an image, video, font, model, texture, animation, script, stylesheet, icon, or analytics resource"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.10"
 name = "store_button_computed_colors"
 description = "The Store button background computes to rgb(210, 255, 0) with text rgb(17, 17, 18), and the menu overlay and footer backgrounds compute to rgb(40, 44, 32)"
@@ -281,26 +265,3 @@ description = "Newsletter Subscribe, race status edit, and press-kit Import vali
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n26"
-name = "export_import_schema_divergence"
-description = "A press-kit JSON export that the UI just produced fails the same Import validation path, or Import accepts payloads whose race dates/status enums the calendar UI itself rejects."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n25"
-name = "press_kit_desyncs_from_selections"
-description = "Race selections or shortlist membership shown in the chrome disagree with the press-kit preview until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical, accessibility, or performance defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, network request, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

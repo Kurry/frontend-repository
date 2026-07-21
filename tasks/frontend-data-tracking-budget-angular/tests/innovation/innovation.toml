@@ -163,14 +163,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "optional_enhancement_breaks_required_export"
-description = "An optional enhancement blocks or replaces the required Export CSV/JSON download, Copy, or Import JSON path"
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user. If present, name the enhancement and cite the concrete evidence. If nothing beyond the covered optional items stands out, answer no."

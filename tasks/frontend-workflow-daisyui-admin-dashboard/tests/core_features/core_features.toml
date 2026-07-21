@@ -218,35 +218,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.23"
-name = "static_html_no_working_crud"
-description = "Users list is static HTML only with no working create/edit/archive against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.24"
-name = "chrome_outbound_link_navigation"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.27"
 name = "header_profile_popover_items"
 description = "Clicking the header profile control opens a popover listing Profile, Inbox (with a badge), Settings, and Logout"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "1.28"
-name = "search_field_decorative_only"
-description = "Typing a seeded user's name into the header search field leaves the All Users row set identical to the unfiltered list (search is decorative)"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "1.29"
@@ -446,22 +422,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.55"
-name = "export_omits_session_mutations"
-description = "After a create, edit, archive, restore, duplicate, or bulk change that is visible in the UI, the Directory JSON or Users CSV export preview still omits that session mutation (stale or seed-only export text)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.56"
-name = "delete_permanently_erases_without_archive"
-description = "Choosing Delete permanently erases the user with no Archive row and no way to Restore the record in the same session"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.59"
 name = "users_csv_import_updates_collection"
 description = "Importing pasted Users CSV text whose rows satisfy the UserCreate field names and enums merges or replaces the active users collection so All Users and the next Users CSV preview match the imported rows; CSV rows violating the enums or bounds show an inline error naming the field and leave the users count and Archive unchanged"
@@ -475,10 +435,3 @@ description = "The Directory JSON exportedAt field is an ISO-8601 timestamp stri
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core functionality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

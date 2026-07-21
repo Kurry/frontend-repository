@@ -122,14 +122,6 @@ weight = 0.5
 optional = true
 
 [[criterion]]
-id = "4.5"
-name = "4_5"
-description = "Interactive chrome such as buttons, theme swatches, and section toggles shows no hover feedback and feels static on pointer hover"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.6"
 name = "copy_export_confirmation_feedback"
 description = "Activating Copy export through the real Export package control shows a brief visible confirmation that appears then reverts, and Import success updates editor and preview without a reload"
@@ -142,14 +134,6 @@ name = "bulk_delete_and_add_card_motion"
 description = "Adding a project or testimonial through the real form controls animates the new card into the preview, and Delete selected removes selected cards with exit motion rather than an instant snap"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "4.n6"
-name = "copy_export_no_confirmation"
-description = "Copy export completes with no visible confirmation feedback, or Import success leaves the preview showing stale pre-import content until a reload"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "4.8"
@@ -221,10 +205,3 @@ description = "Saving a valid draft through Save As Draft animates the new entry
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

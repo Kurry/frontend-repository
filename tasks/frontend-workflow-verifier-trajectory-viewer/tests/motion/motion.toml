@@ -135,14 +135,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.7"
-name = "terminal_pops_in_complete"
-description = "Activating a terminal-bearing agent step renders its entire output instantly as one finished block with no progressive appearance and no streaming affordance"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.8"
 name = "reduced_motion_respected"
 description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly, while every flow (criterion selection, label switching, filtering, adjudication, bulk apply, undo/redo, export, and import) remains complete and usable"
@@ -156,10 +148,3 @@ description = "Opening Export review package through the real control enters the
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

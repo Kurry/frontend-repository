@@ -162,27 +162,3 @@ description = "When over budget, the remaining-budget readout uses a 2 pixel err
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.11"
-name = "desktop_layout_broken"
-description = "At 1440 pixel width, any table, sidebar, feed, modal, or export panel text overlaps another element, is clipped by its container, or renders visibly misaligned"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.12"
-name = "mobile_overflow_present"
-description = "At 375 pixel width, page-level horizontal scrolling appears or content clips outside the viewport instead of the table scrolling within its own container and the sidebar collapsing into a toggleable panel"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true
-

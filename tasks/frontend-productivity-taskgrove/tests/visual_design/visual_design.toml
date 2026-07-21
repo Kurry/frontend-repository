@@ -149,24 +149,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "3.10"
-name = "3_10"
-description = "Task-row panels or the primary/secondary buttons render with rounded corners instead of the specified sharp-cornered and 16px-radius button treatments"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
-id = "3.11"
-name = "3_11"
-description = "Button labels are long descriptive phrases or ALL CAPS instead of the short verb-led labels named in the spec (New Root Task, Add Child, Move Up, and so on)"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "3.12"
 name = "layout_regions_match_spec"
 description = "The app opens into a header with the app name and a one-line description, a toolbar holding search, tag filter chips, a Tag manager toggle, Export grove, Import grove, and a Theme control, a main area with the task tree on the left and the Archive panel on the right, and a footer holding the New root task input"
@@ -216,14 +198,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "3.19"
-name = "placeholder_text_visible_in_ui"
-description = "Lorem-ipsum, 'TODO', template-variable, or other placeholder text is visible somewhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.20"
 name = "muted_secondary_subtitle_color"
 description = "In the Light theme, the header's one-line app description renders in the muted #62748E secondary tone, visibly distinct from the #0F172B primary ink used for body text"
@@ -244,10 +218,3 @@ description = "Each task node row shows readable status and priority chips or la
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

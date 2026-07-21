@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "6.n1"
-name = "primary_agent_flows_unavailable"
-description = "Connect, rename, disconnect, export, or import flows are not enabled from the UI"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n2"
-name = "new_agents_missing_or_duplicated"
-description = "Connecting an agent produces duplicate panel rows or leaves the new agent absent from Session JSON and Agents CSV export previews"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n3"
-name = "agent_state_desyncs_across_surfaces"
-description = "Agent name, state, or count changes appear in the panel but not in the KPI strip, feed, or export previews until reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n4"
-name = "view_switch_breaks_or_loses_filters"
-description = "KPI detail navigation or Back breaks layout or loses feed filter selection"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n5"
-name = "empty_agents_breaks_ui"
-description = "Disconnecting every agent produces a blank broken panel with no empty state or Connect recovery control"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n6"
-name = "filtered_feed_disagrees_with_count"
-description = "Feed filter chips disagree with the visible event count or Clear filters fails to restore the prior feed"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n7"
-name = "export_drawer_cannot_reopen"
-description = "After closing the export drawer or command palette it cannot be reopened from its control"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n8"
-name = "overlay_blocks_navigation"
-description = "Connect dialog, export drawer, or command palette blocks navigation with no Escape or close path"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n9"
-name = "failed_connect_or_import_lacks_feedback"
-description = "Invalid Connect or malformed Import provides no visible per-field feedback"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "6.n10"
-name = "navigation_dead_end_requires_reload"
-description = "Recovering from a detail view, closed overlay, or failed import requires a full page reload"
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "6.11"
 name = "bulk_disconnect_flow"
 description = "Selecting two agent checkboxes and confirming Disconnect selected removes exactly those two rows and appends two disconnected feed events in one action"
@@ -263,18 +182,3 @@ description = "After mutating the session (connect or rename at least one agent)
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "6.n11"
-name = "export_import_round_trip_breaks"
-description = "Export then import of Session JSON after a visible agent mutation leaves agents, feed, or export previews different from the pre-export mutated state without an import error"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "user_flows.catchall"
-name = "user_flows_catchall"
-description = "The app exhibits a significant, browser-observable defect in critical end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

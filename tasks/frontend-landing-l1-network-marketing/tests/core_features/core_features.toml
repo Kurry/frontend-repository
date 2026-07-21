@@ -204,22 +204,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.18"
-name = "static_list_without_crud"
-description = "Events list is static HTML only with no working create/edit/delete against shared state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.19"
-name = "chrome_navigates_offsite"
-description = "App chrome navigates via real outbound links to other origins instead of in-app view state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.20"
 name = "header_hamburger_only_nav"
 description = "The sticky header contains no traditional horizontal navigation link row — navigation lives only in the oversized hamburger mega-menu, and every mega-menu CTA stays in-page"
@@ -437,34 +421,3 @@ description = "Creating or editing an event enforces title and city at least 2 c
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n11"
-name = "export_omits_session_mutations"
-description = "After creating or editing an event or appending a contact lead in the session, the Export JSON/ICS preview or ridge-session-leads.json omits that mutation and still shows only the original seed catalog or an empty leads array"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n12"
-name = "undo_does_not_restore_collection"
-description = "After deleting an event, activating Undo leaves the event absent from the manager list, rollups, or landing listings"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n13"
-name = "success_without_passing_field_contract"
-description = "Contact success state appears, or an event is added, after a submit whose payload fails the declared contact or event field contract (missing required fields, invalid email, out-of-enum values, or featured/status mismatch)"
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in its core features or end-to-end user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

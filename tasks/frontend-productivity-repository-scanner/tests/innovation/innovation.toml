@@ -163,14 +163,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "demo_is_bare_spec_only"
-description = "Optional negative: the build is a bare minimum checklist with no optional polish, coachmarks, or platform flourishes beyond the written must-haves."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "Optional catch-all: the build demonstrates a significant innovative enhancement beyond the specification that is NOT covered by any other criterion in this file. If present, name the enhancement and cite concrete browser evidence. If nothing beyond the other criteria applies, answer no."

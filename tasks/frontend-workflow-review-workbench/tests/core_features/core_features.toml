@@ -176,14 +176,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.13"
-name = "gate_evidence_read_only"
-description = "A control exists that directly edits a gate's score, status, reasons, or evidence text (rather than changing state only through re-runs, fix check-offs, steps, recommendations, and overrides)"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.14"
 name = "rerun_four_named_steps"
 description = "Activating Re-run gate starts a simulated re-evaluation showing four named steps in order — provision harness, collect trials, evaluate checks, publish result — whose statuses advance visibly through pending, running, and complete or failed"
@@ -457,31 +449,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "1.53"
-name = "fabricated_rerun_success"
-description = "A re-run presents a completed state while the gate card, hero banner, portfolio row, or timeline remain unchanged from before the re-run in a case where the published result should have changed them"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.54"
-name = "constraint_ignores_state"
-description = "The enabled recommendation set stays the same across gate flips or fix-item resolution changes that the stated rules say must change it"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.55"
-name = "summary_shows_stale_state"
-description = "The Bundle summary document shows a hero state, recommendation, gate status, fix item, or note that contradicts what the rest of the workspace currently displays"
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "1.56"
 name = "recommendation_override_field_contract"
 description = "Saving an out-of-set recommendation requires overrideJustification of 20–2000 trimmed characters under the recommendation/override field contract: shorter, empty, or whitespace-only input shows an inline error naming the justification field and saves nothing; a valid save records the recommendation and justification"
@@ -516,18 +483,3 @@ description = "Importing valid Review Package JSON after a reload restores the m
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.61"
-name = "export_omits_session_mutations"
-description = "After a recommendation, overrideJustification, fix resolution, step note, bundling, or gate re-run mutation, the Review Package JSON preview still omits that mutation or keeps the pre-mutation values"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

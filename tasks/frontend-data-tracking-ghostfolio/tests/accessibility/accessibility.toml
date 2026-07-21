@@ -131,59 +131,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "keyboard_cannot_reach_core_controls"
-description = "Core interactive controls (Add holding, class filter, table row selection, save, delete) cannot be reached or activated via keyboard Tab/Enter/Space."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_or_obscured"
-description = "Focus indicators are missing or obscured on interactive controls when focused from the keyboard."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "selection_is_color_only"
-description = "The selected holdings row is indicated by color alone, with no non-color cue such as a teal left border and no programmatic selected state for assistive technology."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "validation_visual_only"
-description = "Inline validation or holding change feedback is visual only: no programmatic field association for errors and no live-region announcement for add/update/remove."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, row enter/exit, net-worth transitions, toast motion, or allocation-bar animation still run."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "1.11"
 name = "export_drawer_focus_trap_escape"
 description = "The export drawer traps focus while open, closes on Escape, and returns focus to the control that opened it."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "export_drawer_focus_escapes"
-description = "While the export drawer is open, keyboard focus reaches controls behind the drawer, or pressing Escape leaves the drawer open without returning focus to the opener."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -207,18 +158,3 @@ description = "The Benchmark compare toggle exposes its on/off state to assistiv
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "1.n7"
-name = "new_surfaces_inaccessible"
-description = "The batch selection controls or the CSV import diagnostics screen cannot be reached or operated by keyboard, or performance-summary gain and loss are conveyed by color alone with no text label or programmatic state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

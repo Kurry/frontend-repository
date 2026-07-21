@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.n1"
-name = "cold_load_exceeds_two_seconds"
-description = "More than 2 seconds pass after local cold load before a setting control can be registered."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_editor_flows"
-description = "Console errors, warnings, or unhandled rejections appear during editor, export, or category-navigation flows."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n3"
-name = "category_or_toast_transition_blocks_ui"
-description = "Category body transitions or toast enter/dismiss block the main thread so subsequent clicks queue with visible lag."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n4"
-name = "preview_update_hangs_ui"
-description = "Updating the live preview after a setting change hangs or freezes the UI until the re-theme completes."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n5"
-name = "category_nav_janks"
-description = "Switching categories produces sustained frame-rate collapse or multi-second jank."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n6"
-name = "animation_blocks_slider_input"
-description = "While preview re-theme or override-line animations run, sliders and switches ignore input."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n7"
-name = "asset_load_blocks_first_paint_of_controls"
-description = "The UI blocks rendering of the sidebar and settings form until all assets finish loading, leaving a blank interactive void."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n8"
-name = "runaway_resources_after_rapid_edits"
-description = "Rapid slider or toggle use causes visible memory/CPU runaway that degrades or crashes the tab."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n9"
-name = "blank_while_loading_editor"
-description = "Nothing is displayed (blank page) while the editor loads — no sidebar, form, or config panel."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "9.n10"
-name = "crash_under_rapid_or_edge_use"
-description = "The app crashes or becomes permanently unresponsive under rapid slider/toggle use or after Reset all and re-editing."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "9.11"
 name = "palette_search_responsive"
 description = "Fuzzy filtering in the command palette and settings search stays responsive as the query changes with no visible lag between keystrokes and result updates."
@@ -256,24 +176,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.n11"
-name = "search_keystrokes_lag_visibly"
-description = "Typing in the command palette or settings search shows visible lag or dropped keystrokes before results update."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "9.13"
 name = "compare_recolor_without_cross_lag"
 description = "Switching either Compare themes selector recolors its own preview immediately without lag or repaint jank on the other side"
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

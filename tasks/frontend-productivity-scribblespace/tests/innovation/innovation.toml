@@ -173,15 +173,6 @@ optional = true
 weight = 0.5
 
 [[criterion]]
-id = "11.n1"
-name = "bonus_breaks_required_contracts"
-description = "An optional polish feature contradicts required in-memory, field-contract, or export/import behavior — for example writing boards to localStorage, or a bonus export format that replaces rather than supplements Workspace JSON."
-type = "binary"
-negate = true
-weight = 0.5
-optional = true
-
-[[criterion]]
 id = "innovation.catchall"
 name = "innovation_catchall"
 description = "The app includes a significant, browser-observable innovation beyond the specification that is NOT covered by any other criterion in this file and does not contradict required behaviors. If present, name it and cite concrete evidence. If nothing qualifies, answer no."

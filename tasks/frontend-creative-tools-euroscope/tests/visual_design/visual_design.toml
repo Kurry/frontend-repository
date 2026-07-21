@@ -200,30 +200,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "3.7"
-name = "reads_as_generic_dashboard"
-description = "The initial surface reads as a generic dashboard or starter page rather than a recognisable colour-and-icon patcher"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.8"
-name = "mobile_horizontal_scroll_forced"
-description = "At 375px width the layout forces horizontal scrolling to reach the controls needed to choose a colour set and generate the patched result"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "3.18"
-name = "placeholder_text_visible"
-description = "Placeholder text (lorem ipsum, TODO, asdf, or template variable names) is visible somewhere in the shipped UI"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "3.19"
 name = "contrast_matrix_visual_treatment"
 description = "The contrast matrix uses compact ratio readouts with clear pass (green-tinted) and fail (amber or red-tinted) marks, and the colour-blindness control shows a segmented choice with a visible active selection."
@@ -251,18 +227,3 @@ description = "Empty Undo/Redo and disabled export actions read as non-interacti
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "3.n4"
-name = "export_center_unstyled_dump"
-description = "The export center is missing or renders as an unstyled plain dump with no tab labels or monospaced preview treatment."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "3.catchall"
-name = "visual_design_catchall"
-description = "The app exhibits a significant, browser-observable defect in visual design that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

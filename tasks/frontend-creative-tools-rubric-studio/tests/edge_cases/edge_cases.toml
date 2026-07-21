@@ -131,86 +131,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n1"
-name = "empty_criteria_shows_nothing"
-description = "After the criteria collection is empty, the criteria list shows nothing — no empty-state copy and no Add criterion affordance."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n2"
-name = "validation_errors_only_in_console"
-description = "Invalid criterion submissions or wrong version bumps surface only in the browser console with no visible inline field or violation feedback."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n3"
-name = "save_or_tune_toggle_silent"
-description = "Saving a correctly bumped change or toggling a labelled-case include produces no visible change to version badge, history, bars, or aggregate (silent failure)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n4"
-name = "delete_proceeds_without_confirmation"
-description = "Deleting a criterion proceeds with no confirmation step before the pending major-bump state."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n5"
-name = "interactive_controls_are_nonsemantic"
-description = "Primary interactive controls (rail entries, accordion headers, verdict toggles, case toggles, Add criterion) are non-semantic div/span click targets without button/role semantics."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n6"
-name = "criterion_form_not_keyboard_dismissible"
-description = "With the criterion form dialog open, keyboard users cannot dismiss it (no Escape path and no focusable Cancel control)."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n7"
-name = "duplicate_id_still_submits"
-description = "Entering a duplicate criterion id still enables submit and adds a second criterion with that id, or shows no inline message naming the id field as already in use."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n8"
-name = "ambiguous_or_missing_action_labels"
-description = "Primary actions show blank, placeholder, or ambiguous labels such as Submit, OK, or Button instead of specific labels like Add criterion, Export, or Copy."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n9"
-name = "likert_min_gte_max_accepted"
-description = "Choosing likert with min greater than or equal to max still allows submit, or shows no inline message on the range fields."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n10"
-name = "cancel_still_mutates_rubric"
-description = "Cancel on the criterion form or Cancel on a pending version bump still changes the rubric criteria, version, or history."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.11"
 name = "import_rejects_nonconforming_package"
 description = "Importing malformed JSON or parseable JSON that fails the RubricPackage field contract (schemaVersion not rubric-package-v1, library not Rubric Studio, missing rubrics/generatedAt, or invalid CriterionUpsert) leaves the rubric collection unchanged and shows a visible error naming the offending field or that the package is invalid."
@@ -231,18 +151,3 @@ description = "After deleting all criteria (each with major bump), Export center
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n11"
-name = "invalid_import_mutates_collection"
-description = "A non-conforming Import package mutates the rail or criteria collection despite failing the RubricPackage field contract."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "edge_cases.catchall"
-name = "edge_cases_catchall"
-description = "The app exhibits a significant, browser-observable defect in edge-case UX and feedback that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

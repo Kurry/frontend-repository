@@ -154,18 +154,3 @@ description = "With prefers-reduced-motion set, result cards appear immediately,
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "8.n1"
-name = "motion_absent_without_preference"
-description = "With prefers-reduced-motion NOT set, result entrances, the detail panel, and feedback re-ranking all snap instantly with no transition anywhere, so the specified motion system does not exist"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "8.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

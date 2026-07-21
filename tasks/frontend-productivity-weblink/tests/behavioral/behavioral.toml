@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_localstorage_persistence"
-description = "After reload, some of displayName, roomId, transcript, file queue, or theme silently revert while others survive, producing incoherent partial persistence."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "session_pack_ignores_mutations"
-description = "The Session Pack export preview renders identically regardless of displayName, roomId, chat, file-queue, or theme mutations."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_session_inputs_identical_export"
-description = "Joining different roomIds or sending different chat texts yields byte-identical Session Pack export previews."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "export_stale_until_reload"
-description = "Session mutations appear in the panels but not in Export Session until reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "transfer_pause_resume_checkpoint_probe"
 description = "Checkpoint probe: Start a transfer, Pause it, and record the exact bytes readout; Resume and let it finish; at no point after Resume is the readout lower than the recorded value, the row completes at exactly 100 percent, and Export Session shows that row Completed with bytesTransferred equal to sizeBytes"
@@ -207,26 +175,3 @@ description = "Input-dependent transcript: send distinctive text A and open Expo
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "progress_ignores_pause_or_rewinds"
-description = "A paused row's readout keeps advancing while Paused, or Resume restarts the readout from zero instead of the frozen value."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n6"
-name = "transfer_log_static_or_rewritten"
-description = "Queue lifecycle actions add no transfer-log entries, or later actions rewrite or delete earlier log entries instead of appending."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

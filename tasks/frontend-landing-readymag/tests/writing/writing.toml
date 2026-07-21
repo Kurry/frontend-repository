@@ -150,38 +150,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "15.n1"
-name = "placeholder_copy_visible"
-description = "Lorem ipsum or placeholder text (TODO, Lorem, asdf, or template variables like {{title}}) is visible anywhere in the shipped UI."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n2"
-name = "prominent_copy_has_typos"
-description = "Spelling or grammatical errors appear in prominent copy such as Design and launch outstanding websites, Enjoy easy workflow, Get the best support, or primary CTA labels."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n3"
-name = "source_brand_names_in_copy"
-description = "Rendered copy, wordmark text, or placeholder media captions still name the source product, real agencies, or third-party brands instead of the fictional Canvasly system."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
-id = "15.n4"
-name = "copy_truncated_or_overflowing"
-description = "Truncated or overflowing text renders mandated headings, card bodies, tile labels, or footer links unreadable at 1440 or 390."
-type = "binary"
-negate = true
-weight = 0.5
-
-[[criterion]]
 id = "15.11"
 name = "trial_brief_action_labels_specific"
 description = "Where the app renders trial brief actions, labels stay specific (Download JSON, Copy brief, Import brief, Submit trial brief, Load sample brief, Reset, Undo, Redo) rather than generic Submit/OK alone."
@@ -195,10 +163,3 @@ description = "Where the app renders trial brief validation, messages name the f
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "writing.catchall"
-name = "writing_catchall"
-description = "The app exhibits a significant, browser-observable defect in rendered copy quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

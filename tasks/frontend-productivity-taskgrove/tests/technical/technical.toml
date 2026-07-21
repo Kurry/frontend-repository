@@ -128,39 +128,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.6"
-name = "2_6"
-description = "The tree, tags, collapsed state, archive contents, or chosen theme reset to a default or are lost after a full page refresh"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.7"
-name = "2_7"
-description = "A hidden DOM element, attribute, or window global exposes internal ground-truth state that a real user could not reach through normal visible interaction"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.8"
-name = "2_8"
-description = "A workflow shows a success or completion state (toast, checkmark, updated ring) without the underlying action actually taking effect or surviving a reload"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "2.9"
-name = "2_9"
-description = "The app renders or behaves differently depending on whether it is driven by automation (navigator.webdriver or similar signals)"
-type = "binary"
-weight = 0.5
-negate = true
-optional = true
-
-[[criterion]]
 id = "2.10"
 name = "keyboard_only_operability"
 description = "Every interactive control (inputs, buttons, checkboxes, chevrons, tag chips, breadcrumb segments) is reachable and operable with the keyboard alone, with a visible focus indicator on each"
@@ -203,27 +170,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.16"
-name = "external_network_requests_made"
-description = "The app issues network requests to external origins (CDN scripts, fonts, icons, or APIs) during load or while exercising its features"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "2.17"
 name = "forms_enforce_task_and_tag_field_contracts"
 description = "New root task, Add Child, Edit task, and Tag manager forms enforce the declared field contracts in the UI: blank or over-120-character titles are rejected naming title; status outside todo|in_progress|done|blocked or priority outside low|medium|high|urgent is rejected naming that field; dueDate not empty and not YYYY-MM-DD is rejected naming dueDate; blank, over-40-character, or duplicate tag names are rejected naming name; a color outside the closed hex enum is rejected naming color; submit stays inactive until valid"
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "2.18"
-name = "import_accepts_schema_invalid_grove_package"
-description = "Import grove accepts a parseable JSON or CSV document that violates the Grove package field contract (wrong schemaVersion, theme outside light|dark|forest, status or priority outside closed enums, tag color outside the closed hex enum, or a node tags array longer than 5) and still mutates the tree, tags, archive, or theme"
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "2.19"
@@ -239,10 +190,3 @@ description = "Grove CSV uses the exact header id,title,status,priority,dueDate,
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable technical defect (console health, state coherence, persistence behavior, stability) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, console line, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

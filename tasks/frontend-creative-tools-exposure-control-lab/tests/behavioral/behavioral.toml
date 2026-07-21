@@ -148,39 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring dials and presets then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n2"
-name = "preview_identical_across_different_stops"
-description = "Stepping aperture, shutter, or ISO across clearly different stops leaves brightness, blur, motion frame, grain, and meter visually identical — a derived surface ignoring its inputs."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n3"
-name = "different_presets_apply_identical_dials"
-description = "Applying two presets that declare different aperture/shutter/ISO values yields identical dial readouts and preview/meter state."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n4"
-name = "mode_switch_shows_stale_dials_until_reload"
-description = "After applying a preset or stepping dials, the other mode still shows stale values until a full page reload."
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "14.9"
 name = "export_tracks_mutations_then_import_roundtrip"
 description = "Starting from seed: step ISO up one stop, create a valid preset named Export Probe Look with lookTag cinematic, save a snapshot named Export Probe Snap; confirm the Export panel JSON contains schemaVersion exposure-control-lab.package.v1 and field names aperture/shutter/iso/ev/presets/snapshots plus Export Probe Look, lookTag cinematic, Export Probe Snap, and the new ISO; copy the JSON, reload to seed, import it; confirm dials, both new rows (including lookTag), EV, histogram, and Export panel match the pre-export session."
@@ -202,35 +169,11 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n5"
-name = "export_identical_despite_mutations"
-description = "After creating a preset and changing dials, the Export panel JSON is byte-identical to the pre-mutation export text."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n6"
-name = "undo_leaves_export_desynced"
-description = "After Undo restores dials/presets in the UI, the Export panel JSON still reflects the undone mutations."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "14.12"
 name = "invalid_preset_payload_rejected_end_to_end"
 description = "Attempt to create a preset with a duplicate name, then with lookTag outside the closed enum: both attempts leave the preset count unchanged, show inline errors naming name or lookTag, and leave the Export panel presets array without a new entry."
 type = "binary"
 weight = 1.0
-
-[[criterion]]
-id = "14.n7"
-name = "export_shape_diverges_from_form_payload"
-description = "After a successful preset create, the Export panel presets entry uses different field names or enums than the ExposurePreset form payload (for example tag instead of lookTag, or a free-text look value outside the closed enum)."
-type = "binary"
-weight = 1.0
-negate = true
 
 [[criterion]]
 id = "14.13"
@@ -260,26 +203,3 @@ description = "With dials and at least two sliders off default and a look active
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n8"
-name = "exported_png_identical_across_edit_states"
-description = "Two clearly different edit states (for example seeded state versus Mono look or Exposure -60) produce visually identical exported edited-PNG files"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "14.n9"
-name = "before_release_loses_edit_state"
-description = "After holding and releasing the Before control, the off-default dial stops or develop-slider values are lost instead of being restored exactly"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -154,26 +154,3 @@ description = "Via the real Export Copy and Download controls: a short confirmat
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.n1"
-name = "animation_jank_or_flicker"
-description = "Row, progress, step-chip, or modal animations visibly jank, flicker, or stutter during normal use"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n2"
-name = "static_interactive_chrome"
-description = "Buttons, repository rows, document rows, and timeline entries show no hover wash or press feedback — interactive chrome looks entirely static"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable motion defect that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

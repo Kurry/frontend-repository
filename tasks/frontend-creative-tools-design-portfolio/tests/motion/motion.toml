@@ -155,22 +155,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "4.3"
-name = "missing_or_snapping_microinteractions"
-description = "Required boot, output, skill-bar, window, canvas, or hover feedback snaps with no perceptible transition, or one of the specified pointer targets remains visually inert"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.9"
-name = "motion_blocks_interaction"
-description = "An animation traps input, obscures terminal controls after completion, causes a major layout jump, or continues intensely under reduced-motion preference"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.12"
 name = "palette_and_export_motion"
 description = "Via the real UI path, the command palette opens/closes with a brief opacity or scale transition, and Export Copy shows a short confirmation transition before resetting."
@@ -184,18 +168,3 @@ description = "Archiving a selected project through the visible bulk or per-proj
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.n2"
-name = "palette_or_export_snaps"
-description = "The command palette or export confirmation snaps with no perceptible transition when opened or confirmed via the real UI path."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

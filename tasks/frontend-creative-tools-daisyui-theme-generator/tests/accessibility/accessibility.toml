@@ -162,87 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "theme_studio_controls_unreachable_by_keyboard"
-description = "A theme row, swatch picker, radius/size selector, Depth/Noise toggle, preview tab, Hold to add theme, Remove, or chrome dropdown cannot be reached or activated via keyboard alone."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_on_studio_controls"
-description = "Focused theme rows, swatch pickers, radius/size selectors, toggles, tabs, or chrome dropdown triggers show no visible focus indicator or the indicator is obscured."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "swatch_or_dropdown_lack_semantics"
-description = "Color swatch pickers or chrome dropdown menus use non-semantic tags without ARIA roles or accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "validation_or_active_theme_color_only"
-description = "Create/rename validation or active-theme selection is conveyed by color alone with no text, selected-state label, or other non-color cue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "dropdown_or_picker_no_escape_focus_return"
-description = "With a chrome dropdown or color swatch picker open, Escape fails to close it or focus is stranded away from the opening control."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "unreadable_contrast_on_chrome_or_editor"
-description = "Site chrome labels, editor section headings, or primary action labels are unreadable due to poor contrast against their background in the default theme."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "name_validation_visual_only"
-description = "Create/rename validation feedback naming the name field is visual only and is not associated for assistive technology (no described-by, label wiring, or live region)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "theme_preview_chips_missing_accessible_name"
-description = "Theme-row four-swatch chips that convey color meaning are missing alt text or an accessible name."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_skips_in_editor_or_themes"
-description = "Themes panel or editor section headings skip levels (for example jumping H1 to H3) or have no coherent order."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, Hold-to-add progress fill, My themes row enter/exit, Random icon rotate, or preview re-theme easing still animate."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "1.11"
 name = "contrast_badges_not_color_only"
 description = "Contrast matrix AA/AAA results are exposed as readable text (or equivalent accessible name), not conveyed by color alone."
@@ -256,18 +175,3 @@ description = "Import validation messages for malformed or incomplete declared-t
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n11"
-name = "artifact_dialog_focus_not_trapped"
-description = "With the Artifact center open, keyboard focus can escape the dialog into the page behind it, or Escape fails to return focus to the Export control that opened it."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

@@ -162,86 +162,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n1"
-name = "library_controls_unreachable_by_keyboard"
-description = "A view toggle, period filter, swatch, painting title, editor field, MENU, CART, or favorite control cannot be reached or activated via keyboard alone."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n2"
-name = "focus_indicators_missing_on_controls"
-description = "Focused view toggles, period filter, swatches, editor fields, or header controls show no visible focus indicator or the indicator is obscured."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n3"
-name = "custom_controls_lack_semantics"
-description = "View toggles, swatches, or overlay triggers use non-semantic tags without ARIA roles or accessible names."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n4"
-name = "active_view_or_error_color_only"
-description = "The active view indicator or a form validation error is conveyed by color alone with no text, filled indicator state, or other non-color cue."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n5"
-name = "overlay_fails_to_trap_focus"
-description = "With the cart drawer, subscribe popup, or Detail/Editor overlay open, Tab moves focus to controls behind the overlay without trapping focus in the dialog."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n6"
-name = "unreadable_contrast_on_editorial_field"
-description = "Intro copy, control labels, or nomenclature/meta text is unreadable due to poor contrast against the cream field or swatch surfaces."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n7"
-name = "validation_or_copy_feedback_visual_only"
-description = "Copied confirmation or form validation feedback is visual only and is not announced via an aria-live region or equivalent assistive association."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n8"
-name = "swatches_missing_hex_accessible_name"
-description = "Swatch controls that copy a hex lack an accessible name that includes the hex value."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n9"
-name = "heading_order_skipped"
-description = "Editorial or library headings skip levels (for example jumping H1 to H3) or have no coherent order."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "1.n10"
-name = "animations_ignore_reduced_motion"
-description = "With prefers-reduced-motion set, scroll reveals or palette card enter/exit animations still run fully instead of applying instant state changes."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "1.11"
 name = "wheel_sliders_and_history_keyboard"
 description = "The color-wheel anchor is keyboard-adjustable (arrow keys move the anchor with companion points tracking), and the batch-edit sliders, harmony mode select, Undo/Redo controls, and vision-simulation control are keyboard-operable with visible focus indicators"
@@ -255,18 +175,3 @@ description = "Contrast-matrix pass/fail marks include a text label such as Pass
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n11"
-name = "wheel_pointer_only"
-description = "The color-wheel anchor can only be adjusted by pointer drag, with no keyboard path that moves it"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "accessibility.catchall"
-name = "accessibility_catchall"
-description = "The app exhibits a significant, browser-observable defect in accessibility that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

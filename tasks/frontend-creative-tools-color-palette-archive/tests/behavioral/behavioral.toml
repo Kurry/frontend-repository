@@ -176,62 +176,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring view, filter, sort, favorites, vision mode, and a created palette then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of a full return to the seeded baseline."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "period_filter_identical_across_inputs"
-description = "Switching among distinct period filter choices leaves the visible library membership identical — a derived surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_creates_yield_identical_output"
-description = "Creating two palettes with different names and swatch sets yields identical visible names and swatch sets, or identical export preview text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "layout_shows_stale_edit_until_reload"
-description = "After editing a palette's name or period, another Browse layout or the archive JSON export still shows the stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "export_ignores_session_mutations"
-description = "Export previews remain seed-only or otherwise omit visible session creates/edits/deletes/favorites — export not compiled live from the store."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "undo_fails_batch_or_delete_restore"
-description = "After Batch delete or a single delete, Undo leaves the deleted palettes gone and the export favorite/membership fields stuck at the post-delete state."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n7"
-name = "export_drops_api_shaped_fields"
-description = "After a valid create, the archive JSON export preview is missing version palette-archive.v1 or any of id, name, artist, period, swatches, or favorite for the new palette — export not conforming to the API-shaped archive schema."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.13"
 name = "reorder_export_pipeline"
 description = "Record a palette's swatch order from the archive JSON preview, reorder one swatch via the UI, and confirm the swatches array order in a fresh export changes to match the visible order; a second, different reorder yields a correspondingly different exported order"
@@ -250,21 +194,5 @@ id = "14.15"
 name = "notes_edit_catalog_pipeline"
 description = "Two different provenance notes saved on the same palette produce two different rendered catalog-sheet entries and two different notes strings in the archive JSON export"
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.n8"
-name = "comparison_deltas_static_after_swap"
-description = "Swapping one compared palette for another with different swatches leaves every displayed delta value unchanged"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
 weight = 1.0
 

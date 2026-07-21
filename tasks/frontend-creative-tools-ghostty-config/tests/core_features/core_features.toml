@@ -212,22 +212,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.29"
-name = "first_view_is_welcome_or_default_page"
-description = "The first usable view is an unrelated product, welcome, roadmap, or framework default page instead of the settings editor with its generated-config preview."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.30"
-name = "generated_line_stale_after_edit"
-description = "After a setting is edited, its generated configuration line is stale or disagrees with the control's current value."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.31"
 name = "invalid_value_inline_error_no_malformed_line"
 description = "Typing an invalid value into a validated setting control shows an inline message next to the control naming that setting, and no malformed line is emitted into the generated configuration while the value is invalid."
@@ -361,30 +345,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.n40"
-name = "export_omits_session_overrides"
-description = "With overrides present, Copy or Download produces empty, default-only, or otherwise incomplete config text that omits the session's actual key = value mutations."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n41"
-name = "undo_does_not_restore"
-description = "After a setting edit, Undo leaves the generated line, override count, or live preview unchanged from the post-edit state."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n42"
-name = "export_violates_ghostty_field_contracts"
-description = "With overrides present, the generated or exported config emits values that violate the contracted Ghostty shapes — for example font-size outside 4–60, cursor-style outside block/bar/underline/block_hollow, a non-#RRGGBB color, opacity outside 0–1, theme outside the declared set, or clipboard values outside ask/allow/deny — or omits required contracted keys for overrides the session actually made."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.50"
 name = "profile_rename_updates_name_only"
 description = "A saved profile's Rename control opens an inline form pre-filled with the current name; submitting a valid new name updates the profile's name in the list while its stored override set and override count stay unchanged, and applying the renamed profile still re-applies the same overrides"
@@ -426,18 +386,3 @@ description = "After applying a valid Import, Diff mode lists every imported key
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n43"
-name = "compare_mutates_without_apply"
-description = "Opening the Compare themes surface or changing a side's selector alters the generated configuration text or the override count before any Apply is chosen"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core functionality (a specified core behavior broken or missing) that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered - even partially - by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

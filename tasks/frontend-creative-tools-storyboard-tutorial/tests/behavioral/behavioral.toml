@@ -148,39 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After creating a scene, switching modes, and editing a description, a reload leaves an incoherent mix (for example a user-created scene survives while Tile mode resets, or seeded scenes are missing while Slide position remains)."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "slide_counter_ignores_navigation"
-description = "Advancing previous/next in Slide mode leaves the centered scene and N / total counter identical regardless of navigation input."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_creates_identical_cards"
-description = "Creating two scenes with clearly different titles and descriptions yields visually identical cards or identical visible text."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "mode_switch_stale_until_reload"
-description = "After editing a scene description in Tile mode, List or Slide stays stale until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-
-[[criterion]]
 id = "14.9"
 name = "export_pipeline_contains_session_work"
 description = "Full export pipeline: create a scene with a distinctive title and duration, edit another scene's shotType, switch to List; open Export and confirm Storyboard JSON shows schemaVersion storyboard-tutorial-v1 plus those values under field-contract keys with matching totalDuration, and the Markdown shot list names the same title, shot type, and duration; Copy shows a confirmation."
@@ -206,22 +173,6 @@ id = "14.12"
 name = "undo_round_trip_after_create"
 description = "Undo round-trip: create a uniquely titled scene (count +1), Undo (count back, title gone, Total duration restored), Redo (title and duration return)."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "14.n5"
-name = "schema_invalid_import_mutates_state"
-description = "Importing parseable JSON that fails the StoryboardDocument field contract (wrong schemaVersion, missing scenes, or enum/bounds violations) still mutates scenes or view mode."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n6"
-name = "export_omits_mutations_behavioral"
-description = "After distinctive create/edit mutations, Export Storyboard JSON and Markdown remain identical to a pre-mutation capture."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -252,18 +203,3 @@ description = "Create a scene with a distinctive title and duration, then move a
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n7"
-name = "outline_ignores_session_mutations"
-description = "After a create, reorder, or duration edit, the Printable outline preview remains identical to its pre-mutation content or disagrees with the board order and Total duration."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

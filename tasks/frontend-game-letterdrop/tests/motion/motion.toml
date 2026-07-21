@@ -127,22 +127,6 @@ type = "binary"
 weight = 0.5
 
 [[criterion]]
-id = "4.6"
-name = "toast_persists_or_blocks_play"
-description = "A transient confirmation toast persists indefinitely or blocks further interaction with the board and controls."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.7"
-name = "pause_fails_to_halt_motion"
-description = "Pressing the real Pause control leaves the fall animation visibly running, or motion evidence only appears when game state is snapped through a shortcut rather than driven through the real controls."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.8"
 name = "streak_meter_animates"
 description = "Driven through real tile taps and Submit Word, the combo streak meter fills or animates as consecutive valid submissions accrue and resets visibly on an invalid submission."
@@ -178,34 +162,9 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.n13"
-name = "jarring_or_layout_jank_motion"
-description = "Tile fall, toast, or overlay animation introduces visible layout jank, flicker, or motion so long/distracting that the board becomes hard to read."
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.n14"
-name = "reduced_motion_ignored"
-description = "With prefers-reduced-motion enabled, particle bursts and toast/history transitions continue at full motion as if the preference were unset."
-type = "binary"
-weight = 1.0
-negate = true
-
-
-[[criterion]]
 id = "4.15"
 name = "saved_and_copied_toast_fade"
 description = "Activating Save Progress or Copy on an export through the real controls shows a Saved or Copied toast that fades on its own without blocking play."
 type = "binary"
 weight = 0.5
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true
 

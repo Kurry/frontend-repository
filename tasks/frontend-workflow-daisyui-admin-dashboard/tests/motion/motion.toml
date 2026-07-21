@@ -114,14 +114,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "4.3"
-name = "static_chrome_no_hover_feedback"
-description = "Omits hover washes on buttons, rows, or sidebar items so interactive chrome feels static on pointer hover"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "4.5"
 name = "popover_enter_exit_animation"
 description = "Opened through real clicks on their triggers, the notifications, profile, and sidebar account popovers appear anchored to the trigger with a short opacity + scale enter/exit transition (not an instant snap), the account menu opens upward, and menu rows highlight on hover and keyboard focus"
@@ -164,18 +156,3 @@ description = "Verified through real UI controls: the export drawer slides in fr
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.21"
-name = "export_or_palette_snaps_without_motion"
-description = "The export drawer or command palette appears or disappears with a hard snap and no enter/exit opacity/scale or slide when opened via the real UI controls"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

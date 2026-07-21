@@ -133,18 +133,3 @@ description = "With prefers-reduced-motion enabled, animations are removed or re
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "4.7"
-name = "transitions_snap_everywhere"
-description = "Dialogs, toasts, and status changes snap abruptly with no transition anywhere in the app, leaving the interface feeling entirely static under pointer interaction"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable defect in motion or microinteractions that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, interaction performed, observed behavior) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

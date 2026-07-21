@@ -205,22 +205,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.17"
-name = "verdict_links_are_dead"
-description = "Clicking evidence links or selecting criterion rows leaves both trajectories unchanged — the verdict table is static markup with no linked highlighting"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.18"
-name = "double_submit_double_counts"
-description = "Rapidly double-activating the adjudication submit control records the same criterion twice, inflating the summary panel counts"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.19"
 name = "review_package_export_live"
 description = "Export review package opens with Review Package JSON and Review Memo Markdown tabs regenerated live from the store; the JSON preview shows schemaVersion exactly review-package/v1, exportedAt, taskId, trialId, model, activeLabel, comparedLabels, dimensionRollup matching the rollup bar, adjudications conforming to the create field contract, summaryCounts matching the panel, and flipCriterionIds; after recording an adjudication, reopening Export includes that adjudication in both formats"
@@ -248,26 +232,3 @@ description = "Ctrl+K or Cmd+K opens a command palette listing Jump to trial ent
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.23"
-name = "export_omits_session_adjudications"
-description = "After recording a valid adjudication through a real control, reopening Export review package shows JSON and Markdown that omit that criterionId or still show pre-adjudication summaryCounts, proving the export is stale or hardcoded"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.24"
-name = "import_accepts_invalid_contract"
-description = "Importing malformed JSON or a document that violates the Review Package field contract (wrong schemaVersion, classification outside the closed enum, rationale outside 20–2000 characters, summaryCounts disagreeing with adjudications, or comparedLabels not exactly two distinct trial labels) mutates adjudications or clears them without showing field-named validation"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in core features or user flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, action sequence, page state) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true

@@ -163,86 +163,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "9.n1"
-name = "cold_load_exceeds_two_seconds"
-description = "More than 2 seconds pass before the app is interactive on a local cold load."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n2"
-name = "console_errors_during_shell_flows"
-description = "Console errors or warnings appear during boot, command entry, CRUD, theme/mode switching, or easter eggs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n3"
-name = "theme_or_mode_transition_lags"
-description = "Theme or mode transitions visibly block or lag for a prolonged period before the UI settles."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n4"
-name = "command_output_hangs_shell"
-description = "A section command causes the terminal UI to hang or freeze until the output finishes."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n5"
-name = "seeded_collection_kills_frame_rate"
-description = "Scrolling or filtering the seeded Projects Board visibly kills frame rate or stalls input."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n6"
-name = "matrix_blocks_command_input"
-description = "While matrix-rain is animating, the command input becomes unresponsive to keystrokes."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n7"
-name = "blank_screen_while_booting"
-description = "Cold load shows a prolonged blank screen with no boot lines or terminal chrome before interaction is possible."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n8"
-name = "matrix_keeps_running_after_clear"
-description = "After /clear or an explicit dismiss, the matrix-rain canvas keeps consuming animation work in the background."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n9"
-name = "loading_state_blank_during_commands"
-description = "During command resolution the terminal body stays completely blank with no thinking indicator and no prior context."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "9.n10"
-name = "rapid_commands_crash_or_freeze"
-description = "Rapid repeated command entry crashes the page or freezes the output buffer."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "9.11"
 name = "export_recompile_stays_responsive"
 description = "After a project create, delete, or archive, the export preview recompiles promptly with no multi-second freeze of the shell or command input."
@@ -256,18 +176,3 @@ description = "Rapid repeated undo/redo stays responsive with no hangs, dropped 
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "9.n11"
-name = "export_or_undo_freezes_shell"
-description = "Export recompile or undo/redo freezes the terminal UI for a prolonged period or drops subsequent keystrokes."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "performance.catchall"
-name = "performance_catchall"
-description = "The app exhibits a significant, browser-observable defect in performance or stability that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

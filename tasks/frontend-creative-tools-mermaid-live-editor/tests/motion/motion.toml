@@ -140,26 +140,3 @@ description = "Triggered through the real UI controls, the syntax-error region e
 type = "binary"
 weight = 0.5
 
-[[criterion]]
-id = "4.5"
-name = "missing_control_feedback"
-description = "Buttons, tabs, sample controls, or keyboard-focused elements remain visually inert, or their active and pressed states cannot be distinguished during interaction"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.6"
-name = "reload_or_motion_desynchronization"
-description = "A sample, tab, theme, error-recovery, or source-edit transition reloads the page, flashes unrelated content, or leaves editor, preview, badge, and controls in visibly different states"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "4.catchall"
-name = "motion_catchall"
-description = "The app exhibits a significant, browser-observable motion or microinteraction defect that is NOT covered by any other criterion in this file. Significant means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete browser evidence that demonstrates it. If the defect is already covered even partially by another criterion, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

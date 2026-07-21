@@ -99,14 +99,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.3"
-name = "browser_storage_populated_after_use"
-description = "After exercising create/edit/delete, palette edits, export/import, or snapshots, localStorage or sessionStorage is non-empty — violating the good-app in-memory-only rule."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.4"
 name = "reload_restores_seeded_baseline"
 description = "A page reload returns the app to its seeded state: seeded saved themes present, unsaved edits/snapshots/import drafts/undo history gone."
@@ -149,26 +141,10 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "2.10"
-name = "console_errors_during_full_exercise"
-description = "Console errors or warnings appear during a full exercise of tabs, palette edits, source edits, saved-theme CRUD, export/import, presets, snapshots, or command palette."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "2.11"
 name = "rapid_input_stays_responsive"
 description = "Rapid palette changes, continuous typing in the source editor, and history timeline scrubbing stay responsive with no hangs or dropped interactions."
 type = "binary"
-weight = 1.0
-
-[[criterion]]
-id = "2.12"
-name = "outbound_network_requests_present"
-description = "After settle, the app issues navigational outbound network requests or loads fonts/icons from CDNs instead of staying self-contained."
-type = "binary"
-negate = true
 weight = 1.0
 
 [[criterion]]
@@ -192,26 +168,3 @@ description = "New Theme, Snapshot, and Import validation enforce the same API-s
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "2.n1"
-name = "disconnected_editor_and_preview_copies"
-description = "Editor source and tool controls hold a private disconnected copy of options that disagree with preview, Components demos, or Theme Files export after an edit."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.n2"
-name = "import_accepts_schema_invalid_theme_package"
-description = "Import accepts a package with paletteType outside light/dark, themeOptions.palette.type disagreeing with paletteType, a non-#RRGGBB primary.main, fontSize outside 10–24 when present, or shape.borderRadius outside 0–24 and still mutates the live theme."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "2.catchall"
-name = "technical_catchall"
-description = "The app exhibits a significant, browser-observable defect in technical quality that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

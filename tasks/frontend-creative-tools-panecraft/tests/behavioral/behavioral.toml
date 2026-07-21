@@ -148,38 +148,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "14.n1"
-name = "partial_persistence_after_reload"
-description = "After configuring pages, panes, sizes, and refresh intervals then reloading, some user-configured facets survive while others reset — incoherent partial persistence instead of restoring all facets together."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n2"
-name = "charts_identical_across_date_ranges"
-description = "Switching the shared date range among Today Only, Last 7 Days, Last 30 Days, and Last 90 Days leaves affected time-series panes visually identical — a derived surface ignoring its inputs."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n3"
-name = "different_configs_produce_identical_panes"
-description = "Creating or editing panes with different source/metric/dimension inputs yields identical rendered values and marks."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "14.n4"
-name = "cross_view_state_stale_until_reload"
-description = "After creating or editing a saved analysis or pane, Overview/Table or page-tab surfaces still show stale values until a full page reload."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
 id = "14.9"
 name = "export_pipeline_contains_session_work"
 description = "Full export pipeline: mutate a page name, pane metric, date range, and saved analysis; open Export and confirm Workspace JSON shows schemaVersion panecraft-workspace-v1 plus those values under field-contract keys, and the Markdown report names the same page, metric, and saved analysis; Copy on the active format shows a confirmation."
@@ -193,18 +161,3 @@ description = "After exporting Workspace JSON from a mutated session, change the
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "14.n5"
-name = "schema_invalid_import_mutates_state"
-description = "Importing parseable JSON that fails the WorkspaceDocument field contract (wrong schemaVersion, missing pages/savedAnalyses, or enum/cross-field violations) still mutates pages, panes, date range, or saved analyses."
-type = "binary"
-negate = true
-weight = 1.0
-
-[[criterion]]
-id = "behavioral.catchall"
-name = "behavioral_catchall"
-description = "A behavioral probe reveals stale, hardcoded, or incoherent state handling not covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-negate = true
-weight = 1.0

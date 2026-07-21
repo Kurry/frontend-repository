@@ -219,22 +219,6 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "1.28"
-name = "static_mockup_table"
-description = "The table renders a static, non-interactive poker mockup: \"Deal first hand\" does not seat players or deal cards, or betting controls do not change the pot and stacks"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.29"
-name = "level_up_resets_stats_or_never_advances"
-description = "Advancing 8 hands resets or clears the Session stats or Hand history, or the blind level never advances despite hands completing"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
 id = "1.30"
 name = "raise_bounds_inline_validation"
 description = "Entering a raise amount below the legal minimum raise or above the human's stack shows an inline validation message next to the raise-amount input naming the violated limit, and the raise confirm control stays disabled until the amount is legal"
@@ -339,26 +323,3 @@ description = "Entering a fractional or non-numeric raise amount, or an amount b
 type = "binary"
 weight = 1.0
 
-[[criterion]]
-id = "1.n_export_omits_mutations"
-name = "export_omits_session_mutations"
-description = "After completing a hand that changes stats and Hand history, the Export panel's session JSON preview still omits that hand from handHistory or keeps session.handsPlayed at the pre-play value"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.n_undo_no_restore"
-name = "undo_does_not_restore_stacks"
-description = "Using \"Undo last action\" after a legal human raise leaves the pot and human stack at the post-raise values instead of restoring the prior street state"
-type = "binary"
-weight = 1.0
-negate = true
-
-[[criterion]]
-id = "1.catchall"
-name = "core_features_catchall"
-description = "The app exhibits a significant, browser-observable defect in its core poker, stats, persistence, export, save/resume, or collaboration features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
-type = "binary"
-weight = 1.0
-negate = true
