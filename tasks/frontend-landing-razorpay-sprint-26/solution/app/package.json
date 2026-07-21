@@ -5,6 +5,7 @@
   "description": "Natively authored Vite + three.js + GSAP rebuild of the Razorpay Sprint 2026 microsite (/sprint/26)",
   "type": "module",
   "scripts": {
+    "test:e2e": "playwright test e2e.spec.mjs",
     "dev": "vite --host 0.0.0.0 --port 3000",
     "build": "vite build",
     "verify:build": "vite build",
@@ -18,6 +19,7 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.61.1",
     "vite": "^6.4.3"
   },
   "engines": {
