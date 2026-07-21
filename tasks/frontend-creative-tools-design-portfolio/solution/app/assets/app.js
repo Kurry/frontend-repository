@@ -432,6 +432,9 @@
       document.addEventListener('click', onDismiss);
       document.addEventListener('touchstart', onDismiss);
       document.addEventListener('pointerdown', onDismiss);
+      terminal.addEventListener('click', onDismiss);
+      terminal.addEventListener('pointerdown', onDismiss);
+      terminal.addEventListener('touchstart', onDismiss);
     });
     for (const step of bootLines) {
       if (dismissed) break;
@@ -985,6 +988,7 @@
     store.editingId = null;
     store.draft = null;
     formSlot.innerHTML = '';
+    store.formBusy = false;
   }
 
   function renderForm() {
@@ -1036,11 +1040,9 @@
       if (store.formBusy) return;
       store.formBusy = true;
       const submit = $('#formSubmit');
-      if (submit) { submit.disabled = true; submit.setAttribute('aria-disabled', 'true'); }
       const committed = submitProjectForm();
       if (!committed) {
         store.formBusy = false;
-        if (submit) { submit.disabled = false; submit.removeAttribute('aria-disabled'); }
       }
     });
     $('#formCancel').addEventListener('click', closeForm);
