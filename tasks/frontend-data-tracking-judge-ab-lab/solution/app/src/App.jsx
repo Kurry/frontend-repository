@@ -42,7 +42,10 @@ const CAUSE_SHORT = { 'scorer-noise': 'noise', 'rubric-change-effect': 'rubric',
 
 async function copyText(text) {
   try {
-    if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); return true }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
   } catch { /* fall through to legacy copy path */ }
   try {
     const area = window.document.createElement('textarea')
@@ -57,7 +60,9 @@ async function copyText(text) {
     const ok = window.document.execCommand('copy')
     window.document.body.removeChild(area)
     return ok
-  } catch { return false }
+  } catch {
+    return false
+  }
 }
 
 function ScoreBadge({ result }) {
@@ -756,6 +761,9 @@ function AttributionDrawer() {
     values: { cause: existing?.cause || '', note: existing?.note || '' },
   })
   useEffect(() => {
+    reset({ cause: existing?.cause || '', note: existing?.note || '' })
+  }, [draft, existing, reset])
+  useEffect(() => {
     if (!draft) return undefined
     closer.current = window.document.activeElement
     const onKey = (event) => { if (event.key === 'Escape') { event.stopPropagation(); useLabStore.getState().setAttributionDraft(null); closer.current?.focus?.() } }
@@ -817,8 +825,13 @@ function SavePairModal() {
   const schema = useMemo(() => createSavedPairSchema(savedPairs, labels.map((label) => label.name)), [savedPairs, labels])
   const { register, control, handleSubmit, reset, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
-    values: { name: '', labelA: compareA || '', labelB: compareB || '' },
+    defaultValues: { name: '', labelA: compareA || '', labelB: compareB || '' },
   })
+  useEffect(() => {
+    if (savePairOpen) {
+      reset({ name: '', labelA: compareA || '', labelB: compareB || '' })
+    }
+  }, [savePairOpen, compareA, compareB, reset])
   const submit = (record) => { savePair(record); reset(); setSavePairOpen(false) }
   return (
     <Modal opened={savePairOpen} onClose={() => setSavePairOpen(false)} title={<div className="modal-title"><span className="eyebrow">Saved comparison pair</span><strong>Save the current pair</strong></div>} transitionProps={{ transition: 'pop', duration: 220 }}>
@@ -860,7 +873,7 @@ function RunPanel() {
         </div>
         <div className="run-count"><strong>{complete}<i> / 12</i></strong><span>steps complete</span></div>
       </div>
-      <Progress value={(complete / 12) * 100} size="lg" radius="xl" aria-label={`${complete} of 12 steps complete`} className="run-progress" />
+      <Progress value={(complete / 12) * 100} size="lg" radius="xl" aria-label={`${complete} of 12 steps complete`} className="run-progress" transitionDuration={300} />
       <div className="run-rollups">
         <SummaryMetric label="Steps complete" value={`${complete}/12`} />
         <SummaryMetric label="Failures encountered" value={run.failures} tone={run.failures ? 'bad' : ''} />
@@ -870,8 +883,13 @@ function RunPanel() {
         <div className="steps-list" role="list" aria-label="Rescore steps">
           {run.steps.map((step) => (
             <button key={step.trialId} role="listitem" className={`step ${step.status} ${run.selectedStep === step.trialId ? 'selected' : ''}`} onClick={() => selectRunStep(step.trialId)}>
-              <span className="step-icon" aria-hidden="true">
-                {step.status === 'complete' ? <IconCheck size={14} className="step-check" /> : step.status === 'running' ? <i className="spinner" /> : step.status === 'retrying' ? <IconRefresh size={14} /> : <i className="dot" />}
+<span className="step-icon" aria-hidden="true" style={{ position: 'relative', width: 14, height: 14 }}>
+                <AnimatePresence mode="wait">
+                  {step.status === 'complete' && <motion.div key="complete" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={{ duration: 0.2 }} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconCheck size={14} className="step-check" /></motion.div>}
+                  {step.status === 'running' && <motion.div key="running" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={{ duration: 0.2 }} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="spinner" /></motion.div>}
+                  {step.status === 'retrying' && <motion.div key="retrying" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={{ duration: 0.2 }} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconRefresh size={14} /></motion.div>}
+                  {step.status === 'pending' && <motion.div key="pending" initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.5 }} transition={{ duration: 0.2 }} style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}><i className="dot" /></motion.div>}
+                </AnimatePresence>
               </span>
               <span className="step-name"><strong>{step.trialId}</strong><small>{step.taskName}</small></span>
               <b className="step-status">{step.status === 'retrying' ? `retry ${step.attempt} of 3` : step.status}</b>
@@ -908,8 +926,14 @@ function RescoreModal() {
     resolver: zodResolver(schema),
     defaultValues: { labelName: '', scorerModel: '', configNote: '' },
   })
+  useEffect(() => {
+    if (rescoreOpen && !run.active && !run.label) {
+      reset({ labelName: '', scorerModel: '', configNote: '' })
+    }
+  }, [rescoreOpen, run.active, run.label, reset])
   const submit = (record) => {
     const live = useLabStore.getState()
+
     // Double-activation guard: only the first submit starts a run.
     if (live.run.active || live.run.label) return
     live.startRescore(record)
@@ -1090,15 +1114,17 @@ function ExportModal() {
     link.click()
     URL.revokeObjectURL(url)
   }
-  const runImport = (raw) => {
+const runImport = (raw) => {
     let value
     try { value = JSON.parse(raw) } catch { setImportError('document: malformed JSON — fix the syntax and import again'); setImportSuccess(''); return }
-    const parsed = labResultsSchema.safeParse(value)
-    if (!parsed.success) { setImportError(formatZodError(parsed.error)); setImportSuccess(''); return }
-    const result = useLabStore.getState().importDocument(parsed.data)
-    setImportSuccess(`Import complete: ${result.attributions} attribution${result.attributions === 1 ? '' : 's'} and ${result.savedPairs} saved pair${result.savedPairs === 1 ? '' : 's'} restored. The preview below was regenerated.`)
+    const result = useLabStore.getState().importDocument(value)
+    if (!result.imported) {
+      setImportError(result.error || 'document: validation failed')
+      setImportSuccess('')
+      return
+    }
     setImportError('')
-    setPasted('')
+    setImportSuccess('Lab results restored')
   }
   const importFile = async (event) => {
     const file = event.target.files?.[0]
@@ -1446,9 +1472,17 @@ function AppInner() {
 export default function App() {
   const theme = useLabStore((s) => s.theme)
   return (
-    <MantineProvider forceColorScheme={theme} theme={{ primaryColor: 'teal', defaultRadius: 'md' }}>
-      <Notifications position="bottom-right" zIndex={1300} />
-      <AppInner />
-    </MantineProvider>
+    <MotionConfig reducedMotion="user">
+      <MantineProvider forceColorScheme={theme} theme={{
+        primaryColor: 'teal',
+        defaultRadius: 'md',
+        autoContrast: true,
+        primaryShade: 9
+      }}>
+        <Notifications position="bottom-right" zIndex={1300} />
+        <AppInner />
+      </MantineProvider>
+    </MotionConfig>
   )
+
 }
