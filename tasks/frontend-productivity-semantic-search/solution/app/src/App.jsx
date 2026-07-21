@@ -78,7 +78,7 @@ function HistoryPanel() {
           <div onClick={(e) => e.stopPropagation()}><Checkbox id={`history-${item.id}`} hideLabel labelText={`Select ${item.raw || 'all documents'}`} checked={state.selectedHistory.includes(item.id)} onChange={() => state.toggleHistory(item.id)} /></div>
           <div className="min-w-0 flex-1"><div className="history-query">{item.raw || 'All documents'}</div><div className="fine">{formatTime(item.timestamp)} · {item.count} results</div></div>
         </div>
-        {!!item.filters.length && <div className="mini-chips">{item.filters.map((f, i) => <span className="mini-chip" key={i}>{f.kind}:{f.value}</span>)}</div>}
+        {!!item.filters.length && <div className="mini-chips" role="button" tabIndex={0} onClick={() => state.rerunCaptured(item)} onKeyDown={(event) => event.key === 'Enter' && state.rerunCaptured(item)}>{item.filters.map((f, i) => <span className="mini-chip" key={i}>{f.kind}:{f.value}</span>)}</div>}
       </li>)}
     </ul>}
   </>
