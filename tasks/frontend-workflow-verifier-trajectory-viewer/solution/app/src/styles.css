@@ -30,7 +30,7 @@ button:disabled { cursor: not-allowed; }
 [data-focus-visible] { outline: 2px solid var(--color-accent); outline-offset: 2px; }
 
 .control {
-  @apply inline-flex min-h-9 items-center justify-center gap-2 rounded-md border border-line bg-paper px-3 text-sm font-semibold text-ink shadow-sm transition duration-150 hover:border-[#afb6b0] hover:bg-white hover:shadow active:translate-y-px disabled:opacity-40;
+  @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-line bg-paper px-3 text-sm font-semibold text-ink shadow-sm transition duration-150 hover:border-[#afb6b0] hover:bg-white hover:shadow active:translate-y-px disabled:opacity-40 sm:min-h-9;
 }
 .control-primary { @apply border-accent bg-accent text-white hover:bg-[#0e5f56]; }
 .control-quiet { @apply border-transparent bg-transparent shadow-none hover:bg-black/[0.05] hover:shadow-none; }
@@ -60,8 +60,19 @@ button:disabled { cursor: not-allowed; }
 .trajectory-pane { animation: pane-in .2s ease-out; }
 .verdict-crossfade { animation: row-in .24s ease-out; }
 .verdict-crossfade tbody tr { animation: row-in .22s ease-out; }
+.row-enter { animation: row-in .22s ease-out; }
+.row-exit { animation: row-out .22s ease-in forwards; }
 @keyframes pane-in { from { opacity: .55; transform: translateY(3px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes row-in { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes row-out { to { opacity: 0; transform: translateY(-4px); max-height: 0; padding-top: 0; padding-bottom: 0; } }
+.verdict-table { min-width: 100%; }
+@media (min-width: 900px) {
+  .verdict-table { min-width: 920px; }
+}
+.density-comfortable .hover-wash { @apply py-0.5; }
+.density-comfortable [role="option"] { @apply py-3.5; }
+.print-memo h1 { font-size: 1.5rem; }
+.print-memo h2 { font-size: 1.2rem; margin-top: 1.25rem; }
 [data-entering].fixed { animation: overlay-in .18s ease-out; }
 [data-exiting].fixed { animation: overlay-out .15s ease-in; }
 @keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
