@@ -1,10 +1,9 @@
 import { mount } from 'svelte';
 import App from './App.svelte';
 import './app.css';
-import { initWebMcp } from './lib/webmcp';
+import { initWebMcp } from './webmcp';
 
-mount(App, {
-	target: document.getElementById('app')!
-});
-
+const app = mount(App, { target: document.getElementById('app')! });
 initWebMcp();
+
+export default app;
