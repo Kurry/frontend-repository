@@ -99,8 +99,8 @@ function RailEmpty({ icon: Icon, text }) {
 }
 
 function queryChoices(state) {
-  const saved = state.savedSearches.map((item) => ({ id: `saved:${item.name}`, label: item.name, ...item }))
-  const history = state.history.map((item) => ({ id: `history:${item.id}`, label: item.raw || 'All documents', ...item }))
+  const saved = state.savedSearches.map((item) => ({ id: item.name, label: item.name, ...item }))
+  const history = state.history.map((item) => ({ id: item.id, label: item.raw || 'All documents', ...item }))
   return [...saved, ...history]
 }
 
@@ -179,7 +179,7 @@ function ResultControls({ visible }) {
   const state = useAppStore()
   return <div className="result-tools">
     {(state.filters.length > 0 || state.invalidFilters.length > 0) && <div className="chips-row" aria-label="Active search filters">{state.filters.map((filter, index) => <span className="filter-chip" key={`${filter.kind}-${filter.value}`}><Filter size={13} />{filter.kind}:{filter.value}<button aria-label={`Remove ${filter.kind} ${filter.value}`} onClick={() => state.removeFilter(index)}><Close size={12} /></button></span>)}{state.invalidFilters.map((filter) => <span className="unmatched" key={`${filter.kind}-${filter.value}`}><WarningAlt size={14} /> No matching {filter.kind}: “{filter.value}”</span>)}</div>}
-    <div className="controls-line"><div className="slider-wrap"><label id="threshold-label">Minimum score</label><Slider ariaLabelInput="Minimum similarity score" min={0} max={1} step={0.05} value={state.threshold} hideTextInput onChange={({ value }) => state.setThreshold(value)} /><output className="slider-value">{state.threshold.toFixed(2)}</output></div><div className="control-actions"><Toggle id="group-topic" size="sm" labelText="Group by topic" labelA="Off" labelB="On" toggled={state.grouped} onToggle={state.setGrouped} /><Button size="sm" kind="ghost" renderIcon={Reset} disabled={!Object.keys(state.feedbackByQuery[`${state.activeQuery.toLowerCase()}|${state.filters.map((f) => `${f.kind}:${f.value.toLowerCase()}`).sort().join('|')}`] || {}).length} onClick={state.resetFeedback}>Reset feedback</Button><Button size="sm" kind="tertiary" renderIcon={Save} onClick={() => useAppStore.setState({ saveOpen: true })}>Save search</Button></div></div>
+    <div className="controls-line"><div className="slider-wrap"><Slider labelText="Minimum score" min={0} max={1} step={0.05} value={state.threshold} hideTextInput onChange={({ value }) => state.setThreshold(value)} /><output className="slider-value">{state.threshold.toFixed(2)}</output></div><div className="control-actions"><Toggle id="group-topic" size="sm" labelText="Group by topic" labelA="Off" labelB="On" toggled={state.grouped} onToggle={state.setGrouped} /><Button size="sm" kind="ghost" renderIcon={Reset} disabled={!Object.keys(state.feedbackByQuery[`${state.activeQuery.toLowerCase()}|${state.filters.map((f) => `${f.kind}:${f.value.toLowerCase()}`).sort().join('|')}`] || {}).length} onClick={state.resetFeedback}>Reset feedback</Button><Button size="sm" kind="tertiary" renderIcon={Save} onClick={() => useAppStore.setState({ saveOpen: true })}>Save search</Button></div></div>
     <div className="result-summary"><div><div className="eyebrow">Ranked retrieval</div><h2>{visible.mode === 'keyword' ? 'Keyword results (no semantic matches above threshold)' : 'Semantic results'}</h2>{visible.mode === 'keyword' && <span className="fallback-label">No semantic matches above threshold</span>}</div><div role="status" aria-live="polite"><strong>{visible.items.length}</strong> <span className="muted">matching results</span></div></div>
   </div>
 }
@@ -268,6 +268,7 @@ function SaveSearchModal() {
   const schema = SavedSearchSchema.superRefine((value, ctx) => { if (state.savedSearches.some((item) => item.name.toLowerCase() === value.name.toLowerCase())) ctx.addIssue({ code:'custom', path:['name'], message:'name must be unique' }) })
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(schema), mode:'onChange', defaultValues:{ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold } })
   useEffect(() => { if (state.saveOpen) reset({ name:'', query:state.activeQuery, filters:state.filters, threshold:state.threshold }) }, [state.saveOpen, state.activeQuery, state.filters, state.threshold, reset])
+  useEffect(() => { if (state.saveOpen) setTimeout(() => document.getElementById('saved-name')?.focus(), 10) }, [state.saveOpen])
   return <Modal open={state.saveOpen} modalHeading="Save search" primaryButtonText="Save search" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={close} onRequestSubmit={handleSubmit(state.saveSearch)}><div className="modal-copy" ref={modalRef}><TextInput id="saved-name" labelText="Search name" {...register('name')} invalid={!!errors.name} invalidText={errors.name?.message || 'name is required'} aria-invalid={!!errors.name} aria-describedby={errors.name ? 'saved-name-error' : undefined} /><div className="p-4 bg-gray-50 text-sm"><div><strong>Query</strong> {state.activeQuery || 'All documents'}</div><div><strong>Threshold</strong> {state.threshold.toFixed(2)}</div><div><strong>Filters</strong> {state.filters.map((f) => `${f.kind}:${f.value}`).join(', ') || 'None'}</div></div></div></Modal>
 }
 
@@ -303,7 +304,9 @@ function ExportModal() {
   const close = () => useAppStore.setState({ exportOpen: false })
   useFocusRestorer(state.exportOpen, state.importOpen)
   useOverlayFocusTrap(state.exportOpen, close, modalRef)
-  const value = state.exportTab === 'report' ? state.getReport() : state.getPackage()
+  const reportData = useMemo(() => state.getReport(), [state.exportOpen, state.exportTab, state.exportGeneratedAt, state.activeQuery, state.filters, state.threshold, state.documents, state.indexedIds, state.feedbackByQuery])
+  const packageData = useMemo(() => state.getPackage(), [state.exportOpen, state.exportTab, state.exportGeneratedAt, state.documents, state.savedSearches])
+  const value = state.exportTab === 'report' ? reportData : packageData
   const text = stringifyArtifact(value)
   const copy = async () => { await navigator.clipboard.writeText(text); state.notify(`${state.exportTab === 'report' ? 'Search report' : 'Library package'} copied`) }
   const download = () => { const blob = new Blob([text], { type:'application/json' }); const url=URL.createObjectURL(blob); const link=document.createElement('a'); link.href=url; link.download=state.exportTab === 'report' ? 'semantic-search-report.json' : 'semantic-library-package.json'; link.click(); URL.revokeObjectURL(url); state.notify('JSON download started') }
