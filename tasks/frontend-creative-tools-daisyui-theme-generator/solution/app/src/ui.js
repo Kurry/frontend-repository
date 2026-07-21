@@ -102,7 +102,7 @@ export function buildShell() {
           <label class="field-label" for="theme-name">Name</label>
           <input id="theme-name" class="text-input" type="text" placeholder="mytheme" autocomplete="off"
                  aria-describedby="name-hint name-error" spellcheck="false" />
-          <p id="name-hint" class="hint">2–30 chars · letters, digits, spaces, - and _</p>
+          <p id="name-hint" class="hint">2–30 chars · lowercase letter first · a–z, 0–9, - and _</p>
           <p id="name-error" class="field-error" aria-live="polite"></p>
         </div>
 

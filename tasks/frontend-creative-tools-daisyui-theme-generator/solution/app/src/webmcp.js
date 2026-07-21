@@ -18,6 +18,18 @@ const MODULES = [
 
 const obj = (properties, required = []) => ({ type: 'object', properties, required });
 const str = (description, enums) => ({ type: 'string', description, ...(enums ? { enum: enums } : {}) });
+const themeName = (description) => ({
+  type: 'string',
+  description,
+  minLength: 2,
+  maxLength: 30,
+  pattern: '^[a-z][a-z0-9_-]*$',
+});
+const toolModule = (name) => name.startsWith('editor_')
+  ? 'structured-editor-v1'
+  : name.startsWith('entity_')
+    ? 'entity-collection-v1'
+    : 'artifact-transfer-v1';
 
 const TOOLS = [
   {
@@ -41,11 +53,11 @@ const TOOLS = [
   },
   {
     name: 'editor_preview',
-    description: 'Refresh the live preview from the active theme tokens and optionally switch its visible tab.',
+    description: 'Read a bounded summary of the active theme without changing the visible preview tab or editor state.',
     inputSchema: obj({
       object_type: str('Object type', ['theme']),
-      tab: str('Visible preview tab', ['demo', 'variants', 'palette']),
     }, ['object_type']),
+    annotations: { readOnlyHint: true },
   },
   {
     name: 'editor_switch_mode',
@@ -64,7 +76,7 @@ const TOOLS = [
         type: 'object',
         description: 'Fields for the new theme',
         properties: {
-          name: str('Theme name (2-30 chars; letters, digits, spaces, - and _)'),
+          name: themeName('Theme name: 2-30 characters, starting with a lowercase letter and containing only lowercase letters, digits, hyphens, and underscores'),
           tokens: { type: 'object', description: "Optional initial tokens, e.g. { colors: { '--color-primary': '#123456' } }" },
         },
       },
@@ -87,7 +99,7 @@ const TOOLS = [
       fields: {
         type: 'object',
         properties: {
-          name: str('New name'),
+          name: themeName('New theme name: 2-30 characters, starting with a lowercase letter and containing only lowercase letters, digits, hyphens, and underscores'),
           tokens: { type: 'object', description: "Token patch, e.g. { colors: { '--color-primary': '#123456' }, radius: { box: '1rem' } }" },
         },
       },
@@ -184,13 +196,19 @@ const handlers = {
   },
 
   editor_preview(args) {
-    if (args.tab) {
-      if (!['demo', 'variants', 'palette'].includes(args.tab)) return err("tab must be one of 'demo', 'variants', 'palette'");
-      const tab = document.querySelector(`[data-tab="${args.tab}"]`);
-      if (!tab) return err(`Preview tab '${args.tab}' is unavailable`);
-      tab.click();
-    }
-    return { ok: true, preview_tab: state.previewTab, active: activeTheme().name };
+    if (args.object_type !== 'theme') return err("object_type must be 'theme'");
+    const theme = activeTheme();
+    return {
+      ok: true,
+      theme: {
+        id: theme.id,
+        name: theme.name,
+        builtin: theme.builtin,
+        colorCount: Object.keys(theme.colors).length,
+        fontFamily: theme.fontFamily,
+      },
+      preview_tab: state.previewTab,
+    };
   },
 
   editor_switch_mode(args) {
@@ -310,12 +328,21 @@ export function registerWebMCP() {
   window.webmcp_session_info = () => ({
     contract_version: 'zto-webmcp-v1',
     app: 'daisyui-theme-generator',
-    modules: MODULES,
+    modules: MODULES.map((module) => module.id),
+    module_catalog: MODULES,
   });
 
-  window.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description, inputSchema: t.inputSchema }));
+  window.webmcp_list_tools = () => TOOLS.map((tool) => ({
+    name: tool.name,
+    description: tool.description,
+    inputSchema: tool.inputSchema,
+    module: toolModule(tool.name),
+    ...(tool.annotations ? { annotations: tool.annotations } : {}),
+  }));
 
-  window.webmcp_invoke_tool = async (name, args = {}) => {
+  window.webmcp_invoke_tool = async (request, suppliedArguments = {}) => {
+    const name = typeof request === 'string' ? request : request?.name;
+    const args = typeof request === 'string' ? suppliedArguments : request?.arguments || suppliedArguments;
     const handler = handlers[name];
     if (!handler) return { ok: false, error: `Unknown tool '${name}'` };
     try {
