@@ -15,10 +15,10 @@ export function Card({ className, ...props }) {
   return <div className={cn('card', className)} {...props} />
 }
 
-export function Select({ value, onValueChange, placeholder, options, ariaLabel }) {
+export function Select({ value, onValueChange, placeholder, options, ariaLabel, id }) {
   return (
     <SelectPrimitive.Root value={value} onValueChange={onValueChange}>
-      <SelectPrimitive.Trigger className="select-trigger" aria-label={ariaLabel}>
+      <SelectPrimitive.Trigger id={id} className="select-trigger" aria-label={ariaLabel}>
         <SelectPrimitive.Value placeholder={placeholder} />
         <SelectPrimitive.Icon><IconChevronDown size={16} aria-hidden /></SelectPrimitive.Icon>
       </SelectPrimitive.Trigger>
@@ -27,7 +27,7 @@ export function Select({ value, onValueChange, placeholder, options, ariaLabel }
           <SelectPrimitive.Viewport>
             {options.map((option) => (
               <SelectPrimitive.Item className="select-item" value={option.value} key={option.value}>
-                <SelectPrimitive.ItemIndicator className="select-indicator"><IconCheck size={14} /></SelectPrimitive.ItemIndicator>
+                <SelectPrimitive.ItemIndicator className="select-indicator"><IconCheck size={14} aria-hidden /></SelectPrimitive.ItemIndicator>
                 <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>
               </SelectPrimitive.Item>
             ))}

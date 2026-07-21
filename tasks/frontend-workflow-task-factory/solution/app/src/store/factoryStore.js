@@ -154,6 +154,35 @@ function updatePr(set, repoId, prId, updater) {
   }))
 }
 
+function buildManifest(pr) {
+  if (!pr?.request || pr.checks?.baseline?.status !== 'passing' || pr.checks?.reference?.status !== 'passing') return null
+  const stages = STAGES.map((name, index) => {
+    const stage = pr.stages?.[index]
+    return {
+      name,
+      status: 'complete',
+      attemptCount: Math.max(1, Number(stage?.attemptCount) || 1),
+    }
+  })
+  const payload = {
+    schemaVersion: 1,
+    id: pr.id,
+    repository: pr.request.repository,
+    pullRequestNumber: Number(pr.request.pullRequestNumber),
+    minFiles: Number(pr.request.minFiles),
+    maxFiles: Number(pr.request.maxFiles),
+    checks: { skeleton: true, validate: true },
+    stages,
+    generatedAt: pr.generatedAt && /Z$/.test(pr.generatedAt) ? pr.generatedAt : new Date().toISOString(),
+  }
+  const parsed = taskManifestSchema.safeParse(payload)
+  return parsed.success ? parsed.data : null
+}
+
+const seedManifestLedger = Object.values(prs).flat()
+  .map((pr) => buildManifest(pr))
+  .filter(Boolean)
+
 export const useFactoryStore = create((set, get) => ({
   repositories,
   pullRequests: prs,
@@ -165,23 +194,27 @@ export const useFactoryStore = create((set, get) => ({
   timelineFilter: null,
   pipelineQuery: '',
   pipelineSort: 'newest',
+  pipelineStatusFilter: 'all',
   expandedLogs: {},
   createDialogOpen: false,
   mobileNavOpen: false,
   toasts: [],
   runningIds: [],
-  manifestLedger: [],
+  manifestLedger: seedManifestLedger,
+  lastExportCount: seedManifestLedger.length,
   theme: 'light',
   onboardingStep: 0,
   createDraft: { repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+  gestureMode: false,
+  density: 'comfortable',
 
-  navigate: (view) => set({ activeView: view, mobileNavOpen: false, createDialogOpen: false }),
-  openRepository: (repoId) => set({ activeView: 'repository-pipeline', selectedRepositoryId: repoId, selectedPrId: null, mobileNavOpen: false, createDialogOpen: false }),
+  // Keep create dialog open across view switches so interleaved drafts stay intact.
+  navigate: (view) => set({ activeView: view, mobileNavOpen: false }),
+  openRepository: (repoId) => set({ activeView: 'repository-pipeline', selectedRepositoryId: repoId, selectedPrId: null, mobileNavOpen: false }),
   openTask: (repoId, prId) => set((state) => ({
     activeView: 'task-detail',
     selectedRepositoryId: repoId,
     selectedPrId: prId,
-    createDialogOpen: false,
     trialFilter: state.selectedRepositoryId === repoId && state.selectedPrId === prId ? state.trialFilter : null,
   })),
   backToPipeline: () => set({ activeView: 'repository-pipeline', selectedPrId: null }),
@@ -189,6 +222,7 @@ export const useFactoryStore = create((set, get) => ({
   setTimelineFilter: (timelineFilter) => set({ timelineFilter }),
   setPipelineQuery: (pipelineQuery) => set({ pipelineQuery }),
   setPipelineSort: (pipelineSort) => set({ pipelineSort }),
+  setPipelineStatusFilter: (pipelineStatusFilter) => set({ pipelineStatusFilter }),
   toggleLog: (key) => set((state) => ({ expandedLogs: { ...state.expandedLogs, [key]: !state.expandedLogs[key] } })),
   setCreateDialogOpen: (createDialogOpen) => {
     if (createDialogOpen && typeof document !== 'undefined') createDialogOpener = document.activeElement
@@ -204,6 +238,32 @@ export const useFactoryStore = create((set, get) => ({
   },
   setOnboardingStep: (onboardingStep) => set({ onboardingStep }),
   setCreateDraft: (createDraft) => set({ createDraft }),
+  setGestureMode: (gestureMode) => set({ gestureMode }),
+  setDensity: (density) => set({ density }),
+  clearRepositoryRegister: (repoId) => {
+    if (!repoId) return
+    set((state) => ({
+      pullRequests: { ...state.pullRequests, [repoId]: [] },
+      selectedPrId: null,
+      pipelineQuery: '',
+      pipelineStatusFilter: 'all',
+      activeView: 'repository-pipeline',
+      selectedRepositoryId: repoId,
+    }))
+    get().addToast(`Cleared ${repoId} pipeline register`, 'info')
+  },
+  restoreRepositoryRegister: (repoId) => {
+    if (!repoId || !prs[repoId]) return
+    set((state) => ({
+      pullRequests: { ...state.pullRequests, [repoId]: prs[repoId].map((pr) => ({ ...pr })) },
+      selectedPrId: null,
+      pipelineQuery: '',
+      pipelineStatusFilter: 'all',
+      activeView: 'repository-pipeline',
+      selectedRepositoryId: repoId,
+    }))
+    get().addToast(`Restored ${repoId} seed register`, 'success')
+  },
   addToast: (message, kind = 'info') => {
     const id = `${Date.now()}-${Math.random()}`
     set((state) => ({ toasts: [...state.toasts, { id, message, kind }] }))
@@ -211,34 +271,17 @@ export const useFactoryStore = create((set, get) => ({
   },
   dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })),
 
-  getManifest: (pr) => {
-    if (!pr?.request || pr.checks?.baseline?.status !== 'passing' || pr.checks?.reference?.status !== 'passing') return null
-    const stages = pr.stages.map(({ name, status, attemptCount }) => ({
-      name,
-      status: status === 'skipped' ? 'complete' : status,
-      attemptCount: Math.max(1, Number(attemptCount) || 1),
-    }))
-    const payload = {
-      schemaVersion: 1,
-      id: pr.id,
-      repository: pr.request.repository,
-      pullRequestNumber: Number(pr.request.pullRequestNumber),
-      minFiles: Number(pr.request.minFiles),
-      maxFiles: Number(pr.request.maxFiles),
-      checks: { skeleton: true, validate: true },
-      stages,
-      generatedAt: pr.generatedAt || new Date().toISOString(),
-    }
-    const parsed = taskManifestSchema.safeParse(payload)
-    return parsed.success ? parsed.data : payload
-  },
+  getManifest: (pr) => buildManifest(pr),
 
   listAcceptedManifests: () => {
     const state = get()
-    const live = acceptedTasks(state).map((pr) => state.getManifest(pr)).filter(Boolean)
     const byId = new Map()
+    // Ledger is append-only provenance — never drop prior accepted exports
     state.manifestLedger.forEach((manifest) => byId.set(manifest.id, manifest))
-    live.forEach((manifest) => byId.set(manifest.id, manifest))
+    acceptedTasks(state).forEach((pr) => {
+      const manifest = buildManifest(pr)
+      if (manifest) byId.set(manifest.id, manifest)
+    })
     return [...byId.values()]
   },
 
@@ -316,8 +359,14 @@ export const useFactoryStore = create((set, get) => ({
           ...state.pullRequests,
           [body.repository]: state.pullRequests[body.repository].map((pr) => {
             if (pr.id !== id) return pr
-            const updated = {
+            return {
               ...pr,
+              stages: pr.stages.map((stage, index) => ({
+                ...stage,
+                status: 'complete',
+                attemptCount: index === 3 ? Math.max(2, stage.attemptCount || 2) : Math.max(1, stage.attemptCount || 1),
+                completedAt: stage.completedAt || generatedAt,
+              })),
               checks: {
                 baseline: check('passing', 1, 'FAIL regression_case\nExpected current behavior to fail.\nBaseline reproduced the reported defect.'),
                 reference: check('passing', 1, 'PASS regression_case\nPASS related_behavior\nReference fix completed successfully.'),
@@ -325,37 +374,21 @@ export const useFactoryStore = create((set, get) => ({
               trials: trialSeed.map((trial, index) => ({ ...trial, id: `${id}-trial-${index + 1}` })),
               generatedAt,
             }
-            return updated
           }),
         }
         const accepted = nextPullRequests[body.repository].find((pr) => pr.id === id)
-        const stages = (accepted?.stages || []).map(({ name, status, attemptCount }) => ({
-          name,
-          status: status === 'skipped' ? 'complete' : status,
-          attemptCount: Math.max(1, Number(attemptCount) || 1),
-        }))
-        const payload = accepted ? {
-          schemaVersion: 1,
-          id: accepted.id,
-          repository: accepted.request.repository,
-          pullRequestNumber: Number(accepted.request.pullRequestNumber),
-          minFiles: Number(accepted.request.minFiles),
-          maxFiles: Number(accepted.request.maxFiles),
-          checks: { skeleton: true, validate: true },
-          stages,
-          generatedAt,
-        } : null
-        const parsed = payload ? taskManifestSchema.safeParse(payload) : null
-        manifest = parsed?.success ? parsed.data : payload
+        manifest = accepted ? buildManifest(accepted) : null
+        const ledger = manifest
+          ? [...state.manifestLedger.filter((item) => item.id !== manifest.id), manifest]
+          : state.manifestLedger
         return {
           pullRequests: nextPullRequests,
           runningIds: state.runningIds.filter((item) => item !== runKey),
           selectedPrId: id,
           selectedRepositoryId: body.repository,
           activeView: 'task-detail',
-          manifestLedger: manifest
-            ? [...state.manifestLedger.filter((item) => item.id !== manifest.id), manifest]
-            : state.manifestLedger,
+          manifestLedger: ledger,
+          lastExportCount: ledger.length,
         }
       })
       addEvent(set, { status: 'accepted', repository: body.repository, prNumber: Number(body.pullRequestNumber), text: 'Task accepted' })

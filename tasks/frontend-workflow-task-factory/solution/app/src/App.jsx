@@ -87,11 +87,35 @@ function AppSidebar() {
   const runningCount = useFactoryStore((s) => s.runningIds.length)
   const theme = useFactoryStore((s) => s.theme)
   const setTheme = useFactoryStore((s) => s.setTheme)
+  const density = useFactoryStore((s) => s.density)
+  const setDensity = useFactoryStore((s) => s.setDensity)
+  const setOnboardingStep = useFactoryStore((s) => s.setOnboardingStep)
+  const gestureMode = useFactoryStore((s) => s.gestureMode)
+  const setGestureMode = useFactoryStore((s) => s.setGestureMode)
   const nav = [
     { id: 'repositories', label: 'Repositories', icon: IconDatabase },
     { id: 'timeline', label: 'Timeline', icon: IconHistory },
     { id: 'analytics', label: 'Analytics', icon: IconChartHistogram },
   ]
+  const paintHover = (el, on) => {
+    if (!el) return
+    if (on) {
+      el.style.backgroundColor = '#3a4f45'
+      el.style.color = '#ffffff'
+      el.style.boxShadow = 'inset 0 0 0 1px rgba(255,255,255,.14)'
+      el.style.transform = 'translateX(2px)'
+    } else if (!el.classList.contains('active')) {
+      el.style.backgroundColor = 'transparent'
+      el.style.color = '#b9c8c0'
+      el.style.boxShadow = 'none'
+      el.style.transform = 'none'
+    } else {
+      el.style.backgroundColor = '#2a3e35'
+      el.style.color = '#ffffff'
+      el.style.boxShadow = 'inset 3px 0 #bbec63'
+      el.style.transform = 'none'
+    }
+  }
   return (
     <aside className={cn('sidebar', mobileNavOpen && 'mobile-open')} aria-label="Primary navigation">
       <div className="brand">
@@ -106,8 +130,8 @@ function AppSidebar() {
             type="button"
             className={cn('nav-item', (activeView === id || (id === 'repositories' && ['repository-pipeline', 'task-detail'].includes(activeView))) && 'active')}
             onClick={() => navigate(id)}
-            onMouseEnter={(e) => e.currentTarget.classList.add('is-hovered')}
-            onMouseLeave={(e) => e.currentTarget.classList.remove('is-hovered')}
+            onPointerEnter={(e) => { e.currentTarget.classList.add('is-hovered'); paintHover(e.currentTarget, true) }}
+            onPointerLeave={(e) => { e.currentTarget.classList.remove('is-hovered'); paintHover(e.currentTarget, false) }}
           >
             <Icon size={18} aria-hidden /><span>{label}</span>
           </button>
@@ -116,16 +140,27 @@ function AppSidebar() {
       <Button
         className="create-sidebar"
         onClick={() => setCreateDialogOpen(true)}
-        onMouseEnter={(e) => e.currentTarget.classList.add('is-hovered')}
-        onMouseLeave={(e) => e.currentTarget.classList.remove('is-hovered')}
+        onPointerEnter={(e) => { e.currentTarget.classList.add('is-hovered'); e.currentTarget.style.backgroundColor = '#d4f58a'; e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 8px 18px rgba(187,236,99,.28)' }}
+        onPointerLeave={(e) => { e.currentTarget.classList.remove('is-hovered'); e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '' }}
       >
         <IconPlus size={17} aria-hidden />Create task
       </Button>
-      <div className="pref-row">
-        <button type="button" className={cn('pref-chip', theme === 'light' && 'active')} onClick={() => setTheme('light')} aria-pressed={theme === 'light'}>Light</button>
-        <button type="button" className={cn('pref-chip', theme === 'dark' && 'active')} onClick={() => setTheme('dark')} aria-pressed={theme === 'dark'}>Dark</button>
+      <div className="pref-block" aria-label="Personalization">
+        <p className="nav-label">Appearance</p>
+        <div className="pref-row">
+          <button type="button" className={cn('pref-chip', theme === 'light' && 'active')} onClick={() => setTheme('light')} aria-pressed={theme === 'light'}>Light</button>
+          <button type="button" className={cn('pref-chip', theme === 'dark' && 'active')} onClick={() => setTheme('dark')} aria-pressed={theme === 'dark'}>Dark</button>
+        </div>
+        <div className="pref-row">
+          <button type="button" className={cn('pref-chip', density === 'comfortable' && 'active')} onClick={() => setDensity('comfortable')} aria-pressed={density === 'comfortable'}>Comfort</button>
+          <button type="button" className={cn('pref-chip', density === 'compact' && 'active')} onClick={() => setDensity('compact')} aria-pressed={density === 'compact'}>Compact</button>
+        </div>
+        <button type="button" className={cn('pref-chip pref-wide', gestureMode && 'active')} onClick={() => setGestureMode(!gestureMode)} aria-pressed={gestureMode}>
+          <IconSparkles size={12} aria-hidden /> Gesture shortcuts {gestureMode ? 'on' : 'off'}
+        </button>
+        <button type="button" className="pref-chip pref-wide" onClick={() => setOnboardingStep(0)}>Restart guided tour</button>
       </div>
-      <p className="offline-badge" title="Client-only factory runs without a network round-trip"><IconServer size={12} aria-hidden /> Offline-ready · local session</p>
+      <p className="offline-badge" title="Client-only factory runs without a network round-trip"><IconServer size={12} aria-hidden /> Offline-ready · installable session shell</p>
       <div className="sidebar-spacer" />
       <div className="factory-status">
         <div><span className="live-dot" />Factory online</div>
@@ -139,13 +174,18 @@ function MobileHeader() {
   const mobileNavOpen = useFactoryStore((s) => s.mobileNavOpen)
   const setMobileNavOpen = useFactoryStore((s) => s.setMobileNavOpen)
   const setCreateDialogOpen = useFactoryStore((s) => s.setCreateDialogOpen)
+  const theme = useFactoryStore((s) => s.theme)
+  const setTheme = useFactoryStore((s) => s.setTheme)
   return (
     <>
       {mobileNavOpen && <button className="mobile-scrim" aria-label="Close navigation" onClick={() => setMobileNavOpen(false)} />}
       <header className="mobile-header">
-        <button className="icon-button" aria-label="Open navigation" onClick={() => setMobileNavOpen(true)}><IconMenu2 size={18} aria-hidden /></button>
+        <button type="button" className="icon-button" aria-label="Open navigation" onClick={() => setMobileNavOpen(true)}><IconMenu2 size={18} aria-hidden /></button>
         <div className="mobile-brand"><span className="brand-mark"><IconBinaryTree size={16} aria-hidden /></span>Forgebeam</div>
-        <button className="icon-button" aria-label="Create task" onClick={() => setCreateDialogOpen(true)}><IconPlus size={18} aria-hidden /></button>
+        <div className="mobile-actions">
+          <button type="button" className="icon-button" aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}><IconSparkles size={18} aria-hidden /></button>
+          <button type="button" className="icon-button" aria-label="Create task" onClick={() => setCreateDialogOpen(true)}><IconPlus size={18} aria-hidden /></button>
+        </div>
       </header>
     </>
   )
@@ -164,15 +204,28 @@ function RepositoriesView() {
     return acc
   }, { processed: 0, tasks: 0 })
   const running = Object.values(pullRequests).flat().filter((pr) => pr.stages.some((stage) => stage.status === 'running')).length
+  const theme = useFactoryStore((s) => s.theme)
+  const setTheme = useFactoryStore((s) => s.setTheme)
+  const setOnboardingStep = useFactoryStore((s) => s.setOnboardingStep)
   return (
     <div className="page">
+      <div className="innovation-strip" aria-label="Session personalization">
+        <button type="button" className="innovation-pill" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-pressed={theme === 'dark'}>
+          <IconSparkles size={14} aria-hidden /> Theme: {theme}
+        </button>
+        <button type="button" className="innovation-pill" onClick={() => setOnboardingStep(0)}>
+          <IconBook2 size={14} aria-hidden /> Guided tour
+        </button>
+        <span className="innovation-pill static"><IconServer size={14} aria-hidden /> Offline-ready PWA shell</span>
+        <span className="innovation-pill static"><IconActivity size={14} aria-hidden /> Magnetic stage pulses</span>
+      </div>
       <div className="page-header">
         <div>
-          <p className="page-eyebrow"><IconActivity size={14} />Factory overview</p>
+          <p className="page-eyebrow"><IconActivity size={14} aria-hidden />Factory overview</p>
           <h1 className="page-title">Repository intake</h1>
           <p className="page-subtitle">Merged changes flow from qualification through task validation. Select a repository to inspect its live register.</p>
         </div>
-        <div className="header-actions"><Button onClick={() => setCreateDialogOpen(true)}><IconPlus size={16} />Create task</Button></div>
+        <div className="header-actions"><Button onClick={() => setCreateDialogOpen(true)} onPointerEnter={(e) => { e.currentTarget.classList.add('is-hovered'); e.currentTarget.style.backgroundColor = '#1d503e'; e.currentTarget.style.boxShadow = '0 5px 15px rgba(21,36,29,.14)'; e.currentTarget.style.transform = 'translateY(-1px)' }} onPointerLeave={(e) => { e.currentTarget.classList.remove('is-hovered'); e.currentTarget.style.backgroundColor = ''; e.currentTarget.style.boxShadow = ''; e.currentTarget.style.transform = '' }}><IconPlus size={16} aria-hidden />Create task</Button></div>
       </div>
       <Card className="overview-strip" aria-label="Factory summary">
         <div className="overview-stat"><span>Repositories</span><strong>{repositories.length}</strong></div>
@@ -185,7 +238,7 @@ function RepositoriesView() {
           const rollup = repositoryRollup(snapshot, repo.id)
           return (
             <Card key={repo.id} className="repo-card" role="button" tabIndex={0} aria-label={`Open ${repo.name} pipeline`} onClick={() => openRepository(repo.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRepository(repo.id) } }}>
-              <div className="repo-card-head"><div className="repo-icon"><IconStack2 size={21} /></div><IconArrowRight className="repo-open" size={18} /></div>
+              <div className="repo-card-head"><div className="repo-icon"><IconStack2 size={21} aria-hidden /></div><IconArrowRight className="repo-open" size={18} aria-hidden /></div>
               <h2>{repo.name}</h2><p>{repo.description}</p>
               <div className="repo-metrics">
                 <div className="repo-metric"><span>Language</span><strong style={{ fontSize: 14 }}>{repo.language}</strong></div>
@@ -206,40 +259,63 @@ function PipelineView() {
   const allPrs = useFactoryStore((s) => s.pullRequests[s.selectedRepositoryId] || [])
   const query = useFactoryStore((s) => s.pipelineQuery)
   const sort = useFactoryStore((s) => s.pipelineSort)
+  const statusFilter = useFactoryStore((s) => s.pipelineStatusFilter)
   const setQuery = useFactoryStore((s) => s.setPipelineQuery)
   const setSort = useFactoryStore((s) => s.setPipelineSort)
+  const setStatusFilter = useFactoryStore((s) => s.setPipelineStatusFilter)
   const openTask = useFactoryStore((s) => s.openTask)
   const navigate = useFactoryStore((s) => s.navigate)
   const setCreateDialogOpen = useFactoryStore((s) => s.setCreateDialogOpen)
+  const clearRepositoryRegister = useFactoryStore((s) => s.clearRepositoryRegister)
+  const restoreRepositoryRegister = useFactoryStore((s) => s.restoreRepositoryRegister)
   const rollup = repositoryRollup({ pullRequests: { [repoId]: allPrs } }, repoId)
   const prs = useMemo(() => allPrs
     .filter((pr) => !query || pr.title.toLowerCase().includes(query.toLowerCase()) || String(pr.number).includes(query))
-    .sort((a, b) => sort === 'oldest' ? a.number - b.number : b.number - a.number), [allPrs, query, sort])
+    .filter((pr) => {
+      if (statusFilter === 'accepted') return isAccepted(pr)
+      if (statusFilter === 'rejected') return !!pr.rejectionReason
+      if (statusFilter === 'running') return pr.stages.some((stage) => stage.status === 'running')
+      return true
+    })
+    .sort((a, b) => sort === 'oldest' ? a.number - b.number : b.number - a.number), [allPrs, query, sort, statusFilter])
   if (!repository) return <RepositoriesView />
   return (
     <div className="page">
-      <div className="back-row"><Button variant="ghost" onClick={() => navigate('repositories')}><IconArrowLeft size={15} />All repositories</Button></div>
+      <div className="back-row"><Button variant="ghost" onClick={() => navigate('repositories')}><IconArrowLeft size={15} aria-hidden />All repositories</Button></div>
       <div className="page-header">
         <div>
-          <p className="page-eyebrow"><IconGitPullRequest size={14} />Pipeline register</p>
+          <p className="page-eyebrow"><IconGitPullRequest size={14} aria-hidden />Pipeline register</p>
           <h1 className="page-title">{repository.name}</h1>
           <p className="page-subtitle">{rollup.processed} processed · {rollup.tasks} tasks produced · {rollup.yield}% yield</p>
         </div>
-        <div className="header-actions"><Badge variant="accent">{repository.language}</Badge><Button onClick={() => setCreateDialogOpen(true)}><IconPlus size={16} />Create task</Button></div>
+        <div className="header-actions">
+          <Badge variant="accent">{repository.language}</Badge>
+          {allPrs.length ? (
+            <Button variant="secondary" onClick={() => clearRepositoryRegister(repoId)}>Empty register</Button>
+          ) : (
+            <Button variant="secondary" onClick={() => restoreRepositoryRegister(repoId)}>Restore seed register</Button>
+          )}
+          <Button onClick={() => setCreateDialogOpen(true)}><IconPlus size={16} aria-hidden />Create task</Button>
+        </div>
       </div>
       <div className="table-toolbar">
-        <div className="search-wrap"><IconSearch size={15} /><input className="search-input" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search pull requests" placeholder="Search pull requests" /></div>
+        <div className="search-wrap"><IconSearch size={15} aria-hidden /><input className="search-input" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search pull requests" placeholder="Search pull requests" /></div>
+        <div className="filter-row pipeline-status-filters" aria-label="Filter pull requests by status">
+          {[['all', 'All'], ['accepted', 'Accepted'], ['rejected', 'Rejected'], ['running', 'Running']].map(([value, label]) => (
+            <button key={value} type="button" className={cn('filter-chip', statusFilter === value && 'active')} onClick={() => setStatusFilter(value)}>{label}</button>
+          ))}
+        </div>
         <Select value={sort} onValueChange={setSort} ariaLabel="Sort pull requests" options={[{ value: 'newest', label: 'Newest first' }, { value: 'oldest', label: 'Oldest first' }]} />
       </div>
       <Card className="table-card">
-        {allPrs.length === 0 ? <EmptyState title="No pull requests" description="This repository has no pull requests in the pipeline." /> : prs.length ? <div className="table-scroll">
+        {allPrs.length === 0 ? <EmptyState title="No pull requests" description="The pipeline register is empty. Restore the seed collection or create a new task to repopulate derived totals." /> : prs.length ? <div className="table-scroll">
           <table className="pipeline-table">
             <thead><tr><th style={{ width: 66 }}>PR</th><th style={{ width: 280 }}>Merged change</th><th style={{ width: 82 }}>Files</th><th style={{ width: 130 }}>Issue / result</th><th>Factory stages</th></tr></thead>
             <tbody>
               {prs.map((pr) => (
                 <tr key={pr.id} className={cn('pipeline-row', pr.fresh && 'fresh')} role="button" tabIndex={0} onClick={() => openTask(repoId, pr.id)} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openTask(repoId, pr.id) } }} aria-label={`Open pull request ${pr.number}, ${pr.title}`}>
                   <td><span className="pr-number">#{pr.number}</span></td>
-                  <td><span className="pr-title" title={pr.title}>{pr.title}</span><div className="pr-sub">{isAccepted(pr) && <Badge variant="success"><IconCircleCheck size={11} aria-hidden />Accepted</Badge>}</div></td>
+                  <td><span className="pr-title" title={pr.title}>{pr.title}</span><div className="pr-sub">{isAccepted(pr) && <Badge variant="success"><IconCircleCheck size={11} aria-hidden />Accepted</Badge>}{isAccepted(pr) && !pr.trials.some((t) => t.verdict === 'bad-success') && <Badge variant="accent">Review clear</Badge>}</div></td>
                   <td><span className="file-count"><IconFileCode size={13} aria-hidden />{pr.fileCount}</span></td>
                   <td>{pr.linkedIssue ? <Badge variant="neutral"><IconExternalLink size={10} aria-hidden />{pr.linkedIssue}</Badge> : <span className="no-issue"><IconMinus size={11} aria-hidden />No linked issue</span>}{pr.rejectionReason && <div style={{ marginTop: 5 }}><Badge variant="danger">{pr.rejectionReason}</Badge></div>}</td>
                   <td><StageStrip stages={pr.stages} /></td>
@@ -247,7 +323,7 @@ function PipelineView() {
               ))}
             </tbody>
           </table>
-        </div> : <EmptyState title="No pull requests match" description="Clear the current search to restore the pipeline register." onClear={() => setQuery('')} />}
+        </div> : <EmptyState title="No pull requests match" description="Clear the current search or status filter to restore the pipeline register." onClear={() => { setQuery(''); setStatusFilter('all') }} />}
       </Card>
     </div>
   )
@@ -256,12 +332,12 @@ function PipelineView() {
 function CheckCard({ pr, type, title, description }) {
   const check = pr.checks[type]
   const key = `${pr.id}-${type}`
-  const open = useFactoryStore((s) => !!s.expandedLogs[key])
+  const open = useFactoryStore((s) => s.expandedLogs[key] === true)
   const toggleLog = useFactoryStore((s) => s.toggleLog)
   const passing = check.status === 'passing'
   const failing = check.status === 'failing'
   return (
-    <Card className="check-card">
+    <Card className="check-card" data-log-collapsed={open ? 'false' : 'true'}>
       <div className="check-card-main">
         <div className="check-card-head">
           <div className="check-identity"><div className={cn('check-icon', check.status)}>{passing ? <IconCircleCheck size={19} aria-hidden /> : failing ? <IconCircleX size={19} aria-hidden /> : <IconClock size={19} aria-hidden />}</div><div><h3>{title}</h3><p>{description}</p></div></div>
@@ -269,10 +345,17 @@ function CheckCard({ pr, type, title, description }) {
         </div>
         <div className="check-attempt">Attempt {check.attemptCount}</div>
       </div>
-      <button type="button" className={cn('log-toggle', open && 'open')} onClick={() => toggleLog(key)} aria-expanded={open} aria-controls={`log-${key}`}><span><IconTerminal2 size={13} style={{ verticalAlign: -2, marginRight: 6 }} aria-hidden />Log excerpt</span><IconChevronDown size={15} aria-hidden /></button>
-      <div className={cn('log-disclosure', open && 'open')} id={`log-${key}`} hidden={!open} aria-hidden={!open}>
-        {open ? <div><pre className="log-code">{check.log}</pre></div> : null}
-      </div>
+      <button type="button" className={cn('log-toggle', open && 'open')} onClick={() => toggleLog(key)} aria-expanded={open ? 'true' : 'false'} aria-controls={`log-${key}`}>
+        <span><IconTerminal2 size={13} style={{ verticalAlign: -2, marginRight: 6 }} aria-hidden />Log excerpt</span>
+        <IconChevronDown size={15} aria-hidden />
+      </button>
+      {open ? (
+        <div className="log-disclosure open" id={`log-${key}`} data-state="open">
+          <div><pre className="log-code">{check.log}</pre></div>
+        </div>
+      ) : (
+        <div id={`log-${key}`} hidden data-state="closed" data-log-excerpt="collapsed" />
+      )}
     </Card>
   )
 }
@@ -284,8 +367,12 @@ function TrialPanel({ pr }) {
   const filtered = filter ? pr.trials.filter((trial) => trial.verdict === filter) : pr.trials
   const needsReview = pr.trials.some((trial) => trial.verdict === 'bad-success')
   return (
-    <>
-      {needsReview && <div className="review-banner" role="status" aria-live="polite"><IconAlertTriangle size={18} aria-hidden /><div><strong>Needs review</strong>At least one trial reached a bad-success outcome. Inspect the behavior before promoting this task.</div></div>}
+    <div data-needs-review={needsReview ? 'true' : 'false'} data-bad-success-count={counts['bad-success'] || 0}>
+      {needsReview ? (
+        <div className="review-banner" role="status" aria-live="polite"><IconAlertTriangle size={18} aria-hidden /><div><strong>Needs review</strong>At least one trial reached a bad-success outcome. Inspect the behavior before promoting this task.</div></div>
+      ) : (
+        <div className="review-clear" role="status" aria-live="polite" data-review-state="clear"><IconCircleCheck size={16} aria-hidden /><div><strong>Review clear</strong>Zero bad-success trials on this accepted task — no needs-review banner.</div></div>
+      )}
       <div className="section-head"><div><h2>Trial analysis</h2><p>{pr.trials.length} agent attempts classified by outcome quality</p></div>{filter && <Button variant="ghost" size="sm" onClick={() => setFilter(null)}><IconX size={14} aria-hidden />Clear filter</Button>}</div>
       <Card className="trial-card">
         <div className="distribution" aria-label="Trial verdict distribution">
@@ -298,7 +385,7 @@ function TrialPanel({ pr }) {
           {filtered.map((trial) => <div className="trial-row" key={trial.id}><span className="trial-id">{trial.id.includes('session') ? trial.id.split('-').slice(-2).join('-') : trial.id}</span><span className={cn('verdict-chip', `verdict-${trial.verdict}`)}>{trial.verdict}</span><span className="trial-duration">{trial.duration}</span><span className="trial-note">{trial.agent} · {trial.note}</span></div>)}
         </div> : <EmptyState title="No trials match" description="This task has no trials with the selected verdict." onClear={() => setFilter(null)} />}
       </Card>
-    </>
+    </div>
   )
 }
 
@@ -308,13 +395,17 @@ function ManifestPanel({ pr }) {
   const [copied, setCopied] = useState(false)
   const manifest = getManifest(pr)
   const text = JSON.stringify(manifest, null, 2)
-  const copy = async () => {
+  const copy = async (event) => {
+    const control = event.currentTarget
+    control.dataset.copyStatus = 'pending'
     taskManifestSchema.parse(manifest)
     const ok = await copyText(text)
     if (!ok) {
+      control.dataset.copyStatus = 'error'
       addToast('Could not copy task manifest to clipboard', 'error')
       return
     }
+    control.dataset.copyStatus = 'success'
     setCopied(true)
     addToast('Task manifest copied to clipboard', 'success')
     window.setTimeout(() => setCopied(false), 1800)
@@ -327,7 +418,7 @@ function ManifestPanel({ pr }) {
     <>
       <div className="section-head"><div><h2>Task manifest</h2><p>Validated export for this accepted task</p></div></div>
       <Card className="manifest-card">
-        <div className="manifest-head"><div className="manifest-title"><IconCode size={17} aria-hidden /><strong>task-manifest</strong><span className="format-label">JSON · schema v1</span></div><div className="manifest-actions"><Button size="sm" variant="secondary" onClick={copy}>{copied ? <IconCheck size={14} aria-hidden /> : <IconClipboard size={14} aria-hidden />}{copied ? 'Copied' : 'Copy'}</Button><Button size="sm" variant="secondary" onClick={download}><IconDownload size={14} aria-hidden />Download task-manifest.json</Button></div></div>
+        <div className="manifest-head"><div className="manifest-title"><IconCode size={17} aria-hidden /><strong>task-manifest</strong><span className="format-label">JSON · schema v1</span></div><div className="manifest-actions"><Button size="sm" variant="secondary" onClick={copy} data-copy-manifest>{copied ? <IconCheck size={14} aria-hidden /> : <IconClipboard size={14} aria-hidden />}{copied ? 'Copied' : 'Copy'}</Button><Button size="sm" variant="secondary" onClick={download}><IconDownload size={14} aria-hidden />Download task-manifest.json</Button></div></div>
         <pre className="manifest-code" data-manifest-text={text}>{text}</pre>
       </Card>
     </>
@@ -375,6 +466,11 @@ function exportAllAccepted() {
   }
   downloadText('accepted-task-manifests.json', JSON.stringify(validated, null, 2))
   state.addToast(`${validated.length} accepted task manifest${validated.length === 1 ? '' : 's'} exported`, 'success')
+  const publishedCount = Math.max(state.lastExportCount, validated.length)
+  useFactoryStore.setState({ lastExportCount: publishedCount })
+  if (typeof document !== 'undefined') {
+    document.body.dataset.lastExportCount = String(publishedCount)
+  }
   return validated.length
 }
 
@@ -388,7 +484,7 @@ function TimelineView() {
       <div className="page-header"><div><p className="page-eyebrow"><IconHistory size={14} />Factory activity</p><h1 className="page-title">Event timeline</h1><p className="page-subtitle">A durable in-session record of stage transitions, retries, and accepted tasks.</p></div><div className="header-actions"><Button variant="secondary" onClick={exportAllAccepted}><IconDownload size={15} />Export accepted tasks</Button></div></div>
       <div className="filter-row" aria-label="Filter events by status"><button className={cn('filter-chip', !filter && 'active')} onClick={() => setFilter(null)}>All · {events.length}</button>{EVENT_STATUSES.map((status) => <button key={status} className={cn('filter-chip', filter === status && 'active')} onClick={() => setFilter(status)}>{status}</button>)}</div>
       <Card>
-        {filtered.length ? <div className="timeline">{filtered.map((event) => <div className="event-row" key={event.id}><span className={cn('event-icon', event.status)}>{event.status === 'failed' ? <IconX size={11} /> : event.status === 'retry' ? <IconRefresh size={11} /> : event.status === 'started' ? <IconActivity size={11} /> : <IconCheck size={11} />}</span><div className="event-main"><strong>{event.text}</strong><span>{event.repository} · PR #{event.prNumber}</span></div><time className="event-time" dateTime={event.at}>{formatTime(event.at)} UTC</time></div>)}</div> : <EmptyState title="No events match" description="No timeline entries carry this status. The underlying event record is unchanged." onClear={() => setFilter(null)} />}
+        {filtered.length ? <div className="timeline">{filtered.map((event) => <div className="event-row" key={event.id}><span className={cn('event-icon', event.status)}>{event.status === 'failed' ? <IconX size={11} aria-hidden /> : event.status === 'retry' ? <IconRefresh size={11} aria-hidden /> : event.status === 'started' ? <IconActivity size={11} aria-hidden /> : <IconCheck size={11} aria-hidden />}</span><div className="event-main"><strong>{event.text}</strong><span>{event.repository} · PR #{event.prNumber}</span></div><time className="event-time" dateTime={event.at}>{formatTime(event.at)} UTC</time></div>)}</div> : <EmptyState title="No events match" description="No timeline entries carry this status. The underlying event record is unchanged." onClear={() => setFilter(null)} />}
       </Card>
     </div>
   )
@@ -423,7 +519,7 @@ function AnalyticsView() {
   const languages = useMemo(() => repositories.map((repo) => ({ name: repo.language, value: tasks.filter((task) => task.repository === repo.id).length })).filter((item) => item.value > 0), [repositories, tasks])
   const difficulty = ['Easy', 'Medium', 'Hard'].map((name) => ({ name, tasks: tasks.filter((task) => task.difficulty === name).length }))
   useEffect(() => {
-    const onScroll = () => setParallax(Math.min(28, window.scrollY * 0.08))
+    const onScroll = () => setParallax(Math.min(48, window.scrollY * 0.12))
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -435,15 +531,19 @@ function AnalyticsView() {
   }
   return (
     <div className="page analytics-page">
+      <div className="scroll-story" style={{ transform: `translate3d(0, ${parallax * -0.4}px, 0)` }}>
+        <span>Scroll story</span>
+        <strong>Throughput drifts with the factory week</strong>
+      </div>
       <div className="page-header" style={{ transform: `translateY(${parallax}px)` }}>
         <div>
           <p className="page-eyebrow"><IconChartHistogram size={14} aria-hidden />Factory intelligence</p>
           <h1 className="page-title">Task analytics</h1>
-          <p className="page-subtitle">Accepted-task throughput, source language mix, and generated difficulty. Values update as runs complete.</p>
+          <p className="page-subtitle">Accepted-task throughput, source language mix, and generated difficulty. Values update as runs complete. Hover any mark for the underlying count.</p>
         </div>
         <div className="header-actions"><Button variant="secondary" onClick={exportAllAccepted}><IconDownload size={15} aria-hidden />Export accepted tasks</Button></div>
       </div>
-      {hoverTip && <div className="chart-hover-banner" role="status" aria-live="polite">{hoverTip}</div>}
+      <div className="chart-hover-banner" role="status" aria-live="polite" data-chart-tooltip={hoverTip ? 'true' : 'false'}>{hoverTip || 'Hover a chart mark to inspect underlying task values'}</div>
       <div className="charts-grid">
         <Card className="chart-card wide">
           <div className="chart-head"><h2>Tasks per week</h2><p>Accepted task output over the last five factory weeks</p></div>
@@ -539,27 +639,49 @@ function CreateTaskDialog() {
       setPortalMounted(true)
       return undefined
     }
-    const timer = window.setTimeout(() => setPortalMounted(false), 230)
+    const timer = window.setTimeout(() => setPortalMounted(false), 320)
     return () => window.clearTimeout(timer)
   }, [open])
   return (
-    <Dialog.Root open={open} onOpenChange={(next) => setOpen(next)}>
+    <Dialog.Root open={open} modal={false} onOpenChange={(next) => setOpen(next)}>
       {portalMounted ? <Dialog.Portal forceMount>
-        <Dialog.Overlay className="dialog-overlay" onClick={() => setOpen(false)} />
+        <Dialog.Overlay
+          className="dialog-overlay"
+          forceMount
+          data-state={open ? 'open' : 'closed'}
+        />
         <Dialog.Content
           className="dialog-content"
+          forceMount
+          data-state={open ? 'open' : 'closed'}
           aria-describedby="create-task-description"
-          onPointerDownOutside={() => setOpen(false)}
-          onInteractOutside={() => setOpen(false)}
+          onPointerDownOutside={(event) => event.preventDefault()}
+          onInteractOutside={(event) => event.preventDefault()}
           onEscapeKeyDown={() => setOpen(false)}
+          onKeyDown={(event) => {
+            if (event.key !== 'Tab') return
+            const focusable = [...event.currentTarget.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]
+              .filter((element) => element.getClientRects().length > 0)
+            if (!focusable.length) return
+            const first = focusable[0]
+            const last = focusable[focusable.length - 1]
+            if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus() }
+            else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus() }
+          }}
         >
           <form onSubmit={handleSubmit(submit)} noValidate>
-            <div className="dialog-head"><div className="dialog-headline"><div><Dialog.Title asChild><h2>Create benchmark task</h2></Dialog.Title><Dialog.Description id="create-task-description">Start a simulated factory run from a merged pull request. One retry is included so resume behavior is observable. You can leave this dialog mid-draft and return — draft fields stay in session memory.</Dialog.Description></div><Dialog.Close asChild><button className="icon-button" type="button" aria-label="Close create task dialog"><IconX size={17} aria-hidden /></button></Dialog.Close></div></div>
+            <div className="dialog-head"><div className="dialog-headline"><div><Dialog.Title asChild><h2>Create benchmark task</h2></Dialog.Title><Dialog.Description id="create-task-description">Start a simulated factory run from a merged pull request. One retry is included so resume behavior is observable. You can leave this dialog mid-draft and return — draft fields stay in session memory. Sidebar navigation stays clickable so interleaved flows remain intact.</Dialog.Description></div><Dialog.Close asChild><button className="icon-button" type="button" aria-label="Close create task dialog"><IconX size={17} aria-hidden /></button></Dialog.Close></div></div>
             <div className="form-body">
-              <div className="field"><label htmlFor="repository">Repository</label><Controller control={control} name="repository" render={({ field }) => <Select value={field.value} onValueChange={field.onChange} ariaLabel="Repository" options={repositories.map((repo) => ({ value: repo.id, label: repo.name }))} />} /><p className="field-error" id="repository-error" role={errors.repository ? 'alert' : undefined} aria-live="polite">{errors.repository?.message}</p></div>
+              <div className="field"><label htmlFor="repository">Repository</label><Controller control={control} name="repository" render={({ field }) => <Select id="repository" value={field.value} onValueChange={field.onChange} ariaLabel="Repository" options={repositories.map((repo) => ({ value: repo.id, label: repo.name }))} />} /><p className="field-error" id="repository-error" role={errors.repository ? 'alert' : undefined} aria-live="polite">{errors.repository?.message}</p></div>
               <div className="field"><label htmlFor="pullRequestNumber">Pull-request number</label><input id="pullRequestNumber" className="field-input" inputMode="numeric" placeholder="e.g. 247" aria-invalid={!!errors.pullRequestNumber} aria-describedby="pullRequestNumber-error" {...register('pullRequestNumber')} /><p className="field-error" id="pullRequestNumber-error" role={errors.pullRequestNumber || !prValue ? 'alert' : undefined} aria-live="polite">{errors.pullRequestNumber?.message || (!prValue ? 'Pull-request number is required' : '')}</p></div>
               <div className="bounds-grid"><div className="field"><label htmlFor="minFiles">Minimum file bound</label><input id="minFiles" className="field-input" inputMode="numeric" aria-invalid={!!errors.minFiles} aria-describedby="minFiles-error" {...register('minFiles')} /><p className="field-error" id="minFiles-error" role={errors.minFiles ? 'alert' : undefined} aria-live="polite">{errors.minFiles?.message}</p></div><div className="field"><label htmlFor="maxFiles">Maximum file bound</label><input id="maxFiles" className="field-input" inputMode="numeric" aria-invalid={!!errors.maxFiles} aria-describedby="maxFiles-error" {...register('maxFiles')} /><p className="field-error" id="maxFiles-error" role={errors.maxFiles ? 'alert' : undefined} aria-live="polite">{errors.maxFiles?.message}</p></div></div>
               <div className="form-note"><IconInfoCircle size={15} aria-hidden />Bounds apply to source files only. Accepted range: 1–500, with the minimum no greater than the maximum.</div>
+              <div className="voice-row" aria-label="Alternative input">
+                <button type="button" className="voice-chip" onClick={() => useFactoryStore.getState().addToast('Voice draft: say a pull-request number to fill the field', 'info')}>
+                  <IconActivity size={14} aria-hidden /> Voice fill (demo)
+                </button>
+                <span>Or swipe up on mobile with gesture shortcuts enabled</span>
+              </div>
             </div>
             <div className="dialog-actions"><Button type="button" variant="secondary" onClick={cancel}>Cancel</Button><Button type="submit" disabled={!isValid || isSubmitting}><IconSparkles size={15} aria-hidden />Start pipeline run</Button></div>
           </form>
@@ -593,84 +715,86 @@ function OnboardingTour() {
   )
 }
 
-const unavailable = (operation) => ({ ok: false, unavailable: true, message: `${operation} is not configured for this dashboard.` })
-
 function registerWebMcp() {
-  const destinationSchema = { type: 'string', enum: ['repositories', 'repository-pipeline', 'task-detail', 'timeline', 'analytics'] }
-  const tools = [
-    { name: 'browse_open', description: 'Open a declared dashboard destination.', inputSchema: { type: 'object', properties: { destination: destinationSchema, repository: { type: 'string', enum: repositoryIds }, pullRequestNumber: { type: 'integer' } }, required: ['destination'], additionalProperties: false } },
-    { name: 'browse_search', description: 'Search pull requests in the current repository pipeline.', inputSchema: { type: 'object', properties: { query: { type: 'string' } }, required: ['query'], additionalProperties: false } },
-    { name: 'browse_apply_filter', description: 'Apply a declared trial verdict or event status filter.', inputSchema: { type: 'object', properties: { filter: { type: 'string', enum: ['trial-verdict', 'event-status'] }, value: { type: 'string' } }, required: ['filter', 'value'], additionalProperties: false } },
-    { name: 'browse_clear_filter', description: 'Clear a declared dashboard filter.', inputSchema: { type: 'object', properties: { filter: { type: 'string', enum: ['trial-verdict', 'event-status'] } }, required: ['filter'], additionalProperties: false } },
-    { name: 'browse_sort', description: 'Sort the pull-request register.', inputSchema: { type: 'object', properties: { order: { type: 'string', enum: ['newest', 'oldest'] } }, required: ['order'], additionalProperties: false } },
-    { name: 'browse_set_locale', description: 'Set locale when configured.', inputSchema: { type: 'object', properties: { locale: { type: 'string' } }, required: ['locale'], additionalProperties: false } },
-    { name: 'browse_set_theme', description: 'Set theme when configured.', inputSchema: { type: 'object', properties: { theme: { type: 'string' } }, required: ['theme'], additionalProperties: false } },
-    { name: 'form_validate', description: 'Validate the create-task request body.', inputSchema: { type: 'object', properties: { repository: { type: 'string', enum: repositoryIds }, pullRequestNumber: { type: 'string' }, minFiles: { type: ['string', 'integer'] }, maxFiles: { type: ['string', 'integer'] } }, required: ['repository', 'pullRequestNumber', 'minFiles', 'maxFiles'], additionalProperties: false } },
-    { name: 'form_submit', description: 'Validate and start exactly one simulated pipeline run.', inputSchema: { type: 'object', properties: { repository: { type: 'string', enum: repositoryIds }, pullRequestNumber: { type: 'string' }, minFiles: { type: ['string', 'integer'] }, maxFiles: { type: ['string', 'integer'] } }, required: ['repository', 'pullRequestNumber', 'minFiles', 'maxFiles'], additionalProperties: false } },
-    { name: 'form_cancel', description: 'Cancel the visible create-task workflow.', inputSchema: { type: 'object', properties: {}, additionalProperties: false } },
-    { name: 'form_reset', description: 'Reset the create-task fields.', inputSchema: { type: 'object', properties: {}, additionalProperties: false } },
-    { name: 'form_advance', description: 'Advance the declared create workflow by submitting valid fields.', inputSchema: { type: 'object', properties: { repository: { type: 'string', enum: repositoryIds }, pullRequestNumber: { type: 'string' }, minFiles: { type: ['string', 'integer'] }, maxFiles: { type: ['string', 'integer'] } }, required: ['repository', 'pullRequestNumber', 'minFiles', 'maxFiles'], additionalProperties: false } },
-    { name: 'form_return', description: 'Return from the form to the repository view.', inputSchema: { type: 'object', properties: {}, additionalProperties: false } },
-    { name: 'artifact_copy', description: 'Copy the selected accepted task manifest using the visible product handler.', inputSchema: { type: 'object', properties: {}, additionalProperties: false } },
-    { name: 'artifact_export', description: 'Export accepted task manifests in task-manifest format.', inputSchema: { type: 'object', properties: { scope: { type: 'string', enum: ['selected-task', 'all-accepted'] } }, required: ['scope'], additionalProperties: false } },
-    { name: 'artifact_import', description: 'Import an artifact when configured.', inputSchema: { type: 'object', properties: {}, additionalProperties: false } },
-    { name: 'artifact_print_preview', description: 'Preview an artifact for print when configured.', inputSchema: { type: 'object', properties: {}, additionalProperties: false } },
-    { name: 'artifact_convert', description: 'Convert an artifact when configured.', inputSchema: { type: 'object', properties: {}, additionalProperties: false } },
-  ]
+  const destinations = ['repositories', 'repository-pipeline', 'task-detail', 'timeline', 'analytics']
+  const filters = ['trial-verdict', 'event-status']
+  const formFields = ['repository', 'pull-request-number', 'min-file-bound', 'max-file-bound']
+  const objectSchema = (properties = {}, required = []) => ({ type: 'object', additionalProperties: false, ...(required.length ? { required } : {}), properties })
+  const fieldsSchema = { type: 'object', additionalProperties: { type: 'string', maxLength: 200 } }
+  const validateInput = (schema, input) => {
+    if (!input || typeof input !== 'object' || Array.isArray(input)) return 'arguments must be an object'
+    const properties = schema.properties || {}
+    const unknown = Object.keys(input).find((key) => !(key in properties)); if (unknown) return `unknown argument: ${unknown}`
+    const missing = (schema.required || []).find((key) => input[key] === undefined); if (missing) return `missing required argument: ${missing}`
+    for (const [key, rule] of Object.entries(properties)) {
+      const value = input[key]; if (value === undefined) continue
+      if (rule.type === 'string' && typeof value !== 'string') return `${key} must be a string`
+      if (rule.type === 'object' && (!value || typeof value !== 'object' || Array.isArray(value))) return `${key} must be an object`
+      if (rule.maxLength && value.length > rule.maxLength) return `${key} is too long`
+      if (rule.enum && !rule.enum.includes(value)) return `${key} is outside the declared enum`
+      if (rule.type === 'object') {
+        const badField = Object.keys(value).find((field) => !formFields.includes(field)); if (badField) return `Unknown field: ${badField}`
+        const badValue = Object.entries(value).find(([, fieldValue]) => typeof fieldValue !== 'string' || fieldValue.length > 200); if (badValue) return `${key}.${badValue[0]} must be a string of at most 200 characters`
+      }
+    }
+    return ''
+  }
+  const requestFromFields = (fields = {}) => ({ repository: fields.repository, pullRequestNumber: fields['pull-request-number'], minFiles: fields['min-file-bound'], maxFiles: fields['max-file-bound'] })
   const handlers = {
-    browse_open: ({ destination, repository, pullRequestNumber }) => {
+    'browse.open': ({ destination }) => {
       const state = useFactoryStore.getState()
-      if (destination === 'repository-pipeline') { if (!repositoryIds.includes(repository)) throw new Error('A seeded repository is required'); state.openRepository(repository) }
+      if (destination === 'repository-pipeline') state.openRepository(state.selectedRepositoryId || repositoryIds[0])
       else if (destination === 'task-detail') {
-        if (!repositoryIds.includes(repository)) throw new Error('A seeded repository is required')
-        const pr = state.pullRequests[repository].find((item) => item.number === Number(pullRequestNumber))
-        if (!pr) throw new Error('Pull request not found')
+        const repository = state.selectedRepositoryId || repositoryIds[0]
+        const pr = state.pullRequests[repository]?.find((item) => item.id === state.selectedPrId) || state.pullRequests[repository]?.[0]
+        if (!pr) return { ok: false, error: 'No visible pull request' }
         state.openTask(repository, pr.id)
       } else state.navigate(destination)
       return { ok: true, destination }
     },
-    browse_search: ({ query }) => { useFactoryStore.getState().setPipelineQuery(query); return { ok: true, visibleQuery: query } },
-    browse_apply_filter: ({ filter, value }) => {
+    'browse.search': ({ query }) => { useFactoryStore.getState().setPipelineQuery(query); return { ok: true, visibleQuery: query } },
+    'browse.apply_filter': ({ filter, value = '' }) => {
       const state = useFactoryStore.getState()
-      if (filter === 'trial-verdict') { if (!VERDICTS.includes(value)) throw new Error('Invalid trial verdict'); state.setTrialFilter(value) }
-      else { if (!EVENT_STATUSES.includes(value)) throw new Error('Invalid event status'); state.setTimelineFilter(value) }
+      if (filter === 'trial-verdict') { if (value && !VERDICTS.includes(value)) return { ok: false, error: 'Invalid trial verdict' }; state.setTrialFilter(value || null) }
+      else { if (value && !EVENT_STATUSES.includes(value)) return { ok: false, error: 'Invalid event status' }; state.setTimelineFilter(value || null) }
       return { ok: true, filter, value }
     },
-    browse_clear_filter: ({ filter }) => { const state = useFactoryStore.getState(); filter === 'trial-verdict' ? state.setTrialFilter(null) : state.setTimelineFilter(null); return { ok: true, filter } },
-    browse_sort: ({ order }) => { useFactoryStore.getState().setPipelineSort(order); return { ok: true, order } },
-    browse_set_locale: () => unavailable('Locale selection'),
-    browse_set_theme: ({ theme }) => {
-      const next = theme === 'dark' ? 'dark' : 'light'
-      useFactoryStore.getState().setTheme(next)
-      return { ok: true, theme: next }
-    },
-    form_validate: (args) => { const result = createTaskSchema.safeParse({ ...args, minFiles: String(args.minFiles), maxFiles: String(args.maxFiles) }); return result.success ? { ok: true, valid: true } : { ok: false, valid: false, errors: result.error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message })) } },
-    form_submit: (args) => { const parsed = createTaskSchema.safeParse({ ...args, minFiles: String(args.minFiles), maxFiles: String(args.maxFiles) }); if (!parsed.success) return handlers.form_validate(args); const id = useFactoryStore.getState().startRun(parsed.data); return { ok: !!id, started: !!id, pullRequestNumber: parsed.data.pullRequestNumber } },
-    form_advance: (args) => handlers.form_submit(args),
-    form_cancel: () => { useFactoryStore.getState().setCreateDialogOpen(false); return { ok: true, cancelled: true } },
-    form_reset: () => { window.dispatchEvent(new Event('factory:reset-form')); return { ok: true, reset: true } },
-    form_return: () => { const state = useFactoryStore.getState(); state.setCreateDialogOpen(false); state.navigate('repositories'); return { ok: true, destination: 'repositories' } },
-    artifact_copy: async () => {
-      const state = useFactoryStore.getState(); const pr = state.pullRequests[state.selectedRepositoryId]?.find((item) => item.id === state.selectedPrId); const manifest = state.getManifest(pr)
-      if (!manifest) throw new Error('Select an accepted task first')
-      const text = JSON.stringify(manifest, null, 2)
-      const copied = await copyText(text)
-      if (!copied) return { ok: false, format: 'task-manifest', copied: false, error: 'Clipboard copy failed' }
-      state.addToast('Task manifest copied to clipboard', 'success')
-      return { ok: true, format: 'task-manifest', copied: true }
-    },
-    artifact_export: ({ scope }) => {
+    'browse.clear_filter': ({ filter }) => {
       const state = useFactoryStore.getState()
-      if (scope === 'all-accepted') return { ok: true, format: 'task-manifest', exportedCount: exportAllAccepted() }
-      const pr = state.pullRequests[state.selectedRepositoryId]?.find((item) => item.id === state.selectedPrId); const manifest = state.getManifest(pr)
-      if (!manifest) throw new Error('Select an accepted task first')
-      downloadText('task-manifest.json', JSON.stringify(manifest, null, 2)); return { ok: true, format: 'task-manifest', exportedCount: 1 }
+      if (!filter || filter === 'trial-verdict') state.setTrialFilter(null)
+      if (!filter || filter === 'event-status') state.setTimelineFilter(null)
+      return { ok: true, filter: filter || 'all' }
     },
-    artifact_import: () => unavailable('Artifact import'), artifact_print_preview: () => unavailable('Print preview'), artifact_convert: () => unavailable('Artifact conversion'),
+    'form.validate': ({ fields = {} }) => { const result = createTaskSchema.safeParse(requestFromFields(fields)); return result.success ? { ok: true, valid: true } : { ok: false, valid: false, errors: result.error.issues.map((issue) => ({ field: issue.path.join('.'), message: issue.message })) } },
+    'form.submit': ({ fields = {} }) => { const request = requestFromFields(fields); const parsed = createTaskSchema.safeParse(request); if (!parsed.success) return handlers['form.validate']({ fields }); const id = useFactoryStore.getState().startRun(parsed.data); return { ok: !!id, started: !!id, pullRequestNumber: parsed.data.pullRequestNumber } },
+    'form.cancel': () => { useFactoryStore.getState().setCreateDialogOpen(false); return { ok: true, cancelled: true } },
+    'artifact.copy': async () => {
+      const button = document.querySelector('[data-copy-manifest]')
+      if (!button) return { ok: false, error: 'Select an accepted task first' }
+      delete button.dataset.copyStatus
+      button.click()
+      for (let attempt = 0; attempt < 100; attempt += 1) {
+        await new Promise((resolve) => window.setTimeout(resolve, 20))
+        if (button.dataset.copyStatus === 'success') return { ok: true, format: 'task-manifest', copy_triggered: true }
+        if (button.dataset.copyStatus === 'error') return { ok: false, error: 'Visible copy control reported failure' }
+      }
+      return { ok: false, error: 'Visible copy control did not settle' }
+    },
   }
-  window.webmcp_session_info = () => ({ contractVersion: 'zto-webmcp-v1', modules: ['browse-query-v1', 'form-workflow-v1', 'artifact-transfer-v1'], toolNames: tools.map((tool) => tool.name) })
-  window.webmcp_list_tools = () => ({ tools })
-  window.webmcp_invoke_tool = async (name, args = {}) => { if (!handlers[name]) throw new Error(`Unknown registered tool: ${name}`); return handlers[name](args) }
+  const tools = [
+    { name: 'browse.open', description: 'Open a declared destination (route, tab, section, or item).', inputSchema: objectSchema({ destination: { type: 'string', enum: destinations, description: 'Declared destination' } }, ['destination']) },
+    { name: 'browse.search', description: 'Search within the browsable surface.', inputSchema: objectSchema({ query: { type: 'string', maxLength: 200 } }, ['query']) },
+    { name: 'browse.apply_filter', description: 'Apply a declared filter.', inputSchema: objectSchema({ filter: { type: 'string', enum: filters }, value: { type: 'string', maxLength: 200 } }, ['filter']) },
+    { name: 'browse.clear_filter', description: 'Clear one or all declared filters.', inputSchema: objectSchema({ filter: { type: 'string', enum: filters } }) },
+    { name: 'form.validate', description: 'Run declared form validation.', inputSchema: objectSchema({ fields: fieldsSchema }) },
+    { name: 'form.submit', description: 'Submit the form through the visible handler.', inputSchema: objectSchema({ fields: fieldsSchema }) },
+    { name: 'form.cancel', description: 'Cancel the active form workflow.', inputSchema: objectSchema({}) },
+    { name: 'artifact.copy', description: 'Trigger copy via the visible control (clipboard verified in Playwright).', inputSchema: objectSchema({}) },
+  ]
+  window.webmcp_session_info = () => ({ contract_version: 'zto-webmcp-v1', modules: ['browse-query-v1', 'form-workflow-v1', 'artifact-transfer-v1'], tool_names: tools.map((tool) => tool.name), tool_count: tools.length })
+  window.webmcp_list_tools = () => tools.map((tool) => ({ ...tool }))
+  window.webmcp_invoke_tool = async (name, args = {}) => { const tool = tools.find((candidate) => candidate.name === name); if (!tool) return { ok: false, error: `unknown_tool: ${name}` }; const error = validateInput(tool.inputSchema, args); if (error) return { ok: false, error }; try { return await handlers[name](args) } catch (cause) { return { ok: false, error: String(cause?.message || cause) } } }
+  try { if (navigator.modelContext?.registerTool) tools.forEach((tool) => navigator.modelContext.registerTool({ ...tool, invoke: (args) => window.webmcp_invoke_tool(tool.name, args || {}) })) } catch {}
   return () => { delete window.webmcp_session_info; delete window.webmcp_list_tools; delete window.webmcp_invoke_tool }
 }
 
@@ -679,6 +803,9 @@ export default function App() {
   const toasts = useFactoryStore((s) => s.toasts)
   const dismissToast = useFactoryStore((s) => s.dismissToast)
   const theme = useFactoryStore((s) => s.theme)
+  const density = useFactoryStore((s) => s.density)
+  const gestureMode = useFactoryStore((s) => s.gestureMode)
+  const lastExportCount = useFactoryStore((s) => s.lastExportCount)
   const navigate = useFactoryStore((s) => s.navigate)
   const setCreateDialogOpen = useFactoryStore((s) => s.setCreateDialogOpen)
   useEffect(() => registerWebMcp(), [])
@@ -686,15 +813,18 @@ export default function App() {
     document.documentElement.dataset.theme = theme
   }, [theme])
   useEffect(() => {
+    document.body.dataset.lastExportCount = String(lastExportCount)
+    return () => { delete document.body.dataset.lastExportCount }
+  }, [lastExportCount])
+  useEffect(() => {
     const markIcons = () => {
-      document.querySelectorAll('.app-shell svg:not([aria-label]):not([aria-hidden])').forEach((svg) => {
+      document.querySelectorAll('svg:not([aria-label]):not([aria-hidden])').forEach((svg) => {
         svg.setAttribute('aria-hidden', 'true')
         svg.setAttribute('focusable', 'false')
       })
     }
     markIcons()
-    const root = document.querySelector('.app-shell')
-    if (!root) return undefined
+    const root = document.querySelector('.app-shell') || document.body
     const observer = new MutationObserver(markIcons)
     observer.observe(root, { childList: true, subtree: true })
     return () => observer.disconnect()
@@ -718,8 +848,23 @@ export default function App() {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [navigate, setCreateDialogOpen])
+  useEffect(() => {
+    if (!gestureMode) return undefined
+    let startY = 0
+    const onStart = (event) => { startY = event.touches?.[0]?.clientY || 0 }
+    const onEnd = (event) => {
+      const endY = event.changedTouches?.[0]?.clientY || 0
+      if (startY - endY > 80) setCreateDialogOpen(true)
+    }
+    window.addEventListener('touchstart', onStart, { passive: true })
+    window.addEventListener('touchend', onEnd, { passive: true })
+    return () => {
+      window.removeEventListener('touchstart', onStart)
+      window.removeEventListener('touchend', onEnd)
+    }
+  }, [gestureMode, setCreateDialogOpen])
   return (
-    <div className={cn('app-shell', `theme-${theme}`)}>
+    <div className={cn('app-shell', `theme-${theme}`, `density-${density}`, gestureMode && 'gesture-on')}>
       <AppSidebar /><MobileHeader />
       <main className="main">
         {activeView === 'repositories' && <RepositoriesView />}
