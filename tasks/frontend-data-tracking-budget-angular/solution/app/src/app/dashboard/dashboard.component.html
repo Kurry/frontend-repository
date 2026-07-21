@@ -12,26 +12,44 @@
       <span>Total left</span>
       <strong>${{ summary.totalLeft.toFixed(2) }}</strong>
     </div>
+    <div class="summary-delta" *ngIf="delta$ | async as d" [class.delta-up]="d.delta > 0" [class.delta-down]="d.delta < 0">
+      <span class="material-symbols-outlined" aria-hidden="true">{{ d.delta > 0 ? 'trending_up' : d.delta < 0 ? 'trending_down' : 'trending_flat' }}</span>
+      <span *ngIf="d.hasPrior; else noPrior">vs prior period {{ d.delta >= 0 ? '+' : '' }}${{ d.delta.toFixed(2) }}</span>
+      <ng-template #noPrior><span>no prior-period spending</span></ng-template>
+    </div>
   </mat-card>
 
   <mat-card class="categories-card">
     <h2>Budgets by category</h2>
-    <div class="category-row" *ngFor="let row of budgetsByCategory$ | async" [class.over-budget]="row.isOverBudget">
+    <div
+      class="category-row"
+      *ngFor="let row of budgetsByCategory$ | async; let i = index"
+      [class.over-budget]="row.isOverBudget"
+    >
       <div class="category-heading">
-        <span class="category-name">{{ row.name }}</span>
+        <span class="category-name">
+          <span class="legend-swatch" [style.background]="colorFor(i)" aria-hidden="true"></span>
+          {{ row.name }}
+        </span>
         <span class="category-left">
           left ${{ row.left.toFixed(2) }}
-          (Variance: {{ row.variance > 0 ? '+' : '' }}${{ row.variance.toFixed(2) }})
-          · Projected ${{ row.projected.toFixed(2) }}
         </span>
       </div>
       <div class="progress-wrap">
-        <mat-progress-bar mode="determinate" [value]="row.leftPercentage" [attr.aria-label]="row.name + ' budget progress ' + (row.isOverBudget ? 'over budget' : '')"></mat-progress-bar>
+        <mat-progress-bar mode="determinate" [value]="row.leftPercentage" [attr.aria-label]="row.name + ' budget progress ' + row.currentExpenses.toFixed(2) + ' of ' + row.maxExpenses.toFixed(2) + (row.isOverBudget ? ', over budget' : '')"></mat-progress-bar>
         <span class="progress-label">${{ row.currentExpenses.toFixed(2) }} / ${{ row.maxExpenses.toFixed(2) }}</span>
       </div>
+      <div class="category-meta">
+        <span class="variance">Variance {{ row.variance >= 0 ? '+' : '' }}${{ row.variance.toFixed(2) }}</span>
+        <span class="projected">Projected ${{ row.projected.toFixed(2) }}</span>
+        <span class="forecast-hint" *ngIf="row.isOverBudget || row.projectedOverage">
+          Over by ${{ overBy(row).toFixed(2) }} &middot; {{ daysLeftInMonth$ | async }} days left
+        </span>
+      </div>
       <div class="flags">
-        <span class="flag projected-overage" *ngIf="row.projectedOverage">Projected overage</span>
-        <span class="flag over-threshold" *ngIf="row.overThreshold">Over threshold</span>
+        <span class="flag over-budget-label flag-anim" *ngIf="row.isOverBudget">Over budget</span>
+        <span class="flag projected-overage flag-anim" *ngIf="row.projectedOverage">Projected overage</span>
+        <span class="flag over-threshold flag-anim" *ngIf="row.overThreshold">Over threshold</span>
       </div>
     </div>
   </mat-card>

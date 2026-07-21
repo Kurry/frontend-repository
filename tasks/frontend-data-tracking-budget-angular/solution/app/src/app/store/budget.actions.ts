@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { Expense, Period } from '../models/models';
+import { Expense, Period, RecurringRule } from '../models/models';
 
 export const setView = createAction(
   '[App] Set View',
@@ -62,6 +62,41 @@ export const setDisplayName = createAction(
 export const setThresholdPercent = createAction(
   '[Settings] Set Threshold Percent',
   props<{ thresholdPercent: number }>()
+);
+
+export const addRecurringRule = createAction(
+  '[Recurring] Add Rule',
+  props<{ rule: RecurringRule }>()
+);
+
+export const updateRecurringRule = createAction(
+  '[Recurring] Update Rule',
+  props<{ key: string; rule: RecurringRule }>()
+);
+
+export const deleteRecurringRule = createAction(
+  '[Recurring] Delete Rule',
+  props<{ key: string }>()
+);
+
+export const detachRecurringInstance = createAction(
+  '[Recurring] Detach Instance',
+  props<{ syntheticId: string }>()
+);
+
+export const bulkCategorize = createAction(
+  '[Expenses] Bulk Categorize',
+  props<{ ids: string[]; categoryId: string }>()
+);
+
+export const bulkDelete = createAction(
+  '[Expenses] Bulk Delete',
+  props<{ ids: string[] }>()
+);
+
+export const setSelection = createAction(
+  '[Expenses] Set Selection',
+  props<{ ids: string[] }>()
 );
 
 export const undo = createAction('[App] Undo');

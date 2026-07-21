@@ -29,6 +29,18 @@ export const ExpenseFormSchema = z.object({
   counterparty: z.string().optional().nullable()
 });
 
+export const CategoryNameSchema = z
+  .string()
+  .trim()
+  .min(1, 'Category name is required')
+  .max(40, 'Category name must be 40 characters or fewer');
+
+export const DisplayNameSchema = z
+  .string()
+  .trim()
+  .min(1, 'Display name is required')
+  .max(60, 'Display name must be 60 characters or fewer');
+
 export const CategorySchema = z.object({
   id: z.string(),
   name: z.string().min(1),
@@ -46,10 +58,10 @@ export const CategorySchema = z.object({
 });
 
 export const RecurringRuleSchema = z.object({
-  name: z.string(),
-  value: z.number().positive(),
-  categoryId: z.string(),
-  dayOfMonth: z.number().min(1).max(31)
+  name: z.string().trim().min(1, 'Rule name is required').max(60, 'Rule name must be 60 characters or fewer'),
+  value: z.number().positive('Amount must be greater than 0'),
+  categoryId: z.string().min(1, 'Category is required'),
+  dayOfMonth: z.number().int('Day of month must be an integer').min(1, 'Day of month must be between 1 and 28').max(28, 'Day of month must be between 1 and 28')
 });
 
 const nearlyEqual = (left: number, right: number) => Math.abs(left - right) < 0.005;

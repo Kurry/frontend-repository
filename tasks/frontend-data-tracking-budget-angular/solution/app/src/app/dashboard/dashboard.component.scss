@@ -96,3 +96,56 @@
   background-color: #c2185b;
   color: #fff;
 }
+
+.over-budget-label {
+  background-color: #f44336;
+  color: #fff;
+}
+
+/* Animate the progress-bar fill toward its new value (criterion 4.4). */
+.progress-wrap ::ng-deep .mdc-linear-progress__bar-inner,
+.progress-wrap ::ng-deep .mat-mdc-progress-bar .mdc-linear-progress__bar-inner {
+  transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.legend-swatch {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: -1px;
+}
+
+.category-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #555;
+}
+.forecast-hint {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.summary-delta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #d8d8d8;
+  font-size: 13px;
+  font-weight: 600;
+}
+.summary-delta .material-symbols-outlined {
+  font-size: 18px;
+}
+.delta-up {
+  color: #b91c1c;
+}
+.delta-down {
+  color: #15803d;
+}

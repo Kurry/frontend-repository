@@ -33,3 +33,48 @@
 .threshold-form {
   margin-top: 24px;
 }
+
+.recurring-panel {
+  padding: 16px 4px;
+}
+.rule-form-card {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.rule-form-card h2 {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+.rule-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rule-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.rule-list {
+  background: #fff;
+  border-radius: 8px;
+}
+.rule-item {
+  border-bottom: 1px solid #eee;
+}
+.rule-title {
+  font-weight: 600;
+}
+.rule-detail {
+  color: #555;
+  font-size: 13px;
+}
+.rule-actions-inline {
+  margin-left: auto;
+  display: flex;
+}
+.empty-state {
+  color: #777;
+  text-align: center;
+  padding: 16px 0;
+}

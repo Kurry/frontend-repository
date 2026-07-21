@@ -35,7 +35,7 @@ export class ExpenseDialogComponent {
     this.categories$ = this.store.select(selectCategories);
     this.form = this.fb.group({
       value: [this.data.expense?.value ?? null, [Validators.required, Validators.min(0.01)]],
-      datetime: [this.data.expense?.datetime ?? '', [Validators.required]],
+      datetime: [this.data.expense?.datetime ?? '', [Validators.required, Validators.pattern(/^\d{4}-\d{2}-\d{2}$/)]],
       categoryId: [this.data.expense?.categoryId ?? '', [Validators.required]],
       counterparty: [this.data.expense?.counterparty ?? ''],
     });
