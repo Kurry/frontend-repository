@@ -151,9 +151,11 @@ body.route-about .the-header {
 .stack-group.is-hovered .stack-cover {
   transform: rotateX(-3deg) translateY(1rem);
 }
+.stack-group:hover .stack-cover { transform: rotateX(-3deg) translateY(1rem); }
 .stack-group.is-hovered .stack-cover::after { opacity: 1; }
 .stack-cover__head {
   display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  width: 100%; padding: 0; color: inherit; background: transparent; border: 0; text-align: left;
 }
 .stack-cover__title {
   font-family: "Founders Grotesk", sans-serif; text-transform: uppercase;
@@ -393,6 +395,7 @@ body.route-about .the-header {
 
 /* Waveform audio player */
 .wave-player { background: #111; color: #fff; padding: 1rem; border-radius: 6px; }
+.wave-player audio { position:absolute; width:1px; height:1px; overflow:hidden; opacity:.001; pointer-events:none; }
 .wave-player__title { font-family: "IBM Plex Mono", sans-serif; font-size: .8rem; margin-bottom: .5rem; }
 .wave-player__canvas { width: 100%; height: 80px; opacity: .4; background: #000; display: block; }
 .wave-player.is-playing .wave-player__canvas { opacity: 1; }
@@ -534,6 +537,7 @@ body.route-about .the-header {
 /* reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: .001s !important; animation-duration: .001s !important; animation-iteration-count: 1 !important; }
+  html { scroll-behavior: auto !important; }
   .split-reveal .char { opacity: 1; transform: none; }
   .scrapbook-item { opacity: 1; transform: none; }
   .drawer__panel { transition: none; }

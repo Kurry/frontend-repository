@@ -132,6 +132,47 @@
   var popup = $("#popup"), popupMedia = $("#popupMedia"), popupInfo = $("#popupInfo");
   var readingList = $("#readingList"), dossierPanel = $("#dossierPanel"), commandPalette = $("#commandPalette");
   var galleryTimer = null, audioEl = null, waveInterval = null, paletteFocusEl = null;
+  var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var overlayOpeners = { reading: null, dossier: null, popup: null };
+
+  function motionDelay(milliseconds) { return reducedMotion ? 0 : milliseconds; }
+  function announce(message) {
+    var live = $("#liveStatus");
+    if (!live) return;
+    live.textContent = "";
+    requestAnimationFrame(function () { live.textContent = message; });
+  }
+  function focusableIn(container) {
+    if (!container) return [];
+    return $$("button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), video[controls], audio[controls], a[href], [tabindex]:not([tabindex='-1'])", container)
+      .filter(function (element) { return !element.hidden && element.getClientRects().length > 0; });
+  }
+  function activeOverlay() {
+    if (state.popup.open) return popup;
+    if (state.dossierOpen) return dossierPanel;
+    if (state.readingListOpen) return readingList;
+    if (state.paletteOpen) return commandPalette;
+    return null;
+  }
+  function trapOverlayFocus(event) {
+    var overlay = activeOverlay();
+    if (!overlay || event.key !== "Tab") return false;
+    var items = focusableIn(overlay);
+    if (!items.length) { event.preventDefault(); overlay.focus(); return true; }
+    var first = items[0], last = items[items.length - 1];
+    if (event.shiftKey && (document.activeElement === first || !overlay.contains(document.activeElement))) {
+      event.preventDefault(); last.focus(); return true;
+    }
+    if (!event.shiftKey && (document.activeElement === last || !overlay.contains(document.activeElement))) {
+      event.preventDefault(); first.focus(); return true;
+    }
+    return false;
+  }
+  function restoreOverlayFocus(key, delay) {
+    var opener = overlayOpeners[key];
+    overlayOpeners[key] = null;
+    setTimeout(function () { if (opener && opener.isConnected) opener.focus({ preventScroll: true }); }, motionDelay(delay || 0));
+  }
 
   function categoryOf(slug) {
     for (var i = 0; i < CATEGORIES.length; i++) {
@@ -198,6 +239,7 @@
     refreshCaseChrome();
     renderReadingList();
     refreshDossierPreview();
+    announce("Field note saved for " + ARCHITECTS[slug].name);
     return { ok: true, architect: slug, note: state.notes[slug], pinned: isPinned(slug) };
   }
   function setBookmark(fields) {
@@ -332,6 +374,7 @@
     renderReadingList();
     refreshDossierPreview();
     if (state.activeSlug) applyScrapbookOffsets(state.activeSlug);
+    announce("Dossier imported successfully");
     return { ok: true };
   }
 
@@ -403,19 +446,20 @@
       }).join("");
       group.innerHTML =
         '<div class="stack-cover" style="background-color:' + cat.color + '">' +
-          '<div class="stack-cover__head">' +
+          '<button type="button" class="stack-cover__head" aria-expanded="false">' +
             '<h2 class="stack-cover__title">' + cat.title + "</h2>" +
             '<span class="stack-cover__chevron" aria-hidden="true">&rsaquo;</span>' +
-          "</div>" +
+          "</button>" +
           '<p class="stack-cover__desc">' + cat.thesis + "</p>" +
           '<div class="stack-cover__tags">' + tags + "</div>" +
           (cat.id === "place" ? '<div class="stack-cover__footer">' + footerHTML() + "</div>" : "") +
         "</div>";
       group.addEventListener("mouseenter", function () { group.classList.add("is-hovered"); });
       group.addEventListener("mouseleave", function () { group.classList.remove("is-hovered"); });
-      $(".stack-cover__head", group).addEventListener("click", function () {
+      $(".stack-cover__head", group).addEventListener("click", function (event) {
         group.classList.toggle("is-unfolded");
         state.unfolded = group.classList.contains("is-unfolded") ? cat.id : null;
+        event.currentTarget.setAttribute("aria-expanded", group.classList.contains("is-unfolded") ? "true" : "false");
       });
       stack.appendChild(group);
     });
@@ -459,7 +503,7 @@
               '<div class="case-folder-sheet">' +
                 '<img class="case-folder-sheet__photo" src="' + img(slug + ".avif") + '" alt="' + a.name + '" />' +
                 '<p class="case-folder-sheet__meta">Born ' + a.born + (a.died ? " — Died " + a.died : " — present") + "</p>" +
-                '<h3 class="case-folder-sheet__name">' + a.name + "</h3>" +
+                '<h2 class="case-folder-sheet__name">' + a.name + "</h2>" +
                 '<p class="case-folder-sheet__bio">' + a.bio + "</p>" +
                 '<span class="case-folder-sheet__overlay" aria-hidden="true"></span>' +
               "</div>" +
@@ -579,9 +623,15 @@
       el.innerHTML = it.html;
       if (it.kind) {
         el.dataset.kind = it.kind;
+        el.tabIndex = 0;
+        el.setAttribute("role", "button");
+        el.setAttribute("aria-label", "Open " + it.kind + " for " + ARCHITECTS[slug].name);
         el.addEventListener("click", function () {
           if (el.classList.contains("dragging")) return;
-          openPopup(it.kind, slug);
+          openPopup(it.kind, slug, el);
+        });
+        el.addEventListener("keydown", function (event) {
+          if (event.key === "Enter" || event.key === " ") { event.preventDefault(); openPopup(it.kind, slug, el); }
         });
       }
       makeDraggable(el, slug);
@@ -755,6 +805,8 @@
     opts = opts || {};
     stopGallery();
     state.route = "home"; state.activeSlug = null;
+    header.hidden = false;
+    header.setAttribute("aria-hidden", "false");
     header.classList.remove("is-hidden");
     header.style.transform = "";
     subHeader.classList.add("is-hidden");
@@ -767,7 +819,7 @@
     revealHero();
     $("#stack").querySelectorAll(".tag").forEach(function (t, i) {
       t.classList.remove("is-visible");
-      setTimeout(function () { t.classList.add("is-visible"); }, 200 + i * 60);
+      setTimeout(function () { t.classList.add("is-visible"); }, motionDelay(200 + i * 60));
     });
     applyHomeFilters();
     updateNav();
@@ -781,6 +833,8 @@
     stopMedia();
     renderCase(slug);
     header.classList.add("is-hidden");
+    header.hidden = true;
+    header.setAttribute("aria-hidden", "true");
     header.style.transform = "translateY(-100%)";
     subHeader.classList.remove("is-hidden");
     document.body.classList.remove("route-home", "route-about");
@@ -808,10 +862,10 @@
           c.style.opacity = "1"; c.style.transform = "translateX(0)";
         });
         viewCase.querySelectorAll(".case-folder-tags .tag").forEach(function (t, i) {
-          setTimeout(function () { t.classList.add("is-visible"); }, 850 + i * 80);
+          setTimeout(function () { t.classList.add("is-visible"); }, motionDelay(850 + i * 80));
         });
-        setTimeout(function () { sb.classList.add("is-revealed"); }, 1000);
-        setTimeout(function () { folder.classList.remove("is-flipping"); }, 600);
+        setTimeout(function () { sb.classList.add("is-revealed"); }, motionDelay(1000));
+        setTimeout(function () { folder.classList.remove("is-flipping"); }, motionDelay(600));
       });
     });
     updateNav();
@@ -846,6 +900,8 @@
     stopMedia();
     renderAbout();
     header.classList.add("is-hidden");
+    header.hidden = true;
+    header.setAttribute("aria-hidden", "true");
     header.style.transform = "translateY(-100%)";
     subHeader.classList.add("is-hidden");
     document.body.classList.remove("route-home", "route-case");
@@ -887,7 +943,8 @@
   }
 
   // ================= Popups + media =================
-  function openPopup(kind, slug) {
+  function openPopup(kind, slug, opener) {
+    overlayOpeners.popup = opener || (document.activeElement instanceof HTMLElement ? document.activeElement : null);
     state.popup = { open: true, kind: kind, ref: slug };
     var a = ARCHITECTS[slug];
     popupMedia.innerHTML = ""; popupInfo.textContent = "";
@@ -916,7 +973,11 @@
       popupInfo.textContent = "Julian Kade — recorded lecture (waveform player)";
     }
     popup.classList.add("is-open");
-    requestAnimationFrame(function () { popup.classList.add("is-shown"); });
+    popup.setAttribute("aria-hidden", "false");
+    requestAnimationFrame(function () {
+      popup.classList.add("is-shown");
+      var close = $(".popup__close", popup); if (close) close.focus({ preventScroll: true });
+    });
     document.body.classList.add("is-scroll-disabled");
   }
 
@@ -925,10 +986,12 @@
     popup.classList.remove("is-shown");
     setTimeout(function () {
       popup.classList.remove("is-open");
+      popup.setAttribute("aria-hidden", "true");
       popupMedia.innerHTML = "";
-    }, 300);
+    }, motionDelay(300));
     state.popup = { open: false, kind: null, ref: null };
     document.body.classList.remove("is-scroll-disabled");
+    restoreOverlayFocus("popup", 310);
   }
 
   function playVideo() { var v = $("#popupVideo"); if (v) { v.play(); state.videoPlaying = true; return true; } return false; }
@@ -943,6 +1006,7 @@
     wrap.className = "wave-player"; wrap.id = "wavePlayer";
     wrap.innerHTML =
       '<div class="wave-player__title">Julian Kade — recorded lecture</div>' +
+      '<audio id="waveAudio" preload="metadata" aria-label="Julian Kade recorded lecture"><source id="waveAudioSource" type="audio/mpeg"></audio>' +
       '<canvas class="wave-player__canvas" id="waveCanvas" width="800" height="80"></canvas>' +
       '<div class="wave-player__controls">' +
         '<button type="button" class="wave-player__play" id="wavePlay" aria-label="Play audio">&#9658;</button>' +
@@ -965,8 +1029,10 @@
   function loadWavePart(part) {
     state.audioPart = part;
     if (audioEl) { audioEl.pause(); }
-    audioEl = new Audio(WAVE_PARTS[part].mp3);
-    audioEl.preload = "metadata";
+    audioEl = $("#waveAudio");
+    var source = $("#waveAudioSource");
+    if (source) source.src = WAVE_PARTS[part].mp3;
+    if (audioEl) audioEl.load();
     state.audioPlaying = false;
     fetch(WAVE_PARTS[part].json).then(function (r) { return r.json(); }).then(function (d) {
       drawWave(d.data || []);
@@ -1014,6 +1080,7 @@
 
   // ================= Chrome: reading list / dossier / palette =================
   function openReadingList() {
+    overlayOpeners.reading = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     state.readingListOpen = true;
     readingList.classList.add("is-open");
     readingList.setAttribute("aria-hidden", "false");
@@ -1024,6 +1091,7 @@
     state.readingListOpen = false;
     readingList.classList.remove("is-open");
     readingList.setAttribute("aria-hidden", "true");
+    restoreOverlayFocus("reading", 0);
   }
   function renderReadingList() {
     var body = $("#readingListBody");
@@ -1050,6 +1118,7 @@
   }
 
   function openDossier() {
+    overlayOpeners.dossier = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     state.dossierOpen = true;
     dossierPanel.classList.add("is-open");
     dossierPanel.setAttribute("aria-hidden", "false");
@@ -1060,6 +1129,7 @@
     state.dossierOpen = false;
     dossierPanel.classList.remove("is-open");
     dossierPanel.setAttribute("aria-hidden", "true");
+    restoreOverlayFocus("dossier", 0);
   }
   function setDossierFormat(fmt) {
     if (fmt !== "json" && fmt !== "markdown") return { ok: false, error: "invalid format" };
@@ -1075,6 +1145,7 @@
     var done = function () {
       var el = $("#dossierCopied");
       if (el) { el.hidden = false; setTimeout(function () { el.hidden = true; }, 1500); }
+      announce("Dossier preview copied");
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
       return navigator.clipboard.writeText(text).then(function () { done(); return { ok: true }; })
@@ -1327,9 +1398,10 @@
       return { name: n, module: TOOLS[n].module, operation: TOOLS[n].operation, description: TOOLS[n].description };
     });
   };
-  window.webmcp_invoke_tool = function (name, args) {
+  function settleVisibleUi() { return new Promise(function (resolve) { requestAnimationFrame(function () { requestAnimationFrame(resolve); }); }); }
+  window.webmcp_invoke_tool = async function (name, args) {
     if (!TOOLS[name]) return { ok: false, error: "unknown tool: " + name };
-    try { return TOOLS[name].handler(args || {}); }
+    try { var response = await TOOLS[name].handler(args || {}); await settleVisibleUi(); return response; }
     catch (e) { return { ok: false, error: String(e && e.message || e) }; }
   };
 
@@ -1403,6 +1475,7 @@
 
     document.addEventListener("keydown", function (e) {
       var meta = e.ctrlKey || e.metaKey;
+      if (e.key === "Tab" && trapOverlayFocus(e)) return;
       if (e.key === "Escape") {
         if (state.paletteOpen) { closePalette(); return; }
         if (state.dossierOpen) { closeDossier(); return; }
@@ -1450,7 +1523,7 @@
       if (state.route === "home") {
         revealHero();
         $("#stack").querySelectorAll(".tag").forEach(function (t, i) {
-          setTimeout(function () { t.classList.add("is-visible"); }, 300 + i * 60);
+          setTimeout(function () { t.classList.add("is-visible"); }, motionDelay(300 + i * 60));
         });
       }
     });
