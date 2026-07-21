@@ -1,6 +1,13 @@
-import { useState, useCallback } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { habitsAtom, activeFilterAtom, reorderHabitsAtom } from "./store";
+import { Reorder, useDragControls } from "motion/react";
+import {
+  habitsAtom,
+  activeFilterAtom,
+  reorderByIdsAtom,
+  uiPrefsAtom,
+  type ViewMode,
+} from "./store";
 import HabitCard from "./components/HabitCard";
 import HabitForm from "./components/HabitForm";
 import CategoryFilter from "./components/CategoryFilter";
@@ -10,74 +17,98 @@ import ImportExport from "./components/ImportExport";
 import RecoveryBanner from "./components/RecoveryBanner";
 import { Toaster, toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAutoAnimate } from '@formkit/auto-animate/react';
+import type { Habit } from "./types";
 
-type ViewMode = "habits" | "stats" | "heatmap" | "import";
+function SortableHabit({
+  habit,
+  onOpenHeatmap,
+  onDragSettled,
+}: {
+  habit: Habit;
+  onOpenHeatmap: (id: string) => void;
+  onDragSettled: () => void;
+}) {
+  const dragControls = useDragControls();
+  return (
+    <Reorder.Item
+      as="div"
+      value={habit.id}
+      dragListener={false}
+      dragControls={dragControls}
+      whileDrag={{
+        scale: 1.02,
+        boxShadow: "0 14px 32px rgba(27,36,48,0.18)",
+        zIndex: 30,
+      }}
+      transition={{ type: "spring", stiffness: 420, damping: 36 }}
+      className="relative outline-none"
+      data-dragging="false"
+      onDragStart={() => {
+        const el = document.querySelector(`[data-habit-id="${habit.id}"]`)?.closest("[data-dragging]");
+        el?.setAttribute("data-dragging", "true");
+      }}
+      onDragEnd={() => {
+        const el = document.querySelector(`[data-habit-id="${habit.id}"]`)?.closest("[data-dragging]");
+        el?.setAttribute("data-dragging", "false");
+        onDragSettled();
+      }}
+    >
+      <HabitCard habit={habit} dragControls={dragControls} onOpenHeatmap={onOpenHeatmap} />
+    </Reorder.Item>
+  );
+}
+
+function PausedHabit({
+  habit,
+  onOpenHeatmap,
+}: {
+  habit: Habit;
+  onOpenHeatmap: (id: string) => void;
+}) {
+  const dragControls = useDragControls();
+  return <HabitCard habit={habit} dragControls={dragControls} onOpenHeatmap={onOpenHeatmap} />;
+}
 
 export default function App() {
   const [habits] = useAtom(habitsAtom);
   const [activeFilter] = useAtom(activeFilterAtom);
-  const [, reorder] = useAtom(reorderHabitsAtom);
-  const [view, setView] = useState<ViewMode>("habits");
+  const [, reorderByIds] = useAtom(reorderByIdsAtom);
+  const [uiPrefs, setUiPrefs] = useAtom(uiPrefsAtom);
+
+  const [view, setView] = useState<ViewMode>(() => uiPrefs.lastView ?? "habits");
   const [heatmapHabitId, setHeatmapHabitId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
-  const [dragId, setDragId] = useState<string | null>(null);
-  const [dragOverId, setDragOverId] = useState<string | null>(null);
-  const [listRef] = useAutoAnimate<HTMLDivElement>();
-  const [pausedListRef] = useAutoAnimate<HTMLDivElement>();
+  const [orderIds, setOrderIds] = useState<string[]>([]);
+  const committedKey = useRef("");
+  const orderIdsRef = useRef(orderIds);
+  orderIdsRef.current = orderIds;
 
-  // Filtered habits sorted by order
-  const sortedHabits = [...habits].sort((a, b) => a.order - b.order);
+  const sortedHabits = useMemo(
+    () => [...habits].sort((a, b) => a.order - b.order),
+    [habits]
+  );
   const filteredHabits = activeFilter
     ? sortedHabits.filter((h) => h.categoryId === activeFilter)
     : sortedHabits;
-
-  // Separate active and paused
   const activeHabits = filteredHabits.filter((h) => !h.paused);
   const pausedHabits = filteredHabits.filter((h) => h.paused);
+  const activeKey = activeHabits.map((h) => h.id).join("|");
 
-  // Drag and drop handlers
-  const handleDragStart = useCallback(
-    (e: React.DragEvent, id: string) => {
-      setDragId(id);
-      e.currentTarget.classList.add("dragging");
-    },
-    []
-  );
+  useEffect(() => {
+    const ids = activeHabits.map((h) => h.id);
+    setOrderIds(ids);
+    committedKey.current = ids.join("|");
+  }, [activeKey]);
 
-  const handleDragOver = useCallback(
-    (e: React.DragEvent, id: string) => {
-      e.preventDefault();
-      if (id !== dragId) {
-        setDragOverId(id);
+  const changeView = useCallback(
+    (next: ViewMode) => {
+      setView(next);
+      if (next !== "heatmap") setHeatmapHabitId(null);
+      if (next === "habits" || next === "stats" || next === "import") {
+        setUiPrefs({ lastView: next });
       }
     },
-    [dragId]
-  );
-
-  const handleDragEnd = useCallback(() => {
-    setDragId(null);
-    setDragOverId(null);
-    document.querySelectorAll(".dragging").forEach((el) => el.classList.remove("dragging"));
-  }, []);
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent, targetId: string) => {
-      e.preventDefault();
-      if (!dragId || dragId === targetId) return;
-
-      const fromIndex = sortedHabits.findIndex((h) => h.id === dragId);
-      const toIndex = sortedHabits.findIndex((h) => h.id === targetId);
-
-      if (fromIndex >= 0 && toIndex >= 0) {
-        reorder(fromIndex, toIndex);
-        toast.info("Habits reordered");
-      }
-
-      setDragId(null);
-      setDragOverId(null);
-    },
-    [dragId, sortedHabits, reorder]
+    [setUiPrefs]
   );
 
   const openHeatmap = useCallback((id: string) => {
@@ -85,48 +116,40 @@ export default function App() {
     setView("heatmap");
   }, []);
 
-  const goHome = useCallback(() => {
-    setView("habits");
-    setHeatmapHabitId(null);
-  }, []);
+  const goHome = useCallback(() => changeView("habits"), [changeView]);
 
-  // Empty state
-  const EmptyState = () => (
-    <div className="text-center py-12">
-      <span className="text-5xl mb-4 block">🌱</span>
-      <h3 className="text-lg font-bold text-[#1B2430] mb-2">No habits yet</h3>
-      <p className="text-sm text-[#475569] mb-6 max-w-xs mx-auto">
-        Start building good habits! Create your first habit to begin tracking your daily progress.
-      </p>
-      <button
-        type="button"
-        onClick={() => setShowForm(true)}
-        className="btn-primary px-6 py-3 font-semibold"
-        data-action="open-habit-form"
-      >
-        Create habit
-      </button>
-    </div>
-  );
+  const settleReorder = useCallback(() => {
+    const ids = orderIdsRef.current;
+    const key = ids.join("|");
+    if (!key || key === committedKey.current) return;
+    committedKey.current = key;
+    reorderByIds(ids);
+    toast.info("Habits reordered");
+  }, [reorderByIds]);
+
+  const showCoach = !uiPrefs.coachDismissed && habits.length === 0 && view === "habits";
 
   return (
     <div className="min-h-screen bg-[#F4F7F6]">
-      {/* Header */}
       <header className="bg-[#FFFFFF] border-b border-[#E2E8F0] sticky top-0 z-30">
         <div className="max-w-2xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <h1
-              className="text-xl md:text-2xl font-extrabold text-[#1B2430] cursor-pointer"
-              onClick={goHome}
-            >
-              <span className="text-[#0F9D74]">Loop</span>Daily
-            </h1>
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <h1
+                className="text-xl md:text-[28px] font-extrabold text-[#1B2430] cursor-pointer leading-tight"
+                onClick={goHome}
+              >
+                <span className="text-[#0F9D74]">Loop</span>Daily
+              </h1>
+              <p className="text-[11px] font-medium text-[#64748B] mt-0.5" data-enhancement="local-first">
+                Local-first workspace · offline ready
+              </p>
+            </div>
 
-            {/* Navigation tabs */}
-            <Tabs value={view} onValueChange={(v) => {
-              setView(v as ViewMode);
-              if (v !== "heatmap") setHeatmapHabitId(null);
-            }}>
+            <Tabs
+              value={view === "heatmap" ? "habits" : view}
+              onValueChange={(v) => changeView(v as ViewMode)}
+            >
               <TabsList className="bg-transparent border-none gap-1">
                 <TabsTrigger
                   value="habits"
@@ -157,65 +180,107 @@ export default function App() {
 
       <RecoveryBanner />
 
-      {/* Main content */}
       <main className="max-w-2xl mx-auto px-4 py-4 md:py-6 space-y-4">
-        {/* Habits view */}
+        {showCoach && (
+          <aside
+            className="rounded-[8px] border border-[#0F9D74]/30 bg-[#FFFFFF] p-4 shadow-sm"
+            data-coachmark
+            aria-label="Getting started"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <h2 className="text-base font-bold text-[#1B2430]">Quick tour</h2>
+                <ol className="mt-2 space-y-1.5 text-sm text-[#64748B] list-decimal list-inside">
+                  <li>
+                    Tap <strong className="text-[#1B2430]">New Habit</strong> (or Create habit) to add your first loop.
+                  </li>
+                  <li>
+                    Use <strong className="text-[#1B2430]">category chips</strong> to filter once you have categories.
+                  </li>
+                  <li>
+                    Open <strong className="text-[#1B2430]">Data</strong> anytime for{" "}
+                    <strong className="text-[#1B2430]">Export as JSON</strong>.
+                  </li>
+                </ol>
+                <p className="mt-2 text-xs text-[#64748B]">
+                  Tip: focus a habit card and press{" "}
+                  <kbd className="rounded border border-[#E2E8F0] px-1">C</kbd> to check in.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn-secondary px-3 py-1.5 text-xs font-semibold shrink-0"
+                onClick={() => setUiPrefs({ coachDismissed: true })}
+                data-action="dismiss-coach"
+              >
+                Got it
+              </button>
+            </div>
+          </aside>
+        )}
+
         {view === "habits" && (
           <>
-            {/* Category filter bar */}
             <CategoryFilter />
 
-            {/* Habit cards */}
             {habits.length === 0 ? (
               showForm ? (
                 <HabitForm onClose={() => setShowForm(false)} />
               ) : (
-                <EmptyState />
+                <div className="text-center py-12 bg-[#FFFFFF] rounded-[8px]">
+                  <span className="text-5xl mb-4 block" aria-hidden="true">
+                    🌱
+                  </span>
+                  <h3 className="text-lg font-bold text-[#1B2430] mb-2">No habits yet</h3>
+                  <p className="text-sm text-[#64748B] mb-6 max-w-xs mx-auto">
+                    Start building good habits! Create your first habit to begin tracking your daily
+                    progress.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(true)}
+                    className="btn-primary px-6 py-3 font-semibold"
+                    data-action="open-habit-form"
+                  >
+                    Create habit
+                  </button>
+                </div>
               )
             ) : (
               <>
-                {/* Active habits */}
-                <div className="space-y-2" ref={listRef}>
-                  {activeHabits.map((habit) => (
-                    <div
-                      key={habit.id}
-                      className={dragOverId === habit.id ? "drag-over rounded-lg" : ""}
-                      onDragOver={(e) => handleDragOver(e, habit.id)}
-                      onDrop={(e) => handleDrop(e, habit.id)}
-                    >
-                      <HabitCard
+                <Reorder.Group
+                  as="div"
+                  axis="y"
+                  values={orderIds}
+                  onReorder={setOrderIds}
+                  className="space-y-2"
+                >
+                  {orderIds.map((id) => {
+                    const habit = activeHabits.find((h) => h.id === id);
+                    if (!habit) return null;
+                    return (
+                      <SortableHabit
+                        key={habit.id}
                         habit={habit}
-                        onDragStart={handleDragStart}
-                        onDragOver={handleDragOver}
-                        onDragEnd={handleDragEnd}
                         onOpenHeatmap={openHeatmap}
+                        onDragSettled={settleReorder}
                       />
-                    </div>
-                  ))}
-                </div>
+                    );
+                  })}
+                </Reorder.Group>
 
-                {/* Paused habits section */}
                 {pausedHabits.length > 0 && (
                   <div className="mt-6">
                     <h3 className="text-sm font-semibold text-[#64748B] mb-2 px-1">
                       Paused Habits ({pausedHabits.length})
                     </h3>
-                    <div className="space-y-2" ref={pausedListRef}>
+                    <div className="space-y-2">
                       {pausedHabits.map((habit) => (
-                        <div
+                        <PausedHabit
                           key={habit.id}
-                          className={dragOverId === habit.id ? "drag-over rounded-lg" : ""}
-                          onDragOver={(e) => handleDragOver(e, habit.id)}
-                          onDrop={(e) => handleDrop(e, habit.id)}
-                        >
-                          <HabitCard
-                            habit={habit}
-                            onDragStart={handleDragStart}
-                            onDragOver={handleDragOver}
-                            onDragEnd={handleDragEnd}
-                            onOpenHeatmap={openHeatmap}
-                          />
-                        </div>
+                          habit={habit}
+                          onOpenHeatmap={openHeatmap}
+                        />
                       ))}
                     </div>
                   </div>
@@ -223,18 +288,15 @@ export default function App() {
               </>
             )}
 
-            {/* New habit button / form */}
             {habits.length > 0 && (
               <div className="mt-2">
                 {showForm ? (
-                  <div className="relative">
-                    <HabitForm onClose={() => setShowForm(false)} />
-                  </div>
+                  <HabitForm onClose={() => setShowForm(false)} />
                 ) : (
                   <button
                     type="button"
                     onClick={() => setShowForm(true)}
-                    className="w-full min-h-12 py-3 border-2 border-dashed border-[#E2E8F0] rounded-lg text-sm font-medium text-[#475569] hover:border-[#0F9D74] hover:text-[#0F9D74] transition-colors"
+                    className="w-full min-h-12 py-3 border-2 border-dashed border-[#E2E8F0] rounded-[8px] text-sm font-medium text-[#475569] hover:border-[#0F9D74] hover:text-[#0F9D74] transition-colors"
                     data-action="open-habit-form"
                   >
                     + New habit
@@ -245,15 +307,12 @@ export default function App() {
           </>
         )}
 
-        {/* Stats view */}
         {view === "stats" && <StatsView onBack={goHome} />}
 
-        {/* Heatmap view */}
         {view === "heatmap" && heatmapHabitId && (
           <HeatmapView habitId={heatmapHabitId} onBack={goHome} />
         )}
 
-        {/* Import / Export view */}
         {view === "import" && <ImportExport />}
       </main>
 

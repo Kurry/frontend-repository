@@ -6,17 +6,10 @@ import {
   importMalformedDataAtom,
   malformedSample,
   recoveryAtom,
+  validateWorkspaceDoc,
 } from "../store";
 import { toast } from "sonner";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import Modal from "./ui/modal";
 
 export default function ImportExport() {
   const [state] = useAtom(appStateAtom);
@@ -24,9 +17,16 @@ export default function ImportExport() {
   const [, importMalformedData] = useAtom(importMalformedDataAtom);
   const [, setRecovery] = useAtom(recoveryAtom);
   const fileRef = useRef<HTMLInputElement>(null);
+  const importBtnRef = useRef<HTMLButtonElement>(null);
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingData, setPendingData] = useState<unknown>(null);
   const [importResult, setImportResult] = useState<string | null>(null);
+  const [restoreFocusEl, setRestoreFocusEl] = useState<HTMLElement | null>(null);
+
+  const closeConfirm = () => {
+    setShowConfirm(false);
+    setPendingData(null);
+  };
 
   const handleExport = () => {
     const data = {
@@ -57,6 +57,7 @@ export default function ImportExport() {
       try {
         const parsed = JSON.parse(reader.result as string);
         setPendingData(parsed);
+        setRestoreFocusEl(importBtnRef.current);
         setShowConfirm(true);
         setImportResult(null);
       } catch {
@@ -69,6 +70,15 @@ export default function ImportExport() {
   };
 
   const handleConfirmImport = () => {
+    const precheck = validateWorkspaceDoc(pendingData);
+    if (precheck.length) {
+      const message = precheck.join("; ");
+      toast.error(`Import failed — field contract: ${precheck[0]}`);
+      setImportResult(`Import failed — ${message}`);
+      closeConfirm();
+      return;
+    }
+
     const result = importData(pendingData);
     if (result.success) {
       toast.success(`Imported ${result.habitCount} habits and ${result.categoryCount} categories!`);
@@ -76,11 +86,11 @@ export default function ImportExport() {
         `Successfully imported ${result.habitCount} habits and ${result.categoryCount} categories.`
       );
     } else {
-      toast.error(`Import failed — invalid data format: ${result.error}`);
-      setImportResult(`Import failed — invalid data format: ${result.error}`);
+      const message = result.errors.join("; ") || "invalid data format";
+      toast.error(`Import failed — ${message}`);
+      setImportResult(`Import failed — ${message}`);
     }
-    setShowConfirm(false);
-    setPendingData(null);
+    closeConfirm();
   };
 
   const handleLoadMalformed = () => {
@@ -105,8 +115,12 @@ export default function ImportExport() {
   };
 
   return (
-    <div className="bg-[#FFFFFF] rounded-lg p-4 md:p-6">
-      <h2 className="text-lg font-bold text-[#1B2430] mb-4">Export and import</h2>
+    <div className="bg-[#FFFFFF] rounded-[8px] p-4 md:p-6">
+      <h2 className="text-lg font-bold text-[#1B2430] mb-2">Export and import</h2>
+      <p className="text-sm text-[#64748B] mb-4">
+        Export downloads your portable Workspace JSON. Import always asks for confirmation before
+        current habits, categories, history, and filter are replaced.
+      </p>
 
       <div className="flex flex-wrap gap-3 mb-3">
         <button
@@ -119,6 +133,7 @@ export default function ImportExport() {
         </button>
 
         <button
+          ref={importBtnRef}
           type="button"
           onClick={() => fileRef.current?.click()}
           className="btn-secondary px-4 py-2 text-sm font-medium"
@@ -148,42 +163,41 @@ export default function ImportExport() {
       </div>
 
       {importResult && (
-        <div role="alert" aria-live="assertive" className="mt-3 px-3 py-2 bg-[#F4F7F6] rounded-lg text-sm text-[#1B2430]">
+        <div
+          role="alert"
+          aria-live="assertive"
+          className="mt-3 px-3 py-2 bg-[#F4F7F6] rounded-[8px] text-sm text-[#1B2430]"
+        >
           {importResult}
         </div>
       )}
 
-      <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm import</DialogTitle>
-            <DialogDescription>
-              This will replace all your current habits and categories with the imported data. Are you sure?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <button
-              type="button"
-              onClick={() => {
-                setShowConfirm(false);
-                setPendingData(null);
-              }}
-              className="btn-secondary px-4 py-2 text-sm"
-              data-action="cancel-import"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={handleConfirmImport}
-              className="btn-primary px-4 py-2 text-sm font-medium"
-              data-action="confirm-import"
-            >
-              Import & replace
-            </button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <Modal
+        open={showConfirm}
+        onClose={closeConfirm}
+        restoreFocus={restoreFocusEl}
+        title="Confirm import"
+        description="This will replace all your current habits, categories, history, and active filter with the imported Workspace JSON. Cancel leaves your current data untouched."
+      >
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={closeConfirm}
+            className="btn-secondary px-4 py-2 text-sm"
+            data-action="cancel-import"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleConfirmImport}
+            className="btn-primary px-4 py-2 text-sm font-medium"
+            data-action="confirm-import"
+          >
+            Replace and import
+          </button>
+        </div>
+      </Modal>
     </div>
   );
 }

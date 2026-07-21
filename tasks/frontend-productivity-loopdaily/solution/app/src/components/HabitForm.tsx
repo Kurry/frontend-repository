@@ -8,21 +8,34 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const habitSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(80, "Name must be 80 characters or fewer"),
-  icon: z.string().refine((val) => EMOJI_PALETTE.includes(val as any), {
-    message: "Invalid icon",
+  name: z
+    .string()
+    .trim()
+    .min(1, "name must be non-empty")
+    .max(80, "name must be 80 characters or fewer"),
+  icon: z.string().refine((val) => EMOJI_PALETTE.includes(val as (typeof EMOJI_PALETTE)[number]), {
+    message: "icon must be one of the fixed emoji palette",
   }),
   targetType: z.enum(["once", "count"]),
-  targetCount: z.number().int().min(1).max(100),
+  targetCount: z
+    .number()
+    .int("targetCount must be an integer between 1 and 100")
+    .min(1, "targetCount must be an integer between 1 and 100")
+    .max(100, "targetCount must be an integer between 1 and 100"),
   categoryId: z.string().nullable().optional(),
-  reminder: z.string().trim().max(40, "Reminder must be 40 characters or fewer").optional().default(""),
-}).refine(data => {
-  if (data.targetType === "once" && data.targetCount !== 1) return false;
-  return true;
-}, {
-  message: "Target count must be 1 when target is once",
-  path: ["targetCount"],
-});
+  reminder: z
+    .string()
+    .trim()
+    .max(40, "reminder must be 40 characters or fewer")
+    .optional()
+    .default(""),
+}).refine(
+  (data) => !(data.targetType === "once" && data.targetCount !== 1),
+  {
+    message: "targetCount must be 1 when targetType is once",
+    path: ["targetCount"],
+  }
+);
 
 type HabitFormValues = z.infer<typeof habitSchema>;
 
@@ -82,27 +95,31 @@ export default function HabitForm({ onClose }: HabitFormProps) {
   };
 
   return (
-    <div ref={formRef} className="bg-[#FFFFFF] rounded-lg p-4 md:p-6" data-habit-form>
+    <div ref={formRef} className="bg-[#FFFFFF] rounded-[8px] p-4 md:p-6" data-habit-form>
       <h2 className="text-lg font-bold text-[#1B2430] mb-4">New Habit</h2>
       <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-4" data-habit-form-el>
         {/* Name */}
         <div>
-          <label className="block text-sm font-medium text-[#64748B] mb-1">Habit Name</label>
+          <label htmlFor="habit-name" className="block text-sm font-medium text-[#64748B] mb-1">
+            Habit Name
+          </label>
           <input
+            id="habit-name"
             type="text"
             {...register("name")}
             placeholder="e.g. Morning Run"
-            className={`w-full px-3 py-2 rounded-lg border text-sm transition-colors ${
+            className={`w-full px-3 py-2 rounded-[8px] border text-sm transition-colors ${
               errors.name
                 ? "border-[#EF4444] bg-red-50"
                 : "border-[#E2E8F0] focus:border-[#0F9D74]"
             } text-[#1B2430] placeholder:text-[#94A3B8] outline-none`}
             aria-label="Habit name"
             aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? "habit-name-error" : undefined}
             data-field="name"
           />
           {errors.name && (
-            <p className="text-[#EF4444] text-xs mt-1" role="alert">
+            <p id="habit-name-error" className="text-[#EF4444] text-xs mt-1" role="alert">
               {errors.name.message}
             </p>
           )}
@@ -117,7 +134,7 @@ export default function HabitForm({ onClose }: HabitFormProps) {
                 key={e}
                 type="button"
                 onClick={() => setValue("icon", e)}
-                className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-all ${
+                className={`w-9 h-9 rounded-[8px] flex items-center justify-center text-lg transition-all ${
                   icon === e
                     ? "bg-[#0F9D74] ring-2 ring-[#0F9D74] scale-110"
                     : "bg-[#F4F7F6] hover:bg-[#E2E8F0]"
@@ -172,15 +189,16 @@ export default function HabitForm({ onClose }: HabitFormProps) {
                   min="1"
                   max="100"
                   {...register("targetCount", { valueAsNumber: true })}
-                  className="w-16 px-2 py-1 rounded-lg border border-[#E2E8F0] text-sm text-[#1B2430] outline-none focus:border-[#0F9D74]"
+                  className="w-16 px-2 py-1 rounded-[8px] border border-[#E2E8F0] text-sm text-[#1B2430] outline-none focus:border-[#0F9D74]"
                   aria-label="Daily target count"
+                  aria-describedby={errors.targetCount ? "target-count-error" : undefined}
                   data-field="target-count"
                 />
               )}
             </label>
           </div>
           {errors.targetCount && (
-            <p className="text-[#EF4444] text-xs mt-1" role="alert">
+            <p id="target-count-error" className="text-[#EF4444] text-xs mt-1" role="alert">
               {errors.targetCount.message}
             </p>
           )}
@@ -188,10 +206,13 @@ export default function HabitForm({ onClose }: HabitFormProps) {
 
         {/* Category */}
         <div>
-          <label className="block text-sm font-medium text-[#64748B] mb-1">Category</label>
+          <label htmlFor="habit-category" className="block text-sm font-medium text-[#64748B] mb-1">
+            Category
+          </label>
           <select
+            id="habit-category"
             {...register("categoryId")}
-            className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#1B2430] outline-none focus:border-[#0F9D74] bg-white"
+            className="w-full px-3 py-2 rounded-[8px] border border-[#E2E8F0] text-sm text-[#1B2430] outline-none focus:border-[#0F9D74] bg-white"
             aria-label="Category"
             data-field="category"
           >
@@ -204,17 +225,21 @@ export default function HabitForm({ onClose }: HabitFormProps) {
 
         {/* Reminder */}
         <div>
-          <label className="block text-sm font-medium text-[#64748B] mb-1">Remind me at (optional)</label>
+          <label htmlFor="habit-reminder" className="block text-sm font-medium text-[#64748B] mb-1">
+            Remind me at (optional)
+          </label>
           <input
+            id="habit-reminder"
             type="text"
             {...register("reminder")}
             placeholder="e.g. 7:00 AM"
-            className="w-full px-3 py-2 rounded-lg border border-[#E2E8F0] text-sm text-[#1B2430] placeholder:text-[#94A3B8] outline-none focus:border-[#0F9D74]"
+            className="w-full px-3 py-2 rounded-[8px] border border-[#E2E8F0] text-sm text-[#1B2430] placeholder:text-[#94A3B8] outline-none focus:border-[#0F9D74]"
             aria-label="Reminder time"
+            aria-describedby={errors.reminder ? "habit-reminder-error" : undefined}
             data-field="reminder"
           />
           {errors.reminder && (
-            <p className="text-[#EF4444] text-xs mt-1" role="alert">
+            <p id="habit-reminder-error" className="text-[#EF4444] text-xs mt-1" role="alert">
               {errors.reminder.message}
             </p>
           )}

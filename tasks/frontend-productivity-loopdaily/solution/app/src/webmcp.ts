@@ -46,13 +46,14 @@ function habitCard(habitId: string): HTMLElement | null {
   return q<HTMLElement>(`[data-habit-card][data-habit-id="${habitId}"]`);
 }
 
-function ensureHabitFormOpen(): HTMLElement | null {
+async function ensureHabitFormOpen(): Promise<HTMLElement | null> {
   let form = q<HTMLElement>("[data-habit-form]");
   if (form) return form;
   const opener =
     q<HTMLElement>('[data-action="open-habit-form"]') ||
     q<HTMLElement>('[data-action="submit-habit"]');
   click(opener);
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
   form = q<HTMLElement>("[data-habit-form]");
   return form;
 }
@@ -71,16 +72,13 @@ function browseOpen(args: Record<string, unknown>) {
     return { ok: true, destination };
   }
   if (destination === "heatmap") {
-    const habitId = String(args.habit_id ?? args.entity_id ?? "");
-    if (!habitId) return { ok: false, error: "heatmap destination requires habit_id" };
     goToView("habits");
-    const card = habitCard(habitId);
-    if (!card) return { ok: false, error: `habit not found: ${habitId}` };
-    click(q('[data-action="menu-toggle"]', card));
+    const card = q<HTMLElement>("[data-habit-card]");
+    if (!card) return { ok: false, error: "Create a habit before opening its heatmap" };
     const btn = q('[data-action="view-heatmap"]', card);
     if (!btn) return { ok: false, error: "view-heatmap control not found" };
     click(btn);
-    return { ok: true, destination, habitId };
+    return { ok: true, destination };
   }
   return { ok: false, error: `unknown destination: ${destination}` };
 }
@@ -135,14 +133,12 @@ function entityUpdate(args: Record<string, unknown>) {
     const wantPaused = Boolean(args.paused);
     const isPaused = card.getAttribute("data-habit-paused") === "true";
     if (wantPaused !== isPaused) {
-      click(q('[data-action="menu-toggle"]', card));
       click(q('[data-action="pause-resume"]', card));
     }
     return { ok: true, habitId, paused: wantPaused };
   }
 
   if (args.name !== undefined || args.reminder !== undefined) {
-    click(q('[data-action="menu-toggle"]', card));
     click(q('[data-action="edit"]', card));
     if (args.name !== undefined) {
       const nameInput = q<HTMLInputElement>('[data-field="edit-name"]', card);
@@ -159,15 +155,19 @@ function entityUpdate(args: Record<string, unknown>) {
   return { ok: false, error: "update requires paused, name, and/or reminder" };
 }
 
-function entityDelete(args: Record<string, unknown>) {
+async function entityDelete(args: Record<string, unknown>) {
   if (args.confirm !== true) {
     return { ok: false, error: "delete requires confirm=true" };
   }
   const habitId = String(args.habit_id ?? args.entity_id ?? "");
   const card = habitCard(habitId);
   if (!card) return { ok: false, error: `habit not found: ${habitId}` };
-  click(q('[data-action="menu-toggle"]', card));
   click(q('[data-action="delete"]', card));
+  // The confirmation dialog is portaled by React after the initiating click.
+  await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+  const confirm = q('[data-action="confirm-delete"]');
+  if (!confirm) return { ok: false, error: "delete confirmation did not open" };
+  click(confirm);
   return { ok: true, habitId, deleted: true };
 }
 
@@ -198,8 +198,8 @@ function entityCategoryDelete(args: Record<string, unknown>) {
 
 // ---- form-workflow-v1 (New Habit) ---------------------------------------
 
-function formValidate(args: Record<string, unknown>) {
-  const form = ensureHabitFormOpen();
+async function formValidate(args: Record<string, unknown>) {
+  const form = await ensureHabitFormOpen();
   if (!form) return { ok: false, error: "New Habit form not found" };
   formFillFields(form, (args.fields as Record<string, unknown>) ?? {});
   const nameInput = q<HTMLInputElement>('[data-field="name"]', form);
@@ -237,13 +237,17 @@ function formFillFields(form: HTMLElement, fields: Record<string, unknown>) {
   }
 }
 
-function formSubmit(args: Record<string, unknown>) {
-  const form = ensureHabitFormOpen();
+async function formSubmit(args: Record<string, unknown>) {
+  const form = await ensureHabitFormOpen();
   if (!form) return { ok: false, error: "New Habit form not found" };
   formFillFields(form, (args.fields as Record<string, unknown>) ?? {});
   const submitBtn = q<HTMLElement>('[data-action="submit-habit"]', form);
   if (!submitBtn) return { ok: false, error: "submit control not found" };
   click(submitBtn);
+  for (let attempt = 0; attempt < 25; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    if (!q("[data-habit-form]") || q("[aria-invalid='true']")) break;
+  }
   // The real handler blocks blank-name submits and keeps the form open with
   // an inline error instead of closing it — report that faithfully.
   const stillOpen = !!q("[data-habit-form]");
@@ -318,114 +322,78 @@ function recoveryReset(_args: Record<string, unknown>) {
   return { ok: true, operation: "reset" };
 }
 
-// ---- registry ------------------------------------------------------------
+// ---- exact compiler-shaped registry -------------------------------------
 
 type Handler = (args: Record<string, unknown>) => unknown;
+type Tool = { name: string; description: string; inputSchema: Record<string, unknown>; handler: Handler; allowedFields?: string[] };
+const destinations = ["habits", "stats", "import", "heatmap"];
+const filters = ["category"];
+const entityFields = ["name", "reminder", "paused"];
+const formFields = ["name", "icon", "target-type", "target-count", "category", "reminder"];
+const objectSchema = (properties: Record<string, unknown> = {}, required: string[] = []) => ({ type: "object", additionalProperties: false, properties, ...(required.length ? { required } : {}) });
+const fieldsSchema = { type: "object", additionalProperties: { type: "string", maxLength: 200 } };
+const emptySchema = objectSchema();
 
-const TOOLS: { name: string; description: string; handler: Handler }[] = [
-  {
-    name: "browse-open",
-    description:
-      "Switch the main canvas (args.destination: habits|stats|import|heatmap; heatmap requires args.habit_id) via the same nav tabs / per-habit menu the UI uses.",
-    handler: browseOpen,
-  },
-  {
-    name: "browse-apply_filter",
-    description: "Click the category filter chip for args.category_id (a real category id) to show only that category's habits.",
-    handler: browseApplyFilter,
-  },
-  {
-    name: "browse-clear_filter",
-    description: "Click the \"All\" filter chip to clear the active category filter.",
-    handler: browseClearFilter,
-  },
-  {
-    name: "entity-toggle",
-    description: "Tap a \"Once a day\" habit's one-tap complete control (args.habit_id) to mark/unmark today done.",
-    handler: entityToggle,
-  },
-  {
-    name: "entity-quantity",
-    description: "Tap a numeric-target habit's stepper (args.habit_id, args.delta: positive for +1, negative for -1) the requested number of times.",
-    handler: entityQuantity,
-  },
-  {
-    name: "entity-update",
-    description: "Update a habit (args.habit_id) via its real menu: args.paused toggles Pause/Resume; args.name/args.reminder edits and saves via the real inline editor.",
-    handler: entityUpdate,
-  },
-  {
-    name: "entity-delete",
-    description: "Delete a habit (args.habit_id) via its real menu's Delete action. Requires args.confirm=true.",
-    handler: entityDelete,
-  },
-  {
-    name: "entity-category_create",
-    description: "Create a category (args.name) via the real + Category form.",
-    handler: entityCategoryCreate,
-  },
-  {
-    name: "entity-category_delete",
-    description: "Delete a category (args.category_id) via the real Manage categories panel. Requires args.confirm=true.",
-    handler: entityCategoryDelete,
-  },
-  {
-    name: "form-validate",
-    description: "Open the New Habit form, fill optional args.fields (name, icon, target-type, target-count, category, reminder), and report whether the name field is non-blank.",
-    handler: formValidate,
-  },
-  {
-    name: "form-submit",
-    description: "Open the New Habit form, fill optional args.fields, and submit via the real form element (the same blank-name validation applies).",
-    handler: formSubmit,
-  },
-  {
-    name: "form-cancel",
-    description: "Click Cancel on the open New Habit form.",
-    handler: formCancel,
-  },
-  {
-    name: "artifact-export",
-    description: "Click \"Export as JSON\" on the Data view to trigger the real Blob/anchor download.",
-    handler: artifactExport,
-  },
-  {
-    name: "artifact-import",
-    description: "args.mode: \"malformed-sample\" clicks the real \"Load Malformed Sample\" recovery control and reports the role=alert outcome; \"file\" is refused (real file picker required, driven via Playwright).",
-    handler: artifactImport,
-  },
-  {
-    name: "artifact-import_confirm",
-    description: "Confirm a pending Import & replace dialog. Requires args.confirm=true.",
-    handler: artifactImportConfirm,
-  },
-  {
-    name: "artifact-recovery_retry",
-    description: "Click Retry on the active data-recovery banner.",
-    handler: recoveryRetry,
-  },
-  {
-    name: "artifact-recovery_reset",
-    description: "Click Reset on the active data-recovery banner.",
-    handler: recoveryReset,
-  },
+const TOOLS: Tool[] = [
+  { name: "browse.open", description: "Open a declared destination (route, tab, section, or item).", inputSchema: objectSchema({ destination: { type: "string", enum: destinations, description: "Declared destination" } }, ["destination"]), handler: browseOpen },
+  { name: "browse.search", description: "Search within the browsable surface.", inputSchema: objectSchema({ query: { type: "string", maxLength: 200 } }, ["query"]), handler: () => ({ ok: false, error: "LoopDaily has no visible search control" }) },
+  { name: "browse.apply_filter", description: "Apply a declared filter.", inputSchema: objectSchema({ filter: { type: "string", enum: filters }, value: { type: "string", maxLength: 200 } }, ["filter"]), handler: ({ value }) => browseApplyFilter({ category_id: value || "" }) },
+  { name: "browse.clear_filter", description: "Clear one or all declared filters.", inputSchema: objectSchema({ filter: { type: "string", enum: filters } }), handler: browseClearFilter },
+  { name: "entity.update", description: "Update declared fields on an entity.", inputSchema: objectSchema({ id: { type: "string", maxLength: 128 }, fields: fieldsSchema }, ["id", "fields"]), allowedFields: entityFields, handler: ({ id, fields = {} }) => { const patch = fields as Record<string, unknown>; if (patch.paused !== undefined && patch.paused !== "true" && patch.paused !== "false") return { ok: false, error: "paused must be true or false" }; return entityUpdate({ habit_id: id, ...patch, paused: patch.paused === undefined ? undefined : patch.paused === "true" }); } },
+  { name: "entity.delete", description: "Delete an entity with explicit confirmation.", inputSchema: objectSchema({ id: { type: "string", maxLength: 128 }, confirm: { type: "boolean", const: true } }, ["id", "confirm"]), handler: async ({ id, confirm }) => { const result = await entityDelete({ habit_id: id, confirm }); if (!result.ok) return result; await new Promise((resolve) => setTimeout(resolve, 240)); return habitCard(String(id)) ? { ok: false, error: "Habit remained after confirmation" } : result; } },
+  { name: "entity.toggle", description: "Toggle a boolean field on an entity.", inputSchema: objectSchema({ id: { type: "string", maxLength: 128 }, field: { type: "string", enum: entityFields } }, ["id"]), handler: ({ id }) => entityToggle({ habit_id: id }) },
+  { name: "entity.quantity", description: "Adjust quantity for an entity.", inputSchema: objectSchema({ id: { type: "string", maxLength: 128 }, quantity: { type: "number" } }, ["id", "quantity"]), handler: ({ id, quantity }) => { if (typeof quantity !== "number" || !Number.isFinite(quantity)) return { ok: false, error: "quantity must be a finite number" }; const card = habitCard(String(id)); if (!card) return { ok: false, error: `habit not found: ${id}` }; const current = Number(card.dataset.habitCount || 0); return entityQuantity({ habit_id: id, delta: Math.round(quantity) - current }); } },
+  { name: "form.validate", description: "Run declared form validation.", inputSchema: objectSchema({ fields: fieldsSchema }), allowedFields: formFields, handler: formValidate },
+  { name: "form.submit", description: "Submit the form through the visible handler.", inputSchema: objectSchema({ fields: fieldsSchema }), allowedFields: formFields, handler: formSubmit },
+  { name: "form.cancel", description: "Cancel the active form workflow.", inputSchema: emptySchema, handler: formCancel },
+  { name: "artifact.import", description: "Start a declared import mode (no file bytes in WebMCP).", inputSchema: objectSchema({ mode: { type: "string", enum: ["file", "malformed-sample"] } }, ["mode"]), handler: artifactImport },
+  { name: "artifact.export", description: "Export using a declared format (no blob/base64 in results).", inputSchema: objectSchema({ format: { type: "string", enum: ["json"] } }, ["format"]), handler: artifactExport },
 ];
+
+function validateInput(tool: Tool, input: Record<string, unknown>) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return "arguments must be an object";
+  const properties = (tool.inputSchema.properties || {}) as Record<string, Record<string, unknown>>;
+  const unknown = Object.keys(input).find((key) => !(key in properties)); if (unknown) return `unknown argument: ${unknown}`;
+  const missing = ((tool.inputSchema.required || []) as string[]).find((key) => input[key] === undefined); if (missing) return `missing required argument: ${missing}`;
+  for (const [key, rule] of Object.entries(properties)) {
+    const value = input[key]; if (value === undefined) continue;
+    if (rule.type === "string" && typeof value !== "string") return `${key} must be a string`;
+    if (rule.type === "boolean" && typeof value !== "boolean") return `${key} must be a boolean`;
+    if (rule.type === "number" && typeof value !== "number") return `${key} must be a number`;
+    if (rule.enum && !(rule.enum as unknown[]).includes(value)) return `${key} is outside the declared enum`;
+    if (rule.const !== undefined && value !== rule.const) return `${key} must equal ${rule.const}`;
+    if (rule.type === "object") {
+      if (!value || typeof value !== "object" || Array.isArray(value)) return `${key} must be an object`;
+      const values = value as Record<string, unknown>;
+      const badField = tool.allowedFields && Object.keys(values).find((field) => !tool.allowedFields!.includes(field)); if (badField) return `Unknown field: ${badField}`;
+      const badValue = Object.entries(values).find(([, fieldValue]) => typeof fieldValue !== "string" || fieldValue.length > 200); if (badValue) return `${key}.${badValue[0]} must be a string of at most 200 characters`;
+    }
+  }
+  return "";
+}
 
 export function initWebMcp() {
   const w = window as unknown as Record<string, unknown>;
   w.webmcp_session_info = () => ({
     contract_version: CONTRACT_VERSION,
     modules: ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "artifact-transfer-v1"],
-    tools: TOOLS.map((t) => t.name),
+    tool_names: TOOLS.map((t) => t.name),
+    tool_count: TOOLS.length,
   });
-  w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));
-  w.webmcp_invoke_tool = (name: string, args: Record<string, unknown> = {}) => {
+  w.webmcp_list_tools = () => TOOLS.map(({ name, description, inputSchema }) => ({ name, description, inputSchema }));
+  w.webmcp_invoke_tool = async (name: string | { name?: string; arguments?: Record<string, unknown> }, args: Record<string, unknown> = {}) => {
+    if (name && typeof name === "object") { args = name.arguments || {}; name = name.name || ""; }
     const tool = TOOLS.find((t) => t.name === name);
-    if (!tool) return { ok: false, error: `unknown tool: ${name}` };
+    if (!tool) return { ok: false, error: `unknown_tool: ${name}` };
+    const error = validateInput(tool, args); if (error) return { ok: false, error };
     try {
-      return tool.handler(args || {});
+      return await tool.handler(args || {});
     } catch (err) {
-      return { ok: false, error: String(err) };
+      return { ok: false, error: String((err as Error)?.message || err) };
     }
   };
+  try {
+    const modelContext = (navigator as unknown as { modelContext?: { registerTool: (tool: Record<string, unknown>) => void } }).modelContext;
+    if (modelContext?.registerTool) TOOLS.forEach((tool) => modelContext.registerTool({ name: tool.name, description: tool.description, inputSchema: tool.inputSchema, invoke: (args: Record<string, unknown>) => (w.webmcp_invoke_tool as Function)(tool.name, args || {}) }));
+  } catch { /* Window bridge remains available without native registration. */ }
 }

@@ -1,7 +1,16 @@
+import { useState } from "react";
 import { useAtom } from "jotai";
 import { habitsAtom } from "../store";
-import type { Habit } from "../types";
-import { getMonthDays, parseDateKey, getDayCount, isDayComplete, isFuture, todayKey } from "../utils/helpers";
+import {
+  getMonthDays,
+  parseDateKey,
+  getDayCount,
+  isDayComplete,
+  isFuture,
+  todayKey,
+  formatFullDate,
+  calcStreakAt,
+} from "../utils/helpers";
 
 interface HeatmapViewProps {
   habitId: string;
@@ -11,6 +20,11 @@ interface HeatmapViewProps {
 export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
   const [habits] = useAtom(habitsAtom);
   const habit = habits.find((h) => h.id === habitId);
+  const [tooltip, setTooltip] = useState<{
+    x: number;
+    y: number;
+    text: string;
+  } | null>(null);
 
   if (!habit) return null;
 
@@ -19,7 +33,6 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
   const now = new Date();
   const monthLabel = now.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 
-  // Get day of week of the 1st to determine padding
   const firstDow = parseDateKey(monthDays[0]).getDay();
   const padding: string[] = Array.from({ length: firstDow }, (_, i) => `pad-${i}`);
 
@@ -54,8 +67,23 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
 
   const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  const buildTooltip = (day: string, intensity: string) => {
+    const label = formatFullDate(day);
+    if (intensity === "future") return `${label} — not yet elapsed`;
+    const count = getDayCount(habit, day);
+    const done = isDayComplete(habit, day);
+    const streakAt = calcStreakAt(habit, day);
+    if (done) {
+      return `${label} — complete · streak ${streakAt}d`;
+    }
+    if (habit.targetType === "count" && count > 0) {
+      return `${label} — partial ${count}/${habit.targetCount} · streak ${streakAt}d`;
+    }
+    return `${label} — not done · streak ${streakAt}d`;
+  };
+
   return (
-    <div className="bg-[#FFFFFF] rounded-lg p-4 md:p-6" data-view="heatmap" data-habit-id={habit.id}>
+    <div className="bg-[#FFFFFF] rounded-[8px] p-4 md:p-6" data-view="heatmap" data-habit-id={habit.id}>
       <div className="flex items-center gap-3 mb-4">
         <button
           type="button"
@@ -73,7 +101,6 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
         </h2>
       </div>
 
-      {/* Day labels */}
       <div className="grid grid-cols-7 gap-1 mb-1">
         {dayLabels.map((d) => (
           <div key={d} className="text-center text-[10px] font-medium text-[#64748B] py-1">
@@ -82,8 +109,7 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
         ))}
       </div>
 
-      {/* Calendar grid */}
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-1 relative">
         {padding.map((p) => (
           <div key={p} className="aspect-square" />
         ))}
@@ -91,52 +117,71 @@ export default function HeatmapView({ habitId, onBack }: HeatmapViewProps) {
           const intensity = getCellIntensity(day);
           const isToday = day === today;
           const dateNum = parseDateKey(day).getDate();
+          const tip = buildTooltip(day, intensity);
 
           return (
             <div
               key={day}
-              className={`group relative aspect-square rounded flex items-center justify-center text-xs font-medium transition-colors cursor-default ${intensityClass(
+              role="img"
+              aria-label={tip}
+              title={tip}
+              className={`aspect-square rounded-[8px] flex items-center justify-center text-xs font-medium transition-colors cursor-default ${intensityClass(
                 intensity
-              )} ${
-                ["full", "high"].includes(intensity) ? "text-white" : "text-[#1B2430]"
-              } ${isToday ? "ring-2 ring-[#0F9D74] ring-offset-1" : ""}`}
+              )} ${["full", "high"].includes(intensity) ? "text-white" : "text-[#1B2430]"} ${
+                isToday ? "ring-2 ring-[#0F9D74] ring-offset-1" : ""
+              }`}
+              onMouseEnter={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                setTooltip({
+                  x: rect.left + rect.width / 2,
+                  y: rect.top - 6,
+                  text: tip,
+                });
+              }}
+              onMouseLeave={() => setTooltip(null)}
+              onFocus={(e) => {
+                const rect = e.currentTarget.getBoundingClientRect();
+                setTooltip({
+                  x: rect.left + rect.width / 2,
+                  y: rect.top - 6,
+                  text: tip,
+                });
+              }}
+              onBlur={() => setTooltip(null)}
+              tabIndex={0}
             >
               {dateNum}
-              <div className="pointer-events-none absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-[#1B2430] px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 z-10">
-                {`${day}: ${
-                  intensity === "full"
-                    ? "Complete"
-                    : intensity === "high" || intensity === "low"
-                    ? `Partial (${getDayCount(habit, day)}/${habit.targetCount})`
-                    : intensity === "future"
-                    ? "Future"
-                    : "Not done"
-                }`}
-                {/* Tooltip arrow */}
-                <div className="absolute left-1/2 top-full -mt-px -translate-x-1/2 border-4 border-transparent border-t-[#1B2430]" />
-              </div>
             </div>
           );
         })}
       </div>
 
-      {/* Legend */}
+      {tooltip && (
+        <div
+          className="hm-tooltip"
+          style={{ left: tooltip.x, top: tooltip.y, opacity: 1 }}
+          role="tooltip"
+        >
+          {tooltip.text}
+        </div>
+      )}
+
       <div className="flex items-center gap-3 mt-4 flex-wrap">
         <span className="text-xs text-[#64748B]">Legend:</span>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-[#0F9D74]" />
+          <div className="w-4 h-4 rounded-[8px] bg-[#0F9D74]" />
           <span className="text-xs text-[#64748B]">Complete</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-[#0F9D74]/60" />
+          <div className="w-4 h-4 rounded-[8px] bg-[#0F9D74]/60" />
           <span className="text-xs text-[#64748B]">Partial (≥50%)</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-[#0F9D74]/30" />
+          <div className="w-4 h-4 rounded-[8px] bg-[#0F9D74]/30" />
           <span className="text-xs text-[#64748B]">Partial (&lt;50%)</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-4 h-4 rounded bg-[#F4F7F6] border border-[#E2E8F0]" />
+          <div className="w-4 h-4 rounded-[8px] bg-[#F4F7F6] border border-[#E2E8F0]" />
           <span className="text-xs text-[#64748B]">Not done</span>
         </div>
       </div>

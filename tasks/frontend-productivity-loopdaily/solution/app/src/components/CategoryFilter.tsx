@@ -32,7 +32,11 @@ export default function CategoryFilter() {
     e.preventDefault();
     const trimmed = newName.trim();
     if (!trimmed) {
-      setNameError("Enter a category name to continue.");
+      setNameError("name must be non-empty");
+      return;
+    }
+    if (trimmed.length > 40) {
+      setNameError("name must be 40 characters or fewer");
       return;
     }
     addCategory(trimmed);
@@ -112,8 +116,8 @@ export default function CategoryFilter() {
               data-field="category-name"
             />
             {nameError && (
-              <p className="text-[#EF4444] text-xs mt-1" role="alert">
-                {nameError} Example: Health
+              <p className="text-[#EF4444] text-xs mt-1" role="alert" id={`${inputId}-error`}>
+                {nameError}
               </p>
             )}
           </div>

@@ -1,330 +1,393 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAtom } from "jotai";
-import { updateHabitAtom, toggleCompletionAtom, stepCompletionAtom, deleteHabitAtom } from "../store";
+import { motion, useReducedMotion } from "motion/react";
+import type { DragControls } from "motion/react";
+import confetti from "canvas-confetti";
+import {
+  DotsSixVertical,
+  PencilSimple,
+  ChartBar,
+  Pause as PauseIcon,
+  Play as PlayIcon,
+  Trash,
+  Check,
+  Plus,
+  Minus,
+} from "@phosphor-icons/react";
+import {
+  updateHabitAtom,
+  toggleCompletionAtom,
+  stepCompletionAtom,
+  deleteHabitAtom,
+} from "../store";
 import type { Habit } from "../types";
 import { getDayCount, isDayComplete, calcStreak, todayKey } from "../utils/helpers";
 import WeeklyGrid from "./WeeklyGrid";
-import FlameIcon from "./FlameIcon";
+import FlameIcon, { flameTier } from "./FlameIcon";
 import { toast } from "sonner";
-import confetti from "canvas-confetti";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import Modal from "./ui/modal";
 
 interface HabitCardProps {
   habit: Habit;
-  onDragStart?: (e: React.DragEvent, id: string) => void;
-  onDragOver?: (e: React.DragEvent, id: string) => void;
-  onDragEnd?: () => void;
-  onOpenHeatmap?: (id: string) => void;
+  dragControls: DragControls;
+  onOpenHeatmap: (id: string) => void;
 }
 
-const fireConfetti = (element: HTMLElement | null) => {
+const fireConfetti = (element: HTMLElement | null, tier: "bright" | "gold") => {
   if (!element) return;
   const rect = element.getBoundingClientRect();
   const x = (rect.left + rect.width / 2) / window.innerWidth;
   const y = (rect.top + rect.height / 2) / window.innerHeight;
-
-  const duration = 2000;
-  const end = Date.now() + duration;
-
-  (function frame() {
-    confetti({
-      particleCount: 5,
-      angle: 60,
-      spread: 55,
-      origin: { x, y },
-      colors: ["#FFB020", "#0F9D74", "#FF8C42"],
-      disableForReducedMotion: true,
-    });
-    confetti({
-      particleCount: 5,
-      angle: 120,
-      spread: 55,
-      origin: { x, y },
-      colors: ["#FFB020", "#0F9D74", "#FF8C42"],
-      disableForReducedMotion: true,
-    });
-
-    if (Date.now() < end) {
-      requestAnimationFrame(frame);
-    }
-  })();
+  const gold = tier === "gold";
+  const colors = gold ? ["#FFB020", "#FFD34D", "#FF8C42"] : ["#FFB020", "#0F9D74", "#FFD34D"];
+  // Two-stage burst: an immediate wide spray, then a softer trailing burst —
+  // the extra beat beyond a minimum single pop.
+  confetti({ particleCount: gold ? 90 : 60, spread: gold ? 90 : 70, startVelocity: 38, origin: { x, y }, colors, disableForReducedMotion: true, scalar: gold ? 1.1 : 1 });
+  window.setTimeout(() => {
+    confetti({ particleCount: gold ? 50 : 30, spread: 110, startVelocity: 22, origin: { x, y: y + 0.04 }, colors, disableForReducedMotion: true, ticks: 160 });
+  }, 140);
 };
 
-export default function HabitCard({
-  habit,
-  onDragStart,
-  onDragOver,
-  onDragEnd,
-  onOpenHeatmap,
-}: HabitCardProps) {
+export default function HabitCard({ habit, dragControls, onOpenHeatmap }: HabitCardProps) {
   const [, updateHabit] = useAtom(updateHabitAtom);
   const [, toggleComplete] = useAtom(toggleCompletionAtom);
   const [, stepComplete] = useAtom(stepCompletionAtom);
   const [, deleteHabit] = useAtom(deleteHabitAtom);
+  const prefersReduced = useReducedMotion();
+
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(habit.name);
   const [editReminder, setEditReminder] = useState(habit.reminder);
-  const [cardRef, setCardRef] = useState<HTMLDivElement | null>(null);
+  const [leaving, setLeaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [pulse, setPulse] = useState(false);
+  const cardRef = useRef<HTMLDivElement | null>(null);
 
   const today = todayKey();
   const count = getDayCount(habit, today);
   const done = isDayComplete(habit, today);
   const currentStreak = calcStreak(habit);
 
-  const handleMilestone = (newStreak: number) => {
-    if (newStreak === 7 || newStreak === 30) {
-       fireConfetti(cardRef);
-    }
+  useEffect(() => {
+    setEditName(habit.name);
+    setEditReminder(habit.reminder);
+  }, [habit.name, habit.reminder]);
+
+  const celebrateIfMilestone = (beforeStreak: number, afterStreak: number) => {
+    const crossed = (beforeStreak < 7 && afterStreak >= 7) || (beforeStreak < 30 && afterStreak >= 30);
+    if (!crossed || prefersReduced) return;
+    const tier = afterStreak >= 30 ? "gold" : "bright";
+    fireConfetti(cardRef.current, tier);
+    setPulse(true);
+    window.setTimeout(() => setPulse(false), 720);
   };
 
   const handleToggle = () => {
-    if (habit.targetType === "once") {
-      toggleComplete(habit.id, today);
-      if (!done) {
-        toast.success("✓ Checked in!");
-
-        // Calculate new streak hypothetically
-        const tempHabit = { ...habit, completions: { ...habit.completions, [today]: 1 } };
-        handleMilestone(calcStreak(tempHabit));
-      }
+    if (habit.targetType !== "once") return;
+    const before = currentStreak;
+    toggleComplete(habit.id, today);
+    if (!done) {
+      toast.success("Checked in — nice work!");
+      const temp = { ...habit, completions: { ...habit.completions, [today]: 1 } };
+      celebrateIfMilestone(before, calcStreak(temp));
+    } else {
+      toast.info("Check-in undone");
     }
   };
 
   const handleStep = (delta: number) => {
+    const before = currentStreak;
     stepComplete(habit.id, today, delta);
     const newCount = Math.max(0, Math.min(habit.targetCount, count + delta));
     if (newCount >= habit.targetCount && count < habit.targetCount) {
-      toast.success("🎯 Daily target reached!");
-
-      const tempHabit = { ...habit, completions: { ...habit.completions, [today]: newCount } };
-      handleMilestone(calcStreak(tempHabit));
+      toast.success("Daily target reached!");
+      const temp = { ...habit, completions: { ...habit.completions, [today]: newCount } };
+      celebrateIfMilestone(before, calcStreak(temp));
     }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (editing) return;
+    if (e.key === "c" || e.key === "C") {
+      e.preventDefault();
+      if (habit.targetType === "once") handleToggle();
+      else handleStep(1);
+    }
+  };
+
+  const beginLeave = (after: () => void) => {
+    if (prefersReduced) {
+      after();
+      return;
+    }
+    setLeaving(true);
+    window.setTimeout(after, 200);
   };
 
   const handlePause = () => {
-    updateHabit(habit.id, { paused: !habit.paused });
-    toast.info(habit.paused ? "Habit resumed" : "Habit paused");
+    if (habit.paused) {
+      updateHabit(habit.id, { paused: false });
+      toast.success("Habit resumed");
+    } else {
+      beginLeave(() => {
+        updateHabit(habit.id, { paused: true });
+        toast.info("Habit paused — history kept");
+      });
+    }
   };
 
-  const handleDelete = () => {
-    deleteHabit(habit.id);
-    toast.info("Habit deleted");
+  const confirmDeleteHabit = () => {
+    setConfirmDelete(false);
+    beginLeave(() => {
+      deleteHabit(habit.id);
+      toast.info("Habit deleted");
+    });
   };
 
   const handleSaveEdit = () => {
-    if (editName.trim()) {
-      updateHabit(habit.id, { name: editName.trim(), reminder: editReminder.trim() });
-      toast.success("Habit updated");
-    }
+    const name = editName.trim();
+    if (!name) return;
+    updateHabit(habit.id, { name, reminder: editReminder.trim().slice(0, 40) });
     setEditing(false);
+    toast.success("Habit updated");
   };
 
-  const cardClass = `habit-row bg-[#FFFFFF] rounded-lg transition-all ${
-    habit.paused ? "habit-card-paused" : "shadow-sm hover:shadow-md"
-  }`;
+  const tier = flameTier(currentStreak);
+  const fraction = habit.targetType === "count" ? count / habit.targetCount : done ? 1 : 0;
 
   return (
-    <div
-      ref={setCardRef}
-      className={cardClass}
-      draggable={!editing}
-      onDragStart={(e) => onDragStart?.(e, habit.id)}
-      onDragOver={(e) => onDragOver?.(e, habit.id)}
-      onDragEnd={onDragEnd}
-      data-habit-card
-      data-habit-id={habit.id}
-      data-habit-paused={habit.paused}
-    >
-      <div className="p-3 md:p-4">
-        {/* Top row: drag handle, icon, name, streak, menu */}
-        <div className="flex items-center gap-2">
-          {/* Drag handle */}
-          <div
-            className="cursor-grab text-[#94A3B8] hover:text-[#64748B] p-1 transition-colors duration-150"
-            aria-label="Drag to reorder"
-            title="Drag to reorder"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-              <circle cx="5" cy="3" r="1.5" />
-              <circle cx="11" cy="3" r="1.5" />
-              <circle cx="5" cy="8" r="1.5" />
-              <circle cx="11" cy="8" r="1.5" />
-              <circle cx="5" cy="13" r="1.5" />
-              <circle cx="11" cy="13" r="1.5" />
-            </svg>
-          </div>
+    <>
+      <motion.div
+        ref={cardRef}
+        data-habit-card
+        data-habit-id={habit.id}
+        data-habit-paused={habit.paused}
+        data-habit-count={count}
+        tabIndex={0}
+        role="group"
+        aria-label={`${habit.name}, ${currentStreak} day streak${habit.paused ? ", paused" : ""}. Press C to check in.`}
+        onKeyDown={handleKeyDown}
+        layout
+        initial={{ opacity: 0, scale: 0.96, y: 6 }}
+        animate={leaving ? { opacity: 0, scale: 0.94, x: -12 } : { opacity: 1, scale: 1, y: 0, x: 0 }}
+        transition={{ duration: 0.22, ease: "easeOut" }}
+        className={`habit-row outline-none ${habit.paused ? "habit-card-paused" : ""} ${pulse ? "milestone-pulse" : ""}`}
+      >
+        <div className="p-3 md:p-4">
+          <div className="flex items-center gap-2">
+            {/* Drag handle (pointer-driven via framer DragControls) */}
+            <button
+              type="button"
+              className="drag-handle rounded-[8px] p-1"
+              aria-label={`Drag to reorder ${habit.name}`}
+              title="Drag to reorder"
+              onPointerDown={(e) => dragControls.start(e)}
+              data-action="drag-handle"
+            >
+              <DotsSixVertical size={18} weight="bold" aria-hidden="true" />
+            </button>
 
-          {/* Icon */}
-          <span className="text-xl" aria-hidden="true">{habit.icon}</span>
-
-          {/* Name */}
-          {editing ? (
-            <input
-              type="text"
-              value={editName}
-              onChange={(e) => setEditName(e.target.value)}
-              className="flex-1 px-2 py-1 rounded border border-[#0F9D74] text-sm font-semibold text-[#1B2430] outline-none"
-              autoFocus
-              data-field="edit-name"
-              aria-label="Edit habit name"
-            />
-          ) : (
-            <span className="flex-1 text-sm font-semibold text-[#1B2430] truncate">
-              {habit.name}
-              {habit.paused && (
-                <span className="ml-2 text-xs text-[#64748B] bg-[#E2E8F0] px-1.5 py-0.5 rounded">
-                  Paused
-                </span>
-              )}
+            <span className="text-xl leading-none" aria-hidden="true">
+              {habit.icon}
             </span>
-          )}
 
-          {/* Streak flame */}
-          <FlameIcon habit={habit} />
-
-          {/* Menu button */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button
-                className="p-1 text-[#94A3B8] hover:text-[#1B2430] rounded transition-colors"
-                aria-label="Habit options"
-                data-action="menu-toggle"
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="currentColor" aria-hidden="true">
-                  <circle cx="9" cy="4" r="1.5" />
-                  <circle cx="9" cy="9" r="1.5" />
-                  <circle cx="9" cy="14" r="1.5" />
-                </svg>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[140px]">
-              <DropdownMenuItem onClick={() => setEditing(true)} data-action="edit">
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handlePause} data-action="pause-resume">
-                {habit.paused ? "Resume" : "Pause"}
-              </DropdownMenuItem>
-              {onOpenHeatmap && (
-                <DropdownMenuItem onClick={() => onOpenHeatmap(habit.id)} data-action="view-heatmap">
-                  View Heatmap
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={handleDelete} className="text-[#EF4444] focus:bg-red-50" data-action="delete">
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {/* Reminder note */}
-        {habit.reminder && !editing && (
-          <p className="text-xs text-[#64748B] mt-1 ml-8">
-            <span aria-hidden="true">⏰</span> {habit.reminder}
-          </p>
-        )}
-
-        {/* Edit reminder */}
-        {editing && (
-          <div className="mt-2 ml-8">
-            <input
-              type="text"
-              value={editReminder}
-              onChange={(e) => setEditReminder(e.target.value)}
-              placeholder="Remind me at (e.g. 7:00 AM)"
-              className="w-full px-2 py-1 rounded border border-[#E2E8F0] text-xs text-[#1B2430] outline-none focus:border-[#0F9D74]"
-              data-field="edit-reminder"
-              aria-label="Edit reminder"
-            />
-          </div>
-        )}
-
-        {/* Edit buttons */}
-        {editing && (
-          <div className="flex gap-2 mt-2 ml-8">
-            <button
-              onClick={handleSaveEdit}
-              className="px-3 py-1 bg-[#0F9D74] text-white text-xs font-medium rounded-lg hover:bg-[#0B7D5C] transition-colors"
-              data-action="save-edit"
-            >
-              Save
-            </button>
-            <button
-              onClick={() => { setEditing(false); setEditName(habit.name); setEditReminder(habit.reminder); }}
-              className="px-3 py-1 border border-[#E2E8F0] text-[#64748B] text-xs rounded-lg hover:bg-[#F4F7F6] transition-colors"
-              data-action="cancel-edit"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-
-        {/* Action row */}
-        {!editing && (
-          <div className="flex items-center justify-between mt-3 ml-8 gap-4">
-            {/* Weekly grid */}
-            <WeeklyGrid habit={habit} />
-
-            {/* Complete/Stepper control */}
-            {habit.targetType === "once" ? (
-              <button
-                type="button"
-                onClick={handleToggle}
-                className={`complete-btn flex-shrink-0 px-3 rounded-lg flex items-center justify-center text-sm font-bold transition-all ${
-                  done
-                    ? "bg-[#0F9D74] text-white"
-                    : "border-2 border-[#E2E8F0] text-[#1B2430] hover:border-[#0F9D74] hover:text-[#0F9D74]"
-                }`}
-                aria-pressed={done}
-                data-action="toggle-complete"
-              >
-                {done ? "✓ Done" : "Complete"}
-              </button>
+            {editing ? (
+              <input
+                type="text"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="flex-1 min-w-0 px-2 py-1 rounded-[8px] border border-[#0F9D74] text-sm font-semibold text-[#1B2430] outline-none"
+                autoFocus
+                data-field="edit-name"
+                aria-label="Edit habit name"
+              />
             ) : (
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <button
-                  type="button"
-                  onClick={() => handleStep(-1)}
-                  className="stepper-btn rounded-lg border border-[#E2E8F0] text-[#475569] hover:border-[#EF4444] hover:text-[#EF4444] flex items-center justify-center font-bold transition-colors"
-                  aria-label="Decrease count"
-                  disabled={count <= 0}
-                  data-action="step-dec"
-                >
-                  −
-                </button>
-                <div className="flex flex-col items-center min-w-[52px]">
-                  <span className={`text-sm font-bold transition-colors ${done ? "text-[#0F9D74]" : "text-[#1B2430]"}`}>
-                    {count}/{habit.targetCount}
+              <span className="flex-1 min-w-0 flex items-center gap-2">
+                <span className="truncate text-base font-bold text-[#1B2430]">{habit.name}</span>
+                {habit.paused && (
+                  <span className="shrink-0 rounded-[8px] bg-[#E2E8F0] px-2 py-0.5 text-[11px] font-semibold text-[#64748B]">
+                    Paused
                   </span>
-                  {/* Mini progress bar */}
-                  <div className="w-12 h-1 rounded-full bg-[#E2E8F0] mt-0.5 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ease-out ${
-                        done ? "bg-[#0F9D74]" : "bg-[#0F9D74]/50"
-                      }`}
-                      style={{ width: `${Math.min(100, (count / habit.targetCount) * 100)}%` }}
-                    />
-                  </div>
-                </div>
+                )}
+              </span>
+            )}
+
+            <FlameIcon habit={habit} />
+
+            {!editing && (
+              <div className="flex items-center gap-0.5">
                 <button
                   type="button"
-                  onClick={() => handleStep(1)}
-                  className="stepper-btn rounded-lg bg-[#0F9D74] text-white hover:bg-[#0B7D5C] flex items-center justify-center font-bold transition-colors"
-                  aria-label="Increase count"
-                  disabled={count >= habit.targetCount}
-                  data-action="step-inc"
+                  className="btn-icon"
+                  aria-label={`Edit ${habit.name}`}
+                  title="Edit"
+                  onClick={() => setEditing(true)}
+                  data-action="edit"
                 >
-                  +
+                  <PencilSimple size={18} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className="btn-icon"
+                  aria-label={`View heatmap for ${habit.name}`}
+                  title="Heatmap"
+                  onClick={() => onOpenHeatmap(habit.id)}
+                  data-action="view-heatmap"
+                >
+                  <ChartBar size={18} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  className="btn-icon"
+                  aria-label={habit.paused ? `Resume ${habit.name}` : `Pause ${habit.name}`}
+                  title={habit.paused ? "Resume" : "Pause"}
+                  onClick={handlePause}
+                  data-action="pause-resume"
+                >
+                  {habit.paused ? <PlayIcon size={18} aria-hidden="true" /> : <PauseIcon size={18} aria-hidden="true" />}
+                </button>
+                <button
+                  type="button"
+                  className="btn-icon text-[#EF4444] hover:bg-[#FEF2F2] hover:text-[#EF4444]"
+                  aria-label={`Delete ${habit.name}`}
+                  title="Delete"
+                  onClick={() => setConfirmDelete(true)}
+                  data-action="delete"
+                >
+                  <Trash size={18} aria-hidden="true" />
                 </button>
               </div>
             )}
           </div>
-        )}
-      </div>
-    </div>
+
+          {habit.reminder && !editing && (
+            <p className="mt-1 ml-9 text-xs text-[#64748B]">Remind me at {habit.reminder}</p>
+          )}
+
+          {editing && (
+            <div className="mt-2 ml-9 space-y-2">
+              <input
+                type="text"
+                value={editReminder}
+                onChange={(e) => setEditReminder(e.target.value)}
+                placeholder="Remind me at (e.g. 7:00 AM)"
+                maxLength={40}
+                className="w-full px-2 py-1 rounded-[8px] border border-[#E2E8F0] text-xs text-[#1B2430] outline-none focus:border-[#0F9D74]"
+                data-field="edit-reminder"
+                aria-label="Edit reminder"
+              />
+              <div className="flex gap-2">
+                <button type="button" onClick={handleSaveEdit} className="btn-primary px-3 py-1.5 text-xs font-semibold" data-action="save-edit">
+                  Save changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditing(false);
+                    setEditName(habit.name);
+                    setEditReminder(habit.reminder);
+                  }}
+                  className="btn-secondary px-3 py-1.5 text-xs font-medium"
+                  data-action="cancel-edit"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {!editing && (
+            <div className="mt-3 ml-9 flex flex-wrap items-center justify-between gap-3">
+              <WeeklyGrid habit={habit} />
+
+              {habit.targetType === "once" ? (
+                <button
+                  type="button"
+                  onClick={handleToggle}
+                  aria-pressed={done}
+                  data-action="toggle-complete"
+                  className={`complete-btn inline-flex items-center justify-center gap-1.5 rounded-[8px] px-4 text-sm font-bold ${
+                    done
+                      ? "bg-[#0F9D74] text-white"
+                      : "border-2 border-[#E2E8F0] bg-[#FFFFFF] text-[#1B2430] hover:border-[#0F9D74] hover:text-[#0F9D74]"
+                  }`}
+                >
+                  {done ? <Check size={16} weight="bold" aria-hidden="true" /> : null}
+                  {done ? "Done today" : "Complete"}
+                </button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleStep(-1)}
+                    disabled={count <= 0}
+                    aria-label="Decrease count by one"
+                    data-action="step-dec"
+                    className="stepper-btn inline-flex items-center justify-center rounded-[8px] border border-[#E2E8F0] bg-[#FFFFFF] text-[#1B2430] hover:border-[#EF4444] hover:text-[#EF4444]"
+                  >
+                    <Minus size={16} weight="bold" aria-hidden="true" />
+                  </button>
+                  <div className="flex min-w-[60px] flex-col items-center">
+                    <motion.span
+                      key={count}
+                      initial={{ scale: prefersReduced ? 1 : 1.18 }}
+                      animate={{ scale: 1 }}
+                      transition={{ duration: 0.28, ease: "easeOut" }}
+                      className={`text-sm font-bold tabular-nums ${done ? "text-[#0F9D74]" : "text-[#1B2430]"}`}
+                    >
+                      {count}/{habit.targetCount}
+                    </motion.span>
+                    <div className="mt-1 h-1.5 w-14 overflow-hidden rounded-[8px] bg-[#E2E8F0]">
+                      <motion.div
+                        className={`h-full rounded-[8px] ${done ? "bg-[#0F9D74]" : "bg-[#0F9D74]/60"}`}
+                        initial={false}
+                        animate={{ width: `${Math.min(100, fraction * 100)}%` }}
+                        transition={{ duration: 0.3, ease: "easeOut" }}
+                      />
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleStep(1)}
+                    disabled={count >= habit.targetCount}
+                    aria-label="Increase count by one"
+                    data-action="step-inc"
+                    className="stepper-btn inline-flex items-center justify-center rounded-[8px] bg-[#0F9D74] text-white hover:bg-[#0B7D5C]"
+                  >
+                    <Plus size={16} weight="bold" aria-hidden="true" />
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </motion.div>
+
+      <Modal
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        title={`Delete “${habit.name}”?`}
+        description="This permanently removes the habit and all of its check-in history. This cannot be undone."
+      >
+        <div className="flex justify-end gap-2">
+          <button
+            type="button"
+            className="btn-secondary px-4 py-2 text-sm font-medium"
+            onClick={() => setConfirmDelete(false)}
+            data-action="cancel-delete"
+          >
+            Keep habit
+          </button>
+          <button
+            type="button"
+            className="btn-danger px-4 py-2 text-sm font-semibold"
+            onClick={confirmDeleteHabit}
+            data-action="confirm-delete"
+          >
+            Delete habit
+          </button>
+        </div>
+      </Modal>
+    </>
   );
 }
