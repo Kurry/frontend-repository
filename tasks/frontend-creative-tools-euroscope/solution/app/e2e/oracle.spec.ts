@@ -52,3 +52,23 @@ test("theme, icon count, and wizard step remain coherent through reload", async 
     .toEqual(grey);
   expect(pageErrors).toEqual([]);
 });
+
+// ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test("4.11 reduced_motion_applies_instantly", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto("/");
+  await page.waitForTimeout(500);
+
+  const isReducedMotion = await page.evaluate(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  expect(isReducedMotion).toBe(true);
+
+  await page.getByRole("button", { name: /continue/i }).click();
+
+  const animationDuration = await page.evaluate(() => {
+    const el = document.querySelector('.step-in');
+    return el ? window.getComputedStyle(el).animationDuration : null;
+  });
+
+  expect(animationDuration).toBe("0s");
+});
