@@ -635,3 +635,10 @@ body.image-corners-v2 .scene-image { border-radius: var(--br2); }
   .scene-item, .scene-item.is-entering, .scene-item.is-entered { transition: none !important; transform: none !important; opacity: 1 !important; }
   .scene-item:hover { transform: none !important; }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}

@@ -388,7 +388,7 @@
       const last = store.lastEditedId === s.id ? " is-lastedit" : "";
       const ph = !s.img ? " is-ph" : "";
       const inner = s.img
-        ? '<img src="' + esc(s.img) + '" alt="">'
+        ? '<img src="' + esc(s.img) + '" alt="' + esc(s.alt) + '">'
         : '<span class="icon icon-camera" aria-hidden="true"></span>';
       html += '<button type="button" class="film-thumb' + (isActive ? " is-active" : "") + last + ph + '" data-film="' + s.id + '" role="listitem" aria-label="Go to scene ' + order + ': ' + esc(s.title) + '">' + inner + '<span class="film-num">' + order + '</span></button>';
     });
