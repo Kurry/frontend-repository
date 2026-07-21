@@ -21,6 +21,23 @@ const MOD_KEY = IS_MAC ? '⌘' : 'Ctrl'
 
 function iconOnly(label) { return { hasIconOnly: true, iconDescription: label, 'aria-label': label, title: label, tooltipPosition: 'bottom' } }
 
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text)
+  } catch {
+    const textArea = document.createElement('textarea')
+    textArea.value = text
+    textArea.setAttribute('readonly', '')
+    textArea.style.position = 'fixed'
+    textArea.style.opacity = '0'
+    document.body.appendChild(textArea)
+    textArea.select()
+    const copied = document.execCommand('copy')
+    textArea.remove()
+    if (!copied) throw new Error('Clipboard copy was unavailable')
+  }
+}
+
 // Strip double-brace tokens for display-only surfaces so template syntax never
 // leaks into chrome that is not actively being edited.
 const displayText = (text) => text.replace(/\{\{([A-Za-z0-9_]+)\}\}/g, '$1')
@@ -289,7 +306,7 @@ function RichResponse({ text }) {
   const addToast = useWorkbench((state) => state.addToast)
   const parts = text.split(/```([A-Za-z0-9_+-]*)\n([\s\S]*?)```/g)
   const copyCode = async (code) => {
-    await navigator.clipboard.writeText(code)
+    await copyText(code)
     setCopied(code)
     addToast('Code copied to clipboard')
     window.setTimeout(() => setCopied(''), 1800)
@@ -632,13 +649,13 @@ function ExportModal() {
   const tokens = estimateTokens(pkg.promptText, pkg.model)
   const summaryLine = `prompt-package-v1 · ${modelById(pkg.model).name} · ${tokens} tokens · ${detectVariables(pkg.promptText).length} variables · ${pkg.attachments.length} attachments`
   const copy = async () => {
-    await navigator.clipboard.writeText(preview)
+    await copyText(preview)
     setCopied(true)
     window.setTimeout(() => setCopied(false), 1800)
     addToast(`${format === 'markdown' ? 'Markdown' : 'JSON'} copied to clipboard`)
   }
   const copySummary = async () => {
-    await navigator.clipboard.writeText(summaryLine)
+    await copyText(summaryLine)
     addToast('Package summary copied to clipboard')
   }
   const download = () => {
