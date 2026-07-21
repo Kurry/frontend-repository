@@ -30,17 +30,25 @@
   let virtualItems = $derived.by(() => virtualizer?.getVirtualItems() ?? []);
   let renderedCount = $derived.by(() => virtualItems.length);
 
+  function focusItem(id: string | null) {
+    if (!id || !scrollRef) return;
+    const el = scrollRef.querySelector(`[data-item-id="${id}"]`);
+    if (el instanceof HTMLElement) el.focus();
+  }
+
   function onItemKeydown(e: KeyboardEvent, index: number) {
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       const next = Math.min(index + 1, filteredItems.length - 1);
       selectedId = filteredItems[next]?.id ?? null;
       virtualizer?.scrollToIndex(next, { align: 'auto' });
+      queueMicrotask(() => focusItem(selectedId));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       const prev = Math.max(index - 1, 0);
       selectedId = filteredItems[prev]?.id ?? null;
       virtualizer?.scrollToIndex(prev, { align: 'auto' });
+      queueMicrotask(() => focusItem(selectedId));
     }
   }
 </script>
@@ -70,6 +78,7 @@
             class:bg-indigo-50={selectedId === item.id}
             style="height: {virtualItem.size}px; transform: translateY({virtualItem.start}px);"
             tabindex="0"
+            data-item-id={item.id}
             role="option"
             aria-selected={selectedId === item.id}
             onclick={() => { selectedId = item.id; }}

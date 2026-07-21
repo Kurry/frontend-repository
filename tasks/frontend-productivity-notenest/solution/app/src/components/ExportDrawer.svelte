@@ -50,9 +50,12 @@
     const label = store.exportTab === 'json' ? 'Nest JSON' : 'Markdown vault';
     if (success) {
       copied = true;
+      copyFailed = false;
       liveMessage = `${label} copied to clipboard`;
       setTimeout(() => { copied = false; }, 1600);
     } else {
+      copied = false;
+      copyFailed = true;
       liveMessage = `Failed to copy ${label} to clipboard`;
     }
   }
@@ -141,7 +144,7 @@
           Download
         </button>
         {#if liveMessage}
-          <p class="text-sm text-green-700" role="status" aria-live="polite">{liveMessage}</p>
+          <p class="text-sm {copyFailed ? 'text-red-700' : 'text-green-700'}" role="status" aria-live="polite">{liveMessage}</p>
         {/if}
         <div class="flex-1"></div>
         <button class="px-3 py-2 text-sm font-medium rounded-lg border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition cursor-pointer" onclick={() => { store.exportOpen = false; store.importOpen = true; }}>
