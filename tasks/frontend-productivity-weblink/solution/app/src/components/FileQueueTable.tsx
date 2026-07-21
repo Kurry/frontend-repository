@@ -217,7 +217,7 @@ export default function FileQueueTable() {
                         <circle cx="15" cy="19" r="1"></circle>
                       </svg>
                     </button>
-                    <div class="mt-1 flex flex-col gap-0.5 sm:hidden">
+                    <div class="sr-only flex flex-col gap-0.5">
                       <button type="button" class="touch-target rounded px-1 text-[10px] text-sky-700 disabled:opacity-40" onClick={() => moveUp(f.id)} disabled={idx() === 0}>Move Up</button>
                       <button type="button" class="touch-target rounded px-1 text-[10px] text-sky-700 disabled:opacity-40" onClick={() => moveDown(f.id)} disabled={idx() === state.files.queue.length - 1}>Move Down</button>
                     </div>
