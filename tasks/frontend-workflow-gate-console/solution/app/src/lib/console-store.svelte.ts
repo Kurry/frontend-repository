@@ -471,17 +471,20 @@ export class ConsoleStore {
         })),
         certificate: stage.certificate ? { ...stage.certificate } : null
       })),
-      timeline: payload.timeline.map((entry, index) => ({ ...entry, id: `import-${index}-${Date.now()}` }))
+      timeline: payload.timeline.map((entry, index) => ({
+        ...entry,
+        id: `import-${index}-${entry.timestamp}`
+      }))
     };
     const nextRuns = [...this.runs];
     nextRuns[targetIndex] = nextRun;
-    this.runs = nextRuns;
+    this.runs = [...nextRuns];
     this.selectedRunId = nextRun.id;
     this.selectedStageName = nextRun.stages[0].name;
     this.importDraft = text;
     this.importError = '';
+    this.exportedAt = payload.exportedAt;
     this.resetTransientStageState();
-    this.touchExport();
     this.closeModal();
     this.showToast(`Acceptance package imported for ${nextRun.id}`);
     return { ok: true };
