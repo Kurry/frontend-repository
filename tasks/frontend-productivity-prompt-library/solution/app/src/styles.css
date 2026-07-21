@@ -401,6 +401,12 @@ button:active:not(:disabled),
   animation: row-enter 220ms ease-out both;
 }
 
+.library-table tbody tr.row-deleting {
+  animation: row-collapse 150ms cubic-bezier(0.2, 0, 0.38, 0.9) both;
+  transform-origin: top;
+  pointer-events: none;
+}
+
 .library-table td {
   vertical-align: middle;
 }
@@ -1135,6 +1141,11 @@ button:active:not(:disabled),
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes row-collapse {
+  from { opacity: 1; transform: scaleY(1); }
+  to { opacity: 0; transform: scaleY(0); }
+}
+
 @keyframes modal-enter {
   from { opacity: 0; transform: scale(0.975); }
   to { opacity: 1; transform: scale(1); }
@@ -1342,6 +1353,8 @@ button:active:not(:disabled),
 }
 
 .app-shell--dark {
+  --cds-text-primary: #f4f4f4;
+  --cds-text-secondary: #c6c6c6;
   color: #f4f4f4;
   background: #161616;
 }
@@ -1516,4 +1529,21 @@ button:active:not(:disabled),
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+
+.app-shell--dark .header-actions button {
+  color: #f4f4f4 !important;
+}
+
+.app-shell--dark .header-actions label {
+  color: #f4f4f4 !important;
+}
+
+
+.onboarding-card {
+  color: #161616;
+}
+
+.cds--modal-content {
+  color: #161616;
 }

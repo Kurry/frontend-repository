@@ -30,13 +30,13 @@ export const useStudio = create((set, get) => ({
   toast: null, announcement: '', past: [], future: [], sampleSort: 'desc', copied: false,
 
   setField: (field, value) => set({ [field]: value }),
-  notify: (title, kind = 'success', announcement = title) => {
+  notify: (title, kind = 'success', announcementText = title) => {
     clearTimeout(notifyTimer)
     const id = Date.now()
-    set({ toast: { id, title, kind }, announcement })
+    set({ toast: { id, title, kind }, announcement: announcementText })
     notifyTimer = setTimeout(() => set(state => ({
       toast: state.toast?.id === id ? null : state.toast,
-      announcement: state.announcement === announcement ? '' : state.announcement,
+      announcement: state.announcement === announcementText ? '' : state.announcement,
     })), 3800)
   },
   setSearch: search => set({ search }),

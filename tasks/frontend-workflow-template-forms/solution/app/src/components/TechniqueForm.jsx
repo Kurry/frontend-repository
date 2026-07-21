@@ -4,6 +4,7 @@ import { Controller, useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   Button,
+  InlineLoading,
   Select,
   SelectItem,
   TextArea,
@@ -141,6 +142,7 @@ export default function TechniqueForm({ technique, active }) {
   const setChrome = useStudioStore((state) => state.setChrome)
   const [announcement, setAnnouncement] = useState('')
   const mountedRef = useRef(true)
+  const generationTimerRef = useRef(null)
   const hasAttachments = technique === 'few-shot' || technique === 'role-based'
   const defaults = useMemo(() => ({
     ...clone(draft.fields),
@@ -165,6 +167,7 @@ export default function TechniqueForm({ technique, active }) {
     shouldUnregister: false,
   })
   const [submitAttempted, setSubmitAttempted] = useState(false)
+  const [generating, setGenerating] = useState(false)
   const revealErrors = submitAttempted || isSubmitted
   const showFieldError = (name) => {
     if (revealErrors) return true
@@ -188,6 +191,8 @@ export default function TechniqueForm({ technique, active }) {
   useEffect(() => {
     mountedRef.current = true
     return () => {
+      if (generationTimerRef.current) window.clearTimeout(generationTimerRef.current)
+      generationTimerRef.current = null
       mountedRef.current = false
     }
   }, [])
@@ -204,6 +209,11 @@ export default function TechniqueForm({ technique, active }) {
   useEffect(() => {
     const subscription = watch((nextValues) => {
       if (!mountedRef.current) return
+      if (generationTimerRef.current) {
+        window.clearTimeout(generationTimerRef.current)
+        generationTimerRef.current = null
+        setGenerating(false)
+      }
       const next = clone(nextValues)
       const attachments = hasAttachments ? (next.attachments || []) : []
       delete next.attachments
@@ -219,13 +229,21 @@ export default function TechniqueForm({ technique, active }) {
   }, [getValues, hasAttachments, technique, updateDraft, watch])
 
   function onValid(data) {
-    const clean = clone(data)
-    const attachments = hasAttachments ? (clean.attachments || []) : []
-    delete clean.attachments
-    const promptText = assemblePrompt(technique, clean, attachments)
-    generatePrompt(technique, clean, attachments, promptText)
-    setAnnouncement(`${techniqueById[technique].name} prompt generated.`)
-    requestAnimationFrame(() => document.getElementById('prompt-preview')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }))
+    if (generationTimerRef.current) window.clearTimeout(generationTimerRef.current)
+    const submitted = clone(data)
+    setGenerating(true)
+    generationTimerRef.current = window.setTimeout(() => {
+      generationTimerRef.current = null
+      if (!mountedRef.current) return
+      const clean = clone(submitted)
+      const attachments = hasAttachments ? (clean.attachments || []) : []
+      delete clean.attachments
+      const promptText = assemblePrompt(technique, clean, attachments)
+      generatePrompt(technique, clean, attachments, promptText)
+      setAnnouncement(`${techniqueById[technique].name} prompt generated.`)
+      setGenerating(false)
+      requestAnimationFrame(() => document.getElementById('prompt-preview')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }))
+    }, 300)
   }
 
   function onInvalid() {
@@ -284,6 +302,11 @@ export default function TechniqueForm({ technique, active }) {
         return { ok: true, valid, submitted: valid }
       }
       if (operation === 'reset') {
+        if (generationTimerRef.current) {
+          window.clearTimeout(generationTimerRef.current)
+          generationTimerRef.current = null
+          setGenerating(false)
+        }
         resetTechnique(technique)
         return { ok: true, reset: true }
       }
@@ -311,9 +334,6 @@ export default function TechniqueForm({ technique, active }) {
       className={`technique-form ${active ? 'is-active' : 'is-inactive'}`}
       onSubmit={handleSubmit(onValid, onInvalid)}
       noValidate
-      hidden={!active}
-      aria-hidden={!active}
-      inert={active ? undefined : true}
     >
       <div className="sr-only" aria-live="polite">{announcement}</div>
 
@@ -357,7 +377,7 @@ export default function TechniqueForm({ technique, active }) {
           <Section eyebrow="02 · Demonstrations" title="Build an example set">
             <div className="dynamic-stack" ref={parent}>
               {examples.fields.map((field, index) => (
-                <DynamicRow key={field.id} index={index} title="Example" onRemove={() => examples.remove(index)}>
+                <DynamicRow key={field.id} index={index} title="Example" onRemove={() => { examples.remove(index); trigger('examples') }}>
                   <div className="field-grid">
                     <TextField idPrefix={technique} name={`examples.${index}.input`} label="Example input" required register={register} errors={errors} placeholder="Input or question" showError={showFieldError(`examples.${index}.input`)} />
                     <TextField idPrefix={technique} name={`examples.${index}.output`} label="Expected output" required register={register} errors={errors} placeholder="Ideal response" showError={showFieldError(`examples.${index}.output`)} />
@@ -488,6 +508,11 @@ export default function TechniqueForm({ technique, active }) {
             size="md"
             renderIcon={(props) => <Reset {...props} aria-hidden="true" />}
             onClick={() => {
+              if (generationTimerRef.current) {
+                window.clearTimeout(generationTimerRef.current)
+                generationTimerRef.current = null
+                setGenerating(false)
+              }
               setChrome({ assetPickerOpen: false })
               setSubmitAttempted(false)
               resetTechnique(technique)
@@ -495,22 +520,15 @@ export default function TechniqueForm({ technique, active }) {
           >
             Reset form
           </Button>
-          <span
-            className="submit-proxy"
-            onClick={() => {
-              if (isValid) return
-              setSubmitAttempted(true)
-              trigger()
-              setAnnouncement('Prompt not generated. Resolve the named fields and try again.')
-            }}
-          >
+          <span className="submit-proxy">
             <Button
               type="submit"
               kind="primary"
               size="md"
               renderIcon={(props) => <ArrowRight {...props} aria-hidden="true" />}
+              disabled={generating}
             >
-              Generate prompt
+              {generating ? <InlineLoading description="Generating..." /> : 'Generate prompt'}
             </Button>
           </span>
         </div>

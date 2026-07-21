@@ -140,12 +140,12 @@
     return { errors, value: { title, day: String(raw.day), location, startTime: raw.startTime ? String(raw.startTime) : "", endTime: raw.endTime ? String(raw.endTime) : "", category: String(raw.category), costTier: String(raw.costTier), status: String(raw.status), tags, notes, lat, lng } };
   }
   function validateTripDocument(doc) {
-    if (!doc || typeof doc !== "object") throw new Error("Import must be a JSON object");
-    if (doc.schemaVersion !== "1") throw new Error("schemaVersion must equal 1");
-    if (!doc.trip || typeof doc.trip.title !== "string") throw new Error("trip.title is required");
-    if (doc.trip.dateStart !== "2025-07-05") throw new Error("trip.dateStart must be 2025-07-05");
-    if (doc.trip.dateEnd !== "2025-07-11") throw new Error("trip.dateEnd must be 2025-07-11");
-    if (!Array.isArray(doc.stops)) throw new Error("stops must be an array");
+    if (!doc || typeof doc !== "object") throw new Error("Import must be a valid JSON object");
+    if (doc.schemaVersion !== "1") throw new Error("Import schemaVersion must equal 1");
+    if (!doc.trip || typeof doc.trip.title !== "string") throw new Error("Import trip.title is required");
+    if (doc.trip.dateStart !== "2025-07-05") throw new Error("Import trip.dateStart must be 2025-07-05");
+    if (doc.trip.dateEnd !== "2025-07-11") throw new Error("Import trip.dateEnd must be 2025-07-11");
+    if (!Array.isArray(doc.stops)) throw new Error("Import stops must be an array");
     const values = doc.stops.map((raw, index) => { const result = validateStop(raw); const field = Object.keys(result.errors)[0]; if (field) throw new Error(`Stop ${index + 1}: ${result.errors[field]}`); return { id: uid(), ...result.value }; });
     return { title: doc.trip.title, stops: values };
   }
@@ -177,7 +177,7 @@
     els.planList.innerHTML = daySet.map((day) => {
       const items = sorted(scheduled.filter((item) => item.day === day.date)); let content = "";
       items.forEach((item, index) => { content += rowTemplate(item, items); if (items[index + 1]) content += travelTemplate(item, items[index + 1], index); });
-      if (!items.length) content = `<div class="empty-state"><h3>No stops for ${day.short}</h3><p>Try clearing filters or move an idea into this day.</p></div>`;
+      if (!items.length) content = `<div class="empty-state"><h3>No stops for ${day.short}</h3><p>Add a stop, try clearing filters, or move an idea into this day.</p></div>`;
       return `<section class="day-section" data-day="${day.date}" style="--day:${day.color}"><header class="day-head"><button class="collapse-day" aria-expanded="${!state.collapsed.has(day.date)}" aria-label="${state.collapsed.has(day.date) ? "Expand" : "Collapse"} ${day.label}">⌄</button><span class="day-dot"></span><div><h2>${day.label}</h2><p>${day.place} · ${items.length} ${items.length === 1 ? "stop" : "stops"}</p></div><button class="focus-day">Focus map</button></header><div class="day-body ${state.collapsed.has(day.date) ? "collapsed" : ""}"><div class="day-body-inner">${content}</div></div></section>`;
     }).join("");
     state.lastAddedId = null;
@@ -195,7 +195,7 @@
   function renderBulk() { const n = state.selectedBulk.size; els.bulkBar.classList.toggle("hidden", n === 0); els.bulkCount.textContent = n; if (state.bulkConfirm) cancelBulkConfirm(); }
   function cancelBulkConfirm() { if (!els.bulkDelete) return; state.bulkConfirm = false; els.bulkDelete.classList.remove("confirming"); els.bulkDelete.textContent = "Delete selected"; }
   function renderKanban() {
-    els.kanban.innerHTML = STATUSES.map((status) => { const items = visibleStops().filter((item) => item.status === status); return `<section class="kanban-col" data-status="${status}"><h2>${fmtStatus(status)} <span>${items.length}</span></h2>${items.map((item) => `<article class="kanban-card" draggable="${roleCan()}" data-id="${item.id}" style="--day:${dayOf(item.day)?.color || "#687985"}" tabindex="0"><strong>${esc(item.title)}</strong><small>${esc(dayOf(item.day)?.short || "Idea")} · ${esc(item.category)}</small></article>`).join("") || `<div class="empty-state">Drop stops here</div>`}</section>`; }).join("");
+    els.kanban.innerHTML = STATUSES.map((status) => { const items = visibleStops().filter((item) => item.status === status); return `<section class="kanban-col" data-status="${status}"><h2>${fmtStatus(status)} <span>${items.length}</span></h2>${items.map((item) => `<article class="kanban-card" draggable="${roleCan()}" data-id="${item.id}" style="--day:${dayOf(item.day)?.color || "#687985"}" tabindex="0"><strong>${esc(item.title)}</strong><small>${esc(dayOf(item.day)?.short || "Idea")} · ${esc(item.category)}</small></article>`).join("") || `<div class="empty-state">Drop stops here or add a stop</div>`}</section>`; }).join("");
   }
   function mapPoint(item) { const x = 8 + ((item.lng - 6.58) / 1.02) * 82; const y = 81 - ((item.lat - 43.24) / .57) * 68; return { x: Math.max(6, Math.min(94, x)), y: Math.max(12, Math.min(88, y)) }; }
   function renderMap() {
@@ -391,7 +391,7 @@
   function openExport(format = "markdown") { state.exportFormat = format; renderExport(); if (!els.exportDialog.open) { state.exportTrigger = document.activeElement instanceof HTMLElement ? document.activeElement : els.openExport; els.exportDialog.showModal(); } if (!state.firstExportTip) { state.firstExportTip = true; setTimeout(() => showToast("Tip: Copy trip JSON now to round-trip it later via Import."), 2700); } return { ok: true, format, scheduled_events: state.stops.filter((item) => item.day !== "unscheduled").length, stops: state.stops.length }; }
   function downloadExport() { const text = exportText(); const ext = state.exportFormat === "trip-json" ? "json" : state.exportFormat === "ics" ? "ics" : "md"; const blob = new Blob([text], { type: state.exportFormat === "trip-json" ? "application/json" : "text/plain" }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = `french-riviera-trip.${ext}`; link.click(); setTimeout(() => URL.revokeObjectURL(link.href), 1000); showToast(`Downloaded ${ext.toUpperCase()} from the live plan`); }
   async function copyExport() { try { await navigator.clipboard.writeText(exportText()); showToast(`Copied exact ${state.exportFormat === "trip-json" ? "trip JSON" : state.exportFormat} preview`); } catch { showToast("Clipboard permission was unavailable — preview remains selected"); els.exportPreview.focus(); } }
-  function importDocumentText(text) { let parsed; try { parsed = JSON.parse(text); } catch (error) { return { ok: false, error: `Malformed JSON: ${error.message}` }; } try { const valid = validateTripDocument(parsed); checkpoint(); state.stops = valid.stops; seedDayOrders(); els.tripTitle.textContent = valid.title; state.selectedId = state.stops[0]?.id || null; state.selectedDay = "all"; structuralChange("You", `imported ${state.stops.length} stops from trip JSON`); return { ok: true, stops: state.stops.length }; } catch (error) { return { ok: false, error: error.message }; } }
+  function importDocumentText(text) { let parsed; try { parsed = JSON.parse(text); } catch (error) { return { ok: false, error: `Import must be valid JSON: ${error.message}` }; } try { const valid = validateTripDocument(parsed); checkpoint(); state.stops = valid.stops; seedDayOrders(); els.tripTitle.textContent = valid.title; state.selectedId = state.stops[0]?.id || null; state.selectedDay = "all"; structuralChange("You", `imported ${state.stops.length} stops from trip JSON`); return { ok: true, stops: state.stops.length }; } catch (error) { return { ok: false, error: error.message }; } }
 
   function openStopDialog(item = null) {
     if (!guard()) return; state.editingId = item?.id || null; els.stopDialogTitle.textContent = item ? "Edit stop" : "Add stop"; const form = els.stopForm; form.reset();

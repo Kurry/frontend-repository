@@ -50,6 +50,7 @@ import {
   combineFormSchema,
   extendFormSchema,
   importFormSchema,
+  promptEditSchema,
   promptRequestSchema,
   requestFromPrompt,
   TECHNIQUE_COLORS,
@@ -115,6 +116,10 @@ function useModalFocusTrap(active) {
 
 function closeModalWithFocus() {
   useLibraryStore.getState().closeModal();
+  restoreModalFocus();
+}
+
+function restoreModalFocus() {
   window.requestAnimationFrame(() => modalTriggerRef.current?.focus?.());
 }
 
@@ -170,9 +175,10 @@ function TechniqueTag({ technique }) {
 }
 
 function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm' }) {
+  const [copiedKey, setCopiedKey] = useState(null);
   const copyFeedback = useLibraryStore((state) => state.copyFeedback);
   const showCopyFeedback = useLibraryStore((state) => state.showCopyFeedback);
-  const copied = copyFeedback?.key === feedbackKey;
+  const copied = copyFeedback?.key === feedbackKey || copiedKey === feedbackKey;
 
   const [isExporting, setIsExporting] = useState(false);
   const copy = async () => {
@@ -181,6 +187,8 @@ function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm'
     try {
       await writeClipboard(text);
       showCopyFeedback(feedbackKey, 'Copied exact prompt body to clipboard');
+      setCopiedKey(feedbackKey);
+      setTimeout(() => setCopiedKey(null), 1800);
     } finally {
       setIsExporting(false);
     }
@@ -197,6 +205,7 @@ function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm'
         disabled={isExporting}
         aria-label={isExporting ? 'Copying prompt body' : (copied ? 'Copied' : label)}
         data-clipboard-body={copied ? text : undefined}
+        className={copied ? 'copy-animated' : ''}
       >
         {isExporting ? 'Copying…' : (copied ? 'Copied' : 'Copy')}
       </Button>
@@ -543,7 +552,7 @@ function LibraryTable({ prompts }) {
                   <TableRow
                     key={key}
                     {...rest}
-                    className={`${selected ? 'row-selected' : ''} ${newPromptId === prompt.id ? 'row-created' : ''}`}
+                    className={`${selected ? 'row-selected' : ''} ${newPromptId === prompt.id ? 'row-created' : ''}`} data-id={prompt.id}
                   >
                     <TableCell className="select-column">
                       <Checkbox
@@ -608,7 +617,7 @@ function PromptFormModal({ modal }) {
     watch,
     trigger,
     formState: { errors },
-  } = useForm({ resolver: zodResolver(promptRequestSchema), mode: 'all', defaultValues: initial });
+  } = useForm({ resolver: zodResolver(existing ? promptEditSchema(existing.title) : promptRequestSchema), mode: 'all', defaultValues: initial });
   const values = watch();
 
   useEffect(() => { trigger(); }, [trigger]);
@@ -660,6 +669,7 @@ function PromptFormModal({ modal }) {
           id="prompt-title"
           labelText="Title"
           placeholder="Name this prompt"
+          maxLength={existing?.title.length > 60 ? existing.title.length : 60}
           invalid={!!errors.title}
           invalidText={getFieldError(errors, 'title', 'Title is required.')}
           {...register('title')}
@@ -712,6 +722,11 @@ function DeleteModal({ promptId }) {
   const prompt = useLibraryStore((state) => state.prompts.find((item) => item.id === promptId));
   const closeModal = closeModalWithFocus;
   const deletePrompt = useLibraryStore((state) => state.deletePrompt);
+  const deleteTimer = useRef(null);
+  useEffect(() => () => {
+    if (deleteTimer.current !== null) window.clearTimeout(deleteTimer.current);
+    document.querySelector(`tr[data-id="${promptId}"]`)?.classList.remove('row-deleting');
+  }, [promptId]);
   if (!prompt) return null;
   return (
     <Modal
@@ -726,7 +741,16 @@ function DeleteModal({ promptId }) {
       launcherButtonRef={modalTriggerRef}
       onRequestClose={closeModal}
       onSecondarySubmit={closeModal}
-      onRequestSubmit={() => { deletePrompt(prompt.id); closeModalWithFocus(); }}
+      onRequestSubmit={() => {
+        if (deleteTimer.current !== null) return;
+        const row = document.querySelector(`tr[data-id="${prompt.id}"]`);
+        if (row) row.classList.add("row-deleting");
+        deleteTimer.current = window.setTimeout(() => {
+          deleteTimer.current = null;
+          deletePrompt(prompt.id);
+          closeModalWithFocus();
+        }, 150);
+      }}
     >
       <p className="delete-copy">You’re about to remove <strong>“{prompt.title}”</strong> and its version history from this session.</p>
     </Modal>
@@ -1532,7 +1556,7 @@ function OnboardingTour() {
   if (complete || step >= ONBOARDING_STEPS.length) return null;
   const current = ONBOARDING_STEPS[step];
   return (
-    <div className="onboarding-layer" role="dialog" aria-modal="true" aria-labelledby="onboarding-title">
+    <div className="onboarding-layer" role="dialog" aria-modal="true" aria-labelledby="onboarding-title" onClick={(e) => { if (e.target === e.currentTarget) completeOnboarding(); }}>
       <button type="button" className="onboarding-backdrop" aria-label="Skip onboarding" onClick={completeOnboarding} />
       <div className="onboarding-card">
         <h2 id="onboarding-title">{current.title}</h2>
@@ -1569,6 +1593,21 @@ function App() {
 
   useEffect(() => registerWebMCPTools(), []);
   useModalFocusTrap(Boolean(activeModal) || Boolean(detailPromptId) || Boolean(historyPromptId));
+  useEffect(() => {
+    const onClick = (e) => {
+      if (e.target.classList.contains('cds--modal') && e.target.classList.contains('is-visible')) {
+        const state = useLibraryStore.getState();
+        if (state.activeModal) {
+          closeModalWithFocus();
+        } else if (state.detailPromptId) {
+          state.closeDetail();
+          restoreModalFocus();
+        }
+      }
+    };
+    window.addEventListener('mousedown', onClick);
+    return () => window.removeEventListener('mousedown', onClick);
+  }, []);
   useEffect(() => {
     const onScroll = () => {
       document.documentElement.style.setProperty('--scroll-parallax', `${window.scrollY}px`);

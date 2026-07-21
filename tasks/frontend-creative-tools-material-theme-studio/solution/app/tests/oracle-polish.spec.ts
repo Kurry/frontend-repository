@@ -136,3 +136,31 @@ test('component gallery exposes roughly two dozen demos and search filters secti
   await expect(page.locator('#comp-cards')).toBeHidden();
   expect(await page.locator('[data-component-demo]').evaluateAll(elements => elements.filter(element => (element as HTMLElement).offsetParent !== null).length)).toBe(5);
 });
+
+test('invalid numeric drafts do not mutate the live theme', async ({ page }) => {
+  await page.getByRole('tab', { name: 'Typography' }).click();
+  const fontSize = page.getByLabel('Base Font Size (8–24px)');
+  const borderRadius = page.getByLabel('Border Radius (0–24px)');
+  const initialFontSize = Number(await fontSize.inputValue());
+  const initialBorderRadius = Number(await borderRadius.inputValue());
+
+  await fontSize.fill('1');
+  await expect(page.locator('#font-size-error')).toHaveText('typography.fontSize must be an integer from 8 through 24');
+  await borderRadius.fill('25');
+  await expect(page.locator('#border-radius-error')).toHaveText('shape.borderRadius must be a number from 0 through 24');
+
+  await page.getByRole('tab', { name: 'Export' }).click();
+  const payload = JSON.parse(await page.locator('[data-export-preview]').innerText());
+  expect(payload.typography.fontSize).toBe(initialFontSize);
+  expect(payload.shape.borderRadius).toBe(initialBorderRadius);
+});
+
+test('reduced motion preserves overlay hidden opacity while closing', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.getByRole('button', { name: 'Tutorial' }).click();
+  const dialog = page.locator('[role="dialog"][aria-labelledby="tutorial-title"]');
+  await expect(dialog).toBeVisible();
+
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCSS('opacity', '0', { timeout: 200 });
+});
