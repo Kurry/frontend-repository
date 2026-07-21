@@ -81,6 +81,28 @@ def test_autonomous_analysis_uses_final_same_page_sample_as_before() -> None:
     assert payload["causal"] == ["$.body.dialog"]
 
 
+def test_runtime_rejects_both_standard_false_success_shapes() -> None:
+    runtime = (
+        Path(__file__).parents[1]
+        / "src/corpuscheck/assets/oracle_ci_semantics.mjs"
+    )
+    script = f"""
+      import {{ isErrorResult }} from {json.dumps(runtime.as_uri())};
+      console.log(JSON.stringify([
+        isErrorResult({{ ok: false }}),
+        isErrorResult({{ success: false }}),
+        isErrorResult({{ success: true }}),
+      ]));
+    """
+    result = subprocess.run(
+        ["node", "--input-type=module", "--eval", script],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    assert json.loads(result.stdout) == [True, True, False]
+
+
 def test_changed_oracle_slugs_filters_and_deduplicates_solution_paths(
     tmp_path: Path,
 ) -> None:

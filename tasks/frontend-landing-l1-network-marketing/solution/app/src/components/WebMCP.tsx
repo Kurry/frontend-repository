@@ -16,6 +16,46 @@ const MODULES = ['browse-query-v1', 'form-workflow-v1', 'entity-collection-v1', 
 const DESTINATIONS = ['marketing-home', 'events-manager', 'global-events', 'export-catalog', 'session-leads'] as const;
 const ENTITY_FIELDS = ['title', 'date', 'city', 'category', 'status', 'featured'] as const;
 const previousNonFeaturedStatuses = new Map<string, Exclude<EventStatus, 'featured'>>();
+const objectSchema = (properties: Record<string, unknown> = {}, required: string[] = []) => ({
+  type: 'object', properties, required, additionalProperties: false,
+});
+const stringFieldsSchema = (properties: Record<string, unknown>) => objectSchema(properties);
+const eventFieldsSchema = stringFieldsSchema({
+  title: { type: 'string', minLength: 2, maxLength: 200 },
+  date: { type: 'string', format: 'date' },
+  city: { type: 'string', minLength: 2, maxLength: 200 },
+  category: { type: 'string', enum: EVENT_CATEGORIES },
+  status: { type: 'string', enum: EVENT_STATUSES },
+  featured: { type: 'string', enum: ['true', 'false'] },
+});
+const contactFieldsSchema = stringFieldsSchema({
+  name: { type: 'string', minLength: 2, maxLength: 200 },
+  email: { type: 'string', format: 'email', maxLength: 200 },
+  company: { type: 'string', maxLength: 200 },
+  interest: { type: 'string', enum: ['Build', 'Solutions', 'Community', 'Enterprise'] },
+  privacy_consent: { type: 'string', enum: ['true', 'false'] },
+  message: { type: 'string', minLength: 10, maxLength: 200 },
+});
+const TOOL_INPUT_SCHEMAS: Record<string, Record<string, unknown>> = {
+  'browse.open': objectSchema({ destination: { type: 'string', enum: DESTINATIONS } }, ['destination']),
+  'browse.search': objectSchema({ query: { type: 'string', minLength: 1, maxLength: 200 } }, ['query']),
+  'browse.apply_filter': objectSchema({ filter: { type: 'string', enum: ['status', 'category'] }, value: { type: 'string', maxLength: 128 } }, ['filter', 'value']),
+  'browse.clear_filter': objectSchema({ filter: { type: 'string', enum: ['status', 'category'] } }),
+  'browse.sort': objectSchema({ sort: { type: 'string', enum: ['date', 'title'] } }, ['sort']),
+  'browse.set_theme': objectSchema({ theme: { type: 'string', enum: ['light', 'dark'] } }, ['theme']),
+  'entity.create': objectSchema({ fields: eventFieldsSchema }, ['fields']),
+  'entity.select': objectSchema({ id: { type: 'string', minLength: 1, maxLength: 128 } }, ['id']),
+  'entity.update': objectSchema({ id: { type: 'string', minLength: 1, maxLength: 128 }, fields: eventFieldsSchema }, ['id', 'fields']),
+  'entity.delete': objectSchema({ id: { type: 'string', minLength: 1, maxLength: 128 }, confirm: { type: 'boolean', const: true } }, ['id', 'confirm']),
+  'entity.toggle': objectSchema({ id: { type: 'string', minLength: 1, maxLength: 128 }, field: { type: 'string', enum: ['featured'] } }, ['id']),
+  'form.validate': { ...objectSchema({ fields: contactFieldsSchema }, ['fields']), default: { fields: { name: 'New lead', email: 'lead@example.com', interest: 'Build', privacy_consent: 'true' } } },
+  'form.submit': objectSchema({ fields: contactFieldsSchema }, ['fields']),
+  'form.cancel': objectSchema(),
+  'form.reset': objectSchema(),
+  'artifact.export': objectSchema({ format: { type: 'string', enum: ['json', 'ics', 'leads-json'] } }, ['format']),
+  'artifact.import': objectSchema({ mode: { type: 'string', enum: ['declared-catalog'] } }, ['mode']),
+  'artifact.copy': objectSchema(),
+};
 
 function stringArg(value: unknown, label: string, max = 200): string {
   if (typeof value !== 'string' || value.length === 0 || value.length > max) {
@@ -95,7 +135,13 @@ export default function WebMCP() {
 
     const tools: Tool[] = [
       { name: 'browse.open', module: 'browse-query-v1', description: 'Open a declared marketing destination.', handler: browseOpen },
-      { name: 'browse.search', module: 'browse-query-v1', description: 'No visible free-text search surface is present.', handler: args => ({ success: false, query: stringArg(args.query, 'query'), error: 'This application has no visible search surface' }) },
+      { name: 'browse.search', module: 'browse-query-v1', description: 'Search live events by public text fields without changing visible state.', handler: args => {
+        const query = stringArg(args.query, 'query').trim().toLowerCase();
+        const events = $events.get()
+          .filter(event => [event.id, event.title, event.city, event.category, event.status].some(value => value.toLowerCase().includes(query)))
+          .map(({ id, title, date, city, category, status, featured }) => ({ id, title, date, city, category, status, featured }));
+        return { success: true, query, count: events.length, events };
+      } },
       { name: 'browse.apply_filter', module: 'browse-query-v1', description: 'Apply a declared event filter.', handler: args => {
         const filter = stringArg(args.filter, 'filter', 64);
         if (args.value !== undefined && typeof args.value !== 'string') throw new Error('value must be a string');
@@ -220,11 +266,11 @@ export default function WebMCP() {
 
     const w = window as any;
     w.webmcp_session_info = () => ({ contract_version: CONTRACT_VERSION, modules: MODULES, tools: tools.map(tool => tool.name) });
-    w.webmcp_list_tools = () => tools.map(({ name, module, description }) => ({ name, module, description }));
+    w.webmcp_list_tools = () => tools.map(({ name, module, description }) => ({ name, module, description, inputSchema: TOOL_INPUT_SCHEMAS[name] }));
     w.webmcp_invoke_tool = (name: string, args: Record<string, unknown> = {}) => invoke(name, args);
 
     try {
-      for (const tool of tools) w.navigator?.modelContext?.registerTool?.({ name: tool.name, description: tool.description, invoke: (args: Record<string, unknown>) => invoke(tool.name, args) });
+      for (const tool of tools) w.navigator?.modelContext?.registerTool?.({ name: tool.name, description: tool.description, inputSchema: TOOL_INPUT_SCHEMAS[tool.name], invoke: (args: Record<string, unknown>) => invoke(tool.name, args) });
     } catch { /* optional browser API */ }
 
     return () => {

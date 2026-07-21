@@ -1677,9 +1677,17 @@ const TOOLS = [
   },
   {
     name: 'browse_search', operation: 'search',
-    description: 'No-op search: this dashboard has no free-text search surface; returns an honest empty result.',
+    description: 'Query the active site breakdowns without changing visible filters or navigation.',
     parameters: { query: { type: 'string' } },
-    handler: () => ({ ok: true, results: [], note: 'No search surface on this dashboard.' }),
+    handler: (a) => {
+      const query = String(a && a.query || '').trim().toLowerCase();
+      if (!query) return { ok: false, error: 'query is required' };
+      const site = SITES[state.site];
+      const results = DIMENSIONS.flatMap((dimension) => site[dimension === 'country' ? 'countries' : `${dimension}s`]
+        .filter((entry) => entry.name.toLowerCase().includes(query))
+        .map((entry) => ({ dimension, name: entry.name, visitors: entry.visitors })));
+      return { ok: true, query, count: results.length, results };
+    },
   },
   {
     name: 'browse_apply_filter', operation: 'apply_filter',
@@ -1815,7 +1823,24 @@ window.webmcp_session_info = () => ({
   modules: ['browse-query-v1', 'form-workflow-v1', 'artifact-transfer-v1'],
   state: { site: state.site, period: state.period, sort: state.sort, theme: state.theme, filters: state.filters, compare: state.compare, ceiling: state.ceiling, floor: state.floor },
 });
-window.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, operation: t.operation, description: t.description, parameters: t.parameters }));
+const REQUIRED_TOOL_ARGUMENTS = {
+  browse_open: ['destination'],
+  browse_search: ['query'],
+  browse_apply_filter: ['filter', 'value'],
+  browse_sort: ['sort'],
+  browse_set_theme: ['theme'],
+  form_validate: ['fields'],
+  form_submit: ['form', 'fields'],
+  artifact_export: ['format'],
+  artifact_import: ['mode'],
+  artifact_copy: ['format'],
+};
+window.webmcp_list_tools = () => TOOLS.map((t) => ({
+  name: t.name,
+  operation: t.operation,
+  description: t.description,
+  inputSchema: { type: 'object', properties: t.parameters, required: REQUIRED_TOOL_ARGUMENTS[t.name] || [], additionalProperties: false },
+}));
 window.webmcp_invoke_tool = (name, args) => {
   const tool = TOOLS.find((t) => t.name === name);
   if (!tool) return { ok: false, error: `Unknown tool: ${name}` };

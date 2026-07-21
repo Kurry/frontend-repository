@@ -17,7 +17,8 @@ declare global {
   }
 }
 
-const result = (message: string, data?: Record<string, unknown>) => ({ content: [{ type: 'text', text: message }], ...(data ?? {}) });
+const result = (message: string, data?: Record<string, unknown>) => ({ ok: true, content: [{ type: 'text', text: message }], ...(data ?? {}) });
+const failure = (message: string) => ({ ok: false, error: message, content: [{ type: 'text', text: message }] });
 const toolRegistry: ToolDefinition[] = [];
 
 function register(definition: ToolDefinition) {
@@ -91,13 +92,13 @@ export function registerWebMCP() {
   register({
     name: 'browse_open',
     description: 'Open a bounded benchmark review destination.',
-    inputSchema: { type: 'object', properties: { destination: { type: 'string', enum: destinations }, slug: { type: 'string' }, gate: { type: 'string', enum: GATE_NAMES } }, required: ['destination'], additionalProperties: false },
+    inputSchema: { type: 'object', properties: { destination: { type: 'string', enum: destinations }, slug: { type: 'string' }, gate: { type: 'string', enum: GATE_NAMES } }, required: ['destination'], additionalProperties: false, default: { destination: 'bundle-workspace', slug: 'ember-relay-router' } },
     execute: ({ destination, slug, gate }) => {
       const store = useReviewStore.getState();
       if (destination === 'portfolio') store.openPortfolio();
       else {
         const selectedSlug = typeof slug === 'string' ? slug : store.selection.bundleSlug;
-        if (!selectedSlug || !store.bundles.some((bundle) => bundle.slug === selectedSlug)) return result('A seeded bundle slug is required.');
+        if (!selectedSlug || !store.bundles.some((bundle) => bundle.slug === selectedSlug)) return failure('A seeded bundle slug is required.');
         const panels: Record<string, WorkspacePanel> = { 'bundle-workspace': 'Resolve', 'gate-board': 'Gate', 'trial-inspector': 'Audit', 'fix-list': 'Resolve', 'verdict-panel': 'Verdict', 'bundle-summary': 'Bundle', timeline: 'Timeline' };
         store.openBundle(selectedSlug, panels[String(destination)]);
         if (gate && GATE_NAMES.includes(gate as GateName)) store.selectGate(gate as GateName, destination === 'trial-inspector');
@@ -148,6 +149,7 @@ export function registerWebMCP() {
       notes: { type: 'string', maxLength: 4000 },
     },
     additionalProperties: true,
+    default: { action: 'resolve-fix-item', slug: 'ember-relay-router' },
   };
 
   const runFormAction = (raw: Record<string, unknown>, mutate: boolean) => {
@@ -155,7 +157,7 @@ export function registerWebMCP() {
     const store = useReviewStore.getState();
     const slug = String(input.slug ?? store.selection.bundleSlug ?? '');
     const bundle = store.bundles.find((item) => item.slug === slug);
-    if (!bundle) return result('slug must name a seeded bundle.');
+    if (!bundle) return failure('slug must name a seeded bundle.');
     const action = String(input.action ?? '');
     if (action.includes('fix-item')) {
       let fix = bundle.fixItems.find((item) => item.id === input.fixItemId || item.title === input.title);
@@ -166,42 +168,42 @@ export function registerWebMCP() {
           ? bundle.fixItems.find((item) => item.resolved) ?? bundle.fixItems[0]
           : bundle.fixItems.find((item) => !item.resolved) ?? bundle.fixItems[0];
       }
-      if (!fix) return result('fix item not found on the bundle.');
+      if (!fix) return failure('fix item not found on the bundle.');
       if (mutate) store.toggleFix(slug, fix.id, action === 'resolve-fix-item');
     } else if (action === 'select-recommendation') {
-      if (!RECOMMENDATIONS.includes(input.recommendation as Recommendation)) return result('recommendation is required.');
+      if (!RECOMMENDATIONS.includes(input.recommendation as Recommendation)) return failure('recommendation is required.');
       const recommendation = input.recommendation as Recommendation;
       const live = useReviewStore.getState().bundles.find((item) => item.slug === slug)!;
       const outside = !deriveConstraint(live).allowed.includes(recommendation);
       const overrideEnabled = Boolean(input.overrideEnabled ?? live.overrideEnabled);
       if (outside && (!overrideEnabled || String(input.overrideJustification ?? '').trim().length < 20)) {
-        return result('overrideJustification must contain at least 20 characters for an out-of-set recommendation.');
+        return failure('overrideJustification must contain at least 20 characters for an out-of-set recommendation.');
       }
       if (mutate) {
         const saved = store.saveRecommendation(slug, recommendation, outside ? String(input.overrideJustification) : null, overrideEnabled);
-        if (!saved.ok) return result(saved.error ?? 'Recommendation was not saved.');
+        if (!saved.ok) return failure(saved.error ?? 'Recommendation was not saved.');
       }
     } else if (action === 'override-constraint') {
       if (mutate) store.setOverrideEnabled(slug, Boolean(input.overrideEnabled));
     } else if (action === 'mark-step-done' || action === 'unmark-step-done') {
-      if (!REVIEWER_STEPS.includes(input.step as ReviewerStepName)) return result('step must name a reviewer step.');
+      if (!REVIEWER_STEPS.includes(input.step as ReviewerStepName)) return failure('step must name a reviewer step.');
       if (mutate) {
         const changed = store.setStepDone(slug, input.step as ReviewerStepName, action === 'mark-step-done');
-        if (!changed.ok) return result(changed.error ?? 'Step could not change.');
+        if (!changed.ok) return failure(changed.error ?? 'Step could not change.');
       }
     } else if (action === 'complete-bundling') {
       const live = useReviewStore.getState().bundles.find((item) => item.slug === slug)!;
       if (!live.reviewerSteps.find((item) => item.name === 'Verdict')?.done || !live.recommendation) {
-        return result('Complete Verdict and record a recommendation before bundling.');
+        return failure('Complete Verdict and record a recommendation before bundling.');
       }
       if (mutate) {
         const completed = store.completeBundling(slug);
-        if (!completed.ok) return result(completed.error ?? 'Bundling could not complete.');
+        if (!completed.ok) return failure(completed.error ?? 'Bundling could not complete.');
       }
     } else if (action === 'step-notes') {
-      if (!REVIEWER_STEPS.includes(input.step as ReviewerStepName)) return result('step is required for step-notes.');
+      if (!REVIEWER_STEPS.includes(input.step as ReviewerStepName)) return failure('step is required for step-notes.');
       if (mutate) store.setStepNotes(slug, input.step as ReviewerStepName, String(input.notes ?? ''));
-    } else return result('action is not a declared workflow action.');
+    } else return failure('action is not a declared workflow action.');
     return result(mutate ? `${action} completed through the product handler.` : `${action} is valid.`, { state: snapshotBundle(slug) });
   };
 
@@ -242,7 +244,7 @@ export function registerWebMCP() {
     execute: async () => {
       const store = useReviewStore.getState();
       const bundle = store.bundles.find((item) => item.slug === store.selection.bundleSlug);
-      if (!bundle) return result('Open a bundle before copying its review summary.');
+      if (!bundle) return failure('Open a bundle before copying its review summary.');
       await navigator.clipboard.writeText(bundleSummaryMarkdown(bundle));
       store.setAnnouncement('Review summary copied.');
       return result('Review summary copied; clipboard contents are not returned.');

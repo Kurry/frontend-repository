@@ -13,6 +13,7 @@ import {
   analyzeAutonomousSnapshots,
   causalMutationPaths,
   changedPaths,
+  isErrorResult,
 } from './oracle_ci_semantics.mjs';
 
 const { chromium } = resolvePlaywright();
@@ -176,12 +177,6 @@ function valueForSchema(schema, key = '', depth = 0) {
 function isReadOnly(tool) {
   if (tool.annotations?.readOnlyHint === true) return true;
   return /(?:^|[._])(search|validate|select)$/.test(String(tool.name || ''));
-}
-
-function isErrorResult(result) {
-  if (result === undefined || result === null) return true;
-  if (typeof result !== 'object') return /^error\b/i.test(String(result));
-  return result.ok === false || result.status === 'error' || Boolean(result.error);
 }
 
 async function invokeTool(page, name, args) {

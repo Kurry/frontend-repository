@@ -158,7 +158,8 @@ export function registerWebMCP(store) {
   const publicTools = tools.map(({ execute, ...definition }) => definition)
   window.webmcp_session_info = () => ({
     contract_version: 'zto-webmcp-v1',
-    modules: [
+    modules: ['structured-editor-v1', 'entity-collection-v1', 'form-workflow-v1', 'artifact-transfer-v1'],
+    module_catalog: [
       { id: 'structured-editor-v1', operations: ['add', 'select', 'delete', 'update_property', 'preview', 'switch_mode'] },
       { id: 'entity-collection-v1', entity: 'submitter', operations: ['create', 'select', 'update', 'delete'] },
       { id: 'form-workflow-v1', operations: ['validate', 'submit', 'advance'] },

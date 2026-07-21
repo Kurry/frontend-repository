@@ -1,3 +1,9 @@
+export function isErrorResult(result) {
+  if (result === undefined || result === null) return true;
+  if (typeof result !== 'object') return /^error\b/i.test(String(result));
+  return result.ok === false || result.success === false || result.status === 'error' || Boolean(result.error);
+}
+
 export function changedPaths(before, after, prefix = '$') {
   if (Object.is(before, after)) return [];
 

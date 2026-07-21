@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader, Select, SelectItem, TextInput, Tag } from '@carbon/react';
+import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader, Select, SelectItem, TextArea, Tag } from '@carbon/react';
 import { Checkmark, Flag } from '@carbon/icons-react';
 import { DisputeCreateSchema, ResolveCreateSchema } from '../schemas';
 import { useStudioStore } from '../store';
@@ -14,7 +14,7 @@ function DisputeForm({ item, onClose, openerRef }) {
   const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(DisputeCreateSchema), mode: 'onChange', reValidateMode: 'onChange', defaultValues: { reason: '' } });
   const reason = watch('reason');
   const submit = ({ reason }) => { changeState(item.id, 'disputed', { disputeReason: reason }); onClose(); };
-  return <ComposedModal open={Boolean(item)} onClose={onClose} size="sm" preventCloseOnClickOutside selectorPrimaryFocus="#dispute-reason" launcherButtonRef={openerRef}><ModalHeader title="Dispute annotation" label="Dispute reason" closeModal={onClose} /><ModalBody hasForm><form id="dispute-form" onSubmit={handleSubmit(submit)} className="modal-form"><TextInput id="dispute-reason" labelText="Reason" maxLength={200} invalid={Boolean(errors.reason) || !reason.trim()} invalidText={errors.reason?.message || 'Reason is required'} {...register('reason')} /><p className="form-hint">One line, 1–200 characters. The reason field is required and is preserved in History.</p></form></ModalBody><ModalFooter><Button kind="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="dispute-form" disabled={!isValid}>Dispute</Button></ModalFooter></ComposedModal>;
+  return <ComposedModal open={Boolean(item)} onClose={onClose} size="sm" preventCloseOnClickOutside selectorPrimaryFocus="#dispute-reason" launcherButtonRef={openerRef}><ModalHeader title="Dispute annotation" label="Dispute reason" closeModal={onClose} /><ModalBody hasForm><form id="dispute-form" onSubmit={handleSubmit(submit)} className="modal-form"><TextArea id="dispute-reason" rows={3} labelText="Reason" invalid={Boolean(errors.reason) || !reason.trim()} invalidText={errors.reason?.message || 'Reason is required'} {...register('reason')} /><p className="form-hint">One line, 1–200 characters. The reason field is required and is preserved in History.</p></form></ModalBody><ModalFooter><Button kind="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="dispute-form" disabled={!isValid}>Dispute</Button></ModalFooter></ComposedModal>;
 }
 
 function ResolveForm({ item, onClose, openerRef }) {

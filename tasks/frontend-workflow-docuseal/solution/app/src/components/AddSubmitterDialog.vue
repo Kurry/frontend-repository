@@ -60,14 +60,27 @@ function handleOpen(value) {
           class="dialog-form"
           @submit="onSubmit"
         >
-          <label class="form-label" for="submitter-name">Name</label>
-          <Field id="submitter-name" name="name" class="form-input" placeholder="Third Party" autocomplete="off" />
-          <ErrorMessage name="name" class="form-error" />
+          <Field v-slot="{ field, errorMessage }" name="name" :validate-on-input="true">
+            <label class="form-label" for="submitter-name">Name</label>
+            <input
+              id="submitter-name"
+              v-bind="field"
+              class="form-input"
+              :class="{ invalid: errorMessage }"
+              placeholder="Third Party"
+              autocomplete="off"
+              :aria-invalid="!!errorMessage"
+              :aria-describedby="errorMessage ? 'submitter-name-error' : undefined"
+            />
+            <p v-if="errorMessage" id="submitter-name-error" class="form-error" role="alert">
+              Name: {{ errorMessage }}
+            </p>
+          </Field>
 
           <label class="form-label" for="submitter-color">Colour</label>
           <div class="color-input-wrap">
-            <Field id="submitter-color" name="color" class="color-input" type="color" />
-            <Field name="color" class="form-input" aria-label="Colour hex value" />
+            <Field id="submitter-color" name="color" class="color-input" type="color" :validate-on-input="true" />
+            <Field name="color" class="form-input" aria-label="Colour hex value" :validate-on-input="true" />
           </div>
           <ErrorMessage name="color" class="form-error" />
           <p v-if="formError" class="form-error" role="alert">{{ formError }}</p>

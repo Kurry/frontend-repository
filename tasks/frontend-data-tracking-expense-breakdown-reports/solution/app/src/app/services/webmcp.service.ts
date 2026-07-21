@@ -247,7 +247,8 @@ export class WebmcpService {
     win['webmcp_session_info'] = () => ({
       contract_version: CONTRACT_VERSION,
       app: 'expense-breakdown-reports',
-      modules: [
+      modules: ['browse-query-v1', 'entity-collection-v1', 'artifact-transfer-v1'],
+      module_catalog: [
         { id: 'browse-query-v1', contract_version: CONTRACT_VERSION, tool_name_prefix: 'browse' },
         { id: 'entity-collection-v1', contract_version: CONTRACT_VERSION, tool_name_prefix: 'entity' },
         { id: 'artifact-transfer-v1', contract_version: CONTRACT_VERSION, tool_name_prefix: 'artifact' },
