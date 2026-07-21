@@ -112,7 +112,7 @@ function Row({ node, level, index, readOnly }) {
       tabIndex={0}
       data-tree-row
       className={`tree-row group relative ${pad} ${selected ? 'tree-row-selected' : ''} ${checked ? 'tree-row-checked' : ''} ${isDropped ? 'row-settle' : ''}`}
-      style={{ ...style, paddingLeft: `${level * 22 + 8}px` }}
+      style={{ ...style, '--tree-level': level }}
       ref={setNodeRef}
       onKeyDown={onRowKey}
     >

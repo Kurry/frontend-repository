@@ -14,7 +14,7 @@ import { buildSeeds, SEED_METADATA_FIELDS } from './seeds.js';
 let toastSeq = 0;
 let runSeq = 0;
 
-const burst = { active: false, base: null, label: '', timer: null };
+const burst = { active: false, schemaId: null, base: null, label: '', timer: null };
 
 function deepCopy(v) {
   return typeof structuredClone === 'function' ? structuredClone(v) : JSON.parse(JSON.stringify(v));
@@ -179,8 +179,8 @@ export const useStore = create((set, get) => {
     const s = get();
     const sc = activeSchema(s);
     if (!sc) return;
-    const base = displayedTree(s);
-    const newTree = buildNewTree(base);
+    const base = deepCopy(displayedTree(s));
+    const newTree = buildNewTree(deepCopy(base));
     const past = s.viewIndex !== null && s.viewIndex < sc.past.length
       ? [...sc.past.slice(0, s.viewIndex), { label, tree: base }]
       : [...sc.past, { label, tree: base }];
@@ -196,7 +196,15 @@ export const useStore = create((set, get) => {
     if (!sc || isScrubbing(s)) return;
     if (!burst.active) {
       burst.active = true;
-      burst.base = sc.tree;
+      burst.schemaId = sc.id;
+      burst.base = deepCopy(sc.tree);
+      burst.label = label;
+    } else if (burst.schemaId !== sc.id) {
+      if (burst.timer) clearTimeout(burst.timer);
+      const prior = get().schemas.find((candidate) => candidate.id === burst.schemaId);
+      if (prior) patchSchema(prior.id, { past: [...prior.past, { label: burst.label, tree: burst.base }], future: [] });
+      burst.schemaId = sc.id;
+      burst.base = deepCopy(sc.tree);
       burst.label = label;
     }
     const newTree = updateNode(sc.tree, nodeId, patchFn);
@@ -204,7 +212,7 @@ export const useStore = create((set, get) => {
     if (burst.timer) clearTimeout(burst.timer);
     burst.timer = setTimeout(() => {
       const s2 = get();
-      const sc2 = activeSchema(s2);
+      const sc2 = s2.schemas.find((candidate) => candidate.id === burst.schemaId);
       if (sc2 && burst.active) {
         patchSchema(sc2.id, {
           past: [...sc2.past, { label: burst.label, tree: burst.base }],
@@ -212,6 +220,7 @@ export const useStore = create((set, get) => {
         });
       }
       burst.active = false;
+      burst.schemaId = null;
       burst.base = null;
       burst.label = '';
       burst.timer = null;
@@ -766,7 +775,12 @@ export const useStore = create((set, get) => {
       return { ok: true, label: entry.label };
     },
 
-    scrubTo: (index) => set({ viewIndex: index }),
+    scrubTo: (index) => {
+      const s = get();
+      const sc = activeSchema(s);
+      const bounded = sc && Number.isInteger(index) ? Math.max(0, Math.min(index, sc.past.length)) : null;
+      set({ viewIndex: bounded === sc?.past.length ? null : bounded, selectedNodeId: null, selectedIds: [] });
+    },
 
     setDiffBase: (diffBaseId) => set({ diffBaseId }),
     setDiffCompare: (diffCompareId) => set({ diffCompareId }),
