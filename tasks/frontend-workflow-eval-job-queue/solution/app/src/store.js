@@ -75,6 +75,7 @@ function seedJobs() {
     makeJob({ id: 'evq-308', dataset: 'ledgerline-suite', agent: 'forgeline', model: 'meridian-xl', trialCount: 6, status: 'running', complete: 2, minutes: 11, special: 'backoff' }),
     makeJob({ id: 'evq-307', dataset: 'orchard-qa', agent: 'forgeline', model: 'willow-mini', trialCount: 5, status: 'completed', complete: 5, minutes: 29 }),
     makeJob({ id: 'evq-306', dataset: 'ledgerline-suite', agent: 'scouthand', model: 'cobalt-4', trialCount: 4, status: 'completed', complete: 4, minutes: 41 }),
+    makeJob({ id: 'evq-298', dataset: 'ledgerline-suite', agent: 'scouthand', model: 'willow-mini', trialCount: 4, status: 'failed', complete: 1, minutes: 118 }),
     makeJob({ id: 'evq-305', dataset: 'orchard-qa', agent: 'scouthand', model: 'meridian-xl', trialCount: 7, status: 'running', complete: 3, minutes: 54, special: 'backoff' }),
     makeJob({ id: 'evq-304', dataset: 'ledgerline-suite', agent: 'forgeline', model: 'willow-mini', trialCount: 6, status: 'queued', minutes: 4 }),
     makeJob({ id: 'evq-303', dataset: 'orchard-qa', agent: 'forgeline', model: 'cobalt-4', trialCount: 3, status: 'cancelled', complete: 1, minutes: 68 }),
@@ -243,7 +244,13 @@ export const useQueueStore = create((set, get) => ({
   dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((toast) => toast.id !== id) })),
 
   refreshExport: () => {
-    const preview = JSON.stringify(buildSnapshot(get()), null, 2)
+    const state = get()
+    const jobs = state.jobs.filter((job) =>
+      (!state.filters.status || job.status === state.filters.status)
+      && (!state.filters.model || job.model === state.filters.model)
+      && (!state.filters.dataset || job.dataset === state.filters.dataset),
+    )
+    const preview = JSON.stringify(buildSnapshot({ ...state, jobs }), null, 2)
     set({ exportPreviewText: preview })
     return preview
   },
