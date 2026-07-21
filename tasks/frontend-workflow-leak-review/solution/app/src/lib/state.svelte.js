@@ -6,7 +6,21 @@ const roundThreshold = (value) => Math.round(Number(value) * 100) / 100;
 
 class ReviewConsoleState {
   submissions = $state(seedSubmissions());
-  threshold = $state(0.75);
+  _threshold = $state(0.75);
+  get threshold() { return this._threshold; }
+  set threshold(val) {
+    const next = roundThreshold(val);
+    if (next < 0.5 || next > 0.95 || Number.isNaN(next)) return;
+    this._threshold = next;
+    const confirmedIds = new Set(this.decisions.map((decision) => decision.submissionId));
+    this.submissions.forEach((submission) => {
+      if (!confirmedIds.has(submission.id)) {
+        submission.reviewState = submission.similarity >= next ? 'review-triggered' : 'unreviewed';
+      }
+    });
+    this.bumpExportTimestamp();
+  }
+
   activeView = $state('queue');
   reviewFilter = $state('all');
   auditFilter = $state('all');
@@ -171,15 +185,6 @@ class ReviewConsoleState {
     const next = roundThreshold(nextValue);
     if (next < 0.5 || next > 0.95 || Number.isNaN(next)) return false;
     this.threshold = next;
-    const confirmedIds = new Set(this.decisions.map((decision) => decision.submissionId));
-    this.submissions = this.submissions.map((submission) => {
-      if (confirmedIds.has(submission.id)) return submission;
-      return {
-        ...submission,
-        reviewState: submission.similarity >= next ? 'review-triggered' : 'unreviewed'
-      };
-    });
-    this.bumpExportTimestamp();
     return true;
   }
 
@@ -234,10 +239,15 @@ class ReviewConsoleState {
     const wasFiltered = this.reviewFilter === 'review-triggered';
     if (wasFiltered) this.leavingSubmissionId = submission.id;
 
-    submission.reviewState = requestBody.verdict === 'confirm-clean' ? 'confirmed-clean' : 'confirmed-leak';
-    this.submissions = this.submissions.map((item) =>
-      item.id === submission.id ? { ...item, reviewState: submission.reviewState } : item
-    );
+    const newState = requestBody.verdict === 'confirm-clean' ? 'confirmed-clean' : 'confirmed-leak';
+    submission.reviewState = newState;
+
+    // Explicitly mutate the proxy element so its view updates accurately without proxy tearing
+    const idx = this.submissions.findIndex(item => item.id === submission.id);
+    if (idx !== -1) {
+      this.submissions[idx].reviewState = newState;
+    }
+
     this.decisions.push({
       submissionId: submission.id,
       requestBody,

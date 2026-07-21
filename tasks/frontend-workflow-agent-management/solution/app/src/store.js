@@ -6,6 +6,7 @@ import { createAgentSchema, fleetSnapshotSchema, STATUSES } from './schemas'
 const nowIso = () => new Date().toISOString()
 const uid = (prefix) => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 const clone = (value) => structuredClone(value)
+let pendingRemovalTimer = null
 
 export function getRollup(agents) {
   const rollup = { idle: 0, running: 0, paused: 0, error: 0, offline: 0, total: agents.length }
@@ -104,9 +105,13 @@ export const useFleetStore = create((set, get) => ({
   detailTab: 0,
   highlightedStepId: null,
   expandedSummaries: {},
+  exitingAgentId: null,
+  registerLock: false,
   modal: null,
   exportOpen: false,
   exportPreviewText: '',
+  exportBaselineSignature: '',
+  exportChangeHint: 'First snapshot in this session',
   importOpen: false,
   importDraft: '',
   importError: '',
@@ -138,10 +143,12 @@ export const useFleetStore = create((set, get) => ({
   highlightStep: (stepId) => set({ highlightedStepId: stepId, detailTab: 2 }),
 
   registerAgent: (rawPayload) => {
+    if (get().registerLock) return { ok: false, error: 'Registration is already in progress' }
+    set({ registerLock: true })
     const parsed = createAgentSchema.safeParse(rawPayload)
-    if (!parsed.success) return { ok: false, error: parsed.error.issues[0].message }
+    if (!parsed.success) { set({ registerLock: false }); return { ok: false, error: parsed.error.issues[0].message } }
     const normalized = parsed.data.name.toLocaleLowerCase()
-    if (get().agents.some((agent) => agent.name.toLocaleLowerCase() === normalized)) return { ok: false, error: 'Name must be unique (ignoring letter case)' }
+    if (get().agents.some((agent) => agent.name.toLocaleLowerCase() === normalized)) { set({ registerLock: false }); return { ok: false, error: 'Name must be unique (ignoring letter case)' } }
     const before = mutationSnapshot(get())
     const id = uid('agent')
     const agent = {
@@ -165,7 +172,7 @@ export const useFleetStore = create((set, get) => ({
     }))
     get().addToast(`${agent.name} registered`)
     restoreFocus()
-    setTimeout(() => set((state) => ({ agents: state.agents.map((item) => item.id === id ? { ...item, isNew: false } : item) })), 260)
+    setTimeout(() => set((state) => ({ agents: state.agents.map((item) => item.id === id ? { ...item, isNew: false } : item), registerLock: false })), 260)
     return { ok: true, agent }
   },
 
@@ -190,23 +197,48 @@ export const useFleetStore = create((set, get) => ({
   },
 
   removeAgent: (agentId) => {
-    const target = get().agents.find((agent) => agent.id === agentId)
+    const state = get()
+    const target = state.agents.find((agent) => agent.id === agentId)
     if (!target) return false
-    const before = mutationSnapshot(get())
-    set((state) => ({
-      agents: state.agents.filter((agent) => agent.id !== agentId),
-      selectedIds: state.selectedIds.filter((id) => id !== agentId),
-      detailAgentId: state.detailAgentId === agentId ? null : state.detailAgentId,
-      undoStack: [...state.undoStack, before],
-      redoStack: [],
-      announcement: `${target.name} removed`,
-    }))
-    get().addToast(`${target.name} removed`)
+    if (state.exitingAgentId || pendingRemovalTimer !== null) {
+      set({ announcement: 'Another agent removal is already in progress' })
+      get().addToast('Another agent removal is already in progress', 'error')
+      return false
+    }
+    set({ exitingAgentId: agentId, announcement: `Removing ${target.name}` })
+    pendingRemovalTimer = window.setTimeout(() => {
+      pendingRemovalTimer = null
+      const current = get()
+      const currentTarget = current.agents.find((agent) => agent.id === agentId)
+      if (current.exitingAgentId !== agentId || !currentTarget) {
+        if (current.exitingAgentId === agentId) set({ exitingAgentId: null })
+        return
+      }
+      const before = mutationSnapshot(current)
+      set((state) => ({
+        agents: state.agents.filter((agent) => agent.id !== agentId),
+        selectedIds: state.selectedIds.filter((id) => id !== agentId),
+        detailAgentId: state.detailAgentId === agentId ? null : state.detailAgentId,
+        undoStack: [...state.undoStack, before],
+        redoStack: [],
+        exitingAgentId: null,
+        announcement: `${target.name} removed`,
+      }))
+      get().addToast(`${target.name} removed`)
+    }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 210)
     return true
   },
 
   undo: () => {
     const state = get()
+    if (state.exitingAgentId) {
+      if (pendingRemovalTimer !== null) window.clearTimeout(pendingRemovalTimer)
+      pendingRemovalTimer = null
+      const target = state.agents.find((agent) => agent.id === state.exitingAgentId)
+      set({ exitingAgentId: null, announcement: target ? `Removal of ${target.name} canceled` : 'Removal canceled' })
+      get().addToast(target ? `Removal of ${target.name} canceled` : 'Removal canceled', 'info')
+      return true
+    }
     if (!state.undoStack.length) return false
     const previous = state.undoStack.at(-1)
     set({
@@ -222,6 +254,10 @@ export const useFleetStore = create((set, get) => ({
   },
   redo: () => {
     const state = get()
+    if (state.exitingAgentId) {
+      get().addToast('Wait for the current removal to finish', 'info')
+      return false
+    }
     if (!state.redoStack.length) return false
     const next = state.redoStack.at(-1)
     set({
@@ -391,11 +427,27 @@ export const useFleetStore = create((set, get) => ({
   openExport: () => {
     captureFocus()
     const text = JSON.stringify(compileSnapshot(get().agents), null, 2)
-    set({ exportOpen: true, exportPreviewText: text, paletteOpen: false, importOpen: false, modal: null })
+    const signature = JSON.stringify(compileSnapshot(get().agents, 'session-baseline'))
+    const previous = get().exportBaselineSignature
+    set({
+      exportOpen: true,
+      exportPreviewText: text,
+      exportBaselineSignature: signature,
+      exportChangeHint: previous ? (previous === signature ? 'No registry changes since the last export' : 'Registry changes detected since the last export') : 'First snapshot in this session',
+      paletteOpen: false,
+      importOpen: false,
+      modal: null,
+    })
   },
   closeExport: () => { set({ exportOpen: false }); restoreFocus() },
   refreshExport: () => {
-    if (get().exportOpen) set({ exportPreviewText: JSON.stringify(compileSnapshot(get().agents), null, 2) })
+    if (get().exportOpen) {
+      const signature = JSON.stringify(compileSnapshot(get().agents, 'session-baseline'))
+      set({
+        exportPreviewText: JSON.stringify(compileSnapshot(get().agents), null, 2),
+        exportChangeHint: signature === get().exportBaselineSignature ? get().exportChangeHint : 'Live preview updated after registry changes',
+      })
+    }
   },
   copyExport: async () => {
     const text = get().exportPreviewText || JSON.stringify(compileSnapshot(get().agents), null, 2)

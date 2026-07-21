@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('create dialog traps focus, closes from its backdrop, and returns focus', async ({ page }) => {
+test('create dialog traps focus, supports interleaved navigation, closes from its backdrop, and returns focus', async ({ page }) => {
   await page.goto('/')
   const opener = page.getByRole('button', { name: 'Create task', exact: true }).first()
   await opener.click()
@@ -11,7 +11,10 @@ test('create dialog traps focus, closes from its backdrop, and returns focus', a
 
   await page.keyboard.press('Shift+Tab')
   await expect(dialog.locator(':focus')).toHaveCount(1)
-  await page.mouse.click(4, 4)
+  await page.getByRole('button', { name: 'Analytics' }).click()
+  await expect(page.getByRole('heading', { name: 'Task analytics' })).toBeVisible()
+  await expect(dialog).toBeVisible()
+  await page.mouse.click(260, 4)
   await expect(dialog).toBeHidden()
   await expect(opener).toBeFocused()
 })

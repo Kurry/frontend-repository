@@ -6,9 +6,17 @@
     <meta name="theme-color" content="#f4f4f4" />
     <meta name="description" content="Create, refine, and export a reusable prompt library." />
     <title>Prompt Library</title>
-  </head>
+    <link rel="manifest" href="/manifest.json" />
+</head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW registration failed: ', err));
+      });
+    }
+  </script>
+</body>
 </html>

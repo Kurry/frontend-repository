@@ -3,6 +3,7 @@
   import { validator } from '@felte/validator-zod';
   import { Select } from 'flowbite-svelte';
   import { CheckCircle, ClockCounterClockwise, Funnel, WarningDiamond } from 'phosphor-svelte';
+  import autoAnimate from '@formkit/auto-animate';
   import { auditFilterSchema } from '../lib/schemas.js';
   import { verdictLabels } from '../lib/data.js';
 
@@ -35,7 +36,7 @@
 
   <section class="panel rounded-xl p-4 sm:p-6" aria-live="polite" aria-label="Decision event timeline">
     {#if state.auditEntries.length}
-      <ol class="relative ml-3 border-l-2 border-slate-200">
+      <ol class="relative ml-3 border-l-2 border-slate-200" use:autoAnimate>
         {#each state.auditEntries as entry (entry.submissionId)}
           <li class={`group relative ml-6 pb-7 last:pb-0 ${state.newestAuditSubmissionId === entry.submissionId ? 'audit-enter' : ''}`}>
             <span class={`absolute -left-[2.15rem] top-0 grid size-6 place-items-center rounded-full border-4 border-paper-50 ${entry.requestBody.verdict === 'confirm-clean' ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white'}`}>
