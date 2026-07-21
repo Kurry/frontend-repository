@@ -847,7 +847,7 @@ function useGlobalShortcuts() {
       const typing = active && (['INPUT', 'TEXTAREA', 'SELECT'].includes(active.tagName) || active.isContentEditable);
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       if (event.key === '?') { event.preventDefault(); state.setShortcutsOpen(!state.shortcutsOpen); return; }
-      if (typing || state.shortcutsOpen || state.exportOpen || state.restoreDialog || state.annotationComposerOpen || state.mergeConfirmOpen) return;
+      if (typing || state.shortcutsOpen || state.exportOpen || state.restoreDialog || state.annotationComposerOpen || state.mergeConfirmOpen || state.mergeFlowOpen) return;
       const key = event.key.toLowerCase();
       if (key === 'n' || key === 'j') { event.preventDefault(); if (state.activeMode === 'diff') stepChange(1); }
       else if (key === 'p' || key === 'k') { event.preventDefault(); if (state.activeMode === 'diff') stepChange(-1); }
