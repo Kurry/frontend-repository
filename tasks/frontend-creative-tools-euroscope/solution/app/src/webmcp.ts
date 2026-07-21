@@ -70,6 +70,7 @@ type Tool = {
   name: string;
   module: string;
   description: string;
+  annotations?: { readOnlyHint?: boolean };
   handler: (args: Record<string, unknown>) => ToolResult | Promise<ToolResult>;
 };
 
@@ -310,6 +311,7 @@ const TOOLS: Tool[] = [
     module: "structured-editor-v1",
     description:
       "Read the current editor state: step, base theme, six swatches, icon set, replaced bitmap count, keep-original overrides, snapshots, compare state, and simulation mode.",
+    annotations: { readOnlyHint: true },
     handler: () => ok(snapshot()),
   },
 
@@ -426,6 +428,7 @@ export function installWebmcp(): void {
       name: t.name,
       module: t.module,
       description: t.description,
+      annotations: t.annotations,
     }));
 
   w.webmcp_invoke_tool = async (
