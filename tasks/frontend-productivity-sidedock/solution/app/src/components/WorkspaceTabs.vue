@@ -1,14 +1,15 @@
 <script setup>
 import { ref, nextTick } from 'vue'
 import { useSidedockStore } from '../stores/sidedock.js'
+import DeleteConfirmDialog from './DeleteConfirmDialog.vue'
+import { WORKSPACE_COLORS } from '../validation.js'
 
 const store = useSidedockStore()
 const editingId = ref(null)
 const editValue = ref('')
 const editInput = ref(null)
 const showColorPicker = ref(null)
-
-const WORKSPACE_COLORS = ['#E54610', '#D97706', '#65A30D', '#059669', '#0891B2', '#2563EB', '#7C3AED', '#DB2777', '#6B7280']
+const pendingDeleteWorkspace = ref(null)
 
 function startCreate() {
   store.showCreateWorkspaceModal = true
@@ -32,8 +33,13 @@ function cancelRename() {
 }
 
 function handleDelete(ws) {
-  if (confirm(`Delete workspace "${ws.name}" and all its contents?`)) {
-    store.deleteWorkspace(ws.id)
+  pendingDeleteWorkspace.value = ws
+}
+
+function confirmDeleteWorkspace() {
+  if (pendingDeleteWorkspace.value) {
+    store.deleteWorkspace(pendingDeleteWorkspace.value.id)
+    pendingDeleteWorkspace.value = null
   }
 }
 </script>
@@ -142,27 +148,33 @@ function handleDelete(ws) {
       <span style="font-family: 'Cormorant Upright', Georgia, serif;">Add workspace</span>
     </button>
   </div>
+
+  <DeleteConfirmDialog
+    :show="Boolean(pendingDeleteWorkspace)"
+    :item-label="pendingDeleteWorkspace?.name || ''"
+    item-type="workspace"
+    @confirm="confirmDeleteWorkspace"
+    @cancel="pendingDeleteWorkspace = null"
+  />
 </template>
 
 <style scoped>
 .workspace-tab { font-family: "Cormorant Upright", Georgia, serif; font-size: 24px; }
-.icon-action { width: 48px; height: 48px; min-width: 48px; }
-.color-trigger { border: 2px solid var(--control-background); box-shadow: 0 0 0 1px var(--control-border); }
+.icon-action { width: 44px; height: 44px; min-width: 44px; }
+.color-trigger { width: 32px; height: 32px; border: 2px solid var(--control-background); box-shadow: 0 0 0 1px var(--control-border); }
 .tab-accent-bar {
   position: absolute;
   top: 0;
-  left: 6px;
-  right: 6px;
-  height: 3px;
-  border-radius: 0 0 3px 3px;
+  left: 8px;
+  right: 8px;
+  height: 4px;
+  border-radius: 0 0 4px 4px;
 }
 @media (max-width: 520px) {
-  .workspace-tab { font-size: 20px; }
+  .workspace-tab { font-size: 24px; }
   .workspace-actions { opacity: 1; }
-  .icon-action { width: 28px; height: 28px; min-width: 28px; }
 }
 :global(.compact-view) .workspace-actions { opacity: 1; }
-:global(.compact-view) .icon-action { width: 28px; height: 28px; min-width: 28px; }
 </style>
 
 .workspace-tab:hover {

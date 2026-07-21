@@ -35,7 +35,7 @@ const onSubmit = handleSubmit((values) => {
       <div>
         <label class="block text-sm font-semibold mb-1" style="color: var(--color-text-primary)">Name</label>
         <NInput v-model:value="name" placeholder="Folder name" :status="errors.name ? 'error' : undefined" />
-        <p v-if="errors.name" class="text-red-600 text-xs mt-1">{{ errors.name }}</p>
+        <p v-if="errors.name" class="text-red-600 text-xs mt-1" role="alert" aria-live="assertive">{{ errors.name }}</p>
       </div>
       <div class="flex justify-end gap-2 mt-4">
         <NButton @click="store.showCreateFolderModal = false">Cancel</NButton>
