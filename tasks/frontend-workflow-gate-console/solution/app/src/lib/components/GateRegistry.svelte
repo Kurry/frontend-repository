@@ -98,7 +98,7 @@
   .clear-filter { display:flex; align-items:center; gap:.25rem; color:#99601a; background:transparent; border:0; font-size:.65rem; font-weight:800; cursor:pointer; }
   .registry-layout { display:grid; grid-template-columns:minmax(0, 1.45fr) minmax(260px, .75fr); gap:1rem; align-items:start; }
   .registry-list, .registry-detail { border-radius:.8rem; overflow:hidden; }
-  .registry-list > button { display:block; width:100%; padding:.8rem .9rem; color:inherit; text-align:left; background:transparent; border:0; border-bottom:1px solid #e1e7ef; cursor:pointer; transition:background-color .18s, box-shadow .18s; }
+  .registry-list > button { display:block; width:100%; padding:.8rem .9rem; color:inherit; text-align:left; background:transparent; border:0; border-bottom:1px solid #e1e7ef; cursor:pointer; transition:background-color .09s, box-shadow .09s; }
   .registry-list > button:last-child { border-bottom:0; }
   .registry-list > button:hover { background:#f4f8fb; }
   .registry-list > button.selected { background:#eef9fb; box-shadow:inset 3px 0 #25adc1; }
