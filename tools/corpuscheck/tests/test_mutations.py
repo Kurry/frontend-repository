@@ -251,3 +251,22 @@ def test_assigned_but_absent_task_directory_is_missing(copy_task, tmp_path):
         and item.path == "frontend-workflow-docuseal"
         for item in report.items
     )
+
+
+def test_quarantined_task_directory_is_not_missing(copy_task, tmp_path):
+    tasks_root, _ = copy_task(EVAL_SLUG, tmp_path)
+    quarantine = tasks_root.parent / "tasks-quarantine" / "frontend-workflow-docuseal"
+    quarantine.mkdir(parents=True)
+
+    report = detect_corpus_drift(tasks_root)
+
+    assert not any(
+        item.kind is DriftKind.MISSING_TASK_DIR
+        and item.path == "frontend-workflow-docuseal"
+        for item in report.items
+    )
+    assert any(
+        item.kind is DriftKind.QUARANTINED
+        and item.path == "frontend-workflow-docuseal"
+        for item in report.items
+    )

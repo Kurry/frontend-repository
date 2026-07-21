@@ -96,6 +96,10 @@ class TestWebmcpContract(unittest.TestCase):
             self.assertIn("$WEBMCP_CDP_ENDPOINT", pw_args)
 
     def test_assignment_map_covers_103(self) -> None:
+        # The assignment schema keeps all 103 entries: 65 active tasks under
+        # tasks/ plus 38 quarantined under tasks-quarantine/ (dist-absent
+        # oracles, 2026-07-21). Quarantined slugs keep their assignments so
+        # reinstating one is a plain `git mv` back.
         data = json.loads((ROOT / "schemas/webmcp-assignments.json").read_text())
         self.assertEqual(data["contract_version"], "zto-webmcp-v1")
         self.assertEqual(len(data["assignments"]), 103)

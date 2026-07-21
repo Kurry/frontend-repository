@@ -35,11 +35,13 @@ def test_real_eval_dashboard_passes_static_validation(TASKS_ROOT):
     assert not any(not check.passed for check in result.checks)
 
 
-def test_real_discovery_has_at_least_89_assigned_tasks(TASKS_ROOT):
+def test_real_discovery_has_at_least_64_assigned_tasks(TASKS_ROOT):
+    # 65 active tasks remain under tasks/ after the 2026-07-21 quarantine of
+    # 38 dist-absent oracles into tasks-quarantine/.
     tasks = discover(TASKS_ROOT)
 
-    assert len(tasks) >= 89
-    assert sum(task.has_assignment for task in tasks) >= 89
+    assert len(tasks) >= 64
+    assert sum(task.has_assignment for task in tasks) >= 64
 
 
 def test_real_corpus_has_no_missing_or_orphan_directories(TASKS_ROOT):

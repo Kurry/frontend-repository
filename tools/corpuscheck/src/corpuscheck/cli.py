@@ -262,13 +262,17 @@ def drift_cmd(
     bad_kinds = {DriftKind.MANUAL_EDIT, DriftKind.MISSING_TASK_DIR, DriftKind.ORPHAN_DIR}
     failed = False
     corpus = detect_corpus_drift(root)
-    if corpus.items:
+    corpus_bad = [item for item in corpus.items if item.kind in bad_kinds]
+    quarantined = [item for item in corpus.items if item.kind is DriftKind.QUARANTINED]
+    if corpus_bad:
         console.print("[red]corpus drift[/red]")
-        for item in corpus.items:
+        for item in corpus_bad:
             console.print(f"    - {item}", markup=False)
-            failed |= item.kind in bad_kinds
+        failed = True
     else:
         console.print("[green]corpus assignments match task directories[/green]")
+    if quarantined:
+        console.print(f"[yellow]{len(quarantined)} quarantined assignments (tasks-quarantine/)[/yellow]")
     for task_dir in _resolve_tasks(root, tasks or [], all_tasks):
         report = detect_drift(task_dir)
         console.print(f"[{'green' if report.clean else 'red'}]{'clean' if report.clean else 'drift'}[/] {task_dir.name}")

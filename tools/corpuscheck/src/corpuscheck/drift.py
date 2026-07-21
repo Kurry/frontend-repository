@@ -14,6 +14,7 @@ class DriftKind(str, Enum):
     MANUAL_EDIT = "manual_edit"
     MISSING_TASK_DIR = "missing_task_dir"
     ORPHAN_DIR = "orphan_dir"
+    QUARANTINED = "quarantined"
 
 
 @dataclass
@@ -43,16 +44,24 @@ class DriftReport:
         return False
 
 
-def _expected_files(slug: str) -> dict[str, bytes]:
+SCREENSHOT_COPY = "COPY reference-screenshots/ /reference-screenshots/\n"
+
+
+def _expected_files(slug: str, task_dir: Path | None = None) -> dict[str, bytes]:
     root = resolve_repo_root()
     _, package, _, _ = repository_sources()
+    dockerfile = package.DOCKERFILE
+    # propagate_canonical.py appends the reference-screenshots COPY line for
+    # tasks that ship them; the drift expectation must match.
+    if task_dir is not None and (task_dir / "environment/reference-screenshots").is_dir():
+        dockerfile += SCREENSHOT_COPY
     expected = {
         "tests/test.sh": (root / "scripts/canonical/test.sh").read_bytes(),
         "tests/system_prompt.md": (root / "scripts/canonical/system_prompt.md").read_bytes(),
         "tests/webmcp_stdio_server.mjs": (
             root / "scripts/canonical/mcp/webmcp_stdio_server.mjs"
         ).read_bytes(),
-        "environment/Dockerfile": package.DOCKERFILE.encode(),
+        "environment/Dockerfile": dockerfile.encode(),
     }
     description = (source_metadata().get(slug) or {}).get("description")
     if description is not None:
@@ -63,7 +72,7 @@ def _expected_files(slug: str) -> dict[str, bytes]:
 def detect_drift(task_dir: str | Path) -> DriftReport:
     task_dir = Path(task_dir)
     report = DriftReport(task_dir=str(task_dir))
-    for rel, expected in _expected_files(task_dir.name).items():
+    for rel, expected in _expected_files(task_dir.name, task_dir).items():
         path = task_dir / rel
         matches = path.is_file() and path.read_bytes() == expected
         report.items.append(
@@ -82,9 +91,16 @@ def detect_corpus_drift(root: str | Path) -> DriftReport:
     root = Path(root)
     assignments = set(assignments_by_slug())
     directories = {path.name for path in root.glob("frontend-*") if path.is_dir()}
+    quarantine_root = root.resolve().parent / "tasks-quarantine"
+    quarantined = {path.name for path in quarantine_root.glob("frontend-*") if path.is_dir()}
     report = DriftReport(task_dir=str(root))
     for slug in sorted(assignments - directories):
-        report.items.append(DriftItem(DriftKind.MISSING_TASK_DIR, slug, "assignment has no task directory"))
+        if slug in quarantined:
+            report.items.append(
+                DriftItem(DriftKind.QUARANTINED, slug, "assignment quarantined under tasks-quarantine/")
+            )
+        else:
+            report.items.append(DriftItem(DriftKind.MISSING_TASK_DIR, slug, "assignment has no task directory"))
     for slug in sorted(directories - assignments):
         report.items.append(DriftItem(DriftKind.ORPHAN_DIR, slug, "task directory has no assignment"))
     return report

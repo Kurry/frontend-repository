@@ -4,7 +4,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## What this repo is
 
-103 frontend-only Harbor eval tasks (`tasks/frontend-*`). Each task asks a builder agent to rebuild a reference web app from a PRD-style `instruction.md`; an LLM judge (codex, `gpt-5.6-sol`) then grades the built app in a real browser across **thirteen tag-aligned dimensions** (core_features, visual_design, motion, technical, user_flows, edge_cases, responsiveness, accessibility, performance, writing, innovation, design_fidelity, behavioral). Everything under `tasks/` is **generated or vendored** — the source of truth for shared pieces lives in `scripts/`.
+65 active frontend-only Harbor eval tasks (`tasks/frontend-*`), plus 38 quarantined under `tasks-quarantine/` (dist-absent oracles; see `tasks-quarantine/README.md`). Each task asks a builder agent to rebuild a reference web app from a PRD-style `instruction.md`; an LLM judge (codex, `gpt-5.6-sol`) then grades the built app in a real browser across **thirteen tag-aligned dimensions** (core_features, visual_design, motion, technical, user_flows, edge_cases, responsiveness, accessibility, performance, writing, innovation, design_fidelity, behavioral). Everything under `tasks/` is **generated or vendored** — the source of truth for shared pieces lives in `scripts/`.
 
 ## Non-negotiable invariants (hard-won; a violation is a corpus defect)
 

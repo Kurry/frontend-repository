@@ -1,6 +1,8 @@
 # frontend-repository
 
-103 frontend-only Harbor eval tasks (`tasks/frontend-*`).
+65 active frontend-only Harbor eval tasks (`tasks/frontend-*`), plus 38
+quarantined under `tasks-quarantine/` (dist-absent oracles; see
+`tasks-quarantine/README.md`).
 
 Each task asks a builder agent to recreate a reference web application from an
 observable-behavior PRD (`instruction.md`). An LLM judge then grades the built
@@ -124,8 +126,10 @@ uv run harbor run -y -c configs/<file>.yaml -i <slug> --job-name smoke --yes
 
 ## Layout and pointers
 
-- `tasks/frontend-*/` — the 103 packaged tasks; generated, never hand-edit
+- `tasks/frontend-*/` — the 65 active packaged tasks; generated, never hand-edit
   shared files
+- `tasks-quarantine/frontend-*/` — 38 quarantined tasks (oracle serves a build
+  output whose `dist/`/`build/` is not committed); excluded from all sweeps
 - `scripts/` — source of truth for everything replicated across tasks
 - `configs/` — sweep job configs
 - `schemas/`, `packages/webmcp-contracts/` — WebMCP assignments and module

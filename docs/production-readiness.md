@@ -1,6 +1,7 @@
 # Production readiness checklist
 
-Phased checklist for taking the 103-task corpus to production. Each phase links the
+Phased checklist for taking the corpus — 65 active tasks under `tasks/`, plus 38
+quarantined under `tasks-quarantine/` — to production. Each phase links the
 GitHub issue that tracks its work. Run all commands from the repo root unless noted.
 
 ## Phase 0 — Merge in-flight work
@@ -18,6 +19,9 @@ GitHub issue that tracks its work. Run all commands from the repo root unless no
 - [ ] corpuscheck's own pytest suite (`tools/corpuscheck/tests/`)
 - [ ] Triage every failure: fix, or waive with
       `corpuscheck baseline accept <slug> <tier> --reason "..."` (sparingly, reason required).
+- [x] Dist policy: resolved by quarantining 38 tasks (`tasks-quarantine/`) whose only
+      oracle-tier failure was "start references 'dist'/'build' but it is absent"
+      (2026-07-21). Reinstate per `tasks-quarantine/README.md`.
 - [ ] Run once with `--strict-dimensions --strict-oracle` and record the delta
       (non-core dimension tomls and oracle paths only warn by default).
 
@@ -41,12 +45,13 @@ innovation's single positive catch-all).
 
 ## Phase 3 — Task shape completeness (#535)
 
-- [ ] Capture + install `environment/reference-screenshots/` for the 37 tasks
-      missing them (list in #535):
+- [ ] Capture + install `environment/reference-screenshots/` for the 35 active tasks
+      missing them (recounted after the quarantine; original 37-task list in #535
+      included quarantined slugs):
       `node scripts/capture_reference_screenshots.mjs <slug ...>` then
       `python3 scripts/install_reference_screenshots.py <slug ...>`,
       then `python3 scripts/propagate_canonical.py` (Dockerfile COPY line) and `--check`.
-- [ ] Decide README policy and make the corpus uniform (38 tasks lack `README.md`).
+- [ ] Decide README policy and make the corpus uniform (37 active tasks lack `README.md`).
 
 ## Phase 4 — Docs / tooling truthfulness (#536)
 
