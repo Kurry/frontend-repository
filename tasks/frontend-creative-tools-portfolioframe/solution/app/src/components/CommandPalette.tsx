@@ -158,7 +158,7 @@ export const CommandPalette = component$<CommandPaletteProps>(({ state, history,
         if (lastFocused.value instanceof HTMLElement) lastFocused.value.focus();
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
-        selectedIndex.value = Math.min(selectedIndex.value + 1, results.items.length - 1);
+        selectedIndex.value = results.items.length ? Math.min(selectedIndex.value + 1, results.items.length - 1) : 0;
       } else if (e.key === 'ArrowUp') {
         e.preventDefault();
         selectedIndex.value = Math.max(selectedIndex.value - 1, 0);

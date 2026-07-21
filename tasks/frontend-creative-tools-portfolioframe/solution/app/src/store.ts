@@ -781,6 +781,23 @@ export function importPortfolioJSON(
     if (!proj || typeof proj !== 'object') {
       return { success: false, error: `Import rejected: projects[${i}] must be an object.` };
     }
+
+    const title = String(proj.title ?? '').trim();
+    const category = String(proj.categoryTag ?? proj.category ?? '').trim();
+    const description = String(proj.description ?? '').trim();
+    const linkLabel = String(proj.linkLabel ?? '').trim();
+    if (!title || title.length > 80) {
+      return { success: false, error: `Import rejected: projects[${i}].title must be 1–80 characters.` };
+    }
+    if (!category || category.length > 32) {
+      return { success: false, error: `Import rejected: projects[${i}].categoryTag must be 1–32 characters.` };
+    }
+    if (description.length > 500) {
+      return { success: false, error: `Import rejected: projects[${i}].description must be 500 characters or fewer.` };
+    }
+    if (linkLabel.length > 40) {
+      return { success: false, error: `Import rejected: projects[${i}].linkLabel must be 40 characters or fewer.` };
+    }
     if (!['shipped', 'wip', 'concept'].includes(String(proj.status))) {
       return {
         success: false,
