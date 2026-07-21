@@ -246,7 +246,7 @@ export function Timeline() {
       {events.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none" aria-live="polite">
           <div className="bg-white/80 px-4 py-3 rounded shadow-sm flex flex-col items-center gap-2">
-            <p className="text-gray-600 font-medium">No events match this range and filters.</p>
+            <p className="text-gray-600 font-medium">No events match this range and filters. Try resetting filters or create a new event.</p>
             <button
               type="button"
               className="text-sm text-cyan-600 font-semibold pointer-events-auto hover:underline"

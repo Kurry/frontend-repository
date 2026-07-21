@@ -1,0 +1,1603 @@
+{
+  "accessibility": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "controls_are_keyboard_accessible",
+        "value": 1,
+        "weight": 1,
+        "description": "All interactive controls — mode switch, Filters, About, Reset filters, Undo, Redo, Export timeline, Import timeline, form fields, scrubber thumbs, bulk actions, detail Previous/Next — are keyboard accessible with Tab, Shift+Tab, Enter, or Space.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.2",
+        "name": "modals_manage_focus",
+        "value": 1,
+        "weight": 1,
+        "description": "About modal, Filters drawer, and Export drawer trap focus and return it to the originating control on close.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.3",
+        "name": "images_and_icons_have_alt_text",
+        "value": 1,
+        "weight": 1,
+        "description": "All images and icons have descriptive alt text or accessible names.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.4",
+        "name": "feedback_uses_live_regions",
+        "value": 1,
+        "weight": 1,
+        "description": "Validation errors, import errors, and Copied confirmations are conveyed both visually and via ARIA live regions.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.5",
+        "name": "forms_have_explicit_labels",
+        "value": 1,
+        "weight": 1,
+        "description": "All create/edit and import form elements use explicit label elements.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.6",
+        "name": "headings_follow_logical_order",
+        "value": 1,
+        "weight": 1,
+        "description": "Headings follow a logical order with no skips, such as H1 to H2 to H3.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.7",
+        "name": "landmark_navigation_is_present",
+        "value": 1,
+        "weight": 1,
+        "description": "Skip-to-content or landmark navigation (main/header/nav) is present.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.8",
+        "name": "text_and_controls_have_contrast",
+        "value": 1,
+        "weight": 1,
+        "description": "All text and controls have sufficient color contrast.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_html_roles_are_used",
+        "value": 1,
+        "weight": 1,
+        "description": "Semantic HTML roles such as nav, main, and button are used for chrome and overlays.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.10",
+        "name": "reduced_motion_is_respected",
+        "value": 1,
+        "weight": 1,
+        "description": "Animations respect the prefers-reduced-motion setting while pan/scrub/filter remain usable.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.11",
+        "name": "escape_closes_topmost_overlay",
+        "value": 1,
+        "weight": 1,
+        "description": "Escape closes the topmost of About, Filters drawer, Export drawer, or detail panel.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.12",
+        "name": "arrows_step_detail_when_open",
+        "value": 1,
+        "weight": 1,
+        "description": "ArrowLeft/ArrowRight step Previous/Next while a detail is open and are suppressed while typing in a field.",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "behavioral": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_round_trip",
+        "value": 1,
+        "weight": 1,
+        "description": "Multi-facet round-trip: create an event, toggle a category, set a search, narrow the year window, then reload. All facets coherently reset to the seeded baseline (in-memory genre) — never a mix of surviving and reset facets.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "14.2",
+        "name": "sort_reversal_proves_live_data",
+        "value": 1,
+        "weight": 1,
+        "description": "Chronology proof: with mixed years visible, note Library order (earliest to latest); after creating an event with a year earlier than the first row, it appears before that row; after creating one later than the last visible row (within filters), it appears after — proving order is derived from live years rather than a hardcoded list.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "14.3",
+        "name": "derived_view_responds_to_input",
+        "value": 1,
+        "weight": 1,
+        "description": "Derived-view sensitivity: change the year window or category filter and confirm the category tally and visible pin set change meaningfully rather than redrawing identically regardless of input.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_without_reload",
+        "value": 1,
+        "weight": 1,
+        "description": "Cross-view echo: create or edit an event in Library/Filter mode and confirm the same title/year/type/mediaRefs appear on the stage pin and in an open detail without reload; export preview also reflects the change.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_is_exact",
+        "value": 1,
+        "weight": 1,
+        "description": "Count-delta integrity: measure the visible event count immediately before and after a create; the delta is exactly +1. Repeat for delete with exactly -1.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "14.6",
+        "name": "different_inputs_change_outcomes",
+        "value": 1,
+        "weight": 1,
+        "description": "Input-dependent output: create two events with distinct titles, types, timestamps, mediaRefs, and years; the Library shows both distinct titles and the export JSON events array contains both distinct titles with matching type/timestamp/mediaRefs and years.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_flows_preserve_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Interleaved-flow integrity: start creating event A, switch to Scrub/Explore, return and finish creating event B, then open Export — both intended events exist and neither flow corrupted the other's fields.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "14.8",
+        "name": "empty_to_repopulated_round_trip",
+        "value": 1,
+        "weight": 1,
+        "description": "Edge-state round-trip: drive user-managed events to empty (empty state visible), then create one valid event; Library, tally, and export totals track through both transitions.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "14.9",
+        "name": "undo_round_trip_restores_export",
+        "value": 1,
+        "weight": 1,
+        "description": "Undo round-trip: create Signal Tower Demo, confirm export JSON contains that title, Undo, confirm export no longer contains that title and the count dropped by one, then Redo and confirm the title returns in export.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "14.10",
+        "name": "import_export_byte_stable_titles",
+        "value": 1,
+        "weight": 1,
+        "description": "Import/export round-trip: after two creates, export JSON, clear user events, import the pack, and confirm a fresh export's events array contains the same two titles with the same type, timestamp, and mediaRefs values.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "14.11",
+        "name": "api_payload_round_trip_in_export",
+        "value": 1,
+        "weight": 1,
+        "description": "Create Signal Tower Demo with type First Appearance, timestamp 1920-01-01T00:00:00.000Z, and mediaRefs containing signal-tower-demo; open Export — the JSON events entry for that title carries those exact type, timestamp, and mediaRefs values and document is media-history-timeline.",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "core_features": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "stage_opens_with_seeded_pins",
+        "value": 1,
+        "weight": 1,
+        "description": "On load, Scrub/Explore mode shows a timeline stage with seeded event pins or markers for MediaHistoryTimeline",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.2",
+        "name": "library_shows_seeded_events",
+        "value": 1,
+        "weight": 1,
+        "description": "On load (or after opening Library/Filter), the events list shows multiple seeded events with title and year visible",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.3",
+        "name": "create_signal_tower_demo_visible",
+        "value": 1,
+        "weight": 1,
+        "description": "After creating an event titled Signal Tower Demo with valid HistoryEvent fields (type, timestamp ending with Z, mediaRefs, year, place, categories, summary, detail), the text Signal Tower Demo is visible in the events list",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.4",
+        "name": "three_creates_add_three_rows",
+        "value": 1,
+        "weight": 1,
+        "description": "After adding 3 new events on top of the initial user-managed count, the list shows exactly 3 more rows than before those creates",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.5",
+        "name": "category_filter_narrows_visible_set",
+        "value": 1,
+        "weight": 1,
+        "description": "After filtering by a category/band (with mixed categories present), only matching events remain visible in the filtered list or stage",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.6",
+        "name": "edit_title_to_evening_broadcast",
+        "value": 1,
+        "weight": 1,
+        "description": "After editing an event title to Evening Broadcast, the text Evening Broadcast is visible and the previous title is not",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.7",
+        "name": "delete_removes_title_from_list",
+        "value": 1,
+        "weight": 1,
+        "description": "After deleting an event, that event's title is no longer visible in the events list",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.8",
+        "name": "empty_state_after_clearing_user_events",
+        "value": 1,
+        "weight": 1,
+        "description": "After deleting all user-managed events (or clearing the editable set), an empty state is visible in the list region",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.9",
+        "name": "empty_title_rejected_with_feedback",
+        "value": 1,
+        "weight": 1,
+        "description": "After submitting create with an empty required title, the events count does not increase and validation feedback naming title is visible",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.10",
+        "name": "scrubber_updates_visible_pins",
+        "value": 1,
+        "weight": 1,
+        "description": "After adjusting the year scrubber/window, the set of visible pins or in-view count updates without full page navigation",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.11",
+        "name": "mode_switch_without_reload",
+        "value": 1,
+        "weight": 1,
+        "description": "After switching between Scrub/Explore and Library/Filter modes, the main canvas shows the other mode without full page navigation",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.12",
+        "name": "hover_feedback_on_pins_and_chrome",
+        "value": 1,
+        "weight": 1,
+        "description": "When hovering pins, list rows, or scrubber controls, a visible hover wash, scale, or glow appears",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.13",
+        "name": "detail_next_prev_wraps",
+        "value": 1,
+        "weight": 1,
+        "description": "Click a pin to open its detail panel with title and summary, then use Next/Previous and confirm stepping wraps around at the ends of the sorted filtered set",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.14",
+        "name": "pan_and_wheel_zoom_live",
+        "value": 1,
+        "weight": 1,
+        "description": "Drag the stage to pan and use the wheel to zoom; confirm the pins reposition and the year-range readout changes without full page navigation",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.15",
+        "name": "filter_and_search_recompute",
+        "value": 1,
+        "weight": 1,
+        "description": "Toggle a category filter and type in the search box; confirm the visible pins and list recompute to matching events",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.16",
+        "name": "console_clean_during_session",
+        "value": 1,
+        "weight": 1,
+        "description": "No console.error or unhandled promise rejections appear in the browser log during the agent verifier session",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.17",
+        "name": "crud_updates_shared_collection",
+        "value": 1,
+        "weight": 1,
+        "description": "Timeline events collection supports create, edit, and delete with list rows and derived counts updating from shared application state",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.18",
+        "name": "two_interaction_modes",
+        "value": 1,
+        "weight": 1,
+        "description": "At least two distinct views or interaction modes are switchable without full page navigation",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.19",
+        "name": "filters_recompute_from_shared_collection",
+        "value": 1,
+        "weight": 1,
+        "description": "Domain state beyond CRUD is implemented (filters, year window, category tally) and recomputes visible results from the shared collection",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.23",
+        "name": "detail_panel_fields_and_stepping",
+        "value": 1,
+        "weight": 1,
+        "description": "Selecting a pin opens an in-page detail panel with a year-and-place kicker, title, type, mediaRefs list, category pills, summary, and detail, plus Previous/Next controls that step through the sorted filtered events with wraparound",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.24",
+        "name": "combined_filters_chronological",
+        "value": 1,
+        "weight": 1,
+        "description": "Filtering combines category toggles (an event shows when any of its categories is active), a live text search across title/place/summary/detail, and the year window, recomputing the visible pins and list chronologically",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.25",
+        "name": "dual_handle_scrubber_full_span",
+        "value": 1,
+        "weight": 1,
+        "description": "A dual-handle footer scrubber sets the from/to years with handles that cannot cross and keep a minimum gap, a Full span control fits the whole corpus, and a readout shows the current range in BCE/CE form",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.26",
+        "name": "escape_and_arrow_detail_keys",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Escape closes the topmost of the About modal, Filters drawer, Export drawer, or detail panel, and ArrowLeft/ArrowRight step Previous/Next while a detail is open (suppressed while typing in a field)",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.28",
+        "name": "create_flow_pin_appears_cross_mode",
+        "value": 1,
+        "weight": 1,
+        "description": "Scripted create flow: in Library/Filter mode, note the visible event count, then submit a valid HistoryEvent (including type, Z-timestamp, mediaRefs, and detail) whose year lies inside the current year window and whose category is active. Exactly one new row appears in the Library list showing title and type and any visible count increases by exactly one (measured immediately around the submit); switching back to Scrub/Explore mode then shows a new pin for that event on the stage — all without a reload",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.29",
+        "name": "edit_flow_updates_list_pin_and_detail",
+        "value": 1,
+        "weight": 1,
+        "description": "Scripted edit flow: edit an event's title, type, mediaRefs, and year, then confirm the same record updated everywhere it appears — the Library row shows the new title and type, the pin's position on the stage moved to reflect the new year, and an open detail panel for that event shows the edited type/mediaRefs/year — without a reload",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.30",
+        "name": "delete_flow_clears_all_surfaces",
+        "value": 1,
+        "weight": 1,
+        "description": "Scripted delete flow: with an event selected (detail open), delete it. Its Library row disappears, its pin leaves the stage, the selection/detail panel clears, and the visible count decreases by exactly one (measured immediately around the delete)",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.31",
+        "name": "filter_flow_stage_and_list_in_sync",
+        "value": 1,
+        "weight": 1,
+        "description": "Scripted filter flow: toggling a category off removes that category's pins from the stage and its rows from the Library list at the same time; toggling it back on restores both; narrowing the year window with the scrubber drops out-of-range events from both surfaces simultaneously — the two surfaces never disagree about what is visible",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.32",
+        "name": "filtered_detail_stepping_wraps_with_highlight",
+        "value": 1,
+        "weight": 1,
+        "description": "Scripted stepping flow: with a search or category filter active, open an event's detail and press Next repeatedly — stepping visits only the currently filtered events in chronological order, wraps from the last back to the first, and the stage highlight follows the stepped selection",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.33",
+        "name": "chrome_controls_drawer_modal_reset",
+        "value": 1,
+        "weight": 1,
+        "description": "Filters opens a drawer, About opens an in-page modal, and Reset filters restores the default categories, clears the search, and returns to the default year window",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.34",
+        "name": "default_year_window_bounded",
+        "value": 1,
+        "weight": 1,
+        "description": "On a fresh load the visible year window opens on a bounded default range (for example roughly 1450-1920) rather than the full ~3200 BCE to 2024 CE span, as shown by the range readout and the plotted pins",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.35",
+        "name": "seed_corpus_scale_and_span",
+        "value": 1,
+        "weight": 1,
+        "description": "The seeded corpus is substantial — on the order of dozens of events (target roughly 60) — spanning roughly 3200 BCE to 2024 CE across the twelve closed categories, with every seeded event carrying type, timestamp ending with Z, mediaRefs, and detail (verify by fitting the full span and inspecting Library/detail/export)",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.36",
+        "name": "double_submit_adds_exactly_one",
+        "value": 1,
+        "weight": 1,
+        "description": "Double-activating the create form's submit control in quick succession adds exactly one event: the visible count increases by one and exactly one new row appears",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.37",
+        "name": "full_span_after_narrow_zoom",
+        "value": 1,
+        "weight": 1,
+        "description": "After zooming the year window to a narrow slice, activating the Full span control fits the entire corpus range again, as shown by the readout and pins across the whole span",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.38",
+        "name": "long_title_truncates_with_ellipsis",
+        "value": 1,
+        "weight": 0.5,
+        "description": "An event with a very long title is truncated with an ellipsis in its Library row and shown in full in the detail panel",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.39",
+        "name": "empty_state_offers_recovery_control",
+        "value": 1,
+        "weight": 1,
+        "description": "When the filters, search, and year window match nothing, the list/stage region shows a visible empty state with a message and a working control to reset filters or create an event, and using that control recovers from the empty state",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.40",
+        "name": "inline_errors_and_disabled_submit",
+        "value": 1,
+        "weight": 1,
+        "description": "In the create/edit form, an inline error message naming the field appears next to an empty title, a type outside the closed enum, a non-Z or cross-field-invalid timestamp, empty or over-limit mediaRefs, empty place, empty summary, empty detail, missing categories, or an invalid year before submit, and the submit control stays disabled until every required field is valid",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.41",
+        "name": "library_rows_stream_in_on_fast_scroll",
+        "value": 1,
+        "weight": 1,
+        "description": "Scrolling fast through the full seeded corpus in the Library list shows rows appearing as they enter the viewport, with no blank gaps left behind",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.42",
+        "name": "shift_scroll_slides_year_window",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Shift-scroll (or horizontal scroll) over the stage slides the visible year window earlier or later in time, live and without reload",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.43",
+        "name": "api_field_contract_on_create",
+        "value": 1,
+        "weight": 1,
+        "description": "A valid create requires the HistoryEvent contract: title, type (exactly one of First Appearance, Mass Adoption, Standardization, Obsoletion, Commemoration), ISO-8601 timestamp ending with Z that satisfies the year cross-field rule, mediaRefs (1–6 labels), year (-3200 to 2024 integer), place, one or more closed categories, summary, and detail; the Library row and detail panel show those same field values for the new event",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.44",
+        "name": "year_bounds_rejected",
+        "value": 1,
+        "weight": 1,
+        "description": "Submitting a year below -3200 or above 2024 (or a non-integer year) shows an inline error naming year and does not increase the events count",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.45",
+        "name": "category_tally_tracks_visible_set",
+        "value": 1,
+        "weight": 1,
+        "description": "A live category tally strip shows counts per active category for the currently visible filtered set and recomputes when filters, search, year window, create, edit, delete, bulk actions, undo, or redo change the set",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.46",
+        "name": "bulk_set_category_and_delete",
+        "value": 1,
+        "weight": 1,
+        "description": "In Library/Filter mode, checking at least 2 rows and applying bulk Set category merges the chosen closed-enum category into each checked event without removing unrelated tags; bulk Delete with confirm removes every checked row and the visible count drops by exactly that number",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.47",
+        "name": "undo_redo_create_round_trip",
+        "value": 1,
+        "weight": 1,
+        "description": "After creating an event, Undo removes that row and restores the prior visible count and category tally; Redo restores the created event; Undo and Redo are disabled when their stacks are empty",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.48",
+        "name": "export_drawer_json_csv_live",
+        "value": 1,
+        "weight": 1,
+        "description": "Export timeline opens a drawer with Timeline JSON and Events CSV tabs compiled live from the store; after creating Signal Tower Demo (type First Appearance, timestamp 1920-01-01T00:00:00.000Z, mediaRefs containing signal-tower-demo) and Evening Broadcast (type Mass Adoption), both titles appear in the JSON events array with matching type/timestamp/mediaRefs, document is media-history-timeline, CSV contains both titles under the contract header, and totals.eventCount equals the live collection length",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.49",
+        "name": "export_download_and_copy",
+        "value": 1,
+        "weight": 1,
+        "description": "Download JSON offers timeline-pack.json matching the JSON tab, Download CSV offers timeline-events.csv matching the CSV tab, and Copy on the active tab shows a visible Copied confirmation",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.50",
+        "name": "import_round_trip_reconstructs",
+        "value": 1,
+        "weight": 1,
+        "description": "After mutations, export JSON, clear to an empty/user-cleared state, then Import that JSON — Library list, stage pins, year window, filters, and category tally match the export, and a fresh export's events array matches",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.53",
+        "name": "export_events_carry_api_fields",
+        "value": 1,
+        "weight": 1,
+        "description": "After a valid create, the Timeline JSON events entry for that event includes type from the closed enum, timestamp ending with Z, mediaRefs as a non-empty array, and detail, matching the submitted HistoryEvent payload",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.54",
+        "name": "csv_header_matches_history_event_contract",
+        "value": 1,
+        "weight": 1,
+        "description": "The Events CSV tab header is exactly title,type,timestamp,mediaRefs,year,place,categories,summary,detail with categories pipe-joined and mediaRefs semicolon-joined on data lines",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.55",
+        "name": "closed_type_and_category_enums",
+        "value": 1,
+        "weight": 1,
+        "description": "Create/edit type choices are limited to First Appearance, Mass Adoption, Standardization, Obsoletion, and Commemoration, and category filters expose exactly the twelve closed labels Oral Culture, Manuscript, Print Press, Telegraph, Telephone, Radio, Television, Recording, Computing, Networks, Mobile, and Social Media",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "1.56",
+        "name": "timestamp_year_cross_field_enforced",
+        "value": 1,
+        "weight": 1,
+        "description": "Submitting a CE year with a timestamp whose UTC calendar year does not equal that year, or a BCE year with a timestamp other than 0001-01-01T00:00:00.000Z, shows an inline error naming timestamp or year and does not add an event",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "design_fidelity": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_and_sizing_follow_scale",
+        "value": 1,
+        "weight": 1,
+        "description": "Spacing and sizing follow a coherent scale across stage, scrubber, Library, and export drawer, with no arbitrary one-off values visibly breaking alignment.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Typography matches the instruction: expressive headings/body (not Inter/Roboto/system defaults) with clear hierarchy on stage and detail.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_reference",
+        "value": 1,
+        "weight": 1,
+        "description": "Layout matches reference screenshots to within a small tolerance at desktop — stage, scrubber/footer, and chrome composition — with instruction text winning on conflicts.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.4",
+        "name": "specified_state_changes_animate",
+        "value": 1,
+        "weight": 1,
+        "description": "Transitions or animations are applied to the state changes the spec calls out (detail open/close, list add/remove, drawer enter/exit, export drawer).",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_matches_reference",
+        "value": 1,
+        "weight": 1,
+        "description": "Responsive behavior matches the instruction patterns (desktop stage+scrubber visible; <=768 reflow; 375 no horizontal page scroll).",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.6",
+        "name": "control_styling_matches_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Button and form radii, padding, and states conform to a coherent styled chrome look rather than unstyled browser defaults.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.7",
+        "name": "typography_has_clear_hierarchy",
+        "value": 1,
+        "weight": 1,
+        "description": "Typography has a clear hierarchy that distinguishes brand, detail title, and body text.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Component states (default, hover, active, disabled, error) match the instruction where specified, including disabled Undo/Redo.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.9",
+        "name": "surface_treatments_match_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Color, depth, and paper-stage surface treatments are precise per the instruction's warm/cool atmosphere.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.10",
+        "name": "microinteractions_match_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Microinteraction feedback for hover and press follows the instruction (pin/row wash, scrubber brighten, focus rings).",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "edge_cases": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "empty_state_is_present",
+        "value": 1,
+        "weight": 1,
+        "description": "Empty state UI is present and renders when filters match nothing or all user-managed events are deleted, with a message and a reset/create control",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.2",
+        "name": "forms_validate_inline",
+        "value": 1,
+        "weight": 1,
+        "description": "Inline validation appears on create/edit before submit for empty title, type outside the closed enum, non-Z or cross-field-invalid timestamp, empty mediaRefs, empty place, summary, detail, missing categories, and invalid year, naming each field",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.3",
+        "name": "errors_are_actionable",
+        "value": 1,
+        "weight": 1,
+        "description": "Error messages name the field and the fix rather than only saying Invalid",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.4",
+        "name": "actions_show_confirmation",
+        "value": 1,
+        "weight": 1,
+        "description": "Success or confirmation feedback appears after actions such as Copy (Copied) or completed import",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.5",
+        "name": "async_work_shows_loading_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Where import or export compilation takes noticeable time, a loading or regenerating indication is visible; otherwise rapid preview updates still leave the UI responsive",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.6",
+        "name": "destructive_actions_support_undo_or_cancel",
+        "value": 1,
+        "weight": 1,
+        "description": "Undo is available after create/edit/delete/bulk mutations, and bulk Delete requires an explicit confirm step",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.7",
+        "name": "non_obvious_controls_have_help",
+        "value": 1,
+        "weight": 1,
+        "description": "About/help overlay or tooltips explain scrubbing, filtering, or export for non-obvious controls",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.8",
+        "name": "controls_use_semantic_tags",
+        "value": 1,
+        "weight": 1,
+        "description": "Buttons, inputs, and labels use semantic tags for chrome, forms, and bulk actions",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.9",
+        "name": "modal_supports_close_paths",
+        "value": 1,
+        "weight": 1,
+        "description": "Modal/drawer close controls and Escape both close About, Filters, and Export overlays",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.10",
+        "name": "long_flows_show_progress",
+        "value": 1,
+        "weight": 1,
+        "description": "Export drawer tab switches and import paste/validate provide visible progress or immediate preview feedback",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.11",
+        "name": "scrubber_handles_cannot_cross",
+        "value": 1,
+        "weight": 1,
+        "description": "Dragging one scrubber handle into the other stops at the minimum gap and the range readout never shows an inverted range",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.12",
+        "name": "year_out_of_bounds_rejected",
+        "value": 1,
+        "weight": 1,
+        "description": "A year below -3200 or above 2024 is rejected with an inline error naming year and does not change the collection",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.13",
+        "name": "bulk_with_none_checked_is_noop",
+        "value": 1,
+        "weight": 1,
+        "description": "Bulk Set category and bulk Delete with no rows checked perform no destructive change",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.14",
+        "name": "malformed_import_rejected",
+        "value": 1,
+        "weight": 1,
+        "description": "Importing malformed JSON, document not media-history-timeline, or a pack missing required HistoryEvent fields (bad type, non-Z timestamp, empty mediaRefs, year/timestamp mismatch, or empty detail) shows an inline error naming the import field and leaves collection, filters, and stage unchanged",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.15",
+        "name": "undo_redo_noop_when_empty",
+        "value": 1,
+        "weight": 1,
+        "description": "Undo with nothing to undo and Redo with nothing to redo leave the collection unchanged; controls show disabled treatment",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.16",
+        "name": "empty_export_still_valid_shape",
+        "value": 1,
+        "weight": 1,
+        "description": "With an empty user-managed set (or empty collection where allowed), Export still produces JSON with version 1, document media-history-timeline, live yearWindow/filters, events covering remaining rows (each carrying type, timestamp, and mediaRefs) or empty, and totals that match; Copy still shows Copied",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.17",
+        "name": "media_refs_bounds_rejected",
+        "value": 1,
+        "weight": 1,
+        "description": "Submitting create with zero mediaRefs or more than six mediaRefs shows an inline error naming mediaRefs and does not increase the events count",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.18",
+        "name": "wrong_document_import_rejected",
+        "value": 1,
+        "weight": 1,
+        "description": "Importing a Timeline JSON whose document field is not exactly media-history-timeline shows an inline error naming document or the import field and leaves the collection unchanged",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "innovation": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "export_summary_or_mutation_chip",
+        "value": 1,
+        "weight": 1,
+        "description": "Beyond the required export drawer, a polished archive-operator touch is visible — for example a compact export summary naming eventCount and the active year window above the preview, or a last-mutation chip naming the most recent create/edit/delete.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "11.2",
+        "name": "keyboard_shortcuts_for_undo_redo",
+        "value": 1,
+        "weight": 1,
+        "description": "Beyond required toolbar buttons, keyboard shortcuts for Undo/Redo are available and visibly change the collection when used.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "11.3",
+        "name": "guided_about_onboarding",
+        "value": 1,
+        "weight": 1,
+        "description": "The About/help overlay provides guided how-to copy for scrubbing, filtering, and exporting that helps a first-time operator.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "11.4",
+        "name": "tally_or_era_readout_polish",
+        "value": 1,
+        "weight": 1,
+        "description": "The category tally or era-band labeling provides extra usability beyond a bare list of pins.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "11.5",
+        "name": "alternative_input_support",
+        "value": 1,
+        "weight": 0.5,
+        "description": "The app supports an alternative input path such as keyboard year-window nudges or command-style jump-to-year beyond the required scrubber.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "11.6",
+        "name": "preference_personalization",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional personalization such as a remembered default year window within the session (without browser storage) is visible.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "11.7",
+        "name": "polished_brand_narrative",
+        "value": 1,
+        "weight": 1,
+        "description": "The brand header and About copy present a polished History of Media and Communication narrative without becoming a marketing landing.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "11.8",
+        "name": "dynamic_theming_beyond_requirements",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Optional light paper-tone variants or density controls beyond the required atmosphere are available.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "11.9",
+        "name": "genre_appropriate_platform_features",
+        "value": 1,
+        "weight": 1,
+        "description": "Clipboard copy-with-confirmation and real file downloads for the timeline pack demonstrate polished export UX beyond a preview-only drawer.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "11.10",
+        "name": "competition_level_innovation",
+        "value": 1,
+        "weight": 1,
+        "description": "Competition-level polish is visible to users in stage, export, or bulk workflows beyond a minimal CRUD timeline.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 1,
+        "weight": 1,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "motion": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "hover_wash_and_focus_rings",
+        "value": 1,
+        "weight": 1,
+        "description": "Real pointer hover on a pin or list row shows a scale, glow, or hover wash; hovering scrubber thumbs and chrome buttons brightens them; and keyboard focus shows a visible focus-visible ring on interactive controls (verify hover via computed style while hovering)",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.2",
+        "name": "mode_switch_keeps_hover_feedback",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Mode switches update without full reload and keep hover feedback",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.4",
+        "name": "pan_and_wheel_zoom_live",
+        "value": 1,
+        "weight": 1,
+        "description": "Dragging the stage pans the pins and wheel-zoom narrows or widens the visible year window about its midpoint, live and without reload",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.6",
+        "name": "detail_panel_settle_transition",
+        "value": 1,
+        "weight": 1,
+        "description": "Opening and closing the event detail panel via the real UI (clicking a pin or row, then closing) plays a short opacity/transform settle rather than appearing and disappearing instantly",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.7",
+        "name": "list_row_add_remove_animates",
+        "value": 1,
+        "weight": 1,
+        "description": "Creating an event through the create form animates its row into the Library list, and deleting an event through the UI animates the row out rather than snapping, with the surrounding rows sliding smoothly into place",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.8",
+        "name": "drawer_and_modal_slide_fade",
+        "value": 1,
+        "weight": 1,
+        "description": "The Filters drawer, About modal, and Export drawer enter and exit with a short slide/fade transition rather than appearing and disappearing instantly (opened via their chrome buttons)",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.9",
+        "name": "feedback_messages_animate",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Feedback messages (validation errors, Copied confirmation, import errors) appear with visible motion — a short slide or fade — and dismiss the same way",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.10",
+        "name": "reduced_motion_preference_respected",
+        "value": 1,
+        "weight": 0.5,
+        "description": "With prefers-reduced-motion: reduce emulated, non-essential fades and settles are shortened or removed while panning, scrubbing, and filtering remain fully functional",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "4.11",
+        "name": "bulk_delete_rows_animate_out",
+        "value": 1,
+        "weight": 1,
+        "description": "Bulk Delete animates each removed Library row out rather than snapping the entire list away in one frame",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "performance": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_is_under_two_seconds",
+        "value": 1,
+        "weight": 1,
+        "description": "Cold start to interactive is under 2 seconds on local render.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "9.2",
+        "name": "console_is_clean",
+        "value": 1,
+        "weight": 1,
+        "description": "Browser devtools show no errors or warnings during panning, filtering, CRUD, bulk, undo/redo, export, and import.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "9.3",
+        "name": "transitions_respond_under_100ms",
+        "value": 1,
+        "weight": 1,
+        "description": "UI transitions such as mode switch and export-drawer open respond without perceptible multi-second delay.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "9.4",
+        "name": "async_work_has_loading_indicators",
+        "value": 1,
+        "weight": 1,
+        "description": "Where export preview regeneration or import validation is noticeable, a loading or regenerating indication is shown; otherwise the UI stays responsive.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "9.5",
+        "name": "large_collections_render_without_lag",
+        "value": 1,
+        "weight": 1,
+        "description": "The ~60-event Library list and stage pins render and scroll without perceived lag.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "9.6",
+        "name": "state_changes_remain_interactive",
+        "value": 1,
+        "weight": 1,
+        "description": "The UI remains interactive during filter, create, undo, and export preview updates.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "9.7",
+        "name": "animations_maintain_smooth_frame_rate",
+        "value": 1,
+        "weight": 1,
+        "description": "Stage pan/scrub and list add/remove animations maintain a smooth frame rate during use.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_does_not_freeze",
+        "value": 1,
+        "weight": 1,
+        "description": "The app does not hang or freeze under rapid scrubbing, filtering, or repeated create/undo.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "9.10",
+        "name": "export_tab_switch_regenerates_smoothly",
+        "value": 1,
+        "weight": 1,
+        "description": "Opening the export drawer and switching between Timeline JSON and Events CSV regenerates the preview without freezing the UI.",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "responsiveness": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "layout_adapts_desktop_to_mobile",
+        "value": 1,
+        "weight": 1,
+        "description": "Layout adapts gracefully from 1440px desktop to 375px mobile while keeping stage, scrubber, and Library reachable.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets_are_large_enough",
+        "value": 1,
+        "weight": 1,
+        "description": "UI controls are tap targets at least 44px on mobile.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "7.3",
+        "name": "typography_resizes_across_breakpoints",
+        "value": 1,
+        "weight": 1,
+        "description": "Typography resizes for both mobile and desktop.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "7.4",
+        "name": "content_avoids_clipping_and_overflow",
+        "value": 1,
+        "weight": 1,
+        "description": "Content never clips or overflows the viewport at required widths.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "7.5",
+        "name": "chrome_adapts_to_small_screens",
+        "value": 1,
+        "weight": 1,
+        "description": "Header chrome stacks or collapses at 768px and below while remaining operable.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "7.6",
+        "name": "stacking_reflows_logically",
+        "value": 1,
+        "weight": 1,
+        "description": "Layout stacking order reflows logically at narrow widths (Library uses full width; stage/scrubber remain usable).",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "7.7",
+        "name": "mobile_touch_gestures_work",
+        "value": 1,
+        "weight": 1,
+        "description": "Touch gestures such as tap on pins/rows and scrubber thumbs work on mobile where present.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "7.8",
+        "name": "small_screens_avoid_horizontal_scroll",
+        "value": 1,
+        "weight": 1,
+        "description": "At 375px width there is no page-level horizontal scrolling.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "7.9",
+        "name": "media_and_canvases_resize",
+        "value": 1,
+        "weight": 1,
+        "description": "The timeline stage/canvas sizes responsively to fit the layout.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_remain_accessible",
+        "value": 1,
+        "weight": 1,
+        "description": "Fixed controls (scrubber, mode switch, Export/Import) remain accessible on all devices.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "7.11",
+        "name": "export_drawer_usable_at_375",
+        "value": 1,
+        "weight": 1,
+        "description": "The export drawer and import control stay fully visible and operable at 375px width rather than rendering off-screen.",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "technical": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "shared_state_coherence_across_surfaces",
+        "value": 1,
+        "weight": 1,
+        "description": "A change made in one surface — creating, editing, deleting, bulk mutating, undoing, redoing, or importing — is immediately reflected in every other surface that shows the same data (Library list, stage pins, counts, category tally, detail panel, export preview) without a reload; no surface ever shows stale data another surface already updated",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.2",
+        "name": "seeded_reset_multi_facet_round_trip",
+        "value": 1,
+        "weight": 1,
+        "description": "Scripted probe: create an event, toggle a category off, type a search, narrow the year window, open Export once, and switch mode; confirm localStorage and sessionStorage remain empty throughout; then reload — every facet coherently returns to the seeded baseline (seeded corpus, default categories, empty search, default year window, empty undo stacks), never a mix of surviving and reset facets",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.4",
+        "name": "keyboard_operable_chrome_controls",
+        "value": 1,
+        "weight": 1,
+        "description": "Every chrome control (mode switch, Filters, About, Reset filters, Undo, Redo, Export timeline, Import timeline, form fields, scrubber thumbs, bulk actions) is reachable and operable with the keyboard alone, showing a visible focus indicator on each",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.5",
+        "name": "dialogs_trap_and_return_focus",
+        "value": 1,
+        "weight": 1,
+        "description": "The About modal, Filters drawer, and Export drawer expose dialog semantics, trap keyboard focus while open, and return focus to the control that opened them on close",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.6",
+        "name": "validation_exposed_to_assistive_tech",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Form validation messages and import errors are exposed to assistive technology (e.g. an aria-live region, role=alert, or aria-describedby wiring on the field) in addition to being shown visually",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.7",
+        "name": "interactive_within_two_seconds",
+        "value": 1,
+        "weight": 1,
+        "description": "On a local cold load, the app renders and is interactive (a pin or chrome control responds) within 2 seconds",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.8",
+        "name": "console_clean_during_full_exercise",
+        "value": 1,
+        "weight": 1,
+        "description": "No console errors or warnings appear during a full exercise of the app — panning, zooming, filtering, creating, editing, deleting, bulk actions, undo/redo, exporting, importing, and stepping through details",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.9",
+        "name": "stage_and_library_stay_smooth",
+        "value": 1,
+        "weight": 1,
+        "description": "Panning and scrubbing the stage stay smooth with no visible hitching while the pins reposition, and scrolling the Library list fast stays smooth through the full seeded corpus",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.11",
+        "name": "export_compiled_from_live_store",
+        "value": 1,
+        "weight": 1,
+        "description": "Export JSON and CSV previews are compiled from the live session store under the HistoryEvent contract: after a create or edit, reopening or refreshing the export drawer shows the mutated title/type/timestamp/mediaRefs/detail without reload",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.12",
+        "name": "import_replaces_shared_store",
+        "value": 1,
+        "weight": 1,
+        "description": "A successful Timeline JSON import with document media-history-timeline replaces the shared events collection and filter/window fields so Library, stage, scrubber, tally, and a subsequent export all agree including type, timestamp, and mediaRefs",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.13",
+        "name": "create_record_is_request_body_shape",
+        "value": 1,
+        "weight": 1,
+        "description": "After a valid create, the Library row and detail panel show the submitted HistoryEvent request-body fields (title, type, timestamp, mediaRefs, year, place, categories, summary, detail) and a subsequent Timeline JSON events entry matches that same shape",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "2.14",
+        "name": "in_memory_only_no_storage",
+        "value": 1,
+        "weight": 1,
+        "description": "Throughout create, filter, export, and import exercises, localStorage and sessionStorage remain empty (good-app in-memory genre)",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "user_flows": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "create_flow_updates_all_surfaces",
+        "value": 1,
+        "weight": 1,
+        "description": "Create flow: submitting a valid HistoryEvent (title, type, timestamp, mediaRefs, year, place, categories, summary, detail) adds exactly one Library row showing title and type, increases the visible count by one, updates the category tally, and shows a stage pin when in range — without reload",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_create_shows_inline_validation",
+        "value": 1,
+        "weight": 1,
+        "description": "Create flow: empty title, type outside the closed enum, non-Z or cross-field-invalid timestamp, empty mediaRefs, empty place, empty summary, empty detail, missing categories, or invalid year triggers immediate inline validation naming the field and adds no event",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.3",
+        "name": "edit_flow_updates_related_displays",
+        "value": 1,
+        "weight": 1,
+        "description": "Edit flow: editing title, type, timestamp, mediaRefs, or year updates the Library row, pin position when year changed, open detail (including type and mediaRefs), and a subsequent export's matching event object without reload",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.4",
+        "name": "delete_flow_updates_all_surfaces",
+        "value": 1,
+        "weight": 1,
+        "description": "Delete flow: deleting an event removes its Library row and pin, clears selection/detail, decreases the visible count by one, and drops it from the next export",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.5",
+        "name": "view_switch_retains_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Mode switch between Scrub/Explore and Library/Filter changes the canvas without reload and keeps the shared collection, filters, and year window",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.6",
+        "name": "last_delete_reveals_empty_state",
+        "value": 1,
+        "weight": 1,
+        "description": "After the last user-managed delete (or filtering to zero matches), the empty state is clear and visible in the list/stage region",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.7",
+        "name": "filters_update_all_surfaces",
+        "value": 1,
+        "weight": 1,
+        "description": "Filter flow: toggling a category or narrowing the year window updates Library rows, stage pins, and the category tally together",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.8",
+        "name": "collapsible_chrome_preserves_workflow",
+        "value": 1,
+        "weight": 1,
+        "description": "Filters drawer or collapsed chrome can be hidden and reopened with workflow continuity (filters and year window preserved)",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.9",
+        "name": "overlays_support_expected_flows",
+        "value": 1,
+        "weight": 1,
+        "description": "About modal, Filters drawer, Export drawer, and detail panel open/close as expected for exploration, edit, and export flows",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.10",
+        "name": "flow_recovers_without_reload",
+        "value": 1,
+        "weight": 1,
+        "description": "Recovery: empty-state reset/create, clearing import errors, or closing overlays corrects the flow without a reload (no dead ends)",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.11",
+        "name": "bulk_flow_updates_list_and_stage",
+        "value": 1,
+        "weight": 1,
+        "description": "Bulk flow: checking at least 2 rows and applying bulk Set category merges the chosen closed-enum category into each checked event's categories without removing unrelated tags; bulk Delete with confirm removes every checked row and drops the count by exactly that number",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.12",
+        "name": "undo_flow_restores_prior_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Undo flow: after creating an event, Undo removes that row, decrements the visible count by one, and restores the category tally; Redo restores the created event",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.13",
+        "name": "export_flow_contains_session_titles",
+        "value": 1,
+        "weight": 1,
+        "description": "Export flow: after creating Signal Tower Demo with type First Appearance, timestamp 1920-01-01T00:00:00.000Z, mediaRefs containing signal-tower-demo, and Evening Broadcast with type Mass Adoption, open Export timeline — JSON events contain both titles with matching type/timestamp/mediaRefs, document is media-history-timeline, totals.eventCount matches the live collection length, yearWindow matches the scrubber, CSV contains both titles under the contract header, and Copy shows Copied",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.14",
+        "name": "import_round_trip_flow",
+        "value": 1,
+        "weight": 1,
+        "description": "Import round-trip: export JSON after mutations, clear to empty/user-cleared, Import that JSON — Library titles/types/mediaRefs, pins, year window, filters, and tally reconstruct, and a fresh export's events array matches",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "6.15",
+        "name": "reload_returns_seeded_baseline",
+        "value": 1,
+        "weight": 1,
+        "description": "A page reload returns the seeded corpus, default categories, empty search, default year window, and empty undo/redo stacks",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "visual_design": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "exploration_first_composition",
+        "value": 1,
+        "weight": 1,
+        "description": "Timeline stage plus scrubber/library composition stays exploration-first, not a marketing card stack",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.2",
+        "name": "empty_state_visually_present",
+        "value": 1,
+        "weight": 1,
+        "description": "Empty list/filter state is visually present when no events match",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.4",
+        "name": "era_bands_and_category_pins",
+        "value": 1,
+        "weight": 1,
+        "description": "The canvas axis draws about seven labelled era bands and adaptive year ticks, and pins carry their category color",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.5",
+        "name": "expressive_typography_and_paper_atmosphere",
+        "value": 1,
+        "weight": 1,
+        "description": "Headings and body text render in an expressive typeface (computed font-family is not Inter, Roboto, Arial, or a system default stack), and the stage carries a warm or cool paper-toned atmosphere rather than a plain white background",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.6",
+        "name": "brand_header_and_document_title",
+        "value": 1,
+        "weight": 1,
+        "description": "The brand header shows the product name MediaHistoryTimeline with History of Media and Communication as the brand signal, the first viewport is the timeline tool itself, and the document title reflects MediaHistoryTimeline",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.7",
+        "name": "category_color_and_detail_hierarchy",
+        "value": 1,
+        "weight": 1,
+        "description": "Event pins or list rows show their category color, and the detail panel presents a clear hierarchy: a kicker (year and place), a prominent title, type, mediaRefs list, category pills, summary, and detail visually distinct from the title",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.8",
+        "name": "consistent_icon_set_across_chrome",
+        "value": 1,
+        "weight": 1,
+        "description": "Icons across the chrome (mode switch, filters, about, undo/redo, export/import, form controls) come from one consistent icon set with a uniform stroke style — no mixed icon styles",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.9",
+        "name": "distinct_component_state_treatments",
+        "value": 1,
+        "weight": 1,
+        "description": "Buttons, inputs, and scrubber thumbs show distinct default, hover, focus, and disabled treatments (verified via computed styles while in each state), form fields show a distinct error treatment, and Undo/Redo show disabled treatment when stacks are empty",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.10",
+        "name": "desktop_layout_fits_without_horizontal_scroll",
+        "value": 1,
+        "weight": 1,
+        "description": "At 1024px width and above, the stage, scrubber, and chrome controls are all visible without horizontal scrolling",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.11",
+        "name": "narrow_width_chrome_reflow_usable",
+        "value": 1,
+        "weight": 1,
+        "description": "At widths of 768px and below, the chrome reflows — the header controls stack or collapse and the Library/Filter surface uses the full width — while the stage, scrubber, filtering, detail panel, and export drawer all remain usable",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.13",
+        "name": "consistent_capitalization_convention",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Headings, buttons, and category labels use one consistent capitalization convention (title case or sentence case) throughout the app",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.14",
+        "name": "specific_verb_action_labels",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Action labels are specific verbs such as Add event, Reset filters, Export timeline, Import timeline, Undo, and Redo rather than generic labels like Submit or OK where a specific one is possible",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.15",
+        "name": "helpful_validation_and_empty_state_copy",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Validation messages name the field and the fix, import errors name the import field, and the empty state copy explains what matched nothing and how to recover",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.17",
+        "name": "export_drawer_tabs_and_preview",
+        "value": 1,
+        "weight": 1,
+        "description": "The export drawer shows Timeline JSON and Events CSV tabs with a scrollable preview plus Download and Copy affordances",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "3.18",
+        "name": "category_tally_visually_distinct",
+        "value": 1,
+        "weight": 1,
+        "description": "The category tally strip is visually distinct from Library rows and updates without a layout jump that obscures the list",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  },
+  "writing": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout).",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs (Add event, Reset filters, Export timeline, Import timeline, Undo, Redo), not generic (Submit, OK) when a specific label is possible.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders error messages, they name the problem and the fix (Title is required, Year must be between -3200 and 2024, timestamp must end with Z, mediaRefs required), not just a rejection (Invalid).",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders empty states, the copy explains what matched nothing and how to reset filters or create an event.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders body or help copy (About, empty state, import errors), rate how free it is of spelling and grammatical errors.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places, terminology is consistent (event vs item; Export timeline vs Download).",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders years and counts, formatting is consistent (BCE/CE year readout, tally counts).",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders confirmation messages, they state what happened (Copied) rather than vague affirmations.",
+        "reasoning": "Observed in browser as passing."
+      },
+      {
+        "id": "15.9",
+        "name": "export_tab_labels_exact",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders export drawer tab labels, they read exactly Timeline JSON and Events CSV.",
+        "reasoning": "Observed in browser as passing."
+      }
+    ]
+  }
+}
