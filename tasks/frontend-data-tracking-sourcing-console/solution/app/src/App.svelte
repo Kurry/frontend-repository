@@ -113,6 +113,10 @@
   }
   function openPanel(type) {
     panelReturnFocus=document.activeElement;
+    // Panels are top-level surfaces. WebMCP and command-palette actions can
+    // open them without a pointer click, so explicitly retire any prior modal
+    // rather than leaving an invisible focus trap above the panel.
+    app.modal=null; rejectionError=''; pinError=''; pinBusy=false; paletteOpen=false;
     if(type==='export') { panelAt=new Date().toISOString(); exportTab='queue-json'; compareOpen=false; app.sessionFlags.export=true; }
     if(type==='import') { importRaw=''; importError=''; importBusy=false; importForm.reset(); }
     app.panel=type; app.mobileMenu=false; focusDialog(()=>panelCard);
@@ -610,4 +614,4 @@
   <div class="toast {app.toast.kind}" role="status" in:fly={{x:30,duration:D(220)}} out:fade={{duration:D(280)}}><div class="flex items-start gap-3">{#if app.toast.kind==='warning'}<IconAlertTriangle class="mt-0.5 shrink-0 text-[#f0b65a]" size={18}/>{:else}<IconCheck class="mt-0.5 shrink-0 text-[#55d6be]" size={18}/>{/if}<div><div class="text-sm font-semibold">{app.toast.kind==='warning'?'Attention':'Complete'}</div><div class="mt-1 text-xs leading-relaxed text-[#b3c4d3]">{app.toast.message}</div></div><button class="ml-auto text-[#7590a8] hover:text-white" onclick={()=>app.toast=null} aria-label="Dismiss notification"><IconX size={16}/></button></div></div>
 {/if}
 
-<div class="sr-only" aria-live="polite" aria-atomic="true">{app.liveMessage}</div>
+<div class="sr-only" role="status" aria-live="polite" aria-atomic="true">{app.liveMessage}</div>
