@@ -71,7 +71,7 @@ function MetadataForm({ open, onClose, openerRef }) {
   const save = useStudioStore((s) => s.saveMetadataField);
   useDialogDismiss(open, onClose, openerRef);
   const schema = useMemo(() => createMetadataFormSchema(fields), [fields]);
-  const { register, handleSubmit, control, watch, reset, setError, formState: { errors, isValid } } = useForm({ resolver: zodResolver(schema), mode: 'onChange', defaultValues: { name: '', kind: 'text', options: [] } });
+  const { register, handleSubmit, control, watch, reset, setError, setValue, formState: { errors, isValid } } = useForm({ resolver: zodResolver(schema), mode: 'onChange', defaultValues: { name: '', kind: 'text', options: [] } });
   const kind = watch('kind');
   const options = watch('options') || [];
   const needsOptions = kind === 'select' && !options.length;

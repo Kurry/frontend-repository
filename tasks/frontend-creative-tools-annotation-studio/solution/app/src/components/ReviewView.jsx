@@ -11,9 +11,10 @@ import { useDialogDismiss } from './dialogs';
 function DisputeForm({ item, onClose, openerRef }) {
   const changeState = useStudioStore((s) => s.setReviewState);
   useDialogDismiss(Boolean(item), onClose, openerRef);
-  const { register, handleSubmit, formState: { errors, isValid } } = useForm({ resolver: zodResolver(DisputeCreateSchema), mode: 'onChange', reValidateMode: 'onChange', defaultValues: { reason: '' } });
+  const { register, handleSubmit, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(DisputeCreateSchema), mode: 'onChange', reValidateMode: 'onChange', defaultValues: { reason: '' } });
+  const reason = watch('reason');
   const submit = ({ reason }) => { changeState(item.id, 'disputed', { disputeReason: reason }); onClose(); };
-  return <ComposedModal open={Boolean(item)} onClose={onClose} size="sm" preventCloseOnClickOutside selectorPrimaryFocus="#dispute-reason" launcherButtonRef={openerRef}><ModalHeader title="Dispute annotation" label="Dispute reason" closeModal={onClose} /><ModalBody hasForm><form id="dispute-form" onSubmit={handleSubmit(submit)} className="modal-form"><TextInput id="dispute-reason" labelText="Reason" maxLength={201} invalid={Boolean(errors.reason)} invalidText={errors.reason?.message || 'Reason is required'} {...register('reason')} /><p className="form-hint">One line, 1–200 characters. The reason field is required.</p></form></ModalBody><ModalFooter><Button kind="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="dispute-form" disabled={!isValid}>Dispute</Button></ModalFooter></ComposedModal>;
+  return <ComposedModal open={Boolean(item)} onClose={onClose} size="sm" preventCloseOnClickOutside selectorPrimaryFocus="#dispute-reason" launcherButtonRef={openerRef}><ModalHeader title="Dispute annotation" label="Dispute reason" closeModal={onClose} /><ModalBody hasForm><form id="dispute-form" onSubmit={handleSubmit(submit)} className="modal-form"><TextInput id="dispute-reason" labelText="Reason" maxLength={200} invalid={Boolean(errors.reason) || !reason.trim()} invalidText={errors.reason?.message || 'Reason is required'} {...register('reason')} /><p className="form-hint">One line, 1–200 characters. The reason field is required and is preserved in History.</p></form></ModalBody><ModalFooter><Button kind="secondary" onClick={onClose}>Cancel</Button><Button type="submit" form="dispute-form" disabled={!isValid}>Dispute</Button></ModalFooter></ComposedModal>;
 }
 
 function ResolveForm({ item, onClose, openerRef }) {
