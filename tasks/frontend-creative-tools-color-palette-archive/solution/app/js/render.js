@@ -146,7 +146,8 @@ export function renderCanvas() {
       <p class="empty-state__title">No palettes match ${escapeHtml(desc)}</p>
       <p class="empty-state__copy">Nothing in the archive carries this combination. Loosen the search or clear the active filters to see the full collection.</p>
       <button type="button" class="btn btn--solid js-clear-all">Clear all filters</button>`;
-    renderCountLine(0, 0, list.length);
+    const inScope = state.palettes.filter((p) => (state.archivedFacet ? p.archived : !p.archived)).length;
+    renderCountLine(0, inScope, 0);
     return;
   }
 

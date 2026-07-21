@@ -3,7 +3,7 @@
 // visible UI uses, and validation is shared verbatim — MCP can never do what
 // the form would reject. No raw files, blobs, base64, or artifact contents in
 // arguments or results.
-import {
+import { toggleSelect, 
   state, ui, paletteById, visiblePalettes,
   createPalette, updatePalette, deletePalettes, toggleFavorite,
   batchArchive, restorePalettes, importArchive, setViewState, notify,
@@ -127,8 +127,7 @@ const handlers = {
     if (!args.entity_id || !paletteById(args.entity_id)) {
       return fail('entity_id is required and must reference an existing palette');
     }
-    state.multiSelect = [args.entity_id];
-    notify();
+    toggleSelect(args.entity_id);
     return ok({ entity_id: args.entity_id, selected: state.multiSelect });
   },
 
