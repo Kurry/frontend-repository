@@ -136,23 +136,24 @@ tell a subagent to skip it. Per-feature-group coverage: every `Feature:` group i
 
 Per `create-task`: add the slug to `TASK_SPECS` mirroring the existing entry
 archetype (source, house-style description "<Brand> <domain> good-app eval.",
-modules, bindings, mechanics_exclusions), plus `schemas/webmcp-task-sources.json`
-and `schemas/webmcp-assignments.json`. Package ONLY the new slug (call
+modules, bindings, mechanics_exclusions), plus corpuscheck `schemas/webmcp-task-sources.json`
+and `schemas/webmcp-assignments.json` (package data under
+`packages/corpuscheck/src/corpuscheck/schemas/`). Package ONLY the new slug (call
 `package_task(slug, spec)` directly — full `main()` requires every archived
 authoring source). Check `copy_solution_app`/`should_skip` so INVENTORY.md,
 README.md, and rubric files stay out of `solution/app`.
 
 Growing the corpus breaks count assertions: update
 `test_assignment_map_covers_23`-style hard counts in
-`scripts/tests/test_webmcp_h3.py`.
+`packages/corpuscheck/tests/test_webmcp_h3.py`.
 
 ## Stage 8 — Screenshots + validation
 
 ```bash
-node scripts/capture_reference_screenshots.mjs <slug>       # must be OK consoleErr=0 pageErr=0
-python3 scripts/install_reference_screenshots.py <slug>
-python3 -m unittest scripts.tests.test_webmcp_h3            # from repo root
-python3 scripts/regen_dimension_tomls.py <slug>             # must be ok
+uv run corpuscheck screenshots capture <slug>   # must be OK consoleErr=0 pageErr=0
+uv run corpuscheck screenshots install <slug>
+uv run pytest packages/corpuscheck/tests        # from repo root
+uv run corpuscheck scaffold <slug> --check      # dimension tomls parse
 cd ~/harbor && uv run python -c "import tomllib; from harbor.models.task.config import TaskConfig; TaskConfig.model_validate(tomllib.load(open('<abs task.toml>','rb'))); print('ok')"
 ```
 

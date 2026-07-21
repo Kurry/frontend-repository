@@ -4,15 +4,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-65 active frontend-only Harbor eval tasks (`tasks/frontend-*`), plus 38 quarantined under `tasks-quarantine/` (dist-absent oracles; see `tasks-quarantine/README.md`). Each task asks a builder agent to rebuild a reference web app from a PRD-style `instruction.md`; an LLM judge (codex, `gpt-5.6-sol`) then grades the built app in a real browser across thirteen dimensions (core_features, visual_design, motion, technical, user_flows, edge_cases, responsiveness, accessibility, performance, writing, innovation, design_fidelity, behavioral). Everything under `tasks/` is **generated or vendored** — the source of truth for shared pieces lives in `scripts/`.
+65 active frontend-only Harbor eval tasks (`tasks/frontend-*`), plus 38 quarantined under `tasks-quarantine/` (dist-absent oracles; see `tasks-quarantine/README.md`). Each task asks a builder agent to rebuild a reference web app from a PRD-style `instruction.md`; an LLM judge (codex, `gpt-5.6-sol`) then grades the built app in a real browser across thirteen dimensions (core_features, visual_design, motion, technical, user_flows, edge_cases, responsiveness, accessibility, performance, writing, innovation, design_fidelity, behavioral). Everything under `tasks/` is **generated or vendored** — the source of truth for shared pieces lives in `packages/corpuscheck/` (python tooling, canonical templates, schemas) and `packages/webmcp-contracts/` (module specs).
 
 Four genres: **good-app** tasks (the original corpus, in-memory state, no localStorage), **website-fidelity** tasks (pixel-perfect recreations of live sites — e.g. landing-landonorris, landing-avax-network, landing-hildenkaira, mosbyfiles, landing-razorpay-sprint-26, landing-readymag, landing-units-gr, landing-wolverineworldwide), **hard browser apps/games** (canvas/game/tool apps from zto-phase2 PRDs), and **framework rebuilds** (e.g. workflow-docuseal, creative-tools-mermaid-live-editor, data-tracking-ghostfolio, data-tracking-plausible-analytics). The latter two genres keep localStorage where their source PRD mandates it — the no-localStorage rule binds only the good-app genre. Any task video that the judge must see rendered needs a VP9 `.webm` source ahead of mp4 — the judge's codec-limited chromium cannot decode h264.
 
 ## Commands
 
 ```bash
-# Unit tests (MUST run from repo root — module discovery is cwd-relative)
-python3 -m unittest scripts.tests.test_webmcp_h3
+# Unit tests (corpuscheck package suite, includes the webmcp_h3 contract tests)
+uv run pytest packages/corpuscheck/tests
+
+# Corpus certification + consistency (all tooling is the corpuscheck CLI,
+# a uv-workspace member at packages/corpuscheck — run from repo root)
+uv run corpuscheck validate --all --force --root tasks
+uv run corpuscheck propagate --check   # canonical-surface drift (zero = clean)
 
 # Run a task end-to-end (builder + verifier)
 harbor run -p tasks/frontend-data-tracking-admin-analytics-dashboard -a claude-code -m sonnet
@@ -29,8 +34,8 @@ uv run harbor score <trial-or-job-dir> \
 
 # Capture reference screenshots from every task's solution/app oracle
 # (also a per-oracle smoke validation: serve + zero console/page errors)
-node scripts/capture_reference_screenshots.mjs [slug ...]
-python3 scripts/install_reference_screenshots.py [slug ...]   # install into task envs
+uv run corpuscheck screenshots capture [slug ...]
+uv run corpuscheck screenshots install [slug ...]   # install into task envs
 
 ```
 
@@ -39,26 +44,26 @@ Dimension tomls (`tests/<dim>/<dim>.toml`) are the single source of truth for cr
 ## Non-negotiable invariants (hard-won; see AGENTS.md for the full list)
 
 Every one of these is a corpus defect if violated, and each has a guard:
-- **Consistency is scripted**: after any canonical edit run `python3 scripts/propagate_canonical.py` (`--check` = zero drift). Never hand-copy shared files.
-- **13 tag-aligned dimensions** per task (`scripts/generate_dimension_scaffolds.py` baselines them; `create-rubrics` specializes; `rubric-align` aligns).
+- **Consistency is scripted**: after any canonical edit run `uv run corpuscheck propagate` (`--check` = zero drift). Never hand-copy shared files.
+- **13 tag-aligned dimensions** per task (`uv run corpuscheck scaffold` baselines them; `create-rubrics` specializes; `rubric-align` aligns).
 - **Judge integrity** (canonical `system_prompt.md`, cwd `/logs/verifier`): observer never repairer, never reads app source, `browser_evaluate` read-only, `BLOCKED:`/`FAIL:` prefixes.
 - **Criteria are LLM-judge only, never code checks**; every PRD promise must be tested by a criterion a violating build would FAIL; negatives carry `negate=true` and state the defect as present; only ADD criteria, never renumber/delete (ids are provenance).
 - **API-shaped schemas** and a **useful downloadable end state** are authoring mandates, not extras.
 
-**Legacy authoring archive.** Historic per-task authoring folders were moved to `~/Documents/frontend-repository-authoring-backup-2026-07-18`; `regen_dimension_tomls.py` and full `package_frontend_tasks.py` runs are legacy paths that need them restored. Do not route new work through that pipeline — edit instruction.md and the dimension tomls directly. The mapping slug→source lives in `schemas/webmcp-task-sources.json` and `TASK_SPECS` in `scripts/package_frontend_tasks.py`.
+**Legacy authoring archive.** Historic per-task authoring folders were moved to `~/Documents/frontend-repository-authoring-backup-2026-07-18`; the retired `regen_dimension_tomls.py` (deleted) and full `package_frontend_tasks` runs are legacy paths that need them restored. Do not route new work through that pipeline — edit instruction.md and the dimension tomls directly. The mapping slug→source lives in corpuscheck package data (`packages/corpuscheck/src/corpuscheck/schemas/webmcp-task-sources.json`) and `TASK_SPECS` in `corpuscheck/package_frontend_tasks.py`.
 
 ## Architecture
 
 ### Generation pipeline (edit generators, never the per-task copies)
 
-`scripts/package_frontend_tasks.py` is the single source of truth for everything replicated across tasks: `TEST_SH` (tests/test.sh), `TASK_TOML_TMPL` + `ARTIFACT_EXCLUDES` (task.toml), `DOCKERFILE`, the judge `[judge]` header, and `rubric_to_tomls()` (legacy: compiled archived authoring JSON into dimension tomls). `scripts/canonical/` holds the authored templates it inlines: `system_prompt.md` (judge prompt), `mcp/reward_mcp_servers.toml` (judge MCP servers fragment), `mcp/webmcp_stdio_server.mjs` (vendored per task as `tests/webmcp_stdio_server.mjs`), `test.sh`. All `test.sh` and `task.toml` copies across the 65 active tasks are byte-identical products of these templates — a unit test enforces the artifact-exclude set, so a drive-by edit to one copy will fail CI-style checks.
+`corpuscheck.package_frontend_tasks` (`packages/corpuscheck/src/corpuscheck/package_frontend_tasks.py`) is the single source of truth for everything replicated across tasks: `TEST_SH` (tests/test.sh), `TASK_TOML_TMPL` + `ARTIFACT_EXCLUDES` (task.toml), `DOCKERFILE`, the judge `[judge]` header, and `rubric_to_tomls()` (legacy: compiled archived authoring JSON into dimension tomls). `packages/corpuscheck/src/corpuscheck/canonical/` holds the authored templates it inlines: `system_prompt.md` (judge prompt), `mcp/reward_mcp_servers.toml` (judge MCP servers fragment), `mcp/webmcp_stdio_server.mjs` (vendored per task as `tests/webmcp_stdio_server.mjs`), `test.sh`. All `test.sh` and `task.toml` copies across the 65 active tasks are byte-identical products of these templates — a unit test enforces the artifact-exclude set, so a drive-by edit to one copy will fail CI-style checks.
 
 ### Task anatomy
 
-- `instruction.md` — PRD the builder sees. Content sections (`<summary>`, `<core_features>`, `<visual_design>`, `<motion>`, `<requirements>`) are written as observable behaviors (action → expected evidence, quantifiers resolved). Protected sections (`<integrity>`, `<delivery>`, `<webmcp_action_contract>`, `<reference_screenshots>`) are contract/plumbing — the webmcp block is rendered by `scripts/webmcp_h3.py` from `schemas/webmcp-assignments.json` and module specs in `packages/webmcp-contracts`. The contract is mandatory at authoring time (never deferred; the unit suite fails contract-less task dirs), and bindings aim to cover every `Feature:` group — groups the modules can't express get an explicit `mechanics_exclusions` entry.
-- `README.md` — canonical generated surface (title + one-line description from `schemas/webmcp-task-sources.json`, standard Judging/Running sections), rendered by `scripts/propagate_canonical.py` — never hand-edited.
+- `instruction.md` — PRD the builder sees. Content sections (`<summary>`, `<core_features>`, `<visual_design>`, `<motion>`, `<requirements>`) are written as observable behaviors (action → expected evidence, quantifiers resolved). Protected sections (`<integrity>`, `<delivery>`, `<webmcp_action_contract>`, `<reference_screenshots>`) are contract/plumbing — the webmcp block is rendered by `corpuscheck webmcp apply` (`corpuscheck/webmcp_h3.py`) from corpuscheck schemas/webmcp-assignments.json and module specs in `packages/webmcp-contracts`. The contract is mandatory at authoring time (never deferred; the unit suite fails contract-less task dirs), and bindings aim to cover every `Feature:` group — groups the modules can't express get an explicit `mechanics_exclusions` entry.
+- `README.md` — canonical generated surface (title + one-line description from corpuscheck schemas/webmcp-task-sources.json, standard Judging/Running sections), rendered by `corpuscheck propagate` — never hand-edited.
 - `environment/` — Dockerfile + `reference-screenshots/` (copied to `/reference-screenshots` in the builder container; images are advisory, instruction text wins).
-- `solution/app` — the oracle. Used by `solve.sh`, by the screenshot capture script, and validated to serve with zero console/page errors. Oracles that serve a build output (`vite preview`, `http-server dist`) keep the built `dist/` committed alongside the source so both the capture harness and `test.sh` (`verify:build` then `start`) work. Its `README.md` is likewise a generated `propagate_canonical.py` surface (module list from `schemas/webmcp-assignments.json`).
+- `solution/app` — the oracle. Used by `solve.sh`, by the screenshot capture script, and validated to serve with zero console/page errors. Oracles that serve a build output (`vite preview`, `http-server dist`) keep the built `dist/` committed alongside the source so both the capture harness and `test.sh` (`verify:build` then `start`) work. Its `README.md` is likewise a generated `corpuscheck propagate` surface (module list from corpuscheck schemas/webmcp-assignments.json).
 - `tests/` — `test.sh` (verifier entry), `system_prompt.md`, `mcp/webmcp_stdio_server.mjs`, and thirteen tag-aligned `<dim>/<dim>.toml` rubrics (31–42 criteria in the four core dims; baseline criteria in the rest until specialized).
 
 ### Verifier / judge stack

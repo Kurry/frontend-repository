@@ -14,6 +14,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import Iterable
 
+from .repo import canonical_dir, find_repo_root
+
 
 EXISTING_DIMENSIONS = ("core_features", "visual_design", "motion", "technical")
 NEW_DIMENSIONS = (
@@ -95,13 +97,7 @@ class TaskValidation:
 
 def resolve_repo_root(start: Path | None = None) -> Path:
     """Locate the repository without assuming the caller's working directory."""
-    start = (start or Path(__file__)).resolve()
-    for candidate in (start, *start.parents):
-        if (candidate / "scripts" / "webmcp_h3.py").is_file() and (
-            candidate / "schemas" / "webmcp-assignments.json"
-        ).is_file():
-            return candidate
-    raise FileNotFoundError("cannot locate repository root")
+    return find_repo_root(start)
 
 
 @lru_cache(maxsize=None)
@@ -120,16 +116,12 @@ def repository_sources() -> tuple[ModuleType, ModuleType, ModuleType, ModuleType
     root = resolve_repo_root()
     # Importing repository source-of-truth modules must remain read-only too.
     sys.dont_write_bytecode = True
-    scripts = str(root / "scripts")
-    tasks = str(root / "tasks")
-    for entry in (scripts, tasks):
-        if entry not in sys.path:
-            sys.path.insert(0, entry)
-    webmcp = _load_module("corpuscheck_webmcp_h3", str(root / "scripts/webmcp_h3.py"))
-    package = _load_module(
-        "corpuscheck_package_frontend_tasks",
-        str(root / "scripts/package_frontend_tasks.py"),
-    )
+    # webmcp_h3 and package_frontend_tasks are corpuscheck's own modules now;
+    # the skill validators stay under .claude/skills (shared with the skills
+    # themselves) and are loaded from the repository by file path.
+    from . import package_frontend_tasks as package
+    from . import webmcp_h3 as webmcp
+
     migration = _load_module(
         "corpuscheck_validate_migration",
         str(root / ".claude/skills/instruction-migrate/scripts/validate_migration.py"),
@@ -203,24 +195,32 @@ def validate_layout(
 
 
 def validate_shared_shape(task_dir: Path) -> CheckResult:
-    root = resolve_repo_root()
     _, package, _, _ = repository_sources()
+    canon = canonical_dir()
     messages: list[str] = []
     comparisons: dict[str, bytes] = {
-        "tests/test.sh": (root / "scripts/canonical/test.sh").read_bytes(),
-        "tests/system_prompt.md": (root / "scripts/canonical/system_prompt.md").read_bytes(),
+        "tests/test.sh": (canon / "test.sh").read_bytes(),
+        "tests/system_prompt.md": (canon / "system_prompt.md").read_bytes(),
         "tests/webmcp_stdio_server.mjs": (
-            root / "scripts/canonical/mcp/webmcp_stdio_server.mjs"
+            canon / "mcp/webmcp_stdio_server.mjs"
         ).read_bytes(),
         "environment/Dockerfile": package.DOCKERFILE.encode(),
     }
     sources = source_metadata()
     description = (sources.get(task_dir.name) or {}).get("description")
     if description is None:
-        messages.append("no description in schemas/webmcp-task-sources.json")
+        messages.append("no description in corpuscheck schemas/webmcp-task-sources.json")
     else:
         comparisons["task.toml"] = package.render_task_toml(
             task_dir.name, description
+        ).encode()
+        comparisons["README.md"] = package.render_task_readme(
+            task_dir.name, description
+        ).encode()
+    assignment = assignments_by_slug().get(task_dir.name)
+    if assignment is not None:
+        comparisons["solution/app/README.md"] = package.render_oracle_readme(
+            task_dir.name, assignment["modules"]
         ).encode()
     screenshot_copy = b"COPY reference-screenshots/ /reference-screenshots/\n"
     for rel, expected in comparisons.items():

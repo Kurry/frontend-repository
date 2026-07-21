@@ -6,7 +6,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
-from .validate import assignments_by_slug, repository_sources, resolve_repo_root, source_metadata
+from .repo import canonical_dir
+from .validate import assignments_by_slug, repository_sources, source_metadata
 
 
 class DriftKind(str, Enum):
@@ -48,24 +49,30 @@ SCREENSHOT_COPY = "COPY reference-screenshots/ /reference-screenshots/\n"
 
 
 def _expected_files(slug: str, task_dir: Path | None = None) -> dict[str, bytes]:
-    root = resolve_repo_root()
     _, package, _, _ = repository_sources()
+    canon = canonical_dir()
     dockerfile = package.DOCKERFILE
-    # propagate_canonical.py appends the reference-screenshots COPY line for
+    # `corpuscheck propagate` appends the reference-screenshots COPY line for
     # tasks that ship them; the drift expectation must match.
     if task_dir is not None and (task_dir / "environment/reference-screenshots").is_dir():
         dockerfile += SCREENSHOT_COPY
     expected = {
-        "tests/test.sh": (root / "scripts/canonical/test.sh").read_bytes(),
-        "tests/system_prompt.md": (root / "scripts/canonical/system_prompt.md").read_bytes(),
+        "tests/test.sh": (canon / "test.sh").read_bytes(),
+        "tests/system_prompt.md": (canon / "system_prompt.md").read_bytes(),
         "tests/webmcp_stdio_server.mjs": (
-            root / "scripts/canonical/mcp/webmcp_stdio_server.mjs"
+            canon / "mcp/webmcp_stdio_server.mjs"
         ).read_bytes(),
         "environment/Dockerfile": dockerfile.encode(),
     }
     description = (source_metadata().get(slug) or {}).get("description")
     if description is not None:
         expected["task.toml"] = package.render_task_toml(slug, description).encode()
+        expected["README.md"] = package.render_task_readme(slug, description).encode()
+    assignment = assignments_by_slug().get(slug)
+    if assignment is not None:
+        expected["solution/app/README.md"] = package.render_oracle_readme(
+            slug, assignment["modules"]
+        ).encode()
     return expected
 
 

@@ -29,7 +29,7 @@ PLAYWRIGHT_MCP = "@playwright/mcp@0.0.76"
 # harbor-rewardkit: single source of truth for tests/test.sh installs — NEVER
 # the Dockerfile. The judge harness is installed at verify time, after the
 # builder's turn, so the agent cannot inspect or tamper with it (reward-hacking
-# surface). Bump the SHA -> regenerate test.sh copies via propagate_canonical.py.
+# surface). Bump the SHA -> regenerate test.sh copies via `corpuscheck propagate`.
 # Same Kurry/harbor fork SHA as zto-phase2-prds (pyproject.toml).
 # Do not vendor packages/rewardkit source into task environment/ trees.
 HARBOR_REWARDKIT_GIT_SHA = "49ac88859e31cd5561f98249aaf4b9ca03c90f7e"

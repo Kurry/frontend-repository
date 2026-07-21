@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import sqlite3
-import tomllib
 from pathlib import Path
 
 import typer
@@ -41,9 +40,14 @@ reliability_app = typer.Typer(help="Judge-reliability analysis over ingested tri
 app.add_typer(record_app, name="record")
 app.add_typer(baseline_app, name="baseline")
 app.add_typer(reliability_app, name="reliability")
+screenshots_app = typer.Typer(help="Capture and install oracle reference screenshots.", no_args_is_help=True)
+app.add_typer(screenshots_app, name="screenshots")
 console = Console()
 err = Console(stderr=True)
-DEFAULT_ROOT = str(default_tasks_root())
+try:
+    DEFAULT_ROOT = str(default_tasks_root())
+except FileNotFoundError:  # outside a checkout; commands accept --root
+    DEFAULT_ROOT = "tasks"
 DEFAULT_DB_PATH = str(DEFAULT_DB)
 
 
@@ -214,7 +218,7 @@ def validate_cmd(
     tasks: list[str] = typer.Argument(None, help="frontend-* task names"),
     root: str = typer.Option(DEFAULT_ROOT, "--root"),
     all_tasks: bool = typer.Option(False, "--all"),
-    json_out: str | None = typer.Option(None, "--json", help="write JSON report under tools/corpuscheck"),
+    json_out: str | None = typer.Option(None, "--json", help="write JSON report under packages/corpuscheck"),
     strict_oracle: bool = typer.Option(False, "--strict-oracle"),
     incremental: bool = typer.Option(False, "--incremental"),
     force: bool = typer.Option(False, "--force"),
@@ -593,7 +597,9 @@ def nop_scaffold(
     with _connection(db):
         pass
     output = Path(out).expanduser().resolve()
-    repo = Path(__file__).resolve().parents[3]
+    from .repo import find_repo_root
+
+    repo = find_repo_root()
     try:
         output.relative_to(repo)
     except ValueError:
@@ -745,6 +751,76 @@ def reliability_report(
             console.print(f"- {row['slug']}: {row['blocked']} BLOCKED of {row['total']} verdicts")
     else:
         console.print("- none")
+
+
+@app.command("propagate")
+def propagate_cmd(
+    slugs: list[str] = typer.Argument(None, help="frontend-* task names (default: all)"),
+    check: bool = typer.Option(False, "--check", help="report drift and exit 1; write nothing"),
+    root: str | None = typer.Option(None, "--root", help="repository root (default: walk up from cwd)"),
+) -> None:
+    """Propagate every canonical shared surface to task directories."""
+    from .propagate import propagate
+
+    raise typer.Exit(propagate(slugs or [], check=check, root=Path(root).resolve() if root else None))
+
+
+@app.command("scaffold")
+def scaffold_cmd(
+    slugs: list[str] = typer.Argument(None, help="task slugs (default: every tasks/frontend-* directory)"),
+    force: str | None = typer.Option(None, "--force", metavar="DIMENSION", help="overwrite this one dimension's baseline"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="print planned writes without writing"),
+    check: bool = typer.Option(False, "--check", help="parse each file that would be written without writing"),
+) -> None:
+    """Generate baseline TOML scaffolds for the corpus's additional dimensions."""
+    from .scaffold import main as scaffold_main
+
+    argv = list(slugs or [])
+    if force:
+        argv += ["--force", force]
+    if dry_run:
+        argv.append("--dry-run")
+    if check:
+        argv.append("--check")
+    raise typer.Exit(scaffold_main(argv))
+
+
+@app.command("webmcp")
+def webmcp_cmd(
+    mode: str = typer.Argument(..., help="dry-run | check | apply"),
+) -> None:
+    """Render/check/apply the <webmcp_action_contract> blocks in instructions."""
+    from .webmcp_h3 import run as webmcp_run
+
+    if mode not in ("dry-run", "check", "apply"):
+        err.print(f"[red]invalid mode:[/red] {mode} (expected dry-run | check | apply)")
+        raise typer.Exit(2)
+    raise typer.Exit(webmcp_run(mode))
+
+
+@screenshots_app.command("install")
+def screenshots_install_cmd(
+    slugs: list[str] = typer.Argument(None, help="task slugs (default: every captured slug)"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="report what would change without writing"),
+) -> None:
+    """Install captured reference screenshots into task environments."""
+    from .screenshots import install_many
+
+    raise typer.Exit(install_many(slugs or [], dry_run=dry_run))
+
+
+@screenshots_app.command("capture")
+def screenshots_capture_cmd(
+    slugs: list[str] = typer.Argument(None, help="task slugs (default: every tasks/*/solution/app)"),
+    viewports: str | None = typer.Option(None, "--viewports", help="comma list of desktop,tablet,mobile (default: all)"),
+) -> None:
+    """Capture reference screenshots from task oracles (runs the node asset; needs node on PATH)."""
+    from .screenshots import capture
+
+    args = list(slugs or [])
+    if viewports:
+        args.insert(0, f"--viewports={viewports}")
+    raise typer.Exit(capture(args))
 
 
 if __name__ == "__main__":

@@ -43,7 +43,7 @@ Apply the 1:1 tag-alignment rule: each gradeable instruction tag verifies agains
 1. Check the 9 newer dimension folders: `user_flows`, `edge_cases`, `responsiveness`, `accessibility`, `performance`, `writing`, `innovation`, `design_fidelity`, and `behavioral`. If any is missing, scaffold the baselines from the repository root:
 
    ```bash
-   python3 scripts/generate_dimension_scaffolds.py <slug>
+   uv run corpuscheck scaffold <slug>
    ```
 
    This generator may arrive in a parallel change; reference this path and do not invent a replacement when it is unavailable.
@@ -130,6 +130,6 @@ Fix every `FAIL`.
 Then run the corpus validator:
 
 ```bash
-cd tools/corpuscheck && .venv/bin/python -m corpuscheck.cli validate <slug>
+uv run corpuscheck validate <slug>   # from the repo root
 ```
 

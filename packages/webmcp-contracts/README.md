@@ -22,7 +22,7 @@ import { mountReactWebMcp } from "@zto/webmcp-contracts/adapters/react";
 // also: adapters/{svelte,vue,angular,vanilla}
 ```
 
-1. Read seed map: `schemas/webmcp-assignment-map.json` (23 `frontend-*` entries).
+1. Read seed map: corpuscheck `schemas/webmcp-assignment-map.json` (23 `frontend-*` entries).
 2. `validateAssignmentEntry(entry)` then `compileModules(entry.modules, entry.bindings, handlers)`.
 3. Mount with a lifecycle adapter; bind handlers to the same functions as visible controls.
 4. Never own product state; never score via WebMCP.

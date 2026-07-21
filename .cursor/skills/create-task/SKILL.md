@@ -56,20 +56,20 @@ chart hover, drag gesture fidelity, streaming visuals). No unmapped groups.
 
 Three places, kept consistent:
 
-1. `TASK_SPECS` in `scripts/package_frontend_tasks.py` — slug → source,
+1. `TASK_SPECS` in `corpuscheck/package_frontend_tasks.py` — slug → source,
    description, webmcp `modules`, `bindings`, `mechanics_exclusions`.
-2. `schemas/webmcp-task-sources.json` — slug → source/instruction paths.
-3. `schemas/webmcp-assignments.json` — the webmcp assignment (modules from
+2. corpuscheck `schemas/webmcp-task-sources.json` — slug → source/instruction paths.
+3. corpuscheck `schemas/webmcp-assignments.json` — the webmcp assignment (modules from
    `packages/webmcp-contracts` specs; bindings MUST name real product values —
    a filter binding like `artist` when the UI filters by `period` breaks
-   builders). `scripts/webmcp_h3.py` renders the instruction contract block
+   builders). `uv run corpuscheck webmcp apply` renders the instruction contract block
    from this file; `test_assignment_map_covers_23` asserts the count, so bump
    its expectation when adding a 24th task.
 
 ## Step 3 — Package
 
 ```bash
-python3 scripts/package_frontend_tasks.py   # full pipeline, rebuilds task dirs
+uv run python -c "from corpuscheck import package_frontend_tasks as pft; pft.main()"   # full pipeline, rebuilds task dirs
 ```
 
 This writes: `instruction.md` (content + delivery + webmcp contract),
@@ -82,7 +82,7 @@ directly (full packaging wipes hand-curated task files).
 ## Step 4 — Oracle validation + reference screenshots
 
 ```bash
-node scripts/capture_reference_screenshots.mjs <slug>
+uv run corpuscheck screenshots capture <slug>
 ```
 
 Must report `OK ... consoleErr=0 pageErr=0` — fix the oracle app until it does
@@ -90,7 +90,7 @@ Must report `OK ... consoleErr=0 pageErr=0` — fix the oracle app until it does
 vendor chunks, unguarded optional libs). Then install for the builder:
 
 ```bash
-python3 scripts/install_reference_screenshots.py <slug>
+uv run corpuscheck screenshots install <slug>
 ```
 
 (Adds `environment/reference-screenshots/` + Dockerfile COPY + the
@@ -100,7 +100,7 @@ instruction text wins.)
 ## Step 5 — Validate
 
 ```bash
-python3 -m unittest scripts.tests.test_webmcp_h3        # from repo root
+uv run pytest packages/corpuscheck/tests                # from repo root
 cd ~/harbor && uv run python -c "
 import tomllib
 from harbor.models.task.config import TaskConfig
@@ -129,7 +129,7 @@ the app before blaming the rubric or the judge.
 
 - Never hand-edit the 23 generated copies of `test.sh` / `task.toml` /
   dimension tomls — edit the generator templates in
-  `scripts/package_frontend_tasks.py` + `scripts/canonical/` and regenerate.
+  `corpuscheck/package_frontend_tasks.py` + corpuscheck `canonical/` and regenerate.
 - The app under test must expose `window.webmcp_session_info/list_tools/
   invoke_tool` (contract Implementation section) — the judge's webmcp bridge
   discovers exactly that surface.

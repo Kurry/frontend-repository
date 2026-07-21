@@ -12,8 +12,7 @@ from pathlib import Path
 from typing import Any
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-TASKS_ROOT = REPO_ROOT / "tasks"
+from .repo import find_repo_root
 
 FIDELITY_SLUGS = {
     "frontend-landing-landonorris",
@@ -482,6 +481,7 @@ def render_dimension(slug: str, dimension: str, judge_header: str) -> str:
 
 
 def resolve_tasks(slugs: list[str]) -> list[Path]:
+    TASKS_ROOT = find_repo_root() / "tasks"
     if slugs:
         task_paths = []
         for slug in slugs:
@@ -507,6 +507,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
+    REPO_ROOT = find_repo_root()
     try:
         task_paths = resolve_tasks(args.slugs)
         dimensions = [args.force] if args.force else list(DIMENSION_SPECS)

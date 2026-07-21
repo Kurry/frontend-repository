@@ -26,17 +26,16 @@ separate "rebuild" bucket.
 
 ## Task quality tracking
 
-Every task's readiness lives in `tools/corpuscheck`, not in this file — the
+Every task's readiness lives in `packages/corpuscheck`, not in this file — the
 corpus changes too often for a hand-edited table to stay honest. See
-`tools/corpuscheck/README.md` for the full command surface; the everyday loop
-is:
+`packages/corpuscheck/README.md` for the full command surface; the everyday loop
+(from the repo root) is:
 
 ```bash
-cd tools/corpuscheck
-corpuscheck discover --root ../../tasks   # register new/renamed tasks
-corpuscheck validate --all --incremental  # run static tiers, refresh fingerprints
-corpuscheck status --all                  # print every task's current stage
-corpuscheck advance <slug>                # recompute static stages after a fix
+uv run corpuscheck discover                   # register new/renamed tasks
+uv run corpuscheck validate --all --incremental  # run static tiers, refresh fingerprints
+uv run corpuscheck status --all               # print every task's current stage
+uv run corpuscheck advance <slug>             # recompute static stages after a fix
 ```
 
 Readiness is a lifecycle, monotonic only while a task's content is unchanged:
@@ -76,4 +75,4 @@ reasoned exceptions only — never to silently skip a real failure.
 - `CLAUDE.md` / `AGENTS.md` — the non-negotiable invariants: judge integrity
   (observer never repairer), polarity discipline (negatives state the defect
   as present), the WebMCP contract mandate, and scripted consistency
-  (`scripts/propagate_canonical.py`) for anything shared across tasks.
+  (`uv run corpuscheck propagate`) for anything shared across tasks.

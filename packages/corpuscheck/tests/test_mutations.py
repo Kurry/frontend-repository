@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 import re
 
+import pytest
+
 from corpuscheck.drift import DriftKind, detect_corpus_drift, detect_drift
 from corpuscheck.validate import (
     FULL_DIMENSIONS,
@@ -89,6 +91,25 @@ def test_edited_test_sh_is_manual_drift_and_fails_shared_shape(copy_task, tmp_pa
     )
     assert not result.passed
     assert any("tests/test.sh" in message for message in result.messages)
+
+
+@pytest.mark.parametrize("relative", ["README.md", "solution/app/README.md"])
+def test_edited_generated_readme_is_manual_drift_and_fails_shared_shape(
+    copy_task, tmp_path, relative
+):
+    _, task = copy_task(EVAL_SLUG, tmp_path)
+    with (task / relative).open("a") as stream:
+        stream.write("\nmanual edit\n")
+
+    drift = detect_drift(task)
+    result = validate_shared_shape(task)
+
+    assert any(
+        item.kind is DriftKind.MANUAL_EDIT and item.path == relative
+        for item in drift.items
+    )
+    assert not result.passed
+    assert any(relative in message for message in result.messages)
 
 
 def test_missing_webmcp_contract_fails_contract(copy_task, tmp_path):

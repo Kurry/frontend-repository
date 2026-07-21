@@ -12,7 +12,7 @@ oracle: start references 'dist', but solution/app/dist is absent
 
 That was each task's **only** corpuscheck failure; everything else about them is
 intact. They are excluded from the active corpus (now the 65 tasks under
-`tasks/`), from `scripts/propagate_canonical.py`, and from the corpuscheck
+`tasks/`), from `corpuscheck propagate`, and from the corpuscheck
 validate/drift sweeps.
 
 ## How to reinstate a task
@@ -20,5 +20,5 @@ validate/drift sweeps.
 1. Either commit the built output (`cd solution/app && npm ci && npm run build`,
    then commit `dist/`), or relax the corpuscheck oracle-tier dist check.
 2. `git mv tasks-quarantine/<slug> tasks/<slug>`
-3. Re-run `python3 scripts/propagate_canonical.py` and the corpuscheck sweep
-   (`cd tools/corpuscheck && uv run corpuscheck validate --all --force --root ../../tasks`).
+3. Re-run `uv run corpuscheck propagate` and the corpuscheck sweep
+   (`uv run corpuscheck validate --all --force --root tasks`, from the repo root).

@@ -15,20 +15,27 @@ capture includes the responsive overviews (overview-tablet.png /
 overview-mobile.png), an existing legacy inventory sentence is extended
 in place to mention them (idempotent; custom surrounding prose untouched).
 
-Usage: python3 scripts/install_reference_screenshots.py [--dry-run] [slug ...]
-       (no args = every slug with a capture directory; --dry-run reports
-       what would change without writing anything)
+CLI: `corpuscheck screenshots install [--dry-run] [slug ...]`
+     (no args = every slug with a capture directory; --dry-run reports
+     what would change without writing anything)
+
+Capture itself (`corpuscheck screenshots capture [slug ...]`) shells out to
+the node asset assets/capture_reference_screenshots.mjs, which serves each
+oracle and writes reference-screenshots/<slug>/ at the repository root.
 """
 
 from __future__ import annotations
 
 import re
 import shutil
-import sys
+import subprocess
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-CAPTURES = ROOT / "reference-screenshots"
+from .repo import find_repo_root, package_data
+
+
+def _captures_dir() -> Path:
+    return find_repo_root() / "reference-screenshots"
 
 DOCKERFILE_COPY = "COPY reference-screenshots/ /reference-screenshots/\n"
 
@@ -71,8 +78,8 @@ def extend_inventory(itext: str, backticks: bool) -> str:
 
 
 def install(slug: str, dry_run: bool = False) -> str:
-    cap_dir = CAPTURES / slug
-    task_dir = ROOT / "tasks" / slug
+    cap_dir = _captures_dir() / slug
+    task_dir = find_repo_root() / "tasks" / slug
     if not cap_dir.is_dir():
         return "no-captures"
     pngs = sorted(cap_dir.glob("*.png"))
@@ -131,11 +138,14 @@ def install(slug: str, dry_run: bool = False) -> str:
     return f"{prefix}:{len(pngs)}:note-{note}"
 
 
-def main() -> int:
-    args = sys.argv[1:]
-    dry_run = "--dry-run" in args
-    args = [a for a in args if a != "--dry-run"]
-    slugs = args or sorted(p.name for p in CAPTURES.iterdir() if p.is_dir())
+def install_many(slugs: list[str], dry_run: bool = False) -> int:
+    """Install captures for the given slugs (all captured slugs when empty)."""
+    captures = _captures_dir()
+    if not slugs:
+        if not captures.is_dir():
+            print(f"no capture directory at {captures}")
+            return 1
+        slugs = sorted(p.name for p in captures.iterdir() if p.is_dir())
     failures = 0
     for slug in slugs:
         status = install(slug, dry_run=dry_run)
@@ -145,5 +155,21 @@ def main() -> int:
     return 1 if failures else 0
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
+def capture(args: list[str]) -> int:
+    """Run the node capture asset against the repository's task oracles.
+
+    ``args`` are passed through to the script (slugs and/or --viewports=...).
+    Requires ``node`` on PATH; playwright must be resolvable (see the asset's
+    resolution order).
+    """
+    root = find_repo_root()
+    script = package_data("assets", "capture_reference_screenshots.mjs")
+    node = shutil.which("node")
+    if node is None:
+        print(
+            "error: `node` was not found on PATH — corpuscheck screenshots capture "
+            "runs a Node script (install Node.js >= 20 and retry)"
+        )
+        return 127
+    completed = subprocess.run([node, str(script), *args], cwd=root)
+    return completed.returncode

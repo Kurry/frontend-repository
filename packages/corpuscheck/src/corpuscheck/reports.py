@@ -32,7 +32,7 @@ def write_json_report(results: list[TaskValidation], path: str | Path) -> dict:
     try:
         output.relative_to(package_root)
     except ValueError:
-        raise ValueError("reports may only be written under tools/corpuscheck")
+        raise ValueError("reports may only be written under packages/corpuscheck")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2) + "\n")
     return report

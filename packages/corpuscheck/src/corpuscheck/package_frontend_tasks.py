@@ -10,12 +10,21 @@ import sys
 import textwrap
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
+import importlib.util
+
+from . import webmcp_h3
+from .repo import canonical_dir, find_repo_root, schemas_dir
+
+ROOT = find_repo_root()
 TASKS = ROOT / "tasks"
-sys.path.insert(0, str(TASKS))
-sys.path.insert(0, str(ROOT / "scripts"))
-from _pins import HARBOR_REWARDKIT_PACKAGE  # noqa: E402
-import webmcp_h3  # noqa: E402
+
+# Builder-tooling pins stay task-adjacent (baked into every environment/
+# Dockerfile build context); load them from the repository, not the package.
+_pins_spec = importlib.util.spec_from_file_location("corpuscheck_task_pins", TASKS / "_pins.py")
+assert _pins_spec is not None and _pins_spec.loader is not None
+_pins = importlib.util.module_from_spec(_pins_spec)
+_pins_spec.loader.exec_module(_pins)
+HARBOR_REWARDKIT_PACKAGE = _pins.HARBOR_REWARDKIT_PACKAGE
 
 # slug -> (source relative path, description, webmcp assignment)
 TASK_SPECS: dict[str, dict] = {
@@ -2372,7 +2381,7 @@ def assignment_for_slug(slug: str) -> dict:
 
 def judge_mcp_servers_block() -> str:
     """Inline webmcp bridge + Playwright CDP from canonical fragment."""
-    path = ROOT / "scripts" / "canonical" / "mcp" / "reward_mcp_servers.toml"
+    path = canonical_dir() / "mcp" / "reward_mcp_servers.toml"
     text = path.read_text()
     idx = text.find("[[judge.mcp_servers]]")
     if idx < 0:
@@ -2593,7 +2602,7 @@ def write_dimension_tomls(
 
 def authoring_source_dir(slug: str) -> Path:
     """Resolve authoring-folder path for a packaged task slug."""
-    sources_path = ROOT / "schemas" / "webmcp-task-sources.json"
+    sources_path = schemas_dir() / "webmcp-task-sources.json"
     if sources_path.is_file():
         sources = json.loads(sources_path.read_text())
         entry = sources.get(slug)
@@ -2605,7 +2614,7 @@ def authoring_source_dir(slug: str) -> Path:
 def authoring_rubric_path(slug: str) -> Path:
     """Resolve authoring-folder rubric.json for a packaged task slug.
 
-    Prefer schemas/webmcp-task-sources.json source paths; fall back to TASK_SPECS.
+    Prefer corpuscheck schemas/webmcp-task-sources.json source paths; fall back to TASK_SPECS.
     Packaged tasks/frontend-* trees do not keep a copy of rubric.json.
     """
     return authoring_source_dir(slug) / "rubric.json"
@@ -2767,7 +2776,7 @@ JUDGE_SYSTEM_PROMPT = textwrap.dedent(
 )
 
 DOCKERFILE = textwrap.dedent(
-    f"""\
+    """\
     FROM mcr.microsoft.com/playwright:v1.61.0-noble
     ENV DEBIAN_FRONTEND=noninteractive
 
@@ -2929,7 +2938,7 @@ def render_task_readme(slug: str, description: str) -> str:
     """Canonical packaged-task README: registry/maintainer-facing, and must not
     leak authoring provenance (original brands, capture sources, inspiration
     URLs), oracle implementation details, or judge criteria text. Title and
-    one-line description derive from schemas/webmcp-task-sources.json — the
+    one-line description derive from corpuscheck schemas/webmcp-task-sources.json — the
     same source task.toml descriptions come from."""
     return TASK_README_TMPL.format(
         title=readme_title(slug), description=description, slug=slug
@@ -2962,7 +2971,7 @@ ORACLE_README_TMPL = textwrap.dedent(
 def render_oracle_readme(slug: str, modules: list[str]) -> str:
     """Canonical solution/app README: title/slug derive exactly like the task
     README; the module list comes from the task's entry in
-    schemas/webmcp-assignments.json."""
+    corpuscheck schemas/webmcp-assignments.json."""
     return ORACLE_README_TMPL.format(
         title=readme_title(slug), slug=slug, modules=", ".join(modules)
     )
@@ -3195,13 +3204,13 @@ def package_task(slug: str, spec: dict) -> list[str]:
     # Build-context copy of the bridge for the Dockerfile COPY above; the judge
     # copy in tests/ comes from the same canonical file (zero-skew by construction).
     shutil.copy2(
-        ROOT / "scripts" / "canonical" / "mcp" / "webmcp_stdio_server.mjs",
+        canonical_dir() / "mcp" / "webmcp_stdio_server.mjs",
         out / "environment" / "webmcp_stdio_server.mjs",
     )
     # Entrypoint baked as /opt/verifier/entrypoint.sh (starts the shared CDP
     # Chrome; paired with the Dockerfile HEALTHCHECK).
     shutil.copy2(
-        ROOT / "scripts" / "canonical" / "entrypoint.sh",
+        canonical_dir() / "entrypoint.sh",
         out / "environment" / "entrypoint.sh",
     )
 
@@ -3212,7 +3221,7 @@ def package_task(slug: str, spec: dict) -> list[str]:
     # Reference screenshots are opt-in builder input: when captures exist under
     # reference-screenshots/<slug>/ (see capture_reference_screenshots.mjs),
     # re-install them after the rebuild wiped the task dir.
-    from install_reference_screenshots import install as install_ref_screenshots
+    from .screenshots import install as install_ref_screenshots
 
     install_ref_screenshots(slug)
 
@@ -3256,10 +3265,10 @@ def package_task(slug: str, spec: dict) -> list[str]:
     (out / "tests" / "system_prompt.md").write_text(judge_prompt)
 
     # MCP servers are inlined into dimension TOMLs via judge_mcp_servers_block()
-    # from scripts/canonical/mcp/reward_mcp_servers.toml. The webmcp entry runs the
+    # from corpuscheck canonical/mcp/reward_mcp_servers.toml. The webmcp entry runs the
     # task-local CDP bridge below (vendored per task; playwright-core only).
     shutil.copy2(
-        ROOT / "scripts" / "canonical" / "mcp" / "webmcp_stdio_server.mjs",
+        canonical_dir() / "mcp" / "webmcp_stdio_server.mjs",
         out / "tests" / "webmcp_stdio_server.mjs",
     )
 
@@ -3276,8 +3285,8 @@ def package_task(slug: str, spec: dict) -> list[str]:
 
 
 def write_assignment_map() -> None:
-    """Refresh legacy map; prefer schemas/webmcp-assignments.json when present."""
-    schema_map = ROOT / "schemas" / "webmcp-assignment-map.json"
+    """Refresh legacy map; prefer corpuscheck schemas/webmcp-assignments.json when present."""
+    schema_map = schemas_dir() / "webmcp-assignment-map.json"
     if schema_map.is_file():
         entries = json.loads(schema_map.read_text())
         if len(entries) != 23:
@@ -3293,21 +3302,21 @@ def write_assignment_map() -> None:
                     "mechanics_exclusions": spec.get("mechanics_exclusions") or [],
                 }
             )
-    path = ROOT / "scripts" / "canonical" / "webmcp-assignment-map.json"
+    path = canonical_dir() / "webmcp-assignment-map.json"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(entries, indent=2) + "\n")
 
 
 def _read_canonical_prompt(name: str, fallback: str) -> str:
-    """Prefer authored canonical judge prompt under scripts/canonical/."""
-    path = ROOT / "scripts" / "canonical" / name
+    """Prefer authored canonical judge prompt from corpuscheck package data."""
+    path = canonical_dir() / name
     if path.is_file():
         return path.read_text()
     return fallback
 
 
 def write_canonical_prompts() -> None:
-    canon = ROOT / "scripts" / "canonical"
+    canon = canonical_dir()
     canon.mkdir(parents=True, exist_ok=True)
     # Judge prompt only — builder agent system prompt retired; policy lives in instruction.md.
     judge_path = canon / "system_prompt.md"
@@ -3341,7 +3350,7 @@ def write_canonical_prompts() -> None:
     ):
         if not (mcp_dir / name).exists():
             raise FileNotFoundError(
-                f"missing scripts/canonical/mcp/{name} — restore m5 MCP templates"
+                f"missing corpuscheck canonical/mcp/{name} — restore m5 MCP templates"
             )
 
 
@@ -3473,7 +3482,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  ERROR: {errs}")
             else:
                 polarity_ok.append(slug)
-                print(f"  ok")
+                print("  ok")
 
         coverage_errors = _verify_all_tasks(order, check_webmcp=True)
         for slug, errs in coverage_errors.items():
@@ -3492,265 +3501,265 @@ if __name__ == "__main__":
 
 
 # Batch 3: authored 2026-07-19 — AI-platform suite, viewer/lab, mercor/programbench-derived,
-# factory/queue/pipeline consoles. Bindings live in schemas/webmcp-assignments.json (SoT);
+# factory/queue/pipeline consoles. Bindings live in corpuscheck schemas/webmcp-assignments.json (SoT);
 # entries here mirror modules + provenance for packaging.
 TASK_SPECS.update({
     "frontend-creative-tools-prompt-workbench": {
         "source": "feature-editor-prompt-workbench PRD",
         "description": "Prompt workbench editor with streaming runs, variants, and library.",
         "modules": ["structured-editor-v1", "command-session-v1", "entity-collection-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Run and streaming response: incremental text streaming, blinking cursor, and auto-follow/jump-to-latest scroll mechanics stay Playwright-observed", "Reasoning disclosure: expand/collapse gesture, chevron rotation, and active-indicator visuals stay Playwright-observed"],
     },
     "frontend-creative-tools-rubric-studio": {
         "source": "mercor-constellation rubric surfaces (debranded)",
         "description": "Rubric authoring studio with version gates, tuning, and preview.",
         "modules": ["structured-editor-v1", "browse-query-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Accordion / Grading-notes height transition and chevron rotation timing stay Playwright-observed", "Tune bar width-easing and aggregate count-up animations stay Playwright-observed"],
     },
     "frontend-data-tracking-calibration-matrix": {
         "source": "mercor-constellation calibration surfaces (debranded)",
         "description": "Model-harness calibration heatmap with variance and fairness triage.",
         "modules": ["browse-query-v1", "entity-collection-v1", "command-session-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Heatmap cell hover tooltips and red-amber-green ramp color reads stay Playwright-observed", "Chart bar hover tooltips, legend toggle grow/shrink animations stay Playwright-observed"],
     },
     "frontend-data-tracking-command-center": {
         "source": "feature-dashboard-command-center PRD",
         "description": "Ops command center with KPIs, agent panel, and live activity feed.",
         "modules": ["browse-query-v1", "entity-collection-v1", "command-session-v1", "form-workflow-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["KPI metrics strip: sparkline point hover tooltip and count-up animation stay Playwright-observed", "Activity feed: auto-follow scroll behavior and jump-to-latest scroll mechanics stay Playwright-observed"],
     },
     "frontend-data-tracking-eval-dashboard": {
         "source": "feature-analytics-eval-dashboard PRD",
         "description": "Prompt-eval suite dashboard with durable runs and score analytics.",
         "modules": ["entity-collection-v1", "command-session-v1", "browse-query-v1", "form-workflow-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Score charts: bar/line hover tooltip and bar-grow animation stay Playwright-observed", "Run execution with visible steps: streaming run log incremental appearance, retry backoff countdown ticking, and step-status fade animations stay Playwright-observed"],
     },
     "frontend-data-tracking-judge-ab-lab": {
         "source": "harbor-score judge A/B workflow (debranded)",
         "description": "Judge-config A/B lab with labeled rescores, flips, and cost analytics.",
         "modules": ["browse-query-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Scatter/dumbbell chart mark hover and tooltip reads stay Playwright-observed", "Rescore step running/retry animation timing and progress-fill smoothness stay Playwright-observed"],
     },
     "frontend-data-tracking-model-monitor": {
         "source": "feature-monitor-openrouter-monitor PRD (debranded)",
         "description": "Model marketplace monitor with catalog, alerts, and cost tracking.",
         "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "command-session-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Pie-chart slice hover tooltip stays Playwright-only (computed while hovering)", "Toast slide-in/auto-dismiss timing and event-feed slide-in animations stay Playwright-observed"],
     },
     "frontend-data-tracking-release-diff": {
         "source": "mercor-constellation dataset surfaces (debranded)",
         "description": "Dataset release manager with version diffs, cuts, and rotation.",
         "modules": ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Cut-step badge crossfade and correlation count-up animation stay Playwright-observed", "Unchanged-disclosure height animation and chevron rotation stay Playwright-observed"],
     },
     "frontend-data-tracking-sourcing-console": {
         "source": "programbench sourcing-engine spec (debranded)",
         "description": "Repository sourcing console with quotas, guards, and build queue.",
         "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "command-session-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Commit-hash copy control and its clipboard confirmation stay Playwright (clipboard contents are a Playwright responsibility)", "Drag-reorder gesture and the sliding reorder animation are graded via the real drag/keyboard move controls; WebMCP reorder is for setup only"],
     },
     "frontend-planning-execution-kanban": {
         "source": "feature-task-manager-execution-kanban PRD",
         "description": "Execution kanban with drag/keyboard moves and durable card runs.",
         "modules": ["entity-collection-v1", "browse-query-v1", "form-workflow-v1", "command-session-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Card moves ARE state changes and go through entity update(column)/reorder, but drag gesture fidelity \u2014 raised shadow, ghost placeholder, exact drop-position insertion, settle animation \u2014 is graded via real Playwright drags only", "Keyboard move-control operability is graded via real Playwright keyboard interaction; WebMCP entity update only proves state parity"],
     },
     "frontend-productivity-prompt-library": {
         "source": "feature-content-manager-prompt-library PRD",
         "description": "Prompt library manager with versions, sources, and attachments.",
         "modules": ["entity-collection-v1", "browse-query-v1", "form-workflow-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Attachments: attachment badge hover preview and hover-revealed Remove control visibility stay Playwright-observed", "Prompt body as code: clipboard contents verification and copy-confirmation icon swap/toast animation stay Playwright responsibilities"],
     },
     "frontend-productivity-repository-scanner": {
         "source": "feature-document-scanner-repository-scanner PRD",
         "description": "Repository document scanner with durable scan runs and doc index.",
         "modules": ["entity-collection-v1", "command-session-v1", "browse-query-v1", "form-workflow-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Scan runs as durable workflows: progress-bar fill animation and per-second backoff countdown ticking stay Playwright-observed", "Document index: document-row hover preview and findings-disclosure chevron animation stay Playwright-observed"],
     },
     "frontend-workflow-agent-management": {
         "source": "feature-orchestration-agent-management PRD",
         "description": "Agent registry with durable work runs, timelines, and status filters.",
         "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "command-session-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Backoff countdown ticking and retrying pulse are timed visuals \u2014 Playwright-observed live, never asserted from tool output", "Step-status tick animation, badge color transitions, panel slide-in, and chevron rotation stay Playwright-observed"],
     },
     "frontend-workflow-eval-job-queue": {
         "source": "oddish concept (debranded)",
         "description": "Cloud eval job queue monitor with provider lanes and retries.",
         "modules": ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Backoff countdown ticking and the failed-to-running flip animation stay Playwright-observed (timing mechanics)", "Live simulation progress advancement of running jobs is timing behavior observed via Playwright"],
     },
     "frontend-workflow-flake-triage": {
         "source": "programbench flake-filter spec (debranded)",
         "description": "Test-determinism triage queue with run matrices and quarantine map.",
         "modules": ["browse-query-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Re-run form validation mechanics (run-count select required, disabled submit, inline error naming the field) are graded through the real form via Playwright", "Per-run tick-in entrance transitions and progress-indicator smoothness stay Playwright-observed"],
     },
     "frontend-workflow-gate-console": {
         "source": "programbench gate-engine spec (debranded)",
         "description": "Stage-gate acceptance console with certificates and what-if mode.",
         "modules": ["browse-query-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Gate row evidence height-plus-opacity expand animation and chevron rotation stay Playwright-observed", "What-if/rejection banner slide-in and toast fade timing stay Playwright-observed"],
     },
     "frontend-workflow-leak-review": {
         "source": "programbench decontamination spec (debranded)",
         "description": "Leak review console with similarity evidence, canaries, mutations.",
         "modules": ["browse-query-v1", "form-workflow-v1", "entity-collection-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Threshold slider stays Playwright-driven: the graded behavior is live re-banding and rollup updates during the drag (and arrow-key adjustment); a WebMCP setter would snap state past the graded derivation", "Matched-pair Previous/Next stepping with synced two-pane scrolling is scroll-mechanics, graded via the real controls"],
     },
     "frontend-workflow-research-pipeline-console": {
         "source": "OpenThoughts-Agent concept (debranded)",
         "description": "Research pipeline console chaining datagen, training, and eval.",
         "modules": ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Live phase progress (tasks-generated counter, loss-curve points, trial-by-trial mean) is simulation timing observed via Playwright", "Backoff countdown ticking and the automatic Pending-to-Running chain flip are timing behaviors observed via Playwright after real setup"],
     },
     "frontend-workflow-submission-qc-queue": {
         "source": "mercor-constellation QC surfaces (debranded)",
         "description": "Submission QC triage queue with gates, tiers, and review actions.",
         "modules": ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "command-session-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Contributor drawer slide-in/out easing stays Playwright-observed", "Gate banner cross-fade and struck-through override animate-in stay Playwright-observed"],
     },
     "frontend-workflow-task-factory": {
         "source": "SWE-gen concept (debranded)",
         "description": "PR-to-eval-task factory dashboard with validation and trial analysis.",
         "modules": ["browse-query-v1", "form-workflow-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Simulated stage advancement, failure-and-retry attempt counts, and resume-from-stage timing are run output observed via Playwright; no session controls exist beyond starting the run through the create form", "Check-card and log-excerpt disclosure expand/collapse mechanics stay Playwright-observed"],
     },
     "frontend-workflow-template-forms": {
         "source": "feature-form-builder-template-forms PRD",
         "description": "Schema-driven prompt technique forms with preview and library.",
         "modules": ["form-workflow-v1", "browse-query-v1", "entity-collection-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Technique selector: sidebar status-chip transition animation and form cross-fade stay Playwright-observed", "Schema-driven forms: attachment badge hover preview/remove reveal and dynamic-row height animations stay Playwright-observed"],
     },
     "frontend-workflow-trajectory-viewer": {
         "source": "ATIF-style viewer concept (debranded)",
         "description": "Agent-trial trajectory viewer with timeline scrub and annotations.",
         "modules": ["browse-query-v1", "command-session-v1", "entity-collection-v1", "form-workflow-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Scrubber continuous-drag updating is a gesture-fidelity criterion \u2014 Playwright-only; session advance covers discrete step state", "Terminal progressive streaming, auto-follow, and jump-to-latest visuals are streaming mechanics observed live via Playwright"],
     },
     "frontend-workflow-verifier-trajectory-viewer": {
         "source": "ATIF-style viewer concept, verifier review (debranded)",
         "description": "Verifier review workbench with verdicts, labels, and adjudication.",
         "modules": ["browse-query-v1", "command-session-v1", "entity-collection-v1", "form-workflow-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Terminal progressive streaming and its streaming-vs-complete affordance are observed live via Playwright", "Linked-highlight easing, smooth scroll-to-step, rollup-bar segment animation, and flips-filter row enter/exit animations are motion criteria \u2014 Playwright-observed; the underlying selection state changes via the bound tools"],
     },
     "frontend-workflow-workflow-builder": {
         "source": "feature-workflow-builder-workflow-builder PRD",
         "description": "Node-graph workflow builder with durable executions and timelines.",
         "modules": ["structured-editor-v1", "command-session-v1", "entity-collection-v1", "browse-query-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
         "mechanics_exclusions": ["Node drag positioning, canvas pan/zoom, and palette drag-to-drop coordinates stay Playwright-driven; editor add creates nodes but drop-position mechanics are gesture-graded", "Edge-handle drag drawing and incompatible-connection toast visuals stay Playwright; editor add(edge) only proves the state command"],
     },
 })
 
 
 # Batch 4: authored 2026-07-19 — advanced platform suite, atlas pipeline, live console.
-# Bindings SoT: schemas/webmcp-assignments.json.
+# Bindings SoT: corpuscheck schemas/webmcp-assignments.json.
 TASK_SPECS.update({
     "frontend-creative-tools-annotation-studio": {
         "source": "feature-labeling-annotation-studio PRD",
         "description": "Annotation studio with taxonomy builder, regions, agreement review.",
         "modules": ["entity-collection-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-creative-tools-prompt-diff": {
         "source": "feature-version-control-prompt-diff PRD",
         "description": "Prompt version control with diffs, three-way merge, blame, and graph.",
         "modules": ["structured-editor-v1", "browse-query-v1", "entity-collection-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-creative-tools-schema-builder": {
         "source": "feature-schema-builder-output-schema PRD",
         "description": "Output schema builder with tree editor, playground, and versions.",
         "modules": ["structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-data-tracking-cost-analytics": {
         "source": "feature-analytics-cost-analytics PRD",
         "description": "Cost analytics with budgets, anomalies, what-if repricing, reports.",
         "modules": ["browse-query-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-data-tracking-dataset-manager": {
         "source": "feature-data-manager-dataset-manager PRD",
         "description": "Dataset manager with import wizard, pivot, splits, and snapshots.",
         "modules": ["entity-collection-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-productivity-persona-library": {
         "source": "feature-content-manager-persona-library PRD",
         "description": "Persona library with trait matrix, blending, test bench, and packs.",
         "modules": ["browse-query-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-productivity-semantic-search": {
         "source": "feature-search-semantic-search PRD",
         "description": "Semantic search with feedback re-ranking, clusters, and re-indexing.",
         "modules": ["browse-query-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-workflow-ab-experiments": {
         "source": "feature-experimentation-ab-testing PRD",
         "description": "A/B experiment studio with variants, stats gating, and decisions.",
         "modules": ["form-workflow-v1", "command-session-v1", "entity-collection-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-workflow-automation-studio": {
         "source": "feature-automation-browser-studio PRD",
         "description": "Browser automation studio with step builder, runs, and versioning.",
         "modules": ["browse-query-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-workflow-batch-runner": {
         "source": "feature-batch-processor-batch-runner PRD",
         "description": "Durable batch runner with retries, checkpoints, scheduling, reports.",
         "modules": ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-workflow-live-task-factory": {
         "source": "SWE-gen pipeline, live dual-mode (debranded)",
         "description": "Live PR-to-task factory console with real GitHub/AI integration.",
         "modules": ["entity-collection-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-workflow-quality-audit-desk": {
         "source": "codebase-atlas quality audit (debranded)",
         "description": "Quality audit desk with checks, rubric verdicts, and audit reports.",
         "modules": ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-workflow-review-workbench": {
         "source": "codebase-atlas review app (debranded)",
         "description": "Gated bundle review with verdicts, trial audit, and summary export.",
         "modules": ["browse-query-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
     "frontend-workflow-seed-dataset-studio": {
         "source": "codebase-atlas seed pipeline (debranded)",
         "description": "Dataset factory studio: triage, authoring workbench, gates, exports.",
         "modules": ["structured-editor-v1", "form-workflow-v1", "command-session-v1", "artifact-transfer-v1"],
-        "bindings": "see schemas/webmcp-assignments.json",
+        "bindings": "see corpuscheck schemas/webmcp-assignments.json",
     },
 })

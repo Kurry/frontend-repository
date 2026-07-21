@@ -14,9 +14,9 @@ GitHub issue that tracks its work. Run all commands from the repo root unless no
 - [ ] `corpuscheck validate --all --force` (first run: `--force`, never `--incremental`)
 - [ ] `corpuscheck drift --all` (shared-file drift + assignment orphans)
 - [ ] `corpuscheck status --all` (readiness funnel snapshot)
-- [ ] `python3 scripts/propagate_canonical.py --check` (zero drift)
-- [ ] `python3 -m unittest scripts.tests.test_webmcp_h3`
-- [ ] corpuscheck's own pytest suite (`tools/corpuscheck/tests/`)
+- [ ] `uv run corpuscheck propagate --check` (zero drift)
+- [ ] `uv run pytest packages/corpuscheck/tests`
+- [ ] corpuscheck's own pytest suite (`packages/corpuscheck/tests/`, includes the webmcp_h3 contract tests)
 - [ ] Triage every failure: fix, or waive with
       `corpuscheck baseline accept <slug> <tier> --reason "..."` (sparingly, reason required).
 - [x] Dist policy: resolved by quarantining 38 tasks (`tasks-quarantine/`) whose only
@@ -35,10 +35,10 @@ innovation's single positive catch-all).
 - [ ] Delete untracked root captures (`smoke-desktop-postboot.png`, `smoke-mineclash-game.png`).
 - [ ] Remove tracked junk: `.orig` merge leftovers, committed `.log` files,
       ~45 stray dev screenshots at `solution/app/` roots, unreferenced debug/smoke
-      `.mjs` scripts, the `dropdown-debug` route, `scripts/_capture_sunsama_refs.mjs`.
+      `.mjs` scripts, the `dropdown-debug` route, `_capture_sunsama_refs.mjs`.
       (Full inventory in #534. Never touch `environment/reference-screenshots/`.)
-- [ ] Resolve the needs-confirmation items (`tools/corpuscheck/reports/*.json`,
-      ghostty-config `font-playground` route, `scripts/regen_dimension_tomls.py`).
+- [ ] Resolve the needs-confirmation items (corpuscheck `reports/*.json` — resolved: deleted + gitignored,
+      ghostty-config `font-playground` route, `regen_dimension_tomls.py` — resolved: deleted).
 - [ ] Harden `.gitignore`: `*.orig`, `*.rej`, blanket `*.log`, `Thumbs.db`,
       `desktop.ini`, solution-app-scoped `smoke*/screenshot*/verification*` PNGs.
 - [ ] Re-run the Phase 1 command set clean.
@@ -48,20 +48,20 @@ innovation's single positive catch-all).
 - [ ] Capture + install `environment/reference-screenshots/` for the 35 active tasks
       missing them (recounted after the quarantine; original 37-task list in #535
       included quarantined slugs):
-      `node scripts/capture_reference_screenshots.mjs <slug ...>` then
-      `python3 scripts/install_reference_screenshots.py <slug ...>`,
-      then `python3 scripts/propagate_canonical.py` (Dockerfile COPY line) and `--check`.
+      `uv run corpuscheck screenshots capture <slug ...>` then
+      `uv run corpuscheck screenshots install <slug ...>`,
+      then `uv run corpuscheck propagate` (Dockerfile COPY line) and `--check`.
 - [x] Decide README policy and make the corpus uniform: every active task's `README.md`
       and `solution/app/README.md` are standardized generated surfaces owned by
-      `scripts/propagate_canonical.py` (drift-checked by `--check`).
+      `corpuscheck propagate` (drift-checked by `--check`).
 
 ## Phase 4 — Docs / tooling truthfulness (#536)
 
 - [x] Docs half done on main: CLAUDE.md/AGENTS.md no longer mention anticheat or
       mcp_contract; the corpus is canonically **13** dimension tomls.
-- [x] Align tooling: remove `anticheat` + `mcp_contract` from `tools/corpuscheck`
+- [x] Align tooling: remove `anticheat` + `mcp_contract` from corpuscheck
       (dimension list, anticheat rubric-tier checks, README, tests) and update
-      `scripts/tests/test_webmcp_h3.py` + scaffold/skill assets to the 13-dim set.
+      the corpuscheck webmcp_h3 tests + scaffold/skill assets to the 13-dim set.
 
 ## Phase 5 — Evidence gates (stretch, not release-blocking)
 

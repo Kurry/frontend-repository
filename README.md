@@ -130,12 +130,13 @@ uv run harbor run -y -c configs/<file>.yaml -i <slug> --job-name smoke --yes
   shared files
 - `tasks-quarantine/frontend-*/` — 38 quarantined tasks (oracle serves a build
   output whose `dist/`/`build/` is not committed); excluded from all sweeps
-- `scripts/` — source of truth for everything replicated across tasks
+- `packages/corpuscheck/` — the corpuscheck CLI: source of truth for
+  everything replicated across tasks (canonical templates, schemas) plus
+  validation/drift/readiness tooling (`uv run corpuscheck ...` from repo root)
 - `configs/` — sweep job configs
-- `schemas/`, `packages/webmcp-contracts/` — WebMCP assignments and module
-  specs
+- `packages/webmcp-contracts/` — WebMCP module specs
 - `docs/rubrics.md` — criterion authoring conventions
 - `CONTRIBUTING.md` — task category distribution and quality tracking
-  (`tools/corpuscheck/`)
+  (`packages/corpuscheck/`)
 - `CLAUDE.md` / `AGENTS.md` — full development guide and the non-negotiable
   corpus invariants

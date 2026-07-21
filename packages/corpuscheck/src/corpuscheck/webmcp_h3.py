@@ -9,7 +9,8 @@ Modes:
 
 Targets:
   1. tasks/frontend-*/instruction.md when packaged Harbor tasks exist
-  2. else authoring sources from schemas/webmcp-task-sources.json (instruction.md)
+  2. else authoring sources from corpuscheck schemas/webmcp-task-sources.json
+     (instruction.md)
 
 Never edits rubric.json / criterion TOML. Rejects unknown modules and schema fragments.
 Assignment JSON remains authoring-only; packaged instruction.md is the sole agent source.
@@ -23,11 +24,23 @@ import re
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-ASSIGNMENTS = ROOT / "schemas" / "webmcp-assignments.json"
-SOURCES = ROOT / "schemas" / "webmcp-task-sources.json"
-LEGACY_MAP = ROOT / "scripts" / "canonical" / "webmcp-assignment-map.json"
-MODULE_SPECS_DIR = ROOT / "packages" / "webmcp-contracts" / "specs" / "modules"
+from .repo import canonical_dir, find_repo_root, schemas_dir
+
+
+def _assignments_path() -> Path:
+    return schemas_dir() / "webmcp-assignments.json"
+
+
+def _sources_path() -> Path:
+    return schemas_dir() / "webmcp-task-sources.json"
+
+
+def _legacy_map_path() -> Path:
+    return canonical_dir() / "webmcp-assignment-map.json"
+
+
+def _module_specs_dir() -> Path:
+    return find_repo_root() / "packages" / "webmcp-contracts" / "specs" / "modules"
 
 CANONICAL_MODULES = frozenset(
     {
@@ -128,7 +141,7 @@ def _fmt_binding_value(value: object) -> str:
 
 def load_module_spec(module_id: str) -> dict:
     """Load authoring SoT module JSON from packages/webmcp-contracts/specs/modules/."""
-    path = MODULE_SPECS_DIR / f"{module_id}.json"
+    path = _module_specs_dir() / f"{module_id}.json"
     if not path.is_file():
         raise FileNotFoundError(f"missing module spec: {path}")
     data = json.loads(path.read_text())
@@ -143,7 +156,7 @@ def load_module_spec(module_id: str) -> dict:
 
 def load_module_spec_text(module_id: str) -> str:
     """Exact JSON text for inlining into <module_spec> (authoring SoT file body)."""
-    path = MODULE_SPECS_DIR / f"{module_id}.json"
+    path = _module_specs_dir() / f"{module_id}.json"
     # Validate id / JSON before embedding.
     load_module_spec(module_id)
     return path.read_text().rstrip() + "\n"
@@ -302,26 +315,28 @@ upsert_h3 = upsert_contract
 
 
 def load_assignments() -> list[dict]:
-    map_path = ROOT / "schemas" / "webmcp-assignment-map.json"
+    map_path = schemas_dir() / "webmcp-assignment-map.json"
     if map_path.exists():
         data = json.loads(map_path.read_text())
         if isinstance(data, list):
             return data
         return list(data["assignments"])
-    if ASSIGNMENTS.exists():
-        data = json.loads(ASSIGNMENTS.read_text())
+    if _assignments_path().exists():
+        data = json.loads(_assignments_path().read_text())
         return list(data["assignments"])
-    if LEGACY_MAP.exists():
-        return json.loads(LEGACY_MAP.read_text())
-    raise FileNotFoundError("missing assignment map under schemas/ or scripts/canonical/")
+    if _legacy_map_path().exists():
+        return json.loads(_legacy_map_path().read_text())
+    raise FileNotFoundError(
+        "missing assignment map in corpuscheck package data (schemas/ or canonical/)"
+    )
 
 
 def load_sources() -> dict[str, dict]:
-    if SOURCES.exists():
-        return json.loads(SOURCES.read_text())
-    if LEGACY_MAP.exists():
+    if _sources_path().exists():
+        return json.loads(_sources_path().read_text())
+    if _legacy_map_path().exists():
         out: dict[str, dict] = {}
-        for entry in json.loads(LEGACY_MAP.read_text()):
+        for entry in json.loads(_legacy_map_path().read_text()):
             src = entry.get("source", "")
             out[entry["task"]] = {
                 "source": src,
@@ -334,13 +349,14 @@ def load_sources() -> dict[str, dict]:
 def resolve_instruction_target(assignment: dict, sources: dict[str, dict]) -> Path | None:
     """Prefer packaged Harbor instruction.md; else authoring instruction.md."""
     slug = assignment["task"]
-    packaged = ROOT / "tasks" / slug / "instruction.md"
+    root = find_repo_root()
+    packaged = root / "tasks" / slug / "instruction.md"
     if packaged.exists():
         return packaged
     src_meta = sources.get(slug) or {}
     instr = src_meta.get("instruction")
     if instr:
-        p = ROOT / instr
+        p = root / instr
         if p.exists():
             return p
     return None
@@ -348,7 +364,7 @@ def resolve_instruction_target(assignment: dict, sources: dict[str, dict]) -> Pa
 
 def resolve_readme_target(assignment: dict) -> Path | None:
     slug = assignment["task"]
-    readme = ROOT / "tasks" / slug / "README.md"
+    readme = find_repo_root() / "tasks" / slug / "README.md"
     return readme if readme.exists() else None
 
 
@@ -375,6 +391,7 @@ def contract_matches(text: str, expected: str) -> bool:
 
 
 def run(mode: str) -> int:
+    ROOT = find_repo_root()
     assignments = load_assignments()
     sources = load_sources()
     errors: list[str] = []

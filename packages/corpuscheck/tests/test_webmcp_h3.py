@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import json
-import sys
 import unittest
-from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(ROOT / "scripts"))
+from corpuscheck import webmcp_h3
+from corpuscheck.repo import canonical_dir, find_repo_root, schemas_dir
 
-import webmcp_h3  # noqa: E402
+ROOT = find_repo_root()
+CANON = canonical_dir()
+SCHEMAS = schemas_dir()
 
 
 class TestWebmcpContract(unittest.TestCase):
@@ -39,7 +39,8 @@ class TestWebmcpContract(unittest.TestCase):
         """Every task.toml must carry the full canonical artifact-exclude set
         (build outputs like dist/ must never be collected into artifacts)."""
         import tomllib
-        import package_frontend_tasks as pft
+
+        from corpuscheck import package_frontend_tasks as pft
 
         tomls = sorted(ROOT.glob("tasks/*/task.toml"))
         self.assertGreaterEqual(len(tomls), 65)
@@ -56,12 +57,12 @@ class TestWebmcpContract(unittest.TestCase):
                 )
 
     def test_canonical_prompts_policy(self) -> None:
-        builder = ROOT / "scripts/canonical/agent_system_prompt.md"
+        builder = CANON / "agent_system_prompt.md"
         self.assertFalse(
             builder.exists(),
             "builder agent_system_prompt.md must be deleted; policy lives in instruction.md",
         )
-        judge = (ROOT / "scripts/canonical/system_prompt.md").read_text()
+        judge = (CANON / "system_prompt.md").read_text()
         self.assertNotIn("Baseline Quality Bar", judge)
         self.assertIn("webmcp_list_tools", judge)
         self.assertIn("webmcp_action_contract", judge)
@@ -74,7 +75,7 @@ class TestWebmcpContract(unittest.TestCase):
 
     def test_mcp_templates_pins_and_tool_surface(self) -> None:
         allowed = json.loads(
-            (ROOT / "scripts/canonical/mcp/allowed_tools.json").read_text()
+            (CANON / "mcp/allowed_tools.json").read_text()
         )
         self.assertEqual(
             allowed["webmcp"],
@@ -85,7 +86,7 @@ class TestWebmcpContract(unittest.TestCase):
         self.assertEqual(allowed["pins"]["playwright_mcp"], "@playwright/mcp@0.0.76")
 
         for fname in ("builder.mcp.json", "judge.mcp.json"):
-            payload = json.loads((ROOT / "scripts/canonical/mcp" / fname).read_text())
+            payload = json.loads((CANON / "mcp" / fname).read_text())
             servers = payload["mcpServers"]
             self.assertIn("webmcp", servers)
             self.assertIn("playwright", servers)
@@ -100,7 +101,7 @@ class TestWebmcpContract(unittest.TestCase):
         # tasks/ plus 38 quarantined under tasks-quarantine/ (dist-absent
         # oracles, 2026-07-21). Quarantined slugs keep their assignments so
         # reinstating one is a plain `git mv` back.
-        data = json.loads((ROOT / "schemas/webmcp-assignments.json").read_text())
+        data = json.loads((SCHEMAS / "webmcp-assignments.json").read_text())
         self.assertEqual(data["contract_version"], "zto-webmcp-v1")
         self.assertEqual(len(data["assignments"]), 103)
         for entry in data["assignments"]:
@@ -138,7 +139,7 @@ class TestWebmcpContract(unittest.TestCase):
         discovers its tool surface from the rendered <webmcp_action_contract>, so
         every tasks/frontend-* instruction must carry one and have an assignment.
         (Guard added after a 24-task authoring wave shipped without contracts.)"""
-        data = json.loads((ROOT / "schemas/webmcp-assignments.json").read_text())
+        data = json.loads((SCHEMAS / "webmcp-assignments.json").read_text())
         assigned = {e["task"] for e in data["assignments"]}
         task_dirs = sorted(
             p.name for p in (ROOT / "tasks").iterdir()
@@ -171,7 +172,7 @@ class TestWebmcpContract(unittest.TestCase):
 
     def test_upsert_idempotent(self) -> None:
         assignment = json.loads(
-            (ROOT / "schemas/webmcp-assignments.json").read_text()
+            (SCHEMAS / "webmcp-assignments.json").read_text()
         )["assignments"][0]
         section = webmcp_h3.render_instruction_webmcp_section(assignment)
         base = "<summary>\nDemo\n</summary>\n\n<requirements>\nStack\n</requirements>\n"
@@ -195,7 +196,7 @@ class TestWebmcpContract(unittest.TestCase):
 
     def test_strips_legacy_markdown(self) -> None:
         assignment = json.loads(
-            (ROOT / "schemas/webmcp-assignments.json").read_text()
+            (SCHEMAS / "webmcp-assignments.json").read_text()
         )["assignments"][0]
         section = webmcp_h3.render_instruction_webmcp_section(assignment)
         legacy = (
@@ -215,7 +216,7 @@ class TestWebmcpContract(unittest.TestCase):
 
     def test_upsert_replaces_legacy_delivery_heading(self) -> None:
         assignment = json.loads(
-            (ROOT / "schemas/webmcp-assignments.json").read_text()
+            (SCHEMAS / "webmcp-assignments.json").read_text()
         )["assignments"][0]
         section = webmcp_h3.render_instruction_webmcp_section(assignment)
         legacy = (
@@ -244,7 +245,7 @@ class TestWebmcpContract(unittest.TestCase):
             )
 
     def test_admin_analytics_bindings_are_product_specific(self) -> None:
-        data = json.loads((ROOT / "schemas/webmcp-assignments.json").read_text())
+        data = json.loads((SCHEMAS / "webmcp-assignments.json").read_text())
         entry = next(
             a for a in data["assignments"] if a["task"] == "frontend-data-tracking-admin-analytics-dashboard"
         )
@@ -254,11 +255,11 @@ class TestWebmcpContract(unittest.TestCase):
         self.assertNotIn("records", entry["bindings"]["browsable_entity"])
 
     def test_canonical_dockerfile_has_no_webmcp_pkg(self) -> None:
-        df = (ROOT / "scripts/canonical/environment/Dockerfile").read_text()
+        df = (CANON / "environment/Dockerfile").read_text()
         self.assertNotIn("/opt/webmcp-contracts", df)
         self.assertNotIn("webmcp-contracts", df)
         self.assertFalse(
-            (ROOT / "scripts/canonical/environment/webmcp-contracts").exists()
+            (CANON / "environment/webmcp-contracts").exists()
         )
 
 

@@ -5,11 +5,24 @@ valid evaluation, not merely that its files parse. It combines cheap static
 validation, persisted fingerprints and waivers, and positive/negative trial
 gates.
 
+All commands run from the repository root via the uv workspace
+(`uv run corpuscheck ...`). New consolidated subcommands: `propagate`
+(canonical shared surfaces), `scaffold` (dimension baselines), `webmcp`
+(contract render/check/apply), and `screenshots capture|install`
+(oracle reference screenshots; capture shells out to the node asset in
+`src/corpuscheck/assets/`). Canonical templates and WebMCP schemas ship as
+package data under `src/corpuscheck/canonical/` and `src/corpuscheck/schemas/`.
+
 ```bash
-corpuscheck discover --root ../../tasks
-corpuscheck validate frontend-workflow-docuseal
-corpuscheck validate --all --incremental
-corpuscheck drift --all
+uv run corpuscheck discover
+uv run corpuscheck validate frontend-workflow-docuseal
+uv run corpuscheck validate --all --incremental
+uv run corpuscheck drift --all
+uv run corpuscheck propagate --check
+uv run corpuscheck scaffold --check
+uv run corpuscheck webmcp check
+uv run corpuscheck screenshots capture <slug>
+uv run corpuscheck screenshots install <slug>
 corpuscheck status --all
 corpuscheck advance frontend-workflow-docuseal
 corpuscheck history frontend-workflow-docuseal --limit 10
@@ -21,7 +34,7 @@ corpuscheck reliability report
 ```
 
 Every command accepts `--db PATH`. The default database is
-`tools/corpuscheck/.corpuscheck.db`. Validation stores its run, per-tier
+`packages/corpuscheck/.corpuscheck.db`. Validation stores its run, per-tier
 results, and task fingerprints. `--incremental` skips a task only when its
 fingerprint is unchanged since its last all-pass run; `--force` disables that
 skip. At the end, validation compares with the previous identical validation
@@ -106,7 +119,7 @@ BLOCKED verdict counts by task (the Blocked-vs-Fail taxonomy).
 ## Check-only guarantee
 
 Corpus task files and shared repository sources are always read-only. The tool
-writes only beneath `tools/corpuscheck/`, except for an explicitly selected
+writes only beneath `packages/corpuscheck/`, except for an explicitly selected
 `--db` SQLite path and an explicitly selected `nop-scaffold --out` directory,
 which must be outside the repository. JSON reports are restricted to
-`tools/corpuscheck/` as well.
+`packages/corpuscheck/` as well.

@@ -34,8 +34,8 @@ absence of a backend. The end state of the application must be useful:
    primary collection(s) and derived outcomes (an export/read surface, e.g.
    artifact-transfer export with a structured format, or entity/browse reads
    covering every collection the export contains). If the current assignment
-   cannot express this, extend the assignment (schemas/webmcp-assignments.json
-   → re-render via scripts/webmcp_h3.py apply) as part of the hardening.
+   cannot express this, extend the assignment (corpuscheck schemas/webmcp-assignments.json
+   → re-render via `uv run corpuscheck webmcp apply`) as part of the hardening.
 3. **Persisted where the genre allows:** hard-browser and framework-rebuild
    genre tasks persist end state in localStorage per their PRD mandate;
    good-app genre tasks stay in-memory (their persistence IS the export + MCP
@@ -166,11 +166,11 @@ challenge loop, decided outcomes, a clean restart, and save/resume.
    ```bash
    python3 .claude/skills/create-rubrics/scripts/validate_dimensions.py tasks/<slug>
    python3 .claude/skills/rubric-align/scripts/validate_rubric.py tasks/<slug>/tests
-   cd tools/corpuscheck && .venv/bin/python -m corpuscheck.cli validate <slug>
+   uv run corpuscheck validate <slug>   # from the repo root
    ```
 
-   If the webmcp assignment changed: `python3 scripts/webmcp_h3.py apply` and
-   `python3 -m unittest scripts.tests.test_webmcp_h3` must also pass.
+   If the webmcp assignment changed: `uv run corpuscheck webmcp apply` and
+   `uv run pytest packages/corpuscheck/tests` must also pass.
 
 ## Guardrails
 

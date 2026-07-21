@@ -21,7 +21,7 @@ The tag-to-dimension map is: `<core_features>` → `core_features`, `<visual_des
 
 ## Inputs to read first
 
-**Blocker check before anything else:** the instruction must contain a non-empty `<webmcp_action_contract>` block. State-setup criteria presume the judge can drive state through the contract's bindings; aligning rubrics against a contract-less instruction produces criteria the judge cannot set up. If the block is missing, STOP and report it — the contract (assignment in `schemas/webmcp-assignments.json`, rendered by `scripts/webmcp_h3.py`) must be added first.
+**Blocker check before anything else:** the instruction must contain a non-empty `<webmcp_action_contract>` block. State-setup criteria presume the judge can drive state through the contract's bindings; aligning rubrics against a contract-less instruction produces criteria the judge cannot set up. If the block is missing, STOP and report it — the contract (assignment in corpuscheck `schemas/webmcp-assignments.json`, rendered by `uv run corpuscheck webmcp apply`) must be added first.
 
 1. The task's `instruction.md` — the contract being graded. List its behavioral promises per section as you read.
 2. Every present canonical toml under `tests/<dimension>/<dimension>.toml`: `core_features`, `visual_design`, `motion`, `technical`, `user_flows`, `edge_cases`, `responsiveness`, `accessibility`, `performance`, `writing`, `innovation`, `design_fidelity`, and `behavioral`. All thirteen are required; the validator FAILs any missing file.

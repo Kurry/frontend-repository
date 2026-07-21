@@ -29,7 +29,7 @@ def test_nop_scaffold_writes_stubs_outside_repo_and_refuses_inside_repo(
     assert "window.webmcp_invoke_tool" in index
     assert {"start", "verify:build"}.issubset(package["scripts"])
 
-    forbidden = REPO_ROOT / "tools/corpuscheck/test-nop-output"
+    forbidden = REPO_ROOT / "packages/corpuscheck/test-nop-output"
     refused = runner.invoke(
         app,
         [

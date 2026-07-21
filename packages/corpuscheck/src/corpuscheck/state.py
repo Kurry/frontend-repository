@@ -10,6 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
+from .repo import find_repo_root
+
 
 STAGES = (
     "registered",
@@ -102,7 +104,7 @@ def git_sha() -> str:
     try:
         return subprocess.run(
             ["git", "rev-parse", "HEAD"],
-            cwd=Path(__file__).resolve().parents[3],
+            cwd=find_repo_root(),
             check=True,
             capture_output=True,
             text=True,

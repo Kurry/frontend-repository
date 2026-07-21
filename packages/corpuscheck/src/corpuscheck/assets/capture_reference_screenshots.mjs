@@ -25,10 +25,11 @@
 // Output: reference-screenshots/<slug>/ at the repo root — intentionally
 // OUTSIDE tasks/ so screenshots can never bloat task packages or artifacts.
 //
-// Usage: node scripts/capture_reference_screenshots.mjs [--viewports=desktop,tablet,mobile] [slug ...]
-//        (no args = every tasks/*/solution/app; default captures all three
-//        viewports — pass --viewports to restrict, e.g. --viewports=desktop
-//        for the legacy desktop-only output)
+// Usage: corpuscheck screenshots capture [--viewports=desktop,tablet,mobile] [slug ...]
+//        (runs this script via node with cwd at the repo root; no args =
+//        every tasks/*/solution/app; default captures all three viewports —
+//        pass --viewports to restrict, e.g. --viewports=desktop for the
+//        legacy desktop-only output)
 
 import { createRequire } from 'node:module';
 import { execSync, spawn } from 'node:child_process';
@@ -37,7 +38,28 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const requireCjs = createRequire(import.meta.url);
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+// This script ships inside the corpuscheck python package; the repository is
+// located by walking up from the working directory (the CLI wrapper runs it
+// with cwd at the repo root) to a directory holding both tasks/ and packages/.
+function findRepoRoot(start) {
+  let dir = path.resolve(start);
+  for (;;) {
+    if (fs.existsSync(path.join(dir, 'tasks')) && fs.existsSync(path.join(dir, 'packages'))) {
+      return dir;
+    }
+    const parent = path.dirname(dir);
+    if (parent === dir) {
+      throw new Error(
+        `cannot locate repository root from ${start} (no ancestor contains tasks/ + packages/); ` +
+        'run from inside the repository (corpuscheck screenshots capture does this for you)'
+      );
+    }
+    dir = parent;
+  }
+}
+
+const ROOT = findRepoRoot(process.cwd());
 const OUT_ROOT = path.join(ROOT, 'reference-screenshots');
 const PORT = 45871;
 const VIEWPORT = { width: 1440, height: 900 };
@@ -56,7 +78,6 @@ function resolvePlaywright() {
   const candidates = [
     'playwright',
     path.join(ROOT, 'node_modules', 'playwright'),
-    '/private/tmp/claude-501/-Users-kurrytran-frontend-repository/0a2c5e5d-30a3-4e80-a8b2-fc368a34c16a/scratchpad/node_modules/playwright',
   ];
   for (const c of candidates) {
     try { return requireCjs(c); } catch { /* next */ }
