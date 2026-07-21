@@ -1,0 +1,13 @@
+{
+  "name": "Rescore A/B Lab",
+  "short_name": "Rescore lab",
+  "description": "Rescore completed benchmark trials under alternative scorer configurations and compare the labeled results.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#eef1ec",
+  "theme_color": "#0c6b58",
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
