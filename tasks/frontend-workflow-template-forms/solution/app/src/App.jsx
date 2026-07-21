@@ -21,24 +21,22 @@ import ImportModal from './components/ImportModal'
 import { registerWebMCP } from './webmcp'
 
 function StatusChip({ status }) {
-  const labels = { 'in-progress': 'In progress', generated: 'Generated', saved: 'Saved' }
-  const types = { 'in-progress': 'warm-gray', generated: 'blue', saved: 'green' }
+  const labels = { neutral: 'Neutral', 'in-progress': 'In progress', generated: 'Generated', saved: 'Saved' }
+  const types = { neutral: 'cool-gray', 'in-progress': 'warm-gray', generated: 'blue', saved: 'green' }
   const reduce = useReducedMotion()
   return (
     <AnimatePresence mode="wait">
-      {status !== 'neutral' && (
-        <motion.span
-          key={status}
-          initial={reduce ? false : { opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={reduce ? undefined : { opacity: 0, scale: 0.8 }}
-          transition={{ duration: reduce ? 0 : 0.09 }}
-          className={`status-chip status-${status}`}
-          style={{ display: 'flex' }}
-        >
-          <Tag size="sm" type={types[status]}>{labels[status]}</Tag>
-        </motion.span>
-      )}
+      <motion.span
+        key={status}
+        initial={reduce ? false : { opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={reduce ? undefined : { opacity: 0, scale: 0.8 }}
+        transition={{ duration: reduce ? 0 : 0.09 }}
+        className={`status-chip status-${status}`}
+        style={{ display: 'flex' }}
+      >
+        <Tag size="sm" type={types[status]}>{labels[status]}</Tag>
+      </motion.span>
     </AnimatePresence>
   )
 }
@@ -179,10 +177,12 @@ function AppHeader() {
 
   return (
     <header className="app-header">
-      <button type="button" className="brand" onClick={() => setView('forms')} aria-label="Template Forms home">
-        <span className="brand-mark" aria-hidden="true"><IbmGranite size={20} /></span>
-        <span><strong>Template</strong> Forms</span>
-      </button>
+      <h1 style={{ margin: 0, padding: 0, fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 1 }}>
+        <button type="button" className="brand" onClick={() => setView('forms')} aria-label="Template Forms home">
+          <span className="brand-mark" aria-hidden="true"><IbmGranite size={20} /></span>
+          <span><strong>Template</strong> Forms</span>
+        </button>
+      </h1>
       <nav className="view-nav" aria-label="Primary navigation">
         <Button type="button" kind="ghost" size="md" renderIcon={(props) => <Template {...props} aria-hidden="true" />} className={activeView === 'forms' ? 'nav-active' : ''} onClick={() => setView('forms')}>Studio</Button>
         <Button type="button" kind="ghost" size="md" renderIcon={(props) => <Book {...props} aria-hidden="true" />} className={activeView === 'library' ? 'nav-active' : ''} onClick={() => setView('library')}>
@@ -259,9 +259,17 @@ function FormsView() {
           </motion.div>
         </div>
         <div className={`form-panel ${reduce ? '' : 'form-fade'}`}>
-          {TECHNIQUES.map((item) => (
-            <TechniqueForm key={item.id} technique={item.id} active={technique === item.id} />
-          ))}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={technique}
+              initial={reduce ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reduce ? undefined : { opacity: 0 }}
+              transition={{ duration: reduce ? 0 : 0.15 }}
+            >
+              <TechniqueForm technique={technique} active={true} />
+            </motion.div>
+          </AnimatePresence>
         </div>
         <PreviewPanel saveButtonRef={saveButtonRef} />
         <SaveModal launcherButtonRef={saveButtonRef} />
@@ -329,7 +337,7 @@ function OnboardingCoach() {
     <aside className="onboarding-coach" aria-label="Guided onboarding">
       <div className="onboarding-coach__body">
         <span className="eyebrow">Studio tour · {onboardingStep + 1}/3</span>
-        <h2>{step.heading}</h2>
+        <h3>{step.heading}</h3>
         <p>{step.copy}</p>
         <ContentSwitcher
           size="sm"
