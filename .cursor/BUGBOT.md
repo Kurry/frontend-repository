@@ -417,6 +417,11 @@ structure the Bug with this template:
    the criterion's named observable; for (b) require reasoning text that describes a
    browser OBSERVATION (viewport, action, observed result — not "code implements X");
    (c) is a BLOCKING fabrication finding, enumerated criterion by criterion.
+   Distinct-string counting is NOT sufficient: TEMPLATED reasoning — one sentence
+   skeleton with the criterion name interpolated ("verified `<name>` passed…"), or
+   every criterion citing the same single evidence file — is fabrication with extra
+   steps (observed live: 174 "distinct" reasonings from one template, one video cited
+   174 times). Check the skeleton and the evidence citations, not just uniqueness.
 3. Check arithmetic: reward.json's value must equal the weighted mean of dimension
    scores, and each dimension score the weighted mean of its criterion values. Show
    your computation when flagging.
