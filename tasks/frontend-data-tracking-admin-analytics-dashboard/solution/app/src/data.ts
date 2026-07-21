@@ -14,6 +14,11 @@ export interface User {
   email: string;
   phone?: string;
   notes?: string;
+  accountSegment?: (typeof SEGMENTS)[number];
+  sendInvitation?: boolean;
+  enable2FA?: boolean;
+  productAccess?: boolean;
+  permissions?: string[];
   role: Role;
   status: Status;
   payments: number;
@@ -248,6 +253,11 @@ export function makeUserFromCreate(v: UserCreateValues): User {
     firstName: v.firstName.trim(), lastName: v.lastName.trim(), email: v.email.trim(),
     phone: v.phone && v.phone.trim() ? v.phone.trim() : undefined,
     notes: v.notes && v.notes.trim() ? v.notes.trim() : undefined,
+    accountSegment: v.accountSegment,
+    sendInvitation: v.sendInvitation,
+    enable2FA: v.enable2FA,
+    productAccess: v.productAccess,
+    permissions: v.permissions,
     role: v.role, status: v.status, payments: 0, products: 0,
     lastActive: new Date().toISOString(), avatar: av(Math.floor(Math.random() * 6) + 1),
   };

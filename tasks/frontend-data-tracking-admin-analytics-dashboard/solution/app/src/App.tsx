@@ -422,15 +422,17 @@ function UserForm() {
     resolver: zodResolver(formSchema), mode: 'onChange',
     defaultValues: isEdit ? {
       firstName: editing!.firstName, lastName: editing!.lastName, email: editing!.email, phone: editing!.phone || '',
-      notes: editing!.notes || '', temporaryPassword: '', accountSegment: 'Internal', status: editing!.status, role: editing!.role,
-      sendInvitation: false, enable2FA: false, productAccess: true, permissions: ['read'],
+      notes: editing!.notes || '', temporaryPassword: '', accountSegment: editing!.accountSegment || 'Internal', status: editing!.status, role: editing!.role,
+      sendInvitation: editing!.sendInvitation ?? false, enable2FA: editing!.enable2FA ?? false,
+      productAccess: editing!.productAccess ?? true, permissions: editing!.permissions || ['read'],
     } : { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'], ...addUserDraft },
   });
   useEffect(() => {
     reset(isEdit ? {
       firstName: editing!.firstName, lastName: editing!.lastName, email: editing!.email, phone: editing!.phone || '',
-      notes: editing!.notes || '', temporaryPassword: '', accountSegment: 'Internal', status: editing!.status, role: editing!.role,
-      sendInvitation: false, enable2FA: false, productAccess: true, permissions: ['read'],
+      notes: editing!.notes || '', temporaryPassword: '', accountSegment: editing!.accountSegment || 'Internal', status: editing!.status, role: editing!.role,
+      sendInvitation: editing!.sendInvitation ?? false, enable2FA: editing!.enable2FA ?? false,
+      productAccess: editing!.productAccess ?? true, permissions: editing!.permissions || ['read'],
     } : { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'], ...addUserDraft });
   }, [isEdit, editingId, editing, reset]);
 
@@ -452,7 +454,9 @@ function UserForm() {
     setSubmitting(true);
     if (isEdit) {
       dispatch(updateUser({ ...editing!, firstName: data.firstName.trim(), lastName: data.lastName.trim(), email: data.email.trim(),
-        phone: data.phone?.trim() || undefined, notes: data.notes?.trim() || undefined, role: data.role, status: data.status }));
+        phone: data.phone?.trim() || undefined, notes: data.notes?.trim() || undefined,
+        accountSegment: data.accountSegment, sendInvitation: data.sendInvitation, enable2FA: data.enable2FA,
+        productAccess: data.productAccess, permissions: data.permissions, role: data.role, status: data.status }));
       dispatch(pushToast({ kind: 'success', title: 'User updated', body: `${data.firstName} ${data.lastName} saved across all views` }));
       dispatch(setLastMutation(`Updated ${data.firstName}`));
       dispatch(setActiveView('all-users'));
