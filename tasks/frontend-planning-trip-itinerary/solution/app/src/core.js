@@ -32,7 +32,7 @@ export function deepClone(o) { return structuredClone(o); }
 // --------------------------------- Icons -----------------------------------
 // Minimal inline stroke icons (currentColor). No icon CDN, no pasted sprite set.
 const P = (d, extra = "") =>
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" ${extra}>${d}</svg>`;
 export const icon = {
   compass: P(`<circle cx="12" cy="12" r="9"/><polygon points="16 8 13 13 8 16 11 11 16 8"/>`),
   undo: P(`<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>`),
