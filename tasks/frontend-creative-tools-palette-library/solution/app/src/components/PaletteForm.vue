@@ -237,6 +237,18 @@ const shiftError = ref('');
 
 // When a harmony apply or import rewrites the palette underneath an open editor, re-sync the draft.
 watch(
+  () => props.palette?.id,
+  () => {
+    if (props.mode === 'edit' && props.palette) {
+      resetForm({ values: initialValues() });
+      store.batchSelected = [];
+      store.batchShift = { h: 0, s: 0, l: 0 };
+      shiftError.value = '';
+    }
+  },
+);
+
+watch(
   () => props.resetToken,
   () => {
     if (props.mode === 'edit' && props.palette) {
@@ -344,7 +356,6 @@ function applyShift() {
   store.batchSelected = [];
   store.batchShift = { h: 0, s: 0, l: 0 };
   store.announce(`Applied H/S/L shift to ${props.palette.name}`);
-  emit('saved');
 }
 
 function cancelShift() {

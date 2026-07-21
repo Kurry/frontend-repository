@@ -109,7 +109,7 @@ export const usePaletteStore = defineStore('palette', () => {
 
   // ---- History-aware mutation (one undoable step) -----------------------
   function commit(mutator) {
-    undoStack.value.push(clone(palettes.value));
+    undoStack.value.push({ palettes: clone(palettes.value), cart: clone(cartItems.value) });
     redoStack.value = [];
     mutator();
   }
@@ -131,8 +131,14 @@ export const usePaletteStore = defineStore('palette', () => {
     commit(() => {
       const idx = palettes.value.findIndex((p) => p.id === id);
       if (idx === -1) return;
-      const next = { ...palettes.value[idx], ...patch };
+      const previous = palettes.value[idx];
+      const next = { ...previous, ...patch };
       palettes.value[idx] = next;
+      if (patch.name && patch.name !== previous.name) {
+        cartItems.value = cartItems.value.map((item) =>
+          item.paletteName === previous.name ? { ...item, paletteName: patch.name } : item,
+        );
+      }
     });
   }
 
@@ -184,10 +190,11 @@ export const usePaletteStore = defineStore('palette', () => {
   /** Replace a palette's swatches with the wheel's computed set. One undoable step. */
   function applyHarmonySet(id, hexes) {
     const unique = [...new Set(hexes.map((h) => h.toUpperCase()))];
-    if (unique.length < 3 || unique.length > 8) {
+    const minSwatches = harmonyMode.value === 'Complementary' ? 2 : 3;
+    if (unique.length < minSwatches || unique.length > 8) {
       return {
         ok: false,
-        error: `Swatches must contain 3 to 8 unique hex values — this ${harmonyMode.value} set computes ${unique.length}. Nothing was changed.`,
+        error: `Swatches must contain ${minSwatches} to 8 unique hex values — this ${harmonyMode.value} set computes ${unique.length}. Nothing was changed.`,
       };
     }
     commit(() => {
@@ -222,15 +229,19 @@ export const usePaletteStore = defineStore('palette', () => {
 
   function undo() {
     if (!undoStack.value.length) return;
-    redoStack.value.push(clone(palettes.value));
-    palettes.value = undoStack.value.pop();
+    redoStack.value.push({ palettes: clone(palettes.value), cart: clone(cartItems.value) });
+    const snap = undoStack.value.pop();
+    palettes.value = snap.palettes;
+    cartItems.value = snap.cart;
     healSelection();
   }
 
   function redo() {
     if (!redoStack.value.length) return;
-    undoStack.value.push(clone(palettes.value));
-    palettes.value = redoStack.value.pop();
+    undoStack.value.push({ palettes: clone(palettes.value), cart: clone(cartItems.value) });
+    const snap = redoStack.value.pop();
+    palettes.value = snap.palettes;
+    cartItems.value = snap.cart;
     healSelection();
   }
 
