@@ -13,7 +13,7 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
-const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isRM = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const isMobileBP = () => window.innerWidth < 768;
 
 const CONFIG = {
@@ -57,7 +57,7 @@ export function initHero() {
   let viewportH = window.innerHeight;
 
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-  if (!RM) {
+  if (!isRM()) {
     window.addEventListener("mousemove", (e) => { pointer.tx = (e.clientX / window.innerWidth) * 2 - 1; pointer.ty = -(e.clientY / window.innerHeight) * 2 + 1; }, { passive: true });
     window.addEventListener("mouseleave", () => { pointer.tx = 0; pointer.ty = 0; });
   }
@@ -76,10 +76,16 @@ export function initHero() {
   let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   let glbCamera = null, mixer = null, clipDuration = 0;
 
-  const draco = new DRACOLoader();
-  draco.setDecoderPath("/assets/draco/");
-  const loader = new GLTFLoader();
-  loader.setDRACOLoader(draco);
+  let draco, loader;
+  try {
+    draco = new DRACOLoader();
+    draco.setDecoderPath("/assets/draco/");
+    loader = new GLTFLoader();
+    loader.setDRACOLoader(draco);
+  } catch(e) {
+    fallback();
+    return;
+  }
 
   // ---- scroll-driven state (motion only) ----
   let progress = 0, targetProgress = 0, looping = false, released = true, lastFrame = 0;
@@ -152,7 +158,7 @@ export function initHero() {
       clipDuration = Math.max(...gltf.animations.map((a) => a.duration));
     }
     window.dispatchEvent(new CustomEvent("glbLoaded"));
-    if (RM) {
+    if (isRM()) {
       if (mixer && clipDuration > 0) mixer.setTime(0);
       if (isMobileBP()) camera.position.x += CONFIG.mobile.cameraOffsetX;
       renderer.render(scene, camera);
@@ -165,7 +171,11 @@ export function initHero() {
     setTimeout(() => { const n = document.getElementById("scroll-nudge"); if (n) n.style.opacity = "0"; }, 3000);
   }
 
-  loader.load(CONFIG.glbPath(), onLoaded, undefined, () => { fallback(); });
+  try {
+    loader.load(CONFIG.glbPath(), onLoaded, undefined, () => { fallback(); });
+  } catch(e) {
+    fallback();
+  }
 
   let resizeTimer, lastW = window.innerWidth;
   window.addEventListener("resize", () => {
