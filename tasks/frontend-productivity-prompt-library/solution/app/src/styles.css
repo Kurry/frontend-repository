@@ -74,8 +74,10 @@ button,
   transition: background-color 90ms ease, border-color 90ms ease, box-shadow 90ms ease, transform 90ms ease;
 }
 
-[class*="cds--"] {
-  transition-duration: 90ms !important;
+@media (prefers-reduced-motion: no-preference) {
+  [class*="cds--"] {
+    transition-duration: 90ms !important;
+  }
 }
 
 button:active:not(:disabled),
