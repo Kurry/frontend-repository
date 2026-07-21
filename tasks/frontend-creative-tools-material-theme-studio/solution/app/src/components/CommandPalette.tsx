@@ -155,6 +155,9 @@ export default function CommandPalette({ open, onClose }: { open: boolean; onClo
             } else if (event.key === 'Enter') {
               event.preventDefault();
               runHighlighted();
+            } else if (event.key === 'Escape') {
+              event.preventDefault();
+              onClose();
             }
           }}
           placeholder="Search tabs, tools, themes, samples, and components"

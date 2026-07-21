@@ -298,7 +298,13 @@ export const useLabStore = create((set, get) => ({
   },
 
   importDocument: (document) => {
-    const parsed = labResultsSchema.parse(document)
+    const parsedResult = labResultsSchema.safeParse(document)
+    if (!parsedResult.success) {
+      const issue = parsedResult.error.issues?.[0]
+      const err = issue ? (issue.message.includes(':') ? issue.message : `${issue.path.join('.')}: ${issue.message}`) : 'document: validation failed'
+      return { imported: false, error: err }
+    }
+    const parsed = parsedResult.data
     const importedLabels = parsed.labels.map(({ name, scorerModel, configNote }) => ({ name, scorerModel, configNote }))
     const modelByLabel = Object.fromEntries(importedLabels.map((label) => [label.name, label.scorerModel]))
     const originalById = Object.fromEntries(get().trials.map((trial) => [trial.id, trial]))

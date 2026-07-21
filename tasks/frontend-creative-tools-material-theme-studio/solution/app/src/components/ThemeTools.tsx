@@ -205,6 +205,7 @@ function PaletteTool() {
         const color = (p as any)[intent];
         if (!color) return null;
         const wcag = getWcag(color.main, color.contrastText);
+        const bgWcag = getWcag(p.background?.default || '#fafafa', color.main);
         return (
           <Accordion key={intent} disableGutters className="!bg-gray-800 !text-white !mb-2 rounded">
             <AccordionSummary expandIcon={<Chevron />} className="hover:bg-gray-700/50 flex items-center" aria-label={`${intent} palette row`}>
@@ -225,7 +226,17 @@ function PaletteTool() {
                 </span>
               </div>
             </AccordionSummary>
-            <AccordionDetails className="bg-gray-900 border-t border-gray-700 space-y-3">
+            <AccordionDetails className="bg-gray-900 border-t border-gray-700 space-y-3 pt-4">
+              <div className="flex gap-4 mb-4" aria-label="Contrast pairing visualizer">
+                <div className="flex-1 rounded p-3 flex flex-col justify-center items-center text-center shadow-inner" style={{ backgroundColor: color.main, color: color.contrastText }}>
+                  <span className="text-sm font-medium">Text on Main</span>
+                  <span className="text-[10px] opacity-80">{wcag.ratio?.toFixed(2)}:1 ({wcag.label})</span>
+                </div>
+                <div className="flex-1 rounded p-3 flex flex-col justify-center items-center text-center shadow-inner" style={{ backgroundColor: p.background?.default || '#fafafa', color: color.main }}>
+                  <span className="text-sm font-medium">Main on Background</span>
+                  <span className="text-[10px] opacity-80">{bgWcag.ratio?.toFixed(2)}:1 ({bgWcag.label})</span>
+                </div>
+              </div>
               {(['main', 'light', 'dark', 'contrastText'] as const).map(ch => (
                 <div key={ch} className="flex items-center gap-2">
                   <span className="w-24 capitalize">{ch}</span>

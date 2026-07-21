@@ -47,7 +47,7 @@ const statisticsSchema = z.object({
 })
 
 export const reportSchema = z.object({
-  schemaVersion: z.literal('ab-experiment-report-v1', { errorMap: () => ({ message: 'schemaVersion must be ab-experiment-report-v1' }) }),
+  schemaVersion: z.literal('ab-experiment-report-v1', { error: 'schemaVersion must be ab-experiment-report-v1' }),
   experimentId: z.string().min(1, 'experimentId is required'),
   design: experimentSchema,
   status: z.enum(['completed', 'decided'], { error: 'status must be completed or decided' }),
@@ -72,8 +72,9 @@ export const zodErrorMessage = error => {
   const issue = error?.issues?.[0]
   if (!issue) return 'The payload is invalid'
   const path = issue.path?.length ? `${issue.path.join('.')}: ` : ''
-  if (issue.path?.length === 1 && issue.path[0] === 'schemaVersion') return 'schemaVersion must be ab-experiment-report-v1'
-  if (issue.path?.length === 1 && issue.path[0] === 'variants' && issue.message.includes('Traffic allocation')) return 'Traffic allocation must sum to exactly 100%'
-  if (issue.path?.length === 1 && issue.path[0] === 'rationale') return issue.message
+  const leaf = issue.path?.at(-1)
+  if (leaf === 'schemaVersion') return 'schemaVersion must be ab-experiment-report-v1'
+  if (leaf === 'variants' && issue.message.includes('Traffic allocation')) return 'Traffic allocation must sum to exactly 100%'
+  if (leaf === 'rationale') return issue.message
   return `${path}${issue.message}`
 }
