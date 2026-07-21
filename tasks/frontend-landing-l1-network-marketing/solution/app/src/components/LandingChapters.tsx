@@ -1,4 +1,5 @@
 import React from 'react';
+import { NetworkInAction } from './MockBlocks';
 
 const resources = [
   ['Developer documentation', 'Architecture guides, APIs, and deployment patterns for network builders.'],
@@ -34,6 +35,19 @@ export default function LandingChapters() {
         </div>
       </section>
 
+      <NetworkInAction />
+
+      <section className="chapter py-24" aria-labelledby="news-title">
+        <div className="container mx-auto px-4">
+          <p className="text-sm font-bold uppercase tracking-[.2em] text-accent mb-3">Field notes</p>
+          <h2 id="news-title" className="chapter-title text-4xl md:text-5xl font-bold mb-8">News &amp; stories</h2>
+          <div className="flex gap-5 overflow-x-auto snap-x pb-3">
+            <article className="min-w-[18rem] flex-1 snap-start notch-br bg-surface p-6 border border-current/15"><p className="text-sm opacity-65 mb-3">Ecosystem</p><h3 className="text-xl font-bold">Inside the next generation of enterprise validators</h3></article>
+            <article className="min-w-[18rem] flex-1 snap-start notch-br bg-surface p-6 border border-current/15"><p className="text-sm opacity-65 mb-3">Launch story</p><h3 className="text-xl font-bold">From testnet to a resilient global launch</h3></article>
+          </div>
+        </div>
+      </section>
+
       <section className="chapter py-24 bg-surface" aria-labelledby="solutions-title">
         <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-12">
           <div><p className="text-sm font-bold uppercase tracking-[.2em] text-accent mb-3">Network outcomes</p><h2 id="solutions-title" className="chapter-title text-4xl md:text-5xl font-bold mb-6">Solutions</h2><p className="text-lg opacity-75">Purpose-built infrastructure for regulated assets, institution-grade settlement, and globally distributed applications.</p></div>
@@ -42,9 +56,8 @@ export default function LandingChapters() {
       </section>
 
       <section className="chapter py-24" aria-labelledby="community-title">
-        <div className="container mx-auto px-4 grid lg:grid-cols-[1fr_1.4fr] gap-12 items-start">
+        <div className="container mx-auto px-4 max-w-3xl">
           <div><p className="text-sm font-bold uppercase tracking-[.2em] text-accent mb-3">Build together</p><h2 id="community-title" className="chapter-title text-4xl md:text-5xl font-bold mb-6">Community</h2><p className="text-lg opacity-75">Meet operators, founders, and developers sharing production lessons across the Ridge ecosystem.</p></div>
-          <div aria-labelledby="news-title"><h3 id="news-title" className="text-2xl font-bold mb-5">News &amp; stories</h3><div className="grid sm:grid-cols-2 gap-5"><article className="notch-br bg-surface p-6 border border-current/15"><p className="text-sm opacity-65 mb-3">Ecosystem</p><h4 className="text-xl font-bold">Inside the next generation of enterprise validators</h4></article><article className="notch-br bg-surface p-6 border border-current/15"><p className="text-sm opacity-65 mb-3">Field notes</p><h4 className="text-xl font-bold">From testnet to a resilient global launch</h4></article></div></div>
         </div>
       </section>
     </div>

@@ -53,14 +53,14 @@ export default function GlobalEvents() {
 
         <div className="flex flex-col gap-4">
           {featuredEvents.length === 0 ? (
-            <div className="events-card notch-br bg-void border border-white/10 p-8 lg:p-12 text-white">
+            <div className="events-card notch-br bg-void border border-white/10 p-8 lg:p-12 text-current">
               <span className="w-12 h-1 bg-accent block mb-4"></span>
               <p className="text-sm font-bold tracking-widest uppercase text-accent mb-2">Featured</p>
               <p className="text-gray-400">No featured events yet — mark an event featured in Events Manager to surface it here.</p>
             </div>
           ) : (
             featuredEvents.map((fe) => (
-              <div key={fe.id} className="events-card notch-br bg-void border border-white/10 p-8 lg:p-12 text-white group hover:border-white/20 transition-colors" data-featured-event={fe.id}>
+              <div key={fe.id} className="events-card notch-br bg-void border border-white/10 p-8 lg:p-12 text-current group hover:border-white/20 transition-colors" data-featured-event={fe.id}>
                 <div className="events-card-block mb-8">
                   <span className="w-12 h-1 bg-accent block mb-4"></span>
                   <p className="text-sm font-bold tracking-widest uppercase text-accent mb-2">Featured / {fe.category}</p>

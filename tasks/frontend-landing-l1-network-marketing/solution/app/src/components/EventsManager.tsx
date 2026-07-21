@@ -225,7 +225,7 @@ export default function EventsManager() {
 
         {/* Table */}
         <div className="flex-1 overflow-auto p-4 bg-void">
-          {events.length === 0 && leavingEvents.length === 0 ? (
+          {events.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-8">
               <p className="text-xl text-gray-400 mb-4">No events found in the catalog. Create your first event to start building the schedule.</p>
               <button className="btn btn-primary notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => { setEditingEvent(null); setIsFormOpen(true); }}>Create event</button>
@@ -266,7 +266,7 @@ export default function EventsManager() {
                 {filteredEvents.map(event => {
                   const leaving = leavingIds.includes(event.id);
                   return (
-                    <tr key={event.id} className={`group ${leaving ? 'row-exit' : 'row-enter'}`}>
+                    <tr key={event.id} className={`group hover:bg-surface/50 transition-colors ${leaving ? 'row-exit' : 'row-enter'}`}>
                       <td>
                         <input type="checkbox" className="checkbox checkbox-sm notch-br"
                           disabled={leaving}
