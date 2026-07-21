@@ -4,9 +4,9 @@ import { z } from 'zod';
 const hexColor = z.string().regex(/^#[0-9a-fA-F]{6}$/, 'must be a #RRGGBB color');
 const paletteColorSchema = z.object({
   main: hexColor,
-  light: hexColor,
-  dark: hexColor,
-  contrastText: hexColor,
+  light: hexColor.optional(),
+  dark: hexColor.optional(),
+  contrastText: hexColor.optional(),
 });
 const themeOptionsSchema = z.object({
   name: z.string().trim().min(1, 'name is required').max(64, 'name must be 64 characters or fewer'),
@@ -50,6 +50,16 @@ export function parseImportedTheme(input: unknown): ThemeOptions {
   }
 
   const value = result.data;
+
+  // Fallback defaults for missing intent channels
+  const intents = ['primary', 'secondary', 'error', 'warning', 'info', 'success'] as const;
+  for (const intent of intents) {
+    if (value.palette[intent]) {
+      value.palette[intent].light = value.palette[intent].light || value.palette[intent].main;
+      value.palette[intent].dark = value.palette[intent].dark || value.palette[intent].main;
+      value.palette[intent].contrastText = value.palette[intent].contrastText || '#ffffff';
+    }
+  }
 
   return {
     palette: value.palette,

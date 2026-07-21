@@ -32,7 +32,7 @@ export default function ExportTab() {
     const textToExport = format === 'json' ? jsonExport : cssExport;
 
     const copyText = () => {
-        if (copyBusyRef.current) return;
+        if (copyBusyRef.current || toast?.msg.includes('Export copied')) return;
         copyBusyRef.current = true;
         navigator.clipboard
             .writeText(textToExport)
@@ -62,7 +62,9 @@ export default function ExportTab() {
         const a = document.createElement('a');
         a.href = url;
         a.download = `${themeName.toLowerCase().replace(/\s+/g, '-')}-theme.${downloadFormat}`;
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
         show(`Downloading ${downloadFormat.toUpperCase()} file`);
         dispatch(announce(`Theme ${downloadFormat.toUpperCase()} file download started`));

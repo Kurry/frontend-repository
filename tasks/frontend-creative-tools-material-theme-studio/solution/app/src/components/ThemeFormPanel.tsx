@@ -72,6 +72,14 @@ export default function ThemeFormPanel() {
     dispatch(closeThemeForm());
   };
 
+  const onInvalid = () => {
+    // If submission fails due to validation, explicitly announce the error message
+    // because standard HTML validation is bypassed and the user might just press enter.
+    if (errors.name?.message) {
+      dispatch(announce(errors.name.message));
+    }
+  };
+
   const onValid = (data: FormData) => {
     const name = data.name;
     if (mode === 'rename') {
@@ -109,7 +117,7 @@ export default function ThemeFormPanel() {
           The tab bar stays active while this form is open — focus is kept inside the form for keyboard use.
         </p>
       </div>
-      <form onSubmit={handleSubmit(onValid)} noValidate>
+      <form onSubmit={handleSubmit(onValid, onInvalid)} noValidate>
         <div className="px-5 py-4">
           <TextField
             label="Theme name"
@@ -128,7 +136,7 @@ export default function ThemeFormPanel() {
           <Button
             type="submit"
             variant="contained"
-            disabled={!isValid}
+            disabled={false}
             sx={{ minHeight: 44 }}
           >
             {mode === 'rename' ? 'Rename Theme' : 'Create Theme'}
