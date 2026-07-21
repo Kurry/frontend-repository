@@ -144,7 +144,6 @@ export const notificationsOpen = signal(false);
 export const editUserId = signal(null);
 export const duplicateSourceId = signal(null);
 export const formDraft = signal(null);
-export const uiEpoch = signal(0);
 export const bulkDialog = signal(null);
 export const page = signal(1);
 export const toast = signal('');
@@ -215,10 +214,8 @@ export function bump(message) {
 }
 
 export function syncUiAfterMutation() {
-  uiEpoch.value += 1;
   if (typeof document !== 'undefined') {
     document.documentElement.dataset.theme = theme.value;
-    document.documentElement.dataset.uiEpoch = String(uiEpoch.value);
   }
 }
 

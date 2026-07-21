@@ -247,7 +247,8 @@ function Progress({label,value}) { return <div className="progress-item"><div cl
 function Uptime({label,value,alert}) { return <div style={{marginTop:50}}><div className="progress-label"><span>{label}</span><span>{value}</span></div><div className="uptime-bars">{Array.from({length:12},(_,i)=><i key={i} className={alert&&i===2?'alert':''}/>)}</div></div>; }
 function MetricLine({a,b}) { return <div style={{display:'flex',justifyContent:'space-between',fontSize:12,marginTop:12}}><span>{a}</span><strong>{b}</strong></div>; }
 
-function KpiCard({ label, value, color, index }) {
+function KpiCard({ label, metric, color, index }) {
+  const value = store.kpis.value[metric];
   const seed = [6,7,6,9,10,9,12,value];
   return <article className="card kpi-card"><div><small>{label}</small><strong>{value}</strong></div><div className="spark"><ChartCanvas data={{labels:seed.map((_,i)=>i),datasets:[{data:seed,borderColor:color,backgroundColor:`${color}22`,borderWidth:2,tension:.35,pointRadius:0,fill:true}]}} options={{animation:{duration:380+index*50}}}/></div></article>;
 }
@@ -266,7 +267,7 @@ function AllUsers() {
   const bulkDisabled = selected.size === 0;
   return <UsersShell title="All users" subtitle="Manage access, lifecycle status, and customer value from one live directory.">
     <section className="users-kpis" aria-label="User KPIs">
-      <KpiCard label="Total" value={store.kpis.value.total} color="#25b8ef" index={0}/><KpiCard label="Active" value={store.kpis.value.active} color="#09c8b8" index={1}/><KpiCard label="Paying" value={store.kpis.value.paying} color="#f5b941" index={2}/><KpiCard label="Suspended" value={store.kpis.value.suspended} color="#f15d79" index={3}/>
+      <KpiCard label="Total" metric="total" color="#25b8ef" index={0}/><KpiCard label="Active" metric="active" color="#09c8b8" index={1}/><KpiCard label="Paying" metric="paying" color="#f5b941" index={2}/><KpiCard label="Suspended" metric="suspended" color="#f15d79" index={3}/>
     </section>
     <div className="card filterbar">
       <FunnelIcon className="icon-sm muted"/>
@@ -284,7 +285,7 @@ function AllUsers() {
     <section className="card table-card" aria-label="Users list">
       {current.length ? <div className="table-scroll"><table className="table data-table"><thead><tr><th><input className="checkbox" type="checkbox" aria-label="Select all users on this page" checked={allCurrent} onChange={(e)=>current.forEach(u=>store.toggleSelection(u.id,e.currentTarget.checked))}/></th><th>User</th><th>Role</th><th>Status</th><th>Payments</th><th>Products</th><th>Last active</th><th>Actions</th></tr></thead><tbody>
         {current.map((u)=><UserRow key={u.id} user={u}/>)}</tbody></table></div> : <EmptyUsers filtered={store.users.value.length>0}/>} 
-      <div className="pagination"><span>Showing {current.length ? (store.page.value-1)*pageSize+1 : 0}–{Math.min(store.page.value*pageSize,rows.length)} of {rows.length}</span><div className="join"><button className="btn btn-sm" disabled={store.page.value===1} onClick={()=>store.page.value--}>Previous</button>{Array.from({length:pages},(_,i)=><button key={i} className={`btn btn-sm ${store.page.value===i+1?'active':''}`} onClick={()=>store.page.value=i+1}>{i+1}</button>)}<button className="btn btn-sm" disabled={store.page.value===pages} onClick={()=>store.page.value++}>Next</button></div></div>
+      <div className="pagination"><span>Showing {current.length ? (store.page.value-1)*pageSize+1 : 0}–{Math.min(store.page.value*pageSize,rows.length)} of {rows.length}</span><div className="join"><button className="btn btn-sm" disabled={store.page.value===1} onClick={()=>store.page.value--}>Previous</button>{Array.from({length:pages},(_,i)=><button key={i} aria-label={`Page ${i+1}`} className={`btn btn-sm ${store.page.value===i+1?'active':''}`} onClick={()=>store.page.value=i+1}>{i+1}</button>)}<button className="btn btn-sm" aria-label="Next page" disabled={store.page.value===pages} onClick={()=>store.page.value++}>Next</button></div></div>
     </section>
   </UsersShell>;
 }
@@ -310,7 +311,7 @@ function UserForm() {
     : null;
   const defaults = draftValues || (editing ? {...editing,temporaryPassword:''} : source ? {...source,id:undefined,email:'',temporaryPassword:'',status:'Invited',sendInvitation:true} : defaultUser);
   const schema = editing ? store.userEditSchema : store.userCreateSchema;
-  const {register,handleSubmit,formState:{errors,isSubmitting},watch,reset} = useForm({resolver:zodResolver(schema),mode:'onSubmit',defaultValues:defaults});
+  const {register,handleSubmit,formState:{errors,isSubmitting,isValid},watch,reset} = useForm({resolver:zodResolver(schema),mode:'onChange',defaultValues:defaults});
   const lock = useRef(false);
   useEffect(() => {
     reset(defaults);
@@ -359,7 +360,7 @@ function UserForm() {
       <div className="form-section"><h3>Permissions</h3><p>Only declared permission IDs can be included in the payload.</p><div className="check-grid">
         {store.PERMISSIONS.map(p=><label className="check-row" key={p}><input className="checkbox" type="checkbox" value={p} {...register('permissions')}/>{p}</label>)}
       </div><div className="field-error" role="status">{errors.permissions?.message}</div></div>
-      <div className="form-actions"><button className="btn" type="button" onClick={()=>{store.formDraft.value=null;store.setView('all-users')}}>Cancel</button><button className="btn btn-primary" type="submit" disabled={isSubmitting}>{editing?'Save changes':'Create user'}</button></div>
+      <div className="form-actions"><button className="btn" type="button" onClick={()=>{store.formDraft.value=null;store.setView('all-users')}}>Cancel</button><button className="btn btn-primary" type="submit" disabled={isSubmitting || !isValid}>{editing?'Save changes':'Create user'}</button></div>
       <div className="sr-only" aria-live="polite">{Object.values(errors).map(e=>e?.message).filter(Boolean).join('. ')}</div>
     </form>
   </UsersShell>;
@@ -393,6 +394,7 @@ function BulkDialog() {
   const type=store.bulkDialog.value;
   const schema=type==='status'?z.object({status:z.enum(store.STATUSES)}):z.object({role:z.enum(store.ROLES)});
   const {register,handleSubmit,formState:{isValid}}=useForm({resolver:zodResolver(schema),mode:'onChange',defaultValues:type==='status'?{status:''}:{role:''}});
+
   if(!type)return null;
   const submit=(data)=>{store.bulkUpdate([...store.selection.value],data);store.bulkDialog.value=null;};
   return <div className="overlay" role="presentation" onMouseDown={(e)=>{if(e.target===e.currentTarget)store.bulkDialog.value=null}}><form className="modal-card" role="dialog" aria-modal="true" onSubmit={handleSubmit(submit)}><div className="modal-head"><div><h2>Change {type}</h2><p>Update {store.selection.value.size} selected users.</p></div><button type="button" className="icon-btn" aria-label="Close" onClick={()=>store.bulkDialog.value=null}><XMarkIcon className="icon"/></button></div><Field label={type==='status'?'Status':'Role'} name="bulk-choice"><select id="bulk-choice" className="select" {...register(type)}><option value="">Choose {type}</option>{(type==='status'?store.STATUSES:store.ROLES).map(v=><option key={v}>{v}</option>)}</select></Field><div className="form-actions"><button type="button" className="btn" onClick={()=>store.bulkDialog.value=null}>Cancel</button><button className="btn btn-primary" disabled={!isValid}>Update users</button></div></form></div>;
@@ -446,7 +448,6 @@ function CurrentView() {
 }
 
 export default function App() {
-  store.uiEpoch.value;
   const commandTriggerRef=useRef(null),exportTriggerRef=useRef(null);
   useEffect(()=>{document.documentElement.dataset.theme=store.theme.value},[store.theme.value]);
   useEffect(()=>{const key=(e)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();store.commandOpen.value=true}if(e.key==='Escape'){store.resetTransientMenus();if(store.importOpen.value)store.importOpen.value=false;if(store.bulkDialog.value)store.bulkDialog.value=null}};document.addEventListener('keydown',key);return()=>document.removeEventListener('keydown',key)},[]);
