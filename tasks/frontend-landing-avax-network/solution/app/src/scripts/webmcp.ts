@@ -1,4 +1,4 @@
-// WebMCP surface for the Avalanche homepage oracle.
+// WebMCP surface for the Astra homepage oracle.
 //
 // Every tool drives the SAME DOM controls a human uses: it clicks the real
 // nav/anchor, the real theme toggle, and the real form buttons/inputs — it
@@ -29,24 +29,56 @@ const THEMES = ["light", "dark"];
 
 type FormKey = "newsletter" | "contact";
 
-// Field name -> the DOM input id in each form (newsletter multi-step / contact).
+// Field name (contract) -> the DOM input id in each form. Keys here are the
+// PRD field-contract names (socialhandle, isDeveloper, astra_contact_message, …)
+// so a WebMCP caller using the documented payload fills the right controls.
 const NEWSLETTER_FIELDS: Record<string, string> = {
   firstname: "firstname",
   lastname: "lastname",
   email: "email",
+  socialhandle: "twitterhandle",
   twitterhandle: "twitterhandle",
   country: "country",
+  isDeveloper: "developer_check",
+  hasWeb3Experience: "devexperience_Astra",
+  isStudent: "student_check",
   gdpr: "general-gdpr",
+  marketing_consent: "marketing_consent",
+  newsletter: "newsletter",
 };
 
 const CONTACT_FIELDS: Record<string, string> = {
   firstname: "contact-firstname",
   lastname: "contact-lastname",
   email: "contact-email",
-  avalanche_contact_message: "avalanche_contact_message",
+  otherDetail: "project_type_other",
+  astra_contact_message: "astra_contact_message",
   gdpr: "contact-us-gdpr",
   marketing_consent: "contact-us-marketing",
 };
+
+// Contract field -> the chip-picker options wrapper id it drives. These selects
+// have no native <input required>, so filling them means clicking the matching
+// option chip exactly as a human would (same handler path as the visible UI).
+const CHIP_FIELDS: Record<string, string> = {
+  vertical: "select-vertical-options",
+  source: "select-source-options",
+};
+
+function selectChip(wrapId: string, value: string): boolean {
+  const wrap = document.getElementById(wrapId);
+  if (!wrap) return false;
+  const opts = wrap.querySelectorAll<HTMLElement>("[data-option-value]");
+  const target = [...opts].find((o) => (o.dataset.optionValue || "") === value);
+  if (!target) {
+    // An unknown contract value must remain visibly invalid; selecting a valid
+    // fallback would let the form submit data different from the request.
+    opts.forEach((option) => option.classList.remove("bg-neutral-100"));
+    return false;
+  }
+  target.click();
+  return true;
+}
 
 function q<T extends Element = HTMLElement>(sel: string): T | null {
   return document.querySelector<T>(sel);
@@ -60,6 +92,12 @@ function fillFields(form: FormKey, fields: Record<string, unknown> | undefined) 
   if (!fields) return;
   const map = form === "newsletter" ? NEWSLETTER_FIELDS : CONTACT_FIELDS;
   for (const [name, value] of Object.entries(fields)) {
+    // Chip-picker selects (newsletter vertical / source): click the option chip
+    // so the same UI handler that styles + records the choice runs.
+    if (form === "newsletter" && CHIP_FIELDS[name]) {
+      selectChip(CHIP_FIELDS[name], String(value));
+      continue;
+    }
     const id = map[name] || name;
     const el = document.getElementById(id) as
       | HTMLInputElement
@@ -78,10 +116,13 @@ function fillFields(form: FormKey, fields: Record<string, unknown> | undefined) 
       el.dispatchEvent(new Event("input", { bubbles: true }));
     }
   }
-  // Contact custom project_type select is a hidden input driven by chips.
+  // Contact custom project_type select is a hidden input driven by chips; click
+  // the matching chip so the conditional otherDetail + visible label update too.
   if (form === "contact" && fields && "project_type" in fields) {
+    const val = String((fields as Record<string, unknown>).project_type);
+    const selected = selectChip("select-project_type-options", val);
     const hidden = q<HTMLInputElement>('#select-project_type input[name="project_type"]');
-    if (hidden) hidden.value = String((fields as Record<string, unknown>).project_type);
+    if (hidden) hidden.value = selected ? val : "";
   }
 }
 
@@ -248,17 +289,20 @@ function artifactExport(args: Record<string, unknown>) {
   if (format !== "json") return { ok: false, error: `unsupported format: ${format}` };
   // Drive the same visible Download JSON control.
   const btn = document.getElementById("session-leads-download") as HTMLButtonElement | null;
-  if (btn) btn.click();
+  if (!btn) return { ok: false, error: "Session leads Download JSON control not found" };
+  btn.click();
   const store = leadsStore();
   const counts = store?.counts() ?? { total: 0, newsletter: 0, contact: 0 };
-  return { ok: true, operation: "export", format, leadCount: counts.total, counts, document: store?.buildExport() };
+  return { ok: true, operation: "export", format, leadCount: counts.total, counts };
 }
 
 function artifactCopy(args: Record<string, unknown>) {
   const format = String(args.format ?? "json");
+  if (format !== "json") return { ok: false, error: `unsupported format: ${format}` };
   // Drive the same visible Copy JSON control.
   const btn = document.getElementById("session-leads-copy") as HTMLButtonElement | null;
-  if (btn) btn.click();
+  if (!btn) return { ok: false, error: "Session leads Copy JSON control not found" };
+  btn.click();
   const store = leadsStore();
   const counts = store?.counts() ?? { total: 0, newsletter: 0, contact: 0 };
   return { ok: true, operation: "copy", format, leadCount: counts.total, counts };

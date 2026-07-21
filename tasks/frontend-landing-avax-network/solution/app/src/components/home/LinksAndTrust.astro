@@ -4,23 +4,23 @@ import logos from "../../data/logos.json";
 const cards = [
   {
     title: "Set up a wallet",
-    body: "To connect to the Avalanche ecosystem, set up a non-custodial wallet to store your crypto assets, approve transactions, track your network activity and more.",
+    body: "To connect to the Astra ecosystem, set up a non-custodial wallet to store your crypto assets, approve transactions, track your network activity and more.",
     cta: "Create a Wallet",
     href: "https://core.app",
     icon: "/_astro/Small_Icons_1hiqaE.svg",
     alt: "Set up a wallet icon",
   },
   {
-    title: "The AVAX Token",
-    body: "AVAX powers the Avalanche network—used for paying fees, securing the platform, and fueling custom blockchain operations.",
+    title: "The ASTRA Token",
+    body: "ASTRA powers the Astra network—used for paying fees, securing the platform, and fueling custom blockchain operations.",
     cta: "Learn More",
-    href: "https://coinmarketcap.com/currencies/avalanche/",
+    href: "https://coinmarketcap.com/currencies/Astra/",
     icon: "/_astro/avax-token_ZNPrE8.svg",
-    alt: "The AVAX Token icon",
+    alt: "The ASTRA Token icon",
   },
   {
     title: "Explore the Ecosystem",
-    body: "Discover the expanding web of applications, tools and experiences across the Avalanche network.",
+    body: "Discover the expanding web of applications, tools and experiences across the Astra network.",
     cta: "Start Exploring",
     href: "https://core.app/discover/",
     icon: "/_astro/advisory_Z18SnDj.svg",
@@ -86,11 +86,11 @@ const track = [...logos, ...logos];
           <path d="M61.25 55.3594L6.25001 114M6.25 6L43.1843 45.6563" stroke="currentcolor" fill="none"></path>
         </svg>
         <h2 class="h4 max-w-256 split-heading text-balance text-left leading-none uppercase dark:text-white">
-          Avalanche is Trusted by Businesses Worldwide
+          Astra is Trusted by Businesses Worldwide
         </h2>
       </div>
       <p class="split-text sm:text-balance leading-[135%] lg:self-end">
-        Founders, developers and business leaders across the globe chose Avalanche for their digital asset operations, backed by a reliable, enterprise-grade blockchain network.
+        Founders, developers and business leaders across the globe chose Astra for their digital asset operations, backed by a reliable, enterprise-grade blockchain network.
       </p>
     </div>
 
@@ -101,20 +101,17 @@ const track = [...logos, ...logos];
     >
       <div class="marquee-content flex h-full shrink-0 items-center justify-start gap-px pr-px" style="--duration: 31.5s; --direction: normal;">
         {
-          track.map((logo) => (
+          track.map((logo, i) => (
             <div class="group relative flex aspect-[3/2] w-50 shrink-0 items-center justify-center overflow-clip rounded-2xl bg-white transition-mode lg:w-[clamp(10rem,0rem+15.625vw,18.75rem)] dark:bg-dark">
-              <div
-                class="logo-gradient pointer-events-none absolute left-1/2 top-1/2 aspect-square min-h-full min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.4] overflow-clip opacity-0 transition-[clip-path,opacity] duration-300 ease-out-quart group-hover:opacity-100 lg:opacity-100 lg:duration-1000"
-                style={`--from:${logo.from};--via:${logo.via};--to:${logo.to};`}
-              ></div>
               <img
                 src={`/images/logos/${logo.stem}.webp`}
-                alt={logo.alt}
+                alt={i < logos.length ? logo.alt : ""}
+                aria-hidden={i < logos.length ? undefined : "true"}
                 width="300"
                 height="200"
                 loading="eager"
                 decoding="async"
-                class="pointer-events-none relative h-[90%] w-auto select-none transition-all duration-300 ease-out-cubic group-hover:invert lg:h-[80%] lg:duration-1000"
+                class="pointer-events-none relative h-[90%] w-auto select-none object-contain grayscale transition-all duration-300 ease-out-cubic group-hover:invert lg:h-[80%] lg:duration-1000 dark:invert"
               />
             </div>
           ))

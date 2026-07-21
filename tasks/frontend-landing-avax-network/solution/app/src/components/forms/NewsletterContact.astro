@@ -23,12 +23,11 @@ const interests = [
   "Gaming",
   "Art & Culture",
   "Development",
-  "Policy",
-  "Unsure",
-];
+  "Other",
+]
 
 const hearAbout = [
-  "Social Media (Twitter/X, LinkedIn, Telegram, etc.)",
+  "Social channels",
   "Word of Mouth",
   "Event",
   "Article, press release, or other news source",
@@ -42,7 +41,7 @@ const projectTypes = [
   "Art & Culture",
   "Development",
   "Other",
-];
+]
 
 const btnShape = {
   rounded: "clamp(0.625rem, 0.196rem + 0.67vw, 1rem)",
@@ -81,8 +80,8 @@ const nextShape = {
         <div class="absolute inset-0 bg-gradient-to-r from-black to-transparent"></div>
       </div>
       <div class="relative z-[1] flex w-full flex-col items-start justify-start gap-[var(--gap-base)]">
-        <h2 class="h4 max-w-full leading-none text-white uppercase">Start building On Avalanche</h2>
-        <p class="lg text-white">Create, scale, and innovate with Avalanche’s powerful builder infrastructure.</p>
+        <h2 class="h4 max-w-full leading-none text-white uppercase">Start building On Astra</h2>
+        <p class="lg text-white">Create, scale, and innovate with Astra’s powerful builder infrastructure.</p>
       </div>
       <a class="group/button button arrow white relative z-[1] inline-flex justify-self-start" href="https://build.avax.network" target="_blank" rel="noopener">
         <wm-shape
@@ -144,8 +143,8 @@ const nextShape = {
                 <label for="email" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Email*</label>
               </div>
               <div class="relative group/inputWrapper">
-                <input id="twitterhandle" type="text" name="twitterhandle" placeholder="Twitter Handle" class="input peer" autocomplete="username" />
-                <label for="twitterhandle" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Twitter Handle</label>
+                <input id="twitterhandle" type="text" name="twitterhandle" placeholder="Social Handle" class="input peer" autocomplete="username" />
+                <label for="twitterhandle" class="pointer-events-none absolute top-1/2 left-[var(--padding-md)] origin-top-left -translate-y-1/2 font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:scale-100 peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:-translate-y-[150%] peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:-translate-y-[150%] peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Social Handle</label>
               </div>
             </div>
 
@@ -182,8 +181,8 @@ const nextShape = {
                 <input id="developer_check" name="developer_check" type="checkbox" class="size-5 accent-[var(--color-red)]" />
               </div>
               <div class="group/conditional input col-span-full flex items-center justify-between pr-[var(--padding-md)]">
-                <label for="devexperience_avalanche" class="text-base text-black dark:group-[.light]/form:text-white">Do you have experience building in Web3?</label>
-                <input id="devexperience_avalanche" name="devexperience_avalanche" type="checkbox" class="size-5 accent-[var(--color-red)]" />
+                <label for="devexperience_Astra" class="text-base text-black dark:group-[.light]/form:text-white">Do you have experience building in Web3?</label>
+                <input id="devexperience_Astra" name="devexperience_Astra" type="checkbox" class="size-5 accent-[var(--color-red)]" />
               </div>
             </div>
 
@@ -197,7 +196,7 @@ const nextShape = {
                 <div class="relative z-[2] h-18 lg:h-[clamp(4rem,3.429rem+0.893vw,4.5rem)]">
                   <div id="select-source" data-name="source" class="select group/select relative min-h-18 overflow-hidden bg-white p-0 input dark:group-[.light]/form:bg-dark lg:min-h-[clamp(4rem,3.429rem+0.893vw,4.5rem)]">
                     <button id="select-source-button" type="button" class="relative flex h-18 w-full cursor-pointer flex-row items-center justify-between px-[var(--padding-md)] text-left font-aeonik text-base font-bold text-black lg:h-[clamp(4rem,3.429rem+0.893vw,4.5rem)] dark:group-[.light]/form:text-white">
-                      <span class="pointer-events-none pr-[calc(1rem+var(--padding-lg))]">Where did you hear about Avalanche?*</span>
+                      <span class="pointer-events-none pr-[calc(1rem+var(--padding-lg))]">Where did you hear about Astra?*</span>
                     </button>
                     <div id="select-source-options" class="flex w-full flex-row flex-wrap items-start justify-start gap-0.5 px-[var(--padding-md)] pt-[var(--padding-xs)] pb-[var(--padding-2base)]">
                       {hearAbout.map((opt) => (
@@ -218,12 +217,12 @@ const nextShape = {
                 <span class="text-[var(--text-sm)]">I have read and agree to the privacy policy.</span>
               </label>
               <label class="group/checkboxWrapper relative flex flex-row items-center justify-start gap-[var(--gap-xs)]">
-                <input name="marketing_consent" type="checkbox" class="size-4 accent-[var(--color-red)]" />
-                <span class="text-[var(--text-sm)]">I agree to receive marketing emails from the Avalanche Foundation.</span>
+                <input id="marketing_consent" name="marketing_consent" type="checkbox" class="size-4 accent-[var(--color-red)]" />
+                <span class="text-[var(--text-sm)]">I agree to receive marketing emails from the Astra Foundation.</span>
               </label>
               <label class="group/checkboxWrapper relative flex flex-row items-center justify-start gap-[var(--gap-xs)]">
-                <input name="newsletter" type="checkbox" class="size-4 accent-[var(--color-red)]" />
-                <span class="text-[var(--text-sm)]">I'd also like to subscribe to the Avalanche newsletter.</span>
+                <input id="newsletter" name="newsletter" type="checkbox" class="size-4 accent-[var(--color-red)]" />
+                <span class="text-[var(--text-sm)]">I'd also like to subscribe to the Astra newsletter.</span>
               </label>
             </div>
 
@@ -312,7 +311,7 @@ const nextShape = {
     <div class="grid grid-cols-1 place-items-stretch items-start gap-[var(--gap-xl)] lg:grid-cols-2">
       <div class="flex flex-col items-start gap-[var(--gap-md)]">
         <h3 class="h6 split-text text-balance uppercase">
-          Interested in building your project on Avalanche? Get in touch!
+          Interested in building your project on Astra? Get in touch!
         </h3>
       </div>
       <form id="contact-us-form" novalidate class="group/form light grid place-items-stretch gap-[var(--gap-xs)] sm:grid-cols-2" data-form="contact" onsubmit="return false;">
@@ -372,13 +371,13 @@ const nextShape = {
 
         <div class="relative group/inputWrapper col-span-full -mt-[var(--padding-xs)]">
           <textarea
-            id="avalanche_contact_message"
+            id="astra_contact_message"
             class="input peer h-[clamp(6rem,4.857rem+1.786vw,7rem)] w-full resize-none py-[var(--padding-md)]"
-            name="avalanche_contact_message"
+            name="astra_contact_message"
             placeholder="Share your message with the team"
             required
           ></textarea>
-          <label for="avalanche_contact_message" class="pointer-events-none absolute top-[var(--padding-md)] left-[var(--padding-md)] origin-top-left font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Share your message with the team*</label>
+          <label for="astra_contact_message" class="pointer-events-none absolute top-[var(--padding-md)] left-[var(--padding-md)] origin-top-left font-aeonik text-base font-bold text-black transition-all duration-500 ease-in-out-cubic peer-placeholder-shown:opacity-100 peer-focus:scale-75 peer-focus:opacity-60 peer-[:not(:placeholder-shown)]:scale-75 peer-[:not(:placeholder-shown)]:opacity-60 dark:group-[.light]/form:text-white">Share your message with the team*</label>
         </div>
 
         <div class="relative col-span-full flex flex-col items-start justify-between gap-[var(--gap-base)] sm:flex-row sm:gap-[var(--gap-xl)]">
@@ -400,7 +399,7 @@ const nextShape = {
                 type="checkbox"
                 class="size-6 shrink-0 accent-[var(--color-red)] lg:size-[clamp(0.75rem,-0.107rem+1.339vw,1.5rem)]"
               />
-              <span>I consent to receive Avalanche updates from the Avalanche Foundation and understand I can unsubscribe at any time.</span>
+              <span>I consent to receive Astra updates from the Astra Foundation and understand I can unsubscribe at any time.</span>
             </label>
           </div>
           <button id="contact-us-form-button" type="submit" class="group/button button arrow w-full shrink-0 sm:w-auto">
@@ -472,7 +471,7 @@ const nextShape = {
       const co = val("country"); if (co) p.country = co;
       const vt = chip("select-vertical-options"); if (vt) p.vertical = vt;
       p.isDeveloper = checked("developer_check");
-      p.hasWeb3Experience = checked("devexperience_avalanche");
+      p.hasWeb3Experience = checked("devexperience_Astra");
       p.isStudent = checked("student_check");
       const src = chip("select-source-options"); if (src) p.source = src;
       p.gdpr = checked("general-gdpr");
@@ -498,7 +497,7 @@ const nextShape = {
       if (!emailValid(String(p.email || ""))) errors.push("Email");
       if (!String(p.country || "")) errors.push("Country");
       if (!String(p.vertical || "")) errors.push("Interest");
-      if (!String(p.source || "")) errors.push("How did you hear about Avalanche");
+      if (!String(p.source || "")) errors.push("How did you hear about Astra");
       if (!p.gdpr) errors.push("Privacy policy consent");
       if (errors.length) {
         form.classList.remove("done");
@@ -594,7 +593,7 @@ const nextShape = {
         (document.querySelector<HTMLInputElement>('#select-project_type input[name="project_type"]')?.value || "").trim();
       const isOther = project_type.includes("Other");
       const otherDetail = val("project_type_other");
-      const message = val("avalanche_contact_message");
+      const message = val("astra_contact_message");
       const firstname = val("contact-firstname");
       const lastname = val("contact-lastname");
       const email = val("contact-email");
