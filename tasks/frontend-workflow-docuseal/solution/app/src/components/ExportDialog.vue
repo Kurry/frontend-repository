@@ -76,7 +76,7 @@ onBeforeUnmount(() => window.removeEventListener('docuseal:open-export', handleE
         <TabsRoot v-model="tab" class="artifact-tabs">
           <TabsList class="tabs-list" aria-label="Export formats">
             <TabsTrigger value="json" class="tab-trigger">Template JSON</TabsTrigger>
-            <TabsTrigger value="summary" class="tab-trigger">Signing summary</TabsTrigger>
+            <TabsTrigger value="summary" class="tab-trigger">Signing Summary</TabsTrigger>
           </TabsList>
           <TabsContent value="json" class="artifact-panel">
             <pre aria-label="Template JSON preview">{{ store.templateJson }}</pre>
