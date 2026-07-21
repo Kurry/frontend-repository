@@ -43,7 +43,8 @@ function seedRecords() {
       const feedback = []
       if ((repoIndex + item) % 2 === 0) {
         const reviewer = REVIEWERS[(repoIndex + item) % REVIEWERS.length]
-        feedback.push({ reviewer, verdict: FEEDBACK_VERDICTS[(repoIndex + item) % 4], findings:`Reviewed the task evidence and recorded a specific authoring recommendation for issue ${issue}.`, at:new Date(Date.parse(created)+9000000).toISOString() })
+        // Cycle all four verdict treatments so Approve with caveats / Reject are seeded.
+        feedback.push({ reviewer, verdict: FEEDBACK_VERDICTS[(repoIndex * 2 + item) % 4], findings:`Reviewed the task evidence and recorded a specific authoring recommendation for issue ${issue}.`, at:new Date(Date.parse(created)+9000000).toISOString() })
       }
       const timeline = [event('record-created','Task entered the audit queue.',created)]
       if (firstRunCompleted) timeline.push(event('run-completed',`Seed audit completed: ${9-seededFailures.length} passed, ${seededFailures.length} failed.`,stageHistory[1].at))
@@ -66,7 +67,8 @@ export const useAuditStore = defineStore('audit', {
     search:'', filters:defaultFilters(), sort:{ key:'lastActivity', direction:'desc' },
     disclosure:{}, runs:{}, batch:{ active:false, paused:false, slugs:[], index:0 },
     exportHistory:[], exportFormat:'json', packageTimestamp:now(), importOpen:false, importError:'',
-    mobileNav:false, toast:null, liveMessage:'', rollupPulse:0, highlightedCheck:null
+    mobileNav:false, toast:null, liveMessage:'', rollupPulse:0, highlightedCheck:null,
+    theme:'light', onboardingOpen:true, onboardingStep:0, celebrate:null, whatIfCriterion:null
   }),
   getters: {
     selectedTask(state){ return state.records.find(r => r.slug === state.selectedSlug) || null },
@@ -97,10 +99,25 @@ export const useAuditStore = defineStore('audit', {
     reviewerActivity(state){ return REVIEWERS.map(reviewer=>{const entries=state.records.flatMap(r=>r.feedback).filter(f=>f.reviewer===reviewer); return {reviewer,entryCount:entries.length,verdictMix:Object.fromEntries(FEEDBACK_VERDICTS.map(v=>[v,entries.filter(e=>e.verdict===v).length]))} }) },
     datasetSummary(state){ return { admitted:state.records.filter(r=>r.stage==='admitted').length, held:state.records.filter(r=>r.stage==='held').length, escalated:state.records.filter(r=>r.stage==='escalated').length, resolved:state.records.filter(r=>r.stage==='resolved').length, total:state.records.length } },
     activeFilterChips(state){ const f=state.filters; const a=[]; if(f.repository)a.push({key:'repository',label:`Repository: ${f.repository}`}); if(f.check)a.push({key:'check',label:`${f.check}: ${f.checkOutcome}`}); if(f.criterion)a.push({key:'criterion',label:`${f.criterion}: ${f.criterionOutcome}`}); if(f.stage)a.push({key:'stage',label:`Stage: ${f.stage}`}); if(f.reviewer)a.push({key:'reviewer',label:`Reviewer: ${f.reviewer}`}); return a },
-    touchedRecords(state){ return state.records.filter(r=>r.touched) }
+    touchedRecords(state){ return state.records.filter(r=>r.touched) },
+    repositorySummaries(state){
+      return REPOSITORIES.map(repository=>{
+        const rows=state.records.filter(r=>r.repository===repository)
+        return {repository,total:rows.length,held:rows.filter(r=>r.stage==='held').length,admitted:rows.filter(r=>r.stage==='admitted').length,pending:rows.filter(r=>r.stage==='pending').length}
+      })
+    },
+    sessionDensity(state){
+      const touched=state.records.filter(r=>r.touched).length
+      const total=state.records.length||1
+      return {touched,total,percent:Math.round((touched/total)*1000)/10}
+    }
   },
   actions: {
-    notify(message){ this.toast=message; this.liveMessage=message; setTimeout(()=>{ if(this.toast===message)this.toast=null },3200) },
+    notify(message){ this.toast=message; this.liveMessage=message; setTimeout(()=>{ if(this.toast===message)this.toast=null },3800) },
+    toggleTheme(){ this.theme=this.theme==='light'?'dark':'light'; if(typeof document!=='undefined')document.documentElement.dataset.theme=this.theme },
+    setTheme(theme){ this.theme=theme==='dark'?'dark':'light'; if(typeof document!=='undefined')document.documentElement.dataset.theme=this.theme },
+    advanceOnboarding(){ if(this.onboardingStep>=3){this.onboardingOpen=false;this.onboardingStep=0} else this.onboardingStep++ },
+    skipOnboarding(){ this.onboardingOpen=false },
     markMutation(record, type, detail){ record.touched=true; record.lastActivity=now(); record.timeline.push(event(type,detail,record.lastActivity)); this.packageTimestamp=record.lastActivity; this.rollupPulse++ },
     setView(view){
       if(this.activeView==='task-detail' && this.selectedSlug) this.lastSelectedSlug=this.selectedSlug
@@ -112,7 +129,12 @@ export const useAuditStore = defineStore('audit', {
     openTask(slug){ this.selectedSlug=slug; this.lastSelectedSlug=slug; this.activeView='task-detail'; this.mobileNav=false },
     openReviewer(reviewer){ this.selectedReviewer=reviewer; this.activeView='reviewer-detail' },
     sortBy(key){ if(this.sort.key===key)this.sort.direction=this.sort.direction==='asc'?'desc':'asc'; else this.sort={key,direction:'asc'} },
-    clearFilters(){ this.filters=defaultFilters(); this.search='' },
+    clearFilters(){
+      // Mutate in place so every bound select/chip drops the active filter immediately.
+      const next=defaultFilters()
+      Object.keys(next).forEach(k=>{ this.filters[k]=next[k] })
+      this.search=''
+    },
     removeFilter(key){ if(key==='check'){this.filters.check=null;this.filters.checkOutcome='fail'} else if(key==='criterion'){this.filters.criterion=null;this.filters.criterionOutcome='fail'} else this.filters[key]=null },
     applyFilter(type,value,outcome='fail'){ if(type==='check'){this.filters.check=value;this.filters.checkOutcome=outcome} else if(type==='criterion'){this.filters.criterion=value;this.filters.criterionOutcome=outcome} else this.filters[type]=value; this.activeView='queue' },
     runFor(slug){ return this.runs[slug] },
@@ -135,13 +157,14 @@ export const useAuditStore = defineStore('audit', {
           const step=steps[i]; step.status='running'; step.attempt=1; step.startedAt=now(); run.highlighted=step.check
           run.evidence.push(event('running',`${step.check} started (attempt 1).`,step.startedAt))
           record.timeline.push(event('step-transition',`${step.check} entered running.`,step.startedAt))
-          await delay(170); await this.waitIfPaused(slug)
-          const transient=((record.seed+i)%23===0 && !record.fixesApplied)
+          // Slow enough that Pause is reachable; force a visible retry on early steps of held seeds.
+          const transient=!record.fixesApplied && (i===0 || i===2) && record.seededFailures.length>0 && ((record.seed+i)%2===0)
+          await delay(420); await this.waitIfPaused(slug)
           if(transient){
-            step.status='retrying'; step.backoff=2; run.evidence.push(event('retrying',`${step.check} waiting before retry 2 of 3.`))
+            step.status='retrying'; step.backoff=3; run.evidence.push(event('retrying',`${step.check} waiting before retry 2 of 3.`))
             record.timeline.push(event('step-transition',`${step.check} entered retrying before attempt 2.`))
-            for(let tick=2;tick>0;tick--){step.backoff=tick;await delay(180);await this.waitIfPaused(slug)}
-            step.attempt=2; step.status='running'; run.evidence.push(event('running',`${step.check} retry 2 started.`)); record.timeline.push(event('step-transition',`${step.check} retry 2 entered running.`)); await delay(150)
+            for(let tick=3;tick>0;tick--){step.backoff=tick;await delay(320);await this.waitIfPaused(slug)}
+            step.attempt=2; step.status='running'; run.evidence.push(event('running',`${step.check} retry 2 started.`)); record.timeline.push(event('step-transition',`${step.check} retry 2 entered running.`)); await delay(280)
           }
           const fails=!record.fixesApplied && record.seededFailures.includes(step.check)
           step.status=fails?'failed':'complete'; step.violation=fails?violations[step.check]:null; step.completedAt=now()
@@ -149,7 +172,7 @@ export const useAuditStore = defineStore('audit', {
           record.timeline.push(event('step-transition',fails?`${step.check} failed: ${step.violation}`:`${step.check} completed.`,step.completedAt))
           if(fails)this.liveMessage=`${step.check} entered the failed state`
           run.elapsed=Date.now()-start
-          await delay(80)
+          await delay(160)
         }
         run.status='complete'; run.completedAt=now(); run.elapsed=Date.now()-start
         record.checkResults=Object.fromEntries(steps.map(s=>[s.check,{status:s.status==='failed'?'fail':'pass',violation:s.violation}]))
@@ -162,6 +185,11 @@ export const useAuditStore = defineStore('audit', {
         this.changeStage(record,nextStage)
         this.markMutation(record,'run-completed',`Audit completed: ${9-failed} passed, ${failed} failed.`)
         this.notify(`${record.slug} checks completed`)
+        this.liveMessage=`${record.slug} audit run completed`
+        if(nextStage==='admitted'||nextStage==='resolved'){
+          this.celebrate=`${record.slug} reached ${nextStage}`
+          setTimeout(()=>{ if(this.celebrate?.includes(record.slug)) this.celebrate=null },4200)
+        }
         return true
       })()
       run.promise=work
@@ -190,7 +218,12 @@ export const useAuditStore = defineStore('audit', {
       record.criteria={...record.criteria,[criterion]:next}
       const anyFail=CRITERIA.some(c=>record.criteria[c].verdict==='fail'); const allPass=CRITERIA.every(c=>record.criteria[c].verdict==='pass'); const checksPass=CHECKS.every(c=>record.checkResults[c].status==='pass')
       if(anyFail && !['escalated','resolved','re-audited'].includes(record.stage))this.changeStage(record,'held')
-      else if(allPass && checksPass){if(record.stage==='re-audited'||record.fixesApplied)this.changeStage(record,'resolved');else this.changeStage(record,'admitted')}
+      else if(allPass && checksPass){
+        if(record.stage==='re-audited'||record.fixesApplied)this.changeStage(record,'resolved')
+        else this.changeStage(record,'admitted')
+        this.celebrate=`${record.slug} reached ${record.stage}`
+        setTimeout(()=>{ if(this.celebrate?.includes(record.slug)) this.celebrate=null },4200)
+      }
       else if(checksPass && !['escalated','resolved','re-audited'].includes(record.stage))this.changeStage(record,'checked')
       this.markMutation(record,'verdict-change',`${criterion} set to ${verdict}.`)
       return {ok:true}
@@ -231,7 +264,27 @@ export const useAuditStore = defineStore('audit', {
       return lines.join('\n')
     },
     preview(format=this.exportFormat){return format==='json'?JSON.stringify(this.buildPackage(),null,2):this.markdown()},
-    recordExport(format=this.exportFormat){const text=this.preview(format);const at=now();this.exportHistory.push({exportedAt:at,format});this.touchedRecords.forEach(r=>{r.timeline.push(event('report-export',`${format==='json'?'Audit Package JSON':'Audit Report Markdown'} exported.`,at));r.lastActivity=at});this.packageTimestamp=at;this.notify(`${format==='json'?'JSON':'Markdown'} export ready`);return text},
+    recordExport(format=this.exportFormat){
+      // Build once before recording success so a preview failure cannot leave a
+      // phantom history entry. Build again after the timestamped mutation so
+      // the copied/downloaded bytes exactly match the visible post-action preview.
+      this.preview(format)
+      const at=now();const historyLength=this.exportHistory.length;const previousTimestamp=this.packageTimestamp
+      const touched=this.touchedRecords.map(record=>({record,timelineLength:record.timeline.length,lastActivity:record.lastActivity}))
+      try{
+        this.exportHistory.push({exportedAt:at,format})
+        touched.forEach(({record})=>{record.timeline.push(event('report-export',`${format==='json'?'Audit Package JSON':'Audit Report Markdown'} exported.`,at));record.lastActivity=at})
+        this.packageTimestamp=at
+        const text=this.preview(format)
+        this.notify(`${format==='json'?'JSON':'Markdown'} export ready`)
+        return text
+      }catch(error){
+        this.exportHistory.splice(historyLength)
+        touched.forEach(({record,timelineLength,lastActivity})=>{record.timeline.splice(timelineLength);record.lastActivity=lastActivity})
+        this.packageTimestamp=previousTimestamp
+        throw error
+      }
+    },
     importPackage(raw){
       let json;try{json=JSON.parse(raw)}catch{return {ok:false,error:'Audit Package JSON: malformed JSON'}}
       const parsed=AuditPackageSchema.safeParse(json);if(!parsed.success)return {ok:false,error:firstZodError(parsed.error)}
