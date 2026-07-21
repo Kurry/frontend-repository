@@ -203,14 +203,28 @@ export const useWorkflowStore = create((set, get) => ({
     }
     const dragStarted = allowedChanges.some((change) => change.type === 'position' && change.dragging === true);
     if (dragStarted && !get().nodeDragInProgress) get().pushHistory();
-    set((state) => ({
-      nodes: applyNodeChanges(allowedChanges, state.nodes),
-      nodeDragInProgress: dragEnded ? false : (dragStarted ? true : state.nodeDragInProgress),
-    }));
+    set((state) => {
+      const nodes = applyNodeChanges(allowedChanges, state.nodes);
+      const selectedNodeId = nodes.find((node) => node.selected)?.id || null;
+      return {
+        nodes,
+        selectedNodeId,
+        selectedEdgeId: selectedNodeId ? null : state.selectedEdgeId,
+        nodeDragInProgress: dragEnded ? false : (dragStarted ? true : state.nodeDragInProgress),
+      };
+    });
   },
   onEdgesChange: (changes) => {
     const allowedChanges = isRunActive(get().run) ? changes.filter((change) => change.type === 'select') : changes;
-    if (allowedChanges.length) set((state) => ({ edges: applyEdgeChanges(allowedChanges, state.edges) }));
+    if (allowedChanges.length) set((state) => {
+      const edges = applyEdgeChanges(allowedChanges, state.edges);
+      const selectedEdgeId = edges.find((edge) => edge.selected)?.id || null;
+      return {
+        edges,
+        selectedEdgeId,
+        selectedNodeId: selectedEdgeId ? null : state.selectedNodeId,
+      };
+    });
   },
 
   selectNode: (id) => set((state) => ({
