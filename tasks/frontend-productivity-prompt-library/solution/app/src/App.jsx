@@ -179,7 +179,6 @@ function CopyButton({ text, feedbackKey, label = 'Copy prompt body', size = 'sm'
     if (isExporting) return;
     setIsExporting(true);
     try {
-      await new Promise(r => setTimeout(r, 500));
       await writeClipboard(text);
       showCopyFeedback(feedbackKey, 'Copied exact prompt body to clipboard');
     } finally {
@@ -633,6 +632,7 @@ function PromptFormModal({ modal }) {
   return (
     <Modal
       open
+      preventCloseOnClickOutside={false}
       size="lg"
       className="prompt-form-modal"
       modalHeading={existing ? 'Edit prompt' : 'Create a new prompt'}
@@ -717,6 +717,7 @@ function DeleteModal({ promptId }) {
     <Modal
       danger
       open
+      preventCloseOnClickOutside={false}
       size="sm"
       modalHeading="Delete prompt?"
       modalLabel="This action cannot be undone"
@@ -771,6 +772,7 @@ function ExtendModal({ promptIds }) {
   return (
     <Modal
       open
+      preventCloseOnClickOutside={false}
       size="lg"
       modalHeading="Extend a prompt"
       modalLabel={`Source · ${base.title}`}
@@ -847,6 +849,7 @@ function CombineModal({ promptIds }) {
   return (
     <Modal
       open
+      preventCloseOnClickOutside={false}
       size="lg"
       modalHeading="Combine selected prompts"
       modalLabel={`${selected.length} linked sources`}
@@ -910,7 +913,6 @@ function ExportModal() {
     if (isExporting) return;
     setIsExporting(true);
     try {
-      await new Promise(r => setTimeout(r, 500));
       await writeClipboard(visible);
       showCopyFeedback('export', `${filename} copied to clipboard`);
     } finally {
@@ -978,6 +980,7 @@ function ImportModal() {
   return (
     <Modal
       open
+      preventCloseOnClickOutside={false}
       size="lg"
       modalHeading="Import library JSON"
       modalLabel={isLoading ? 'Importing library...' : 'Replace the current session collection'}
@@ -1444,7 +1447,14 @@ function registerWebMCPTools() {
   window.webmcp_list_tools = () => ({ tools });
   window.webmcp_invoke_tool = async (name, args = {}) => {
     if (!handlers[name]) throw new Error(`Unknown registered tool: ${name}`);
-    return handlers[name](args);
+    const result = await handlers[name](args);
+    // WebMCP callers inspect the browser immediately after a tool resolves.
+    // Wait through React's commit and one paint so the declared result is
+    // already observable in the table, detail/history views, and exports.
+    await new Promise((resolve) => window.requestAnimationFrame(
+      () => window.requestAnimationFrame(resolve),
+    ));
+    return result;
   };
 
   return () => {
