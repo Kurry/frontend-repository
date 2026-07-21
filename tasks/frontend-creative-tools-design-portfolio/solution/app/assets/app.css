@@ -207,7 +207,7 @@ body.maximized { padding: 0; }
   backdrop-filter: blur(12px);
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  transition: opacity 0.3s ease;
 }
 .close-overlay.visible { opacity: 1; visibility: visible; }
 .close-window {
@@ -626,6 +626,11 @@ body.maximized { padding: 0; }
 }
 .board-card.card-enter { animation: cardIn 0.34s cubic-bezier(0.22, 1, 0.36, 1); }
 .board-card.card-exit { animation: cardOut 0.27s ease forwards; }
+.board-card.card-reflow { animation: cardReflow 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes cardReflow {
+  from { opacity: 0.65; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 @keyframes highlightPulse {
   0% { box-shadow: 0 0 0 0 rgba(232,168,124,0.55); }
   100% { box-shadow: 0 0 0 14px rgba(232,168,124,0); }
@@ -848,6 +853,21 @@ body.maximized { padding: 0; }
 .kind-badge.view { color: var(--green); }
 .palette-empty { padding: 16px; color: var(--text-dim); font-size: 0.78rem; text-align: center; }
 .palette-foot { padding: 8px 16px; border-top: 1px solid var(--border); font-size: 0.66rem; color: var(--text-muted); }
+
+.view-enter { animation: viewEnter 0.3s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes viewEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.autocomplete.show .autocomplete-item { animation: autocompleteIn 0.18s ease both; }
+.autocomplete.show .autocomplete-item:nth-child(2) { animation-delay: 25ms; }
+.autocomplete.show .autocomplete-item:nth-child(3) { animation-delay: 50ms; }
+.autocomplete.show .autocomplete-item:nth-child(4) { animation-delay: 75ms; }
+@keyframes autocompleteIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
 /* ---------- Toasts ---------- */
 .toast-wrap {
