@@ -1,65 +1,59 @@
-# Qwik City App ⚡️
+# Palette Library — Object and Archive (o+a)
 
-- [Qwik Docs](https://qwik.dev/)
-- [Discord](https://qwik.dev/chat)
-- [Qwik GitHub](https://github.com/QwikDev/qwik)
-- [@QwikDev](https://twitter.com/QwikDev)
-- [Vite](https://vitejs.dev/)
+A fine-art colour archive: every palette in the collection, each swatch paired
+with its nearest historical colour name, with WCAG contrast + hue-harmony
+analysis, and a `palette-archive.v1` export/import pipeline. A static,
+frontend-only app with **zero runtime dependencies** — all fonts are bundled
+locally, so it makes no outbound network requests and uses no browser storage
+(reload returns the seeded baseline).
 
----
+## Run
 
-## Project Structure
-
-This project is using Qwik with [QwikCity](https://qwik.dev/qwikcity/overview/). QwikCity is just an extra set of tools on top of Qwik to make it easier to build a full site, including directory-based routing, layouts, and more.
-
-Inside your project, you'll see the following directory structure:
-
-```
-├── public/
-│   └── ...
-└── src/
-    ├── components/
-    │   └── ...
-    └── routes/
-        └── ...
+```sh
+npm run verify:build   # checks entry + referenced assets + JS modules parse
+npm start              # serves the app on http://localhost:3000 (PORT overrides)
 ```
 
-- `src/routes`: Provides the directory-based routing, which can include a hierarchy of `layout.tsx` layout files, and an `index.tsx` file as the page. Additionally, `index.ts` files are endpoints. Please see the [routing docs](https://qwik.dev/qwikcity/routing/overview/) for more info.
+`server.mjs` is a tiny dependency-free static server.
 
-- `src/components`: Recommended directory for components.
+## Layout
 
-- `public`: Any static assets, like images, can be placed in the public directory. Please see the [Vite public directory](https://vitejs.dev/guide/assets.html#the-public-directory) for more info.
-
-## Add Integrations and deployment
-
-Use the `npm run qwik add` command to add additional integrations. Some examples of integrations includes: Cloudflare, Netlify or Express Server, and the [Static Site Generator (SSG)](https://qwik.dev/qwikcity/guides/static-site-generation/).
-
-```shell
-npm run qwik add # or `yarn qwik add`
+```
+index.html              semantic shell (chrome, library, overlays)
+css/styles.css          cream editorial system + every surface
+fonts/                  bundled woff2 (Abril Fatface, Libre Baskerville,
+                        IBM Plex Mono, Pinyon Script)
+js/
+  data.js               seed palettes + historical colour-name dataset + periods
+  lib.js                colour maths, contrast, harmony, vision matrices,
+                        validation, markdown, focus-trap / overlay helpers
+  store.js              in-memory shared store, derived views, undo/redo,
+                        all mutating commands (shared with WebMCP)
+  exporter.js           CSS / utility-theme / SCSS / archive-JSON / catalog sheet
+  render.js             the three Browse layouts, controls, facets, tray,
+                        hue spectrum, copy feedback, vision simulation
+  editor.js             Detail/Editor: validation, contrast matrix, harmony,
+                        notes Write/Preview, drag + keyboard swatch reorder
+  overlays.js           export drawer (+ import + print), compare, confirm,
+                        batch-tag, subscribe popup, menu/cart, coachmark
+  webmcp.js             browse-query-v1 / entity-collection-v1 / artifact-transfer-v1
+  app.js                boot, event wiring, keyboard shortcuts, scroll reveals
+scripts/verify-build.mjs  the verify:build gate
 ```
 
-## Development
+## WebMCP
 
-Development mode uses [Vite's development server](https://vitejs.dev/). The `dev` command will server-side render (SSR) the output during development.
+The page exposes `window.webmcp_session_info`, `window.webmcp_list_tools`, and
+`window.webmcp_invoke_tool(name, args)`. Fourteen tools implement the
+contract's three modules, each bound to the same store commands and validators
+the visible UI uses (so MCP can never do what the form would reject, and never
+returns raw artifact contents).
 
-```shell
-npm start # or `yarn start`
-```
+## Notes
 
-> Note: during dev mode, Vite may request a significant number of `.js` files. This does not represent a Qwik production build.
-
-## Preview
-
-The preview command will create a production build of the client modules, a production build of `src/entry.preview.tsx`, and run a local server. The preview server is only for convenience to preview a production build locally and should not be used as a production server.
-
-```shell
-npm run preview # or `yarn preview`
-```
-
-## Production
-
-The production build will generate client and server modules by running both client and server build commands. The build command will use Typescript to run a type check on the source code.
-
-```shell
-npm run build # or `yarn build`
-```
+- Deterministic Nomenclature index: one row per unique hex, ordered by hue with
+  low-saturation / near-black colours bucketed to the end.
+- Reordering swatches commits immediately to the shared store (an undoable
+  step), so the order persists across close/reopen and into exports.
+- The subscribe popup only reveals on genuine user scrolling (wheel / touch /
+  paging keys) or ~45s idle — programmatic scrolls never pop it over the work.
