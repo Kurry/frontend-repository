@@ -746,12 +746,16 @@ function openCssModal() {
   modalLastFocus = document.activeElement;
   renderExportOutput();
   const modal = document.getElementById("css-modal");
+  modal.inert = false;
+  modal.setAttribute("aria-hidden", "false");
   modal.classList.add("open");
   modal.querySelector("#css-close")?.focus();
 }
 
 function closeModal(modal) {
   modal.classList.remove("open");
+  modal.inert = true;
+  modal.setAttribute("aria-hidden", "true");
   if (modalLastFocus && typeof modalLastFocus.focus === "function") {
     modalLastFocus.focus();
   }
@@ -843,8 +847,13 @@ function downloadExport() {
   a.download = `${fileSlug(state.active?.name)}.${ext}`;
   document.body.appendChild(a);
   a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // Keep the activated anchor alive until Chromium has consumed the blob URL.
+  // Removing it synchronously can cancel the download even though the UI then
+  // reports success.
+  setTimeout(() => {
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, 1000);
   toast(`Downloaded ${fileSlug(state.active?.name)}.${ext}`);
 }
 
@@ -858,6 +867,8 @@ function openImportModal() {
   const err = document.getElementById("import-error");
   err.textContent = "";
   const modal = document.getElementById("import-modal");
+  modal.inert = false;
+  modal.setAttribute("aria-hidden", "false");
   modal.classList.add("open");
   input.focus();
 }
