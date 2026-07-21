@@ -52,6 +52,8 @@
     "typescript": "~5.7.2"
   },
   "overrides": {
+    "baseline-browser-mapping": "2.10.11",
+    "browserslist": "4.28.6",
     "p-map": "7.0.3",
     "tar": "7.5.19"
   }
