@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { modelNames, harnessNames, tasks, createSeedCells } from './seed'
-import { classificationSchema } from './schemas'
+import { classificationSchema, calibrationPackSchema } from './schemas'
 
 const categories = [...new Set(tasks.map((task) => task.category))]
 const keyFor = (model, harness) => `${model}::${harness}`
@@ -36,6 +36,9 @@ function escapeCsv(value) {
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const clonePlain = (value) => JSON.parse(JSON.stringify(value))
 
+let eventSeq = 0
+const nextEventId = () => { eventSeq += 1; return `event-${eventSeq}` }
+
 export const useCalibrationStore = defineStore('calibration', {
   state: () => ({
     models: [...modelNames],
@@ -44,6 +47,7 @@ export const useCalibrationStore = defineStore('calibration', {
     tasks: tasks.map((task) => ({ ...task, biases: [...task.biases] })),
     cells: createSeedCells(),
     filters: { model: [], harness: [], taskCategory: [] },
+    filterSearch: { model: '', harness: '', taskCategory: '' },
     sigmaThreshold: 0.12,
     classifications: {},
     reruns: {},
@@ -63,6 +67,9 @@ export const useCalibrationStore = defineStore('calibration', {
       paletteOpen: false,
       copyRequest: 0,
       toast: { show: false, text: '', color: 'success' },
+      density: 'comfortable',
+      tipsVisible: true,
+      validation: null,
     },
     undoStack: [],
     redoStack: [],
@@ -71,13 +78,19 @@ export const useCalibrationStore = defineStore('calibration', {
 
   getters: {
     activeModels(state) {
-      return state.filters.model.length ? state.models.filter((item) => state.filters.model.includes(item)) : state.models
+      const search = state.filterSearch.model.trim().toLowerCase()
+      const selected = state.filters.model.length ? state.models.filter((item) => state.filters.model.includes(item)) : state.models
+      return search ? selected.filter((item) => item.toLowerCase().includes(search)) : selected
     },
     activeHarnesses(state) {
-      return state.filters.harness.length ? state.harnesses.filter((item) => state.filters.harness.includes(item)) : state.harnesses
+      const search = state.filterSearch.harness.trim().toLowerCase()
+      const selected = state.filters.harness.length ? state.harnesses.filter((item) => state.filters.harness.includes(item)) : state.harnesses
+      return search ? selected.filter((item) => item.toLowerCase().includes(search)) : selected
     },
     activeCategories(state) {
-      return state.filters.taskCategory.length ? state.categories.filter((item) => state.filters.taskCategory.includes(item)) : state.categories
+      const search = state.filterSearch.taskCategory.trim().toLowerCase()
+      const selected = state.filters.taskCategory.length ? state.categories.filter((item) => state.filters.taskCategory.includes(item)) : state.categories
+      return search ? selected.filter((item) => item.toLowerCase().includes(search)) : selected
     },
     visibleCells() {
       return this.activeModels.flatMap((model) => this.activeHarnesses.map((harness) => this.cells[keyFor(model, harness)]).filter(Boolean))
@@ -162,7 +175,7 @@ export const useCalibrationStore = defineStore('calibration', {
         harnesses: [...state.harnesses],
         cells: this.allCellRecords,
         varianceRows,
-        timeline: state.timeline.map((entry) => ({ ...entry })),
+        timeline: state.timeline.filter((entry) => entry.kind !== 'classification').map(({ timestamp, model, harness, mean }) => ({ timestamp, model, harness, mean })),
         baseline: state.baseline ? { cells: state.baseline.cells.map((cell) => ({ ...cell })) } : null,
         filters: {
           model: [...state.filters.model],
@@ -203,6 +216,14 @@ export const useCalibrationStore = defineStore('calibration', {
     getCellMean(model, harness) {
       return cellMean(this.cells[keyFor(model, harness)])
     },
+    heatmapMean(model, harness) {
+      const cell = this.cells[keyFor(model, harness)]
+      if (!cell) return 0
+      if (!this.filters.taskCategory.length && !this.filterSearch.taskCategory.trim()) return cellMean(cell)
+      const activeTasks = this.tasks.filter((task) => this.activeCategories.includes(task.category))
+      if (!activeTasks.length) return 0
+      return round(meanOf(activeTasks.map((task) => scoreFor(task, model, harness, cell))), 4)
+    },
     scoreForTask(taskName, model, harness) {
       const task = this.tasks.find((item) => item.name === taskName)
       return task ? scoreFor(task, model, harness, this.cells[keyFor(model, harness)]) : 0
@@ -218,7 +239,23 @@ export const useCalibrationStore = defineStore('calibration', {
       this.sigmaThreshold = snapshot.sigmaThreshold
       this.classifications = clonePlain(snapshot.classifications)
       this.baseline = snapshot.baseline ? clonePlain(snapshot.baseline) : null
+      this.pruneClassificationEvents()
       this.sanitizeSelection()
+    },
+    pruneClassificationEvents() {
+      this.timeline = this.timeline.filter((entry) => {
+        if (entry.kind !== 'classification') return true
+        const record = this.classifications[entry.task]
+        return Boolean(record && record.classification === entry.classification)
+      })
+      // Keep timeline events coherent with restored classifications on undo/redo:
+      // every classified task has exactly one matching event, newest first.
+      Object.entries(this.classifications).forEach(([task, record]) => {
+        const present = this.timeline.some((entry) => entry.kind === 'classification' && entry.task === task && entry.classification === record.classification)
+        if (!present) {
+          this.timeline.unshift({ id: nextEventId(), kind: 'classification', timestamp: new Date().toISOString(), task, classification: record.classification })
+        }
+      })
     },
     checkpoint(snapshot = null) {
       this.undoStack.push(snapshot || this.captureSnapshot())
@@ -260,12 +297,17 @@ export const useCalibrationStore = defineStore('calibration', {
     },
     setFilter(type, values) {
       if (!['model', 'harness', 'taskCategory'].includes(type)) return
-      const allowed = type === 'model' ? this.models : type === 'harness' ? this.harnesses : this.categories
-      this.filters[type] = (Array.isArray(values) ? values : [values]).filter((value) => allowed.includes(value))
+      this.filters[type] = (Array.isArray(values) ? values : [values]).filter((value) => typeof value === 'string' && value.trim().length > 0).map((value) => value.trim())
+      this.sanitizeSelection()
+    },
+    setFilterSearch(type, text) {
+      if (!['model', 'harness', 'taskCategory'].includes(type)) return
+      this.filterSearch[type] = typeof text === 'string' ? text : ''
       this.sanitizeSelection()
     },
     clearFilters() {
       this.filters = { model: [], harness: [], taskCategory: [] }
+      this.filterSearch = { model: '', harness: '', taskCategory: '' }
       this.sanitizeSelection()
     },
     sanitizeSelection() {
@@ -274,13 +316,26 @@ export const useCalibrationStore = defineStore('calibration', {
     },
     toggleTaskSelection(task) {
       const row = this.varianceRows.find((item) => item.task === task)
-      if (!row || row.stability !== 'divergent') return
+      if (!row || row.stability !== 'divergent') return false
       this.selectedVarianceTasks = this.selectedVarianceTasks.includes(task)
         ? this.selectedVarianceTasks.filter((item) => item !== task)
         : [...this.selectedVarianceTasks, task]
+      return true
     },
     clearTaskSelection() {
       this.selectedVarianceTasks = []
+    },
+    addClassificationEvents(records) {
+      records.forEach((record) => {
+        this.timeline = this.timeline.filter((entry) => !(entry.kind === 'classification' && entry.task === record.task))
+        this.timeline.unshift({
+          id: nextEventId(),
+          kind: 'classification',
+          timestamp: new Date().toISOString(),
+          task: record.task,
+          classification: record.classification,
+        })
+      })
     },
     classify(record) {
       const parsed = classificationSchema.safeParse(record)
@@ -289,7 +344,8 @@ export const useCalibrationStore = defineStore('calibration', {
       if (!row || row.stability !== 'divergent') return { ok: false, field: 'task', message: 'task must name a currently divergent row' }
       this.checkpoint()
       this.classifications[parsed.data.task] = parsed.data
-      this.showToast(`Classification saved for ${parsed.data.task}`)
+      this.addClassificationEvents([parsed.data])
+      this.showToast(`Classification saved for ${parsed.data.task} (${parsed.data.classification})`)
       return { ok: true, record: parsed.data }
     },
     bulkClassify(taskNames, classification, rationale) {
@@ -297,10 +353,12 @@ export const useCalibrationStore = defineStore('calibration', {
       const records = validRows.map((task) => classificationSchema.safeParse({ task, classification, rationale }))
       if (validRows.length < 2 || records.some((result) => !result.success)) return { ok: false, message: 'Select at least two divergent tasks and complete every field' }
       this.checkpoint()
-      records.forEach((result) => { this.classifications[result.data.task] = result.data })
+      const saved = records.map((result) => result.data)
+      saved.forEach((record) => { this.classifications[record.task] = record })
+      this.addClassificationEvents(saved)
       this.selectedVarianceTasks = []
-      this.showToast(`${records.length} tasks classified`)
-      return { ok: true, records: records.map((result) => result.data) }
+      this.showToast(`${saved.length} tasks classified as ${classification}`)
+      return { ok: true, records: saved }
     },
     importClassifications(entries) {
       const divergent = new Set(this.divergentRows.map((row) => row.task))
@@ -308,13 +366,14 @@ export const useCalibrationStore = defineStore('calibration', {
       if (!matches.length) return { ok: false, message: 'entries: no tasks match currently divergent rows' }
       this.checkpoint()
       matches.forEach((entry) => { this.classifications[entry.task] = { ...entry } })
+      this.addClassificationEvents(matches)
       this.showToast(`${matches.length} classifications imported`)
       return { ok: true, count: matches.length }
     },
     pinBaseline() {
       this.checkpoint()
-      this.baseline = { cells: this.allCellRecords.map(({ model, harness, mean }) => ({ model, harness, mean })) }
-      this.showToast('Baseline pinned')
+      this.baseline = { cells: this.models.flatMap((model) => this.harnesses.map((harness) => ({ model, harness, mean: this.heatmapMean(model, harness) }))) }
+      this.showToast('Baseline pinned from current cell means')
     },
     clearBaseline() {
       if (!this.baseline) return
@@ -334,6 +393,9 @@ export const useCalibrationStore = defineStore('calibration', {
     goTo(view) {
       if (!['heatmap', 'variance', 'chart', 'timeline'].includes(view)) return
       this.activeView = view
+      // A view switch must never be blocked by an open overlay drawer.
+      this.ui.exportOpen = false
+      this.ui.paletteOpen = false
     },
     openExport(format = 'json') {
       this.ui.exportTab = format === 'csv' || format === 'variance-csv' ? 'csv' : 'json'
@@ -352,6 +414,23 @@ export const useCalibrationStore = defineStore('calibration', {
       if (format) this.ui.exportTab = format === 'variance-csv' ? 'csv' : 'json'
       this.ui.copyRequest += 1
     },
+    toggleDensity() {
+      this.ui.density = this.ui.density === 'comfortable' ? 'compact' : 'comfortable'
+      this.showToast(this.ui.density === 'compact' ? 'Compact density on' : 'Comfortable density restored', 'info')
+    },
+    dismissTips() {
+      this.ui.tipsVisible = false
+    },
+    validatePack() {
+      const result = calibrationPackSchema.safeParse(clonePlain(this.calibrationPack))
+      if (result.success) {
+        this.ui.validation = { ok: true, message: `CalibrationPack v${result.data.schemaVersion} schema valid — ${result.data.cells.length} cells, ${result.data.varianceRows.length} variance rows` }
+      } else {
+        const issue = result.error.issues[0]
+        this.ui.validation = { ok: false, message: `${issue.path.join('.') || 'payload'}: ${issue.message}` }
+      }
+      return this.ui.validation
+    },
     showToast(text, color = 'success') {
       this.ui.toast = { show: false, text, color }
       queueMicrotask(() => { this.ui.toast.show = true })
@@ -361,7 +440,7 @@ export const useCalibrationStore = defineStore('calibration', {
       if (!this.cells[key] || ['queued', 'running'].includes(this.reruns[key]?.status)) return { ok: false, message: 'run already active' }
       const runId = Date.now().toString(36)
       this.reruns[key] = { status: 'queued', progress: [], runId }
-      await sleep(480)
+      await sleep(700)
       if (this.reruns[key]?.runId !== runId) return { ok: false }
       const count = 4 + Math.floor(Math.random() * 3)
       const currentMean = cellMean(this.cells[key])
@@ -381,15 +460,15 @@ export const useCalibrationStore = defineStore('calibration', {
         progress: nextTrials.map((trial) => ({ id: trial.id, complete: false })),
       }
       for (let index = 0; index < nextTrials.length; index += 1) {
-        await sleep(330)
+        await sleep(380)
         if (this.reruns[key]?.runId !== runId) return { ok: false }
         this.reruns[key].progress[index].complete = true
       }
       this.cells = { ...this.cells, [key]: { ...this.cells[key], trials: nextTrials } }
       const resultMean = cellMean(this.cells[key])
       this.reruns[key].status = 'complete'
-      this.timeline.unshift({ timestamp: new Date().toISOString(), model, harness, mean: resultMean })
-      this.showToast(`${model} × ${harness} re-run complete`)
+      this.timeline.unshift({ id: nextEventId(), kind: 're-run', timestamp: new Date().toISOString(), model, harness, mean: resultMean })
+      this.showToast(`Re-run complete: ${model} × ${harness} now ${resultMean.toFixed(2)} across ${count} trials`)
       return { ok: true, mean: resultMean, trialCount: count }
     },
   },
