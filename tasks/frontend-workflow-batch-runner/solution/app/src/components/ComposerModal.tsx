@@ -121,7 +121,7 @@ export function ComposerModal() {
     windowEnd: toLocalDateTime(job?.schedule?.windowEnd),
   }), [job])
 
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors, isValid, isSubmitting } } = useForm<ComposerValues>({
+  const { register, handleSubmit, getValues, setValue, watch, reset, formState: { errors, isValid, isSubmitting } } = useForm<ComposerValues>({
     resolver: zodResolver(composerSchema),
     mode: 'all',
     defaultValues: defaults,
@@ -176,7 +176,7 @@ export function ComposerModal() {
   }
 
   const applyPaste = () => {
-    const result = parseDatasetPaste(paste)
+    const result = parseDatasetPaste(getValues('datasetPaste'))
     setParseErrors(result.errors)
     if (result.errors.length) return
     setValue('dataset', result.rows, { shouldValidate: true, shouldDirty: true })
@@ -219,6 +219,7 @@ export function ComposerModal() {
               invalid={Boolean(nameError)}
               invalidText={nameError}
               helperText={`${nameValue.length} of 80 characters`}
+              onFocus={() => setNameTouched(true)}
               {...register('name', { onBlur: () => setNameTouched(true) })}
             />
             <NumberInput
@@ -310,7 +311,7 @@ export function ComposerModal() {
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" type="button" onClick={close}>Cancel</Button>
-        <Button type="submit" form="job-composer" disabled={!isValid || isSubmitting || parseErrors.length > 0} onClick={submit}>{job ? 'Save job' : 'Create ready job'}</Button>
+        <Button type="submit" form="job-composer" disabled={!isValid || isSubmitting || parseErrors.length > 0}>{job ? 'Save job' : 'Create ready job'}</Button>
       </ModalFooter>
     </ComposedModal>
   )

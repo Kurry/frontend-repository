@@ -211,7 +211,7 @@ button, [role="button"], input, textarea, select { outline-offset: 2px; }
 .ready-stat strong { display: block; font-size: 1.3rem; font-weight: 400; }
 .ready-stat span { color: #6f6f6f; font-size: .72rem; }
 
-.inspector-dock { background: #fff; border: 1px solid #e0e0e0; min-width: 0; box-shadow: var(--shadow-panel); display: flex; flex-direction: column; min-height: 24rem; max-height: min(54vh, 34rem); transition: box-shadow 240ms cubic-bezier(.2, 0, .38, .9), transform 240ms cubic-bezier(.2, 0, .38, .9); }
+.inspector-dock { background: #fff; border: 1px solid #e0e0e0; min-width: 0; box-shadow: var(--shadow-panel); display: flex; flex-direction: column; min-height: 24rem; max-height: min(54vh, 34rem); transform: translateX(.75rem); transition: box-shadow 240ms cubic-bezier(.2, 0, .38, .9), transform 240ms cubic-bezier(.2, 0, .38, .9); }
 .inspector-dock.open { box-shadow: inset 4px 0 #6929c4, var(--shadow-panel); transform: translateX(0); }
 .inspector-dock .inspector-head { min-height: 3.25rem; padding: .75rem 1rem; background: #262626; color: #fff; display: flex; justify-content: space-between; align-items: center; gap: .75rem; }
 .inspector-dock .inspector-head .panel-heading { color: #fff; margin: 0; }

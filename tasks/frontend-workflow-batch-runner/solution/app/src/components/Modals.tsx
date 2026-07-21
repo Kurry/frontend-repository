@@ -96,7 +96,7 @@ export function ScheduleModal() {
           {job?.schedule && <Button type="button" kind="danger--tertiary" size="sm" renderIcon={TrashCan} onClick={() => setSchedule(job.id, null)}>Remove schedule</Button>}
         </form>
       </ModalBody>
-      <ModalFooter><Button kind="secondary" onClick={close}>Cancel</Button><Button type="submit" form="schedule-form" disabled={!isValid} onClick={submit}>Save schedule</Button></ModalFooter>
+      <ModalFooter><Button kind="secondary" onClick={close}>Cancel</Button><Button type="submit" form="schedule-form" disabled={!isValid}>Save schedule</Button></ModalFooter>
     </ComposedModal>
   )
 }
@@ -188,7 +188,7 @@ export function ImportModal() {
           <p className="field-note">Validation checks the schema version, model and status enums, bounds, costs, attempts, rollups, timeline, and job payload before any state changes.</p>
         </form>
       </ModalBody>
-      <ModalFooter><Button kind="secondary" onClick={close}>Cancel</Button><Button form="import-form" type="submit" disabled={!isValid} onClick={submit}>Import run report</Button></ModalFooter>
+      <ModalFooter><Button kind="secondary" onClick={close}>Cancel</Button><Button form="import-form" type="submit" disabled={!isValid}>Import run report</Button></ModalFooter>
     </ComposedModal>
   )
 }
