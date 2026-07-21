@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>2025 Apex Grand Prix Driver — Avery Vale</title>
   <meta name="description" content="The fictional Avery Vale / Nova Racing driver homepage: race calendar, editorial media, press kit, and command palette." />
+  <meta name="theme-color" content="#282c20" />
   <meta property="og:title" content="2025 Apex Grand Prix Driver — Avery Vale" />
   <meta property="og:image" content="/images/og-image.svg" />
   <link rel="icon" href="/images/favicon.svg" />
@@ -17,7 +18,7 @@
   </div>
 
   <!-- ===================== FIXED NAV ===================== -->
-  <header class="nav" id="siteNav">
+  <header class="nav" id="siteNav" aria-label="Primary">
     <div class="nav-inner">
       <a class="nav-brand-link" href="#hero" data-menu-link data-dest="hero" aria-label="Avery Vale home">
         <span class="nav-brand" aria-hidden="true">
@@ -80,14 +81,14 @@
               <li><button type="button" class="text-link-w" data-anim="text-hover" data-social="video">VIDEO</button></li>
               <li><button type="button" class="text-link-w" data-anim="text-hover" data-social="live">LIVE</button></li>
             </ul>
-            <a class="text-link-w nav-menu-business" data-anim="text-hover" href="mailto:hello@averyvale.example">hello@averyvale.example</a>
+            <button type="button" class="text-link-w nav-menu-business" data-anim="text-hover" data-contact aria-label="Business contact hello@averyvale.example — copies the address">hello@averyvale.example</button>
           </div>
         </div>
         <div class="nav-menu-images-w" aria-hidden="true">
-          <div class="nav-menu-img-w"><img src="/menu/menu-1.svg" alt="" /></div>
-          <div class="nav-menu-img-w"><img src="/menu/menu-2.svg" alt="" /></div>
-          <div class="nav-menu-img-w"><img src="/menu/menu-3.svg" alt="" /></div>
-          <div class="nav-menu-img-w"><img src="/menu/menu-4.svg" alt="" /></div>
+          <div class="nav-menu-img-w"><img src="/menu/menu-1.png" alt="" width="680" height="906" /></div>
+          <div class="nav-menu-img-w"><img src="/menu/menu-2.png" alt="" width="680" height="906" /></div>
+          <div class="nav-menu-img-w"><img src="/menu/menu-3.png" alt="" width="680" height="906" /></div>
+          <div class="nav-menu-img-w"><img src="/menu/menu-4.png" alt="" width="680" height="906" /></div>
         </div>
       </div>
     </div>
@@ -95,6 +96,7 @@
 
   <!-- ===================== MAIN PAGE ===================== -->
   <main class="page-w" id="top">
+    <h1 class="visually-hidden">Avery Vale — 2025 Apex Grand Prix Driver</h1>
 
     <!-- HERO -->
     <section class="home-hero" id="hero" data-section="hero">
@@ -163,11 +165,12 @@
     <!-- SOCIAL VIDEO STREAM -->
     <section class="social-stream-section" id="social-stream" data-section="social-stream">
       <h2 class="section-eyebrow">SOCIAL</h2>
-      <div class="video-stream-wrap" data-video-stream-wrap tabindex="0" role="group" aria-label="Social video, hover to play">
-        <video id="socialVideo" data-video-el muted loop playsinline preload="metadata" poster="/images/social-poster.svg" aria-label="Muted looping Avery Vale social clip">
+      <div class="video-stream-wrap" data-video-stream-wrap>
+        <video id="socialVideo" data-video-el muted loop playsinline preload="metadata" poster="/images/social-poster.png" aria-label="Muted looping Avery Vale social clip">
           <source src="/video/avery-loop.webm" type="video/webm" />
         </video>
-        <img class="video-stream-placeholder" data-video-stream-placeholder src="/images/social-poster.svg" alt="Social video preview" />
+        <img class="video-stream-placeholder" data-video-stream-placeholder src="/images/social-poster.png" alt="Social video preview" width="880" height="495" />
+        <button type="button" class="video-play-btn" data-video-play-btn aria-pressed="false" aria-label="Play the social clip">PLAY</button>
         <span class="video-stream-hint" data-video-hint aria-hidden="true">HOVER TO PLAY</span>
       </div>
     </section>
@@ -175,7 +178,7 @@
     <!-- FOOTER -->
     <footer class="footer" id="footer" data-section="footer">
       <div class="footer-inner">
-        <p class="footer-statement" data-split-text aria-label="DRIVEN BY THE FANS BUILT FOR THE FUTURE">DRIVEN BY THE FANS BUILT FOR THE FUTURE</p>
+        <p class="footer-statement" data-split-text aria-label="DRIVEN BY THE FANS. BUILT FOR THE FUTURE.">DRIVEN BY THE FANS. BUILT FOR THE FUTURE.</p>
         <div class="marquee" data-marquee>
           <ul class="marquee-list" data-marquee-list="right" role="list" id="footerMarquee"></ul>
           <ul class="marquee-list" data-marquee-list="right" aria-hidden="true" id="footerMarquee2"></ul>
@@ -212,7 +215,10 @@
   <div class="drawer-scrim" data-presskit-scrim hidden></div>
   <aside class="presskit-drawer" id="pressKitDrawer" role="dialog" aria-modal="true" aria-label="Press kit" aria-hidden="true">
     <div class="presskit-head">
-      <h2>Press kit</h2>
+      <div>
+        <h2>Press kit</h2>
+        <p class="pk-summary" data-pk-summary>Selected races 0 · Shortlist 0 · Newsletter none</p>
+      </div>
       <button type="button" class="drawer-close" data-presskit-close aria-label="Close press kit">
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 5l14 14M19 5L5 19"/></svg>
       </button>
@@ -246,6 +252,7 @@
     <ul class="palette-list" id="paletteList" role="listbox" aria-label="Commands"></ul>
   </div>
 
+  <script src="/hero-gl.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

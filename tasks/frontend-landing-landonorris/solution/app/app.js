@@ -1,8 +1,8 @@
 'use strict';
 /* =========================================================================
    Avery Vale / Nova Racing — fictional driver homepage oracle.
-   In-memory Svelte-store-style state (no browser storage). All UI controls
-   and the WebMCP tools call the same handlers.
+   In-memory Svelte-store-style state (no browser storage of any kind).
+   Every visible UI control and every WebMCP tool calls the same handlers.
    ========================================================================= */
 (function () {
   const $ = (s, r = document) => r.querySelector(s);
@@ -11,30 +11,31 @@
 
   /* ---------------- Seed data ---------------- */
   const SEED_RACES = [
-    { id: 'r1', circuit: 'Alpine GP',         date: '2025-03-16', status: 'Upcoming'  },
-    { id: 'r2', circuit: 'Bayfront Circuit',  date: '2025-04-06', status: 'Upcoming'  },
-    { id: 'r3', circuit: 'Ridgeway GP',       date: '2025-05-04', status: 'Completed' },
-    { id: 'r4', circuit: 'Solstice GP',       date: '2025-06-15', status: 'Upcoming'  },
-    { id: 'r5', circuit: 'Meridian Night Run',date: '2025-07-20', status: 'Upcoming'  },
-    { id: 'r6', circuit: 'Cascade Finale',    date: '2025-09-07', status: 'Upcoming'  },
+    { id: 'r1', circuit: 'Alpine GP',          date: '2025-03-16', status: 'Upcoming'  },
+    { id: 'r2', circuit: 'Bayfront Circuit',   date: '2025-04-06', status: 'Upcoming'  },
+    { id: 'r3', circuit: 'Ridgeway GP',        date: '2025-05-04', status: 'Completed' },
+    { id: 'r4', circuit: 'Solstice GP',        date: '2025-06-15', status: 'Upcoming'  },
+    { id: 'r5', circuit: 'Meridian Night Run', date: '2025-07-20', status: 'Upcoming'  },
+    { id: 'r6', circuit: 'Cascade Finale',     date: '2025-09-07', status: 'Upcoming'  },
   ];
   const EDITORIALS = [
-    { index: 1, label: 'ON TRACK', img: '/editorial/strip-1.svg' },
-    { index: 2, label: 'SPEED',    img: '/editorial/strip-2.svg' },
-    { index: 3, label: 'OFF TRACK',img: '/editorial/strip-3.svg' },
-    { index: 4, label: 'FOCUS',    img: '/editorial/strip-4.svg' },
-    { index: 5, label: 'GARAGE',   img: '/editorial/strip-5.svg' },
-    { index: 6, label: 'PODIUM',   img: '/editorial/strip-6.svg' },
+    { index: 1, label: 'ON TRACK',  img: '/editorial/strip-1.png' },
+    { index: 2, label: 'SPEED',     img: '/editorial/strip-2.png' },
+    { index: 3, label: 'OFF TRACK', img: '/editorial/strip-3.png' },
+    { index: 4, label: 'FOCUS',     img: '/editorial/strip-4.png' },
+    { index: 5, label: 'GARAGE',    img: '/editorial/strip-5.png' },
+    { index: 6, label: 'PODIUM',    img: '/editorial/strip-6.png' },
   ];
   const HELMETS = [
     { index: 1, label: 'AURA GEOMETRY', base: '/helmets/helmet-1-base.svg', reveal: '/helmets/helmet-1-reveal.svg' },
     { index: 2, label: 'IRIDESCENT',    base: '/helmets/helmet-2-base.svg', reveal: '/helmets/helmet-2-reveal.svg' },
     { index: 3, label: 'TYPO STACK',    base: '/helmets/helmet-3-base.svg', reveal: '/helmets/helmet-3-reveal.svg' },
   ];
-  const MARKS = ['/marks/mark-1.svg','/marks/mark-2.svg','/marks/mark-3.svg','/marks/mark-4.svg','/marks/mark-5.svg'];
-  const DESTINATIONS = ['hero','horizontal-media','helmet-grid','race-calendar','collabs','social-stream','footer','menu','press-kit'];
+  const MARKS = ['/marks/mark-1.svg', '/marks/mark-2.svg', '/marks/mark-3.svg', '/marks/mark-4.svg', '/marks/mark-5.svg'];
+  const DESTINATIONS = ['hero', 'horizontal-media', 'helmet-grid', 'race-calendar', 'collabs', 'social-stream', 'footer', 'menu', 'press-kit'];
+  const BUSINESS_EMAIL = 'hello@averyvale.example';
 
-  /* ---------------- State ---------------- */
+  /* ---------------- State (in-memory only) ---------------- */
   const state = {
     races: SEED_RACES.map(r => ({ ...r, selected: false, uid: 'avery-' + r.id + '@averyvale.example' })),
     shortlist: [],           // array of {kind,label,index}
@@ -50,7 +51,7 @@
   };
   let lastFocus = null;
 
-  /* ---------------- Schema validation (mirrors API-shaped contracts) ---------------- */
+  /* ---------------- Schema validation (mirrors the API-shaped contracts) ---------------- */
   const isPlainStr = v => typeof v === 'string';
   function validateEmail(raw) {
     if (!isPlainStr(raw)) return { ok: false, error: 'email must be text' };
@@ -86,7 +87,12 @@
     if (doc.season !== 2025) return 'season must be 2025';
     if (doc.newsletter !== 'none' && !validateEmail(doc.newsletter).ok) return 'newsletter must be none or a valid email';
     if (!Array.isArray(doc.races)) return 'races must be an array';
-    for (const r of doc.races) { const e = validateRaceRecord(r); if (e) return e; if (r.selected !== true) return 'races must all be selected'; if (!SEED_RACES.some(sr => sr.id === r.id)) return 'race id must match a known race'; }
+    for (const r of doc.races) {
+      const e = validateRaceRecord(r);
+      if (e) return e;
+      if (r.selected !== true) return 'races must all be selected';
+      if (!SEED_RACES.some(sr => sr.id === r.id)) return 'race id must match a known race';
+    }
     if (!Array.isArray(doc.shortlist)) return 'shortlist must be an array';
     for (const s of doc.shortlist) { const e = validateShortlist(s); if (e) return e; }
     if (!isPlainStr(doc.generatedAt) || !/Z$/.test(doc.generatedAt) || Number.isNaN(Date.parse(doc.generatedAt))) return 'generatedAt must be ISO-8601 ending in Z';
@@ -97,6 +103,23 @@
   const announcer = $('[data-announcer]');
   function announce(msg) { if (announcer) { announcer.textContent = ''; requestAnimationFrame(() => { announcer.textContent = msg; }); } }
 
+  /* ---------------- Clipboard helper (with legacy fallback) ---------------- */
+  async function copyText(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch (_) { /* fall through */ }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      return ok;
+    } catch (_) { return false; }
+  }
+
   /* ---------------- Derived / render ---------------- */
   function selectedRaces() { return state.races.filter(r => r.selected); }
   function raceRecord(r) { return { id: r.id, circuit: r.circuit, date: r.date, status: r.status, selected: r.selected, uid: r.uid }; }
@@ -104,6 +127,12 @@
   function renderCounts() {
     $('[data-selected-count]').textContent = String(selectedRaces().length);
     $('[data-shortlist-count]').textContent = String(state.shortlist.length);
+    const sum = $('[data-pk-summary]');
+    if (sum) {
+      sum.textContent = 'Selected races ' + selectedRaces().length +
+        ' · Shortlist ' + state.shortlist.length +
+        ' · Newsletter ' + (state.subscriber || 'none');
+    }
   }
 
   function renderShortlistButtons() {
@@ -124,19 +153,21 @@
     state.redoStack.length = 0;
   }
   function undo() {
-    if (!state.undoStack.length) return false;
+    if (!state.undoStack.length) return false;   // empty stack: complete no-op
     const cmd = state.undoStack.pop();
     cmd.undo();
     state.redoStack.push(cmd);
     afterMutation();
+    announce('Undo: ' + selectedRaces().length + ' selected races, shortlist ' + state.shortlist.length);
     return true;
   }
   function redo() {
-    if (!state.redoStack.length) return false;
+    if (!state.redoStack.length) return false;   // empty stack: complete no-op
     const cmd = state.redoStack.pop();
     cmd.redo();
     state.undoStack.push(cmd);
     afterMutation();
+    announce('Redo: ' + selectedRaces().length + ' selected races, shortlist ' + state.shortlist.length);
     return true;
   }
   function afterMutation() {
@@ -161,7 +192,9 @@
     if (r) setRaceSelected(id, !r.selected);
   }
   function updateRaceStatus(id, status) {
-    if (status !== 'Upcoming' && status !== 'Completed') return { ok: false, error: 'status must be Upcoming or Completed' };
+    if (status !== 'Upcoming' && status !== 'Completed') {
+      return { ok: false, error: 'Status is invalid: status must be Upcoming or Completed.' };
+    }
     const r = state.races.find(x => x.id === id);
     if (!r) return { ok: false, error: 'race not found' };
     r.status = status;
@@ -219,21 +252,59 @@
       const r = state.races.find(x => x.id === row.dataset.raceId);
       if (!r) return;
       row.classList.toggle('is-selected', r.selected);
+      const toggle = row.querySelector('[data-race-toggle]');
+      if (toggle) toggle.setAttribute('aria-pressed', String(r.selected));
+      // Filtering only hides rows; it never clears selections on hidden rows.
       const visible = state.filter === 'All' || r.status === state.filter;
       row.hidden = !visible;
       const st = row.querySelector('[data-race-status]');
       if (st) { st.textContent = r.status; st.className = 'race-status ' + r.status; }
-      const toggle = row.querySelector('[data-race-toggle]');
-      if (toggle) { toggle.textContent = r.circuit; toggle.setAttribute('aria-pressed', String(r.selected)); }
+      if (toggle) toggle.textContent = r.circuit;
       const date = row.querySelector('[data-race-date]');
       if (date) date.textContent = r.date;
     });
   }
   function setFilter(f) {
-    if (!['All','Upcoming','Completed'].includes(f)) return;
+    if (!['All', 'Upcoming', 'Completed'].includes(f)) return;
     state.filter = f;
     $$('.filter-btn').forEach(b => b.classList.toggle('is-active', b.dataset.filter === f));
     renderCalendarRows();
+  }
+
+  /* ---------------- Race status editor (schema-validated before commit) ---------------- */
+  function openRaceEditor(row, id) {
+    if (row.querySelector('.race-edit-form')) return;
+    const r = state.races.find(x => x.id === id);
+    const editBtn = row.querySelector('[data-race-edit]');
+    editBtn.style.display = 'none';
+    const form = document.createElement('form');
+    form.className = 'race-edit-form';
+    form.innerHTML = `
+      <label class="visually-hidden" for="edit-${id}">Edit status for ${r.circuit}</label>
+      <select id="edit-${id}" data-status-select>
+        <option value="Upcoming">Upcoming</option>
+        <option value="Completed">Completed</option>
+        <option value="Postponed">Postponed</option>
+      </select>
+      <button type="submit" class="race-edit">Save</button>
+      <button type="button" class="race-edit" data-cancel>Cancel</button>
+      <span class="race-edit-error" role="alert" data-edit-error></span>`;
+    row.appendChild(form);
+    const sel = form.querySelector('[data-status-select]');
+    sel.value = r.status;
+    form.querySelector('[data-cancel]').addEventListener('click', () => { form.remove(); editBtn.style.display = ''; });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const res = updateRaceStatus(id, sel.value);
+      if (!res.ok) {
+        form.querySelector('[data-edit-error]').textContent = res.error;
+        announce('Status error: ' + res.error);
+        return;
+      }
+      form.remove();
+      editBtn.style.display = '';
+    });
+    sel.focus();
   }
 
   /* ---------------- Shortlist handlers ---------------- */
@@ -242,17 +313,23 @@
     if (i >= 0) {
       const removed = state.shortlist[i];
       state.shortlist.splice(i, 1);
-      if (record) pushCommand({ undo: () => state.shortlist.push(removed), redo: () => { const j = state.shortlist.findIndex(s => s.kind === kind && s.index === index); if (j >= 0) state.shortlist.splice(j, 1); } });
+      if (record) pushCommand({
+        undo: () => state.shortlist.push(removed),
+        redo: () => { const j = state.shortlist.findIndex(s => s.kind === kind && s.index === index); if (j >= 0) state.shortlist.splice(j, 1); },
+      });
     } else {
       const entry = { kind, label, index };
       state.shortlist.push(entry);
-      if (record) pushCommand({ undo: () => { const j = state.shortlist.findIndex(s => s.kind === kind && s.index === index); if (j >= 0) state.shortlist.splice(j, 1); }, redo: () => state.shortlist.push(entry) });
+      if (record) pushCommand({
+        undo: () => { const j = state.shortlist.findIndex(s => s.kind === kind && s.index === index); if (j >= 0) state.shortlist.splice(j, 1); },
+        redo: () => state.shortlist.push(entry),
+      });
     }
     afterMutation();
     announce('Shortlist ' + state.shortlist.length);
   }
 
-  /* ---------------- Build editorial + helmet cards ---------------- */
+  /* ---------------- Build editorial + helmet cards + marquees ---------------- */
   function buildEditorial() {
     const track = $('#horizontalTrack');
     track.innerHTML = '';
@@ -260,9 +337,9 @@
       const card = document.createElement('div');
       card.className = 'h-card';
       card.innerHTML = `
-        <img src="${e.img}" alt="Editorial ${e.label.toLowerCase()} composition ${e.index}" />
+        <img src="${e.img}" alt="Editorial ${e.label.toLowerCase()} composition ${e.index}" width="460" height="300" />
         <span class="h-card-cap">${e.label}</span>
-        <button type="button" class="shortlist-btn" data-kind="editorial" data-index="${e.index}" data-label="${e.label}">Shortlist</button>`;
+        <button type="button" class="shortlist-btn" aria-pressed="false" data-kind="editorial" data-index="${e.index}" data-label="${e.label}">Shortlist</button>`;
       track.appendChild(card);
     });
   }
@@ -275,14 +352,14 @@
       card.innerHTML = `
         <img class="helmet-card-base" src="${h.base}" alt="Helmet livery ${h.label.toLowerCase()}" />
         <img class="helmet-card-reveal" src="${h.reveal}" alt="" aria-hidden="true" />
-        <span class="helmet-index">0${h.index}</span>
-        <button type="button" class="shortlist-btn" data-kind="helmet" data-index="${h.index}" data-label="${h.label}">Shortlist</button>`;
+        <span class="helmet-index" aria-hidden="true">0${h.index}</span>
+        <button type="button" class="shortlist-btn" aria-pressed="false" data-kind="helmet" data-index="${h.index}" data-label="${h.label}">Shortlist</button>`;
       grid.appendChild(card);
     });
   }
   function buildMarquees() {
-    const mk = () => MARKS.map(m => `<li><img src="${m}" alt="Partner mark" /></li>`).join('');
-    ['#collabList','#collabList2','#footerMarquee','#footerMarquee2'].forEach(sel => { $(sel).innerHTML = mk(); });
+    const mk = () => MARKS.map(m => `<li><img src="${m}" alt="Partner mark" width="180" height="60" loading="lazy" /></li>`).join('');
+    ['#collabList', '#collabList2', '#footerMarquee', '#footerMarquee2'].forEach(sel => { $(sel).innerHTML = mk(); });
   }
 
   /* ---------------- Press kit builders ---------------- */
@@ -309,11 +386,11 @@
     lines.push('Newsletter: ' + doc.newsletter);
     lines.push('');
     lines.push('## Selected races');
-    if (!doc.races.length) lines.push('_Selection list is empty._');
+    if (!doc.races.length) lines.push('_The selection list is empty._');
     doc.races.forEach(r => lines.push(`- ${r.circuit} — ${r.date} (${r.status})`));
     lines.push('');
     lines.push('## Shortlist');
-    if (!doc.shortlist.length) lines.push('_Shortlist is empty._');
+    if (!doc.shortlist.length) lines.push('_The shortlist is empty._');
     doc.shortlist.forEach(s => lines.push(`- [${s.kind}] ${s.label} (#${s.index})`));
     return lines.join('\n');
   }
@@ -338,19 +415,17 @@
   }
   function renderPreview() { $('[data-presskit-preview]').textContent = currentPreviewText(); }
 
-  /* ---------------- Import ---------------- */
+  /* ---------------- Import (schema-validated; no mutation on failure) ---------------- */
   function importPressKit(text) {
     const msg = $('[data-import-msg]');
-    const fail = (e) => { msg.textContent = 'Import error: ' + e; msg.className = 'presskit-import-msg is-error'; return { ok: false, error: e }; };
+    const fail = (e) => { msg.textContent = 'Import error: ' + e; msg.className = 'presskit-import-msg is-error'; announce('Import error: ' + e); return { ok: false, error: e }; };
     let doc;
     try { doc = JSON.parse(text); } catch (_) { return fail('malformed JSON'); }
     const err = validatePressKit(doc);
     if (err) return fail(err);
-    // apply (no mutation happened before this point)
+    // Apply only after the whole document validated; nothing mutated before here.
     state.races.forEach(r => { r.selected = false; });
     doc.races.forEach(rec => {
-      // validatePressKit already rejected any id outside SEED_RACES, so every
-      // rec here matches an existing seeded row; the calendar never grows.
       const r = state.races.find(x => x.id === rec.id);
       if (r) { r.selected = true; r.status = rec.status; r.circuit = rec.circuit; r.date = rec.date; r.uid = rec.uid; }
     });
@@ -360,18 +435,16 @@
     buildCalendar();
     afterMutation();
     syncNewsletterFromState();
-    msg.textContent = 'Imported ' + doc.races.length + ' selected race(s), ' + doc.shortlist.length + ' shortlist item(s).';
+    msg.textContent = 'Imported ' + doc.races.length + ' selected race(s) and ' + doc.shortlist.length + ' shortlist item(s).';
     msg.className = 'presskit-import-msg is-ok';
     return { ok: true };
   }
 
   /* ---------------- Download / Copy ---------------- */
   function download(format) {
-    const prev = state.activeTab; state.activeTab = format;
     const map = { json: ['avery-vale-press-kit.json', 'application/json'], markdown: ['avery-vale-press-kit.md', 'text/markdown'], ics: ['avery-vale-press-kit.ics', 'text/calendar'] };
     const [name, mime] = map[format] || map.json;
     const text = format === 'json' ? JSON.stringify(pressKitJSON(), null, 2) : (format === 'markdown' ? pressKitMarkdown() : pressKitICS());
-    state.activeTab = prev;
     const blob = new Blob([text], { type: mime });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -379,17 +452,22 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     return name;
   }
+  let confirmTimer = 0;
+  function showPkConfirm(text) {
+    const c = $('[data-presskit-confirm]');
+    c.textContent = text;
+    c.classList.add('is-shown');
+    clearTimeout(confirmTimer);
+    confirmTimer = setTimeout(() => { c.classList.remove('is-shown'); c.textContent = ''; }, 1600);
+  }
   async function copyActive() {
     const text = currentPreviewText();
-    let ok = true;
-    try { await navigator.clipboard.writeText(text); } catch (_) { ok = false; /* clipboard may be blocked; preview still authoritative */ }
-    const c = $('[data-presskit-confirm]');
-    c.textContent = ok ? 'Copied' : 'Copy failed';
-    setTimeout(() => { c.textContent = ''; }, 1500);
+    const ok = await copyText(text);
+    showPkConfirm(ok ? 'Copied ✓' : 'Copy blocked by browser');
     return ok;
   }
 
-  /* ---------------- Newsletter ---------------- */
+  /* ---------------- Newsletter (schema-validated subscribe flow) ---------------- */
   function syncNewsletterFromState() {
     const input = $('#newsletterEmail');
     input.value = state.subscriber || '';
@@ -399,13 +477,16 @@
     const input = $('#newsletterEmail');
     const btn = $('#newsletterSubmit');
     const msg = $('[data-newsletter-msg]');
-    const res = validateEmail(input.value);
     if (input.value.trim() === '') {
-      btn.disabled = true; msg.className = 'newsletter-msg'; msg.textContent = ''; return;
+      btn.disabled = true;
+      msg.className = 'newsletter-msg';
+      msg.textContent = '';
+      return;
     }
+    const res = validateEmail(input.value);
     if (!res.ok) {
       btn.disabled = true;
-      msg.textContent = 'Please enter a valid email in the email field: ' + res.error + '.';
+      msg.textContent = 'Email is invalid: the email field needs one @ and a domain with a dot (example fan@averyvale.example).';
       msg.className = 'newsletter-msg is-shown is-error';
     } else {
       btn.disabled = false;
@@ -418,17 +499,21 @@
     const msg = $('[data-newsletter-msg]');
     const res = validateEmail(input.value);
     if (!res.ok) {
-      msg.textContent = 'Please enter a valid email in the email field.';
+      msg.textContent = input.value.trim() === ''
+        ? 'Email is missing: enter an email like fan@averyvale.example in the email field, then subscribe.'
+        : 'Email is invalid: the email field needs one @ and a domain with a dot (example fan@averyvale.example).';
       msg.className = 'newsletter-msg is-shown is-error';
-      announce('Newsletter error: invalid email');
+      announce('Newsletter error: enter a valid email');
+      input.focus();
       return { ok: false };
     }
     state.subscriber = res.value;
     input.value = '';
-    $('#newsletterSubmit').disabled = true;
-    msg.textContent = 'Thanks — your signup to the Nova Racing dispatch succeeded.';
+    $('#newsletterSubmit').disabled = true;   // synchronous: double-activation shows exactly one confirmation
+    msg.textContent = 'Signup succeeded — welcome to the Nova Racing dispatch.';
     msg.className = 'newsletter-msg is-shown is-ok';
     announce('Newsletter signup succeeded');
+    renderCounts();
     if (state.pressKitOpen) renderPreview();
     return { ok: true, value: res.value };
   }
@@ -442,16 +527,19 @@
     if (el) el.scrollIntoView({ behavior: prefersReduced() ? 'auto' : 'smooth', block: 'start' });
   }
 
-  /* ---------------- Menu overlay (modal, focus trap) ---------------- */
+  /* ---------------- Menu overlay (modal: Escape closes, focus trapped) ---------------- */
   const menu = $('#navMenu');
   const ham = $('#navHam');
   function focusable(container) {
-    return $$('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])', container).filter(el => el.offsetParent !== null || el === document.activeElement);
+    return $$('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])', container)
+      .filter(el => !el.disabled && (el.offsetParent !== null || el === document.activeElement));
   }
-  function trapFocus(container, event, isOpen) {
-    if (event.key !== 'Tab' || !isOpen) return;
-    const items = focusable(container); if (!items.length) return;
+  function trapFocus(container, event) {
+    if (event.key !== 'Tab') return;
+    const items = focusable(container);
+    if (!items.length) return;
     const first = items[0], last = items[items.length - 1];
+    if (!container.contains(document.activeElement)) { event.preventDefault(); first.focus(); return; }
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
     else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
   }
@@ -460,6 +548,7 @@
     state.menuOpen = true; lastFocus = document.activeElement;
     menu.classList.add('is-open'); menu.setAttribute('aria-hidden', 'false');
     ham.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('is-menu-open');
     const first = $('.nav-menu-close', menu);
     if (first) first.focus();
   }
@@ -468,18 +557,21 @@
     state.menuOpen = false;
     menu.classList.remove('is-open'); menu.setAttribute('aria-hidden', 'true');
     ham.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('is-menu-open');
     if (ham) ham.focus();
   }
 
   /* ---------------- Press kit drawer ---------------- */
   const drawer = $('#pressKitDrawer');
   const drawerScrim = $('[data-presskit-scrim]');
+  let drawerLastFocus = null;
   function openPressKit() {
     if (state.menuOpen) closeMenu();
     if (state.pressKitOpen) return;
-    state.pressKitOpen = true; lastFocus = document.activeElement;
+    state.pressKitOpen = true; drawerLastFocus = document.activeElement;
     drawerScrim.hidden = false;
     drawer.classList.add('is-open'); drawer.setAttribute('aria-hidden', 'false');
+    renderCounts();
     renderPreview();
     const c = $('[data-presskit-close]'); if (c) c.focus();
   }
@@ -488,12 +580,16 @@
     state.pressKitOpen = false;
     drawer.classList.remove('is-open'); drawer.setAttribute('aria-hidden', 'true');
     drawerScrim.hidden = true;
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    if (drawerLastFocus && drawerLastFocus.focus) drawerLastFocus.focus();
   }
   function setTab(tab) {
-    if (!['json','markdown','ics'].includes(tab)) return;
+    if (!['json', 'markdown', 'ics'].includes(tab)) return;
     state.activeTab = tab;
-    $$('.presskit-tab').forEach(t => { const on = t.dataset.tab === tab; t.classList.toggle('is-active', on); t.setAttribute('aria-selected', String(on)); });
+    $$('.presskit-tab').forEach(t => {
+      const on = t.dataset.tab === tab;
+      t.classList.toggle('is-active', on);
+      t.setAttribute('aria-selected', String(on));
+    });
     renderPreview();
   }
 
@@ -501,13 +597,14 @@
   const palette = $('#commandPalette');
   const paletteScrim = $('[data-palette-scrim]');
   const paletteInput = $('#paletteInput');
+  let paletteLastFocus = null;
   const COMMANDS = [
     { id: 'go-home', label: 'Go HOME', run: () => { closePalette(); goTo('hero'); } },
     { id: 'go-ontrack', label: 'Go ON TRACK', run: () => { closePalette(); goTo('horizontal-media'); } },
     { id: 'go-offtrack', label: 'Go OFF TRACK', run: () => { closePalette(); goTo('social-stream'); } },
     { id: 'go-calendar', label: 'Go CALENDAR', run: () => { closePalette(); goTo('race-calendar'); } },
     { id: 'open-presskit', label: 'Open press kit', run: () => { closePalette(); openPressKit(); } },
-    { id: 'undo', label: 'Undo', run: () => { undo(); } },
+    { id: 'undo', label: 'Undo', run: () => { undo(); } },        // no-ops on empty stack; palette stays open
     { id: 'redo', label: 'Redo', run: () => { redo(); } },
   ];
   let paletteActive = 0;
@@ -530,7 +627,7 @@
   }
   function openPalette() {
     if (state.paletteOpen) return;
-    state.paletteOpen = true; lastFocus = document.activeElement;
+    state.paletteOpen = true; paletteLastFocus = document.activeElement;
     paletteScrim.hidden = false;
     palette.classList.add('is-open'); palette.setAttribute('aria-hidden', 'false');
     paletteInput.value = ''; paletteActive = 0; renderPalette();
@@ -541,39 +638,72 @@
     state.paletteOpen = false;
     palette.classList.remove('is-open'); palette.setAttribute('aria-hidden', 'true');
     paletteScrim.hidden = true;
-    if (lastFocus && lastFocus.focus) lastFocus.focus();
+    if (paletteLastFocus && paletteLastFocus.focus) paletteLastFocus.focus();
   }
 
-  /* ---------------- Video hover-to-play ---------------- */
+  /* ---------------- Social video (hover-to-play + real play/pause control) ---------------- */
   const video = $('#socialVideo');
   const videoWrap = $('[data-video-stream-wrap]');
-  function playVideo() { state.videoPlaying = true; videoWrap.classList.add('is-playing'); const p = video.play(); if (p && p.catch) p.catch(() => {}); }
-  function pauseVideo() { state.videoPlaying = false; videoWrap.classList.remove('is-playing'); video.pause(); }
+  const videoBtn = $('[data-video-play-btn]');
+  function syncVideoBtn() {
+    if (!videoBtn) return;
+    videoBtn.textContent = state.videoPlaying ? 'PAUSE' : 'PLAY';
+    videoBtn.setAttribute('aria-pressed', String(state.videoPlaying));
+    videoBtn.setAttribute('aria-label', state.videoPlaying ? 'Pause the social clip' : 'Play the social clip');
+  }
+  function playVideo() {
+    state.videoPlaying = true;
+    videoWrap.classList.add('is-playing');   // fades the placeholder out via the 0.3s opacity transition
+    const p = video.play();
+    if (p && p.catch) p.catch(() => {});
+    syncVideoBtn();
+  }
+  function pauseVideo() {
+    state.videoPlaying = false;
+    videoWrap.classList.remove('is-playing'); // restores the placeholder to fully opaque
+    video.pause();
+    syncVideoBtn();
+  }
   function restartVideo() { video.currentTime = 0; playVideo(); }
 
   /* ---------------- Wire UI ---------------- */
   function wire() {
-    // preloader
+    // Preloader: lime LOAD VALE cover, clears within ~1.8s (instant under reduced motion).
     const pre = $('#preloader');
     const dismiss = () => pre.classList.add('is-done');
-    if (prefersReduced()) dismiss(); else setTimeout(dismiss, 1400);
+    if (prefersReduced()) dismiss(); else setTimeout(dismiss, 1200);
 
-    // nav
-    $('#navHam').addEventListener('click', openMenu);
+    // Nav chrome (all in-page; nothing reloads or leaves the origin)
+    ham.addEventListener('click', () => (state.menuOpen ? closeMenu() : openMenu()));
     $('#navClose').addEventListener('click', closeMenu);
     $('#storeBtn').addEventListener('click', () => goTo('hero'));
     $('#pressKitBtn').addEventListener('click', openPressKit);
 
-    // menu links / socials / business / legal (in-page, no navigation)
+    // Menu links scroll within the same homepage document.
     $$('[data-menu-link]').forEach(el => el.addEventListener('click', (e) => {
       e.preventDefault();
       const dest = el.dataset.dest;
       if (state.menuOpen) closeMenu();
       goTo(dest);
     }));
+    // Socials / legal links: same-document no-ops.
     $$('[data-social], [data-legal]').forEach(el => el.addEventListener('click', (e) => { e.preventDefault(); }));
+    // Business contact: copies the address; never navigates off the page.
+    const contact = $('[data-contact]');
+    if (contact) {
+      let contactTimer = 0;
+      contact.addEventListener('click', async () => {
+        const copied = await copyText(BUSINESS_EMAIL);
+        contact.textContent = copied ? 'COPIED ✓' : 'COPY BLOCKED';
+        announce(copied
+          ? 'Business contact ' + BUSINESS_EMAIL + ' copied'
+          : 'Business contact copy was blocked by the browser');
+        clearTimeout(contactTimer);
+        contactTimer = setTimeout(() => { contact.textContent = BUSINESS_EMAIL; }, 1400);
+      });
+    }
 
-    // calendar
+    // Calendar filter + rows
     $$('.filter-btn').forEach(b => b.addEventListener('click', () => setFilter(b.dataset.filter)));
     $('#calendarList').addEventListener('click', (e) => {
       const row = e.target.closest('.race-row'); if (!row) return;
@@ -583,23 +713,30 @@
       toggleRace(id);
     });
 
-    // shortlist (delegated)
+    // Shortlist (delegated so injected cards are covered)
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.shortlist-btn');
       if (!btn) return;
       toggleShortlist(btn.dataset.kind, Number(btn.dataset.index), btn.dataset.label);
     });
 
-    // newsletter
+    // Newsletter (Enter submits even while Subscribe is disabled, so an
+    // empty-field submit attempt is blocked with a named inline error)
     $('#newsletterEmail').addEventListener('input', validateNewsletterLive);
+    $('#newsletterEmail').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); submitNewsletter(); }
+    });
     $('#newsletterForm').addEventListener('submit', (e) => { e.preventDefault(); submitNewsletter(); });
 
-    // press kit
+    // Press kit
     $('[data-presskit-close]').addEventListener('click', closePressKit);
     drawerScrim.addEventListener('click', closePressKit);
     $$('.presskit-tab').forEach(t => t.addEventListener('click', () => setTab(t.dataset.tab)));
     $('[data-presskit-copy]').addEventListener('click', copyActive);
-    $('[data-presskit-download]').addEventListener('click', () => download(state.activeTab));
+    $('[data-presskit-download]').addEventListener('click', () => {
+      const name = download(state.activeTab);
+      showPkConfirm('Downloading ' + name);
+    });
     $('[data-import-paste]').addEventListener('click', () => importPressKit($('[data-import-area]').value));
     $('[data-import-file]').addEventListener('change', (e) => {
       const f = e.target.files && e.target.files[0]; if (!f) return;
@@ -608,7 +745,7 @@
       reader.readAsText(f);
     });
 
-    // palette
+    // Palette
     paletteScrim.addEventListener('click', closePalette);
     paletteInput.addEventListener('input', () => { paletteActive = 0; renderPalette(); });
     paletteInput.addEventListener('keydown', (e) => {
@@ -618,209 +755,178 @@
       else if (e.key === 'Enter') { e.preventDefault(); if (items[paletteActive]) items[paletteActive].run(); }
     });
 
-    // video hover
-    ['mouseenter', 'focus'].forEach(ev => videoWrap.addEventListener(ev, playVideo));
-    ['mouseleave', 'blur'].forEach(ev => videoWrap.addEventListener(ev, pauseVideo));
+    // Video: hover-to-play cycle + real button control (muted forever)
+    video.muted = true;
+    videoWrap.addEventListener('mouseenter', playVideo);
+    videoWrap.addEventListener('mouseleave', pauseVideo);
+    if (videoBtn) videoBtn.addEventListener('click', () => (state.videoPlaying ? pauseVideo() : playVideo()));
 
-    // global keys
+    // Global keys: Meta/Ctrl+K toggles the palette; Escape closes the top overlay only.
     document.addEventListener('keydown', (e) => {
-      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); state.paletteOpen ? closePalette() : openPalette(); return; }
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
+        e.preventDefault();
+        state.paletteOpen ? closePalette() : openPalette();
+        return;
+      }
       if (e.key === 'Escape') {
         if (state.paletteOpen) { closePalette(); return; }
         if (state.pressKitOpen) { closePressKit(); return; }
         if (state.menuOpen) { closeMenu(); return; }
+        // With every overlay closed, Escape changes nothing.
       }
     });
 
-    // modal focus traps
-    menu.addEventListener('keydown', (e) => trapFocus(menu, e, state.menuOpen));
-    drawer.addEventListener('keydown', (e) => trapFocus(drawer, e, state.pressKitOpen));
-    palette.addEventListener('keydown', (e) => trapFocus(palette, e, state.paletteOpen));
+    // Modal focus traps
+    menu.addEventListener('keydown', (e) => { if (state.menuOpen) trapFocus(menu, e); });
+    drawer.addEventListener('keydown', (e) => { if (state.pressKitOpen) trapFocus(drawer, e); });
+    palette.addEventListener('keydown', (e) => { if (state.paletteOpen) trapFocus(palette, e); });
 
-    // marquee inview
+    // Marquees run only in view (paused otherwise)
     const io = new IntersectionObserver((entries) => {
       entries.forEach(en => en.target.classList.toggle('is-inview', en.isIntersecting));
     }, { threshold: 0.05 });
     $$('.marquee').forEach(m => io.observe(m));
 
-    // split-text fill on scroll
+    // Split-text character fills (footer statement keeps its first word in lime)
     setupSplitText('.text-impact');
-    setupSplitText('.footer-statement');
+    setupSplitText('.footer-statement', { firstWordAccent: true });
 
-    // horizontal scroll-linked track
+    // Scroll-linked horizontal track
     setupHorizontal();
-
-    // hero canvas
-    drawHero();
-  }
-
-  function openRaceEditor(row, id) {
-    if (row.querySelector('.race-edit-form')) return;
-    const r = state.races.find(x => x.id === id);
-    const editBtn = row.querySelector('[data-race-edit]');
-    editBtn.style.display = 'none';
-    const form = document.createElement('form');
-    form.className = 'race-edit-form';
-    form.innerHTML = `
-      <label class="visually-hidden" for="edit-${id}">Edit status for ${r.circuit}</label>
-      <select id="edit-${id}" data-status-select>
-        <option value="Upcoming">Upcoming</option>
-        <option value="Completed">Completed</option>
-        <option value="Retired">Retired (invalid)</option>
-      </select>
-      <button type="submit" class="race-edit">Save</button>
-      <button type="button" class="race-edit" data-cancel>Cancel</button>
-      <span class="race-edit-error" data-edit-error></span>`;
-    row.appendChild(form);
-    const sel = form.querySelector('[data-status-select]');
-    sel.value = r.status;
-    form.querySelector('[data-cancel]').addEventListener('click', () => { form.remove(); editBtn.style.display = ''; });
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const res = updateRaceStatus(id, sel.value);
-      if (!res.ok) { form.querySelector('[data-edit-error]').textContent = res.error; announce('Status error'); return; }
-      form.remove(); editBtn.style.display = '';
-    });
-    sel.focus();
   }
 
   /* ---------------- Split text ---------------- */
-  function setupSplitText(sel) {
+  function setupSplitText(sel, opts = {}) {
     const el = $(sel); if (!el) return;
     const text = el.getAttribute('aria-label') || el.textContent;
+    el.setAttribute('aria-label', text);
     el.textContent = '';
     const chars = [];
+    let inFirstWord = true;
     for (const ch of text) {
+      if (ch === ' ') {
+        // Real, breakable space between words (keeps the statements wrapping).
+        el.appendChild(document.createTextNode(' '));
+        inFirstWord = false;
+        continue;
+      }
       const span = document.createElement('span');
-      span.className = 'char'; span.setAttribute('aria-hidden', 'true');
-      span.textContent = ch === ' ' ? ' ' : ch;
+      span.className = 'char';
+      span.setAttribute('aria-hidden', 'true');
+      span.textContent = ch;
+      if (opts.firstWordAccent && inFirstWord) span.classList.add('is-word1');
       el.appendChild(span); chars.push(span);
     }
-    const fill = () => chars.forEach((c, i) => setTimeout(() => c.classList.add('is-filled'), prefersReduced() ? 0 : i * 40));
+    let filled = false;
+    const fill = () => {
+      if (filled) return; filled = true;
+      chars.forEach((c, i) => setTimeout(() => c.classList.add('is-filled'), prefersReduced() ? 0 : i * 40));
+    };
     const io = new IntersectionObserver((entries) => {
       entries.forEach(en => { if (en.isIntersecting) { fill(); io.disconnect(); } });
     }, { threshold: 0.4 });
     io.observe(el);
   }
 
-  /* ---------------- Horizontal scroll-linked ---------------- */
+  /* ---------------- Horizontal scroll-linked track ---------------- */
   function setupHorizontal() {
     const section = $('#horizontal-media');
     const track = $('#horizontalTrack');
     if (!section || !track) return;
+    // Extra scroll height gives the pinned strip its travel distance (multiples of the viewport).
+    section.style.height = '300vh';
+    let ticking = false;
     function onScroll() {
-      if (prefersReduced()) { track.style.transform = 'none'; return; }
-      const rect = section.getBoundingClientRect();
-      const total = section.offsetHeight - window.innerHeight;
-      const progress = Math.min(1, Math.max(0, -rect.top / (total || 1)));
-      const max = track.scrollWidth - window.innerWidth;
-      track.style.transform = 'translateX(' + (-progress * Math.max(0, max)) + 'px)';
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        ticking = false;
+        if (prefersReduced()) { track.style.transform = 'translateX(' + (-Math.max(0, track.scrollWidth - window.innerWidth)) + 'px)'; return; }
+        const rect = section.getBoundingClientRect();
+        const total = section.offsetHeight - window.innerHeight;
+        const progress = Math.min(1, Math.max(0, -rect.top / (total || 1)));
+        const max = Math.max(0, track.scrollWidth - window.innerWidth);
+        track.style.transform = 'translateX(' + (-progress * max) + 'px)';
+      });
     }
-    // give the pinned section extra scroll height for the travel
-    section.style.height = (200 + 100) + 'vh';
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     onScroll();
   }
 
-  /* ---------------- Hero canvas (original decorative composition) ---------------- */
-  function drawHero() {
-    const c = $('[data-hero-canvas]'); if (!c) return;
-    const ctx = c.getContext('2d'); if (!ctx) return;
-    const hero = c.closest('.home-hero');
-    if (!hero) return;
-    const size = 480; c.width = size; c.height = size;
-    let t = 0, raf, pointerX = 0, pointerY = 0, interaction = 0, hovered = false, pressed = false, scrollProgress = 0;
-    const updatePointer = (event) => {
-      const rect = hero.getBoundingClientRect();
-      pointerX = ((event.clientX - rect.left) / rect.width - 0.5) * 2;
-      pointerY = ((event.clientY - rect.top) / rect.height - 0.5) * 2;
-    };
-    hero.addEventListener('pointerenter', () => { hovered = true; });
-    hero.addEventListener('pointermove', updatePointer);
-    hero.addEventListener('pointerdown', () => { pressed = true; });
-    hero.addEventListener('pointerup', () => { pressed = false; });
-    hero.addEventListener('pointerleave', () => { hovered = false; pressed = false; pointerX = 0; pointerY = 0; });
-    window.addEventListener('scroll', () => {
-      scrollProgress = Math.min(1, Math.max(0, window.scrollY / Math.max(1, hero.offsetHeight)));
-    }, { passive: true });
-    function frame() {
-      ctx.clearRect(0, 0, size, size);
-      const targetInteraction = pressed ? 1 : hovered ? 0.55 : 0;
-      interaction += (targetInteraction - interaction) * 0.12;
-      const menuPulse = state.menuOpen ? 18 : 0;
-      for (let i = 0; i < 5; i++) {
-        ctx.beginPath();
-        const r = 60 + i * 32 + Math.sin(t / (40 - interaction * 14) + i) * (10 + interaction * 9) + scrollProgress * 24 + menuPulse;
-        ctx.arc(size / 2 + pointerX * (12 + i * 2), size / 2 + pointerY * (12 + i * 2), r, 0, Math.PI * 2);
-        ctx.strokeStyle = i % 2 ? `rgba(210,255,0,${0.5 + interaction * 0.35})` : 'rgba(17,17,18,0.35)';
-        ctx.lineWidth = 2 + interaction * 2; ctx.stroke();
-      }
-      t++;
-      if (!prefersReduced()) raf = requestAnimationFrame(frame);
-    }
-    frame();
-    if (prefersReduced() && raf) cancelAnimationFrame(raf);
-  }
-
-  /* ---------------- WebMCP (delivery contract; same handlers as UI) ---------------- */
+  /* ---------------- WebMCP (delivery contract; same handlers as the visible UI) ---------------- */
   function registerWebMCP() {
     const tools = [];
-    const T = (name, description, handler) => tools.push({ name, description, handler });
+    const T = (name, description, handler) => tools.push({
+      name,
+      module: ({ browse: 'browse-query-v1', session: 'command-session-v1', entity: 'entity-collection-v1', artifact: 'artifact-transfer-v1' })[name.split('.')[0]],
+      description,
+      handler,
+    });
 
     // browse-query-v1
-    T('browse_open', 'Scroll/open a homepage destination. arg: destination', (a) => {
+    T('browse.open', 'Scroll/open a homepage destination. arg: destination', (a) => {
       if (!DESTINATIONS.includes(a && a.destination)) return { ok: false, error: 'unknown destination' };
       goTo(a.destination); return { ok: true, destination: a.destination };
     });
-    T('browse_apply_filter', 'Apply race status filter. arg: value (All|Upcoming|Completed)', (a) => {
-      const v = a && a.value;
-      if (!['All','Upcoming','Completed'].includes(v)) return { ok: false, error: 'invalid filter' };
-      setFilter(v); return { ok: true, filter: v };
+    T('browse.search', 'Search the declared homepage destinations.', (a) => {
+      const query = String(a && a.query || '').trim().toLowerCase();
+      if (!query || query.length > 200) return { ok: false, error: 'query must be 1-200 characters' };
+      return { ok: true, matches: DESTINATIONS.filter(destination => destination.includes(query)) };
     });
-    T('browse_clear_filter', 'Clear the race status filter (All).', () => { setFilter('All'); return { ok: true, filter: 'All' }; });
 
     // command-session-v1 (social video)
-    T('session_start', 'Start the social video playback.', () => { playVideo(); return { ok: true }; });
-    T('session_pause', 'Pause the social video playback.', () => { pauseVideo(); return { ok: true }; });
-    T('session_restart', 'Restart the social video from the beginning.', () => { restartVideo(); return { ok: true }; });
+    T('session.start', 'Start the social video playback.', () => { playVideo(); return { ok: true }; });
+    T('session.pause', 'Pause the social video playback.', () => { pauseVideo(); return { ok: true }; });
+    T('session.restart', 'Restart the social video from the beginning.', () => { restartVideo(); return { ok: true }; });
 
     // entity-collection-v1 (race)
-    T('entity_select', 'Select a race by id. arg: id', (a) => {
+    T('entity.select', 'Select a race by id. arg: id', (a) => {
       const r = state.races.find(x => x.id === (a && a.id)); if (!r) return { ok: false, error: 'race not found' };
       setRaceSelected(r.id, true); return { ok: true, id: r.id, selected: true };
     });
-    T('entity_toggle', 'Toggle a race selection by id. arg: id', (a) => {
+    T('entity.toggle', 'Toggle a race selection by id. arg: id', (a) => {
       const r = state.races.find(x => x.id === (a && a.id)); if (!r) return { ok: false, error: 'race not found' };
+      if (a.field !== undefined && a.field !== 'selected') return { ok: false, error: 'only selected is toggleable' };
       toggleRace(r.id); return { ok: true, id: r.id, selected: r.selected };
     });
-    T('entity_update', 'Update a race field. args: id, field (selected|status|circuit|date), value', (a) => {
-      if (!a || !['selected','status','circuit','date'].includes(a.field)) return { ok: false, error: 'invalid field' };
-      return updateRaceField(a.id, a.field, a.value);
+    T('entity.update', 'Update declared race fields. args: id, fields', (a) => {
+      const fields = a && a.fields;
+      if (!a || !fields || typeof fields !== 'object' || Array.isArray(fields)) return { ok: false, error: 'id and fields are required' };
+      const keys = Object.keys(fields);
+      if (!keys.length || keys.some(field => !['selected', 'status', 'circuit', 'date'].includes(field))) return { ok: false, error: 'invalid fields' };
+      if (!state.races.some(race => race.id === a.id)) return { ok: false, error: 'race not found' };
+      if (fields.selected !== undefined && fields.selected !== 'true' && fields.selected !== 'false') return { ok: false, error: 'selected must be true or false' };
+      if (fields.status !== undefined && !['Upcoming', 'Completed'].includes(fields.status)) return { ok: false, error: 'status must be Upcoming or Completed' };
+      if (fields.circuit !== undefined && (!isPlainStr(fields.circuit) || !fields.circuit.trim() || fields.circuit.trim().length > 80)) return { ok: false, error: 'circuit invalid' };
+      if (fields.date !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(fields.date)) return { ok: false, error: 'date must be YYYY-MM-DD' };
+      for (const field of keys) {
+        const result = updateRaceField(a.id, field, fields[field]);
+        if (!result.ok) return result;
+      }
+      return { ok: true, id: a.id };
     });
 
     // artifact-transfer-v1 (press kit)
-    T('artifact_export', 'Download the press kit in a format. arg: format (json|markdown|ics)', (a) => {
-      const f = a && a.format; if (!['json','markdown','ics'].includes(f)) return { ok: false, error: 'invalid format' };
-      openPressKit(); const name = download(f); return { ok: true, format: f, filename: name };
+    T('artifact.export', 'Download the press kit in a format. arg: format (json|markdown|ics)', (a) => {
+      const f = a && a.format; if (!['json', 'markdown', 'ics'].includes(f)) return { ok: false, error: 'invalid format' };
+      openPressKit(); download(f); return { ok: true, format: f };
     });
-    T('artifact_copy', 'Copy the press kit preview for a format. arg: format', async (a) => {
-      const f = a && a.format; if (!['json','markdown','ics'].includes(f)) return { ok: false, error: 'invalid format' };
-      openPressKit(); setTab(f);
+    T('artifact.copy', 'Copy the currently selected press kit preview through the visible control.', async () => {
+      openPressKit();
       const copied = await copyActive();
-      return { ok: copied, format: f };
+      return { ok: copied };
     });
-    T('artifact_import', 'Import press kit from the paste textarea (paste mode only). arg: mode', (a) => {
-      const mode = (a && a.mode) || 'paste';
+    T('artifact.import', 'Import press kit from the visible paste textarea. arg: mode', (a) => {
+      const mode = a && a.mode;
       if (mode !== 'paste') return { ok: false, error: 'only paste mode is available via WebMCP' };
       openPressKit();
-      const res = importPressKit($('[data-import-area]').value);
-      return res;
+      return importPressKit($('[data-import-area]').value);
     });
 
     const byName = Object.fromEntries(tools.map(t => [t.name, t]));
     window.webmcp_session_info = () => ({ contract_version: 'zto-webmcp-v1', app: 'avery-vale-homepage', tools: tools.map(t => t.name) });
-    window.webmcp_list_tools = () => tools.map(t => ({ name: t.name, description: t.description }));
+    window.webmcp_list_tools = () => tools.map(t => ({ name: t.name, module: t.module, description: t.description }));
     window.webmcp_invoke_tool = (name, args) => {
       const t = byName[name];
       if (!t) return { ok: false, error: 'unknown tool: ' + name };
@@ -837,6 +943,7 @@
     renderCounts();
     renderShortlistButtons();
     wire();
+    syncVideoBtn();
     registerWebMCP();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
