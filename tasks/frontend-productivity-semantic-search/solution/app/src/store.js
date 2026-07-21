@@ -287,7 +287,7 @@ export const useAppStore = create((set, get) => ({
     }
     get().pushUndo('Import library package')
     const documents = checked.data.documents.map((doc) => ({ ...doc, topic: doc.tags[0] || 'Other', createdAt: now() }))
-    set({ documents, indexedIds: [], savedSearches: checked.data.savedSearches, importOpen: false, selectedDocuments: [], hasSearched: false, activeRaw: '', activeQuery: '', filters: [], history: [], exportGeneratedAt: checked.data.generatedAt || now() })
+    set({ documents, indexedIds: [], savedSearches: checked.data.savedSearches, importOpen: false, selectedDocuments: [], hasSearched: false, activeRaw: '', activeQuery: '', filters: [], history: [], exportGeneratedAt: now() })
     get().notify(`Imported ${documents.length} documents — index required`)
     return { ok: true }
   },
@@ -392,7 +392,7 @@ export const useAppStore = create((set, get) => ({
           ...s.indexRun,
           status: 'running',
           steps: s.indexRun.steps.map((step, i) => step.status === 'failed'
-            ? { ...step, status: 'pending', error: null, attempts: 0, manualRetryUsed: true, retryIn: null }
+            ? { ...step, status: 'pending', error: null, manualRetryUsed: true, retryIn: null }
             : step),
         },
       }))

@@ -40,7 +40,7 @@ export function DatasetDialog() {
                   {schemaValues?.[i]?.type === 'category' ? (
                     <Controller name={`schema.${i}.allowedValues`} control={control} render={({ field: f }) => (
                       <TextField id={`schema-values-${i}`} label="Allowed values (comma separated)" required placeholder="e.g. Low, Medium, High"
-                        value={(f.value || []).join(', ')} onChange={(e) => f.onChange(e.target.value.split(',').map((v) => v.trim()).filter(Boolean))}
+                        value={(f.value || []).join(', ')} onChange={(e) => f.onChange(e.target.value.split(',').map((v) => v.trim()).filter((v) => v !== ''))}
                         error={typeof errors.schema?.[i]?.allowedValues?.message === 'string' ? errors.schema[i].allowedValues.message : errors.schema?.[i]?.allowedValues?.[0]?.message} />
                     )} />
                   ) : <div className="self-end pb-2 text-xs t-3">Allowed values: none for this type</div>}

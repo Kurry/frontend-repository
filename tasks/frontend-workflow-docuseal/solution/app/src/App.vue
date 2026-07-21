@@ -49,6 +49,13 @@ function onKeydown(event) {
     event.preventDefault()
     store.deleteFields()
   }
+  const overlayHandledEscape = event.defaultPrevented || Boolean(document.querySelector(
+    '[role="listbox"][data-state="open"], [role="dialog"][data-state="open"]',
+  ))
+  if (event.key === 'Escape' && !editing && !overlayHandledEscape && store.selectedFieldIds.length > 0) {
+    event.preventDefault()
+    store.clearSelection()
+  }
 }
 
 onMounted(() => {

@@ -133,6 +133,10 @@
         ' · Shortlist ' + state.shortlist.length +
         ' · Newsletter ' + (state.subscriber || 'none');
     }
+    const undoBtn = $('[data-undo]');
+    const redoBtn = $('[data-redo]');
+    if (undoBtn) undoBtn.disabled = state.undoStack.length === 0;
+    if (redoBtn) redoBtn.disabled = state.redoStack.length === 0;
   }
 
   function renderShortlistButtons() {
@@ -531,13 +535,13 @@
   const menu = $('#navMenu');
   const ham = $('#navHam');
   function focusable(container) {
-    return $$('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])', container)
-      .filter(el => !el.disabled && (el.offsetParent !== null || el === document.activeElement));
+    return $$('button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])', container)
+      .filter(el => !el.hidden && el.getAttribute('aria-hidden') !== 'true' && el.getClientRects().length > 0);
   }
   function trapFocus(container, event) {
     if (event.key !== 'Tab') return;
     const items = focusable(container);
-    if (!items.length) return;
+    if (!items.length) { event.preventDefault(); container.tabIndex = -1; container.focus(); return; }
     const first = items[0], last = items[items.length - 1];
     if (!container.contains(document.activeElement)) { event.preventDefault(); first.focus(); return; }
     if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
@@ -558,7 +562,9 @@
     menu.classList.remove('is-open'); menu.setAttribute('aria-hidden', 'true');
     ham.setAttribute('aria-expanded', 'false');
     document.body.classList.remove('is-menu-open');
-    if (ham) ham.focus();
+    const target = lastFocus && lastFocus.isConnected ? lastFocus : ham;
+    if (target) target.focus({ preventScroll: true });
+    lastFocus = null;
   }
 
   /* ---------------- Press kit drawer ---------------- */
@@ -580,7 +586,9 @@
     state.pressKitOpen = false;
     drawer.classList.remove('is-open'); drawer.setAttribute('aria-hidden', 'true');
     drawerScrim.hidden = true;
-    if (drawerLastFocus && drawerLastFocus.focus) drawerLastFocus.focus();
+    const target = drawerLastFocus && drawerLastFocus.isConnected ? drawerLastFocus : $('#pressKitBtn');
+    if (target) target.focus({ preventScroll: true });
+    drawerLastFocus = null;
   }
   function setTab(tab) {
     if (!['json', 'markdown', 'ics'].includes(tab)) return;
@@ -638,7 +646,9 @@
     state.paletteOpen = false;
     palette.classList.remove('is-open'); palette.setAttribute('aria-hidden', 'true');
     paletteScrim.hidden = true;
-    if (paletteLastFocus && paletteLastFocus.focus) paletteLastFocus.focus();
+    const target = paletteLastFocus && paletteLastFocus.isConnected ? paletteLastFocus : $('#pressKitBtn');
+    if (target && target.focus) target.focus({ preventScroll: true });
+    paletteLastFocus = null;
   }
 
   /* ---------------- Social video (hover-to-play + real play/pause control) ---------------- */
@@ -670,7 +680,7 @@
   function wire() {
     // Preloader: lime LOAD VALE cover, clears within ~1.8s (instant under reduced motion).
     const pre = $('#preloader');
-    const dismiss = () => pre.classList.add('is-done');
+    const dismiss = () => { pre.classList.add('is-done'); pre.setAttribute('aria-hidden', 'true'); };
     if (prefersReduced()) dismiss(); else setTimeout(dismiss, 1200);
 
     // Nav chrome (all in-page; nothing reloads or leaves the origin)
@@ -678,6 +688,8 @@
     $('#navClose').addEventListener('click', closeMenu);
     $('#storeBtn').addEventListener('click', () => goTo('hero'));
     $('#pressKitBtn').addEventListener('click', openPressKit);
+    $('[data-undo]').addEventListener('click', undo);
+    $('[data-redo]').addEventListener('click', redo);
 
     // Menu links scroll within the same homepage document.
     $$('[data-menu-link]').forEach(el => el.addEventListener('click', (e) => {
@@ -761,12 +773,25 @@
     videoWrap.addEventListener('mouseleave', pauseVideo);
     if (videoBtn) videoBtn.addEventListener('click', () => (state.videoPlaying ? pauseVideo() : playVideo()));
 
-    // Global keys: Meta/Ctrl+K toggles the palette; Escape closes the top overlay only.
+    // Global keys: focus containment, history shortcuts, palette, and Escape.
     document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        if (state.paletteOpen) { trapFocus(palette, e); return; }
+        if (state.pressKitOpen) { trapFocus(drawer, e); return; }
+        if (state.menuOpen) { trapFocus(menu, e); return; }
+      }
       if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
         e.preventDefault();
         state.paletteOpen ? closePalette() : openPalette();
         return;
+      }
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && (e.key === 'z' || e.key === 'Z')) {
+        e.preventDefault();
+        e.shiftKey ? redo() : undo();
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && !e.altKey && (e.key === 'y' || e.key === 'Y')) {
+        e.preventDefault(); redo(); return;
       }
       if (e.key === 'Escape') {
         if (state.paletteOpen) { closePalette(); return; }
@@ -775,11 +800,6 @@
         // With every overlay closed, Escape changes nothing.
       }
     });
-
-    // Modal focus traps
-    menu.addEventListener('keydown', (e) => { if (state.menuOpen) trapFocus(menu, e); });
-    drawer.addEventListener('keydown', (e) => { if (state.pressKitOpen) trapFocus(drawer, e); });
-    palette.addEventListener('keydown', (e) => { if (state.paletteOpen) trapFocus(palette, e); });
 
     // Marquees run only in view (paused otherwise)
     const io = new IntersectionObserver((entries) => {
@@ -927,10 +947,11 @@
     const byName = Object.fromEntries(tools.map(t => [t.name, t]));
     window.webmcp_session_info = () => ({ contract_version: 'zto-webmcp-v1', app: 'avery-vale-homepage', tools: tools.map(t => t.name) });
     window.webmcp_list_tools = () => tools.map(t => ({ name: t.name, module: t.module, description: t.description }));
-    window.webmcp_invoke_tool = (name, args) => {
+    const settleVisibleUi = () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    window.webmcp_invoke_tool = async (name, args) => {
       const t = byName[name];
       if (!t) return { ok: false, error: 'unknown tool: ' + name };
-      try { return t.handler(args || {}); } catch (err) { return { ok: false, error: String(err && err.message || err) }; }
+      try { const result = await t.handler(args || {}); await settleVisibleUi(); return result; } catch (err) { return { ok: false, error: String(err && err.message || err) }; }
     };
   }
 

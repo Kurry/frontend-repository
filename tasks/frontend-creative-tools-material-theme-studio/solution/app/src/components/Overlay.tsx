@@ -89,13 +89,15 @@ export default function Overlay({
   useEffect(() => {
     if (!mounted) return;
     const handler = (event: KeyboardEvent) => {
-      if (overlayStack[overlayStack.length - 1] !== id) return;
       if (event.key === 'Escape') {
-        event.preventDefault();
-        event.stopPropagation();
-        onCloseRef.current();
+        if (overlayStack[overlayStack.length - 1] === id) {
+          event.preventDefault();
+          event.stopPropagation();
+          onCloseRef.current();
+        }
         return;
       }
+      if (overlayStack[overlayStack.length - 1] !== id) return;
       if (event.key !== 'Tab') return;
       const panel = panelRef.current;
       if (!panel) return;
