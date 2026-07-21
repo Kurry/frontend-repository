@@ -405,6 +405,14 @@ export class TransactionsComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     if (start && end && start > end) {
       this.dateError = 'End date must be on or after start date; the range was not applied.';
+      // A change event from the first field may already have applied an
+      // open-ended half of the draft range. Roll that transient half back so
+      // an invalid completed range never leaves the table partially filtered.
+      if ((this.filters.dateStart === start && this.filters.dateEnd === null) ||
+          (this.filters.dateEnd === end && this.filters.dateStart === null)) {
+        this.store.dispatch(A.applyFilter({ key: 'dateStart', value: null }));
+        this.store.dispatch(A.applyFilter({ key: 'dateEnd', value: null }));
+      }
       return;
     }
     this.dateError = null;

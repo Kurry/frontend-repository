@@ -36,7 +36,7 @@ interface CoachStep {
           <p class="text-[11px] font-semibold uppercase tracking-[0.14em] text-mint-600">
             Guided tour · {{ index + 1 }} of {{ steps.length }}
           </p>
-          <h3 class="font-display mt-1 text-sm font-bold text-teal-950">{{ step.title }}</h3>
+          <h2 class="font-display mt-1 text-sm font-bold text-teal-950">{{ step.title }}</h2>
           <p class="mt-1 text-xs leading-relaxed text-ink-soft">{{ step.body }}</p>
           <div class="mt-3 flex items-center justify-between">
             <button type="button" class="text-xs font-medium text-ink-soft underline decoration-mint-300 underline-offset-2 hover:text-teal-950 focus-ring rounded"

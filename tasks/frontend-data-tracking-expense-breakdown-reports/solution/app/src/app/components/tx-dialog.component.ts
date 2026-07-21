@@ -18,6 +18,7 @@ import * as A from '../store/app.actions';
   selector: 'app-tx-dialog',
   imports: [ReactiveFormsModule, TrapFocusDirective],
   template: `
+    @if (open) {
     <div class="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-teal-950/45 px-4 py-10 sm:py-16" (click)="onScrim($event)">
       <div
         appTrapFocus
@@ -109,6 +110,7 @@ import * as A from '../store/app.actions';
         </form>
       </div>
     </div>
+    }
   `,
 })
 export class TxDialogComponent implements OnInit {
@@ -119,6 +121,7 @@ export class TxDialogComponent implements OnInit {
 
   mode: 'create' | 'edit' = 'create';
   editId: string | null = null;
+  open = false;
   submitting = false;
   errors: FieldError[] = [];
 
@@ -140,6 +143,7 @@ export class TxDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.store.select((s) => s.app.dialog).subscribe((dialog) => {
+      this.open = dialog !== null;
       if (!dialog) return;
       this.mode = dialog.mode;
       this.editId = dialog.id;
