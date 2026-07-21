@@ -12,7 +12,6 @@ import { contributors, useQcStore } from '../store'
 const store = useQcStore()
 const searchInput = ref(null)
 const paletteEl = ref(null)
-let priorFocus = null
 
 function fuzzy(query, text) {
   const q = query.toLowerCase().replace(/\s/g, '')
@@ -33,8 +32,18 @@ const results = computed(() => {
 })
 
 watch(() => store.palette.open, async (open) => {
-  if (open) { priorFocus = document.activeElement; store.palette.query = ''; store.palette.activeIndex = 0; await nextTick(); searchInput.value?.focus() }
-  else priorFocus?.focus?.()
+  if (open) {
+    if (!store.paletteOpener) store.paletteOpener = document.activeElement
+    store.palette.query = ''
+    store.palette.activeIndex = 0
+    await nextTick()
+    searchInput.value?.focus()
+  } else {
+    const opener = store.paletteOpener
+    store.paletteOpener = null
+    await nextTick()
+    if (opener && typeof opener.focus === 'function') opener.focus()
+  }
 })
 watch(() => store.palette.query, () => { store.palette.activeIndex = 0 })
 

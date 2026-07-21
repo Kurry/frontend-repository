@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { NButton, NDatePicker, NProgress, NSelect } from 'naive-ui'
+import { NButton, NDatePicker, NProgress } from 'naive-ui'
 import IconArrowLeft from '~icons/lucide/arrow-left'
 import IconCheck from '~icons/lucide/check'
 import IconCheckCircle from '~icons/lucide/circle-check-big'
@@ -29,11 +29,23 @@ const approveReason = computed(() => {
   if (gateFailed.value) return `Approval unavailable: ${counts.value.blocker} open blocker finding${counts.value.blocker === 1 ? '' : 's'}.`
   return ''
 })
-const dateRangeValue = computed(() => store.profileRange.map((d) => new Date(`${d}T12:00:00Z`).getTime()))
+const dateRangeValue = computed(() => store.profileRange.map((d) => {
+  const [y, m, day] = d.split('-').map(Number)
+  return new Date(y, m - 1, day).getTime()
+}))
 const tierOptions = [{ label: 'Blocker', value: 'blocker' }, { label: 'Major', value: 'major' }, { label: 'Minor', value: 'minor' }]
 
 function openOverride(id) { store.dialogs.overrideFindingId = id; store.dialogs.override = true }
-function updateDateRange(value) { if (value?.length === 2) store.setProfileRange(value.map((t) => new Date(t).toISOString().slice(0, 10))) }
+function updateDateRange(value) {
+  if (!value?.length || value.length !== 2) return
+  store.setProfileRange(value.map((t) => {
+    const date = new Date(t)
+    const y = date.getFullYear()
+    const m = String(date.getMonth() + 1).padStart(2, '0')
+    const d = String(date.getDate()).padStart(2, '0')
+    return `${y}-${m}-${d}`
+  }))
+}
 function useRange(range) { store.setProfileRange(range) }
 function beginReview() { store.updateSubmission(submission.value.id, 'stage', 'in-review'); store.notify('Submission moved to in-review') }
 </script>
@@ -89,13 +101,13 @@ function beginReview() { store.updateSubmission(submission.value.id, 'stage', 'i
             <p class="finding-description">{{ item.description }}</p>
             <div v-if="item.status === 'overridden'" class="override-note"><strong>Override justification</strong><span>{{ item.override_justification }}</span></div>
             <div v-else class="finding-actions-row">
-              <label class="retier-control"><span>Tier</span><NSelect size="small" :value="item.tier" :options="tierOptions" :aria-label="`Change tier for ${item.id}`" @update:value="store.retierFinding(submission.id, item.id, $event)" /></label>
+              <label class="retier-control" :for="`retier-${item.id}`"><span>Tier</span><select :id="`retier-${item.id}`" class="filter-select retier-select" :value="item.tier" :aria-label="`Change tier for ${item.id}`" @change="store.retierFinding(submission.id, item.id, $event.target.value)"><option v-for="opt in tierOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option></select></label>
               <NButton size="tiny" quaternary @click="openOverride(item.id)"><IconShieldOff /> Override</NButton>
               <NButton size="tiny" quaternary class="remove-finding" @click="store.removeFinding(submission.id, item.id)"><IconTrash /> Remove</NButton>
             </div>
             <div class="evidence-block">
-              <button class="evidence-toggle" :aria-expanded="!!store.disclosureState[item.id]" :aria-controls="`evidence-${item.id}`" @click="store.toggleDisclosure(item.id)">
-                <span>Evidence</span><span v-if="!item.evidence" class="no-evidence">None attached</span><IconChevronDown :class="{ rotated: store.disclosureState[item.id] }" />
+              <button class="evidence-toggle" type="button" :aria-expanded="!!store.disclosureState[item.id] ? 'true' : 'false'" :aria-controls="`evidence-${item.id}`" @click="store.toggleDisclosure(item.id)">
+                <span>Evidence</span><span v-if="!item.evidence" class="no-evidence">None attached</span><IconChevronDown :class="{ rotated: !!store.disclosureState[item.id] }" />
               </button>
               <Transition name="disclosure">
                 <div v-if="store.disclosureState[item.id]" :id="`evidence-${item.id}`" class="evidence-copy">{{ item.evidence || 'No evidence text was attached to this finding.' }}</div>
@@ -122,10 +134,17 @@ function beginReview() { store.updateSubmission(submission.value.id, 'stage', 'i
           </div>
           <div class="profile-legend"><span><i class="legend-standard"></i> Standard</span><span><i class="legend-bearing"></i> Load-bearing · weight 3+</span></div>
           <div class="profile-bars">
-            <div v-for="criterion in store.profileData" :key="criterion.id" class="profile-row" :class="{ bearing: criterion.weight >= 3 }">
+            <div
+              v-for="(criterion, index) in store.profileData"
+              :key="criterion.id"
+              class="profile-row"
+              :class="{ bearing: criterion.weight >= 3, ranked: index === 0 }"
+              :style="{ '--stagger': `${index * 45}ms` }"
+              :title="`${criterion.name}: ${criterion.rate}% failure across ${criterion.trials} trials (mean ${criterion.mean})`"
+            >
               <div class="profile-label"><span>{{ criterion.name }} <small>W{{ criterion.weight }}</small></span><strong>{{ criterion.rate }}%</strong></div>
               <div class="bar-track"><div class="bar-fill" :style="{ width: `${criterion.rate}%` }"></div></div>
-              <div class="profile-meta"><span>Failure rate</span><span>Mean score <strong>{{ criterion.mean }}</strong> / 5</span></div>
+              <div class="profile-meta"><span>Failure rate</span><span>Mean score <strong>{{ criterion.mean }}</strong> / 5</span><span v-if="index === 0" class="rank-callout">Highest failure</span></div>
             </div>
           </div>
         </section>
