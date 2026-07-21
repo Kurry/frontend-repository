@@ -1,1 +1,0 @@
-import{v as i}from"./core.min-DGtNB905.js";import{v as p}from"./gameLogic-BYBrtOsQ.js";import"./preloader-Bns9QiKi.js";const a=t=>{const[e,r]=i();if(t.preventDefault(),r.currentTurn!=="player"||r.isRivalThinking||r.phase!=="playing")return;const o=r.tiles[e.row]?.[e.col];!o||o.revealed||p(r,e.row,e.col)};export{a as s_yiMA0J3pO4U};

@@ -6,7 +6,7 @@ export const Scoreboard = component$(() => {
   const store = useContext(AppCtx);
 
   return (
-    <div style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+    <div class="scoreboard" style={{ display: 'flex', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
       {/* Player Panel */}
       <PlayerPanel
         label="You"
@@ -18,7 +18,7 @@ export const Scoreboard = component$(() => {
         target={store.targetScore}
       />
       {/* VS divider */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px', color: '#A8A29E', fontWeight: '700', fontSize: '14px' }}>
+      <div class="scoreboard-versus" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px', color: '#A8A29E', fontWeight: '700', fontSize: '14px' }}>
         vs
       </div>
       {/* Rival Panel */}

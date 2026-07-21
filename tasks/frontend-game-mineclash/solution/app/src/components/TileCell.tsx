@@ -100,7 +100,14 @@ export const TileCell = component$<Props>(({ row, col }) => {
       }}
       onContextMenu$={(e) => {
         e.preventDefault();
-        if (store.currentTurn !== 'player' || store.isRivalThinking || store.phase !== 'playing') return;
+        if (store.paused) {
+          showToast(store, 'Match is paused — resume before flagging a tile.', 'reject');
+          return;
+        }
+        if (store.currentTurn !== 'player' || store.isRivalThinking || store.phase !== 'playing') {
+          showToast(store, 'Not your turn — wait for the Rival before flagging.', 'reject');
+          return;
+        }
         const t = store.tiles[row]?.[col];
         if (!t || t.revealed) return;
         playerToggleFlag(store, row, col);

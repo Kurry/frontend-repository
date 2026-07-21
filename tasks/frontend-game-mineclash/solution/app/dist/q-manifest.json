@@ -1,6 +1,6 @@
 {
 	"version": "1",
-	"manifestHash": "9i4cvm",
+	"manifestHash": "o08s8a",
 	"options": {
 		"target": "client",
 		"buildMode": "production",
@@ -10,127 +10,128 @@
 	},
 	"core": "../assets/core.min-DGtNB905.js",
 	"preloader": "../assets/preloader-Bns9QiKi.js",
-	"bundleGraphAsset": "assets/bundle-graph-DShe7Q5S.json",
+	"bundleGraphAsset": "assets/bundle-graph-DIgIQNyD.json",
 	"injections": [
 		{
 			"tag": "style",
 			"location": "head",
 			"attributes": {
-				"data-src": "/assets/index-B9cAF_vR.css",
-				"dangerouslySetInnerHTML": "@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-rotate-x:initial;--tw-rotate-y:initial;--tw-rotate-z:initial;--tw-skew-x:initial;--tw-skew-y:initial;--tw-border-style:solid;--tw-ordinal:initial;--tw-slashed-zero:initial;--tw-numeric-figure:initial;--tw-numeric-spacing:initial;--tw-numeric-fraction:initial;--tw-blur:initial;--tw-brightness:initial;--tw-contrast:initial;--tw-grayscale:initial;--tw-hue-rotate:initial;--tw-invert:initial;--tw-opacity:initial;--tw-saturate:initial;--tw-sepia:initial;--tw-drop-shadow:initial;--tw-drop-shadow-color:initial;--tw-drop-shadow-alpha:100%;--tw-drop-shadow-size:initial}}}@layer theme{:root,:host{--font-sans:\"Segoe UI\", Arial, sans-serif;--font-mono:\"Courier New\", monospace;--default-transition-duration:.15s;--default-transition-timing-function:cubic-bezier(.4, 0, .2, 1);--default-font-family:var(--font-sans);--default-mono-font-family:var(--font-mono)}}@layer base{*,:after,:before,::backdrop{box-sizing:border-box;border:0 solid;margin:0;padding:0}::file-selector-button{box-sizing:border-box;border:0 solid;margin:0;padding:0}html,:host{-webkit-text-size-adjust:100%;tab-size:4;line-height:1.5;font-family:var(--default-font-family,ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\");font-feature-settings:var(--default-font-feature-settings,normal);font-variation-settings:var(--default-font-variation-settings,normal);-webkit-tap-highlight-color:transparent}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,samp,pre{font-family:var(--default-mono-font-family,ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace);font-feature-settings:var(--default-mono-font-feature-settings,normal);font-variation-settings:var(--default-mono-font-variation-settings,normal);font-size:1em}small{font-size:80%}sub,sup{vertical-align:baseline;font-size:75%;line-height:0;position:relative}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}:-moz-focusring{outline:auto}progress{vertical-align:baseline}summary{display:list-item}ol,ul,menu{list-style:none}img,svg,video,canvas,audio,iframe,embed,object{vertical-align:middle;display:block}img,video{max-width:100%;height:auto}button,input,select,optgroup,textarea{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}::file-selector-button{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}:where(select:is([multiple],[size])) optgroup{font-weight:bolder}:where(select:is([multiple],[size])) optgroup option{padding-inline-start:20px}::file-selector-button{margin-inline-end:4px}::placeholder{opacity:1}@supports (not ((-webkit-appearance:-apple-pay-button))) or (contain-intrinsic-size:1px){::placeholder{color:currentColor}@supports (color:color-mix(in lab,red,red)){::placeholder{color:color-mix(in oklab,currentcolor 50%,transparent)}}}textarea{resize:vertical}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-date-and-time-value{min-height:1lh;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-datetime-edit{padding-block:0}::-webkit-datetime-edit-year-field{padding-block:0}::-webkit-datetime-edit-month-field{padding-block:0}::-webkit-datetime-edit-day-field{padding-block:0}::-webkit-datetime-edit-hour-field{padding-block:0}::-webkit-datetime-edit-minute-field{padding-block:0}::-webkit-datetime-edit-second-field{padding-block:0}::-webkit-datetime-edit-millisecond-field{padding-block:0}::-webkit-datetime-edit-meridiem-field{padding-block:0}::-webkit-calendar-picker-indicator{line-height:1}:-moz-ui-invalid{box-shadow:none}button,input:where([type=button],[type=reset],[type=submit]){appearance:button}::file-selector-button{appearance:button}::-webkit-inner-spin-button{height:auto}::-webkit-outer-spin-button{height:auto}[hidden]:where(:not([hidden=until-found])){display:none!important}}@layer components;@layer utilities{.visible{visibility:visible}.absolute{position:absolute}.fixed{position:fixed}.relative{position:relative}.container{width:100%}@media(min-width:40rem){.container{max-width:40rem}}@media(min-width:48rem){.container{max-width:48rem}}@media(min-width:64rem){.container{max-width:64rem}}@media(min-width:80rem){.container{max-width:80rem}}@media(min-width:96rem){.container{max-width:96rem}}.block{display:block}.contents{display:contents}.flex{display:flex}.grid{display:grid}.hidden{display:none}.inline{display:inline}.table{display:table}.w-full{width:100%}.transform{transform:var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,)}.resize{resize:both}.border{border-style:var(--tw-border-style);border-width:1px}.tabular-nums{--tw-numeric-spacing:tabular-nums;font-variant-numeric:var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,)}.filter{filter:var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)}.transition{transition-property:color,background-color,border-color,outline-color,text-decoration-color,fill,stroke,--tw-gradient-from,--tw-gradient-via,--tw-gradient-to,opacity,box-shadow,transform,translate,scale,rotate,filter,-webkit-backdrop-filter,backdrop-filter,display,content-visibility,overlay,pointer-events;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}}:root{--color-primary:#f59e0b;--color-accent:#38bdf8;--color-background:#1c1917;--color-surface:#292524;--color-success:#4ade80;--color-warning:#facc15;--color-error:#ef4444;--color-text-primary:#fafaf9;--color-text-secondary:#a8a29e}*{box-sizing:border-box}body{color:#fafaf9;background-color:#1c1917;margin:0;font-family:Segoe UI,Arial,sans-serif;font-size:16px}button:focus-visible{outline-offset:3px;outline:3px solid #38bdf8}input:focus-visible,textarea:focus-visible,[role=switch]:focus-visible{outline-offset:2px;outline:3px solid #38bdf8}button:active:not(:disabled){filter:brightness(1.12)}.font-mono{font-family:Courier New,monospace}@keyframes pulse-glow{0%,to{opacity:1}50%{opacity:.5}}@keyframes thinking-dots{0%{content:\".\"}33%{content:\"..\"}66%{content:\"...\"}}@keyframes slide-in{0%{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}@keyframes shake{0%,to{transform:translate(0)}20%{transform:translate(-4px)}40%{transform:translate(4px)}60%{transform:translate(-4px)}80%{transform:translate(4px)}}@keyframes overlay-fade{0%{opacity:0}to{opacity:1}}@keyframes hist-in{0%{opacity:0;transform:translate(-6px)}to{opacity:1;transform:translate(0)}}@keyframes hist-out{0%{opacity:1;max-height:40px;transform:translate(0)}to{opacity:0;max-height:0;margin:0;padding-top:0;padding-bottom:0;transform:translate(8px)}}@keyframes toast-in{0%{opacity:0;transform:translate(-50%)translateY(12px)scale(.96)}12%{opacity:1;transform:translate(-50%)translateY(0)scale(1)}82%{opacity:1;transform:translate(-50%)translateY(0)scale(1)}to{opacity:0;transform:translate(-50%)translateY(-6px)scale(.98)}}@keyframes confetti-fall{0%{opacity:0;transform:translate(0)rotate(0)scale(.6)}12%{opacity:1}to{opacity:0;transform:translate(var(--mc-dx,0),60vh) rotate(var(--mc-rot,360deg)) scale(1)}}.animate-pulse-glow{animation:1.2s ease-in-out infinite pulse-glow}.animate-slide-in{animation:.2s ease-out slide-in}.animate-shake{animation:.4s ease-in-out shake}.overlay{animation:.22s ease-out overlay-fade}.history-node.hist-enter{animation:.24s ease-out hist-in}.history-node.hist-exit{pointer-events:none;animation:.28s ease-in forwards hist-out;overflow:hidden}.mc-toast{animation:1.7s ease-out forwards toast-in}.mc-toast-reject{animation:1.7s ease-out forwards toast-in,.4s ease-in-out shake}.mc-confetti-piece{will-change:transform,opacity;animation:1.4s cubic-bezier(.2,.6,.4,1) forwards confetti-fall}.tile-btn{cursor:pointer;-webkit-user-select:none;user-select:none;background:#292524;border:1px solid #44403c;border-radius:4px;justify-content:center;align-items:center;transition:background .1s,transform 50ms;display:flex;position:relative;overflow:hidden}.tile-btn:hover:not(.tile-revealed):not(.tile-mine){filter:brightness(1.22);background:#3c3735;transform:scale(1.04)}.tile-btn.tile-flagged{background:#1e3a4a;border-color:#38bdf8}.tile-btn.tile-hinted-safe{background:#1a3b28;border-color:#4ade80}.tile-btn.tile-hinted-mine{background:#3b2e10;border-color:#facc15}.tile-btn.tile-revealed{cursor:default;background:#1c1917;border-color:#3c3735}.tile-btn.tile-mine-hit{background:#3b1515;border-color:#ef4444}.tile-btn.flag-cursor{cursor:crosshair}.tile-btn.hint-cursor{cursor:help}.strike-icon{border:2px solid #78716c;border-radius:50%;width:18px;height:18px;transition:background .2s,border-color .2s;display:inline-block}.strike-icon.strike-filled{background:#ef4444;border-color:#ef4444;box-shadow:0 0 6px #ef444480}.strike-icon.strike-warning{background:#facc15;border-color:#facc15;box-shadow:0 0 6px #facc1580}.btn-primary{color:#1c1917;cursor:pointer;background:#f59e0b;border:none;border-radius:8px;padding:10px 24px;font-family:Segoe UI,Arial,sans-serif;font-size:15px;font-weight:700;transition:background .15s,transform .1s,opacity .15s;box-shadow:0 2px 8px #f59e0b4d}.btn-primary:hover:not(:disabled){background:#d97706;transform:translateY(-1px)}.btn-primary:active:not(:disabled){transform:translateY(0)}.btn-primary:disabled{opacity:.4;cursor:not-allowed}.btn-secondary{color:#f59e0b;cursor:pointer;background:0 0;border:2px solid #f59e0b;border-radius:8px;padding:8px 20px;font-family:Segoe UI,Arial,sans-serif;font-size:15px;font-weight:600;transition:background .15s,transform .1s,opacity .15s}.btn-secondary:hover:not(:disabled){background:#f59e0b1a;transform:translateY(-1px)}.btn-secondary:disabled{opacity:.4;cursor:not-allowed}.btn-mode-active{color:#38bdf8!important;background:#38bdf826!important;border-color:#38bdf8!important}.history-node{cursor:pointer;border:1px solid #0000;border-radius:4px;padding:4px 8px;font-family:Courier New,monospace;font-size:12px;transition:background .1s}.history-node:hover{background:#3c3735}.history-node.current{background:#38bdf81a;border-color:#38bdf8}.history-node.selected{background:#f59e0b1a;border-color:#f59e0b}.history-node.current.selected{background:#4ade801a;border-color:#4ade80}.overlay{z-index:100;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);background:#000000b3;justify-content:center;align-items:center;display:flex;position:fixed;inset:0}.panel{background:#292524;border:1px solid #44403c;border-radius:12px;padding:20px;position:relative}.icon-button:hover:not(:disabled){color:#38bdf8!important;background:#38bdf81f!important}.sound-switch:hover:not(:disabled){filter:brightness(1.15);box-shadow:0 0 0 3px #f59e0b40}@media(max-width:420px){.game-shell{padding:8px!important}.game-grid{gap:1px!important}}@media(prefers-reduced-motion:reduce){*,:before,:after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}.adj-0{color:#a8a29e}.adj-1{color:#38bdf8}.adj-2{color:#4ade80}.adj-3{color:#facc15}.adj-4{color:#f59e0b}.adj-5{color:#fb923c}.adj-6{color:#ef4444}.adj-7{color:#f87171}.adj-8{color:#fafaf9}@property --tw-rotate-x{syntax:\"*\";inherits:false}@property --tw-rotate-y{syntax:\"*\";inherits:false}@property --tw-rotate-z{syntax:\"*\";inherits:false}@property --tw-skew-x{syntax:\"*\";inherits:false}@property --tw-skew-y{syntax:\"*\";inherits:false}@property --tw-border-style{syntax:\"*\";inherits:false;initial-value:solid}@property --tw-ordinal{syntax:\"*\";inherits:false}@property --tw-slashed-zero{syntax:\"*\";inherits:false}@property --tw-numeric-figure{syntax:\"*\";inherits:false}@property --tw-numeric-spacing{syntax:\"*\";inherits:false}@property --tw-numeric-fraction{syntax:\"*\";inherits:false}@property --tw-blur{syntax:\"*\";inherits:false}@property --tw-brightness{syntax:\"*\";inherits:false}@property --tw-contrast{syntax:\"*\";inherits:false}@property --tw-grayscale{syntax:\"*\";inherits:false}@property --tw-hue-rotate{syntax:\"*\";inherits:false}@property --tw-invert{syntax:\"*\";inherits:false}@property --tw-opacity{syntax:\"*\";inherits:false}@property --tw-saturate{syntax:\"*\";inherits:false}@property --tw-sepia{syntax:\"*\";inherits:false}@property --tw-drop-shadow{syntax:\"*\";inherits:false}@property --tw-drop-shadow-color{syntax:\"*\";inherits:false}@property --tw-drop-shadow-alpha{syntax:\"<percentage>\";inherits:false;initial-value:100%}@property --tw-drop-shadow-size{syntax:\"*\";inherits:false}\n"
+				"data-src": "/assets/index-BjtX12Uz.css",
+				"dangerouslySetInnerHTML": "@layer properties{@supports (((-webkit-hyphens:none)) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-rotate-x:initial;--tw-rotate-y:initial;--tw-rotate-z:initial;--tw-skew-x:initial;--tw-skew-y:initial;--tw-border-style:solid;--tw-ordinal:initial;--tw-slashed-zero:initial;--tw-numeric-figure:initial;--tw-numeric-spacing:initial;--tw-numeric-fraction:initial;--tw-blur:initial;--tw-brightness:initial;--tw-contrast:initial;--tw-grayscale:initial;--tw-hue-rotate:initial;--tw-invert:initial;--tw-opacity:initial;--tw-saturate:initial;--tw-sepia:initial;--tw-drop-shadow:initial;--tw-drop-shadow-color:initial;--tw-drop-shadow-alpha:100%;--tw-drop-shadow-size:initial}}}@layer theme{:root,:host{--font-sans:\"Segoe UI\", Arial, sans-serif;--font-mono:\"Courier New\", monospace;--default-transition-duration:.15s;--default-transition-timing-function:cubic-bezier(.4, 0, .2, 1);--default-font-family:var(--font-sans);--default-mono-font-family:var(--font-mono)}}@layer base{*,:after,:before,::backdrop{box-sizing:border-box;border:0 solid;margin:0;padding:0}::file-selector-button{box-sizing:border-box;border:0 solid;margin:0;padding:0}html,:host{-webkit-text-size-adjust:100%;tab-size:4;line-height:1.5;font-family:var(--default-font-family,ui-sans-serif, system-ui, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\", \"Noto Color Emoji\");font-feature-settings:var(--default-font-feature-settings,normal);font-variation-settings:var(--default-font-variation-settings,normal);-webkit-tap-highlight-color:transparent}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;-webkit-text-decoration:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,samp,pre{font-family:var(--default-mono-font-family,ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace);font-feature-settings:var(--default-mono-font-feature-settings,normal);font-variation-settings:var(--default-mono-font-variation-settings,normal);font-size:1em}small{font-size:80%}sub,sup{vertical-align:baseline;font-size:75%;line-height:0;position:relative}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}:-moz-focusring{outline:auto}progress{vertical-align:baseline}summary{display:list-item}ol,ul,menu{list-style:none}img,svg,video,canvas,audio,iframe,embed,object{vertical-align:middle;display:block}img,video{max-width:100%;height:auto}button,input,select,optgroup,textarea{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}::file-selector-button{font:inherit;font-feature-settings:inherit;font-variation-settings:inherit;letter-spacing:inherit;color:inherit;opacity:1;background-color:#0000;border-radius:0}:where(select:is([multiple],[size])) optgroup{font-weight:bolder}:where(select:is([multiple],[size])) optgroup option{padding-inline-start:20px}::file-selector-button{margin-inline-end:4px}::placeholder{opacity:1}@supports (not ((-webkit-appearance:-apple-pay-button))) or (contain-intrinsic-size:1px){::placeholder{color:currentColor}@supports (color:color-mix(in lab,red,red)){::placeholder{color:color-mix(in oklab,currentcolor 50%,transparent)}}}textarea{resize:vertical}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-date-and-time-value{min-height:1lh;text-align:inherit}::-webkit-datetime-edit{display:inline-flex}::-webkit-datetime-edit-fields-wrapper{padding:0}::-webkit-datetime-edit{padding-block:0}::-webkit-datetime-edit-year-field{padding-block:0}::-webkit-datetime-edit-month-field{padding-block:0}::-webkit-datetime-edit-day-field{padding-block:0}::-webkit-datetime-edit-hour-field{padding-block:0}::-webkit-datetime-edit-minute-field{padding-block:0}::-webkit-datetime-edit-second-field{padding-block:0}::-webkit-datetime-edit-millisecond-field{padding-block:0}::-webkit-datetime-edit-meridiem-field{padding-block:0}::-webkit-calendar-picker-indicator{line-height:1}:-moz-ui-invalid{box-shadow:none}button,input:where([type=button],[type=reset],[type=submit]){appearance:button}::file-selector-button{appearance:button}::-webkit-inner-spin-button{height:auto}::-webkit-outer-spin-button{height:auto}[hidden]:where(:not([hidden=until-found])){display:none!important}}@layer components;@layer utilities{.visible{visibility:visible}.absolute{position:absolute}.fixed{position:fixed}.relative{position:relative}.container{width:100%}@media(min-width:40rem){.container{max-width:40rem}}@media(min-width:48rem){.container{max-width:48rem}}@media(min-width:64rem){.container{max-width:64rem}}@media(min-width:80rem){.container{max-width:80rem}}@media(min-width:96rem){.container{max-width:96rem}}.block{display:block}.contents{display:contents}.flex{display:flex}.grid{display:grid}.hidden{display:none}.inline{display:inline}.table{display:table}.w-full{width:100%}.transform{transform:var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,)}.resize{resize:both}.border{border-style:var(--tw-border-style);border-width:1px}.tabular-nums{--tw-numeric-spacing:tabular-nums;font-variant-numeric:var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,)}.filter{filter:var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,)}.transition{transition-property:color,background-color,border-color,outline-color,text-decoration-color,fill,stroke,--tw-gradient-from,--tw-gradient-via,--tw-gradient-to,opacity,box-shadow,transform,translate,scale,rotate,filter,-webkit-backdrop-filter,backdrop-filter,display,content-visibility,overlay,pointer-events;transition-timing-function:var(--tw-ease,var(--default-transition-timing-function));transition-duration:var(--tw-duration,var(--default-transition-duration))}}:root{--color-primary:#f59e0b;--color-accent:#38bdf8;--color-background:#1c1917;--color-surface:#292524;--color-success:#4ade80;--color-warning:#facc15;--color-error:#ef4444;--color-text-primary:#fafaf9;--color-text-secondary:#a8a29e}*{box-sizing:border-box}body{color:#fafaf9;background-color:#1c1917;margin:0;font-family:Segoe UI,Arial,sans-serif;font-size:16px}button:focus-visible{outline-offset:3px;outline:3px solid #38bdf8}input:focus-visible,textarea:focus-visible,[role=switch]:focus-visible{outline-offset:2px;outline:3px solid #38bdf8}button:active:not(:disabled){filter:brightness(1.12)}.font-mono{font-family:Courier New,monospace}@keyframes pulse-glow{0%,to{opacity:1}50%{opacity:.5}}@keyframes thinking-dots{0%{content:\".\"}33%{content:\"..\"}66%{content:\"...\"}}@keyframes slide-in{0%{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}@keyframes shake{0%,to{transform:translate(0)}20%{transform:translate(-4px)}40%{transform:translate(4px)}60%{transform:translate(-4px)}80%{transform:translate(4px)}}@keyframes overlay-fade{0%{opacity:0}to{opacity:1}}@keyframes hist-in{0%{opacity:0;transform:translate(-6px)}to{opacity:1;transform:translate(0)}}@keyframes hist-out{0%{opacity:1;max-height:40px;transform:translate(0)}to{opacity:0;max-height:0;margin:0;padding-top:0;padding-bottom:0;transform:translate(8px)}}@keyframes toast-in{0%{opacity:0;transform:translate(-50%)translateY(12px)scale(.96)}12%{opacity:1;transform:translate(-50%)translateY(0)scale(1)}82%{opacity:1;transform:translate(-50%)translateY(0)scale(1)}to{opacity:0;transform:translate(-50%)translateY(-6px)scale(.98)}}@keyframes confetti-fall{0%{opacity:0;transform:translate(0)rotate(0)scale(.6)}12%{opacity:1}to{opacity:0;transform:translate(var(--mc-dx,0),60vh) rotate(var(--mc-rot,360deg)) scale(1)}}.animate-pulse-glow{animation:1.2s ease-in-out infinite pulse-glow}.animate-slide-in{animation:.2s ease-out slide-in}.animate-shake{animation:.4s ease-in-out shake}.overlay{animation:.22s ease-out overlay-fade}.history-node.hist-enter{animation:.24s ease-out hist-in}.history-node.hist-exit{pointer-events:none;animation:.28s ease-in forwards hist-out;overflow:hidden}.mc-toast{animation:1.7s ease-out forwards toast-in}.mc-toast-reject{animation:1.7s ease-out forwards toast-in,.4s ease-in-out shake}.mc-confetti-piece{will-change:transform,opacity;animation:1.4s cubic-bezier(.2,.6,.4,1) forwards confetti-fall}.tile-btn{cursor:pointer;-webkit-user-select:none;user-select:none;background:#292524;border:1px solid #44403c;border-radius:4px;justify-content:center;align-items:center;transition:background .1s,transform 50ms;display:flex;position:relative;overflow:hidden}.tile-btn:hover:not(.tile-revealed):not(.tile-mine){filter:brightness(1.22);background:#3c3735;transform:scale(1.04)}.tile-btn.tile-flagged{background:#1e3a4a;border-color:#38bdf8}.tile-btn.tile-hinted-safe{background:#1a3b28;border-color:#4ade80}.tile-btn.tile-hinted-mine{background:#3b2e10;border-color:#facc15}.tile-btn.tile-revealed{cursor:default;background:#1c1917;border-color:#3c3735}.tile-btn.tile-mine-hit{background:#3b1515;border-color:#ef4444}.tile-btn.flag-cursor{cursor:crosshair}.tile-btn.hint-cursor{cursor:help}.strike-icon{border:2px solid #78716c;border-radius:50%;width:18px;height:18px;transition:background .2s,border-color .2s;display:inline-block}.strike-icon.strike-filled{background:#ef4444;border-color:#ef4444;box-shadow:0 0 6px #ef444480}.strike-icon.strike-warning{background:#facc15;border-color:#facc15;box-shadow:0 0 6px #facc1580}.btn-primary{color:#1c1917;cursor:pointer;background:#f59e0b;border:none;border-radius:8px;padding:10px 24px;font-family:Segoe UI,Arial,sans-serif;font-size:15px;font-weight:700;transition:background .15s,transform .1s,opacity .15s;box-shadow:0 2px 8px #f59e0b4d}.btn-primary:hover:not(:disabled){background:#d97706;transform:translateY(-1px)}.btn-primary:active:not(:disabled){transform:translateY(0)}.btn-primary:disabled{opacity:.4;cursor:not-allowed}.btn-secondary{color:#f59e0b;cursor:pointer;background:0 0;border:2px solid #f59e0b;border-radius:8px;padding:8px 20px;font-family:Segoe UI,Arial,sans-serif;font-size:15px;font-weight:600;transition:background .15s,transform .1s,opacity .15s}.btn-secondary:hover:not(:disabled){background:#f59e0b1a;transform:translateY(-1px)}.btn-secondary:disabled{opacity:.4;cursor:not-allowed}.btn-mode-active{color:#38bdf8!important;background:#38bdf826!important;border-color:#38bdf8!important}.history-node{cursor:pointer;border:1px solid #0000;border-radius:4px;padding:4px 8px;font-family:Courier New,monospace;font-size:12px;transition:background .1s}.history-node:hover{background:#3c3735}.history-node.current{background:#38bdf81a;border-color:#38bdf8}.history-node.selected{background:#f59e0b1a;border-color:#f59e0b}.history-node.current.selected{background:#4ade801a;border-color:#4ade80}.overlay{z-index:100;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);background:#000000b3;justify-content:center;align-items:center;display:flex;position:fixed;inset:0}.panel{background:#292524;border:1px solid #44403c;border-radius:12px;padding:20px;position:relative}.icon-button:hover:not(:disabled){color:#38bdf8!important;background:#38bdf81f!important}.sound-switch:hover:not(:disabled){filter:brightness(1.15);box-shadow:0 0 0 3px #f59e0b40}@media(max-width:420px){.game-shell{padding:8px!important}.game-grid{gap:1px!important}.scoreboard{flex-direction:column}.scoreboard-versus{min-height:24px}}@media(prefers-reduced-motion:reduce){*,:before,:after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}}.adj-0{color:#a8a29e}.adj-1{color:#38bdf8}.adj-2{color:#4ade80}.adj-3{color:#facc15}.adj-4{color:#f59e0b}.adj-5{color:#fb923c}.adj-6{color:#ef4444}.adj-7{color:#f87171}.adj-8{color:#fafaf9}@property --tw-rotate-x{syntax:\"*\";inherits:false}@property --tw-rotate-y{syntax:\"*\";inherits:false}@property --tw-rotate-z{syntax:\"*\";inherits:false}@property --tw-skew-x{syntax:\"*\";inherits:false}@property --tw-skew-y{syntax:\"*\";inherits:false}@property --tw-border-style{syntax:\"*\";inherits:false;initial-value:solid}@property --tw-ordinal{syntax:\"*\";inherits:false}@property --tw-slashed-zero{syntax:\"*\";inherits:false}@property --tw-numeric-figure{syntax:\"*\";inherits:false}@property --tw-numeric-spacing{syntax:\"*\";inherits:false}@property --tw-numeric-fraction{syntax:\"*\";inherits:false}@property --tw-blur{syntax:\"*\";inherits:false}@property --tw-brightness{syntax:\"*\";inherits:false}@property --tw-contrast{syntax:\"*\";inherits:false}@property --tw-grayscale{syntax:\"*\";inherits:false}@property --tw-hue-rotate{syntax:\"*\";inherits:false}@property --tw-invert{syntax:\"*\";inherits:false}@property --tw-opacity{syntax:\"*\";inherits:false}@property --tw-saturate{syntax:\"*\";inherits:false}@property --tw-sepia{syntax:\"*\";inherits:false}@property --tw-drop-shadow{syntax:\"*\";inherits:false}@property --tw-drop-shadow-color{syntax:\"*\";inherits:false}@property --tw-drop-shadow-alpha{syntax:\"<percentage>\";inherits:false;initial-value:100%}@property --tw-drop-shadow-size{syntax:\"*\";inherits:false}\n"
 			}
 		}
 	],
 	"mapping": {
-		"s_1V00Oeumm3A": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-LCjtTzsX.js",
-		"s_6GkoBWguNM4": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-CrNgPo9R.js",
+		"s_1V00Oeumm3A": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-BOAgT0bG.js",
+		"s_6GkoBWguNM4": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-D_FOq8T2.js",
 		"s_7KOrS001cXg": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_button_onClick_7KOrS001cXg-DBv0RpfX.js",
-		"s_Dei6RWBbu1A": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-B4hH1n9d.js",
-		"s_EKeb6KqxSI4": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-B7GsErnj.js",
-		"s_EnBW0wvCL0s": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-DnFLpqfi.js",
-		"s_F9FALmrlteE": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-S3BQP6pF.js",
-		"s_FMSYg76N0Zs": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs-CwNGA5-6.js",
-		"s_IPqaPOjKhxc": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-CdH9vD0y.js",
-		"s_JyjuChi10ZU": "../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU--Ww9U5nX.js",
-		"s_L3ob80fuEAU": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-rqXUFLcK.js",
-		"s_NTmF8n9I0Gs": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-Do4eK-Ri.js",
-		"s_NsvVAXre3TA": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-2mjlDp7F.js",
+		"s_Dei6RWBbu1A": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-BuzF0xYk.js",
+		"s_EKeb6KqxSI4": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-B5IdCvTa.js",
+		"s_EnBW0wvCL0s": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-COkEuotT.js",
+		"s_F9FALmrlteE": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-C5xiT8Lk.js",
+		"s_FMSYg76N0Zs": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs--RWAM19A.js",
+		"s_IPqaPOjKhxc": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-boFlvHgN.js",
+		"s_JyjuChi10ZU": "../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU-DAznD8YS.js",
+		"s_L3ob80fuEAU": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-jXbPVHqD.js",
+		"s_NTmF8n9I0Gs": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-CFTRxl9o.js",
+		"s_NsvVAXre3TA": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-B1sOwpeY.js",
 		"s_PAuFJflBP1s": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_3_PAuFJflBP1s-6aluu93t.js",
-		"s_Pj8Co1EUM0g": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-Do7iDUPd.js",
+		"s_Pj8Co1EUM0g": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-CijXoH82.js",
 		"s_PuUk0bQf6G8": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_4_PuUk0bQf6G8-D05MCvvb.js",
-		"s_SQNZtBMmRaE": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-eH__XdAH.js",
+		"s_SQNZtBMmRaE": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-CTf0dffC.js",
 		"s_Sekd3xm9Hlk": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_2_Sekd3xm9Hlk-CvaGrUPR.js",
-		"s_U4ieqgPSVw8": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-CijY3N8o.js",
+		"s_U4ieqgPSVw8": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-BnoJGKmS.js",
 		"s_V00XREVXB7M": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_V00XREVXB7M-Czge6nzr.js",
-		"s_ZGMjM8QCA0M": "../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-CHcno5Wk.js",
-		"s_c6GPsnYA3Tw": "../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-DYad3goq.js",
-		"s_cXBKM6w6Wu4": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-CVR7SPKI.js",
-		"s_ds9tGvfajnM": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM-CnJEeqTH.js",
+		"s_ZGMjM8QCA0M": "../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-BuJPJsGx.js",
+		"s_c6GPsnYA3Tw": "../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-BAMbKr5O.js",
+		"s_cXBKM6w6Wu4": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-DhdDKEtL.js",
+		"s_ds9tGvfajnM": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM--r5LFgRb.js",
 		"s_l6qVcIhvLdw": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_1_l6qVcIhvLdw-CS-RgLWm.js",
-		"s_nIiEenZlTf8": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-CiTETJb9.js",
+		"s_nIiEenZlTf8": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-CuezC2ut.js",
 		"s_nc38IlLFEBE": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_3_nc38IlLFEBE-MPn9EQQr.js",
-		"s_oBdtupCTDg0": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-C0D7N8mO.js",
-		"s_pDhtHaOoBT8": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-CUtRPBUL.js",
-		"s_psYPS1pW8mw": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-BkQ3NFdL.js",
-		"s_qNFtIiIKwVc": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-NizMef7W.js",
-		"s_vAuKY3MyLMQ": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-BHEAYMvH.js",
-		"s_vD4RAMsccTk": "../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-D7UTcxNB.js",
-		"s_xc8nAqmejr8": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-BiBj7Xul.js",
-		"s_xhLlu2KzRFo": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-QIuYb_HA.js",
+		"s_oBdtupCTDg0": "../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-DXRqRM5G.js",
+		"s_pDhtHaOoBT8": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-QAlG0I51.js",
+		"s_psYPS1pW8mw": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-y0fHOf6r.js",
+		"s_qNFtIiIKwVc": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-EJ34CGHd.js",
+		"s_vAuKY3MyLMQ": "../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-C2EwBNtP.js",
+		"s_vD4RAMsccTk": "../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-PHtN1GlI.js",
+		"s_xc8nAqmejr8": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-BVhsT_Tp.js",
+		"s_xhLlu2KzRFo": "../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-C8RejQdT.js",
 		"s_yaN0jRapfjU": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_div_button_onClick_yaN0jRapfjU-K6PWGQYw.js",
-		"s_yiMA0J3pO4U": "../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-DNQHuEVM.js",
+		"s_yiMA0J3pO4U": "../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-wTsWQzIE.js",
 		"s_S0h0027RObQ": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_textarea_onInput_S0h0027RObQ-B2fB_i7j.js",
-		"s_hZfT9p0uXk4": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-CwoNG9qS.js",
-		"s_S2CSE0Gzo4k": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-lYIpy2Ye.js",
+		"s_hZfT9p0uXk4": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-B0d8H0Ga.js",
+		"s_S2CSE0Gzo4k": "../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-DkKwgz1L.js",
 		"s_8cEnb6VAgJ0": "../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_1_8cEnb6VAgJ0-C6BJy0gh.js",
 		"s_AGMhcRtyECs": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_useVisibleTask_AGMhcRtyECs-C43tTuxN.js",
 		"s_B6SgwAuFFL4": "../assets/Confetti.tsx_Confetti_component_useVisibleTask_B6SgwAuFFL4-BAaqjxCG.js",
-		"s_C69My0oHP0Q": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-Di9ywvWD.js",
-		"s_NbCPVgdXbTo": "../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-Cj2_9dqZ.js",
+		"s_C69My0oHP0Q": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-BB0RGhvT.js",
+		"s_MvNYQXMjSCo": "../assets/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo-BnheNqbP.js",
+		"s_NbCPVgdXbTo": "../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-DElO4DCM.js",
 		"s_SEVuqJn0rLA": "../assets/App.tsx_App_component_useVisibleTask_SEVuqJn0rLA-CRNUeNpq.js",
 		"s_aBQHsmYNI04": "../assets/App.tsx_App_component_useVisibleTask_2_aBQHsmYNI04-BYblDy1p.js",
 		"s_brSDhVKHAYs": "../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_brSDhVKHAYs-T4bxmL42.js",
-		"s_g6jJ5iiT0cs": "../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-CUII_7IG.js",
-		"s_h00hjwWyXnI": "../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-Bm3T9TyY.js",
-		"s_0ZDMGydeKSw": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-voCzK3Cw.js",
-		"s_4vu2fcO2qTg": "../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-DwpvQmRt.js",
-		"s_BDsq7Z6XZxs": "../assets/App.tsx_App_component_BDsq7Z6XZxs-S7nDkt6C.js",
-		"s_IcXLrc5UqwU": "../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-DRV5rjQh.js",
-		"s_JW2EPiCEiOI": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-CYLmjVf3.js",
-		"s_PO80pwp8je0": "../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-D-LVFqvz.js",
-		"s_VaDtMGCFjxA": "../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-5nNv-3QY.js",
+		"s_g6jJ5iiT0cs": "../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-7TeMWrBn.js",
+		"s_h00hjwWyXnI": "../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-4qenxkAF.js",
+		"s_0ZDMGydeKSw": "../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-SaL-m7LF.js",
+		"s_4vu2fcO2qTg": "../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-oDqHIhE-.js",
+		"s_BDsq7Z6XZxs": "../assets/App.tsx_App_component_BDsq7Z6XZxs-CBPfu0_7.js",
+		"s_IcXLrc5UqwU": "../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-DsEiUc-B.js",
+		"s_JW2EPiCEiOI": "../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-SC-q166q.js",
+		"s_PO80pwp8je0": "../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-By-D1_8X.js",
+		"s_VaDtMGCFjxA": "../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-Rr_5xxDA.js",
 		"s_XoKsqidUSEQ": "../assets/StatsScreen.tsx_StatRow_component_XoKsqidUSEQ-Bz4JzalJ.js",
-		"s_YWDa0BbEeyI": "../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-B76Rpc4a.js",
-		"s_ZQvKK1V1KOg": "../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-CPhcIvAx.js",
+		"s_YWDa0BbEeyI": "../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-CFOngrkB.js",
+		"s_ZQvKK1V1KOg": "../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-C8BtIxNA.js",
 		"s_ZyFNs40m23c": "../assets/Confetti.tsx_Confetti_component_ZyFNs40m23c-CDaIA3yn.js",
-		"s_f2FHIWngX2E": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-BhQBmiRP.js",
-		"s_hXuZU8fZq00": "../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DE_8gq9d.js",
-		"s_k7s0bu4aUyo": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-DbvEv9Iz.js",
-		"s_nwa1BvVxOjY": "../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-CBfe-UTi.js",
-		"s_o6mOxEjWsMg": "../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-BkguJ_h4.js",
+		"s_f2FHIWngX2E": "../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-CxqXYnIS.js",
+		"s_hXuZU8fZq00": "../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DZv1Yd7c.js",
+		"s_k7s0bu4aUyo": "../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-CSnBkVoc.js",
+		"s_nwa1BvVxOjY": "../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-YOLh5Vw3.js",
+		"s_o6mOxEjWsMg": "../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-BEAObQaC.js",
 		"s_u3s63rt8sUk": "../assets/Toast.tsx_Toast_component_u3s63rt8sUk-piSTtnxJ.js",
 		"s_uDtgd0ueDpk": "../assets/MatchCompleteScreen.tsx_ScoreBadge_component_uDtgd0ueDpk-BZTX3eiq.js"
 	},
 	"bundles": {
-		"../assets/App-CL1ytf1w.js": {
+		"../assets/App-XxpMh6Q-.js": {
 			"size": 948,
-			"total": 62861,
+			"total": 62907,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js",
+				"../assets/gameLogic-BOGBTXck.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/App.tsx_App_component_BDsq7Z6XZxs-S7nDkt6C.js"
+				"../assets/App.tsx_App_component_BDsq7Z6XZxs-CBPfu0_7.js"
 			],
 			"origins": [
 				"src/components/App.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/App.tsx_App_component_BDsq7Z6XZxs-S7nDkt6C.js": {
+		"../assets/App.tsx_App_component_BDsq7Z6XZxs-CBPfu0_7.js": {
 			"size": 2171,
-			"total": 372844,
+			"total": 372936,
 			"imports": [
-				"../assets/App-CL1ytf1w.js",
+				"../assets/App-XxpMh6Q-.js",
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js",
-				"../assets/MatchCompleteScreen-Blxw3pbD.js",
-				"../assets/MatchLogScreen-B-Gg1XYv.js",
+				"../assets/gameLogic-BOGBTXck.js",
+				"../assets/MatchCompleteScreen-D_We9DZH.js",
+				"../assets/MatchLogScreen-B-WosNKU.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/SetupScreen-iZtaMVQd.js",
-				"../assets/StatsScreen-C6S84apn.js"
+				"../assets/SetupScreen-BBSdhFIl.js",
+				"../assets/StatsScreen-BiIErQi5.js"
 			],
 			"dynamicImports": [
-				"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-Bm3T9TyY.js",
+				"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-4qenxkAF.js",
 				"../assets/App.tsx_App_component_useVisibleTask_2_aBQHsmYNI04-BYblDy1p.js",
-				"../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-CUII_7IG.js",
-				"../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-Cj2_9dqZ.js",
+				"../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-7TeMWrBn.js",
+				"../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-DElO4DCM.js",
 				"../assets/App.tsx_App_component_useVisibleTask_SEVuqJn0rLA-CRNUeNpq.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-CYLmjVf3.js",
-				"../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-5nNv-3QY.js",
-				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-BhQBmiRP.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-SC-q166q.js",
+				"../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-Rr_5xxDA.js",
+				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-CxqXYnIS.js",
 				"../assets/Toast.tsx_Toast_component_u3s63rt8sUk-piSTtnxJ.js"
 			],
 			"origins": [
@@ -145,12 +146,12 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-Bm3T9TyY.js": {
+		"../assets/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI-4qenxkAF.js": {
 			"size": 7193,
-			"total": 67852,
+			"total": 67898,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/App.tsx_App_component_useVisibleTask_1_h00hjwWyXnI.js",
@@ -176,12 +177,12 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-CUII_7IG.js": {
+		"../assets/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs-7TeMWrBn.js": {
 			"size": 411,
-			"total": 61070,
+			"total": 61116,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/App.tsx_App_component_useVisibleTask_3_g6jJ5iiT0cs.js"
@@ -191,12 +192,12 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-Cj2_9dqZ.js": {
+		"../assets/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo-DElO4DCM.js": {
 			"size": 321,
-			"total": 60980,
+			"total": 61026,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/App.tsx_App_component_useVisibleTask_4_NbCPVgdXbTo.js"
@@ -296,7 +297,7 @@
 			],
 			"interactivity": 0
 		},
-		"../assets/ExportArtifactView-C2XzP4j7.js": {
+		"../assets/ExportArtifactView-Cy6LyExq.js": {
 			"size": 247,
 			"total": 49350,
 			"imports": [
@@ -304,19 +305,19 @@
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DE_8gq9d.js"
+				"../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DZv1Yd7c.js"
 			],
 			"origins": [
 				"src/components/ExportArtifactView.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-CHcno5Wk.js": {
+		"../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-BuJPJsGx.js": {
 			"size": 201,
-			"total": 60860,
+			"total": 60906,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M.js"
@@ -326,7 +327,7 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DE_8gq9d.js": {
+		"../assets/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00-DZv1Yd7c.js": {
 			"size": 2784,
 			"total": 99819,
 			"imports": [
@@ -335,7 +336,7 @@
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-CHcno5Wk.js"
+				"../assets/ExportArtifactView.tsx_ExportArtifactView_component_div_div_button_onClick_ZGMjM8QCA0M-BuJPJsGx.js"
 			],
 			"origins": [
 				"src/components/ExportArtifactView.tsx_ExportArtifactView_component_hXuZU8fZq00.js"
@@ -345,12 +346,12 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-NizMef7W.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-EJ34CGHd.js": {
 			"size": 186,
-			"total": 60845,
+			"total": 60891,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc.js"
@@ -360,12 +361,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-Do4eK-Ri.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-CFTRxl9o.js": {
 			"size": 186,
-			"total": 60845,
+			"total": 60891,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs.js"
@@ -375,12 +376,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs-CwNGA5-6.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs--RWAM19A.js": {
 			"size": 209,
-			"total": 60868,
+			"total": 60914,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs.js"
@@ -390,12 +391,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-LCjtTzsX.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-BOAgT0bG.js": {
 			"size": 186,
-			"total": 60845,
+			"total": 60891,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A.js"
@@ -405,12 +406,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-CiTETJb9.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-CuezC2ut.js": {
 			"size": 223,
-			"total": 60882,
+			"total": 60928,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8.js"
@@ -420,12 +421,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-eH__XdAH.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-CTf0dffC.js": {
 			"size": 190,
-			"total": 60849,
+			"total": 60895,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE.js"
@@ -449,23 +450,23 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-CYLmjVf3.js": {
+		"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_JW2EPiCEiOI-SC-q166q.js": {
 			"size": 4363,
-			"total": 163558,
+			"total": 163604,
 			"imports": [
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
-				"../assets/ExportArtifactView-C2XzP4j7.js",
-				"../assets/gameLogic-BYBrtOsQ.js",
+				"../assets/ExportArtifactView-Cy6LyExq.js",
+				"../assets/gameLogic-BOGBTXck.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-NizMef7W.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-Do4eK-Ri.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs-CwNGA5-6.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-LCjtTzsX.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-CiTETJb9.js",
-				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-eH__XdAH.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_button_onClick_qNFtIiIKwVc-EJ34CGHd.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_button_onClick_NTmF8n9I0Gs-CFTRxl9o.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_1_FMSYg76N0Zs--RWAM19A.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_2_1V00Oeumm3A-BOAgT0bG.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_3_nIiEenZlTf8-CuezC2ut.js",
+				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_div_button_onClick_SQNZtBMmRaE-CTf0dffC.js",
 				"../assets/ExportCenterScreen.tsx_ExportCenterScreen_component_div_div_div_textarea_onInput_S0h0027RObQ-B2fB_i7j.js"
 			],
 			"origins": [
@@ -476,14 +477,14 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-DwpvQmRt.js": {
+		"../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-oDqHIhE-.js": {
 			"size": 700,
 			"total": 147159,
 			"imports": [
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/TileCell-H1xhu0M9.js"
+				"../assets/TileCell-CMG09Sac.js"
 			],
 			"origins": [
 				"src/components/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg.js"
@@ -493,20 +494,20 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/gameLogic-BYBrtOsQ.js": {
-			"size": 12810,
-			"total": 12810,
+		"../assets/gameLogic-BOGBTXck.js": {
+			"size": 12856,
+			"total": 12856,
 			"origins": [
 				"src/gameLogic.ts"
 			],
 			"interactivity": 0
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-B4hH1n9d.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-BuzF0xYk.js": {
 			"size": 309,
-			"total": 60968,
+			"total": 61014,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A.js"
@@ -516,12 +517,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-C0D7N8mO.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-DXRqRM5G.js": {
 			"size": 181,
-			"total": 60840,
+			"total": 60886,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0.js"
@@ -573,12 +574,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-QIuYb_HA.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-C8RejQdT.js": {
 			"size": 198,
-			"total": 60857,
+			"total": 60903,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo.js"
@@ -602,12 +603,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-CijY3N8o.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-BnoJGKmS.js": {
 			"size": 194,
-			"total": 60853,
+			"total": 60899,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8.js"
@@ -617,27 +618,27 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-5nNv-3QY.js": {
+		"../assets/GameScreen.tsx_GameScreen_component_VaDtMGCFjxA-Rr_5xxDA.js": {
 			"size": 6585,
-			"total": 215349,
+			"total": 215395,
 			"imports": [
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js",
-				"../assets/HistoryPanel-DPfNqGED.js",
+				"../assets/gameLogic-BOGBTXck.js",
+				"../assets/HistoryPanel-XlnDgQrx.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/Scoreboard-DEND_Mvv.js"
+				"../assets/Scoreboard-C2s-1TiY.js"
 			],
 			"dynamicImports": [
-				"../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-DwpvQmRt.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-B4hH1n9d.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-C0D7N8mO.js",
+				"../assets/GameBoard.tsx_GameBoard_component_4vu2fcO2qTg-oDqHIhE-.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_1_Dei6RWBbu1A-BuzF0xYk.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_2_oBdtupCTDg0-DXRqRM5G.js",
 				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_3_nc38IlLFEBE-MPn9EQQr.js",
 				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_4_PuUk0bQf6G8-D05MCvvb.js",
 				"../assets/GameScreen.tsx_GameScreen_component_div_div_button_onClick_V00XREVXB7M-Czge6nzr.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-QIuYb_HA.js",
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_1_xhLlu2KzRFo-C8RejQdT.js",
 				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_2_Sekd3xm9Hlk-CvaGrUPR.js",
-				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-CijY3N8o.js"
+				"../assets/GameScreen.tsx_GameScreen_component_div_div_div_button_onClick_U4ieqgPSVw8-BnoJGKmS.js"
 			],
 			"origins": [
 				"src/components/GameBoard.tsx",
@@ -648,7 +649,7 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/HistoryPanel-DPfNqGED.js": {
+		"../assets/HistoryPanel-XlnDgQrx.js": {
 			"size": 369,
 			"total": 49472,
 			"imports": [
@@ -656,19 +657,19 @@
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-D-LVFqvz.js"
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-By-D1_8X.js"
 			],
 			"origins": [
 				"src/components/HistoryPanel.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM-CnJEeqTH.js": {
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM--r5LFgRb.js": {
 			"size": 220,
-			"total": 60879,
+			"total": 60925,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM.js"
@@ -692,12 +693,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-BHEAYMvH.js": {
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-C2EwBNtP.js": {
 			"size": 186,
-			"total": 60845,
+			"total": 60891,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ.js"
@@ -707,12 +708,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-S3BQP6pF.js": {
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-C5xiT8Lk.js": {
 			"size": 186,
-			"total": 60845,
+			"total": 60891,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE.js"
@@ -722,20 +723,20 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-D-LVFqvz.js": {
+		"../assets/HistoryPanel.tsx_HistoryPanel_component_PO80pwp8je0-By-D1_8X.js": {
 			"size": 4278,
 			"total": 150785,
 			"imports": [
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
-				"../assets/HistoryPanel-DPfNqGED.js",
+				"../assets/HistoryPanel-XlnDgQrx.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM-CnJEeqTH.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_button_onClick_ds9tGvfajnM--r5LFgRb.js",
 				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_button_onClick_7KOrS001cXg-DBv0RpfX.js",
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-BHEAYMvH.js",
-				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-S3BQP6pF.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_1_vAuKY3MyLMQ-C2EwBNtP.js",
+				"../assets/HistoryPanel.tsx_HistoryPanel_component_div_div_div_button_onClick_F9FALmrlteE-C5xiT8Lk.js",
 				"../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_1_8cEnb6VAgJ0-C6BJy0gh.js",
 				"../assets/HistoryPanel.tsx_HistoryPanel_component_useVisibleTask_brSDhVKHAYs-T4bxmL42.js"
 			],
@@ -775,13 +776,13 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/index-CWFDbSEO.js": {
+		"../assets/index-InnUVP28.js": {
 			"size": 3566,
-			"total": 128340,
+			"total": 128432,
 			"imports": [
-				"../assets/App-CL1ytf1w.js",
+				"../assets/App-XxpMh6Q-.js",
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js",
+				"../assets/gameLogic-BOGBTXck.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"origins": [
@@ -792,7 +793,7 @@
 			],
 			"interactivity": 0
 		},
-		"../assets/MatchCompleteScreen-Blxw3pbD.js": {
+		"../assets/MatchCompleteScreen-D_We9DZH.js": {
 			"size": 375,
 			"total": 49478,
 			"imports": [
@@ -800,7 +801,7 @@
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-DbvEv9Iz.js",
+				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-CSnBkVoc.js",
 				"../assets/MatchCompleteScreen.tsx_ScoreBadge_component_uDtgd0ueDpk-BZTX3eiq.js"
 			],
 			"origins": [
@@ -822,12 +823,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-2mjlDp7F.js": {
+		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-B1sOwpeY.js": {
 			"size": 204,
-			"total": 60863,
+			"total": 60909,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA.js"
@@ -837,12 +838,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-BiBj7Xul.js": {
+		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-BVhsT_Tp.js": {
 			"size": 179,
-			"total": 60838,
+			"total": 60884,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8.js"
@@ -852,21 +853,21 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-DbvEv9Iz.js": {
+		"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_k7s0bu4aUyo-CSnBkVoc.js": {
 			"size": 3982,
 			"total": 249464,
 			"imports": [
 				"../assets/Confetti-BLeo2UXm.js",
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
-				"../assets/ExportArtifactView-C2XzP4j7.js",
-				"../assets/MatchCompleteScreen-Blxw3pbD.js",
+				"../assets/ExportArtifactView-Cy6LyExq.js",
+				"../assets/MatchCompleteScreen-D_We9DZH.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
 				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_1_l6qVcIhvLdw-CS-RgLWm.js",
-				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-2mjlDp7F.js",
-				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-BiBj7Xul.js",
+				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_2_NsvVAXre3TA-B1sOwpeY.js",
+				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_div_div_div_button_onClick_xc8nAqmejr8-BVhsT_Tp.js",
 				"../assets/MatchCompleteScreen.tsx_MatchCompleteScreen_component_useVisibleTask_AGMhcRtyECs-C43tTuxN.js"
 			],
 			"origins": [
@@ -905,7 +906,7 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/MatchLogScreen-B-Gg1XYv.js": {
+		"../assets/MatchLogScreen-B-WosNKU.js": {
 			"size": 348,
 			"total": 49451,
 			"imports": [
@@ -913,27 +914,27 @@
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-voCzK3Cw.js"
+				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-SaL-m7LF.js"
 			],
 			"origins": [
 				"src/components/MatchLogScreen.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-voCzK3Cw.js": {
+		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw-SaL-m7LF.js": {
 			"size": 3233,
 			"total": 199069,
 			"imports": [
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
-				"../assets/ExportArtifactView-C2XzP4j7.js",
-				"../assets/MatchLogScreen-B-Gg1XYv.js",
+				"../assets/ExportArtifactView-Cy6LyExq.js",
+				"../assets/MatchLogScreen-B-WosNKU.js",
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-Do7iDUPd.js",
-				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-B7GsErnj.js",
-				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-CVR7SPKI.js"
+				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-CijXoH82.js",
+				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-B5IdCvTa.js",
+				"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-DhdDKEtL.js"
 			],
 			"origins": [
 				"src/components/MatchLogScreen.tsx_MatchLogScreen_component_0ZDMGydeKSw.js"
@@ -943,12 +944,12 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-Do7iDUPd.js": {
+		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g-CijXoH82.js": {
 			"size": 186,
-			"total": 60845,
+			"total": 60891,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_1_Pj8Co1EUM0g.js"
@@ -958,12 +959,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-B7GsErnj.js": {
+		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4-B5IdCvTa.js": {
 			"size": 186,
-			"total": 60845,
+			"total": 60891,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/MatchLogScreen.tsx_MatchLogScreen_component_div_div_button_onClick_EKeb6KqxSI4.js"
@@ -973,12 +974,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-CVR7SPKI.js": {
+		"../assets/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4-DhdDKEtL.js": {
 			"size": 196,
-			"total": 60855,
+			"total": 60901,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/MatchLogScreen.tsx_MatchLogScreen_component_div_div_div_div_button_onClick_cXBKM6w6Wu4.js"
@@ -1009,12 +1010,12 @@
 			],
 			"interactivity": 0
 		},
-		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-CdH9vD0y.js": {
+		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-boFlvHgN.js": {
 			"size": 179,
-			"total": 60838,
+			"total": 60884,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc.js"
@@ -1024,7 +1025,7 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-BhQBmiRP.js": {
+		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E-CxqXYnIS.js": {
 			"size": 2646,
 			"total": 99681,
 			"imports": [
@@ -1033,8 +1034,8 @@
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-CdH9vD0y.js",
-				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-Di9ywvWD.js"
+				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_div_div_button_onClick_IPqaPOjKhxc-boFlvHgN.js",
+				"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-BB0RGhvT.js"
 			],
 			"origins": [
 				"src/components/RoundResultOverlay.tsx_RoundResultOverlay_component_f2FHIWngX2E.js"
@@ -1044,13 +1045,13 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-Di9ywvWD.js": {
+		"../assets/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q-BB0RGhvT.js": {
 			"size": 807,
-			"total": 62306,
+			"total": 62352,
 			"imports": [
 				"../assets/audio-B74xn9bK.js",
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/RoundResultOverlay.tsx_RoundResultOverlay_component_useVisibleTask_C69My0oHP0Q.js"
@@ -1060,7 +1061,7 @@
 			],
 			"interactivity": 3
 		},
-		"../assets/Scoreboard-DEND_Mvv.js": {
+		"../assets/Scoreboard-C2s-1TiY.js": {
 			"size": 344,
 			"total": 49447,
 			"imports": [
@@ -1068,20 +1069,20 @@
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-CBfe-UTi.js",
-				"../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-DRV5rjQh.js"
+				"../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-YOLh5Vw3.js",
+				"../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-DsEiUc-B.js"
 			],
 			"origins": [
 				"src/components/Scoreboard.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-CBfe-UTi.js": {
+		"../assets/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-YOLh5Vw3.js": {
 			"size": 1503,
-			"total": 62162,
+			"total": 62208,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY.js"
@@ -1091,14 +1092,14 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-DRV5rjQh.js": {
-			"size": 1497,
-			"total": 147979,
+		"../assets/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-DsEiUc-B.js": {
+			"size": 1542,
+			"total": 148024,
 			"imports": [
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/Scoreboard-DEND_Mvv.js"
+				"../assets/Scoreboard-C2s-1TiY.js"
 			],
 			"origins": [
 				"src/components/Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU.js"
@@ -1108,7 +1109,7 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/SetupScreen-iZtaMVQd.js": {
+		"../assets/SetupScreen-BBSdhFIl.js": {
 			"size": 433,
 			"total": 49536,
 			"imports": [
@@ -1116,19 +1117,19 @@
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-B76Rpc4a.js"
+				"../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-CFOngrkB.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-DnFLpqfi.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-COkEuotT.js": {
 			"size": 194,
-			"total": 60853,
+			"total": 60899,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s.js"
@@ -1138,12 +1139,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-CUtRPBUL.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-QAlG0I51.js": {
 			"size": 904,
-			"total": 61563,
+			"total": 61609,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8.js"
@@ -1167,12 +1168,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-CrNgPo9R.js": {
-			"size": 373,
-			"total": 61032,
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-D_FOq8T2.js": {
+			"size": 392,
+			"total": 61097,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4.js"
@@ -1182,12 +1183,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-BkQ3NFdL.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-y0fHOf6r.js": {
 			"size": 202,
-			"total": 60861,
+			"total": 60907,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw.js"
@@ -1197,12 +1198,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-rqXUFLcK.js": {
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-jXbPVHqD.js": {
 			"size": 198,
-			"total": 60857,
+			"total": 60903,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU.js"
@@ -1226,9 +1227,9 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-lYIpy2Ye.js": {
-			"size": 223,
-			"total": 48072,
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-DkKwgz1L.js": {
+			"size": 241,
+			"total": 48090,
 			"imports": [
 				"../assets/core.min-DGtNB905.js"
 			],
@@ -1240,9 +1241,9 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-CwoNG9qS.js": {
-			"size": 246,
-			"total": 48095,
+		"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-B0d8H0Ga.js": {
+			"size": 274,
+			"total": 48123,
 			"imports": [
 				"../assets/core.min-DGtNB905.js"
 			],
@@ -1254,25 +1255,40 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-B76Rpc4a.js": {
-			"size": 6384,
-			"total": 152955,
+		"../assets/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo-BnheNqbP.js": {
+			"size": 199,
+			"total": 48048,
+			"imports": [
+				"../assets/core.min-DGtNB905.js"
+			],
+			"origins": [
+				"src/components/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo.js"
+			],
+			"symbols": [
+				"s_MvNYQXMjSCo"
+			],
+			"interactivity": 3
+		},
+		"../assets/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI-CFOngrkB.js": {
+			"size": 6543,
+			"total": 153114,
 			"imports": [
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/SetupScreen-iZtaMVQd.js"
+				"../assets/SetupScreen-BBSdhFIl.js"
 			],
 			"dynamicImports": [
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-DnFLpqfi.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-CUtRPBUL.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_1_EnBW0wvCL0s-COkEuotT.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_2_pDhtHaOoBT8-QAlG0I51.js",
 				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_3_PAuFJflBP1s-6aluu93t.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-CrNgPo9R.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-BkQ3NFdL.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-rqXUFLcK.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_button_onClick_6GkoBWguNM4-D_FOq8T2.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_1_psYPS1pW8mw-y0fHOf6r.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_button_onClick_L3ob80fuEAU-jXbPVHqD.js",
 				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_div_button_onClick_yaN0jRapfjU-K6PWGQYw.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-lYIpy2Ye.js",
-				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-CwoNG9qS.js"
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onBlur_S2CSE0Gzo4k-DkKwgz1L.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_div_div_div_input_onInput_hZfT9p0uXk4-B0d8H0Ga.js",
+				"../assets/SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo-BnheNqbP.js"
 			],
 			"origins": [
 				"src/components/SetupScreen.tsx_SetupScreen_component_YWDa0BbEeyI.js"
@@ -1282,7 +1298,7 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/StatsScreen-C6S84apn.js": {
+		"../assets/StatsScreen-BiIErQi5.js": {
 			"size": 399,
 			"total": 49502,
 			"imports": [
@@ -1291,7 +1307,7 @@
 			],
 			"dynamicImports": [
 				"../assets/StatsScreen.tsx_StatRow_component_XoKsqidUSEQ-Bz4JzalJ.js",
-				"../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-CPhcIvAx.js"
+				"../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-C8BtIxNA.js"
 			],
 			"origins": [
 				"src/components/StatsScreen.tsx"
@@ -1312,12 +1328,12 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-DYad3goq.js": {
+		"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-BAMbKr5O.js": {
 			"size": 186,
-			"total": 60845,
+			"total": 60891,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw.js"
@@ -1327,12 +1343,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU--Ww9U5nX.js": {
+		"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU-DAznD8YS.js": {
 			"size": 186,
-			"total": 60845,
+			"total": 60891,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU.js"
@@ -1342,18 +1358,18 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-CPhcIvAx.js": {
+		"../assets/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg-C8BtIxNA.js": {
 			"size": 3046,
 			"total": 149583,
 			"imports": [
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/StatsScreen-C6S84apn.js"
+				"../assets/StatsScreen-BiIErQi5.js"
 			],
 			"dynamicImports": [
-				"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-DYad3goq.js",
-				"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU--Ww9U5nX.js"
+				"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_1_c6GPsnYA3Tw-BAMbKr5O.js",
+				"../assets/StatsScreen.tsx_StatsScreen_component_div_div_button_onClick_JyjuChi10ZU-DAznD8YS.js"
 			],
 			"origins": [
 				"src/components/StatsScreen.tsx_StatsScreen_component_ZQvKK1V1KOg.js"
@@ -1371,7 +1387,7 @@
 			],
 			"interactivity": 0
 		},
-		"../assets/TileCell-H1xhu0M9.js": {
+		"../assets/TileCell-CMG09Sac.js": {
 			"size": 321,
 			"total": 49424,
 			"imports": [
@@ -1379,20 +1395,20 @@
 				"../assets/preload-helper-CVfkMyKi.js"
 			],
 			"dynamicImports": [
-				"../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-BkguJ_h4.js"
+				"../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-BEAObQaC.js"
 			],
 			"origins": [
 				"src/components/TileCell.tsx"
 			],
 			"interactivity": 0
 		},
-		"../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-D7UTcxNB.js": {
+		"../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-PHtN1GlI.js": {
 			"size": 926,
-			"total": 62425,
+			"total": 62471,
 			"imports": [
 				"../assets/audio-B74xn9bK.js",
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk.js"
@@ -1402,12 +1418,12 @@
 			],
 			"interactivity": 5
 		},
-		"../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-DNQHuEVM.js": {
-			"size": 334,
-			"total": 60993,
+		"../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-wTsWQzIE.js": {
+			"size": 495,
+			"total": 61200,
 			"imports": [
 				"../assets/core.min-DGtNB905.js",
-				"../assets/gameLogic-BYBrtOsQ.js"
+				"../assets/gameLogic-BOGBTXck.js"
 			],
 			"origins": [
 				"src/components/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U.js"
@@ -1417,18 +1433,18 @@
 			],
 			"interactivity": 2
 		},
-		"../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-BkguJ_h4.js": {
+		"../assets/TileCell.tsx_TileCell_component_o6mOxEjWsMg-BEAObQaC.js": {
 			"size": 3030,
 			"total": 149489,
 			"imports": [
 				"../assets/context-BPISbJT0.js",
 				"../assets/core.min-DGtNB905.js",
 				"../assets/preload-helper-CVfkMyKi.js",
-				"../assets/TileCell-H1xhu0M9.js"
+				"../assets/TileCell-CMG09Sac.js"
 			],
 			"dynamicImports": [
-				"../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-D7UTcxNB.js",
-				"../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-DNQHuEVM.js"
+				"../assets/TileCell.tsx_TileCell_component_button_onClick_vD4RAMsccTk-PHtN1GlI.js",
+				"../assets/TileCell.tsx_TileCell_component_button_onContextMenu_yiMA0J3pO4U-wTsWQzIE.js"
 			],
 			"origins": [
 				"src/components/TileCell.tsx_TileCell_component_o6mOxEjWsMg.js"
@@ -1455,16 +1471,16 @@
 		}
 	},
 	"assets": {
-		"assets/index-B9cAF_vR.css": {
+		"assets/index-BjtX12Uz.css": {
 			"name": "index.css",
-			"size": 13312
+			"size": 13381
 		},
 		"index.html": {
 			"size": 683
 		},
-		"assets/bundle-graph-DShe7Q5S.json": {
+		"assets/bundle-graph-DIgIQNyD.json": {
 			"name": "bundle-graph.json",
-			"size": 538
+			"size": 545
 		}
 	},
 	"symbols": {
@@ -1492,8 +1508,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				4927,
-				5409
+				5227,
+				5788
 			]
 		},
 		"s_7KOrS001cXg": {
@@ -1548,8 +1564,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				5626,
-				5658
+				6005,
+				6037
 			]
 		},
 		"s_F9FALmrlteE": {
@@ -1618,8 +1634,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				5973,
-				6009
+				6352,
+				6388
 			]
 		},
 		"s_NTmF8n9I0Gs": {
@@ -1660,8 +1676,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				10496,
-				10547
+				10875,
+				10926
 			]
 		},
 		"s_Pj8Co1EUM0g": {
@@ -1870,8 +1886,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				7497,
-				9787
+				7876,
+				10166
 			]
 		},
 		"s_psYPS1pW8mw": {
@@ -1884,8 +1900,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				6236,
-				6276
+				6615,
+				6655
 			]
 		},
 		"s_qNFtIiIKwVc": {
@@ -1968,8 +1984,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				3822,
-				3990
+				4080,
+				4248
 			]
 		},
 		"s_yiMA0J3pO4U": {
@@ -1983,7 +1999,7 @@
 			"origin": "components/TileCell.tsx",
 			"loc": [
 				4125,
-				4399
+				4664
 			]
 		},
 		"s_S0h0027RObQ": {
@@ -2010,8 +2026,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				2212,
-				2543
+				2348,
+				2740
 			]
 		},
 		"s_S2CSE0Gzo4k": {
@@ -2024,8 +2040,8 @@
 			"parent": "s_YWDa0BbEeyI",
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				2566,
-				2798
+				2763,
+				3056
 			]
 		},
 		"s_8cEnb6VAgJ0": {
@@ -2082,6 +2098,20 @@
 			"loc": [
 				600,
 				1960
+			]
+		},
+		"s_MvNYQXMjSCo": {
+			"displayName": "SetupScreen.tsx_SetupScreen_component_useVisibleTask",
+			"hash": "MvNYQXMjSCo",
+			"ctxKind": "function",
+			"ctxName": "useVisibleTask$",
+			"captures": true,
+			"canonicalFilename": "SetupScreen.tsx_SetupScreen_component_useVisibleTask_MvNYQXMjSCo",
+			"parent": "s_YWDa0BbEeyI",
+			"origin": "components/SetupScreen.tsx",
+			"loc": [
+				868,
+				911
 			]
 		},
 		"s_NbCPVgdXbTo": {
@@ -2221,7 +2251,7 @@
 			"origin": "components/Scoreboard.tsx",
 			"loc": [
 				179,
-				1215
+				1260
 			]
 		},
 		"s_JW2EPiCEiOI": {
@@ -2290,8 +2320,8 @@
 			"parent": null,
 			"origin": "components/SetupScreen.tsx",
 			"loc": [
-				664,
-				10965
+				681,
+				11344
 			]
 		},
 		"s_ZQvKK1V1KOg": {
@@ -2374,8 +2404,8 @@
 			"parent": null,
 			"origin": "components/Scoreboard.tsx",
 			"loc": [
-				1414,
-				3119
+				1459,
+				3164
 			]
 		},
 		"s_o6mOxEjWsMg": {
@@ -2389,7 +2419,7 @@
 			"origin": "components/TileCell.tsx",
 			"loc": [
 				460,
-				5720
+				5985
 			]
 		},
 		"s_u3s63rt8sUk": {
@@ -2427,6 +2457,6 @@
 		"rollup": "4.62.2",
 		"env": "node",
 		"os": "darwin",
-		"node": "26.5.0"
+		"node": "26.4.0"
 	}
 }
