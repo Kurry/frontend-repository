@@ -223,7 +223,7 @@ function KpiStrip() {
 
 function ConfirmDialog({ open, title, description, confirmLabel, danger = true, onConfirm, onClose }) {
   const [render, exiting] = usePresence(open)
-  const ref = useFocusTrap(render, onClose)
+  const ref = useFocusTrap(open, onClose)
   if (!render) return null
   return (
     <div className={cx('overlay overlay-center', exiting && 'overlay-exit')} role="presentation">
@@ -375,7 +375,7 @@ function ConnectDialog({ openerRef }) {
   const setOpen = useCommandStore((state) => state.setConnectOpen)
   const connectAgent = useCommandStore((state) => state.connectAgent)
   const [render, exiting] = usePresence(open)
-  const dialogRef = useFocusTrap(render, () => setOpen(false), openerRef)
+  const dialogRef = useFocusTrap(open, () => setOpen(false), openerRef)
   const submitLock = useRef(false)
   const { register, control, handleSubmit, reset, trigger, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(agentInputSchema), mode: 'onChange', defaultValues: { name: '', model: '', description: '' } })
   useEffect(() => {
@@ -417,7 +417,7 @@ function NightSchedule({ badgeRef }) {
   const setAccent = useCommandStore((state) => state.setAccent)
   const save = useCommandStore((state) => state.saveNightSchedule)
   const [render, exiting] = usePresence(open, 160)
-  const popoverRef = useFocusTrap(render, () => setOpen(false), badgeRef)
+  const popoverRef = useFocusTrap(open, () => setOpen(false), badgeRef)
   const { register, control, handleSubmit, reset, trigger, watch, formState: { errors } } = useForm({ resolver: zodResolver(nightScheduleSchema), mode: 'onChange', defaultValues: schedule })
   useEffect(() => { if (open) reset(schedule) }, [open, reset, schedule])
   const enabled = watch('enable')
@@ -523,7 +523,7 @@ function CommandPalette({ openerRef, exportRef }) {
   const open = useCommandStore((state) => state.paletteOpen)
   const setOpen = useCommandStore((state) => state.setPaletteOpen)
   const [render, exiting] = usePresence(open, 170)
-  const dialogRef = useFocusTrap(render, () => setOpen(false), openerRef)
+  const dialogRef = useFocusTrap(open, () => setOpen(false), openerRef)
   const [query, setQuery] = useState('')
   useEffect(() => { if (open) setQuery('') }, [open])
   const store = useCommandStore.getState
@@ -554,7 +554,7 @@ function SummaryDialog() {
   const setOpen = useCommandStore((state) => state.setSummaryOpen)
   const state = useCommandStore()
   const [render, exiting] = usePresence(open)
-  const dialogRef = useFocusTrap(render, () => setOpen(false))
+  const dialogRef = useFocusTrap(open, () => setOpen(false))
   if (!render) return null
   const kpis = getLiveKpis(state)
   return (
@@ -579,7 +579,7 @@ function ShortcutsDialog() {
   const open = useCommandStore((state) => state.shortcutsOpen)
   const setOpen = useCommandStore((state) => state.setShortcutsOpen)
   const [render, exiting] = usePresence(open, 160)
-  const dialogRef = useFocusTrap(render, () => setOpen(false))
+  const dialogRef = useFocusTrap(open, () => setOpen(false))
   if (!render) return null
   const shortcuts = [
     ['⌘K / Ctrl K', 'Open the command palette'],
