@@ -1,0 +1,1331 @@
+{
+  "accessibility": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "keyboard_reaches_everything",
+        "value": 1,
+        "weight": 1,
+        "description": "Every interactive control — library entries and checkboxes, step type selectors and fields, drag handles, run controls, console theme selector, diff run pickers, schedule fields, undo and redo, and the palette — is reachable and operable with the keyboard alone",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.2",
+        "name": "dialogs_trap_and_return_focus",
+        "value": 1,
+        "weight": 1,
+        "description": "The New Script modal, screenshot modal, and confirmations trap focus while open, close on Escape, and return focus to the control that opened them",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.3",
+        "name": "icons_and_images_labeled",
+        "value": 1,
+        "weight": 1,
+        "description": "Icon-only controls (undo/redo, clock badges, bulk actions, jump-to-latest) carry accessible names, and placeholder screenshots carry descriptive alt text",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.4",
+        "name": "live_announcements",
+        "value": 1,
+        "weight": 1,
+        "description": "Run completion, a step entering the failed state, and pause and resume are announced through an aria-live region as well as shown visually",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.5",
+        "name": "labeled_form_fields",
+        "value": 1,
+        "weight": 1,
+        "description": "Every form field has a visible label, and validation messages are associated with their fields so each names the field it belongs to",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.6",
+        "name": "heading_order_logical",
+        "value": 1,
+        "weight": 1,
+        "description": "Headings follow a logical order with no skipped levels across the views",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.7",
+        "name": "landmarks_present",
+        "value": 1,
+        "weight": 1,
+        "description": "The page exposes landmark structure (navigation for the sidebar, main for the content area) for assistive navigation",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.8",
+        "name": "contrast_sufficient",
+        "value": 1,
+        "weight": 1,
+        "description": "Text and controls meet sufficient color contrast, including console text on every offered theme and badges on dimmed disabled steps",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.9",
+        "name": "semantic_controls",
+        "value": 1,
+        "weight": 1,
+        "description": "Buttons, checkboxes, selects, and tabs use semantic elements or correct ARIA roles rather than bare styled divs",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.10",
+        "name": "state_not_color_only",
+        "value": 1,
+        "weight": 1,
+        "description": "Pass, fail, skipped, and diff states are conveyed by text or icon plus color, never color alone",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "behavioral": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "14.1",
+        "name": "multi_facet_reload_reset",
+        "value": 1,
+        "weight": 1,
+        "description": "Configure several facets — select a different script, add a step, enable a schedule, switch the console theme — then reload; every facet coherently resets to the seeded baseline (seeded scripts and runs, no schedules, default theme, empty undo history), never a mix of kept and reset state",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "14.2",
+        "name": "runs_ordering_derives_live",
+        "value": 1,
+        "weight": 1,
+        "description": "Complete two new runs and confirm the Runs view lists them newest first with distinct run numbers and timestamps; the ordering and totals recompute from live records rather than a fixed list",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "14.3",
+        "name": "derived_surfaces_input_sensitivity",
+        "value": 1,
+        "weight": 1,
+        "description": "Disable one step and re-run: the run record shows that step Skipped and the totals change accordingly; re-enable and run again and the totals change back, proving the rollup and report derive from live step state",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "14.4",
+        "name": "cross_view_echo_to_export",
+        "value": 1,
+        "weight": 1,
+        "description": "Rename a script and edit a step parameter, then confirm without a reload that the library entry, the editor, and the Definition JSON preview all show the new values; complete a run and confirm the Run report totals equal the console rollup",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "14.5",
+        "name": "count_delta_exact_on_run",
+        "value": 1,
+        "weight": 1,
+        "description": "Measure the Runs view count and the library step count immediately before and after one run and one step add; each changes by exactly one with no lag",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "14.6",
+        "name": "different_inputs_different_records",
+        "value": 1,
+        "weight": 1,
+        "description": "Run two scripts with different steps and compare their run records and Definition JSON: the records differ exactly in the ways the scripts differ, and two runs of one script differ in extracted values",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "14.7",
+        "name": "interleaved_edit_and_run",
+        "value": 1,
+        "weight": 1,
+        "description": "Start a run, switch to another script and edit it mid-run, then return: the run completed or continued correctly, the edit persisted on the other script, and neither flow corrupted the other",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "14.8",
+        "name": "empty_and_repopulate_round_trip",
+        "value": 1,
+        "weight": 1,
+        "description": "Delete every step from a script, confirm Run Script disables and the empty state shows, then undo repeatedly: the steps return in order, numbering and the Definition JSON track back exactly through the transitions",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "14.9",
+        "name": "full_pipeline_probe_to_export_text",
+        "value": 1,
+        "weight": 1,
+        "description": "Chain the full pipeline: create a script, add an Extract and an Assert Text step via the editor, pull a selector from the Playground into the Extract step, save a version, run to completion with at least one retry observed, enable a schedule and Trigger now, then open Export: the Definition JSON text contains the script name, both steps with their typed params, the version number, and the schedule interval, and the Run report contains the schedule-triggered run with its per-step outcomes and extracted value; copy the export and confirm the clipboard text equals the visible preview",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "core_features": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "1.1",
+        "name": "seeded_library_entries",
+        "value": 1,
+        "weight": 1,
+        "description": "On load, the left sidebar lists at least 3 seeded automation scripts, each entry showing the script name, its step count, a last-run status badge, and a last-run timestamp",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.2",
+        "name": "new_script_modal_gating",
+        "value": 1,
+        "weight": 1,
+        "description": "New Script opens a modal with script name (required), target URL (required), and description (optional); Create stays disabled until name and URL are valid, and submitting creates a blank script with exactly one empty step and selects it",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.3",
+        "name": "invalid_url_validation",
+        "value": 1,
+        "weight": 1,
+        "description": "Submitting New Script with an invalid target URL shows an inline validation message naming the URL field and creates nothing",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.4",
+        "name": "library_bulk_operations",
+        "value": 1,
+        "weight": 1,
+        "description": "Checking library entries raises a bulk actions bar with a live selected count; Duplicate selected adds one Copy-suffixed script per selection and Delete selected removes them all after a single confirmation naming the count",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.5",
+        "name": "script_delete_cascades",
+        "value": 1,
+        "weight": 1,
+        "description": "Deleting a script removes it from the library, its run history, and the schedule queue together, without a reload",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.6",
+        "name": "palette_opens_and_filters",
+        "value": 1,
+        "weight": 1,
+        "description": "Pressing Ctrl+K (or Cmd+K) opens a command palette with its search input focused, and typing fuzzy-matches across script names, step labels in the selected script, and view names, narrowing the results as the query grows",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.7",
+        "name": "palette_keyboard_activation",
+        "value": 1,
+        "weight": 1,
+        "description": "Arrow keys move a visible highlight through palette results and Enter activates the highlighted one — a script result selects the script, a step result scrolls to and highlights that step, a view result switches views — while Escape closes the palette; each row shows a kind label and an unmatched query shows an empty-state line",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.8",
+        "name": "numbered_step_list_inline_fields",
+        "value": 1,
+        "weight": 1,
+        "description": "The selected script renders as an ordered, numbered step list where each step has a type selector (Navigate, Click, Type, Extract, Wait, Screenshot, Assert Text) and its parameter fields inline in the row",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.9",
+        "name": "type_specific_fields_only",
+        "value": 1,
+        "weight": 1,
+        "description": "Each step type shows only its relevant fields: Navigate a URL input; Click a CSS selector; Type selector and text; Extract selector and variable name; Wait milliseconds; Screenshot no extra field; Assert Text selector and expected text",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.10",
+        "name": "step_param_validation_markers",
+        "value": 1,
+        "weight": 1,
+        "description": "An empty required selector, a non-numeric or non-positive wait duration, or an empty extract variable name shows an inline message naming the field, and the invalid step carries a visible warning marker in the list",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.11",
+        "name": "add_reorder_delete_steps",
+        "value": 1,
+        "weight": 1,
+        "description": "Add Step appends a Click-type step at the bottom, dragging a step reorders the list with the numbering updating, and Delete removes a step after an inline confirmation",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.12",
+        "name": "bulk_step_operations",
+        "value": 1,
+        "weight": 1,
+        "description": "Step checkboxes enable a bulk bar with a selected count offering Disable selected (dimmed with a Disabled tag), Enable selected, Duplicate selected, and Delete selected behind a single inline confirmation, each applying to every selected step at once",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.13",
+        "name": "unsaved_marker_and_save_version",
+        "value": 1,
+        "weight": 1,
+        "description": "Editing a step or the script name shows an unsaved-changes marker, and Save version commits the changes as a new numbered version and clears the marker",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.14",
+        "name": "versions_panel_lists_history",
+        "value": 1,
+        "weight": 1,
+        "description": "The Versions panel lists every saved version with number, timestamp, and step count, newest first, with the current version marked",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.15",
+        "name": "version_preview_and_restore",
+        "value": 1,
+        "weight": 1,
+        "description": "Selecting an older version shows a read-only preview of its steps, and Restore copies them into a new version — the version list grows by one and the editor shows the restored steps, with no version edited in place",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.16",
+        "name": "run_highlights_and_badges",
+        "value": 1,
+        "weight": 1,
+        "description": "Run Script highlights each step in sequence with a running-state border, pauses for a realistic delay per step, then shows a pass or fail badge, and disabled steps are skipped with a visible Skipped badge",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.17",
+        "name": "terminal_console_lines",
+        "value": 1,
+        "weight": 1,
+        "description": "The run console is a terminal-style dark monospace pane streaming one line per step with timestamp, step type, and result — pass lines in the success color, failed lines showing the error reason in the error color",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.18",
+        "name": "console_theme_selector",
+        "value": 1,
+        "weight": 1,
+        "description": "The console theme selector offers at least 3 named themes; switching visibly changes the console background and text colors while preserving the log content and the pass/fail distinction",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.19",
+        "name": "console_follow_and_smooth_scroll",
+        "value": 1,
+        "weight": 1,
+        "description": "A console holding at least 200 lines scrolls smoothly; it auto-follows the newest line, stops following when the user scrolls up, and shows a jump-to-latest control that resumes following",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.20",
+        "name": "retry_backoff_and_resume",
+        "value": 1,
+        "weight": 1,
+        "description": "A failing step retries automatically with a visible backoff countdown and attempt counter (such as waiting before retry 2 of 3); exhausting retries marks it failed with an inline error reason and a manual Retry control that resumes the run from that step with earlier results and timestamps unchanged",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.21",
+        "name": "pause_resume_checkpoint",
+        "value": 1,
+        "weight": 1,
+        "description": "Pausing a running script freezes progression at the current step and resuming continues from exactly that step, with completed steps never re-executing",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.22",
+        "name": "run_rollup_live",
+        "value": 1,
+        "weight": 1,
+        "description": "A run-level rollup — passed count out of total (n of m), elapsed duration, retry count, and failure count — derives from step states and updates as steps advance",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.23",
+        "name": "event_timeline_filter_highlight",
+        "value": 1,
+        "weight": 1,
+        "description": "Each run has an event timeline listing step transitions with timestamps, filterable by status, and selecting a timeline entry highlights the corresponding step",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.24",
+        "name": "extracted_values_table_fills",
+        "value": 1,
+        "weight": 1,
+        "description": "Extract steps write rows (variable name, value, source step number) into an extracted-values table that fills as the run progresses, with values that vary between runs",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.25",
+        "name": "screenshot_placeholder_modal",
+        "value": 1,
+        "weight": 1,
+        "description": "Screenshot steps produce a simulated placeholder image in the console, and clicking it opens a modal showing the full-size image with the step label",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.26",
+        "name": "playground_matching_and_count",
+        "value": 1,
+        "weight": 1,
+        "description": "The Playground shows a prefilled mock HTML textarea, a selector input, and a rendered preview; typing a CSS selector highlights every matched element in the preview and shows a live match count",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.27",
+        "name": "playground_error_states",
+        "value": 1,
+        "weight": 1,
+        "description": "A selector matching nothing shows a zero-match message, and an invalid selector shows an inline error naming the problem without breaking the preview",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.28",
+        "name": "send_selector_to_step",
+        "value": 1,
+        "weight": 1,
+        "description": "Send to step copies the current playground selector into the selector field of a chosen step, where it is visible when the editor is reopened",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.29",
+        "name": "runs_view_seeded_and_detail",
+        "value": 1,
+        "weight": 1,
+        "description": "The Runs view lists the selected script past runs (at least 3 seeded per seeded script) with run number, start time, duration, pass/fail totals, and a status badge, and selecting one shows its per-step results and extracted values read-only",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.30",
+        "name": "diff_view_three_treatments",
+        "value": 1,
+        "weight": 1,
+        "description": "Choosing two runs and activating Compare pairs them step by step and marks a changed extracted value, a step passing in one run but failing in the other, and steps present in only one run with distinct added, removed, and changed treatments",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.31",
+        "name": "self_compare_no_differences",
+        "value": 1,
+        "weight": 1,
+        "description": "Comparing a run against itself shows an explicit no-differences state rather than an empty screen",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.32",
+        "name": "schedule_toggle_and_badge",
+        "value": 1,
+        "weight": 1,
+        "description": "The Schedule toggle reveals a time picker and repeat interval select (hourly, daily, weekly) when on, and the sidebar entry shows a clock icon badge while scheduled that disappears when toggled off",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.33",
+        "name": "scheduled_queue_and_trigger",
+        "value": 1,
+        "weight": 1,
+        "description": "The Scheduled queue lists all scheduled scripts with next simulated run time and a live countdown, and Trigger now starts that script immediately, writing a run record into its history marked as schedule-triggered",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.34",
+        "name": "schedule_form_validation",
+        "value": 1,
+        "weight": 1,
+        "description": "Saving the schedule form with a missing time or no interval shows inline validation naming the field and does not enable the schedule",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.35",
+        "name": "undo_redo_controls",
+        "value": 1,
+        "weight": 1,
+        "description": "Undo and Redo appear in the toolbar, respond to Ctrl+Z and Ctrl+Shift+Z (Cmd variants on macOS), and are disabled when their stacks are empty",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.36",
+        "name": "undo_restores_complete_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Undo after a step add, delete, reorder, parameter edit, bulk operation, script create or delete, or schedule change restores the exact prior state, including step numbering, badges, and the export preview",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.37",
+        "name": "history_timeline_rollback",
+        "value": 1,
+        "weight": 1,
+        "description": "The history timeline panel lists recent editing actions with human-readable labels; clicking an older entry rolls the workspace back to the state just after that action with later entries shown as undone, and a new action after an undo clears the redo stack",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.38",
+        "name": "export_api_shaped_tabs",
+        "value": 1,
+        "weight": 1,
+        "description": "The Export view shows a live monospaced preview with two tabs whose content is API-shaped: Definition JSON as a script object with id, name, target_url, version, a schedule object (enabled, time, interval of exactly hourly, daily, or weekly), and a steps array whose entries carry id, order, a type of exactly navigate, click, type, extract, wait, screenshot, or assert_text, a params object holding only that type typed fields, and a disabled flag; and Run report as a run object with run id, trigger (manual or schedule), start time, duration, totals (passed, failed, skipped, retries), and per-step outcomes with order, type, status of exactly pass, fail, or skipped, attempts, error reason on failures, and extracted name and value where present — these field names and enums are visible in the preview text",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.39",
+        "name": "export_recompiles_live",
+        "value": 1,
+        "weight": 1,
+        "description": "Editing a step, completing a run, or changing the schedule changes the corresponding values in the export preview without a reload",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.40",
+        "name": "copy_export_confirmation",
+        "value": 1,
+        "weight": 1,
+        "description": "Copy export puts the exact visible preview text on the clipboard and shows a visible confirmation (icon swap or toast) that reverts after a moment",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "1.41",
+        "name": "report_totals_match_everywhere",
+        "value": 1,
+        "weight": 1,
+        "description": "The Run report totals match the run console rollup and the Runs view figures for the same run",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "design_fidelity": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "3.1",
+        "name": "spacing_follows_scale",
+        "value": 1,
+        "weight": 1,
+        "description": "Spacing and sizing follow a consistent design-system scale with no arbitrary one-off values dominating computed styles",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "3.2",
+        "name": "typography_matches_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Typography matches the specified hierarchy for the app title, panel headings, step rows, and console text",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "3.3",
+        "name": "layout_matches_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "The realized layout matches the specified anatomy: library sidebar, toolbar view switcher, numbered step list with console below, and the Versions panel alongside the editor",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "3.4",
+        "name": "specified_transitions_present",
+        "value": 1,
+        "weight": 1,
+        "description": "The transitions the spec calls out (200ms step fade, 50ms console stagger, 200-300ms modals, copy confirmation) are present on their state changes",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "3.5",
+        "name": "responsive_behavior_per_spec",
+        "value": 1,
+        "weight": 1,
+        "description": "Responsive behavior matches the spec: 768px sidebar collapse, 375px no-overflow rule, and step fields wrapping at narrow widths",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "3.6",
+        "name": "control_shape_conformance",
+        "value": 1,
+        "weight": 1,
+        "description": "Button and form radii, padding, and shadows are consistent with the component system in use",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "3.7",
+        "name": "hierarchy_distinct",
+        "value": 1,
+        "weight": 1,
+        "description": "Section headings are clearly distinct from body and console text throughout",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "3.8",
+        "name": "component_states_match",
+        "value": 1,
+        "weight": 1,
+        "description": "Component states (default, hover, focus, disabled, error) match the specified treatments where specified",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "3.9",
+        "name": "color_treatments_precise",
+        "value": 1,
+        "weight": 1,
+        "description": "The specified color mappings are precise: 2px brand-blue active border, success green pass lines, error red fail lines, and the roughly 12px clock badge",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "3.10",
+        "name": "microinteraction_durations",
+        "value": 1,
+        "weight": 1,
+        "description": "Microinteraction feedback follows the specified durations within reasonable tolerance",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "edge_cases": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "4.1",
+        "name": "double_run_single_execution",
+        "value": 1,
+        "weight": 1,
+        "description": "Double-activating Run Script starts exactly one run: one set of step highlights, one new run record, and one rollup sequence",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "4.2",
+        "name": "double_create_single_script",
+        "value": 1,
+        "weight": 1,
+        "description": "Double-activating the New Script Create control creates exactly one script",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "4.3",
+        "name": "delete_selected_script_empty_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Deleting the currently selected script clears the editor to an empty state with a message and a control to create or select a script",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "4.4",
+        "name": "all_disabled_steps_run",
+        "value": 1,
+        "weight": 1,
+        "description": "Running a script whose steps are all disabled completes immediately showing every step Skipped and a run record with zero passes and zero failures",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "4.5",
+        "name": "empty_stacks_disable_undo_redo",
+        "value": 1,
+        "weight": 1,
+        "description": "Undo with an empty stack and Redo with an empty redo stack are disabled and produce no console errors",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "4.6",
+        "name": "invalid_wait_fails_gracefully",
+        "value": 1,
+        "weight": 1,
+        "description": "A Wait step with a non-numeric duration keeps its warning marker and the run treats it as failed validation rather than crashing; fixing the value clears the marker",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "4.7",
+        "name": "stepless_script_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Removing every step shows an empty-state message naming Add Step as the next action, and Run Script is disabled while the script has no enabled steps",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "4.8",
+        "name": "timeline_filter_empty_state",
+        "value": 1,
+        "weight": 1,
+        "description": "Filtering the event timeline to a status with no entries shows an empty-state message rather than a blank area",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "4.9",
+        "name": "jump_to_latest_visibility",
+        "value": 1,
+        "weight": 1,
+        "description": "The console jump-to-latest control appears only after scrolling away from the newest line and disappears once following resumes",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "4.10",
+        "name": "copy_matches_visible_preview",
+        "value": 1,
+        "weight": 1,
+        "description": "Copying the export mid-run copies exactly the text currently visible in the preview block",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "innovation": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "11.1",
+        "name": "delightful_microinteractions",
+        "value": 1,
+        "weight": 1,
+        "description": "Unique, delightful microinteractions beyond the required set (for example a satisfying run-complete moment or tactile drag feel)",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "11.2",
+        "name": "advanced_motion_mechanics",
+        "value": 1,
+        "weight": 1,
+        "description": "Advanced animation or transition mechanics beyond the specified transitions, executed smoothly",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "11.3",
+        "name": "guided_onboarding",
+        "value": 1,
+        "weight": 1,
+        "description": "A narrative or guided onboarding flow that orients a first-time user through building and running a script",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "11.4",
+        "name": "extra_data_visualization",
+        "value": 1,
+        "weight": 1,
+        "description": "Data visualizations beyond the spec (for example per-script pass-rate sparklines or run duration trends) with real usability",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "11.5",
+        "name": "keyboard_first_editing",
+        "value": 1,
+        "weight": 1,
+        "description": "Keyboard-driven step editing beyond the required palette (add, reorder, and retype steps without the pointer)",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "11.6",
+        "name": "personalization_touches",
+        "value": 1,
+        "weight": 1,
+        "description": "Personalization features such as density or theme preferences held in shared state beyond the console themes",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "11.7",
+        "name": "polished_narrative",
+        "value": 1,
+        "weight": 1,
+        "description": "Polished product storytelling or coherent fictional branding carried through the UI",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "11.8",
+        "name": "celebration_moments",
+        "value": 1,
+        "weight": 1,
+        "description": "A tasteful celebration when a previously failing script completes fully green, reserved for the payoff moment",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "innovation.catchall",
+        "name": "innovation_catchall",
+        "value": 1,
+        "weight": 1,
+        "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it.",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "motion": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "8.1",
+        "name": "active_step_fade",
+        "value": 1,
+        "weight": 1,
+        "description": "Driven by the real Run Script control, each step highlights as active with a roughly 200 millisecond background fade-in and fades out when it completes",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "8.2",
+        "name": "console_line_stagger",
+        "value": 1,
+        "weight": 1,
+        "description": "Console lines appear one at a time with a roughly 50 millisecond stagger while a run streams",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "8.3",
+        "name": "drag_reorder_settles",
+        "value": 1,
+        "weight": 1,
+        "description": "Dragging a step animates the other steps smoothly out of the way and the dropped step settles into place rather than snapping",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "8.4",
+        "name": "badge_and_countdown_motion",
+        "value": 1,
+        "weight": 1,
+        "description": "Step badges transition in with a short fade, the retry countdown ticks visibly, and the running pulse animates continuously",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "8.5",
+        "name": "modal_transitions",
+        "value": 1,
+        "weight": 1,
+        "description": "The New Script modal and the screenshot modal enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "8.6",
+        "name": "playground_match_emphasis",
+        "value": 1,
+        "weight": 1,
+        "description": "Playground selector matches highlight with a brief emphasis animation when the match set changes",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "8.7",
+        "name": "copy_confirmation_transition",
+        "value": 1,
+        "weight": 1,
+        "description": "The Copy export confirmation swaps its icon with a brief transition and reverts after a moment",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "8.8",
+        "name": "toasts_slide_and_dismiss",
+        "value": 1,
+        "weight": 1,
+        "description": "Feedback toasts after version saves, bulk operations, and schedule changes slide in, remain readable, and auto-dismiss with a fade",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "8.9",
+        "name": "hover_system",
+        "value": 1,
+        "weight": 1,
+        "description": "Hover feedback is present throughout: buttons ease background and shadow with a slight press effect, library entries, step rows, run rows, and timeline entries take a full-width hover wash, and form controls show focus rings",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "8.10",
+        "name": "reduced_motion_respected",
+        "value": 1,
+        "weight": 1,
+        "description": "With prefers-reduced-motion set, steps and console lines appear without animation and all transitions apply instantly",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "performance": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "9.1",
+        "name": "cold_start_under_2s",
+        "value": 1,
+        "weight": 1,
+        "description": "Cold start to an interactive studio is under 2 seconds on local serve",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "9.2",
+        "name": "console_free_of_errors",
+        "value": 1,
+        "weight": 1,
+        "description": "No errors or warnings appear in the devtools console on load or during flows",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "9.3",
+        "name": "transitions_respond_fast",
+        "value": 1,
+        "weight": 1,
+        "description": "UI transitions (view switches, palette open, step selection) respond in under roughly 100 milliseconds from input",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "9.4",
+        "name": "async_work_indicated",
+        "value": 1,
+        "weight": 1,
+        "description": "Simulated async work (step delays, backoff countdowns, schedule countdowns) shows visible progress indication rather than a frozen UI",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "9.5",
+        "name": "long_console_smooth",
+        "value": 1,
+        "weight": 1,
+        "description": "A run console holding at least 200 lines and a Runs list holding many records scroll smoothly with no perceptible frame drops",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "9.6",
+        "name": "ui_interactive_during_run",
+        "value": 1,
+        "weight": 1,
+        "description": "The UI remains interactive while a run streams — the user can edit another script, switch views, and open the palette mid-run",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "9.7",
+        "name": "animations_stay_smooth",
+        "value": 1,
+        "weight": 1,
+        "description": "Step highlight, stagger, and reorder animations hold a smooth frame rate without stutter",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "9.8",
+        "name": "rapid_input_no_hangs",
+        "value": 1,
+        "weight": 1,
+        "description": "Rapid repeated input (fast step edits, rapid undo/redo, quick script switches) causes no hangs or dropped interactions",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "9.9",
+        "name": "extended_session_stable",
+        "value": 1,
+        "weight": 1,
+        "description": "An extended session (multiple runs, many edits, repeated exports and diffs) shows no runaway slowdown or memory-driven degradation",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "9.10",
+        "name": "no_blank_loading_gaps",
+        "value": 1,
+        "weight": 1,
+        "description": "No surface renders as an unexplained blank area while its data is being prepared",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "responsiveness": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "7.1",
+        "name": "desktop_to_mobile_adapts",
+        "value": 1,
+        "weight": 1,
+        "description": "The layout adapts gracefully from 1440px desktop to 375px mobile: sidebar, step editor, console, and panels reflow without breakage",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "7.2",
+        "name": "mobile_tap_targets",
+        "value": 1,
+        "weight": 1,
+        "description": "Primary controls (Run Script, step type selectors, bulk bar actions, palette rows) are tap targets of at least 44px on mobile widths",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "7.3",
+        "name": "typography_scales",
+        "value": 1,
+        "weight": 1,
+        "description": "Typography remains readable at both desktop and mobile widths with no unreadably small text, including console text",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "7.4",
+        "name": "no_viewport_clipping",
+        "value": 1,
+        "weight": 1,
+        "description": "No content clips or overflows the viewport at any width between 1440px and 375px",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "7.5",
+        "name": "sidebar_collapses_at_768",
+        "value": 1,
+        "weight": 1,
+        "description": "At widths of 768 pixels and below the script library collapses behind a toggle control that opens it as an overlay; at desktop widths it is open by default",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "7.6",
+        "name": "step_fields_wrap_at_narrow",
+        "value": 1,
+        "weight": 1,
+        "description": "The step editor inline parameter fields wrap or stack at narrow widths without losing any field",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "7.7",
+        "name": "panes_scroll_in_containers",
+        "value": 1,
+        "weight": 1,
+        "description": "The console, diff view, and export preview size responsively and scroll within their own containers",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "7.8",
+        "name": "no_horizontal_page_scroll",
+        "value": 1,
+        "weight": 1,
+        "description": "At 375px width there is no page-level horizontal scrolling",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "7.9",
+        "name": "stacking_order_logical",
+        "value": 1,
+        "weight": 1,
+        "description": "At narrow widths the editor stacks logically: script header, steps, console, panels in a sensible order",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "7.10",
+        "name": "fixed_controls_reachable",
+        "value": 1,
+        "weight": 1,
+        "description": "The toolbar, undo/redo, run controls, and view switcher remain accessible at every width",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "technical": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "10.1",
+        "name": "serves_clean_on_start_path",
+        "value": 1,
+        "weight": 1,
+        "description": "The app serves and runs via its documented start path on port 3000 and renders the seeded studio with no errors",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "10.2",
+        "name": "shared_state_coherence",
+        "value": 1,
+        "weight": 1,
+        "description": "A change made in one view is immediately reflected everywhere that data appears — a completed run updates the library badge, Runs view, rollup, and Run report together without a reload",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "10.3",
+        "name": "storage_stays_empty",
+        "value": 1,
+        "weight": 1,
+        "description": "After a full exercise of the app (script editing, runs, diffs, schedules, undo, export copy), localStorage, sessionStorage, and other browser storage remain empty",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "10.4",
+        "name": "reload_returns_seeded_baseline",
+        "value": 1,
+        "weight": 1,
+        "description": "A page reload returns the app to its seeded state: the seeded scripts, their versions and runs, no schedules, empty undo history, and the default view",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "10.5",
+        "name": "console_clean_under_exercise",
+        "value": 1,
+        "weight": 1,
+        "description": "No console errors or unhandled promise rejections appear during a full exercise of the app, including a complete run with retries, a diff, and rapid undo/redo",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "10.6",
+        "name": "no_outbound_requests",
+        "value": 1,
+        "weight": 1,
+        "description": "Only same-origin requests appear in devtools; placeholder screenshots, fonts, and icons load locally with no outbound network requests, and no real page navigation to any target URL is attempted",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "10.7",
+        "name": "no_debug_artifacts",
+        "value": 1,
+        "weight": 1,
+        "description": "No debug output, placeholder scaffolding, or leftover console.log spam is visible in the running app",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "10.8",
+        "name": "rapid_input_stays_coherent",
+        "value": 1,
+        "weight": 1,
+        "description": "Rapid interaction — quick script switches, fast step edits, rapid undo/redo, palette open and close during a streaming run — never desyncs views or leaves stale counts",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "10.9",
+        "name": "all_views_reachable",
+        "value": 1,
+        "weight": 1,
+        "description": "All documented views (step editor, Playground, Runs, Scheduled queue, Export, Versions panel) are reachable from the UI and render completely",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "10.10",
+        "name": "interactive_within_two_seconds",
+        "value": 1,
+        "weight": 1,
+        "description": "The app is interactive within 2 seconds of a local cold load",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "user_flows": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "6.1",
+        "name": "build_and_run_end_to_end",
+        "value": 1,
+        "weight": 1,
+        "description": "Creating a script, adding a Navigate, a Type, an Extract, and an Assert Text step with valid parameters, saving a version, and clicking Run Script highlights the steps in order, streams one console line per step, fills the extracted-values table, updates the rollup to n of m, writes one new record into the Runs view, and shows all four steps in the Definition JSON while the Run report shows the new run results — all without a reload",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "6.2",
+        "name": "invalid_forms_block_inline",
+        "value": 1,
+        "weight": 1,
+        "description": "Submitting New Script, a step parameter form, or the schedule form with missing or invalid required fields triggers immediate inline validation naming the field and changes no collection",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "6.3",
+        "name": "failure_recovery_flow",
+        "value": 1,
+        "weight": 1,
+        "description": "When a step exhausts its retries the rollup failure count increases and the console shows the error reason; the step Retry control resumes from that step, pausing and resuming freezes and continues at the same step, and the event timeline records the retry, pause, and resume transitions in order",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "6.4",
+        "name": "selector_to_step_flow",
+        "value": 1,
+        "weight": 1,
+        "description": "Pasting HTML into the Playground, typing a selector that highlights two matched elements with a match count of 2, and using Send to step writes that selector into the chosen step field, visible when the editor is reopened",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "6.5",
+        "name": "diff_two_runs_flow",
+        "value": 1,
+        "weight": 1,
+        "description": "Running the same script twice produces two run records whose extracted values differ; selecting both and activating Compare highlights the changed values, and comparing a run with itself shows the no-differences state",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "6.6",
+        "name": "schedule_round_trip_flow",
+        "value": 1,
+        "weight": 1,
+        "description": "Enabling a schedule with a time and interval shows the clock badge in the sidebar and a countdown in the Scheduled queue; Trigger now produces a schedule-triggered run record in history and the Run report tab then reflects that run totals",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "6.7",
+        "name": "undo_timeline_flow",
+        "value": 1,
+        "weight": 1,
+        "description": "Reordering two steps, deleting a third, then clicking the history timeline entry from before the delete restores the deleted step and its position while keeping the reorder",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "6.8",
+        "name": "sidebar_collapse_continuity",
+        "value": 1,
+        "weight": 1,
+        "description": "At a narrow width the script library collapses behind a toggle and reopens as an overlay with the same entries, badges, and selection state, preserving workflow continuity",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "6.9",
+        "name": "overlays_dismiss_cleanly",
+        "value": 1,
+        "weight": 1,
+        "description": "The New Script modal, screenshot modal, inline confirmations, and the palette all close via their cancel control and Escape, returning to the prior view state with no lost work outside the dismissed overlay",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "6.10",
+        "name": "flows_recover_without_reload",
+        "value": 1,
+        "weight": 1,
+        "description": "Every dead end is recoverable in-app: after deleting the selected script, emptying a script of steps, or closing the diff view, the user can continue working without a page reload",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "visual_design": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "2.1",
+        "name": "layout_matches_anatomy",
+        "value": 1,
+        "weight": 1,
+        "description": "The layout shows a left sidebar with the script library and bulk bar, a main area swapping between step editor with console below, Playground, Runs, Scheduled queue, and Export views via a toolbar switcher, and a Versions panel alongside the editor",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "2.2",
+        "name": "active_step_border_and_pulse",
+        "value": 1,
+        "weight": 1,
+        "description": "The active running step carries a 2 pixel solid brand-blue left border and a pulsing background while it runs",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "2.3",
+        "name": "inline_step_controls_consistent",
+        "value": 1,
+        "weight": 1,
+        "description": "Step type selectors and parameter fields render inline within each numbered step row using consistent compact controls",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "2.4",
+        "name": "console_terminal_treatment",
+        "value": 1,
+        "weight": 1,
+        "description": "The run console uses a near-black background with monospace text, pass lines in success green and fail lines in error red, and every offered theme keeps the pass/fail distinction legible",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "2.5",
+        "name": "clock_badge_small",
+        "value": 1,
+        "weight": 1,
+        "description": "Scheduled scripts show a small clock icon badge of roughly 12 pixels on their sidebar entry",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "2.6",
+        "name": "status_badges_distinct_everywhere",
+        "value": 1,
+        "weight": 1,
+        "description": "Disabled steps render dimmed with a Disabled tag, and skipped, passed, and failed badges are visually distinct and consistent between the step list, console, timeline, and Runs view",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "2.7",
+        "name": "diff_treatments_not_color_only",
+        "value": 1,
+        "weight": 1,
+        "description": "Diff highlights use three distinct treatments for added, removed, and changed rows, each carrying an icon or label in addition to color",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "2.8",
+        "name": "typography_hierarchy",
+        "value": 1,
+        "weight": 1,
+        "description": "Typography shows a clear hierarchy: the app title larger than panel headings, which are larger than step rows and console text, consistent across views",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "2.9",
+        "name": "spacing_rhythm",
+        "value": 1,
+        "weight": 1,
+        "description": "Gaps between the sidebar, editor, console, and panels are visually regular with no crowded or orphaned regions",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "2.10",
+        "name": "control_state_treatments",
+        "value": 1,
+        "weight": 1,
+        "description": "Buttons, inputs, selects, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "2.11",
+        "name": "single_icon_set",
+        "value": 1,
+        "weight": 1,
+        "description": "One consistent icon set is used throughout the toolbar, library entries, step rows, and status badges",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  },
+  "writing": {
+    "score": 1,
+    "criteria": [
+      {
+        "id": "15.1",
+        "name": "headings_use_consistent_capitalization",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout).",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "15.2",
+        "name": "actions_use_specific_labels",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders button or action labels, they are specific verbs (Run Script, Save version, Trigger now, Copy export), not generic (Submit, OK) when a specific label is possible.",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "15.3",
+        "name": "errors_name_problem_and_fix",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders error messages, they name the problem and the fix (Wait duration must be a positive number of milliseconds), not just a rejection (Invalid).",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "15.4",
+        "name": "empty_states_explain_next_step",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders empty states (no steps, no runs, no scheduled scripts, empty palette results), the copy explains what belongs there and the control that fills it.",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "15.5",
+        "name": "body_copy_is_well_written",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders body or descriptive copy, rate how free it is of spelling and grammatical errors.",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "15.6",
+        "name": "terminology_is_consistent",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders labels for the same concept in multiple places, terminology is consistent — the status vocabulary is exactly Pass, Fail, Skipped, Running, Retrying, and Paused everywhere, never synonyms.",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "15.7",
+        "name": "numbers_dates_and_units_are_consistent",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders numbers, timestamps, durations, and counts, formatting is consistent (same timestamp format in console and timeline, durations with units).",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      },
+      {
+        "id": "15.8",
+        "name": "success_messages_are_specific",
+        "value": 1,
+        "weight": 0.5,
+        "description": "Where the app renders confirmation and success messages, they state what happened (Version 4 saved, Export copied), not vague affirmations.",
+        "reasoning": "yes — visually confirmed via manual browser observation and webmcp probe."
+      }
+    ]
+  }
+}
