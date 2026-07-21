@@ -83,19 +83,42 @@ const formatKpi = (kpi, value) => kpi.format === 'currency' ? `$${Number(value).
 function useCountUp(target) {
   const [value, setValue] = useState(0)
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setValue(target); return }
-    setValue(0)
+    const mql = window.matchMedia('(prefers-reduced-motion: reduce)')
     let frame
-    let start = 0
-    const tick = (time) => {
-      if (!start) start = time
-      const progress = Math.min(1, (time - start) / 800)
-      setValue(Math.round(target * (1 - Math.pow(1 - progress, 3))))
-      if (progress < 1) frame = requestAnimationFrame(tick)
+
+    const runAnimation = () => {
+      if (mql.matches) {
+        setValue(target)
+        return
+      }
+      setValue(0)
+      let start = 0
+      const tick = (time) => {
+        if (!start) start = time
+        const progress = Math.min(1, (time - start) / 800)
+        setValue(Math.round(target * (1 - Math.pow(1 - progress, 3))))
+        if (progress < 1) frame = requestAnimationFrame(tick)
+        else if (progress === 1) setValue(target)
+      }
+      frame = requestAnimationFrame(() => { frame = requestAnimationFrame(tick) })
     }
-    // Defer start so an early sample within ~100ms still sees 0.
-    frame = requestAnimationFrame(() => { frame = requestAnimationFrame(tick) })
-    return () => cancelAnimationFrame(frame)
+
+    runAnimation()
+
+    const listener = (e) => {
+      cancelAnimationFrame(frame)
+      if (e.matches) {
+        setValue(target)
+      } else {
+        runAnimation()
+      }
+    }
+
+    mql.addEventListener('change', listener)
+    return () => {
+      cancelAnimationFrame(frame)
+      mql.removeEventListener('change', listener)
+    }
   }, [target])
   return value
 }
@@ -478,7 +501,9 @@ function ExportDrawer({ openerRef }) {
     const link = document.createElement('a')
     link.href = url
     link.download = format === 'json' ? 'promptops-session.json' : 'promptops-agents.csv'
+    document.body.appendChild(link)
     link.click()
+    document.body.removeChild(link)
     URL.revokeObjectURL(url)
     useCommandStore.getState().markArtifactAction(`Downloaded ${format === 'json' ? 'Session JSON' : 'Agents CSV'}`, `${format === 'json' ? 'Session JSON' : 'Agents CSV'} downloaded.`)
   }
@@ -563,7 +588,7 @@ function SummaryDialog() {
           <p className="summary-stamp">PromptOps command center · captured {new Date().toLocaleString()}</p>
           <div className="summary-kpis">{kpis.map((kpi) => <div key={kpi.key}><span>{kpi.label}</span><strong>{formatKpi(kpi, kpi.current)}</strong><em className={kpi.trend >= 0 ? 'positive' : 'negative'}>{kpi.trend >= 0 ? '+' : ''}{kpi.trend}%</em></div>)}</div>
           <h3>Connected agents ({state.agents.length})</h3>
-          {state.agents.length ? <table className="breakdown-table summary-table"><thead><tr><th>Name</th><th>Model</th><th>State</th><th>Last active</th></tr></thead><tbody>{state.agents.map((agent) => <tr key={agent.id}><td>{agent.name}</td><td>{agent.model}</td><td>{agent.state}</td><td>{relativeTime(agent.lastActive)}</td></tr>)}</tbody></table> : <p className="summary-empty">No agents are connected right now.</p>}
+          {state.agents.length ? <div className="breakdown-table-wrap"><table className="breakdown-table summary-table"><thead><tr><th>Name</th><th>Model</th><th>State</th><th>Last active</th></tr></thead><tbody>{state.agents.map((agent) => <tr key={agent.id}><td>{agent.name}</td><td>{agent.model}</td><td>{agent.state}</td><td>{relativeTime(agent.lastActive)}</td></tr>)}</tbody></table></div> : <p className="summary-empty">No agents are connected right now.</p>}
           <h3>Schedule</h3>
           <p className="summary-schedule">Night mode is {state.theme === 'night' ? 'active' : state.nightSchedule.enable ? `scheduled from ${state.nightSchedule.startTime} to ${state.nightSchedule.endTime}` : 'disabled'} · {state.events.length} activity events on record · last mutation: {state.lastAction}.</p>
         </div>
