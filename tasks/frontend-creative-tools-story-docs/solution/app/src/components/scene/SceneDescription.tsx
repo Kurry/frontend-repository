@@ -1,116 +1,125 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useStore } from '@nanostores/react';
 import { editScene, toggleCheckbox } from '@/store';
-import { marked } from 'marked';
+import { editingSceneIdStore, showToast } from '@/store/ui';
+import { renderMarkdownHtml, toggleChecklistLine } from '@/lib/markdown';
 import { clsx } from 'clsx';
 
-interface SceneDescriptionProps {
-    sceneId: string;
-    body: string;
-}
+export function SceneDescription({ sceneId, body }: { sceneId: string; body: string }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editText, setEditText] = useState(body);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const editingTarget = useStore(editingSceneIdStore);
 
-export function SceneDescription({ sceneId, body }: SceneDescriptionProps) {
-    const [isEditing, setIsEditing] = useState(false);
-    const [editText, setEditText] = useState(body);
-    const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const html = useMemo(() => renderMarkdownHtml(body), [body]);
 
-    useEffect(() => {
-        setEditText(body);
-    }, [body]);
-
-    useEffect(() => {
-        if (isEditing && textareaRef.current) {
-            textareaRef.current.focus();
-            // Move cursor to end
-            textareaRef.current.selectionStart = textareaRef.current.value.length;
-            textareaRef.current.selectionEnd = textareaRef.current.value.length;
-        }
-    }, [isEditing]);
-
-    const handleSave = () => {
-        setIsEditing(false);
-        if (editText !== body && editText.trim().length >= 8) {
-            editScene(sceneId, { body: editText });
-        } else if (editText.trim().length < 8) {
-            setEditText(body); // Revert on invalid
-        }
-    };
-
-    const renderMarkdown = (text: string) => {
-        // Custom renderer for checkboxes to make them interactive via data attributes
-        const renderer = new marked.Renderer();
-        renderer.listitem = (text) => {
-            if (text.includes('task-list-item')) {
-                 return `<li class="task-list-item">${text}</li>`;
-            }
-            return `<li>${text}</li>`;
-        };
-        renderer.checkbox = (checked) => {
-            return `<input type="checkbox" aria-label="Toggle checklist item" role="checkbox" aria-checked="${checked}" class="scene-checkbox" ${checked ? 'checked' : ''} />`;
-        };
-
-        marked.setOptions({ renderer });
-        return { __html: marked.parse(text) as string };
-    };
-
-    const handleContentClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        if ((e.target as HTMLElement).classList.contains('scene-checkbox')) {
-            const checkbox = e.target as HTMLInputElement;
-            // Find the line in the markdown and toggle it
-            const lines = body.split('\n');
-            let checkboxCount = 0;
-            const newLines = lines.map(line => {
-                const match = line.match(/^(\s*-\s*\[)([ xX])(\]\s+.*)/);
-                if (match) {
-                    if (checkboxCount === Array.from(document.querySelectorAll(`[data-scene-id="${sceneId}"] .scene-checkbox`)).indexOf(checkbox)) {
-                        return `${match[1]}${checkbox.checked ? 'x' : ' '}${match[3]}`;
-                    }
-                    checkboxCount++;
-                }
-                return line;
-            });
-            toggleCheckbox(sceneId, newLines.join('\n'));
-            e.stopPropagation();
-        } else {
-            setIsEditing(true);
-        }
-    };
-
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-        if (!isEditing && (e.key === 'Enter' || e.key === ' ')) {
-            setIsEditing(true);
-            e.preventDefault();
-        }
-    };
-
-    if (isEditing) {
-        return (
-            <textarea
-                ref={textareaRef}
-                className="w-full h-full min-h-[100px] p-2 text-sm bg-yellow-50 border-2 border-dashed border-yellow-400 focus:outline-none resize-none scene-description is-editing"
-                value={editText}
-                onChange={(e) => setEditText(e.target.value)}
-                onBlur={handleSave}
-                onKeyDown={(e) => {
-                    if (e.key === 'Escape') {
-                        setEditText(body);
-                        setIsEditing(false);
-                    }
-                }}
-            />
-        );
+  // External "Edit Scene" request from the kebab menu.
+  useEffect(() => {
+    if (editingTarget === sceneId) {
+      setEditText(body);
+      setIsEditing(true);
+      editingSceneIdStore.set(null);
     }
+  }, [editingTarget, sceneId, body]);
 
+  useEffect(() => {
+    setEditText(body);
+  }, [body]);
+
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.focus();
+      const end = textareaRef.current.value.length;
+      textareaRef.current.setSelectionRange(end, end);
+    }
+  }, [isEditing]);
+
+  // Wire rendered checkboxes to their body-source lines (mouse + keyboard).
+  useEffect(() => {
+    const root = contentRef.current;
+    if (!root || isEditing) return;
+    const boxes = Array.from(root.querySelectorAll<HTMLInputElement>('input.scene-checkbox'));
+    const handlers = boxes.map((box) => {
+      const handler = () => {
+        const index = Number(box.dataset.cbIndex ?? '0');
+        const next = toggleChecklistLine(body, index);
+        if (next) toggleCheckbox(sceneId, next);
+      };
+      box.addEventListener('change', handler);
+      return () => box.removeEventListener('change', handler);
+    });
+    return () => handlers.forEach((off) => off());
+  }, [html, body, sceneId, isEditing]);
+
+  const save = () => {
+    setIsEditing(false);
+    const trimmed = editText.trim();
+    if (trimmed === body) return;
+    if (trimmed.length < 8) {
+      setEditText(body);
+      showToast('Description must be at least 8 characters');
+      return;
+    }
+    if (trimmed.length > 2000) {
+      setEditText(body);
+      showToast('Description must be at most 2,000 characters');
+      return;
+    }
+    editScene(sceneId, { body: trimmed });
+    showToast('Description updated');
+  };
+
+  if (isEditing) {
     return (
-        <div
-            className="scene-description prose prose-sm max-w-none cursor-pointer hover:bg-yellow-50/50 p-2 -mx-2 rounded transition-colors focus:ring-2 focus:ring-yellow-400"
-            tabIndex={0}
-            onClick={handleContentClick}
-            onFocus={() => setIsEditing(true)}
-            onKeyDown={handleKeyDown}
-            data-scene-id={sceneId}
-            dangerouslySetInnerHTML={renderMarkdown(body)}
-            role="button"
-            aria-label="Edit scene description"
-        />
+      <textarea
+        ref={textareaRef}
+        aria-label="Edit scene description"
+        value={editText}
+        onChange={(e) => setEditText(e.target.value)}
+        onBlur={save}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            e.stopPropagation();
+            setEditText(body);
+            setIsEditing(false);
+          } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+            e.preventDefault();
+            save();
+          }
+        }}
+        className={clsx(
+          'scene-description is-editing min-h-24 w-full resize-y rounded-lg border-2 border-dashed border-yellow-400 bg-yellow-50 p-2.5 text-sm leading-relaxed text-gray-800',
+          'shadow-inner outline-none transition-colors focus:border-yellow-500 focus:bg-yellow-50'
+        )}
+      />
     );
+  }
+
+  return (
+    <div
+      ref={contentRef}
+      role="button"
+      tabIndex={0}
+      aria-label="Edit scene description"
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest('input.scene-checkbox')) return;
+        setEditText(body);
+        setIsEditing(true);
+      }}
+      onKeyDown={(e) => {
+        if (e.target !== e.currentTarget) return;
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          setEditText(body);
+          setIsEditing(true);
+        }
+      }}
+      className={clsx(
+        'scene-description md-body cursor-text rounded-lg p-1.5 text-sm leading-relaxed text-gray-600 transition-colors',
+        'hover:bg-yellow-50/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400'
+      )}
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
 }

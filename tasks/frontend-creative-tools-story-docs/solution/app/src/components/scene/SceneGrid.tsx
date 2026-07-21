@@ -1,9 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useStore } from '@nanostores/react';
-import { filteredScenes, viewModeStore, activeSlideIndexStore, searchFilterStore, statusFilterStore, reorderScenes, setCanvasPosition } from '@/store';
+import gsap from 'gsap';
+import { Flip } from 'gsap/Flip';
+import { clsx } from 'clsx';
+import {
+  filteredScenes,
+  viewModeStore,
+  activeSlideIndexStore,
+  searchFilterStore,
+  statusFilterStore,
+  reorderScenes,
+  setCanvasPosition,
+  canvasGridPosition,
+  layoutTickStore,
+  type Scene,
+} from '@/store';
+import {
+  isAddSceneOpenStore,
+  isCommandPaletteOpenStore,
+  isExportDrawerOpenStore,
+  isImportModalOpenStore,
+  versionHistorySceneIdStore,
+  openAddScene,
+  showToast,
+} from '@/store/ui';
+import { prefersReducedMotion } from '@/lib/motion';
 import { SceneCard } from './SceneCard';
 import { AddSceneForm } from './AddSceneForm';
-import { clsx } from 'clsx';
+import { Ri } from '../common/Ri';
+
+gsap.registerPlugin(Flip);
+
+function anyDialogOpen(): boolean {
+  return (
+    isCommandPaletteOpenStore.get() ||
+    isExportDrawerOpenStore.get() ||
+    isImportModalOpenStore.get() ||
+    versionHistorySceneIdStore.get() !== null
+  );
+}
 
 export function SceneGrid() {
   const scenes = useStore(filteredScenes);
@@ -11,150 +46,366 @@ export function SceneGrid() {
   const activeSlideIndex = useStore(activeSlideIndexStore);
   const searchFilter = useStore(searchFilterStore);
   const statusFilter = useStore(statusFilterStore);
+  const isAdding = useStore(isAddSceneOpenStore);
+  const [dismissedWelcome, setDismissedWelcome] = useState(false);
 
-  const [isAdding, setIsAdding] = useState(false);
-
-  // Drag and Drop State for Tile/List reordering
+  const gridRef = useRef<HTMLDivElement>(null);
+  const flipStateRef = useRef<Flip.FlipState | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [draggingCanvasId, setDraggingCanvasId] = useState<string | null>(null);
+  const canvasDragRef = useRef<{
+    id: string;
+    startX: number;
+    startY: number;
+    baseX: number;
+    baseY: number;
+    moved: boolean;
+  } | null>(null);
 
-  // Canvas drag state
-  const [canvasDrag, setCanvasDrag] = useState<{ id: string, startX: number, startY: number, initialX: number, initialY: number } | null>(null);
-
-  // Slide navigation
-  const handlePrev = () => {
-    if (activeSlideIndex > 0) activeSlideIndexStore.set(activeSlideIndex - 1);
-  };
-  const handleNext = () => {
-    if (activeSlideIndex < scenes.length - 1) activeSlideIndexStore.set(activeSlideIndex + 1);
-  };
-
-  // Reordering handlers (Tile/List)
-  const handleDragStart = (e: React.DragEvent, index: number) => {
-      if (viewMode === 'canvas') return;
-      setDraggedIndex(index);
-      e.dataTransfer.effectAllowed = 'move';
-  };
-  const handleDragOver = (e: React.DragEvent, index: number) => {
-      if (viewMode === 'canvas') return;
-      e.preventDefault();
-  };
-  const handleDrop = (e: React.DragEvent, index: number) => {
-      if (viewMode === 'canvas' || draggedIndex === null || draggedIndex === index) return;
-      reorderScenes(draggedIndex, index);
-      setDraggedIndex(null);
-  };
-
-  // Canvas Drag Handlers
-  const handleCanvasPointerDown = (e: React.PointerEvent, id: string, x: number, y: number) => {
-      if (viewMode !== 'canvas') return;
-      e.target.setPointerCapture(e.pointerId);
-      setCanvasDrag({ id, startX: e.clientX, startY: e.clientY, initialX: x, initialY: y });
-  };
-  const handleCanvasPointerMove = (e: React.PointerEvent) => {
-      if (!canvasDrag || viewMode !== 'canvas') return;
-      const dx = e.clientX - canvasDrag.startX;
-      const dy = e.clientY - canvasDrag.startY;
-      setCanvasPosition(canvasDrag.id, canvasDrag.initialX + dx, canvasDrag.initialY + dy);
-  };
-  const handleCanvasPointerUp = (e: React.PointerEvent) => {
-      if (!canvasDrag || viewMode !== 'canvas') return;
-      e.target.releasePointerCapture(e.pointerId);
-      setCanvasDrag(null);
-  };
-
-  if (scenes.length === 0) {
-    if (searchFilter || statusFilter !== 'all') {
-         return (
-             <div className="flex flex-col items-center justify-center py-20 text-center">
-                 <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                 </div>
-                 <h2 className="text-lg font-semibold text-gray-900 mb-2">No matches found</h2>
-                 <p className="text-gray-500 mb-6 max-w-md">Try adjusting your search or clearing the status filter to see all scenes.</p>
-                 <button
-                    className="btn btn-outline hover:bg-gray-50 focus:ring-2 focus:ring-yellow-400"
-                    onClick={() => { searchFilterStore.set(''); statusFilterStore.set('all'); }}
-                 >
-                    Clear Filters
-                 </button>
-             </div>
-         );
+  /* Keep the active slide inside the visible range. */
+  useEffect(() => {
+    if (scenes.length === 0) {
+      if (activeSlideIndex !== 0) activeSlideIndexStore.set(0);
+    } else if (activeSlideIndex > scenes.length - 1) {
+      activeSlideIndexStore.set(scenes.length - 1);
     }
+  }, [scenes.length, activeSlideIndex]);
 
+  /* Capture pre-change layout for FLIP settle on deletes/reorders/undo/import. */
+  useEffect(() => {
+    const unsub = layoutTickStore.subscribe(() => {
+      const mode = viewModeStore.get();
+      if (prefersReducedMotion() || (mode !== 'tile' && mode !== 'list')) return;
+      flipStateRef.current = Flip.getState(gridRef.current?.querySelectorAll('[data-flip-id]') ?? [], {
+        props: 'opacity',
+      });
+    });
+    return unsub;
+  }, []);
+
+  /* Capture pre-change layout when toggling between Tile and List. */
+  const prevModeRef = useRef(viewMode);
+  useEffect(() => {
+    const unsub = viewModeStore.subscribe((mode) => {
+      const prev = prevModeRef.current;
+      prevModeRef.current = mode;
+      const relayout = ['tile', 'list'];
+      if (prefersReducedMotion() || !relayout.includes(prev) || !relayout.includes(mode)) return;
+      flipStateRef.current = Flip.getState(gridRef.current?.querySelectorAll('[data-flip-id]') ?? [], {
+        props: 'opacity',
+      });
+    });
+    return unsub;
+  }, []);
+
+  /* After React re-renders, ease remaining cards into their new slots. */
+  useLayoutEffect(() => {
+    const state = flipStateRef.current;
+    if (!state) return;
+    flipStateRef.current = null;
+    Flip.from(state, {
+      duration: 0.38,
+      ease: 'power2.out',
+      absolute: false,
+      onEnter: (els) =>
+        gsap.fromTo(els, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out', clearProps: 'transform' }),
+      onComplete: () => {
+        // Never leave inline transforms behind — they would block the CSS hover lift.
+        gridRef.current?.querySelectorAll('[data-flip-id]').forEach((el) => {
+          gsap.set(el, { clearProps: 'transform' });
+        });
+      },
+    });
+  }, [scenes, viewMode]);
+
+  /* Slide mode: arrow keys advance when no dialog is open. */
+  useEffect(() => {
+    if (viewMode !== 'slide') return;
+    const onKey = (e: KeyboardEvent) => {
+      if (anyDialogOpen() || isAddSceneOpenStore.get()) return;
+      const target = e.target as HTMLElement | null;
+      if (target && target.closest('[role="dialog"], textarea, input, select')) return;
+      const list = filteredScenes.get();
+      if (e.key === 'ArrowRight') {
+        const idx = activeSlideIndexStore.get();
+        if (idx < list.length - 1) {
+          e.preventDefault();
+          activeSlideIndexStore.set(idx + 1);
+        }
+      } else if (e.key === 'ArrowLeft') {
+        const idx = activeSlideIndexStore.get();
+        if (idx > 0) {
+          e.preventDefault();
+          activeSlideIndexStore.set(idx - 1);
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [viewMode]);
+
+  /* Reorder handlers (Tile / List) */
+  const onDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', String(index));
+  };
+  const onDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+  const onDrop = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) {
+      setDraggedIndex(null);
+      return;
+    }
+    reorderScenes(draggedIndex, index);
+    setDraggedIndex(null);
+    showToast('Scenes Reordered');
+  };
+
+  /* Canvas free-drag handlers (position only — never order). */
+  const onCanvasPointerDown = (e: React.PointerEvent, scene: Scene, index: number) => {
+    if (e.button !== 0) return;
+    const grid = canvasGridPosition(index);
+    canvasDragRef.current = {
+      id: scene.id,
+      startX: e.clientX,
+      startY: e.clientY,
+      baseX: scene.canvasX ?? grid.x,
+      baseY: scene.canvasY ?? grid.y,
+      moved: false,
+    };
+  };
+  const onCanvasPointerMove = (e: React.PointerEvent) => {
+    const drag = canvasDragRef.current;
+    if (!drag) return;
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    if (!drag.moved && Math.hypot(dx, dy) > 4) {
+      drag.moved = true;
+      setDraggingCanvasId(drag.id);
+      // Capture only once this is a real drag, so plain clicks still reach card content.
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    }
+    if (drag.moved) {
+      setCanvasPosition(drag.id, Math.max(0, drag.baseX + dx), Math.max(0, drag.baseY + dy));
+    }
+  };
+  const onCanvasPointerUp = (e: React.PointerEvent, scene: Scene) => {
+    const drag = canvasDragRef.current;
+    canvasDragRef.current = null;
+    if (!drag) return;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      /* pointer capture may already be released */
+    }
+    if (drag.moved) {
+      setDraggingCanvasId(null);
+      const card = gridRef.current?.querySelector(`[data-flip-id="${scene.id}"]`);
+      if (card && !prefersReducedMotion()) {
+        gsap.fromTo(card, { scale: 1.03 }, { scale: 1, duration: 0.25, ease: 'power2.out', clearProps: 'transform' });
+      }
+    }
+  };
+
+  /* ------------------------- Empty states ------------------------- */
+  if (scenes.length === 0) {
+    const filteredEmpty = searchFilter.trim() !== '' || statusFilter !== 'all';
     return (
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 bg-yellow-50 rounded-full flex items-center justify-center mb-4 text-yellow-600">
-               <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-            </div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">It's a blank canvas</h2>
-            <p className="text-gray-500 mb-6 max-w-md">Start building your storyboard by adding your first scene.</p>
+      <section className="flex flex-col items-center justify-center px-4 py-16 text-center" aria-live="polite">
+        {filteredEmpty ? (
+          <>
+            <span className="mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-gray-100 text-gray-400">
+              <Ri name="search-line" size={28} />
+            </span>
+            <h2 className="text-lg font-bold tracking-tight text-gray-900">No Matching Scenes</h2>
+            <p className="mt-1.5 max-w-md text-sm text-gray-500">
+              No scenes match the current search or status filter. Clear filters to see the full board again.
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                searchFilterStore.set('');
+                statusFilterStore.set('all');
+              }}
+              className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-yellow-400 hover:bg-yellow-50 hover:text-yellow-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+            >
+              <Ri name="close-line" size={16} />
+              Clear Filters
+            </button>
+          </>
+        ) : (
+          <>
+            <span className="mb-4 grid h-16 w-16 place-items-center rounded-2xl bg-yellow-50 text-yellow-600 ring-1 ring-inset ring-yellow-200/70">
+              <Ri name="apps-line" size={28} />
+            </span>
+            <h2 className="text-lg font-bold tracking-tight text-gray-900">No Scenes Left</h2>
+            <p className="mt-1.5 max-w-md text-sm text-gray-500">
+              Every scene has been deleted, so the board is empty. Add a scene below to start rebuilding your
+              storyboard.
+            </p>
             {isAdding ? (
-                <div className="w-full max-w-2xl text-left"><AddSceneForm onClose={() => setIsAdding(false)} /></div>
+              <div className="mt-6 w-full max-w-2xl text-left">
+                <AddSceneForm />
+              </div>
             ) : (
-                <button className="btn btn-primary bg-yellow-400 hover:bg-yellow-500 text-yellow-950 border-none focus:ring-2 focus:ring-yellow-600 focus:ring-offset-2" onClick={() => setIsAdding(true)}>
-                    Add Scene
-                </button>
+              <button
+                type="button"
+                onClick={() => openAddScene()}
+                className="mt-6 inline-flex h-11 items-center gap-2 rounded-xl bg-yellow-400 px-5 text-sm font-bold text-yellow-950 shadow-sm shadow-yellow-400/40 transition-all hover:bg-yellow-300 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-500 focus-visible:ring-offset-2"
+              >
+                <Ri name="add-line" size={18} />
+                Add Scene
+              </button>
             )}
-        </div>
+          </>
+        )}
+      </section>
     );
   }
 
-  return (
-    <main className="pb-24" aria-label="Storyboard Main Content">
-      {isAdding && <AddSceneForm onClose={() => setIsAdding(false)} />}
+  /* --------------------------- Board ------------------------------ */
+  const isSlide = viewMode === 'slide';
+  const isCanvas = viewMode === 'canvas';
+  const activeScene = scenes[Math.min(activeSlideIndex, scenes.length - 1)];
 
-      {viewMode === 'slide' && scenes.length > 0 && (
-          <div className="flex items-center justify-between mb-6 bg-white p-4 rounded-xl border border-gray-200 shadow-sm sticky top-32 z-10" aria-label="Slide Controls">
-              <button className="btn btn-sm btn-ghost focus:ring-2 focus:ring-yellow-400" disabled={activeSlideIndex === 0} onClick={handlePrev} aria-label="Previous slide">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg> Prev
-              </button>
-              <span className="text-sm font-medium text-gray-600" aria-live="polite">
-                  Scene {activeSlideIndex + 1} of {scenes.length}
-              </span>
-              <button className="btn btn-sm btn-ghost focus:ring-2 focus:ring-yellow-400" disabled={activeSlideIndex === scenes.length - 1} onClick={handleNext} aria-label="Next slide">
-                  Next <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
-              </button>
-          </div>
+  return (
+    <section aria-label="Scene board">
+      {dismissedWelcome === false && (
+        <div className="mb-5 flex items-start gap-3 rounded-xl bg-yellow-50 px-4 py-3 ring-1 ring-inset ring-yellow-200/70">
+          <Ri name="sparkling-2-fill" size={17} className="mt-0.5 shrink-0 text-yellow-500" />
+          <p className="min-w-0 flex-1 text-sm text-yellow-900">
+            <strong className="font-bold">Welcome to Docs!</strong> Click any scene description to edit it in
+            place, switch view modes below, and press <kbd className="rounded border border-yellow-300 bg-white px-1 py-0.5 text-[10px] font-bold">⌘K</kbd> for
+            the command palette.
+          </p>
+          <button
+            type="button"
+            aria-label="Dismiss welcome message"
+            onClick={() => setDismissedWelcome(true)}
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-yellow-700 transition-colors hover:bg-yellow-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          >
+            <Ri name="close-line" size={15} />
+          </button>
+        </div>
+      )}
+
+      {isAdding && (
+        <div className="mb-6">
+          <AddSceneForm />
+        </div>
+      )}
+
+      {isSlide && (
+        <div
+          className="mb-5 flex items-center justify-between rounded-xl border border-gray-200 bg-white px-3 py-2 shadow-sm"
+          aria-label="Slide controls"
+        >
+          <button
+            type="button"
+            disabled={activeSlideIndex <= 0}
+            onClick={() => activeSlideIndexStore.set(Math.max(0, activeSlideIndex - 1))}
+            aria-label="Previous scene"
+            className="inline-flex h-11 items-center gap-1 rounded-lg px-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 disabled:pointer-events-none disabled:opacity-30"
+          >
+            <Ri name="arrow-left-s-line" size={19} />
+            Prev
+          </button>
+          <span className="text-sm font-semibold tabular-nums text-gray-600" aria-live="polite">
+            Scene {Math.min(activeSlideIndex, scenes.length - 1) + 1} of {scenes.length}
+          </span>
+          <button
+            type="button"
+            disabled={activeSlideIndex >= scenes.length - 1}
+            onClick={() => activeSlideIndexStore.set(Math.min(scenes.length - 1, activeSlideIndex + 1))}
+            aria-label="Next scene"
+            className="inline-flex h-11 items-center gap-1 rounded-lg px-3 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 disabled:pointer-events-none disabled:opacity-30"
+          >
+            Next
+            <Ri name="arrow-right-s-line" size={19} />
+          </button>
+        </div>
       )}
 
       <div
+        ref={gridRef}
         className={clsx(
-          "w-full transition-all duration-300 scenes-grid",
-          viewMode === 'tile' && "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6",
-          viewMode === 'list' && "flex flex-col gap-4 max-w-4xl is-list",
-          viewMode === 'slide' && "flex justify-center is-slide",
-          viewMode === 'canvas' && "relative h-[800px] bg-gray-50/50 rounded-xl border-2 border-dashed border-gray-200 overflow-hidden"
+          'scenes-grid transition-opacity duration-200',
+          viewMode === 'tile' && 'grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4',
+          viewMode === 'list' && 'is-list flex max-w-4xl flex-col gap-4',
+          viewMode === 'slide' && 'is-slide',
+          viewMode === 'canvas' &&
+            'canvas-surface relative min-h-[560px] overflow-auto rounded-2xl border-2 border-dashed border-gray-300/80 bg-[#fafaf7]'
         )}
       >
-        {scenes.map((scene, i) => (
-            <div
-                key={scene.id}
-                draggable={viewMode === 'tile' || viewMode === 'list'}
-                onDragStart={(e) => handleDragStart(e, i)}
-                onDragOver={(e) => handleDragOver(e, i)}
-                onDrop={(e) => handleDrop(e, i)}
-                onPointerDown={(e) => handleCanvasPointerDown(e, scene.id, scene.canvasX || (i % 4) * 300, scene.canvasY || Math.floor(i / 4) * 350)}
-                onPointerMove={handleCanvasPointerMove}
-                onPointerUp={handleCanvasPointerUp}
-                className={clsx("transition-opacity", draggedIndex === i && "opacity-50", viewMode === 'canvas' && "absolute touch-none")}
-                style={viewMode === 'canvas' ? { left: scene.canvasX || (i % 4) * 300, top: scene.canvasY || Math.floor(i / 4) * 350, zIndex: canvasDrag?.id === scene.id ? 10 : 1 } : undefined}
-            >
-                <SceneCard scene={scene} index={i} layout={viewMode} isActiveSlide={i === activeSlideIndex} />
+        {isSlide ? (
+          activeScene && (
+            <div key={activeScene.id} className="slide-slot">
+              <SceneCard scene={activeScene} index={0} layout="slide" />
             </div>
-        ))}
+          )
+        ) : isCanvas ? (
+          <div className="relative min-h-[540px] min-w-[720px] sm:min-w-0">
+            {scenes.map((scene, i) => {
+              const grid = canvasGridPosition(i);
+              const x = scene.canvasX ?? grid.x;
+              const y = scene.canvasY ?? grid.y;
+              return (
+                <div
+                  key={scene.id}
+                  className={clsx(
+                    'absolute touch-none',
+                    draggingCanvasId === scene.id
+                      ? 'z-30'
+                      : 'transition-[left,top] duration-300 ease-out'
+                  )}
+                  style={{ left: x, top: y }}
+                  onPointerDown={(e) => onCanvasPointerDown(e, scene, i)}
+                  onPointerMove={onCanvasPointerMove}
+                  onPointerUp={(e) => onCanvasPointerUp(e, scene)}
+                  onPointerCancel={(e) => onCanvasPointerUp(e, scene)}
+                >
+                  <SceneCard scene={scene} index={i} layout="canvas" isDragging={draggingCanvasId === scene.id} />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          scenes.map((scene, i) => (
+            <div
+              key={scene.id}
+              draggable
+              onDragStart={(e) => onDragStart(e, i)}
+              onDragOver={onDragOver}
+              onDrop={(e) => onDrop(e, i)}
+              onDragEnd={() => setDraggedIndex(null)}
+              className={clsx(
+                'rounded-xl transition-opacity duration-200',
+                draggedIndex === i && 'opacity-40',
+                viewMode === 'list' && 'list-row'
+              )}
+            >
+              <SceneCard scene={scene} index={i} layout={viewMode} />
+            </div>
+          ))
+        )}
       </div>
 
-      {viewMode !== 'canvas' && !isAdding && (
-          <div className="mt-8 flex justify-center">
-              <button
-                  className="btn btn-ghost border-2 border-dashed border-gray-300 w-full max-w-xs hover:border-yellow-400 hover:text-yellow-600 hover:bg-yellow-50 focus:ring-2 focus:ring-yellow-400"
-                  onClick={() => setIsAdding(true)}
-              >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
-                  Add Scene
-              </button>
-          </div>
+      {!isCanvas && !isSlide && !isAdding && (
+        <div className="mt-7 flex justify-center">
+          <button
+            type="button"
+            onClick={() => openAddScene()}
+            className="inline-flex h-12 w-full max-w-xs items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-300 text-sm font-bold text-gray-500 transition-all hover:border-yellow-400 hover:bg-yellow-50/60 hover:text-yellow-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400"
+          >
+            <Ri name="add-line" size={18} />
+            Add Scene
+          </button>
+        </div>
       )}
-    </main>
+    </section>
   );
 }
