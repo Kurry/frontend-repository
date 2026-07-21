@@ -1,82 +1,80 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-chrome="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="CSS theme builder: edit colors, radius, depth, noise, and sizes; preview components; copy CSS; share via #theme= hash."
+      content="CSS theme builder: edit colors, radius, depth, noise, and sizes; preview components; export CSS, Theme JSON, or a theme-extension; share via the #theme= hash."
     />
     <title>CSS Theme Builder</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Noto+Sans:wght@400;500;600&display=swap"
-      rel="stylesheet"
-      media="(min-width: 520px)"
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%2360a5fa'/%3E%3Cstop offset='1' stop-color='%23f472b6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='32' height='32' rx='7' fill='url(%23g)'/%3E%3Ccircle cx='12' cy='13' r='4' fill='%23fff'/%3E%3Ccircle cx='21' cy='19' r='4' fill='%23111'/%3E%3C/svg%3E"
     />
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="./vendor/daisyui.css" rel="stylesheet" type="text/css" />
+    <script src="./vendor/tailwind-browser.js"></script>
     <link href="./css/app.css" rel="stylesheet" />
   </head>
   <body>
     <div class="app-shell">
-      <div class="announce">
+      <p class="announce">
         <button type="button" class="inert-nav">Theme toolkit v5.6 is now available!</button>
-      </div>
+      </p>
 
       <header class="topnav">
-        <button type="button" class="brand inert-nav" aria-label="Home">
+        <h1 class="brand">
           <span class="brand-mark" aria-hidden="true"></span>
           <span>Theme Builder</span>
-        </button>
+        </h1>
 
         <div class="dropdown" data-dropdown>
-          <button type="button" class="nav-chip" data-dropdown-trigger>5.6.18</button>
-          <div class="dropdown-panel">
-            <button type="button">5.6.18</button>
-            <button type="button">5.5.x</button>
-            <button type="button">4.x</button>
+          <button type="button" class="nav-chip" data-dropdown-trigger aria-haspopup="menu" aria-expanded="false">5.6.18</button>
+          <div class="dropdown-panel" role="menu" aria-label="Version">
+            <button type="button" role="menuitem" class="active" aria-current="true">5.6.18</button>
+            <button type="button" role="menuitem">5.5.x</button>
+            <button type="button" role="menuitem">4.x</button>
           </div>
         </div>
 
         <div class="nav-spacer"></div>
 
         <div class="dropdown" data-dropdown>
-          <button type="button" class="nav-chip" data-dropdown-trigger>Theme</button>
-          <div class="dropdown-panel">
-            <button type="button" data-chrome-theme="light">light</button>
-            <button type="button" data-chrome-theme="dark" class="active">dark</button>
-            <button type="button" data-chrome-theme="cupcake">cupcake</button>
-            <button type="button" data-chrome-theme="synthwave">synthwave</button>
+          <button type="button" class="nav-chip" data-dropdown-trigger aria-haspopup="menu" aria-expanded="false">Theme</button>
+          <div class="dropdown-panel" role="menu" aria-label="Chrome theme">
+            <button type="button" role="menuitem" data-chrome-theme="light">light</button>
+            <button type="button" role="menuitem" data-chrome-theme="dark" class="active" aria-current="true">dark</button>
+            <button type="button" role="menuitem" data-chrome-theme="cupcake">cupcake</button>
+            <button type="button" role="menuitem" data-chrome-theme="synthwave">synthwave</button>
           </div>
         </div>
 
         <div class="dropdown" data-dropdown>
-          <button type="button" class="nav-chip" data-dropdown-trigger>EN</button>
-          <div class="dropdown-panel">
-            <button type="button">EN</button>
-            <button type="button">ES</button>
-            <button type="button">FR</button>
-            <button type="button">JA</button>
+          <button type="button" class="nav-chip" data-dropdown-trigger aria-haspopup="menu" aria-expanded="false">EN</button>
+          <div class="dropdown-panel" role="menu" aria-label="Language">
+            <button type="button" role="menuitem" class="active" aria-current="true">EN</button>
+            <button type="button" role="menuitem">ES</button>
+            <button type="button" role="menuitem">FR</button>
+            <button type="button" role="menuitem">JA</button>
           </div>
         </div>
 
-        <button type="button" class="nav-chip inert-nav">★ 41k</button>
+        <button type="button" class="nav-chip inert-nav" aria-label="41,000 stars">★ 41k</button>
         <button type="button" class="nav-chip inert-nav">Docs</button>
         <button type="button" class="nav-chip inert-nav">Components</button>
       </header>
 
       <main class="workspace">
-        <aside class="panel" aria-label="Themes">
+        <aside class="panel" id="themes-panel" aria-label="Themes">
           <div class="panel-head">
             <h2>Themes</h2>
-            <button type="button" class="btn" title="Options">⋯</button>
+            <span class="count-chip" title="Custom themes in My themes"><span id="my-themes-count">0</span> custom</span>
           </div>
           <div class="panel-body">
-            <button type="button" class="hold-btn" id="hold-add">
+            <button type="button" class="hold-btn" id="hold-add" aria-describedby="hold-hint">
               <span>Hold to add theme</span>
             </button>
+            <p class="hint hold-hint" id="hold-hint">Press and hold for about a second — the progress sweep adds a custom theme.</p>
 
             <p class="section-label">My themes</p>
             <div class="theme-list" id="my-themes"></div>
@@ -86,7 +84,7 @@
           </div>
         </aside>
 
-        <section class="panel" aria-label="Theme editor">
+        <section class="panel" id="editor-panel" aria-label="Theme editor">
           <div class="panel-head">
             <h2>Editor</h2>
           </div>
@@ -94,18 +92,37 @@
             <div class="editor-toolbar">
               <div class="name-field-wrap">
                 <label class="name-field">
-                  <span aria-hidden="true">✎</span>
-                  <input id="theme-name" type="text" placeholder="mytheme" autocomplete="off" aria-describedby="theme-name-error" aria-invalid="false" />
+                  <span class="name-icon" aria-hidden="true">✎</span>
+                  <input
+                    id="theme-name"
+                    type="text"
+                    placeholder="my theme"
+                    autocomplete="off"
+                    aria-label="Theme name"
+                    aria-describedby="theme-name-error"
+                    aria-invalid="false"
+                  />
                 </label>
                 <span id="theme-name-error" class="validation-error" role="alert" hidden></span>
               </div>
-              <button type="button" class="btn" id="btn-random">Random</button>
-              <button type="button" class="btn btn-primary" id="btn-css">{ }</button>
+            </div>
+            <div class="editor-actions">
+              <button type="button" class="btn btn-sm" id="btn-undo" disabled aria-disabled="true">Undo</button>
+              <button type="button" class="btn btn-sm" id="btn-redo" disabled aria-disabled="true">Redo</button>
+              <button type="button" class="btn btn-sm" id="btn-random">Random</button>
+              <button type="button" class="btn btn-sm" id="btn-import">Import theme</button>
+              <button type="button" class="btn btn-primary btn-sm" id="btn-export">Export</button>
             </div>
 
             <div class="editor-block">
-              <h3>Change Colors</h3>
+              <h3>Change colors</h3>
               <div class="color-grid" id="color-controls"></div>
+            </div>
+
+            <div class="editor-block">
+              <h3>Harmony</h3>
+              <p class="hint">Suggestions derive from the primary hue — click one to apply it as the new primary. Arrow keys nudge a focused color swatch.</p>
+              <div id="harmony-controls" class="harmony"></div>
             </div>
 
             <div class="editor-block">
@@ -125,46 +142,71 @@
 
             <div class="editor-block">
               <h3>Options</h3>
-              <label class="toggle-row"
-                >Default theme <input type="checkbox" id="opt-default"
-              /></label>
-              <label class="toggle-row"
-                >Default dark theme <input type="checkbox" id="opt-prefersdark"
-              /></label>
-              <label class="toggle-row"
-                >Dark color scheme <input type="checkbox" id="opt-darkscheme"
-              /></label>
-              <div class="row" style="margin-top: 0.65rem">
-                <button type="button" class="btn" id="btn-reset">Reset theme</button>
-                <button type="button" class="btn" id="btn-remove">Remove theme</button>
+              <label class="toggle-row">Default theme <input type="checkbox" id="opt-default" /></label>
+              <label class="toggle-row">Default dark theme <input type="checkbox" id="opt-prefersdark" /></label>
+              <label class="toggle-row">Dark color scheme <input type="checkbox" id="opt-darkscheme" /></label>
+              <div class="editor-row-actions">
+                <button type="button" class="btn btn-sm" id="btn-duplicate">Duplicate</button>
+                <button type="button" class="btn btn-sm" id="btn-reset">Reset theme</button>
+                <button type="button" class="btn btn-sm btn-danger" id="btn-remove">Remove theme</button>
+              </div>
+            </div>
+
+            <div class="editor-block">
+              <h3>Contrast</h3>
+              <p class="hint">Live WCAG ratios for every face/content pair.</p>
+              <div id="contrast-rows" class="contrast-rows"></div>
+            </div>
+
+            <div class="editor-block">
+              <h3>Snapshots</h3>
+              <div class="snapshot-form">
+                <input
+                  id="snapshot-name"
+                  type="text"
+                  placeholder="snapshot name"
+                  autocomplete="off"
+                  aria-label="Snapshot name"
+                  aria-describedby="snapshot-name-error"
+                  aria-invalid="false"
+                />
+                <button type="button" class="btn btn-sm" id="save-snapshot">Save snapshot</button>
+              </div>
+              <span id="snapshot-name-error" class="validation-error" role="alert" hidden></span>
+              <div id="snapshot-list" class="snapshot-list"></div>
+              <div class="ba-toggle" role="group" aria-label="Preview the last restored snapshot against your live edits">
+                <button type="button" class="btn btn-sm" id="ba-before" aria-pressed="false" disabled>Before</button>
+                <button type="button" class="btn btn-sm" id="ba-after" aria-pressed="true">After</button>
               </div>
             </div>
           </div>
         </section>
 
         <section class="panel preview-panel" aria-label="Live preview">
-          <div class="panel-head">
+          <div class="panel-head preview-head">
             <h2>Preview</h2>
-            <div class="preview-tabs">
-              <label
-                ><input type="radio" name="preview-tab" value="demo" checked /> Components
-                Demo</label
-              >
-              <label
-                ><input type="radio" name="preview-tab" value="variants" /> Component
-                Variants</label
-              >
-              <label
-                ><input type="radio" name="preview-tab" value="palette" /> Color Palette</label
-              >
+            <div class="preview-controls">
+              <div id="preview-tabs" class="preview-tabs" role="tablist" aria-label="Preview mode">
+                <button type="button" role="tab" data-tab="demo" aria-selected="true" aria-controls="pane-demo" tabindex="0">Components Demo</button>
+                <button type="button" role="tab" data-tab="variants" aria-selected="false" aria-controls="pane-variants" tabindex="-1">Component Variants</button>
+                <button type="button" role="tab" data-tab="palette" aria-selected="false" aria-controls="pane-palette" tabindex="-1">Color Palette</button>
+              </div>
+              <label class="vision-control">Vision
+                <select id="vision-mode">
+                  <option value="none">None</option>
+                  <option value="deuteranopia">Deuteranopia</option>
+                  <option value="protanopia">Protanopia</option>
+                  <option value="tritanopia">Tritanopia</option>
+                </select>
+              </label>
             </div>
           </div>
           <div class="preview-stage">
             <div id="preview-frame" class="preview-frame" data-theme="light">
-              <div id="pane-demo" class="preview-pane active">
+              <div id="pane-demo" class="preview-pane active" role="tabpanel" aria-label="Components demo" tabindex="0">
                 <div class="demo-grid">
                   <div class="demo-card stack">
-                    <h4>Filters</h4>
+                    <h3 class="demo-title">Filters</h3>
                     <div class="row">
                       <div class="badge badge-primary">New</div>
                       <div class="badge badge-secondary">Sale</div>
@@ -172,13 +214,13 @@
                       <div class="badge badge-outline">Archive</div>
                     </div>
                     <div class="join">
-                      <input class="input input-bordered join-item input-sm" placeholder="Search" />
+                      <input class="input input-bordered join-item input-sm" placeholder="Search" aria-label="Search filters" />
                       <button class="btn btn-primary btn-sm join-item" type="button">Go</button>
                     </div>
                   </div>
 
                   <div class="demo-card stack">
-                    <h4>Calendar</h4>
+                    <h3 class="demo-title">Calendar</h3>
                     <div class="row">
                       <button class="btn btn-sm" type="button">Today</button>
                       <button class="btn btn-sm btn-primary" type="button">Add event</button>
@@ -191,20 +233,20 @@
                   </div>
 
                   <div class="demo-card stack">
-                    <h4>Tabs & range</h4>
-                    <div role="tablist" class="tabs tabs-boxed">
+                    <h3 class="demo-title">Tabs &amp; range</h3>
+                    <div class="tabs tabs-boxed">
                       <button type="button" class="tab tab-active">Overview</button>
                       <button type="button" class="tab">Details</button>
                       <button type="button" class="tab">Settings</button>
                     </div>
-                    <input type="range" min="0" max="100" value="62" class="range range-primary" />
+                    <input type="range" min="0" max="100" value="62" class="range range-primary" aria-label="Example range" />
                   </div>
 
                   <div class="demo-card stack">
-                    <h4>Product</h4>
+                    <h3 class="demo-title">Product</h3>
                     <div class="card bg-base-100 shadow">
                       <div class="card-body p-4">
-                        <h2 class="card-title text-base">Soft shell jacket</h2>
+                        <p class="card-title text-base">Soft shell jacket</p>
                         <p class="text-sm opacity-80">Breathable layers for cool evenings.</p>
                         <div class="card-actions justify-end">
                           <button class="btn btn-secondary btn-sm" type="button">Wishlist</button>
@@ -215,14 +257,14 @@
                   </div>
 
                   <div class="demo-card stack">
-                    <h4>Registration</h4>
+                    <h3 class="demo-title">Registration</h3>
                     <label class="form-control w-full">
                       <span class="label-text text-xs mb-1">Email</span>
                       <input type="email" class="input input-bordered input-sm" placeholder="you@example.com" />
                     </label>
                     <label class="form-control w-full">
                       <span class="label-text text-xs mb-1">Password</span>
-                      <input type="password" class="input input-bordered input-sm" value="••••••••" />
+                      <input type="password" class="input input-bordered input-sm" value="hunter22!" />
                     </label>
                     <label class="label cursor-pointer justify-start gap-2">
                       <input type="checkbox" class="checkbox checkbox-sm checkbox-primary" checked />
@@ -232,7 +274,7 @@
                   </div>
 
                   <div class="demo-card stack">
-                    <h4>Stats</h4>
+                    <h3 class="demo-title">Stats</h3>
                     <div class="stats stats-vertical lg:stats-horizontal shadow bg-base-100">
                       <div class="stat py-3 px-4">
                         <div class="stat-title">Downloads</div>
@@ -250,13 +292,14 @@
                       style="--value: 70"
                       aria-valuenow="70"
                       role="progressbar"
+                      aria-label="Storage used"
                     >
                       70%
                     </div>
                   </div>
 
                   <div class="demo-card stack">
-                    <h4>Orders</h4>
+                    <h3 class="demo-title">Orders</h3>
                     <div class="overflow-x-auto">
                       <table class="table table-sm">
                         <thead>
@@ -288,7 +331,7 @@
                   </div>
 
                   <div class="demo-card stack">
-                    <h4>Chat</h4>
+                    <h3 class="demo-title">Chat</h3>
                     <div class="chat chat-start">
                       <div class="chat-bubble">Can we tighten the radius?</div>
                     </div>
@@ -302,13 +345,13 @@
                   </div>
 
                   <div class="demo-card stack">
-                    <h4>Pricing</h4>
+                    <h3 class="demo-title">Pricing</h3>
                     <div class="row">
-                      <input type="radio" name="plan" class="radio radio-primary" checked />
+                      <input type="radio" name="plan" class="radio radio-primary" checked aria-label="Starter plan" />
                       <span class="text-sm">Starter</span>
-                      <input type="radio" name="plan" class="radio radio-secondary" />
+                      <input type="radio" name="plan" class="radio radio-secondary" aria-label="Pro plan" />
                       <span class="text-sm">Pro</span>
-                      <input type="checkbox" class="toggle toggle-accent" checked />
+                      <input type="checkbox" class="toggle toggle-accent" checked aria-label="Yearly billing" />
                     </div>
                     <div class="alert alert-info text-sm">
                       <span>Share themes with the #theme= URL hash.</span>
@@ -318,10 +361,10 @@
                 </div>
               </div>
 
-              <div id="pane-variants" class="preview-pane">
+              <div id="pane-variants" class="preview-pane" role="tabpanel" aria-label="Component variants" tabindex="0">
                 <div class="variants-grid">
                   <div class="demo-card stack">
-                    <h4>Buttons</h4>
+                    <h3 class="demo-title">Buttons</h3>
                     <div class="row">
                       <button class="btn" type="button">Neutral</button>
                       <button class="btn btn-primary" type="button">Primary</button>
@@ -334,23 +377,23 @@
                     </div>
                   </div>
                   <div class="demo-card stack">
-                    <h4>Form controls</h4>
+                    <h3 class="demo-title">Form controls</h3>
                     <div class="row">
-                      <input type="checkbox" class="checkbox" />
-                      <input type="checkbox" class="checkbox checkbox-primary" checked />
-                      <input type="radio" name="v" class="radio" />
-                      <input type="radio" name="v" class="radio radio-secondary" checked />
-                      <input type="checkbox" class="toggle" />
-                      <input type="checkbox" class="toggle toggle-accent" checked />
+                      <input type="checkbox" class="checkbox" aria-label="Unchecked example" />
+                      <input type="checkbox" class="checkbox checkbox-primary" checked aria-label="Checked example" />
+                      <input type="radio" name="v" class="radio" aria-label="Unselected example" />
+                      <input type="radio" name="v" class="radio radio-secondary" checked aria-label="Selected example" />
+                      <input type="checkbox" class="toggle" aria-label="Off toggle example" />
+                      <input type="checkbox" class="toggle toggle-accent" checked aria-label="On toggle example" />
                     </div>
-                    <select class="select select-bordered select-sm w-full max-w-xs">
+                    <select class="select select-bordered select-sm w-full max-w-xs" aria-label="Example select">
                       <option>Select option</option>
                       <option>Option A</option>
                       <option>Option B</option>
                     </select>
                   </div>
                   <div class="demo-card stack">
-                    <h4>Alerts</h4>
+                    <h3 class="demo-title">Alerts</h3>
                     <div class="alert alert-success text-sm"><span>Success message</span></div>
                     <div class="alert alert-warning text-sm"><span>Warning message</span></div>
                     <div class="alert alert-error text-sm"><span>Error message</span></div>
@@ -358,7 +401,7 @@
                 </div>
               </div>
 
-              <div id="pane-palette" class="preview-pane">
+              <div id="pane-palette" class="preview-pane" role="tabpanel" aria-label="Color palette" tabindex="0">
                 <div class="palette-grid" id="palette-grid"></div>
               </div>
             </div>
@@ -367,59 +410,109 @@
       </main>
     </div>
 
-    <div class="modal-backdrop" id="css-modal" role="dialog" aria-modal="true" aria-label="Export Theme">
-      <div class="modal">
+    <div class="modal-backdrop" id="css-modal" role="dialog" aria-modal="true" aria-labelledby="export-title">
+      <div class="modal-card">
         <header>
-          <strong>Export Theme</strong>
-          <button type="button" class="btn" id="css-close">Close</button>
+          <strong id="export-title">Export theme</strong>
+          <button type="button" class="btn btn-sm" id="css-close">Close</button>
         </header>
 
-        <div class="export-tabs" role="tablist">
-          <label role="tab" tabindex="0">
-             <input type="radio" name="export-tab" value="css" checked tabindex="-1" />
-             CSS
-          </label>
-          <label role="tab" tabindex="0">
-             <input type="radio" name="export-tab" value="json" tabindex="-1" />
-             JSON
-          </label>
-          <label role="tab" tabindex="0">
-             <input type="radio" name="export-tab" value="extension" tabindex="-1" />
-             Extension Link
-          </label>
+        <div id="export-tabs" class="export-tabs" role="tablist" aria-label="Export format">
+          <button type="button" role="tab" data-format="css" aria-selected="true" tabindex="0">CSS</button>
+          <button type="button" role="tab" data-format="json" aria-selected="false" tabindex="-1">Theme JSON</button>
+          <button type="button" role="tab" data-format="theme-extension" aria-selected="false" tabindex="-1">theme-extension</button>
         </div>
 
-        <pre id="css-output"></pre>
+        <pre id="css-output" tabindex="0" aria-label="Export preview"></pre>
 
         <footer>
           <span class="hint">Copy into your stylesheet or daisyUI theme config.</span>
-          <button type="button" class="btn btn-primary" id="css-copy">Copy</button>
-          <button type="button" class="btn" id="css-download">Download</button>
+          <span class="footer-btns">
+            <button type="button" class="btn btn-primary btn-sm" id="css-copy">Copy</button>
+            <button type="button" class="btn btn-sm" id="css-download">Download</button>
+          </span>
         </footer>
       </div>
     </div>
 
-    <div class="modal-backdrop" id="import-modal" role="dialog" aria-modal="true" aria-label="Import Theme">
-      <div class="modal">
+    <div class="modal-backdrop" id="import-modal" role="dialog" aria-modal="true" aria-labelledby="import-title">
+      <div class="modal-card">
         <header>
-          <strong>Import Theme (JSON)</strong>
-          <button type="button" class="btn" id="import-close">Close</button>
+          <strong id="import-title">Import theme</strong>
+          <button type="button" class="btn btn-sm" id="import-close">Close</button>
         </header>
 
-        <div style="padding: 1rem;">
-          <textarea id="import-input" rows="8" aria-describedby="import-error" aria-invalid="false" style="width: 100%; resize: vertical; border: 1px solid var(--color-base-300); border-radius: 4px; padding: 0.5rem; background: var(--color-base-200); color: var(--color-base-content);" placeholder='{"name": "...", "--color-primary": "..."}'></textarea>
-          <span id="import-error" class="validation-error" role="alert" aria-live="assertive" style="color: var(--color-error); font-size: 0.75rem; display: block; margin-top: 0.25rem;"></span>
+        <div class="import-body">
+          <p class="hint">Paste a Theme JSON document exported from this studio. It is validated against the theme field contract before anything changes.</p>
+          <textarea
+            id="import-input"
+            rows="9"
+            aria-label="Theme JSON document"
+            aria-describedby="import-error"
+            aria-invalid="false"
+            spellcheck="false"
+            placeholder='{"name": "my theme", "color-scheme": "light", "--color-primary": "#4f46e5", …}'
+          ></textarea>
+          <span id="import-error" class="validation-error" role="alert" hidden></span>
         </div>
 
         <footer>
-          <button type="button" class="btn btn-primary" id="import-submit">Import</button>
+          <span class="hint">Invalid documents leave My themes, the editor, the preview, and Export untouched.</span>
+          <span class="footer-btns">
+            <button type="button" class="btn btn-primary btn-sm" id="import-submit">Import theme</button>
+          </span>
         </footer>
       </div>
     </div>
 
-    <div class="toast" id="toast" role="status"></div>
+    <div class="app-toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+    <div id="coachmark" class="coachmark" hidden>
+      <div class="coach-spotlight" aria-hidden="true"></div>
+      <div class="coach-card" role="region" aria-label="Studio tour">
+        <p class="coach-title"></p>
+        <p class="coach-body"></p>
+        <div class="coach-actions">
+          <span class="coach-dots" aria-hidden="true"></span>
+          <span class="coach-btns">
+            <button type="button" class="btn btn-sm coach-back">Back</button>
+            <button type="button" class="btn btn-primary btn-sm coach-next">Next</button>
+            <button type="button" class="inert-nav coach-skip">Skip tour</button>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <svg aria-hidden="true" focusable="false" style="position: absolute; width: 0; height: 0; overflow: hidden">
+      <filter id="vision-deuteranopia">
+        <feColorMatrix
+          type="matrix"
+          values="0.367322 0.860646 -0.227968 0 0
+                  0.280085 0.672501 0.047413 0 0
+                  -0.011820 0.042940 0.968881 0 0
+                  0 0 0 1 0"
+        />
+      </filter>
+      <filter id="vision-protanopia">
+        <feColorMatrix
+          type="matrix"
+          values="0.152286 1.052583 -0.204868 0 0
+                  0.114503 0.786281 0.099216 0 0
+                  -0.003882 -0.048116 1.051998 0 0
+                  0 0 0 1 0"
+        />
+      </filter>
+      <filter id="vision-tritanopia">
+        <feColorMatrix
+          type="matrix"
+          values="1.255528 -0.076749 -0.178779 0 0
+                  -0.078411 0.930809 0.147602 0 0
+                  0.004733 0.691367 0.303900 0 0
+                  0 0 0 1 0"
+        />
+      </filter>
+    </svg>
+
     <script type="module" src="./js/app.js"></script>
   </body>
 </html>
