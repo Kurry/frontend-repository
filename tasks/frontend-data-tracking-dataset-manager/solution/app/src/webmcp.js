@@ -158,10 +158,10 @@ const tools = [
     name: 'artifact_copy', description: 'Activate the visible export Copy control. Clipboard contents are intentionally not returned.',
     inputSchema: { type: 'object', properties: {}, additionalProperties: false },
     execute: async () => {
-      const button = [...document.querySelectorAll('button')].find((b) => /^(Copy|Copied)$/.test(b.textContent.trim()))
+      const button = [...document.querySelectorAll('button')].find((b) => /^(Copy artifact|Copied artifact)$/.test(b.textContent.trim()))
       if (!button) return failure('Open the export drawer before copying')
       button.click()
-      return result('Visible Copy control activated; verify clipboard through browser interaction')
+      return result('Visible Copy artifact control activated; a named confirmation toast is shown')
     },
   },
 ]

@@ -1431,7 +1431,14 @@ function AppInner() {
       <ShortcutsDialog />
       <OnboardingTour />
       <Toasts />
-      <div className="visually-hidden" aria-live="polite">{liveMessage}</div>
+      <div
+        className={liveMessage ? 'live-feedback' : 'visually-hidden'}
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {liveMessage}
+      </div>
     </div>
   )
 }

@@ -114,7 +114,7 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible { outline: 
 .phase-head > div { display: flex; align-items: baseline; gap: 7px; }
 .phase-index { color: #a4a9b3; font-family: ui-monospace,SFMono-Regular,monospace; font-size: 8px; }
 .phase-head h3 { margin: 0; font-size: 11px; font-weight: 670; letter-spacing: -.01em; }
-.status-chip { display: inline-flex; height: 20px; align-items: center; gap: 5px; border: 1px solid transparent; border-radius: 999px; padding: 0 7px; font-size: 10px; font-weight: 700; letter-spacing: .015em; transition: color .25s ease, background .25s ease, border .25s ease, opacity .25s ease; }
+.status-chip { display: inline-flex; height: 20px; align-items: center; gap: 5px; border: 1px solid transparent; border-radius: 999px; padding: 0 7px; font-size: 10px; font-weight: 700; letter-spacing: .015em; transition: color .25s ease, background-color .25s ease, border-color .25s ease, opacity .25s ease; }
 .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 .status-pending { color: #555c6a; background: #eef0f3; }
 .status-running { color: #3443b8; background: #eaf0ff; }
@@ -356,8 +356,10 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible { outline: 
   .leaderboard { min-width: 920px; font-size: 12px; }
   .leaderboard thead th, .sort-header, .result-cell strong, .result-cell span, .result-cell small { font-size: 11px; }
   .run-strip { max-width: 100%; }
-  .phase-flow { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
-  .phase-card { width: 240px; min-width: 240px; }
+  .phase-flow { display: grid; grid-template-columns: minmax(0, 1fr); overflow: visible; max-width: 100%; gap: 10px; }
+  .phase-slot { min-width: 0; }
+  .phase-slot > .connector { display: none; }
+  .phase-card { width: 100%; min-width: 0; }
   .mantine-Notifications-root { bottom: 12px !important; right: 12px !important; left: 12px !important; width: auto !important; }
 }
 
@@ -373,7 +375,7 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible { outline: 
   .heading-actions .mantine-Button-root { flex: 1; min-height: 44px; }
   .run-header { min-width: 0; }
   .phase-flow { min-width: 0; }
-  .phase-card { width: 220px; min-width: 220px; }
+  .phase-card { width: 100%; min-width: 0; }
   .dataset-grid { grid-template-columns: 1fr; }
   .catalog-summary { flex-wrap: wrap; }
   .catalog-summary > div { width: 100%; margin: 4px 0 0; }
@@ -392,6 +394,19 @@ button:focus-visible, [role="button"]:focus-visible, a:focus-visible { outline: 
 }
 
 .run-drawer-content { max-width: min(720px, 100vw) !important; }
+
+/* Keep dense operational metadata readable against white surfaces. These
+   labels remain subordinate without relying on near-gray, 7px text. */
+.sidebar-foot span, .rollup em, .updated, .run-meta, .phase-index,
+.config-grid dt, .metric-row, .running-mean, .provenance > span,
+.provenance small, .result-kpi span, .panel-heading p, .model-name small,
+.result-cell span, .result-cell small, .delta-title small, .drawer-title small,
+.form-section p, .detail-section-title span, .output-meta dt,
+.timeline-entry > div > span, .timeline-entry time, .drill-summary span,
+.trace-box small, .mantine-InputWrapper-description {
+  color: #626a78;
+  font-size: max(9px, .5625rem);
+}
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }

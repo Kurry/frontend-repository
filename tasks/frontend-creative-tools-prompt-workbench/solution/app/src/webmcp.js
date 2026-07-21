@@ -9,6 +9,11 @@ const personaIds = PERSONAS.map((item) => item.id)
 const assetIds = ASSETS.map((item) => item.id)
 const modelIds = MODELS.map((item) => item.id)
 
+async function settleVisibleUi() {
+  await Promise.resolve()
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+}
+
 function removeVariable(name) {
   const state = useWorkbench.getState()
   const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -240,6 +245,8 @@ export function registerWebMCP() {
   window.webmcp_invoke_tool = async (name, args) => {
     const tool = tools.find(t => t.name === name);
     if (!tool) throw new Error(`Tool ${name} not found`);
-    return await tool.execute(args);
+    const result = await tool.execute(args);
+    await settleVisibleUi();
+    return result;
   };
 }

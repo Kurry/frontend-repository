@@ -23,7 +23,6 @@
   <meta name="twitter:description" content="Product designer, Design Systems Lead. Interfaces, design systems, and brands." />
 
   <link rel="preload" as="image" href="./dark-theme-blur.avif" type="image/avif" fetchpriority="high">
-  <link rel="preload" as="font" type="font/woff2" href="./assets/fonts/jetbrains-mono.woff2" crossorigin>
   <link rel="stylesheet" href="./assets/app.css">
   <script src="./assets/app.js" defer></script>
 </head>
@@ -47,12 +46,12 @@
 <canvas id="confettiCanvas" aria-hidden="true" role="presentation"></canvas>
 
 <!-- Close overlay -->
-<div class="close-overlay" id="closeOverlay" role="dialog" aria-modal="true" aria-label="Terminal closed">
+<div class="close-overlay" id="closeOverlay" role="dialog" aria-modal="true" aria-label="Terminal closed" aria-hidden="true">
   <div class="close-window">
     <div class="titlebar">
-      <span class="titlebar-dot red" aria-hidden="true"><span class="dot-visual"></span></span>
-      <span class="titlebar-dot yellow" aria-hidden="true"><span class="dot-visual"></span></span>
-      <span class="titlebar-dot green" aria-hidden="true"><span class="dot-visual"></span></span>
+      <button type="button" class="titlebar-dot red" disabled aria-label="Close (inactive)"><span class="dot-visual"></span></button>
+      <button type="button" class="titlebar-dot yellow" disabled aria-label="Minimize (inactive)"><span class="dot-visual"></span></button>
+      <button type="button" class="titlebar-dot green" disabled aria-label="Maximize (inactive)"><span class="dot-visual"></span></button>
       <div class="titlebar-title">designer@portfolio ~ /exit</div>
     </div>
     <div class="close-body">
@@ -85,7 +84,7 @@
 
 <!-- Terminal window -->
 <!-- psst... try typing /secrets, or sudo hire designer, or the konami code -->
-<div class="terminal-window booting" id="terminal">
+<main class="terminal-window booting" id="terminal" aria-label="Interactive portfolio terminal">
   <div class="titlebar">
     <button type="button" class="titlebar-dot red" id="dotClose" aria-label="Close terminal"><span class="dot-visual"></span></button>
     <button type="button" class="titlebar-dot yellow" id="dotMinimize" aria-label="Minimize terminal"><span class="dot-visual"></span></button>
@@ -287,6 +286,7 @@
         aria-label="Terminal command input"
         aria-autocomplete="list"
         aria-controls="autocomplete"
+        aria-expanded="false"
       >
     </div>
   </div>
@@ -310,7 +310,7 @@
       <span id="statusClock" title="Local session time">--:--:--</span>
     </span>
   </div>
-</div>
+</main>
 
 <!-- Toasts + live region -->
 <div class="toast-wrap" id="toastWrap" aria-hidden="true"></div>

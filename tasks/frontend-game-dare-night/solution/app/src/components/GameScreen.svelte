@@ -69,7 +69,7 @@
 
 <svelte:window onkeydown={(e: KeyboardEvent) => { if (e.key === 'Escape' && showScoreboard) showScoreboard = false; }} />
 
-<div class="min-h-screen p-5 flex flex-col gap-5" style="background-color: var(--color-bg);">
+<main class="min-h-screen p-5 flex flex-col gap-5" style="background-color: var(--color-bg);">
   <!-- Header -->
   <header class="flex items-center justify-between gap-2.5 max-w-lg mx-auto w-full">
     <button class="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-white text-sm font-semibold border-2 border-black hover:bg-gray-50 transition-colors" onclick={onNewGame}>
@@ -192,9 +192,9 @@
   {/if}
 
   <!-- Live event feed -->
-  <div class="max-w-lg mx-auto w-full">
+  <aside class="max-w-lg mx-auto w-full" aria-label="Live event feed">
     <LiveEventPanel status={streamStatus} {appliedEvents} {bonuses} {offeredEvent} {deliveredCount} {totalEvents} {duplicatesIgnored} onStart={onStreamStart} onPause={onStreamPause} onReconnect={onStreamReconnect} onDeliverOutOfOrder={onStreamDeliverOutOfOrder} />
-  </div>
+  </aside>
 
   <!-- Scoreboard slide-over -->
   {#if showScoreboard}
@@ -210,4 +210,4 @@
       </div>
     </div>
   {/if}
-</div>
+</main>

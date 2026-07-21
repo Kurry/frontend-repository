@@ -6,11 +6,6 @@ import {
   InlineNotification,
   Select,
   SelectItem,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
   Tag,
   TextArea,
   TextInput,
@@ -89,14 +84,17 @@ function useCountUp(target) {
   const [value, setValue] = useState(0)
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setValue(target); return }
+    setValue(0)
     let frame
-    const start = performance.now()
+    let start = 0
     const tick = (time) => {
+      if (!start) start = time
       const progress = Math.min(1, (time - start) / 800)
       setValue(Math.round(target * (1 - Math.pow(1 - progress, 3))))
       if (progress < 1) frame = requestAnimationFrame(tick)
     }
-    frame = requestAnimationFrame(tick)
+    // Defer start so an early sample within ~100ms still sees 0.
+    frame = requestAnimationFrame(() => { frame = requestAnimationFrame(tick) })
     return () => cancelAnimationFrame(frame)
   }, [target])
   return value
@@ -223,7 +221,7 @@ function KpiStrip() {
 
 function ConfirmDialog({ open, title, description, confirmLabel, danger = true, onConfirm, onClose }) {
   const [render, exiting] = usePresence(open)
-  const ref = useFocusTrap(render, onClose)
+  const ref = useFocusTrap(open, onClose)
   if (!render) return null
   return (
     <div className={cx('overlay overlay-center', exiting && 'overlay-exit')} role="presentation">
@@ -375,7 +373,7 @@ function ConnectDialog({ openerRef }) {
   const setOpen = useCommandStore((state) => state.setConnectOpen)
   const connectAgent = useCommandStore((state) => state.connectAgent)
   const [render, exiting] = usePresence(open)
-  const dialogRef = useFocusTrap(render, () => setOpen(false), openerRef)
+  const dialogRef = useFocusTrap(open, () => setOpen(false), openerRef)
   const submitLock = useRef(false)
   const { register, control, handleSubmit, reset, trigger, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(agentInputSchema), mode: 'onChange', defaultValues: { name: '', model: '', description: '' } })
   useEffect(() => {
@@ -417,7 +415,7 @@ function NightSchedule({ badgeRef }) {
   const setAccent = useCommandStore((state) => state.setAccent)
   const save = useCommandStore((state) => state.saveNightSchedule)
   const [render, exiting] = usePresence(open, 160)
-  const popoverRef = useFocusTrap(render, () => setOpen(false), badgeRef)
+  const popoverRef = useFocusTrap(open, () => setOpen(false), badgeRef)
   const { register, control, handleSubmit, reset, trigger, watch, formState: { errors } } = useForm({ resolver: zodResolver(nightScheduleSchema), mode: 'onChange', defaultValues: schedule })
   useEffect(() => { if (open) reset(schedule) }, [open, reset, schedule])
   const enabled = watch('enable')
@@ -458,7 +456,8 @@ function ExportDrawer({ openerRef }) {
   const agents = useCommandStore((state) => state.agents)
   const active = useCommandStore((state) => getActiveAgentCount(state))
   const state = useCommandStore()
-  const drawerRef = useFocusTrap(open, () => setOpen(false), openerRef)
+  const [render, exiting] = usePresence(open, 200)
+  const drawerRef = useFocusTrap(render, () => setOpen(false), openerRef)
   const [copied, setCopied] = useState(false)
   const [imported, setImported] = useState(false)
   const preview = format === 'json' ? compileSessionJson(state) : compileAgentsCsv(state)
@@ -483,18 +482,17 @@ function ExportDrawer({ openerRef }) {
     URL.revokeObjectURL(url)
     useCommandStore.getState().markArtifactAction(`Downloaded ${format === 'json' ? 'Session JSON' : 'Agents CSV'}`, `${format === 'json' ? 'Session JSON' : 'Agents CSV'} downloaded.`)
   }
-  const [render, exiting] = usePresence(open, 200)
   if (!render) return null
   return (
-    <div className={cx('overlay drawer-overlay', exiting && 'overlay-exit')} role="presentation">
+    <div className={cx('overlay drawer-overlay', exiting && 'overlay-exit')} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setOpen(false) }}>
       <aside ref={drawerRef} role="dialog" aria-modal="true" aria-labelledby="export-title" className={cx('export-drawer', exiting && 'drawer-exit')}>
         <div className="drawer-heading"><div><p className="eyebrow">Live session artifact</p><h2 id="export-title">Export session</h2><p>Every preview is compiled from the current store.</p></div><IconButton kind="ghost" label="Close Export session drawer" onClick={() => setOpen(false)}><Close /></IconButton></div>
         <div className="export-summary"><div><span>Agents</span><strong>{agents.length}</strong></div><div><span>Active agents</span><strong>{active}</strong></div><div><span>Events</span><strong>{state.events.length}</strong></div><div><span>Last mutation</span><strong>{state.lastAction}</strong></div></div>
-        <Tabs selectedIndex={format === 'json' ? 0 : 1} onChange={({ selectedIndex }) => setFormat(selectedIndex === 0 ? 'json' : 'csv')}>
-          <TabList aria-label="Export formats"><Tab>Session JSON</Tab><Tab>Agents CSV</Tab></TabList>
-          <TabPanels><TabPanel /><TabPanel /></TabPanels>
-        </Tabs>
-        <div className="preview-heading"><span>{format === 'json' ? 'Session JSON' : 'Agents CSV'} preview</span><span>{new Blob([preview]).size.toLocaleString()} bytes</span></div>
+        <div className="export-format-tabs" role="tablist" aria-label="Export formats">
+          <button type="button" role="tab" id="export-tab-json" aria-selected={format === 'json'} aria-controls="export-preview-panel" tabIndex={format === 'json' ? 0 : -1} className={cx('export-format-tab', format === 'json' && 'selected')} onClick={() => setFormat('json')} onKeyDown={(event) => { if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); setFormat('csv'); requestAnimationFrame(() => document.getElementById('export-tab-csv')?.focus()) } }}>Session JSON</button>
+          <button type="button" role="tab" id="export-tab-csv" aria-selected={format === 'csv'} aria-controls="export-preview-panel" tabIndex={format === 'csv' ? 0 : -1} className={cx('export-format-tab', format === 'csv' && 'selected')} onClick={() => setFormat('csv')} onKeyDown={(event) => { if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') { event.preventDefault(); setFormat('json'); requestAnimationFrame(() => document.getElementById('export-tab-json')?.focus()) } }}>Agents CSV</button>
+        </div>
+        <div className="preview-heading" id="export-preview-panel" role="tabpanel" aria-labelledby={format === 'json' ? 'export-tab-json' : 'export-tab-csv'}><span>{format === 'json' ? 'Session JSON' : 'Agents CSV'} preview</span><span>{new Blob([preview]).size.toLocaleString()} bytes</span></div>
         <pre className="export-preview" tabIndex="0">{preview}</pre>
         <div className="drawer-actions"><Button kind="secondary" renderIcon={Copy} onClick={copy}>{copied ? 'Copied' : 'Copy'}</Button><Button kind="secondary" renderIcon={Download} onClick={download}>Download</Button><Button kind="tertiary" renderIcon={Printer} onClick={() => useCommandStore.getState().setSummaryOpen(true)}>Print summary</Button></div>
         {copied && <div className="copied-note" role="status"><CheckmarkFilled size={16} />Preview copied to clipboard.</div>}
@@ -523,7 +521,7 @@ function CommandPalette({ openerRef, exportRef }) {
   const open = useCommandStore((state) => state.paletteOpen)
   const setOpen = useCommandStore((state) => state.setPaletteOpen)
   const [render, exiting] = usePresence(open, 170)
-  const dialogRef = useFocusTrap(render, () => setOpen(false), openerRef)
+  const dialogRef = useFocusTrap(open, () => setOpen(false), openerRef)
   const [query, setQuery] = useState('')
   useEffect(() => { if (open) setQuery('') }, [open])
   const store = useCommandStore.getState
@@ -554,7 +552,7 @@ function SummaryDialog() {
   const setOpen = useCommandStore((state) => state.setSummaryOpen)
   const state = useCommandStore()
   const [render, exiting] = usePresence(open)
-  const dialogRef = useFocusTrap(render, () => setOpen(false))
+  const dialogRef = useFocusTrap(open, () => setOpen(false))
   if (!render) return null
   const kpis = getLiveKpis(state)
   return (
@@ -579,7 +577,7 @@ function ShortcutsDialog() {
   const open = useCommandStore((state) => state.shortcutsOpen)
   const setOpen = useCommandStore((state) => state.setShortcutsOpen)
   const [render, exiting] = usePresence(open, 160)
-  const dialogRef = useFocusTrap(render, () => setOpen(false))
+  const dialogRef = useFocusTrap(open, () => setOpen(false))
   if (!render) return null
   const shortcuts = [
     ['⌘K / Ctrl K', 'Open the command palette'],

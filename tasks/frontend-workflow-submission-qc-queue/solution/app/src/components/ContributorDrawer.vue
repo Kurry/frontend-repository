@@ -1,14 +1,17 @@
 <script setup>
-import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import { NDrawer, NDrawerContent } from 'naive-ui'
 import IconClock from '~icons/lucide/clock-3'
 import IconFileText from '~icons/lucide/file-text'
 import IconUser from '~icons/lucide/user-round'
+import IconX from '~icons/lucide/x'
 import { contributors, useQcStore } from '../store'
 import StatusPill from './StatusPill.vue'
 
 const store = useQcStore()
 const viewportWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1200)
+const closeButton = ref(null)
+const opener = ref(null)
 function onResize() { viewportWidth.value = window.innerWidth }
 onMounted(() => window.addEventListener('resize', onResize))
 onBeforeUnmount(() => window.removeEventListener('resize', onResize))
@@ -19,6 +22,16 @@ const submissions = computed(() => store.drawerContributor ? store.contributorSu
 const timeline = computed(() => store.drawerContributor ? store.contributorTimeline(store.drawerContributor) : [])
 function openSubmission(id) { store.drawerContributor = null; store.openSubmission(id) }
 function closeDrawer() { store.drawerContributor = null }
+function focusDrawer() { closeButton.value?.focus() }
+function restoreFocus() {
+  const target = opener.value?.isConnected ? opener.value : document.querySelector('.palette-trigger')
+  target?.focus()
+  opener.value = null
+}
+
+watch(() => store.drawerContributor, (name, previous) => {
+  if (name && !previous) opener.value = document.activeElement
+})
 </script>
 
 <template>
@@ -34,9 +47,13 @@ function closeDrawer() { store.drawerContributor = null }
     @mask-click="closeDrawer"
     @esc="closeDrawer"
     @update:show="!$event && closeDrawer()"
+    @after-enter="focusDrawer"
+    @after-leave="restoreFocus"
   >
-    <NDrawerContent closable :native-scrollbar="false" class="contributor-drawer" @close="closeDrawer">
-      <template #header><span class="drawer-kicker">Contributor record</span></template>
+    <NDrawerContent :native-scrollbar="false" class="contributor-drawer">
+      <template #header>
+        <div class="drawer-header"><span class="drawer-kicker">Contributor record</span><button ref="closeButton" type="button" class="drawer-close" aria-label="Close contributor drawer" @click="closeDrawer"><IconX /></button></div>
+      </template>
       <div v-if="profile" class="drawer-profile">
         <div class="profile-avatar">{{ profile.initials }}</div>
         <div><h2>{{ profile.name }}</h2><p>{{ profile.role }}</p></div>

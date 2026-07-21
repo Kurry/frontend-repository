@@ -80,12 +80,8 @@ export default function StepBitmaps() {
           </span>
         </span>
         <p class="text-sm text-scope-fg2" aria-live="polite">
-          <Show
-            when={state.iconSet === "vector"}
-            fallback={<>Keeping the original embedded bitmaps.</>}
-          >
-            {replacedCount()} of {BITMAPS.length} bitmaps set to Vector.
-          </Show>
+          {replacedCount()} of {BITMAPS.length} bitmaps set to Vector.
+          <Show when={state.iconSet === "none"}> Keeping the original embedded bitmaps.</Show>
         </p>
       </div>
 

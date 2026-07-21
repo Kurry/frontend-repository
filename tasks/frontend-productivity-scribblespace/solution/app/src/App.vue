@@ -96,12 +96,12 @@ const objectCount = computed(() => store.activeBoard?.objects.length || 0)
       </div>
     </header>
 
-    <div class="app-actions flex flex-col gap-2 px-3 py-2 shrink-0 z-20 relative">
-      <Toolbar :canvasCenter="canvasCenter" />
-      <SelectionControls />
+    <div class="app-actions flex flex-col gap-2 px-3 py-2 shrink-0 z-20 relative pointer-events-none">
+      <div class="pointer-events-auto w-full flex justify-center"><Toolbar :canvasCenter="canvasCenter" /></div>
+      <div class="pointer-events-auto w-full flex justify-center"><SelectionControls /></div>
     </div>
 
-    <main ref="mainRef" class="flex-1 relative overflow-hidden min-h-[280px]">
+    <main ref="mainRef" class="app-main flex-1 relative overflow-hidden min-h-[280px]">
       <Canvas v-if="store.viewMode === 'canvas'" :width="mainSize.width" :height="mainSize.height" />
       <OutlineView v-else />
       <LivePanel v-if="store.showLivePanel" />

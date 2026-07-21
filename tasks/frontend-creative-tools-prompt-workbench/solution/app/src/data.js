@@ -1,10 +1,10 @@
 export const MODELS = [
-  { id: 'nova-2-pro', name: 'Nova 2 Pro', provider: 'Nimbus AI', charsPerToken: 3.7, pricePerMillion: 12 },
-  { id: 'nova-2-mini', name: 'Nova 2 Mini', provider: 'Nimbus AI', charsPerToken: 4.2, pricePerMillion: 1.8 },
-  { id: 'sonnet-4', name: 'Sonnet 4', provider: 'Vertexa', charsPerToken: 3.5, pricePerMillion: 15 },
-  { id: 'haiku-3-5', name: 'Haiku 3.5', provider: 'Vertexa', charsPerToken: 4.4, pricePerMillion: 0.8 },
-  { id: 'gemini-2-5-pro', name: 'Gemini 2.5 Pro', provider: 'Google', charsPerToken: 3.9, pricePerMillion: 10 },
-  { id: 'gemini-2-5-flash', name: 'Gemini 2.5 Flash', provider: 'Google', charsPerToken: 4.6, pricePerMillion: 0.5 },
+  { id: 'nova-2-pro', name: 'Nova 2 Pro', provider: 'Nimbus AI', charsPerToken: 3.7, promptOverheadTokens: 7, pricePerMillion: 12 },
+  { id: 'nova-2-mini', name: 'Nova 2 Mini', provider: 'Nimbus AI', charsPerToken: 4.2, promptOverheadTokens: 3, pricePerMillion: 1.8 },
+  { id: 'sonnet-4', name: 'Sonnet 4', provider: 'Vertexa', charsPerToken: 3.5, promptOverheadTokens: 8, pricePerMillion: 15 },
+  { id: 'haiku-3-5', name: 'Haiku 3.5', provider: 'Vertexa', charsPerToken: 4.4, promptOverheadTokens: 2, pricePerMillion: 0.8 },
+  { id: 'gemini-2-5-pro', name: 'Gemini 2.5 Pro', provider: 'Google', charsPerToken: 3.9, promptOverheadTokens: 6, pricePerMillion: 10 },
+  { id: 'gemini-2-5-flash', name: 'Gemini 2.5 Flash', provider: 'Google', charsPerToken: 4.6, promptOverheadTokens: 1, pricePerMillion: 0.5 },
 ]
 
 export const PERSONAS = [
@@ -56,7 +56,8 @@ export function detectVariables(text) {
 
 export function estimateTokens(text, modelId) {
   if (!text) return 0
-  return Math.max(1, Math.ceil(text.length / modelById(modelId).charsPerToken))
+  const model = modelById(modelId)
+  return Math.max(1, Math.ceil(text.length / model.charsPerToken) + model.promptOverheadTokens)
 }
 
 export function estimateCost(text, modelId) {
@@ -67,4 +68,3 @@ export function estimateCost(text, modelId) {
 export function resolvedPrompt(text, bindings) {
   return text.replace(/\{\{([A-Za-z0-9_]+)\}\}/g, (_, name) => bindings[name] || `{{${name}}}`)
 }
-

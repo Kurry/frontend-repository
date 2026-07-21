@@ -35,7 +35,7 @@ html { scroll-behavior: auto; }
 body {
   font-family: 'DM Sans', system-ui, sans-serif;
   background-color: var(--color-void);
-  color: white;
+  color: inherit;
   overflow-x: hidden;
 }
 
@@ -155,6 +155,8 @@ tbody tr.row-exit {
   --color-surface: #f3f4f6;
   color: #000000;
 }
+:root[data-theme="light"] .on-dark-plane,
+:root[data-theme="light"] .ink { color: #ffffff; }
 :root[data-theme="dark"] {
   --color-void: #000000;
   --color-surface: #111111;

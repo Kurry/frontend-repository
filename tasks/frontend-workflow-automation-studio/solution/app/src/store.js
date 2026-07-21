@@ -77,10 +77,14 @@ function finishRun(set, get, runStatus = 'pass') {
   set({
     scripts,
     liveRun: { ...live, status: runStatus === 'fail' ? 'failed' : 'complete', finishedAt: isoNow(), totals },
-    announcement: runStatus === 'fail' ? 'Run failed. Retry is available.' : `Run complete. ${totals.passed} of ${script.steps.length} steps passed.`,
+    announcement: runStatus === 'fail'
+      ? 'Run failed. Retry is available.'
+      : `Run complete. ${totals.passed} Pass, ${totals.failed} Fail, ${totals.skipped} Skipped of ${script.steps.length} steps.`,
   })
-  if (runStatus === 'pass' && totals.failed === 0 && totals.passed > 0) {
-    get().toastMessage(`All ${totals.passed} steps passed — great run!`)
+  if (runStatus === 'pass' && totals.failed === 0 && (totals.passed > 0 || totals.skipped > 0)) {
+    get().toastMessage(totals.skipped && !totals.passed
+      ? `Run finished — all ${totals.skipped} steps Skipped`
+      : `All ${totals.passed} steps passed — great run!`)
   }
 }
 
@@ -164,7 +168,7 @@ export const useStudio = create((set, get) => ({
   timelineFilter: 'all', highlightedStepId: null,
   playgroundHtml: seededHtml, playgroundSelector: '.partner', playgroundMatches: 2, playgroundError: '', playgroundTargetStep: '',
   exportTab: 'definition', copied: false, screenshotModal: null, newScriptModal: false, scheduleOpen: false,
-  toast: null, announcement: '',
+  toast: null, announcement: '', density: 'comfortable', onboardingOpen: true,
 
   selectedScript: () => get().scripts.find(s => s.id === get().selectedScriptId),
   setView: view => set({ view, sidebarOpen: false }),
@@ -211,7 +215,7 @@ export const useStudio = create((set, get) => ({
     const liveScriptId = get().liveRun?.scriptId
     applyCommit(set, get, `Deleted ${ids.length} script${ids.length === 1 ? '' : 's'}`, draft => {
       draft.scripts = draft.scripts.filter(s => !ids.includes(s.id))
-      if (ids.includes(draft.selectedScriptId)) draft.selectedScriptId = draft.scripts[0]?.id ?? null
+      if (ids.includes(draft.selectedScriptId)) draft.selectedScriptId = null
     })
     const patch = {}
     if (ids.includes(liveScriptId)) {
@@ -342,17 +346,19 @@ export const useStudio = create((set, get) => ({
   },
   pauseRun: () => {
     const live = get().liveRun; if (!live || !['running', 'retrying'].includes(live.status)) return
-    set({ liveRun: { ...live, status: 'paused', pausedFrom: live.status }, announcement: 'Run paused' })
     const script = get().scripts.find(s => s.id === live.scriptId); const step = script?.steps[live.currentIndex]
-    addEvent(set, get, step, 'paused', 'Run paused')
-    addConsole(set, get, 'paused', `Run paused at step ${live.currentIndex + 1}`, step?.id)
+    const label = step ? `Paused at step ${step.order}: ${step.label}` : 'Run paused'
+    set({ liveRun: { ...live, status: 'paused', pausedFrom: live.status, checkpointLabel: label }, announcement: label })
+    addEvent(set, get, step, 'paused', label)
+    addConsole(set, get, 'paused', label, step?.id)
   },
   resumeRun: () => {
     const live = get().liveRun; if (!live || live.status !== 'paused') return
-    set({ liveRun: { ...live, status: live.pausedFrom || 'running' }, announcement: 'Run resumed' })
     const script = get().scripts.find(s => s.id === live.scriptId); const step = script?.steps[live.currentIndex]
-    addEvent(set, get, step, 'running', 'Run resumed')
-    addConsole(set, get, 'system', `Run resumed at step ${live.currentIndex + 1}`, step?.id)
+    const label = step ? `Resumed at step ${step.order}: ${step.label}` : 'Run resumed'
+    set({ liveRun: { ...live, status: live.pausedFrom || 'running', checkpointLabel: null }, announcement: label })
+    addEvent(set, get, step, 'running', label)
+    addConsole(set, get, 'system', label, step?.id)
   },
   retryFailed: () => {
     const live = get().liveRun; if (!live || live.status !== 'failed') return
@@ -374,6 +380,8 @@ export const useStudio = create((set, get) => ({
     get().updateStep(stepId, 'selector', selector); set({ view: 'step-editor', highlightedStepId: stepId }); get().toastMessage('Selector sent to step')
   },
   selectRun: id => set({ selectedRuns: get().selectedRuns.includes(id) ? get().selectedRuns.filter(x => x !== id) : [...get().selectedRuns.slice(-1), id] }),
+  setDensity: density => set({ density }),
+  dismissOnboarding: () => set({ onboardingOpen: false }),
 }))
 
 export const getSelectedScript = state => state.scripts.find(s => s.id === state.selectedScriptId)

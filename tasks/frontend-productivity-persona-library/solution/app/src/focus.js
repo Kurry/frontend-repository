@@ -7,7 +7,9 @@ export function captureFocus() {
 
 export function restoreFocus() {
   const el = focusReturnStack.pop()
-  if (el?.isConnected) el.focus()
+  window.setTimeout(() => {
+    if (el?.isConnected) el.focus()
+  }, 0)
 }
 
 export function clearFocusCapture() {

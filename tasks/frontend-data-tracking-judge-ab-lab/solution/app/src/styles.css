@@ -133,6 +133,23 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 .muted { color: var(--muted); }
 
+.live-feedback {
+  position: fixed;
+  left: 50%;
+  bottom: 18px;
+  z-index: 1400;
+  max-width: min(560px, calc(100vw - 24px));
+  transform: translateX(-50%);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 /* ---------------------------------------------------------------------------
    Ambient background — layered parallax surfaces
 --------------------------------------------------------------------------- */
@@ -411,6 +428,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 .table-scroll { overflow-x: auto; overscroll-behavior-x: contain; max-width: 100%; }
 .table-scroll table { min-width: 660px; }
+
+.header-rescore { background: var(--primary-strong) !important; color: #fff !important; }
 
 .lab-row { transition: background-color 0.18s ease; }
 .lab-row.clickable { cursor: pointer; }
@@ -1175,6 +1194,13 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .steps-list { max-height: 320px; }
   .shortcuts-fab { width: 48px; height: 48px; }
   .table-toolbar { flex-direction: column; align-items: stretch; }
+  .table-scroll table { width: 100%; min-width: 0; table-layout: fixed; }
+  .table-scroll th, .table-scroll td { min-width: 0; padding-inline: 5px; overflow-wrap: anywhere; }
+  .table-scroll .trial-col { width: 28%; }
+  .label-header { min-width: 0; }
+  .label-header small, .label-header-nums i { display: none; }
+  .label-header strong, .label-header span, .label-header-nums { font-size: 10px; overflow-wrap: anywhere; }
+  .trial-cell strong, .trial-cell span { font-size: 10px; overflow-wrap: anywhere; }
 }
 
 /* ---------------------------------------------------------------------------

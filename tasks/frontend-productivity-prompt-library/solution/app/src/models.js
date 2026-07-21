@@ -18,6 +18,15 @@ export const promptRequestSchema = z.object({
   description: z.string().max(280, 'Description must be 280 characters or fewer.').optional().default(''),
 });
 
+export const promptEditSchema = (existingTitle) => promptRequestSchema.extend({
+  title: z.string().trim().min(1, 'Title is required.')
+    .max(Math.max(60, existingTitle.length), 'Title must be 60 characters or fewer.')
+    .refine(
+      (title) => title.length <= 60 || title === existingTitle,
+      'Title must be 60 characters or fewer.',
+    ),
+});
+
 export const extendFormSchema = promptRequestSchema.extend({
   extensionText: z.string().trim().min(1, 'Extension text is required.').max(4000, 'Extension text must be 4,000 characters or fewer.'),
 }).superRefine((data, ctx) => {
@@ -35,6 +44,9 @@ export const combineFormSchema = promptRequestSchema.extend({
 });
 
 export const exportedPromptSchema = promptRequestSchema.extend({
+  // Preserve legacy seeded display fixtures during export/import round-trips;
+  // newly created or changed request bodies remain capped at 60 characters.
+  title: z.string().trim().min(1).max(150),
   id: z.string().min(1),
   created: z.string().datetime({ offset: true }),
   version: z.number().int().positive(),
@@ -111,7 +123,7 @@ export const ATTACHMENT_CATALOG = [
 const attachment = (id) => ATTACHMENT_CATALOG.find((item) => item.id === id);
 
 const seedDefinitions = [
-  ['p-001', 'Executive summary from research', 'You are a senior research analyst. Summarize the material into five concise findings, then state the single most important implication for an executive audience.', 'Role prompting', 'Turns dense research into a decisive leadership brief.', ['att-research-notes']],
+  ['p-001', 'Executive summary from research that is extremely long and will definitely exceed the sixty character limit in the table view', 'You are a senior research analyst. Summarize the material into five concise findings, then state the single most important implication for an executive audience.', 'Role prompting', 'Turns dense research into a decisive leadership brief.', ['att-research-notes']],
   ['p-002', 'Support reply with examples', 'Write a helpful support response. Follow these examples for tone:\n\nExample 1: “Thanks for flagging this — I can help.”\nExample 2: “Here is the quickest path forward.”\n\nNow respond to the customer message supplied in the ticket.', 'Few-shot', 'A warm and direct customer-support response.', []],
   ['p-003', 'Reason through a pricing decision', 'Evaluate the pricing decision step by step. Identify assumptions, compare three options, test the strongest counterargument, and conclude with a recommendation.', 'Chain-of-thought', 'A structured internal decision analysis.', []],
   ['p-004', 'JSON issue classifier', 'Classify the issue and return only JSON matching: {"category":"billing|technical|account|other","urgency":"low|medium|high","summary":"string"}.', 'Structured output', 'Produces machine-readable issue routing.', ['att-response-schema']],

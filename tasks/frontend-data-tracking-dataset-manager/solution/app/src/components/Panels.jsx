@@ -276,8 +276,8 @@ export function ExportDrawer({ dataset }) {
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <p className="text-xs t-3" aria-live="polite">{tab === 'csv' ? `${Math.max(0, output.csv.split('\n').length - 1)} visible rows · honors the unverified-only filter` : `schemaVersion dataset-manager.package/v1 · ${dataset.rows.length} rows · ${dataset.snapshots.length} snapshots · regenerated ${new Date(useStore.getState().exportGeneratedAt || Date.now()).toLocaleTimeString()}`}</p>
           <div className="flex flex-wrap gap-2">
-            <Btn size="sm" kind="ghost" icon={copied ? Checkmark : Copy} onClick={copy} aria-live="polite">{copied ? 'Copied' : 'Copy'}</Btn>
-            <Btn size="sm" kind="ghost" icon={Download} onClick={download}>Download</Btn>
+            <Btn size="sm" kind="ghost" icon={copied ? Checkmark : Copy} onClick={copy} aria-live="polite">{copied ? 'Copied artifact' : 'Copy artifact'}</Btn>
+            <Btn size="sm" kind="ghost" icon={Download} onClick={download}>Download artifact</Btn>
             <Btn size="sm" kind="ghost" icon={Printer} onClick={print}>Print preview</Btn>
             <Btn size="sm" kind="outline" icon={Upload} onClick={() => setImportOpen((v) => !v)} aria-expanded={importOpen}>Import package</Btn>
           </div>

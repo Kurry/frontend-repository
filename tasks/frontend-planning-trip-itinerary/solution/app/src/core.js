@@ -32,7 +32,7 @@ export function deepClone(o) { return structuredClone(o); }
 // --------------------------------- Icons -----------------------------------
 // Minimal inline stroke icons (currentColor). No icon CDN, no pasted sprite set.
 const P = (d, extra = "") =>
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ${extra}>${d}</svg>`;
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" ${extra}>${d}</svg>`;
 export const icon = {
   compass: P(`<circle cx="12" cy="12" r="9"/><polygon points="16 8 13 13 8 16 11 11 16 8"/>`),
   undo: P(`<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>`),
@@ -388,7 +388,7 @@ export function buildTripJson(state) {
   };
 }
 export function buildMarkdown(state) {
-  const out = [`# ${"Trip to the French Riviera - Cote d'Azur"}`, `> 7/5 – 7/11 · 2025`, ""];
+  const out = [`# ${state.tripTitle || "Trip to the French Riviera - Cote d'Azur"}`, `> 7/5 – 7/11 · 2025`, ""];
   for (const d of DAY_META) {
     const stops = state.stops.filter((s) => s.day === d.date).sort((a, b) => (a.startTime || "99:99").localeCompare(b.startTime || "99:99"));
     out.push(`## ${d.dow}, ${d.md}`);
@@ -581,6 +581,7 @@ export function createStore() {
     const v = validateTripJson(obj);
     if (!v.ok) return { ok: false, error: v.error };
     snapshot();
+    state.tripTitle = obj.trip.title;
     state.stops = obj.stops.map((s) => ({ id: uid("stop"), title: s.title, day: s.day, category: s.category, location: s.location || "", notes: s.notes || "", startTime: s.startTime || "", endTime: s.endTime || "" }));
     state.expenses = obj.expenses.map((x) => normalizeExpense(x));
     state.settled = {};
@@ -653,8 +654,24 @@ export function createStore() {
   function factoryReset() {
     snapshot();
     const s = seedState();
-    Object.assign(state, s);
-    state.settled = {}; state.selectedRows = []; state.selectedStopId = s.stops.find((x) => x.title === "Musee Picasso")?.id || s.stops[0].id;
+    Object.assign(state, {
+      theme: "light",
+      view: "explore",
+      budgetTab: "ledger",
+      mode: "split",
+      dayFilter: null,
+      detailTab: "About",
+      drawerOpen: false,
+      sbHidden: false,
+      docMode: "plan",
+      displayCurrency: "EUR",
+      ledgerSort: { key: "day", dir: "asc" },
+      selectedRows: [],
+      pivotMode: "cat-day",
+      ...s,
+    });
+    document.documentElement.setAttribute("data-theme", "light");
+    state.selectedStopId = s.stops.find((x) => x.title === "Musee Picasso")?.id || s.stops[0].id;
     initial = deepClone(Object.fromEntries(UNDOABLE.map((k) => [k, state[k]])));
     emit();
   }

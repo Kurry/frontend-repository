@@ -56,7 +56,7 @@ export function Header({ historyDisabled = false }) {
   }, [aboutOpen, exportOpen, filterOpen, historyDisabled, undo, redo]);
 
   return (
-    <header className="h-[var(--h-header)] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-[var(--z-header)] sticky top-0 shrink-0 shadow-sm">
+    <header className="timeline-header h-[var(--h-header)] bg-white border-b border-gray-200 flex items-center justify-between px-4 z-[var(--z-header)] sticky top-0 shrink-0 shadow-sm">
       <h1 className="m-0 shrink min-w-0">
         <button
           type="button"
@@ -72,7 +72,7 @@ export function Header({ historyDisabled = false }) {
         </button>
       </h1>
 
-      <Group gap="xs" wrap="nowrap">
+      <Group className="timeline-actions" gap="xs" wrap="nowrap">
         <Button
           variant="default"
           radius="xl"
@@ -101,6 +101,7 @@ export function Header({ historyDisabled = false }) {
         <Button
           variant={mode === 'explore' ? 'filled' : 'light'}
           color="cyan"
+          autoContrast
           radius="xl"
           size="xs"
           onClick={() => setMode('explore')}
@@ -111,6 +112,7 @@ export function Header({ historyDisabled = false }) {
         <Button
           variant={mode === 'library' ? 'filled' : 'light'}
           color="cyan"
+          autoContrast
           radius="xl"
           size="xs"
           onClick={() => setMode('library')}

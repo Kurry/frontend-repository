@@ -25,6 +25,15 @@
 
 * { box-sizing: border-box; }
 
+.cds--search-input,
+.cds--text-input,
+.cds--text-area,
+.cds--btn,
+.cds--modal,
+.cds--modal-container {
+  transition-duration: 90ms !important;
+}
+
 html { scroll-behavior: smooth; }
 
 body {
@@ -592,6 +601,7 @@ a:focus-visible,
 .preview-actions { justify-content: flex-end; margin-top: 18px; }
 
 .modal-copy { margin: 0 0 22px; color: #5f6672; font-size: 13px; line-height: 1.55; }
+.onboarding-coach__heading { margin: 4px 0 0; color: var(--text-primary); font-size: 1.125rem; font-weight: 650; line-height: 1.3; }
 .import-divider { position: relative; margin: 20px 0; border-top: 1px solid #dfe3e8; text-align: center; }
 .import-divider span { position: relative; top: -8px; padding: 0 9px; color: #777f8b; background: #fff; font-size: 10px; text-transform: uppercase; }
 .cds--modal-container { transition: opacity 90ms var(--ease-out), transform 90ms var(--ease-out); }

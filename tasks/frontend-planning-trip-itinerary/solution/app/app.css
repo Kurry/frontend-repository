@@ -104,6 +104,7 @@ html, body { height: 100%; }
 
 body {
   margin: 0;
+  overflow-x: hidden;
   font-family: var(--font);
   color: var(--ink);
   background:
@@ -170,7 +171,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.01em; color: va
 }
 .brand .mark svg { width: 20px; height: 20px; }
 .brand .word { display: flex; flex-direction: column; line-height: 1.05; min-width: 0; }
-.brand .word b { font-weight: 800; letter-spacing: -0.02em; font-size: 16px; }
+.brand .word h1 { font-weight: 800; letter-spacing: -0.02em; font-size: 16px; }
 .brand .word span { font-size: 11px; color: var(--ink-soft); letter-spacing: 0.04em; }
 
 .topbar .spacer { flex: 1; }
@@ -183,11 +184,9 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.01em; color: va
   min-height: 0;
 }
 
-/* mode emphasis at desktop */
-.app-root[data-mode="list"] .shell { grid-template-columns: var(--sb) minmax(0, 1fr) 0; }
-.app-root[data-mode="list"] .mappane { display: none; }
-.app-root[data-mode="map"] .shell { grid-template-columns: var(--sb) 0 minmax(0, 1fr); }
-.app-root[data-mode="map"] .main { display: none; }
+/* Mode emphasis preserves the required three-pane desktop composition. */
+.app-root[data-mode="list"] .shell { grid-template-columns: var(--sb) minmax(0, 1.3fr) minmax(300px, 0.7fr); }
+.app-root[data-mode="map"] .shell { grid-template-columns: var(--sb) minmax(340px, 0.75fr) minmax(0, 1.25fr); }
 
 /* ------------------------------- Sidebar --------------------------------- */
 .sidebar {
@@ -236,7 +235,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.01em; color: va
 .nav-foot { margin-top: auto; display: flex; flex-direction: column; gap: 2px; padding-top: 10px; }
 
 /* --------------------------------- Main ---------------------------------- */
-.main { overflow-y: auto; min-height: 0; padding: 18px 22px 40px; }
+.main { overflow-y: auto; min-width: 0; min-height: 0; padding: 18px 22px 40px; }
 
 .hero { position: relative; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-1); }
 .hero .cover { height: 190px; position: relative; }
@@ -263,7 +262,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.01em; color: va
 .hero .avatars { margin-left: auto; display: flex; }
 .hero .avatars .av {
   width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--surface);
-  margin-left: -8px; display: grid; place-items: center; color: #fff; font-size: 11px; font-weight: 700;
+  margin-left: -8px; display: grid; place-items: center; color: #08111d; font-size: 11px; font-weight: 800;
 }
 
 .section-head { display: flex; align-items: center; gap: 12px; margin: 26px 2px 12px; }
@@ -469,7 +468,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.01em; color: va
 .photo-grid .ph svg { width: 100%; height: 100%; }
 
 /* ------------------------------ Budget view ------------------------------ */
-.workspace { display: flex; flex-direction: column; gap: 16px; }
+.workspace { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .ws-tabs { display: flex; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 0; }
 .ws-tab { border: 0; background: transparent; padding: 9px 13px; font-weight: 650; font-size: 13px; color: var(--ink-soft); border-bottom: 2.5px solid transparent; margin-bottom: -1px; display: inline-flex; gap: 7px; align-items: center; transition: color var(--t-fast) var(--ease), border-color var(--t-fast) var(--ease); }
 .ws-tab svg { width: 15px; height: 15px; }
@@ -505,7 +504,7 @@ table.ledger .flag svg { width: 13px; height: 13px; }
 table.ledger .mini-sel { padding: 4px 24px 4px 8px; font-size: 12px; width: auto; }
 table.ledger .desc-cell { max-width: 220px; }
 table.ledger .rowcheck { width: 16px; height: 16px; accent-color: var(--accent); }
-.scroll-x { overflow-x: auto; scrollbar-width: thin; }
+.scroll-x { min-width: 0; max-width: 100%; overflow-x: auto; scrollbar-width: thin; }
 
 .fx-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
 .fx-table th, .fx-table td { padding: 8px 12px; border-bottom: 1px solid var(--line-2); text-align: left; }
@@ -752,24 +751,35 @@ table.ss td.sel { background: color-mix(in srgb, var(--accent) 12%, var(--surfac
   .form-grid { grid-template-columns: 1fr; }
   .md-split { grid-template-columns: 1fr; }
   .hero .title-input { font-size: 21px; }
-  .topbar { padding: 9px 12px; gap: 8px; }
-  .brand .word span { display: none; }
+  .topbar { padding: 9px 10px; gap: 6px; overflow: hidden; }
+  .brand .word { display: none; }
+  .mode-switch { margin-left: 0 !important; }
+  .mode-switch button span, .topbar > .btn.primary span { display: none; }
+  .topbar > .btn.primary { width: 38px; height: 38px; padding: 0; display: grid; place-items: center; }
+  .formula { min-width: 0; flex-wrap: wrap; }
   .hide-sm { display: none !important; }
 }
 
 @media (max-width: 420px) {
+  .topbar .brand { display: none; }
   .kpis { grid-template-columns: 1fr; }
   .toast-root { left: 12px; right: 12px; bottom: 12px; width: auto; }
 }
 
 /* honor reduced motion: drop transitions/animations, keep state changes instant */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  *, *::before, *::after { animation-duration: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0s !important; scroll-behavior: auto !important; }
 }
 
 
 .app-root[data-sb="hidden"] .shell { grid-template-columns: 0 minmax(0, 1fr) var(--mapw); }
 .app-root[data-sb="hidden"] .sidebar { display: none; }
-.app-root[data-sb="hidden"][data-mode="list"] .shell { grid-template-columns: 0 minmax(0, 1fr) 0; }
-.app-root[data-sb="hidden"][data-mode="map"] .shell { grid-template-columns: 0 0 minmax(0, 1fr); }
+.app-root[data-sb="hidden"][data-mode="list"] .shell { grid-template-columns: 0 minmax(0, 1.3fr) minmax(300px, 0.7fr); }
+.app-root[data-sb="hidden"][data-mode="map"] .shell { grid-template-columns: 0 minmax(340px, 0.75fr) minmax(0, 1.25fr); }
 .app-root[data-sb="hidden"] .menu-btn { display: inline-grid; }
+
+@media (max-width: 1023px) {
+  .app-root[data-sb="hidden"] .shell,
+  .app-root[data-sb="hidden"][data-mode="list"] .shell,
+  .app-root[data-sb="hidden"][data-mode="map"] .shell { grid-template-columns: minmax(0, 1fr); }
+}

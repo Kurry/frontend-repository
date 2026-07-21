@@ -23,9 +23,16 @@ export async function copySwatch(el) {
   // restart the flash animation even on rapid repeat clicks
   void el.offsetWidth;
   el.classList.add('is-copied', 'is-flashing');
+  el.querySelectorAll('.copy-label').forEach((node) => node.remove());
+  const label = document.createElement('span');
+  label.className = 'copy-label';
+  label.setAttribute('aria-hidden', 'true');
+  label.textContent = 'Copied';
+  el.append(label);
   if (copyTimers.has(el)) clearTimeout(copyTimers.get(el));
   copyTimers.set(el, setTimeout(() => {
     el.classList.remove('is-copied', 'is-flashing');
+    label.remove();
   }, 1000));
   const { name } = nearestColorName(hex);
   announce(`Copied ${hex} — ${name} — to the clipboard.`);
@@ -185,7 +192,7 @@ function renderNomenclature(container, list) {
         return `<div class="nomenclature-row" data-hex-row="${escapeHtml(row.hex)}">
           <button type="button" class="nomenclature-swatch js-copy" data-hex="${escapeHtml(row.hex)}"
             style="background-color:${escapeHtml(row.hex)}" aria-label="Copy ${escapeHtml(row.hex)} (${escapeHtml(name)})">
-            <span class="copy-label" aria-hidden="true">Copied</span></button>
+            </button>
           <span class="nomenclature-hex">${escapeHtml(row.hex)}</span>
           <span class="nomenclature-namecell">
             <em class="nomenclature-name">${escapeHtml(name)}</em>
@@ -221,10 +228,11 @@ function renderPaletteView(container, list) {
       const swatches = p.swatches
         .map((hex) => {
           const h = fmtHex(hex);
+          const ink = isLight(h) ? 'rgba(18,18,16,0.9)' : 'rgba(249,248,242,0.96)';
           return `<button type="button" class="palette-card__swatch js-copy" data-hex="${escapeHtml(h)}"
             style="background-color:${escapeHtml(h)}" aria-label="Copy ${escapeHtml(h)}">
-            <span class="palette-card__swatch-hex">${escapeHtml(h)}</span>
-            <span class="copy-label" aria-hidden="true">Copied</span></button>`;
+            <span class="palette-card__swatch-hex" style="color:${ink}">${escapeHtml(h)}</span>
+            </button>`;
         })
         .join('');
       const selected = state.multiSelect.includes(p.id);
@@ -281,7 +289,6 @@ function renderSwatchView(container, list) {
         <span class="swatch-tile__title" style="color:${ink}">${escapeHtml(t.palette)}</span>
         <span class="swatch-tile__name" style="color:${ink}">${escapeHtml(name)}</span>
         <span class="swatch-tile__hex" style="color:${ink}">${escapeHtml(t.hex)}</span>
-        <span class="copy-label" aria-hidden="true">Copied</span>
       </button>`;
     })
     .join('');

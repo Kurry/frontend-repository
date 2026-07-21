@@ -203,14 +203,14 @@
               }
             }}
           >
-            <td>
+            <td data-label="Test identifier">
               <span class="test-id mono">{test.id}</span>
             </td>
-            <td><RunMatrix runs={test.runs} /></td>
-            <td><VerdictChip verdict={verdictFor(test.runs)} /></td>
-            <td><ReasonSelect testId={test.id} reason={test.reason} onReasonChange={updateReason} /></td>
-            <td><span class="divergence-count mono">{divergenceFor(test.runs)} / 5</span></td>
-            <td>
+            <td data-label="Five-run matrix"><RunMatrix runs={test.runs} /></td>
+            <td data-label="Verdict"><VerdictChip verdict={verdictFor(test.runs)} /></td>
+            <td data-label="Assigned reason"><ReasonSelect testId={test.id} reason={test.reason} onReasonChange={updateReason} /></td>
+            <td data-label="Divergence"><span class="divergence-count mono">{divergenceFor(test.runs)} / 5</span></td>
+            <td data-label="Action">
               <button
                 class="rerun-button"
                 type="button"
@@ -394,8 +394,48 @@
     .queue-meta { align-items: flex-start; flex-direction: column; padding: 10px 16px; }
     .suite-subtitle { display: none !important; }
     .test-id, .divergence-count, .rerun-button { font-size: 12px; }
-    th, td { font-size: 12px; }
-    .triage-table { min-width: 0; }
+    .table-scroll { overflow-x: hidden; padding: 10px; box-sizing: border-box; }
+    .triage-table, .triage-table tbody { display: block; width: 100%; min-width: 0; }
+    .triage-table thead { display: none; }
+    .triage-table tbody { display: grid; gap: 10px; }
+    .triage-table tbody tr {
+      display: grid;
+      width: 100%;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid #e0e7e3;
+      border-radius: 12px;
+      box-sizing: border-box;
+    }
+    .triage-table td {
+      display: grid;
+      width: 100%;
+      min-width: 0;
+      height: auto;
+      min-height: 46px;
+      grid-template-columns: minmax(92px, .42fr) minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      box-sizing: border-box;
+      font-size: 12px;
+    }
+    .triage-table td:first-child,
+    .triage-table td:last-child { padding-right: 12px; padding-left: 12px; }
+    .triage-table td::before {
+      content: attr(data-label);
+      color: #6b7873;
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .triage-table td :global(select),
+    .triage-table td .rerun-button { width: 100%; max-width: 100%; justify-content: center; box-sizing: border-box; }
+    .triage-table td :global(select),
+    .triage-table td .rerun-button { min-height: 38px; }
+    :global(.dark) .triage-table tbody tr { border-color: #30403a; }
+    :global(.dark) .triage-table td::before { color: #9eaaa5; }
   }
   @media (max-width: 420px) {
     .empty-state {

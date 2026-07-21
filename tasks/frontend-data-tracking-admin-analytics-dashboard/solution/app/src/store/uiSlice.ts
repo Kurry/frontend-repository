@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import type { SortKey } from '../data';
+import type { SortKey, UserCreateValues } from '../data';
 
 export type ViewKey =
   | 'operations-overview' | 'all-users' | 'add-user' | 'edit-user'
@@ -28,6 +28,7 @@ export interface UIState {
   toasts: Toast[];
   confirm: ConfirmState;
   lastMutation: string | null;
+  addUserDraft: Partial<UserCreateValues>;
 }
 
 const initialState: UIState = {
@@ -48,6 +49,7 @@ const initialState: UIState = {
   toasts: [],
   confirm: { open: false, title: '', body: '', ids: [] },
   lastMutation: null,
+  addUserDraft: {},
 };
 
 export const uiSlice = createSlice({
@@ -80,6 +82,8 @@ export const uiSlice = createSlice({
     dismissToast: (s, a: PayloadAction<string>) => { s.toasts = s.toasts.filter((t) => t.id !== a.payload); },
     setConfirm: (s, a: PayloadAction<ConfirmState>) => { s.confirm = a.payload; },
     setLastMutation: (s, a: PayloadAction<string | null>) => { s.lastMutation = a.payload; },
+    setAddUserDraft: (s, a: PayloadAction<Partial<UserCreateValues>>) => { s.addUserDraft = a.payload; },
+    clearAddUserDraft: (s) => { s.addUserDraft = {}; },
     resetFilters: (s) => { s.filterRole = ''; s.filterStatus = ''; s.search = ''; },
   },
 });
@@ -88,6 +92,6 @@ export const {
   setTheme, toggleTheme, setAccent, setActiveView, setSidebarOpen, setExpandedGroup,
   setFilterRole, setFilterStatus, setSearch, setSort, setExportOpen, setExportTab, setDensity,
   setSelection, toggleSelection, clearSelection, setEditingId, pushToast, dismissToast,
-  setConfirm, setLastMutation, resetFilters,
+  setConfirm, setLastMutation, setAddUserDraft, clearAddUserDraft, resetFilters,
 } = uiSlice.actions;
 export default uiSlice.reducer;

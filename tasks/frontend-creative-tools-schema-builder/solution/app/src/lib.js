@@ -16,6 +16,17 @@ export const TYPE_COLORS = {
 export const KEY_PATTERN = /^[A-Za-z0-9_]+$/;
 export const KEY_RULE = 'letters, digits, and underscores only (no spaces or punctuation)';
 
+export function jsonParseError(text, error, context = 'Invalid JSON') {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/position\s+\d+/i.test(message)) return `${context} — ${message}`;
+  const position = /unexpected end/i.test(message) ? text.length : 0;
+  const before = text.slice(0, position);
+  const line = before.split('\n').length;
+  const lastBreak = before.lastIndexOf('\n');
+  const column = position - lastBreak;
+  return `${context} at position ${position} (line ${line}, column ${column}) — ${message}`;
+}
+
 let uidCounter = 0;
 export function uid(prefix = 'n') {
   uidCounter += 1;
@@ -191,7 +202,7 @@ export function validateSchemaPackage(text) {
   try {
     pkg = JSON.parse(text);
   } catch (e) {
-    return { ok: false, error: `Import package: invalid JSON — ${e.message}` };
+    return { ok: false, error: jsonParseError(text, e, 'Import package: invalid JSON') };
   }
   if (!pkg || typeof pkg !== 'object' || Array.isArray(pkg)) {
     return { ok: false, error: 'Import package: the root value must be a JSON object' };

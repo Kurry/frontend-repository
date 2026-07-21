@@ -98,9 +98,8 @@ export function SelectField({ id, label, error, hint, required, children, classN
  * dismiss one layer at a time and focus returns to the opener. */
 const overlayStack = []
 export function useOverlayBehavior(ref, onClose, { initialFocus = true } = {}) {
-  const returnFocus = useRef(null)
+  const returnFocus = useRef(typeof document === 'undefined' ? null : document.activeElement)
   useEffect(() => {
-    returnFocus.current = document.activeElement
     const entry = { onClose }
     overlayStack.push(entry)
     if (initialFocus) {
@@ -112,7 +111,7 @@ export function useOverlayBehavior(ref, onClose, { initialFocus = true } = {}) {
     const onKey = (e) => {
       const top = overlayStack[overlayStack.length - 1]
       if (top !== entry) return
-      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); onClose() }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); top.onClose() }
       else if (e.key === 'Tab') {
         const nodes = [...(ref.current?.querySelectorAll(
           'input:not([type="hidden"]), select, textarea, button, [tabindex]:not([tabindex="-1"])'
@@ -128,9 +127,15 @@ export function useOverlayBehavior(ref, onClose, { initialFocus = true } = {}) {
       document.removeEventListener('keydown', onKey, true)
       const i = overlayStack.indexOf(entry)
       if (i >= 0) overlayStack.splice(i, 1)
-      if (returnFocus.current?.focus && document.contains(returnFocus.current)) returnFocus.current.focus()
+      const opener = returnFocus.current
+      window.requestAnimationFrame(() => {
+        // React StrictMode replays effect cleanup while the overlay remains mounted.
+        // Restore focus only after a real teardown has removed the overlay.
+        if (ref.current?.isConnected) return
+        if (opener?.focus && document.contains(opener)) opener.focus({ preventScroll: true })
+      })
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [onClose])
 }
 
 /* ---------------- Modal shell ---------------- */
@@ -196,11 +201,14 @@ export function useAnimatedNumber(value, duration = 450) {
   const frame = useRef(null)
   useEffect(() => {
     const from = prev.current, to = value
-    if (from === to) return
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    if (from === to || reduced) {
+      prev.current = to
+      if (display !== to) setDisplay(to)
+      return
+    }
     prev.current = to
     const start = performance.now()
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
-    if (reduced) { setDisplay(to); return }
     const tick = (t) => {
       const p = Math.min(1, (t - start) / duration)
       const eased = 1 - Math.pow(1 - p, 3)

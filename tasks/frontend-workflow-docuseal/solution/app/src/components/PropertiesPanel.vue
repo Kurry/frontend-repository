@@ -47,7 +47,7 @@ function applyBatch() {
       <div class="panel-heading-row">
         <div>
           <h2 class="eyebrow">{{ store.selectedField ? 'Field properties' : store.selectedFields.length > 1 ? 'Multiple fields' : 'Template' }}</h2>
-          <p class="panel-context">{{ store.activeTemplate.fields.length }} fields · {{ store.activeTemplate.pages }} pages</p>
+          <p class="panel-context">{{ store.activeTemplate.fields.length }} {{ store.activeTemplate.fields.length === 1 ? 'field' : 'fields' }} · {{ store.activeTemplate.pages }} {{ store.activeTemplate.pages === 1 ? 'page' : 'pages' }}</p>
         </div>
         <span v-if="store.selectedField" class="type-badge">{{ TYPE_LABELS[store.selectedField.type] }}</span>
       </div>
@@ -115,6 +115,7 @@ function applyBatch() {
             <CheckboxRoot
               :model-value="store.selectedField.required"
               class="checkbox-root"
+              aria-label="Required field"
               @update:model-value="handleRequired($event, handleChange)"
             >
               <CheckboxIndicator class="checkbox-indicator"><PhCheck :size="13" weight="bold" /></CheckboxIndicator>
@@ -181,7 +182,7 @@ function applyBatch() {
       </section>
 
       <section class="breakdown">
-        <h3 class="eyebrow">Fields by submitter</h3>
+        <h3 class="eyebrow">Fields by Submitter</h3>
         <div v-for="submitter in store.submitters" :key="submitter.id" class="breakdown-row">
           <span><span class="submitter-swatch small" :style="{ backgroundColor: submitter.color }" />{{ submitter.name }}</span>
           <strong>{{ store.fieldCounts[submitter.name] || 0 }}</strong>

@@ -18,10 +18,11 @@ export function restoreDialogOpener(event, dialog) {
       .some((element) => element !== event.currentTarget)
     if (anotherOpenDialog) return
   }
-  if (opener instanceof HTMLElement && opener.isConnected && opener !== document.body && opener.getClientRects().length) {
-    opener.focus()
-    return
-  }
   const fallbackIds = { export: 'btn-export', import: 'btn-import', palette: 'btn-palette', note: 'btn-annotate' }
-  document.getElementById(fallbackIds[dialog])?.focus()
+  window.requestAnimationFrame(() => {
+    const target = opener instanceof HTMLElement && opener.isConnected && opener !== document.body && opener.getClientRects().length
+      ? opener
+      : document.getElementById(fallbackIds[dialog])
+    target?.focus({ preventScroll: true })
+  })
 }

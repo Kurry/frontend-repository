@@ -644,6 +644,7 @@ export async function copyText(text: string): Promise<boolean> {
 }
 
 export async function copyArtifact(store: AppStore, text: string, verb = 'Copied') {
+  showToast(store, `${verb} — writing to clipboard…`, 'success');
   const ok = await copyText(text);
   if (ok) showToast(store, `${verb} to clipboard.`, 'success');
   else showToast(store, 'Could not copy — select the JSON below and copy it manually.', 'reject');

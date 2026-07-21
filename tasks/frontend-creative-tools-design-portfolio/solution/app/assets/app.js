@@ -58,6 +58,7 @@
     editingId: null,
     justAddedId: null,
     formBusy: false,
+    boardMotion: '',
   };
   let commandHistory = [];
   let historyIndex = -1;
@@ -179,19 +180,28 @@
   }
   let lastFocusBeforeOverlay = null;
 
+  function setTerminalInert(value) {
+    terminal.inert = value;
+    if (value) terminal.setAttribute('aria-hidden', 'true');
+    else terminal.removeAttribute('aria-hidden');
+  }
+
   $('#dotClose').addEventListener('click', () => {
     lastFocusBeforeOverlay = document.activeElement;
     closeOverlay.classList.add('visible');
-    // Focus after the visibility transition has flipped (a synchronous focus()
-    // on a still-computed-hidden element is silently dropped).
-    window.setTimeout(() => { if (closeOverlay.classList.contains('visible')) $('#closeReopen').focus(); }, 80);
+    closeOverlay.setAttribute('aria-hidden', 'false');
+    setTerminalInert(true);
+    $('#closeReopen').focus({ preventScroll: true });
   });
   function reopenTerminal() {
     closeOverlay.classList.remove('visible');
+    closeOverlay.setAttribute('aria-hidden', 'true');
+    setTerminalInert(false);
     terminal.style.display = '';
-    restoreFromMinimize();
+    terminal.classList.remove('minimized');
+    document.body.classList.remove('minimized');
     if (lastFocusBeforeOverlay && lastFocusBeforeOverlay.focus) {
-      try { lastFocusBeforeOverlay.focus(); } catch (e) { cmdInput.focus(); }
+      try { lastFocusBeforeOverlay.focus({ preventScroll: true }); } catch (e) { cmdInput.focus(); }
     } else {
       cmdInput.focus();
     }
@@ -200,7 +210,7 @@
 
   // Focus stays inside the exit overlay while it is open
   closeOverlay.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') { e.preventDefault(); reopenTerminal(); return; }
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); reopenTerminal(); return; }
     if (e.key !== 'Tab') return;
     const focusables = $$('button', closeOverlay).filter((b) => !b.disabled);
     if (!focusables.length) return;
@@ -344,6 +354,7 @@
   function setMode(mode, opts) {
     opts = opts || {};
     if (['terminal', 'board', 'export', 'archive'].indexOf(mode) === -1) mode = 'terminal';
+    const previousMode = store.mode;
     store.mode = mode;
     terminalCore.hidden = mode !== 'terminal';
     boardView.hidden = mode !== 'board';
@@ -355,6 +366,13 @@
     if (mode === 'archive') renderArchive();
     renderStatusbar();
     updateDocTitle();
+    if (previousMode !== mode && !reducedMotion()) {
+      const activeView = mode === 'terminal' ? terminalCore : mode === 'board' ? boardView : mode === 'export' ? exportView : archiveView;
+      activeView.classList.remove('view-enter');
+      void activeView.offsetWidth;
+      activeView.classList.add('view-enter');
+      window.setTimeout(() => activeView.classList.remove('view-enter'), 320);
+    }
     if (mode === 'terminal') {
       terminalBody.scrollTop = terminalBody.scrollHeight;
       if (!opts.noFocus) cmdInput.focus();
@@ -648,6 +666,8 @@
     pushUndo('Deleted "' + p.name + '"');
     store.projects.splice(idx, 1);
     store.selection.delete(id);
+    store.boardMotion = 'delete';
+    if (!store.projects.length) store.query = '';
     renderAll();
     if (!opts.quiet) toast('Deleted "' + p.name + '" — Ctrl+Z to undo');
     return true;
@@ -661,6 +681,8 @@
     store.projects = store.projects.filter((p) => ids.indexOf(p.id) === -1);
     moving.forEach((p) => store.archive.push(clone(p)));
     ids.forEach((id) => store.selection.delete(id));
+    store.boardMotion = 'archive';
+    if (!store.projects.length) store.query = '';
     renderAll();
     if (!opts.quiet) toast('Archived ' + moving.length + ' project' + (moving.length > 1 ? 's' : '') + ' — see /archive');
   }
@@ -791,6 +813,13 @@
 
     const list = filteredProjects();
     boardGrid.innerHTML = list.map(cardHtml).join('');
+    if (store.boardMotion && !reducedMotion()) {
+      $$('.board-card', boardGrid).forEach((card, i) => {
+        card.classList.add('card-reflow');
+        card.style.animationDelay = Math.min(i * 18, 126) + 'ms';
+      });
+    }
+    store.boardMotion = '';
     if (store.justAddedId) {
       const el = boardGrid.querySelector('[data-id="' + (window.CSS && CSS.escape ? CSS.escape(store.justAddedId) : store.justAddedId) + '"]');
       if (el) el.classList.add('card-enter');
@@ -799,7 +828,8 @@
     if (store.projects.length === 0) {
       boardEmpty.hidden = false;
       boardEmpty.innerHTML = '<span class="empty-title">No projects in the collection</span>' +
-        'The board is empty. Click <b>+ New project</b> or run <b>/create</b> in the terminal to add your first project.';
+        'The board is empty. Create the first project here or run <b>/create</b> in the terminal.<br>' +
+        '<button type="button" class="btn btn-primary" data-act="create-project">+ New project</button>';
     } else if (list.length === 0) {
       boardEmpty.hidden = false;
       boardEmpty.innerHTML = '<span class="empty-title">No projects match "' + escapeHtml(store.query) + '"</span>' +
@@ -867,6 +897,8 @@
   });
 
   boardEmpty.addEventListener('click', (e) => {
+    const create = e.target.closest ? e.target.closest('[data-act="create-project"]') : null;
+    if (create) { openCreateForm(); return; }
     const btn = e.target.closest ? e.target.closest('[data-act="clear-filters"]') : null;
     if (!btn) return;
     store.query = '';
@@ -930,6 +962,7 @@
   ];
 
   function openCreateForm() {
+    store.formBusy = false;
     store.editingId = null;
     store.draft = { name: '', slug: '', blurb: '', status: 'shipped', tags: '', stats: '', type: '', year: String(CURRENT_YEAR) };
     store.draftSlugTouched = false;
@@ -941,6 +974,7 @@
   function openEditForm(id) {
     const p = byId(id);
     if (!p) return;
+    store.formBusy = false;
     store.editingId = id;
     store.draft = { name: p.name, slug: p.slug, blurb: p.blurb, status: p.status, tags: p.tags.join(', '), stats: p.stats.join(', '), type: p.type, year: String(p.year) };
     store.draftSlugTouched = true;
@@ -1001,8 +1035,13 @@
       e.preventDefault();
       if (store.formBusy) return;
       store.formBusy = true;
-      window.setTimeout(() => { store.formBusy = false; }, 350);
-      submitProjectForm();
+      const submit = $('#formSubmit');
+      if (submit) { submit.disabled = true; submit.setAttribute('aria-disabled', 'true'); }
+      const committed = submitProjectForm();
+      if (!committed) {
+        store.formBusy = false;
+        if (submit) { submit.disabled = false; submit.removeAttribute('aria-disabled'); }
+      }
     });
     $('#formCancel').addEventListener('click', closeForm);
   }
@@ -1035,7 +1074,7 @@
       const first = $('#f-' + keys[0]);
       if (first) first.focus();
       announce(keys.length + ' field' + (keys.length > 1 ? 's' : '') + ' need attention: ' + keys.join(', '));
-      return;
+      return false;
     }
     if (store.editingId) {
       updateProject(store.editingId, rec);
@@ -1043,6 +1082,7 @@
       createProject(rec);
     }
     closeForm();
+    return true;
   }
 
   // ============ ARCHIVE VAULT ============
@@ -2356,12 +2396,13 @@
     const val = value.toLowerCase().trim();
     acItems = [];
     acIndex = -1;
-    if (!val) { autocompleteEl.classList.remove('show'); cmdInput.removeAttribute('aria-activedescendant'); return; }
+    if (!val) { autocompleteEl.classList.remove('show'); cmdInput.removeAttribute('aria-activedescendant'); cmdInput.setAttribute('aria-expanded', 'false'); return; }
     const matches = allCommandEntries().filter((e) => e[0].startsWith(val) || e[0].startsWith('/' + val));
     const capped = matches.slice(0, 9);
     if (!capped.length || (capped.length === 1 && capped[0][0] === val)) {
       autocompleteEl.classList.remove('show');
       cmdInput.removeAttribute('aria-activedescendant');
+      cmdInput.setAttribute('aria-expanded', 'false');
       return;
     }
     acItems = capped;
@@ -2371,21 +2412,26 @@
       item.className = 'autocomplete-item';
       item.id = 'ac-opt-' + i;
       item.setAttribute('role', 'option');
+      item.setAttribute('aria-selected', 'false');
       item.innerHTML = '<span class="ac-cmd">' + escapeHtml(e[0]) + '</span><span class="ac-desc">' + escapeHtml(e[1]) + '</span>';
       item.addEventListener('mousedown', (ev) => {
         ev.preventDefault();
         cmdInput.value = e[0];
         autocompleteEl.classList.remove('show');
+        cmdInput.removeAttribute('aria-activedescendant');
+        cmdInput.setAttribute('aria-expanded', 'false');
         cmdInput.focus();
       });
       autocompleteEl.appendChild(item);
     });
     autocompleteEl.classList.add('show');
+    cmdInput.setAttribute('aria-expanded', 'true');
   }
 
   function highlightAcItem() {
     $$('.autocomplete-item', autocompleteEl).forEach((el, i) => {
       el.classList.toggle('active', i === acIndex);
+      el.setAttribute('aria-selected', i === acIndex ? 'true' : 'false');
       if (i === acIndex) {
         el.scrollIntoView({ block: 'nearest' });
         cmdInput.setAttribute('aria-activedescendant', el.id);
@@ -2397,6 +2443,7 @@
     else if (acItems.length) cmdInput.value = acItems[0][0];
     autocompleteEl.classList.remove('show');
     cmdInput.removeAttribute('aria-activedescendant');
+    cmdInput.setAttribute('aria-expanded', 'false');
   }
 
   cmdInput.addEventListener('input', () => updateAutocomplete(cmdInput.value));
@@ -2409,6 +2456,15 @@
       if (e.key === 'Tab') { e.preventDefault(); completeFromAc(); return; }
       if (e.key === 'Enter') {
         e.preventDefault();
+        if (acIndex >= 0 && acItems[acIndex]) {
+          const selected = acItems[acIndex][0];
+          autocompleteEl.classList.remove('show');
+          cmdInput.removeAttribute('aria-activedescendant');
+          cmdInput.setAttribute('aria-expanded', 'false');
+          cmdInput.value = '';
+          executeCommand(selected);
+          return;
+        }
         // If the top suggestion is just the typed value (or its /normalized
         // form), run it outright instead of forcing a second Enter.
         const top = (acIndex >= 0 && acItems[acIndex]) ? acItems[acIndex][0] : (acItems.length ? acItems[0][0] : '');
@@ -2416,6 +2472,7 @@
         if (top && (top === val || top === '/' + val)) {
           autocompleteEl.classList.remove('show');
           cmdInput.removeAttribute('aria-activedescendant');
+          cmdInput.setAttribute('aria-expanded', 'false');
           cmdInput.value = '';
           executeCommand(top);
           return;
@@ -2423,7 +2480,7 @@
         completeFromAc();
         return;
       }
-      if (e.key === 'Escape') { autocompleteEl.classList.remove('show'); return; }
+      if (e.key === 'Escape') { autocompleteEl.classList.remove('show'); cmdInput.removeAttribute('aria-activedescendant'); cmdInput.setAttribute('aria-expanded', 'false'); return; }
     }
     if (e.key === 'Tab') {
       e.preventDefault();
@@ -2436,6 +2493,8 @@
     }
     if (e.key === 'Enter') {
       autocompleteEl.classList.remove('show');
+      cmdInput.removeAttribute('aria-activedescendant');
+      cmdInput.setAttribute('aria-expanded', 'false');
       const value = cmdInput.value;
       cmdInput.value = '';
       executeCommand(value);
@@ -2492,6 +2551,7 @@
 
   let paletteResults = [];
   let paletteIndex = -1;
+  let lastFocusBeforePalette = null;
 
   function paletteScore(item, q) {
     if (!q) return 1;
@@ -2542,14 +2602,20 @@
     it.run();
   }
   function openPalette() {
+    lastFocusBeforePalette = document.activeElement;
     paletteOverlay.hidden = false;
+    setTerminalInert(true);
     paletteInput.value = '';
     renderPalette();
     paletteInput.focus();
   }
   function closePalette(refocus) {
     paletteOverlay.hidden = true;
-    if (refocus !== false) cmdInput.focus();
+    setTerminalInert(false);
+    if (refocus !== false) {
+      const target = lastFocusBeforePalette && lastFocusBeforePalette.isConnected ? lastFocusBeforePalette : cmdInput;
+      target.focus({ preventScroll: true });
+    }
   }
   paletteInput.addEventListener('input', renderPalette);
   paletteInput.addEventListener('keydown', (e) => {
@@ -2594,6 +2660,7 @@
     }
     if (e.key === 'Escape') {
       if (closeOverlay.classList.contains('visible')) { reopenTerminal(); return; }
+      if (!paletteOverlay.hidden) { closePalette(); return; }
       if (matrixCanvas.classList.contains('active')) stopMatrix();
     }
   });

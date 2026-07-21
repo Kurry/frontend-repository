@@ -78,7 +78,9 @@ export function seedEvents() {
 }
 
 export const DEFAULT_RANGE = {
-  from: formatISO(subDays(END_DATE, 29), { representation: 'date' }),
+  // Keep the default ledger large enough to exercise virtualization while
+  // retaining six additional seeded days for prior-range comparisons.
+  from: formatISO(subDays(END_DATE, 89), { representation: 'date' }),
   to: formatISO(END_DATE, { representation: 'date' }),
 };
 

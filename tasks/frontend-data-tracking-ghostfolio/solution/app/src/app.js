@@ -1158,18 +1158,30 @@ function syncControls() {
   refs.benchmarkToggle.setAttribute('aria-checked', String(state.benchmarkOn));
 }
 
-// number tween
+// Keep derived figures truthful at every observable point. The old count-up
+// animation temporarily put intermediate currency values in the DOM, so a
+// reload or rapid filter/add/clear flow could visibly report a false net worth.
+// Transition the figure itself while exposing the exact value synchronously.
+const numberTweens = new WeakMap();
 function tweenNumber(node, from, to, fmt) {
-  if (prefersReducedMotion() || from === to) { node.textContent = fmt(to); return; }
-  const start = performance.now();
-  const dur = 400;
-  function step(now) {
-    const t = Math.min(1, (now - start) / dur);
-    const eased = 1 - Math.pow(1 - t, 3);
-    node.textContent = fmt(from + (to - from) * eased);
-    if (t < 1) requestAnimationFrame(step);
+  const previous = numberTweens.get(node);
+  if (previous) previous.cancel();
+  node.textContent = fmt(to);
+  if (prefersReducedMotion() || from === to || typeof node.animate !== 'function') {
+    numberTweens.delete(node);
+    return;
   }
-  requestAnimationFrame(step);
+  const animation = node.animate(
+    [
+      { opacity: 0.58, transform: 'translateY(2px)' },
+      { opacity: 1, transform: 'translateY(0)' }
+    ],
+    { duration: 240, easing: 'cubic-bezier(.2,.8,.2,1)' }
+  );
+  numberTweens.set(node, animation);
+  animation.addEventListener('finish', () => {
+    if (numberTweens.get(node) === animation) numberTweens.delete(node);
+  }, { once: true });
 }
 
 function announce(msg) {

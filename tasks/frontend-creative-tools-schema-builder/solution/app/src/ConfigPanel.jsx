@@ -156,7 +156,7 @@ export default function ConfigPanel() {
 
   const errProps = (name) => ({
     'aria-invalid': errors[name] ? 'true' : undefined,
-    'aria-describedby': errors[name] ? `${`cfg-${name}`}-error` : undefined,
+    'aria-describedby': errors[name] ? `cfg-${name}-error` : `cfg-${name}-hint`,
   });
 
   return (
@@ -209,6 +209,7 @@ export default function ConfigPanel() {
                       id="cfg-required"
                       checked={!!v.required}
                       label={`Required for ${node.key}`}
+                      labelledBy="cfg-required-label"
                       onChange={() => setValue('required', !v.required, { shouldValidate: true, shouldDirty: true })}
                     />
                     <span className="muted text-xs">{v.required ? 'Required' : 'Optional'}</span>

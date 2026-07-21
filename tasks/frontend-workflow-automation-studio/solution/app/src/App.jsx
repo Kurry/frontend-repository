@@ -111,13 +111,15 @@ function Toolbar() {
   const script = useStudio(getSelectedScript)
   const cursor = useStudio(s => s.historyCursor)
   const actionCount = useStudio(s => s.editActions.length)
-  const { setView, undo, redo, setUi, toggleSidebar } = useStudio()
+  const density = useStudio(s => s.density)
+  const { setView, undo, redo, setUi, toggleSidebar, setDensity } = useStudio()
   return <header className="topbar">
     <div className="topbar-main">
       <Button className="mobile-menu" kind="ghost" size="sm" hasIconOnly renderIcon={Menu} iconDescription="Open script library" onClick={toggleSidebar} />
       <div className="topbar-title min-w-0 flex-1"><div className="eyebrow">Current script</div><div className="truncate text-sm font-semibold">{script?.name || 'No script selected'}</div></div>
       <Button kind="ghost" size="sm" hasIconOnly renderIcon={Undo} iconDescription="Undo" disabled={!cursor} onClick={undo} />
       <Button kind="ghost" size="sm" hasIconOnly renderIcon={Redo} iconDescription="Redo" disabled={cursor >= actionCount} onClick={redo} />
+      <Button kind="ghost" size="sm" aria-pressed={density === 'compact'} onClick={() => setDensity(density === 'compact' ? 'comfortable' : 'compact')}>{density === 'compact' ? 'Comfortable view' : 'Compact view'}</Button>
       <Button kind="ghost" size="sm" renderIcon={Time} onClick={() => setUi({ historyOpen: !useStudio.getState().historyOpen })}>History</Button>
       <Button kind="tertiary" size="sm" renderIcon={Search} onClick={() => setUi({ paletteOpen: true, paletteQuery: '', paletteIndex: 0 })}>Commands <span className="ml-2 opacity-60">⌘K</span></Button>
     </div>
@@ -321,12 +323,16 @@ function RunRollup({ script }) {
   const [, tick] = useState(0)
   useEffect(() => { if (!live || ['complete','failed'].includes(live.status)) return; const id = setInterval(() => tick(v => v + 1), 250); return () => clearInterval(id) }, [live?.status])
   const elapsed = live ? Date.now() - Date.parse(live.start_time) : 0
-  return <div className="rollup-grid">
-    <div className="metric"><span className="metric-label">Pass</span><strong>{rollup.passed} of {script.steps.length}</strong></div>
-    <div className="metric"><span className="metric-label">Elapsed</span><strong>{formatDuration(elapsed)}</strong></div>
-    <div className="metric"><span className="metric-label">Retrying</span><strong>{rollup.retries}</strong></div>
-    <div className="metric"><span className="metric-label">Fail</span><strong>{rollup.failed}</strong></div>
-  </div>
+  return <>
+    <div className="rollup-grid">
+      <div className="metric"><span className="metric-label">Pass</span><strong>{rollup.passed} of {script.steps.length}</strong></div>
+      <div className="metric"><span className="metric-label">Fail</span><strong>{rollup.failed}</strong></div>
+      <div className="metric"><span className="metric-label">Skipped</span><strong>{rollup.skipped}</strong></div>
+      <div className="metric"><span className="metric-label">Retries</span><strong>{rollup.retries}</strong></div>
+      <div className="metric"><span className="metric-label">Elapsed</span><strong>{formatDuration(elapsed)}</strong></div>
+    </div>
+    {live?.checkpointLabel && <div className="checkpoint-note" role="status">{live.checkpointLabel}</div>}
+  </>
 }
 
 function RunConsole() {
@@ -375,7 +381,7 @@ function EditorView() {
   const [stepMenu, setStepMenu] = useState(false)
   if (!script) return <div className="panel empty-state"><h1 className="page-title text-slate-900">No script selected</h1><p className="mt-3">Choose a script from the library or create a new script to open the editor.</p><Button className="mt-6" renderIcon={Add} onClick={() => setUi({ newScriptModal: true })}>New Script</Button></div>
   const running = live?.scriptId === script.id && ['running','retrying','paused'].includes(live.status)
-  const canRun = script.steps.some(step => !step.disabled)
+  const canRun = script.steps.length > 0
   return <>
     <div className="editor-grid">
       <section className="panel min-w-0">
@@ -521,8 +527,14 @@ function ExportView() {
   const copied = useStudio(s => s.copied)
   const setUi = useStudio(s => s.setUi)
   const value = JSON.stringify(tab === 'definition' ? definitionFor(script) : reportFor(script), null, 2)
-  const copy = async () => { await navigator.clipboard.writeText(value); setUi({ copied: true }); setTimeout(() => setUi({ copied: false }), 1800) }
-  return <section><div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><div className="eyebrow">API-shaped artifacts</div><h1 className="page-title">Export center</h1><p className="muted mt-2 text-sm">The visible payload compiles live from the current Zustand session.</p></div><Button className={`copy-export-btn${copied ? ' copied' : ''}`} onClick={copy}><span className="copy-icon inline-flex items-center gap-2">{copied ? <Checkmark size={16} /> : <Copy size={16} />}{copied ? 'Copied' : 'Copy export'}</span></Button></div>
+  const copy = async () => {
+    await navigator.clipboard.writeText(value)
+    const label = tab === 'definition' ? 'Definition JSON' : 'Run report'
+    setUi({ copied: true, announcement: `${label} copied to the clipboard.` })
+    useStudio.getState().toastMessage(`${label} copied`)
+    setTimeout(() => setUi({ copied: false }), 1800)
+  }
+  return <section><div className="mb-5 flex flex-wrap items-end justify-between gap-3"><div><div className="eyebrow">API-shaped artifacts</div><h1 className="page-title">Export center</h1><p className="muted mt-2 text-sm">The visible payload compiles live from the current Zustand session.</p></div><Button className={`copy-export-btn${copied ? ' copied' : ''}`} onClick={copy}><span className="copy-icon inline-flex items-center gap-2">{copied ? <Checkmark size={16} /> : <Copy size={16} />}{copied ? `${tab === 'definition' ? 'Definition JSON' : 'Run report'} copied` : 'Copy export'}</span></Button></div>
     <div className="panel overflow-hidden"><div className="panel-header"><div className="flex gap-1"><button className={`view-tab ${tab === 'definition' ? 'active' : ''}`} onClick={() => setUi({ exportTab: 'definition' })}>Definition JSON</button><button className={`view-tab ${tab === 'report' ? 'active' : ''}`} onClick={() => setUi({ exportTab: 'report' })}>Run report</button></div><div className="flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-green-500" /><span className="text-xs font-semibold text-green-700">Compiled from session state</span></div></div><pre className="export-code" aria-label="Export preview">{value}</pre></div>
   </section>
 }
@@ -540,6 +552,9 @@ function App() {
   const setUi = useStudio(s => s.setUi)
   const undo = useStudio(s => s.undo)
   const redo = useStudio(s => s.redo)
+  const density = useStudio(s => s.density)
+  const onboardingOpen = useStudio(s => s.onboardingOpen)
+  const dismissOnboarding = useStudio(s => s.dismissOnboarding)
   const newScriptRef = useRef(null)
   useEffect(() => {
     const onKey = event => {
@@ -559,7 +574,7 @@ function App() {
     window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
   }, [])
   const page = { 'step-editor': <EditorView />, playground: <PlaygroundView />, runs: <RunsView />, 'scheduled-queue': <ScheduledView />, export: <ExportView /> }[view]
-  return <div className="app-shell"><Sidebar newScriptRef={newScriptRef} /><div className="workspace"><Toolbar /><main className="content">{page}</main></div>
+  return <div className="app-shell" data-density={density}><Sidebar newScriptRef={newScriptRef} /><div className="workspace"><Toolbar /><main className="content">{onboardingOpen && <section className="onboarding-card" aria-label="Automation studio quick start"><div><strong>Build, run, and export your first automation</strong><p>Choose a seeded script, edit its ordered steps, then run it to watch the console and report update together.</p></div><Button size="sm" kind="ghost" onClick={dismissOnboarding}>Dismiss tips</Button></section>}{page}</main></div>
     <HistoryDrawer /><NewScriptModal launcherRef={newScriptRef} /><ScheduleModal /><ScreenshotModal /><AnimatePresence><CommandPalette /></AnimatePresence>
     <AnimatePresence>{toast && <motion.div className="toast-stack" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }}><InlineNotification lowContrast kind="success" title={toast.message} /></motion.div>}</AnimatePresence>
     <div className="sr-only" aria-live="assertive" aria-atomic="true">{announcement}</div>

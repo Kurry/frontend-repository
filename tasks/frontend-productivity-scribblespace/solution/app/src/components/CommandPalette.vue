@@ -6,6 +6,7 @@ import {
   DialogPortal,
   DialogOverlay,
   DialogContent,
+  DialogTitle,
   ComboboxRoot,
   ComboboxInput,
   ComboboxContent,
@@ -34,6 +35,11 @@ const filteredCommands = computed(() => {
 })
 
 const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && isOpen.value) {
+    e.preventDefault()
+    isOpen.value = false
+    return
+  }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
     e.preventDefault()
     isOpen.value = true
@@ -45,12 +51,12 @@ const onOpenPalette = () => {
 }
 
 onMounted(() => {
-  window.addEventListener('keydown', handleKeydown)
+  window.addEventListener('keydown', handleKeydown, true)
   window.addEventListener('scribblespace:open-palette', onOpenPalette)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('keydown', handleKeydown)
+  window.removeEventListener('keydown', handleKeydown, true)
   window.removeEventListener('scribblespace:open-palette', onOpenPalette)
 })
 
@@ -87,8 +93,10 @@ watch(isOpen, (val) => {
     <DialogPortal>
       <DialogOverlay class="fixed inset-0 bg-black/40 z-[60] transition-opacity duration-300" />
       <DialogContent
-        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl w-[min(480px,calc(100vw-24px))] max-h-[min(420px,calc(100vh-48px))] z-[60] overflow-hidden flex flex-col"
+        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl w-[min(480px,calc(100vw-24px))] max-h-[min(420px,calc(100vh-48px))] z-[61] overflow-hidden flex flex-col"
         :trap-focus="true"
+        @escape-key-down="isOpen = false"
+        @pointer-down-outside="isOpen = false"
       >
          <DialogTitle class="sr-only">Command palette</DialogTitle>
          <ComboboxRoot

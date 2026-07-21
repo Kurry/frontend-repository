@@ -34,8 +34,8 @@
     [data-hero-fade] { opacity: 0; transform: translateY(30px); }
     [data-word-reveal] { opacity: 0.99; }
   </style>
-  <script type="module" crossorigin src="/assets/index-DTVXLlpG.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-BCa643sI.css">
+  <script type="module" crossorigin src="/assets/index-CUdG8bFw.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-DPC4rvRQ.css">
 </head>
 <body>
   <div id="live-status" class="sr-only" role="status" aria-live="polite"></div>
@@ -1077,6 +1077,7 @@
       <span class="dock-counts"><span id="dock-shortlist-count">0</span> pinned &middot; <span id="dock-compare-count">0</span>/3</span>
     </button>
     <button type="button" id="btn-export-brief" class="dock-btn dock-btn--export" aria-label="Export sprint brief">Export sprint brief</button>
+    <button type="button" id="btn-command-palette" class="dock-btn" aria-haspopup="dialog" aria-controls="command-palette">Open command palette <span class="dock-counts">Ctrl K</span></button>
   </div>
   <aside id="trays-ui" class="session-tray" role="dialog" aria-modal="true" aria-label="Sprint session: shortlist, compare and filters" aria-hidden="true">
     <div class="session-tray__bar">
@@ -1142,7 +1143,7 @@
         </div>
         <button id="btn-import" aria-label="Import brief" class="cta-pill cta-pill--black">Import brief</button>
         <button id="btn-load-sample" aria-label="Load sample brief" class="cta-pill cta-pill--black">Load sample brief</button>
-        <input type="file" id="file-import" accept=".json" style="display: none;">
+        <input type="file" id="file-import" accept="application/json,.json" aria-label="Choose sprint brief JSON">
         <div id="import-error" aria-live="polite" style="color: #ff4d4d; font-size: 14px; align-self: center; margin-left: auto;"></div>
       </div>
     </div>

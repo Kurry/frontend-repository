@@ -5,6 +5,7 @@ import {
   state, activeTheme, selectTheme, selectByName, notify,
   setColor, setRadius, setFontFamily, createTheme, validateRename,
   removeTheme, importFromText, uniqueName, pushExternalHistory, snapshotState,
+  syncHash,
 } from './state.js';
 import { COLOR_KEYS, RADIUS_VALUES, RADIUS_GROUPS, FONT_FAMILIES } from './data.js';
 import { openArtifact, copyArtifact, showToast } from './ui.js';
@@ -40,8 +41,11 @@ const TOOLS = [
   },
   {
     name: 'editor_preview',
-    description: 'Refresh the live preview from the active theme tokens (same state the visible preview renders).',
-    inputSchema: obj({ object_type: str('Object type', ['theme']) }, ['object_type']),
+    description: 'Refresh the live preview from the active theme tokens and optionally switch its visible tab.',
+    inputSchema: obj({
+      object_type: str('Object type', ['theme']),
+      tab: str('Visible preview tab', ['demo', 'variants', 'palette']),
+    }, ['object_type']),
   },
   {
     name: 'editor_switch_mode',
@@ -179,7 +183,13 @@ const handlers = {
     return { ok: true, active: t.name, property: args.property, applied: args.property === 'color' ? { [normalizeColorKey(args.token || args.key)]: t.colors[normalizeColorKey(args.token || args.key)] } : String(args.value) };
   },
 
-  editor_preview() {
+  editor_preview(args) {
+    if (args.tab) {
+      if (!['demo', 'variants', 'palette'].includes(args.tab)) return err("tab must be one of 'demo', 'variants', 'palette'");
+      const tab = document.querySelector(`[data-tab="${args.tab}"]`);
+      if (!tab) return err(`Preview tab '${args.tab}' is unavailable`);
+      tab.click();
+    }
     return { ok: true, preview_tab: state.previewTab, active: activeTheme().name };
   },
 
@@ -229,6 +239,7 @@ const handlers = {
       applyTokenPatch(res.theme, fields.tokens);
       return { ok: true, name: res.theme.name, count: state.customs.length };
     }
+    state.activeId = target.id;
     if (fields.name && fields.name.trim() !== target.name) {
       const check = validateRename(fields.name);
       if (!check.ok) return err(check.error);
@@ -238,6 +249,7 @@ const handlers = {
     }
     applyTokenPatch(target, fields.tokens);
     pushExternalHistory(before);
+    syncHash();
     notify('structure');
     return { ok: true, name: target.name };
   },
@@ -291,6 +303,10 @@ const handlers = {
 };
 
 export function registerWebMCP() {
+  const afterRender = async (result) => {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    return result;
+  };
   window.webmcp_session_info = () => ({
     contract_version: 'zto-webmcp-v1',
     app: 'daisyui-theme-generator',
@@ -303,7 +319,7 @@ export function registerWebMCP() {
     const handler = handlers[name];
     if (!handler) return { ok: false, error: `Unknown tool '${name}'` };
     try {
-      return await handler(args || {});
+      return afterRender(await handler(args || {}));
     } catch (e) {
       return { ok: false, error: `Tool '${name}' failed: ${e?.message || e}` };
     }

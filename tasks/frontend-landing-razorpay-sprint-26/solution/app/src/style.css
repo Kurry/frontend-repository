@@ -21,9 +21,9 @@
   --yellow: #e3f51a;
   --sky: #b8cbd1;
   --grey: #2c2c2c;
-  --ink: #767676;             /* body copy on light bands (AA on white) */
-  --ink-on-dark: #a8a8a8;     /* body copy on dark bands (AA on #151515) */
-  --secondary: #8a8a8a;       /* rgb(138,138,138) index numerals / mono meta */
+  --ink: #595959;             /* body copy on light bands (AA on white) */
+  --ink-on-dark: #b3b3b3;     /* body copy on dark bands (AA on #151515) */
+  --secondary: #626262;       /* AA-safe index numerals / mono meta on light bands */
   --stack-overlap: 100px;
   --nav-h: 70px;
   --gutter: 66px;
@@ -46,9 +46,9 @@ button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit
 /* =========================================================================
    SiteLoader — exact CSS is normative (PRD -> Components -> SiteLoader)
    ========================================================================= */
-#site-loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; will-change: transform; pointer-events: all; }
-.loader-logo { width: 220px; height: auto; display: block; filter: brightness(0) invert(1); opacity: 0; animation: loaderFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards 0.3s; user-select: none; pointer-events: none; -webkit-user-drag: none; }
-.loader-track { width: 220px; height: 2px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; opacity: 0; animation: loaderFadeIn 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards 0.5s; }
+#site-loader { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; will-change: transform; pointer-events: none; }
+.loader-logo { width: 220px; height: auto; display: block; filter: brightness(0) invert(1); opacity: 1; user-select: none; pointer-events: none; -webkit-user-drag: none; }
+.loader-track { width: 220px; height: 2px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; opacity: 1; }
 .loader-bar { height: 100%; width: 0%; background: var(--blue-spy); border-radius: 2px; transition: width 0.12s linear; will-change: width; }
 @keyframes loaderFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 #site-loader.is-exiting { transform: translateY(-100%); transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1); }
@@ -82,7 +82,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit
 .threejs-scroll-section.no-webgl .hero-billboard__t { font-family: "TASA Orbiter", sans-serif; font-weight: 400; font-size: 2.6rem; line-height: 100%; letter-spacing: -1px; color: #fff; }
 .threejs-scroll-section.no-webgl .hero-billboard__s { font-family: "Geist Mono", sans-serif; font-size: 0.8rem; letter-spacing: 0.04em; color: #cfd6ff; margin-top: 6px; }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   #threejs-logo { top: 20px; left: 20px; width: 120px; }
   #scroll-nudge { bottom: 24px; }
   .threejs-scroll-section.no-webgl .hero-billboard { right: 50%; transform: translateX(50%) perspective(700px) rotateY(-8deg); top: 30%; }
@@ -100,10 +100,10 @@ button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit
 .seg-logo { width: 150px; height: auto; }
 /* Mutual exclusivity is enforced in JS; click flash must win while pressed. */
 .seg-cell.is-active { background-color: var(--blue-spy); }
-.seg-cell.is-clicked { background-color: var(--blue-click); }
+.seg-cell.is-clicked { background-color: var(--blue-click) !important; }
 
 /* keep all six labels on one row down to 1280 without clipping */
-@media (min-width: 768px) and (max-width: 1439px) {
+@media (min-width: 769px) and (max-width: 1439px) {
   .seg-cell span { font-size: 0.72rem; padding: 0 7px; letter-spacing: -0.2px; }
   .seg-logo { width: 112px; }
   .seg-cell--logo { padding: 0 14px; }
@@ -112,7 +112,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit
 /* Mobile bar + menu (below 768px the desktop segment nav is gone) */
 .mobile-bar { display: none; }
 .mobile-menu { display: none; }
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .seg-nav { display: none; }
   :root { --nav-h: 56px; }
   .mobile-bar { display: flex; align-items: center; justify-content: space-between; height: var(--nav-h); padding: 0 12px; background: var(--black); border-bottom: 0.5px solid rgba(255, 255, 255, 0.35); position: relative; z-index: 2; }
@@ -136,7 +136,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit
 .access-rail__link { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; background-color: var(--blue-click); text-decoration: none; transition: background-color 0.3s ease; }
 .access-rail__link span { writing-mode: vertical-rl; transform: rotate(180deg); color: #fff; font-family: "Geist Mono", sans-serif; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; }
 .access-rail__link:hover { background-color: var(--blue-spy); }
-@media (max-width: 767px) { .access-rail { display: none; } }
+@media (max-width: 768px) { .access-rail { display: none; } }
 
 /* =========================================================================
    Hero fold (revealed after the Three.js sequence)
@@ -165,7 +165,7 @@ button { background: none; border: 0; padding: 0; cursor: pointer; font: inherit
 .wrap { margin: 0 var(--gutter); position: relative; z-index: 1; }
 .stack-section { position: relative; margin-top: calc(-1 * var(--stack-overlap)); overflow: hidden; will-change: transform; }
 .parallax-layer { position: absolute; top: -20%; left: 0; width: 100%; height: 140%; background-size: contain; background-position: center center; background-repeat: repeat; opacity: 0.5; z-index: 0; pointer-events: none; }
-@media (max-width: 767px) { .stack-section { margin-top: 0 !important; will-change: auto; } }
+@media (max-width: 768px) { .stack-section { margin-top: 0 !important; will-change: auto; } }
 
 .section--stack-intro { background-color: #151515; padding: 160px 0; z-index: 1; }
 #Agentic-Commerce { background-color: #151515; padding: 90px 0; z-index: 2; }
@@ -242,7 +242,7 @@ a.cta-pill { text-decoration: underline; text-underline-offset: 2px; }
   .rive-card:hover { transform: scale(1.03); }
 }
 .only-mobile { display: none; }
-@media (max-width: 767px) { .only-desktop { display: none; } .only-mobile { display: block; } }
+@media (max-width: 768px) { .only-desktop { display: none; } .only-mobile { display: block; } }
 
 /* Card grids */
 .card-grid { display: grid; gap: 40px 24px; margin-bottom: 48px; }
@@ -257,7 +257,6 @@ a.cta-pill { text-decoration: underline; text-underline-offset: 2px; }
 .theme-dark .card__body { color: var(--ink-on-dark); }
 .theme-blue .card__body { color: #d7e0ff; }
 .card__body--platform { color: #c7d4ff; }
-
 /* Mini text-card columns */
 .mini-grid { display: grid; gap: 0 32px; border-top: 1px solid #bbb; margin-top: 24px; }
 .mini-grid--4 { grid-template-columns: repeat(4, 1fr); }
@@ -336,6 +335,8 @@ a.cta-pill { text-decoration: underline; text-underline-offset: 2px; }
 #brief-panel-inner:focus { outline: 2px solid var(--blue-spy); outline-offset: -2px; }
 #brief-panel h2 { color: #fff; }
 #brief-panel button { cursor: pointer; }
+#file-import { max-width: 220px; color: #fff; font-family: "Geist Mono", sans-serif; font-size: 11px; }
+#file-import::file-selector-button { min-height: 36px; margin-right: 8px; border: 1px solid var(--blue-spy); border-radius: 999px; color: #fff; background: var(--grey); cursor: pointer; }
 #tab-json, #tab-markdown { padding: 10px; color: #fff; border: none; background: var(--grey); flex: 1; font-family: "Geist Mono", sans-serif; }
 #tab-json.is-active, #tab-markdown.is-active { background: var(--blue-spy); }
 #json-content { margin: 0; font-family: "Geist Mono", monospace; font-size: 14px; color: var(--sky); white-space: pre-wrap; }
@@ -349,7 +350,8 @@ a.cta-pill { text-decoration: underline; text-underline-offset: 2px; }
 #palette-search { width: 100%; padding: 15px; font-size: 16px; background: none; border: none; color: #fff; outline: none; border-bottom: 1px solid #333; font-family: "Inter Tight", sans-serif; }
 #palette-results { list-style: none; padding: 0; margin: 0; max-height: 320px; overflow-y: auto; }
 #palette-results li { display: flex; align-items: center; padding: 11px 15px; cursor: pointer; border-bottom: 1px solid #2a2a2a; color: #fff; }
-#palette-results li:hover, #palette-results li:focus { background: var(--blue-spy); outline: none; }
+#palette-results li:hover { background: var(--blue-spy); }
+#palette-results li:focus-visible { background: var(--blue-spy); outline: 2px solid #fff; outline-offset: -3px; }
 .palette-kind { display: inline-block; font-family: "Geist Mono", sans-serif; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: #0a0a0a; background: var(--sky); border-radius: 4px; padding: 1px 6px; margin-right: 10px; }
 
 /* =========================================================================
@@ -360,7 +362,7 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible, select:focus-vi
 /* =========================================================================
    Responsive — tablet (<=991 but >=768 keeps desktop segment nav)
    ========================================================================= */
-@media (min-width: 768px) and (max-width: 991px) {
+@media (min-width: 769px) and (max-width: 991px) {
   :root { --gutter: 40px; }
   .hero-big-text { font-size: 7rem; letter-spacing: -4px; padding-left: 20px; }
   .hero-intro { font-size: 0.9rem; line-height: 1.1rem; width: 180px; }
@@ -383,7 +385,7 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible, select:focus-vi
 /* =========================================================================
    Responsive — mobile (<768)
    ========================================================================= */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   :root { --gutter: 12px; }
   .hero-section { height: auto; padding-top: 90px; }
   .hero-fold { gap: 24px; }
@@ -418,6 +420,9 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible, select:focus-vi
   .footer__logo { letter-spacing: -3px; font-size: 20vw; }
   .session-tray { bottom: 96px; }
   .session-tray__grid { grid-template-columns: 1fr; }
+  .feature-hero, .feature-hero--chat { grid-template-columns: minmax(0, 1fr); overflow: hidden; }
+  .card, .mini-card, .shortlist-item, .rive-box { min-width: 0; max-width: 100%; }
+  .card__controls { max-width: 100%; }
 }
 
 /* =========================================================================

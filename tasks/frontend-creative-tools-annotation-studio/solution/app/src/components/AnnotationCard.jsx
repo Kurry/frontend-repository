@@ -197,9 +197,9 @@ export default function AnnotationCard() {
     {item.image && <RegionWorkspace item={item} draft={draft} />}
     <section className="response-section"><h2>Model response</h2><Tile className="response-tile">{item.response}</Tile></section>
     <section className="rating-section"><div><h2>Binary rating</h2><p>Choose the overall evaluation outcome.</p></div><RatingControls rating={draft.rating} onChange={(rating) => updateDraft(item.id, { rating })} /></section>
-    <section className="rubric-section"><h2>Rubric scores</h2><div className="rubric-grid">{Object.keys(draft.scores).map((key) => <div className="rubric-row" key={key}>
+    <section className="rubric-section"><h2>Rubric scores</h2><p className="rubric-help">Move each slider or focus it and use the arrow keys to confirm all three scores.</p><div className="rubric-grid">{Object.keys(draft.scores).map((key) => <div className="rubric-row" key={key} onPointerDown={() => updateScore(item.id, key, draft.scores[key])}>
       <div><strong>{key}</strong><span>{draft.touchedScores[key] ? 'Scored' : 'Move slider to confirm'}</span></div>
-      <Slider id={`${item.id}-${key}`} labelText="" min={1} max={5} step={1} value={draft.scores[key]} hideTextInput onChange={({ value }) => updateScore(item.id, key, Number(value))} />
+      <Slider id={`${item.id}-${key}`} labelText={`${key} score`} hideLabel min={1} max={5} step={1} value={draft.scores[key]} hideTextInput onChange={({ value }) => updateScore(item.id, key, Number(value))} />
       <output key={`${key}-${draft.scores[key]}`} className="score-pop" aria-label={`${key} score`}>{draft.scores[key]}</output>
     </div>)}</div></section>
     <section className="comment-section"><TextArea id={`${item.id}-comment`} labelText="Annotator comments (optional)" maxLength={500} value={draft.comment} onChange={(event) => updateDraft(item.id, { comment: event.target.value.slice(0, 500) })} /><span className="char-counter">{500 - draft.comment.length} remaining</span></section>

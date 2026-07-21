@@ -81,7 +81,7 @@
   }
 </script>
 
-<div class="min-h-screen p-5 flex flex-col items-center" style="background-color: var(--color-bg);">
+<main class="min-h-screen p-5 flex flex-col items-center" style="background-color: var(--color-bg);">
   <div class="w-full max-w-lg mx-auto">
     <!-- Header -->
     <header class="text-center mb-5 mt-5">
@@ -101,8 +101,8 @@
     </header>
 
     <!-- Players -->
-    <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg">
-      <h2 class="text-lg font-semibold mb-2.5" style="color: var(--color-accent);">Players (2–8)</h2>
+    <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg" role="form" aria-labelledby="players-heading">
+      <h2 id="players-heading" class="text-lg font-semibold mb-2.5" style="color: var(--color-accent);">Players (2–8)</h2>
 
       <div class="space-y-2.5 mb-2.5">
         {#each playerNames as name, index}
@@ -216,9 +216,9 @@
     </section>
 
     <!-- Custom cards -->
-    <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg">
+    <aside class="bg-white rounded-[10px] p-5 mb-5 shadow-lg" aria-label="Custom card editor">
       <CustomCards {customCards} {showDeleteConfirm} onAddCard={onAddCustomCard} onShowDeleteConfirm={onShowDeleteConfirm} />
-    </section>
+    </aside>
 
     <!-- Session transfer -->
     <section class="bg-white rounded-[10px] p-5 mb-5 shadow-lg">
@@ -256,4 +256,4 @@
       </p>
     {/if}
   </div>
-</div>
+</main>

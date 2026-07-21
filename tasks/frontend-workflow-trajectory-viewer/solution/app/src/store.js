@@ -9,6 +9,7 @@ const emptyChrome = {
   paletteOpen: false,
   mobilePane: 'timeline',
   copied: '',
+  notice: '',
 }
 
 const cloneReview = (state, trialId) => ({

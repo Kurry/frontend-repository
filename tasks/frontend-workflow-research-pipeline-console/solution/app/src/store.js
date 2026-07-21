@@ -89,7 +89,9 @@ export const usePipelineStore = create((set, get) => ({
   drilldown: null,
   alerts: [],
   importError: null,
-  setView: (activeView) => set({ activeView, mobileNavOpen: false, selectedRunId: null, drilldown: null }),
+  // Keep the selected run and its timeline filters while visiting catalog and
+  // results views so returning to the board restores the same detail context.
+  setView: (activeView) => set({ activeView, mobileNavOpen: false, drilldown: null }),
   setMobileNav: (mobileNavOpen) => set({ mobileNavOpen }),
   setDensity: (density) => set({ density }),
   openSubmission: () => set({ submissionOpen: true, selectedRunId: null, drilldown: null, importError: null }),
@@ -117,6 +119,7 @@ export const usePipelineStore = create((set, get) => ({
       runs: [run, ...s.runs],
       submissionOpen: false,
       activeView: 'pipeline',
+      datasetFilter: null,
       selectedRunId: null,
       submitting: false,
       alerts: [...s.alerts, { id: `submit-${run.id}`, message: `${run.id} submitted to ${config.cluster}`, color: 'indigo' }],
@@ -201,6 +204,7 @@ export const usePipelineStore = create((set, get) => ({
         runs: [...runs, ...s.runs],
         importError: null,
         activeView: 'pipeline',
+        datasetFilter: null,
         alerts: [...s.alerts, { id: `import-${Date.now()}`, message: `Imported ${runs.length} job config(s)`, color: 'green' }],
       }));
       return true;
@@ -218,6 +222,7 @@ export const usePipelineStore = create((set, get) => ({
       runs: [run, ...s.runs],
       importError: null,
       activeView: 'pipeline',
+      datasetFilter: null,
       alerts: [...s.alerts, { id: `import-${run.id}`, message: `Imported ${run.id} from job-config`, color: 'green' }],
     }));
     return true;

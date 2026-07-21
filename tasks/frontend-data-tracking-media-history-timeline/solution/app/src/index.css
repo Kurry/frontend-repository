@@ -149,10 +149,30 @@ button {
 
 /* Mobile: every chrome control is a >=44px tap target, labels stay legible */
 @media (max-width: 767px) {
+  .timeline-header {
+    height: auto !important;
+    min-height: var(--h-header);
+    align-content: center;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    padding-block: 0.375rem;
+  }
+  .timeline-header h1 {
+    flex: 1 1 9rem;
+  }
+  .timeline-actions {
+    flex: 1 1 100%;
+    flex-wrap: wrap !important;
+    justify-content: space-between;
+  }
   .mantine-Button-root {
     min-height: 44px;
   }
   .mantine-ActionIcon-root {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .timeline-pin {
     min-width: 44px;
     min-height: 44px;
   }

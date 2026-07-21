@@ -99,7 +99,7 @@ export function EventForm({ initialData, onClose }) {
             name="title"
             control={control}
             render={({ field }) => (
-              <TextInput label="Title" error={errors.title?.message} {...field} />
+              <TextInput id="event-title" label="Title" error={errors.title?.message} {...field} />
             )}
           />
 
@@ -108,14 +108,14 @@ export function EventForm({ initialData, onClose }) {
               name="year"
               control={control}
               render={({ field }) => (
-                <TextInput type="number" label="Year" error={errors.year?.message} {...field} />
+                <TextInput id="event-year" type="number" label="Year" error={errors.year?.message} {...field} />
               )}
             />
             <Controller
               name="place"
               control={control}
               render={({ field }) => (
-                <TextInput label="Place" error={errors.place?.message} {...field} />
+                <TextInput id="event-place" label="Place" error={errors.place?.message} {...field} />
               )}
             />
           </Group>
@@ -125,14 +125,14 @@ export function EventForm({ initialData, onClose }) {
               name="type"
               control={control}
               render={({ field }) => (
-                <Select label="Type" data={typeEnum} error={errors.type?.message} {...field} />
+                <Select id="event-type" label="Type" data={typeEnum} error={errors.type?.message} {...field} />
               )}
             />
             <Controller
               name="timestamp"
               control={control}
               render={({ field }) => (
-                <TextInput label="Timestamp (ISO-8601 ending with Z)" error={errors.timestamp?.message} {...field} />
+                <TextInput id="event-timestamp" label="Timestamp (ISO-8601 ending with Z)" error={errors.timestamp?.message} {...field} />
               )}
             />
           </Group>
@@ -141,7 +141,7 @@ export function EventForm({ initialData, onClose }) {
             name="categories"
             control={control}
             render={({ field }) => (
-              <MultiSelect label="Categories" data={categoryOptions} error={errors.categories?.message} {...field} />
+              <MultiSelect id="event-categories" label="Categories" data={categoryOptions} error={errors.categories?.message} {...field} />
             )}
           />
 
@@ -149,7 +149,7 @@ export function EventForm({ initialData, onClose }) {
             name="mediaRefs"
             control={control}
             render={({ field }) => (
-              <TextInput label="Media Refs (semicolon separated)" error={errors.mediaRefs?.message} {...field} />
+              <TextInput id="event-media-refs" label="Media Refs (semicolon separated)" error={errors.mediaRefs?.message} {...field} />
             )}
           />
 
@@ -157,7 +157,7 @@ export function EventForm({ initialData, onClose }) {
             name="summary"
             control={control}
             render={({ field }) => (
-              <Textarea label="Summary" minRows={2} error={errors.summary?.message} {...field} />
+              <Textarea id="event-summary" label="Summary" minRows={2} error={errors.summary?.message} {...field} />
             )}
           />
 
@@ -165,7 +165,7 @@ export function EventForm({ initialData, onClose }) {
             name="detail"
             control={control}
             render={({ field }) => (
-              <Textarea label="Detail" minRows={4} error={errors.detail?.message} {...field} />
+              <Textarea id="event-detail" label="Detail" minRows={4} error={errors.detail?.message} {...field} />
             )}
           />
 

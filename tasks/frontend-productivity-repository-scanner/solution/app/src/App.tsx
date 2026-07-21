@@ -113,8 +113,15 @@ function useEscape(handler: () => void, active: boolean) {
 function useModalFocusTrap(open: boolean, onClose: () => void, selector = '.cds--modal.is-visible .cds--modal-container') {
   const openerRef = useRef<HTMLElement | null>(null)
   useEffect(() => {
+    if (open) return undefined
+    const rememberOpener = () => { openerRef.current = document.activeElement as HTMLElement }
+    document.addEventListener('focusin', rememberOpener)
+    return () => document.removeEventListener('focusin', rememberOpener)
+  }, [open])
+  useEffect(() => {
     if (!open) return undefined
-    openerRef.current = document.activeElement as HTMLElement
+    const active = document.activeElement as HTMLElement | null
+    if (active && !active.closest('.cds--modal, [role="dialog"]')) openerRef.current = active
     let container: Element | null = null
     let attempts = 0
     const focusModal = () => {
@@ -521,7 +528,7 @@ function ScanPanel() {
   const events = timelineFilters.length ? run.timeline.filter((event) => timelineFilters.includes(event.status)) : run.timeline
 
   return (
-    <section className="panel scan-panel" aria-labelledby="scan-heading">
+    <section id="scan-panel" className="panel scan-panel" aria-labelledby="scan-heading">
       <div className="panel-heading scan-heading">
         <div>
           <p className="eyebrow">Durable workflow</p>
@@ -764,9 +771,13 @@ function FileViewer() {
   if (!document) return <DocumentTree />
 
   const copy = async () => {
-    await navigator.clipboard.writeText(document.content)
-    setCopied(true)
-    window.setTimeout(() => setCopied(false), 1600)
+    try {
+      await navigator.clipboard.writeText(document.content)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1600)
+    } catch {
+      setCopied(false)
+    }
   }
 
   return (
@@ -774,7 +785,9 @@ function FileViewer() {
       <div className="viewer-toolbar">
         <Button size="sm" kind="ghost" renderIcon={ArrowLeft} onClick={showTree}>Back to document tree</Button>
         <Button size="sm" kind="tertiary" renderIcon={copied ? CheckmarkFilled : Copy} onClick={() => void copy()}>{copied ? 'Copied' : 'Copy'}</Button>
+        <span className="sr-only" role="status" aria-live="polite">{copied ? 'File content copied' : ''}</span>
       </div>
+      <ActiveScanContext />
       <div className="panel-heading">
         <p className="eyebrow">Read-only file viewer · {document.type}</p>
         <h2 id="viewer-heading">{fileName(document.path)}</h2>
@@ -793,6 +806,30 @@ function FileViewer() {
         <Findings document={document} />
       </div>
     </section>
+  )
+}
+
+function ActiveScanContext() {
+  const activeScanId = useAppStore((state) => state.activeScanId)
+  const run = useAppStore((state) => activeScanId ? state.scanRuns[activeScanId] : undefined)
+  const repository = useAppStore((state) => state.repositories.find((item) => item.id === activeScanId))
+  const pause = useAppStore((state) => state.pauseScan)
+  const resume = useAppStore((state) => state.resumeScan)
+  if (!activeScanId || !run || !repository) return null
+  const complete = run.steps.filter((step) => step.status === 'complete').length
+  return (
+    <div className="active-scan-context">
+      <span className="sr-only" role="status" aria-live="polite">Active scan {repositoryLabel(repository)}, {complete} of {run.steps.length} files, {run.status}</span>
+      <div>
+        <strong>Active scan · {repositoryLabel(repository)}</strong>
+        <span>{complete}/{run.steps.length} files · {run.status}</span>
+      </div>
+      <div>
+        {run.status === 'running' && <Button size="sm" kind="secondary" renderIcon={Pause} onClick={() => pause(repository.id)}>Pause scan</Button>}
+        {run.status === 'paused' && <Button size="sm" renderIcon={Play} onClick={() => resume(repository.id)}>Resume scan</Button>}
+        <Button size="sm" kind="ghost" onClick={() => document.getElementById('scan-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}>View scan panel</Button>
+      </div>
+    </div>
   )
 }
 
@@ -815,8 +852,12 @@ function ExportModal() {
     window.setTimeout(() => setConfirmation(''), 1600)
   }
   const copy = async () => {
-    await navigator.clipboard.writeText(activeText)
-    confirm(`${format} copied`)
+    try {
+      await navigator.clipboard.writeText(activeText)
+      confirm(`${format} copied`)
+    } catch {
+      confirm(`${format} copy failed`)
+    }
   }
   const download = () => {
     const blob = new Blob([activeText], { type: tab === 0 ? 'application/json' : 'text/markdown' })
@@ -848,7 +889,9 @@ function ExportModal() {
           <Button size="sm" renderIcon={Download} onClick={download}>Download</Button>
         </div>
       </div>
-      {confirmation && <InlineNotification kind="success" lowContrast hideCloseButton title={confirmation} />}
+      <div className="export-live" role="status" aria-live="polite">
+        {confirmation && <InlineNotification kind="success" lowContrast hideCloseButton title={confirmation} />}
+      </div>
       <Tabs selectedIndex={tab} onChange={({ selectedIndex }) => setTab(selectedIndex)}>
         <TabList aria-label="Export formats" contained>
           <Tab>Scan Index JSON</Tab>
@@ -949,6 +992,13 @@ function CommandPalette() {
   const inputRef = useRef<HTMLInputElement>(null)
   const openerRef = useRef<HTMLElement | null>(null)
 
+  useEffect(() => {
+    if (open) return undefined
+    const rememberOpener = () => { openerRef.current = document.activeElement as HTMLElement }
+    document.addEventListener('focusin', rememberOpener)
+    return () => document.removeEventListener('focusin', rememberOpener)
+  }, [open])
+
   const close = () => {
     setUi('paletteOpen', false)
     window.setTimeout(() => openerRef.current?.focus(), 0)
@@ -957,7 +1007,8 @@ function CommandPalette() {
 
   useEffect(() => {
     if (open) {
-      openerRef.current = document.activeElement as HTMLElement
+      const active = document.activeElement as HTMLElement | null
+      if (active && !active.closest('.palette-backdrop, [role="dialog"]')) openerRef.current = active
       setQuery('')
       setHighlight(0)
       window.setTimeout(() => inputRef.current?.focus(), 0)
@@ -1083,6 +1134,8 @@ function Toolbar() {
   const redo = useAppStore((state) => state.redo)
   const canUndo = useAppStore((state) => state.undoStack.length > 0)
   const canRedo = useAppStore((state) => state.redoStack.length > 0)
+  const failureDemoRun = useAppStore((state) => state.scanRuns['repo-2'])
+  const failureDemoRunning = failureDemoRun?.status === 'running' || failureDemoRun?.status === 'paused'
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -1101,6 +1154,9 @@ function Toolbar() {
         <Button size="sm" renderIcon={Add} onClick={() => setUi('addOpen', true)}>Add repository</Button>
         <Button size="sm" kind="secondary" renderIcon={Play} disabled={!selectedCount} onClick={() => void scanSelected()}>
           Scan selected{selectedCount ? ` (${selectedCount})` : ''}
+        </Button>
+        <Button size="sm" kind="danger--tertiary" renderIcon={WarningFilled} disabled={failureDemoRunning} onClick={() => void startScan('repo-2')}>
+          Run failure demo
         </Button>
       </div>
       <div className="toolbar-secondary">

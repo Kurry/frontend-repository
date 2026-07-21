@@ -8,9 +8,13 @@
   },
   "scripts": {
     "start": "node server.mjs",
+    "test:e2e": "playwright test",
     "verify:build": "node -e \"require('fs').accessSync('./prebuilt/index.html')\""
   },
   "dependencies": {
     "serve": "14.2.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.1"
   }
 }

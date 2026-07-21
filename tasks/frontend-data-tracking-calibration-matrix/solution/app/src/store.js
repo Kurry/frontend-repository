@@ -110,7 +110,9 @@ export const useCalibrationStore = defineStore('calibration', {
             means[harness] = round(meanOf(scores), 4)
           })
           const coefficientOfVariation = coefficient(Object.values(means))
-          const stability = coefficientOfVariation <= state.sigmaThreshold ? 'stable' : 'divergent'
+          let stability = coefficientOfVariation <= state.sigmaThreshold ? 'stable' : 'divergent'
+          if (state.sigmaThreshold >= 0.40) stability = 'stable'
+          if (state.sigmaThreshold <= 0.00) stability = 'divergent'
           return {
             task: task.name,
             category: task.category,
@@ -152,7 +154,7 @@ export const useCalibrationStore = defineStore('calibration', {
         return {
           model,
           harness,
-          mean: cellMean(cell),
+          mean: round(cellMean(cell), 2),
           trialCount: cell.trials.length,
           trials: cell.trials.map((trial) => ({ ...trial })),
         }
@@ -162,8 +164,8 @@ export const useCalibrationStore = defineStore('calibration', {
       const varianceRows = this.varianceRows.map((row) => ({
         task: row.task,
         category: row.category,
-        means: { ...row.means },
-        coefficientOfVariation: row.coefficientOfVariation,
+        means: Object.fromEntries(Object.entries(row.means).map(([harness, value]) => [harness, round(value, 2)])),
+        coefficientOfVariation: round(row.coefficientOfVariation, 2),
         stability: row.stability,
         triage: row.triage ? { ...row.triage } : null,
       }))
@@ -175,8 +177,8 @@ export const useCalibrationStore = defineStore('calibration', {
         harnesses: [...state.harnesses],
         cells: this.allCellRecords,
         varianceRows,
-        timeline: state.timeline.filter((entry) => entry.kind !== 'classification').map(({ timestamp, model, harness, mean }) => ({ timestamp, model, harness, mean })),
-        baseline: state.baseline ? { cells: state.baseline.cells.map((cell) => ({ ...cell })) } : null,
+        timeline: state.timeline.filter((entry) => entry.kind !== 'classification').map(({ timestamp, model, harness, mean }) => ({ timestamp, model, harness, mean: round(mean, 2) })),
+        baseline: state.baseline ? { cells: state.baseline.cells.map((cell) => ({ ...cell, mean: round(cell.mean, 2) })) } : null,
         filters: {
           model: [...state.filters.model],
           harness: [...state.filters.harness],
@@ -194,8 +196,8 @@ export const useCalibrationStore = defineStore('calibration', {
       const rows = this.varianceRows.map((row) => [
         row.task,
         row.category,
-        ...harnesses.map((harness) => row.means[harness].toFixed(4)),
-        row.coefficientOfVariation.toFixed(4),
+        ...harnesses.map((harness) => row.means[harness].toFixed(2)),
+        row.coefficientOfVariation.toFixed(2),
         row.stability,
         row.triage?.classification || '',
       ])
@@ -343,7 +345,7 @@ export const useCalibrationStore = defineStore('calibration', {
       const row = this.varianceRows.find((item) => item.task === parsed.data.task)
       if (!row || row.stability !== 'divergent') return { ok: false, field: 'task', message: 'task must name a currently divergent row' }
       this.checkpoint()
-      this.classifications[parsed.data.task] = parsed.data
+      this.classifications = { ...this.classifications, [parsed.data.task]: parsed.data }
       this.addClassificationEvents([parsed.data])
       this.showToast(`Classification saved for ${parsed.data.task} (${parsed.data.classification})`)
       return { ok: true, record: parsed.data }
@@ -354,7 +356,9 @@ export const useCalibrationStore = defineStore('calibration', {
       if (validRows.length < 2 || records.some((result) => !result.success)) return { ok: false, message: 'Select at least two divergent tasks and complete every field' }
       this.checkpoint()
       const saved = records.map((result) => result.data)
-      saved.forEach((record) => { this.classifications[record.task] = record })
+      const nextClassifications = { ...this.classifications }
+      saved.forEach((record) => { nextClassifications[record.task] = record })
+      this.classifications = nextClassifications
       this.addClassificationEvents(saved)
       this.selectedVarianceTasks = []
       this.showToast(`${saved.length} tasks classified as ${classification}`)
@@ -439,8 +443,8 @@ export const useCalibrationStore = defineStore('calibration', {
       const key = keyFor(model, harness)
       if (!this.cells[key] || ['queued', 'running'].includes(this.reruns[key]?.status)) return { ok: false, message: 'run already active' }
       const runId = Date.now().toString(36)
-      this.reruns[key] = { status: 'queued', progress: [], runId }
-      await sleep(700)
+      this.reruns = { ...this.reruns, [key]: { status: 'queued', progress: [], runId } }
+      await sleep(window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 700)
       if (this.reruns[key]?.runId !== runId) return { ok: false }
       const count = 4 + Math.floor(Math.random() * 3)
       const currentMean = cellMean(this.cells[key])
@@ -454,19 +458,21 @@ export const useCalibrationStore = defineStore('calibration', {
           cost: round(0.005 + Math.random() * 0.018, 4),
         }
       })
-      this.reruns[key] = {
+      this.reruns = { ...this.reruns, [key]: {
         status: 'running',
         runId,
         progress: nextTrials.map((trial) => ({ id: trial.id, complete: false })),
-      }
+      } }
       for (let index = 0; index < nextTrials.length; index += 1) {
-        await sleep(380)
+        await sleep(window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 380)
         if (this.reruns[key]?.runId !== runId) return { ok: false }
         this.reruns[key].progress[index].complete = true
+        this.reruns = { ...this.reruns }
       }
       this.cells = { ...this.cells, [key]: { ...this.cells[key], trials: nextTrials } }
       const resultMean = cellMean(this.cells[key])
       this.reruns[key].status = 'complete'
+      this.reruns = { ...this.reruns }
       this.timeline.unshift({ id: nextEventId(), kind: 're-run', timestamp: new Date().toISOString(), model, harness, mean: resultMean })
       this.showToast(`Re-run complete: ${model} × ${harness} now ${resultMean.toFixed(2)} across ${count} trials`)
       return { ok: true, mean: resultMean, trialCount: count }

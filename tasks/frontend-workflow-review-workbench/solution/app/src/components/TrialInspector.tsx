@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Badge, Button, Group, Paper, Select, Stack, Text, Title } from '@mantine/core';
+import { Badge, Button, Group, Modal, Paper, Select, Stack, Text, Title } from '@mantine/core';
 import { Controller, useForm } from 'react-hook-form';
 import { IconArrowsDiff, IconArrowBackUp, IconCheck, IconCircleX, IconFlask, IconLink } from '@tabler/icons-react';
 import { isTrialValid } from '../domain';
@@ -20,25 +20,35 @@ function TrialDiff({ bundle }: { bundle: ReviewBundle }) {
   const trials = bundle.trials.filter((trial) => trial.model === model);
   const defaultLeft = diff.leftTrialId ?? diff.previousTrialId ?? trials[0]?.id ?? '';
   const defaultRight = diff.rightTrialId ?? trials.find((trial) => trial.id !== defaultLeft)?.id ?? '';
-  const { control, handleSubmit, watch, formState: { errors } } = useForm<DiffValues>({ resolver: zodResolver(diffFormSchema), defaultValues: { leftTrialId: defaultLeft, rightTrialId: defaultRight } });
-  const leftId = watch('leftTrialId');
+  const { control, handleSubmit, formState: { errors } } = useForm<DiffValues>({ resolver: zodResolver(diffFormSchema), defaultValues: { leftTrialId: defaultLeft, rightTrialId: defaultRight } });
   const left = trials.find((trial) => trial.id === diff.leftTrialId);
   const right = trials.find((trial) => trial.id === diff.rightTrialId);
   const flips = left && right ? CHECK_NAMES.filter((name) => left.checks.find((check) => check.name === name)?.outcome !== right.checks.find((check) => check.name === name)?.outcome) : [];
+  const picking = !left || !right;
   return (
     <section className="diff-mode" aria-labelledby="diff-title">
       <Group justify="space-between"><div><Text className="eyebrow">Same-gate comparison</Text><Title id="diff-title" order={2}>Trial Check Diff</Title></div><Button variant="default" leftSection={<IconArrowBackUp size={16} />} onClick={exitDiff}>Leave diff mode</Button></Group>
-      {!left || !right ? (
-        <Paper component="form" className="diff-picker" onSubmit={handleSubmit((values) => { if (values.leftTrialId === values.rightTrialId) return; setDiffTrials(values.leftTrialId, values.rightTrialId) })}>
-          <Text fw={750}>Pick two {model} trials</Text>
+      <Modal
+        opened={picking}
+        onClose={exitDiff}
+        title={<div><Text className="eyebrow">Diff picker</Text><Title order={3}>Pick two {model} trials</Title></div>}
+        trapFocus
+        returnFocus
+        closeOnEscape
+        withinPortal
+        closeButtonProps={{ 'aria-label': 'Close diff picker' }}
+        overlayProps={{ backgroundOpacity: 0.35, blur: 2 }}
+      >
+        <form className="diff-picker" onSubmit={handleSubmit((values) => { if (values.leftTrialId === values.rightTrialId) return; setDiffTrials(values.leftTrialId, values.rightTrialId); })}>
           <Group align="start" mt="sm">
             <Controller name="leftTrialId" control={control} render={({ field }) => <Select {...field} label="First trial" data={trials.map((trial) => ({ value: trial.id, label: `${trial.model} · trial ${trial.number} · ${isTrialValid(trial) ? 'valid' : 'invalid'}` }))} />} />
             <Controller name="rightTrialId" control={control} render={({ field }) => <Select {...field} label="Second trial" error={errors.rightTrialId?.message} data={trials.map((trial) => ({ value: trial.id, label: `${trial.model} · trial ${trial.number} · ${isTrialValid(trial) ? 'valid' : 'invalid'}` }))} />} />
             <Button type="submit" mt={25} leftSection={<IconArrowsDiff size={16} />}>Compare trials</Button>
           </Group>
           {diff.error && <Text c="red.7" size="sm" role="alert">{diff.error}</Text>}
-        </Paper>
-      ) : (
+        </form>
+      </Modal>
+      {!picking && (
         <Paper className="diff-table-wrap">
           <Group justify="space-between" mb="md"><Text fw={750}>{left.model} trial {left.number} ↔ trial {right.number}</Text><Badge className={flips.length ? 'flip-summary active' : 'flip-summary'}>{flips.length} flipped checks out of 8</Badge></Group>
           <div className="diff-grid diff-header"><span>Validity check</span><span>Trial {left.number}</span><span>Trial {right.number}</span><span>Change</span></div>

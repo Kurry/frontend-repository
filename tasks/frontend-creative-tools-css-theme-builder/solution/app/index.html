@@ -72,7 +72,8 @@
           </div>
           <div class="panel-body">
             <button type="button" class="hold-btn" id="hold-add" aria-describedby="hold-hint">
-              <span>Hold to add theme</span>
+              <span class="hold-progress" aria-hidden="true"></span>
+              <span class="hold-label">Hold to add theme</span>
             </button>
             <p class="hint hold-hint" id="hold-hint">Press and hold for about a second — the progress sweep adds a custom theme.</p>
 
@@ -410,7 +411,7 @@
       </main>
     </div>
 
-    <div class="modal-backdrop" id="css-modal" role="dialog" aria-modal="true" aria-labelledby="export-title">
+    <div class="modal-backdrop" id="css-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="export-title" inert>
       <div class="modal-card">
         <header>
           <strong id="export-title">Export theme</strong>
@@ -435,7 +436,7 @@
       </div>
     </div>
 
-    <div class="modal-backdrop" id="import-modal" role="dialog" aria-modal="true" aria-labelledby="import-title">
+    <div class="modal-backdrop" id="import-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="import-title" inert>
       <div class="modal-card">
         <header>
           <strong id="import-title">Import theme</strong>

@@ -379,7 +379,10 @@
     canUndo = false;
     undoData = null;
     stopTimer();
-    if (currentCard && timerEnabled) startTimer(snapshot.timeLeft);
+    // A timer forfeit snapshots at 0 seconds. Restarting from that value used
+    // to forfeit the restored card again one second after Undo, making Undo
+    // appear reusable and hiding the exact card the player asked to restore.
+    if (currentCard && timerEnabled) startTimer(snapshot.timeLeft > 0 ? snapshot.timeLeft : 15);
     showToast('Last turn undone', 'info');
   }
 
@@ -612,8 +615,11 @@
       a.download = `dare-night-session-${Date.now()}.json`;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      setTimeout(() => {
+        a.remove();
+        URL.revokeObjectURL(url);
+      }, 1000);
+      showToast('Session JSON downloaded', 'success');
     } catch { showToast('Download failed', 'error'); }
   }
 

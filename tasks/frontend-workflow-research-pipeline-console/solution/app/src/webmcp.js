@@ -56,7 +56,7 @@ function displayEnums(config) {
 const handlers = {
   browse_open: async ({ destination, runId, model, benchmark } = {}) => {
     const s = state();
-    if (destination === 'pipeline-board') { s.setView('pipeline'); s.selectRun(null); }
+    if (destination === 'pipeline-board') s.setView('pipeline');
     else if (destination === 'datasets') s.setView('datasets');
     else if (destination === 'results') s.setView('results');
     else if (destination === 'run-detail' && s.runs.some((r) => r.id === runId)) { s.setView('pipeline'); s.selectRun(runId); }

@@ -7,17 +7,33 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function MotionManager() {
   useEffect(() => {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    // --- Reduced motion: paint fully settled, no smoothing, no decode. ---
-    if (reduceMotion) {
+    const applyReducedMotion = () => {
       document.documentElement.style.scrollBehavior = 'auto';
       document.documentElement.classList.add('is-mounted');
       const headline = document.getElementById('eventsHeadline');
       if (headline) { headline.textContent = 'RIDGE GLOBAL EVENTS'; headline.setAttribute('aria-label', 'RIDGE GLOBAL EVENTS'); }
       const trio = document.getElementById('trio');
       if (trio) trio.classList.add('trio-in');
-      return;
+
+      // also instantly clear any gsap properties on these targets if they were mid-animation
+      gsap.set('#chrome, .bento-mission, .bento-clock, .hero-plane, .blurb-line', { clearProps: 'all' });
+    };
+
+    if (mql.matches) {
+      applyReducedMotion();
+    }
+
+    const listener = (e: MediaQueryListEvent) => {
+      if (e.matches) applyReducedMotion();
+    };
+
+    mql.addEventListener('change', listener);
+
+    // --- Reduced motion: paint fully settled, no smoothing, no decode. ---
+    if (mql.matches) {
+      return () => { mql.removeEventListener('change', listener); };
     }
 
     // --- Lenis Smooth Scrolling (desktop only) ---
@@ -132,6 +148,7 @@ export default function MotionManager() {
       lenis?.destroy();
       trioTrigger?.kill();
       ScrollTrigger.getAll().forEach(t => t.kill());
+      mql.removeEventListener('change', listener);
     };
   }, []);
 

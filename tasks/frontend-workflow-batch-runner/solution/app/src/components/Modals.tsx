@@ -67,7 +67,7 @@ export function ScheduleModal() {
   const job = useBatchStore((state) => state.jobs.find((entry) => entry.id === state.selectedJobId))
   const setUi = useBatchStore((state) => state.setUi)
   const setSchedule = useBatchStore((state) => state.setSchedule)
-  const { register, reset, handleSubmit, formState: { errors, isValid } } = useForm<z.infer<typeof scheduleFormSchema>>({
+  const { register, reset, handleSubmit, formState: { errors } } = useForm<z.infer<typeof scheduleFormSchema>>({
     resolver: zodResolver(scheduleFormSchema), mode: 'onChange', defaultValues: { windowStart: '', windowEnd: '' },
   })
 
@@ -96,7 +96,7 @@ export function ScheduleModal() {
           {job?.schedule && <Button type="button" kind="danger--tertiary" size="sm" renderIcon={TrashCan} onClick={() => setSchedule(job.id, null)}>Remove schedule</Button>}
         </form>
       </ModalBody>
-      <ModalFooter><Button kind="secondary" onClick={close}>Cancel</Button><Button type="submit" form="schedule-form" disabled={!isValid}>Save schedule</Button></ModalFooter>
+      <ModalFooter><Button kind="secondary" onClick={close}>Cancel</Button><Button type="submit" form="schedule-form">Save schedule</Button></ModalFooter>
     </ComposedModal>
   )
 }

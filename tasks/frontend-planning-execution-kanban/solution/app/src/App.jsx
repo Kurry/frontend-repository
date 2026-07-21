@@ -267,6 +267,7 @@ function BoardCard({ card, prompt, people, selected, backoff, dropPosition, inde
         {...attributes}
         {...listeners}
         data-card-id={card.id}
+        data-column={card.column}
         className={`card-tile accent-${card.column} ${isDragging ? 'is-dragging' : ''}`}
         tabIndex={0}
         role="button"
@@ -440,7 +441,7 @@ function CreateCardModal({ column, shown }) {
     [state.prompts, state.assignees],
   )
   const seed = state.createFormSeed
-  const { register, handleSubmit, setError, clearErrors, reset, watch, formState: { errors, isSubmitting } } = useForm({
+  const { register, handleSubmit, setError, clearErrors, reset, trigger, watch, formState: { errors, isSubmitting } } = useForm({
     resolver: zodResolver(schema),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -502,7 +503,10 @@ function CreateCardModal({ column, shown }) {
             placeholder="What should this prompt execution accomplish?"
             invalid={Boolean(errors.title)}
             invalidText={errors.title?.message}
-            {...register('title', { onChange: () => { clearErrors('title'); state.setCreateFormErrors({ ...state.createFormErrors, title: undefined }) } })}
+            {...register('title', {
+              onBlur: () => { void trigger('title') },
+              onChange: () => { clearErrors('title'); state.setCreateFormErrors({ ...state.createFormErrors, title: undefined }) },
+            })}
           />
           <TextArea id="create-description" labelText="Description (optional)" placeholder="Add useful context, acceptance criteria, or evaluation notes." invalid={Boolean(errors.description)} invalidText={errors.description?.message} {...register('description')} />
           <Select id="create-prompt" labelText="Attached prompt (optional)" invalid={Boolean(errors.attached_prompt)} invalidText={errors.attached_prompt?.message} {...register('attached_prompt')}>
@@ -708,7 +712,19 @@ function PromptPanel({ promptId, shown }) {
   if (!prompt) return null
   return (
     <div className={`drawer-scrim ${shown ? 'is-shown' : ''}`} onMouseDown={(event) => { if (event.target === event.currentTarget) close() }}>
-      <aside ref={panelRef} className={`side-panel prompt-panel ${shown ? 'is-open' : ''}`} role="dialog" aria-modal="true" aria-labelledby="prompt-panel-title">
+      <aside
+        ref={panelRef}
+        className={`side-panel prompt-panel ${shown ? 'is-open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="prompt-panel-title"
+        onKeyDownCapture={(event) => {
+          if (event.key !== 'Escape') return
+          event.preventDefault()
+          event.stopPropagation()
+          close()
+        }}
+      >
         <header className="drawer-header">
           <div><span className="eyebrow">Prompt library</span><h2 id="prompt-panel-title">{prompt.title}</h2></div>
           <Button hasIconOnly kind="ghost" renderIcon={Close} iconDescription="Close prompt panel" onClick={close} />
@@ -1163,7 +1179,7 @@ function App() {
       <ExportDrawerHost />
       <ToastHost />
 
-      <div className="announcement" aria-live="polite" aria-atomic="true">{state.announcement}</div>
+      <div className="announcement" role="status" aria-live="polite" aria-atomic="true">{state.announcement}</div>
     </div>
   )
 }

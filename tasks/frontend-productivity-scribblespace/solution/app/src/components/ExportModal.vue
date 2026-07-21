@@ -227,8 +227,7 @@ const doImport = () => {
     <DialogPortal>
       <DialogOverlay v-motion="motionConfigOverlay" class="fixed inset-0 bg-black/40 z-50 transition-opacity duration-300" />
       <DialogContent
-        v-motion="motionConfigContent"
-        class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-xl shadow-xl p-6 w-[min(800px,calc(100vw-24px))] h-[min(600px,calc(100vh-48px))] flex flex-col z-50"
+        class="fixed inset-3 m-auto bg-white rounded-xl shadow-xl p-6 w-[min(800px,calc(100vw-24px))] h-[min(600px,calc(100vh-24px))] flex flex-col z-[51]"
         :trap-focus="true"
       >
         <div class="flex items-center justify-between mb-4 shrink-0">
@@ -256,13 +255,13 @@ const doImport = () => {
 
                  <div class="flex-1 border border-gray-200 rounded-lg overflow-hidden bg-gray-50 flex">
                     <TabsContent value="json" class="flex-1 w-full h-full outline-none">
-                       <textarea readonly class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="jsonText"></textarea>
+                       <textarea readonly aria-label="Workspace JSON export preview" class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="jsonText"></textarea>
                     </TabsContent>
                     <TabsContent value="md" class="flex-1 w-full h-full outline-none">
-                       <textarea readonly class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="markdownText"></textarea>
+                       <textarea readonly aria-label="Markdown export preview" class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="markdownText"></textarea>
                     </TabsContent>
                     <TabsContent value="text" class="flex-1 w-full h-full outline-none">
-                       <textarea readonly class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="plainText"></textarea>
+                       <textarea readonly aria-label="Plain text export preview" class="w-full h-full p-4 font-mono text-sm resize-none bg-transparent outline-none text-gray-800" :value="plainText"></textarea>
                     </TabsContent>
                  </div>
 
@@ -276,7 +275,7 @@ const doImport = () => {
            <TabsContent value="import" class="flex-1 flex flex-col pt-4 min-h-0 outline-none">
               <p class="text-sm text-gray-600 mb-2">Paste a valid Workspace JSON package below to restore a previous session.</p>
               <label for="import-workspace-json" class="sr-only">Workspace JSON</label>
-              <textarea id="import-workspace-json" v-model="importText" aria-describedby="import-error" class="flex-1 w-full p-4 font-mono text-sm resize-none border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#6D5BD0] text-gray-800" placeholder='{"schemaVersion": "scribblespace-workspace-v1", ...}'></textarea>
+              <textarea id="import-workspace-json" v-model="importText" aria-label="Import Workspace JSON" aria-describedby="import-error" class="flex-1 w-full p-4 font-mono text-sm resize-none border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-[#6D5BD0] text-gray-800" placeholder='{"schemaVersion": "scribblespace-workspace-v1", ...}'></textarea>
               <div v-if="importError" id="import-error" role="alert" aria-live="polite" class="text-red-600 text-sm mt-2 font-medium">{{ importError }}</div>
 
               <div class="flex justify-end gap-3 mt-4 shrink-0">

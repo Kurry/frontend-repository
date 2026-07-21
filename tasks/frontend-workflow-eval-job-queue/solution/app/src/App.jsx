@@ -464,7 +464,7 @@ function SubmitDialog() {
   const setFormDraft = useQueueStore((state) => state.setFormDraft)
   const submitJobs = useQueueStore((state) => state.submitJobs)
   const submitting = useQueueStore((state) => state.submitting)
-  const { register, handleSubmit, watch, formState: { errors, isSubmitting }, reset, trigger } = useForm({ resolver: zodResolver(createJobSchema), mode: 'onChange', defaultValues: draft })
+  const { register, handleSubmit, watch, formState: { errors, isSubmitting, isValid }, reset, trigger } = useForm({ resolver: zodResolver(createJobSchema), mode: 'onChange', defaultValues: draft })
   const values = watch()
   useEffect(() => { setFormDraft(values) }, [values.dataset, values.agent, values.model, values.trialCount, values.sweepModel])
   useEffect(() => { if (open) { reset(draft); trigger() } }, [open])
@@ -484,7 +484,7 @@ function SubmitDialog() {
           <label className="form-field"><span>Sweep model <b>Optional</b></span><NativeSelect.Root><NativeSelect.Field aria-invalid={Boolean(errors.sweepModel)} aria-describedby={described('sweepModel')} {...register('sweepModel')}><option value="">No sweep model</option>{MODELS.map((value) => <option key={value}>{value}</option>)}</NativeSelect.Field><NativeSelect.Indicator /></NativeSelect.Root><FieldError id="sweepModel-error" message={errors.sweepModel?.message} /><small>Creates one job for each selected model.</small></label>
         </div>
         <ConfigPreview values={values} />
-        <div className="dialog-actions submit-actions"><Button type="button" className="button button-ghost" onClick={() => setChrome('submitOpen', false)}>Cancel</Button><Button type="submit" className="button button-primary" disabled={isSubmitting || submitting}>{isSubmitting || submitting ? <span className="spinner" /> : <Plus size={17} aria-hidden="true" />}Submit job</Button></div>
+        <div className="dialog-actions submit-actions"><Button type="button" className="button button-ghost" onClick={() => setChrome('submitOpen', false)}>Cancel</Button><Button type="submit" className="button button-primary" disabled={!isValid || isSubmitting || submitting}>{isSubmitting || submitting ? <span className="spinner" /> : <Plus size={17} aria-hidden="true" />}Submit job</Button></div>
       </form>
     </DialogShell>
   )

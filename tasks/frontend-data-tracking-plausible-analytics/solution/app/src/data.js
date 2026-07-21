@@ -190,6 +190,7 @@ function scale(n, factor) {
 // jitter; buckets always sum to the given total.
 function buildTrend(total, period, seedKey) {
   const n = period.buckets;
+  if (total <= 0) return Array.from({ length: n }, () => 0);
   const weights = [];
   let sum = 0;
   for (let i = 0; i < n; i++) {
@@ -248,6 +249,11 @@ export function computeDashboard(siteId, periodId, filters, sortId, compare, add
       fraction = 0;
     }
   }
+  // The seed has independent one-dimensional totals rather than a full event
+  // cube. Treat a complete source/page/country stack as a deliberately sparse
+  // intersection so the UI can represent a genuine no-visitors result instead
+  // of inventing traffic by multiplying unrelated marginal counts.
+  if (new Set(activeFilters.map((filter) => filter.dimension)).size === DIMENSIONS.length) fraction = 0;
   const visitors = scale(Math.round(site.visitors * fraction), f);
   const pageviews = scale(Math.round(site.pageviews * fraction), f);
   // With multiple stacked filters, visitors already accounts for every active
@@ -275,6 +281,10 @@ export function computeDashboard(siteId, periodId, filters, sortId, compare, add
       );
     }
   }
+  if (visitors === 0) {
+    bounceRate = 0;
+    avgDuration = 0;
+  }
   const kpi = {
     visitors,
     pageviews,
@@ -293,6 +303,7 @@ export function computeDashboard(siteId, periodId, filters, sortId, compare, add
   // the shape (not just scale) shifts; the filtered dimension's own panel shows
   // only the selected row.
   function panel(dim) {
+    if (kpi.visitors === 0) return [];
     const list = site[DIM_KEY[dim]];
     const dimensionFilter = activeFilters.find((filter) => filter.dimension === dim);
     if (dimensionFilter) {
@@ -312,7 +323,7 @@ export function computeDashboard(siteId, periodId, filters, sortId, compare, add
     { name: 'Pricing viewed', goal_type: 'page', match_key: '/pricing' },
     { name: 'Docs read', goal_type: 'page', match_key: '/docs' },
   ];
-  const goalRecords = [...seededGoals, ...(Array.isArray(addedGoals) ? addedGoals : [])];
+  const goalRecords = kpi.visitors === 0 ? [] : [...seededGoals, ...(Array.isArray(addedGoals) ? addedGoals : [])];
   const goals = goalRecords.map((goal) => {
     const rate = 0.04 + hash(`${siteId}|${goal.name}|${filterKey}`) * 0.18;
     const completions = Math.min(kpi.visitors, Math.round(kpi.visitors * rate));
@@ -322,7 +333,7 @@ export function computeDashboard(siteId, periodId, filters, sortId, compare, add
   const pricingCount = goals.find((goal) => goal.name === 'Pricing viewed')?.completions ?? 0;
   const signupCount = Math.min(pricingCount, goals.find((goal) => goal.name === 'Signup')?.completions ?? 0);
   const funnelCounts = [kpi.visitors, Math.min(kpi.visitors, pricingCount), signupCount];
-  const funnel = ['Visited', 'Pricing viewed', 'Signup'].map((name, index) => ({
+  const funnel = kpi.visitors === 0 ? [] : ['Visited', 'Pricing viewed', 'Signup'].map((name, index) => ({
     name,
     count: funnelCounts[index],
     step_conversion: index === 0

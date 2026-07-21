@@ -230,6 +230,7 @@ main { width: min(1540px, 100%); margin: 0 auto; padding: 20px 28px 46px; }
 .form-field > span { margin: 0 0 6px; display: flex; align-items: center; justify-content: space-between; color: #c8d3ce; font-size: 10px; font-weight: 630; }
 .form-field > span b { color: #66736d; font-size: 7px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; }
 .form-field select, .text-input { width: 100% !important; height: 39px !important; padding: 0 34px 0 10px !important; border: 1px solid var(--border) !important; border-radius: 7px !important; color: var(--text) !important; background: #0c1411 !important; font-size: 11px !important; transition: border-color .2s, box-shadow .2s !important; }
+.form-field select option, .compact-field select option { color: #101815 !important; background: #fff !important; }
 .text-input { padding-right: 10px !important; }
 .form-field select:hover, .text-input:hover, .import-textarea:hover { border-color: #3a4b44 !important; }
 .form-field select:focus, .text-input:focus, .import-textarea:focus { border-color: var(--mint) !important; box-shadow: 0 0 0 3px rgba(114,215,174,.08) !important; }

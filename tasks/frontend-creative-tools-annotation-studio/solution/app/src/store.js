@@ -76,6 +76,14 @@ export function isAgreementFlagged(row) {
     || Object.keys(row.annotatorA.scores).some((key) => Math.abs(row.annotatorA.scores[key] - row.annotatorB.scores[key]) >= 2);
 }
 
+export function agreementMetrics(rows, items) {
+  const seededDisagreements = rows.filter(isAgreementFlagged).length;
+  const openDisputes = rows.filter((row) => items[row.itemId]?.review_state === 'disputed').length;
+  const flagged = Math.min(rows.length, seededDisagreements + openDisputes);
+  const aligned = Math.max(0, rows.length - flagged);
+  return { flagged, aligned, percent: rows.length ? Math.round((aligned / rows.length) * 100) : 0 };
+}
+
 export function compileLabelsPackage(state) {
   return {
     schemaVersion: 'annotation-studio-labels-v1',
@@ -109,7 +117,7 @@ export function compileStats(state) {
     const suiteItems = suite.itemIds.map((id) => state.items[id]).filter(Boolean);
     const completed = suiteItems.filter((item) => item.review_state !== 'unlabeled').length;
     const rows = state.agreement.filter((row) => row.suiteId === suite.id);
-    const agreement = rows.length ? Math.round((rows.filter((row) => !isAgreementFlagged(row)).length / rows.length) * 100) : 0;
+    const agreement = agreementMetrics(rows, state.items).percent;
     return `${suite.name}: ${completed}/${suiteItems.length} completed · ${suiteItems.length - completed} remaining · ${agreement}% agreement`;
   });
   const classLines = state.taxonomy.map((cls) => {
@@ -292,6 +300,7 @@ export const useStudioStore = create((set, get) => ({
       return {
         items,
         historyOrder: [itemId, ...current.historyOrder.filter((id) => id !== itemId)],
+        historyItemId: itemId,
         activeItemId: firstUnlabeled(shadow, item.suiteId),
         selected: current.selected.filter((id) => id !== itemId),
         liveMessage: `Annotation submitted for ${item.title}`,
@@ -399,6 +408,7 @@ export const useStudioStore = create((set, get) => ({
       taxonomy: editingId
         ? current.taxonomy.map((cls) => cls.id === editingId ? { id, ...parsed.data } : cls)
         : [...current.taxonomy, { id, ...parsed.data }],
+      liveMessage: editingId ? `Taxonomy class ${parsed.data.name} updated` : `Taxonomy class ${parsed.data.name} created`,
     }));
     return { ok: true, id };
   },
@@ -423,7 +433,9 @@ export const useStudioStore = create((set, get) => ({
     transact(set, get, 'Created metadata field', (current) => ({
       metadataFields: [...current.metadataFields, field],
       drafts: Object.fromEntries(Object.entries(current.drafts).map(([id, draft]) => [id, { ...draft, metadata: { ...draft.metadata, [field.name]: value } }])),
+      liveMessage: `Metadata field ${field.name} created and added to every annotation card`,
     }));
+    get().setToast(`Metadata field ${field.name} created`);
     return { ok: true };
   },
   deleteMetadataField: (fieldId) => {
@@ -461,7 +473,7 @@ export const useStudioStore = create((set, get) => ({
           ...extra,
         },
       };
-      const next = { items, historyOrder: review_state !== 'unlabeled' && !current.historyOrder.includes(itemId) ? [itemId, ...current.historyOrder] : current.historyOrder };
+      const next = { items, historyOrder: review_state !== 'unlabeled' && !current.historyOrder.includes(itemId) ? [itemId, ...current.historyOrder] : current.historyOrder, historyItemId: itemId, liveMessage: review_state === 'disputed' ? `Dispute created for ${item.title}: ${extra.disputeReason || 'reason recorded'}` : `${item.title} marked ${review_state}` };
       if (wasUnlabeled && review_state !== 'unlabeled' && current.activeItemId === itemId) {
         next.activeItemId = firstUnlabeled({ ...current, items }, current.activeSuiteId);
       }
@@ -473,6 +485,8 @@ export const useStudioStore = create((set, get) => ({
     if (!item?.annotation || !['up', 'down'].includes(rating)) return { ok: false, error: 'rating: choose up or down' };
     transact(set, get, 'Resolved dispute', (state) => ({
       items: { ...state.items, [itemId]: { ...state.items[itemId], review_state: 'reviewed', annotation: { ...state.items[itemId].annotation, rating }, disputeReason: '' } },
+      historyItemId: itemId,
+      liveMessage: `Dispute resolved for ${state.items[itemId].title}`,
     }));
     get().setToast('Dispute resolved');
     return { ok: true };

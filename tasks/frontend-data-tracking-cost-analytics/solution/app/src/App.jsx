@@ -347,8 +347,8 @@ function Header({ onSaveView, onSchedule, onPalette }) {
           <div className="capacity-track"><div className="capacity-fill" style={{ width: `${Math.min(100, count / 20)}%` }} /></div>
         </div>
         <div className="toolbar" id="header-workspace-controls" aria-label="History and workspace actions">
-          <Button kind="ghost" size="sm" hasIconOnly renderIcon={Undo} iconDescription="Undo" tooltipPosition="bottom" disabled={!historyCount} onClick={undo} />
-          <Button kind="ghost" size="sm" hasIconOnly renderIcon={Redo} iconDescription="Redo" tooltipPosition="bottom" disabled={!futureCount} onClick={redo} />
+          <Button kind="ghost" size="sm" hasIconOnly renderIcon={Undo} iconDescription="Undo last change" aria-label="Undo last change" tooltipPosition="bottom" disabled={!historyCount} onClick={undo} />
+          <Button kind="ghost" size="sm" hasIconOnly renderIcon={Redo} iconDescription="Redo last change" aria-label="Redo last change" tooltipPosition="bottom" disabled={!futureCount} onClick={redo} />
           <button type="button" className="chrome-chip" onClick={onPalette} aria-label="Open command palette">
             <Catalog size={16} aria-hidden="true" /> <kbd>Ctrl K</kbd>
           </button>
@@ -356,8 +356,8 @@ function Header({ onSaveView, onSchedule, onPalette }) {
             {theme === 'dark' ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
           </button>
           <PreferencesPopover />
-          <Button kind="ghost" size="sm" renderIcon={Save} onClick={onSaveView}><span className="label">Save view</span></Button>
-          <Button kind="ghost" size="sm" renderIcon={Calculator} onClick={onSchedule}><span className="label">Reports</span></Button>
+          <Button id="save-view-trigger" kind="ghost" size="sm" renderIcon={Save} onClick={onSaveView}><span className="label">Save view</span></Button>
+          <Button id="reports-trigger" kind="ghost" size="sm" renderIcon={Calculator} onClick={onSchedule}><span className="label">Reports</span></Button>
         </div>
       </div>
     </header>
@@ -427,14 +427,14 @@ function RangeForm() {
   return (
     <div>
       <form className="range-form" onSubmit={handleSubmit(applyRange)} aria-label="Date range request body">
-        <div className="compact-field"><label htmlFor="date-from">From</label><input id="date-from" type="date" aria-invalid={Boolean(errors.from)} {...register('from')} /></div>
-        <div className="compact-field"><label htmlFor="date-to">To</label><input id="date-to" type="date" aria-invalid={Boolean(errors.to || backwards)} {...register('to')} /></div>
+        <div className="compact-field"><label htmlFor="date-from">From</label><input id="date-from" type="date" aria-invalid={Boolean(errors.from)} aria-describedby={(errors.from || backwards) ? 'date-range-error' : undefined} {...register('from')} /></div>
+        <div className="compact-field"><label htmlFor="date-to">To</label><input id="date-to" type="date" aria-invalid={Boolean(errors.to || backwards)} aria-describedby={(errors.to || backwards) ? 'date-range-error' : undefined} {...register('to')} /></div>
         <Button type="submit" size="sm" disabled={!isValid || backwards}>Apply</Button>
         <label className="compare-toggle" title="Overlay the previous period of equal length on the spend chart">
           <input type="checkbox" checked={compare} onChange={(e) => setCompare(e.target.checked)} /> Compare prior period
         </label>
       </form>
-      {(errors.to || backwards) && <div className="inline-error" role="alert">date range: to must be on or after from — swap the dates or extend the end date</div>}
+      {(errors.to || backwards) && <div id="date-range-error" className="inline-error" role="alert">date range: to must be on or after from — swap the dates or extend the end date</div>}
     </div>
   );
 }
@@ -476,7 +476,7 @@ function SpendChart() {
             <YAxis tickFormatter={compactCurrency} tick={{ fontSize: 11, fill: chartTheme.axis }} tickLine={false} axisLine={false} width={55} />
             <Tooltip content={<MoneyTooltip />} />
             {state.compare && <Line type="monotone" dataKey="previous" name="Previous period" stroke={chartTheme.palette[1]} strokeWidth={2} strokeDasharray="6 5" dot={false} isAnimationActive={!reduced} animationDuration={550} />}
-            <Line type="monotone" dataKey="cumulative" name="Current period" stroke={chartTheme.palette[0]} strokeWidth={3} dot={anomalyDot} activeDot={{ r: 6, strokeWidth: 2, stroke: 'white' }} isAnimationActive={!reduced} animationDuration={600} animationEasing="ease-out" />
+            <Line className="spend-line" type="monotone" dataKey="cumulative" name="Current period" stroke={chartTheme.palette[0]} strokeWidth={3} dot={anomalyDot} activeDot={{ r: 6, strokeWidth: 2, stroke: 'white' }} isAnimationActive={!reduced} animationDuration={600} animationEasing="ease-out" />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -657,12 +657,13 @@ function TeamRow({ row, allRows, chartTheme }) {
         <input type="hidden" {...register('team')} />
         <div>
           <label className="header-label ceiling-label" htmlFor={`ceiling-${row.team}`}>Ceiling (ceilingUsd)</label>
-          <input id={`ceiling-${row.team}`} type="number" step="0.01" min="0" aria-invalid={Boolean(errors.ceilingUsd || excess)} {...register('ceilingUsd', { valueAsNumber: true })} />
+          <input id={`ceiling-${row.team}`} type="number" step="0.01" min="0" aria-invalid={Boolean(errors.ceilingUsd || excess)} aria-describedby={(errors.ceilingUsd || excess) ? `ceiling-error-${row.team}` : undefined} {...register('ceilingUsd', { valueAsNumber: true })} />
         </div>
-        <button type="submit" disabled={!isValid || excess > 0}>Save</button>
+        <button type="submit" disabled={!isValid || excess > 0}>Save {row.team} ceiling</button>
       </form>
-      {errors.ceilingUsd && <div className="inline-error" role="alert">ceilingUsd: must be greater than 0 with at most 2 decimals</div>}
-      {excess > 0 && <div className="inline-error" role="alert">team ceilings would exceed capUsd by {currency(excess)} — lower another ceiling or raise the cap</div>}
+      {errors.ceilingUsd
+        ? <div id={`ceiling-error-${row.team}`} className="inline-error" role="alert">ceilingUsd: must be greater than 0 with at most 2 decimals</div>
+        : excess > 0 && <div id={`ceiling-error-${row.team}`} className="inline-error" role="alert">team ceilings would exceed capUsd by {currency(excess)} — lower another ceiling or raise the cap</div>}
     </div>
   );
 }
@@ -1020,7 +1021,7 @@ function SaveViewModal({ open, onClose }) {
   const saveView = useCostStore((s) => s.saveView);
   const requestClose = useModalExit(onClose);
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(savedViewSchema), mode: 'onChange', defaultValues: { name: '', dimension: state.dimension, range: state.range } });
-  useDialogKeyboard(open, requestClose, 'view-name');
+  useDialogKeyboard(open, requestClose, 'view-name', 'save-view-trigger');
   useEffect(() => { if (open) reset({ name: '', dimension: state.dimension, range: state.range }); }, [open, state.dimension, state.range, reset]);
   const submit = (body) => { saveView(body); requestClose(); };
   return (
@@ -1042,7 +1043,7 @@ function ScheduleModal({ open, onClose }) {
   const saveSchedule = useCostStore((s) => s.saveSchedule);
   const requestClose = useModalExit(onClose);
   const { register, handleSubmit, reset, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(scheduleSchema), mode: 'onChange', defaultValues: existing || { frequency: 'weekly', sections: [] } });
-  useDialogKeyboard(open, requestClose, 'report-frequency');
+  useDialogKeyboard(open, requestClose, 'report-frequency', 'reports-trigger');
   useEffect(() => { if (open) reset(existing || { frequency: 'weekly', sections: [] }); }, [open, existing, reset]);
   const sections = watch('sections') || [];
   const submit = (body) => { saveSchedule(body); requestClose(); };
@@ -1053,7 +1054,7 @@ function ScheduleModal({ open, onClose }) {
           <SelectItem value="daily" text="Daily" /><SelectItem value="weekly" text="Weekly" /><SelectItem value="monthly" text="Monthly" />
         </Select>
         <fieldset>
-          <legend className="cds--label">Sections to include</legend>
+          <legend className="cds--label">Sections to include (choose at least one)</legend>
           <div className="checkbox-group">
             <Checkbox id="section-totals" labelText="Totals" value="totals" {...register('sections')} />
             <Checkbox id="section-dimensions" labelText="Per-dimension tables" value="per-dimension-tables" {...register('sections')} />

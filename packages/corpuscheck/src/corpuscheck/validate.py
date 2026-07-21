@@ -37,6 +37,7 @@ REQUIRED_FILES = (
     "tests/test.sh",
     "tests/system_prompt.md",
     "tests/reward.toml",
+    "tests/playwright_rm_config.json",
     "tests/webmcp_stdio_server.mjs",
     *(f"tests/{dim}/{dim}.toml" for dim in EXISTING_DIMENSIONS),
 )

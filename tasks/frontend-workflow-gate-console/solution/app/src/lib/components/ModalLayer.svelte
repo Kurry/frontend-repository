@@ -45,18 +45,7 @@
 
   async function writeClipboard(value: string, key: string) {
     try {
-            try {
-        await navigator.clipboard.writeText(value);
-      } catch (err) {
-        const textarea = document.createElement('textarea');
-        textarea.value = value;
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-      }
+      await navigator.clipboard.writeText(value);
     } catch {
       const textarea = document.createElement('textarea');
       textarea.value = value;
@@ -79,7 +68,9 @@
     const anchor = document.createElement('a');
     anchor.href = url;
     anchor.download = `${consoleStore.selectedRun.id.toLowerCase()}-${json ? 'acceptance-package.json' : 'certificate-chain.md'}`;
+    document.body.appendChild(anchor);
     anchor.click();
+    anchor.remove();
     URL.revokeObjectURL(url);
     consoleStore.showToast(json ? 'Acceptance package downloaded' : 'Certificate chain downloaded');
   }

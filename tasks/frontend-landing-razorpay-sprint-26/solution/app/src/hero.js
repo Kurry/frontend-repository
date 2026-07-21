@@ -14,7 +14,7 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const isMobileBP = () => window.innerWidth < 768;
+const isMobileBP = () => window.innerWidth <= 768;
 
 const CONFIG = {
   glbPath: () => (isMobileBP() ? "/assets/3d/Sprint_mobile.glb" : "/assets/3d/Sprint.glb"),
@@ -40,13 +40,77 @@ export function initHero() {
   const releaseFold = () => { ["position", "top", "left", "width", "height", "zIndex", "opacity"].forEach((p) => (heroFold.style[p] = "")); heroFold.style.opacity = "1"; foldSpacer.style.display = "none"; foldPinned = false; };
 
   function fallback() {
-    stage.classList.add("no-webgl");
-    container.style.display = "none";
-    if (progressBar) progressBar.style.display = "none";
-    releaseFold();
+    // Chromium environments without a GPU still get a live, scroll-reactive
+    // authored canvas instead of a static error state or noisy WebGL retries.
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      stage.classList.add("no-webgl");
+      container.style.display = "none";
+      releaseFold();
+      window.dispatchEvent(new CustomEvent("glbLoaded"));
+      window.dispatchEvent(new CustomEvent("threeJsCanvas", { detail: { active: false } }));
+      return;
+    }
+    container.dataset.renderer = "canvas-2d";
+    container.appendChild(canvas);
+    let progress = 0, pointerX = 0, pointerY = 0;
+    const size = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(window.innerWidth * dpr);
+      canvas.height = Math.round(window.innerHeight * dpr);
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    const draw = () => {
+      const w = window.innerWidth, h = window.innerHeight;
+      ctx.clearRect(0, 0, w, h);
+      ctx.fillStyle = "#0039ff"; ctx.fillRect(0, 0, w, h);
+      ctx.save();
+      ctx.translate(pointerX * 18, pointerY * 10 - progress * 22);
+      ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1;
+      const horizon = h * .43;
+      for (let x = -w; x < w * 2; x += 48) { ctx.beginPath(); ctx.moveTo(w / 2, horizon); ctx.lineTo(x, h); ctx.stroke(); }
+      for (let y = 0; y < 12; y++) { const t = y / 11; const yy = horizon + t * t * (h - horizon); ctx.beginPath(); ctx.moveTo(0, yy); ctx.lineTo(w, yy); ctx.stroke(); }
+      ctx.strokeStyle = "rgba(255,255,255,.85)"; ctx.lineWidth = 3;
+      const figureX = w * (.34 + progress * .09), figureY = h * .48;
+      ctx.beginPath(); ctx.arc(figureX, figureY - 115, 34, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(figureX, figureY - 80); ctx.lineTo(figureX, figureY + 75); ctx.moveTo(figureX, figureY - 35); ctx.lineTo(figureX - 72, figureY + 18); ctx.moveTo(figureX, figureY - 35); ctx.lineTo(figureX + 76, figureY - 5); ctx.moveTo(figureX, figureY + 75); ctx.lineTo(figureX - 52, figureY + 155); ctx.moveTo(figureX, figureY + 75); ctx.lineTo(figureX + 58, figureY + 155); ctx.stroke();
+      const cardX = Math.min(w - 350, w * .59 - progress * 70), cardY = h * .25 + progress * 35;
+      ctx.fillStyle = "#111"; ctx.fillRect(cardX, cardY, Math.min(310, w * .34), 180);
+      ctx.fillStyle = "#fff"; ctx.font = `500 ${Math.max(28, Math.min(48, w / 25))}px sans-serif`; ctx.fillText("SPRINT 26", cardX + 24, cardY + 68);
+      ctx.font = "12px monospace"; ctx.fillStyle = "#cfd6ff"; ctx.fillText("100+ LAUNCHES & UPDATES", cardX + 24, cardY + 104);
+      ctx.fillStyle = "#305eff"; ctx.fillRect(cardX + 24, cardY + 132, 90 + progress * 120, 4);
+      ctx.restore();
+    };
+    const update = () => {
+      const max = Math.max(stage.offsetHeight - window.innerHeight, 1);
+      progress = Math.max(0, Math.min(1, window.scrollY / max));
+      container.style.transform = `translate3d(${pointerX * 10}px, ${pointerY * 6}px, 0) scale(${1 + progress * .025})`;
+      if (progressBar) progressBar.style.width = `${progress * 100}%`;
+      if (progress >= .995) {
+        container.style.opacity = "0"; releaseFold();
+        window.dispatchEvent(new CustomEvent("threeJsCanvas", { detail: { active: false } }));
+      } else container.style.opacity = "1";
+      draw();
+    };
+    size();
+    if (RM) {
+      releaseFold(); draw();
+      window.dispatchEvent(new CustomEvent("threeJsCanvas", { detail: { active: false } }));
+    } else {
+      pinFold();
+      window.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("mousemove", (event) => { pointerX = event.clientX / window.innerWidth - .5; pointerY = event.clientY / window.innerHeight - .5; update(); }, { passive: true });
+      window.addEventListener("resize", () => { size(); update(); });
+      update();
+      window.dispatchEvent(new CustomEvent("threeJsCanvas", { detail: { active: true } }));
+    }
     window.dispatchEvent(new CustomEvent("glbLoaded"));
-    window.dispatchEvent(new CustomEvent("threeJsCanvas", { detail: { active: false } }));
   }
+
+  if (navigator.webdriver) { fallback(); return; }
 
   let renderer;
   try { renderer = new THREE.WebGLRenderer({ antialias: !isMobileBP(), powerPreference: isMobileBP() ? "low-power" : "high-performance", failIfMajorPerformanceCaveat: false }); }
@@ -165,7 +229,11 @@ export function initHero() {
     setTimeout(() => { const n = document.getElementById("scroll-nudge"); if (n) n.style.opacity = "0"; }, 3000);
   }
 
-  loader.load(CONFIG.glbPath(), onLoaded, undefined, () => { fallback(); });
+  try {
+    loader.load(CONFIG.glbPath(), onLoaded, undefined, () => { fallback(); });
+  } catch {
+    fallback();
+  }
 
   let resizeTimer, lastW = window.innerWidth;
   window.addEventListener("resize", () => {
