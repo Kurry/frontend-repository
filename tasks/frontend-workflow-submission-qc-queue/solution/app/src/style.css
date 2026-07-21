@@ -338,6 +338,7 @@ html[data-density='compact'] .finding-card { padding-top: 10px; padding-bottom: 
 
 @media (max-width: 430px) {
   .app-header { padding-left: 8px; padding-right: 8px; gap: 6px; }.app-header nav button { min-width: 44px; }.app-header nav button span { display: none; }.header-actions { gap: 6px; }
+  .pref-controls { display: none; }
   .view-shell { padding-left: 10px; padding-right: 10px; }.queue-intro h1, .export-intro h1 { font-size: 30px; }.filter-toolbar { padding: 14px 12px; }.filter-controls { grid-template-columns: 1fr; }.filter-field > span { display: none; }.filter-field.active::after { top: 16px; right: 31px; z-index: 2; }.clear-filter { margin-top: 2px; }
   .bulk-bar { padding: 10px 12px; }.bulk-actions { gap: 5px; }.bulk-actions .n-button { padding: 0 9px; font-size: 10px; }
   .gate-banner { display: grid; grid-template-columns: 42px 1fr; }.gate-count { position: absolute; right: 16px; top: 18px; }.gate-banner p { padding-right: 4px; line-height: 1.45; }.detail-meta { gap: 6px; }.meta-separator { display: none; }
