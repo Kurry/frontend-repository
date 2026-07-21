@@ -38,8 +38,8 @@ function Header() {
     <div className="header-actions">
       <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Undo} aria-label={undo ? `Undo ${undo.label}` : 'Nothing to undo'} title={undo ? `Undo ${undo.label}` : 'Nothing to undo'} disabled={!undo} onClick={state.undo}>{undo ? `Undo · ${undo.label}` : 'Undo'}</Button>
       <Button className="secondary-header" size="sm" kind="ghost" renderIcon={Redo} aria-label={redo ? `Redo ${redo.label}` : 'Nothing to redo'} title={redo ? `Redo ${redo.label}` : 'Nothing to redo'} disabled={!redo} onClick={state.redo}>{redo ? `Redo · ${redo.label}` : 'Redo'}</Button>
-      <Button kind="ghost" renderIcon={MacCommand} onClick={() => state.setPalette(true)}><span className="action-label">Commands</span></Button>
-      <Button kind="primary" renderIcon={Export} onClick={() => state.openExport('report')}><span className="action-label">Export</span></Button>
+      <Button kind="ghost" renderIcon={MacCommand} aria-label="Commands" onClick={() => state.setPalette(true)}><span className="action-label">Commands</span></Button>
+      <Button kind="primary" renderIcon={Export} aria-label="Export" onClick={() => state.openExport('report')}><span className="action-label">Export</span></Button>
     </div>
   </header>
 }
