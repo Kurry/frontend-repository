@@ -2,7 +2,12 @@
   <div class="panel-card">
     <h2 class="panel-title">Canvas size</h2>
     <label class="field-label" for="canvas-size">Canvas size preset</label>
-    <select id="canvas-size" class="size-select" :value="store.canvasSize" @change="store.canvasSize = ($event.target as HTMLSelectElement).value as any">
+    <select
+      id="canvas-size"
+      class="size-select"
+      :value="store.canvasSize"
+      @change="store.canvasSize = ($event.target as HTMLSelectElement).value as typeof store.canvasSize"
+    >
       <option value="square">Square (1:1) — 800×800</option>
       <option value="widescreen">Widescreen (16:9) — 1280×720</option>
       <option value="story">Story (9:16) — 720×1280</option>
@@ -19,6 +24,7 @@ const store = useCanvasStore()
 <style scoped>
 .size-select {
   width: 100%;
+  min-height: 44px;
   padding: 8px 12px;
   border: 2px solid #92400e;
   border-radius: 8px;

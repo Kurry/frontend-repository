@@ -2,8 +2,8 @@
   <div class="panel-card">
     <h2 class="panel-title">Background</h2>
 
-    <!-- Presets swatches -->
-    <div class="swatches">
+    <!-- Preset swatches -->
+    <div class="swatches" role="group" aria-label="Background presets">
       <button
         v-for="preset in BG_PRESETS"
         :key="preset.id"
@@ -11,10 +11,10 @@
         class="swatch"
         :style="{ background: preset.value }"
         :class="{ active: !store.useCustomBg && store.backgroundPreset === preset.id }"
-        @click="selectPreset(preset.id)"
         :title="preset.label"
         :aria-label="`${preset.label} background`"
         :aria-pressed="!store.useCustomBg && store.backgroundPreset === preset.id"
+        @click="selectPreset(preset.id)"
       >
         <span v-if="!store.useCustomBg && store.backgroundPreset === preset.id" class="selected-mark" aria-hidden="true">✓</span>
       </button>
@@ -26,41 +26,56 @@
         type="button"
         class="custom-toggle"
         :class="{ active: store.useCustomBg }"
-        @click="store.useCustomBg = !store.useCustomBg"
         :aria-pressed="store.useCustomBg"
+        @click="toggleCustom"
       >Custom</button>
       <div v-if="store.useCustomBg" class="color-inputs">
-        <label class="sr-only" for="background-color">Background color</label>
-        <input id="background-color" type="color" :value="store.customBgColor" @input="onColorInput" class="color-picker" />
-        <label class="sr-only" for="background-hex">Background hex value</label>
+        <label class="sr-only" for="background-color">Custom background color picker</label>
+        <input id="background-color" type="color" :value="store.customBgColor" class="color-picker" @input="onColorInput" />
+        <label class="sr-only" for="background-hex">Custom background hex value</label>
         <input
           id="background-hex"
           type="text"
           :value="store.customBgColor"
-          @change="onHexChange"
           class="hex-input"
           maxlength="7"
           placeholder="#FDE047"
+          :aria-invalid="Boolean(hexError)"
+          aria-describedby="background-hex-error"
+          @change="onHexChange"
         />
       </div>
     </div>
+    <div v-if="hexError" id="background-hex-error" class="error-msg fade-in" role="alert" aria-live="polite">{{ hexError }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { useCanvasStore, BACKGROUND_PRESETS } from '../stores/canvas'
+import { useAnnouncer } from '../stores/announcer'
+import { INVALID_COLOR_MSG } from '../utils/recipe'
 
 const BG_PRESETS = BACKGROUND_PRESETS
 const store = useCanvasStore()
+const announcer = useAnnouncer()
+const hexError = ref('')
 
 function selectPreset(id: string) {
   store.backgroundPreset = id
   store.useCustomBg = false
+  hexError.value = ''
+}
+
+function toggleCustom() {
+  store.useCustomBg = !store.useCustomBg
+  hexError.value = ''
 }
 
 function onColorInput(e: Event) {
   store.customBgColor = (e.target as HTMLInputElement).value
   store.useCustomBg = true
+  hexError.value = ''
 }
 
 function onHexChange(e: Event) {
@@ -68,6 +83,12 @@ function onHexChange(e: Event) {
   if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
     store.customBgColor = val
     store.useCustomBg = true
+    hexError.value = ''
+  } else {
+    // Keep the last valid color rendering; reject the bad hex with a named error.
+    hexError.value = INVALID_COLOR_MSG
+    announcer.announce(INVALID_COLOR_MSG)
+    ;(e.target as HTMLInputElement).value = store.customBgColor
   }
 }
 </script>
@@ -87,11 +108,15 @@ function onHexChange(e: Event) {
   border-radius: 8px;
   cursor: pointer;
   border: 2px solid #92400e;
-  transition: all 0.15s;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
   position: relative;
 }
-.swatch:hover { transform: scale(1.08); box-shadow: 0 2px 8px rgba(0,0,0,0.2); }
-.swatch.active { border-color: #713F12; box-shadow: 0 0 0 3px rgba(253,224,71,0.5); transform: scale(1.08); }
+.swatch:hover { transform: translateY(-2px) scale(1.05); box-shadow: 0 4px 12px rgba(113, 63, 18, 0.25); }
+.swatch.active {
+  border-color: #713F12;
+  box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.6);
+  transform: scale(1.05);
+}
 .selected-mark {
   position: absolute;
   inset: 50% auto auto 50%;
@@ -115,25 +140,25 @@ function onHexChange(e: Event) {
 .custom-toggle {
   font-size: 11px;
   font-weight: 700;
-  padding: 8px 12px;
+  padding: 8px 16px;
   min-height: 44px;
   border-radius: 999px;
   border: 2px solid #92400e;
   background: #fff;
   cursor: pointer;
   color: #92400e;
-  transition: all 0.15s;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
-.custom-toggle:hover { border-color: #FDE047; }
+.custom-toggle:hover { border-color: #FDE047; transform: translateY(-1px); }
 .custom-toggle.active { background: #FDE047; color: #713F12; border-color: #FDE047; }
 .color-inputs { display: flex; align-items: center; gap: 8px; }
 .color-picker { width: 44px; height: 44px; border-radius: 8px; border: 2px solid #92400e; padding: 4px; }
 .hex-input {
-  width: 80px;
+  width: 88px;
   min-height: 44px;
   padding: 8px;
   border: 2px solid #92400e;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 12px;
   color: #713F12;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -149,5 +174,15 @@ function onHexChange(e: Event) {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
+}
+.fade-in { animation: feedback-in 0.2s ease-out; }
+@keyframes feedback-in {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .swatch, .custom-toggle { transition: none; }
+  .swatch:hover, .custom-toggle:hover, .swatch.active { transform: none; }
+  .fade-in { animation: none; }
 }
 </style>
