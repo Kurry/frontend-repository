@@ -98,8 +98,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .experiment-table { width: 100%; min-width: 1060px; border-collapse: collapse; table-layout: auto; }
 .experiment-table th { height: 43px; padding: 0 12px; color: var(--muted-2); background: #0e121d; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; text-align: left; font-weight: 600; border-bottom: 1px solid var(--border); }
 .experiment-table td { padding: 16px 12px; color: #bdc3d0; font-size: 12px; border-bottom: 1px solid #222838; vertical-align: middle; }
-.experiment-table tbody tr { transition: background .18s, opacity .25s, transform .25s; }
-.experiment-table tbody tr:hover { background: rgba(124,92,255,.045); }
+.experiment-table tbody tr { transition: background .18s, opacity .25s, transform .25s; cursor: pointer; }
+.experiment-table tbody tr:hover { background: rgba(124,92,255,.08); }
+.experiment-table tbody tr:hover td { background: transparent; }
 .experiment-table tbody tr:last-child td { border-bottom: 0; }
 .check-cell { width: 45px; padding-left: 15px !important; }
 .experiment-name { max-width: 300px; display: block; padding: 0; border: 0; background: transparent; text-align: left; color: #f2f3f8; font-size: 13px; font-weight: 600; line-height: 1.4; cursor: pointer; }
@@ -126,17 +127,20 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .criterion-card:hover { border-color: var(--border-bright); }
 .criterion-top { display: flex; justify-content: space-between; align-items: center; }
 .criterion-index { font-family: ui-monospace, monospace; color: #6f788d; font-size: 11px; }
-.criterion-card h3 { font-size: 20px; margin: 42px 0 9px; font-weight: 450; text-transform: capitalize; }
-.criterion-card p { color: var(--muted); min-height: 38px; font-size: 13px; line-height: 1.45; }
-.threshold-bar { height: 3px; margin-top: 24px; background: #2b3141; overflow: hidden; }
-.threshold-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--brand), var(--teal)); }
+.criterion-card h3 { font-size: 20px; margin: 12px 0 9px; font-weight: 450; text-transform: capitalize; }
+.criterion-radial { position: relative; max-width: 150px; margin: 8px auto 0; }
+.criterion-radial > strong { position: absolute; inset: 0; display: grid; place-items: center; font-size: 22px; font-weight: 450; }
+.winner-badge { margin-top: 4px; max-inline-size: none; }
+.winner-value.tie-badge { display: inline-block; margin-top: 4px; }
+.stat-tile > small { display: block; color: var(--muted-2); font-size: 10px; margin-top: 8px; }
 .prompt-list { display: grid; gap: 8px; }
 .prompt-row { display: grid; grid-template-columns: 44px 1fr auto auto; align-items: center; gap: 16px; padding: 17px !important; border: 1px solid var(--border); background: var(--surface) !important; }
 .prompt-icon { width: 40px; height: 40px; display: grid; place-items: center; color: #a999ff; background: var(--brand-soft); }
 .prompt-row h3 { margin: 0 0 5px; font-size: 14px; }
 .prompt-row code { color: var(--muted); font-size: 10px; }
 .prompt-meta { color: var(--muted-2); font-size: 11px; }
-.results-panel { position: fixed; z-index: 50; top: 66px; right: 0; bottom: 0; width: min(790px, calc(100vw - 206px)); overflow-y: auto; background: #0d111c; border-left: 1px solid #343b51; box-shadow: -30px 0 80px rgba(0,0,0,.4); transition: transform 0.25s ease-out; }
+.results-panel { position: fixed; z-index: 50; top: 66px; right: 0; bottom: 0; width: min(790px, calc(100vw - 206px)); overflow-y: auto; background: #0d111c; border-left: 1px solid #343b51; box-shadow: -30px 0 80px rgba(0,0,0,.4); transform: translateX(100%); transition: transform 0.25s cubic-bezier(0.2, 0, 0.38, 0.9), opacity 0.25s ease; opacity: 0; }
+.results-panel.results-panel-open { transform: translateX(0); opacity: 1; }
 .panel-header { position: relative; padding: 18px 26px 22px; border-bottom: 1px solid var(--border); background: radial-gradient(circle at 100% 0, rgba(124,92,255,.16), transparent 44%), #111522; }
 .panel-topline { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
 .panel-topline .cds--tag { margin-left: auto; margin-right: 4px; }
@@ -158,8 +162,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .stat-tile:last-child { border-right: 0; }
 .stat-tile > span { display: block; min-height: 28px; color: var(--muted-2); font-size: 10px; text-transform: uppercase; letter-spacing: .07em; }
 .stat-tile > strong { display: block; color: var(--text); font-size: 20px; font-weight: 450; line-height: 1.15; }
-.stat-tile > small { display: block; color: var(--muted-2); font-size: 9px; margin-top: 8px; }
-.winner-value.significant { color: #6ee7a7 !important; }
+.criterion-card p { color: var(--muted); min-height: 38px; font-size: 13px; line-height: 1.45; }
 .panel-body .cds--tabs { margin-bottom: 18px; }
 .panel-body .cds--tab-content { padding: 18px 0 0; }
 .results-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 13px; }
@@ -299,7 +302,11 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .import-button:hover { background: #41368a; }
 .import-button input { display: none; }
 .import-error { display: flex; align-items: center; gap: 7px; padding: 10px; margin-top: 8px; border: 1px solid #854451; background: rgba(255,107,120,.07); }
-.toast-wrap { position: fixed; z-index: 10000; right: 18px; bottom: 18px; width: min(360px, calc(100vw - 36px)); }
+.toast-wrap { position: fixed; z-index: 10000; right: 18px; bottom: 18px; width: min(360px, calc(100vw - 36px)); animation: toastIn .25s ease, toastOut .35s ease 3.45s forwards; }
+@keyframes toastIn { from { opacity: 0; transform: translateX(36px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateX(24px); } }
+.report-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.report-action-btn { min-height: 44px; min-width: 44px; }
 .cds--btn { transition: background .16s, box-shadow .16s, transform .12s; }
 .cds--btn:hover { box-shadow: 0 4px 15px rgba(0,0,0,.18); }
 .cds--btn:active { transform: translateY(1px); }
@@ -312,7 +319,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 .cds--text-input, .cds--text-area, .cds--select-input, .cds--number input, .cds--dropdown { background-color: #202637 !important; border-bottom-color: #586078 !important; }
 .cds--progress-bar__track { background: #292f40; }
 .cds--progress-bar__bar { background: linear-gradient(90deg, var(--brand), #9d89ff); transition: width .24s linear; }
-.cds--tabs__nav-link { white-space: nowrap; }
+.cds--tabs__nav-link { white-space: nowrap; min-height: 44px; }
+.panel-body .cds--tab--list { overflow-x: auto; max-width: 100%; flex-wrap: nowrap; }
+.stat-tile > span, .chart-heading p, .timeline-list time { font-size: 10px; }
 
 @media (max-width: 1100px) {
   .toolbar-row { flex-wrap: wrap; }
@@ -347,6 +356,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   .preview-columns { grid-template-columns: 1fr; }
   .report-toolbar { align-items: flex-start; flex-direction: column; }
   .report-toolbar > div:last-child { width: 100%; flex-wrap: wrap; }
+  .row-actions .cds--btn { min-height: 44px; }
+  .panel-actions .cds--btn { min-height: 44px; }
+  .report-action-btn { width: 100%; justify-content: center; }
 }
 
 @media (max-width: 520px) {
@@ -381,20 +393,22 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
-}
-
-
-.results-panel {
-  transition: transform 0.25s cubic-bezier(0.2, 0, 0.38, 0.9), opacity 0.25s ease;
+  .results-panel.results-panel-open { transform: translateX(0); opacity: 1; }
 }
 
 .recharts-bar-rectangle path,
 .recharts-bar-rectangles rect {
-  transition: height 0.4s ease, y 0.4s ease;
+  transition: height 0.4s ease, y 0.4s ease, transform 0.4s ease;
+  transform-origin: bottom center;
 }
 
-.toast-wrap {
-  transition: transform 0.25s ease, opacity 0.25s ease;
+.chart-bars-animate .recharts-bar-rectangle path {
+  animation: barGrow 0.4s ease forwards;
+}
+
+@keyframes barGrow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
 }
 
 .criteria-list {
@@ -406,7 +420,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-
   overflow-x: auto;
 }
 .experiment-table {
-  min-width: 800px; /* Force scroll on mobile */
+  min-width: 720px;
 }
 
 @media (max-width: 768px) {

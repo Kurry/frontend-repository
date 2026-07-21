@@ -18,7 +18,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react'
 import { useAutoAnimate } from '@formkit/auto-animate/react'
 import { useStudio, getVisibleExperiments } from './store'
-import { experimentSchema, criterionSchema, decisionSchema, LETTERS, MODELS, STATUSES, reportSchema, zodErrorMessage } from './contracts'
+import { experimentSchema, criterionSchema, decisionSchema, LETTERS, MODELS, STATUSES, reportSchema } from './contracts'
 import { defaultExperiment } from './data'
 import { computeStatistics, criterionMeans, matrixMetrics, passRates, cumulativeData, sampleRows, usableSamples } from './stats'
 
@@ -30,31 +30,39 @@ const truncate = value => value.length > 60 ? `${value.slice(0, 60)}…` : value
 
 function App() {
   const store = useStudio()
+  const launcherRef = useRef(null)
+  const rememberLauncher = event => { launcherRef.current = event.currentTarget }
   useEffect(() => {
-    const timer = setInterval(() => useStudio.getState().tickRuns(), 250)
+    const timer = setInterval(() => useStudio.getState().tickRuns(), 200)
     return () => clearInterval(timer)
   }, [])
-  useWebMCP()
+  const modalOpen = !!(store.designer || store.criterionOpen || store.decisionFor || store.reportFor || store.confirm)
+  useEffect(() => {
+    document.querySelectorAll('.modal-backdrop-target').forEach(node => {
+      if (modalOpen) node.setAttribute('inert', '')
+      else node.removeAttribute('inert')
+    })
+  }, [modalOpen])
   const active = store.experiments.find(item => item.id === store.activeExperimentId)
   return <div className="app-shell">
     <a className="skip-link" href="#main-content">Skip to content</a>
     <Header />
-    <div className="studio-layout">
+    <div className="studio-layout modal-backdrop-target">
       <SideRail />
       <main id="main-content" className="main-stage">
-        {store.view === 'experiments' && <Library />}
+        {store.view === 'experiments' && <Library rememberLauncher={rememberLauncher} />}
         {store.view === 'criteria' && <CriteriaView />}
         {store.view === 'prompts' && <PromptsView />}
       </main>
-      <AnimatePresence>{active && <ResultsPanel experiment={active} />}</AnimatePresence>
+      {active && <ResultsPanel experiment={active} />}
     </div>
-    {store.designer && <DesignerModal />}
-    {store.criterionOpen && <CriterionModal />}
-    {store.decisionFor && <DecisionModal />}
-    {store.reportFor && <ReportModal />}
-    {store.confirm && <ConfirmDialog />}
-    <AnimatePresence>{store.toast && <motion.div className="toast-wrap" initial={{ opacity: 0, x: 36 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 36 }}><ToastNotification kind={store.toast.kind} title={store.toast.title} timeout={0} /></motion.div>}</AnimatePresence>
-    <div className="sr-only" aria-live="polite">{store.announcement}</div>
+    {store.designer && <DesignerModal launcherButtonRef={launcherRef} />}
+    {store.criterionOpen && <CriterionModal launcherButtonRef={launcherRef} />}
+    {store.decisionFor && <DecisionModal launcherButtonRef={launcherRef} />}
+    {store.reportFor && <ReportModal launcherButtonRef={launcherRef} />}
+    {store.confirm && <ConfirmDialog launcherButtonRef={launcherRef} />}
+    {store.toast && <div className="toast-wrap toast-enter" key={store.toast.id}><ToastNotification kind={store.toast.kind} title={store.toast.title} timeout={0} /></div>}
+    <div className="sr-only" aria-live="polite" aria-atomic="true">{store.announcement}</div>
   </div>
 }
 
@@ -64,7 +72,7 @@ function Header() {
   const undo = useStudio(state => state.undo)
   const redo = useStudio(state => state.redo)
   return <header className="top-header">
-    <div className="brand-mark"><span className="brand-glyph"><IbmWatsonMachineLearning size={20} /></span><div><span className="eyebrow">Prompt operations</span><h1>Signal lab</h1></div></div>
+    <div className="brand-mark"><span className="brand-glyph"><IbmWatsonMachineLearning size={20} aria-hidden="true" /></span><div><span className="eyebrow">Prompt Operations</span><h1>Signal Lab</h1></div></div>
     <div className="header-actions">
       <span className="session-status"><span className="live-dot" /> Session workspace</span>
       <Button kind="ghost" size="sm" renderIcon={Undo} iconDescription="Undo" hasIconOnly disabled={!past.length} onClick={undo} tooltipPosition="bottom" />
@@ -89,7 +97,7 @@ function SideRail() {
   </nav>
 }
 
-function Library() {
+function Library({ rememberLauncher }) {
   const state = useStudio()
   const visible = getVisibleExperiments(state)
   const [rowsRef] = useAutoAnimate({ duration: 260 })
@@ -98,8 +106,8 @@ function Library() {
   const openArchive = () => state.setField('confirm', { type: 'archive', count: state.selectedIds.length })
   return <section className="page-section" aria-labelledby="library-title">
     <div className="page-heading">
-      <div><span className="eyebrow accent">Experiment workspace</span><h2 id="library-title">Experiment library</h2><p>Design, run, evaluate, and package prompt experiments.</p></div>
-      <Button renderIcon={Add} onClick={() => state.openDesigner()}>New experiment</Button>
+      <div><span className="eyebrow accent">Experiment Workspace</span><h2 id="library-title">Experiment Library</h2><p>Design, run, evaluate, and package prompt experiments.</p></div>
+      <Button renderIcon={Add} onClick={event => { rememberLauncher(event); state.openDesigner() }}>New Experiment</Button>
     </div>
     <div className="library-card">
       <div className="toolbar-row">
@@ -111,7 +119,7 @@ function Library() {
       </div>
       <div className="active-filter-row">
         <span><strong>{visible.length}</strong> experiment{visible.length === 1 ? '' : 's'}</span>
-        {state.filters.map(filter => <Tag key={filter} type="purple" filter onClose={() => state.toggleFilter(filter)}>{statusLabel(filter)}</Tag>)}
+        {state.filters.map(filter => <Tag key={filter} type="purple" filter onClose={() => state.toggleFilter(filter)} title={`Remove ${statusLabel(filter)} filter`}>{statusLabel(filter)}</Tag>)}
         {(state.filters.length > 0 || state.search || state.showArchived) && <button className="text-action" onClick={state.clearFilters}>Clear filters</button>}
       </div>
       <AnimatePresence>{state.selectedIds.length > 0 && <motion.div className="bulk-bar" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}><strong>{state.selectedIds.length} selected</strong><Button size="sm" kind="secondary" renderIcon={Archive} onClick={openArchive}>Archive selected</Button><Button size="sm" kind="danger--tertiary" renderIcon={TrashCan} onClick={openDelete}>Delete selected</Button><Button size="sm" kind="ghost" onClick={() => state.setField('selectedIds', [])}>Clear</Button></motion.div>}</AnimatePresence>
@@ -119,7 +127,7 @@ function Library() {
         <table className="experiment-table">
           <thead><tr><th className="check-cell"><Checkbox id="select-all" labelText="Select all visible experiments" hideLabel checked={visible.length > 0 && selectedVisible.length === visible.length} onChange={() => state.selectAll(visible.map(item => item.id))} /></th><th>Name</th><th>Variants</th><th>Sample size</th><th>Status</th><th>Started</th><th>Actions</th></tr></thead>
           <tbody ref={rowsRef}>
-            {visible.map(experiment => <ExperimentRow key={experiment.id} experiment={experiment} />)}
+            {visible.map(experiment => <ExperimentRow key={experiment.id} experiment={experiment} rememberLauncher={rememberLauncher} />)}
           </tbody>
         </table>
         {!visible.length && <div className="empty-state"><div className="empty-icon"><Filter size={26} /></div><h3>No experiments match</h3><p>Adjust the status filters or search to bring experiments back into view.</p><Button kind="tertiary" size="sm" onClick={state.clearFilters}>Clear filters</Button></div>}
@@ -128,7 +136,7 @@ function Library() {
   </section>
 }
 
-function ExperimentRow({ experiment }) {
+function ExperimentRow({ experiment, rememberLauncher }) {
   const state = useStudio()
   const selected = state.selectedIds.includes(experiment.id)
   const letters = experiment.variants.map((_, index) => LETTERS[index])
@@ -143,7 +151,7 @@ function ExperimentRow({ experiment }) {
     <td><div className="status-cell"><Tag type={statusKind[experiment.status]}>{statusLabel(experiment.status)}</Tag>{experiment.status === 'running' && <InlineLoading description={`${current} of ${total}`} />}</div></td>
     <td>{fmtDate(experiment.startedAt)}</td>
     <td><div className="row-actions">
-      {experiment.status === 'pending' && <><Button size="sm" kind="ghost" renderIcon={Play} onClick={() => state.startRun(experiment.id)}>Run experiment</Button><Button size="sm" kind="ghost" renderIcon={Edit} onClick={() => state.openDesigner(experiment.id)}>Edit</Button></>}
+      {experiment.status === 'pending' && <><Button size="sm" kind="ghost" renderIcon={Play} onClick={() => state.startRun(experiment.id)}>Run Experiment</Button><Button size="sm" kind="ghost" renderIcon={Edit} onClick={event => { rememberLauncher(event); state.openDesigner(experiment.id) }}>Edit</Button></>}
       {experiment.status === 'running' && <><Button size="sm" kind="ghost" renderIcon={Pause} onClick={() => state.pauseRun(experiment.id)}>Pause</Button><Button size="sm" kind="ghost" onClick={open}>View run</Button></>}
       {experiment.status === 'paused' && <><Button size="sm" kind="ghost" renderIcon={Play} onClick={() => state.resumeRun(experiment.id)}>Resume</Button><Button size="sm" kind="ghost" onClick={open}>View run</Button></>}
       {['completed', 'decided'].includes(experiment.status) && <Button size="sm" kind="ghost" renderIcon={ChevronRight} onClick={open}>View results</Button>}
@@ -155,21 +163,19 @@ function ExperimentRow({ experiment }) {
 function CriteriaView() {
   const criteria = useStudio(state => state.criteria)
   const setField = useStudio(state => state.setField)
-  return <section className="page-section"><div className="page-heading"><div><span className="eyebrow accent">Evaluation system</span><h2>Scoring criteria</h2><p>Reusable judges that define success across every experiment.</p></div><Button renderIcon={Add} onClick={() => setField('criterionOpen', true)}>New criterion</Button></div><div className="criteria-grid">{criteria.map((criterion, index) => <Tile key={criterion.id} className="criterion-card"><div className="criterion-top"><span className="criterion-index">0{index + 1}</span><Tag type="outline">Pass ≥ {criterion.passThreshold}</Tag></div><h3>{criterion.label || criterion.name}</h3><p>{criterion.description}</p><div className="threshold-bar"><span style={{ width: `${criterion.passThreshold}%` }} /></div></Tile>)}</div></section>
+  return <section className="page-section"><div className="page-heading"><div><span className="eyebrow accent">Evaluation System</span><h2>Scoring Criteria</h2><p>Reusable judges that define success across every experiment.</p></div><Button renderIcon={Add} onClick={() => setField('criterionOpen', true)}>New Criterion</Button></div><div className="criteria-grid">{criteria.map((criterion, index) => <Tile key={criterion.id} className="criterion-card"><div className="criterion-top"><span className="criterion-index">0{index + 1}</span><Tag type="outline">Pass ≥ {criterion.passThreshold}</Tag></div><div className="criterion-radial"><ResponsiveContainer width="100%" height={120}><RadialBarChart innerRadius="72%" outerRadius="100%" data={[{ value: criterion.passThreshold, fill: COLORS[index % COLORS.length] }]} startAngle={90} endAngle={-270}><PolarAngleAxis type="number" domain={[0, 100]} tick={false} /><RadialBar dataKey="value" background={{ fill: '#292f40' }} cornerRadius={8} isAnimationActive={false} /></RadialBarChart></ResponsiveContainer><strong>{criterion.passThreshold}%</strong></div><h3>{criterion.label || criterion.name}</h3><p>{criterion.description}</p></Tile>)}</div></section>
 }
 
 function PromptsView() {
   const prompts = useStudio(state => state.prompts)
-  return <section className="page-section"><div className="page-heading"><div><span className="eyebrow accent">Version registry</span><h2>Prompt library</h2><p>Seeded prompt assets and the current promoted head versions.</p></div></div><div className="prompt-list">{prompts.map((prompt, index) => <Tile key={prompt.id} className="prompt-row"><span className="prompt-icon"><List size={20} /></span><div><h3>{prompt.name}</h3><code>{prompt.id}</code></div><span className="prompt-meta">Head version</span><Tag type={String(prompt.head).includes('promoted') ? 'purple' : 'blue'}>{prompt.head}</Tag></Tile>)}</div></section>
+  return <section className="page-section"><div className="page-heading"><div><span className="eyebrow accent">Version Registry</span><h2>Prompt Library</h2><p>Seeded prompt assets and the current promoted head versions.</p></div></div><div className="prompt-list">{prompts.map((prompt, index) => <Tile key={prompt.id} className="prompt-row"><span className="prompt-icon"><List size={20} /></span><div><h3>{prompt.name}</h3><code>{prompt.id}</code></div><span className="prompt-meta">Head version</span><Tag type={String(prompt.head).includes('promoted') ? 'purple' : 'blue'}>{prompt.head}</Tag></Tile>)}</div></section>
 }
 
 function ResultsPanel({ experiment }) {
   const state = useStudio()
   const statistics = computeStatistics(experiment)
   const complete = ['completed', 'decided'].includes(experiment.status)
-  const letters = experiment.variants.map((_, index) => LETTERS[index])
-  const progress = Math.min(...letters.map(letter => experiment.progress[letter] || 0))
-  return <motion.aside className="results-panel" initial={{ x: '100%', opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: '100%', opacity: 0 }} transition={{ duration: 0.25 }} aria-label={`Results for ${experiment.name}`}>
+  return <aside className="results-panel results-panel-open" aria-label={`Results for ${experiment.name}`}>
     <div className="panel-header">
       <div className="panel-topline"><Button kind="ghost" size="sm" renderIcon={ArrowLeft} onClick={state.closePanel}>Back</Button><Tag type={statusKind[experiment.status]}>{statusLabel(experiment.status)}</Tag><Button kind="ghost" size="sm" renderIcon={Close} hasIconOnly iconDescription="Close results" onClick={state.closePanel} /></div>
       <span className="eyebrow accent">{experiment.id}</span><h2>{experiment.name}</h2><p>{experiment.hypothesis}</p>
@@ -181,8 +187,8 @@ function ResultsPanel({ experiment }) {
         {experiment.decision?.choice === 'declare-winner' && <Button size="sm" kind="tertiary" onClick={() => state.setField('confirm', { type: 'promote', experimentId: experiment.id })}>Promote winner</Button>}
       </div>
     </div>
-    {complete ? <div className="panel-body"><SummaryStrip experiment={experiment} statistics={statistics} /><Tabs selectedIndex={['results', 'monitoring', 'matrix', 'analytics', 'inspector'].indexOf(state.activeTab)} onChange={({ selectedIndex }) => state.setField('activeTab', ['results', 'monitoring', 'matrix', 'analytics', 'inspector'][selectedIndex])}><TabList aria-label="Result views" contained><Tab>Results</Tab><Tab>Monitoring</Tab><Tab>Matrix</Tab><Tab>Analytics</Tab><Tab>Inspector</Tab></TabList><TabPanels><TabPanel><ResultsTab experiment={experiment} /></TabPanel><TabPanel><MonitoringTab experiment={experiment} /></TabPanel><TabPanel><MatrixTab experiment={experiment} /></TabPanel><TabPanel><AnalyticsTab experiment={experiment} /></TabPanel><TabPanel><InspectorTab experiment={experiment} /></TabPanel></TabPanels></Tabs></div> : <div className="panel-body running-results"><SummaryStrip experiment={experiment} statistics={statistics} /><Timeline experiment={experiment} /></div>}
-  </motion.aside>
+    {complete ? <div className="panel-body"><SummaryStrip experiment={experiment} statistics={statistics} /><Tabs selectedIndex={['results', 'monitoring', 'matrix', 'analytics', 'inspector'].indexOf(state.activeTab)} onChange={({ selectedIndex }) => state.setField('activeTab', ['results', 'monitoring', 'matrix', 'analytics', 'inspector'][selectedIndex])}><TabList aria-label="Result views" contained><Tab renderIcon={ChartBar}>Results</Tab><Tab renderIcon={Events}>Monitoring</Tab><Tab renderIcon={List}>Matrix</Tab><Tab renderIcon={SettingsAdjust}>Analytics</Tab><Tab renderIcon={Flag}>Inspector</Tab></TabList><TabPanels><TabPanel><ResultsTab experiment={experiment} /></TabPanel><TabPanel><MonitoringTab experiment={experiment} /></TabPanel><TabPanel><MatrixTab experiment={experiment} /></TabPanel><TabPanel><AnalyticsTab experiment={experiment} /></TabPanel><TabPanel><InspectorTab experiment={experiment} /></TabPanel></TabPanels></Tabs></div> : <div className="panel-body running-results"><SummaryStrip experiment={experiment} statistics={statistics} /><Timeline experiment={experiment} /></div>}
+  </aside>
 }
 
 function RunProgress({ experiment }) {
@@ -205,7 +211,7 @@ function SummaryStrip({ experiment, statistics }) {
   return <div className="summary-wrap">
     {underpowered ? <div className="power-banner" aria-live="polite"><Events size={18} /><div><strong>Underpowered</strong><span>{remaining} sample{remaining === 1 ? '' : 's'} per variant remaining before the significance verdict activates.</span></div></div> : statistics.insufficient ? <div className="power-banner warning" aria-live="polite"><WarningAlt size={18} /><div><strong>Insufficient data</strong><span>Every response for at least one variant is flagged. Unflag a response to compute statistics.</span></div></div> : <div className={`power-banner ${verdict ? 'success' : 'warning'}`} aria-live="polite"><CheckmarkFilled size={18} /><div><strong>{verdict ? 'Significance reached' : 'Not significant'}</strong><span>Minimum sample size reached · p-value {statistics.pValue.toFixed(4)}</span></div></div>}
     <div className="summary-strip">
-      <Tile className="stat-tile"><span>Winner</span><strong className={`winner-value ${!underpowered && verdict ? 'significant' : ''}`}>{statistics.winner === 'Tie' ? 'Tie' : `Variant ${statistics.winner}`}</strong><small>{underpowered ? 'Verdict pending' : verdict ? 'Significant' : 'Not significant'}</small></Tile>
+      <Tile className="stat-tile"><span>Winner</span>{underpowered || statistics.winner === 'Tie' ? <strong className="winner-value tie-badge">Tie</strong> : <Tag type={!underpowered && verdict ? 'green' : 'gray'} className="winner-badge">{`Variant ${statistics.winner}`}</Tag>}<small>{underpowered ? 'Verdict pending' : verdict ? 'Significant' : 'Not significant'}</small></Tile>
       <Tile className="stat-tile"><span>Win rate</span><strong>{(statistics.winRate * 100).toFixed(1)}%</strong><small>Leader vs. baseline</small></Tile>
       <Tile className="stat-tile"><span>p-value</span><strong>{statistics.pValue < 0.000001 ? statistics.pValue.toExponential(2) : statistics.pValue.toFixed(6)}</strong><small>Two-sample t-test</small></Tile>
       <Tile className="stat-tile"><span>95% confidence interval</span><strong>[{statistics.confidenceInterval[0].toFixed(2)}, {statistics.confidenceInterval[1].toFixed(2)}]</strong><small>Score delta</small></Tile>
@@ -285,12 +291,12 @@ function InspectorTab({ experiment }) {
   return <section><div className="inspector-controls"><Dropdown id="inspector-variant" titleText="Inspect variant" label="Select variant" selectedItem={letter} items={experiment.variants.map((_, index) => LETTERS[index])} itemToString={item => `Variant ${item}`} onChange={({ selectedItem }) => state.setField('inspectorVariant', selectedItem)} /><Toggle id="flagged-only" labelText="Flagged only" labelA="All" labelB="Flagged" toggled={state.flaggedOnly} onToggle={value => state.setField('flaggedOnly', value)} /></div>{locked && <div className="locked-note"><Locked size={17} />Outlier controls are locked because a decision has been confirmed.</div>}<div className="inspector-list">{list.map(sample => { const flagged = experiment.flaggedResponseIds.includes(sample.id); return <article key={sample.id} className={`response-card ${flagged ? 'flagged' : ''}`}><div className="response-top"><div><span className="sample-id">{sample.id}</span><h4>{sample.input}</h4></div><Button size="sm" kind={flagged ? 'danger--tertiary' : 'ghost'} renderIcon={Flag} disabled={locked} onClick={() => state.toggleOutlier(experiment.id, sample.id)}>{flagged ? 'Unflag outlier' : 'Flag outlier'}</Button></div><p className="response-text">{sample.response}</p><div className="response-metrics">{Object.entries(sample.criterionScores).map(([name, score]) => <span key={name}>{name.replace('-', ' ')} <strong>{score.toFixed(1)}</strong></span>)}<span>Latency <strong>{sample.latency} ms</strong></span><span>Tokens <strong>{sample.tokens}</strong></span></div></article>})}{!list.length && <div className="empty-state compact"><Flag size={24} /><h3>No flagged responses</h3><p>Flag an outlier to make it appear in this filtered view.</p></div>}</div></section>
 }
 
-function DesignerModal() {
+function DesignerModal({ launcherButtonRef }) {
   const state = useStudio()
   const existing = state.designer === 'new' ? null : state.experiments.find(item => item.id === state.designer)
-  const defaults = existing ? { name: existing.name, hypothesis: existing.hypothesis, successMetric: existing.successMetric, minimumSampleSize: existing.minimumSampleSize, variants: existing.variants } : defaultExperiment
+  const defaults = existing ? { name: existing.name, hypothesis: existing.hypothesis, successMetric: existing.successMetric, minimumSampleSize: existing.minimumSampleSize, variants: existing.variants.map(variant => ({ ...variant, temperature: Number(variant.temperature), trafficAllocation: Number(variant.trafficAllocation) })) } : defaultExperiment
   const { register, control, handleSubmit, watch, formState: { errors, isValid, isSubmitting }, setError, reset } = useForm({ resolver: zodResolver(experimentSchema), mode: 'onChange', defaultValues: structuredClone(defaults) })
-  React.useEffect(() => { reset(structuredClone(defaults)) }, [state.designer])
+  React.useEffect(() => { reset(structuredClone(defaults)) }, [state.designer, existing?.id, existing?.minimumSampleSize])
   const { fields, append, remove } = useFieldArray({ control, name: 'variants' })
   const values = watch()
   const total = (values.variants || []).reduce((sum, item) => sum + Number(item.trafficAllocation || 0), 0)
@@ -298,116 +304,71 @@ function DesignerModal() {
   const [previewInput, setPreviewInput] = useState('Explain the key idea clearly and concisely.')
   const submit = payload => { const result = state.saveExperiment(payload); if (!result.ok) setError('root', { message: result.error }) }
   const runPreview = () => setPreviewResults((values.variants || []).map((variant, index) => ({ letter: LETTERS[index], title: variant.title, model: variant.model, latency: 590 + index * 161 + previewInput.length, tokens: 104 + index * 29 + Math.round(previewInput.length / 3), text: `${variant.title} via ${variant.model}: ${previewInput} — this ${index % 2 ? 'evidence-aware, detailed' : 'direct, compact'} response uses ${variant.promptId}.` })))
-  return <Modal open preventCloseOnClickOutside={false} modalHeading={existing ? 'Edit experiment' : 'New experiment'} modalLabel="ExperimentUpsert · API-shaped design" primaryButtonText={existing ? 'Save changes' : 'Create experiment'} secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || total !== 100 || isSubmitting} onRequestClose={state.closeDesigner} onRequestSubmit={handleSubmit(submit)} size="lg" className="designer-modal">
+  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} modalHeading={existing ? 'Edit Experiment' : 'New Experiment'} modalLabel="ExperimentUpsert · API-shaped design" primaryButtonText={existing ? 'Save Changes' : 'Create Experiment'} secondaryButtonText="Cancel" primaryButtonDisabled={!isValid || total !== 100 || isSubmitting} onRequestClose={state.closeDesigner} onRequestSubmit={handleSubmit(submit)} size="lg" className="designer-modal">
     <div className="modal-intro">Configure 2–4 ordered variants. Every valid submission is the exact experiment API request body.</div>
     {errors.root && <div className="form-error global" aria-live="polite">{errors.root.message}</div>}
     <div className="form-grid two"><TextInput id="experiment-name" labelText="Experiment name" invalid={!!errors.name} invalidText={errors.name?.message} {...register('name')} /><Select id="success-metric" labelText="Success metric" invalid={!!errors.successMetric} invalidText={errors.successMetric?.message} {...register('successMetric')}>{state.criteria.map(criterion => <SelectItem key={criterion.id} value={criterion.name} text={criterion.label || criterion.name} />)}</Select></div>
     <TextArea id="hypothesis" labelText="Hypothesis" rows={3} invalid={!!errors.hypothesis} invalidText={errors.hypothesis?.message} {...register('hypothesis')} />
-    <NumberInput id="minimum-sample-size" label="Minimum sample size" min={1} max={500} invalid={!!errors.minimumSampleSize} invalidText={errors.minimumSampleSize?.message} {...register('minimumSampleSize')} />
+    <Controller control={control} name="minimumSampleSize" render={({ field }) => <NumberInput id="minimum-sample-size" label="Minimum sample size" min={1} max={500} value={field.value} onChange={(_, { value }) => field.onChange(Number(value))} invalid={!!errors.minimumSampleSize} invalidText={errors.minimumSampleSize?.message} />} />
     <div className={`allocation-status ${total === 100 ? 'valid' : 'invalid'}`}><div><strong>Traffic allocation</strong><span>{total === 100 ? 'Ready to run' : 'Traffic allocation rule: values must sum to exactly 100%'}</span></div><b>{total}%</b></div>
     {errors.variants?.root?.message && <div className="form-error" aria-live="polite">{errors.variants.root.message}</div>}
-    <div className="variant-editor">{fields.map((field, index) => <section className="variant-card" key={field.id}><div className="variant-card-head"><div><i style={{ background: COLORS[index] }}>{LETTERS[index]}</i><strong>Variant {LETTERS[index]}</strong></div>{index > 1 && <Button kind="ghost" size="sm" renderIcon={TrashCan} onClick={() => remove(index)} iconDescription="Remove variant">Remove</Button>}</div><div className="form-grid three"><TextInput id={`variant-title-${index}`} labelText="Variant title" invalid={!!errors.variants?.[index]?.title} invalidText={errors.variants?.[index]?.title?.message} {...register(`variants.${index}.title`)} /><Select id={`variant-prompt-${index}`} labelText="Prompt" invalid={!!errors.variants?.[index]?.promptId} invalidText={errors.variants?.[index]?.promptId?.message} {...register(`variants.${index}.promptId`)}>{state.prompts.map(prompt => <SelectItem key={prompt.id} value={prompt.id} text={prompt.name} />)}</Select><Select id={`variant-model-${index}`} labelText="Model" invalid={!!errors.variants?.[index]?.model} invalidText={errors.variants?.[index]?.model?.message} {...register(`variants.${index}.model`)}>{MODELS.map(model => <SelectItem key={model} value={model} text={model} />)}</Select></div><div className="form-grid slider-grid"><NumberInput id={`variant-temperature-${index}`} label="Temperature" min={0} max={2} step={0.1} invalid={!!errors.variants?.[index]?.temperature} invalidText={errors.variants?.[index]?.temperature?.message} {...register(`variants.${index}.temperature`)} /><div className="range-field"><span>Traffic allocation <strong>{Number(values.variants?.[index]?.trafficAllocation || 0)}%</strong></span><Controller control={control} name={`variants.${index}.trafficAllocation`} render={({ field: allocation }) => <Slider id={`traffic-allocation-${index}`} aria-label={`Variant ${LETTERS[index]} traffic allocation`} labelText={`Variant ${LETTERS[index]} traffic allocation`} aria-valuenow={Number(allocation.value || 0)} min={0} max={100} step={1} value={Number(allocation.value || 0)} onChange={({ value }) => allocation.onChange(value)} hideTextInput />} /><small>0%</small><small>100%</small></div></div></section>)}</div>
+    <div className="variant-editor">{fields.map((field, index) => <section className="variant-card" key={field.id}><div className="variant-card-head"><div><i style={{ background: COLORS[index] }}>{LETTERS[index]}</i><strong>Variant {LETTERS[index]}</strong></div>{index > 1 && <Button kind="ghost" size="sm" renderIcon={TrashCan} onClick={() => remove(index)} iconDescription="Remove variant">Remove</Button>}</div><div className="form-grid three"><TextInput id={`variant-title-${index}`} labelText="Variant title" invalid={!!errors.variants?.[index]?.title} invalidText={errors.variants?.[index]?.title?.message} {...register(`variants.${index}.title`)} /><Select id={`variant-prompt-${index}`} labelText="Prompt" invalid={!!errors.variants?.[index]?.promptId} invalidText={errors.variants?.[index]?.promptId?.message} {...register(`variants.${index}.promptId`)}>{state.prompts.map(prompt => <SelectItem key={prompt.id} value={prompt.id} text={prompt.name} />)}</Select><Select id={`variant-model-${index}`} labelText="Model" invalid={!!errors.variants?.[index]?.model} invalidText={errors.variants?.[index]?.model?.message} {...register(`variants.${index}.model`)}>{MODELS.map(model => <SelectItem key={model} value={model} text={model} />)}</Select></div><div className="form-grid slider-grid"><Controller control={control} name={`variants.${index}.temperature`} render={({ field }) => <NumberInput id={`variant-temperature-${index}`} label="Temperature" min={0} max={2} step={0.1} value={field.value} onChange={(_, { value }) => field.onChange(Number(value))} invalid={!!errors.variants?.[index]?.temperature} invalidText={errors.variants?.[index]?.temperature?.message} />} /><div className="range-field"><span>Traffic allocation <strong>{Number(values.variants?.[index]?.trafficAllocation || 0)}%</strong></span><Controller control={control} name={`variants.${index}.trafficAllocation`} render={({ field: allocation }) => <Slider id={`traffic-allocation-${index}`} aria-label={`Variant ${LETTERS[index]} traffic allocation ${Number(allocation.value || 0)} percent`} labelText={`Variant ${LETTERS[index]} traffic allocation`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Number(allocation.value || 0)} aria-valuetext={`${Number(allocation.value || 0)} percent`} min={0} max={100} step={1} value={Number(allocation.value || 0)} onChange={({ value }) => allocation.onChange(value)} hideTextInput inputType="range" />} /><small>0%</small><small>100%</small></div></div></section>)}</div>
     <div className="designer-actions"><Button kind="tertiary" size="sm" renderIcon={Add} disabled={fields.length >= 4} onClick={() => append({ title: `Variant ${LETTERS[fields.length]}`, promptId: state.prompts[fields.length]?.id || state.prompts[0].id, model: MODELS[fields.length % MODELS.length], temperature: 0.5, trafficAllocation: 0 })}>Add variant</Button><Button kind="ghost" size="sm" renderIcon={Play} onClick={() => state.setField('previewOpen', !state.previewOpen)}>Preview playground</Button></div>
     {state.previewOpen && <div className="preview-playground"><div className="preview-input"><TextArea id="preview-input" labelText="Shared test input" value={previewInput} onChange={event => setPreviewInput(event.target.value)} rows={2} /><Button renderIcon={Play} onClick={runPreview}>Run preview</Button></div><div className="preview-columns">{(values.variants || []).map((variant, index) => { const response = previewResults[index]; return <div className="preview-column" key={index}><div><i style={{ background: COLORS[index] }}>{LETTERS[index]}</i><strong>{variant.title || `Variant ${LETTERS[index]}`}</strong><span>{variant.model}</span></div>{response ? <><p>{response.text}</p><footer>{response.latency} ms · {response.tokens} tokens</footer></> : <div className="preview-empty">Run the shared input to compare this response.</div>}</div> })}</div></div>}
   </Modal>
 }
 
-function CriterionModal() {
+function CriterionModal({ launcherButtonRef }) {
   const state = useStudio()
   const { register, handleSubmit, setError, formState: { errors, isValid } } = useForm({ resolver: zodResolver(criterionSchema), mode: 'onChange', defaultValues: { name: '', description: '', passThreshold: 75 } })
   const submit = payload => { const result = state.addCriterion(payload); if (!result.ok) setError(result.error.includes('unique') ? 'name' : 'root', { message: result.error }) }
-  return <Modal open preventCloseOnClickOutside={false} modalHeading="New scoring criterion" modalLabel="CriterionUpsert · reusable judge" primaryButtonText="Create criterion" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => state.setField('criterionOpen', false)} onRequestSubmit={handleSubmit(submit)}>
+  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} modalHeading="New Scoring Criterion" modalLabel="CriterionUpsert · reusable judge" primaryButtonText="Create Criterion" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => state.setField('criterionOpen', false)} onRequestSubmit={handleSubmit(submit)}>
     {errors.root && <div className="form-error global" aria-live="polite">{errors.root.message}</div>}<TextInput id="criterion-name" labelText="Criterion name" invalid={!!errors.name} invalidText={errors.name?.message} {...register('name')} /><TextArea id="criterion-description" labelText="Description" rows={4} invalid={!!errors.description} invalidText={errors.description?.message} {...register('description')} /><NumberInput id="pass-threshold" label="Pass threshold" min={0} max={100} invalid={!!errors.passThreshold} invalidText={errors.passThreshold?.message} {...register('passThreshold')} />
   </Modal>
 }
 
-function DecisionModal() {
+function DecisionModal({ launcherButtonRef }) {
   const state = useStudio()
   const experiment = state.experiments.find(item => item.id === state.decisionFor)
   const { register, handleSubmit, watch, setError, formState: { errors, isValid } } = useForm({ resolver: zodResolver(decisionSchema), mode: 'onChange', defaultValues: { choice: 'declare-winner', winnerVariant: '', rationale: '' } })
   const choice = watch('choice')
   const submit = payload => { const normalized = { ...payload, winnerVariant: payload.choice === 'declare-winner' ? payload.winnerVariant || null : null }; const result = state.decide(experiment.id, normalized); if (!result.ok) setError('root', { message: result.error }) }
-  return <Modal open preventCloseOnClickOutside={false} danger modalHeading="Record experiment decision" modalLabel="DecisionUpsert · permanent lock" primaryButtonText="Confirm decision" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => state.setField('decisionFor', null)} onRequestSubmit={handleSubmit(submit)}>
+  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} danger modalHeading="Record Experiment Decision" modalLabel="DecisionUpsert · permanent lock" primaryButtonText="Confirm Decision" secondaryButtonText="Cancel" primaryButtonDisabled={!isValid} onRequestClose={() => state.setField('decisionFor', null)} onRequestSubmit={handleSubmit(submit)}>
     <div className="decision-warning"><Locked size={18} /><span>This action locks editing and outlier flags. Decisions are excluded from undo.</span></div>{errors.root && <div className="form-error global" aria-live="polite">{errors.root.message}</div>}<Select id="decision-choice" labelText="Decision choice" invalid={!!errors.choice} invalidText={errors.choice?.message} {...register('choice')}><SelectItem value="declare-winner" text="Declare winner" /><SelectItem value="inconclusive" text="Inconclusive" /><SelectItem value="stop-early" text="Stop early" /></Select>{choice === 'declare-winner' && <Select id="winner-variant" labelText="Winner variant" invalid={!!errors.winnerVariant} invalidText={errors.winnerVariant?.message} {...register('winnerVariant')}><SelectItem value="" text="Choose a variant" />{experiment.variants.map((variant, index) => <SelectItem key={variant.title} value={LETTERS[index]} text={`Variant ${LETTERS[index]} — ${variant.title}`} />)}</Select>}<TextArea id="decision-rationale" labelText="Decision rationale" rows={5} invalid={!!errors.rationale} invalidText={errors.rationale?.message} {...register('rationale')} />
   </Modal>
 }
 
-function ReportModal() {
+function ReportModal({ launcherButtonRef }) {
   const state = useStudio()
   const [generatedAt, setGeneratedAt] = useState(Date.now())
   const [importError, setImportError] = useState('')
   const report = useMemo(() => state.compileReport(state.reportFor), [state.reportFor, state.experiments, generatedAt])
   const text = JSON.stringify(report, null, 2)
-  const copy = async () => { await navigator.clipboard.writeText(text); state.setField('copied', true); state.notify('Report JSON copied'); setTimeout(() => state.setField('copied', false), 2200) }
+  const copy = async () => { await navigator.clipboard.writeText(text); state.setField('copied', true); state.notify('Report JSON copied', 'success', 'Report JSON copied to clipboard.'); setTimeout(() => state.setField('copied', false), 2200) }
   const download = () => { const blob = new Blob([text], { type: 'application/json' }); const url = URL.createObjectURL(blob); const anchor = document.createElement('a'); anchor.href = url; anchor.download = 'experiment-report.json'; anchor.click(); URL.revokeObjectURL(url); state.notify('Experiment report downloaded') }
   const importFile = async event => { const file = event.target.files?.[0]; if (!file) return; const content = await file.text(); const result = state.importReport(content, state.reportFor); if (!result.ok) setImportError(result.error); else { setImportError(''); setGeneratedAt(Date.now()) } event.target.value = '' }
-  return <Modal open preventCloseOnClickOutside={false} modalHeading="Experiment report" modalLabel="ab-experiment-report-v1 · portable result pack" passiveModal onRequestClose={() => state.setField('reportFor', null)} size="lg" className="report-modal">
-    <div className="report-toolbar"><div><Tag type="green">Schema valid</Tag><span>Generated {new Date(report.generatedAt).toLocaleTimeString()}</span></div><div><Button size="sm" kind="ghost" renderIcon={Renew} onClick={() => setGeneratedAt(Date.now())}>Regenerate</Button><Button size="sm" kind="tertiary" renderIcon={Copy} onClick={copy}>{state.copied ? 'Copied' : 'Copy JSON'}</Button><Button size="sm" renderIcon={Download} onClick={download}>Download JSON</Button></div></div>
+  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} modalHeading="Experiment Report" modalLabel="ab-experiment-report-v1 · portable result pack" passiveModal onRequestClose={() => state.setField('reportFor', null)} size="lg" className="report-modal">
+    <div className="report-toolbar"><div><Tag type="green">Schema Valid</Tag><span>Generated {new Date(report.generatedAt).toLocaleTimeString()}</span></div><div className="report-actions"><Button size="sm" kind="ghost" renderIcon={Renew} onClick={() => setGeneratedAt(Date.now())}>Regenerate</Button><Button size="sm" kind="tertiary" renderIcon={Copy} className="report-action-btn" onClick={copy}>{state.copied ? 'Copied' : 'Copy JSON'}</Button><Button size="sm" renderIcon={Download} className="report-action-btn" onClick={download}>Download JSON</Button></div></div>
     <pre className="json-preview" aria-label="Experiment Report JSON preview">{text}</pre>
     <div className="import-zone"><div><h3>Import report</h3><p>Round-trip a schema-valid Experiment Report JSON onto this experiment.</p></div><label className="import-button"><Upload size={18} />Import JSON<input type="file" accept="application/json,.json" onChange={importFile} /></label></div>{importError && <div className="form-error import-error" aria-live="polite"><WarningAlt size={16} />Import error — {importError}. No changes were applied.</div>}
   </Modal>
 }
 
-function ConfirmDialog() {
+function ConfirmDialog({ launcherButtonRef }) {
   const state = useStudio()
   const confirm = state.confirm
   const isDelete = confirm.type === 'delete'
   const isArchive = confirm.type === 'archive'
-  const action = () => { if (isDelete) state.deleteSelected(); else if (isArchive) state.archiveSelected(); else { state.promoteWinner(confirm.experimentId); return } state.setField('confirm', null) }
-  const heading = isDelete ? `Delete ${confirm.count} selected experiment${confirm.count === 1 ? '' : 's'}?` : isArchive ? `Archive ${confirm.count} selected experiment${confirm.count === 1 ? '' : 's'}?` : 'Promote winning prompt?'
-  return <Modal open preventCloseOnClickOutside={false} danger={isDelete} alert modalHeading={heading} primaryButtonText={isDelete ? 'Delete experiments' : isArchive ? 'Archive experiments' : 'Promote winner'} secondaryButtonText="Cancel" onRequestClose={() => state.setField('confirm', null)} onRequestSubmit={action}><p>{isDelete ? 'Only the selected rows will be removed. You can undo this action from the header.' : isArchive ? 'Every selected experiment will move to Archived and retain its prior status for restoration.' : 'The winning variant’s prompt becomes the new head version in the prompt library.'}</p></Modal>
-}
-
-function useWebMCP() {
-  useEffect(() => {
-    const execute = (name, args = {}) => {
-      const state = useStudio.getState()
-      if (name === 'form_validate' || name === 'form_submit') {
-        const schemas = { 'experiment-designer': experimentSchema, 'new-criterion-form': criterionSchema, 'decision-dialog': decisionSchema }
-        if (args.workflow === 'promote-winner-confirm') {
-          if (name === 'form_submit') state.promoteWinner(args.experimentId)
-          return { ok: true, workflow: args.workflow }
-        }
-        const schema = schemas[args.workflow]
-        if (!schema) return { ok: false, error: 'workflow must be experiment-designer, new-criterion-form, decision-dialog, or promote-winner-confirm' }
-        const parsed = schema.safeParse(args.values || {})
-        if (!parsed.success) return { ok: false, error: zodErrorMessage(parsed.error) }
-        if (name === 'form_validate') return { ok: true, valid: true, workflow: args.workflow }
-        if (args.workflow === 'experiment-designer') { state.setField('designer', args.experimentId || 'new'); return state.saveExperiment(parsed.data) }
-        if (args.workflow === 'new-criterion-form') return state.addCriterion(parsed.data)
-        if (args.workflow === 'decision-dialog') return state.decide(args.experimentId, parsed.data)
-      }
-      if (name === 'session_start') { state.startRun(args.experimentId); return { ok: true, visiblePostcondition: 'Status changes to Running' } }
-      if (name === 'session_pause') { state.pauseRun(args.experimentId); return { ok: true } }
-      if (name === 'session_resume') { state.resumeRun(args.experimentId); return { ok: true } }
-      if (name === 'session_trigger_demo') { state.runPreview(); return { ok: true, demo: 'preview-run' } }
-      if (name === 'entity_create') { state.openDesigner(); return { ok: true, visiblePostcondition: 'The experiment designer is open' } }
-      if (name === 'entity_select') { state.selectExperiment(args.experimentId); return { ok: true } }
-      if (name === 'entity_toggle') { if (args.field === 'archived') args.value ? state.archiveOne(args.experimentId) : state.unarchive(args.experimentId); else if (args.field === 'outlier-flag') state.toggleOutlier(args.experimentId, args.responseId); return { ok: true } }
-      if (name === 'entity_delete') { if (args.confirm !== true) return { ok: false, error: 'confirm=true is required' }; state.setField('selectedIds', [args.experimentId]); state.deleteSelected(); return { ok: true } }
-      if (name === 'artifact_export') { const report = state.compileReport(args.experimentId); if (!report) return { ok: false, error: 'A completed or decided experiment is required' }; state.setField('reportFor', args.experimentId); return { ok: true, format: 'experiment-report', visiblePostcondition: 'The Experiment Report panel is open' } }
-      if (name === 'artifact_import') { state.setField('reportFor', args.experimentId); return { ok: true, visiblePostcondition: 'The report panel and file import control are open' } }
-      if (name === 'form_cancel') { state.setField('designer', null); state.setField('criterionOpen', false); state.setField('decisionFor', null); return { ok: true } }
-      return { ok: false, unavailable: true, error: `${name} requires visible form or pointer interaction` }
-    }
-    const definitions = [
-      ['form_validate', 'Validate declared fields in the active workflow'], ['form_submit', 'Submit the active declared form workflow'], ['form_cancel', 'Cancel the active form workflow'],
-      ['session_start', 'Start an experiment run'], ['session_pause', 'Pause an experiment run'], ['session_resume', 'Resume an experiment run'], ['session_trigger_demo', 'Run the preview-run demo'],
-      ['entity_select', 'Select an experiment'], ['entity_delete', 'Delete an experiment with explicit confirmation'], ['entity_toggle', 'Toggle archived or outlier-flag'],
-      ['artifact_export', 'Open experiment-report export']
-    ].map(([name, description]) => {
-      const variantProperties = { title: { type: 'string', minLength: 1, maxLength: 40 }, promptId: { type: 'string' }, model: { type: 'string', enum: MODELS }, temperature: { type: 'number', minimum: 0, maximum: 2 }, trafficAllocation: { type: 'number', minimum: 0, maximum: 100 } }
-      const formValues = { type: 'object', properties: { name: { type: 'string', minLength: 1, maxLength: 120 }, hypothesis: { type: 'string', minLength: 1, maxLength: 2000 }, successMetric: { type: 'string' }, minimumSampleSize: { type: 'integer', minimum: 1, maximum: 500 }, variants: { type: 'array', minItems: 2, maxItems: 4, items: { type: 'object', properties: variantProperties, required: Object.keys(variantProperties), additionalProperties: false } }, description: { type: 'string', minLength: 1, maxLength: 400 }, passThreshold: { type: 'integer', minimum: 0, maximum: 100 }, choice: { type: 'string', enum: ['declare-winner', 'inconclusive', 'stop-early'] }, winnerVariant: { type: ['string', 'null'], enum: ['A', 'B', 'C', 'D', null] }, rationale: { type: 'string', minLength: 1, maxLength: 1000 } }, additionalProperties: false }
-      const formInput = { type: 'object', properties: { workflow: { type: 'string', enum: ['experiment-designer', 'new-criterion-form', 'decision-dialog', 'promote-winner-confirm'] }, experimentId: { type: 'string' }, values: formValues }, required: ['workflow'], additionalProperties: false }
-      const commandInput = { type: 'object', properties: { experimentId: { type: 'string' }, responseId: { type: 'string' }, field: { type: 'string', enum: ['archived', 'outlier-flag'] }, value: { type: 'boolean' }, confirm: { type: 'boolean' } }, additionalProperties: false }
-      return { name, description, inputSchema: name.startsWith('form_') ? formInput : commandInput, execute: args => execute(name, args) }
-    })
-    window.webmcp_tools = definitions
-    window.webmcp_list_tools = () => definitions.map(({ name, description, inputSchema }) => ({ name, description, inputSchema }))
-    window.webmcp_invoke_tool = (name, args) => execute(name, args)
-    const api = navigator.modelContext
-    if (api?.registerTool) definitions.forEach(tool => { try { api.registerTool(tool) } catch { /* bridge may already contain the tool */ } })
-  }, [])
+  const isArchiveOne = confirm.type === 'archive-one'
+  const action = () => {
+    if (isDelete) state.deleteSelected()
+    else if (isArchive) state.archiveSelected()
+    else if (isArchiveOne) { state.setField('selectedIds', [confirm.experimentId]); state.archiveSelected() }
+    else { state.promoteWinner(confirm.experimentId); return }
+    state.setField('confirm', null)
+  }
+  const heading = isDelete ? `Delete ${confirm.count} selected experiment${confirm.count === 1 ? '' : 's'}?` : isArchive ? `Archive ${confirm.count} selected experiment${confirm.count === 1 ? '' : 's'}?` : isArchiveOne ? 'Archive this experiment?' : 'Promote Winning Prompt?'
+  return <Modal open preventCloseOnClickOutside launcherButtonRef={launcherButtonRef} danger={isDelete} alert modalHeading={heading} primaryButtonText={isDelete ? 'Delete Experiments' : isArchive || isArchiveOne ? 'Archive Experiments' : 'Promote Winner'} secondaryButtonText="Cancel" onRequestClose={() => state.setField('confirm', null)} onRequestSubmit={action}><p>{isDelete ? 'Only the selected rows will be removed. You can undo this action from the header.' : isArchive || isArchiveOne ? 'The experiment will move to Archived and retain its prior status for restoration.' : 'The winning variant’s prompt becomes the new head version in the prompt library.'}</p></Modal>
 }
 
 export default App
