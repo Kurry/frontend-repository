@@ -111,7 +111,7 @@ export function useOverlayBehavior(ref, onClose, { initialFocus = true } = {}) {
     const onKey = (e) => {
       const top = overlayStack[overlayStack.length - 1]
       if (top !== entry) return
-      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); onClose() }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); top.onClose() }
       else if (e.key === 'Tab') {
         const nodes = [...(ref.current?.querySelectorAll(
           'input:not([type="hidden"]), select, textarea, button, [tabindex]:not([tabindex="-1"])'
@@ -135,7 +135,7 @@ export function useOverlayBehavior(ref, onClose, { initialFocus = true } = {}) {
         if (opener?.focus && document.contains(opener)) opener.focus({ preventScroll: true })
       })
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [onClose])
 }
 
 /* ---------------- Modal shell ---------------- */
@@ -201,11 +201,14 @@ export function useAnimatedNumber(value, duration = 450) {
   const frame = useRef(null)
   useEffect(() => {
     const from = prev.current, to = value
-    if (from === to) return
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    if (from === to || reduced) {
+      prev.current = to
+      if (display !== to) setDisplay(to)
+      return
+    }
     prev.current = to
     const start = performance.now()
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
-    if (reduced) { setDisplay(to); return }
     const tick = (t) => {
       const p = Math.min(1, (t - start) / duration)
       const eased = 1 - Math.pow(1 - p, 3)
