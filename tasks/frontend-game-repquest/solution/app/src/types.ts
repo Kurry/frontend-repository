@@ -85,6 +85,7 @@ export interface ChallengeRun {
   repsLogged: number;
   targetReps: number;
   startedAt: number;
+  pausedElapsed: number;
   result: ChallengeResult;
 }
 
@@ -94,12 +95,14 @@ export interface ChallengeCheckpoint {
   difficulty: Difficulty;
   repsLogged: number;
   targetReps: number;
+  elapsedMs: number;
   savedAt: string;
 }
 
-export interface ScenarioPreset {
+export type AccentId = 'amber' | 'teal' | 'rose';
+
+export interface Toast {
   id: number;
-  label: string;
-  dailyGoalDelta: number;
-  bonusQp: number;
+  message: string;
+  tone: 'info' | 'success' | 'warn' | 'victory' | 'defeat';
 }

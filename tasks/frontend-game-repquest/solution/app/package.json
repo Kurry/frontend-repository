@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "4.3.2",
+    "phosphor-svelte": "^3.1.0",
     "svelte": "5.56.4",
     "tailwindcss": "4.3.2",
     "xstate": "5.32.4"

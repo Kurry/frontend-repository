@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { fly } from 'svelte/transition';
+  import { fly, fade } from 'svelte/transition';
+  import { Trash, ListChecks, NoteBlank } from 'phosphor-svelte';
   import { quest } from '../../store.svelte';
 
   const repHistory = $derived(quest.state.repHistory);
@@ -19,39 +20,48 @@
 </script>
 
 <div class="bg-slate-800 rounded-xl p-4 border border-slate-700">
-  <h2 class="text-lg font-bold text-amber-400 mb-3">Rep history</h2>
+  <h2 class="text-lg font-bold mb-3 flex items-center gap-2" style="color: var(--accent-strong)">
+    <ListChecks size={18} weight="fill" /> Rep history
+  </h2>
 
   {#if repHistory.length === 0}
-    <div class="text-center py-8">
-      <div class="text-4xl mb-2">🏋️</div>
-      <p class="text-slate-400 text-sm">No sets logged yet — log your first set!</p>
+    <div class="text-center py-8" transition:fade={{ duration: 200 }}>
+      <div class="flex justify-center mb-2 text-slate-500"><NoteBlank size={36} /></div>
+      <p class="text-slate-300 text-sm font-medium">No sets logged yet.</p>
+      <p class="text-slate-500 text-xs mt-1">Each set you log from the Quest tab appears here, most recent first, with its rep count, note, and timestamp.</p>
     </div>
   {:else}
-    <div class="max-h-64 overflow-y-auto space-y-2 pr-1">
+    <ul class="max-h-72 overflow-y-auto space-y-2 pr-1" data-history-list>
       {#each repHistory as set (set.id)}
-        <div transition:fly={{ x: 18, duration: 180 }} class="flex items-center justify-between bg-slate-900 rounded-lg px-3 py-2 group hover:bg-slate-900/80 transition-colors">
+        <li
+          in:fly={{ y: -14, opacity: 0, duration: 260 }}
+          out:fly={{ x: 28, opacity: 0, duration: 220 }}
+          class="flex items-center justify-between gap-2 bg-slate-900 rounded-lg px-3 py-2.5 group hover:bg-slate-900/70 transition-colors border border-slate-800"
+          data-history-row={set.id}
+          data-rep-count={set.reps}
+        >
           <div class="flex-1 min-w-0">
             <div class="flex items-baseline gap-2">
-              <span class="text-lg font-bold text-amber-400">{set.reps}</span>
+              <span class="text-lg font-bold" style="color: var(--accent-strong)">{set.reps}</span>
               <span class="text-xs text-slate-400">reps</span>
+              <span class="text-xs text-slate-500 ml-auto sm:ml-0">{formatDate(set.timestamp)}</span>
             </div>
-            <p class="text-xs text-slate-500 truncate">{formatDate(set.timestamp)}</p>
-            <p class="text-[10px] text-slate-500">ID: {set.setId || set.id} · {set.loggedAt || new Date(set.timestamp).toISOString()}</p>
+            <p class="text-[10px] text-slate-500 truncate">ID: {set.setId || set.id} · {set.loggedAt || new Date(set.timestamp).toISOString()}</p>
             {#if set.note}<p class="text-sm text-slate-300 mt-1 break-words">{set.note}</p>{/if}
           </div>
           <button
             onclick={() => handleDelete(set.id)}
             data-action="delete-set"
             data-set-id={set.id}
-            class="text-slate-500 hover:text-red-400 text-xs px-2 py-1 rounded
+            class="inline-flex items-center gap-1 text-slate-400 hover:text-red-400 text-xs px-2 py-1.5 rounded border border-transparent hover:border-red-800
                    opacity-100 sm:opacity-0 sm:group-hover:opacity-100
-                   transition-all focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-red-400"
+                   transition-all focus-visible:opacity-100"
             aria-label="Delete set of {set.reps} reps"
           >
-            Delete
+            <Trash size={14} /> Delete
           </button>
-        </div>
+        </li>
       {/each}
-    </div>
+    </ul>
   {/if}
 </div>
