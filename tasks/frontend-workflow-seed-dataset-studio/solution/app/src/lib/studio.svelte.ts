@@ -442,7 +442,8 @@ export class StudioState {
 
   startHarvest(seed: Seed, options: { forceFailReproduce?: boolean } = {}) {
     if (seed.authoring.harvest.running) return false;
-    const forceFailReproduce = options.forceFailReproduce ?? true;
+    // Normal runs complete; the explicit retry demo opts into deterministic failure.
+    const forceFailReproduce = options.forceFailReproduce ?? false;
     seed.authoring.harvest = {
       running: true,
       paused: false,
@@ -601,7 +602,7 @@ export class StudioState {
   preview(tab: 'manifest' | 'snapshot' | 'studio') {
     if (tab === 'manifest') return this.activeSeed ? JSON.stringify(this.packageManifest(this.activeSeed), null, 2) : JSON.stringify({ message: 'Select a seed to preview its package manifest.' }, null, 2);
     if (tab === 'snapshot') return JSON.stringify(this.snapshot(), null, 2);
-    return JSON.stringify(this.studioPackage());
+    return JSON.stringify(this.studioPackage(), null, 2);
   }
 
   openExport(seedId?: string) {
