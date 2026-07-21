@@ -14,7 +14,7 @@
     "@tailwindcss/vite": "4.3.2",
     "motion": "12.23.12",
     "qrious": "4.0.2",
-    "solid-js": "1.9.9",
+    "solid-js": "1.9.14",
     "tailwindcss": "4.3.2",
     "zod": "4.1.12"
   },
