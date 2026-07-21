@@ -20,9 +20,32 @@ test('editing a prior generated draft marks the technique in progress and surviv
   await expect(page.getByRole('button', { name: /Zero-Shot/ }).first()).toContainText('In progress')
 })
 
+test('editing during generation cancels the stale submitted snapshot', async ({ page }) => {
+  await page.goto('/')
+  const task = page.locator('#zero-shot-taskDescription')
+  await task.fill('Initial prompt content')
+  await page.locator('form.technique-form.is-active').getByRole('button', { name: 'Generate prompt' }).click()
+  await task.fill('Revised before generation settled')
+  await page.waitForTimeout(400)
+  await expect(page.getByLabel('Prompt preview')).toContainText('Your assembled prompt will appear here')
+  await expect(page.getByRole('button', { name: /Zero-Shot/ }).first()).toContainText('In progress')
+})
+
+test('clearing a generated form restores the neutral lifecycle state', async ({ page }) => {
+  await page.goto('/')
+  const task = page.locator('#zero-shot-taskDescription')
+  await task.fill('Generate this prompt, then clear it')
+  await page.locator('form.technique-form.is-active').getByRole('button', { name: 'Generate prompt' }).click()
+  await expect(page.locator('#prompt-preview')).toContainText('Generate this prompt, then clear it')
+  await task.fill('')
+  await expect(page.getByRole('button', { name: /Zero-Shot/ }).first()).toContainText('Neutral')
+  await expect(page.getByLabel('Prompt preview')).toContainText('Your assembled prompt will appear here')
+})
+
 test('few-shot can reach zero examples and explains the minimum', async ({ page }) => {
   await page.goto('/')
   await page.getByRole('button', { name: /Few-Shot/ }).first().click()
+  await expect(page.locator('form.technique-form.is-active #few-shot-taskDescription')).toBeVisible()
   const removeExamples = page.locator('form.technique-form.is-active').getByRole('button', { name: /Remove example/i })
   await removeExamples.evaluateAll((buttons) => buttons.forEach((button) => button.click()))
   await expect(removeExamples).toHaveCount(0)
