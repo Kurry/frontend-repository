@@ -25,6 +25,15 @@
 
 * { box-sizing: border-box; }
 
+.cds--search-input,
+.cds--text-input,
+.cds--text-area,
+.cds--btn,
+.cds--modal,
+.cds--modal-container {
+  transition-duration: 90ms !important;
+}
+
 html { scroll-behavior: smooth; }
 
 body {
