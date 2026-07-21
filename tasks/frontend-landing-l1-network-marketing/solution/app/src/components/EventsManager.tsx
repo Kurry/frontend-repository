@@ -3,10 +3,12 @@ import { useStore } from '@nanostores/react';
 import {
   $events, $eventsManagerOpen, $eventsFilter, $eventsSort,
   $selectedEventIds, deleteEvents, undoEventAction, redoEventAction,
-  $historyUndo, $historyRedo, RidgeEvent
+  $historyUndo, $historyRedo, RidgeEvent, formatEventDate, announce
 } from '../store';
 import { X, Plus, Trash, ArrowUUpLeft, ArrowUUpRight, ArrowUp, ArrowDown } from 'phosphor-react';
 import EventForm from './EventForm';
+
+let managerCoachSeen = false;
 
 export default function EventsManager() {
   const isOpen = useStore($eventsManagerOpen);
@@ -19,34 +21,53 @@ export default function EventsManager() {
 
   const [editingEvent, setEditingEvent] = useState<RidgeEvent | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
+  const [leavingIds, setLeavingIds] = useState<string[]>([]);
+  const [leavingEvents, setLeavingEvents] = useState<RidgeEvent[]>([]);
+  const [showCoach, setShowCoach] = useState(false);
   const firstFocusRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const lastFocused = useRef<HTMLElement | null>(null);
+  const visible = isOpen || closing;
+
+  const requestClose = () => {
+    if (closing || isFormOpen) return;
+    setClosing(true);
+    window.setTimeout(() => {
+      $eventsManagerOpen.set(false);
+      setClosing(false);
+      lastFocused.current?.focus?.();
+      lastFocused.current = null;
+    }, 160);
+  };
 
   useEffect(() => {
     if (isOpen) {
-      setTimeout(() => firstFocusRef.current?.focus(), 100);
-      const handleEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && !isFormOpen) {
-          $eventsManagerOpen.set(false);
-        }
-      };
+      lastFocused.current = document.activeElement as HTMLElement | null;
+      const t = window.setTimeout(() => firstFocusRef.current?.focus(), 80);
+      const handleEscape = (e: KeyboardEvent) => { if (e.key === 'Escape' && !isFormOpen) { e.preventDefault(); requestClose(); } };
       window.addEventListener('keydown', handleEscape);
-      return () => window.removeEventListener('keydown', handleEscape);
+      // Show once per page lifetime without browser persistence; this genre is
+      // intentionally in-memory only.
+      if (!managerCoachSeen) { managerCoachSeen = true; setShowCoach(true); }
+      return () => { window.removeEventListener('keydown', handleEscape); window.clearTimeout(t); };
     }
   }, [isOpen, isFormOpen]);
 
   const filteredEvents = useMemo(() => {
-    return events.filter(e => {
+    const displayedEvents = [...events, ...leavingEvents.filter(leaving => !events.some(event => event.id === leaving.id))];
+    return displayedEvents.filter(e => {
       if (filter.status && e.status !== filter.status) return false;
       if (filter.category && e.category !== filter.category) return false;
       return true;
     }).sort((a, b) => {
-      let valA = a[sort.by];
-      let valB = b[sort.by];
-      if (valA < valB) return sort.direction === 'asc' ? -1 : 1;
-      if (valA > valB) return sort.direction === 'asc' ? 1 : -1;
+      const va = a[sort.by];
+      const vb = b[sort.by];
+      if (va < vb) return sort.direction === 'asc' ? -1 : 1;
+      if (va > vb) return sort.direction === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [events, filter, sort]);
+  }, [events, leavingEvents, filter, sort]);
 
   const stats = {
     upcoming: events.filter(e => e.status === 'upcoming').length,
@@ -63,37 +84,66 @@ export default function EventsManager() {
   };
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      $selectedEventIds.set(filteredEvents.map(ev => ev.id));
-    } else {
-      $selectedEventIds.set([]);
-    }
+    $selectedEventIds.set(e.target.checked ? filteredEvents.map(ev => ev.id) : []);
   };
 
   const handleSelectOne = (id: string, checked: boolean) => {
-    if (checked) {
-      $selectedEventIds.set([...selectedIds, id]);
-    } else {
-      $selectedEventIds.set(selectedIds.filter(sId => sId !== id));
-    }
+    if (checked) $selectedEventIds.set([...selectedIds, id]);
+    else $selectedEventIds.set(selectedIds.filter(sId => sId !== id));
   };
 
-  const handleDeleteSelected = () => {
-    if (selectedIds.length > 0) {
-      deleteEvents(selectedIds);
-    }
+  // Commit immediately so Undo targets this deletion, while a local snapshot
+  // keeps the removed row mounted only for its exit transition.
+  const requestDelete = (ids: string[]) => {
+    if (ids.length === 0) return;
+    const rows = events.filter(event => ids.includes(event.id));
+    if (rows.length === 0) return;
+    setLeavingEvents(prev => [...prev.filter(event => !ids.includes(event.id)), ...rows]);
+    setLeavingIds(prev => Array.from(new Set([...prev, ...ids])));
+    deleteEvents(ids);
+    announce(`Deleted ${ids.length} event${ids.length === 1 ? '' : 's'}. Use Undo to restore.`);
+    window.setTimeout(() => {
+      setLeavingEvents(prev => prev.filter(event => !ids.includes(event.id)));
+      setLeavingIds(prev => prev.filter(x => !ids.includes(x)));
+    }, 300);
   };
 
-  if (!isOpen) return null;
+  const handleDeleteSelected = () => requestDelete(selectedIds);
+
+  const trapFocus = (e: React.KeyboardEvent) => {
+    if (e.key !== 'Tab' || !dialogRef.current) return;
+    const f = Array.from(dialogRef.current.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'))
+      .filter(el => !el.hasAttribute('disabled') && el.offsetParent !== null);
+    if (f.length === 0) return;
+    const first = f[0], last = f[f.length - 1];
+    const active = document.activeElement as HTMLElement;
+    if (e.shiftKey && active === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus(); }
+  };
+
+  if (!visible) return null;
+
+  const sortAria = (field: 'date' | 'title'): 'ascending' | 'descending' | 'none' =>
+    sort.by === field ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" role="dialog" aria-modal="true">
-      <div className="bg-surface w-full max-w-6xl max-h-[90vh] rounded-xl shadow-2xl flex flex-col border border-white/10 overflow-hidden">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm ${closing ? 'backdrop-out' : 'backdrop-in'}`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Events Manager"
+      onMouseDown={(e) => { if (e.target === e.currentTarget) requestClose(); }}
+    >
+      <div
+        ref={dialogRef}
+        onKeyDown={trapFocus}
+        className={`bg-surface w-full max-w-6xl max-h-[90vh] rounded-xl shadow-2xl flex flex-col border border-white/10 overflow-hidden ${closing ? 'overlay-out' : 'overlay-in'}`}
+      >
 
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-white/10 bg-void/50">
           <h2 className="text-2xl font-bold display-font">Events Manager</h2>
-          <button ref={firstFocusRef} className="btn btn-square btn-ghost text-current" onClick={() => $eventsManagerOpen.set(false)} aria-label="Close Events Manager">
+          <button ref={firstFocusRef} className="btn btn-square btn-ghost text-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={requestClose} aria-label="Close Events Manager">
             <X size={24} />
           </button>
         </div>
@@ -101,36 +151,41 @@ export default function EventsManager() {
         {/* Toolbar */}
         <div className="p-4 flex flex-wrap gap-4 items-center justify-between border-b border-white/10 bg-surface/50">
           <div className="flex flex-wrap gap-4 items-center">
-            <button className="btn btn-primary btn-sm notch-br gap-2" onClick={() => { setEditingEvent(null); setIsFormOpen(true); }}>
-              <Plus size={16} /> Create
-            </button>
-            <button className="btn btn-error btn-sm notch-br gap-2" disabled={selectedIds.length === 0} onClick={handleDeleteSelected}>
-              <Trash size={16} /> Delete Selected
+            <button className="btn btn-primary btn-sm notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => { setEditingEvent(null); setIsFormOpen(true); }}>
+              <Plus size={16} /> Create event
             </button>
 
             <div className="flex gap-2 border-l border-white/10 pl-4">
-              <button className="btn btn-ghost btn-sm notch-br px-2" disabled={undoStack.length === 0} onClick={undoEventAction} aria-label="Undo">
+              <button className="btn btn-ghost btn-sm notch-br px-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" disabled={undoStack.length === 0} onClick={() => { undoEventAction(); announce('Undo applied across manager, rollups, and listings.'); }} aria-label="Undo last change">
                 <ArrowUUpLeft size={18} />
               </button>
-              <button className="btn btn-ghost btn-sm notch-br px-2" disabled={redoStack.length === 0} onClick={redoEventAction} aria-label="Redo">
+              <button className="btn btn-ghost btn-sm notch-br px-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" disabled={redoStack.length === 0} onClick={() => { redoEventAction(); announce('Redo applied across manager, rollups, and listings.'); }} aria-label="Redo last change">
                 <ArrowUUpRight size={18} />
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex gap-2">
-              <span className="badge badge-neutral">Upcoming: {stats.upcoming}</span>
-              <span className="badge badge-accent">Featured: {stats.featured}</span>
-              <span className="badge">Past: {stats.past}</span>
-            </div>
+          <div className="flex items-center gap-2 text-sm" aria-live="polite">
+            <span className="badge badge-neutral">Upcoming: {stats.upcoming}</span>
+            <span className="badge badge-accent">Featured: {stats.featured}</span>
+            <span className="badge">Past: {stats.past}</span>
           </div>
         </div>
+
+        {/* Animated bulk action bar — mounts with an entrance when selection is non-empty */}
+        {selectedIds.length > 0 && (
+          <div className="bulk-bar-in overflow-hidden px-4 py-3 flex items-center justify-between gap-4 border-b border-accent/30 bg-accent/10" role="region" aria-label="Bulk selection actions">
+            <span className="text-sm font-medium">{selectedIds.length} selected</span>
+            <button className="btn btn-error btn-sm notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={handleDeleteSelected}>
+              <Trash size={16} /> Delete selected
+            </button>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="p-4 flex flex-wrap gap-4 items-center border-b border-white/10 bg-surface/30 text-sm">
           <select
-            className="select select-sm select-bordered notch-br"
+            className="select select-sm select-bordered notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             value={filter.status}
             onChange={e => $eventsFilter.set({ ...filter, status: e.target.value as any })}
             aria-label="Filter by status"
@@ -142,7 +197,7 @@ export default function EventsManager() {
           </select>
 
           <select
-            className="select select-sm select-bordered notch-br"
+            className="select select-sm select-bordered notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             value={filter.category}
             onChange={e => $eventsFilter.set({ ...filter, category: e.target.value as any })}
             aria-label="Filter by category"
@@ -156,44 +211,50 @@ export default function EventsManager() {
           </select>
 
           {(filter.status || filter.category) && (
-            <button className="btn btn-ghost btn-sm text-gray-400" onClick={() => $eventsFilter.set({ status: '', category: '' })}>Clear filters</button>
+            <button className="btn btn-ghost btn-sm text-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => $eventsFilter.set({ status: '', category: '' })}>Clear filters</button>
           )}
         </div>
 
+        {/* First-run coachmark */}
+        {showCoach && (
+          <div className="px-4 py-3 flex items-center justify-between gap-4 bg-ink/20 border-b border-white/10 text-sm" role="note">
+            <span>Tip: select rows to bulk-delete, filter by status or category, sort by column, and press <kbd className="kbd kbd-xs">Ctrl</kbd>+<kbd className="kbd ksd-xs">K</kbd> to jump anywhere.</span>
+            <button className="btn btn-ghost btn-xs focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => setShowCoach(false)} aria-label="Dismiss tip">Got it</button>
+          </div>
+        )}
+
         {/* Table */}
         <div className="flex-1 overflow-auto p-4 bg-void">
-          {events.length === 0 ? (
+          {events.length === 0 && leavingEvents.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-8">
-              <p className="text-xl text-gray-400 mb-4">No events found in the catalog.</p>
-              <button className="btn btn-primary notch-br" onClick={() => { setEditingEvent(null); setIsFormOpen(true); }}>Create your first event</button>
+              <p className="text-xl text-gray-400 mb-4">No events found in the catalog. Create your first event to start building the schedule.</p>
+              <button className="btn btn-primary notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => { setEditingEvent(null); setIsFormOpen(true); }}>Create event</button>
             </div>
           ) : filteredEvents.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center text-center p-8">
               <p className="text-xl text-gray-400 mb-4">No events match the current filters.</p>
-              <button className="btn btn-outline notch-br" onClick={() => $eventsFilter.set({ status: '', category: '' })}>Clear filters</button>
+              <button className="btn btn-outline notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => $eventsFilter.set({ status: '', category: '' })}>Clear filters</button>
             </div>
           ) : (
             <table className="table w-full">
               <thead>
                 <tr>
                   <th>
-                    <label>
-                      <input type="checkbox" className="checkbox checkbox-sm notch-br"
-                        checked={filteredEvents.length > 0 && selectedIds.length === filteredEvents.length}
-                        onChange={handleSelectAll}
-                        aria-label="Select all"
-                      />
-                    </label>
+                    <input type="checkbox" className="checkbox checkbox-sm notch-br"
+                      checked={filteredEvents.length > 0 && selectedIds.length === filteredEvents.length}
+                      onChange={handleSelectAll}
+                      aria-label="Select all events"
+                    />
                   </th>
-                  <th className="cursor-pointer hover:bg-white/5" onClick={() => handleToggleSort('title')}>
-                    <div className="flex items-center gap-1">
+                  <th>
+                    <button type="button" className="flex items-center gap-1 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => handleToggleSort('title')} aria-sort={sortAria('title')}>
                       Title {sort.by === 'title' && (sort.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>)}
-                    </div>
+                    </button>
                   </th>
-                  <th className="cursor-pointer hover:bg-white/5" onClick={() => handleToggleSort('date')}>
-                    <div className="flex items-center gap-1">
+                  <th>
+                    <button type="button" className="flex items-center gap-1 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => handleToggleSort('date')} aria-sort={sortAria('date')}>
                       Date {sort.by === 'date' && (sort.direction === 'asc' ? <ArrowUp size={14}/> : <ArrowDown size={14}/>)}
-                    </div>
+                    </button>
                   </th>
                   <th>City</th>
                   <th>Category</th>
@@ -202,36 +263,41 @@ export default function EventsManager() {
                 </tr>
               </thead>
               <tbody>
-                {filteredEvents.map(event => (
-                  <tr key={event.id} className="hover:bg-white/5 transition-colors group">
-                    <td>
-                      <label>
+                {filteredEvents.map(event => {
+                  const leaving = leavingIds.includes(event.id);
+                  return (
+                    <tr key={event.id} className={`group ${leaving ? 'row-exit' : 'row-enter'}`}>
+                      <td>
                         <input type="checkbox" className="checkbox checkbox-sm notch-br"
+                          disabled={leaving}
                           checked={selectedIds.includes(event.id)}
                           onChange={e => handleSelectOne(event.id, e.target.checked)}
                           aria-label={`Select ${event.title}`}
                         />
-                      </label>
-                    </td>
-                    <td className="font-medium">{event.title}</td>
-                    <td>{event.date}</td>
-                    <td>{event.city}</td>
-                    <td>{event.category}</td>
-                    <td>
-                      <div className={`badge badge-sm notch-br ${
-                        event.status === 'featured' ? 'badge-accent' :
-                        event.status === 'past' ? 'badge-neutral' : 'badge-primary'
-                      }`}>
-                        {event.status}
-                      </div>
-                    </td>
-                    <td>
-                      <button className="btn btn-xs btn-ghost opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity" onClick={() => { setEditingEvent(event); setIsFormOpen(true); }}>
-                        Edit
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="font-medium">{event.title}</td>
+                      <td className="tabular-nums">{formatEventDate(event.date)}</td>
+                      <td>{event.city}</td>
+                      <td>{event.category}</td>
+                      <td>
+                        <div className={`badge badge-sm notch-br ${
+                          event.status === 'featured' ? 'badge-accent' :
+                          event.status === 'past' ? 'badge-neutral' : 'badge-primary'
+                        }`}>
+                          {event.status}
+                        </div>
+                      </td>
+                      <td className="flex gap-1">
+                        <button disabled={leaving} className="btn btn-xs btn-ghost opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => { setEditingEvent(event); setIsFormOpen(true); }}>
+                          Edit
+                        </button>
+                        <button disabled={leaving} className="btn btn-xs btn-ghost text-error opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => requestDelete([event.id])} aria-label={`Delete ${event.title}`}>
+                          <Trash size={14} />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           )}

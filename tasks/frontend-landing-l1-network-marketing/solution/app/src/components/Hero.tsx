@@ -14,7 +14,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="hero relative min-h-screen flex flex-col" id="hero" aria-label="Hero">
+    <section className="hero relative min-h-screen flex flex-col overflow-clip" id="hero" aria-label="Hero">
       <div className="container mx-auto px-4 z-10 pt-20 grid grid-cols-1 md:grid-cols-2 gap-4 bento-row">
 
         <div className="bento-mission load-target notch-br bg-surface/80 p-8 backdrop-blur-sm border border-white/10 flex flex-col justify-between min-h-[300px]">

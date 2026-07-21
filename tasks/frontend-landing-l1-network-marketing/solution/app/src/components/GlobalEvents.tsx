@@ -1,22 +1,42 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useStore } from '@nanostores/react';
-import { $events, $eventsManagerOpen } from '../store';
+import { $events, $eventsFilter, $eventsSort, $eventsManagerOpen, formatEventDate } from '../store';
 import { ArrowRight } from 'phosphor-react';
 
 export default function GlobalEvents() {
   const events = useStore($events);
-  const featuredEvent = events.find(e => e.featured) || events[0];
+  const filter = useStore($eventsFilter);
+  const sort = useStore($eventsSort);
+
+  const featuredEvents = useMemo(() => events.filter(e => e.featured), [events]);
+
+  // Landing listing mirrors the manager's shared collection, filter, and sort so
+  // create / edit / delete / filter are reflected here without a reload.
+  const listing = useMemo(() => {
+    return events.filter(e => {
+      if (filter.status && e.status !== filter.status) return false;
+      if (filter.category && e.category !== filter.category) return false;
+      return true;
+    }).sort((a, b) => {
+      const va = a[sort.by];
+      const vb = b[sort.by];
+      if (va < vb) return sort.direction === 'asc' ? -1 : 1;
+      if (va > vb) return sort.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }, [events, filter, sort]);
+
+  const filtered = Boolean(filter.status || filter.category);
 
   return (
     <section className="events chapter py-24 bg-surface text-current relative z-20" id="events" aria-label="Global Events">
-      <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+      <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 
         <div className="events-copy">
           <h2 className="events-headline text-5xl md:text-7xl font-bold display-font tracking-tight mb-8 min-h-[4rem]" id="eventsHeadline" aria-label="RIDGE GLOBAL EVENTS">
             {/* Decoded by JS */}
           </h2>
           <div className="events-blurb text-xl text-gray-400 max-w-lg mb-8" id="eventsBlurb" aria-hidden="true">
-            {/* Handled by JS animation if needed, or fallback */}
             <p>Join our worldwide network of developers, founders, and enterprise partners building the future of institutional infrastructure.</p>
           </div>
           <p className="sr-only" id="eventsBlurbA11y">
@@ -24,27 +44,72 @@ export default function GlobalEvents() {
           </p>
           <button
             type="button"
-            className="btn btn-outline notch-br text-current border-current"
+            className="btn btn-outline notch-br text-current border-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
             onClick={() => $eventsManagerOpen.set(true)}
           >
             View all events
           </button>
         </div>
 
-        {featuredEvent && (
-          <div className="events-card notch-br bg-void border border-white/10 p-8 lg:p-12 text-white group hover:border-white/20 transition-colors">
-            <div className="events-card-block mb-8">
+        <div className="flex flex-col gap-4">
+          {featuredEvents.length === 0 ? (
+            <div className="events-card notch-br bg-void border border-white/10 p-8 lg:p-12 text-white">
               <span className="w-12 h-1 bg-accent block mb-4"></span>
-              <p className="text-sm font-bold tracking-widest uppercase text-accent mb-2">Featured / {featuredEvent.category}</p>
-              <h3 className="text-3xl display-font font-bold line-clamp-2">{featuredEvent.title}</h3>
-              <p className="text-gray-400 mt-2">{featuredEvent.city} — {new Date(featuredEvent.date).toLocaleDateString()}</p>
+              <p className="text-sm font-bold tracking-widest uppercase text-accent mb-2">Featured</p>
+              <p className="text-gray-400">No featured events yet — mark an event featured in Events Manager to surface it here.</p>
             </div>
-            <button type="button" className="cta notch-br btn btn-primary flex items-center gap-2 group-hover:brightness-110 transition-all">
-              Learn more <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-            </button>
-          </div>
-        )}
+          ) : (
+            featuredEvents.map((fe) => (
+              <div key={fe.id} className="events-card notch-br bg-void border border-white/10 p-8 lg:p-12 text-white group hover:border-white/20 transition-colors" data-featured-event={fe.id}>
+                <div className="events-card-block mb-8">
+                  <span className="w-12 h-1 bg-accent block mb-4"></span>
+                  <p className="text-sm font-bold tracking-widest uppercase text-accent mb-2">Featured / {fe.category}</p>
+                  <h3 className="text-3xl display-font font-bold line-clamp-2">{fe.title}</h3>
+                  <p className="text-gray-400 mt-2">{fe.city} — {formatEventDate(fe.date)}</p>
+                </div>
+                <button type="button" className="cta notch-br btn btn-primary flex items-center gap-2 group-hover:brightness-110 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
+                  Learn more <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
 
+      {/* Live landing listing (shares the manager's collection / filter / sort) */}
+      <div className="container mx-auto px-4 mt-12">
+        <div className="notch-br bg-void border border-white/10 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold display-font tracking-wide">Global Events lineup</h3>
+            {filtered && (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm text-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                onClick={() => $eventsFilter.set({ status: '', category: '' })}
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+          {listing.length === 0 ? (
+            <p className="text-gray-400 text-sm py-6 text-center">No events match the active filter.</p>
+          ) : (
+            <ul className="divide-y divide-white/5" data-events-listing aria-label="Global events listing">
+              {listing.map((e) => (
+                <li key={e.id} className="flex items-center justify-between gap-4 py-3" data-event-row={e.id}>
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{e.title}</p>
+                    <p className="text-xs text-gray-500">{e.city} · {e.category}</p>
+                  </div>
+                  <div className="flex items-center gap-3 shrink-0">
+                    <time className="text-sm text-gray-400 tabular-nums" dateTime={e.date}>{formatEventDate(e.date)}</time>
+                    <span className={`badge badge-sm notch-br ${e.status === 'featured' ? 'badge-accent' : e.status === 'past' ? 'badge-neutral' : 'badge-primary'}`}>{e.status}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </section>
   );

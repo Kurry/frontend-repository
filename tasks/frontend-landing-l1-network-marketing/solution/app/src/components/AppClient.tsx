@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useStore } from '@nanostores/react';
-import { $theme } from '../store';
+import { $theme, $a11yStatus } from '../store';
 import Header from './Header';
 import Hero from './Hero';
 import WhyRidge from './WhyRidge';
@@ -15,6 +15,7 @@ import WebMCP from './WebMCP';
 
 export default function AppClient() {
   const theme = useStore($theme);
+  const a11yStatus = useStore($a11yStatus);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -40,6 +41,8 @@ export default function AppClient() {
       </footer>
       <EventsManager />
       <ExportCatalog />
+      {/* Persistent polite live region for cross-component announcements. */}
+      <div aria-live="polite" role="status" className="sr-only" data-a11y-status>{a11yStatus}</div>
     </div>
   );
 }

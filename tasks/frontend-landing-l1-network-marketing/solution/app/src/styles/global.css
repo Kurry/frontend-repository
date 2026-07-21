@@ -12,15 +12,35 @@
   --color-accent-hover: #f43f5e;
 }
 
+/* ---- Bundled open-license display + body faces (no CDN) ---- */
+@font-face {
+  font-family: 'Space Grotesk';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url('/fonts/space-grotesk-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('/fonts/dm-sans-latin-wght-normal.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+html { scroll-behavior: auto; }
+
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'DM Sans', system-ui, sans-serif;
   background-color: var(--color-void);
   color: white;
   overflow-x: hidden;
 }
 
 h1, h2, h3, h4, h5, h6, .display-font, .chapter-title {
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
 }
 
 .notch-br {
@@ -36,14 +56,97 @@ h1, h2, h3, h4, h5, h6, .display-font, .chapter-title {
   border-bottom-left-radius: 4px;
 }
 
-/* Reduced motion support */
+/* ---- Why Ridge progressive sticky pile (desktop only) ---- */
+.why-card { position: static; }
+@media (min-width: 768px) {
+  .why-card {
+    position: sticky;
+    top: calc(96px + var(--i, 0) * 32px);
+    z-index: calc(var(--i, 0) + 1);
+  }
+}
+
+/* ---- Get started trio rise (below lg only), per-card stagger via transition-delay ---- */
+@media (max-width: 1023px) {
+  .trio-card {
+    transform: translateY(50%);
+    opacity: 0;
+    transition: transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition-delay: calc(2s + var(--i, 0) * 0.4s);
+  }
+  #trio.trio-in .trio-card {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ---- Events Manager row enter / exit ---- */
+@keyframes ridge-row-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+tbody tr.row-enter { animation: ridge-row-in 0.32s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+tbody tr.row-exit {
+  opacity: 0;
+  transform: translateX(24px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* ---- Bulk action bar entrance ---- */
+@keyframes ridge-bulk-in {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.bulk-bar-in { animation: ridge-bulk-in 0.28s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+
+/* ---- Overlay (palette / export / manager / form) enter & exit ---- */
+@keyframes ridge-overlay-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes ridge-overlay-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.96) translateY(8px); }
+}
+.overlay-in  { animation: ridge-overlay-in 0.18s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+.overlay-out { animation: ridge-overlay-out 0.16s ease-in both; }
+
+@keyframes ridge-backdrop-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ridge-backdrop-out { from { opacity: 1; } to { opacity: 0; } }
+.backdrop-in  { animation: ridge-backdrop-in 0.18s ease both; }
+.backdrop-out { animation: ridge-backdrop-out 0.16s ease both; }
+
+/* ---- Mega menu drawer slide ---- */
+@keyframes ridge-drawer-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes ridge-drawer-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
+.drawer-in  { animation: ridge-drawer-in 0.3s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+.drawer-out { animation: ridge-drawer-out 0.24s ease-in both; }
+
+/* ---- Contact success rise ---- */
+@keyframes ridge-success-in { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: scale(1); } }
+.success-in { animation: ridge-success-in 0.4s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
+
+/* ---- Command palette active row ---- */
+.palette-row[aria-selected="true"] {
+  background-color: color-mix(in srgb, var(--color-accent) 22%, transparent);
+  color: var(--color-accent);
+  box-shadow: inset 3px 0 0 var(--color-accent);
+  font-weight: 600;
+}
+
+/* ---- Reduced motion: kill all signature motion, smooth scroll, and entrance offsets ---- */
 @media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
+  html, body { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    transition-duration: 0.001ms !important;
+    transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
+  .why-card { position: static !important; top: auto !important; }
+  .trio-card { transform: none !important; opacity: 1 !important; }
+  .load-target { transform: none !important; clip-path: none !important; opacity: 1 !important; }
 }
 
 /* Thematic custom properties handled via classes or data-theme */

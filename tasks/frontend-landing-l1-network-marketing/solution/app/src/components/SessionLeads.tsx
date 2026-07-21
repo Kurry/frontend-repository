@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useStore } from '@nanostores/react';
-import { $leads, $theme, undoLastLead } from '../store';
+import { $leads, $theme, undoLastLead, announce } from '../store';
 import { Download, Copy, ArrowUUpLeft } from 'phosphor-react';
 
 export default function SessionLeads() {
@@ -23,40 +23,59 @@ export default function SessionLeads() {
     const a = document.createElement('a');
     a.href = url;
     a.download = 'ridge-session-leads.json';
+    document.body.appendChild(a);
     a.click();
+    a.remove();
     URL.revokeObjectURL(url);
+    announce('Downloaded ridge-session-leads.json.');
   };
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(getExportData());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 3000);
+    try {
+      await navigator.clipboard.writeText(getExportData());
+      setCopied(true);
+      announce('Copied leads JSON to clipboard.');
+      setTimeout(() => setCopied(false), 3000);
+    } catch {
+      setCopied(false);
+      announce('Leads JSON copy was blocked by the browser.');
+    }
+  };
+
+  const handleUndo = () => {
+    if (leads.length === 0) return;
+    const removed = leads[0];
+    undoLastLead();
+    announce(`Undo last lead removed ${removed.payload.name}.`);
   };
 
   return (
     <section className="session-leads py-12 bg-surface/30 border-t border-white/10" id="session-leads-section" aria-label="Session Leads">
       <div className="container mx-auto px-4 max-w-5xl">
-        <div className="flex justify-between items-end mb-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8">
           <div>
             <h2 className="text-2xl font-bold display-font">Session Leads</h2>
-            <p className="text-sm text-gray-400 mt-1">Total: {leads.length}</p>
+            <p className="text-sm text-gray-400 mt-1" aria-live="polite">Total: {leads.length}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 sm:justify-end">
              <button
-               className="btn btn-sm btn-ghost notch-br gap-2"
-               disabled={leads.length < 2}
-               onClick={undoLastLead}
+               aria-label="Undo last lead"
+               className="btn btn-sm btn-ghost notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+               disabled={leads.length === 0}
+               onClick={handleUndo}
              >
                <ArrowUUpLeft size={16} /> Undo last lead
              </button>
              <button
-               className="btn btn-sm btn-outline notch-br gap-2 text-current border-current"
+               aria-label="Copy leads JSON"
+               className="btn btn-sm btn-outline notch-br gap-2 text-current border-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                onClick={handleCopy}
              >
                <Copy size={16} /> {copied ? 'Copied' : 'Copy leads JSON'}
              </button>
              <button
-               className="btn btn-sm btn-primary notch-br gap-2"
+               aria-label="Download leads JSON"
+               className="btn btn-sm btn-primary notch-br gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                onClick={handleDownload}
              >
                <Download size={16} /> Download leads JSON
@@ -67,17 +86,17 @@ export default function SessionLeads() {
         <div className="bg-void notch-br border border-white/10 p-6 min-h-[200px]">
           {leads.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-              <p className="text-gray-400">Contact submissions will appear here.</p>
+              <p className="text-gray-400">Contact submissions will appear here. Submit the contact form above to capture a session lead.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {leads.map(lead => (
-                <div key={lead.id} className="p-4 bg-surface/50 border border-white/5 rounded flex justify-between items-center">
-                  <div>
+                <div key={lead.id} className="p-4 bg-surface/50 border border-white/5 rounded flex justify-between items-center gap-3 row-enter">
+                  <div className="min-w-0">
                     <span className="badge badge-sm badge-accent mr-3">{lead.kind}</span>
                     <span className="font-medium">{lead.payload.name} — {lead.payload.interest}</span>
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-gray-500 shrink-0">
                     {new Date(lead.submittedAt).toLocaleTimeString()}
                   </div>
                 </div>
@@ -86,9 +105,8 @@ export default function SessionLeads() {
           )}
         </div>
 
-        {/* ARIA live region for copied announcement */}
         <div aria-live="polite" className="sr-only">
-          {copied ? 'Copied' : ''}
+          {copied ? 'Copied leads JSON to clipboard.' : ''}
         </div>
       </div>
     </section>
