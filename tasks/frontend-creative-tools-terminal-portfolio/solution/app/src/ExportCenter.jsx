@@ -1,177 +1,215 @@
-import { useState } from 'preact/hooks';
+import { useState, useRef, useEffect } from 'preact/hooks';
 import * as v from 'valibot';
-import { projects, mode, theme, identity, skills, cookieConsent, profiles, THEMES } from './store.js';
-import { IdentitySchema, ProjectSchema, SkillSchema } from './forms.jsx';
+import {
+  projects, buildPortfolioDocument, applyImportedDocument, configTab,
+  ProjectSchema, IdentitySchema, SkillSchema, THEMES,
+} from './store.js';
 
-// Mirrors the per-theme custom properties declared in index.css, keyed by
-// the PortfolioDocument/Theme CSS contract names (background/text/accent/chrome)
-// rather than the internal CSS variable names.
+const ProfileImportSchema = v.object({
+  name: v.pipe(v.string(), v.minLength(1), v.maxLength(40)),
+  theme: v.picklist(THEMES),
+  featuredSlugs: v.pipe(v.array(v.string()), v.maxLength(3)),
+});
+
+const PortfolioImportSchema = v.object({
+  schemaVersion: v.literal('1.0'),
+  identity: IdentitySchema,
+  theme: v.picklist(THEMES),
+  consent: v.picklist(['not_set', 'accepted', 'declined']),
+  projects: v.array(ProjectSchema),
+  skills: v.array(SkillSchema),
+  featuredSlugs: v.pipe(v.array(v.string()), v.maxLength(3)),
+  profiles: v.array(ProfileImportSchema),
+});
+
 const THEME_TOKENS = {
   dark: { background: '#0f1115', text: '#e2e8f0', accent: '#38bdf8', chrome: '#334155' },
   light: { background: '#f8fafc', text: '#0f172a', accent: '#0284c7', chrome: '#cbd5e1' },
   retro: { background: '#2a211c', text: '#ffb000', accent: '#ff6600', chrome: '#7a5c29' },
-  glass: { background: '#000000', text: '#ffffff', accent: '#ffffff', chrome: 'rgba(255, 255, 255, 0.2)' },
+  glass: { background: '#000000', text: '#ffffff', accent: '#ffffff', chrome: 'rgba(255,255,255,0.2)' },
 };
 
-const ProfileSchema = v.object({
-  name: v.pipe(v.string(), v.minLength(1, "Profile name is required"), v.maxLength(40, "Profile name must be at most 40 characters")),
-  theme: v.picklist(THEMES, "Invalid theme"),
-  featuredSlugs: v.pipe(v.array(v.string()), v.maxLength(3, "At most 3 featured slugs allowed"))
-});
+const TABS = [
+  { id: 'json', label: 'Portfolio JSON', file: 'portfolio.json', mime: 'application/json' },
+  { id: 'config', label: 'Terminal Config', file: 'terminal.config', mime: 'text/plain' },
+  { id: 'css', label: 'Theme CSS', file: 'theme.css', mime: 'text/css' },
+];
 
-// Every PortfolioDocument key is required (profiles/skills/featuredSlugs may
-// be empty arrays, but must be present) so a partial document — e.g. one
-// missing theme/consent/skills — is rejected instead of silently applied.
-const PortfolioImportSchema = v.object({
-  schemaVersion: v.literal('1.0'),
-  identity: IdentitySchema,
-  theme: v.picklist(THEMES, "Invalid theme"),
-  consent: v.picklist(['not_set', 'accepted', 'declined'], "Invalid consent value"),
-  projects: v.array(ProjectSchema),
-  skills: v.array(SkillSchema),
-  featuredSlugs: v.pipe(v.array(v.string()), v.maxLength(3, "At most 3 featured slugs allowed")),
-  profiles: v.array(ProfileSchema)
-});
-
-function downloadTextFile(filename, text, mimeType) {
-  const blob = new Blob([text], { type: mimeType });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+function buildPreviews() {
+  const doc = buildPortfolioDocument();
+  const json = JSON.stringify(doc, null, 2);
+  const tokens = THEME_TOKENS[doc.theme] || THEME_TOKENS.dark;
+  const css = `:root[data-theme="${doc.theme}"] {\n  --background: ${tokens.background};\n  --text: ${tokens.text};\n  --accent: ${tokens.accent};\n  --chrome: ${tokens.chrome};\n}\n`;
+  const featured = doc.featuredSlugs.join(',');
+  const config = [
+    '# terminal-portfolio config',
+    `theme = ${doc.theme}`,
+    `display_name = ${doc.identity.displayName}`,
+    `email = ${doc.identity.email}`,
+    `location = ${doc.identity.location}`,
+    `featured = ${featured}`,
+  ].join('\n');
+  return { json, config, css };
 }
 
-function PreviewBlock({ title, text, filename, mimeType }) {
-  const [copied, setCopied] = useState(false);
+async function copyText(text) {
+  try {
+    if (navigator.clipboard?.writeText) { await navigator.clipboard.writeText(text); return true; }
+  } catch { /* fall through */ }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { return document.execCommand('copy'); }
+    finally { ta.remove(); }
+  } catch { return false; }
+}
 
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // Clipboard permission denied or unavailable; leave the preview visible
-      // for a manual select-and-copy instead of throwing.
-    }
-  };
-
-  return (
-    <div>
-      <div className="flex justify-between items-center mb-2">
-        <h3 className="font-bold">{title}</h3>
-        <div className="flex gap-2">
-          <button type="button" className="btn btn-xs btn-outline" onClick={handleCopy} aria-label={`Copy ${title}`}>
-            {copied ? 'Copied!' : 'Copy'}
-          </button>
-          <button type="button" className="btn btn-xs btn-outline" onClick={() => downloadTextFile(filename, text, mimeType)} aria-label={`Download ${title}`}>
-            Download
-          </button>
-        </div>
-      </div>
-      <pre className="bg-base-300 p-4 rounded text-xs overflow-x-auto">{text}</pre>
-    </div>
-  );
+function downloadText(filename, text, mime) {
+  const blob = new Blob([text], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export default function ExportCenter() {
-  const [importText, setImportText] = useState("");
-  const [importError, setImportError] = useState("");
+  const [tab, setTab] = useState('json');
+  const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState('');
+  const [importText, setImportText] = useState('');
+  const [importError, setImportError] = useState('');
+  const [importOk, setImportOk] = useState('');
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef(null);
 
-  const featuredSlugs = projects.value.filter(p => p.featured).map(p => p.slug);
+  // /import opens export center on the import panel.
+  useEffect(() => { if (configTab.value === 'import') setTab('json'); }, [configTab.value]);
 
-  const jsonPreview = JSON.stringify({
-    schemaVersion: '1.0',
-    identity: identity.value,
-    theme: theme.value,
-    consent: cookieConsent.value,
-    projects: projects.value,
-    skills: skills.value,
-    featuredSlugs,
-    profiles: profiles.value
-  }, null, 2);
+  // Read projects so previews recompile live after any mutation.
+  const _live = projects.value; void _live;
+  const previews = buildPreviews();
+  const active = TABS.find((t) => t.id === tab);
+  const activeText = previews[tab];
 
-  const tokens = THEME_TOKENS[theme.value] || THEME_TOKENS.dark;
-  const cssPreview = `:root[data-theme="${theme.value}"] {\n  --background: ${tokens.background};\n  --text: ${tokens.text};\n  --accent: ${tokens.accent};\n  --chrome: ${tokens.chrome};\n}`;
+  const onCopy = async () => {
+    const ok = await copyText(activeText);
+    setCopied(ok);
+    setCopyError(ok ? '' : 'Copy was blocked. Select the preview text and copy it manually.');
+    if (ok) setTimeout(() => setCopied(false), 1500);
+  };
 
-  const configPreview = [
-    '# terminal-portfolio config',
-    `theme = ${theme.value}`,
-    `display_name = ${identity.value.name}`,
-    `email = ${identity.value.email}`,
-    `location = ${identity.value.location}`,
-    `featured = ${featuredSlugs.join(',')}`
-  ].join('\n');
-
-  const handleImport = () => {
-    try {
-       const result = v.safeParse(PortfolioImportSchema, JSON.parse(importText));
-       if (result.success) {
-          const importedProjects = result.output.projects;
-
-          const seenSlugs = new Set();
-          const duplicateSlug = importedProjects.find(p => {
-            if (seenSlugs.has(p.slug)) return true;
-            seenSlugs.add(p.slug);
-            return false;
-          });
-          if (duplicateSlug) {
-            setImportError(`Invalid import: duplicate slug "${duplicateSlug.slug}" found in projects`);
-            return;
-          }
-
-          const featuredCount = importedProjects.filter(p => p.featured).length;
-          if (featuredCount > 3) {
-            setImportError(`Invalid import: maximum 3 featured projects allowed, found ${featuredCount}`);
-            return;
-          }
-
-          const missingFeaturedSlug = result.output.featuredSlugs.find(
-            slug => !importedProjects.some(p => p.slug === slug)
-          );
-          if (missingFeaturedSlug) {
-            setImportError(`Invalid import: featuredSlugs references unknown slug "${missingFeaturedSlug}"`);
-            return;
-          }
-
-          projects.value = importedProjects;
-          identity.value = result.output.identity;
-          theme.value = result.output.theme;
-          cookieConsent.value = result.output.consent;
-          skills.value = result.output.skills;
-          profiles.value = result.output.profiles;
-          setImportError("");
-          alert("Import successful!");
-       } else {
-          const issue = result.issues[0];
-          const path = issue.path?.map(segment => segment.key).filter(key => key !== undefined).join('.') || 'document';
-          setImportError(`Invalid JSON schema at ${path}: ${issue.message}`);
-       }
-    } catch(err) {
-       setImportError("Invalid JSON: " + err.message);
+  const runImport = (text) => {
+    setImportOk('');
+    let parsed;
+    try { parsed = JSON.parse(text); }
+    catch (err) { setImportError(`Invalid JSON: ${err.message}. No projects were changed.`); return; }
+    const result = v.safeParse(PortfolioImportSchema, parsed);
+    if (!result.success) {
+      const issue = result.issues[0];
+      const path = issue.path?.map((s) => s.key).filter((k) => k !== undefined).join('.') || 'document';
+      setImportError(`Invalid Portfolio JSON at "${path}": ${issue.message}. Required keys are schemaVersion (1.0), identity, theme, consent, projects, skills, featuredSlugs, profiles. No projects were changed.`);
+      return;
     }
+    const doc = result.output;
+    const projectSlugs = doc.projects.map((project) => project.slug);
+    if (projectSlugs.length !== new Set(projectSlugs).size) {
+      setImportError('Invalid Portfolio JSON: projects contains duplicate slug values. No projects were changed.');
+      return;
+    }
+    const skillNames = doc.skills.map((skill) => skill.name.toLowerCase());
+    if (skillNames.length !== new Set(skillNames).size) {
+      setImportError('Invalid Portfolio JSON: skills contains duplicate names. Skill names must be unique regardless of letter case. No projects were changed.');
+      return;
+    }
+    const missing = doc.featuredSlugs.find((s) => !doc.projects.some((p) => p.slug === s));
+    if (missing) { setImportError(`Invalid Portfolio JSON: featuredSlugs references unknown slug "${missing}". No projects were changed.`); return; }
+    const dup = doc.featuredSlugs.length !== new Set(doc.featuredSlugs).size;
+    if (dup) { setImportError('Invalid Portfolio JSON: featuredSlugs contains duplicates. No projects were changed.'); return; }
+    const featSet = new Set(doc.projects.filter((p) => p.featured).map((p) => p.slug));
+    const mismatch = doc.featuredSlugs.length !== featSet.size || doc.featuredSlugs.some((s) => !featSet.has(s));
+    if (mismatch) { setImportError('Invalid Portfolio JSON: featuredSlugs must equal the set of projects with featured true. No projects were changed.'); return; }
+    const profileNames = doc.profiles.map((profile) => profile.name.toLowerCase());
+    if (profileNames.length !== new Set(profileNames).size) {
+      setImportError('Invalid Portfolio JSON: profiles contains duplicate names. Profile names must be unique regardless of letter case. No projects were changed.');
+      return;
+    }
+    for (const profile of doc.profiles) {
+      if (profile.featuredSlugs.length !== new Set(profile.featuredSlugs).size) {
+        setImportError(`Invalid Portfolio JSON: profile "${profile.name}" contains duplicate featuredSlugs. No projects were changed.`);
+        return;
+      }
+      const unknown = profile.featuredSlugs.find((slug) => !projectSlugs.includes(slug));
+      if (unknown) {
+        setImportError(`Invalid Portfolio JSON: profile "${profile.name}" references unknown project slug "${unknown}". No projects were changed.`);
+        return;
+      }
+    }
+    applyImportedDocument(doc);
+    setImportError('');
+    setImportOk(`Imported ${doc.projects.length} project(s), ${doc.skills.length} skill(s), theme "${doc.theme}". Board, /work, and all three tabs now match the imported state.`);
+  };
+
+  const onFile = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => { const t = String(reader.result || ''); setImportText(t); runImport(t); };
+    reader.onerror = () => setImportError('Could not read that file. Paste the JSON instead.');
+    reader.readAsText(file);
   };
 
   return (
-    <div className="h-full overflow-y-auto relative p-4 text-text-main flex flex-col gap-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-bold text-primary">Export Center</h2>
-        <button className="btn btn-sm btn-ghost" onClick={() => mode.value = 'board'}>&larr; Back to Board</button>
+    <div className="export-center surface-fade">
+      <h2 className="surface-h">Export Center</h2>
+
+      <div className="tab-row" role="tablist" aria-label="Export format">
+        {TABS.map((t) => (
+          <button key={t.id} role="tab" aria-selected={tab === t.id} type="button" className={`tab ${tab === t.id ? 'is-active' : ''}`} onClick={() => { setTab(t.id); setCopied(false); setCopyError(''); }}>{t.label}</button>
+        ))}
       </div>
 
-      <div className="bg-base-200 p-4 rounded border border-border">
-         <label className="font-bold mb-2 block" htmlFor="portfolio-import-json">Import Portfolio JSON</label>
-         <textarea id="portfolio-import-json" className="textarea textarea-bordered w-full h-24 font-mono text-xs" value={importText} onChange={e => setImportText(e.target.value)} placeholder="Paste JSON here..."></textarea>
-         {importError && <p className="text-error text-xs mt-1">{importError}</p>}
-         <button className="btn btn-primary btn-sm mt-2" onClick={handleImport}>Import JSON</button>
+      <div className="preview-block" key={tab}>
+        <div className="preview-actions">
+          <button type="button" className="btn btn-sm btn-ghost" onClick={onCopy} aria-label={`Copy ${active.label}`}>
+            <span className={`icon-[${copied ? 'tabler--check' : 'tabler--copy'}] size-4`} />
+            {copied ? 'Copied!' : 'Copy'}
+          </button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={() => downloadText(active.file, activeText, active.mime)} aria-label={`Download ${active.label}`}>
+            <span className="icon-[tabler--download] size-4" /> Download
+          </button>
+        </div>
+        {copyError && <p className="field-error" role="alert">{copyError}</p>}
+        <pre className="preview-pre" tabIndex={0}>{activeText}</pre>
       </div>
 
-      <PreviewBlock title="Portfolio JSON" text={jsonPreview} filename="portfolio.json" mimeType="application/json" />
-      <PreviewBlock title="Terminal Config" text={configPreview} filename="terminal.config" mimeType="text/plain" />
-      <PreviewBlock title="Theme CSS" text={cssPreview} filename="theme.css" mimeType="text/css" />
+      <div
+        className={`import-block ${dragOver ? 'is-drag' : ''}`}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => { e.preventDefault(); setDragOver(false); const f = e.dataTransfer?.files?.[0]; if (f) onFile(f); }}
+      >
+        <h3 className="panel-h">Import Portfolio JSON</h3>
+        <p className="field-hint">Paste a Portfolio JSON document, or drop a .json file here. A conforming document replaces the live collection; anything else is rejected without changing your projects.</p>
+        <label className="field-label" htmlFor="import-textarea">Portfolio JSON document</label>
+        <textarea id="import-textarea" className="textarea import-textarea" value={importText} onInput={(e) => { setImportText(e.target.value); setImportError(''); setImportOk(''); }} placeholder='{"schemaVersion":"1.0", ...}' spellCheck="false" />
+        <div aria-live="polite" className="form-live">
+          {importError && <p className="field-error" role="alert">{importError}</p>}
+          {importOk && <p className="field-success">{importOk}</p>}
+        </div>
+        <div className="import-actions">
+          <button type="button" className="btn btn-primary btn-sm" onClick={() => runImport(importText)}>Import JSON</button>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => fileRef.current?.click()}><span className="icon-[tabler--file-upload] size-4" /> Load file</button>
+          <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" onChange={(e) => onFile(e.target.files?.[0])} aria-label="Load a Portfolio JSON file" />
+        </div>
+      </div>
     </div>
   );
 }

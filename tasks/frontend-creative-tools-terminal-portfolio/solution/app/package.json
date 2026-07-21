@@ -9,6 +9,7 @@
     "dev": "vite"
   },
   "dependencies": {
+    "@iconify-json/tabler": "1.2.35",
     "@iconify/tailwind": "^1.2.0",
     "@preact/signals": "^2.9.4",
     "@tabler/icons": "^3.45.0",
