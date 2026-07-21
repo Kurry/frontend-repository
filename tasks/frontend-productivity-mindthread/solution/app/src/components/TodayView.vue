@@ -1,7 +1,7 @@
 <template>
   <div class="mx-auto max-w-3xl space-y-6">
     <header>
-      <h2 class="font-heading text-[1.35rem] font-semibold text-ink">Today</h2>
+      <h1 class="font-heading text-[1.35rem] font-semibold text-ink">Today</h1>
       <p class="mt-1 text-[0.9rem] text-inksoft">
         Every spark you capture today appears here, grouped by the thread it belongs to.
       </p>

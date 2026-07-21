@@ -33,6 +33,9 @@ export const useUiStore = defineStore('ui', () => {
 
   function setSearchQuery(query: string) {
     searchQuery.value = query
+    if (query.trim()) {
+      openThreadId.value = null
+    }
   }
 
   function clearSearch() {

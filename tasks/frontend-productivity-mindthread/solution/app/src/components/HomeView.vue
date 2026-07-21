@@ -1,9 +1,15 @@
 <template>
   <div class="space-y-6">
-    <!-- Capture bar -->
+    <header>
+      <h1 class="font-heading text-[1.35rem] font-semibold text-ink">Home</h1>
+      <p class="mt-1 text-[0.9rem] text-inksoft">
+        Capture sparks, weave them into threads, and export your workspace.
+      </p>
+    </header>
+
     <section class="card p-5">
       <form @submit.prevent="handleAddSpark">
-        <h2 class="block font-heading text-[1rem] font-semibold text-ink">
+        <h2 class="font-heading text-[1rem] font-semibold text-ink">
           <label for="capture-input">Capture a spark</label>
         </h2>
         <textarea
@@ -21,27 +27,24 @@
         </p>
         <div class="mt-3 flex flex-wrap items-center justify-between gap-3">
           <span class="meta-mono">Press Enter or select Add Spark</span>
-          <button type="submit" class="btn-primary">Add Spark</button>
+          <button type="submit" class="btn-primary" :disabled="capturing">Add Spark</button>
         </div>
       </form>
     </section>
 
     <div class="flex flex-col gap-6 lg:flex-row">
-      <!-- Main column -->
       <div class="min-w-0 flex-1 space-y-4">
-        <!-- Search -->
         <section class="card p-4">
           <label for="search-input" class="field-label">Search</label>
           <div class="mt-1 flex items-center gap-2">
             <input
               id="search-input"
               v-model="searchQuery"
-              type="text"
+              type="search"
               class="input-field"
               placeholder="Search sparks, reflections and threads"
               autocomplete="off"
               @keydown.escape="searchQuery = ''"
-              @keydown.enter.prevent
             />
             <button
               v-if="searchQuery"
@@ -54,10 +57,8 @@
           </div>
         </section>
 
-        <!-- Tag filter -->
         <TagFilterPanel v-model:active-tags="activeTags" />
 
-        <!-- Search results, thread detail, or inbox -->
         <SearchResults
           v-if="searchActive"
           :query="trimmedQuery"
@@ -72,7 +73,7 @@
 
         <section v-else class="card p-5">
           <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 class="font-heading text-[1rem] font-semibold text-ink">Unthreaded</h3>
+            <h2 class="font-heading text-[1rem] font-semibold text-ink">Unthreaded</h2>
             <span class="meta-mono">{{ inboxCountLabel }}</span>
           </div>
 
@@ -82,17 +83,7 @@
             body="A spark is a quick, fleeting thought worth keeping. Type it in the capture bar above and select Add Spark to store it here until you weave it into a thread."
           >
             <template #icon>
-              <svg
-                viewBox="0 0 24 24"
-                class="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-                focusable="false"
-              >
+              <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z" />
               </svg>
             </template>
@@ -102,34 +93,22 @@
             v-else-if="filteredUnthreaded.length === 0"
             title="No matching sparks"
             body="No unthreaded sparks carry the selected tags. Select Clear Filters to see every spark again."
-          >
-            <template #icon>
-              <svg
-                viewBox="0 0 24 24"
-                class="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m21 21-4.3-4.3" />
-              </svg>
-            </template>
-          </EmptyState>
+          />
 
-          <ul v-else class="mt-4 space-y-3">
+          <ul v-else v-auto-animate class="mt-4 space-y-3">
             <li v-for="spark in filteredUnthreaded" :key="spark.id">
-              <SparkCard :spark="spark" @delete="handleDeleteSpark" @assign="handleAssign" />
+              <SparkCard
+                :spark="spark"
+                :selected="selectedSparkIds.includes(spark.id)"
+                @delete="handleDeleteSpark"
+                @assign="handleAssign"
+                @toggle-select="toggleSelect"
+              />
             </li>
           </ul>
         </section>
       </div>
 
-      <!-- Threads column -->
       <aside class="w-full flex-shrink-0 space-y-4 lg:w-80">
         <section class="card p-4">
           <form @submit.prevent="handleCreateThread">
@@ -144,35 +123,16 @@
               :aria-invalid="threadTitleError ? 'true' : undefined"
               :aria-describedby="threadTitleError ? 'thread-title-error' : undefined"
             />
-            <p
-              v-if="threadTitleError"
-              id="thread-title-error"
-              class="mt-1 text-[0.8rem] text-error"
-            >
-              Enter a title to create a thread
+            <p v-if="threadTitleError" id="thread-title-error" class="mt-1 text-[0.8rem] text-error">
+              {{ threadTitleError }}
             </p>
             <button type="submit" class="btn-primary-sm mt-3 w-full">+ New Thread</button>
           </form>
         </section>
 
         <section v-if="visiblePinnedThreads.length > 0">
-          <h3 class="mb-2 flex items-center gap-2 section-title">
-            <svg
-              viewBox="0 0 24 24"
-              class="h-4 w-4 text-primary"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-              focusable="false"
-            >
-              <path d="M6 3h12v18l-6-4-6 4V3z" />
-            </svg>
-            Pinned
-          </h3>
-          <ul class="space-y-3">
+          <h2 class="mb-2 flex items-center gap-2 section-title">Pinned</h2>
+          <TransitionGroup name="thread-reorder" tag="ul" class="space-y-3">
             <li v-for="thread in visiblePinnedThreads" :key="thread.id">
               <ThreadCard
                 :thread="thread"
@@ -181,47 +141,30 @@
                 @archive="handleArchive(thread.id)"
               />
             </li>
-          </ul>
+          </TransitionGroup>
         </section>
 
         <section>
-          <h3 class="mb-2 section-title">
+          <h2 class="mb-2 section-title">
             Threads
-            <span class="meta-mono font-normal">{{ visibleRegularThreads.length }}</span>
-          </h3>
+            <span class="meta-mono font-normal">{{ threadCountLabel }}</span>
+          </h2>
 
           <div v-if="showThreadsEmptyState" class="card">
             <EmptyState
               title="No threads yet"
               body="Create a thread with + New Thread, or assign an unthreaded spark to a new thread."
-            >
-              <template #icon>
-                <svg
-                  viewBox="0 0 24 24"
-                  class="h-6 w-6"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                  focusable="false"
-                >
-                  <path d="M4 6h16M4 12h16M4 18h10" />
-                </svg>
-              </template>
-            </EmptyState>
+            />
           </div>
 
           <p
             v-else-if="visibleRegularThreads.length === 0"
             class="card p-4 text-[0.85rem] text-inksoft"
           >
-            No matching threads carry the selected tags. Select Clear Filters to see every
-            thread again.
+            No matching threads carry the selected tags. Select Clear Filters to see every thread again.
           </p>
 
-          <ul v-else class="space-y-3">
+          <TransitionGroup v-else name="thread-reorder" tag="ul" class="space-y-3">
             <li v-for="thread in visibleRegularThreads" :key="thread.id">
               <ThreadCard
                 :thread="thread"
@@ -230,23 +173,24 @@
                 @archive="handleArchive(thread.id)"
               />
             </li>
-          </ul>
+          </TransitionGroup>
         </section>
       </aside>
     </div>
 
-    <!-- Virtualized sample collection -->
     <VirtualizedItemsPanel />
+    <BulkTray :selected-ids="selectedSparkIds" @clear="selectedSparkIds = []" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
-import { useSparkStore } from '../stores/sparkStore'
+import { SparkUpsertSchema, ThreadUpsertSchema, useSparkStore } from '../stores/sparkStore'
 import type { Spark, Thread } from '../stores/sparkStore'
 import { useUiStore } from '../stores/uiStore'
 import { showToast } from '../utils/toast'
+import BulkTray from './BulkTray.vue'
 import EmptyState from './EmptyState.vue'
 import SearchResults from './SearchResults.vue'
 import SparkCard from './SparkCard.vue'
@@ -255,48 +199,54 @@ import ThreadCard from './ThreadCard.vue'
 import ThreadDetailView from './ThreadDetailView.vue'
 import VirtualizedItemsPanel from './VirtualizedItemsPanel.vue'
 
-import { SparkUpsertSchema, ThreadUpsertSchema } from '../stores/sparkStore'
-
-
 const store = useSparkStore()
 const { pinnedThreads, sparks, unpinnedThreads, unthreadedSparks } = storeToRefs(store)
 
 const ui = useUiStore()
 const { activeTags, openThreadId, searchQuery } = storeToRefs(ui)
 
-
 const newSparkText = ref('')
 const captureError = ref('')
 const newThreadTitle = ref('')
 const threadTitleError = ref('')
-
+const capturing = ref(false)
+const selectedSparkIds = ref<string[]>([])
 
 const trimmedQuery = computed(() => searchQuery.value.trim())
 const searchActive = computed(() => trimmedQuery.value.length > 0)
 
 watch(newSparkText, () => {
-  captureError.value = false
+  captureError.value = ''
 })
 
 watch(newThreadTitle, () => {
-  threadTitleError.value = false
+  threadTitleError.value = ''
 })
 
-// --- Capture ---
-
 function handleAddSpark() {
-  const spark = store.addSpark(newSparkText.value)
+  if (capturing.value) return
+  capturing.value = true
+  const parsed = SparkUpsertSchema.safeParse({ text: newSparkText.value })
+  if (!parsed.success) {
+    captureError.value = parsed.error.issues[0]?.message ?? 'Enter a thought to add a spark'
+    capturing.value = false
+    return
+  }
+  const spark = store.addSpark(parsed.data.text)
   if (!spark) {
-    captureError.value = true
+    captureError.value = 'Enter a thought to add a spark'
+    capturing.value = false
     return
   }
   newSparkText.value = ''
-  captureError.value = false
+  captureError.value = ''
   showToast('Spark added', 'success')
+  capturing.value = false
 }
 
 function handleDeleteSpark(sparkId: string) {
   store.deleteSpark(sparkId)
+  selectedSparkIds.value = selectedSparkIds.value.filter(id => id !== sparkId)
   showToast('Spark deleted', 'info')
 }
 
@@ -318,16 +268,20 @@ function handleAssign(sparkId: string, threadId: string) {
   showToast(`Spark assigned to "${thread.title}"`, 'success')
 }
 
-// --- Threads ---
-
 function handleCreateThread() {
-  const thread = store.addThread(newThreadTitle.value)
+  const parsed = ThreadUpsertSchema.safeParse({ title: newThreadTitle.value })
+  if (!parsed.success) {
+    threadTitleError.value =
+      parsed.error.issues[0]?.message ?? 'Enter a title to create a thread'
+    return
+  }
+  const thread = store.addThread(parsed.data.title)
   if (!thread) {
-    threadTitleError.value = true
+    threadTitleError.value = 'Enter a title to create a thread'
     return
   }
   newThreadTitle.value = ''
-  threadTitleError.value = false
+  threadTitleError.value = ''
   showToast(`Thread "${thread.title}" created`, 'success')
 }
 
@@ -343,11 +297,19 @@ function handleTogglePin(threadId: string) {
 
 function handleArchive(threadId: string) {
   store.setArchived(threadId, true)
-  if (openThreadId.value === threadId) openThreadId.value = null
+  if (openThreadId.value === threadId) ui.closeThread()
   showToast('Thread archived', 'success')
 }
 
-// --- Filtering ---
+function toggleSelect(sparkId: string, selected: boolean) {
+  if (selected) {
+    if (!selectedSparkIds.value.includes(sparkId)) {
+      selectedSparkIds.value = [...selectedSparkIds.value, sparkId]
+    }
+  } else {
+    selectedSparkIds.value = selectedSparkIds.value.filter(id => id !== sparkId)
+  }
+}
 
 function sparkMatchesTags(spark: Spark): boolean {
   if (activeTags.value.length === 0) return true
@@ -356,19 +318,13 @@ function sparkMatchesTags(spark: Spark): boolean {
 
 function threadMatchesTags(thread: Thread): boolean {
   if (activeTags.value.length === 0) return true
-  return sparks.value.some(
-    spark => spark.threadId === thread.id && sparkMatchesTags(spark),
-  )
+  return sparks.value.some(spark => spark.threadId === thread.id && sparkMatchesTags(spark))
 }
 
-const filteredUnthreaded = computed(() =>
-  unthreadedSparks.value.filter(sparkMatchesTags),
-)
+const filteredUnthreaded = computed(() => unthreadedSparks.value.filter(sparkMatchesTags))
 
 const visiblePinnedThreads = computed(() => pinnedThreads.value.filter(threadMatchesTags))
-const visibleRegularThreads = computed(() =>
-  unpinnedThreads.value.filter(threadMatchesTags),
-)
+const visibleRegularThreads = computed(() => unpinnedThreads.value.filter(threadMatchesTags))
 
 const showInboxEmptyState = computed(
   () => unthreadedSparks.value.length === 0 && activeTags.value.length === 0,
@@ -389,4 +345,15 @@ const inboxCountLabel = computed(() => {
   }
   return `${total} ${total === 1 ? 'spark' : 'sparks'}`
 })
+
+const threadCountLabel = computed(() => {
+  const total = pinnedThreads.value.length + unpinnedThreads.value.length
+  return `${total} ${total === 1 ? 'thread' : 'threads'}`
+})
 </script>
+
+<style scoped>
+.thread-reorder-move {
+  transition: transform 0.25s ease;
+}
+</style>

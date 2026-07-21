@@ -70,6 +70,11 @@ export function startOfNextDay(timestamp: number): number {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1).getTime()
 }
 
+/** Compact relative label prefixed with Updated, e.g. "Updated just now", "Updated 5m ago". */
+export function formatUpdatedRelative(timestamp: number, reference: number): string {
+  return `Updated ${formatRelative(timestamp, reference)}`
+}
+
 /** Stable per-day index used for inclusive calendar-day arithmetic. */
 export function dayNumber(timestamp: number): number {
   return Math.round(startOfDay(timestamp) / 86400000)

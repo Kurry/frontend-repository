@@ -1,61 +1,76 @@
 <template>
-  <DialogRoot :open="isOpen" @update:open="emit('update:open', $event)">
+  <DialogRoot :open="open" @update:open="open = $event">
     <DialogPortal>
-      <DialogOverlay class="fixed inset-0 z-50 bg-ink/40" />
+      <DialogOverlay class="fixed inset-0 z-50 bg-ink/40 data-[state=open]:animate-in data-[state=open]:fade-in" />
       <DialogContent
-        class="fixed right-0 top-0 z-50 h-full w-full max-w-xl bg-surface p-6 shadow-xl"
+        class="fixed inset-y-0 right-0 z-50 flex h-full w-full max-w-[min(100vw,36rem)] flex-col bg-surface p-4 shadow-xl sm:p-6 data-[state=open]:animate-in data-[state=open]:slide-in-from-right"
         :aria-describedby="undefined"
       >
-        <DialogTitle class="font-heading text-xl font-bold text-ink mb-4">Export Workspace</DialogTitle>
+        <DialogTitle class="mb-4 font-heading text-xl font-bold text-ink">Export Workspace</DialogTitle>
 
-        <TabsRoot v-model="activeTab" class="flex flex-col h-[calc(100%-80px)]">
-          <TabsList class="flex border-b border-linesoft mb-4">
+        <TabsRoot v-model="activeTab" class="flex min-h-0 flex-1 flex-col">
+          <TabsList class="mb-4 flex border-b border-linesoft">
             <TabsTrigger
               value="json"
-              class="px-4 py-2 font-medium text-sm data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary text-inksoft"
+              class="px-4 py-2 text-sm font-medium text-inksoft data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary"
             >
               Workspace JSON
             </TabsTrigger>
             <TabsTrigger
               value="markdown"
-              class="px-4 py-2 font-medium text-sm data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary text-inksoft"
+              class="px-4 py-2 text-sm font-medium text-inksoft data-[state=active]:border-b-2 data-[state=active]:border-primary data-[state=active]:text-primary"
             >
               Today digest
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="json" class="flex-1 flex flex-col min-h-0">
-            <div class="flex justify-between items-center mb-2">
+          <TabsContent value="json" class="flex min-h-0 flex-1 flex-col">
+            <div class="mb-2 flex flex-wrap items-center justify-between gap-2">
               <span class="text-xs text-inksoft">mindthread-workspace-v1</span>
-              <div class="flex gap-2">
-                <button @click="copy(workspaceJson)" class="btn-secondary">Copy</button>
-                <button @click="download(workspaceJson, 'workspace.json')" class="btn-primary-sm">Download</button>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" class="btn-secondary" @click="wrapLines = !wrapLines">
+                  {{ wrapLines ? 'No wrap' : 'Wrap lines' }}
+                </button>
+                <button type="button" class="btn-secondary" @click="copy(workspaceJson)">Copy</button>
+                <button type="button" class="btn-primary-sm" @click="download(workspaceJson, 'workspace.json')">
+                  Download
+                </button>
               </div>
             </div>
             <textarea
               readonly
-              class="flex-1 w-full font-mono text-sm p-4 bg-appbg border border-linesoft rounded resize-none"
+              class="min-h-0 flex-1 w-full resize-none rounded border border-linesoft bg-appbg p-4 font-mono text-sm"
+              :class="wrapLines ? 'whitespace-pre-wrap' : 'whitespace-pre overflow-x-auto'"
               :value="workspaceJson"
             ></textarea>
           </TabsContent>
 
-          <TabsContent value="markdown" class="flex-1 flex flex-col min-h-0">
-            <div class="flex justify-end mb-2">
-              <div class="flex gap-2">
-                <button @click="copy(todayDigest)" class="btn-secondary">Copy</button>
-                <button @click="download(todayDigest, 'digest.md')" class="btn-primary-sm">Download</button>
-              </div>
+          <TabsContent value="markdown" class="flex min-h-0 flex-1 flex-col">
+            <div class="mb-2 flex flex-wrap justify-end gap-2">
+              <button type="button" class="btn-secondary" @click="wrapLines = !wrapLines">
+                {{ wrapLines ? 'No wrap' : 'Wrap lines' }}
+              </button>
+              <button type="button" class="btn-secondary" @click="copy(todayDigest)">Copy</button>
+              <button type="button" class="btn-primary-sm" @click="download(todayDigest, 'digest.md')">
+                Download
+              </button>
             </div>
             <textarea
               readonly
-              class="flex-1 w-full font-mono text-sm p-4 bg-appbg border border-linesoft rounded resize-none"
+              class="min-h-0 flex-1 w-full resize-none rounded border border-linesoft bg-appbg p-4 font-mono text-sm"
+              :class="wrapLines ? 'whitespace-pre-wrap' : 'whitespace-pre overflow-x-auto'"
               :value="todayDigest"
             ></textarea>
           </TabsContent>
         </TabsRoot>
 
-        <DialogClose class="absolute top-4 right-4 text-inksoft hover:text-ink">
-          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        <DialogClose
+          class="absolute right-4 top-4 text-inksoft transition-colors hover:text-ink focus-ring"
+          aria-label="Close export drawer"
+        >
+          <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </DialogClose>
       </DialogContent>
     </DialogPortal>
@@ -63,73 +78,118 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import {
-  DialogRoot, DialogPortal, DialogOverlay, DialogContent, DialogTitle, DialogClose,
-  TabsRoot, TabsList, TabsTrigger, TabsContent
+  DialogClose,
+  DialogContent,
+  DialogOverlay,
+  DialogPortal,
+  DialogRoot,
+  DialogTitle,
+  TabsContent,
+  TabsList,
+  TabsRoot,
+  TabsTrigger,
 } from 'reka-ui'
 import { useSparkStore } from '../stores/sparkStore'
 import { showToast } from '../utils/toast'
-import { formatTimestamp, startOfDay, startOfNextDay, now } from '../utils/time'
+import { now, startOfDay, startOfNextDay } from '../utils/time'
 
-const props = defineProps<{ isOpen: boolean }>()
-const emit = defineEmits<{ (e: 'update:open', val: boolean): void }>()
+const open = defineModel<boolean>('open', { default: false })
 
 const store = useSparkStore()
 const activeTab = ref('json')
+const wrapLines = ref(true)
 
-const workspaceJson = computed(() => {
-  return JSON.stringify({
-    schemaVersion: 'mindthread-workspace-v1',
-    exportedAt: new Date().toISOString(),
-    sparks: store.sparks,
-    threads: store.threads,
-    reflections: store.reflections
-  }, null, 2)
-})
+const workspaceJson = computed(() => JSON.stringify(store.buildWorkspaceExport(), null, 2))
 
 const todayDigest = computed(() => {
   const dayStart = startOfDay(now.value)
   const dayEnd = startOfNextDay(now.value)
   const todaySparks = store.sparks
-    .filter(s => s.createdAt >= dayStart && s.createdAt < dayEnd)
+    .filter(spark => spark.createdAt >= dayStart && spark.createdAt < dayEnd)
     .sort((a, b) => a.createdAt - b.createdAt)
 
   if (todaySparks.length === 0) return 'No sparks captured yet today.'
 
-  let digest = `# Today's Digest\n\n`
+  const groups = new Map<string, typeof todaySparks>()
   for (const spark of todaySparks) {
-    digest += `- ${spark.text}\n`
-    if (spark.tags.length > 0) {
-      digest += `  Tags: ${spark.tags.map(t => `#${t}`).join(', ')}\n`
-    }
-    const reflections = store.reflections.filter(r => r.sparkId === spark.id)
-    if (reflections.length > 0) {
-      for (const r of reflections) {
-        digest += `  > ${r.text}\n`
-      }
+    const key = spark.threadId ?? '__unthreaded__'
+    const bucket = groups.get(key) ?? []
+    bucket.push(spark)
+    groups.set(key, bucket)
+  }
+
+  let digest = "# Today's Digest\n\n"
+  if (groups.has('__unthreaded__')) {
+    digest += '## Unthreaded\n\n'
+    for (const spark of groups.get('__unthreaded__')!) {
+      digest += `- ${spark.text}\n`
     }
     digest += '\n'
   }
-  return digest
+  for (const [threadId, threadSparks] of groups.entries()) {
+    if (threadId === '__unthreaded__') continue
+    const thread = store.getThread(threadId)
+    digest += `## ${thread?.title ?? 'Thread'}\n\n`
+    for (const spark of threadSparks) {
+      digest += `- ${spark.text}\n`
+    }
+    digest += '\n'
+  }
+  return digest.trim()
 })
 
 async function copy(text: string) {
   try {
     await navigator.clipboard.writeText(text)
-    showToast('Copied to clipboard', 'success')
-  } catch (err) {
-    showToast('Failed to copy', 'error')
+    showToast('Copied export to clipboard', 'success')
+  } catch {
+    showToast('Failed to copy export', 'error')
   }
 }
 
 function download(text: string, filename: string) {
   const blob = new Blob([text], { type: 'text/plain' })
   const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = filename
-  a.click()
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  anchor.click()
   URL.revokeObjectURL(url)
+  showToast(`Downloaded ${filename}`, 'success')
 }
 </script>
+
+<style scoped>
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+:deep([data-state='open'].animate-in) {
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+}
+
+:deep(.fade-in) {
+  animation-name: fade-in;
+}
+
+:deep(.slide-in-from-right) {
+  animation-name: slide-in-from-right;
+}
+</style>
