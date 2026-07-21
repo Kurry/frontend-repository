@@ -4,8 +4,8 @@ import { taskManifestSchema } from '../lib/schemas'
 let createDialogOpener = null
 
 export const STAGES = ['Fetch', 'Evaluate', 'Skeleton', 'Generate', 'Validate']
-export const VERDICTS = ['good-success', 'bad-success', 'good-failure', 'bad-failure', 'infrastructure-error']
-export const EVENT_STATUSES = ['started', 'completed', 'failed', 'retry', 'accepted']
+export const VERDICTS = ['good-success', 'bad-success', 'good-failure', 'bad-failure', 'infrastructure-error', 'timeout']
+export const EVENT_STATUSES = ['started', 'completed', 'failed', 'retry', 'accepted', 'skipped']
 
 const stageSet = (statuses, attempts = {}) => STAGES.map((name, index) => ({
   name,
@@ -204,7 +204,12 @@ export const useFactoryStore = create((set, get) => ({
   lastExportCount: seedManifestLedger.length,
   theme: 'light',
   onboardingStep: 0,
-  createDraft: { repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+  createDrafts: {
+    'quartz-orm': { repository: 'quartz-orm', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+    'copperline': { repository: 'copperline', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+    'fernweh-gateway': { repository: 'fernweh-gateway', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+    'lattice-db': { repository: 'lattice-db', pullRequestNumber: '', minFiles: '2', maxFiles: '20' },
+  },
   gestureMode: false,
   density: 'comfortable',
 
@@ -237,7 +242,7 @@ export const useFactoryStore = create((set, get) => ({
     if (typeof document !== 'undefined') document.documentElement.dataset.theme = theme
   },
   setOnboardingStep: (onboardingStep) => set({ onboardingStep }),
-  setCreateDraft: (createDraft) => set({ createDraft }),
+  setCreateDraft: (repo, draft) => set((state) => ({ createDrafts: { ...state.createDrafts, [repo]: draft } })),
   setGestureMode: (gestureMode) => set({ gestureMode }),
   setDensity: (density) => set({ density }),
   clearRepositoryRegister: (repoId) => {
@@ -393,6 +398,7 @@ export const useFactoryStore = create((set, get) => ({
       })
       addEvent(set, { status: 'accepted', repository: body.repository, prNumber: Number(body.pullRequestNumber), text: 'Task accepted' })
       get().addToast(`Task accepted · ${body.repository} #${body.pullRequestNumber}`, 'success')
+      get().addToast(`Run completed · ${body.repository} #${body.pullRequestNumber}`, 'success')
     }, delay + 200)
     return id
   },

@@ -50,7 +50,6 @@ tasks/frontend-<slug>/
 │   └── assets/                    # website-fidelity tasks only
 ├── solution/
 │   ├── solve.sh
-│   ├── reward-details.json
 │   └── app/                       # the working oracle (zero console/page errors)
 └── tests/                         # the verifier
     ├── test.sh                    # entry point
@@ -96,8 +95,9 @@ as Next.js, Nuxt, and SvelteKit count within their base framework):
   `window.webmcp_*` tools on the same page. It accelerates judging but is
   never itself a scoring criterion.
 - Criteria live in `tests/<dimension>/<dimension>.toml`.
-- Results, including per-dimension `cost_usd`, land in `reward.json` and
-  `reward-details.json`.
+- Results, including per-dimension `cost_usd`, land in each Harbor trial's
+  verifier output as `reward.json` and `reward-details.json`; they are not
+  committed inside task solutions.
 
 ## Corpus sweeps
 

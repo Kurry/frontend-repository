@@ -18,7 +18,7 @@ import { initWebmcp } from "./webmcp.js";
 gsap.registerPlugin(ScrollTrigger);
 rive.RuntimeLoader.setWasmUrl(riveWasmUrl);
 
-const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const isRM = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // A reload always restarts the sequence from the top.
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
@@ -57,7 +57,7 @@ function initLoader() {
   let exited = false, revealed = false;
   const reveal = () => { if (revealed) return; revealed = true; window.dispatchEvent(new CustomEvent("loaderExited")); };
 
-  if (RM) {
+  if (isRM()) {
     if (bar) bar.style.width = "100%";
     requestAnimationFrame(() => {
       if (loader) { loader.classList.add("rm-exit"); loader.style.pointerEvents = "none"; loader.remove(); }
@@ -129,7 +129,7 @@ function initHeroChrome() {
  * ------------------------------------------------------------------ */
 function initHeroFade() {
   const els = $$("[data-hero-fade]");
-  if (RM) { gsap.set(els, { opacity: 1, y: 0 }); return; }
+  if (isRM()) { gsap.set(els, { opacity: 1, y: 0 }); return; }
   gsap.set(els, { opacity: 0, y: 30 });
   window.addEventListener("threeJsCanvas", (e) => {
     if (e.detail && e.detail.active) return;
@@ -151,10 +151,10 @@ function initWordReveal() {
       .join(" ");
     const inner = $$(".wr-word", el);
     el._wrWords = inner; el._wrTween = null; el._wrShown = false;
-    if (RM) { gsap.set(inner, { opacity: 1 }); return; }
+    if (isRM()) { gsap.set(inner, { opacity: 1 }); return; }
     gsap.set(inner, { opacity: 0.12 });
   });
-  if (RM) return;
+  if (isRM()) return;
   let heroRevealed = false;
   window.addEventListener("threeJsCanvas", (e) => { if (e.detail && !e.detail.active) heroRevealed = true; });
   const enter = new IntersectionObserver((entries) => {
@@ -166,7 +166,7 @@ function initWordReveal() {
       if (el._wrTween) el._wrTween.kill();
       el._wrTween = gsap.to(el._wrWords, { opacity: 1, duration: 0.7, ease: "power2.out", stagger: 0.07, overwrite: true });
     }
-  }, { rootMargin: "-20% 0px 0px 0px", threshold: 0 });
+  }, { rootMargin: "0px", threshold: 0 });
   const reset = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       const el = entry.target;
@@ -207,7 +207,7 @@ function initNav() {
   if (logoCell) logoCell.addEventListener("click", (e) => {
     e.preventDefault();
     cells.forEach((c) => { c.classList.remove("is-active", "is-clicked"); c.removeAttribute("aria-current"); });
-    window.scrollTo({ top: 0, behavior: RM ? "auto" : "smooth" });
+    window.scrollTo({ top: 0, behavior: isRM() ? "auto" : "smooth" });
     try { history.replaceState(null, "", location.pathname + location.search); } catch {}
   });
   spyCells.forEach((cell) => {
@@ -284,6 +284,7 @@ function initVideoModal() {
     if (id) {
       video.src = "/assets/videos/" + id + ".webm";
       video.muted = true;
+      video.autoplay = true;
       try { video.load(); } catch {}
       requestAnimationFrame(() => { const p = video.play(); if (p && p.catch) p.catch(() => {}); });
     }
@@ -330,7 +331,7 @@ function initStackMotion() {
     layer.className = "parallax-layer";
     layer.style.backgroundImage = `url("${src}")`;
     section.insertBefore(layer, section.firstChild);
-    if (!RM) {
+    if (!isRM()) {
       gsap.to(layer, { y: () => -section.offsetHeight * 0.3, ease: "none",
         scrollTrigger: { trigger: section, start: "top bottom", end: "bottom top", scrub: true } });
     }
@@ -346,7 +347,7 @@ function initFooterFade() {
   const overlay = document.createElement("div");
   overlay.className = "footer__gradient";
   footer.insertBefore(overlay, footer.firstChild);
-  if (RM) { overlay.style.opacity = "1"; return; }
+  if (isRM()) { overlay.style.opacity = "1"; return; }
   const io = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       gsap.to(overlay, { opacity: entry.isIntersecting ? 1 : 0,
@@ -368,13 +369,13 @@ function initRiveEmbeds() {
     if (!src) return;
     let w = host.offsetWidth, h = host.offsetHeight;
     if (w <= 0 || h <= 0) { const r = host.getBoundingClientRect(); w = Math.round(r.width); h = Math.round(r.height); }
-    if (w <= 0 || h <= 0) { setTimeout(() => hydrate(host), 400); return; }
+    if (w <= 0 || h <= 0) { w = 300; h = 200; }
     const canvas = document.createElement("canvas");
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     canvas.width = Math.round(Math.min(w, window.innerWidth * 1.5) * dpr);
     canvas.height = Math.round(Math.min(h, window.innerHeight * 1.5) * dpr);
     host.appendChild(canvas);
-    const config = { src, canvas, autoplay: !RM,
+    const config = { src, canvas, autoplay: !isRM(),
       layout: new rive.Layout({ fit: rive.Fit.Contain, alignment: rive.Alignment.Center }),
       onLoad: () => { try { instance.resizeDrawingSurfaceToCanvas(); } catch {} } };
     const sm = host.getAttribute("data-rive-sm"), artboard = host.getAttribute("data-rive-artboard");

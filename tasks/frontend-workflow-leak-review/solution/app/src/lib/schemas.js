@@ -131,11 +131,12 @@ export const auditFilterSchema = z.object({
 });
 
 export const importFileSchema = z.object({
-  document: z.any().refine(
-    (value) => (typeof File !== 'undefined' && value instanceof File) || (value && value.length === 1),
-    'Import payload must be a single Review report JSON file.'
-  )
-});
+  documentFile: z.any().optional(),
+  documentText: z.string().optional()
+}).refine(
+  (data) => (data.documentFile && data.documentFile.length === 1) || (typeof File !== 'undefined' && data.documentFile instanceof File) || (data.documentText && data.documentText.trim().length > 0),
+  { message: 'Select a file or paste JSON payload.', path: ['documentFile'] }
+);
 
 export function formatSchemaError(error) {
   const issue = error?.issues?.[0];

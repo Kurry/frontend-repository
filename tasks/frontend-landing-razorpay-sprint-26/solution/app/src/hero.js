@@ -229,7 +229,11 @@ export function initHero() {
     setTimeout(() => { const n = document.getElementById("scroll-nudge"); if (n) n.style.opacity = "0"; }, 3000);
   }
 
-  loader.load(CONFIG.glbPath(), onLoaded, undefined, () => { fallback(); });
+  try {
+    loader.load(CONFIG.glbPath(), onLoaded, undefined, () => { fallback(); });
+  } catch {
+    fallback();
+  }
 
   let resizeTimer, lastW = window.innerWidth;
   window.addEventListener("resize", () => {

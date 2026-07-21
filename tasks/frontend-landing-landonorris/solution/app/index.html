@@ -18,8 +18,8 @@
   </div>
 
   <!-- ===================== FIXED NAV ===================== -->
-  <header class="nav" id="siteNav" aria-label="Primary">
-    <div class="nav-inner">
+  <header class="nav" id="siteNav">
+    <nav class="nav-inner" aria-label="Primary navigation">
       <a class="nav-brand-link" href="#hero" data-menu-link data-dest="hero" aria-label="Avery Vale home">
         <span class="nav-brand" aria-hidden="true">
           <span class="wordmark-avery">AVERY</span>
@@ -40,6 +40,8 @@
       <div class="nav-right">
         <span class="nav-count" data-anim="none" aria-hidden="false">Selected races <b data-selected-count>0</b></span>
         <span class="nav-count" aria-hidden="false">Shortlist <b data-shortlist-count>0</b></span>
+        <button type="button" class="history-btn" data-undo disabled aria-label="Undo last race or shortlist change">Undo</button>
+        <button type="button" class="history-btn" data-redo disabled aria-label="Redo last race or shortlist change">Redo</button>
         <button type="button" class="btn-w is-nav" id="storeBtn" data-store-cta aria-label="Store">
           <span class="btn-icon-w" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8V6a3 3 0 0 1 6 0v2m-9 0h12l-1 12H4L3 8z"/></svg>
@@ -51,7 +53,7 @@
           <span class="nav-ham-lines" aria-hidden="true"><span></span><span></span></span>
         </button>
       </div>
-    </div>
+    </nav>
   </header>
 
   <!-- ===================== FULL-SCREEN MENU OVERLAY ===================== -->
@@ -84,11 +86,11 @@
             <button type="button" class="text-link-w nav-menu-business" data-anim="text-hover" data-contact aria-label="Business contact hello@averyvale.example — copies the address">hello@averyvale.example</button>
           </div>
         </div>
-        <div class="nav-menu-images-w" aria-hidden="true">
-          <div class="nav-menu-img-w"><img src="/menu/menu-1.png" alt="" width="680" height="906" /></div>
-          <div class="nav-menu-img-w"><img src="/menu/menu-2.png" alt="" width="680" height="906" /></div>
-          <div class="nav-menu-img-w"><img src="/menu/menu-3.png" alt="" width="680" height="906" /></div>
-          <div class="nav-menu-img-w"><img src="/menu/menu-4.png" alt="" width="680" height="906" /></div>
+        <div class="nav-menu-images-w" aria-label="Avery Vale editorial gallery">
+          <div class="nav-menu-img-w"><img src="/menu/menu-1.png" alt="Avery Vale beside her fictional Nova Racing car" width="680" height="906" /></div>
+          <div class="nav-menu-img-w"><img src="/menu/menu-2.png" alt="Avery Vale preparing her gloves in the garage" width="680" height="906" /></div>
+          <div class="nav-menu-img-w"><img src="/menu/menu-3.png" alt="Avery Vale studying the circuit at dawn" width="680" height="906" /></div>
+          <div class="nav-menu-img-w"><img src="/menu/menu-4.png" alt="Avery Vale driving through a fast corner" width="680" height="906" /></div>
         </div>
       </div>
     </div>
@@ -129,7 +131,7 @@
 
     <!-- IMPACT STATEMENT -->
     <section class="impact-content-w" data-section="impact">
-      <p class="text-impact" data-split-text aria-label="NO LIMITS ONLY LAPS">NO LIMITS ONLY LAPS</p>
+      <h2 class="text-impact" data-split-text aria-label="NO LIMITS ONLY LAPS">NO LIMITS ONLY LAPS</h2>
     </section>
 
     <!-- HELMET GRID -->
@@ -178,7 +180,7 @@
     <!-- FOOTER -->
     <footer class="footer" id="footer" data-section="footer">
       <div class="footer-inner">
-        <p class="footer-statement" data-split-text aria-label="DRIVEN BY THE FANS. BUILT FOR THE FUTURE.">DRIVEN BY THE FANS. BUILT FOR THE FUTURE.</p>
+        <h2 class="footer-statement" data-split-text aria-label="DRIVEN BY THE FANS. BUILT FOR THE FUTURE.">DRIVEN BY THE FANS. BUILT FOR THE FUTURE.</h2>
         <div class="marquee" data-marquee>
           <ul class="marquee-list" data-marquee-list="right" role="list" id="footerMarquee"></ul>
           <ul class="marquee-list" data-marquee-list="right" aria-hidden="true" id="footerMarquee2"></ul>
