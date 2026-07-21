@@ -12,6 +12,7 @@ import SessionLeads from './SessionLeads';
 import ExportCatalog from './ExportCatalog';
 import MotionManager from './MotionManager';
 import WebMCP from './WebMCP';
+import { TrustStrip, DeveloperResources, NetworkInAction, NewsStories, SolutionsGrid, CommunityBlock } from './MockBlocks';
 
 export default function AppClient() {
   const theme = useStore($theme);
@@ -30,6 +31,12 @@ export default function AppClient() {
         <Hero />
         <WhyRidge />
         <GetStarted />
+        <TrustStrip />
+        <DeveloperResources />
+        <NetworkInAction />
+        <NewsStories />
+        <SolutionsGrid />
+        <CommunityBlock />
         <GlobalEvents />
         <ContactForm />
       </main>
