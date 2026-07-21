@@ -2,6 +2,16 @@
 Build a quality-control triage queue for contributor task submissions on an evaluation platform using Vue 3, Pinia, Tailwind CSS 4.3.2, and Naive UI. The app produces the operator's QC package — structured export files compiled live from the session — so triage work leaves the browser as an interoperable artifact.
 </summary>
 
+<reference_screenshots>
+Screenshots of the reference application are provided in-container at
+/reference-screenshots/: overview.png is a full-page desktop-layout
+overview (downscaled); overview-tablet.png and overview-mobile.png are full-page responsive
+reflows at 1024x768 (tablet) and 390x844 (mobile) viewports; segment-NN.png are full-resolution 1440x900 sections
+in top-to-bottom order with slight overlap. They are part of this instruction:
+recreate what they show. Where a screenshot and the text conflict, the text
+wins. Do not copy the images into /app or ship them as app assets.
+</reference_screenshots>
+
 <core_features>
 Core features (each line is an observable behavior the finished app must exhibit):
 
