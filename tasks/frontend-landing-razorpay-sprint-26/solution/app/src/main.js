@@ -22,6 +22,7 @@ const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 // A reload always restarts the sequence from the top.
 if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+if (location.hash) history.replaceState(null, "", location.pathname + location.search);
 window.scrollTo(0, 0);
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -191,10 +192,13 @@ function initNav() {
   function spy() {
     if (clickLock) return;
     let active = null;
+    const probe = navH + Math.min(window.innerHeight * 0.35, 280);
     for (const cell of spyCells) {
       const section = document.getElementById(cell.getAttribute("data-section"));
       if (!section) continue;
-      if (section.getBoundingClientRect().top <= navH + 12) active = cell;
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= probe && rect.bottom > probe) { active = cell; break; }
+      if (rect.top <= navH + 12) active = cell;
     }
     cells.forEach((c) => { c.classList.remove("is-active", "is-clicked"); c.removeAttribute("aria-current"); });
     if (active) { active.classList.add("is-active"); active.setAttribute("aria-current", "true"); }
@@ -207,7 +211,8 @@ function initNav() {
     try { history.replaceState(null, "", location.pathname + location.search); } catch {}
   });
   spyCells.forEach((cell) => {
-    cell.addEventListener("click", () => {
+    cell.addEventListener("click", (event) => {
+      event.preventDefault();
       cells.forEach((c) => { c.classList.remove("is-active", "is-clicked"); c.removeAttribute("aria-current"); });
       cell.classList.add("is-clicked");
       cell.setAttribute("aria-current", "true");
@@ -218,13 +223,21 @@ function initNav() {
         clickTimer = setTimeout(() => {
           clickLock = false; cell.classList.remove("is-clicked");
           window.removeEventListener("scroll", settle); spy();
-        }, 150);
+        }, 4500);
       };
       window.addEventListener("scroll", settle, { passive: true });
+      const target = document.getElementById(cell.getAttribute("data-section"));
+      if (target) {
+        const priorBehavior = document.documentElement.style.scrollBehavior;
+        document.documentElement.style.scrollBehavior = "auto";
+        window.scrollTo(0, Math.max(0, window.scrollY + target.getBoundingClientRect().top - navH));
+        try { history.replaceState(null, "", cell.getAttribute("href")); } catch {}
+        requestAnimationFrame(() => { document.documentElement.style.scrollBehavior = priorBehavior; });
+      }
       clickTimer = setTimeout(() => {
         clickLock = false; cell.classList.remove("is-clicked");
         window.removeEventListener("scroll", settle); spy();
-      }, 600);
+      }, 6500);
     });
   });
   window.addEventListener("scroll", spy, { passive: true });
@@ -247,6 +260,7 @@ function initMobileMenu() {
   };
   toggle.addEventListener("click", () => set(!open));
   $$("#mobile-menu a").forEach((a) => a.addEventListener("click", () => open && set(false)));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && open) { set(false); toggle.focus(); } });
 }
 
 /* ------------------------------------------------------------------ *
@@ -262,16 +276,17 @@ function initVideoModal() {
     const id = trigger ? trigger.getAttribute("data-video") : null;
     const poster = trigger ? trigger.getAttribute("data-poster") : null;
     if (poster) video.poster = poster;
-    if (id) {
-      video.src = "/assets/videos/" + id + ".webm";
-      try { video.load(); } catch {}
-      const p = video.play(); if (p && p.catch) p.catch(() => {});
-    }
     const exec = trigger && trigger.getAttribute("data-exec");
     if (exec && window.appMutations) window.appMutations.watchExecutive(exec);
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
     document.body.style.overflow = "hidden";
+    if (id) {
+      video.src = "/assets/videos/" + id + ".webm";
+      video.muted = true;
+      try { video.load(); } catch {}
+      requestAnimationFrame(() => { const p = video.play(); if (p && p.catch) p.catch(() => {}); });
+    }
     requestAnimationFrame(() => { if (close) close.focus(); });
     if (!releaseTrap) releaseTrap = makeTrap(box);
   }
@@ -406,8 +421,12 @@ function updateShortlistUI() {
   if (window.updateBriefPreview) window.updateBriefPreview();
 }
 function updateCompareUI() {
-  const list = $("#compare-items"), count = $("#compare-count");
-  if (count) count.textContent = String(window.appState.compare.length);
+  const list = $("#compare-items"), heading = $("#st-h-comp");
+  if (heading) heading.innerHTML = window.appState.compare.length >= 3
+    ? 'Compare is full (<span id="compare-count">3</span>/3)'
+    : `Compare (<span id="compare-count">${window.appState.compare.length}</span>/3)`;
+  const liveCount = $("#compare-count");
+  if (liveCount) liveCount.textContent = String(window.appState.compare.length);
   if (list) { list.innerHTML = ""; window.appState.compare.forEach((n) => { const li = document.createElement("li"); li.textContent = n; list.appendChild(li); }); }
   refreshDock();
   if (window.updateBriefPreview) window.updateBriefPreview();
@@ -642,6 +661,8 @@ function wireChrome() {
   const dockToggle = $("#dock-toggle"), trayClose = $("#tray-close");
   if (dockToggle) dockToggle.addEventListener("click", () => trayOpen ? closeTray() : openTray(dockToggle));
   if (trayClose) trayClose.addEventListener("click", closeTray);
+  const paletteButton = $("#btn-command-palette");
+  if (paletteButton) paletteButton.addEventListener("click", openPalette);
 
   const btnExport = $("#btn-export-brief");
   if (btnExport) btnExport.addEventListener("click", () => openBrief(btnExport));
@@ -740,11 +761,6 @@ function wireChrome() {
   updateUndoRedoButtons();
   if (window.updateBriefPreview) window.updateBriefPreview();
 
-  const honorHash = () => {
-    const h = location.hash;
-    if (h && h !== "#Hero") { const cell = $(`a.seg-cell[href="${h}"]`); if (cell) cell.click(); }
-  };
-  if (location.hash && location.hash !== "#Hero") window.addEventListener("loaderExited", () => setTimeout(honorHash, 60), { once: true });
 }
 
 /* ------------------------------------------------------------------ */
