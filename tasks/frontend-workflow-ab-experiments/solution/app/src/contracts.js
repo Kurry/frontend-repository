@@ -32,7 +32,7 @@ export const criterionSchema = z.object({
 export const decisionSchema = z.object({
   choice: z.enum(['declare-winner', 'inconclusive', 'stop-early'], { error: 'Decision choice is required' }),
   winnerVariant: z.preprocess(value => value === '' ? null : value, z.enum(LETTERS).nullable().optional()),
-  rationale: z.string().trim().min(1, 'Decision rationale is required').max(1000, 'Decision rationale must be 1,000 characters or fewer')
+  rationale: z.string({ error: 'Decision rationale is required' }).trim().min(1, 'Decision rationale is required').max(1000, 'Decision rationale must be 1,000 characters or fewer')
 }).superRefine((value, context) => {
   if (value.choice === 'declare-winner' && !value.winnerVariant) context.addIssue({ code: 'custom', path: ['winnerVariant'], message: 'Winner variant is required when declaring a winner' })
   if (value.choice !== 'declare-winner' && value.winnerVariant) context.addIssue({ code: 'custom', path: ['winnerVariant'], message: 'Winner variant must be empty for this decision choice' })
@@ -72,5 +72,9 @@ export const zodErrorMessage = error => {
   const issue = error?.issues?.[0]
   if (!issue) return 'The payload is invalid'
   const path = issue.path?.length ? `${issue.path.join('.')}: ` : ''
+  const leaf = issue.path?.at(-1)
+  if (issue.message === 'schemaVersion must be ab-experiment-report-v1') return issue.message
+  if (issue.message === 'Traffic allocation must sum to exactly 100%') return issue.message
+  if (leaf === 'rationale') return issue.message
   return `${path}${issue.message}`
 }

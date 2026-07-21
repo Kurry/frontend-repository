@@ -71,7 +71,7 @@ export default function EditorSidebar() {
         syncRef.current = false;
         syncTimeoutRef.current = null;
       }
-    }, 400);
+    }, 50);
   };
 
   const copyCode = () => {
