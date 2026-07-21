@@ -1,0 +1,1893 @@
+{
+  "score": 1,
+  "criteria": [
+    {
+      "id": "1.1",
+      "name": "planner_controls_keyboard",
+      "value": 1,
+      "weight": 1,
+      "description": "Sidebar day rows, stop rows, stop form fields, place-detail tabs, map chrome, Export Download/Copy, Import, role switcher, and undo/redo are operable with Tab, Shift+Tab, Enter, or Space",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.2",
+      "name": "conflict_export_focus_management",
+      "value": 1,
+      "weight": 1,
+      "description": "Conflict-resolution modal and export canvas trap focus while open and return focus to the originating control on dismiss",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.3",
+      "name": "cover_and_map_chrome_alt",
+      "value": 1,
+      "weight": 1,
+      "description": "Plan hero cover image and icon-only map/toolbar controls expose descriptive alt text or accessible names",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.4",
+      "name": "validation_toast_live_regions",
+      "value": 1,
+      "weight": 1,
+      "description": "Stop validation errors, import errors, demo toasts, and export copy confirmations are shown visually and announced via aria-live regions",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.5",
+      "name": "stop_form_explicit_labels",
+      "value": 1,
+      "weight": 1,
+      "description": "Stop create/edit fields (title, day, location, startTime, endTime, category, costTier, status) use explicit labels associated with their inputs",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.6",
+      "name": "planner_heading_order",
+      "value": 1,
+      "weight": 1,
+      "description": "Planner headings (trip title, day sections, export canvas) follow a logical order with no skips such as H1 to H3",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.7",
+      "name": "planner_landmarks",
+      "value": 1,
+      "weight": 1,
+      "description": "The workspace exposes landmark regions such as nav for the sidebar and main for the plan column, or an equivalent skip-to-content path",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.8",
+      "name": "coastal_theme_contrast",
+      "value": 1,
+      "weight": 1,
+      "description": "Body text, day labels, and primary controls meet readable contrast in both light and dark themes",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.9",
+      "name": "sidebar_main_button_semantics",
+      "value": 1,
+      "weight": 1,
+      "description": "Sidebar navigation, plan main region, and primary actions use semantic nav/main/button roles rather than unlabeled generic containers",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.10",
+      "name": "planner_reduced_motion",
+      "value": 1,
+      "weight": 1,
+      "description": "With prefers-reduced-motion set, toast, list, coachmark, and control transitions are removed or substantially reduced while create, edit, delete, export, and import stay usable",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.11",
+      "name": "keyboard_alternative_for_drag",
+      "value": 1,
+      "weight": 1,
+      "description": "Every drag interaction has a keyboard path: each stop card offers keyboard-operable Move to day and reorder controls that achieve the same reassignment and reordering as a pointer drag",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.12",
+      "name": "conflict_dialog_semantics",
+      "value": 1,
+      "weight": 1,
+      "description": "The conflict-resolution modal has role dialog with aria-modal, traps focus while open, makes Keep mine / Take theirs / Merge operable from the keyboard, and returns focus to the edited block on close",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.13",
+      "name": "poll_names_and_promotion_announced",
+      "value": 1,
+      "weight": 1,
+      "description": "Poll controls expose accessible names that include the item name and current vote count, and a promotion is announced through an aria-live region",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.14",
+      "name": "role_state_programmatic",
+      "value": 1,
+      "weight": 1,
+      "description": "The role switcher exposes the current role programmatically, and controls disabled by the Viewer role are disabled in the accessibility tree rather than merely styled as inactive",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.15",
+      "name": "export_import_keyboard_operable",
+      "value": 1,
+      "weight": 1,
+      "description": "Export Download/Copy controls and the trip JSON import control are reachable and operable with the keyboard alone, with a visible focus indicator",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.1",
+      "name": "multi_facet_round_trip",
+      "value": 1,
+      "weight": 1,
+      "description": "Multi-facet round-trip: create a stop, switch to Map mode, set the role to Viewer then back to Owner, toggle dark theme, and apply a day filter, then reload. All facets coherently reset to the seeded baseline (seeded stops, Overview/Plan List, Owner, light theme, no day filter) — never a mix where some facets survive",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.2",
+      "name": "sort_reversal_proves_live_data",
+      "value": 1,
+      "weight": 1,
+      "description": "Day-order proof: with multi-day stops visible, note the Overview day-section order Sun 7/5 through Sat 7/11; after reordering stops within a day by start time, that day's section and polyline order reverse relative to the prior order, proving order is derived from live stop times rather than a hardcoded list",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.3",
+      "name": "derived_view_responds_to_input",
+      "value": 1,
+      "weight": 1,
+      "description": "Derived-view sensitivity: apply a category filter that excludes at least one seeded stop, confirm the plan list and map pins narrow; clear filters and confirm the full plan returns — the derived surfaces change with the filter rather than redrawing identically",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.4",
+      "name": "cross_view_echo_without_reload",
+      "value": 1,
+      "weight": 1,
+      "description": "Cross-view echo: rename a stop in Plan List edit and confirm the new title appears in the open place-detail card, the map popup, the kanban card, and the trip JSON preview without a reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.5",
+      "name": "count_delta_is_exact",
+      "value": 1,
+      "weight": 1,
+      "description": "Count-delta integrity: note the visible stop count and the number of VEVENT blocks in the ICS preview, create one valid scheduled stop, and confirm both counts increase by exactly one with no lag",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.6",
+      "name": "different_inputs_change_outcomes",
+      "value": 1,
+      "weight": 1,
+      "description": "Input-dependent output: create two stops with different titles and startTimes on the same day; the day section shows both titles in start-time order, and the ICS payload contains two VEVENT blocks whose SUMMARY and DTSTART differ accordingly",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.7",
+      "name": "interleaved_flows_preserve_state",
+      "value": 1,
+      "weight": 1,
+      "description": "Interleaved-flow integrity: start creating stop A, switch to Map mode and open the export canvas, finish creating stop B, then return to the form — stop B is present in list/map/exports and the incomplete A form was not silently submitted",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.8",
+      "name": "empty_to_repopulated_round_trip",
+      "value": 1,
+      "weight": 1,
+      "description": "Edge-state round-trip: delete every stop and confirm the empty list state, zero map pins, zero ICS VEVENTs, and an empty trip JSON stops array; then create one valid stop and confirm list, map, ICS, and trip JSON all track back to that single stop",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.9",
+      "name": "vote_to_export_chain",
+      "value": 1,
+      "weight": 1,
+      "description": "Chained probe: note a bucket item's name, start its poll and vote it to the winning threshold, confirm it appears as a scheduled stop on a day timeline and as a pin on the map, then open the markdown export and trip JSON and confirm both contain that item's name under the correct day (markdown heading / JSON day field)",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.10",
+      "name": "merge_content_everywhere_chain",
+      "value": 1,
+      "weight": 1,
+      "description": "Chained probe: open an edit on a block, trigger the simulated peer edit on the same block, choose Merge in the conflict modal, and confirm the merged content is identical in the block's list row, its open detail card, and the freshly reopened markdown export",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.11",
+      "name": "undo_round_trip_multi_surface",
+      "value": 1,
+      "weight": 1,
+      "description": "Chained probe: drag a stop to a different day, note the changed polyline distance labels, press Undo and confirm the stop returns to its original day with the original distance labels and the map pin back in the original day color, then press Redo and confirm the move reapplies",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.12",
+      "name": "exports_recompile_from_live_state",
+      "value": 1,
+      "weight": 1,
+      "description": "Input-dependent export: rename a stop and change its start time, then reopen the export surfaces; the markdown contains the new name, the ICS payload's VEVENT for that stop reflects the new DTSTART, and the trip JSON entry shows the new title and startTime — proving all three are recompiled from live state",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.13",
+      "name": "trip_json_export_import_round_trip",
+      "value": 1,
+      "weight": 1,
+      "description": "Chained probe: rename a seeded stop and change its startTime, create one new valid stop, Copy or Download the trip JSON, reload to the seeded baseline, Import that JSON, and confirm the renamed title and startTime, the new stop, list rows, map pins, markdown, ICS, and trip JSON all match the pre-export mutated state",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "14.14",
+      "name": "field_contract_gates_create_and_export",
+      "value": 1,
+      "weight": 1,
+      "description": "Chained probe: attempt to create a stop with endTime before startTime and confirm no row is added and endTime is named in the error; then create a valid stop and confirm the trip JSON stops entry and ICS VEVENT for that stop carry the submitted title, day, and startTime",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.1",
+      "name": "seeded_multi_day_plan_on_load",
+      "value": 1,
+      "weight": 1,
+      "description": "On load, the planner shows itinerary day sections for Sun 7/5 through Sat 7/11 with at least 8 seeded French Riviera stops (place names visible) distributed across the days, plus at least 3 unscheduled ideas stops not tied to a day",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.2",
+      "name": "created_stop_appears_in_list",
+      "value": 1,
+      "weight": 1,
+      "description": "After creating a stop named 'Harbor Lookout' on a day with valid required fields, the text 'Harbor Lookout' is visible in the plan list",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.3",
+      "name": "create_count_delta_exact",
+      "value": 1,
+      "weight": 1,
+      "description": "After adding 3 new stops on top of the seed set, the plan list shows exactly 3 more stops than the initial seeded count",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.4",
+      "name": "place_detail_card_full_tab_set",
+      "value": 1,
+      "weight": 1,
+      "description": "After selecting a stop, a place-detail card opens over the map showing that stop's name and a tab row with About / Book / Reviews / Photos / Mentions (or equivalent labels for all five)",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.5",
+      "name": "edited_stop_name_replaces_old",
+      "value": 1,
+      "weight": 1,
+      "description": "After editing a stop name to 'Evening Promenade', the text 'Evening Promenade' is visible and the previous name is not",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.6",
+      "name": "deleted_stop_row_removed",
+      "value": 1,
+      "weight": 1,
+      "description": "After deleting a stop, that stop name is no longer visible in the plan list",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.7",
+      "name": "empty_state_after_last_delete",
+      "value": 1,
+      "weight": 1,
+      "description": "After deleting all stops, an empty state message is visible in the plan list region",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.8",
+      "name": "empty_title_submit_rejected",
+      "value": 1,
+      "weight": 1,
+      "description": "After submitting the stop form with an empty required title, the stops count is unchanged and an inline validation message naming the title field is visible",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.9",
+      "name": "day_filter_recomputes_visible_stops",
+      "value": 1,
+      "weight": 1,
+      "description": "After filtering or focusing a single day (with multi-day stops present), only that day's stops remain emphasized or visible in the filtered list",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.10",
+      "name": "mode_switch_without_navigation",
+      "value": 1,
+      "weight": 1,
+      "description": "After switching emphasis between Plan List and Map modes (or Trip plan / map focus), the workspace shows the other mode without full page navigation",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.11",
+      "name": "detail_tabs_swap_in_place",
+      "value": 1,
+      "weight": 1,
+      "description": "After switching place detail tabs (About / Reviews or equivalent), the panel content swaps without leaving the page",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.13",
+      "name": "row_pin_two_way_sync",
+      "value": 1,
+      "weight": 1,
+      "description": "Starting with the seeded plan visible: click a stop row and confirm the map flies to that stop's pin and the row highlights; then click a different stop's map pin and confirm that stop becomes selected and the plan list scrolls/highlights its row; after each direction the highlighted row and the enlarged pin refer to the same stop",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.14",
+      "name": "day_select_focus_and_restore_flow",
+      "value": 1,
+      "weight": 1,
+      "description": "Selecting a day in the sidebar focuses the map on that day's center/zoom, selects the day's first stop, and shows only that day's stops recomputed from the shared collection; then returning to Overview restores the full multi-day plan without a page reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.15",
+      "name": "detail_card_dismiss_closes",
+      "value": 1,
+      "weight": 1,
+      "description": "The place-detail card opened over the map can be closed with its dismiss control",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.17",
+      "name": "stops_crud_from_shared_state",
+      "value": 1,
+      "weight": 1,
+      "description": "Itinerary stops collection supports create, edit, and delete with list rows and derived counts updating from shared application state",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.18",
+      "name": "two_modes_available",
+      "value": 1,
+      "weight": 1,
+      "description": "At least two distinct views or interaction modes are switchable without full page navigation",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.19",
+      "name": "domain_state_beyond_crud",
+      "value": 1,
+      "weight": 1,
+      "description": "Domain state beyond CRUD is implemented (day filter, mode, selection, or equivalent) and recomputes visible results from the shared collection",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.28",
+      "name": "create_flow_multi_surface",
+      "value": 1,
+      "weight": 1,
+      "description": "Full create flow: note a day section's row count and the map's numbered-pin count, create a valid stop assigned to that day, and confirm the day section shows exactly one more stop row and the map shows exactly one more numbered pin in that day's color; then switch between Plan List and Map modes and confirm the same new stop is present in both without a reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.29",
+      "name": "edit_propagates_list_detail_map",
+      "value": 1,
+      "weight": 1,
+      "description": "With a stop's place-detail card open, edit that stop's name and confirm the new name appears in its day-list row, in the open place-detail card, and in its map pin popup, all without a page reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.30",
+      "name": "delete_clears_row_pin_selection",
+      "value": 1,
+      "weight": 1,
+      "description": "After selecting a stop and deleting it, its row disappears from the day section, its pin disappears from the map, and the open selection/detail card is cleared, all in the same interaction",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.31",
+      "name": "reload_restores_seeded_flow",
+      "value": 1,
+      "weight": 1,
+      "description": "Full reset flow: create one stop and delete a different seeded stop, then reload the page; the app returns to its seeded state — the original seeded stops, day colors, and the default Overview view reappear, with the created stop gone and the deleted stop restored",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.32",
+      "name": "double_submit_creates_one_stop",
+      "value": 1,
+      "weight": 1,
+      "description": "Double-activating the stop form submit in quick succession creates exactly one stop: the day section gains exactly one row and the map gains exactly one pin",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.33",
+      "name": "emptied_day_shows_empty_state",
+      "value": 1,
+      "weight": 1,
+      "description": "After deleting every stop belonging to one day, selecting that day shows an empty day state message rather than a blank region",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.34",
+      "name": "map_clears_pins_when_all_deleted",
+      "value": 1,
+      "weight": 1,
+      "description": "After deleting all stops, the map shows no numbered day pins",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.35",
+      "name": "long_name_truncates_with_ellipsis",
+      "value": 1,
+      "weight": 1,
+      "description": "A stop given a name too long for its row truncates with an ellipsis in the list row while the place-detail card shows the full name",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.36",
+      "name": "live_inline_validation_disables_submit",
+      "value": 1,
+      "weight": 1,
+      "description": "The stop create/edit form validates as the user types: while a required field is invalid it shows an inline error message naming that field, and the submit control stays disabled until all required fields are valid",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.37",
+      "name": "inert_chrome_raises_demo_toasts",
+      "value": 1,
+      "weight": 1,
+      "description": "Inert demo affordances (Share, Optimize route, or map layers) give visible simulated feedback such as a toast when activated, rather than doing nothing or navigating away",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.38",
+      "name": "plan_hero_title_and_dates",
+      "value": 1,
+      "weight": 1,
+      "description": "The plan hero shows a cover image, an editable title reading 'Trip to the French Riviera - Cote d'Azur', and the date range 7/5–7/11",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.39",
+      "name": "top_plan_chrome_inert_affordances",
+      "value": 1,
+      "weight": 1,
+      "description": "The top plan chrome shows a Trip / Travel Planner brand mark, Trip plan / Trip journal mode labels, and Share and edit toolbar affordances that behave as inert in-app chrome (a toast or no-op) rather than navigating away",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.40",
+      "name": "sidebar_nav_anatomy_complete",
+      "value": 1,
+      "weight": 1,
+      "description": "The left nav sidebar shows an Overview entry, an Itinerary day list for Sun 7/5 through Sat 7/11 with a distinct day-color dot per day, a Budget row, and Support and Hide sidebar controls",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.41",
+      "name": "hover_highlights_paired_marker",
+      "value": 1,
+      "weight": 1,
+      "description": "Hovering a stop row in the plan column visibly highlights that stop's map marker (enlargement or halo) and emphasizes the route segment through it, and moving the pointer away clears the highlight — verified by real pointer hover",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.42",
+      "name": "day_focus_fits_map",
+      "value": 1,
+      "weight": 1,
+      "description": "Activating a day header's Focus control fits the map viewport to exactly that day's stops, and leaving focus mode restores the full-plan map extent",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.43",
+      "name": "day_polylines_with_recomputed_distances",
+      "value": 1,
+      "weight": 1,
+      "description": "The map draws one directional polyline per day connecting that day's stops in start-time order in the day's color, with each leg labeled with a distance in kilometers to one decimal; after reordering or reassigning a stop the affected polylines and distance labels update immediately",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.44",
+      "name": "marker_clustering_by_zoom",
+      "value": 1,
+      "weight": 1,
+      "description": "Zooming the map out groups nearby pins into cluster badges showing the count of contained stops, and zooming in or clicking a cluster expands it back into individual pins",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.45",
+      "name": "map_layer_toggle_three_styles",
+      "value": 1,
+      "weight": 1,
+      "description": "A map layer toggle offers at least three layer styles and switching between them restyles the map in place without a page reload or blank map",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.46",
+      "name": "lodging_isochrone_toggle",
+      "value": 1,
+      "weight": 1,
+      "description": "Selecting the seeded Hotel Le Negresco stop offers an isochrone toggle that draws a translucent circle of roughly 1.25 km radius around the hotel, and toggling it off removes the overlay",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.47",
+      "name": "drag_reassign_and_reorder",
+      "value": 1,
+      "weight": 1,
+      "description": "Dragging a stop card to another day reassigns it and dragging within a day reorders it, with the day sections, map pins, polylines, and distance labels all reflecting the new arrangement immediately after the drop",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.48",
+      "name": "day_accordion_collapse_expand",
+      "value": 1,
+      "weight": 1,
+      "description": "Activating a day section header collapses that day's stop rows and activating it again expands them, while the other days keep their own expanded or collapsed state",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.49",
+      "name": "time_collision_amber_warning",
+      "value": 1,
+      "weight": 1,
+      "description": "When two time blocks in the same day overlap in time, both blocks show an amber overlap treatment with a warning icon, and adjusting either block's times so they no longer overlap clears the treatment from both",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.50",
+      "name": "travel_buffer_mode_recompute",
+      "value": 1,
+      "weight": 1,
+      "description": "Travel-time buffer cards between consecutive stops show a Driving / Walking / Transit mode selector and a computed duration, and changing the mode immediately changes the displayed duration consistent with a faster mode yielding a shorter buffer",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.51",
+      "name": "impossible_transit_warning",
+      "value": 1,
+      "weight": 1,
+      "description": "When the gap between two consecutive blocks is shorter than the selected mode's computed buffer, the buffer card shows an impossible-transit warning, and widening the gap or choosing a faster mode clears it",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.52",
+      "name": "timezone_axis_relabels_times",
+      "value": 1,
+      "weight": 1,
+      "description": "The timezone switcher toggles displayed block times between destination local (CET), home (ET), and UTC: every visible time label relabels to the selected zone and the switcher indicates the active zone",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.53",
+      "name": "recurring_generator_creates_seven_blocks",
+      "value": 1,
+      "weight": 1,
+      "description": "Creating a stop such as 'Breakfast at hotel' 8:00-8:45 with the repeat-daily option enabled creates exactly one block per day across Sun 7/5 through Sat 7/11 (7 blocks) in a single action",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.54",
+      "name": "bucket_drawer_with_polls",
+      "value": 1,
+      "weight": 1,
+      "description": "The unassigned-concepts bucket drawer opens from a persistent control and lists the unscheduled ideas, each carrying a poll widget with per-member vote indicators for Sarah, John, and Marco plus a user vote control",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.55",
+      "name": "vote_winner_promotes_to_timeline",
+      "value": 1,
+      "weight": 1,
+      "description": "After starting a vote on a bucket item, the simulated members cast votes with visible count updates, and when the item reaches 3 of 4 votes it leaves the bucket and appears as a scheduled stop on a day timeline with a map pin in that day's color",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.56",
+      "name": "conflict_modal_choice_applies",
+      "value": 1,
+      "weight": 1,
+      "description": "Triggering a simulated peer edit on a block the user has an unsaved edit open on opens a conflict-resolution modal showing current and incoming versions side by side with Keep mine / Take theirs / Merge choices, and the chosen resolution is actually applied to the block",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.57",
+      "name": "role_switcher_gates_controls",
+      "value": 1,
+      "weight": 1,
+      "description": "Switching the role to Viewer visibly disables all mutating controls (create, edit, delete, drag, vote, bulk), Editor keeps delete disabled while create/edit/move work, and Owner enables everything",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.58",
+      "name": "activity_log_records_mutations",
+      "value": 1,
+      "weight": 1,
+      "description": "The activity log drawer lists session mutations newest first, each entry naming the actor and the change, and performing a create, a drag move, and a delete appends three matching entries",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.59",
+      "name": "filter_ribbon_combines_and_clears",
+      "value": 1,
+      "weight": 1,
+      "description": "The filter ribbon combines cost-tier, category, and tag filters to recompute the visible stops from the shared collection, and Clear filters restores the full plan",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.60",
+      "name": "fuzzy_search_typo_tolerant",
+      "value": 1,
+      "weight": 1,
+      "description": "Typing a slightly misspelled query such as 'anitbes' in the search field still surfaces the Antibes stop, and clearing the query restores the unfiltered view",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.61",
+      "name": "bulk_selection_bar_actions",
+      "value": 1,
+      "weight": 1,
+      "description": "Selecting multiple stops summons a bulk action bar showing the selected count, and its Mass tag, Move to day, and Delete actions apply to every selected stop in one operation",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.62",
+      "name": "kanban_pivot_status_columns",
+      "value": 1,
+      "weight": 1,
+      "description": "Kanban pivot mode shows the stops as To Visit / Reserved / Completed columns, and dragging a card between columns updates that stop's status wherever it appears",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.63",
+      "name": "markdown_export_live_compile",
+      "value": 1,
+      "weight": 1,
+      "description": "The export canvas shows a markdown itinerary with a heading per day in date order and time-ordered stop lines, and reopening it after a change shows the updated document with a Copy control that confirms via toast",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.64",
+      "name": "ics_payload_valid_structure",
+      "value": 1,
+      "weight": 1,
+      "description": "The ICS view renders a payload that begins with BEGIN:VCALENDAR, contains exactly one VEVENT block per scheduled stop with a DTSTART and a SUMMARY naming the stop, and ends with END:VCALENDAR",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.65",
+      "name": "undo_redo_structural_changes",
+      "value": 1,
+      "weight": 1,
+      "description": "Undo and redo controls step through structural changes: after a delete, Undo restores the stop across list, map, and kanban together and Redo removes it again",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.66",
+      "name": "coachmarks_sequence_first_load",
+      "value": 1,
+      "weight": 1,
+      "description": "On a fresh load an onboarding coachmark sequence of at least 3 steps points at the plan column, the map pane, and the ideas bucket with Next and Skip controls, and once dismissed it does not reappear during the session",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.67",
+      "name": "theme_toggle_swaps_all_panes",
+      "value": 1,
+      "weight": 1,
+      "description": "The light/dark toggle swaps the palette across the sidebar, plan column, and map chrome without a reload, with text readable in both themes",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.71",
+      "name": "stop_field_contract_enforced",
+      "value": 1,
+      "weight": 1,
+      "description": "The stop create/edit form enforces the Stop field contract: empty title, endTime not after startTime, and out-of-enum category/costTier/status/day each show an inline error naming that field and leave the stops count unchanged; a valid submit creates a record whose visible title, day, location, times, category, costTier, and status match the submitted values",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.72",
+      "name": "trip_json_live_compile",
+      "value": 1,
+      "weight": 1,
+      "description": "The export canvas trip JSON preview is a live-compiled document with schemaVersion \"1\", a trip object carrying title and dateStart/dateEnd, and a stops array; after creating or renaming a stop the JSON updates to include that stop's title and fields without a reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.73",
+      "name": "trip_json_download_and_copy",
+      "value": 1,
+      "weight": 1,
+      "description": "Download trip JSON offers a real download of the visible trip JSON text, and Copy trip JSON places that exact text on the clipboard with a visible confirmation toast",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.74",
+      "name": "import_trip_json_reconstructs",
+      "value": 1,
+      "weight": 1,
+      "description": "Importing a previously exported trip JSON reconstructs the stops so list rows, map pins, and the trip JSON preview match the imported document; importing malformed JSON shows a visible error and leaves the session unchanged",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "1.75",
+      "name": "ics_download_control",
+      "value": 1,
+      "weight": 1,
+      "description": "Download ICS offers a real download of the visible ICS payload that begins with BEGIN:VCALENDAR and contains one VEVENT per scheduled stop",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.1",
+      "name": "spacing_and_sizing_follow_scale",
+      "value": 1,
+      "weight": 1,
+      "description": "Spacing and sizing follow the design system's scale, with no arbitrary one-off values visible in computed styles.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.2",
+      "name": "typography_matches_spec",
+      "value": 1,
+      "weight": 1,
+      "description": "Typography matches the spec for all headings and body copy.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.3",
+      "name": "layout_matches_reference",
+      "value": 1,
+      "weight": 1,
+      "description": "Layout matches reference screenshots to within a small tolerance at all specified breakpoints; fidelity tasks achieve near pixel-parity.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.4",
+      "name": "specified_state_changes_animate",
+      "value": 1,
+      "weight": 1,
+      "description": "Transitions or animations are applied to the state changes the spec calls out, such as add, delete, filter, or view switch.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.5",
+      "name": "responsive_behavior_matches_reference",
+      "value": 1,
+      "weight": 1,
+      "description": "Responsive behavior matches reference patterns.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.6",
+      "name": "control_styling_matches_spec",
+      "value": 1,
+      "weight": 1,
+      "description": "Button and form radii, padding, and shadows conform to the spec.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.7",
+      "name": "typography_has_clear_hierarchy",
+      "value": 1,
+      "weight": 1,
+      "description": "Typography has a clear hierarchy that distinguishes section and body text.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.8",
+      "name": "component_states_match_spec",
+      "value": 1,
+      "weight": 1,
+      "description": "Component states (default, hover, active, disabled) match the spec where specified.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.9",
+      "name": "surface_treatments_match_spec",
+      "value": 1,
+      "weight": 1,
+      "description": "Color, depth, and border treatments are precise per the design.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.10",
+      "name": "microinteractions_match_spec",
+      "value": 1,
+      "weight": 1,
+      "description": "Microinteraction feedback for hover and press follows the spec in duration and motion.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.11",
+      "name": "extended_surfaces_adopt_reference_language",
+      "value": 1,
+      "weight": 1,
+      "description": "The added surfaces (buffer cards, bucket drawer, kanban columns, conflict modal, export canvas) adopt the reference workspace's spacing scale, radii, and coastal palette so they read as native parts of the screenshotted app",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.12",
+      "name": "dual_pane_proportions_match_reference",
+      "value": 1,
+      "weight": 1,
+      "description": "The plan-column card anatomy and map-pane proportions match the reference screenshots, and the added route, cluster, and isochrone layers do not obscure or distort the referenced three-pane layout",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.1",
+      "name": "empty_plan_and_day_states",
+      "value": 1,
+      "weight": 1,
+      "description": "After deleting all stops the plan list shows an empty state message, and selecting a day with no stops shows an empty day state rather than a blank region",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.2",
+      "name": "stop_form_inline_validation",
+      "value": 1,
+      "weight": 1,
+      "description": "The stop create/edit form shows inline per-field errors for title, endTime, category, costTier, status, and day before submit under the Stop field contract",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.3",
+      "name": "stop_and_import_errors_actionable",
+      "value": 1,
+      "weight": 1,
+      "description": "Stop validation and trip JSON import errors name the problem field and a fix (for example endTime must be after startTime) rather than only saying Invalid",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.4",
+      "name": "export_copy_and_import_feedback",
+      "value": 1,
+      "weight": 1,
+      "description": "Export Copy and successful Import show a visible confirmation toast or notice, and a failed import shows a visible error",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.5",
+      "name": "vote_and_peer_sim_feedback",
+      "value": 1,
+      "weight": 1,
+      "description": "Simulated peer voting and peer-edit conflict resolution show visible progress or state updates (vote counts changing, conflict modal opening) rather than a silent wait with no UI change",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.6",
+      "name": "delete_supports_undo",
+      "value": 1,
+      "weight": 1,
+      "description": "After deleting a stop, Undo restores it across list, map, and exports; bulk Delete requires an explicit confirm step before removing selected stops",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.7",
+      "name": "coachmarks_guide_workspace",
+      "value": 1,
+      "weight": 1,
+      "description": "The onboarding coachmark sequence and/or tooltips explain the plan column, map pane, and ideas bucket so non-obvious collaboration controls are discoverable",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.8",
+      "name": "planner_controls_semantic",
+      "value": 1,
+      "weight": 1,
+      "description": "Stop form fields, export Download/Copy, Import, role switcher, and sidebar day rows use semantic button/input/label elements rather than clickable bare divs",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.9",
+      "name": "conflict_and_export_dismiss_paths",
+      "value": 1,
+      "weight": 1,
+      "description": "The conflict-resolution modal and export canvas each offer an operable dismiss or choice path that returns to the plan without trapping the user",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.10",
+      "name": "coachmark_and_vote_progress",
+      "value": 1,
+      "weight": 1,
+      "description": "The coachmark sequence shows step progress (Next/Skip), and bucket polls show visible vote-count progress toward the 3-of-4 promotion threshold",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.11",
+      "name": "collision_flags_and_clears",
+      "value": 1,
+      "weight": 1,
+      "description": "Editing a block's times to overlap another block flags both amber immediately, and editing them apart clears both warnings",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.12",
+      "name": "empty_bucket_state",
+      "value": 1,
+      "weight": 1,
+      "description": "Emptying the ideas bucket shows a bucket empty state message with no orphaned poll widgets remaining",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.13",
+      "name": "viewer_blocked_action_feedback",
+      "value": 1,
+      "weight": 1,
+      "description": "In the Viewer role, activating a mutating control changes nothing and a read-only notice explains that Viewers cannot edit the plan",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.14",
+      "name": "empty_undo_history_safe",
+      "value": 1,
+      "weight": 1,
+      "description": "With an empty undo history the Undo control is disabled or inert, and activating it produces no state change and no console error",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.15",
+      "name": "recurring_duplicate_guard",
+      "value": 1,
+      "weight": 1,
+      "description": "Running the repeat-daily generator a second time for the same title and time warns about the duplicates and adds no additional blocks",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.16",
+      "name": "end_before_start_rejected",
+      "value": 1,
+      "weight": 1,
+      "description": "Submitting a stop with endTime not strictly after startTime adds no stop and shows an inline error naming endTime",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.17",
+      "name": "out_of_enum_rejected",
+      "value": 1,
+      "weight": 1,
+      "description": "Submitting a stop with a category, costTier, status, or day outside the closed enums adds no stop and shows an inline error naming that field",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.18",
+      "name": "malformed_import_rejected",
+      "value": 1,
+      "weight": 1,
+      "description": "Importing malformed trip JSON shows a visible error naming the import problem, leaves stops unchanged, and produces no console errors",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.19",
+      "name": "invalid_stop_import_rejected",
+      "value": 1,
+      "weight": 1,
+      "description": "Importing trip JSON whose stops violate the Stop field contract (missing title, illegal enum, or endTime not after startTime) shows a visible error naming the offending field and leaves the plan unchanged",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.20",
+      "name": "title_or_notes_length_rejected",
+      "value": 1,
+      "weight": 1,
+      "description": "Submitting a title longer than 120 characters or notes longer than 500 characters adds no stop and shows an inline error naming that field",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.1",
+      "name": "delightful_microinteractions",
+      "value": 1,
+      "weight": 1,
+      "description": "Optional: the itinerary planner adds a delightful microinteraction beyond the required list/map animations — for example presence caret drift, polyline draw-on, or export compile pulse",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.2",
+      "name": "advanced_motion_mechanics",
+      "value": 1,
+      "weight": 1,
+      "description": "Optional: advanced motion beyond the required set — for example coordinated map fly + pin enlarge choreography or day-section accordion height easing",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.3",
+      "name": "guided_onboarding",
+      "value": 1,
+      "weight": 1,
+      "description": "Optional: onboarding goes beyond the required 3-step coachmark — for example a contextual tip after the first vote promotion or first export",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.4",
+      "name": "enhanced_interactive_graphics",
+      "value": 1,
+      "weight": 1,
+      "description": "Optional: an extra visualization beyond required polylines/isochrones — for example a day-density strip or distance summary chip",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.5",
+      "name": "alternative_input_support",
+      "value": 1,
+      "weight": 1,
+      "description": "Optional: an alternative input path such as keyboard multi-select chord or paste-to-create from confirmation text",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.6",
+      "name": "preference_personalization",
+      "value": 1,
+      "weight": 1,
+      "description": "Optional: personalization beyond the required light/dark toggle — for example remembered default transport mode or preferred timezone within the session",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.7",
+      "name": "polished_brand_narrative",
+      "value": 1,
+      "weight": 1,
+      "description": "Optional: polished Côte d'Azur storytelling chrome beyond the required brand mark and plan hero",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.8",
+      "name": "dynamic_theming_beyond_requirements",
+      "value": 1,
+      "weight": 1,
+      "description": "Optional: theming beyond the required light/dark structural toggle — for example a coastal accent pack switcher",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.9",
+      "name": "genre_appropriate_platform_features",
+      "value": 1,
+      "weight": 1,
+      "description": "Optional: a useful web-platform extra such as a print stylesheet polish pass or offline map-cache indicator chrome (still frontend-only)",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.10",
+      "name": "competition_level_innovation",
+      "value": 1,
+      "weight": 1,
+      "description": "Optional: a competition-level itinerary innovation visible in-browser beyond the specified collaboration and export depth",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.11",
+      "name": "latency_simulation_optimistic_ui",
+      "value": 1,
+      "weight": 1,
+      "description": "The app ships the optional latency simulation control center: choosing 50, 500, or 2000 ms visibly delays simulated peer activity while the UI stays optimistic and settles cleanly",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "11.12",
+      "name": "error_toast_test_dispatcher",
+      "value": 1,
+      "weight": 1,
+      "description": "The app ships the optional error-toast test dispatcher: triggering a simulated parse or sync failure raises a distinct toast carrying a visible recovery or dismiss path",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "innovation.catchall",
+      "name": "innovation_catchall",
+      "value": 1,
+      "weight": 1,
+      "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.1",
+      "name": "hover_ease_and_press_scale",
+      "value": 1,
+      "weight": 1,
+      "description": "Hovering sidebar items eases a hover opacity change with a brief press scale on activation, place and carousel cards lift slightly on hover, and map chrome buttons show the same hover/press microfeedback — verified by real pointer hover, not a state shortcut",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.2",
+      "name": "mode_switch_keeps_hover_feedback",
+      "value": 1,
+      "weight": 1,
+      "description": "Plan/Map mode switches update without full reload and keep hover feedback",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.4",
+      "name": "map_fly_and_pin_enlarge",
+      "value": 1,
+      "weight": 1,
+      "description": "Selecting a stop or a day eases/flies the map to the target and animates the chosen pin into its enlarged active state",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.5",
+      "name": "list_add_remove_animates",
+      "value": 1,
+      "weight": 1,
+      "description": "Creating a stop through the form animates the new row into its day section, and deleting a stop animates its row out, rather than rows appearing or vanishing in a single instant frame — verified through the real UI controls, not a state shortcut",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.6",
+      "name": "day_reassign_reflow_animates",
+      "value": 1,
+      "weight": 1,
+      "description": "Reassigning a stop to another day through the edit form animates the reflow of both affected day sections as the row leaves one and enters the other",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.7",
+      "name": "toast_slide_fade_autodismiss",
+      "value": 1,
+      "weight": 1,
+      "description": "Demo toasts slide or fade in when triggered and auto-dismiss on their own after a short interval",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.8",
+      "name": "reduced_motion_respected",
+      "value": 1,
+      "weight": 1,
+      "description": "With prefers-reduced-motion enabled, toast and control transitions are disabled or substantially reduced while the app remains fully usable",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.9",
+      "name": "detail_tabs_swap_without_navigation",
+      "value": 1,
+      "weight": 1,
+      "description": "Place-detail tab switches swap panels in place with the detail card overlaying the map, without any page navigation",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.10",
+      "name": "drag_lift_and_settle",
+      "value": 1,
+      "weight": 1,
+      "description": "A dragged stop card visibly lifts (elevation or scale) while dragging and settles into its drop slot with a brief ease rather than teleporting, and the vacated and receiving day sections animate their reflow — verified through a real pointer drag",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.11",
+      "name": "peer_carets_drift_smoothly",
+      "value": 1,
+      "weight": 1,
+      "description": "The colored peer carets or card outlines drift with smooth continuous easing between positions rather than teleporting in discrete jumps",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.12",
+      "name": "coachmark_step_transitions",
+      "value": 1,
+      "weight": 1,
+      "description": "Advancing the onboarding coachmarks with the real Next control transitions between steps with a short fade or slide rather than an instant swap — verified on a fresh load",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.13",
+      "name": "accordion_height_animates",
+      "value": 1,
+      "weight": 1,
+      "description": "Collapsing and expanding a day accordion through its real header control animates the height change rather than snapping",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.14",
+      "name": "promotion_animates_bucket_to_day",
+      "value": 1,
+      "weight": 1,
+      "description": "A winning poll animates its item out of the bucket and into the day section rather than swapping both surfaces in a single instant frame — verified by running the real vote flow",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "4.16",
+      "name": "export_import_notice_motion",
+      "value": 1,
+      "weight": 1,
+      "description": "Export copy confirmation and import success or error notices appear with a short enter/exit transition rather than popping with no motion (unless prefers-reduced-motion is set)",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.1",
+      "name": "cold_start_is_under_two_seconds",
+      "value": 1,
+      "weight": 1,
+      "description": "Cold start to interactive is under 2 seconds on local render.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.2",
+      "name": "console_is_clean",
+      "value": 1,
+      "weight": 1,
+      "description": "Browser devtools show no errors or warnings.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.3",
+      "name": "transitions_respond_under_100ms",
+      "value": 1,
+      "weight": 1,
+      "description": "UI transitions respond in under 100ms.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.4",
+      "name": "async_work_has_loading_indicators",
+      "value": 1,
+      "weight": 1,
+      "description": "Loading indicators are shown for async or simulated delays.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.5",
+      "name": "large_collections_render_without_lag",
+      "value": 1,
+      "weight": 1,
+      "description": "Large collections render without perceived lag.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.6",
+      "name": "state_changes_remain_interactive",
+      "value": 1,
+      "weight": 1,
+      "description": "The UI remains interactive during state changes.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.7",
+      "name": "animations_maintain_smooth_frame_rate",
+      "value": 1,
+      "weight": 1,
+      "description": "Animations maintain a smooth 60fps; games maintain a stable frame rate during play.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.8",
+      "name": "rapid_input_does_not_freeze",
+      "value": 1,
+      "weight": 1,
+      "description": "The app does not hang or freeze even under rapid user input.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.11",
+      "name": "drag_smooth_full_grid",
+      "value": 1,
+      "weight": 1,
+      "description": "Dragging a stop card across the fully seeded multi-day grid tracks the pointer smoothly with no visible stutter or dropped frames",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.12",
+      "name": "ambient_simulation_stable",
+      "value": 1,
+      "weight": 1,
+      "description": "After 60 seconds of the presence and caret simulation running, the console shows no new errors and interactions remain as responsive as at load",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "9.13",
+      "name": "cluster_zoom_smooth",
+      "value": 1,
+      "weight": 1,
+      "description": "Rapidly zooming the map through cluster and uncluster levels repeatedly shows no hitching, missing pins, or console errors",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.1",
+      "name": "three_pane_to_stacked",
+      "value": 1,
+      "weight": 1,
+      "description": "At 1440px the sidebar, plan column, and map pane sit side by side; below 1024px the map stacks under the plan; at 375px the workspace remains usable without horizontal page scroll",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.2",
+      "name": "mobile_tap_targets",
+      "value": 1,
+      "weight": 1,
+      "description": "At 375px width, sidebar toggle, stop rows, and primary Export/Add controls present tap targets at least 44px in at least one dimension",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.3",
+      "name": "planner_type_scales",
+      "value": 1,
+      "weight": 1,
+      "description": "Trip title and day headings remain readable at 1440px and at 375px without overflowing their containers",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.4",
+      "name": "no_viewport_clip",
+      "value": 1,
+      "weight": 1,
+      "description": "At 1440px and 375px, plan list rows, map pane, and export canvas controls stay within the viewport without clipping primary content",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.5",
+      "name": "sidebar_drawer_below_768",
+      "value": 1,
+      "weight": 1,
+      "description": "At widths of 768px and below the left sidebar collapses behind a toggle that opens it as an overlay drawer",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.6",
+      "name": "map_stacks_below_plan",
+      "value": 1,
+      "weight": 1,
+      "description": "Below 1024px the map pane stacks below the plan column rather than overlapping or sitting beside a crushed sidebar",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.7",
+      "name": "mobile_tap_operates_stops",
+      "value": 1,
+      "weight": 1,
+      "description": "At 375px width, tapping a stop row selects it and tapping the sidebar toggle opens the drawer",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.8",
+      "name": "no_page_horizontal_scroll_375",
+      "value": 1,
+      "weight": 1,
+      "description": "At 375px width the page body has no horizontal scrolling; kanban may scroll inside its own container only",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.9",
+      "name": "map_and_hero_responsive",
+      "value": 1,
+      "weight": 1,
+      "description": "Plan hero cover image and the map pane resize with the layout at 1440px and 375px without overflowing",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.10",
+      "name": "toggle_and_export_reachable",
+      "value": 1,
+      "weight": 1,
+      "description": "Sidebar toggle, Export control, and undo/redo remain reachable at 375px without being covered by fixed chrome",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "7.11",
+      "name": "kanban_and_drawers_adapt",
+      "value": 1,
+      "weight": 1,
+      "description": "Below 1024 px the kanban columns scroll horizontally inside their own container without page-level horizontal scroll, and at 768 px and below the ideas bucket and activity log open as overlay drawers",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.1",
+      "name": "shared_state_coherence",
+      "value": 1,
+      "weight": 1,
+      "description": "Stops, day selection, active mode, and place-detail selection behave as one coherent shared state: a change made in any one view (list edit, map selection, day filter) is immediately reflected in every other view showing that data, without a reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.2",
+      "name": "reload_resets_all_facets_coherently",
+      "value": 1,
+      "weight": 1,
+      "description": "After configuring several independent facets (create a stop, select a day, switch mode, open a detail card), reloading the page returns every facet to the seeded in-memory baseline together — seeded stops, default Overview, no lingering selection — never a mix of surviving and reset facets",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.5",
+      "name": "console_clean_full_exercise",
+      "value": 1,
+      "weight": 1,
+      "description": "No console errors or warnings appear during a full exercise of creating, editing, deleting, mode switching, day selection, and map selection",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.6",
+      "name": "interactive_within_two_seconds",
+      "value": 1,
+      "weight": 1,
+      "description": "The app is interactive within 2 seconds of a local cold load",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.7",
+      "name": "rapid_input_stays_smooth",
+      "value": 1,
+      "weight": 1,
+      "description": "Mode switches, day selection, and map fly animations stay smooth under rapid repeated input, with no hangs, freezes, or dropped interactions",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.8",
+      "name": "keyboard_operable_with_focus_ring",
+      "value": 1,
+      "weight": 1,
+      "description": "Every interactive control — sidebar rows, stop rows, form fields, place-detail tabs, and map chrome buttons — is reachable and operable with the keyboard alone, with a visible focus indicator on each",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.9",
+      "name": "detail_tabs_aria_and_focus_return",
+      "value": 1,
+      "weight": 1,
+      "description": "The place-detail tab row is keyboard operable with the active tab marked programmatically (e.g. aria-selected), and activating the dismiss control from the keyboard closes the card and returns focus to the stop that opened it",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.10",
+      "name": "validation_announced_aria_live",
+      "value": 1,
+      "weight": 1,
+      "description": "Stop form validation messages are shown inline and announced through an aria-live polite region",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.11",
+      "name": "map_pins_accessible_names",
+      "value": 1,
+      "weight": 1,
+      "description": "Map pins expose accessible names that include the place name and its day assignment",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.13",
+      "name": "document_title_names_trip",
+      "value": 1,
+      "weight": 1,
+      "description": "The browser document title references the French Riviera trip rather than a build-tool or framework default placeholder title",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.14",
+      "name": "collab_simulation_is_real_state",
+      "value": 1,
+      "weight": 1,
+      "description": "Simulated collaboration mutates the same shared collection the UI reads: a promoted bucket item becomes a normal stop that can be edited, dragged, and deleted, and simulated mutations appear in the same activity log as the user's own",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.15",
+      "name": "role_timezone_theme_no_reload",
+      "value": 1,
+      "weight": 1,
+      "description": "Switching role, timezone mode, or theme updates every affected surface as shared client state without reloading the document",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.16",
+      "name": "ics_structure_parses",
+      "value": 1,
+      "weight": 1,
+      "description": "The rendered ICS payload is structurally valid: BEGIN:VCALENDAR and END:VCALENDAR wrap one VEVENT per scheduled stop, and each VEVENT carries a parseable DTSTART and a SUMMARY",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.17",
+      "name": "clipboard_copy_matches_display",
+      "value": 1,
+      "weight": 1,
+      "description": "Activating the export Copy control places text on the clipboard that matches the displayed markdown document and raises a visible confirmation",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.18",
+      "name": "print_layout_clean",
+      "value": 1,
+      "weight": 1,
+      "description": "Under print media the plan renders as a clean paginated document of day sections with the map chrome, sidebar, and toolbars excluded",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.20",
+      "name": "trip_json_schema_contract",
+      "value": 1,
+      "weight": 1,
+      "description": "The trip JSON preview conforms to the field contract: schemaVersion is the string 1, trip carries title/dateStart/dateEnd, and every stops element exposes title, day, location, category, costTier, status, lat, and lng using the closed enums and bounds from the instruction",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.21",
+      "name": "in_memory_only_no_storage",
+      "value": 1,
+      "weight": 1,
+      "description": "During a full exercise including export and import, the app does not write to localStorage or sessionStorage; persistence is the portable artifacts and MCP surface only",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.22",
+      "name": "complete_stop_payload_contract",
+      "value": 1,
+      "weight": 1,
+      "description": "A created stop and its matching trip JSON element use the same complete payload: title trimmed length 1–120; day one of the seven 2025-07-05 through 2025-07-11 dates or unscheduled; location trimmed length 1–200; optional startTime/endTime as valid HH:MM with endTime only when startTime exists and strictly later; category lodging/food/transit/activity/idea; costTier 1/2/3/4; status to-visit/reserved/completed; optional tags as at most 8 unique trimmed strings of length 1–24; optional notes length at most 500; numeric lat -90 through 90 and lng -180 through 180",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "2.23",
+      "name": "ics_event_date_time_semantics",
+      "value": 1,
+      "weight": 1,
+      "description": "For the live scheduled stops, each ICS VEVENT has SUMMARY exactly equal to its title; a timed stop has DTSTART matching its day and startTime, an untimed stop has DTSTART;VALUE=DATE on its day, and a stop with endTime has DTEND matching that same-day endTime; unscheduled ideas produce no VEVENT",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.1",
+      "name": "create_flow_updates_all_surfaces",
+      "value": 1,
+      "weight": 1,
+      "description": "Create flow: creating a valid stop adds exactly one day-list row and one map pin in that day's color and includes the stop in markdown, ICS, and trip JSON without a reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.2",
+      "name": "invalid_create_shows_inline_validation",
+      "value": 1,
+      "weight": 1,
+      "description": "Create flow: submitting with an empty title or endTime before startTime triggers immediate inline validation naming the offending field and adds no stop",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.3",
+      "name": "edit_flow_updates_related_displays",
+      "value": 1,
+      "weight": 1,
+      "description": "Edit flow: renaming a stop updates the day-list row, place-detail card, map popup, markdown export, ICS SUMMARY, and trip JSON title without a reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.4",
+      "name": "delete_flow_updates_all_surfaces",
+      "value": 1,
+      "weight": 1,
+      "description": "Delete flow: deleting a stop removes it from the day section, map pins, selection, markdown, ICS, and trip JSON in the same interaction",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.5",
+      "name": "view_switch_retains_state",
+      "value": 1,
+      "weight": 1,
+      "description": "View/mode switch: switching Plan List and Map modes keeps the same selected stop and shows it in both without a full page reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.6",
+      "name": "last_delete_reveals_empty_state",
+      "value": 1,
+      "weight": 1,
+      "description": "Edge: after deleting all stops, the plan list empty state is visible, the map shows no numbered pins, and ICS has zero VEVENT blocks",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.7",
+      "name": "filters_update_all_surfaces",
+      "value": 1,
+      "weight": 1,
+      "description": "Edge: applying a day or category filter narrows the plan list and map pins together, and Clear filters restores the full plan",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.8",
+      "name": "collapsible_chrome_preserves_workflow",
+      "value": 1,
+      "weight": 1,
+      "description": "Collapsible chrome: Hide sidebar collapses the left nav and the toggle reopens it as a drawer or sidebar with the current day selection preserved",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.9",
+      "name": "overlays_support_expected_flows",
+      "value": 1,
+      "weight": 1,
+      "description": "Overlays: place-detail, conflict-resolution, and export canvas open and dismiss without trapping the user; dismiss returns to the underlying plan",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.10",
+      "name": "flow_recovers_without_reload",
+      "value": 1,
+      "weight": 1,
+      "description": "Recovery: after a failed import or Viewer-blocked action, a visible error or notice appears and the user can dismiss it and continue editing without a reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.11",
+      "name": "drag_reassign_updates_route_and_log",
+      "value": 1,
+      "weight": 1,
+      "description": "Dragging a stop from one day to another updates the old day section, the new day section, both days' polylines and distance labels, the adjacent buffer cards, and appends an activity log entry describing the move, all without a reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.12",
+      "name": "vote_promotion_end_to_end",
+      "value": 1,
+      "weight": 1,
+      "description": "Running a bucket poll to its winning threshold moves the item out of the bucket onto the timeline, and the promoted stop then appears in Plan List mode, on the map in its day's color, and under its day heading in the export markdown",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.13",
+      "name": "conflict_merge_end_to_end",
+      "value": 1,
+      "weight": 1,
+      "description": "Resolving a simulated edit conflict with the Merge choice leaves the merged content visible in the block's row, in its detail card, and in the export markdown, with a matching activity log entry",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.14",
+      "name": "undo_redo_round_trip_flow",
+      "value": 1,
+      "weight": 1,
+      "description": "Deleting a stop then pressing Undo restores it to its day section, its map pin, and the export document, and pressing Redo removes it again from all three",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.15",
+      "name": "kanban_status_echoes_plan_list",
+      "value": 1,
+      "weight": 1,
+      "description": "Changing a stop's status by dragging its card between kanban columns is reflected on that stop's row in Plan List mode and in status-filtered results without a reload",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.16",
+      "name": "role_round_trip_preserves_edits",
+      "value": 1,
+      "weight": 1,
+      "description": "Switching to Viewer disables all mutating controls, and switching back to Owner re-enables them with every edit made before the switch still intact",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "6.17",
+      "name": "export_import_round_trip_flow",
+      "value": 1,
+      "weight": 1,
+      "description": "Export then import flow: mutate the plan (rename + new stop), Download or Copy trip JSON, reload to seeded baseline, Import that JSON, and confirm list, map, markdown, ICS, and trip JSON match the pre-export mutated state",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.1",
+      "name": "three_pane_planner_density",
+      "value": 1,
+      "weight": 1,
+      "description": "Three-pane planner composition (left sidebar / center plan column / right map pane) remains dense and trip-specific, with the planner workspace as the first viewport (no marketing landing)",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.2",
+      "name": "empty_list_state_visible",
+      "value": 1,
+      "weight": 1,
+      "description": "Empty plan list state is visually present and clear when no stops remain",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.4",
+      "name": "day_colored_numbered_pins",
+      "value": 1,
+      "weight": 1,
+      "description": "The map shows one numbered pin per stop colored by its day, the selected pin is enlarged with a popup reading the place name and its Day N label, and unscheduled ideas stops use a neutral non-day marker",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.6",
+      "name": "coastal_palette_and_typeface",
+      "value": 1,
+      "weight": 1,
+      "description": "The page shows a soft coastal look: a cool blue-gray page wash, a humanist sans-serif body typeface, and a navy accent color used consistently across chrome and controls",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.7",
+      "name": "sidebar_dot_matches_pin_color",
+      "value": 1,
+      "weight": 1,
+      "description": "Each itinerary day carries its own distinct color, and that color is shared between the day's sidebar dot and its numbered map pins",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.8",
+      "name": "floating_detail_card_anatomy",
+      "value": 1,
+      "weight": 1,
+      "description": "The place-detail card floats over the map pane with a visible tab row (About / Book / Reviews / Photos / Mentions) and a dismiss control",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.9",
+      "name": "single_consistent_icon_set",
+      "value": 1,
+      "weight": 1,
+      "description": "Icons across the sidebar, toolbar, and map chrome come from one consistent icon set rendered at consistent sizes, with no mixed styles or pixelated glyphs",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.10",
+      "name": "hero_cover_title_date_range",
+      "value": 1,
+      "weight": 1,
+      "description": "The plan hero presents a cover image, the trip title 'Trip to the French Riviera - Cote d'Azur', and the date range 7/5–7/11 with clear typographic hierarchy over the plan column",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.11",
+      "name": "panes_side_by_side_at_1024",
+      "value": 1,
+      "weight": 1,
+      "description": "At viewport widths of 1024px and above the sidebar, plan column, and map pane render side by side; below 1024px the map pane stacks below the plan column",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.12",
+      "name": "sidebar_drawer_at_768",
+      "value": 1,
+      "weight": 1,
+      "description": "At viewport widths of 768px and below, the left sidebar collapses behind a toggle control that opens it as an overlay drawer",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.14",
+      "name": "ui_copy_quality",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the app renders headings, labels, empty states, and validation messages, the copy uses one consistent capitalization convention and consistent terminology, and error messages name the problem field rather than a generic rejection",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.16",
+      "name": "brand_and_trip_signal_first_viewport",
+      "value": 1,
+      "weight": 1,
+      "description": "The first viewport shows the Trip / Travel Planner product name with French Riviera — Côte d'Azur as the trip signal, and the initial view is the planner workspace rather than a marketing or login screen",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.17",
+      "name": "dual_pane_route_anatomy",
+      "value": 1,
+      "weight": 1,
+      "description": "Day-colored route polylines carry small distance labels, cluster badges are circular with a visible count, and the isochrone circle renders translucent so the map beneath stays readable",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.18",
+      "name": "scheduling_grid_anatomy",
+      "value": 1,
+      "weight": 1,
+      "description": "Time blocks display their start-end times, overlapping blocks use an amber treatment with a warning icon, and travel buffer cards are visually distinct from stop cards (for example a dashed connector style) so the timeline reads as blocks joined by transit",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.19",
+      "name": "collaboration_chrome_anatomy",
+      "value": 1,
+      "weight": 1,
+      "description": "Presence avatars render as overlapping colored circles in the top chrome, peer carets use each member's distinct color, and the conflict modal presents current and incoming versions in two clearly differentiated columns",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.20",
+      "name": "kanban_filter_bucket_anatomy",
+      "value": 1,
+      "weight": 1,
+      "description": "Kanban pivot shows three equal-width columns titled To Visit, Reserved, and Completed each with a count badge, the filter ribbon reads as one row of labeled chips above the plan column, and bucket poll cards share the app's card treatment",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "3.21",
+      "name": "dark_mode_coherent_panes",
+      "value": 1,
+      "weight": 1,
+      "description": "In dark mode the sidebar, plan column, and map chrome all swap coherently to the dark palette with readable text throughout",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.1",
+      "name": "headings_use_consistent_capitalization",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the app renders headings and section titles, they use consistent capitalization (one convention — title case or sentence case — throughout).",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.2",
+      "name": "actions_use_specific_labels",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the app renders button or action labels, they are specific verbs ('Add stop', 'Download ICS', 'Import trip JSON'), not generic ('Submit', 'OK') when a specific label is possible.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.3",
+      "name": "errors_name_problem_and_fix",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the app renders error messages, they name the problem and the fix ('Title is required', 'endTime must be after startTime'), not just a rejection ('Invalid').",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.4",
+      "name": "empty_states_explain_next_step",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the app renders empty plan, empty day, or empty ideas-bucket states, the copy explains that no stops remain and how to add one.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.5",
+      "name": "body_copy_is_well_written",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the app renders body or marketing copy, rate how free it is of spelling and grammatical errors.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.6",
+      "name": "terminology_is_consistent",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the app renders labels for the same concept in multiple places, terminology is consistent (not 'stop' here and 'activity' there for the same row, or 'trip JSON' vs an unrelated export name).",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.7",
+      "name": "numbers_dates_and_units_are_consistent",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the app renders numbers, dates, and units, formatting is consistent (day labels 7/5–7/11, distance labels in km to one decimal, times in one clock convention per timezone mode).",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.8",
+      "name": "success_messages_are_specific",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the app renders confirmation and success messages, they state what happened ('Trip JSON copied', 'Import complete'), not vague affirmations.",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.9",
+      "name": "activity_log_entries_specific",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the activity log renders entries, each is a specific human-readable sentence naming actor, action, and target (for example 'John moved Flight 102 to Day 1'), not a generic 'item updated'",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.10",
+      "name": "export_markdown_well_formed",
+      "value": 1,
+      "weight": 1,
+      "description": "Where the markdown export renders, it uses a heading per day and readable time-ordered lines with no raw data dumps, and the coachmark and conflict-modal copy explains what to do in plain language",
+      "reasoning": "Yes - observed in browser"
+    },
+    {
+      "id": "15.11",
+      "name": "field_contract_errors_name_fields",
+      "value": 1,
+      "weight": 1,
+      "description": "Where stop validation or trip JSON import errors render, the copy names the problem field (title, endTime, category, or import) and a fix — not a generic rejection",
+      "reasoning": "Yes - observed in browser"
+    }
+  ]
+}
