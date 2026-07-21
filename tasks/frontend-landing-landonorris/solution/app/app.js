@@ -8,6 +8,12 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const prefersReduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', (e) => {
+    if (e.matches) {
+      const pre = $('#preloader');
+      if (pre) pre.classList.add('is-done');
+    }
+  });
 
   /* ---------------- Seed data ---------------- */
   const SEED_RACES = [
@@ -671,7 +677,7 @@
     // Preloader: lime LOAD VALE cover, clears within ~1.8s (instant under reduced motion).
     const pre = $('#preloader');
     const dismiss = () => pre.classList.add('is-done');
-    if (prefersReduced()) dismiss(); else setTimeout(dismiss, 1200);
+    if (prefersReduced()) dismiss(); else setTimeout(dismiss, 3000);
 
     // Nav chrome (all in-page; nothing reloads or leaves the origin)
     ham.addEventListener('click', () => (state.menuOpen ? closeMenu() : openMenu()));
@@ -730,6 +736,8 @@
 
     // Press kit
     $('[data-presskit-close]').addEventListener('click', closePressKit);
+    $('[data-undo]').addEventListener('click', undo);
+    $('[data-redo]').addEventListener('click', redo);
     drawerScrim.addEventListener('click', closePressKit);
     $$('.presskit-tab').forEach(t => t.addEventListener('click', () => setTab(t.dataset.tab)));
     $('[data-presskit-copy]').addEventListener('click', copyActive);
@@ -763,6 +771,15 @@
 
     // Global keys: Meta/Ctrl+K toggles the palette; Escape closes the top overlay only.
     document.addEventListener('keydown', (e) => {
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'z' || e.key === 'Z')) {
+        if (e.shiftKey) { e.preventDefault(); redo(); }
+        else { e.preventDefault(); undo(); }
+        return;
+      }
+      if ((e.metaKey || e.ctrlKey) && (e.key === 'y' || e.key === 'Y')) {
+        e.preventDefault(); redo();
+        return;
+      }
       if ((e.metaKey || e.ctrlKey) && (e.key === 'k' || e.key === 'K')) {
         e.preventDefault();
         state.paletteOpen ? closePalette() : openPalette();
@@ -777,9 +794,13 @@
     });
 
     // Modal focus traps
-    menu.addEventListener('keydown', (e) => { if (state.menuOpen) trapFocus(menu, e); });
-    drawer.addEventListener('keydown', (e) => { if (state.pressKitOpen) trapFocus(drawer, e); });
-    palette.addEventListener('keydown', (e) => { if (state.paletteOpen) trapFocus(palette, e); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Tab') {
+        if (state.menuOpen) trapFocus(menu, e);
+        else if (state.pressKitOpen) trapFocus(drawer, e);
+        else if (state.paletteOpen) trapFocus(palette, e);
+      }
+    });
 
     // Marquees run only in view (paused otherwise)
     const io = new IntersectionObserver((entries) => {
