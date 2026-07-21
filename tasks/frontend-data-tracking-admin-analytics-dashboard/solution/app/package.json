@@ -2,7 +2,7 @@
   "name": "oracle-static",
   "private": true,
   "scripts": {
-    "verify:build": "esbuild src/index.tsx --bundle --outfile=app.js && node -e \"require('fs').accessSync('index.html')\"",
+    "verify:build": "esbuild src/index.tsx --bundle --minify --define:process.env.NODE_ENV=\\\"production\\\" --outfile=app.js && node -e \"require('fs').accessSync('index.html')\"",
     "start": "npx --yes serve -l 3000 -n"
   },
   "dependencies": {

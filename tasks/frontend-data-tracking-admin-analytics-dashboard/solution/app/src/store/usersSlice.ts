@@ -1,70 +1,36 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SEED_USERS, User, Role, Status } from '../data';
 
-export interface User {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone?: string;
-  notes?: string;
-  status: 'Active' | 'Invited' | 'Suspended';
-  role: string;
-  payments: number;
-  products: number;
-  lastActive: string;
-}
-
-const initialUsers: User[] = [
-  { id: '1', firstName: 'Alice', lastName: 'Smith', email: 'alice@example.com', status: 'Active', role: 'Admin', payments: 1200, products: 4, lastActive: new Date().toISOString() },
-  { id: '2', firstName: 'Bob', lastName: 'Jones', email: 'bob@example.com', status: 'Active', role: 'User', payments: 300, products: 1, lastActive: new Date().toISOString() },
-  { id: '3', firstName: 'Charlie', lastName: 'Brown', email: 'charlie@example.com', status: 'Suspended', role: 'User', payments: 0, products: 0, lastActive: new Date().toISOString() },
-  { id: '4', firstName: 'Diana', lastName: 'Prince', email: 'diana@example.com', status: 'Active', role: 'Manager', payments: 4500, products: 8, lastActive: new Date().toISOString() },
-  { id: '5', firstName: 'Evan', lastName: 'Wright', email: 'evan@example.com', status: 'Invited', role: 'User', payments: 0, products: 0, lastActive: new Date().toISOString() },
-  { id: '6', firstName: 'Fiona', lastName: 'Gallagher', email: 'fiona@example.com', status: 'Active', role: 'User', payments: 150, products: 2, lastActive: new Date().toISOString() },
-  { id: '7', firstName: 'George', lastName: 'Costanza', email: 'george@example.com', status: 'Suspended', role: 'User', payments: 20, products: 1, lastActive: new Date().toISOString() },
-  { id: '8', firstName: 'Hannah', lastName: 'Abbott', email: 'hannah@example.com', status: 'Active', role: 'Manager', payments: 800, products: 3, lastActive: new Date().toISOString() },
-];
+export interface UsersState { data: User[]; }
+const initialState: UsersState = { data: SEED_USERS.map((u) => ({ ...u })) };
 
 export const usersSlice = createSlice({
   name: 'users',
-  initialState: {
-    data: initialUsers,
-  },
+  initialState,
   reducers: {
-    addUser: (state, action: PayloadAction<User>) => {
-      state.data.push(action.payload);
+    addUser: (s, a: PayloadAction<User>) => { s.data.push(a.payload); },
+    updateUser: (s, a: PayloadAction<User>) => {
+      const i = s.data.findIndex((u) => u.id === a.payload.id);
+      if (i >= 0) s.data[i] = a.payload;
     },
-    updateUser: (state, action: PayloadAction<User>) => {
-      const index = state.data.findIndex(u => u.id === action.payload.id);
-      if (index !== -1) {
-        state.data[index] = action.payload;
-      }
+    patchUsers: (s, a: PayloadAction<{ ids: string[]; patch: Partial<User> }>) => {
+      s.data.forEach((u) => { if (a.payload.ids.includes(u.id)) Object.assign(u, a.payload.patch); });
     },
-    deleteUser: (state, action: PayloadAction<string>) => {
-      state.data = state.data.filter(u => u.id !== action.payload);
+    deleteUser: (s, a: PayloadAction<string>) => { s.data = s.data.filter((u) => u.id !== a.payload); },
+    deleteUsers: (s, a: PayloadAction<string[]>) => { s.data = s.data.filter((u) => !a.payload.includes(u.id)); },
+    updateUsersStatus: (s, a: PayloadAction<{ ids: string[]; status: Status }>) => {
+      s.data.forEach((u) => { if (a.payload.ids.includes(u.id)) u.status = a.payload.status; });
     },
-    deleteUsers: (state, action: PayloadAction<string[]>) => {
-      state.data = state.data.filter(u => !action.payload.includes(u.id));
+    updateUsersRole: (s, a: PayloadAction<{ ids: string[]; role: Role }>) => {
+      s.data.forEach((u) => { if (a.payload.ids.includes(u.id)) u.role = a.payload.role; });
     },
-    updateUsersStatus: (state, action: PayloadAction<{ ids: string[], status: User['status'] }>) => {
-      state.data.forEach(u => {
-        if (action.payload.ids.includes(u.id)) {
-          u.status = action.payload.status;
-        }
-      });
-    },
-    updateUsersRole: (state, action: PayloadAction<{ ids: string[], role: string }>) => {
-      state.data.forEach(u => {
-        if (action.payload.ids.includes(u.id)) {
-          u.role = action.payload.role;
-        }
-      });
-    },
-    setUsers: (state, action: PayloadAction<User[]>) => {
-      state.data = action.payload;
-    }
+    setUsers: (s, a: PayloadAction<User[]>) => { s.data = a.payload; },
+    resetUsers: (s) => { s.data = SEED_USERS.map((u) => ({ ...u })); },
   },
 });
 
-export const { addUser, updateUser, deleteUser, deleteUsers, updateUsersStatus, updateUsersRole, setUsers } = usersSlice.actions;
+export const {
+  addUser, updateUser, patchUsers, deleteUser, deleteUsers,
+  updateUsersStatus, updateUsersRole, setUsers, resetUsers,
+} = usersSlice.actions;
 export default usersSlice.reducer;
