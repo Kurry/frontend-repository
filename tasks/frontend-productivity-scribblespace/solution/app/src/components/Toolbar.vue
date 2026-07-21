@@ -42,7 +42,7 @@ const objectCount = computed(() => store.activeBoard?.objects.length || 0)
 
 <template>
   <div
-    class="flex flex-nowrap items-center gap-2 px-3 py-2 bg-white/95 shadow-md w-full rounded-xl border border-gray-200 overflow-x-auto"
+    class="flex flex-nowrap items-center gap-2 px-3 py-2 bg-white/95 shadow-md w-full rounded-[12px] border border-gray-200 overflow-x-auto"
     role="toolbar"
     aria-label="Canvas tools"
   >
@@ -167,13 +167,7 @@ const objectCount = computed(() => store.activeBoard?.objects.length || 0)
 
 <style scoped>
 @reference "../index.css";
-.btn-primary {
-  @apply bg-[#6D5BD0] hover:bg-[#5A4AB8] text-white font-medium rounded-lg px-4 min-h-[36px] text-sm;
-}
-.btn-secondary {
-  @apply bg-white hover:bg-gray-100 text-gray-800 border border-gray-300 font-medium rounded-lg px-3 min-h-[36px] text-sm;
-}
-.btn-tool {
-  @apply bg-white hover:bg-[#F3F0FF] text-gray-700 font-medium rounded-lg px-3 min-h-[36px] text-sm border-transparent border aria-pressed:border-[#6D5BD0] aria-pressed:bg-[#F3F0FF] aria-pressed:text-[#6D5BD0];
-}
+
+
+
 </style>
