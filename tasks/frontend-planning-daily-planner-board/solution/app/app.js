@@ -625,6 +625,8 @@
   function showToast(msg) {
     var t = byId("toast");
     if (!t) return;
+    var sr = byId("toast-sr");
+    if (sr) sr.textContent = msg;
     t.textContent = msg;
     t.hidden = false;
     void t.offsetWidth; // restart the enter transition
@@ -660,11 +662,11 @@
     if (t.id === newlyAddedId) { card.classList.add("entering"); newlyAddedId = null; }
     card.dataset.id = t.id;
 
-    var chk = el("button", "chk");
-    chk.type = "button";
+    var chk = el("input", "chk");
+    chk.type = "checkbox"; chk.checked = t.done;
     chk.dataset.act = "toggle";
-    chk.setAttribute("aria-label", (t.done ? "Mark task incomplete: " : "Complete task: ") + t.title);
-    chk.setAttribute("aria-pressed", String(t.done));
+    chk.setAttribute("aria-label", "Toggle completion for " + t.title);
+
     chk.appendChild(el("span", "box"));
     card.appendChild(chk);
 
@@ -968,7 +970,7 @@
     }
   }
 
-  function renderTray() {
+    function renderTray() {
     var tray = byId("bulk-tray");
     if (!tray) return;
     if (state.selected.length) {
@@ -977,6 +979,9 @@
     } else {
       tray.hidden = true;
     }
+    ['bulk-complete', 'bulk-move', 'bulk-delete'].forEach(function(id) {
+      if (byId(id)) byId(id).disabled = state.selected.length === 0;
+    });
   }
 
   function updateUndoRedoButtons() {
