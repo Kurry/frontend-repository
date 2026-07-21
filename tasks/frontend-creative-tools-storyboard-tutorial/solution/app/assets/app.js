@@ -969,6 +969,7 @@
       p.elapsedBefore += performance.now() - p.startedAt;
     }
     renderPresenterControls();
+    wirePresenter(presenterEl.querySelector("#pres-controls"));
   }
   function finishPresenter() {
     cancelAnimationFrame(rafId);
@@ -1045,8 +1046,8 @@
       '<button type="button" class="pres-btn primary" data-p="pause"><span class="icon ' + (p.paused ? "icon-play" : "icon-pause") + '" aria-hidden="true"></span>' + (p.paused ? "Resume" : "Pause") + '</button>' +
       '<button type="button" class="pres-btn" data-p="next" aria-label="Next scene"><span class="icon icon-chevron-right" aria-hidden="true"></span></button>';
   }
-  function wirePresenter() {
-    presenterEl.querySelectorAll("[data-p]").forEach((b) => b.addEventListener("click", () => {
+  function wirePresenter(root) {
+    (root || presenterEl).querySelectorAll("[data-p]").forEach((b) => b.addEventListener("click", () => {
       const a = b.getAttribute("data-p");
       if (a === "exit") exitPresenter();
       else if (a === "pause") togglePause();
@@ -1111,7 +1112,7 @@
       '<div class="coach-actions"><span class="coach-dots"><i class="on"></i></span><button type="button" class="coach-btn coach-next" data-coach="dismiss">Got it</button></div>';
     const cw = 300;
     coachEl.style.left = Math.min(Math.max(8, r.right - cw), window.innerWidth - cw - 8) + "px";
-    coachEl.style.top = (r.bottom + 12) + "px";
+    coachEl.style.top = Math.max(8, r.bottom + 12) + "px";
   }
   coachEl.addEventListener("click", (e) => {
     const b = e.target.closest("[data-coach]");
