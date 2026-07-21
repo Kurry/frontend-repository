@@ -266,6 +266,8 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   .header-actions { gap: 2px; }
   .topbar .v-btn.v-btn--icon { width: 40px; height: 40px; }
   .overview-row h2 { font-size: 24px; }
+  .overview-actions { display: grid; grid-template-columns: minmax(0, 1fr); }
+  .overview-actions .v-btn { width: 100%; min-width: 0; }
   .baseline-badge { display: none; }
   .triage-donut-row { grid-template-columns: 96px 1fr; }
   .variance-top-grid { gap: 12px; }
