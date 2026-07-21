@@ -184,9 +184,14 @@ export const useLabStore = create((set, get) => ({
 
   setCompare: (side, label) => set((state) => {
     if (!label) {
-      return side === 'A'
-        ? { compareA: '', compareError: '', pairRejection: '' }
-        : { compareB: '', pairRejection: '' }
+      const compareA = side === 'A' ? '' : state.compareA
+      const compareB = side === 'B' ? '' : state.compareB
+      return {
+        ...(side === 'A'
+          ? { compareA: '', compareError: '', pairRejection: '' }
+          : { compareB: '', pairRejection: '' }),
+        deltaPair: compareA && compareB ? [compareA, compareB] : [],
+      }
     }
     if ((side === 'A' && label === state.compareB) || (side === 'B' && label === state.compareA)) {
       const field = side === 'A' ? 'labelA' : 'labelB'
