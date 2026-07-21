@@ -306,7 +306,9 @@ function UserForm() {
   const editing = store.editUserId.value ? store.users.value.find(u=>u.id===store.editUserId.value) : null;
   const source = store.duplicateSourceId.value ? store.users.value.find(u=>u.id===store.duplicateSourceId.value) : null;
   const mode = editing ? 'edit' : source ? 'duplicate' : 'add';
-  const draft = store.formDraft.value;
+  // Restore the saved draft when this view mounts without subscribing the
+  // entire form component to every draft write; react-hook-form owns live edits.
+  const draft = store.formDraft.peek();
   const draftValues = draft && draft.mode === mode && draft.editId === (editing?.id ?? null) && draft.sourceId === (source?.id ?? null)
     ? draft.values
     : null;
