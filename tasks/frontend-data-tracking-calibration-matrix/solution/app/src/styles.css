@@ -277,7 +277,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; view-transition-name: none !important; }
   .heat-cell:hover, .heat-cell:focus-within { transform: none !important; }
 }
 
