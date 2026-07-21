@@ -8,7 +8,7 @@
     "verify:build": "vite build"
   },
   "dependencies": {
-    "@fontsource/outfit": "^5.2.5"
+    "@fontsource/outfit": "5.2.5"
   },
   "devDependencies": {
     "vite": "^7.3.1"
