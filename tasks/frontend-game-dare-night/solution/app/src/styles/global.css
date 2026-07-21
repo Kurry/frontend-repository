@@ -197,6 +197,9 @@ div.bg-white.rounded-2xl {
 
 .dialog-panel {
   animation: dialogIn 0.22s ease-out;
+  max-height: calc(100dvh - 2.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .dialog-backdrop {
