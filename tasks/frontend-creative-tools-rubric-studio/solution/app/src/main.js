@@ -3,6 +3,11 @@ import { createPinia } from 'pinia'
 import PrimeVue from 'primevue/config'
 import ToastService from 'primevue/toastservice'
 import Aura from '@primeuix/themes/aura'
+// Locally bundled variable fonts (no CDN): Space Grotesk for display,
+// Public Sans for body, JetBrains Mono for code / metric surfaces.
+import '@fontsource-variable/space-grotesk'
+import '@fontsource-variable/public-sans'
+import '@fontsource-variable/jetbrains-mono'
 import App from './App.vue'
 import './styles.css'
 

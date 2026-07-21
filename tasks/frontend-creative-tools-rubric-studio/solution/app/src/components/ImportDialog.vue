@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { z } from 'zod'
 import { toTypedSchema } from '@vee-validate/zod'
 import { useForm } from 'vee-validate'
@@ -7,10 +7,12 @@ import Dialog from 'primevue/dialog'
 import Textarea from 'primevue/textarea'
 import Button from 'primevue/button'
 import { useStudioStore } from '../store'
+import { useFocusTrap } from '../focus-trap'
 
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close', 'imported'])
 const store = useStudioStore()
+useFocusTrap(computed(() => props.open))
 const packageError = ref('')
 const formSchema = toTypedSchema(z.object({ json: z.string().trim().min(1, 'Package JSON is required; paste an exported package') }))
 const { defineField, errors, meta, handleSubmit, resetForm, validate } = useForm({ validationSchema: formSchema, initialValues: { json: '' }, validateOnMount: true })

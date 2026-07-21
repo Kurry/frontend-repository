@@ -124,8 +124,15 @@ export const useStudioStore = defineStore('studio', () => {
     activeDiffId: null,
     expandedCriteria: [],
     expandedRationales: [],
+    collapsingIds: [],
     newCriterionId: null,
+    leavingId: null,
+    versionCommitBusy: false,
   })
+  // Session personalization: within the in-memory session the studio remembers
+  // the last opened view per rubric (and the tour dismissal) until reload.
+  const lastViews = ref({})
+  const tourDismissed = ref(false)
 
   function initializeCriterionState() {
     for (const rubric of rubrics.value) {
@@ -174,22 +181,27 @@ export const useStudioStore = defineStore('studio', () => {
     mutation()
   }
   function undo() {
+    if (ui.versionCommitBusy) return false
     const entry = undoStack.value.pop()
-    if (!entry) return
+    if (!entry) return false
     redoStack.value.push({ label: entry.label, state: snapshot() })
     restore(entry.state)
+    return true
   }
   function redo() {
+    if (ui.versionCommitBusy) return false
     const entry = redoStack.value.pop()
-    if (!entry) return
+    if (!entry) return false
     undoStack.value.push({ label: entry.label, state: snapshot() })
     restore(entry.state)
+    return true
   }
 
   function selectRubric(slug) {
+    if (ui.versionCommitBusy) return false
     if (!rubrics.value.some((rubric) => rubric.slug === slug)) return false
     activeSlug.value = slug
-    activeView.value = 'criteria'
+    activeView.value = lastViews.value[slug] || 'criteria'
     ui.activeDiffId = null
     ui.railOpen = false
     return true
@@ -197,6 +209,7 @@ export const useStudioStore = defineStore('studio', () => {
   function setView(view) {
     if (!['criteria', 'tune', 'preview'].includes(view)) return false
     activeView.value = view
+    lastViews.value[activeSlug.value] = view
     ui.activeDiffId = null
     return true
   }
@@ -211,6 +224,7 @@ export const useStudioStore = defineStore('studio', () => {
     return true
   }
   function addCriterion(payload) {
+    if (ui.versionCommitBusy) return { ok: false, message: 'Pending change is already being applied' }
     const validated = CriterionSchema.safeParse(payload)
     if (!validated.success) return { ok: false, message: formatZodError(validated.error) }
     payload = validated.data
@@ -225,6 +239,7 @@ export const useStudioStore = defineStore('studio', () => {
     return { ok: true }
   }
   function stageEdit(id, payload) {
+    if (ui.versionCommitBusy) return false
     const before = activeRubric.value.criteria.find((item) => item.id === id)
     if (!before) return false
     const validated = CriterionSchema.safeParse(payload)
@@ -239,13 +254,15 @@ export const useStudioStore = defineStore('studio', () => {
     return true
   }
   function stageDelete(id) {
+    if (ui.versionCommitBusy) return false
     const before = activeRubric.value.criteria.find((item) => item.id === id)
     if (!before) return false
     pendingChange.value = { action: 'delete', kind: 'major', criterionId: id, before: clone(before), after: null }
     ui.versionOpen = true
     return true
   }
-  function applyPending(version) {
+  function applyPending(version, allowBusyCommit = false) {
+    if (ui.versionCommitBusy && !allowBusyCommit) return { ok: false, message: 'Pending change is already being applied' }
     const pending = pendingChange.value
     if (!pending || !requiredVersion(pending.kind, activeRubric.value.version, version)) return { ok: false, message: `${pending?.kind || 'version'} bump required` }
     commit(`${pending.action} ${pending.criterionId}`, () => {
@@ -279,8 +296,10 @@ export const useStudioStore = defineStore('studio', () => {
     return { ok: true, action }
   }
   function cancelPending() {
+    if (ui.versionCommitBusy) return false
     pendingChange.value = null
     ui.versionOpen = false
+    return true
   }
   function toggleCase(id, value) {
     const target = cases.value.find((item) => item.id === id)
@@ -326,7 +345,7 @@ export const useStudioStore = defineStore('studio', () => {
     const precision = tp + fp ? tp / (tp + fp) : 0
     const recall = tp + fn ? tp / (tp + fn) : 0
     const f1 = precision + recall ? (2 * precision * recall) / (precision + recall) : 0
-    return { precision, recall, f1, tp, fp, fn }
+    return { precision, recall, f1, tp, fp, fn, tn: set.length - tp - fp - fn }
   }
   const macroMetrics = computed(() => {
     const rows = activeRubric.value?.criteria.map(metricsFor).filter(Boolean) || []
@@ -375,6 +394,7 @@ export const useStudioStore = defineStore('studio', () => {
     ui.exportOpen = true
   }
   function importPackage(input) {
+    if (ui.versionCommitBusy) return { ok: false, message: 'Pending change is already being applied' }
     const result = RubricPackageSchema.safeParse(input)
     if (!result.success) return { ok: false, message: formatZodError(result.error) }
     const used = new Set()
@@ -404,6 +424,7 @@ export const useStudioStore = defineStore('studio', () => {
     rubrics, activeSlug, activeView, activeRubric, activeHistory, activeDiff, cases, includedCases,
     thresholds, verdicts, rollup, macroMetrics, aggregate, undoStack, redoStack, pendingChange,
     exportGeneratedAt, ui, rubricDocument, rubricJson, packageDocument, packageJson, structuredText,
+    lastViews, tourDismissed,
     selectRubric, setView, setModel, setAggregation, addCriterion, stageEdit, stageDelete,
     applyPending, cancelPending, toggleCase, setThreshold, setVerdict, applyVerdictPattern,
     metricsFor, undo, redo, openExport, importPackage,

@@ -4,10 +4,12 @@ import Dialog from 'primevue/dialog'
 import Button from 'primevue/button'
 import { PhCopy as Copy, PhCheck as Check, PhDownloadSimple as DownloadSimple } from '@phosphor-icons/vue'
 import { useStudioStore } from '../store'
+import { useFocusTrap } from '../focus-trap'
 
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close', 'copied'])
 const store = useStudioStore()
+useFocusTrap(computed(() => props.open))
 const copied = ref(false)
 const tabs = [
   { value: 'structured-text', label: 'Structured text', filename: 'rubric.txt', mime: 'text/plain' },

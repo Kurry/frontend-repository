@@ -10,10 +10,12 @@ import InputNumber from 'primevue/inputnumber'
 import Button from 'primevue/button'
 import { CriterionSchema } from '../schemas'
 import { useStudioStore } from '../store'
+import { useFocusTrap } from '../focus-trap'
 
 const props = defineProps({ open: Boolean, mode: { type: String, default: 'add' }, criterion: { type: Object, default: null } })
 const emit = defineEmits(['close', 'submitted'])
 const store = useStudioStore()
+useFocusTrap(computed(() => props.open))
 
 const blank = () => ({ id: '', name: '', description: '', type: 'binary', likertMin: null, likertMax: null, weight: 1, importance: 'nice-to-have' })
 const { defineField, errors, meta, handleSubmit, resetForm, validate, setFieldValue } = useForm({
@@ -66,7 +68,13 @@ const submit = handleSubmit((values) => emit('submitted', CriterionSchema.parse(
 </script>
 
 <template>
-  <Dialog :visible="open" modal :header="mode === 'add' ? 'Add criterion' : 'Edit criterion'" class="form-dialog" :style="{ width: 'min(680px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
+  <!--
+    Deliberately non-modal: the interleaved workflow (fill the form, switch to
+    Tune to toggle a case, return and finish submitting) needs the canvas to
+    stay clickable while the form is open. Keyboard focus is still trapped by
+    useFocusTrap, Escape still closes, and focus returns to the opener.
+  -->
+  <Dialog :visible="open" :modal="false" :header="mode === 'add' ? 'Add criterion' : 'Edit criterion'" class="form-dialog" :style="{ width: 'min(680px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
     <form class="criterion-form" novalidate @submit.prevent="submit">
       <div class="field-grid two-col">
         <div class="field-block">

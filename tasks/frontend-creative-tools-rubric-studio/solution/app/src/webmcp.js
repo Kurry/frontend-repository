@@ -40,7 +40,7 @@ export function registerWebMCP(store) {
       return result.ok ? ok(`Added criterion ${criterion.id}`, { criteriaCount: store.rollup.count }) : result
     },
     editor_delete({ id }) {
-      if (!store.stageDelete(id)) return { ok: false, message: `Unknown criterion ${id}` }
+      if (!store.stageDelete(id)) return { ok: false, message: store.ui.versionCommitBusy ? 'Pending change is already being applied' : `Unknown criterion ${id}` }
       return ok(`Major bump required before deleting ${id}`, { versionGateOpen: true, pendingKind: 'major' })
     },
     editor_update_property({ objectType, id, property, value, version }) {
@@ -58,7 +58,7 @@ export function registerWebMCP(store) {
       const map = { 'likert-min': 'likertMin', 'likert-max': 'likertMax' }
       const key = map[property] || property
       const after = { ...item, [key]: value }
-      if (!store.stageEdit(id, after)) return { ok: false, message: 'Property is invalid or unchanged' }
+      if (!store.stageEdit(id, after)) return { ok: false, message: store.ui.versionCommitBusy ? 'Pending change is already being applied' : 'Property is invalid or unchanged' }
       if (version) {
         const result = store.applyPending(version)
         return result.ok ? ok(`Updated ${property} for ${id}`, { version: store.activeRubric.version }) : result

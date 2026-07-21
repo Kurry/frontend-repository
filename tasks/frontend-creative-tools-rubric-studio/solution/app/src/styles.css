@@ -6,8 +6,9 @@
   --color-studio-600: #5547d7;
   --color-bearing-50: #fff7ed;
   --color-bearing-500: #e66b2f;
-  --font-sans: "Inter", "Avenir Next", "Segoe UI", sans-serif;
-  --font-mono: "SFMono-Regular", "Cascadia Code", "Roboto Mono", monospace;
+  --font-sans: "Public Sans Variable", "Avenir Next", "Segoe UI", sans-serif;
+  --font-display: "Space Grotesk Variable", "Public Sans Variable", "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono Variable", "SFMono-Regular", "Cascadia Code", monospace;
 }
 
 :root {
@@ -131,7 +132,6 @@ button:focus-visible, a:focus-visible, .p-focus, .p-inputtext:focus, .p-textarea
 .criterion-panel { position: relative; border: 1px solid #e0e2e9 !important; border-radius: 11px !important; background: white; overflow: hidden; transition: border-color .18s ease, box-shadow .18s ease, transform .2s ease; }
 .criterion-panel:hover { border-color: #c9cbd5 !important; box-shadow: 0 5px 15px rgba(34,37,50,.055); }
 .criterion-panel.load-bearing { border-left: 4px solid var(--bearing) !important; }
-.criterion-panel.new-row { animation: row-in .55s cubic-bezier(.2,.75,.25,1) both; }
 .criterion-panel .p-accordionheader { min-height: 76px; padding: 13px 15px !important; border: 0 !important; background: transparent !important; color: inherit !important; }
 .criterion-panel .p-accordionheader:hover { background: #fafafd !important; }
 .criterion-panel .p-accordioncontent-content { padding: 0 17px 17px !important; border: 0 !important; background: transparent !important; }
@@ -212,8 +212,9 @@ button:focus-visible, a:focus-visible, .p-focus, .p-inputtext:focus, .p-textarea
 .verdict-copy { min-width: 0; }.verdict-copy strong { display: block; overflow: hidden; color: #3d404c; font-size: .78rem; text-overflow: ellipsis; white-space: nowrap; }.verdict-copy small { display: block; margin-top: 4px; color: #9295a0; font-size: .62rem; }
 .verdict-control { display: flex; flex: 0 0 auto; align-items: center; gap: 8px; }.verdict-control b { color: var(--danger); font-size: .66rem; }.verdict-control.pass b { color: #278460; }.verdict-control .p-toggleswitch { transform: scale(.85); }
 .aggregate-card { position: sticky; top: 92px; display: grid; justify-items: center; padding: 20px 14px; border: 1px solid #dcd8ff; border-radius: 13px; background: linear-gradient(150deg,#f9f8ff,#fff); text-align: center; }
-.aggregate-card > span { color: #777a87; font-size: .69rem; font-weight: 700; }.aggregate-value { margin: 6px 0 12px; color: #3c356e; font-size: 2.65rem; line-height: 1; letter-spacing: -.06em; animation: score-pop .32s ease; }.aggregate-value small { font-size: 1rem; }.aggregate-card p { margin: 12px 0 0; color: #818490; font-size: .68rem; }.aggregate-card p b { color: #5147a6; }
-.score-ring { --score: 0deg; width: 72px; height: 72px; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(var(--primary) var(--score),#e6e4f2 0); transition: background .4s ease; }.score-ring span { width: 57px; height: 57px; border-radius: 50%; background: #fbfaff; }
+.aggregate-card > span { color: #777a87; font-size: .69rem; font-weight: 700; }.aggregate-value { margin: 6px 0 12px; color: #3c356e; font-family: var(--font-display); font-size: 2.65rem; line-height: 1; letter-spacing: -.06em; font-variant-numeric: tabular-nums; }.aggregate-value small { font-size: 1rem; }.aggregate-card p { margin: 12px 0 0; color: #818490; font-size: .68rem; }.aggregate-card p b { color: #5147a6; }
+@property --score-a { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+.score-ring { --score-a: 0deg; width: 72px; height: 72px; display: grid; place-items: center; border-radius: 50%; background: conic-gradient(var(--primary) var(--score-a),#e6e4f2 0); transition: --score-a .45s cubic-bezier(.2,.75,.25,1); }.score-ring span { width: 57px; height: 57px; border-radius: 50%; background: #fbfaff; }
 
 .back-button { display: flex; align-items: center; gap: 6px; margin: -4px 0 17px; padding: 4px 0; border: 0; background: transparent; color: var(--primary-dark); font-size: .72rem; font-weight: 700; cursor: pointer; }
 .diff-heading { display: flex; justify-content: space-between; gap: 14px; }.history-time { color: #979aa5; font-size: .63rem; white-space: nowrap; }
@@ -240,18 +241,98 @@ button:focus-visible, a:focus-visible, .p-focus, .p-inputtext:focus, .p-textarea
 .save-hint { margin: 0; padding: 9px 11px; border: 1px solid #e6d3a4; border-radius: 8px; background: #fff8e8; color: #866219; font-size: .69rem; line-height: 1.45; }
 .bump-major ~ .save-gate-row .save-hint, .save-hint.major { border-color: #f0c3c8; background: #fff3f4; color: #a33d48; }
 
-/* Motion: explicit, timed transitions the judge can observe. */
-.p-dialog { animation: dialog-in .24s cubic-bezier(.2,.75,.25,1) both; }
-@keyframes dialog-in { from { opacity: 0; transform: scale(.94) translateY(8px); } to { opacity: 1; transform: none; } }
-.p-toast-message { animation: toast-in .3s cubic-bezier(.2,.75,.25,1) both; }
-@keyframes toast-in { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
-.p-accordionheader svg, .criterion-panel .p-accordionheader [data-pc-section="toggleicon"] { transition: transform .24s ease !important; }
-.criterion-panel .p-accordioncontent-content { animation: accordion-in .26s ease both; }
-@keyframes accordion-in { from { opacity: 0; transform: translateY(-7px); } to { opacity: 1; transform: none; } }
+/* First-run coach tour: an inline strip above the canvas, never blocking. */
+.coachmark { display: flex; align-items: center; gap: 14px; margin: 14px 18px 0; padding: 12px 16px; border: 1px solid #d9d4ff; border-radius: 12px; background: linear-gradient(120deg,#f6f4ff,#fff); box-shadow: 0 6px 18px rgba(70,58,180,.08); animation: surface-in .35s ease both; }
+.coachmark-icon { width: 38px; height: 38px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 11px; background: var(--primary-pale); color: var(--primary); }
+.coachmark-copy { min-width: 0; flex: 1; }
+.coachmark-copy strong { display: flex; align-items: center; gap: 8px; color: #33304f; font-family: var(--font-display); font-size: .82rem; }
+.coachmark-step { padding: 2px 6px; border-radius: 999px; background: var(--primary-pale); color: var(--primary-dark); font-family: var(--font-mono); font-size: .58rem; font-weight: 700; }
+.coachmark-copy p { margin: 4px 0 0; color: #6d6f7e; font-size: .72rem; line-height: 1.45; }
+.coachmark-dots { display: flex; gap: 5px; }
+.coachmark-dots span { width: 6px; height: 6px; border-radius: 50%; background: #d6d3ea; transition: background .2s ease, transform .2s ease; }
+.coachmark-dots span.active { background: var(--primary); transform: scale(1.25); }
+.coachmark-actions { display: flex; gap: 4px; }
 
-@keyframes row-in { from { opacity: 0; transform: translateY(-9px) scale(.99); } to { opacity: 1; transform: none; } }
+/* Confusion matrix under each Tune criterion's bars. */
+.confusion-matrix { margin-top: 12px; padding-top: 11px; border-top: 1px dashed #e4e5ec; }
+.cm-title { display: flex; align-items: center; gap: 5px; color: #8a8d99; font-size: .6rem; font-weight: 750; letter-spacing: .07em; text-transform: uppercase; }
+.cm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; max-width: 210px; margin-top: 7px; }
+.cm-cell { display: grid; grid-template-columns: 1fr auto; align-items: baseline; gap: 6px; padding: 6px 9px; border-radius: 7px; transition: transform .16s ease, box-shadow .16s ease; }
+.cm-cell:hover { transform: translateY(-1px); box-shadow: 0 3px 8px rgba(35,38,52,.1); }
+.cm-cell b { font-family: var(--font-mono); font-size: .74rem; }
+.cm-cell span { font-size: .55rem; font-weight: 800; letter-spacing: .05em; }
+.cm-tp { background: #e7f6ee; color: #226e49; }
+.cm-tn { background: #eef1f8; color: #4c5266; }
+.cm-fp { background: #fdf0e6; color: #a05a1f; }
+.cm-fn { background: #fdeef0; color: #a53a48; }
+
+/* Keyboard shortcut listing dialog. */
+.shortcut-grid { display: grid; gap: 7px; }
+.shortcut-row { display: flex; align-items: center; gap: 12px; padding: 6px 9px; border-radius: 8px; }
+.shortcut-row:nth-child(odd) { background: #f7f7fb; }
+.shortcut-row kbd { min-width: 86px; padding: 3px 8px; border: 1px solid #d9dbe4; border-bottom-width: 2px; border-radius: 6px; background: white; color: #454a5c; font-family: var(--font-mono); font-size: .62rem; font-weight: 700; text-align: center; }
+.shortcut-row span { color: #5d6170; font-size: .7rem; }
+kbd { font-family: var(--font-mono); }
+
+/* Version gate extras: bump-kind chip and suggested-version flash. */
+.bump-callout-row { display: flex; align-items: center; gap: 8px; }
+.bump-chip { padding: 2px 7px; border-radius: 999px; font-family: var(--font-mono); font-size: .58rem; font-weight: 800; letter-spacing: .08em; animation: chip-in .3s ease both; }
+.bump-chip-patch { background: #e7ecf8; color: #43507a; }
+.bump-chip-minor { background: #f6e9c8; color: #7e5a18; }
+.bump-chip-major { background: #f9d9dc; color: #a53843; }
+@keyframes chip-in { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
+.suggestion-flash { animation: flash-field .6s ease both; }
+@keyframes flash-field { 0% { box-shadow: 0 0 0 0 rgba(102,88,232,.55); } 100% { box-shadow: 0 0 0 9px rgba(102,88,232,0); } }
+
+/* Diff storytelling: cards settle in, changed fields reveal in a stagger,
+   before/after panes wipe, and the removed strikethrough draws on. */
+.diff-card { animation: diff-in .35s cubic-bezier(.2,.75,.25,1) both; }
+@keyframes diff-in { from { opacity: 0; transform: translateY(10px) scale(.99); } to { opacity: 1; transform: none; } }
+.diff-field { animation: field-in .4s ease both; }
+@keyframes field-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+.before-after > div { overflow: hidden; animation: pane-wipe .45s ease both; }
+@keyframes pane-wipe { from { opacity: 0; clip-path: inset(0 100% 0 0); } to { opacity: 1; clip-path: inset(0 0 0 0); } }
+.removed-copy h3, .removed-copy code, .removed-copy p { animation: strike-draw .55s ease .15s both; }
+@keyframes strike-draw { from { text-decoration-color: transparent; } to { text-decoration-color: #c0404c; } }
+
+/* The criterion form dialog is non-modal and docks bottom-right so the
+   canvas (view switcher, Tune cases) stays clickable while it is open. */
+.p-dialog-mask:has(.form-dialog) { pointer-events: none; }
+/* Auto margins beat the theme's centered flex alignment, docking the
+   non-modal form bottom-right so the canvas stays clickable beside it. */
+.form-dialog { margin: auto 10px 10px auto !important; }
+.p-dialog-mask:has(.form-dialog) .p-dialog { pointer-events: auto; max-height: calc(100vh - 20px); }
+.form-dialog .p-dialog-content { overflow-y: auto; }
+
+/* Local display face for headings and brand surfaces. */
+h1, h2, .rail-brand strong, .view-switcher button, .section-kicker, .bump-callout strong { font-family: var(--font-display); }
+
+/* Motion: explicit, timed transitions on every state change the spec calls out. */
+.p-dialog { transition: opacity .25s cubic-bezier(.2,.75,.25,1), transform .25s cubic-bezier(.2,.75,.25,1); }
+.p-dialog-enter-active, .p-dialog-leave-active { transition: opacity .25s cubic-bezier(.2,.75,.25,1), transform .25s cubic-bezier(.2,.75,.25,1); }
+.p-dialog-enter-from, .p-dialog-leave-to { opacity: 0; transform: scale(.94) translateY(10px); }
+.p-toast-message { transition: opacity .3s ease, transform .3s cubic-bezier(.2,.75,.25,1); }
+.p-toast-message-enter-active, .p-toast-message-leave-active { transition: opacity .3s ease, transform .3s cubic-bezier(.2,.75,.25,1); }
+.p-toast-message-enter-from { opacity: 0; transform: translateX(30px); }
+.p-toast-message-leave-to { opacity: 0; transform: translateX(22px) scale(.97); }
+
+/* Accordion rows: chevron rotates with the expanded state and the content
+   animates its height open; collapse is intercepted in App.vue so the row can
+   animate its height closed before the panel unmounts. */
+.p-accordionheader svg { transition: transform .26s cubic-bezier(.2,.75,.25,1) !important; }
+.p-accordionheader[aria-expanded="true"] svg { transform: rotate(180deg); }
+.criterion-panel .p-accordioncontent { overflow: hidden; transition: height .28s ease, max-height .28s ease; }
+.criterion-panel .p-accordioncontent-content { overflow: hidden; transition: max-height .28s ease, opacity .22s ease; animation: accordion-in .28s cubic-bezier(.2,.75,.25,1) both; }
+@keyframes accordion-in { from { opacity: 0; max-height: 0; transform: translateY(-7px); } to { opacity: 1; max-height: 1100px; transform: none; } }
+.criterion-panel.collapsing .p-accordioncontent-content { animation: accordion-out .3s ease both; }
+@keyframes accordion-out { from { opacity: 1; max-height: 620px; } to { opacity: 0; max-height: 0; } }
+.criterion-panel.collapsing .p-accordionheader svg { transform: rotate(0deg); }
+
+@keyframes row-in { from { opacity: 0; max-height: 0; transform: translateY(-9px) scale(.99); } to { opacity: 1; max-height: 500px; transform: none; } }
+.criterion-panel.new-row { animation: row-in .5s cubic-bezier(.2,.75,.25,1) both; }
+.criterion-panel.row-leave { animation: row-out .38s ease both; pointer-events: none; }
+@keyframes row-out { to { opacity: 0; transform: translateX(26px) scale(.98); max-height: 0; margin: 0; padding: 0; } }
 @keyframes surface-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-@keyframes score-pop { 0% { opacity: .3; transform: translateY(6px) scale(.94); } 100% { opacity: 1; transform: none; } }
 
 @media (max-width: 1200px) {
   .workspace-grid { grid-template-columns: minmax(0,1fr) 275px; }
@@ -282,6 +363,7 @@ button:focus-visible, a:focus-visible, .p-focus, .p-inputtext:focus, .p-textarea
 }
 
 @media (max-width: 600px) {
+  .icon-button { width: 44px; height: 44px; }
   .studio-toolbar { align-items: flex-start; gap: 8px; }
   .toolbar-leading { width: 100%; justify-content: flex-start; }
   .toolbar-actions { width: 100%; display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; }
