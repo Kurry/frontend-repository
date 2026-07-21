@@ -1,168 +1,188 @@
-import { createSignal, createEffect, Show, onMount } from 'solid-js';
-import { state, setState, undo, redo } from './store';
-import { MT_DATA } from './data';
-import TimelineStage from './components/TimelineStage';
-import Scrubber from './components/Scrubber';
-import Library from './components/Library';
-import EventForm from './components/EventForm';
-import ExportDrawer from './components/ExportDrawer';
-import ImportDialog from './components/ImportDialog';
-import { registerWebMCP } from './webmcp';
+import { createSignal, Show, onMount, onCleanup } from "solid-js";
+import {
+  state,
+  setState,
+  undo,
+  redo,
+  canUndo,
+  canRedo,
+  openAbout,
+  openImport,
+  openExport,
+  setMode,
+  inViewCount,
+} from "./store";
+import { registerWebMCP } from "./webmcp";
+import TimelineStage from "./components/TimelineStage";
+import Scrubber from "./components/Scrubber";
+import Library, { FilterSidebar } from "./components/Library";
+import DensityStrip from "./components/DensityStrip";
+import EventForm from "./components/EventForm";
+import DetailPanel from "./components/DetailPanel";
+import ExportDrawer from "./components/ExportDrawer";
+import ImportDialog from "./components/ImportDialog";
+import AboutOverlay from "./components/AboutOverlay";
+import BatchConfirm from "./components/BatchConfirm";
+import Toasts, { LiveRegion } from "./components/Toasts";
+import {
+  IconTimeline,
+  IconListDetails,
+  IconArrowBackUp,
+  IconArrowForwardUp,
+  IconPlus,
+  IconFileExport,
+  IconFileImport,
+  IconInfoCircle,
+  IconAdjustmentsHorizontal,
+} from "@tabler/icons-solidjs";
 
 export default function App() {
   const [formOpen, setFormOpen] = createSignal(false);
-  const [editingEvent, setEditingEvent] = createSignal(null);
-  const [importOpen, setImportOpen] = createSignal(false);
+  const [formClosing, setFormClosing] = createSignal(false);
+  const [editing, setEditing] = createSignal(null);
+  const [filtersOpen, setFiltersOpen] = createSignal(false);
 
   onMount(() => {
     registerWebMCP();
-    
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+    const onKey = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+        const tag = (e.target && e.target.tagName) || "";
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
         if (e.shiftKey) {
+          if (canRedo()) { e.preventDefault(); redo(); }
+        } else if (canUndo()) {
           e.preventDefault();
-          if (state.redoHistory.length) redo();
-        } else {
-          e.preventDefault();
-          if (state.undoHistory.length) undo();
+          undo();
         }
       }
     };
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", onKey);
+    onCleanup(() => document.removeEventListener("keydown", onKey));
   });
 
-  const openEdit = (ev) => {
-    setEditingEvent(ev);
+  function openCreate() {
+    setEditing(null);
+    setFormClosing(false);
     setFormOpen(true);
-  };
+  }
+  function openEdit(ev) {
+    setEditing(ev);
+    setFormClosing(false);
+    setFormOpen(true);
+  }
+  function closeForm() {
+    if (formClosing()) return;
+    setFormClosing(true);
+    setTimeout(() => {
+      setFormOpen(false);
+      setEditing(null);
+      setTimeout(() => setFormClosing(false), 200);
+    }, 180);
+  }
 
-  const closeForm = () => {
-    setFormOpen(false);
-    setEditingEvent(null);
-  };
+  const modeBtn = (mode, label, Icon) => (
+    <button
+      class={`chrome-btn inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium ${state.activeMode === mode ? "bg-[#1b6b4a] text-white" : "bg-white text-[color:var(--ink)] hover:bg-[color:var(--paper-deep)]"}`}
+      onClick={() => setMode(mode)}
+      aria-pressed={state.activeMode === mode}
+    >
+      <Icon size={17} /> {label}
+    </button>
+  );
 
   return (
-    <div class="h-screen w-screen flex flex-col overflow-hidden text-gray-900 selection:bg-cyan-200">
-      {/* Header */}
-      <header class="h-16 flex items-center justify-between px-6 bg-white border-b shrink-0 z-20 shadow-sm relative">
-        <h1 class="text-xl font-bold tracking-tight">MediaTimeline <span class="text-gray-400 font-normal ml-2 hidden sm:inline">History of Media & Communication</span></h1>
-        
-        <div class="flex items-center gap-3">
-          <Show when={state.lastMutation}>
-            <div class="text-xs font-mono bg-cyan-50 text-cyan-800 px-2 py-1 rounded hidden sm:block">
-              {state.lastMutation}
-            </div>
-          </Show>
-          
-          <div class="flex items-center border rounded overflow-hidden">
-            <button 
-              class={`px-4 py-1.5 text-sm font-medium transition-colors ${state.activeMode === 'scrub' ? 'bg-cyan-600 text-white' : 'bg-gray-50 hover:bg-gray-100'}`}
-              onClick={() => setState('activeMode', 'scrub')}
-            >
-              Scrub/Explore
-            </button>
-            <button 
-              class={`px-4 py-1.5 text-sm font-medium transition-colors ${state.activeMode === 'library' ? 'bg-cyan-600 text-white' : 'bg-gray-50 hover:bg-gray-100'}`}
-              onClick={() => setState('activeMode', 'library')}
-            >
-              Library/Filter
-            </button>
+    <div class="h-screen w-screen flex flex-col overflow-hidden text-[color:var(--ink)] selection:bg-[#c26a0044]">
+      <LiveRegion />
+
+      <header class="shrink-0 z-30 bg-[color:var(--paper)]/95 backdrop-blur border-b border-[color:var(--line)] px-3 sm:px-5 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-2 shadow-sm">
+        <div class="flex items-baseline gap-2 mr-1">
+          <h1 class="font-display text-[22px] sm:text-2xl font-bold tracking-tight leading-none">
+            Media<span class="text-[#1b6b4a]">Timeline</span>
+          </h1>
+          <span class="hidden md:inline font-display italic text-sm text-[color:var(--ink-soft)]">History of Media &amp; Communication</span>
+        </div>
+
+        <Show when={state.lastMutation}>
+          <span class="hidden lg:inline-flex items-center rounded-full bg-[#1b6b4a1a] text-[#14512f] text-[11px] font-medium px-2 py-0.5 mono" aria-live="polite" title="Last mutating action">
+            last: {state.lastMutation}
+          </span>
+        </Show>
+
+        <div class="flex items-center gap-1 ml-auto">
+          <div class="flex rounded-lg border border-[color:var(--line)] overflow-hidden" role="group" aria-label="Interaction mode">
+            {modeBtn("scrub", "Scrub/Explore", IconTimeline)}
+            {modeBtn("library", "Library/Filter", IconListDetails)}
           </div>
+        </div>
 
-          <div class="h-6 w-px bg-gray-200 mx-1"></div>
-
-          <button onClick={() => undo()} disabled={!state.undoHistory.length} class="p-1.5 rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed" title="Undo (Ctrl+Z)">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path></svg>
+        <div class="flex items-center gap-1.5 w-full sm:w-auto flex-wrap">
+          <button class="chrome-btn inline-flex items-center gap-1 rounded-lg border border-[color:var(--line)] bg-white px-2.5 py-2 text-sm font-medium disabled:opacity-35 disabled:cursor-not-allowed min-h-[40px]" onClick={() => undo()} disabled={!canUndo()} aria-label="Undo" title="Undo (Ctrl+Z)">
+            <IconArrowBackUp size={17} /> <span class="hidden sm:inline">Undo</span>
           </button>
-          <button onClick={() => redo()} disabled={!state.redoHistory.length} class="p-1.5 rounded hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed" title="Redo (Ctrl+Shift+Z)">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"></path></svg>
+          <button class="chrome-btn inline-flex items-center gap-1 rounded-lg border border-[color:var(--line)] bg-white px-2.5 py-2 text-sm font-medium disabled:opacity-35 disabled:cursor-not-allowed min-h-[40px]" onClick={() => redo()} disabled={!canRedo()} aria-label="Redo" title="Redo (Ctrl+Shift+Z)">
+            <IconArrowForwardUp size={17} /> <span class="hidden sm:inline">Redo</span>
           </button>
-          
-          <div class="h-6 w-px bg-gray-200 mx-1"></div>
-          
-          <button onClick={() => setFormOpen(true)} class="px-3 py-1.5 bg-gray-100 text-sm font-medium rounded hover:bg-gray-200">
-            Create
+          <span class="hidden sm:block w-px h-6 bg-[color:var(--line)] mx-0.5" aria-hidden="true" />
+          <button class="chrome-btn inline-flex items-center gap-1.5 rounded-lg bg-[#1b6b4a] text-white px-3 py-2 text-sm font-medium min-h-[40px] hover:brightness-110" onClick={openCreate}>
+            <IconPlus size={17} /> Create
           </button>
-          <button onClick={() => setState('exportDrawerOpen', true)} class="px-3 py-1.5 bg-gray-100 text-sm font-medium rounded hover:bg-gray-200">
-            Export timeline
+          <button class="chrome-btn inline-flex items-center gap-1.5 rounded-lg border border-[color:var(--line)] bg-white px-3 py-2 text-sm font-medium min-h-[40px]" onClick={() => openExport()}>
+            <IconFileExport size={17} /> <span class="hidden sm:inline">Export timeline</span>
           </button>
-          <button onClick={() => setImportOpen(true)} class="px-3 py-1.5 bg-gray-100 text-sm font-medium rounded hover:bg-gray-200">
-            Import
+          <button class="chrome-btn inline-flex items-center gap-1.5 rounded-lg border border-[color:var(--line)] bg-white px-3 py-2 text-sm font-medium min-h-[40px]" onClick={() => openImport()}>
+            <IconFileImport size={17} /> <span class="hidden sm:inline">Import</span>
+          </button>
+          <button class="chrome-btn inline-flex items-center rounded-lg border border-[color:var(--line)] bg-white p-2 min-h-[40px] min-w-[40px]" onClick={() => openAbout()} aria-label="About and help">
+            <IconInfoCircle size={17} />
           </button>
         </div>
       </header>
 
-      {/* Main content */}
       <main class="flex-1 flex overflow-hidden relative">
-        <Show when={state.activeMode === 'scrub'}>
-           <div class="flex-1 flex flex-col">
-              <TimelineStage />
-              <div class="h-24 bg-white border-t p-4 shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
-                 <Scrubber />
+        {/* mode views animate in on switch (animationName != none) */}
+        <Show when={state.activeMode === "scrub"}>
+          <div key="scrub" class="anim-view flex-1 flex flex-col min-w-0">
+            <TimelineStage onAbout={openAbout} />
+            <div class="shrink-0 border-t border-[color:var(--line)] bg-[color:var(--paper)]/95 backdrop-blur px-4 py-3 z-20 shadow-[0_-6px_14px_-10px_rgba(0,0,0,0.3)]">
+              <div class="flex flex-col gap-2">
+                <Scrubber />
+                <DensityStrip enabled={() => state.enabledCategories} class="hidden md:flex" />
               </div>
-           </div>
+            </div>
+          </div>
         </Show>
 
-        <Show when={state.activeMode === 'library'}>
-           <div class="flex-1 flex overflow-hidden">
-              {/* Filter Sidebar */}
-              <div class="w-64 bg-gray-50 border-r p-4 overflow-y-auto shrink-0 flex flex-col">
-                <input 
-                  type="text" 
-                  placeholder="Search events..." 
-                  class="w-full border rounded p-2 text-sm mb-4"
-                  value={state.filters.search}
-                  onInput={(e) => setState('filters', 'search', e.target.value)}
-                />
-                
-                <h3 class="font-semibold text-sm text-gray-500 uppercase tracking-wider mb-3">Categories</h3>
-                <div class="flex flex-col gap-2 flex-1">
-                  {MT_DATA.categories.map(cat => (
-                    <label class="flex items-center gap-2 text-sm cursor-pointer group">
-                      <input 
-                        type="checkbox" 
-                        class="rounded"
-                        checked={state.filters.categories.includes(cat.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) setState('filters', 'categories', [...state.filters.categories, cat.id]);
-                          else setState('filters', 'categories', state.filters.categories.filter(c => c !== cat.id));
-                        }}
-                      />
-                      <span class="w-3 h-3 rounded-full" style={`background-color: ${cat.color}`}></span>
-                      <span class="group-hover:text-cyan-700">{cat.label}</span>
-                    </label>
-                  ))}
-                </div>
-                
-                <button 
-                  class="mt-4 px-4 py-2 bg-white border rounded text-sm hover:bg-gray-50"
-                  onClick={() => {
-                    setState('filters', 'categories', MT_DATA.categories.map(c => c.id));
-                    setState('filters', 'search', '');
-                    setState('window', { from: MT_DATA.yearMin, to: MT_DATA.yearMax });
-                  }}
-                >
-                  Clear Filters
-                </button>
+        <Show when={state.activeMode === "library"}>
+          <div key="library" class="anim-view flex-1 flex flex-col md:flex-row min-w-0 overflow-hidden">
+            {/* mobile filters toggle */}
+            <div class="md:hidden shrink-0 flex items-center justify-between px-3 py-2 border-b border-[color:var(--line)] bg-[color:var(--paper-deep)]">
+              <button class="chrome-btn inline-flex items-center gap-1.5 rounded-lg border border-[color:var(--line)] bg-white px-3 py-2 text-sm font-medium" onClick={() => setFiltersOpen((v) => !v)} aria-expanded={filtersOpen()}>
+                <IconAdjustmentsHorizontal size={16} /> Filters &amp; search
+              </button>
+              <span class="text-xs text-[color:var(--ink-soft)]">
+                <span class="font-display tabular-nums text-[color:var(--ink)]">{inViewCount()}</span> in view
+              </span>
+            </div>
+            <Show when={filtersOpen()}>
+              <div class="md:hidden anim-fade max-h-[46vh] overflow-hidden flex">
+                <FilterSidebar />
               </div>
-              
-              <Library onEditEvent={openEdit} />
-           </div>
+            </Show>
+            <div class="hidden md:flex">
+              <FilterSidebar />
+            </div>
+            <Library onEditEvent={openEdit} onCreate={openCreate} />
+          </div>
         </Show>
       </main>
 
-      {/* Modals & Drawers */}
-      <Show when={formOpen()}>
-         <EventForm initialData={editingEvent()} onClose={closeForm} />
-      </Show>
-
-      <Show when={state.exportDrawerOpen}>
-         <ExportDrawer onClose={() => setState('exportDrawerOpen', false)} />
-      </Show>
-
-      <Show when={importOpen()}>
-         <ImportDialog onClose={() => setImportOpen(false)} />
-      </Show>
+      <EventForm open={formOpen()} closing={formClosing()} initialData={editing()} onClose={closeForm} />
+      <DetailPanel />
+      <ExportDrawer />
+      <ImportDialog />
+      <AboutOverlay />
+      <BatchConfirm />
+      <Toasts />
     </div>
   );
 }

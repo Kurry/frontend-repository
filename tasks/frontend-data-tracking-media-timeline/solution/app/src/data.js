@@ -1,739 +1,146 @@
-export const MT_DATA = {
-  productName: "MediaTimeline",
-  tagline: "History of Media & Communication",
-  description:
-    "An interactive timeline exploring how humans record, transmit, and share meaning — from early writing systems to networked media.",
-  yearMin: -3200,
-  yearMax: 2024,
-  defaultFrom: 1450,
-  defaultTo: 1920,
-  categories: [
-    { id: "writing", label: "Writing & Script", color: "#00838f" },
-    { id: "print", label: "Print & Publishing", color: "#1b6b4a" },
-    { id: "postal", label: "Postal & Courier", color: "#8b6239" },
-    { id: "telecom", label: "Telecom", color: "#2f5d8c" },
-    { id: "broadcast", label: "Broadcast", color: "#c26a00" },
-    { id: "photo", label: "Photography & Film", color: "#5c6b7a" },
-    { id: "audio", label: "Sound & Music Tech", color: "#0d7377" },
-    { id: "compute", label: "Computing", color: "#1a508b" },
-    { id: "network", label: "Networks & Internet", color: "#a33b4a" },
-    { id: "design", label: "Design & Typography", color: "#556070" },
-    { id: "journalism", label: "Journalism", color: "#b45309" },
-    { id: "social", label: "Social & Platforms", color: "#0e7490" },
-  ],
-  eras: [
-    { id: "origins", label: "Origins of Record", from: -3200, to: -500, tint: "#00838f" },
-    { id: "classical", label: "Classical Transmission", from: -499, to: 500, tint: "#2f5d8c" },
-    { id: "manuscript", label: "Manuscript Age", from: 501, to: 1440, tint: "#8b6239" },
-    { id: "print", label: "Print Revolution", from: 1441, to: 1830, tint: "#1b6b4a" },
-    { id: "electric", label: "Electric Media", from: 1831, to: 1945, tint: "#c26a00" },
-    { id: "mass", label: "Mass Media Century", from: 1946, to: 1990, tint: "#a33b4a" },
-    { id: "networked", label: "Networked Era", from: 1991, to: 2024, tint: "#0e7490" },
-  ],
-  events: [
-    {
-      id: "e01",
-      title: "Cuneiform on Clay",
-      year: -3200,
-      place: "Sumer",
-      categories: ["writing"],
-      summary:
-        "Administrative marks on clay tablets become a durable writing system for trade, law, and myth.",
-      detail:
-        "Early cuneiform begins as pictographic accountancy and evolves into a flexible script pressed into wet clay — one of the first scalable media for institutional memory.",
-    },
-    {
-      id: "e02",
-      title: "Egyptian Hieroglyphs",
-      year: -3100,
-      place: "Egypt",
-      categories: ["writing"],
-      summary:
-        "Monumental and administrative writing systems encode language in sacred and civic contexts.",
-      detail:
-        "Hieroglyphic, hieratic, and later demotic scripts show how medium (stone, papyrus) shapes formality, speed, and audience.",
-    },
-    {
-      id: "e03",
-      title: "Phoenician Alphabet",
-      year: -1050,
-      place: "Levant",
-      categories: ["writing"],
-      summary:
-        "A compact consonant alphabet spreads along trade routes and seeds later Mediterranean scripts.",
-      detail:
-        "Fewer signs lower the barrier to literacy compared with logo-syllabic systems, accelerating cross-cultural exchange.",
-    },
-    {
-      id: "e04",
-      title: "Greek Vowels Added",
-      year: -800,
-      place: "Greece",
-      categories: ["writing"],
-      summary:
-        "Adaptation of Phoenician letters adds explicit vowels, clarifying spoken language in text.",
-      detail:
-        "The Greek alphabet becomes a template for Etruscan and Latin scripts that later dominate European media.",
-    },
-    {
-      id: "e05",
-      title: "Library of Alexandria",
-      year: -280,
-      place: "Egypt",
-      categories: ["writing", "journalism"],
-      summary:
-        "A vast collection and research center models knowledge as curated, copyable archive.",
-      detail:
-        "Scroll acquisition, cataloging, and scholarly commentary foreshadow later libraries, encyclopedias, and research networks.",
-    },
-    {
-      id: "e06",
-      title: "Roman Road Posts & Cursus",
-      year: 50,
-      place: "Roman Empire",
-      categories: ["postal"],
-      summary:
-        "Imperial courier systems move official messages across a continent-scale network.",
-      detail:
-        "Relay stations and road infrastructure turn distance into a managed latency problem — proto-telecom logistics.",
-    },
-    {
-      id: "e07",
-      title: "Codex Replaces Scroll",
-      year: 300,
-      place: "Mediterranean",
-      categories: ["writing", "design"],
-      summary:
-        "Bound pages enable random access, marginalia, and portable libraries.",
-      detail:
-        "The codex form factor reshapes reading habits and later becomes the default metaphor for books and documents.",
-    },
-    {
-      id: "e08",
-      title: "Paper Travels West",
-      year: 750,
-      place: "Central Asia / Iberia",
-      categories: ["print", "writing"],
-      summary:
-        "Papermaking techniques move along trade routes, lowering the cost of writing surfaces.",
-      detail:
-        "Cheaper substrates expand who can produce and store documents beyond elite parchment economies.",
-    },
-    {
-      id: "e09",
-      title: "Woodblock Printing",
-      year: 868,
-      place: "China",
-      categories: ["print"],
-      summary:
-        "The Diamond Sutra and related prints demonstrate large-scale text reproduction.",
-      detail:
-        "Block printing separates authorship from scribal labor and prefigures industrial publishing.",
-    },
-    {
-      id: "e10",
-      title: "Movable Type in East Asia",
-      year: 1040,
-      place: "China / Korea",
-      categories: ["print"],
-      summary:
-        "Ceramic and later metal type experiments show recomposable text production.",
-      detail:
-        "Independent inventions of movable type highlight how media breakthroughs can emerge in parallel cultures.",
-    },
-    {
-      id: "e11",
-      title: "Gutenberg Press",
-      year: 1455,
-      place: "Mainz",
-      categories: ["print", "design"],
-      summary:
-        "European movable-type printing scales book production and standardizes page design.",
-      detail:
-        "Press economics transform religion, science, and politics by collapsing the cost of identical copies.",
-    },
-    {
-      id: "e12",
-      title: "First Newspapers",
-      year: 1605,
-      place: "Strasbourg",
-      categories: ["journalism", "print"],
-      summary:
-        "Periodic printed news sheets establish a cadence for public information.",
-      detail:
-        "Regular issues create expectation loops — audiences return for the next edition, a pattern later media inherit.",
-    },
-    {
-      id: "e13",
-      title: "Penny Post Concepts",
-      year: 1680,
-      place: "London",
-      categories: ["postal"],
-      summary:
-        "Urban postal experiments make personal correspondence more frequent and affordable.",
-      detail:
-        "Cheap letters densify social graphs long before electronic messaging.",
-    },
-    {
-      id: "e14",
-      title: "Encyclopédie",
-      year: 1751,
-      place: "Paris",
-      categories: ["print", "design"],
-      summary:
-        "A multi-volume reference project organizes technical knowledge for a reading public.",
-      detail:
-        "Cross-references and plates model information architecture as a civic project.",
-    },
-    {
-      id: "e15",
-      title: "Optical Telegraph",
-      year: 1792,
-      place: "France",
-      categories: ["telecom"],
-      summary:
-        "Semaphore towers relay coded messages line-of-sight across long distances.",
-      detail:
-        "Latency drops from days to hours for state messaging — a dress rehearsal for electric networks.",
-    },
-    {
-      id: "e16",
-      title: "Lithography",
-      year: 1796,
-      place: "Munich",
-      categories: ["print", "design"],
-      summary:
-        "Stone-based printing expands illustration, posters, and commercial graphics.",
-      detail:
-        "Artists and advertisers gain a flexible reproduction medium that fuels visual mass culture.",
-    },
-    {
-      id: "e17",
-      title: "Daguerreotype",
-      year: 1839,
-      place: "Paris",
-      categories: ["photo"],
-      summary:
-        "A practical photographic process freezes appearances with chemical fidelity.",
-      detail:
-        "Photography challenges drawing as the default evidence medium and invents new genres of portrait and reportage.",
-    },
-    {
-      id: "e18",
-      title: "Electric Telegraph",
-      year: 1844,
-      place: "United States",
-      categories: ["telecom"],
-      summary:
-        "Morse’s line demonstrates near-instant text over wire.",
-      detail:
-        "Time zones, news wires, and finance sync to telegraph rhythm — distance becomes less decisive than bandwidth.",
-    },
-    {
-      id: "e19",
-      title: "Atlantic Cable",
-      year: 1866,
-      place: "Atlantic",
-      categories: ["telecom", "network"],
-      summary:
-        "A durable undersea cable links continents for message traffic.",
-      detail:
-        "Global news and markets begin to share a common clock, foreshadowing internet backbone geopolitics.",
-    },
-    {
-      id: "e20",
-      title: "Typewriter Standardizes",
-      year: 1874,
-      place: "United States",
-      categories: ["writing", "design"],
-      summary:
-        "Commercial typewriters normalize office text production and QWERTY layouts.",
-      detail:
-        "Mechanical keyboards reshape literacy labor and later influence computer input design.",
-    },
-    {
-      id: "e21",
-      title: "Telephone Patent Era",
-      year: 1876,
-      place: "United States",
-      categories: ["telecom", "audio"],
-      summary:
-        "Voice carried electrically opens conversational distance-collapse.",
-      detail:
-        "Switchboards and directories invent real-time interpersonal media as infrastructure.",
-    },
-    {
-      id: "e22",
-      title: "Phonograph",
-      year: 1877,
-      place: "United States",
-      categories: ["audio"],
-      summary:
-        "Recorded sound becomes storable and replayable outside live performance.",
-      detail:
-        "Music, speech, and later radio content gain a durable medium independent of performers.",
-    },
-    {
-      id: "e23",
-      title: "Kodak Snapshot Culture",
-      year: 1888,
-      place: "United States",
-      categories: ["photo", "social"],
-      summary:
-        "Simple cameras and processing services democratize personal image-making.",
-      detail:
-        "Everyday photography shifts from specialist craft to household habit.",
-    },
-    {
-      id: "e24",
-      title: "Cinema Projection",
-      year: 1895,
-      place: "Paris",
-      categories: ["photo", "broadcast"],
-      summary:
-        "Public film screenings establish moving images as shared spectacle.",
-      detail:
-        "Theaters become ritual spaces for collective attention — a template for later screening cultures.",
-    },
-    {
-      id: "e25",
-      title: "Marconi Wireless",
-      year: 1901,
-      place: "Atlantic",
-      categories: ["telecom", "broadcast"],
-      summary:
-        "Transatlantic wireless signals prove radio as a message medium.",
-      detail:
-        "Untethered transmission enables maritime safety, news flashes, and eventually entertainment broadcasting.",
-    },
-    {
-      id: "e26",
-      title: "Halftone Newspapers",
-      year: 1905,
-      place: "Global press",
-      categories: ["journalism", "print", "photo"],
-      summary:
-        "Photographic halftones become routine in mass newspapers.",
-      detail:
-        "Visual evidence enters daily news cycles, changing what counts as a story.",
-    },
-    {
-      id: "e27",
-      title: "Commercial Radio Boom",
-      year: 1920,
-      place: "United States",
-      categories: ["broadcast", "audio"],
-      summary:
-        "Scheduled radio programming builds national audiences in real time.",
-      detail:
-        "Advertising-supported broadcasting invents appointment listening and shared sonic culture.",
-    },
-    {
-      id: "e28",
-      title: "Talking Pictures",
-      year: 1927,
-      place: "United States",
-      categories: ["photo", "audio"],
-      summary:
-        "Synchronized sound transforms cinema storytelling and industry structure.",
-      detail:
-        "Studios retool for dialogue, music scoring, and new star systems built on voice.",
-    },
-    {
-      id: "e29",
-      title: "Television Experiments to Sets",
-      year: 1936,
-      place: "United Kingdom",
-      categories: ["broadcast"],
-      summary:
-        "Regular television service begins to move images into the home.",
-      detail:
-        "Living-room screens relocate public spectacle into domestic schedules.",
-    },
-    {
-      id: "e30",
-      title: "Magnetic Tape Recording",
-      year: 1940,
-      place: "Germany / US",
-      categories: ["audio", "broadcast"],
-      summary:
-        "High-quality tape enables editing, delay, and studio production workflows.",
-      detail:
-        "Broadcast and music industries gain non-linear control over recorded time.",
-    },
-    {
-      id: "e31",
-      title: "ENIAC & Stored Programs",
-      year: 1945,
-      place: "United States",
-      categories: ["compute"],
-      summary:
-        "Electronic computation accelerates and soon stores instructions as data.",
-      detail:
-        "Programmable machines become a new medium for symbols — not only calculation tools.",
-    },
-    {
-      id: "e32",
-      title: "Transistor Radio",
-      year: 1954,
-      place: "United States",
-      categories: ["broadcast", "audio"],
-      summary:
-        "Portable radios detach listening from furniture and family rooms.",
-      detail:
-        "Youth culture and mobile attention patterns intensify with pocket receivers.",
-    },
-    {
-      id: "e33",
-      title: "TV News as Ritual",
-      year: 1960,
-      place: "United States",
-      categories: ["broadcast", "journalism"],
-      summary:
-        "Televised debates and evening news consolidate visual politics.",
-      detail:
-        "Image performance becomes inseparable from electoral and wartime narration.",
-    },
-    {
-      id: "e34",
-      title: "Packet Switching Ideas",
-      year: 1964,
-      place: "UK / US",
-      categories: ["network", "compute"],
-      summary:
-        "Researchers propose breaking messages into routed packets.",
-      detail:
-        "Resilient data networks replace circuit assumptions and enable the internet stack.",
-    },
-    {
-      id: "e35",
-      title: "ARPANET First Link",
-      year: 1969,
-      place: "United States",
-      categories: ["network"],
-      summary:
-        "Host-to-host networking begins among research institutions.",
-      detail:
-        "Email and file transfer soon show that networks are social media before the brand exists.",
-    },
-    {
-      id: "e36",
-      title: "Color TV Saturation",
-      year: 1972,
-      place: "Global",
-      categories: ["broadcast"],
-      summary:
-        "Color broadcasting becomes mainstream in many markets.",
-      detail:
-        "Chromatic realism raises production values and advertising spectacle.",
-    },
-    {
-      id: "e37",
-      title: "Personal Computing Arrives",
-      year: 1977,
-      place: "United States",
-      categories: ["compute", "design"],
-      summary:
-        "Home computers put interactive screens in non-institutional spaces.",
-      detail:
-        "Hobbyists, schools, and offices invent new literacies around software as medium.",
-    },
-    {
-      id: "e38",
-      title: "Walkman & Private Soundtrack",
-      year: 1979,
-      place: "Japan",
-      categories: ["audio", "social"],
-      summary:
-        "Personal cassette players privatize public space with headphones.",
-      detail:
-        "Mobile listening cultures redefine urban attention and later earbud norms.",
-    },
-    {
-      id: "e39",
-      title: "GUI & Desktop Metaphor",
-      year: 1984,
-      place: "United States",
-      categories: ["compute", "design"],
-      summary:
-        "Graphical interfaces popularize windows, icons, and direct manipulation.",
-      detail:
-        "Visual computing becomes the default language for personal media tools.",
-    },
-    {
-      id: "e40",
-      title: "CD Digital Audio",
-      year: 1982,
-      place: "Japan / Netherlands",
-      categories: ["audio"],
-      summary:
-        "Optical discs standardize consumer digital sound distribution.",
-      detail:
-        "Perfect-copy audio shifts industry economics and listener expectations of fidelity.",
-    },
-    {
-      id: "e41",
-      title: "World Wide Web",
-      year: 1991,
-      place: "CERN",
-      categories: ["network", "journalism"],
-      summary:
-        "Hypertext over internet protocols makes linked documents universal.",
-      detail:
-        "Browsers turn the network into a publishable medium anyone can address by URL.",
-    },
-    {
-      id: "e42",
-      title: "SMS Texting Culture",
-      year: 1993,
-      place: "Europe",
-      categories: ["telecom", "social"],
-      summary:
-        "Short messages become a mass interpersonal channel on mobiles.",
-      detail:
-        "Character limits invent new slang, timing norms, and always-on social presence.",
-    },
-    {
-      id: "e43",
-      title: "Search Engines Scale",
-      year: 1998,
-      place: "United States",
-      categories: ["network", "journalism"],
-      summary:
-        "Algorithmic ranking becomes the front door to the web’s archive.",
-      detail:
-        "Discoverability — not just publishing — becomes the scarce media resource.",
-    },
-    {
-      id: "e44",
-      title: "Blogging Platforms",
-      year: 1999,
-      place: "Global",
-      categories: ["social", "journalism"],
-      summary:
-        "Easy publishing tools expand who can maintain a public chronicle.",
-      detail:
-        "Reverse-chronological feeds prefigure later social streams and creator economies.",
-    },
-    {
-      id: "e45",
-      title: "Wikipedia",
-      year: 2001,
-      place: "Global",
-      categories: ["network", "writing"],
-      summary:
-        "Collaborative encyclopedias show peer production at planetary scale.",
-      detail:
-        "Version history and citation norms become visible infrastructure for contested facts.",
-    },
-    {
-      id: "e46",
-      title: "Social Networks Mainstream",
-      year: 2004,
-      place: "United States",
-      categories: ["social", "network"],
-      summary:
-        "Profile-based networks organize identity, friendship, and attention graphs.",
-      detail:
-        "The feed becomes a primary interface to news, culture, and personal performance.",
-    },
-    {
-      id: "e47",
-      title: "YouTube & Video Upload",
-      year: 2005,
-      place: "United States",
-      categories: ["broadcast", "social", "photo"],
-      summary:
-        "Amateur video distribution scales without broadcast gatekeepers.",
-      detail:
-        "On-demand clips invent new genres, virality mechanics, and creator livelihoods.",
-    },
-    {
-      id: "e48",
-      title: "Smartphone Convergence",
-      year: 2007,
-      place: "United States",
-      categories: ["telecom", "compute", "photo"],
-      summary:
-        "Phones absorb camera, browser, music player, and messaging into one slab.",
-      detail:
-        "Always-carried computers make media capture and consumption continuous.",
-    },
-    {
-      id: "e49",
-      title: "App Stores & Push Feeds",
-      year: 2008,
-      place: "Global",
-      categories: ["network", "social"],
-      summary:
-        "Curated software marketplaces and notifications reorganize attention.",
-      detail:
-        "Distribution shifts from open web surfing to gated, interrupt-driven apps.",
-    },
-    {
-      id: "e50",
-      title: "Streaming Music Norm",
-      year: 2011,
-      place: "Global",
-      categories: ["audio", "network"],
-      summary:
-        "Subscription catalogs replace ownership as the default listening model.",
-      detail:
-        "Recommendation systems become co-authors of taste and chart dynamics.",
-    },
-    {
-      id: "e51",
-      title: "Mobile-First News",
-      year: 2013,
-      place: "Global",
-      categories: ["journalism", "social"],
-      summary:
-        "Cards, snaps, and vertical video reshape how stories are packaged.",
-      detail:
-        "Newsrooms redesign for thumb-stopping formats and platform referral traffic.",
-    },
-    {
-      id: "e52",
-      title: "Live Streaming Everywhere",
-      year: 2016,
-      place: "Global",
-      categories: ["broadcast", "social"],
-      summary:
-        "Anyone can broadcast live from a pocket camera to global audiences.",
-      detail:
-        "Liveness returns as a participatory format spanning games, protests, and performance.",
-    },
-    {
-      id: "e53",
-      title: "Podcast Renaissance",
-      year: 2018,
-      place: "Global",
-      categories: ["audio", "journalism"],
-      summary:
-        "On-demand spoken audio becomes a major narrative and news medium.",
-      detail:
-        "Long-form listening thrives alongside short video, showing format diversity in networked eras.",
-    },
-    {
-      id: "e54",
-      title: "Short-Form Video Dominance",
-      year: 2020,
-      place: "Global",
-      categories: ["social", "photo", "broadcast"],
-      summary:
-        "Vertical looping clips capture massive share of youth attention.",
-      detail:
-        "Algorithmic For You feeds intensify discovery without follower graphs.",
-    },
-    {
-      id: "e55",
-      title: "Generative Media Tools",
-      year: 2023,
-      place: "Global",
-      categories: ["compute", "design", "writing"],
-      summary:
-        "Widely available models draft text, images, and audio on demand.",
-      detail:
-        "Authorship, authenticity, and provenance become central design problems for communication systems.",
-    },
-    {
-      id: "e56",
-      title: "Postal Uniform Penny Rate",
-      year: 1840,
-      place: "United Kingdom",
-      categories: ["postal", "social"],
-      summary:
-        "Rowland Hill’s reforms make distance-independent letter rates a mass service.",
-      detail:
-        "Stamps and prepaid postage industrialize personal and commercial correspondence.",
-    },
-    {
-      id: "e57",
-      title: "Offset Printing Industrializes",
-      year: 1904,
-      place: "United States",
-      categories: ["print", "design"],
-      summary:
-        "Offset lithography accelerates high-volume commercial print.",
-      detail:
-        "Magazines, packaging, and advertising gain cheaper, sharper color reproduction.",
-    },
-    {
-      id: "e58",
-      title: "Helvetica & Modernist UI Roots",
-      year: 1957,
-      place: "Switzerland",
-      categories: ["design"],
-      summary:
-        "Neutral sans-serif type becomes a global interface for clarity.",
-      detail:
-        "Corporate identity and later screen UI borrow modernist typographic neutrality.",
-    },
-    {
-      id: "e59",
-      title: "Satellite TV & Global Feeds",
-      year: 1962,
-      place: "Orbit / Atlantic",
-      categories: ["broadcast", "telecom"],
-      summary:
-        "Telstar and successors relay live television across oceans.",
-      detail:
-        "Audiences experience simultaneous planetary events — a new scale of shared media time.",
-    },
-    {
-      id: "e60",
-      title: "Fiber Optic Backbones",
-      year: 1988,
-      place: "Global",
-      categories: ["telecom", "network"],
-      summary:
-        "Glass fibers carry enormous bandwidth for voice and data.",
-      detail:
-        "Undersea and terrestrial fiber become the quiet substrate of modern platforms.",
-    },
-    {
-      id: "e61",
-      title: "Open Source Collaboration",
-      year: 1991,
-      place: "Global",
-      categories: ["compute", "network"],
-      summary:
-        "Publicly shared codebases coordinate distributed development.",
-      detail:
-        "Version control and mailing lists invent durable patterns for remote creative work.",
-    },
-    {
-      id: "e62",
-      title: "Digital Cameras Consumerize",
-      year: 1995,
-      place: "Japan / Global",
-      categories: ["photo"],
-      summary:
-        "Filmless cameras make instant review and deletion normal.",
-      detail:
-        "Zero marginal cost per shot changes photographic selectivity and volume.",
-    },
-    {
-      id: "e63",
-      title: "RSS & Syndicated Feeds",
-      year: 2002,
-      place: "Web",
-      categories: ["journalism", "network"],
-      summary:
-        "Machine-readable feeds let readers pull updates from many publishers.",
-      detail:
-        "Syndication decouples publishing from a single homepage destination.",
-    },
-    {
-      id: "e64",
-      title: "Cloud Media Libraries",
-      year: 2010,
-      place: "Global",
-      categories: ["network", "photo", "audio"],
-      summary:
-        "Personal archives migrate to remote storage synced across devices.",
-      detail:
-        "Access replaces possession as the everyday metaphor for media collections.",
-    },
-  ],
-};
+// Closed enums + named eras are the source of truth for the TimelineEvent contract.
+export const CATEGORIES = [
+  { id: "Print", color: "#1b6b4a" },
+  { id: "Broadcast", color: "#c26a00" },
+  { id: "Photography", color: "#5c6b7a" },
+  { id: "Cinema", color: "#a33b4a" },
+  { id: "Computing", color: "#1a508b" },
+  { id: "Networks", color: "#0e7490" },
+  { id: "Audio", color: "#0d7377" },
+  { id: "Typography", color: "#b45309" },
+  { id: "Publishing", color: "#7a4ea3" },
+  { id: "Telecom", color: "#2f5d8c" },
+];
+
+export const CATEGORY_IDS = CATEGORIES.map((c) => c.id);
+export const CATEGORY_COLOR = Object.fromEntries(CATEGORIES.map((c) => [c.id, c.color]));
+
+export const TYPES = ["Milestone", "Invention", "Release", "Publication", "Broadcast"];
+
+// Exactly five named era bands, washing the stage behind the axis.
+export const ERAS = [
+  { name: "Oral Tradition", fromYear: -4000, toYear: 500 },
+  { name: "Manuscript Age", fromYear: 501, toYear: 1449 },
+  { name: "Print Revolution", fromYear: 1450, toYear: 1876 },
+  { name: "Broadcast Era", fromYear: 1877, toYear: 1990 },
+  { name: "Network Age", fromYear: 1991, toYear: 2100 },
+];
+
+// Horizontal swimlanes echoing the reference composition (category groups).
+export const LANES = [
+  { id: "write", label: "Writing & Design", cats: ["Typography", "Publishing", "Print"], from: "#f4c430", to: "#f6b27a" },
+  { id: "media", label: "Everyday Media", cats: ["Photography", "Cinema", "Broadcast", "Audio"], from: "#b51717", to: "#f5871f" },
+  { id: "mile", label: "Media Milestones", cats: ["Computing", "Networks", "Telecom"], from: "#7b3f86", to: "#5b8def" },
+];
+
+export function laneForEvent(ev) {
+  const primary = ev.categories[0];
+  const lane = LANES.find((l) => l.cats.includes(primary));
+  return lane ? lane.id : "mile";
+}
+
+export const YEAR_MIN = -4000;
+export const YEAR_MAX = 2100;
+export const DEFAULT_FROM = 1450;
+export const DEFAULT_TO = 1920;
+
+function pad(n) {
+  return String(n).padStart(2, "0");
+}
+
+// Cross-field rule: BCE (year < 1) => timestamp is exactly 0001-01-01T00:00:00.000Z;
+// CE (year >= 1) => the UTC calendar year of timestamp equals year.
+function timestampFor(year, m = 6, d = 15) {
+  if (year < 1) return "0001-01-01T00:00:00.000Z";
+  return `${String(year).padStart(4, "0")}-${pad(m)}-${pad(d)}T12:00:00.000Z`;
+}
+
+// compact spec rows: [id, title, year, place, type, [cats], [mediaRefs], summary, month?, day?]
+const SPEC = [
+  // --- Oral Tradition (-4000..500) ---
+  ["e01", "Cuneiform on Clay Tablets", -3200, "Sumer", "Invention", ["Typography"], ["cuneiform-clay", "tablet-impressions"], "Administrative marks on wet clay harden into a durable writing system for trade, law, and myth."],
+  ["e02", "Egyptian Hieroglyphic Script", -3100, "Egypt", "Milestone", ["Typography", "Publishing"], ["hieroglyph-corpus", "papyrus-rolls"], "Monumental and administrative scripts encode language for sacred and civic memory."],
+  ["e03", "Phoenician Consonant Alphabet", -1050, "Levant", "Invention", ["Typography"], ["phonetic-alphabet"], "A compact consonant alphabet travels trade routes and seeds later Mediterranean scripts."],
+  ["e04", "Greek Alphabet Adds Vowels", -800, "Greece", "Milestone", ["Typography", "Publishing"], ["greek-vowels"], "Explicit vowel signs clarify spoken language and template later European scripts."],
+  ["e05", "Library of Alexandria", -283, "Alexandria", "Milestone", ["Publishing"], ["scroll-catalogue", "mouseion-archives"], "A great collection organizes copied scrolls into a shared scholarly memory."],
+  ["e06", "Roman Acta Diurna Notices", -59, "Rome", "Publication", ["Publishing", "Print"], ["acta-diurna", "public-notices"], "Daily public notices post official acts and births, an early mass information sheet."],
+  ["e07", "Cursus Publicus Postal Relay", 14, "Rome", "Invention", ["Telecom"], ["cursus-publicus", "relay-stations"], "An imperial relay of horses and stations carries state messages across provinces."],
+  ["e08", "Chinese Paper Making", 105, "Han China", "Invention", ["Print", "Publishing"], ["cai-lun-paper", "rag-pulp"], "Bark and rag pulp yield a cheap writing surface that reshapes record-keeping."],
+  ["e09", "Codex Replaces the Scroll", 300, "Mediterranean", "Release", ["Publishing"], ["bound-codex", "leaf-folio"], "Bound leaves let readers flip and reference, foreshadowing the modern book."],
+  ["e10", "Woodblock Printing in Tang China", 700, "Tang China", "Invention", ["Print", "Typography"], ["woodblock-press", "ink-rubbing"], "Carved blocks print repeated text and image, scaling reproduction beyond scribes."],
+
+  // --- Manuscript Age (501..1449) ---
+  ["e11", "Book of Kells Illumination", 800, "Iona", "Publication", ["Typography", "Publishing"], ["illuminated-manuscript", "insular-script"], "Lavish insular illumination fuses text and ornament into a devotional object."],
+  ["e12", "House of Wisdom Translation Bureau", 830, "Baghdad", "Milestone", ["Publishing"], ["translation-bureau", "paper-mills"], "Scholars translate and copy Greek, Persian, and Indian works onto paper."],
+  ["e13", "Movable Type in Song China", 1040, "Song China", "Invention", ["Print", "Typography"], ["bi-sheng-type", "clay-sort"], "Reusable clay sorts compose pages, anticipating metal movable type."],
+  ["e14", "University Scriptoria Spread", 1150, "Bologna", "Milestone", ["Publishing"], ["pecia-system", "glossed-texts"], "Copied quires circulate among students, standardizing scholarly texts."],
+  ["e15", "Mechanical Clock Tower Signals", 1283, "England", "Invention", ["Computing"], ["verge-escapement", "tower-clock"], "Weight-driven escapements measure and broadcast equal hours to a town."],
+  ["e16", "Movable Metal Type in Korea", 1377, "Goryeo", "Invention", ["Print", "Typography"], ["jikji-metal-type", "bronze-cast"], "Cast metal sorts print the Jikji, the earliest surviving movable-metal-type book."],
+  ["e17", "Paper Mills Reach Europe", 1276, "Fabriano", "Milestone", ["Print", "Publishing"], ["waterwheel-mill", "sized-paper"], "Water-powered mills make abundant paper, priming Europe for the press."],
+
+  // --- Print Revolution (1450..1876) ---
+  ["e18", "Gutenberg Movable-Type Press", 1455, "Mainz", "Invention", ["Print", "Typography"], ["forty-two-line-bible", "hand-mould"], "A screw press and cast type industrialize the page and fix the printed book."],
+  ["e19", "Aldine Italic and Pocket Books", 1501, "Venice", "Release", ["Typography", "Publishing"], ["aldine-italic", "octavo-format"], "Compact italics and small formats make books portable and affordable."],
+  ["e20", "Weekly Printed News Sheets", 1605, "Strasbourg", "Publication", ["Publishing", "Print"], ["relation-newsbook", "weekly-sheet"], "Regular printed newsbooks begin a rhythm of public current affairs."],
+  ["e21", "First Daily Newspaper", 1702, "London", "Publication", ["Publishing", "Print"], ["daily-courant", "two-column"], "A daily paper turns news into a habit of the reading public."],
+  ["e22", "Copperplate Engraving Plates", 1520, "Antwerp", "Invention", ["Print", "Photography"], ["intaglio-plate", "burin-lines"], "Engraved metal plates reproduce fine image and map detail at scale."],
+  ["e23", "Lithography from Stone", 1796, "Munich", "Invention", ["Print", "Photography"], ["senefelder-stone", "greasy-crayon"], "Drawing on stone with grease lets image and text print cheaply together."],
+  ["e24", "Steam-Powered Printing Press", 1814, "London", "Invention", ["Print", "Computing"], ["koenig-steam", "times-press"], "Steam drives the press, multiplying pages per hour for mass readership."],
+  ["e25", "Rotary Press and Paper Reels", 1843, "United States", "Invention", ["Print", "Computing"], ["rotary-cylinder", "continuous-reel"], "Curved plates on a cylinder print from endless paper at speed."],
+  ["e26", "Penny Press Mass Dailies", 1833, "New York", "Release", ["Publishing", "Print"], ["penny-sun", "street-vendors"], "A one-cent paper sells on the street and courts a vast new audience."],
+  ["e27", "Electric Telegraph Lines", 1844, "United States", "Invention", ["Telecom", "Networks"], ["morse-key", "what-hath-god"], "Pulsed current carries coded words across continents in minutes."],
+  ["e28", "Associated Press Wire Service", 1846, "New York", "Milestone", ["Publishing", "Telecom"], ["harbor-news-pool", "shared-wire"], "Papers pool telegraph costs, birthing the wire service and shared copy."],
+  ["e29", "Daguerreotype Photograph", 1839, "Paris", "Invention", ["Photography"], ["daguerre-plate", "silvered-copper"], "Light fixes a mirror-like image on silver, inaugurating practical photography."],
+  ["e30", "Collodion Wet-Plate Process", 1851, "England", "Invention", ["Photography"], ["wet-plate", "glass-negative"], "A glass negative allows many prints and sharp field photographs."],
+  ["e31", "Phonograph Records Sound", 1877, "United States", "Invention", ["Audio"], ["tinfoil-cylinder", "etched-groove"], "A stylus etches and replays sound, capturing the voice for the first time."],
+  ["e32", "Halftone Photo Reproduction", 1880, "New York", "Invention", ["Print", "Photography"], ["halftone-screen", "dot-pattern"], "Photographs print alongside text through screened dots of ink."],
+
+  // --- Broadcast Era (1877..1990) ---
+  ["e33", "Telephone Voice Network", 1876, "United States", "Invention", ["Telecom", "Networks"], ["bell-patent", "liquid-transmitter"], "Speech travels over wire, weaving a switched voice network."],
+  ["e34", "Cinema Projected Motion Pictures", 1895, "Paris", "Release", ["Cinema", "Photography"], ["cinematographe", "lumiere-reels"], "Projected film turns sequential frames into a shared moving image."],
+  ["e35", "Marconi Radio Telegraphy", 1901, "Atlantic", "Milestone", ["Telecom", "Broadcast"], ["transatlantic-signal", "spark-gap"], "Wireless signals leap the ocean, freeing messages from the wire."],
+  ["e36", "Audion Vacuum Tube Amplifier", 1906, "United States", "Invention", ["Audio", "Broadcast"], ["de-forest-audion", "triode"], "The triode amplifies weak signals, enabling broadcast and long-distance voice."],
+  ["e37", "First Scheduled Radio Broadcast", 1920, "Pittsburgh", "Broadcast", ["Broadcast", "Audio"], ["kdk-news-bulletin", "scheduled-program"], "A licensed station airs scheduled programs to a listening public."],
+  ["e38", "Vitaphone Sound Film", 1927, "Hollywood", "Release", ["Cinema", "Audio"], ["jazz-singer", "sound-on-disc"], "Synchronized sound joins the moving image in popular cinema."],
+  ["e39", "Television Broadcast Service", 1936, "London", "Broadcast", ["Broadcast", "Cinema"], ["bbc-alexandra", "mechanical-scan"], "Regular high-definition television broadcasts begin for the public."],
+  ["e40", "Magnetic Tape Recording", 1935, "Germany", "Invention", ["Audio"], ["magnetophon", "oxide-tape"], "Magnetic tape records and edits sound, reshaping the studio."],
+  ["e41", "Transistor Radio Sets", 1954, "United States", "Release", ["Audio", "Computing"], ["regency-tr1", "pocket-radio"], "Cheap transistors make radio personal and portable."],
+  ["e42", "Color Television Standard", 1953, "United States", "Release", ["Broadcast", "Cinema"], ["ntsc-color", "compatible-signal"], "A compatible color standard brings color to the broadcast screen."],
+  ["e43", "Communication Satellites", 1962, "Orbit", "Milestone", ["Telecom", "Networks"], ["telstar", "microwave-relay"], "Orbiting relays carry live television and calls across hemispheres."],
+  ["e44", "Videocassette Home Recording", 1976, "Japan", "Release", ["Cinema", "Broadcast"], ["vhs-deck", "time-shift"], "Home cassettes let audiences record and replay the broadcast flow."],
+  ["e45", "Cable and Satellite Networks", 1980, "United States", "Milestone", ["Broadcast", "Networks"], ["cnn-feed", "narrowcast-channels"], "Narrowcast channels multiply, fragmenting the mass audience."],
+
+  // --- Network Age (1991..2100) ---
+  ["e46", "World Wide Web over the Internet", 1991, "Geneva", "Milestone", ["Networks", "Computing"], ["http-protocol", "first-website"], "Hypertext over the internet opens a global, linked publishing medium."],
+  ["e47", "Mosaic Graphical Browser", 1993, "Illinois", "Release", ["Networks", "Publishing"], ["inline-images", "point-and-click"], "Inline images and a graphical interface bring the web to millions."],
+  ["e48", "MP3 Compressed Audio", 1993, "Europe", "Invention", ["Audio", "Networks"], ["mpeg-layer3", "perceptual-coding"], "Perceptual coding shrinks audio files, priming network music."],
+  ["e49", "Digital Cameras Go Consumer", 1994, "Japan", "Release", ["Photography", "Computing"], ["ccd-sensor", "memory-card"], "Solid-state sensors and cards move photography off film."],
+  ["e50", "SMS Text Messaging", 1992, "Europe", "Invention", ["Telecom", "Networks"], ["first-sms", "160-chars"], "Short text rides the signaling channel, birthing mobile messaging."],
+  ["e51", "Streaming Media over the Web", 1995, "United States", "Release", ["Broadcast", "Networks"], ["realplayer", "progressive-stream"], "Buffered streams deliver audio and video without full downloads."],
+  ["e52", "Blogging and Self-Publishing", 1999, "Global", "Milestone", ["Publishing", "Networks"], ["blogger-platform", "rss-feeds"], "Cheap publishing tools let anyone broadcast to a feed."],
+  ["e53", "Wikipedia Collaborative Publishing", 2001, "Global", "Milestone", ["Publishing", "Networks"], ["wiki-engine", "open-edit"], "A free encyclopedia anyone can edit scales shared knowledge."],
+  ["e54", "Social News Feeds", 2004, "United States", "Release", ["Networks", "Publishing"], ["news-feed", "social-graph"], "Algorithmic feeds reorder media around the social graph."],
+  ["e55", "Video Sharing Platforms", 2005, "United States", "Release", ["Cinema", "Networks"], ["user-uploads", "embed-player"], "Easy upload and embed make amateur video a public medium."],
+  ["e56", "Smartphone Touch Computing", 2007, "United States", "Release", ["Computing", "Telecom"], ["multitouch-screen", "app-store"], "A pocket computer with a touch screen folds every medium into one device."],
+  ["e57", "Streaming Replaces Broadcast Slot", 2013, "Global", "Milestone", ["Broadcast", "Networks"], ["binge-release", "on-demand"], "On-demand seasons shift viewing from the schedule to the queue."],
+  ["e58", "Podcasting Goes Mainstream", 2014, "Global", "Release", ["Audio", "Networks"], ["serial-podcast", "rss-audio"], "Serial narrative podcasts revive long-form audio for the network."],
+  ["e59", "Live Mobile Video", 2015, "Global", "Release", ["Broadcast", "Telecom"], ["periscope-live", "phone-broadcast"], "Anyone with a phone can broadcast live to a global audience."],
+  ["e60", "Generative Media Tools", 2022, "Global", "Invention", ["Computing", "Typography"], ["diffusion-models", "text-to-image"], "Generative models synthesize text and image from prompts."],
+  ["e61", "Spatial and Immersive Media", 2024, "Global", "Release", ["Cinema", "Computing"], ["volumetric-capture", "headset-display"], "Volumetric capture and headsets push media into three dimensions."],
+  ["e62", "Open Federated Networks", 2023, "Global", "Milestone", ["Networks", "Publishing"], ["activitypub", "fediverse"], "Open protocols let independent servers exchange posts and media."],
+];
+
+export const SEED_EVENTS = SPEC.map(
+  ([id, title, year, place, type, categories, mediaRefs, summary, m, d]) => ({
+    id,
+    title,
+    year,
+    place,
+    type,
+    categories,
+    mediaRefs,
+    summary,
+    timestamp: timestampFor(year, m, d),
+    source: "corpus",
+  }),
+);

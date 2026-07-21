@@ -1,201 +1,236 @@
-import { createSignal, createEffect, onMount, onCleanup, For, Show } from 'solid-js';
-import { state, setState } from '../store';
-import { MT_DATA } from '../data';
-import { formatYear } from '../utils';
-import { Popover } from '@kobalte/core/popover';
-import { Dialog } from '@kobalte/core/dialog';
+import { createMemo, createSignal, onMount, onCleanup, For, Show } from "solid-js";
+import { state, inView, openDetail, zoomAroundMidpoint, panBy, setWindow } from "../store";
+import { LANES, ERAS, laneForEvent, CATEGORY_COLOR } from "../data";
+import { fmtYear, eraAtMidpoint } from "../format";
+import { IconInfoCircle } from "@tabler/icons-solidjs";
 
-const catsById = Object.fromEntries(MT_DATA.categories.map((c) => [c.id, c]));
+const PAD_LEFT = 0.16; // fraction of width reserved for the tapering ribbon edge
+const PAD_RIGHT = 0.13; // fraction reserved for lane labels
 
-export default function TimelineStage() {
-  let viewportRef;
-  const [panX, setPanX] = createSignal(0);
-
-  const filteredEvents = () => {
-    const q = state.filters.search.trim().toLowerCase();
-    const activeCats = new Set(state.filters.categories);
-    return state.events.filter((ev) => {
-      if (ev.year < state.window.from || ev.year > state.window.to) return false;
-      if (!ev.categories.some((c) => activeCats.has(c))) return false;
-      if (!q) return true;
-      const hay = `${ev.title} ${ev.place || ''} ${ev.summary || ''}`.toLowerCase();
-      return hay.includes(q);
-    }).sort((a, b) => a.year - b.year || a.title.localeCompare(b.title));
-  };
-
-  const midPoint = () => (state.window.from + state.window.to) / 2;
-  const currentEra = () => {
-    return MT_DATA.eras.find((e) => midPoint() >= e.from && midPoint() <= e.to) || MT_DATA.eras[MT_DATA.eras.length - 1];
-  };
-
-  const setRange = (from, to, keepPan = false) => {
-    let a = Math.max(MT_DATA.yearMin, Math.round(from));
-    let b = Math.min(MT_DATA.yearMax, Math.round(to));
-    if (b <= a) b = Math.min(MT_DATA.yearMax, a + 1);
-    setState('window', { from: a, to: b });
-    if (!keepPan) setPanX(0);
-  };
-
-  const handleWheel = (e) => {
-    e.preventDefault();
-    const span = state.window.to - state.window.from;
-    if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-      const dx = e.deltaX || e.deltaY;
-      const yearDelta = (dx / (viewportRef?.clientWidth || 800)) * span;
-      setRange(state.window.from + yearDelta, state.window.to + yearDelta, true);
-      return;
-    }
-    const zoom = e.deltaY > 0 ? 1.12 : 0.9;
-    const mid = midPoint();
-    const half = Math.max(15, Math.min((MT_DATA.yearMax - MT_DATA.yearMin) / 2, (span * zoom) / 2));
-    setRange(mid - half, mid + half);
-  };
+export default function TimelineStage(props) {
+  let containerRef;
+  const [width, setWidth] = createSignal(960);
+  const [hoverId, setHoverId] = createSignal(null);
+  const [drag, setDrag] = createSignal(null);
 
   onMount(() => {
-    if (viewportRef) {
-      viewportRef.addEventListener('wheel', handleWheel, { passive: false });
-    }
-  });
-  
-  onCleanup(() => {
-    if (viewportRef) {
-      viewportRef.removeEventListener('wheel', handleWheel);
-    }
+    const ro = new ResizeObserver((entries) => {
+      for (const e of entries) setWidth(e.contentRect.width);
+    });
+    if (containerRef) ro.observe(containerRef);
+    setWidth(containerRef ? containerRef.clientWidth : 960);
+    onCleanup(() => ro.disconnect());
   });
 
-  return (
-    <div class="relative flex-1 overflow-hidden bg-slate-50 flex flex-col" ref={viewportRef}>
-      <div class="absolute top-4 left-4 z-10 flex gap-2">
-        <div class="bg-white/80 px-3 py-1 rounded shadow text-sm font-medium">
-          <span id="current-era-label">{currentEra()?.label}</span>
-        </div>
-        <div class="bg-white/80 px-3 py-1 rounded shadow text-sm font-medium">
-          <span id="events-in-view-count">{filteredEvents().length} events in view</span>
-        </div>
-      </div>
-      
-      <div class="absolute inset-0 pointer-events-none">
-        <For each={MT_DATA.eras}>
-          {(era) => {
-            if (era.to < state.window.from || era.from > state.window.to) return null;
-            const w = viewportRef ? viewportRef.clientWidth : 800;
-            const span = state.window.to - state.window.from || 1;
-            const x0 = ((Math.max(era.from, state.window.from) - state.window.from) / span) * w + panX();
-            const x1 = ((Math.min(era.to, state.window.to) - state.window.from) / span) * w + panX();
-            return (
-              <div class="absolute top-0 bottom-0 opacity-10" style={`left: ${x0}px; width: ${Math.max(0, x1 - x0)}px; background-color: ${era.tint}`}></div>
-            );
-          }}
-        </For>
-      </div>
+  const W = createMemo(() => Math.max(280, width()));
+  const drawLeft = createMemo(() => W() * PAD_LEFT);
+  const drawRight = createMemo(() => W() * (1 - PAD_RIGHT));
+  const drawW = createMemo(() => Math.max(40, drawRight() - drawLeft()));
 
-      <div class="relative w-full h-full mt-24">
-        <For each={filteredEvents()}>
-          {(ev, idx) => {
-             const w = viewportRef ? viewportRef.clientWidth : 800;
-             const span = state.window.to - state.window.from || 1;
-             const x = ((ev.year - state.window.from) / span) * w + panX();
-             if (x < -60 || x > w + 60) return null;
-             
-             const hash = [...ev.id].reduce((a, c) => a + c.charCodeAt(0), 0);
-             const h = viewportRef ? viewportRef.clientHeight : 600;
-             const base = 0.34 + ((hash % 7) / 7) * 0.24;
-             const stagger = (idx() % 5) * 0.042;
-             const yRatio = Math.max(0.2, Math.min(0.58, base - stagger));
-             const pinY = h * yRatio;
-             const color = catsById[ev.categories?.[0]]?.color || '#00838f';
-             
-             return (
-                <button
-                  type="button"
-                  class={`absolute group transform -translate-x-1/2 -translate-y-full hover:z-50 transition-transform hover:scale-110 focus:outline-none ${state.selectedId === ev.id ? 'z-40 scale-110' : 'z-20'}`}
-                  style={`left: ${x}px; top: ${pinY}px;`}
-                  onClick={() => setState('selectedId', ev.id)}
-                  aria-label={`${ev.title}, ${formatYear(ev.year)}`}
-                >
-                  <div class="w-4 h-4 rounded-full shadow-md border-2 border-white" style={`background-color: ${color}`}></div>
-                  <div class="hidden group-hover:block absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-max bg-white p-2 rounded shadow-lg text-xs z-50 pointer-events-none">
-                    <p class="font-bold">{ev.title}</p>
-                    <p class="text-gray-600">{ev.place} · {formatYear(ev.year)}</p>
-                  </div>
-                </button>
-             );
-          }}
-        </For>
-      </div>
-      
-      <Show when={state.selectedId}>
-        <DetailPanel />
-      </Show>
-    </div>
-  );
-}
-
-function DetailPanel() {
-  const ev = () => state.events.find(e => e.id === state.selectedId);
-  
-  const handleClose = () => setState('selectedId', null);
-  
-  const filteredEvents = () => {
-    const q = state.filters.search.trim().toLowerCase();
-    const activeCats = new Set(state.filters.categories);
-    return state.events.filter((e) => {
-      if (e.year < state.window.from || e.year > state.window.to) return false;
-      if (!e.categories.some((c) => activeCats.has(c))) return false;
-      if (!q) return true;
-      const hay = `${e.title} ${e.place || ''} ${e.summary || ''}`.toLowerCase();
-      return hay.includes(q);
-    }).sort((a, b) => a.year - b.year || a.title.localeCompare(b.title));
+  const xForYear = (year) => {
+    const f = state.window.from;
+    const t = state.window.to;
+    const r = t === f ? 0.5 : (year - f) / (t - f);
+    return drawLeft() + r * drawW();
   };
-  
-  const step = (dir) => {
-    const list = filteredEvents();
-    if (!list.length) return;
-    const idx = list.findIndex(e => e.id === state.selectedId);
-    if (idx === -1) return;
-    const next = list[(idx + dir + list.length) % list.length];
-    setState('selectedId', next.id);
+  const yearForX = (x) => {
+    const f = state.window.from;
+    const t = state.window.to;
+    const r = (x - drawLeft()) / drawW();
+    return Math.round(f + r * (t - f));
   };
 
-  createEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') handleClose();
-      if (e.key === 'ArrowLeft') step(-1);
-      if (e.key === 'ArrowRight') step(1);
+  // group in-view events by lane and compute vertical offset for same/near-year overlaps
+  const lanes = createMemo(() => {
+    const view = inView();
+    const byLane = {};
+    for (const l of LANES) byLane[l.id] = [];
+    for (const ev of view) {
+      const lid = laneForEvent(ev);
+      (byLane[lid] || (byLane[lid] = [])).push(ev);
+    }
+    const result = {};
+    for (const l of LANES) {
+      const arr = byLane[l.id].slice().sort((a, b) => a.year - b.year);
+      const placed = [];
+      for (const ev of arr) {
+        const x = xForYear(ev.year);
+        // vertical fan among pins that land within 22px on the same lane, so each stays clickable
+        const near = placed.filter((p) => Math.abs(p.x - x) < 22).length;
+        const vy = near === 0 ? 0 : (near % 2 === 1 ? -1 : 1) * (12 + Math.floor(near / 2) * 10);
+        placed.push({ ev, x, vy });
+      }
+      // mark cluster sizes for same-year groups (for the count badge)
+      const yearCount = {};
+      for (const p of placed) yearCount[p.ev.year] = (yearCount[p.ev.year] || 0) + 1;
+      for (const p of placed) p.sameYear = yearCount[p.ev.year];
+      result[l.id] = placed;
+    }
+    return result;
+  });
+
+  // wheel: zoom on plain wheel, pan on shift or horizontal-dominant wheel
+  function onWheel(e) {
+    const horiz = Math.abs(e.deltaX) > Math.abs(e.deltaY);
+    if (e.shiftKey || horiz) {
+      e.preventDefault();
+      const d = horiz ? e.deltaX : e.deltaY;
+      const span = state.window.to - state.window.from;
+      const years = Math.round((d / 240) * span * 0.4);
+      if (years !== 0) panBy(years);
+    } else {
+      e.preventDefault();
+      const factor = e.deltaY > 0 ? 1.12 : 0.89;
+      zoomAroundMidpoint(factor);
+    }
+  }
+
+  function onPointerDown(e) {
+    if (e.target !== e.currentTarget && e.target.getAttribute("data-stage-bg") !== "true") return;
+    setDrag({ x: e.clientX, from: state.window.from, to: state.window.to });
+    const move = (ev) => {
+      const dx = ev.clientX - drag().x;
+      const span = drag().to - drag().from;
+      const years = -Math.round((dx / drawW()) * span);
+      setWindow(drag().from + years, drag().to + years);
     };
-    document.addEventListener('keydown', handleKeyDown);
-    onCleanup(() => document.removeEventListener('keydown', handleKeyDown));
-  });
+    const up = () => {
+      setDrag(null);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+    };
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+  }
+
+  const laneHeight = 120;
+  const stageHeight = () => LANES.length * laneHeight + 36;
+  const midEra = createMemo(() => eraAtMidpoint(state.window.from, state.window.to));
 
   return (
-    <Show when={ev()}>
-      <div class="absolute right-4 top-4 bottom-4 w-80 bg-white rounded-lg shadow-2xl p-6 flex flex-col z-50 animate-fade-in" role="dialog" aria-modal="true">
-        <button onClick={handleClose} class="absolute top-4 right-4 text-gray-500 hover:text-black">
-          ✕
-        </button>
-        <p class="text-sm text-gray-500 font-mono mb-2">{formatYear(ev().year)} · {ev().place}</p>
-        <h2 class="text-xl font-bold mb-1">{ev().title}</h2>
-        <p class="text-sm font-semibold text-cyan-700 mb-3">{ev().type}</p>
-        
-        <div class="flex gap-2 mb-4 flex-wrap">
-          <For each={ev().categories}>
-            {(c) => <span class="text-xs px-2 py-1 rounded-full text-white" style={`background-color: ${catsById[c]?.color || '#333'}`}>{catsById[c]?.label || c}</span>}
+    <div class="relative flex-1 min-h-0 overflow-hidden" style={{ "min-height": "360px" }}>
+      <div
+        ref={containerRef}
+        class="absolute inset-0 cursor-grab active:cursor-grabbing touch-none"
+        onWheel={onWheel}
+        onPointerDown={onPointerDown}
+        role="application"
+        aria-label="Timeline stage. Drag to pan, scroll to zoom, shift-scroll to pan the year window."
+        tabindex="0"
+      >
+        {/* era bands wash (vertical columns) */}
+        <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+          <For each={ERAS}>
+            {(era) => {
+              const f = state.window.from;
+              const t = state.window.to;
+              const left = Math.max(0, Math.min(1, (era.fromYear - f) / (t - f))) * 100;
+              const right = Math.max(0, Math.min(1, (era.toYear - f) / (t - f))) * 100;
+              const visible = right > left && right > 0 && left < 100;
+              return (
+                <Show when={visible}>
+                  <div class="absolute top-0 bottom-0 border-r border-[rgba(120,90,50,0.10)]" style={{ left: left + "%", width: Math.max(0, right - left) + "%", background: "rgba(120,90,50,0.045)" }}>
+                    <span class="absolute top-1.5 left-2 text-[10px] uppercase tracking-[0.18em] text-[rgba(80,60,35,0.6)] font-semibold whitespace-nowrap">{era.name}</span>
+                  </div>
+                </Show>
+              );
+            }}
           </For>
         </div>
-        
-        <div class="flex-1 overflow-y-auto">
-          <p class="font-medium text-gray-800 mb-4">{ev().summary}</p>
-          <div class="text-sm text-gray-600 space-y-2">
-            <p><strong>Media Refs:</strong> {ev().mediaRefs?.join('; ')}</p>
-            <p><strong>Source:</strong> {ev().source || 'Unknown'}</p>
-          </div>
+
+        {/* corner numerals */}
+        <div class="absolute top-3 left-4 pointer-events-none">
+          <span class="font-display italic font-bold text-[clamp(28px,5vw,52px)] leading-none text-[color:var(--ink)] drop-shadow-sm">{fmtYear(state.window.from)}</span>
         </div>
-        
-        <div class="mt-4 flex justify-between pt-4 border-t">
-          <button onClick={() => step(-1)} class="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded">Previous</button>
-          <button onClick={() => step(1)} class="text-sm px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded">Next</button>
+        <div class="absolute top-3 right-4 pointer-events-none text-right">
+          <span class="font-display italic font-bold text-[clamp(28px,5vw,52px)] leading-none text-[color:var(--ink)] drop-shadow-sm">{fmtYear(state.window.to)}</span>
+        </div>
+
+        {/* midpoint vertical line */}
+        <div class="absolute top-0 bottom-0 w-px bg-[rgba(40,30,20,0.35)] pointer-events-none" style={{ left: "50%" }} aria-hidden="true" />
+
+        {/* swimlanes */}
+        <div class="absolute left-0 right-0" style={{ top: "64px" }} data-stage-bg="true">
+          <For each={LANES}>
+            {(lane, i) => {
+              const top = () => i() * laneHeight;
+              const placed = () => lanes()[lane.id] || [];
+              return (
+                <div class="absolute left-0 right-0" style={{ top: top() + "px", height: laneHeight + "px" }} data-stage-bg="true">
+                  {/* ribbon with tapering left edge */}
+                  <div
+                    class="absolute top-2 bottom-2 left-0 rounded-r-[40px]"
+                    data-stage-bg="true"
+                    style={{
+                      right: "8px",
+                      background: `linear-gradient(90deg, ${lane.from}, ${lane.to})`,
+                      "-webkit-mask-image": "linear-gradient(90deg, transparent 0%, #000 15%, #000 100%)",
+                      "mask-image": "linear-gradient(90deg, transparent 0%, #000 15%, #000 100%)",
+                      opacity: "0.92",
+                    }}
+                  />
+                  {/* center strand */}
+                  <div class="absolute left-[14%] right-10 top-1/2 h-px bg-[rgba(255,255,255,0.7)]" data-stage-bg="true" aria-hidden="true" />
+                  {/* lane label */}
+                  <span class="absolute right-3 top-1/2 -translate-y-1/2 font-display italic font-bold text-[13px] text-[#241a10] hidden sm:block pointer-events-none">{lane.label}</span>
+                  {/* pins */}
+                  <For each={placed()}>
+                    {(p) => {
+                      const col = () => CATEGORY_COLOR[p.ev.categories[0]] || "#333";
+                      const isHover = () => hoverId() === p.ev.id;
+                      return (
+                        <div class="absolute" style={{ left: p.x + "px", top: laneHeight / 2 + p.vy + "px", transform: "translate(-50%,-50%)", "z-index": isHover() ? 30 : 10 }}>
+                          <button
+                            class="pin-dot anim-pin relative grid place-items-center rounded-full bg-white shadow-md"
+                            style={{ width: p.sameYear > 1 ? "26px" : "16px", height: p.sameYear > 1 ? "26px" : "16px", "box-shadow": isHover() ? `0 0 0 4px ${col()}44, 0 3px 10px rgba(0,0,0,0.3)` : "0 1px 4px rgba(0,0,0,0.25)" }}
+                            onMouseEnter={() => setHoverId(p.ev.id)}
+                            onMouseLeave={() => setHoverId((h) => (h === p.ev.id ? null : h))}
+                            onFocus={() => setHoverId(p.ev.id)}
+                            onBlur={() => setHoverId((h) => (h === p.ev.id ? null : h))}
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDetail(p.ev.id);
+                            }}
+                            aria-label={`${p.ev.title}, ${p.ev.place}, ${fmtYear(p.ev.year)}. Open detail.`}
+                          >
+                            <span class="rounded-full" style={{ width: p.sameYear > 1 ? "8px" : "7px", height: p.sameYear > 1 ? "8px" : "7px", background: col() }} />
+                            <Show when={p.sameYear > 1}>
+                              <span class="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-white text-[10px] font-bold px-1.5 shadow" style={{ color: col() }}>
+                                {p.sameYear}
+                              </span>
+                            </Show>
+                          </button>
+                          <Show when={isHover()}>
+                            <div class="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 z-40 w-max max-w-[220px] rounded-lg bg-[#1d1a16] text-[#f3ead9] text-xs px-2.5 py-1.5 shadow-xl pointer-events-none anim-fade">
+                              <div class="font-semibold leading-tight">{p.ev.title}</div>
+                              <div class="text-[#cdbfa6] mt-0.5">
+                                {p.ev.place} &middot; {fmtYear(p.ev.year)}
+                              </div>
+                            </div>
+                          </Show>
+                        </div>
+                      );
+                    }}
+                  </For>
+                </div>
+              );
+            }}
+          </For>
+        </div>
+
+        {/* current era + in-view readouts overlaid bottom-left */}
+        <div class="absolute bottom-3 left-4 flex items-center gap-2 pointer-events-none">
+          <span class="rounded-full bg-[rgba(29,26,22,0.85)] text-[#f3ead9] text-xs px-2.5 py-1 font-medium">
+            era at midpoint: <span class="font-display">{midEra().name}</span>
+          </span>
         </div>
       </div>
-    </Show>
+
+      {/* floating help / about trigger on stage */}
+      <button class="chrome-btn absolute top-3 left-1/2 -translate-x-1/2 inline-flex items-center gap-1 rounded-full bg-white/85 backdrop-blur border border-[color:var(--line)] px-3 py-1 text-xs font-medium shadow-sm" onClick={() => props.onAbout && props.onAbout()} aria-label="Open About and help">
+        <IconInfoCircle size={14} /> About &amp; help
+      </button>
+    </div>
   );
 }
