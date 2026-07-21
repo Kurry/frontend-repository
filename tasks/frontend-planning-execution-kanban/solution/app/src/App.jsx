@@ -508,7 +508,7 @@ function CreateCardModal({ column, shown }) {
               onChange: () => { clearErrors('title'); state.setCreateFormErrors({ ...state.createFormErrors, title: undefined }) },
             })}
           />
-          <TextArea id="create-description" labelText="Description (optional)" placeholder="Add useful context, acceptance criteria, or evaluation notes." invalid={Boolean(errors.description)} invalidText={errors.description?.message} {...register('description')} />
+          <TextArea autoComplete="off" id="create-description" labelText="Description (optional)" placeholder="Add useful context, acceptance criteria, or evaluation notes." invalid={Boolean(errors.description)} invalidText={errors.description?.message} {...register('description')} />
           <Select id="create-prompt" labelText="Attached prompt (optional)" invalid={Boolean(errors.attached_prompt)} invalidText={errors.attached_prompt?.message} {...register('attached_prompt')}>
             <SelectItem value="" text="No attached prompt" />
             {state.prompts.map((prompt) => <SelectItem key={prompt.id} value={prompt.id} text={prompt.title} />)}
@@ -561,8 +561,8 @@ function DetailEditForm({ card, onSave }) {
   })
   return (
     <form id="detail-edit-form" onSubmit={submit} className="modal-form" noValidate>
-      <TextInput id="detail-title" labelText="Title" invalid={Boolean(errors.title)} invalidText={errors.title?.message} {...register('title')} />
-      <TextArea id="detail-description" labelText="Description" rows={4} invalid={Boolean(errors.description)} invalidText={errors.description?.message} {...register('description')} />
+      <TextInput autoComplete="off" id="detail-title" labelText="Title" invalid={Boolean(errors.title)} invalidText={errors.title?.message} {...register('title')} />
+      <TextArea autoComplete="off" id="detail-description" labelText="Description" rows={4} invalid={Boolean(errors.description)} invalidText={errors.description?.message} {...register('description')} />
       <Select id="detail-assignee" labelText="Assignee" invalid={Boolean(errors.assignee)} invalidText={errors.assignee?.message} {...register('assignee')}>
         <SelectItem value="" text="Unassigned" />
         {assignees.map((person) => <SelectItem key={person.id} value={person.id} text={person.name} />)}
@@ -650,7 +650,7 @@ function CardDetailModal({ cardId, shown }) {
                 ))}
               </div>
               <form className="comment-form" onSubmit={submitComment}>
-                <TextArea id="detail-comment" labelText="Add a comment" rows={2} invalid={Boolean(commentForm.formState.errors.comment)} invalidText={commentForm.formState.errors.comment?.message} {...commentForm.register('comment')} />
+                <TextArea autoComplete="off" id="detail-comment" labelText="Add a comment" rows={2} invalid={Boolean(commentForm.formState.errors.comment)} invalidText={commentForm.formState.errors.comment?.message} {...commentForm.register('comment')} />
                 {/* preventDefault on mousedown: Carbon centers newly focused
                     nodes inside scrollable modal content, which would shift the
                     button out from under the pointer between down and up. */}
@@ -801,7 +801,20 @@ function ExportDrawer({ shown }) {
   const copy = async (text, control) => {
     control.dataset.copyStatus = 'pending'
     try {
-      await navigator.clipboard.writeText(text)
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text)
+      } else {
+        const textArea = document.createElement("textarea")
+        textArea.value = text
+        textArea.style.position = "fixed"
+        textArea.style.left = "-999999px"
+        textArea.style.top = "-999999px"
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        document.execCommand('copy')
+        textArea.remove()
+      }
       control.dataset.copyStatus = 'success'
       state.notify('success', 'Copied', 'The exact visible preview is on your clipboard.')
       state.announce('Export copied to clipboard.')
@@ -1124,7 +1137,7 @@ function App() {
               <SelectItem value="all" text="All assignees" />
               {state.assignees.map((person) => <SelectItem key={person.id} value={person.id} text={person.name} />)}
             </Select>
-            <Search id="board-search" size="lg" labelText="Search cards by title" placeholder="Search card titles" value={state.search} onChange={(event) => state.setSearch(event.target.value)} />
+            <Search autoComplete="off" id="board-search" size="lg" labelText="Search cards by title" placeholder="Search card titles" value={state.search} onChange={(event) => state.setSearch(event.target.value)} />
             <Button kind="ghost" size="md" disabled={!filtersActive} onClick={state.clearFilters}>Clear filters</Button>
           </div>
           <div className="toolbar-actions">
