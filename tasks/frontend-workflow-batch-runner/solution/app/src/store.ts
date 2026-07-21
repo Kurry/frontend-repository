@@ -673,7 +673,7 @@ export const useBatchStore = create<Store>()((set, get) => ({
           items,
           queue,
           timeline: [...candidate.timeline, ...events],
-          updatedAt: Date.now(),
+          updatedAt: run.status === 'paused' && !settled && events.length === 0 ? candidate.updatedAt : Date.now(),
         } : candidate),
       } : entry),
       ui: { ...current.ui, announcement: settled ? `${job.name} run completed` : announcement, toast: settled ? { id: Date.now(), kind: 'success', title: 'Run complete', subtitle: `${job.name} finished processing ${items.length} items.` } : current.ui.toast },
