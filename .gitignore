@@ -79,3 +79,4 @@ tasks/*/solution/app/verification*.png
 
 # Transient git worktrees (jules teleport / agent checkouts)
 .worktrees/
+node_modules/
