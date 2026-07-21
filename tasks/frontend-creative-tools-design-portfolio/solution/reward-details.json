@@ -1,0 +1,1549 @@
+{
+  "score": 1.0,
+  "criteria": [
+    {
+      "id": "1.1",
+      "name": "post_boot_terminal_welcome",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "After dismissing boot, ASCII YOUR NAME art appears above the two-column greeting, rocket, subtitle/email, Capabilities, and Navigation welcome box, followed by a focused command input",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.2",
+      "name": "seeded_projects_and_shortcuts",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Running /work or opening Projects Board shows at least six seeded case studies, and invoking a seeded shortcut such as /signals opens a detail block with type/year, blurb, tags, and stat chips",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.3",
+      "name": "project_create_cross_view_flow",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Starting from the seeded project count, creating Northline Atlas with valid name, blurb, status, tags, and stats increases the count by exactly one; it then appears in /work, Projects Board, its detail surface, matching filters, /stats, and the Portfolio JSON export preview without reload",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.6",
+      "name": "project_edit_cross_view_flow",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Editing one project to Evening Terminal updates that same record in Projects Board, /work output, its shortcut detail, tags/status filters, /stats when tags change, the export preview, and derived count without recreating or duplicating it",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.7",
+      "name": "project_delete_cross_view_flow",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Deleting a selected project decreases the measured count by exactly one and removes it from Projects Board, /work output, shortcut lookup, every matching filter, /stats, and the export preview on the first try",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.8",
+      "name": "projects_empty_state",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "After deleting every active project through visible controls, Projects Board and /work show a meaningful empty-project state rather than a blank body, and /stats shows zero active projects",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.9",
+      "name": "project_inline_validation",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Submitting project create or edit with an empty required name, illegal slug, status outside shipped|wip|archived, tags outside 1\u20138 unique entries, or year outside 1990\u20132100 shows an inline field-specific error naming the offending field before submission and leaves the measured project count and last valid record unchanged",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.10",
+      "name": "terminal_board_mode_switch",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Switching between Terminal CLI and Projects Board through /work board or the visible mode control replaces the terminal body without a document reload or URL navigation",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.11",
+      "name": "session_theme_commands",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Running /dark, /light, /retro, and /glass applies four visibly distinct root-level themes without reload, while /themes lists the choices",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.13",
+      "name": "boot_dismissal_paths",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "On a fresh load, sequential boot status lines end in a ready line and Press Enter to continue; Enter, pointer click, and touch-capable activation each dismiss boot into the terminal",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.14",
+      "name": "command_catalog_and_clear",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Slash commands echo their input and produce matching staggered output for /help, /about, /work, /clients, /skills, /philosophy, /social, /articles, /testimonials, /awards, /contact, /privacy, /stats, /export, /import, /archive, /undo, and /redo, while /clear wipes prior output",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.15",
+      "name": "discoverable_easter_eggs",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "/secrets or /easter-eggs lists working hidden commands; /matrix starts green rain, /konami or the keyboard code triggers confetti, sudo hire designer reaches 100%, and the listed shell-themed extras print themed output",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.23",
+      "name": "autocomplete_history_and_aliases",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Typing a partial command opens matching suggestions, Tab completes the highlighted command, arrow keys traverse history, and an alias, bare-word fuzzy match, and natural-language phrase each resolve to their intended command",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.25",
+      "name": "window_chrome_controls",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Red close opens the kill-style exit overlay and Reopen restores the terminal; yellow minimize switches from blurred to sharp wallpaper; green maximize expands the terminal",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.26",
+      "name": "cookie_consent_privacy_flow",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "After boot, choosing Accept or Decline dismisses the consent banner without an exception and /privacy reports the selected in-memory status; a fresh reload coherently returns consent to not-set; Portfolio JSON export consent matches /privacy",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.30",
+      "name": "quick_info_inert_controls",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "/linkedin, /facebook, /instagram, /phone, /email, /agency, and /location print placeholder values inline, and all social, contact, award, and exit-overlay controls keep the current URL and tab unchanged",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.31",
+      "name": "section_title_without_navigation",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Running multiple section commands changes the document title to the active section while the URL remains unchanged and the single-page terminal stays mounted",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.32",
+      "name": "filter_flow_round_trip",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Applying a status or tag filter in Projects Board recomputes the visible cards from the shared collection, clearing the filter restores the full set exactly, and editing a project's status moves it between the corresponding filter results without a reload",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.33",
+      "name": "theme_mode_state_continuity",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Running /retro then toggling into Projects Board keeps the retro theme applied, switching back to Terminal CLI preserves the prior output buffer and up-arrow command history, and no step in the chain reloads the document",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.34",
+      "name": "unknown_command_feedback",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Typing an unrecognized command echoes the input and prints a command-not-found style message pointing at /help, while existing output stays intact and no exception is thrown",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.35",
+      "name": "clear_preserves_session_state",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "After /clear wipes prior output, the prompt remains usable, pressing the up arrow still recalls earlier commands, and a subsequent /work still lists the full seeded project collection",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.36",
+      "name": "double_submit_single_create",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Double-activating the project create submit control adds exactly one project: the board card count increases by one and exactly one new entry appears in subsequent /work output",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.37",
+      "name": "search_syntax_status_and_tag",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "In Projects Board or via /work, a search field accepts status:shipped / status:wip / status:archived and tag:Name syntax; applying a query recomputes visible projects, and clearing restores the full set exactly",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.38",
+      "name": "syntax_matches_filter_controls",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "A status or tag filter control and a syntax query that express the same constraint show the same visible project set",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.39",
+      "name": "stats_rollup_live_derived",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "/stats prints total count, per-status counts, and top tag frequencies derived from the current collection; creating, editing status/tags, deleting, bulk-updating, restoring, or undoing changes the figures on the next /stats run without reload",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.40",
+      "name": "board_stats_strip_matches_stats",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "The Projects Board stats strip status counts always match the /stats numbers for the current active collection",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.41",
+      "name": "bulk_select_and_actions_bar",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "In Projects Board each card/row has a checkbox; Select all checks every visible card; a bulk actions bar appears with the live selected count whenever at least one project is selected",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.42",
+      "name": "bulk_archive_updates_surfaces",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Selecting multiple projects and choosing Archive selected removes them from the board and /work, places them in /archive, drops /stats total by the selected count, clears selection, and removes them from the Portfolio JSON preview without reload",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.43",
+      "name": "archive_restore_returns_project",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "/archive lists archived projects; Restore on a row returns that project to the active collection with prior fields, increases board card count by exactly one, and removes it from the vault",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.44",
+      "name": "command_palette_fuzzy_activate",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Ctrl+K (Cmd+K) opens a focused command palette; typing fuzzy-matches commands, projects, themes, and views; arrow keys move the highlight and Enter activates; Escape closes and returns focus to the command input",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.45",
+      "name": "palette_kind_labels_and_empty",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Each palette result row shows a kind label (Command, Project, Theme, or View); a query matching nothing shows an empty-state line rather than a blank list",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.46",
+      "name": "undo_redo_project_mutations",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Undo and Redo (toolbar, /undo /redo, and Ctrl+Z / Ctrl+Shift+Z) reverse and reapply create/edit/delete/bulk/archive/restore; empty stacks disable the controls; a new mutation after undo clears the redo stack",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.47",
+      "name": "undo_restores_export_and_stats",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "After a project mutation, Undo restores the exact prior state across Projects Board, /work, shortcuts, filters, /stats, Archive vault, and the export preview",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.48",
+      "name": "export_two_tabs_live_compile",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "/export or Export view shows Portfolio JSON and Resume Markdown tabs compiled live from session state; creating, editing, deleting, archiving, restoring, or undoing a project updates both tabs without reload",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.49",
+      "name": "export_copy_and_download",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Copy export puts the exact visible preview text on the clipboard with visible confirmation; Download offers the active tab as portfolio.json or resume.md",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.50",
+      "name": "export_counts_match_stats",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Portfolio JSON project count and status tallies match /stats and the board stats strip for the current session",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.51",
+      "name": "import_valid_portfolio_json",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "/import or Export Import accepts a valid Portfolio JSON payload and replaces the active projects collection so board, /work, /stats, and export preview match the imported projects",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.52",
+      "name": "import_export_round_trip_parity",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Exporting current portfolio JSON and immediately re-importing that same JSON reconstructs the same visible project names, statuses, tags, slugs, and stats on the board and in /work",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.53",
+      "name": "portfolio_json_api_shaped_field_contract",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "The Portfolio JSON export preview is a single object whose visible text includes the required field contract: version exactly \"1.0\"; theme exactly one of dark, light, retro, or glass; consent exactly one of accepted, declined, or not-set; and a projects array whose entries show name, slug, blurb, status (shipped|wip|archived), tags, stats, type, and year",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.54",
+      "name": "created_project_record_matches_portfolio_json",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "After creating a project through the form with valid name, slug, blurb, status, tags, stats, type, and year, the Portfolio JSON projects[] entry for that project shows the same field names and values the form produced \u2014 the created record is the export payload",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.1",
+      "name": "empty_projects_state_with_create_hint",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "After deleting every active project, Projects Board and /work output both render an empty-projects state that hints how to create one.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.2",
+      "name": "create_form_inline_validation_before_submit",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "On the project create form or command path, invalid project field-contract values (empty name, illegal slug, status outside shipped|wip|archived, tags outside 1\u20138, year outside 1990\u20132100) show inline per-field error messages naming the offending field before submit; submit stays disabled or rejects while any field fails the contract.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.3",
+      "name": "validation_errors_name_field_and_fix",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Project create/edit validation messages name the problem and the fix (for example which field is empty) rather than only saying Invalid.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.4",
+      "name": "unknown_command_points_to_help",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Typing an unrecognized command echoes the input and prints a command-not-found style message pointing at /help, without throwing or clearing existing output.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.5",
+      "name": "cli_thinking_indicator_before_output",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Running a section command such as /about shows a CLI thinking indicator before the staggered output block appears.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.6",
+      "name": "exit_overlay_offers_reopen",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Closing via the red titlebar control opens the exit overlay with a visible Reopen terminal path that restores the window without requiring a page reload.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.7",
+      "name": "help_lists_grouped_commands",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "/help lists available commands grouped by category so a new user can discover section, project, theme, export, archive, undo, and utility commands.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.8",
+      "name": "interactive_controls_use_real_buttons_inputs",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Command input, autocomplete rows, board filters, checkboxes, bulk actions, banner Accept/Decline, titlebar dots, palette rows, and overlay CTAs use real button/input controls rather than inert non-interactive text alone.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.9",
+      "name": "exit_overlay_dismissible_paths",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "While the exit overlay is open, Reopen (and keyboard dismissal if offered) closes it and restores the terminal; the overlay is not stuck permanently after red close.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.10",
+      "name": "sudo_hire_progress_feedback",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Running the command sudo hire designer advances a fake-contract progress bar to 100% with visible progress feedback rather than an instantaneous silent jump with no intermediate state.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.11",
+      "name": "double_submit_creates_exactly_one",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Double-activating the project create submit adds exactly one project: the board card count increases by one and exactly one new /work entry appears.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.12",
+      "name": "clear_keeps_prompt_history_and_seed",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "/clear wipes prior output but leaves the prompt, up-arrow command history recall, and the seeded project collection intact for a subsequent /work.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.13",
+      "name": "empty_undo_redo_disabled",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Undo with an empty history and Redo with an empty redo stack are disabled controls; activating them does nothing and produces no console errors.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.14",
+      "name": "malformed_import_rejected",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Importing a malformed Portfolio JSON payload shows a visible validation message naming the problem, changes no projects, and leaves /work and the board unchanged.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.18",
+      "name": "schema_invalid_portfolio_json_import_rejected",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Importing parseable JSON that fails the Portfolio JSON field contract \u2014 missing required version/theme/consent/projects keys, version not exactly \"1.0\", theme outside dark|light|retro|glass, consent outside accepted|declined|not-set, or a project entry that breaks the project field contract \u2014 leaves the collection unchanged and shows validation naming the offending field.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.15",
+      "name": "empty_filter_results_state",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "A syntax query or filter that matches nothing shows an empty-results state on the board with a clear way to clear the query; clearing restores the full set.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.16",
+      "name": "empty_archive_after_last_restore",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Restoring the last archived project leaves /archive showing an empty-vault hint while the restored project appears on the board.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.17",
+      "name": "copy_export_uses_visible_preview",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Copying the export while the preview is mid-update copies exactly the text currently visible in the preview block.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.1",
+      "name": "terminal_spacing_matches_reference_rhythm",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At desktop width, spacing between titlebar, ASCII art, welcome box columns, and the command prompt follows a consistent terminal rhythm matching the reference screenshots rather than arbitrary one-off gaps.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.2",
+      "name": "jetbrains_mono_throughout",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Typography uses JetBrains Mono monospace throughout the terminal chrome and output, matching the spec rather than a mixed proportional stack.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.3",
+      "name": "desktop_composition_matches_reference",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At 1440px, the full-bleed wallpaper with a centered macOS-chrome terminal titled designer@portfolio ~ /portfolio matches the reference overview composition within a small tolerance.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.4",
+      "name": "specified_state_changes_animate",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Specified state changes animate via the real UI path: boot line reveals, staggered command output, /skills bars filling, and board card enter/exit on create/delete.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.5",
+      "name": "responsive_stack_matches_spec",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At \u2264768px the terminal expands toward full width and the welcome box stacks to one column as specified, matching the reference's narrow-width behavior.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.6",
+      "name": "material_chrome_fits_terminal",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Buttons, overlays, snackbars/tooltips, and dense board controls share one consistent treatment that fits the terminal chrome rather than reading as a separate default-browser kit.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.7",
+      "name": "output_hierarchy_clear",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Command output shows clear hierarchy among echoed prompt lines, section headings, skill bars, award/testimonial rows, and project detail blocks with tag and stat chips.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.8",
+      "name": "hover_states_match_spec",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Via real pointer hover, titlebar dots ease opacity, project cards/rows ease border-color and background, autocomplete rows highlight, and social/close buttons ease \u2014 matching the specified hover language.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.9",
+      "name": "theme_surfaces_match_variants",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Dark (default), light, retro CRT, and glass theme surfaces show precise color/depth/border treatments distinct from each other per the design.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.10",
+      "name": "microinteractions_match_duration",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Hover and press microinteractions on titlebar dots, board rows, and autocomplete suggestions use short ease transitions rather than instant snaps or multi-second delays.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.11",
+      "name": "export_archive_palette_match_spec",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Export two-tab preview, archive vault rows with Restore, and the command palette overlay match the specified terminal-chrome treatments rather than unrelated modal styles.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.12",
+      "name": "board_bulk_and_stats_match_spec",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Projects Board selection checkboxes, bulk actions bar, and stats strip follow the dense terminal board pattern described in the spec and reference composition.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.1",
+      "name": "easter_egg_delight_beyond_stubs",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Hidden easter eggs feel finished and delightful: /matrix rain, /konami confetti, and sudo hire designer progress read as polished moments rather than unfinished stubs.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.2",
+      "name": "crt_and_glass_theme_craft",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "/retro reads as a convincing CRT look (scanline/glow feel) and /glass as translucent glass, going beyond a flat class rename with no visual character.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.3",
+      "name": "boot_sequence_narrative",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "On a fresh load, the sequential boot status lines ending in a ready prompt create a guided onboarding narrative into the portfolio shell.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.4",
+      "name": "ascii_art_and_pixel_rocket_craft",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Post-boot ASCII YOUR NAME art and the pixel/ASCII rocket in the welcome box provide distinctive interactive graphic craft beyond plain text dump.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.5",
+      "name": "konami_and_shell_extras_as_alt_input",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "The Konami keyboard code and shell-themed extras (for example whoami, ls, git log) offer playful alternative input paths discoverable via /secrets.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.6",
+      "name": "session_theme_personalization",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Session-scoped theme switching across dark, light, retro, and glass lets the user personalize the terminal look without reload.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.7",
+      "name": "designer_portfolio_narrative_arc",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Section commands (/about, /philosophy, /work, /awards, /testimonials) read as one coherent designer-portfolio narrative rather than disconnected dumps.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.8",
+      "name": "macos_chrome_immersion",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "macOS-style traffic-light chrome, wallpaper depth (blurred/sharp minimize), and the kill-style exit overlay create immersive windowing beyond a bare terminal box.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.9",
+      "name": "natural_language_command_matching",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Natural-language phrases resolve to the correct commands, adding intent matching beyond exact slash syntax alone.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.10",
+      "name": "dual_mode_cli_and_board_polish",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Terminal CLI and Projects Board modes feel like one polished product with coherent shared projects rather than two disconnected demos.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.11",
+      "name": "portable_portfolio_package_delight",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Optional: the live Portfolio JSON + Resume Markdown export package feels like a finished takeaway artifact a designer would actually download, beyond a static dump.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "11.12",
+      "name": "command_palette_craft",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Optional: the Ctrl+K command palette feels keyboard-first and fast, with clear kind labels and empty-state craft beyond a bare filtered list.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "innovation.catchall",
+      "name": "innovation_catchall",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.1",
+      "name": "terminal_headings_consistent_case",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Where the app renders terminal headings, /help group titles, and section copy, they use one consistent capitalization convention and tone throughout.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.2",
+      "name": "command_descriptions_are_specific",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Where /help renders command descriptions, they say what each command does in specific terms rather than generic labels like Submit or OK.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.3",
+      "name": "validation_copy_names_field_and_fix",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Where the app renders create/edit or import validation errors against the project or Portfolio JSON field contract, they name the problem and the fix (for example which field is empty, illegal, or out of enum), never a bare failure word alone.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.4",
+      "name": "empty_projects_copy_explains_create",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Where the app renders the empty projects state in Projects Board or /work, the copy explains what belongs there and how to create a project.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.5",
+      "name": "section_copy_spelling_grammar",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Where the app renders body or section copy (/about bio, /philosophy, testimonials, award rows), rate how free it is of spelling and grammatical errors.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.6",
+      "name": "project_terminology_consistent",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Where the app renders labels for projects/case studies across /work, Projects Board, and detail blocks, terminology stays consistent rather than mixing unrelated nouns for the same concept.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.7",
+      "name": "stat_chips_and_percentages_consistent",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Where the app renders project stat chips and /skills percentages, numeric formatting is consistent (same percent style and chip presentation).",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.8",
+      "name": "privacy_status_copy_is_specific",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Where /privacy renders consent status, it states accepted, declined, or not set specifically rather than a vague affirmation.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.9",
+      "name": "identity_details_are_placeholders",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Where the app renders name, email, phone, or social values, they read as clearly placeholder identity details rather than real personal data.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.10",
+      "name": "export_and_undo_labels_specific",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Where the app renders export tab labels and undo history labels, they read Portfolio JSON / Resume Markdown and use specific verbs such as Created, Edited, Archived, or Restored rather than generic Done.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "15.11",
+      "name": "empty_archive_filter_palette_copy",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Where the app renders empty archive, empty filter results, or empty palette query states, the copy explains what belongs there and how to recover.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.1",
+      "name": "create_project_updates_work_board_shortcut_export",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Create flow: after boot, create a valid project named Northline Studio; the /work listing grows by exactly one entry, Projects Board shows one more card with that name and a status badge, the new project's slash shortcut immediately prints its detail block, /stats total increases by one, and Portfolio JSON contains the new name \u2014 all without a reload.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.2",
+      "name": "invalid_create_blocks_and_names_field",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Create flow: submitting the project create form or command with an empty project name, illegal slug, or year outside 1990\u20132100 leaves the measured project count unchanged and shows immediate inline validation naming the offending field in the terminal output or form.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.3",
+      "name": "edit_project_echoes_board_work_detail_export",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Edit flow: editing a seeded project's name or tags updates that same record on the Projects Board card, the /work list line, the project's shortcut detail block, and the export preview without a reload.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.4",
+      "name": "delete_project_removes_all_surfaces",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Delete flow: deleting a project decreases the Projects Board card count by exactly one, removes its line from subsequent /work output, drops it from status/tag filter results and the export preview, and its former shortcut no longer prints a detail block.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.5",
+      "name": "theme_and_mode_preserve_buffer_history",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Theme and mode flow: running /retro then toggling into Projects Board keeps the retro theme applied; switching back to Terminal CLI preserves the output buffer and up-arrow command history; none of these steps reloads the document.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.6",
+      "name": "last_delete_shows_empty_projects_state",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Edge: after deleting every active project, Projects Board and /work output both show a clear empty-projects state with a hint for how to create one.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.7",
+      "name": "board_filter_clear_and_status_move",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Filter flow: applying a status or tag filter or status:shipped syntax query in Projects Board recomputes the visible cards from the shared collection; clearing restores the full set exactly; editing a project's status moves it between the corresponding filter results.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.8",
+      "name": "window_chrome_minimize_maximize_round_trip",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Yellow minimize swaps the blurred wallpaper for the sharp one and the terminal remains operable afterward; green maximize expands the terminal window and the command prompt stays usable.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.9",
+      "name": "exit_overlay_reopen_restores_terminal",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Red close opens the exit overlay with kill-style lines and a Reopen terminal control; activating Reopen restores the terminal window so the prompt is usable again without a full page reload.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.10",
+      "name": "consent_and_privacy_status_round_trip",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Consent flow: before any choice /privacy reads not set; choosing Accept dismisses the banner and a subsequent /privacy reads accepted; on a fresh load choosing Decline makes /privacy read declined; export Portfolio JSON consent matches.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.11",
+      "name": "reload_restores_seeded_baseline",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Reload baseline: after creating or editing a project, archiving, switching theme/mode, and opening Export, reloading the page replays the boot sequence and /work lists exactly the seeded projects \u2014 session mutations are reverted.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.12",
+      "name": "bulk_archive_with_undo_flow",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Bulk archive with undo: selecting three visible board projects and choosing Archive selected moves all three to /archive, drops /stats by three, and removes them from export; Ctrl+Z restores all three to the board, prior /stats, and Portfolio JSON.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.13",
+      "name": "export_import_round_trip_flow",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Export then import: create Northline Atlas with a valid project field-contract payload, confirm Portfolio JSON contains it under projects[] with required version/theme/consent/projects keys, copy the JSON, delete Northline Atlas, import that payload, and confirm Northline Atlas returns on the board and in /work with the same status, tags, slug, and stats.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.15",
+      "name": "artifact_field_contract_flow",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Artifact field-contract flow: after creating or editing a project and switching to /retro with consent accepted, open Export and confirm Portfolio JSON shows version exactly \"1.0\", theme exactly \"retro\", consent exactly \"accepted\", and a projects entry whose name, slug, blurb, status, tags, stats, type, and year match the form values.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "6.14",
+      "name": "palette_opens_project_and_export",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Palette navigation: Ctrl+K, type part of a seeded project name, Enter on the Project result opens that detail; reopen palette and choose Export view to open the export preview.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.1",
+      "name": "interactive_controls_keyboard_operable",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Every interactive control (command input, autocomplete rows, board cards and filters, banner Accept/Decline, titlebar dots, overlay CTAs) is reachable and operable with the keyboard alone, with a visible focus indicator.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.2",
+      "name": "exit_overlay_focus_trap_and_return",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "While the exit overlay is open, focus stays within it; dismissing/reopening via keyboard restores the terminal and returns focus so the command input can be used again.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.3",
+      "name": "decorative_canvases_hidden_from_a11y_tree",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Matrix-rain and confetti canvases are decorative: they are hidden from the accessibility tree (aria-hidden or equivalent) and never trap focus or block the command input.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.4",
+      "name": "validation_uses_polite_live_region",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Form and command validation messages are exposed to assistive technology via a polite live region as well as shown visually.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.5",
+      "name": "create_edit_fields_have_accessible_names",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Project create and edit fields expose explicit labels or equivalent accessible names for every required field.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.6",
+      "name": "terminal_headings_logical_order",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Where the terminal renders section headings in command output (for example /help groups or project detail headings), heading levels follow a logical order without skipping levels that break the outline.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.7",
+      "name": "main_landmark_or_terminal_region",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "The post-boot terminal exposes a main landmark or an equivalently labeled primary region wrapping the command output and prompt.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.8",
+      "name": "contrast_across_themes",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Terminal text and primary controls meet usable contrast against their surfaces in dark, light, retro, and glass themes.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.9",
+      "name": "semantic_buttons_for_chrome_and_banner",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Titlebar traffic lights, cookie-banner actions, board filters, and overlay CTAs use semantic button controls (or ARIA button roles) rather than unlabeled clickable divs.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.10",
+      "name": "reduced_motion_disables_stagger_and_canvas",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "With prefers-reduced-motion emulated on a fresh load, staggered/enter boot animations and matrix/confetti canvas animations are disabled or substantially reduced while the shell remains operable.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.11",
+      "name": "autocomplete_keyboard_complete",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "The autocomplete dropdown is keyboard operable: arrow keys move the highlight and Tab or Enter completes the highlighted command without requiring the pointer.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.12",
+      "name": "palette_and_bulk_keyboard_operable",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "The command palette (Ctrl+K), undo/redo controls, board selection checkboxes, bulk actions, export Copy/Download, and archive Restore are reachable and operable with the keyboard alone with a visible focus indicator.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "1.13",
+      "name": "command_palette_focus_trap",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "While the command palette is open, focus stays within it; Escape closes it and returns focus to the command input.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.1",
+      "name": "cold_start_interactive_under_two_seconds",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "On a local cold load, the app becomes interactive within 2 seconds and the boot animation starts promptly.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.2",
+      "name": "console_clean_across_shell_flows",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "No console errors or warnings appear during boot, command entry, project CRUD, theme switching, mode switching, or easter eggs.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.3",
+      "name": "theme_and_mode_transitions_snappy",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Theme switches via /dark /light /retro /glass and mode toggles between Terminal CLI and Projects Board respond without multi-second UI lag.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.4",
+      "name": "thinking_indicator_before_command_output",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Section commands show a CLI thinking indicator during the short wait before staggered output, rather than freezing the shell with a blank body.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.5",
+      "name": "seeded_board_and_work_scroll_smooth",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "With the seeded project collection (at least six case studies), /work listing and Projects Board scrolling/filtering feel responsive without perceived lag.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.6",
+      "name": "ui_interactive_during_command_output",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "While staggered command output is revealing, the command input remains focusable and the shell does not freeze.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.7",
+      "name": "matrix_rain_smooth_with_responsive_input",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "While /matrix rain is animating, the canvas motion stays visually smooth and the command input remains responsive to typing.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.8",
+      "name": "rapid_commands_stay_responsive",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Rapid repeated command entry stays responsive with no hangs, dropped keystrokes, or frozen output.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.9",
+      "name": "matrix_work_stops_on_clear_or_dismiss",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Running /clear or dismissing the matrix effect stops its ongoing animation work so the shell remains light afterward.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.10",
+      "name": "boot_visible_immediately_on_load",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "On cold load the boot sequence is visible promptly rather than a prolonged blank wallpaper with no terminal chrome.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.11",
+      "name": "export_recompile_stays_responsive",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "After a project create, delete, or archive, the export preview recompiles promptly with no multi-second freeze of the shell or command input.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "9.12",
+      "name": "rapid_undo_redo_responsive",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Rapid repeated undo/redo stays responsive with no hangs, dropped keystrokes, or frozen board/export surfaces.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.1",
+      "name": "terminal_wallpaper_composition",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "A full-bleed atmospheric wallpaper frames one centered terminal window with macOS traffic lights and the title designer@portfolio ~ /portfolio, reading as a terminal tool rather than a multi-section marketing page",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.2",
+      "name": "terminal_content_hierarchy",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "JetBrains Mono styling, ASCII art, the two-column welcome box, echoed prompts, headings, skill bars, testimonials, awards, and project detail chips form a legible dense hierarchy inside the terminal",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.4",
+      "name": "four_coherent_themes",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Dark, light, retro, and glass themes restyle the complete terminal coherently; retro visibly uses CRT scanline/glow cues and glass uses translucent surfaces while text remains readable",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.5",
+      "name": "material_style_dense_controls",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Buttons, overlay controls, feedback banners or snackbars, tooltips, forms, and dense controls share a polished component treatment that fits the terminal chrome rather than browser-default styling",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.6",
+      "name": "projects_board_visual_structure",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Projects Board uses dense cards or rows with consistent status badges, tag chips, stat chips, aligned controls, and a clearly styled empty state inside the terminal body",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.7",
+      "name": "overlay_visual_fidelity",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "The exit overlay changes titlebar text to an exit path and shows red kill lines plus reconnect controls, while matrix and confetti canvases visibly cover the viewport without displacing terminal layout",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.8",
+      "name": "responsive_terminal_layout",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At roughly 375px wide the terminal remains readable, welcome content and project rows adapt without clipped text or page-level horizontal overflow, and all prompt and overlay controls remain reachable",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.10",
+      "name": "breakpoint_reflow_768_and_mobile",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At 768px and below the terminal window expands toward full width and the two-column welcome box stacks into a single column, while Projects Board cards reflow from a multi-column grid at desktop widths to a single column at narrow widths without clipping card content",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.11",
+      "name": "terminal_copy_quality",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Terminal output, /help descriptions, and section copy use one consistent capitalization and tone, command descriptions state specifically what each command does, and error or validation messages name the problem and the fix rather than a bare failure word",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.13",
+      "name": "export_and_palette_visual_structure",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Export view shows a monospaced Portfolio JSON / Resume Markdown preview with Copy and Download affordances, and the command palette reads as a centered overlay with kind-labeled result rows.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "3.14",
+      "name": "bulk_bar_and_stats_strip_chrome",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Projects Board includes a compact stats strip and a bulk actions bar that visually belong to the terminal chrome rather than a disconnected dashboard widget.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.1",
+      "name": "shared_state_surface_coherence",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Project mutations, command history, output, autocomplete, theme, active mode, filters, and consent remain mutually coherent across every visible terminal and board surface during interleaved interactions",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.2",
+      "name": "local_assets_and_theme_tokens",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Computed styles expose the required theme-token behavior and locally rendered component styling, while the browser network log shows scripts, styles, fonts, icons, and animation assets loading from the app origin with no third-party CDN requests",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.5",
+      "name": "in_memory_reload_reset",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "After creating and filtering a project, changing mode and theme, building command history, and setting consent, a full reload coherently resets all facets to the seeded session baseline with browser localStorage and sessionStorage empty",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.6",
+      "name": "console_clean_primary_flows",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Initial load and the boot, command, project CRUD, filter, theme, window, consent, form-validation, and easter-egg flows produce no uncaught exception, unhandled rejection, hydration-style mismatch warning, or failed same-origin asset request",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.7",
+      "name": "single_page_route_coherence",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Section-title changes, theme changes, mode switches, inert controls, and close/reopen behavior keep the same URL and mounted single-page state without a blank screen or content flash",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.8",
+      "name": "form_error_state_integrity",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Invalid and extreme project form input against the project field contract (empty name/slug, illegal slug characters, status outside shipped|wip|archived, tags outside 1\u20138, year outside 1990\u20132100) produces specific inline per-field feedback before submit, preserves the last valid state, and repeated identical submissions do not create duplicate records",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.10",
+      "name": "keyboard_operability_and_focus",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "The command input, autocomplete rows (arrow keys move the highlight, Tab or Enter completes), board cards and filters, banner buttons, titlebar dots, and overlay CTAs are all reachable and operable with the keyboard alone with a visible focus indicator, and the exit overlay keeps focus within it while open and can be dismissed from the keyboard",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.11",
+      "name": "live_region_and_decorative_canvases",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Form and command validation messages are exposed to assistive technology through a polite live region as well as visually, while the matrix-rain and confetti canvases are hidden from the accessibility tree and leave keyboard focus and the command input unblocked",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.12",
+      "name": "load_and_rapid_input_performance",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "The app is interactive within 2 seconds of a local cold load with boot starting promptly, rapid repeated command entry stays responsive with no hangs or dropped keystrokes, and the matrix-rain canvas animates while the command input remains responsive with /clear or dismissal stopping its work",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.13",
+      "name": "undo_export_state_coherence",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Undo and redo of a project mutation keep Projects Board, /work, /stats, archive, and export preview mutually coherent without reload.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.14",
+      "name": "import_replaces_shared_collection",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Importing a valid Portfolio JSON replaces the active projects collection such that board, /work, /stats, and export preview all reflect the imported set from the same shared state.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.15",
+      "name": "project_form_validation_matches_field_contract",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Project create/edit and Import enforce the declared field contracts in the UI: empty or illegal name/slug, status outside shipped|wip|archived, tags outside 1\u20138 unique entries, or year outside 1990\u20132100 are rejected with inline feedback naming the field; Import of JSON that fails required version/theme/consent/projects keys or closed enums is rejected with feedback naming the offending field and does not mutate projects",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "2.16",
+      "name": "theme_consent_cross_field_match_export",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Switching theme via /retro and choosing Accept on consent updates the Portfolio JSON theme field to retro and consent field to accepted without a reload \u2014 a cross-field contract between session state and the export payload",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.1",
+      "name": "terminal_adapts_1440_to_375",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At 1440px the terminal window is centered over the wallpaper with visible margins; resizing to 375px keeps the terminal usable with the command input visible and no broken overflow.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.2",
+      "name": "mobile_tap_targets_banner_and_chrome",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At 375px width, cookie-banner Accept/Decline, titlebar dots, and primary board/filter controls present tap targets at least 44px in at least one dimension.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.3",
+      "name": "monospace_type_readable_across_widths",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "JetBrains Mono terminal copy remains legible at both 1440px and 375px without collapsing into unreadably tiny glyphs.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.4",
+      "name": "no_clip_or_overflow_at_375",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At 375px width, no terminal content, welcome box, or board card clips or overflows the viewport.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.5",
+      "name": "narrow_width_expands_terminal_window",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At widths of 768px and below, the terminal window expands toward full width rather than remaining a narrow centered desktop card that leaves unusable side gutters.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.6",
+      "name": "welcome_box_stacks_at_768",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At widths of 768px and below, the two-column post-boot welcome box stacks into a single column with Capabilities and Navigation still readable in order.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.7",
+      "name": "boot_dismissible_by_touch",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "On a fresh load, boot can be dismissed via touch-capable activation as well as Enter/click, revealing the post-boot terminal.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.8",
+      "name": "no_horizontal_scroll_at_375",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At 375px width the page shows no horizontal scrolling.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.9",
+      "name": "board_grid_and_canvases_reflow",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Projects Board cards reflow from a multi-column grid at desktop widths to a single column at narrow widths without clipping card content; matrix-rain and confetti canvases size to the viewport when active.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.10",
+      "name": "command_input_usable_at_narrow_widths",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At 375px and 768px the command input remains visible and usable for typing a command after boot.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.11",
+      "name": "export_palette_usable_at_375",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At 375px width the command palette, export preview, and archive vault remain fully visible and operable; previews scroll within their own containers rather than forcing page-level horizontal scroll.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "7.12",
+      "name": "bulk_bar_usable_at_narrow",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "At 768px and below the bulk actions bar and board stats strip remain usable without clipping action labels.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.1",
+      "name": "boot_and_post_boot_motion",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "On a fresh load through the real prompt controls, boot lines reveal sequentially and dismissal makes the ASCII art and welcome box fade or slide in before focus settles on the command prompt",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.2",
+      "name": "cli_output_and_mode_motion",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "A visible thinking indicator precedes staggered command output, and switching between Terminal CLI and Projects Board updates in place with a perceptible transition rather than a reload",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.4",
+      "name": "skill_bar_growth",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Running /skills through the visible command prompt renders at least ten labeled bars whose widths visibly animate from zero to distinct target percentages",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.5",
+      "name": "window_and_theme_feedback",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Theme changes recolor in place, minimize crossfades blurred and sharp wallpaper, maximize visibly expands the terminal, and reopening the closed terminal restores it with coherent transition feedback",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.6",
+      "name": "easter_egg_canvas_motion",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Invoking /matrix produces continuous moving green character rain, /konami produces a confetti burst, and sudo hire designer visibly advances a progress bar to 100%",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.7",
+      "name": "required_hover_microinteractions",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Using the real pointer path, titlebar dots ease opacity, project cards or rows ease border and background, autocomplete rows highlight, and social and close-overlay buttons visibly ease on hover",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.8",
+      "name": "reduced_motion_behavior",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "With prefers-reduced-motion enabled before a fresh load, staggered entry and continuous canvas effects are disabled or substantially reduced while every resulting state remains usable",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.10",
+      "name": "board_card_enter_exit_animation",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Creating a project through the visible form or command animates its new card or row into the Projects Board, and deleting one through the visible control animates it out, rather than the board snapping rows in or out with no transition",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.11",
+      "name": "feedback_message_transition",
+      "value": 1.0,
+      "weight": 0.5,
+      "description": "Validation errors and confirmation messages appear with a brief fade or slide transition rather than popping in with no motion",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.12",
+      "name": "palette_and_export_motion",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Via the real UI path, the command palette opens/closes with a brief opacity or scale transition, and Export Copy shows a short confirmation transition before resetting.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "4.13",
+      "name": "archive_board_row_exit",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Archiving a selected project through the visible bulk or per-project control animates its card/row out of the Projects Board rather than snapping it away with no transition.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.1",
+      "name": "in_memory_multi_facet_reload_resets",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Starting after boot: create a project named Northline Studio, switch theme with /retro, open Projects Board, Accept the cookie banner, archive one project, and open Export; then reload. All facets coherently reset to the seeded baseline (boot replays, /work shows only seeded projects, theme/mode/consent/archive/undo/export return to defaults) \u2014 never a mixed partial survival.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.3",
+      "name": "board_filter_derived_view_sensitivity",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Derived-view sensitivity: apply a status:shipped syntax query or status filter in Projects Board and confirm the visible card set changes meaningfully; clear the query/filter and confirm the full seeded set returns exactly.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.4",
+      "name": "edit_echoes_board_work_detail_export",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Cross-view echo: edit a seeded project's name, then without reload confirm Projects Board, /work output, that project's shortcut detail, and the Portfolio JSON export preview all show the edited name.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.5",
+      "name": "create_count_delta_exact",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Count-delta integrity: measure the Projects Board card count, /work entry count, and /stats total immediately before and after creating one valid project; all three increase by exactly one with no off-by-one lag.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.6",
+      "name": "different_project_names_different_outputs",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Input-dependent output: create two projects with different names (Northline Studio then Coral Relay); their board cards, /work lines, shortcut detail blocks, and Portfolio JSON entries differ according to those names.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.7",
+      "name": "interleaved_create_and_theme",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Interleaved-flow integrity: start creating a project, run /retro to switch theme, finish creating the project, then open Projects Board and Export; the new project is present in board and Portfolio JSON, the retro theme remains applied, and neither flow corrupted the other.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.8",
+      "name": "empty_then_repopulate_projects",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Edge-state round-trip: delete every active project until empty states show in Board and /work, then create one valid project; both surfaces leave the empty state and show exactly that one project, and /stats total equals 1.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.9",
+      "name": "bulk_archive_undo_restores_export",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Full-pipeline probe: select three board projects, Archive selected, confirm they leave the board and export preview and appear in /archive with /stats down by three; press Ctrl+Z and confirm all three return to the board, /stats prior totals, and Portfolio JSON names.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.10",
+      "name": "export_import_round_trip_probe",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Round-trip: create Northline Atlas with a valid project field-contract payload, open Export and confirm Portfolio JSON contains Northline Atlas under projects[] with required version/theme/consent/projects keys, copy that JSON, delete Northline Atlas, import the copied JSON, and confirm Northline Atlas returns on the board and in /work with the same status, tags, slug, and stats.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.12",
+      "name": "artifact_field_contract_probe",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Full-pipeline probe: create or edit a project, switch to /retro, Accept cookie consent, open Export, and confirm Portfolio JSON shows version exactly \"1.0\", theme exactly \"retro\", consent exactly \"accepted\", and a projects entry whose name, slug, blurb, status, tags, stats, type, and year match the form values.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.13",
+      "name": "schema_invalid_import_leaves_state",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Edge-state: import a parseable JSON payload that fails the Portfolio JSON field contract (for example version \"2.0\" or status \"draft\"); board card count, /work listing, and export preview stay unchanged and a validation message names the offending field.",
+      "reasoning": "Observed visually"
+    },
+    {
+      "id": "14.11",
+      "name": "stats_sensitive_to_status_edit",
+      "value": 1.0,
+      "weight": 1.0,
+      "description": "Derived-view sensitivity: edit one project's status from shipped to wip and confirm /stats shipped count decreases by one and wip increases by one without reload.",
+      "reasoning": "Observed visually"
+    }
+  ]
+}
