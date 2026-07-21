@@ -146,6 +146,13 @@ export const useStore = create((set, get) => ({
     scanTimers.forEach(clearTimeout)
     scanTimers = []
     const advance = (stages, status, extra = {}) => set((s) => ({ duplicateScan: { ...s.duplicateScan, stages, status, ...extra } }))
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    if (reduced) {
+      const s = get()
+      const groups = findDuplicateGroups(selected(s), s.duplicateScan.dismissed)
+      set({ duplicateScan: { ...s.duplicateScan, status: 'done', stages: ['complete', 'complete', 'complete'], groups, announce: `Scan complete: ${groups.length} duplicate group${groups.length === 1 ? '' : 's'} found` } })
+      return
+    }
     advance(['running', 'pending', 'pending'], 'running')
     set((s) => ({ duplicateScan: { ...s.duplicateScan, announce: 'Stage 1 of 3: scanning rows' } }))
     scanTimers.push(setTimeout(() => { advance(['complete', 'running', 'pending'], 'running'); set((s) => ({ duplicateScan: { ...s.duplicateScan, announce: 'Stage 2 of 3: grouping matches' } })) }, 1100))
@@ -172,7 +179,9 @@ export const useStore = create((set, get) => ({
       ds.rows = ds.rows.filter((r) => r.id === ids[0] || !ids.includes(r.id))
     }, `${ids.length} duplicates merged into 1 row`)
     get().announce(`Merged ${ids.length} duplicate rows into 1 row`)
-    set((s) => ({ modal: null, duplicateScan: { ...s.duplicateScan, groups: s.duplicateScan.groups.filter((g) => g.id !== groupId) } }))
+    scanTimers.forEach(clearTimeout)
+    scanTimers = []
+    set((s) => ({ modal: null, duplicateScan: { ...s.duplicateScan, groups: findDuplicateGroups(selected(s), s.duplicateScan.dismissed) } }))
     return true
   },
   importPackage: (text) => {

@@ -214,7 +214,7 @@ export function validatePackage(input) {
   for (const summary of computed.numericSummaries) {
     const incoming = input.stats.numericSummaries.find((s) => s?.field === summary.field)
     if (!incoming) return { error: `stats.numericSummaries must include numeric field ${summary.field}` }
-    for (const metric of ['min','max','mean']) if (!Number.isFinite(incoming[metric]) || Math.abs(incoming[metric] - summary[metric]) > 1e-9) return { error: `stats.numericSummaries.${summary.field}.${metric} must match the dataset rows` }
+    for (const metric of ['min','max','mean']) if (!Number.isFinite(incoming[metric]) || Math.abs(incoming[metric] - summary[metric]) > 1e-5) return { error: `stats.numericSummaries.${summary.field}.${metric} must match the dataset rows` }
   }
   return { data: input }
 }
@@ -241,7 +241,7 @@ export function snapshotDiff(older, newer, schema) {
     const changes = [...schema.map((f) => f.name), 'expectedOutput', 'verified', 'split'].flatMap((field) => {
       const oldVal = oldRow.values?.[field] ?? oldRow[field] ?? ''
       const newVal = newRow.values?.[field] ?? newRow[field] ?? ''
-      return oldVal !== newVal ? [{ field, oldVal, newVal }] : []
+      return String(oldVal) !== String(newVal) ? [{ field, oldVal, newVal }] : []
     })
     return changes.length ? [{ id, status: 'changed', changes }] : []
   })

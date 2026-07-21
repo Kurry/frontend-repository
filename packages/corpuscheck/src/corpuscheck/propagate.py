@@ -55,6 +55,12 @@ def desired_files(task: Path, sources: dict, modules: dict) -> dict[Path, bytes]
         canon / "mcp/webmcp_stdio_server.mjs"
     ).read_bytes()
     out[task / "tests/reward.toml"] = (canon / "reward.toml").read_bytes()
+    # Judge-side reduced-motion emulation: chromium's --force-prefers-reduced-motion
+    # is a no-op on current builds, so the playwright_reduced_motion MCP server
+    # loads this config (contextOptions.reducedMotion) instead.
+    out[task / "tests/playwright_rm_config.json"] = (
+        canon / "mcp/playwright_rm_config.json"
+    ).read_bytes()
     # Same canonical bridge, twice: judge runs the tests/ copy; the environment/
     # copy is the docker build-context file the Dockerfile bakes to /opt/webmcp.
     out[task / "environment/webmcp_stdio_server.mjs"] = (

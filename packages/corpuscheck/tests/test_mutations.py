@@ -77,6 +77,16 @@ def test_missing_test_sh_fails_layout(copy_task, tmp_path):
     assert any("tests/test.sh" in message for message in result.messages)
 
 
+def test_missing_playwright_reduced_motion_config_fails_layout(copy_task, tmp_path):
+    _, task = copy_task(EVAL_SLUG, tmp_path)
+    (task / "tests/playwright_rm_config.json").unlink()
+
+    result = validate_layout(task)
+
+    assert not result.passed
+    assert any("tests/playwright_rm_config.json" in message for message in result.messages)
+
+
 def test_edited_test_sh_is_manual_drift_and_fails_shared_shape(copy_task, tmp_path):
     _, task = copy_task(EVAL_SLUG, tmp_path)
     with (task / "tests/test.sh").open("ab") as stream:

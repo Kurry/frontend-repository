@@ -28,10 +28,10 @@ const av = (i: number) => ((i - 1) % 6) + 1;
 const daysAgo = (d: number) => new Date(Date.now() - d * 86400000).toISOString();
 
 export const SEED_USERS: User[] = [
-  { id: 'u1', firstName: 'Ada', lastName: 'Lovelace', email: 'ada.lovelace@pineapple.io', phone: '4155550101', notes: 'Founding analyst', role: 'Admin', status: 'Active', payments: 18400, products: 9, lastActive: daysAgo(0), avatar: av(1) },
+  { id: 'u1', firstName: 'Ada', lastName: 'Lovelace', email: 'ada.lovelace@pineapple.io', phone: '4155550101', notes: 'Founding analyst', role: 'Admin', status: 'Active', payments: 18400, products: 9, lastActive: daysAgo(50), avatar: av(1) },
   { id: 'u2', firstName: 'Grace', lastName: 'Hopper', email: 'grace.hopper@pineapple.io', phone: '4155550102', role: 'Manager', status: 'Active', payments: 12250, products: 6, lastActive: daysAgo(1), avatar: av(2) },
   { id: 'u3', firstName: 'Alan', lastName: 'Turing', email: 'alan.turing@pineapple.io', role: 'Member', status: 'Suspended', payments: 0, products: 0, lastActive: daysAgo(40), avatar: av(3) },
-  { id: 'u4', firstName: 'Katherine', lastName: 'Johnson', email: 'katherine.johnson@pineapple.io', phone: '4155550104', role: 'Manager', status: 'Active', payments: 9620, products: 5, lastActive: daysAgo(2), avatar: av(4) },
+  { id: 'u4', firstName: 'Katherine', lastName: 'Johnson', email: 'katherine.johnson@pineapple.io', phone: '4155550104', role: 'Manager', status: 'Active', payments: 9620, products: 5, lastActive: daysAgo(0), avatar: av(4) },
   { id: 'u5', firstName: 'Linus', lastName: 'Torvalds', email: 'linus.torvalds@pineapple.io', role: 'Member', status: 'Invited', payments: 0, products: 0, lastActive: daysAgo(8), avatar: av(5) },
   { id: 'u6', firstName: 'Margaret', lastName: 'Hamilton', email: 'margaret.hamilton@pineapple.io', phone: '4155550106', role: 'Admin', status: 'Active', payments: 15300, products: 7, lastActive: daysAgo(3), avatar: av(6) },
   { id: 'u7', firstName: 'Barbara', lastName: 'Liskov', email: 'barbara.liskov@pineapple.io', role: 'Viewer', status: 'Active', payments: 210, products: 1, lastActive: daysAgo(5), avatar: av(1) },
@@ -90,7 +90,8 @@ export function sortUsers(users: User[], key: SortKey): User[] {
   if (key === 'name-az') return a.sort((x, y) => x.firstName.localeCompare(y.firstName) || x.lastName.localeCompare(y.lastName));
   if (key === 'highest-spend') return a.sort((x, y) => y.payments - x.payments);
   if (key === 'newest') return a.sort((x, y) => +new Date(y.lastActive) - +new Date(x.lastActive));
-  return a.sort((x, y) => +new Date(y.lastActive) - +new Date(x.lastActive));
+  if (key === 'last-active') return a.sort((x, y) => +new Date(y.lastActive) - +new Date(x.lastActive));
+  return a;
 }
 
 const csvField = (v: unknown): string => {
@@ -238,7 +239,8 @@ export function importUsersCsv(text: string): ImportErr {
   return { ok: true, users: out };
 }
 
-export function nextId(): string { return `u-${Date.now()}-${Math.floor(Math.random() * 1e4)}`; }
+let _uid = 100;
+export function nextId(): string { return `u-${Date.now()}-${_uid++}`; }
 
 export function makeUserFromCreate(v: UserCreateValues): User {
   return {

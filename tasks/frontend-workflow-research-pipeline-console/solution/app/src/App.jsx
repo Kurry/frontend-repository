@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Accordion, ActionIcon, Badge, Button, Drawer, Modal, NumberInput,
+  Accordion, ActionIcon, Badge, Button, Drawer, Modal, NumberInput, Tooltip,
   SegmentedControl, Select, Switch, Table, TextInput,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -173,10 +173,12 @@ function Board() {
   return (
     <div className="view board-view">
       <div className="view-heading"><div><p className="eyebrow">Live workspace</p><h1>Pipeline board</h1><p>Watch datasets become checkpoints, then benchmark results.</p></div><div className="heading-actions"><Button variant="default" leftSection={<Icon icon={IconDownload} label="Export" size={16} decorative />} onClick={downloadExport}>Export runs</Button><Button leftSection={<Icon icon={IconFlask} label="Submit job" size={16} decorative />} onClick={openSubmission}>Submit job</Button></div></div>
-      <div className="board-toolbar"><div><span className="section-count" data-testid="run-count">{visible.length} runs</span><span className="updated"><span className="sim-dot" aria-hidden="true"/>advancing live</span></div>{datasetFilter && <button type="button" className="active-filter" onClick={() => setDatasetFilter(null)} aria-label={`Clear dataset filter ${datasetFilter}`}><Icon icon={IconFilter} label="Active filter" size={14} /><span className="filter-chip-label">{datasetFilter}</span><Icon icon={IconX} label="Clear" size={13} /></button>}</div>
+      <div className="board-toolbar"><div><span className="section-count" data-testid="run-count">{visible.length} runs</span><span className="updated"><span className="sim-dot" aria-hidden="true"/>advancing live</span></div>{datasetFilter && <Tooltip label="Clear filter"><button type="button" className="active-filter" onClick={() => setDatasetFilter(null)} aria-label={`Clear dataset filter ${datasetFilter}`}><Icon icon={IconFilter} label="Active filter" size={14} /><span className="filter-chip-label">{datasetFilter}</span><Icon icon={IconX} label="Clear" size={13} /></button></Tooltip>}</div>
       <div className="run-list" ref={parent} aria-busy={visible.some((run) => run.phases.some((phase) => phase.status === 'Running' && !phase.paused))}>
         {visible.map((run) => <RunStrip key={run.id} run={run}/>) }
-        {!visible.length && <EmptyState title={`No runs use ${datasetFilter}`} body={`The dataset filter “${datasetFilter}” matches zero runs. Clear the filter to restore the full board.`} action="Clear dataset filter" onAction={() => setDatasetFilter(null)} />}
+        {!visible.length && (datasetFilter
+          ? <EmptyState title={`No runs use ${datasetFilter}`} body={`The dataset filter “${datasetFilter}” matches zero runs. Clear the filter to restore the full board.`} action="Clear dataset filter" onAction={() => setDatasetFilter(null)} />
+          : <EmptyState title="No pipeline runs yet" body="Submit a research job to add the first run to this board." action="Submit job" onAction={openSubmission} />)}
       </div>
     </div>
   );
@@ -304,7 +306,7 @@ function TrialDrilldown() {
   const [completedTraces,setCompletedTraces] = useState(()=>new Set());
   const entry = drilldown ? trialData.find((x)=>x.model===drilldown.model&&x.benchmark===drilldown.benchmark) : null;
   useEffect(()=>{setExpandedTrial(null);setCompletedTraces(new Set())},[drilldown?.model,drilldown?.benchmark]);
-  return <Drawer opened={Boolean(drilldown)} onClose={()=>setDrilldown(null)} position="right" size="md" withinPortal keepMounted={false} title={<div className="drawer-title"><span className="eyebrow">Trial drill-down</span><strong>{drilldown?.benchmark}</strong><small>{drilldown?.model}</small></div>} overlayProps={{backgroundOpacity:.25,blur:2}} closeOnEscape closeOnClickOutside closeButtonProps={{'aria-label':'Close trial drill-down'}}>
+  return <Drawer opened={Boolean(drilldown)} onClose={()=>setDrilldown(null)} position="right" size="md" withinPortal keepMounted={false} title={<div className="drawer-title"><span className="eyebrow">Trial drill-down</span><strong>{drilldown?.benchmark}</strong><small>{drilldown?.model}</small></div>} overlayProps={{backgroundOpacity:.25,blur:2}} closeOnEscape closeOnClickOutside={true} closeButtonProps={{'aria-label':'Close trial drill-down'}}>
     {entry && <><div className="drill-summary"><div><span>Mean score</span><strong>{mean(entry.trials.map(t=>t.score)).toFixed(3)}</strong></div><div><span>Spread</span><strong>± {spread(entry.trials.map(t=>t.score)).toFixed(2)}</strong></div><div><span>Trials</span><strong>{entry.trials.length}</strong></div></div><Accordion value={expandedTrial} onChange={setExpandedTrial} variant="separated" className="trial-list">{entry.trials.map((trial)=><Accordion.Item value={trial.id} key={trial.id}><Accordion.Control><div className="trial-row"><strong>{trial.id}</strong><span>score <b>{trial.score.toFixed(3)}</b></span><span>{trial.duration}s</span></div></Accordion.Control><Accordion.Panel>{expandedTrial===trial.id&&<TraceExcerpt trial={trial} instant={completedTraces.has(trial.id)} onComplete={()=>setCompletedTraces((seen)=>{if(seen.has(trial.id))return seen;const next=new Set(seen);next.add(trial.id);return next})}/>}</Accordion.Panel></Accordion.Item>)}</Accordion></>}
   </Drawer>;
 }
@@ -320,7 +322,9 @@ function RunDetail() {
   const setTimelinePhase = usePipelineStore((s)=>s.setTimelinePhase);
   const setTimelineStatus = usePipelineStore((s)=>s.setTimelineStatus);
   const setHighlightedPhase = usePipelineStore((s)=>s.setHighlightedPhase);
-  const [timelineListRef] = useAutoAnimate({duration:220});
+  const reducedMotion = useReducedMotion();
+  const [timelineListRef, enableTimelineAnimations] = useAutoAnimate({duration:220});
+  useEffect(() => enableTimelineAnimations(!reducedMotion), [enableTimelineAnimations, reducedMotion]);
   const run = runs.find((r)=>r.id===selectedRunId);
   const filtered = run?.events.filter((e)=>(timelinePhase==='all'||e.phase===timelinePhase)&&(timelineStatus==='all'||e.status===timelineStatus)) ?? [];
   return <Drawer opened={activeView === 'pipeline' && Boolean(run)} onClose={()=>selectRun(null)} position="right" size="xl" withinPortal keepMounted={false} title={run ? <div className="drawer-title"><span className="eyebrow">Run detail</span><strong>{run.id} · {run.label}</strong><small>Submitted {fmtTime(run.createdAt)}</small></div> : ''} overlayProps={{backgroundOpacity:.2,blur:2}} classNames={{body:'run-drawer-body', content:'run-drawer-content'}} closeOnEscape closeOnClickOutside closeButtonProps={{'aria-label':'Close run detail'}}>
@@ -334,8 +338,8 @@ function RunDetail() {
 function downloadText(text, filename) {
   const blob = new Blob([text], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.style.display = 'none'; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1500);
 }
 
 const suggestions = [
@@ -425,7 +429,7 @@ function SubmissionDrawer() {
         )}/>
         <div className="form-row"><Controller name="count" control={control} render={({field})=>(
           <div>
-            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label={jobType==='Fine-tune'?'Epoch count':jobType==='Data generation'?'Trial count':'Trial budget'} min={1} max={50} clampBehavior="none" hideControls error={errors.count?.message} required/>
+            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label={jobType==='Fine-tune'?'Epoch count':jobType==='Data generation'?'Trial count':'Trial budget'} min={1} max={50} clampBehavior="none" error={errors.count?.message} required incrementButtonProps={{ tabIndex: 0 }} decrementButtonProps={{ tabIndex: 0 }} />
             <FieldError message={errors.count?.message} />
           </div>
         )}/><Controller name="cluster" control={control} render={({field})=>(
@@ -441,7 +445,7 @@ function SubmissionDrawer() {
           </div>
         )}/><Controller name="repetitions" control={control} render={({field})=>(
           <div>
-            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label="Repetition count" min={1} max={10} clampBehavior="none" hideControls error={errors.repetitions?.message} required/>
+            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label="Repetition count" min={1} max={10} clampBehavior="none" error={errors.repetitions?.message} required incrementButtonProps={{ tabIndex: 0 }} decrementButtonProps={{ tabIndex: 0 }} />
             <FieldError message={errors.repetitions?.message} />
           </div>
         )}/></div></div>}
@@ -493,12 +497,12 @@ function App() {
       <Rollups/>
       <div className="prefs-bar" aria-label="Display preferences">
         <span>Density</span>
-        <SegmentedControl size="xs" value={density} onChange={setDensity} data={[{value:'comfortable',label:'Comfortable'},{value:'compact',label:'Compact'}]} aria-label="Board density preference"/>
+        <Tooltip label="Change board density"><SegmentedControl size="xs" value={density} onChange={setDensity} data={[{value:'comfortable',label:'Comfortable'},{value:'compact',label:'Compact'}]} aria-label="Board density preference"/></Tooltip>
         <small className="shortcut-hint"><Icon icon={IconSparkles} label="Shortcut" size={12} /> ⌘K submit job</small>
       </div>
       <div className="canvas">{activeView==='pipeline'?<Board/>:activeView==='datasets'?<DatasetsView/>:<ResultsView/>}</div>
     </main>
-    <Drawer opened={mobileNavOpen} onClose={()=>setMobileNav(false)} position="left" size="280px" withinPortal withCloseButton closeButtonProps={{'aria-label':'Close navigation'}} classNames={{body:'mobile-nav-body'}} closeOnEscape closeOnClickOutside><Sidebar mobile/></Drawer>
+    <Drawer opened={mobileNavOpen} onClose={()=>setMobileNav(false)} position="left" size="280px" withinPortal withCloseButton closeButtonProps={{'aria-label':'Close navigation'}} classNames={{body:'mobile-nav-body'}} closeOnEscape closeOnClickOutside={true}><Sidebar mobile/></Drawer>
     <SubmissionDrawer/><RunDetail/><TrialDrilldown/>
     <div className="sr-only" aria-live="polite" aria-atomic="true">{latestAlert}</div>
     <div className="sr-only" aria-live="polite" aria-atomic="true">{autoTrigger}</div>

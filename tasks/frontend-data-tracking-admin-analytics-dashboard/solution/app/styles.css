@@ -155,7 +155,7 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--ff-display); letter-spacing: .01e
 .nav-items { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .28s ease; }
 .nav-group.open > .nav-items { grid-template-rows: 1fr; }
 .nav-items > div { overflow: hidden; min-height: 0; }
-.nav-item {
+.nav-item { min-height: 44px;
   width: 100%; text-align: left; background: transparent; border: 0; cursor: pointer;
   padding: .42rem .7rem .42rem 2.1rem; border-radius: .5rem; color: var(--muted);
   transition: background .18s ease, color .18s ease; display: block;
@@ -360,7 +360,7 @@ table.tbl tr.selected { background: color-mix(in oklab, var(--accent) 12%, trans
 }
 .export-drawer.open { transform: translateX(0); }
 .export-head { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.2rem; border-bottom: var(--hairline); }
-.export-tabs { display: flex; gap: .4rem; padding: .8rem 1.2rem; border-bottom: var(--hairline); }
+.export-tabs { display: flex; gap: .4rem; padding: .8rem 1.2rem; border-bottom: var(--hairline); flex-wrap: wrap; }
 .export-summary { display: flex; gap: 1.2rem; padding: .7rem 1.2rem; border-bottom: var(--hairline); background: var(--color-base-200); font-size: .78rem; }
 .export-summary .es b { display: block; font-size: 1.05rem; font-family: var(--ff-display); }
 .export-summary .es span { color: var(--muted); }
