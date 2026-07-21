@@ -358,7 +358,7 @@ function AllUsers() {
         </div>
 
         {filtered.length === 0 ? (
-          <div className="empty"><UsersIcon className="e-ico" /><h3>No users match these filters</h3>
+          <div className="empty"><UsersIcon className="e-ico" /><h2>No users match these filters</h2>
             <p>Try clearing the search or filters, or add a new user to the directory.</p>
             <button className="btn btn-primary" onClick={() => dispatch(setActiveView('add-user'))}><PlusIcon className="icon-sm" /> Add user</button>
           </div>
@@ -481,32 +481,32 @@ function UserForm() {
       <div className="form-layout">
         <form key={isEdit ? `edit-${editingId}` : 'add-user'} onSubmit={handleSubmit(onSubmit)} noValidate style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           <div className="card"><div className="card-body">
-            <h3 className="card-title">Profile</h3>
+            <h2 className="card-title">Profile</h2>
             <div className="field-grid" style={{ marginTop: '1rem' }}>
               <div className="field"><label htmlFor="firstName">First name <span className="req">*</span></label>
-                <input id="firstName" className={`input ${inv('firstName') ? 'err' : ''}`} autoComplete="given-name" aria-invalid={inv('firstName')} aria-describedby={inv('firstName') ? 'firstName-error' : undefined} {...register('firstName')} /><Err k="firstName" /></div>
+                <input id="firstName" className={`input ${inv('firstName') ? 'err' : ''}`} autoComplete="off" aria-invalid={inv('firstName')} aria-describedby={inv('firstName') ? 'firstName-error' : undefined} {...register('firstName')} /><Err k="firstName" /></div>
               <div className="field"><label htmlFor="lastName">Last name <span className="req">*</span></label>
-                <input id="lastName" className={`input ${inv('lastName') ? 'err' : ''}`} autoComplete="family-name" aria-invalid={inv('lastName')} aria-describedby={inv('lastName') ? 'lastName-error' : undefined} {...register('lastName')} /><Err k="lastName" /></div>
+                <input id="lastName" className={`input ${inv('lastName') ? 'err' : ''}`} autoComplete="off" aria-invalid={inv('lastName')} aria-describedby={inv('lastName') ? 'lastName-error' : undefined} {...register('lastName')} /><Err k="lastName" /></div>
               <div className="field"><label htmlFor="email">Email <span className="req">*</span></label>
-                <input id="email" type="email" className={`input ${inv('email') ? 'err' : ''}`} autoComplete="email" aria-invalid={inv('email')} aria-describedby={inv('email') ? 'email-error' : undefined} {...register('email')} /><Err k="email" /></div>
+                <input id="email" type="email" className={`input ${inv('email') ? 'err' : ''}`} autoComplete="off" aria-invalid={inv('email')} aria-describedby={inv('email') ? 'email-error' : undefined} {...register('email')} /><Err k="email" /></div>
               <div className="field"><label htmlFor="phone">Phone</label>
-                <input id="phone" className={`input ${inv('phone') ? 'err' : ''}`} autoComplete="tel" aria-invalid={inv('phone')} aria-describedby={inv('phone') ? 'phone-error' : undefined} {...register('phone')} /><Err k="phone" /></div>
+                <input id="phone" className={`input ${inv('phone') ? 'err' : ''}`} autoComplete="off" aria-invalid={inv('phone')} aria-describedby={inv('phone') ? 'phone-error' : undefined} {...register('phone')} /><Err k="phone" /></div>
               <div className="field" style={{ gridColumn: '1 / -1' }}><label htmlFor="notes">Notes</label>
                 <textarea id="notes" rows={2} className={`textarea ${inv('notes') ? 'err' : ''}`} aria-invalid={inv('notes')} aria-describedby={inv('notes') ? 'notes-error' : undefined} {...register('notes')} /><Err k="notes" /></div>
             </div>
           </div></div>
           <div className="card"><div className="card-body">
-            <h3 className="card-title">Access</h3>
+            <h2 className="card-title">Access</h2>
             <div className="field-grid" style={{ marginTop: '1rem' }}>
               <div className="field"><label htmlFor="temporaryPassword">Temporary password {!isEdit && <span className="req">*</span>}</label>
-                <input id="temporaryPassword" type="password" className={`input ${inv('temporaryPassword') ? 'err' : ''}`} autoComplete="new-password" aria-invalid={inv('temporaryPassword')} aria-describedby={inv('temporaryPassword') ? 'temporaryPassword-error' : undefined} {...register('temporaryPassword')} /><Err k="temporaryPassword" /></div>
+                <input id="temporaryPassword" type="password" className={`input ${inv('temporaryPassword') ? 'err' : ''}`} autoComplete="off" aria-invalid={inv('temporaryPassword')} aria-describedby={inv('temporaryPassword') ? 'temporaryPassword-error' : undefined} {...register('temporaryPassword')} /><Err k="temporaryPassword" /></div>
               <div className="field"><label htmlFor="accountSegment">Account segment <span className="req">*</span></label>
                 <select id="accountSegment" className="select" {...register('accountSegment')}>{SEGMENTS.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
               <div className="field"><label className="switch" style={{ marginTop: '.4rem' }}><span className={`track ${vals.sendInvitation ? 'on' : ''}`} /><input type="checkbox" className="sr-only" {...register('sendInvitation')} /> Send invitation email</label></div>
             </div>
           </div></div>
           <div className="card"><div className="card-body">
-            <h3 className="card-title">Account settings</h3>
+            <h2 className="card-title">Account settings</h2>
             <div className="field-grid" style={{ marginTop: '1rem' }}>
               <div className="field"><label htmlFor="status">Status <span className="req">*</span></label>
                 <select id="status" className="select" {...register('status')}>{STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}</select></div>
@@ -517,7 +517,7 @@ function UserForm() {
             </div>
           </div></div>
           <div className="card"><div className="card-body">
-            <h3 className="card-title">Permissions</h3>
+            <h2 className="card-title">Permissions</h2>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', marginTop: '1rem' }}>
               {['read', 'write', 'export', 'admin'].map((p) => (
                 <label key={p} className="check"><input type="checkbox" value={p} {...register('permissions')} /> {p}</label>
@@ -526,11 +526,11 @@ function UserForm() {
           </div></div>
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.6rem' }}>
             <button type="button" className="btn btn-ghost" onClick={cancel}>Cancel</button>
-            <button type="submit" className="btn btn-primary" disabled={!isValid || submitting}>{isEdit ? 'Save changes' : 'Create user'}</button>
+            <button type="submit" className="btn btn-primary" disabled={submitting}>{isEdit ? 'Save changes' : 'Create user'}</button>
           </div>
         </form>
         <aside className="card" aria-label="Field contract checklist"><div className="card-body">
-          <h3 className="card-title"><ShieldCheckIcon className="ico" /> Field contract</h3>
+          <h2 className="card-title"><ShieldCheckIcon className="ico" /> Field contract</h2>
           <p className="card-sub">Each rule lights up as the payload becomes valid.</p>
           <ul className="contract" style={{ marginTop: '.8rem' }}>
             {rules.map(([label, ok]) => <li key={label as string} className={ok ? 'ok' : ''}><span className="ck">{ok ? '✓' : ''}</span>{label}</li>)}
@@ -722,7 +722,7 @@ function ExportDrawer() {
   useEffect(() => {
     if (!exportOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); dispatch(setExportOpen(false)); return; }
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); dispatch(setExportOpen(false)); const f = lastFocus.current; setTimeout(() => { if (f) f.focus(); }, 0); return; }
       if (e.key === 'Tab' && drawerRef.current) {
         const f = drawerRef.current.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
         if (!f.length) return; const first = f[0], last = f[f.length - 1];
@@ -862,13 +862,13 @@ function ConfirmDialog() {
   useEffect(() => {
     if (!confirm.open) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
-    document.addEventListener('keydown', onKey); return () => document.removeEventListener('keydown', onKey);
+    document.addEventListener('keydown', onKey); const focusTimer = window.setTimeout(() => { const btn = document.querySelector(".modal .btn-error"); if (btn) (btn as HTMLButtonElement).focus(); }, 100); return () => { document.removeEventListener('keydown', onKey); window.clearTimeout(focusTimer); };
   }, [confirm.open]);
   if (!confirm.open) return null;
   return (
     <div className="modal-backdrop" role="alertdialog" aria-modal="true" aria-label={confirm.title} onClick={close}>
       <motion.div className="modal" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} onClick={(e) => e.stopPropagation()}>
-        <h3>{confirm.title}</h3><p>{confirm.body}</p>
+        <h2>{confirm.title}</h2><p>{confirm.body}</p>
         <div className="actions"><button className="btn btn-ghost" onClick={close}>Cancel</button><button className="btn btn-error" onClick={confirmDel} autoFocus>Delete</button></div>
       </motion.div>
     </div>
