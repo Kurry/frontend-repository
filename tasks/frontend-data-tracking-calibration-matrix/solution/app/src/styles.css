@@ -280,3 +280,39 @@ button:focus-visible, input:focus-visible, textarea:focus-visible, [role="button
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .001ms !important; }
   .heat-cell:hover, .heat-cell:focus-within { transform: none !important; }
 }
+
+/* Preserve strong artifact-contract contrast and keep dense task actions reachable. */
+.schema-badge {
+  color: #fff !important;
+  border-color: #aaa4f0;
+  background: #49418e;
+}
+
+.export-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1003;
+  background: rgba(18, 22, 38, .46);
+}
+
+@media (max-width: 1023px) {
+  .side-stack { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .variance-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .variance-table { min-width: 760px; }
+  .variance-table thead th:last-child,
+  .variance-table tbody td:last-child {
+    position: sticky;
+    right: 0;
+    z-index: 2;
+    background: #fff;
+    box-shadow: -8px 0 12px rgba(35, 40, 68, .08);
+  }
+  .classify-btn { min-height: 44px; }
+}

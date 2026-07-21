@@ -24,6 +24,13 @@ export function registerWebMcp(pinia) {
   const store = useCalibrationStore(pinia)
   const models = [...store.models]
   const harnesses = [...store.harnesses]
+  const animatedTools = new Set(['browse_apply_filter', 'entity_create', 'entity_update', 'session_start'])
+
+  const settleVisibleState = async (toolName) => {
+    await Promise.resolve()
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+    if (animatedTools.has(toolName)) await new Promise((resolve) => setTimeout(resolve, 560))
+  }
 
   const classificationArgsSchema = {
     type: 'object',
@@ -53,6 +60,7 @@ export function registerWebMcp(pinia) {
       if (!DESTINATIONS.includes(destination)) return fail(`destination must be one of ${DESTINATIONS.join(', ')}`)
       if (destination === 'cell-drawer') {
         if (!models.includes(model) || !harnesses.includes(harness)) return fail('cell-drawer requires a seeded model and harness')
+        store.goTo('heatmap')
         store.openCell(model, harness)
         return ok({ destination, model, harness, visible_postcondition: 'Cell drawer is open with the trial ledger and distribution chart.' })
       }
@@ -66,11 +74,17 @@ export function registerWebMcp(pinia) {
       if (typeof query !== 'string' || !query.trim()) return fail('query must be a non-empty string')
       const needle = query.toLowerCase()
       const matches = store.allCellRecords.filter((cell) => `${cell.model} ${cell.harness}`.toLowerCase().includes(needle))
+      const modelMatches = models.some((item) => item.toLowerCase().includes(needle))
+      const harnessMatches = harnesses.some((item) => item.toLowerCase().includes(needle))
+      store.setFilterSearch('model', harnessMatches && !modelMatches ? '' : query)
+      store.setFilterSearch('harness', harnessMatches ? query : '')
       return ok({
         query,
         matchCount: matches.length,
         matches: matches.slice(0, 8).map((cell) => ({ model: cell.model, harness: cell.harness, mean: cell.mean })),
-        visible_postcondition: 'Use browse_open with destination cell-drawer to inspect a match.',
+        visible_postcondition: matches.length
+          ? 'The visible matrix is narrowed to matching model or harness labels.'
+          : 'The visible matrix shows its designed empty state.',
       })
     },
 
@@ -295,7 +309,9 @@ export function registerWebMcp(pinia) {
     const handler = handlers[name]
     if (!handler) return fail(`Unsupported tool: ${name}. Registered tools: ${toolNames.join(', ')}`)
     try {
-      return await handler(args || {})
+      const result = await handler(args || {})
+      await settleVisibleState(name)
+      return result
     } catch (error) {
       return fail(error?.message || String(error))
     }

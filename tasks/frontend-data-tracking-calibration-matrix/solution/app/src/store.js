@@ -152,7 +152,7 @@ export const useCalibrationStore = defineStore('calibration', {
         return {
           model,
           harness,
-          mean: cellMean(cell),
+          mean: round(cellMean(cell), 2),
           trialCount: cell.trials.length,
           trials: cell.trials.map((trial) => ({ ...trial })),
         }
@@ -162,8 +162,8 @@ export const useCalibrationStore = defineStore('calibration', {
       const varianceRows = this.varianceRows.map((row) => ({
         task: row.task,
         category: row.category,
-        means: { ...row.means },
-        coefficientOfVariation: row.coefficientOfVariation,
+        means: Object.fromEntries(Object.entries(row.means).map(([harness, value]) => [harness, round(value, 2)])),
+        coefficientOfVariation: round(row.coefficientOfVariation, 2),
         stability: row.stability,
         triage: row.triage ? { ...row.triage } : null,
       }))
@@ -175,8 +175,8 @@ export const useCalibrationStore = defineStore('calibration', {
         harnesses: [...state.harnesses],
         cells: this.allCellRecords,
         varianceRows,
-        timeline: state.timeline.filter((entry) => entry.kind !== 'classification').map(({ timestamp, model, harness, mean }) => ({ timestamp, model, harness, mean })),
-        baseline: state.baseline ? { cells: state.baseline.cells.map((cell) => ({ ...cell })) } : null,
+        timeline: state.timeline.filter((entry) => entry.kind !== 'classification').map(({ timestamp, model, harness, mean }) => ({ timestamp, model, harness, mean: round(mean, 2) })),
+        baseline: state.baseline ? { cells: state.baseline.cells.map((cell) => ({ ...cell, mean: round(cell.mean, 2) })) } : null,
         filters: {
           model: [...state.filters.model],
           harness: [...state.filters.harness],
@@ -194,8 +194,8 @@ export const useCalibrationStore = defineStore('calibration', {
       const rows = this.varianceRows.map((row) => [
         row.task,
         row.category,
-        ...harnesses.map((harness) => row.means[harness].toFixed(4)),
-        row.coefficientOfVariation.toFixed(4),
+        ...harnesses.map((harness) => row.means[harness].toFixed(2)),
+        row.coefficientOfVariation.toFixed(2),
         row.stability,
         row.triage?.classification || '',
       ])
