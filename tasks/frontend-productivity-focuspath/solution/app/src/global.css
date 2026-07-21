@@ -309,4 +309,140 @@
     cursor: pointer;
     flex-shrink: 0;
   }
+
+  /* ── Inline-edit triggers: a real <button> styled to read as the heading /
+     text it replaces, so the control is keyboard-operable (a11y 1.1/2.12) while
+     keeping the serif/sans hierarchy the design calls for. ── */
+  .inline-title, .inline-text {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    color: inherit;
+    font: inherit;
+    transition: opacity 0.15s, background-color 0.15s;
+  }
+  .inline-title { font-family: "Fraunces", "Georgia", serif; font-weight: 600; color: var(--color-text-primary); }
+  .inline-text:hover, .inline-title:hover { background-color: rgba(43,111,110,0.07); }
+  .inline-title:focus-visible, .inline-text:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  .inline-title[disabled], .inline-text[disabled] { cursor: default; }
+  .inline-title[disabled]:hover, .inline-text[disabled]:hover { background: none; }
+
+  /* ── Icon set: one consistent line style, sized via em, colour via currentColor. ── */
+  .fp-icon { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex-shrink: 0; }
+
+  /* ── Detail view responsive scaffold: goal header spans the top; below it the
+     milestone path and Today's Focus sit side by side at >=1024px and stack
+     (path first, focus below) on narrow screens. ── */
+  .detail-cols { display: block; }
+  @media (min-width: 1024px) {
+    .detail-cols--two {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 20rem;
+      gap: 2rem;
+      align-items: start;
+    }
+  }
+
+  /* ── Milestone path: vertical timeline by default (mobile); a horizontal,
+     left-to-right roadmap at >=1024px that scrolls within its own track so the
+     page never scrolls sideways. ── */
+  .milestone-path { display: flex; flex-direction: column; gap: 0; }
+  .ms-item { display: flex; flex-direction: row; gap: 1rem; }
+  .ms-node-col {
+    display: flex; flex-direction: column; align-items: center;
+    width: 2.25rem; flex-shrink: 0;
+  }
+  .ms-connector-v { width: 2px; flex: 1 1 auto; min-height: 1.5rem; margin: 0.25rem 0; }
+  .ms-connector-h { display: none; }
+  .ms-card { flex: 1 1 auto; min-width: 0; padding-bottom: 1.5rem; }
+
+  @media (min-width: 1024px) {
+    .milestone-path {
+      flex-direction: row; align-items: flex-start; gap: 0;
+      overflow-x: auto; padding-bottom: 0.5rem; scroll-padding-left: 0.5rem;
+    }
+    .ms-item {
+      flex-direction: column; align-items: stretch;
+      flex: 1 0 17rem; min-width: 17rem; max-width: 22rem;
+    }
+    .ms-node-col { flex-direction: row; align-items: center; width: auto; height: 2.25rem; }
+    .ms-connector-v { display: none; }
+    .ms-connector-h { display: block; flex: 1 1 auto; height: 2px; margin: 0 0.35rem; }
+    .ms-item:last-child .ms-connector-h { display: none; }
+    .ms-card { padding-bottom: 0; margin-top: 0.75rem; }
+  }
+
+  /* ── Velocity gauge: a CSS conic-gradient ring (no SVG, no chart lib). ── */
+  .velocity-gauge {
+    --g: 0deg;
+    width: 2.75rem; height: 2.75rem; border-radius: 50%; flex-shrink: 0;
+    background: conic-gradient(var(--color-success) var(--g), #e5e7eb 0deg);
+    display: grid; place-items: center;
+    transition: background 0.4s ease;
+  }
+  .velocity-gauge > span {
+    width: 2rem; height: 2rem; border-radius: 50%; background: var(--color-surface);
+    display: grid; place-items: center; font-size: 0.8rem; font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  /* ── Export JSON syntax highlighting (a small, palette-calm token set). ── */
+  .json-hl { font-family: "SFMono-Regular", monospace; font-size: 0.75rem; line-height: 1.5; }
+  .json-hl .jk { color: #2b6f6e; }   /* key   */
+  .json-hl .js { color: #8b5a8c; }   /* string */
+  .json-hl .jn { color: #c98a3d; }   /* number */
+  .json-hl .jb { color: #3f9d6b; }   /* bool/null */
+  .json-hl .jp { color: var(--color-text-secondary); } /* punctuation */
+  .md-hl .mh { color: #2b6f6e; font-weight: 700; }
+  .md-hl .mx { color: #3f9d6b; }     /* checked box */
+  .md-hl .mu { color: var(--color-text-secondary); } /* unchecked box */
+
+  /* ── Coachmark / session chrome ── */
+  .coachmark {
+    border: 1px dashed var(--color-accent);
+    background: #fdf6ea;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+  }
+  .session-summary {
+    font-size: 0.72rem;
+    color: var(--color-text-secondary);
+    border-top: 1px solid #e5e7eb;
+    margin-top: 2rem;
+    padding-top: 0.75rem;
+  }
+
+  /* ── Inline feedback enter transition (a11y/motion 4.7). ── */
+  .feedback-in { animation: feedbackIn 0.18s ease forwards; }
+  @keyframes feedbackIn {
+    from { opacity: 0; transform: translateY(-2px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Density personalization (in-memory preference). ── */
+  .density-compact .card { padding: 0.625rem !important; }
+  .density-compact .step-row { padding: 0.3rem 0.6rem; }
+  .density-compact .ms-card { padding-bottom: 0.75rem; }
+
+  /* ── Calm chrome tint personalization (stays within the off-white family). ── */
+  .tint-cool { --color-background: #f1f4f3; }
+  .tint-warm { --color-background: #f8f3ec; }
+
+  /* ── Reduced motion: collapse every animation/transition to near-instant while
+     leaving state changes intact (a11y 1.10 / motion 4.9). ── */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }

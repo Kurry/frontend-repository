@@ -25,6 +25,7 @@ interface FocusPathUi {
   copyExport: () => unknown | Promise<unknown>;
   openImport: () => unknown;
   openPalette: () => unknown;
+  setPaletteQuery: (query: string) => unknown;
 }
 
 function ui(): FocusPathUi | null {
@@ -101,6 +102,12 @@ function entityUpdate(args: Record<string, unknown>) {
     title: typeof args.title === "string" ? args.title : undefined,
     targetDate: typeof args.target_date === "string" ? args.target_date : undefined,
     motivation: typeof args.motivation === "string" ? args.motivation : undefined,
+    accentColor: typeof args.accent_color === "string" ? args.accent_color : undefined,
+    createdAt: typeof args.created_at === "string" ? args.created_at : undefined,
+    lastCompletedAt: typeof args.last_completed_at === "string" ? args.last_completed_at : undefined,
+    completionDate: typeof args.completion_date === "string" ? args.completion_date : undefined,
+    completed: typeof args.completed === "boolean" ? args.completed : undefined,
+    focusToday: typeof args.focus_today === "boolean" ? args.focus_today : undefined,
   });
 }
 
@@ -160,7 +167,7 @@ function browseOpen(args: Record<string, unknown>) {
     const u = ui();
     return u ? { ok: true, destination, ...(u.openPalette() as object) } : { ok: false, error: "ui bridge not ready" };
   }
-  return a.open(destination, str(args.goal_id) || undefined);
+  return a.open(destination);
 }
 
 // ---- artifact-transfer-v1 --------------------------------------------------
@@ -189,18 +196,16 @@ function artifactImport(args: Record<string, unknown>) {
   return { ok: true, operation: "import", mode };
 }
 
-async function artifactCopy(args: Record<string, unknown>) {
+async function artifactCopy() {
   const u = ui();
   if (!u) return { ok: false, error: "ui bridge not ready" };
-  const format = str(args.format, "path-pack-json");
-  if (!EXPORT_FORMATS.includes(format)) return { ok: false, error: `unknown format: ${format}` };
   u.openExport();
-  u.setExportTab(format === "markdown-report" ? "markdown" : "json");
+  u.setExportTab("json");
   // Await so the clipboard write (now performed by copyExport) has landed
   // before this tool call resolves — otherwise a caller reading the
   // clipboard right after invoke_tool returns could race the write.
   await u.copyExport();
-  return { ok: true, operation: "copy", format };
+  return { ok: true, operation: "copy", format: "path-pack-json" };
 }
 
 // ---- command-session-v1 ----------------------------------------------------
@@ -233,113 +238,178 @@ function sessionDisconnect() {
     ? { ok: true, operation: "disconnect" }
     : { ok: false, error: "Disconnect control not found" };
 }
-function sessionTriggerDemo(args: Record<string, unknown>) {
-  const demo = str(args.demo, "Deliver Out of Order");
-  if (demo !== "Deliver Out of Order") return { ok: false, error: `unknown demo: ${demo}` };
-  return clickById("fp-live-deliver")
-    ? { ok: true, operation: "trigger_demo", demo }
-    : { ok: false, error: "Deliver Out of Order control not found" };
-}
-
-// ---- registry --------------------------------------------------------------
+// ---- exact compiler-shaped registry ---------------------------------------
 
 type Handler = (args: Record<string, unknown>) => unknown;
+type Schema = Record<string, unknown>;
+type Snapshot = {
+  view: string;
+  activeGoalId: string;
+  goals: Array<{ id: string; completed: boolean; milestones: Array<{ id: string; completed: boolean; steps: Array<{ id: string; completed: boolean; focusToday: boolean }> }> }>;
+};
+type Located = { entity: "goal" | "milestone" | "step"; goalId: string; milestoneId?: string; stepId?: string };
 
-const TOOLS: { name: string; description: string; handler: Handler }[] = [
-  {
-    name: "entity-create",
-    description:
-      "Create a goal, milestone, or step via the same store command the visible add controls use. args.entity_type is goal|milestone|step; goal needs title (optional target_date, accent_color, motivation); milestone needs goal_id + title; step needs goal_id + milestone_id + title.",
-    handler: entityCreate,
-  },
-  {
-    name: "entity-select",
-    description: "Open a goal's detail/path view. args.goal_id.",
-    handler: entitySelect,
-  },
-  {
-    name: "entity-update",
-    description:
-      "Edit a goal/milestone/step in place. args.entity_type + goal_id (+ milestone_id/step_id) and the fields to change (title, target_date, motivation).",
-    handler: entityUpdate,
-  },
-  {
-    name: "entity-delete",
-    description:
-      "Delete a goal, milestone, or step (nested data removed). args.entity_type + ids; requires confirm=true.",
-    handler: entityDelete,
-  },
-  {
-    name: "entity-toggle",
-    description:
-      "Toggle a step. args.toggle is step-complete (checks/unchecks the step, auto-completing its milestone when all steps are done) or focus-today (adds/removes Today's Focus, capped at 3). Needs goal_id, milestone_id, step_id.",
-    handler: entityToggle,
-  },
-  {
-    name: "entity-reorder",
-    description:
-      "Move a milestone up or down its goal's path via the real reorder command. args.goal_id, milestone_id, direction (up|down). Rejected when the milestone or any earlier one is complete.",
-    handler: entityReorder,
-  },
-  {
-    name: "entity-complete-goal",
-    description:
-      "Run the Mark Goal Complete command (only succeeds at 100%). args.goal_id.",
-    handler: entityCompleteGoal,
-  },
-  {
-    name: "browse-open",
-    description:
-      "Switch the visible view. args.destination is goals-overview | goal-detail (optional goal_id) | completed-goals.",
-    handler: browseOpen,
-  },
-  { name: "session-start", description: "Click the live-activity Start control.", handler: sessionStart },
-  { name: "session-pause", description: "Click the live-activity Pause control.", handler: sessionPause },
-  { name: "session-resume", description: "Resume the live stream (clicks Start again).", handler: sessionResume },
-  { name: "session-connect", description: "Click the live-activity Reconnect control.", handler: sessionConnect },
-  { name: "session-disconnect", description: "Click the live-activity Disconnect control.", handler: sessionDisconnect },
-  {
-    name: "session-trigger_demo",
-    description: 'Click the "Deliver Out of Order" control. args.demo defaults to "Deliver Out of Order".',
-    handler: sessionTriggerDemo,
-  },
-  {
-    name: "artifact-export",
-    description:
-      "Open the live Export drawer for a format. args.format is path-pack-json | markdown-report. Opens the same drawer the header Export button opens; file contents stay with Playwright.",
-    handler: artifactExport,
-  },
-  {
-    name: "artifact-import",
-    description:
-      "Open the Path Pack import flow. args.mode is path-pack. Opens the same confirm-gated importer the header Import button opens; file picking stays with Playwright.",
-    handler: artifactImport,
-  },
-  {
-    name: "artifact-copy",
-    description:
-      "Trigger the Export drawer's Copy affordance for a format, writing the current export text to the clipboard exactly like the visible Copy button. args.format is path-pack-json | markdown-report.",
-    handler: artifactCopy,
-  },
+const ENTITY_FIELDS = ["title", "target-date", "accent-color", "motivation", "completed", "focus-today", "created-at", "last-completed-at", "completion-date"];
+const objectSchema = (properties: Record<string, unknown> = {}, required: string[] = []): Schema => ({ type: "object", additionalProperties: false, ...(required.length ? { required } : {}), properties });
+const fieldsSchema = { type: "object", additionalProperties: { type: "string", maxLength: 200 } };
+const emptySchema = objectSchema();
+
+function snapshot(): Snapshot | null {
+  const value = api()?.snapshot();
+  return value && typeof value === "object" ? value as Snapshot : null;
+}
+
+function locate(id: string): Located | null {
+  const data = snapshot();
+  if (!data) return null;
+  for (const goal of data.goals) {
+    if (goal.id === id) return { entity: "goal", goalId: goal.id };
+    for (const milestone of goal.milestones) {
+      if (milestone.id === id) return { entity: "milestone", goalId: goal.id, milestoneId: milestone.id };
+      const step = milestone.steps.find((item) => item.id === id);
+      if (step) return { entity: "step", goalId: goal.id, milestoneId: milestone.id, stepId: step.id };
+    }
+  }
+  return null;
+}
+
+function parseBooleanField(value: unknown, name: string): boolean | undefined {
+  if (value === undefined) return undefined;
+  if (value === "true") return true;
+  if (value === "false") return false;
+  throw new Error(`${name} must be true or false`);
+}
+
+function canonicalCreate(args: Record<string, unknown>) {
+  const a = api(); const data = snapshot();
+  if (!a || !data) return { ok: false, error: "bridge not ready" };
+  const fields = (args.fields ?? {}) as Record<string, string>;
+  const title = fields.title ?? "";
+  const active = data.goals.find((goal) => goal.id === data.activeGoalId);
+  if (!active || fields["accent-color"] !== undefined || fields.motivation !== undefined) {
+    return a.createGoal({ title, targetDate: fields["target-date"], accentColor: fields["accent-color"], motivation: fields.motivation });
+  }
+  if (fields["target-date"] !== undefined || active.milestones.length === 0) {
+    return a.createMilestone(active.id, { title, targetDate: fields["target-date"] });
+  }
+  const milestone = active.milestones.find((item) => !item.completed) ?? active.milestones.at(-1);
+  return milestone ? a.createStep(active.id, milestone.id, title) : { ok: false, error: "no milestone available for step creation" };
+}
+
+function canonicalSelect({ id }: Record<string, unknown>) {
+  const a = api(); const found = locate(str(id));
+  if (!a) return { ok: false, error: "bridge not ready" };
+  if (!found) return { ok: false, error: "entity not found" };
+  return a.select(found.goalId);
+}
+
+function canonicalUpdate({ id, fields: rawFields }: Record<string, unknown>) {
+  const a = api(); const found = locate(str(id));
+  if (!a) return { ok: false, error: "bridge not ready" };
+  if (!found) return { ok: false, error: "entity not found" };
+  const fields = (rawFields ?? {}) as Record<string, string>;
+  return a.update({
+    entity: found.entity, goalId: found.goalId, milestoneId: found.milestoneId, stepId: found.stepId,
+    title: fields.title, targetDate: fields["target-date"], accentColor: fields["accent-color"], motivation: fields.motivation,
+    completed: parseBooleanField(fields.completed, "completed"), focusToday: parseBooleanField(fields["focus-today"], "focus-today"),
+    createdAt: fields["created-at"], lastCompletedAt: fields["last-completed-at"], completionDate: fields["completion-date"],
+  });
+}
+
+function canonicalDelete({ id, confirm }: Record<string, unknown>) {
+  const a = api(); const found = locate(str(id));
+  if (!a) return { ok: false, error: "bridge not ready" };
+  if (!found) return { ok: false, error: "entity not found" };
+  return a.remove({ entity: found.entity, goalId: found.goalId, milestoneId: found.milestoneId, stepId: found.stepId, confirm: confirm === true });
+}
+
+function canonicalToggle({ id, field }: Record<string, unknown>) {
+  const a = api(); const found = locate(str(id));
+  if (!a) return { ok: false, error: "bridge not ready" };
+  if (!found) return { ok: false, error: "entity not found" };
+  if (found.entity === "goal" && (field === undefined || field === "completed")) return a.markGoalComplete(found.goalId);
+  if (found.entity !== "step") return { ok: false, error: "this entity has no visible toggle command" };
+  if (field === "focus-today") return a.toggleFocusToday(found.goalId, found.milestoneId!, found.stepId!);
+  if (field === undefined || field === "completed") return a.toggleStepComplete(found.goalId, found.milestoneId!, found.stepId!);
+  return { ok: false, error: `unsupported toggle field: ${String(field)}` };
+}
+
+function canonicalReorder({ id, to_index }: Record<string, unknown>) {
+  const a = api(); const found = locate(str(id));
+  if (!a) return { ok: false, error: "bridge not ready" };
+  if (!found || found.entity !== "milestone") return { ok: false, error: "milestone not found" };
+  const target = Number(to_index);
+  let data = snapshot(); let goal = data?.goals.find((item) => item.id === found.goalId); let index = goal?.milestones.findIndex((item) => item.id === found.milestoneId) ?? -1;
+  if (!goal || target < 0 || target >= goal.milestones.length) return { ok: false, error: "to_index is outside the milestone list" };
+  while (index !== target) {
+    const result = a.reorderMilestone(found.goalId, found.milestoneId!, target < index ? "up" : "down") as { ok?: boolean; error?: string };
+    if (!result?.ok) return result;
+    index += target < index ? -1 : 1;
+  }
+  return { ok: true, id: found.milestoneId, to_index: target };
+}
+
+function browseSearch({ query }: Record<string, unknown>) {
+  const u = ui();
+  return u ? u.setPaletteQuery(str(query)) : { ok: false, error: "ui bridge not ready" };
+}
+
+type Tool = { name: string; description: string; inputSchema: Schema; handler: Handler };
+const TOOLS: Tool[] = [
+  { name: "entity.create", description: "Create an entity using declared fields.", inputSchema: objectSchema({ fields: fieldsSchema }), handler: canonicalCreate },
+  { name: "entity.select", description: "Select an entity by public id.", inputSchema: objectSchema({ id: { type: "string", maxLength: 128 } }, ["id"]), handler: canonicalSelect },
+  { name: "entity.update", description: "Update declared fields on an entity.", inputSchema: objectSchema({ id: { type: "string", maxLength: 128 }, fields: fieldsSchema }, ["id", "fields"]), handler: canonicalUpdate },
+  { name: "entity.delete", description: "Delete an entity with explicit confirmation.", inputSchema: objectSchema({ id: { type: "string", maxLength: 128 }, confirm: { type: "boolean", const: true } }, ["id", "confirm"]), handler: canonicalDelete },
+  { name: "entity.toggle", description: "Toggle a boolean field on an entity.", inputSchema: objectSchema({ id: { type: "string", maxLength: 128 }, field: { type: "string", enum: ENTITY_FIELDS } }, ["id"]), handler: canonicalToggle },
+  { name: "entity.reorder", description: "Reorder an entity by index when gesture mechanics are excluded.", inputSchema: objectSchema({ id: { type: "string", maxLength: 128 }, to_index: { type: "integer", minimum: 0 } }, ["id", "to_index"]), handler: canonicalReorder },
+  { name: "browse.open", description: "Open a declared destination (route, tab, section, or item).", inputSchema: objectSchema({ destination: { type: "string", enum: DESTINATIONS, description: "Declared destination" } }, ["destination"]), handler: browseOpen },
+  { name: "browse.search", description: "Search within the browsable surface.", inputSchema: objectSchema({ query: { type: "string", maxLength: 200 } }, ["query"]), handler: browseSearch },
+  { name: "session.start", description: "Invoke session operation: start.", inputSchema: emptySchema, handler: sessionStart },
+  { name: "session.pause", description: "Invoke session operation: pause.", inputSchema: emptySchema, handler: sessionPause },
+  { name: "session.resume", description: "Invoke session operation: resume.", inputSchema: emptySchema, handler: sessionResume },
+  { name: "session.connect", description: "Invoke session operation: connect.", inputSchema: emptySchema, handler: sessionConnect },
+  { name: "session.disconnect", description: "Invoke session operation: disconnect.", inputSchema: emptySchema, handler: sessionDisconnect },
+  { name: "artifact.import", description: "Start a declared import mode (no file bytes in WebMCP).", inputSchema: objectSchema({ mode: { type: "string", enum: ["path-pack"] } }, ["mode"]), handler: artifactImport },
+  { name: "artifact.export", description: "Export using a declared format (no blob/base64 in results).", inputSchema: objectSchema({ format: { type: "string", enum: EXPORT_FORMATS } }, ["format"]), handler: artifactExport },
+  { name: "artifact.copy", description: "Trigger copy via the visible control (clipboard verified in Playwright).", inputSchema: emptySchema, handler: artifactCopy },
 ];
+
+function validateInput(schema: Schema, input: Record<string, unknown>): string {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return "arguments must be an object";
+  const properties = (schema.properties ?? {}) as Record<string, Record<string, unknown>>;
+  const unknown = Object.keys(input).find((key) => !(key in properties)); if (unknown) return `unknown argument: ${unknown}`;
+  const missing = ((schema.required ?? []) as string[]).find((key) => input[key] === undefined); if (missing) return `missing required argument: ${missing}`;
+  for (const [key, rule] of Object.entries(properties)) {
+    const value = input[key]; if (value === undefined) continue;
+    if (rule.type === "string" && typeof value !== "string") return `${key} must be a string`;
+    if (rule.type === "boolean" && typeof value !== "boolean") return `${key} must be a boolean`;
+    if ((rule.type === "integer" && (!Number.isInteger(value) || Number(value) < Number(rule.minimum ?? 0)))) return `${key} must be a non-negative integer`;
+    if (rule.maxLength && typeof value === "string" && value.length > Number(rule.maxLength)) return `${key} is too long`;
+    if (rule.enum && !(rule.enum as unknown[]).includes(value)) return `${key} is outside the declared enum`;
+    if (rule.const !== undefined && value !== rule.const) return `${key} must equal ${String(rule.const)}`;
+    if (rule.type === "object") {
+      if (!value || typeof value !== "object" || Array.isArray(value)) return `${key} must be an object`;
+      const badField = Object.keys(value).find((field) => !ENTITY_FIELDS.includes(field)); if (badField) return `Unknown field: ${badField}`;
+      const badValue = Object.entries(value).find(([, fieldValue]) => typeof fieldValue !== "string" || fieldValue.length > 200); if (badValue) return `${key}.${badValue[0]} must be a string of at most 200 characters`;
+    }
+  }
+  return "";
+}
 
 export function initWebMcp() {
   const w = window as unknown as Record<string, unknown>;
-  w.webmcp_session_info = () => ({
-    contract_version: CONTRACT_VERSION,
-    modules: MODULES,
-    tools: TOOLS.map((t) => t.name),
-  });
-  w.webmcp_list_tools = () => TOOLS.map((t) => ({ name: t.name, description: t.description }));
-  w.webmcp_invoke_tool = (name: string, args: Record<string, unknown> = {}) => {
-    const tool = TOOLS.find((t) => t.name === name);
-    if (!tool) return { ok: false, error: `unknown tool: ${name}` };
-    try {
-      return tool.handler(args || {});
-    } catch (err) {
-      return { ok: false, error: String(err) };
-    }
+  w.webmcp_session_info = () => ({ contract_version: CONTRACT_VERSION, modules: MODULES, tool_names: TOOLS.map((tool) => tool.name), tool_count: TOOLS.length });
+  w.webmcp_list_tools = () => TOOLS.map(({ handler: _handler, ...tool }) => tool);
+  w.webmcp_invoke_tool = async (name: string, args: Record<string, unknown> = {}) => {
+    const tool = TOOLS.find((candidate) => candidate.name === name);
+    if (!tool) return { ok: false, error: `unknown_tool: ${name}` };
+    const error = validateInput(tool.inputSchema, args); if (error) return { ok: false, error };
+    try { return await tool.handler(args); } catch (cause) { return { ok: false, error: String((cause as Error)?.message ?? cause) }; }
   };
+  try {
+    const context = (navigator as unknown as { modelContext?: { registerTool: (tool: Record<string, unknown>) => void } }).modelContext;
+    if (context?.registerTool) TOOLS.forEach((tool) => context.registerTool({ name: tool.name, description: tool.description, inputSchema: tool.inputSchema, invoke: (args: Record<string, unknown>) => (w.webmcp_invoke_tool as (name: string, args: Record<string, unknown>) => unknown)(tool.name, args ?? {}) }));
+  } catch { /* self-test globals remain available when native WebMCP is absent */ }
 }
 
 initWebMcp();

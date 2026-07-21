@@ -193,32 +193,31 @@ export function computeProgress(goal: Goal): { completed: number; total: number;
   return { completed, total, pct: total === 0 ? 0 : Math.round((completed / total) * 100) };
 }
 
+// A goal is "stalled" (Needs Attention) when at least one incomplete milestone
+// has gone quiet for over 7 days. Per-milestone recency keys off each step's
+// last activity — its lastCompletedAt when completed, otherwise its createdAt —
+// so an imported/seeded goal whose steps were created long ago (and never
+// completed) reads as stalled, while a goal touched today does not. Completing
+// a fresh step dated today makes that milestone's recency "now" and clears the
+// badge (unless another incomplete milestone is still quiet).
 export function isStalled(goal: Goal): boolean {
   if (goal.completed) return false;
   const milestones = Array.isArray(goal.milestones) ? goal.milestones : [];
-  const hasIncomplete = milestones.some((m) => !m.completed);
-  if (!hasIncomplete) return false;
+  const incomplete = milestones.filter((m) => !m.completed);
+  if (incomplete.length === 0) return false;
   const sevenDaysAgo = new Date();
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-  // Find latest activity across all steps: prefer the actual completion
-  // timestamp, falling back to createdAt only for legacy/seeded records
-  // that predate the completedAt field.
-  let latestActivity: Date | null = null;
-  for (const m of milestones) {
+  for (const m of incomplete) {
     const steps = Array.isArray(m.steps) ? m.steps : [];
+    let recency: Date | null = null;
     for (const s of steps) {
-      if (s.completed) {
-        const d = new Date(s.completedAt || s.createdAt);
-        if (!latestActivity || d > latestActivity) latestActivity = d;
-      }
+      const d = new Date(s.completed ? s.completedAt || s.createdAt : s.createdAt);
+      if (!recency || d > recency) recency = d;
     }
+    if (!recency) recency = new Date(m.createdAt); // zero-step milestone: its own birth
+    if (recency < sevenDaysAgo) return true;
   }
-  if (!latestActivity) {
-    // no steps completed, use goal creation date
-    const created = new Date(goal.createdAt);
-    return created < sevenDaysAgo;
-  }
-  return latestActivity < sevenDaysAgo;
+  return false;
 }
 
 export function checkMilestoneAutoComplete(milestone: Milestone): boolean {
