@@ -352,7 +352,7 @@ button:active:not(:disabled), .cds--btn:active:not(:disabled) { transform: trans
   .budget-cap, .capacity { grid-row: 2; }
   .charts-layout { grid-template-columns: 1fr; }
   .side-stack { grid-template-columns: 1fr 1fr; }
-  .export-previews { grid-template-columns: 1fr; }
+  .export-previews { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 768px) {
   .topbar-inner { padding: 1rem; grid-template-columns: 1fr; gap: .8rem; }

@@ -754,7 +754,7 @@ function UnitCostExplorer() {
             return (
               <div className="rate-row" key={model}>
                 <span className="rate-model">{model}{changed && <span className="rate-changed" aria-label="what-if rate active">*</span>}</span>
-                <Slider id={`rate-${model}`} hideTextInput labelText={`${model} what-if rate per 1,000 tokens`} min={Math.max(0.0005, ORIGINAL_RATES[model] * 0.25)} max={ORIGINAL_RATES[model] * 2.5} step={0.0005} value={rate} onChange={({ value }) => setRate(model, Number(value))} />
+                <Slider id={`rate-${model}`} hideTextInput labelText={`${model} what-if rate per 1,000 tokens`} min={Number(Math.max(0.0005, ORIGINAL_RATES[model] * 0.25).toFixed(6))} max={Number((ORIGINAL_RATES[model] * 2.5).toFixed(6))} step={0.0005} value={rate} onChange={({ value }) => setRate(model, Number(value))} />
                 <span className="rate-value">{currency(rate, 4)}</span>
               </div>
             );
