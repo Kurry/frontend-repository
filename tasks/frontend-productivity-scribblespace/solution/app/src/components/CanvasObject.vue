@@ -79,6 +79,11 @@ const renderEditor = useEditor({
   content: editorText.value,
   editable: false,
   extensions: [StarterKit],
+  editorProps: {
+    attributes: {
+      'aria-label': props.obj.type === 'note' ? 'Note text preview' : 'Flashcard text preview',
+    },
+  },
 })
 
 watch(editorText, (val) => {
