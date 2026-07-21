@@ -22,7 +22,13 @@
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   let lastFocus = null;
   let copyTimer = 0;
+  const overlayCloseTimers = { briefing: 0, command: 0, preferences: 0 };
   let refreshCarousel = () => {};
+
+  function cancelOverlayClose(name) {
+    if (overlayCloseTimers[name]) clearTimeout(overlayCloseTimers[name]);
+    overlayCloseTimers[name] = 0;
+  }
 
   function snapshot() {
     return { pinnedTitles: [...state.pinnedTitles], consent: { ...state.consent }, consentSet: state.consentSet, bannerVisible: state.bannerVisible, generatedAt: state.generatedAt };
@@ -117,6 +123,7 @@
     $("#redo").disabled = !state.redo.length;
   }
   function renderAll() { renderPins(); renderConsent(); renderBriefing(); renderHistory(); }
+  function announce(message) { const node = $("#live-status"); if (node) { node.textContent = ""; requestAnimationFrame(() => { node.textContent = message; }); } }
 
   function setPinned(title, shouldPin) {
     if (!TITLES.includes(title)) return { ok: false, error: "Unknown news title" };
@@ -125,6 +132,7 @@
     mutate(shouldPin ? "pin" : "unpin", () => {
       state.pinnedTitles = shouldPin ? [...state.pinnedTitles, title] : state.pinnedTitles.filter((item) => item !== title);
     });
+    announce(shouldPin ? `Pinned to briefing. Shortlist ${state.pinnedTitles.length} of 8.` : `Removed from briefing. Shortlist ${state.pinnedTitles.length} of 8.`);
     return { ok: true, changed: true, pinned: shouldPin, count: state.pinnedTitles.length };
   }
   function togglePinned(title) { return setPinned(title, !state.pinnedTitles.includes(title)); }
@@ -179,7 +187,7 @@
     document.body.classList.toggle("locked", locked);
   }
   function openMobile() {
-    closeOtherLayers("menu"); lastFocus = $("#menu-open");
+    closeOtherLayers("menu"); lastFocus = $("#menu-open") || document.activeElement;
     if (state.bannerVisible) $("#cookie-layer").hidden = true;
     const menu = $("#mobile-menu"); menu.hidden = false; requestAnimationFrame(() => menu.classList.add("open"));
     $("#menu-open").setAttribute("aria-expanded", "true"); $("#menu-close").focus(); updateBodyLock();
@@ -189,14 +197,18 @@
     menu.classList.remove("open"); menu.hidden = true; $("#menu-open").setAttribute("aria-expanded", "false"); renderConsent(); updateBodyLock();
     if (returnFocus) $("#menu-open").focus();
   }
-  function openBriefing() {
-    closeOtherLayers("briefing"); lastFocus = document.activeElement;
+  function openBriefing(trigger) {
+    cancelOverlayClose("briefing");
+    closeOtherLayers("briefing"); lastFocus = trigger || document.activeElement;
     if (state.bannerVisible) $("#cookie-layer").hidden = true;
-    $("#briefing-panel").hidden = false; renderBriefing(); $("#briefing-close").focus(); updateBodyLock();
+    const panel = $("#briefing-panel"); panel.hidden = false; renderBriefing(); requestAnimationFrame(() => panel.classList.add("open")); $("#briefing-close").focus(); updateBodyLock();
   }
   function closeBriefing(returnFocus = true) {
-    if ($("#briefing-panel").hidden) return;
-    $("#briefing-panel").hidden = true; renderConsent(); updateBodyLock(); if (returnFocus && lastFocus) lastFocus.focus();
+    const panel = $("#briefing-panel"); if (panel.hidden) return;
+    cancelOverlayClose("briefing");
+    panel.classList.remove("open");
+    const finish = () => { overlayCloseTimers.briefing = 0; panel.hidden = true; renderConsent(); updateBodyLock(); if (returnFocus && lastFocus) lastFocus.focus(); };
+    if (reducedMotion()) finish(); else overlayCloseTimers.briefing = setTimeout(finish, 200);
   }
   const COMMANDS = [
     { label: "Hero", detail: "Section", run: () => openSection("hero") },
@@ -236,31 +248,44 @@
     $("#command-search").setAttribute("aria-activedescendant", buttons[next].id);
     buttons[next].scrollIntoView({ block: "nearest" });
   }
-  function openCommand() {
-    if (!$("#command-palette").hidden) {
+  function openCommand(trigger) {
+    const palette = $("#command-palette");
+    cancelOverlayClose("command");
+    if (!palette.hidden) {
+      palette.classList.add("open");
       $("#command-search").focus();
       return;
     }
-    closeOtherLayers("command"); lastFocus = document.activeElement;
+    closeOtherLayers("command"); lastFocus = trigger || document.activeElement;
     if (state.bannerVisible) $("#cookie-layer").hidden = true;
-    $("#command-palette").hidden = false; $("#command-search").value = ""; renderCommands(); $("#command-search").focus(); updateBodyLock();
+    palette.hidden = false; requestAnimationFrame(() => palette.classList.add("open")); $("#command-search").value = ""; renderCommands(); $("#command-search").focus(); updateBodyLock();
   }
-  function closeCommand(returnFocus = true) { if ($("#command-palette").hidden) return; $("#command-palette").hidden = true; renderConsent(); updateBodyLock(); if (returnFocus && lastFocus) lastFocus.focus(); }
+  function closeCommand(returnFocus = true) {
+    const palette = $("#command-palette"); if (palette.hidden) return;
+    cancelOverlayClose("command");
+    palette.classList.remove("open");
+    const finish = () => { overlayCloseTimers.command = 0; palette.hidden = true; renderConsent(); updateBodyLock(); if (returnFocus && lastFocus) lastFocus.focus(); };
+    if (reducedMotion()) finish(); else overlayCloseTimers.command = setTimeout(finish, 200);
+  }
 
-  function openPreferences(payload) {
+  function openPreferences(payload, trigger) {
+    cancelOverlayClose("preferences");
     const otherLayerOpen = [$("#mobile-menu"), $("#briefing-panel"), $("#command-palette")].some((layer) => !layer.hidden);
-    const opener = otherLayerOpen && lastFocus ? lastFocus : document.activeElement;
+    const opener = trigger || (otherLayerOpen && lastFocus ? lastFocus : document.activeElement);
     closeOtherLayers("preferences"); lastFocus = opener;
     const source = payload && typeof payload === "object" ? payload : state.consent;
     $("#consent-necessary").checked = source.necessary !== false;
     $("#consent-analytics").checked = Boolean(source.analytics);
     $("#consent-marketing").checked = Boolean(source.marketing);
     $("#consent-functional").checked = Boolean(source.functional);
-    showConsentErrors({}); $("#preferences-modal").hidden = false; renderConsent(); $("#preferences-close").focus(); updateBodyLock();
+    showConsentErrors({}); const modal = $("#preferences-modal"); modal.classList.remove("is-closing"); modal.classList.add("is-opening"); modal.hidden = false; renderConsent(); requestAnimationFrame(() => requestAnimationFrame(() => modal.classList.remove("is-opening"))); $("#preferences-close").focus(); updateBodyLock();
   }
   function closePreferences(returnFocus = true) {
-    if ($("#preferences-modal").hidden) return;
-    $("#preferences-modal").hidden = true; renderConsent(); updateBodyLock(); if (returnFocus && lastFocus) lastFocus.focus();
+    const modal = $("#preferences-modal"); if (modal.hidden) return;
+    cancelOverlayClose("preferences");
+    modal.classList.add("is-closing");
+    const finish = () => { overlayCloseTimers.preferences = 0; modal.classList.remove("is-closing"); modal.hidden = true; renderConsent(); updateBodyLock(); if (returnFocus && lastFocus) lastFocus.focus(); };
+    if (reducedMotion()) finish(); else overlayCloseTimers.preferences = setTimeout(finish, 250);
   }
   function openResponsibility() { closeOtherLayers("responsibility"); const menu = $("#responsibility-menu"); menu.hidden = false; $("#responsibility-toggle").setAttribute("aria-expanded", "true"); }
   function closeResponsibility() { $("#responsibility-menu").hidden = true; $("#responsibility-toggle").setAttribute("aria-expanded", "false"); }
@@ -270,6 +295,7 @@
     target.scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "start" }); return { ok: true, destination: id };
   }
   function reducedMotion() { return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+  document.documentElement.classList.toggle("motion-ok", !reducedMotion());
 
   function validateBriefing(value) {
     if (!value || typeof value !== "object" || Array.isArray(value)) return "briefing must be a single JSON object";
@@ -300,9 +326,18 @@
   }
   async function copyBriefing() {
     const text = $("#briefing-preview").textContent;
-    try { await navigator.clipboard.writeText(text); } catch (_) { const area = document.createElement("textarea"); area.value = text; area.style.position = "fixed"; area.style.opacity = "0"; document.body.append(area); area.select(); document.execCommand("copy"); area.remove(); }
-    clearTimeout(copyTimer); $("#copy-status").textContent = "Copied briefing"; copyTimer = setTimeout(() => { $("#copy-status").textContent = ""; }, 2000);
-    return { ok: true, format: state.activeFormat };
+    let copied = false;
+    try { await navigator.clipboard.writeText(text); copied = true; } catch (_) {
+      const area = document.createElement("textarea");
+      try { area.value = text; area.style.position = "fixed"; area.style.opacity = "0"; document.body.append(area); area.select(); copied = document.execCommand("copy"); }
+      catch (_) { copied = false; }
+      finally { area.remove(); }
+    }
+    clearTimeout(copyTimer);
+    $("#copy-status").textContent = copied ? "Copied briefing" : "Copy blocked — select the preview text and copy manually";
+    announce(copied ? "Briefing copied to clipboard." : "Copy was blocked. Select the preview text and copy it manually.");
+    copyTimer = setTimeout(() => { $("#copy-status").textContent = ""; }, 3000);
+    return { ok: copied, format: state.activeFormat };
   }
 
   function setupCarousel() {
@@ -330,11 +365,54 @@
     window.addEventListener("resize", () => go(Math.min(state.carouselIndex, maxIndex())));
   }
   function setupParticles() {
-    if (reducedMotion()) return;
-    const cards = $$(".galaxy-card"); let target = 0, current = 0, frame = 0;
-    function tick() { current += (target - current) * .1; cards.forEach((card, index) => { const speed = .15 + index * .025; const y = current * speed * .05; const scale = Math.max(.5, Math.min(1.2, 1 - Math.abs(y) * .0004)); card.style.transform = `translate3d(0,${y}px,0) scale(${scale})`; }); frame = requestAnimationFrame(tick); }
-    window.addEventListener("scroll", () => { const section = $("#portfolio"); target = window.scrollY - section.offsetTop; }, { passive: true });
+    const particles = $$(".galaxy .particle");
+    particles.forEach((p, i) => {
+      p.dataset.speed = (0.06 + (i % 5) * 0.045).toFixed(3);
+      const done = () => p.classList.add("loaded");
+      if (p.complete && p.naturalWidth) done(); else { p.addEventListener("load", done, { once: true }); p.addEventListener("error", done, { once: true }); }
+    });
+    if (reducedMotion()) { particles.forEach((p) => p.classList.add("loaded")); return; }
+    const section = $("#portfolio"); let target = 0, current = 0, frame = 0;
+    function tick() {
+      current += (target - current) * 0.1;
+      particles.forEach((p) => {
+        const speed = parseFloat(p.dataset.speed) || 0.1;
+        const y = current * speed * 2.4;
+        const scale = Math.max(0.85, Math.min(1.12, 1 + current * 0.00006 * (speed * 6)));
+        p.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+      });
+      frame = requestAnimationFrame(tick);
+    }
+    const onScroll = () => { if (section) target = window.scrollY - section.offsetTop; };
+    window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
     frame = requestAnimationFrame(tick); window.addEventListener("pagehide", () => cancelAnimationFrame(frame), { once: true });
+  }
+
+  function setupHeroIntro() {
+    if (reducedMotion()) return;
+    const video = $("#hero-video");
+    const lines = $$(".hero h1 span");
+    const card = $(".hero-report");
+    const EXPO = "cubic-bezier(0.19, 1, 0.22, 1)";
+    if (video) { video.style.transition = "none"; video.style.transform = "scale(1.08)"; }
+    lines.forEach((line) => { line.style.transition = "none"; line.style.opacity = "0"; line.style.transform = "translateY(40%)"; });
+    if (card) { card.style.transition = "none"; card.style.opacity = "0"; card.style.transform = "translateY(10%) scale(0.9)"; }
+    void document.body.offsetWidth;
+    requestAnimationFrame(() => {
+      if (video) { video.style.transition = `transform 1.3s ${EXPO}`; video.style.transform = "scale(1)"; }
+      lines.forEach((line, i) => { line.style.transition = `opacity 1.3s ${EXPO} ${0.25 + i * 0.12}s, transform 1.3s ${EXPO} ${0.25 + i * 0.12}s`; line.style.opacity = "1"; line.style.transform = "translateY(0)"; });
+      if (card) { card.style.transition = `opacity 1s ${EXPO} 0.6s, transform 1s ${EXPO} 0.6s`; card.style.opacity = "1"; card.style.transform = "translateY(0) scale(1)"; }
+    });
+  }
+
+  function setupReveal() {
+    const els = $$(".reveal");
+    if (reducedMotion()) { els.forEach((el) => el.classList.add("in")); return; }
+    if (!("IntersectionObserver" in window)) { els.forEach((el) => el.classList.add("in")); return; }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("in"); io.unobserve(entry.target); } });
+    }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+    els.forEach((el) => io.observe(el));
   }
 
   function setupHeroVideoFallback() {
@@ -356,7 +434,7 @@
     $$("#responsibility-menu a").forEach((link) => link.addEventListener("click", closeResponsibility));
     $("#menu-open").addEventListener("click", openMobile); $("#menu-close").addEventListener("click", () => closeMobile());
     $$("#mobile-menu a").forEach((link, index) => { link.style.setProperty("--index", index); link.addEventListener("click", () => closeMobile()); });
-    $("#briefing-open").addEventListener("click", openBriefing); $("#briefing-open-secondary").addEventListener("click", openBriefing); $("#briefing-close").addEventListener("click", () => closeBriefing());
+    $("#briefing-open").addEventListener("click", (e) => openBriefing(e.currentTarget)); $("#briefing-open-secondary").addEventListener("click", (e) => openBriefing(e.currentTarget)); $("#briefing-close").addEventListener("click", () => closeBriefing());
     $("#tab-json").addEventListener("click", () => { state.activeFormat = "json"; renderBriefing(); }); $("#tab-markdown").addEventListener("click", () => { state.activeFormat = "markdown"; renderBriefing(); });
     $("#download-briefing").addEventListener("click", downloadBriefing); $("#copy-briefing").addEventListener("click", copyBriefing);
     $("#import-form").addEventListener("submit", (event) => { event.preventDefault(); importBriefingText($("#import-text").value); });
@@ -365,9 +443,9 @@
     $("#undo").addEventListener("click", undo); $("#redo").addEventListener("click", redo);
     $("#accept-all").addEventListener("click", () => applyConsent({ necessary: true, analytics: true, marketing: true, functional: true }, "accept all"));
     $("#reject-all").addEventListener("click", () => applyConsent({ necessary: true, analytics: false, marketing: false, functional: false }, "reject all"));
-    $("#manage-preferences").addEventListener("click", () => openPreferences()); $("#preferences-close").addEventListener("click", () => closePreferences());
+    $("#manage-preferences").addEventListener("click", (e) => openPreferences(undefined, e.currentTarget)); $("#preferences-close").addEventListener("click", () => closePreferences());
     $("#preferences-form").addEventListener("submit", (event) => { event.preventDefault(); applyConsent(consentDraft(), "save preferences"); });
-    $("#command-open").addEventListener("click", openCommand); $("#command-close").addEventListener("click", () => closeCommand()); $("#command-search").addEventListener("input", renderCommands);
+    $("#command-open").addEventListener("click", (e) => openCommand(e.currentTarget)); $("#command-close").addEventListener("click", () => closeCommand()); $("#command-search").addEventListener("input", renderCommands);
     $("#command-results").addEventListener("click", (event) => { const button = event.target.closest("button[data-command-index]"); if (!button) return; const command = COMMANDS[Number(button.dataset.commandIndex)]; closeCommand(); command.run(); });
     $("#command-search").addEventListener("keydown", (event) => {
       if (event.key === "ArrowDown" || event.key === "ArrowUp") {
@@ -387,7 +465,10 @@
   }
 
   window.NorthstarApp = {
-    BRANDS, TITLES, state,
+    BRANDS, TITLES,
+    getConsent() { return { ...state.consent }; },
+    getPinnedTitles() { return [...state.pinnedTitles]; },
+    getBriefing() { return briefingObject(); },
     openSection, openMobile, openResponsibility, openBriefing, openCommand, openPreferences,
     setPinned, togglePinned, undo, redo, validateConsent, applyConsent, consentDraft,
     briefingObject, markdownBriefing, activeBriefingText, validateBriefing, importBriefingText,
@@ -399,5 +480,5 @@
     renderAll
   };
 
-  bindEvents(); setupCarousel(); setupParticles(); setupHeroVideoFallback(); renderAll(); updateBodyLock();
+  bindEvents(); setupCarousel(); setupParticles(); setupHeroIntro(); setupReveal(); setupHeroVideoFallback(); renderAll(); updateBodyLock();
 })();
