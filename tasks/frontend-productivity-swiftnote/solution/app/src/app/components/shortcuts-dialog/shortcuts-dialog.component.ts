@@ -93,6 +93,15 @@ export class ShortcutsDialogComponent {
 
   shortcutGroups = [
     {
+      title: 'Editor',
+      shortcuts: [
+        { desc: 'Bold', keys: ['Ctrl', 'B'], key: 'bold' },
+        { desc: 'Italic', keys: ['Ctrl', 'I'], key: 'italic' },
+        { desc: 'Undo', keys: ['Ctrl', 'Z'], key: 'undo' },
+        { desc: 'Redo', keys: ['Ctrl', 'Y'], key: 'redo' },
+      ]
+    },
+    {
       title: 'Notes',
       shortcuts: [
         { desc: 'New note', keys: ['Alt', 'N'], key: 'new' },
