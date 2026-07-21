@@ -62,6 +62,7 @@
 </div>
 
 <style>
+/* Above the editor panels (z 600) and palette (z 700): a confirm/alert always wins. */
 .alert-backdrop {
     position: absolute;
     inset: 0;
@@ -69,7 +70,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 100;
+    z-index: 900;
 }
 
 .alert-card {
@@ -89,7 +90,7 @@
         0 0 20px -1px rgba(0, 0, 0, 0.7),
         0 0 1px white inset;
     /* gap: 26px; */
-    z-index: 101;
+    z-index: 901;
 }
 
 .alert-header {

@@ -34,6 +34,10 @@
     import ScrollMultiplier from "$lib/components/settings/ScrollMultiplier.svelte";
     import NumberWithUnits from "$lib/components/settings/NumberWithUnits.svelte";
     import {type DropdownOption, type FeatureDef, type PillOption, type SettingsRegistry, type SpecialValue} from "$lib/settings/types";
+    import EditorToolbar from "$lib/components/chrome/EditorToolbar.svelte";
+    import ThemeSwatchStrip from "$lib/components/chrome/ThemeSwatchStrip.svelte";
+    import Button from "$lib/components/Button.svelte";
+    import {openCompare} from "$lib/stores/editor.svelte";
 
 
     const category = $derived(navigation.find(c => c.id === $page.params.category));
@@ -86,11 +90,18 @@
 
 
 <Page {title}>
+    {#snippet headerExtra()}
+        <EditorToolbar />
+    {/snippet}
     {#if category}
         {#if category.id === "fonts"}
             <Admonition size="1.5rem">The font playground has moved to a <a href={resolve("/app/font-playground")}>separate page</a>.</Admonition>
         {:else if category.id === "colors"}
             <Admonition size="1.5rem">You can reset a color to its default value by right clicking!</Admonition>
+            <div class="compare-row">
+                <ThemeSwatchStrip />
+                <Button onclick={openCompare} title="Preview two themes side by side before applying">Compare themes…</Button>
+            </div>
         {/if}
         {#each category.groups as group (group.id)}
             <Group title={group.name} note={"note" in group ? group.note : undefined}>
@@ -126,7 +137,7 @@
                             {:else if widget.type === "text"}
                                 <Text bind:value={config[settingId] as string} placeholder={widget.placeholder} size={widget.size} />
                             {:else if widget.type === "range"}
-                                <Range bind:value={config[settingId] as string} min={widget.min} max={widget.max} step={widget.step} showLabels={widget.showLabels} />
+                                <Range bind:value={config[settingId] as string} min={widget.min} max={widget.max} step={widget.step} showLabels={widget.showLabels} showInput={widget.showInput} />
                             {:else if widget.type === "number"}
                                 <!-- Per the AGENTS.md defaults convention, `default: ""` means the setting is genuinely unset by default — exactly the ones a user may clear back to unset. -->
                                 <Number bind:value={config[settingId] as string} min={widget.min} max={widget.max} step={widget.step} size={widget.size} placeholder={widget.placeholder} integer={widget.integer} nullable={setting.default === ""} />
@@ -169,7 +180,21 @@
             </Group>
         {/each}
     {:else}
-        <h1>What Happened?</h1>
+        <h1>What happened?</h1>
         <p>You shouldn't be here! If you followed a link, please report the bug on GitHub. Otherwise, go ahead and start browsing on the left.</p>
     {/if}
 </Page>
+
+<style>
+.compare-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    margin-bottom: 6px;
+}
+
+.compare-row :global(button) {
+    align-self: flex-start;
+}
+</style>

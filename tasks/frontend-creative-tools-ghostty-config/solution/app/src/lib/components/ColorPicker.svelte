@@ -66,16 +66,24 @@
             value = input as HexColor;
         }
     }
+
+    pickerInstances += 1;
+    const hexInputId = `color-picker-hex-${pickerInstances}`;
+</script>
+
+<script lang="ts" module>
+    // Shared counter so every picker instance gets a unique hex-field id for its label.
+    let pickerInstances = 0;
 </script>
 
 <svelte:document onmouseup={() => tracked = null} onmousemove={mouseMove} />
 
 <div class="picker-container">
-    <div id="colorspace" style:background={hueField} onmousedown={mouseDown} role="slider" aria-valuenow={saturation} tabindex="0">
+    <div id="colorspace" style:background={hueField} onmousedown={mouseDown} role="slider" aria-label="Saturation and brightness" aria-valuenow={saturation} tabindex="0">
         <div class="colorspace-grabber" style:top={csgTop + "%"} style:left={csgLeft + "%"}></div>
     </div>
 
-    <div id="huespace" onmousedown={mouseDown} role="slider" aria-valuenow={hue} tabindex="0">
+    <div id="huespace" onmousedown={mouseDown} role="slider" aria-label="Hue" aria-valuenow={hue} tabindex="0">
         <div class="huespace-grabber" style:left={hgLeft + "%"}></div>
     </div>
 
@@ -84,7 +92,8 @@
             <div class="color-picked" class:empty={isEmpty} style:background="rgb({red}, {green}, {blue})" style:border-color={borderColor}></div>
 
             <div class="color-values">
-                <input type="text" class="hex-value" value={isEmpty ? "-" : hexValue} oninput={handleHexInput} maxlength="7" />
+                <label class="hex-label" for={hexInputId}>Hex</label>
+                <input id={hexInputId} type="text" class="hex-value" value={isEmpty ? "-" : hexValue} oninput={handleHexInput} maxlength="7" />
 
                 <div class="rgb-values">
                     <div class="rgb-value">
@@ -228,6 +237,14 @@
     align-items: center;
     flex: 50%;
     gap: 12px;
+}
+
+.hex-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--font-color-muted);
+    text-align: center;
+    cursor: pointer;
 }
 
 .hex-value {

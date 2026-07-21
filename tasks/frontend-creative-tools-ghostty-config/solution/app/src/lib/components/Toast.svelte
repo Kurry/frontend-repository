@@ -1,5 +1,4 @@
 <script lang="ts">
-    import {dismissToast} from "$lib/stores/toasts.svelte";
     import {sequoiaEase} from "$lib/utils/animations";
     import {fly} from "svelte/transition";
 
@@ -10,17 +9,14 @@
     }
 
     const {id, type, message}: Props = $props();
-
-    function handleDismiss() {
-        dismissToast(id);
-    }
-
+    void id;
 </script>
 
 <div class="toast-container" role="status" aria-live="polite">
-    <!-- eslint-disable-next-line svelte/no-unused-class-name -->
-    <button type="button" class="toast toast-{type}" onclick={handleDismiss} transition:fly={{y: -44, duration: 300, easing: sequoiaEase}}>
-        <div class="toast-icon">
+    <!-- Non-interactive banner: it announces through the live region, fades on its own, and
+         can never sit between the pointer and a control. -->
+    <div class="toast toast-{type}" transition:fly={{y: -44, duration: 300, easing: sequoiaEase}}>
+        <div class="toast-icon" aria-hidden="true">
             {#if type === "success"}
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
@@ -38,12 +34,13 @@
             {/if}
         </div>
         <div class="toast-message">{message}</div>
-    </button>
+    </div>
 </div>
 
 <style>
     .toast-container {
         display: flex;
+        pointer-events: none;
     }
 
     .toast {
@@ -53,7 +50,6 @@
         padding: 12px 16px;
         min-width: 280px;
         max-width: 400px;
-        width: 100%;
         border: none;
         border-radius: var(--radius-level-3);
         backdrop-filter: blur(20px);
@@ -62,35 +58,15 @@
             0 4px 16px rgba(0, 0, 0, 0.3),
             0 0 0 1px rgba(255, 255, 255, 0.1) inset,
             0 1px 2px rgba(0, 0, 0, 0.5);
-        cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
-        /* animation: slideIn 0.3s cubic-bezier(0.4, 0.0, 0.2, 1); */
         font-family: inherit;
         text-align: left;
-    }
-
-    .toast:hover {
-        transform: translateY(-2px);
-        box-shadow:
-            0 6px 20px rgba(0, 0, 0, 0.35),
-            0 0 0 1px rgba(255, 255, 255, 0.15) inset,
-            0 1px 2px rgba(0, 0, 0, 0.5);
-    }
-
-    .toast:focus {
-        outline: none;
-        transform: translateY(-2px);
-        box-shadow:
-            0 6px 20px rgba(0, 0, 0, 0.35),
-            0 0 0 2px var(--color-input-accent),
-            0 1px 2px rgba(0, 0, 0, 0.5);
     }
 
     .toast-success {
         background: linear-gradient(
             135deg,
-            rgba(52, 199, 89, 0.85) 0%,
-            rgba(48, 176, 79, 0.85) 100%
+            rgba(52, 199, 89, 0.9) 0%,
+            rgba(48, 176, 79, 0.9) 100%
         );
         color: #ffffff;
     }
@@ -98,8 +74,8 @@
     .toast-error {
         background: linear-gradient(
             135deg,
-            rgba(255, 69, 58, 0.85) 0%,
-            rgba(235, 61, 50, 0.85) 100%
+            rgba(255, 69, 58, 0.9) 0%,
+            rgba(235, 61, 50, 0.9) 100%
         );
         color: #ffffff;
     }

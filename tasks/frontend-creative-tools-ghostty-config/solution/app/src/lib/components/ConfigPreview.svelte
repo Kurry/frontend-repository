@@ -1,4 +1,5 @@
 <script lang="ts">
+    import {fade, fly} from "svelte/transition";
     import type {PreviewState} from "$lib/stores/import.svelte";
 
     interface Props {
@@ -12,7 +13,29 @@
 
     const {parsed = true, parsedDiff, parseError, text, showEmptyState = true, clampHeight = false}: Props = $props();
 
-    const hasDiff = $derived(parsedDiff && Object.keys(parsedDiff).length > 0);
+    interface ConfigLine {
+        id: string;
+        key: string;
+        value: string;
+    }
+
+    // Flat, stably-keyed line list so an entering override animates in and a removed one
+    // animates out in place, without surrounding lines jumping mid-transition.
+    const lines = $derived.by((): ConfigLine[] => {
+        if (!parsedDiff) return [];
+        const out: ConfigLine[] = [];
+        for (const [key, value] of Object.entries(parsedDiff)) {
+            if (Array.isArray(value)) {
+                value.forEach((entry, index) => out.push({id: `${key}=${entry}#${index}`, key, value: String(entry)}));
+            }
+            else {
+                out.push({id: `${key}=${value}`, key, value: String(value)});
+            }
+        }
+        return out;
+    });
+
+    const hasDiff = $derived(lines.length > 0);
 </script>
 
 <div class="preview" class:clamped={clampHeight}>
@@ -26,14 +49,10 @@
         <div class="row">&nbsp;</div>
 
         {#if parsedDiff}
-            {#each Object.entries(parsedDiff) as [key, value], i (i)}
-                {#if Array.isArray(value)}
-                    {#each value as val, v (v)}
-                    <div class="row"><span class="p4">{key}</span> = <span class="p5">{val}</span></div>
-                    {/each}
-                {:else}
-                    <div class="row"><span class="p4">{key}</span> = <span class="p5">{value}</span></div>
-                {/if}
+            {#each lines as line (line.id)}
+                <div class="row" in:fly={{x: -8, duration: 220}} out:fade={{duration: 200}}>
+                    <span class="p4">{line.key}</span> = <span class="p5">{line.value}</span>
+                </div>
             {/each}
         {/if}
     {:else}
@@ -79,4 +98,9 @@
 .p4 {color: var(--config-palette-4);}
 .p5 {color: var(--config-palette-5);}
 
+@media (prefers-reduced-motion: reduce) {
+    .preview .row {
+        transition: none;
+    }
+}
 </style>

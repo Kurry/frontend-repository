@@ -107,7 +107,7 @@ export function stripMarkdownRegex(md: string): string {
 // TODO: this is pretty inefficient, we should probably build an index for this instead
 // of doing a linear search through all settings every time. However, it is unlikely that
 // there will be enough settings to cause performance issues, so this is good enough for now.
-const searchableSettings = (() => {
+export const searchableSettings = (() => {
     const results: SearchResult[] = [];
     for (const category of navigation) {
         if (!category.groups) continue;

@@ -57,13 +57,6 @@
         }
     }
 
-    function handleWindowKeydown(event: KeyboardEvent): void {
-        if ((event.metaKey || event.ctrlKey) && event.key.toLocaleLowerCase() === "k") {
-            event.preventDefault();
-            focusSearch();
-        }
-    }
-
     function handleSearchKeydown(event: KeyboardEvent): void {
         if (!hasResults()) return;
 
@@ -104,8 +97,6 @@
     });
 </script>
 
-<svelte:window onkeydown={handleWindowKeydown} />
-
 <div class="sidebar-search">
     <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" viewBox="0 0 56 56" class="search-icon" aria-hidden="true">
         <path d="M0 0h56v56H0z" fill="none" />
@@ -120,7 +111,7 @@
         oninput={handleSearchInput}
         onkeydown={handleSearchKeydown}
         placeholder="Search"
-        aria-label="Search"
+        aria-label="Search settings"
         autocomplete="off"
         spellcheck={false}
         bind:this={inputElement}
@@ -240,7 +231,7 @@
                         <path d="M0 0h56v56H0z" fill="none" />
                         <path fill="currentColor" d="M23.957 41.77a18.02 18.02 0 0 0 10.477-3.376l11.109 11.11a2.66 2.66 0 0 0 1.898.773c1.524 0 2.625-1.172 2.625-2.672c0-.703-.234-1.359-.75-1.874L38.277 34.668c2.32-3.047 3.703-6.82 3.703-10.922c0-9.914-8.109-18.023-18.023-18.023c-9.937 0-18.023 8.109-18.023 18.023S14.02 41.77 23.957 41.77m0-3.891c-7.758 0-14.133-6.398-14.133-14.133S16.2 9.613 23.957 9.613c7.734 0 14.133 6.399 14.133 14.133c0 7.735-6.399 14.133-14.133 14.133" />
                     </svg>
-                    <h2>No Results</h2>
+                    <h2>No results</h2>
                     <p class="search-empty">No results for<span>"{searchState.query}"</span></p>
                 </div>
 
@@ -290,8 +281,14 @@
 }
 
 .search-input:focus {
-    /* Focus border is handled by container */
+    /* The container paints the ring so it wraps the icon too, but the input keeps its own
+       visible indicator as a fallback for browsers without :has(). */
     outline: 0;
+}
+
+.search-input:focus-visible {
+    box-shadow: 0 0 0 2px var(--color-input-accent);
+    border-radius: 4px;
 }
 
 .search-clear-button {

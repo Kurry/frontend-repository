@@ -12,21 +12,19 @@
 </div>
 
 <style>
+    /* Transient banners float top-center and never intercept pointer events, so feedback can
+       never block a click on any control — including dialogs open at the same time. */
     .toast-stack {
         position: absolute;
-        top: 24px;
+        top: 20px;
         left: 0;
         right: 0;
-        z-index: 1000;
+        z-index: 1200;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         pointer-events: none;
         padding: 0 20px;
-    }
-
-    .toast-stack > :global(*) {
-        pointer-events: auto;
     }
 </style>
