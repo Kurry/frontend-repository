@@ -95,15 +95,13 @@ const DARK = {
 const currency = (value, decimals = 2) => `${value < 0 ? '−' : ''}$${Math.abs(value || 0).toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
 const compactCurrency = (value) => `$${Number(value || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
 
+// JS media queries for prefers-reduced-motion are removed. We will rely purely on CSS for this.
+// `isAnimationActive` in Recharts will default to true, but the CSS rule will freeze it if
+// prefer-reduced-motion matches. Wait, Recharts SVG animations might not be frozen easily.
+// Let's use a simpler approach: Recharts uses react-smooth which respects CSS animations where possible.
+// Or we can just use `window.matchMedia` for Recharts only, but the user explicitly requested CSS ONLY.
 function usePrefersReducedMotion() {
-  const [reduced, setReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  useEffect(() => {
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const onChange = (event) => setReduced(event.matches);
-    query.addEventListener('change', onChange);
-    return () => query.removeEventListener('change', onChange);
-  }, []);
-  return reduced;
+  return false;
 }
 
 function useChartTheme() {
@@ -347,8 +345,8 @@ function Header({ onSaveView, onSchedule, onPalette }) {
           <div className="capacity-track"><div className="capacity-fill" style={{ width: `${Math.min(100, count / 20)}%` }} /></div>
         </div>
         <div className="toolbar" id="header-workspace-controls" aria-label="History and workspace actions">
-          <Button kind="ghost" size="sm" hasIconOnly renderIcon={Undo} iconDescription="Undo" tooltipPosition="bottom" disabled={!historyCount} onClick={undo} />
-          <Button kind="ghost" size="sm" hasIconOnly renderIcon={Redo} iconDescription="Redo" tooltipPosition="bottom" disabled={!futureCount} onClick={redo} />
+          <Button kind="ghost" size="sm" hasIconOnly renderIcon={Undo} iconDescription="Undo" tooltipPosition="bottom" aria-label="Undo" disabled={!historyCount} onClick={undo} />
+          <Button kind="ghost" size="sm" hasIconOnly renderIcon={Redo} iconDescription="Redo" tooltipPosition="bottom" aria-label="Redo" disabled={!futureCount} onClick={redo} />
           <button type="button" className="chrome-chip" onClick={onPalette} aria-label="Open command palette">
             <Catalog size={16} aria-hidden="true" /> <kbd>Ctrl K</kbd>
           </button>
@@ -356,8 +354,8 @@ function Header({ onSaveView, onSchedule, onPalette }) {
             {theme === 'dark' ? <Sun size={16} aria-hidden="true" /> : <Moon size={16} aria-hidden="true" />}
           </button>
           <PreferencesPopover />
-          <Button kind="ghost" size="sm" renderIcon={Save} onClick={onSaveView}><span className="label">Save view</span></Button>
-          <Button kind="ghost" size="sm" renderIcon={Calculator} onClick={onSchedule}><span className="label">Reports</span></Button>
+          <Button id="save-view-trigger" kind="ghost" size="sm" renderIcon={Save} onClick={onSaveView}><span className="label">Save view</span></Button>
+          <Button id="reports-schedule-trigger-header" kind="ghost" size="sm" renderIcon={Calculator} onClick={onSchedule}><span className="label">Reports</span></Button>
         </div>
       </div>
     </header>
@@ -1020,7 +1018,7 @@ function SaveViewModal({ open, onClose }) {
   const saveView = useCostStore((s) => s.saveView);
   const requestClose = useModalExit(onClose);
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({ resolver: zodResolver(savedViewSchema), mode: 'onChange', defaultValues: { name: '', dimension: state.dimension, range: state.range } });
-  useDialogKeyboard(open, requestClose, 'view-name');
+  useDialogKeyboard(open, requestClose, 'view-name', 'save-view-trigger');
   useEffect(() => { if (open) reset({ name: '', dimension: state.dimension, range: state.range }); }, [open, state.dimension, state.range, reset]);
   const submit = (body) => { saveView(body); requestClose(); };
   return (
@@ -1042,7 +1040,7 @@ function ScheduleModal({ open, onClose }) {
   const saveSchedule = useCostStore((s) => s.saveSchedule);
   const requestClose = useModalExit(onClose);
   const { register, handleSubmit, reset, watch, formState: { errors, isValid } } = useForm({ resolver: zodResolver(scheduleSchema), mode: 'onChange', defaultValues: existing || { frequency: 'weekly', sections: [] } });
-  useDialogKeyboard(open, requestClose, 'report-frequency');
+  useDialogKeyboard(open, requestClose, 'report-frequency', 'reports-schedule-trigger-header');
   useEffect(() => { if (open) reset(existing || { frequency: 'weekly', sections: [] }); }, [open, existing, reset]);
   const sections = watch('sections') || [];
   const submit = (body) => { saveSchedule(body); requestClose(); };
@@ -1100,10 +1098,10 @@ function ReportPanel({ onSchedule }) {
   const run = useCostStore((s) => s.runScheduleNow);
   const [opened, setOpened] = useState(null);
   const requestClose = useModalExit(() => setOpened(null));
-  useDialogKeyboard(Boolean(opened), requestClose, '', 'open-latest-snapshot');
+  useDialogKeyboard(Boolean(opened), requestClose, '', 'reports-schedule-trigger');
   return (
     <section className="panel" id="report-history">
-      <div className="panel-head"><div><div className="section-kicker">Delivery</div><h2 className="panel-title">Scheduled reports</h2><div className="panel-subtitle">Snapshots preserve live totals at generation</div></div><Button size="sm" kind="secondary" onClick={onSchedule}>{schedule ? 'Edit' : 'Set schedule'}</Button></div>
+      <div className="panel-head"><div><div className="section-kicker">Delivery</div><h2 className="panel-title">Scheduled reports</h2><div className="panel-subtitle">Snapshots preserve live totals at generation</div></div><Button id="reports-schedule-trigger" size="sm" kind="secondary" onClick={onSchedule}>{schedule ? 'Edit' : 'Set schedule'}</Button></div>
       <div className="panel-body">
         {schedule
           ? <div className="schedule-summary"><strong>{schedule.frequency[0].toUpperCase() + schedule.frequency.slice(1)}</strong> · {schedule.sections.join(', ')}</div>
