@@ -1,36 +1,155 @@
-/* units-gr oracle — styles for the injected menu overlay backing the hamburger.
-   Token-driven; no external requests. */
+/* Noma oracle — supplemental chrome: menu overlay, scroll lock, booking dialog,
+   shortlist drawer, FAQ, command palette, coachmark, focus, reduced-motion.
+   All brand tokens reused from the Astro layer; no external requests. */
 
-/* Menu overlay backing the hamburger */
-.nav-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 600;
-  background: #f4e9e1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .5s cubic-bezier(.19,1,.22,1);
+/* ---------- keyboard focus visibility ---------- */
+:focus-visible{outline:3px solid #000;outline-offset:2px;border-radius:4px}
+.background-black :focus-visible,.background-black:focus-visible,
+.cmd-item.active:focus-visible,.shortlist-opener:focus-visible{outline-color:#fff}
+
+/* ---------- full-screen menu overlay (hamburger) ---------- */
+.nav-overlay{position:fixed;inset:0;z-index:600;background:#f4e9e1;display:flex;
+  align-items:center;justify-content:center;opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .5s cubic-bezier(.19,1,.22,1),visibility 0s linear .5s}
+.nav-overlay.is-open{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .5s cubic-bezier(.19,1,.22,1)}
+.nav-overlay__inner{position:relative;width:min(560px,90vw);text-align:left;padding:30px}
+.nav-overlay__close{position:absolute;top:-6px;right:-6px;width:48px;height:48px;font-size:30px;line-height:1;
+  background:#000;color:#fff;border:none;border-radius:50%;cursor:pointer}
+.nav-overlay__list{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:14px}
+.nav-overlay__list a{display:flex;flex-direction:column;gap:10px;border-radius:14px;padding:16px 18px;text-decoration:none;color:#000;
+  transition:transform .5s cubic-bezier(.19,1,.22,1)}
+.nav-overlay__list a:hover{transform:translateX(6px)}
+.nav-overlay__list .idx{font:850 14px/1 Aeonik Pro,arial;display:flex;justify-content:space-between}
+.nav-overlay__list .lbl{font:850 clamp(28px,7vw,44px)/1 var(--font-Alfabet,Alfabet,arial)}
+.nav-overlay__list li:nth-child(1) a{background:#0072e3}
+.nav-overlay__list li:nth-child(2) a{background:#ffb200}
+.nav-overlay__list li:nth-child(3) a{background:#ff5c38}
+.nav-overlay__list li:nth-child(4) a{background:#00aa3c}
+.nav-overlay__book{margin-top:18px;display:inline-block;background:#ab54f7;color:#000;border:none;border-radius:100px;
+  padding:14px 26px;font:700 16px/1.2 Aeonik Pro,arial;cursor:pointer}
+
+/* ---------- scroll lock while menu open ---------- */
+html.menu-locked,html.menu-locked body{overflow:hidden!important}
+
+/* ---------- booking inquiry dialog ---------- */
+dialog#booking-inquiry-overlay{padding:0;border:0;background:transparent;width:100vw;height:100dvh;
+  max-width:none;max-height:none;overflow:hidden;color:#000}
+dialog#booking-inquiry-overlay[open]{display:flex;align-items:center;justify-content:center;animation:oin .4s cubic-bezier(.19,1,.22,1)}
+dialog#booking-inquiry-overlay::backdrop{background:rgba(244,233,225,.88)}
+@keyframes oin{from{opacity:0}to{opacity:1}}
+.inq-panel{background:#f4e9e1;border:1px solid #000;border-radius:30px;width:calc(100% - 28px);max-width:620px;
+  max-height:calc(100dvh - 32px);overflow:auto;padding:26px 24px 24px;position:relative;box-sizing:border-box}
+.inq-panel h2{font:850 clamp(26px,4vw,34px)/1.05 var(--font-Alfabet,Alfabet,arial);margin:0 0 14px}
+.inq-close{position:sticky;top:-8px;float:right;width:44px;height:44px;margin:-6px -6px 0 0;background:#000;color:#fff;
+  border:none;border-radius:50%;font-size:24px;line-height:1;cursor:pointer;z-index:2}
+.inq-field{display:block;margin:0 0 12px}
+.inq-field>span{display:block;font:700 13px/1.3 Aeonik Pro,arial;margin-bottom:5px}
+.inq-field input,.inq-field select,.inq-field textarea{width:100%;box-sizing:border-box;background:#fff;border:1px solid #000;
+  border-radius:12px;padding:11px 12px;font:400 15px/1.3 Aeonik Pro,arial}
+.inq-field textarea{min-height:70px;resize:vertical}
+.inq-check{display:flex;gap:10px;align-items:flex-start;font:400 14px/1.4 Aeonik Pro,arial}
+.inq-check input{width:18px;height:18px;margin-top:2px;flex:0 0 auto}
+.inq-err{color:#a30000;font:600 12px/1.3 Aeonik Pro,arial;margin-top:4px}
+.inq-err:empty{display:none}
+.inq-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.inq-btn{border-radius:100px;border:1px solid #000;padding:11px 16px;font:700 14px/1.2 Aeonik Pro,arial;cursor:pointer;background:#fff;color:#000}
+.inq-btn.primary{background:#000;color:#fff}
+.inq-btn[hidden]{display:none}
+.inq-ready{background:#1be349;border:1px solid #000;border-radius:14px;padding:12px 14px;font:700 14px/1.3 Aeonik Pro,arial;margin:12px 0}
+.inq-ready[hidden]{display:none}
+.inq-importerr{color:#a30000;font:600 13px/1.3 Aeonik Pro,arial;margin:8px 0}
+.inq-importerr:empty{display:none}
+.packet-preview{background:#fff;border:1px solid #000;border-radius:14px;padding:12px;margin-top:12px;max-height:220px;overflow:auto;
+  font:400 12px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word}
+.packet-preview[hidden]{display:none}
+.copied-flag{font:700 13px/1 Aeonik Pro,arial;color:#0072e3;margin-left:6px}
+
+/* ---------- shortlist drawer + opener ---------- */
+.shortlist-opener{position:fixed;right:18px;bottom:18px;z-index:790;background:#000;color:#fff;border:1px solid #000;
+  border-radius:100px;padding:12px 18px;font:700 14px/1.2 Aeonik Pro,arial;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.shortlist-opener .ct{background:#fff;color:#000;border-radius:50%;min-width:22px;height:22px;padding:0 5px;
+  display:inline-flex;align-items:center;justify-content:center;font-size:12px}
+.shortlist-drawer{position:fixed;top:0;right:0;height:100dvh;width:min(360px,92vw);background:#f4e9e1;border-left:1px solid #000;
+  transform:translateX(100%);transition:transform .4s cubic-bezier(.19,1,.22,1);z-index:800;display:flex;flex-direction:column;
+  padding:22px;box-sizing:border-box;gap:14px}
+body.drawer-open .shortlist-drawer{transform:none}
+.shortlist-drawer h3{font:850 22px/1.1 var(--font-Alfabet,Alfabet,arial);margin:0;display:flex;justify-content:space-between;align-items:center}
+.shortlist-drawer .dl-close{background:#000;color:#fff;border:none;border-radius:50%;width:38px;height:38px;font-size:20px;cursor:pointer}
+.shortlist-rows{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;overflow:auto;flex:1 1 auto}
+.shortlist-rows li{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#fff;border:1px solid #000;border-radius:12px;padding:10px 12px;font:700 14px/1.3 Aeonik Pro,arial}
+.shortlist-rows button{background:#fff;border:1px solid #000;border-radius:100px;padding:5px 10px;font:700 12px/1 Aeonik Pro,arial;cursor:pointer}
+.shortlist-empty{font:400 14px/1.4 Aeonik Pro,arial;opacity:.7}
+.shortlist-foot{border-top:1px solid #000;padding-top:12px;display:flex;flex-direction:column;gap:10px}
+.shortlist-foot .est{font:850 18px/1.2 var(--font-Alfabet,Alfabet,arial)}
+.shortlist-foot .ur{display:flex;gap:8px}
+.shortlist-foot .ur button{flex:1 1 0;background:#fff;border:1px solid #000;border-radius:100px;padding:9px;font:700 13px/1 Aeonik Pro,arial;cursor:pointer}
+.shortlist-foot .ur button:disabled{opacity:.4;cursor:default}
+
+/* ---------- shortlist toggle buttons in pricing list ---------- */
+section.typical_unit .pricing-list li{flex-wrap:wrap;gap:8px 12px}
+.add-to-shortlist-btn{border:1px solid #000;background:#fff;color:#000;border-radius:100px;padding:7px 14px;
+  font:700 13px/1.1 Aeonik Pro,arial;cursor:pointer;transition:background .3s,color .3s}
+.add-to-shortlist-btn[aria-pressed="true"]{background:#000;color:#fff}
+
+/* ---------- FAQ accordion (inside footer) ---------- */
+.faq-block{width:100%;margin:0 0 26px;border-top:1px solid #000}
+.faq-block h2{font:850 clamp(24px,3vw,33px)/1.1 var(--font-Alfabet,Alfabet,arial);margin:24px 0 8px}
+.faq-item{border-bottom:1px solid #000}
+.faq-q{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;background:none;border:0;cursor:pointer;
+  text-align:left;padding:16px 4px;font:700 16px/1.3 Aeonik Pro,arial;color:#000}
+.faq-q .pm{font-size:22px;line-height:1;transition:transform .35s ease}
+.faq-item.open .faq-q .pm{transform:rotate(45deg)}
+.faq-a{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .35s cubic-bezier(.19,1,.22,1),opacity .35s ease}
+.faq-item.open .faq-a{grid-template-rows:1fr;opacity:1}
+.faq-a>div{overflow:hidden}
+.faq-a p{margin:0;padding:0 4px 18px;font:400 15px/1.6 Aeonik Pro,arial;max-width:62ch}
+
+/* ---------- command palette ---------- */
+.cmd-palette{position:fixed;inset:0;z-index:1100;background:rgba(0,0,0,.5);display:none;align-items:flex-start;justify-content:center;padding-top:14vh}
+.cmd-palette.open{display:flex;animation:oin .25s ease}
+.cmd-box{background:#f4e9e1;border:1px solid #000;border-radius:24px;width:min(560px,92vw);overflow:hidden}
+.cmd-box input{width:100%;box-sizing:border-box;padding:18px 20px;border:0;border-bottom:1px solid #000;
+  font:700 18px/1.3 Aeonik Pro,arial;background:transparent}
+.cmd-list{max-height:52vh;overflow:auto;margin:0;padding:6px;list-style:none}
+.cmd-item{padding:13px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;border-radius:12px;font:600 15px/1.3 Aeonik Pro,arial}
+.cmd-item.active{background:#000;color:#fff}
+.cmd-item .hint{opacity:.6;font:400 12px/1 ui-monospace,monospace}
+.cmd-item.active .hint{opacity:.8}
+.cmd-empty{padding:14px 16px;opacity:.6;font:400 14px/1.4 Aeonik Pro,arial}
+
+/* ---------- coachmark ---------- */
+.coach{position:fixed;z-index:795;background:#000;color:#fff;border-radius:14px;padding:12px 38px 12px 14px;max-width:240px;
+  font:600 13px/1.4 Aeonik Pro,arial;display:none;box-shadow:0 8px 30px #00000033}
+.coach.show{display:block;animation:oin .3s ease}
+.coach .cx{position:absolute;top:6px;right:8px;background:none;border:0;color:#fff;font-size:18px;cursor:pointer;line-height:1}
+
+/* ---------- media roles ---------- */
+.insta-tile{position:relative;overflow:hidden}
+.insta-tile img{position:absolute;inset:0;margin:auto;width:62%;height:62%;opacity:.85}
+.map .map-art{position:absolute;inset:0;width:100%;height:100%;border-radius:var(--border-radius)}
+.living-icon{width:48px;height:48px;display:block}
+.living-icon svg{width:100%;height:100%}
+.social a{display:inline-flex}
+.social a img{width:22px;height:22px}
+footer.footer .fcol{display:flex;flex-direction:column;gap:8px}
+footer.footer .fbtn{background:none;border:0;padding:0;color:inherit;text-decoration:none;cursor:pointer;font:inherit;text-align:left}
+footer.footer .fbtn:hover{text-decoration:underline}
+
+/* ---------- reduced motion: kill loops/intro/reveals/cursor motion ---------- */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+  .marquee .marquee-track{transform:none!important}
+  .block-cursor{display:none!important}
 }
-.nav-overlay.is-open { opacity: 1; pointer-events: auto; }
-.nav-overlay__inner { position: relative; text-align: center; padding: 30px; }
-.nav-overlay__close {
-  position: absolute;
-  top: -10px;
-  right: -6px;
-  font-size: 34px;
-  line-height: 1;
-  background: none;
-  border: none;
-  color: var(--color-1);
-  cursor: pointer;
-}
-.nav-overlay__list li { margin: 14px 0; }
-.nav-overlay__list a {
-  font: 850 clamp(30px, 5vw, 56px)/1 var(--font-Alfabet, Alfabet, arial);
-  color: var(--color-1);
-  text-decoration: none;
-}
-.nav-overlay__list a:hover { color: #0072e3; }
+html.forced-reduced-motion *,html.forced-reduced-motion *::before,html.forced-reduced-motion *::after{
+  animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+html.forced-reduced-motion .marquee .marquee-track{transform:none!important}
+html.forced-reduced-motion .block-cursor{display:none!important}
+
+/* fix: the vendored `.cta > *{position:relative}` rule pulls the shape-overlay
+   svg (which must be absolute) into flow and bloats every CTA. Restore it, and
+   keep the hero CTA as the reference's large rounded panel while the in-content
+   CTAs stay compact pills. */
+svg.shape-overlays{position:absolute!important}
+section.hero .cta{min-width:min(360px,62vw);min-height:170px;align-items:center;justify-content:flex-start}
+section.typical_unit .cta,section.community .cta{align-self:flex-start;width:auto}
