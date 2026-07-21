@@ -85,13 +85,16 @@ export function parseFormula(input, dataset) {
   const match = input.trim().match(/^=(SUM|AVERAGE|MIN|MAX|COUNT)\(([A-Za-z0-9_]+)(?:,\s*(\d+):(\d+))?\)$/i)
   if (!match) {
     const named = input.trim().match(/^=([A-Za-z]+)\(/)
-    if (named && !['SUM','AVERAGE','MIN','MAX','COUNT'].includes(named[1].toUpperCase())) return { error: `Unknown formula function “${named[1]}”` }
+    if (named && !['SUM','AVERAGE','MIN','MAX','COUNT'].includes(named[1].toUpperCase())) return { error: `Unknown formula function “${named[1]}”. Use SUM, AVERAGE, MIN, MAX, or COUNT.` }
     return { error: 'Formula must use SUM, AVERAGE, MIN, MAX, or COUNT, for example =SUM(score, 1:100)' }
   }
   const [, fnRaw, column, startRaw, endRaw] = match
   const field = dataset.schema.find((f) => f.name.toLowerCase() === column.toLowerCase())
-  if (!field) return { error: `Unknown formula column “${column}”` }
-  if (field.type !== 'number') return { error: `Column “${field.name}” has type ${field.type}; numeric formulas require a number column` }
+  if (!field) {
+    const numeric = dataset.schema.filter((candidate) => candidate.type === 'number').map((candidate) => candidate.name)
+    return { error: numeric.length ? `Unknown formula column “${column}”. Choose a number column: ${numeric.join(', ')}.` : `Unknown formula column “${column}”. Add a number field to this dataset before running a formula.` }
+  }
+  if (field.type !== 'number') return { error: `Column “${field.name}” has type ${field.type}. Choose a number column instead.` }
   const start = startRaw ? Math.max(0, Number(startRaw) - 1) : 0
   const end = endRaw ? Number(endRaw) : dataset.rows.length
   const values = dataset.rows.slice(start, end).map((r) => r.values[field.name]).filter(Number.isFinite)

@@ -128,7 +128,10 @@ export function useOverlayBehavior(ref, onClose, { initialFocus = true } = {}) {
       document.removeEventListener('keydown', onKey, true)
       const i = overlayStack.indexOf(entry)
       if (i >= 0) overlayStack.splice(i, 1)
-      if (returnFocus.current?.focus && document.contains(returnFocus.current)) returnFocus.current.focus()
+      const opener = returnFocus.current
+      window.setTimeout(() => {
+        if (opener?.focus && document.contains(opener)) opener.focus()
+      }, 0)
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 }

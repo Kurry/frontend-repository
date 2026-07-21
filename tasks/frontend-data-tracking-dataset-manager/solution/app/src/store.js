@@ -122,7 +122,7 @@ export const useStore = create((set, get) => ({
   },
   createDataset: (payload) => {
     const id = uid('dataset')
-    get().commit((datasets) => datasets.push({ id, ...payload, createdAt: new Date().toISOString(), rows: [], thresholdRules: [], snapshots: [], splitPercentages: { train: 80, validation: 10, test: 10 }, attachedSuiteId: null }), 'Dataset created')
+    get().commit((datasets) => datasets.push({ id, ...payload, createdAt: new Date().toISOString(), rows: [], thresholdRules: [], snapshots: [], splitPercentages: { train: 80, validation: 10, test: 10 }, attachedSuiteId: null }), `Dataset “${payload.name}” created with 0 rows`)
     set({ selectedId: id, modal: null })
     return id
   },

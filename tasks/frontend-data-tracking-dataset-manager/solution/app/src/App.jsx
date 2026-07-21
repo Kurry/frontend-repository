@@ -151,13 +151,13 @@ function Toolbar({ dataset }) {
           onClick={() => window.matchMedia('(max-width: 768px)').matches ? setUi({ sidebarOpen: !sidebarOpen }) : setUi({ sidebarDesktopOpen: !sidebarDesktopOpen })} />
         <Btn size="sm" icon={Add} onClick={() => setUi({ modal: { type: 'row', mode: 'add' } })}>Add row</Btn>
         <Btn size="sm" kind="ghost" icon={Upload} onClick={openImport}>Import CSV</Btn>
-        <Btn size="sm" kind="ghost" icon={Export} onClick={() => setUi({ panel: 'export', exportGeneratedAt: Date.now() })}>Export</Btn>
+        <Btn size="sm" kind="ghost" icon={Export} onClick={() => setUi({ panel: 'export', exportGeneratedAt: Date.now() })}>Export package</Btn>
         <span className="divider-v mx-1 hidden sm:block" aria-hidden="true" />
         <Btn size="sm" kind={pivotMode ? 'secondary' : 'ghost'} icon={ChartRelationship} aria-pressed={pivotMode} onClick={() => setUi({ pivotMode: !pivotMode })}>{pivotMode ? 'Grid view' : 'Pivot view'}</Btn>
-        <Btn size="sm" kind="ghost" icon={Events} onClick={() => setUi({ panel: 'duplicates' })}>Duplicates</Btn>
-        <Btn size="sm" kind="ghost" icon={Flag} onClick={() => setUi({ panel: 'thresholds' })}>Thresholds</Btn>
-        <Btn size="sm" kind="ghost" onClick={() => setUi({ panel: 'splits' })}>Splits</Btn>
-        <Btn size="sm" kind="ghost" icon={Save} onClick={() => setUi({ panel: 'snapshots' })}>Snapshots</Btn>
+        <Btn size="sm" kind="ghost" icon={Events} onClick={() => setUi({ panel: 'duplicates' })}>Find duplicates</Btn>
+        <Btn size="sm" kind="ghost" icon={Flag} onClick={() => setUi({ panel: 'thresholds' })}>Manage thresholds</Btn>
+        <Btn size="sm" kind="ghost" onClick={() => setUi({ panel: 'splits' })}>Assign splits</Btn>
+        <Btn size="sm" kind="ghost" icon={Save} onClick={() => setUi({ panel: 'snapshots' })}>Compare snapshots</Btn>
         <span className="divider-v mx-1 hidden sm:block" aria-hidden="true" />
         <Btn size="sm" kind="ghost" icon={Undo} iconOnly aria-label="Undo (Ctrl+Z)" title="Undo (Ctrl+Z)" disabled={!history.length} onClick={undo} />
         <Btn size="sm" kind="ghost" icon={Redo} iconOnly aria-label="Redo (Ctrl+Shift+Z)" title="Redo (Ctrl+Shift+Z)" disabled={!future.length} onClick={redo} />
