@@ -1,7 +1,9 @@
 <script>
 	import { onMount } from "svelte";
 	import { page } from "$app/state";
+	import { fade } from "svelte/transition";
 	import { store, toggleTheme, applyTheme } from "../lib/store.svelte.js";
+	import { dur } from "../lib/motion.js";
 	import { installWebMCP } from "../lib/webmcp.js";
 	import "../app.css";
 
@@ -58,7 +60,11 @@
 	</header>
 
 	<main class="container">
-		{@render children()}
+		{#key page.url.pathname}
+			<div class="view" in:fade={{ duration: dur(180) }}>
+				{@render children()}
+			</div>
+		{/key}
 	</main>
 
 	<footer class="footer container">

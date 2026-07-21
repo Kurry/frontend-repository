@@ -1,10 +1,12 @@
 <script>
 	import { store, setSettings, setTheme, savePreset, loadPreset, deletePreset, importSession, compileSession, compileConversionReport, targetsFor } from "../store.svelte.js";
 	import { SettingsUpdate, ConversionPreset } from "../schemas.js";
+	import { dur } from "../motion.js";
 	import { superForm, defaults } from "sveltekit-superforms";
 	import { zod4 } from "sveltekit-superforms/adapters";
 	import * as Form from "formsnap";
 	import { Select, Dialog } from "bits-ui";
+	import { fade, scale } from "svelte/transition";
 
 	const targets = targetsFor().map((target) => target.slice(1));
 	let settingsSubmitted = false;
@@ -13,6 +15,9 @@
 		defaults({ quality: store.quality, keepMetadata: store.keepMetadata, defaultTarget: store.defaultTarget.slice(1), theme: store.theme }, zod4(SettingsUpdate)),
 		{
 			SPA: true,
+			// Keep the user's submitted values in the form; the default reset
+			// would snap controls back to the values captured at mount time.
+			resetForm: false,
 			validators: zod4(SettingsUpdate),
 			onSubmit() {
 				settingsSubmitted = true;
@@ -50,6 +55,7 @@
 		defaults({ name: "", quality: store.quality, target: store.defaultTarget.slice(1) }, zod4(ConversionPreset)),
 		{
 			SPA: true,
+			resetForm: false,
 			validators: zod4(ConversionPreset),
 			onSubmit() {
 				presetSubmitted = true;
@@ -97,24 +103,76 @@
 				importError = result.error;
 			}
 		} catch (e) {
-			importError = "Invalid JSON";
+			importError = "Invalid JSON — paste the exact text from a Session export";
 		}
 	}
 
+	// WebMCP artifact_import surfaces the same Import session dialog the
+	// visible control opens (and pre-fills/applies a session document when one
+	// is provided through the contract).
+	function showImportRequest(detail) {
+		importText = detail?.text ?? "";
+		importError = "";
+		importSuccess = !!detail?.applied;
+		importOpen = true;
+		if (importSuccess) {
+			syncSettingsForm();
+			setTimeout(() => { importSuccess = false; }, 1500);
+		}
+	}
+
+	$effect(() => {
+		const onOpenImport = (event) => showImportRequest(event.detail);
+		window.addEventListener("vert:open-import", onOpenImport);
+		return () => window.removeEventListener("vert:open-import", onOpenImport);
+	});
+
+	// Consume a request that was stored while this view was not mounted.
+	$effect(() => {
+		if (store.importRequest) {
+			const pending = store.importRequest;
+			store.importRequest = null;
+			showImportRequest(pending);
+		}
+	});
+
+	const storedTab = typeof localStorage !== "undefined" ? localStorage.getItem("vert.exportTab") : null;
 	let exportOpen = $state(false);
-	let exportFormat = $state("session-json");
+	let exportFormat = $state(storedTab === "conversion-report" ? "conversion-report" : "session-json");
+	$effect(() => {
+		try { localStorage.setItem("vert.exportTab", exportFormat); } catch { /* ignore */ }
+	});
 	let exportText = $derived(
 		exportFormat === "session-json"
 			? JSON.stringify(compileSession(), null, 2)
 			: compileConversionReport()
 	);
 	let exportCopied = $state(false);
+	let copyFallback = "";
 
-	function copyExport() {
-		navigator.clipboard.writeText(exportText).then(() => {
+	async function copyExport() {
+		let ok = false;
+		try {
+			await navigator.clipboard.writeText(exportText);
+			ok = true;
+		} catch {
+			// Clipboard can be unavailable in restricted contexts; fall back to
+			// a transient selection copy so Copy always works.
+			const helper = document.createElement("textarea");
+			helper.value = exportText;
+			helper.setAttribute("readonly", "");
+			helper.style.position = "fixed";
+			helper.style.opacity = "0";
+			document.body.appendChild(helper);
+			helper.select();
+			try { ok = document.execCommand("copy"); } catch { ok = false; }
+			helper.remove();
+		}
+		if (ok) {
 			exportCopied = true;
-			setTimeout(() => { exportCopied = false; }, 2000);
-		});
+			clearTimeout(copyFallback);
+			copyFallback = setTimeout(() => { exportCopied = false; }, 2000);
+		}
 	}
 
 	function downloadExport() {
@@ -128,6 +186,14 @@
 		anchor.click();
 		anchor.remove();
 		URL.revokeObjectURL(url);
+	}
+
+	function openImportFromExport() {
+		exportOpen = false;
+		importText = exportText;
+		importError = "";
+		importSuccess = false;
+		importOpen = true;
 	}
 </script>
 
@@ -181,11 +247,11 @@
 				{#snippet children({ props })}
 				<div class="setting-row">
 					<div>
-						<Form.Label class="setting-label">Default Target</Form.Label>
+						<Form.Label class="setting-label">Default target</Form.Label>
 						<Form.Description class="setting-help">Default output format for newly added files</Form.Description>
 					</div>
 					<Select.Root type="single" name={props.name} bind:value={$formData.defaultTarget}>
-						<Select.Trigger class="btn focus-visible:ring-2 bg-surface" aria-label="Default target format">
+						<Select.Trigger class="btn focus-visible:ring-2 bg-surface min-h-[44px]" aria-label="Default target format">
 							{$formData.defaultTarget}
 						</Select.Trigger>
 						<Select.Content class="bg-surface border border-border rounded shadow-lg p-1 z-50">
@@ -203,7 +269,7 @@
 		</Form.Field>
 
 		<div class="mt-4 mb-8">
-			<button class="btn btn-primary min-h-[44px] min-w-[44px] focus-visible:ring-2">Apply Settings</button>
+			<button class="btn btn-primary min-h-[44px] min-w-[44px] focus-visible:ring-2">Apply settings</button>
 		</div>
 	</form>
 
@@ -214,7 +280,11 @@
 
 	<div class="presets-list mb-4 grid gap-2">
 		{#each store.presets as p (p.id)}
-			<div class="flex items-center justify-between p-3 border border-border rounded bg-surface-2">
+			<div
+				class="flex items-center justify-between p-3 border border-border rounded bg-surface-2 motion-safe:transition-all"
+				in:fade|global={{ duration: dur(200) }}
+				out:fade|global={{ duration: dur(180) }}
+			>
 				<div>
 					<div class="font-bold">{p.name}</div>
 					<div class="text-sm text-text-muted">
@@ -229,14 +299,14 @@
 		{/each}
 	</div>
 
-	<button class="btn focus-visible:ring-2 min-h-[44px]" onclick={openPresetDialog}>Save Current as Preset</button>
+	<button class="btn focus-visible:ring-2 min-h-[44px]" onclick={openPresetDialog}>Save preset</button>
 
 	<div class="divider"></div>
 
 	<h2>Session</h2>
 	<div class="flex gap-4">
-		<button class="btn focus-visible:ring-2 min-h-[44px]" onclick={() => { exportOpen = true; }}>Export Session</button>
-		<button class="btn focus-visible:ring-2 min-h-[44px]" onclick={() => { importOpen = true; importText = ""; importError = ""; }}>Import Session</button>
+		<button class="btn focus-visible:ring-2 min-h-[44px]" onclick={() => { exportOpen = true; }}>Export session</button>
+		<button class="btn focus-visible:ring-2 min-h-[44px]" onclick={() => { importOpen = true; importText = ""; importError = ""; importSuccess = false; }}>Import session</button>
 	</div>
 
 	<div class="divider"></div>
@@ -268,21 +338,50 @@
 
 <Dialog.Root bind:open={presetOpen}>
 	<Dialog.Portal>
-		<Dialog.Overlay class="fixed inset-0 bg-black/50 z-40" />
-		<Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface p-6 rounded shadow-xl w-[90vw] max-w-md z-50">
-			<Dialog.Title class="text-xl font-bold mb-4">Save Preset</Dialog.Title>
+		<Dialog.Overlay class="fixed inset-0 bg-black/50 z-40 dialog-overlay-anim" />
+		<Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface p-6 rounded shadow-xl w-[90vw] max-w-md z-50 dialog-anim">
+			<Dialog.Title class="text-xl font-bold mb-4">Save preset</Dialog.Title>
 			<form method="POST" use:presetEnhance class="flex flex-col gap-4">
 				<Form.Field form={presetForm} name="name">
 					<Form.Control>
 						{#snippet children({ props })}
-						<Form.Label>Preset Name</Form.Label>
+						<Form.Label>Preset name</Form.Label>
 						<input type="text" {...props} bind:value={$presetData.name} class="input block w-full border border-border p-2 rounded focus-visible:ring-2 bg-surface-2" />
 						{/snippet}
 					</Form.Control>
 					<Form.FieldErrors class="text-bad text-sm" />
 				</Form.Field>
-				<input type="hidden" name="quality" value={$presetData.quality} />
-				<input type="hidden" name="target" value={$presetData.target} />
+				<Form.Field form={presetForm} name="quality">
+					<Form.Control>
+						{#snippet children({ props })}
+						<Form.Label>Quality</Form.Label>
+						<input type="number" min="1" max="100" {...props} bind:value={$presetData.quality} class="input block w-full border border-border p-2 rounded focus-visible:ring-2 bg-surface-2" />
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors class="text-bad text-sm" />
+				</Form.Field>
+				<Form.Field form={presetForm} name="target">
+					<Form.Control>
+						{#snippet children({ props })}
+						<Form.Label>Target format</Form.Label>
+						<div class="pt-1">
+							<Select.Root type="single" name={props.name} bind:value={$presetData.target}>
+								<Select.Trigger class="btn bg-surface-2 focus-visible:ring-2 min-h-[44px] w-full justify-start" aria-label="Preset target format">
+									{$presetData.target}
+								</Select.Trigger>
+								<Select.Content class="bg-surface border border-border rounded shadow-lg p-1 z-50">
+									{#each targets as t}
+										<Select.Item value={t} class="px-3 py-1.5 cursor-pointer hover:bg-surface-2 rounded">
+											{t}
+										</Select.Item>
+									{/each}
+								</Select.Content>
+							</Select.Root>
+						</div>
+						{/snippet}
+					</Form.Control>
+					<Form.FieldErrors class="text-bad text-sm" />
+				</Form.Field>
 				<div class="flex justify-end gap-2 mt-4">
 					<Dialog.Close class="btn focus-visible:ring-2 min-h-[44px]">Cancel</Dialog.Close>
 					<button class="btn btn-primary focus-visible:ring-2 min-h-[44px]">Save</button>
@@ -294,10 +393,11 @@
 
 <Dialog.Root bind:open={importOpen}>
 	<Dialog.Portal>
-		<Dialog.Overlay class="fixed inset-0 bg-black/50 z-40" />
-		<Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface p-6 rounded shadow-xl w-[90vw] max-w-xl z-50">
-			<Dialog.Title class="text-xl font-bold mb-4">Import Session</Dialog.Title>
-			<textarea bind:value={importText} class="w-full h-48 border border-border p-2 rounded font-mono text-sm focus-visible:ring-2 mb-2 bg-surface-2" placeholder="Paste session JSON here..."></textarea>
+		<Dialog.Overlay class="fixed inset-0 bg-black/50 z-40 dialog-overlay-anim" />
+		<Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface p-6 rounded shadow-xl w-[90vw] max-w-xl z-50 dialog-anim">
+			<Dialog.Title class="text-xl font-bold mb-4">Import session</Dialog.Title>
+			<label class="setting-label block mb-1" for="import-text">Session JSON</label>
+			<textarea id="import-text" bind:value={importText} class="w-full h-48 border border-border p-2 rounded font-mono text-sm focus-visible:ring-2 mb-2 bg-surface-2" placeholder="Paste session JSON here..."></textarea>
 
 			<div aria-live="polite" class="min-h-[24px]">
 				{#if importError}
@@ -317,12 +417,12 @@
 
 <Dialog.Root bind:open={exportOpen}>
 	<Dialog.Portal>
-		<Dialog.Overlay class="fixed inset-0 bg-black/50 z-40" />
-		<Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface p-6 rounded shadow-xl w-[90vw] max-w-xl z-50">
-			<Dialog.Title class="text-xl font-bold mb-4">Export Session</Dialog.Title>
+		<Dialog.Overlay class="fixed inset-0 bg-black/50 z-40 dialog-overlay-anim" />
+		<Dialog.Content class="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-surface p-6 rounded shadow-xl w-[90vw] max-w-xl z-50 dialog-anim">
+			<Dialog.Title class="text-xl font-bold mb-4">Export session</Dialog.Title>
 			<div class="flex gap-2 mb-3" role="tablist" aria-label="Export format">
-				<button class="btn btn-sm focus-visible:ring-2" class:btn-primary={exportFormat === "session-json"} role="tab" aria-selected={exportFormat === "session-json"} onclick={() => exportFormat = "session-json"}>Session JSON</button>
-				<button class="btn btn-sm focus-visible:ring-2" class:btn-primary={exportFormat === "conversion-report"} role="tab" aria-selected={exportFormat === "conversion-report"} onclick={() => exportFormat = "conversion-report"}>Conversion report</button>
+				<button class="btn btn-sm focus-visible:ring-2 min-h-[44px]" class:btn-primary={exportFormat === "session-json"} role="tab" aria-selected={exportFormat === "session-json"} onclick={() => exportFormat = "session-json"}>Session JSON</button>
+				<button class="btn btn-sm focus-visible:ring-2 min-h-[44px]" class:btn-primary={exportFormat === "conversion-report"} role="tab" aria-selected={exportFormat === "conversion-report"} onclick={() => exportFormat = "conversion-report"}>Conversion report</button>
 			</div>
 			<textarea readonly value={exportText} aria-label={exportFormat === "session-json" ? "Session JSON preview" : "Conversion report preview"} class="w-full h-64 border border-border p-2 rounded font-mono text-sm focus-visible:ring-2 mb-2 bg-surface-2"></textarea>
 
@@ -332,10 +432,11 @@
 				{/if}
 			</div>
 
-			<div class="flex justify-end gap-2 mt-4">
+			<div class="flex justify-end gap-2 mt-4 flex-wrap">
 				<Dialog.Close class="btn focus-visible:ring-2 min-h-[44px]">Close</Dialog.Close>
+				<button class="btn focus-visible:ring-2 min-h-[44px]" onclick={openImportFromExport}>Import session JSON</button>
 				<button class="btn focus-visible:ring-2 min-h-[44px]" onclick={downloadExport}>Download session</button>
-				<button class="btn btn-primary focus-visible:ring-2 min-h-[44px]" onclick={copyExport}>Copy</button>
+				<button class="btn btn-primary focus-visible:ring-2 min-h-[44px]" onclick={copyExport}>{exportCopied ? "Copied!" : "Copy"}</button>
 			</div>
 		</Dialog.Content>
 	</Dialog.Portal>
