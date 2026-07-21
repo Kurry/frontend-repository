@@ -1,5 +1,5 @@
 /**
- * WebMCP surface for the Novapay Sprint 26 microsite.
+ * WebMCP surface for the Razorpay Sprint 26 microsite.
  * Tool names and input schemas mirror packages/webmcp-contracts exactly; every
  * handler drives the same visible control path as a person using the page.
  */
