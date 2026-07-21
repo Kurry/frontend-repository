@@ -10,12 +10,12 @@
     "verify:build": "astro build"
   },
   "dependencies": {
-    "@astrojs/svelte": "8.1.2",
+    "@astrojs/svelte": "9.0.1",
     "@felte/validator-zod": "^1.0.18",
     "@fontsource/poppins": "^5.3.0",
     "@tailwindcss/vite": "4.3.2",
     "@types/canvas-confetti": "^1.9.0",
-    "astro": "6.4.8",
+    "astro": "7.1.3",
     "bits-ui": "^2.18.1",
     "canvas-confetti": "^1.9.4",
     "felte": "^1.3.0",
