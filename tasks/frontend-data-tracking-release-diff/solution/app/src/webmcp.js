@@ -2,16 +2,10 @@ import { cutReleaseSchema } from './lib/contracts'
 
 const destinations = ['manifest', 'diff', 'splits', 'rotation', 'timeline']
 const exportFormats = ['release-pack-json', 'manifest-summary-text']
-const demos = ['release-cut', 'retry-rank-stability-check', 'advance-rotation']
 
 const objectSchema = (properties = {}, required = []) => ({ type: 'object', properties, required, additionalProperties: false })
 const stringEnum = (values) => ({ type: 'string', enum: values })
 const response = (payload) => ({ content: [{ type: 'text', text: JSON.stringify(payload) }] })
-
-function unavailable(store, message) {
-  store.toast(message, 'info')
-  return response({ ok: false, unavailable: true, message })
-}
 
 function toolsFor(store) {
   const currentVersionEnum = () => store.versions.map((version) => version.name)
@@ -19,6 +13,7 @@ function toolsFor(store) {
 
   return [
     register('browse_open', 'Open a declared Larkspur Releases destination.', objectSchema({ destination: stringEnum(destinations) }, ['destination']), async ({ destination }) => {
+      if (!destinations.includes(destination)) return response({ ok: false, message: `Destination must be one of ${destinations.join(', ')}.` })
       if (destination === 'timeline') document.querySelector('.timeline-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
       else store.setActiveTab(destination)
       return response({ ok: true, destination, visible: true })
@@ -41,62 +36,42 @@ function toolsFor(store) {
       store.setActiveTab('diff')
       return response({ ok: true, base: store.diffBase, compare: store.diffCompare })
     }),
-    register('browse_sort', 'Use the fixed release-register ordering.', objectSchema(), async () => unavailable(store, 'Release sorting is fixed to newest semantic version first.')),
-    register('browse_set_locale', 'Use the fixed release-register locale.', objectSchema(), async () => unavailable(store, 'Larkspur Releases currently uses its fixed English data-ops locale.')),
-    register('browse_set_theme', 'Use the fixed release-register visual theme.', objectSchema(), async () => unavailable(store, 'Larkspur Releases currently uses its fixed register theme.')),
-
-    register('form_validate', 'Validate the declared cut-release fields without starting a cut.', objectSchema({ 'version-name': { type: 'string' }, notes: { type: 'string' } }, ['version-name', 'notes']), async (args) => {
-      const payload = { name: args['version-name'], notes: args.notes }
+    register('form_validate', 'Validate the declared cut-release fields without starting a cut.', objectSchema({ 'version-name': { type: 'string' }, notes: { type: 'string', maxLength: 500 } }, ['version-name']), async (args) => {
+      const payload = { name: args['version-name'], notes: args.notes ?? '' }
       const parsed = cutReleaseSchema.safeParse(payload)
       const duplicate = store.versions.some((version) => version.name.toLowerCase() === payload.name.toLowerCase())
       store.openDialog('cut')
       return response({ ok: parsed.success && !duplicate, fieldErrors: parsed.success ? (duplicate ? { 'version-name': `Version ${payload.name} already exists.` } : {}) : Object.fromEntries(parsed.error.issues.map((issue) => [issue.path[0] === 'name' ? 'version-name' : issue.path[0], issue.message])) })
     }),
-    register('form_submit', 'Submit the cut-release form through the same release workflow as the visible form.', objectSchema({ 'version-name': { type: 'string' }, notes: { type: 'string' } }, ['version-name', 'notes']), async (args) => {
+    register('form_submit', 'Submit the cut-release form through the same release workflow as the visible form.', objectSchema({ 'version-name': { type: 'string' }, notes: { type: 'string', maxLength: 500 } }, ['version-name']), async (args) => {
       store.openDialog('cut')
-      const result = await store.startCut({ name: args['version-name'], notes: args.notes })
+      const result = await store.startCut({ name: args['version-name'], notes: args.notes ?? '' })
       return response({ ok: result.success, message: result.message || (store.cutRun.error || 'Release workflow started.'), visibleStep: store.cutRun.steps.find((step) => step.status === 'running' || step.status === 'failed')?.id || 'seal' })
     }),
     register('form_cancel', 'Cancel the visible cut form when no cut is running.', objectSchema(), async () => response({ ok: store.closeDialog(), dialog: store.dialog })),
-    register('form_reset', 'Reset the cut-release form workflow record.', objectSchema(), async () => { store.resetCut(); store.openDialog('cut'); return response({ ok: true, dialog: 'cut' }) }),
-    register('form_advance', 'Advance a failed rank-stability workflow by retrying the check.', objectSchema(), async () => response({ ok: await store.retryRankCheck(), correlation: store.cutRun.correlation, threshold: store.cutRun.threshold })),
-    register('form_return', 'Return to the selected release manifest.', objectSchema(), async () => { store.closeDialog(); store.setActiveTab('manifest'); return response({ ok: true, destination: 'manifest' }) }),
-
-    register('session_start', 'Start one declared Larkspur demo through its product command.', objectSchema({ demo: stringEnum(demos), 'version-name': { type: 'string' }, notes: { type: 'string' } }, ['demo']), async (args) => {
-      if (args.demo === 'advance-rotation') return response({ ok: true, cycle: store.advanceRotation() })
-      if (args.demo === 'retry-rank-stability-check') return response({ ok: await store.retryRankCheck(), correlation: store.cutRun.correlation })
-      if (!args['version-name']) return response({ ok: false, message: 'version-name is required for the release-cut demo.' })
+    register('session_start', 'Start the declared release-cut session through the same product command as the visible form.', objectSchema({ 'version-name': { type: 'string' }, notes: { type: 'string', maxLength: 500 } }, ['version-name']), async (args) => {
       store.openDialog('cut')
-      const result = await store.startCut({ name: args['version-name'], notes: args.notes || '' })
+      const result = await store.startCut({ name: args['version-name'], notes: args.notes ?? '' })
       return response({ ok: result.success, message: result.message || store.cutRun.error || 'Release workflow started.' })
     }),
-    register('session_pause', 'Pause a running client-side simulation when supported.', objectSchema(), async () => unavailable(store, 'Release cut timing cannot be paused; its visible state remains authoritative.')),
-    register('session_resume', 'Resume a paused client-side simulation when supported.', objectSchema(), async () => unavailable(store, 'No paused Larkspur simulation is available to resume.')),
-    register('session_stop', 'Stop a running client-side simulation when supported.', objectSchema(), async () => unavailable(store, 'A release cut cannot be stopped after its immutable workflow begins.')),
     register('session_restart', 'Restart the failed rank-stability check.', objectSchema(), async () => response({ ok: await store.retryRankCheck(), correlation: store.cutRun.correlation })),
     register('session_advance', 'Advance the held-out subset rotation by one cycle.', objectSchema(), async () => response({ ok: true, cycle: store.advanceRotation(), activeSubsets: store.rotation.activeSubsets })),
-    register('session_trigger_demo', 'Trigger a declared bounded product demo.', objectSchema({ demo: stringEnum(demos), 'version-name': { type: 'string' }, notes: { type: 'string' } }, ['demo']), async (args) => {
-      if (args.demo === 'advance-rotation') return response({ ok: true, cycle: store.advanceRotation() })
-      if (args.demo === 'retry-rank-stability-check') return response({ ok: await store.retryRankCheck(), correlation: store.cutRun.correlation })
-      if (!args['version-name']) return response({ ok: false, message: 'version-name is required for the release-cut demo.' })
-      store.openDialog('cut'); const result = await store.startCut({ name: args['version-name'], notes: args.notes || '' }); return response({ ok: result.success, message: result.message || store.cutRun.error || 'Release workflow started.' })
-    }),
-    register('session_connect', 'Connect to a declared session service when supported.', objectSchema(), async () => unavailable(store, 'Larkspur Releases is intentionally backend-free and has no remote session to connect.')),
-    register('session_disconnect', 'Disconnect from a declared session service when supported.', objectSchema(), async () => unavailable(store, 'Larkspur Releases is already an isolated in-memory session.')),
 
-    register('artifact_import', 'Open the visible release-pack JSON import workflow.', objectSchema({ mode: stringEnum(['release-pack-json']) }, ['mode']), async () => { store.openDialog('import'); return response({ ok: true, panel: 'import', message: 'The visible file picker, paste area, and seeded sample are ready.' }) }),
-    register('artifact_export', 'Compile and download a declared release artifact through the visible export flow.', objectSchema({ format: stringEnum(exportFormats) }, ['format']), async ({ format }) => {
-      store.setExportFormat(format)
-      const filename = store.downloadActiveExport()
-      return response({ ok: true, format, filename, panel: 'export' })
+    register('artifact_import', 'Open the visible release-pack JSON import workflow and focus its paste field.', objectSchema({ mode: stringEnum(['release-pack-json']) }, ['mode']), async () => {
+      store.openDialog('import')
+      window.setTimeout(() => document.getElementById('pack-json')?.focus(), 100)
+      return response({ ok: true, panel: 'import', message: 'The visible file picker, paste area, and seeded sample are ready.' })
     }),
-    register('artifact_copy', 'Copy the declared live release artifact through the visible export flow.', objectSchema({ format: stringEnum(exportFormats) }, ['format']), async ({ format }) => {
+    register('artifact_export', 'Open a declared live release artifact and focus its visible Download control.', objectSchema({ format: stringEnum(exportFormats) }, ['format']), async ({ format }) => {
       store.setExportFormat(format)
-      await store.copyActiveExport()
-      return response({ ok: true, format, panel: 'export', message: 'The visible copy confirmation is active.' })
+      window.setTimeout(() => document.getElementById('export-download-button')?.focus(), 100)
+      return response({ ok: true, format, panel: 'export' })
     }),
-    register('artifact_print_preview', 'Open a print preview when supported.', objectSchema(), async () => unavailable(store, 'Print preview is not part of the release-pack artifact workflow.')),
-    register('artifact_convert', 'Convert an artifact when supported.', objectSchema(), async () => unavailable(store, 'Only release-pack JSON and manifest-summary text are declared export formats.')),
+    register('artifact_copy', 'Open a declared live release artifact and focus its visible Copy control. Clipboard interaction remains a Playwright gesture.', objectSchema({ format: stringEnum(exportFormats) }, ['format']), async ({ format }) => {
+      store.setExportFormat(format)
+      window.setTimeout(() => document.getElementById('export-copy-button')?.focus(), 100)
+      return response({ ok: true, format, panel: 'export' })
+    }),
   ]
 }
 

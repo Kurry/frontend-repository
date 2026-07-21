@@ -74,17 +74,15 @@ export function createSeedVersions() {
   ]
 }
 
-export const seedSplitComposition = [
-  { name: 'auric-holdout', description: 'Sequestered evaluation slice', categories: [
-    { name: 'Reasoning', current: 18, target: 18 }, { name: 'Extraction', current: 12, target: 16 }, { name: 'Planning', current: 14, target: 14 }, { name: 'Classification', current: 9, target: 12 },
-  ] },
-  { name: 'basalt-train', description: 'Primary training register', categories: [
-    { name: 'Reasoning', current: 44, target: 40 }, { name: 'Extraction', current: 38, target: 38 }, { name: 'Planning', current: 29, target: 34 }, { name: 'Classification', current: 31, target: 30 },
-  ] },
-  { name: 'cinder-public', description: 'Open inspection sample', categories: [
-    { name: 'Reasoning', current: 10, target: 10 }, { name: 'Extraction', current: 8, target: 10 }, { name: 'Planning', current: 12, target: 12 }, { name: 'Classification', current: 7, target: 8 },
-  ] },
-]
+// Per-split quota targets for the four task categories (Reasoning,
+// Extraction, Planning, Classification). Current counts derive from the
+// selected version's manifest in the store; every seeded version leaves at
+// least one category below target in every split so shortfalls stay scannable.
+export const splitQuotaTargets = {
+  'auric-holdout': [3, 3, 2, 3],
+  'basalt-train': [2, 2, 5, 2],
+  'cinder-public': [2, 3, 2, 2],
+}
 
 export function createSeedRotation() {
   return {

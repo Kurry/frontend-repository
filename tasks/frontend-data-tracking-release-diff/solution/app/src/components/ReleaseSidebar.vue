@@ -18,39 +18,41 @@ const { versions, selectedVersionName, sidebarOpen } = storeToRefs(store)
       <span class="count-chip">{{ versions.length }}</span>
     </div>
     <div class="release-list">
-      <button
-        v-for="version in versions"
-        :key="version.name"
-        type="button"
-        class="release-entry"
-        :class="{ selected: selectedVersionName === version.name }"
-        @click="store.selectVersion(version.name); store.setActiveTab('manifest')"
-      >
-        <span class="entry-rail" />
-        <span class="entry-top">
-          <span class="version-label"><LockKeyIcon :size="15" weight="fill" /> v{{ version.name }}</span>
-          <TooltipRoot>
-            <TooltipTrigger as-child>
-              <span class="info-affordance" tabindex="0" :aria-label="`About sealed release ${version.name}`" @click.stop><InfoIcon :size="15" /></span>
-            </TooltipTrigger>
-            <TooltipPortal>
-              <TooltipContent class="tooltip-content" side="right" :side-offset="8">
-                Sealed releases are immutable and cannot be modified or deleted.
-                <TooltipArrow class="tooltip-arrow" />
-              </TooltipContent>
-            </TooltipPortal>
-          </TooltipRoot>
-        </span>
-        <span class="entry-meta">
-          <span>{{ version.cutDate }}</span>
-          <span>{{ version.taskCount }} tasks</span>
-        </span>
-      </button>
+      <TransitionGroup name="entry-anim">
+        <button
+          v-for="version in versions"
+          :key="version.name"
+          type="button"
+          class="release-entry"
+          :class="{ selected: selectedVersionName === version.name }"
+          @click="store.selectVersion(version.name); store.setActiveTab('manifest')"
+        >
+          <span class="entry-rail" />
+          <span class="entry-top">
+            <span class="version-label"><LockKeyIcon :size="15" weight="fill" /> v{{ version.name }}</span>
+            <TooltipRoot>
+              <TooltipTrigger as-child>
+                <span class="info-affordance" tabindex="0" :aria-label="`About sealed release ${version.name}`" @click.stop><InfoIcon :size="15" /></span>
+              </TooltipTrigger>
+              <TooltipPortal>
+                <TooltipContent class="tooltip-content" side="right" :side-offset="8">
+                  Sealed releases are immutable and cannot be modified or deleted.
+                  <TooltipArrow class="tooltip-arrow" />
+                </TooltipContent>
+              </TooltipPortal>
+            </TooltipRoot>
+          </span>
+          <span class="entry-meta">
+            <span>{{ version.cutDate }}</span>
+            <span>{{ version.taskCount }} tasks</span>
+          </span>
+        </button>
+      </TransitionGroup>
     </div>
     <div v-if="!versions.length" class="empty-state compact"><SealCheckIcon :size="24" /><p>Sealed releases will appear here.</p></div>
     <div class="sidebar-foot">
-      <span class="live-dot" /> In-memory session
-      <span>Reload restores the seeded register.</span>
+      <span class="live-dot" :class="{ offline: !store.online }" /> {{ store.online ? 'In-memory session' : 'Offline · in-memory session' }}
+      <span>Reload restores the seeded register — export a release pack to carry your work out.</span>
     </div>
   </aside>
 </template>

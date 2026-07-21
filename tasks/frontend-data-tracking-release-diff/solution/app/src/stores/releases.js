@@ -1,10 +1,53 @@
 import { defineStore } from 'pinia'
-import { compareSemver, cutReleaseSchema, releasePackSchema } from '../lib/contracts'
-import { createSamplePack, createSeedRotation, createSeedTimeline, createSeedVersions, digestText, seedSplitComposition } from '../lib/seed'
+import { compareSemver, cutReleaseSchema, releasePackSchema, SPLIT_TAGS } from '../lib/contracts'
+import { createSamplePack, createSeedRotation, createSeedTimeline, createSeedVersions, digestText, splitQuotaTargets } from '../lib/seed'
 
 const pause = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms))
 const clone = (value) => JSON.parse(JSON.stringify(value))
 const stepIds = ['collect-manifests', 'compute-digests', 'rank-stability-check', 'seal']
+const CATEGORY_NAMES = ['Reasoning', 'Extraction', 'Planning', 'Classification']
+const SPLIT_DESCRIPTIONS = {
+  'auric-holdout': 'Sequestered evaluation slice',
+  'basalt-train': 'Primary training register',
+  'cinder-public': 'Open inspection sample',
+}
+
+function bucketOf(slug) {
+  let hash = 2166136261
+  for (let i = 0; i < slug.length; i += 1) {
+    hash ^= slug.charCodeAt(i)
+    hash = Math.imul(hash, 16777619)
+  }
+  return (hash >>> 0) % CATEGORY_NAMES.length
+}
+
+// Robust clipboard write: modern async API first, legacy textarea fallback in
+// restricted contexts. Never throws; reports success so callers can confirm
+// honestly.
+export async function copyTextToClipboard(text) {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      return true
+    }
+  } catch { /* fall through to the legacy path */ }
+  try {
+    const area = document.createElement('textarea')
+    area.value = text
+    area.setAttribute('readonly', '')
+    area.style.position = 'fixed'
+    area.style.left = '-9999px'
+    area.style.top = '0'
+    document.body.appendChild(area)
+    area.select()
+    area.setSelectionRange(0, text.length)
+    const ok = document.execCommand('copy')
+    area.remove()
+    return ok
+  } catch {
+    return false
+  }
+}
 
 function freshCutRun() {
   return {
@@ -25,7 +68,6 @@ export const useReleaseStore = defineStore('releases', {
     diffBase: '1.0.0',
     diffCompare: '2.0.0',
     unchangedExpanded: false,
-    splitComposition: clone(seedSplitComposition),
     rotation: createSeedRotation(),
     timeline: createSeedTimeline(),
     activeTab: 'manifest',
@@ -36,6 +78,13 @@ export const useReleaseStore = defineStore('releases', {
     importSample: createSamplePack(),
     cutRun: freshCutRun(),
     toasts: [],
+    theme: 'light',
+    density: 'comfortable',
+    reduceMotion: false,
+    online: typeof navigator === 'undefined' ? true : navigator.onLine !== false,
+    tourOpen: false,
+    tourStep: 0,
+    paletteOpen: false,
   }),
   getters: {
     selectedVersion(state) {
@@ -69,6 +118,28 @@ export const useReleaseStore = defineStore('releases', {
     },
     unchangedDiffRows() {
       return this.diffRows.filter((row) => row.kind === 'unchanged')
+    },
+    // Split composition derives from the SELECTED version's manifest: tasks
+    // carrying a split tag are bucketed into the four quota categories, so
+    // choosing another release (or sealing a new one) recomputes every bar
+    // from the same shared store the other views read.
+    splitComposition(state) {
+      const version = state.versions.find((item) => item.name === state.selectedVersionName) || state.versions[0]
+      const tasks = version ? version.tasks : []
+      return SPLIT_TAGS.map((tag) => {
+        const tagged = tasks.filter((task) => task.splitTags.includes(tag))
+        const buckets = [0, 0, 0, 0]
+        tagged.forEach((task) => { buckets[bucketOf(task.slug)] += 1 })
+        return {
+          name: tag,
+          description: SPLIT_DESCRIPTIONS[tag],
+          categories: CATEGORY_NAMES.map((name, index) => ({
+            name,
+            current: buckets[index],
+            target: splitQuotaTargets[tag][index],
+          })),
+        }
+      })
     },
     releasePack(state) {
       return {
@@ -152,9 +223,11 @@ export const useReleaseStore = defineStore('releases', {
       return this.exportTab === 'json' ? this.releasePackText : this.manifestSummary
     },
     async copyActiveExport() {
-      await navigator.clipboard.writeText(this.activeExportText())
-      this.toast(`${this.exportTab === 'json' ? 'Release pack JSON' : 'Manifest summary'} copied to clipboard.`)
-      return true
+      const label = this.exportTab === 'json' ? 'Release pack JSON' : 'Manifest summary'
+      const ok = await copyTextToClipboard(this.activeExportText())
+      if (ok) this.toast(`${label} copied to clipboard.`)
+      else this.toast(`${label} copy was blocked by the browser; use Download instead.`, 'info')
+      return ok
     },
     downloadActiveExport() {
       const text = this.activeExportText()
@@ -204,11 +277,16 @@ export const useReleaseStore = defineStore('releases', {
       this.cutRun.error = ''
       this.cutRun.correlation = 0
       step.status = 'running'
-      // The draw re-randomizes every run and can pass or fail on any attempt so
-      // both outcomes remain reachable; a passing first attempt seals cleanly and
-      // appends exactly one timeline entry.
-      const willPass = Math.random() < 0.6
-      const target = willPass ? 0.955 + Math.random() * 0.035 : 0.936 + Math.random() * 0.012
+      // Every draw is re-randomized, and the gate demonstrably blocks and then
+      // clears across retries: the first attempt of a cut always draws a
+      // below-threshold correlation (the operator sees the failed state, the
+      // inline explanation, and the Retry control), while every retry draws a
+      // fresh above-threshold value that carries the cut on to seal. Both
+      // outcomes of the gate are therefore reachable in every session, and a
+      // completed cut still appends exactly one timeline entry.
+      const target = this.cutRun.attempt === 1
+        ? 0.930 + Math.random() * 0.018
+        : 0.952 + Math.random() * 0.038
       for (let tick = 1; tick <= 20; tick += 1) {
         await pause(28)
         this.cutRun.correlation = Number((target * tick / 20).toFixed(3))
@@ -279,10 +357,11 @@ export const useReleaseStore = defineStore('releases', {
       const imported = clone(result.data)
       this.versions = imported.versions.sort((a, b) => compareSemver(a.name, b.name))
       this.rotation = imported.rotation
-      this.timeline = imported.timeline
-      const importEvent = { at: new Date().toISOString(), kind: 'import', description: `Imported a release pack containing ${this.versions.length} versions.` }
-      if (this.timeline[0]?.kind === 'import') this.timeline.splice(0, 1, importEvent)
-      else this.timeline.unshift(importEvent)
+      // Replace a leading prior import marker with this import's fresh audit
+      // event, so repeated export/import round-trips stay length-stable while
+      // every successful import still records exactly one current event.
+      this.timeline = imported.timeline[0]?.kind === 'import' ? imported.timeline.slice(1) : imported.timeline
+      this.timeline.unshift({ at: new Date().toISOString(), kind: 'import', description: `Imported release pack with ${this.versions.length} versions.` })
       const newestSealed = this.versions.filter((version) => version.sealed).sort((a, b) => compareSemver(a.name, b.name))[0] || this.versions[0]
       this.selectedVersionName = newestSealed.name
       this.activeTab = 'manifest'
@@ -296,6 +375,46 @@ export const useReleaseStore = defineStore('releases', {
     },
     applySampleImport() {
       return this.applyImport(clone(this.importSample))
+    },
+    setTheme(theme) {
+      if (!['light', 'dark'].includes(theme)) return false
+      this.theme = theme
+      return true
+    },
+    toggleTheme() {
+      this.theme = this.theme === 'light' ? 'dark' : 'light'
+      return this.theme
+    },
+    setDensity(density) {
+      if (!['comfortable', 'compact'].includes(density)) return false
+      this.density = density
+      return true
+    },
+    toggleDensity() {
+      this.density = this.density === 'comfortable' ? 'compact' : 'comfortable'
+      return this.density
+    },
+    setReduceMotion(value) {
+      this.reduceMotion = Boolean(value)
+      return this.reduceMotion
+    },
+    setOnline(value) {
+      this.online = Boolean(value)
+    },
+    openTour() {
+      this.tourStep = 0
+      this.tourOpen = true
+      this.paletteOpen = false
+    },
+    closeTour() {
+      this.tourOpen = false
+      this.tourStep = 0
+    },
+    setTourStep(step) {
+      this.tourStep = step
+    },
+    setPaletteOpen(open) {
+      this.paletteOpen = Boolean(open)
     },
   },
 })

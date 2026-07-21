@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { TabsList, TabsRoot, TabsTrigger, TooltipProvider } from 'reka-ui'
 import {
@@ -7,6 +7,7 @@ import {
   PhArrowsLeftRight as ArrowsLeftRightIcon,
   PhChartBar as ChartBarIcon,
   PhClockCounterClockwise as ClockCounterClockwiseIcon,
+  PhCompass as CompassIcon,
   PhDownloadSimple as DownloadSimpleIcon,
   PhList as ListIcon,
   PhPlus as PlusIcon,
@@ -24,9 +25,12 @@ import CutDialog from './components/CutDialog.vue'
 import ExportDialog from './components/ExportDialog.vue'
 import ImportDialog from './components/ImportDialog.vue'
 import ToastStack from './components/ToastStack.vue'
+import CommandPalette from './components/CommandPalette.vue'
+import TourOverlay from './components/TourOverlay.vue'
+import PrefsPopover from './components/PrefsPopover.vue'
 
 const store = useReleaseStore()
-const { activeTab, sidebarOpen } = storeToRefs(store)
+const { activeTab, sidebarOpen, theme, density, reduceMotion } = storeToRefs(store)
 
 const tabIcons = { manifest: ArchiveTrayIcon, diff: ArrowsLeftRightIcon, splits: ChartBarIcon, rotation: ClockCounterClockwiseIcon }
 const tabs = [
@@ -37,11 +41,36 @@ const tabs = [
 ]
 const activeView = computed(() => ({ manifest: ManifestView, diff: DiffView, splits: SplitsView, rotation: RotationView }[activeTab.value] || ManifestView))
 const tabModel = computed({ get: () => activeTab.value, set: (value) => store.setActiveTab(value) })
+const rootClasses = computed(() => ({
+  'theme-dark': theme.value === 'dark',
+  'density-compact': density.value === 'compact',
+  'reduce-motion': reduceMotion.value,
+}))
+
+function onGlobalKeydown(event) {
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+    event.preventDefault()
+    store.setPaletteOpen(!store.paletteOpen)
+  }
+}
+const goOnline = () => store.setOnline(true)
+const goOffline = () => store.setOnline(false)
+
+onMounted(() => {
+  window.addEventListener('keydown', onGlobalKeydown)
+  window.addEventListener('online', goOnline)
+  window.addEventListener('offline', goOffline)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onGlobalKeydown)
+  window.removeEventListener('online', goOnline)
+  window.removeEventListener('offline', goOffline)
+})
 </script>
 
 <template>
   <TooltipProvider :delay-duration="250">
-    <div class="app-root">
+    <div class="app-root" :class="rootClasses">
       <header class="topbar">
         <div class="brand-block">
           <button class="icon-button mobile-menu" type="button" :aria-label="sidebarOpen ? 'Close releases' : 'Open releases'" @click="store.sidebarOpen = !store.sidebarOpen">
@@ -55,15 +84,21 @@ const tabModel = computed({ get: () => activeTab.value, set: (value) => store.se
           </div>
         </div>
         <div class="header-actions">
-          <button class="button secondary header-button" type="button" @click="store.openDialog('import')">
-            <UploadSimpleIcon :size="17" /> <span>Import <span class="button-long">release pack</span></span>
-          </button>
-          <button class="button secondary header-button" type="button" @click="store.openDialog('export')">
-            <DownloadSimpleIcon :size="17" /> <span>Export <span class="button-long">release pack</span></span>
-          </button>
-          <button class="button primary header-button" type="button" :disabled="store.cutRun.running" @click="store.resetCut(); store.openDialog('cut')">
+          <span class="pack-group" data-tour="pack">
+            <button class="button secondary header-button" type="button" @click="store.openDialog('import')">
+              <UploadSimpleIcon :size="17" /> <span>Import <span class="button-long">release pack</span></span>
+            </button>
+            <button class="button secondary header-button" type="button" @click="store.openDialog('export')">
+              <DownloadSimpleIcon :size="17" /> <span>Export <span class="button-long">release pack</span></span>
+            </button>
+          </span>
+          <button class="button primary header-button" type="button" data-tour="cut" :disabled="store.cutRun.running" @click="store.resetCut(); store.openDialog('cut')">
             <PlusIcon :size="17" weight="bold" /> <span>{{ store.cutRun.running ? 'Cut running' : 'Cut release' }}</span>
           </button>
+          <button class="icon-button tour-button" type="button" aria-label="Take the guided tour" title="Guided tour" @click="store.openTour()">
+            <CompassIcon :size="18" />
+          </button>
+          <PrefsPopover />
         </div>
       </header>
 
@@ -94,6 +129,8 @@ const tabModel = computed({ get: () => activeTab.value, set: (value) => store.se
       <ExportDialog />
       <ImportDialog />
       <ToastStack />
+      <CommandPalette />
+      <TourOverlay />
     </div>
   </TooltipProvider>
 </template>
