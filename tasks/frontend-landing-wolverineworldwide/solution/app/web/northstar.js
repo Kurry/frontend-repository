@@ -68,7 +68,7 @@
     return {
       schemaVersion: 1,
       company: "Northstar Collective, Inc. (NST)",
-      quote: { value: 18.16, currency: "USD", daysHigh: 18.6, daysLow: 18.16, daysVolume: 38982, lastUpdated: "2hours ago" },
+      quote: { value: 18.16, currency: "USD", daysHigh: 18.6, daysLow: 18.16, daysVolume: 38982, lastUpdated: "2 hours ago" },
       brands: [...BRANDS],
       pinnedTitles: [...state.pinnedTitles],
       consent: { ...state.consent },
@@ -101,7 +101,7 @@
     }
     $("#shortlist-count").textContent = `${state.pinnedTitles.length} of 8`;
     $("#header-count").textContent = state.pinnedTitles.length;
-    refreshCarousel(refreshTrack);
+    if (refreshTrack || state.filter === "pinned") refreshCarousel(true);
   }
   function renderConsent() {
     const layer = $("#cookie-layer");
@@ -302,7 +302,7 @@
     if (value.schemaVersion !== 1) return "schemaVersion must be exactly 1";
     if (value.company !== "Northstar Collective, Inc. (NST)") return "company must be Northstar Collective, Inc. (NST)";
     const q = value.quote;
-    if (!q || q.value !== 18.16 || q.currency !== "USD" || q.daysHigh !== 18.6 || q.daysLow !== 18.16 || q.daysVolume !== 38982 || q.lastUpdated !== "2hours ago") return "quote is missing or does not match the Northstar market snapshot";
+    if (!q || q.value !== 18.16 || q.currency !== "USD" || q.daysHigh !== 18.6 || q.daysLow !== 18.16 || q.daysVolume !== 38982 || q.lastUpdated !== "2 hours ago") return "quote is missing or does not match the Northstar market snapshot";
     if (!Array.isArray(value.brands) || value.brands.length !== BRANDS.length || value.brands.some((brand, index) => brand !== BRANDS[index])) return "brands must contain all eleven Northstar brands in order";
     if (!Array.isArray(value.pinnedTitles) || value.pinnedTitles.some((title) => !TITLES.includes(title)) || new Set(value.pinnedTitles).size !== value.pinnedTitles.length) return "pinnedTitles contains an unknown or duplicate news title";
     const consentResult = validateConsent(value.consent || {}); if (!consentResult.valid) return `consent is invalid: ${Object.values(consentResult.errors).join(", ")}`;
@@ -358,7 +358,10 @@
     refreshCarousel = (reset = false) => go(reset ? 0 : state.carouselIndex);
     $("#news-prev").addEventListener("click", () => go(state.carouselIndex - 1)); $("#news-next").addEventListener("click", () => go(state.carouselIndex + 1));
     let down = false, startX = 0, startScroll = 0;
-    track.addEventListener("pointerdown", (event) => { down = true; startX = event.clientX; startScroll = track.scrollLeft; track.classList.add("dragging"); track.setPointerCapture(event.pointerId); });
+    track.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("button, a, input, textarea, select")) return;
+      down = true; startX = event.clientX; startScroll = track.scrollLeft; track.classList.add("dragging"); track.setPointerCapture(event.pointerId);
+    });
     track.addEventListener("pointermove", (event) => { if (down) track.scrollLeft = startScroll - (event.clientX - startX); });
     function release(event) { if (!down) return; down = false; track.classList.remove("dragging"); if (event && track.hasPointerCapture(event.pointerId)) track.releasePointerCapture(event.pointerId); const cards = visibleCards(); if (!cards.length) return go(0); const cardWidth = cards[0].getBoundingClientRect().width + 20; go(Math.round(track.scrollLeft / cardWidth)); }
     track.addEventListener("pointerup", release); track.addEventListener("pointercancel", release);
@@ -378,12 +381,11 @@
       particles.forEach((p) => {
         const speed = parseFloat(p.dataset.speed) || 0.1;
         const y = current * speed * 2.4;
-        const scale = Math.max(0.85, Math.min(1.12, 1 + current * 0.00006 * (speed * 6)));
-        p.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0) scale(${scale.toFixed(3)})`;
+        p.style.transform = `translate3d(0, ${y.toFixed(1)}px, 0) scale(1)`;
       });
       frame = requestAnimationFrame(tick);
     }
-    const onScroll = () => { if (section) target = window.scrollY - section.offsetTop; };
+    const onScroll = () => { if (section) target = window.scrollY + window.innerHeight * 0.5 - section.offsetTop; };
     window.addEventListener("scroll", onScroll, { passive: true }); onScroll();
     frame = requestAnimationFrame(tick); window.addEventListener("pagehide", () => cancelAnimationFrame(frame), { once: true });
   }
@@ -399,9 +401,9 @@
     if (card) { card.style.transition = "none"; card.style.opacity = "0"; card.style.transform = "translateY(10%) scale(0.9)"; }
     void document.body.offsetWidth;
     requestAnimationFrame(() => {
-      if (video) { video.style.transition = `transform 1.3s ${EXPO}`; video.style.transform = "scale(1)"; }
-      lines.forEach((line, i) => { line.style.transition = `opacity 1.3s ${EXPO} ${0.25 + i * 0.12}s, transform 1.3s ${EXPO} ${0.25 + i * 0.12}s`; line.style.opacity = "1"; line.style.transform = "translateY(0)"; });
-      if (card) { card.style.transition = `opacity 1s ${EXPO} 0.6s, transform 1s ${EXPO} 0.6s`; card.style.opacity = "1"; card.style.transform = "translateY(0) scale(1)"; }
+      if (video) { video.style.transition = `transform 1.4s ${EXPO} 0.4s`; video.style.transform = "scale(1)"; }
+      lines.forEach((line, i) => { line.style.transition = `opacity 1.1s ${EXPO} ${0.65 + i * 0.14}s, transform 1.1s ${EXPO} ${0.65 + i * 0.14}s`; line.style.opacity = "1"; line.style.transform = "translateY(0)"; });
+      if (card) { card.style.transition = `opacity 1s ${EXPO} 0.9s, transform 1s ${EXPO} 0.9s`; card.style.opacity = "1"; card.style.transform = "translateY(0) scale(1)"; }
     });
   }
 
@@ -412,7 +414,14 @@
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add("in"); io.unobserve(entry.target); } });
     }, { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
-    els.forEach((el) => io.observe(el));
+    const sectionCounts = new Map();
+    els.forEach((el) => {
+      const section = el.closest("section") || document.body;
+      const index = sectionCounts.get(section) || 0;
+      sectionCounts.set(section, index + 1);
+      el.style.setProperty("--reveal-delay", `${Math.min(index * 0.1, 0.4)}s`);
+      io.observe(el);
+    });
   }
 
   function setupHeroVideoFallback() {
@@ -430,7 +439,6 @@
   function bindEvents() {
     window.addEventListener("scroll", () => $("[data-header]").classList.toggle("scrolled", window.scrollY > 30), { passive: true });
     $("#responsibility-toggle").addEventListener("click", () => $("#responsibility-menu").hidden ? openResponsibility() : closeResponsibility());
-    $(".responsibility-wrap").addEventListener("mouseenter", openResponsibility); $(".responsibility-wrap").addEventListener("mouseleave", closeResponsibility);
     $$("#responsibility-menu a").forEach((link) => link.addEventListener("click", closeResponsibility));
     $("#menu-open").addEventListener("click", openMobile); $("#menu-close").addEventListener("click", () => closeMobile());
     $$("#mobile-menu a").forEach((link, index) => { link.style.setProperty("--index", index); link.addEventListener("click", () => closeMobile()); });
@@ -480,5 +488,23 @@
     renderAll
   };
 
+  function resetSessionBaseline() {
+    state.pinnedTitles = [];
+    state.consent = { ...DEFAULT_CONSENT };
+    state.consentSet = false;
+    state.bannerVisible = true;
+    state.activeFormat = "json";
+    state.generatedAt = new Date().toISOString();
+    state.undo = [];
+    state.redo = [];
+    state.carouselIndex = 0;
+    state.filter = "all";
+    state.sort = "original";
+    closeResponsibility();
+    window.scrollTo({ top: 0, behavior: "auto" });
+    renderAll();
+  }
+
   bindEvents(); setupCarousel(); setupParticles(); setupHeroIntro(); setupReveal(); setupHeroVideoFallback(); renderAll(); updateBodyLock();
+  window.addEventListener("pageshow", resetSessionBaseline);
 })();

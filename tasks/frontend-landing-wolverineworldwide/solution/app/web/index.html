@@ -18,9 +18,6 @@
   <meta name="twitter:description" content="Eleven brands. One shared culture. Better made, every day.">
   <meta name="twitter:image" content="/assets/og-northstar.jpg">
   <link rel="preload" href="/fonts/ABCDiatype-Bold.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/assets/icons.svg" as="image" type="image/svg+xml">
-  <link rel="preload" href="/assets/hero-montage.webm" as="video" type="video/webm">
-  <link rel="preload" href="/assets/northstar-annual-report-2025.pdf" as="fetch" type="application/pdf" crossorigin>
   <link rel="stylesheet" href="/northstar.css">
   <script>try{if(!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches))document.documentElement.classList.add('motion-ok');}catch(e){}</script>
   <script src="/northstar.js" defer></script>
@@ -102,13 +99,13 @@
     <section id="culture" class="culture section-pad" aria-labelledby="culture-title">
       <p class="eyebrow">One collective / many perspectives</p>
       <h2 id="culture-title" class="reveal">Many brands, one shared culture, limitless innovation.</h2>
-      <div id="purpose" class="culture-copy"><p>Curiosity keeps us asking better questions. Creativity turns those questions into useful, lasting ideas. Collaboration brings the right voices into the room—and carries the work beyond it.</p><a class="text-link" href="#culture-stats">Meet our culture <span aria-hidden="true">→</span></a></div>
+      <div id="purpose" class="culture-copy reveal"><p>We make every day better by giving people the freedom to move, work, and live with confidence—across every brand in our collective.</p><a class="pill-button" href="#culture-stats"><span>Learn More About Us</span><span aria-hidden="true">→</span></a></div>
     </section>
 
     <section id="market" class="market section-pad" aria-labelledby="market-title">
       <div><p class="eyebrow">Investors / NYSE</p><h2 id="market-title">Market Snapshot</h2><p>Northstar Collective, Inc. (NST)</p><p>Common Stock</p></div>
       <div class="quote reveal"><strong>18.16</strong><span>USD</span></div>
-      <dl><div><dt>DAY'S HIGH</dt><dd>$18.60</dd></div><div><dt>DAY'S LOW</dt><dd>$18.16</dd></div><div><dt>DAY'S VOLUME</dt><dd>38,982.00</dd></div><div><dt>LAST UPDATED</dt><dd>2hours ago</dd></div></dl>
+      <dl><div><dt>DAY'S HIGH</dt><dd>$18.60</dd></div><div><dt>DAY'S LOW</dt><dd>$18.16</dd></div><div><dt>DAY'S VOLUME</dt><dd>38,982.00</dd></div><div><dt>LAST UPDATED</dt><dd>2 hours ago</dd></div></dl>
     </section>
 
     <section id="latest-news" class="news section-pad" aria-labelledby="news-title">
@@ -149,7 +146,7 @@
     <section id="preferences-modal" class="preferences-modal" role="dialog" aria-modal="true" aria-labelledby="preferences-title" hidden>
       <div class="panel-head"><div><p class="eyebrow">Consent preferences</p><h2 id="preferences-title">Choose your settings</h2></div><button id="preferences-close" type="button" aria-label="Close preferences">Close ×</button></div>
       <form id="preferences-form" novalidate>
-        <label class="toggle-row"><span><strong>Necessary</strong><small>Required for core site behavior — always on when saved</small></span><input id="consent-necessary" name="necessary" type="checkbox" checked aria-describedby="err-necessary"><i></i></label><p class="form-error" id="err-necessary" data-error="necessary"></p>
+        <label class="toggle-row"><span><strong>Necessary</strong><small>Required for core site behavior — always on</small></span><input id="consent-necessary" name="necessary" type="checkbox" checked disabled aria-disabled="true" aria-describedby="err-necessary"><i></i></label><p class="form-error" id="err-necessary" data-error="necessary"></p>
         <label class="toggle-row"><span><strong>Analytics</strong><small>Helps us understand site use</small></span><input id="consent-analytics" name="analytics" type="checkbox"><i></i></label><p class="form-error" data-error="analytics"></p>
         <label class="toggle-row"><span><strong>Marketing</strong><small>Supports relevant campaign measurement</small></span><input id="consent-marketing" name="marketing" type="checkbox"><i></i></label><p class="form-error" data-error="marketing"></p>
         <label class="toggle-row"><span><strong>Functional</strong><small>Enables enhanced experience features</small></span><input id="consent-functional" name="functional" type="checkbox"><i></i></label><p class="form-error" data-error="functional"></p>
