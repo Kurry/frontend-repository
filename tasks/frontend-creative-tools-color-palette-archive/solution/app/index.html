@@ -78,7 +78,7 @@
           <div class="controls-strip">
             <span class="controls-strip__filter">
               <label class="control-label" for="PeriodFilter">Filter by Period:</label>
-              <select id="PeriodFilter" class="control-select">
+              <select id="PeriodFilter" autocomplete="off" class="control-select">
                 <option value="">All Periods</option>
                 <option>Abstract + Geometric</option>
                 <option>Americana</option>
@@ -99,14 +99,14 @@
             </span>
             <span class="controls-strip__sort">
               <label class="control-label" for="NameSort">Sort:</label>
-              <select id="NameSort" class="control-select">
+              <select id="NameSort" autocomplete="off" class="control-select">
                 <option value="name-asc">Name A–Z</option>
                 <option value="name-desc">Name Z–A</option>
               </select>
             </span>
             <span class="controls-strip__vision">
               <label class="control-label" for="VisionSimulation">Vision:</label>
-              <select id="VisionSimulation" class="control-select">
+              <select id="VisionSimulation" autocomplete="off" class="control-select">
                 <option value="none">None</option>
                 <option value="protanopia">Protanopia</option>
                 <option value="deuteranopia">Deuteranopia</option>
@@ -259,11 +259,11 @@
       <div class="compare-selects">
         <span>
           <label class="control-label" for="compare-select-a">Left palette</label>
-          <select id="compare-select-a" class="control-select"></select>
+          <select id="compare-select-a" autocomplete="off" class="control-select"></select>
         </span>
         <span>
           <label class="control-label" for="compare-select-b">Right palette</label>
-          <select id="compare-select-b" class="control-select"></select>
+          <select id="compare-select-b" autocomplete="off" class="control-select"></select>
         </span>
       </div>
       <div id="compare-body"></div>
@@ -275,7 +275,7 @@
     <h2 id="confirm-title">Delete this palette?</h2>
     <p id="confirm-body"></p>
     <div class="confirm-actions">
-      <button type="button" class="btn btn--ghost" id="confirm-cancel">Cancel</button>
+      <button type="button" class="btn btn--ghost" id="confirm-cancel">Cancel deletion</button>
       <button type="button" class="btn btn--solid btn--danger" id="confirm-ok">Delete palette</button>
     </div>
   </div>
@@ -288,7 +288,7 @@
     <input type="text" id="batch-tag-input" class="ed-input" maxlength="24" autocomplete="off" placeholder="e.g. study" aria-describedby="batch-tag-error" />
     <p class="field-error" id="batch-tag-error" hidden></p>
     <div class="confirm-actions">
-      <button type="button" class="btn btn--ghost" id="batch-tag-cancel">Cancel</button>
+      <button type="button" class="btn btn--ghost" id="batch-tag-cancel">Cancel tag</button>
       <button type="button" class="btn btn--solid" id="batch-tag-apply">Apply tag</button>
     </div>
   </div>

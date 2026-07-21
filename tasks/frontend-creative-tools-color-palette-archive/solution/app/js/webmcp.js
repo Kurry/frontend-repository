@@ -19,7 +19,8 @@ const EXPORT_FORMATS = ['css', 'utility-theme', 'scss', 'json'];
 const ENTITY_FIELDS = ['name', 'artist', 'swatches', 'favorite', 'period', 'tags', 'notes', 'archived'];
 
 function ok(extra = {}) { return { success: true, ...extra }; }
-function fail(error) { return { success: false, error }; }
+import { announce } from "./lib.js";
+function fail(error) { announce(`WebMCP Error: ${error}`); return { success: false, error }; }
 
 function closeOverlaysForBrowse() {
   if (ui.editor) closeEditor(true);

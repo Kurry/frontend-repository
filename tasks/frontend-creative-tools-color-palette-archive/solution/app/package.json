@@ -6,5 +6,8 @@
   "scripts": {
     "start": "node server.mjs",
     "verify:build": "node scripts/verify-build.mjs"
+  },
+  "dependencies": {
+    "playwright": "^1.61.1"
   }
 }
