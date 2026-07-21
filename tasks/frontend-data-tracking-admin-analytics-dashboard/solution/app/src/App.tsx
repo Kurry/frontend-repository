@@ -20,7 +20,7 @@ import {
   setTheme, toggleTheme, setAccent, setActiveView, setSidebarOpen, setExpandedGroup,
   setFilterRole, setFilterStatus, setSearch, setSort, setExportOpen, setExportTab, setDensity,
   setSelection, toggleSelection, clearSelection, setEditingId, pushToast, dismissToast,
-  setConfirm, setLastMutation, resetFilters, type ViewKey,
+  setConfirm, setLastMutation, setDraftUserForm, resetFilters, type ViewKey,
 } from './store/uiSlice';
 import {
   addUser, updateUser, patchUsers, deleteUser, deleteUsers, updateUsersStatus, updateUsersRole,
@@ -181,7 +181,7 @@ function Sidebar() {
   return (
     <>
       <div className={`mobile-overlay ${sidebarOpen ? 'open' : ''}`} onClick={() => dispatch(setSidebarOpen(false))} aria-hidden="true" />
-      <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`} aria-label="Primary navigation">
+      <nav className={`sidebar ${sidebarOpen ? 'open' : ''}`} aria-label="Primary navigation">
         <div className="sidebar-brand"><span className="brand-mark">PT</span> Pineapple Tech</div>
         <div className="sidebar-scroll">
           <button className={`nav-top ${activeView === 'operations-overview' ? 'active' : ''}`} onClick={() => go('operations-overview')}>
@@ -227,7 +227,7 @@ function Sidebar() {
             ))}
           </div>
         </div>
-      </aside>
+      </nav>
     </>
   );
 }
@@ -417,23 +417,33 @@ function UserForm() {
   const [live, setLive] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const formSchema = isEdit ? userEditSchema : userCreateSchema;
-  const { register, handleSubmit, watch, formState: { errors, isValid }, reset } = useForm<UserCreateValues | UserEditValues>({
-    resolver: zodResolver(formSchema), mode: 'onChange',
-    defaultValues: isEdit ? {
+  const draftUserForm = useSelector((s: RootState) => s.ui.draftUserForm);
+  const defaultValues = isEdit ? {
       firstName: editing!.firstName, lastName: editing!.lastName, email: editing!.email, phone: editing!.phone || '',
       notes: editing!.notes || '', temporaryPassword: '', accountSegment: 'Internal', status: editing!.status, role: editing!.role,
       sendInvitation: false, enable2FA: false, productAccess: true, permissions: ['read'],
-    } : { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'] },
+    } : (draftUserForm || { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'] });
+
+  const { register, handleSubmit, watch, formState: { errors, isValid }, reset } = useForm<UserCreateValues | UserEditValues>({
+    resolver: zodResolver(formSchema), mode: 'onChange',
+    defaultValues,
   });
   useEffect(() => {
     reset(isEdit ? {
       firstName: editing!.firstName, lastName: editing!.lastName, email: editing!.email, phone: editing!.phone || '',
       notes: editing!.notes || '', temporaryPassword: '', accountSegment: 'Internal', status: editing!.status, role: editing!.role,
       sendInvitation: false, enable2FA: false, productAccess: true, permissions: ['read'],
-    } : { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'] });
+    } : (draftUserForm || { accountSegment: 'Internal', status: 'Active', role: 'Member', sendInvitation: true, enable2FA: false, productAccess: true, permissions: ['read'] }));
   }, [isEdit, editingId, editing, reset]);
 
   const vals = watch();
+
+  // Save to draft on unmount
+  useEffect(() => {
+    return () => {
+      if (!isEdit) dispatch(setDraftUserForm(vals));
+    };
+  }, [dispatch, isEdit, vals]);
   const rules = CONTRACT_RULES(vals);
   useEffect(() => {
     if (Object.keys(errors).length) setLive(`Validation errors: ${Object.keys(errors).map((k) => (errors as any)[k]?.message || k).join('; ')}`);
@@ -453,11 +463,12 @@ function UserForm() {
       dispatch(addUser(makeUserFromCreate(data)));
       dispatch(pushToast({ kind: 'success', title: 'User added', body: `${data.firstName} ${data.lastName} added to the directory` }));
       dispatch(setLastMutation(`Created ${data.firstName}`));
+      dispatch(setDraftUserForm(null));
       setTimeout(() => dispatch(setActiveView('all-users')), 700);
     }
     setTimeout(() => setSubmitting(false), 400);
   };
-  const cancel = () => { dispatch(setActiveView('all-users')); };
+  const cancel = () => { dispatch(setDraftUserForm(null)); dispatch(setActiveView('all-users')); };
 
   const Err = ({ k }: { k: keyof UserCreateValues }) => (errors as any)[k] ? <span className="field-error" id={`${k}-error`} role="alert">{(errors as any)[k].message}</span> : null;
   const inv = (k: keyof UserCreateValues) => !!(errors as any)[k];
@@ -750,6 +761,7 @@ function ExportDrawer() {
           <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>{importMode ? 'Import session' : 'Export session'}</h2>
           <button className="btn btn-ghost btn-circle" aria-label="Close export drawer" onClick={() => dispatch(setExportOpen(false))}><XMarkIcon className="icon-md" /></button>
         </div>
+        <div aria-live="polite" className="sr-only">{`Export preview updated: ${exportTab === "json" ? "Session JSON" : "Users CSV"}`}</div>
         <div className="export-tabs" role="tablist" aria-label="Export format">
           <button role="tab" aria-selected={exportTab === 'json'} className={`btn btn-sm ${exportTab === 'json' ? 'btn-neutral' : 'btn-ghost'}`} onClick={() => dispatch(setExportTab('json'))}>Session JSON</button>
           <button role="tab" aria-selected={exportTab === 'csv'} className={`btn btn-sm ${exportTab === 'csv' ? 'btn-neutral' : 'btn-ghost'}`} onClick={() => dispatch(setExportTab('csv'))}>Users CSV</button>
@@ -757,7 +769,7 @@ function ExportDrawer() {
           <button className="btn btn-sm btn-ghost" onClick={() => setImportMode((v) => !v)}>{importMode ? 'Back to preview' : 'Import session'}</button>
         </div>
         {!importMode && (
-          <div className="export-summary" aria-label="Export summary">
+          <div className="export-summary" aria-live="polite" aria-atomic="true" aria-label="Export summary">
             <div className="es"><b>{users.length}</b><span>users</span></div>
             <div className="es"><b>{kpis.total}</b><span>KPI total</span></div>
             <div className="es"><b>{kpis.active}</b><span>active</span></div>
@@ -975,6 +987,7 @@ export default function App() {
   const { theme, accent, activeView } = useSelector((s: RootState) => s.ui);
   useEffect(() => { document.documentElement.setAttribute('data-theme', theme); }, [theme]);
   useEffect(() => { document.documentElement.setAttribute('data-accent', accent); }, [accent]);
+
   const view = () => {
     switch (activeView) {
       case 'all-users': return <AllUsers />;
@@ -988,16 +1001,17 @@ export default function App() {
       default: return <Overview />;
     }
   };
+
   return (
     <>
       <WebMCPBinder />
       <TooltipPortal />
       <div className="shell">
         <Sidebar />
-        <div className="main-canvas">
+        <main className="main-canvas">
           <Header />
           <div className="grid12">{view()}</div>
-        </div>
+        </main>
       </div>
       <button className="fab" aria-label="Open export drawer" onClick={() => dispatch(setExportOpen(true))}><ArrowDownTrayIcon className="icon-md" /></button>
       <ExportDrawer />

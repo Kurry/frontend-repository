@@ -28,6 +28,7 @@ export interface UIState {
   toasts: Toast[];
   confirm: ConfirmState;
   lastMutation: string | null;
+  draftUserForm: any;
 }
 
 const initialState: UIState = {
@@ -48,6 +49,7 @@ const initialState: UIState = {
   toasts: [],
   confirm: { open: false, title: '', body: '', ids: [] },
   lastMutation: null,
+  draftUserForm: null,
 };
 
 export const uiSlice = createSlice({
@@ -80,6 +82,7 @@ export const uiSlice = createSlice({
     dismissToast: (s, a: PayloadAction<string>) => { s.toasts = s.toasts.filter((t) => t.id !== a.payload); },
     setConfirm: (s, a: PayloadAction<ConfirmState>) => { s.confirm = a.payload; },
     setLastMutation: (s, a: PayloadAction<string | null>) => { s.lastMutation = a.payload; },
+    setDraftUserForm: (s, a: PayloadAction<any>) => { s.draftUserForm = a.payload; },
     resetFilters: (s) => { s.filterRole = ''; s.filterStatus = ''; s.search = ''; },
   },
 });
@@ -88,6 +91,6 @@ export const {
   setTheme, toggleTheme, setAccent, setActiveView, setSidebarOpen, setExpandedGroup,
   setFilterRole, setFilterStatus, setSearch, setSort, setExportOpen, setExportTab, setDensity,
   setSelection, toggleSelection, clearSelection, setEditingId, pushToast, dismissToast,
-  setConfirm, setLastMutation, resetFilters,
+  setConfirm, setLastMutation, setDraftUserForm, resetFilters,
 } = uiSlice.actions;
 export default uiSlice.reducer;
