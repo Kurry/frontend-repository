@@ -237,7 +237,7 @@ section { position: relative; }
 /* Impact statement — centered oversized serif display in lime-off */
 .impact-content-w { background: var(--surface-dark); padding: calc(var(--unit) * 6) var(--unit); text-align: center; }
 .text-impact {
-  margin: 0 auto; font-family: var(--serif); font-weight: 400; text-transform: uppercase;
+  margin: 0 auto; font-family: var(--serif); font-weight: 400;
   color: var(--accent-lime-off);
   font-size: clamp(48px, 9.2vw, 132px); line-height: 0.826; /* ≈109px at the 132px desktop size */
   max-width: 1600px;
@@ -356,7 +356,7 @@ section { position: relative; }
 .footer { background: var(--surface-dark); padding: calc(var(--unit) * 4) var(--unit) var(--unit); }
 .footer-inner { max-width: 1600px; margin: 0 auto; }
 .footer-statement {
-  margin: 0 0 var(--unit); font-family: var(--serif); font-weight: 400; text-transform: uppercase;
+  margin: 0 0 var(--unit); font-family: var(--serif); font-weight: 400;
   color: var(--text-offwhite);
   font-size: clamp(36px, 5vw, 72px); line-height: 1.06;
 }

@@ -63,12 +63,12 @@
     return { ok: true, value: email };
   }
   function validateRaceRecord(r) {
-    if (!r || typeof r !== 'object') return 'race must be an object';
-    if (!isPlainStr(r.id) || !r.id.trim()) return 'race id required';
-    if (!isPlainStr(r.circuit) || !r.circuit.trim() || r.circuit.trim().length > 80) return 'race circuit invalid';
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(r.date)) return 'race date must be YYYY-MM-DD';
-    if (r.status !== 'Upcoming' && r.status !== 'Completed') return 'race status must be Upcoming or Completed';
-    if (typeof r.selected !== 'boolean') return 'race selected must be boolean';
+    if (!r || typeof r !== 'object') return 'import problem: race must be an object';
+    if (!isPlainStr(r.id) || !r.id.trim()) return 'import problem: race id required';
+    if (!isPlainStr(r.circuit) || !r.circuit.trim() || r.circuit.trim().length > 80) return 'import problem: race circuit invalid';
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(r.date)) return 'import problem: race date must be YYYY-MM-DD';
+    if (r.status !== 'Upcoming' && r.status !== 'Completed') return 'import problem: race status must be Upcoming or Completed';
+    if (typeof r.selected !== 'boolean') return 'import problem: race selected must be boolean';
     if (!isPlainStr(r.uid) || !r.uid.trim()) return 'race uid required';
     return null;
   }
@@ -81,8 +81,8 @@
   }
   function validatePressKit(doc) {
     if (!doc || typeof doc !== 'object') return 'press kit must be a JSON object';
-    if (doc.schemaVersion !== 1) return 'schemaVersion must be 1';
-    if (doc.driver !== 'Avery Vale') return 'driver must be Avery Vale';
+    if (doc.schemaVersion !== 1) return 'import problem: schemaVersion must be 1';
+    if (doc.driver !== 'Avery Vale') return 'import problem: driver must be Avery Vale';
     if (doc.team !== 'Nova Racing') return 'team must be Nova Racing';
     if (doc.season !== 2025) return 'season must be 2025';
     if (doc.newsletter !== 'none' && !validateEmail(doc.newsletter).ok) return 'newsletter must be none or a valid email';
@@ -193,7 +193,7 @@
   }
   function updateRaceStatus(id, status) {
     if (status !== 'Upcoming' && status !== 'Completed') {
-      return { ok: false, error: 'Status is invalid: status must be Upcoming or Completed.' };
+      return { ok: false, error: 'Status is invalid: the status field must be Upcoming or Completed.' };
     }
     const r = state.races.find(x => x.id === id);
     if (!r) return { ok: false, error: 'race not found' };
@@ -386,11 +386,11 @@
     lines.push('Newsletter: ' + doc.newsletter);
     lines.push('');
     lines.push('## Selected races');
-    if (!doc.races.length) lines.push('_The selection list is empty._');
+    if (!doc.races.length) lines.push('_The selection lists are empty._');
     doc.races.forEach(r => lines.push(`- ${r.circuit} — ${r.date} (${r.status})`));
     lines.push('');
     lines.push('## Shortlist');
-    if (!doc.shortlist.length) lines.push('_The shortlist is empty._');
+    if (!doc.shortlist.length) lines.push('_The selection lists are empty._');
     doc.shortlist.forEach(s => lines.push(`- [${s.kind}] ${s.label} (#${s.index})`));
     return lines.join('\n');
   }
@@ -409,7 +409,13 @@
     return out.join('\r\n');
   }
   function currentPreviewText() {
-    if (state.activeTab === 'json') return JSON.stringify(pressKitJSON(), null, 2);
+    if (state.activeTab === 'json') {
+      const doc = pressKitJSON();
+      if (!doc.races.length && !doc.shortlist.length && doc.newsletter === 'none') {
+        return 'The selection lists are empty.';
+      }
+      return JSON.stringify(doc, null, 2);
+    }
     if (state.activeTab === 'markdown') return pressKitMarkdown();
     return pressKitICS();
   }
@@ -511,8 +517,9 @@
     input.value = '';
     $('#newsletterSubmit').disabled = true;   // synchronous: double-activation shows exactly one confirmation
     msg.textContent = 'Signup succeeded — welcome to the Nova Racing dispatch.';
+    announce('Signup succeeded — welcome to the Nova Racing dispatch.');
     msg.className = 'newsletter-msg is-shown is-ok';
-    announce('Newsletter signup succeeded');
+
     renderCounts();
     if (state.pressKitOpen) renderPreview();
     return { ok: true, value: res.value };
