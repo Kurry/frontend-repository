@@ -1,215 +1,119 @@
-import { createForm } from '@tanstack/solid-form';
-import { z } from 'zod';
-import { store, setStore, APERTURE_STOPS, SHUTTER_STOPS, ISO_STOPS, generatePresetId } from './store';
-import { Show, For } from 'solid-js';
+import { createSignal, For, Show } from "solid-js";
+import { createForm } from "@tanstack/solid-form";
+import { z } from "zod";
+import { store, APERTURE_STOPS, SHUTTER_STOPS, ISO_STOPS, createPreset, updatePreset } from "./store";
 
-const presetSchema = z.object({
-  name: z.string().min(1, "Name is required").max(64, "Name is too long"),
-  aperture: z.number().refine(v => APERTURE_STOPS.includes(v), "Invalid aperture"),
-  shutter: z.number().refine(v => SHUTTER_STOPS.includes(v), "Invalid shutter speed"),
-  iso: z.number().refine(v => ISO_STOPS.includes(v), "Invalid ISO"),
-  lookTag: z.string().min(1, "Tag is required").max(32, "Tag is too long"),
+const schema = z.object({
+  name: z.string().trim().min(1, "required — enter a 1–64 character name").max(64, "must be 64 characters or fewer"),
+  aperture: z.number().refine((v) => APERTURE_STOPS.includes(v), "must be a supported f-stop"),
+  shutter: z.number().refine((v) => SHUTTER_STOPS.includes(v), "must be a supported shutter speed"),
+  iso: z.number().refine((v) => ISO_STOPS.includes(v), "must be a supported ISO"),
+  lookTag: z.string().trim().min(1, "required — add a 1–32 character look tag").max(32, "must be 32 characters or fewer"),
   favorite: z.boolean().default(false),
 });
 
+const FIELD_LABEL = { name: "Name", aperture: "Aperture", shutter: "Speed", iso: "ISO", lookTag: "Look tag" };
+
 export default function PresetForm(props) {
-  const isEditing = !!props.preset;
+  const isEdit = () => !!props.preset;
+  const [submitting, setSubmitting] = createSignal(false);
 
   const form = createForm(() => ({
-    defaultValues: isEditing ? {
-      name: props.preset.name,
-      aperture: props.preset.aperture,
-      shutter: props.preset.shutter,
-      iso: props.preset.iso,
-      lookTag: props.preset.lookTag,
-      favorite: props.preset.favorite,
+    defaultValues: isEdit() ? {
+      name: props.preset.name, aperture: props.preset.aperture, shutter: props.preset.shutter,
+      iso: props.preset.iso, lookTag: props.preset.lookTag, favorite: props.preset.favorite,
     } : {
-      name: "",
-      aperture: store.aperture,
-      shutter: store.shutter,
-      iso: store.iso,
-      lookTag: "",
-      favorite: false,
+      name: "", aperture: store.aperture, shutter: store.shutter, iso: store.iso, lookTag: "", favorite: false,
     },
-    validators: {
-      onChange: presetSchema,
-    },
+    validators: { onChange: schema, onSubmit: schema },
     onSubmit: async ({ value }) => {
-      const validData = presetSchema.parse(value);
-      if (isEditing) {
-        if (window.webmcp_tools && window.webmcp_tools['entity_update']) {
-          window.webmcp_tools['entity_update']({
-            entity: 'preset',
-            id: props.preset.id,
-            fields: validData
-          });
-        } else {
-          setStore('presets', p => p.id === props.preset.id, p => ({ ...p, ...validData }));
-        }
-      } else {
-        if (window.webmcp_tools && window.webmcp_tools['entity_create']) {
-          window.webmcp_tools['entity_create']({
-            entity: 'preset',
-            fields: validData
-          });
-        } else {
-          const newPreset = {
-            id: generatePresetId(),
-            ...validData
-          };
-          setStore('presets', p => [...p, newPreset]);
-        }
-      }
+      if (submitting()) return;
+      setSubmitting(true);
+      const data = schema.parse(value);
+      if (isEdit()) updatePreset(props.preset.id, data);
+      else createPreset(data);
       props.onClose();
     },
   }));
 
-  const FieldError = (props) => (
-    <Show when={props.field().state.meta.errors.length > 0}>
-      <div class="text-red-500 text-xs mt-1">{props.field().state.meta.errors.join(', ')}</div>
+  const Err = (field, label) => (
+    <Show when={field().state.meta.errors.length}>
+      <span class="val-enter text-[11px] text-primary-soft block mt-0.5" role="alert">{label}: {field().state.meta.errors[0]}</span>
     </Show>
   );
 
   return (
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div class="bg-gray-900 border border-gray-700 rounded-lg shadow-2xl w-full max-w-md p-6">
-        <h2 class="text-2xl font-bold mb-6">{isEditing ? 'Edit Preset' : 'Save Preset'}</h2>
-
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
-          class="space-y-4"
-        >
+    <div class="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label={isEdit() ? "Edit preset" : "Create preset"}>
+      <div class="bg-ink border border-white/15 rounded-2xl shadow-2xl w-full max-w-md p-6 pop-in">
+        <h2 class="font-display text-xl uppercase tracking-widest mb-5">{isEdit() ? "Edit preset" : "Save preset"}</h2>
+        <form class="space-y-3" onSubmit={(e) => { e.preventDefault(); e.stopPropagation(); form.handleSubmit(); }}>
           <form.Field name="name">
-            {(field) => (
+            {(f) => (
               <div>
-                <label for="preset-name" class="block text-sm font-medium text-gray-400 mb-1">Preset Name</label>
-                <input
-                  id="preset-name"
-                  name={field().name}
-                  value={field().state.value}
-                  onBlur={field().handleBlur}
-                  onInput={(e) => field().handleChange(e.target.value)}
-                  class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white focus:border-primary focus:outline-none"
-                  placeholder="e.g. Moody Night"
-                />
-                <FieldError field={field} />
+                <label for="pf-name" class="font-display text-[11px] uppercase tracking-wider text-white/60">Name</label>
+                <input id="pf-name" value={f().state.value} onBlur={f().handleBlur} onInput={(e) => f().handleChange(e.target.value)} aria-invalid={!!f().state.meta.errors.length} aria-describedby="pf-name-err" class="w-full bg-black/40 border border-white/15 rounded px-2 py-1.5 text-sm text-white" placeholder="e.g. Golden Hour Soft" />
+                <span id="pf-name-err">{Err(f, FIELD_LABEL.name)}</span>
               </div>
             )}
           </form.Field>
-
-          <div class="grid grid-cols-3 gap-4">
+          <div class="grid grid-cols-3 gap-3">
             <form.Field name="aperture">
-              {(field) => (
+              {(f) => (
                 <div>
-                  <label for="preset-aperture" class="block text-sm font-medium text-gray-400 mb-1">Aperture</label>
-                  <select
-                    id="preset-aperture"
-                    name={field().name}
-                    value={field().state.value}
-                    onBlur={field().handleBlur}
-                    onChange={(e) => field().handleChange(Number(e.target.value))}
-                    class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white"
-                  >
-                    <For each={APERTURE_STOPS}>{v => <option value={v}>f/{v}</option>}</For>
+                  <label for="pf-ap" class="font-display text-[11px] uppercase tracking-wider text-white/60">Aperture</label>
+                  <select id="pf-ap" value={f().state.value} onBlur={f().handleBlur} onChange={(e) => f().handleChange(Number(e.target.value))} class="w-full bg-black/40 border border-white/15 rounded px-1 py-1.5 text-sm text-white">
+                    <For each={APERTURE_STOPS}>{(v) => <option value={v}>f/{v}</option>}</For>
                   </select>
-                  <FieldError field={field} />
+                  {Err(f, FIELD_LABEL.aperture)}
                 </div>
               )}
             </form.Field>
             <form.Field name="shutter">
-              {(field) => (
+              {(f) => (
                 <div>
-                  <label for="preset-shutter" class="block text-sm font-medium text-gray-400 mb-1">Shutter</label>
-                  <select
-                    id="preset-shutter"
-                    name={field().name}
-                    value={field().state.value}
-                    onBlur={field().handleBlur}
-                    onChange={(e) => field().handleChange(Number(e.target.value))}
-                    class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white"
-                  >
-                    <For each={SHUTTER_STOPS}>{v => <option value={v}>1/{v}</option>}</For>
+                  <label for="pf-sh" class="font-display text-[11px] uppercase tracking-wider text-white/60">Speed</label>
+                  <select id="pf-sh" value={f().state.value} onBlur={f().handleBlur} onChange={(e) => f().handleChange(Number(e.target.value))} class="w-full bg-black/40 border border-white/15 rounded px-1 py-1.5 text-sm text-white">
+                    <For each={SHUTTER_STOPS}>{(v) => <option value={v}>1/{v}</option>}</For>
                   </select>
-                  <FieldError field={field} />
+                  {Err(f, FIELD_LABEL.shutter)}
                 </div>
               )}
             </form.Field>
             <form.Field name="iso">
-              {(field) => (
+              {(f) => (
                 <div>
-                  <label for="preset-iso" class="block text-sm font-medium text-gray-400 mb-1">ISO</label>
-                  <select
-                    id="preset-iso"
-                    name={field().name}
-                    value={field().state.value}
-                    onBlur={field().handleBlur}
-                    onChange={(e) => field().handleChange(Number(e.target.value))}
-                    class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white"
-                  >
-                    <For each={ISO_STOPS}>{v => <option value={v}>{v}</option>}</For>
+                  <label for="pf-iso" class="font-display text-[11px] uppercase tracking-wider text-white/60">ISO</label>
+                  <select id="pf-iso" value={f().state.value} onBlur={f().handleBlur} onChange={(e) => f().handleChange(Number(e.target.value))} class="w-full bg-black/40 border border-white/15 rounded px-1 py-1.5 text-sm text-white">
+                    <For each={ISO_STOPS}>{(v) => <option value={v}>{v}</option>}</For>
                   </select>
-                  <FieldError field={field} />
+                  {Err(f, FIELD_LABEL.iso)}
                 </div>
               )}
             </form.Field>
           </div>
-
           <form.Field name="lookTag">
-            {(field) => (
+            {(f) => (
               <div>
-                <label for="preset-look-tag" class="block text-sm font-medium text-gray-400 mb-1">Look Tag</label>
-                <input
-                  id="preset-look-tag"
-                  name={field().name}
-                  value={field().state.value}
-                  onBlur={field().handleBlur}
-                  onInput={(e) => field().handleChange(e.target.value)}
-                  class="w-full bg-gray-800 border border-gray-700 rounded p-2 text-white focus:border-primary focus:outline-none"
-                  placeholder="e.g. Portrait"
-                />
-                <FieldError field={field} />
+                <label for="pf-tag" class="font-display text-[11px] uppercase tracking-wider text-white/60">Look tag</label>
+                <input id="pf-tag" value={f().state.value} onBlur={f().handleBlur} onInput={(e) => f().handleChange(e.target.value)} aria-invalid={!!f().state.meta.errors.length} aria-describedby="pf-tag-err" class="w-full bg-black/40 border border-white/15 rounded px-2 py-1.5 text-sm text-white" placeholder="e.g. Portrait" />
+                <span id="pf-tag-err">{Err(f, FIELD_LABEL.lookTag)}</span>
               </div>
             )}
           </form.Field>
-
           <form.Field name="favorite">
-            {(field) => (
-              <div class="flex items-center space-x-2">
-                <input
-                  id="preset-favorite"
-                  type="checkbox"
-                  name={field().name}
-                  checked={field().state.value}
-                  onChange={(e) => field().handleChange(e.target.checked)}
-                  class="w-4 h-4 text-primary bg-gray-800 border-gray-700 rounded focus:ring-primary focus:ring-offset-gray-900"
-                />
-                <label for="preset-favorite" class="text-sm font-medium text-gray-300">Mark as favorite</label>
-              </div>
+            {(f) => (
+              <label class="flex items-center gap-2 text-sm text-white/80">
+                <input type="checkbox" checked={f().state.value} onChange={(e) => f().handleChange(e.target.checked)} class="w-4 h-4 accent-primary" />
+                Mark as favorite
+              </label>
             )}
           </form.Field>
-
-          <div class="flex justify-end space-x-3 pt-4 border-t border-gray-800 mt-6">
-            <button
-              type="button"
-              class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white"
-              onClick={props.onClose}
-            >
-              Cancel
-            </button>
-            <form.Subscribe
-              selector={(state) => [state.canSubmit, state.isSubmitting]}
-            >
-              {([canSubmit, isSubmitting]) => (
-                <button
-                  type="submit"
-                  disabled={!canSubmit}
-                  class="px-6 py-2 text-sm font-bold bg-primary text-white rounded hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? 'Saving...' : 'Save Preset'}
+          <div class="flex justify-end gap-3 pt-3 border-t border-white/10">
+            <button type="button" onClick={props.onClose} class="hover-wash rounded px-4 py-2 text-sm text-white/70">Cancel</button>
+            <form.Subscribe selector={(s) => s.canSubmit}>
+              {(canSubmit) => (
+                <button type="submit" disabled={!canSubmit() || submitting()} class="hover-wash rounded px-5 py-2 bg-primary hover:bg-primary-soft text-white text-sm font-display tracking-wide disabled:opacity-40 disabled:cursor-not-allowed">
+                  {isEdit() ? "Update preset" : "Save preset"}
                 </button>
               )}
             </form.Subscribe>
