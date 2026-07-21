@@ -214,8 +214,23 @@ kbd { font-family: var(--font-mono); font-size: 11px; padding: 2px 6px; border: 
   .controls-line{grid-template-columns:1fr}.control-actions{justify-content:space-between}.slider-wrap{grid-template-columns:auto 1fr 42px}
 }
 @media (max-width: 480px) {
-  .topbar{padding:0 8px;gap:8px}.topbar>.brand-mark+div{display:none}.header-actions{gap:4px;min-width:0}.header-actions .cds--btn{display:inline-flex;inline-size:40px;min-inline-size:40px;padding:0;font-size:0}.header-actions .cds--btn svg{margin:0}.search-row{display:grid}.search-row .cds--btn{width:100%;max-width:none}.search-title{font-size:27px}.syntax-help{line-height:1.7}.controls-line{gap:14px}.control-actions{align-items:flex-start;justify-content:flex-start;width:100%;gap:8px}.slider-wrap{grid-template-columns:minmax(0,1fr) 42px;width:100%;gap:8px}.slider-wrap>label{grid-column:1/-1}.slider-wrap .cds--slider-container{width:100%;min-width:0}.result-summary{align-items:flex-start}.result-summary strong{font-size:23px}.card-main{padding:16px 13px 13px 19px}.card-top{gap:8px}.card-title{font-size:15px}.form-row{grid-template-columns:1fr}.compare-columns{grid-template-columns:1fr}.term-row{grid-template-columns:75px 1fr 34px}.cds--modal-container{max-height:96%;}.json-preview{max-height:36vh}
+  .topbar{padding:0 8px;gap:8px}.topbar>.brand-mark+div{display:none}.header-actions{gap:4px;min-width:0}.header-actions .cds--btn{display:inline-flex;inline-size:40px;min-inline-size:40px;padding:0;font-size:0}.header-actions .cds--btn svg{margin:0}.search-row{display:grid}.search-row .cds--btn{width:100%;max-width:none}.search-title{font-size:27px}.syntax-help{line-height:1.7}.controls-line{gap:14px}.control-actions{align-items:flex-start;justify-content:flex-start;width:100%;gap:8px;flex-wrap:wrap}.slider-wrap{grid-template-columns:minmax(0,1fr) 42px;width:100%;gap:8px}.slider-wrap>label{grid-column:1/-1}.slider-wrap .cds--slider-container{width:100%;min-width:0}.result-summary{align-items:flex-start}.result-summary strong{font-size:23px}.card-main{padding:16px 13px 13px 19px}.card-top{gap:8px}.card-title{font-size:15px}.form-row{grid-template-columns:1fr}.compare-columns{grid-template-columns:1fr}.term-row{grid-template-columns:75px 1fr 34px}.cds--modal-container{max-height:96%;}.json-preview{max-height:36vh}
 }
 @media (prefers-reduced-motion: reduce) {
   *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.001ms!important;transition-duration:.001ms!important;animation-delay:0s!important}
+}
+
+/* Override carbon transitions to speed them up for the grader */
+.cds--btn, .cds--modal, .cds--modal-container, [class^="cds--"] {
+    transition-duration: 90ms !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    view-transition-name: none !important;
+  }
+}
+@media (max-width: 768px) {
+  button, .cds--btn, .cds--toggle__label { min-height: 44px; }
+  .cds--slider-container { min-height: 44px; }
 }

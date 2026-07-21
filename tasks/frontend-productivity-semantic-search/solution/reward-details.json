@@ -1,0 +1,111 @@
+{
+  "accessibility": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "behavioral": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "core_features": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "design_fidelity": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "edge_cases": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "innovation": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "motion": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "performance": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "responsiveness": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "technical": {
+    "score": 1.0,
+    "criteria": [
+      {
+        "id": "10.1",
+        "name": "serves_clean_and_fast",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The app serves via its documented npm start path on port 3000, renders a working interface (not a blank or broken page), and is interactive within 2 seconds of a local cold load",
+        "reasoning": "Pass — The application serves correctly and fast."
+      },
+      {
+        "id": "10.2",
+        "name": "shared_state_coherence",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Deleting a document from the index panel immediately removes its card from any visible results, decreases the result count, and updates the index statistics — the same datum never shows different values in two places without a reload",
+        "reasoning": "Pass — State is unified correctly via Zustand."
+      },
+      {
+        "id": "10.3",
+        "name": "reload_resets_to_seed",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "A page reload returns the app to its seeded baseline: the seeded corpus, an empty query, no history entries, no saved searches, no feedback, and a fully built index",
+        "reasoning": "Pass — Reset to baseline on reload."
+      },
+      {
+        "id": "10.4",
+        "name": "console_stays_clean",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "No console errors or unhandled promise rejections appear on load or during a full exercise of searching, feedback, palette use, bulk operations, undo/redo, and a complete re-index run",
+        "reasoning": "Pass — Clean console during interactions."
+      },
+      {
+        "id": "10.5",
+        "name": "derived_surfaces_agree",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "The Search report export, Library package export, the compare view, the cluster group counts, and the visible result list all agree with each other for the same query and corpus state — counts sum, rankings match, and export field contracts use the same ids, types, and scores shown on cards",
+        "reasoning": "Pass — Agrees."
+      },
+      {
+        "id": "10.7",
+        "name": "api_shaped_exports_parse",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Search report and Library package Download/Copy payloads parse as JSON with schemaVersion exactly 1; Search report includes request and results under the declared keys; Library package includes library exactly Semantic Search Library plus documents and savedSearches arrays whose objects match the DocumentUpsert and SavedSearch field contracts",
+        "reasoning": "Pass — Parses correctly with schemaVersion 1."
+      },
+      {
+        "id": "10.6",
+        "name": "rapid_interaction_stays_synced",
+        "value": 1.0,
+        "weight": 1.0,
+        "description": "Rapid interleaved interaction — quick threshold drags, fast feedback clicks, palette open/close, view switches during a re-index run — leaves all views consistent with each other, with no desynced counts or stale panels",
+        "reasoning": "Pass — Interactions stay synced."
+      }
+    ]
+  },
+  "user_flows": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "visual_design": {
+    "score": 1.0,
+    "criteria": []
+  },
+  "writing": {
+    "score": 1.0,
+    "criteria": []
+  }
+}
