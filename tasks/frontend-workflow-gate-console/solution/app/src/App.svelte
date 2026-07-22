@@ -24,11 +24,15 @@
 
   onMount(() => {
     if (!registerWebMCP()) setTimeout(registerWebMCP, 800);
+    let timer;
     const decorateIcons = () => {
-      document.querySelectorAll('svg:not([aria-label]):not([aria-labelledby])').forEach((svg) => {
-        svg.setAttribute('aria-hidden', 'true');
-        svg.removeAttribute('role');
-      });
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        document.querySelectorAll('svg:not([aria-label]):not([aria-labelledby])').forEach((svg) => {
+          svg.setAttribute('aria-hidden', 'true');
+          svg.removeAttribute('role');
+        });
+      }, 0);
     };
     decorateIcons();
     const observer = new MutationObserver(decorateIcons);
