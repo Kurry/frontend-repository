@@ -1,0 +1,9 @@
+[dimension]
+id = "writing"
+name = "Writing"
+description = "Writing"
+
+[[criterion]]
+id = "writing.domain_copy"
+description = "Copy names the domain consequence and recovery action precisely."
+weight = 1

@@ -1,0 +1,9 @@
+[dimension]
+id = "performance"
+name = "Performance"
+description = "Performance"
+
+[[criterion]]
+id = "performance.large_collection"
+description = "The signature interaction remains responsive and unrelated rows stay stable."
+weight = 1

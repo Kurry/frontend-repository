@@ -1,0 +1,14 @@
+[dimension]
+id = "innovation"
+name = "Innovation"
+description = "Innovation"
+
+[[criterion]]
+id = "innovation.catchall"
+description = "Any other innovation not covered by the above criteria but showing evidence of domain utility beyond CRUD."
+weight = 1
+
+[[criterion]]
+id = "innovation.linked_utility"
+description = "Linked views provide domain utility beyond CRUD."
+weight = 1

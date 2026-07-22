@@ -1,0 +1,9 @@
+[dimension]
+id = "core_features"
+name = "Core Features"
+description = "Core features"
+
+[[criterion]]
+id = "core_features.signature_mutation"
+description = "The scenario weaver mutation changes the primary record, linked view, and status together."
+weight = 1

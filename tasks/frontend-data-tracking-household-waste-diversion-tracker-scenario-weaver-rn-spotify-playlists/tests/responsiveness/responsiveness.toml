@@ -1,0 +1,9 @@
+[dimension]
+id = "responsiveness"
+name = "Responsiveness"
+description = "Responsiveness"
+
+[[criterion]]
+id = "responsiveness.mobile_mode"
+description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+weight = 1
