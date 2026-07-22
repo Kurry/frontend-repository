@@ -234,6 +234,7 @@ export function StoryboardNav() {
 
           <button
             type="button"
+            aria-label="Import"
             onClick={() => isImportModalOpenStore.set(true)}
             className="inline-flex h-11 items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-yellow-400 hover:bg-yellow-50 hover:text-yellow-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 sm:px-3.5"
           >
@@ -242,6 +243,7 @@ export function StoryboardNav() {
           </button>
           <button
             type="button"
+            aria-label="Export"
             onClick={() => isExportDrawerOpenStore.set(true)}
             className="inline-flex h-11 items-center gap-1.5 rounded-xl border border-gray-300 bg-white px-3 text-sm font-semibold text-gray-700 shadow-sm transition-colors hover:border-yellow-400 hover:bg-yellow-50 hover:text-yellow-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-yellow-400 sm:px-3.5"
           >
