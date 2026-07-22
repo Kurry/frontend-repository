@@ -1,0 +1,8 @@
+[judge]
+system_prompt_filename = "tests/system_prompt.md"
+agent_message_prompt_filename = "tests/agent_message.md"
+
+[[criterion]]
+id = "AC-03"
+description = "Sample canonical insert, gap/profile/forecast transition, one rehearsal advance, compaction cancel, and invalid return at early/settled frames; motion explains causality and reduced motion exposes equivalent queue cards, outlines, deltas, IDs, patterns, and phase status."
+weight = 1.0

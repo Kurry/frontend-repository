@@ -1,0 +1,8 @@
+[judge]
+system_prompt_filename = "tests/system_prompt.md"
+agent_message_prompt_filename = "tests/agent_message.md"
+
+[[criterion]]
+id = "AC-02"
+description = "At 1440x900, three patterned spirals and tray dominate while queue, demand/profile, inventory, issue graph, rehearsal, and history form a deliberate refill desk; track, bay, gap, variant, selection, preview, invalid, rehearsed, branched, and approved states remain legible without color alone."
+weight = 1.0
