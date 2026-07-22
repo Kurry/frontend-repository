@@ -1,0 +1,5 @@
+[task]
+name = "mercor-intelligence/frontend-data-tracking-subscription-renewal-radar-replay-timeline-rn-lightroom-editing"
+version = "1.0.0"
+description = "Manage subscriptions through a domain-native browser surface where one meaningful mutation updates linked views and an interoperable artifact. Variant focus: scrub a selected record through its timeline and restore a prior checkpoint."
+authors = [{ name = "Kurry Tran", email = "kurry.tran@example.com" }]
