@@ -1,0 +1,26 @@
+[judge]
+dimensions = [
+  "core_features",
+  "visual_design",
+  "motion",
+  "technical",
+  "user_flows",
+  "edge_cases",
+  "responsiveness",
+  "accessibility",
+  "performance",
+  "writing",
+  "innovation",
+  "design_fidelity",
+  "behavioral",
+]
+
+[[criterion]]
+id = "AC-08"
+title = "alternate_input"
+description = "Alternate input produces identical state with visible focus and live feedback."
+evaluation_steps = [
+  "Repeat the signature interaction with keyboard and touch-equivalent controls.",
+  "Observe that the input behaves identically to mouse interaction with visible focus."
+]
+weight = 1.0

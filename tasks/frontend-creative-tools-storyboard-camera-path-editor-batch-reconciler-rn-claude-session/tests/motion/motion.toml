@@ -1,0 +1,26 @@
+[judge]
+dimensions = [
+  "core_features",
+  "visual_design",
+  "motion",
+  "technical",
+  "user_flows",
+  "edge_cases",
+  "responsiveness",
+  "accessibility",
+  "performance",
+  "writing",
+  "innovation",
+  "design_fidelity",
+  "behavioral",
+]
+
+[[criterion]]
+id = "AC-03"
+title = "causal_motion"
+description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+evaluation_steps = [
+  "group selected records into a batch and reconcile aggregate totals.",
+  "Observe motion connecting the acted-on item to its new state."
+]
+weight = 1.0

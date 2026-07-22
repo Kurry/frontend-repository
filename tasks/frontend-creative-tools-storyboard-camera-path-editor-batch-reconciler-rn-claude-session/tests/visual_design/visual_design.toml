@@ -1,0 +1,26 @@
+[judge]
+dimensions = [
+  "core_features",
+  "visual_design",
+  "motion",
+  "technical",
+  "user_flows",
+  "edge_cases",
+  "responsiveness",
+  "accessibility",
+  "performance",
+  "writing",
+  "innovation",
+  "design_fidelity",
+  "behavioral",
+]
+
+[[criterion]]
+id = "AC-02"
+title = "visual_hierarchy"
+description = "The visual hierarchy makes current state and next action clear."
+evaluation_steps = [
+  "Inspect the primary work surface, linked summary, and detail panel.",
+  "Observe that the visual hierarchy clearly distinguishes states and next actions."
+]
+weight = 1.0

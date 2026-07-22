@@ -1,0 +1,26 @@
+[judge]
+dimensions = [
+  "core_features",
+  "visual_design",
+  "motion",
+  "technical",
+  "user_flows",
+  "edge_cases",
+  "responsiveness",
+  "accessibility",
+  "performance",
+  "writing",
+  "innovation",
+  "design_fidelity",
+  "behavioral",
+]
+
+[[criterion]]
+id = "AC-09"
+title = "large_collection"
+description = "The signature interaction remains responsive and unrelated rows stay stable."
+evaluation_steps = [
+  "Exercise a seeded collection with at least 100 records.",
+  "Observe that the signature interaction is responsive and unrelated UI does not rebuild."
+]
+weight = 1.0
