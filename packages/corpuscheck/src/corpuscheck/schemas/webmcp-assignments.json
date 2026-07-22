@@ -2047,6 +2047,27 @@
       ]
     },
     {
+      "task": "frontend-creative-tools-weaving-draft-constraint-studio",
+      "modules": ["entity-collection-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "entity": "draft-variant",
+        "entity_operations": ["create", "select", "update", "toggle"],
+        "entity_fields": ["name", "threading", "tie-up", "treadling", "warp-colors", "weft-colors", "repeat", "approval"],
+        "editor_object_types": ["threading-cell", "tie-up-cell", "treadling-cell", "color-cell", "repeat-range", "variant-range"],
+        "editor_operations": ["select", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_properties": ["shaft", "treadle", "lifted", "color-id", "operation", "offset", "max-float", "sequence"],
+        "editor_modes": ["paint", "erase", "threading", "tie-up", "treadling", "colors", "repeat", "analysis", "variants", "simulation", "artifacts"],
+        "session_operations": ["start", "restart", "advance", "trigger_demo"],
+        "demos": ["wrong-treadle", "wrong-color", "broken-yarn", "branch-at-error"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "wif-ini", "draft-svg", "drawdown-svg", "yarn-pick-ledger-csv"],
+        "import_modes": ["canonical-json", "wif-ini"],
+        "value_bounds": ["ends integer 1-64 and picks integer 1-96", "shaft and treadle indices integer 1-4", "repeat nesting depth at most 2", "float threshold integer 3-7", "yarn calculations use declared integer millimeter and gram rounding"],
+        "visible_postconditions": ["editing threading, tie-up, treadling, or color cells immediately recomputes the derived drawdown and highlights bound inputs without permitting direct drawdown edits", "repeat transforms preserve bounded source ranges and show the first expected-versus-actual break; incompatible overlaps block", "float and structural analysis lists run type, length, and coordinates plus empty treadles, unused shafts, duplicate picks, and edge balance", "forking and merging named variants updates cell/color/yarn comparisons while approved checksums remain frozen", "simulation advance, pause, error, unweave, correction, resume, and branch-at-error update the visible pick and recovery history", "canonical JSON or WIF import reconstructs the visible draft; export formats reflect current grid, color, yarn, repeat, variant, and simulation state" ]
+      },
+      "mechanics_exclusions": ["Grid painting, erasing, range drag selection, direct keyboard navigation, mobile sequence sheets, palette reorder, and simulation control gestures are driven with Playwright; equivalent bounded state uses editor and session tools", "Drawdown highlight causality, repeat overlays, responsive layout, focus indicators, hover states, and transitions remain Playwright-observed", "File downloads, native file selection, and clipboard contents remain Playwright responsibilities"]
+    },
+    {
       "task": "frontend-data-tracking-admin-analytics-dashboard",
       "modules": [
         "browse-query-v1",
@@ -6218,6 +6239,27 @@
       ]
     },
     {
+      "task": "frontend-workflow-apparel-sample-review-pipeline",
+      "modules": ["entity-collection-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "entity": "apparel-review-record",
+        "entity_operations": ["create", "select", "update", "toggle"],
+        "entity_fields": ["record-type", "label", "status", "severity", "owner", "measurement", "material-lot", "reason", "evidence"],
+        "editor_object_types": ["callout", "measurement-point", "construction-region", "material-binding", "sample-erratum", "issue-revision"],
+        "editor_operations": ["select", "add", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_properties": ["x", "y", "type", "label", "method", "anchor", "note", "base-target", "tolerance", "size-rule", "material-id", "measured-value", "status"],
+        "editor_modes": ["diagram", "measurements", "materials", "samples", "issues", "compare", "approvals", "package"],
+        "session_operations": ["start", "restart", "advance", "trigger_demo"],
+        "demos": ["package-run", "retry-failed-package", "comparison-lens", "approval-check"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "annotated-svg", "measurements-csv", "materials-csv", "sample-history-csv", "tech-pack-markdown", "changelog-markdown"],
+        "import_modes": ["canonical-json"],
+        "value_bounds": ["callout normalized x and y each 0-100 and constrained to declared garment anchor zones", "measurements use integer tenths of millimeters with non-negative tolerances and acyclic dependencies", "material reservations conserve non-negative integer square centimeters or units per lot", "issue status follows the declared lifecycle without skipping required states", "sample snapshots are immutable and corrections append errata"],
+        "visible_postconditions": ["moving or editing a callout updates the shared diagram/table selection and recalculates dependent size targets while invalid bounds or cycles leave state unchanged with field errors", "changing a material binding adjusts derived targets and reservations and marks dependent samples and approvals stale", "recording a sample measurement classifies pass, high, low, or not-measured against the frozen revision while corrections append an erratum", "accepting and implementing an issue creates a revision branch and marks dependent conclusions stale", "selecting a compare or heatmap cell highlights its diagram, evidence, revision, and tech-pack row while zero remains distinct from missing", "the first package run preserves successful outputs while failing one colorway diagram and one checksum; retry-failed changes only those failed outputs", "canonical import reconstructs the visible diagram, specifications, materials, samples, issues, revisions, approvals, and package history" ]
+      },
+      "mechanics_exclusions": ["Callout and evidence-region dragging, diagram/heatmap selection, keyboard coordinate editing, mobile cards and drilldowns, and responsive navigation are driven with Playwright; equivalent bounded state uses editor/entity tools", "Visual stale markers, tolerance bands, leader lines, collision avoidance, focus indicators, hover states, and transitions remain Playwright-observed", "File downloads, native file selection, and clipboard contents remain Playwright responsibilities"]
+    },
+    {
       "task": "frontend-workflow-automation-studio",
       "modules": [
         "browse-query-v1",
@@ -7045,6 +7087,92 @@
       ]
     },
     {
+      "task": "frontend-workflow-partial-fill-allocation-reconciliation-floor",
+      "modules": [
+        "entity-collection-v1",
+        "structured-editor-v1",
+        "artifact-transfer-v1"
+      ],
+      "bindings": {
+        "entity": "fill-intent-allocation-record",
+        "entity_operations": ["create", "select", "update", "delete", "toggle"],
+        "entity_fields": ["fill-id", "intent-id", "source-id", "account-id", "symbol", "side", "quantity", "price", "occurred-at", "exception-reason", "override-reason"],
+        "editor_object_types": ["mapping-cell", "allocation-flow", "lot-split", "correction-link", "variance-cell", "checkpoint"],
+        "editor_operations": ["select", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_properties": ["mapped-field", "typed-value", "excluded", "allocation-quantity", "ratio", "exception-reason", "override-reason", "ledger-time", "checkpoint-name"],
+        "editor_modes": ["import-repair", "allocation-floor", "execution-ledger", "variance-matrix", "checkpoint-compare", "export"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["api-batch-json", "reconciliation-csv", "exception-csv"],
+        "import_modes": ["api-batch-json"],
+        "value_bounds": [
+          "intent and fill ids are unique non-empty strings and quantities are positive integers",
+          "allocation quantities are positive integers bounded by both remaining fill quantity and remaining intent quantity",
+          "short-side allocations consume non-negative locate inventory in occurred-at event order",
+          "rule overrides require a declared reason code and non-empty note",
+          "API batch JSON preserves authored decisions, layout, checkpoints, and execution history"
+        ],
+        "visible_postconditions": [
+          "repairing a typed import cell updates its preview and row/column diagnostics; committing remains blocked while duplicate ids or invalid numeric fields remain",
+          "allocating or splitting a fill creates Sankey edges and updates imported, excluded, allocatable, allocated, remaining, and excepted conservation totals without loss",
+          "merging compatible sibling allocations replaces them with one allocation of equal conserved quantity",
+          "a rejected rule or locate allocation names the violated guard; a valid reason-bound override records the exception and permits the bounded action",
+          "scrubbing the ordered execution ledger reconstructs allocation and correction state at the selected event",
+          "selecting or bulk-updating variance cells highlights their allocation edges and records exception reasons",
+          "checkpoint comparison reports differences between two named authored states",
+          "export then import reconstructs the visible allocations, exceptions, checkpoints, layout, and history; invalid artifacts leave state unchanged and name offending fields"
+        ]
+      },
+      "mechanics_exclusions": [
+        "File dropzones, native file selection, drag-and-drop fill placement, Sankey-edge selection, quantity-slider and ledger-scrubber gestures are driven through Playwright; equivalent state mutations use declared entity/editor tools",
+        "Responsive rail-to-drawer transitions, keyboard navigation, focus indicators, hover highlights, and matrix virtualization remain Playwright-observed",
+        "File downloads and clipboard contents remain Playwright responsibilities"
+      ]
+    },
+    {
+      "task": "frontend-workflow-podcast-episode-assembly-board",
+      "modules": [
+        "entity-collection-v1",
+        "structured-editor-v1",
+        "command-session-v1",
+        "artifact-transfer-v1"
+      ],
+      "bindings": {
+        "entity": "source-clip-and-timeline-instance",
+        "entity_operations": ["create", "select", "update", "delete", "reorder", "toggle"],
+        "entity_fields": ["source-range", "lane", "episode-time", "transcript-inclusion", "citation", "rights-state", "approval-state"],
+        "editor_object_types": ["timeline-instance", "transcript-token", "citation", "narrative-block", "automation-point", "branch-cut"],
+        "editor_operations": ["select", "add", "delete", "update_property", "switch_mode", "preview"],
+        "editor_properties": ["source-in", "source-out", "start-ms", "duration-ms", "lane", "gain", "fade", "included", "title", "summary", "approval"],
+        "editor_modes": ["sources", "timeline", "transcript", "chapters", "mix", "rights", "branches", "render"],
+        "session_operations": ["start", "pause", "resume", "stop", "restart", "advance"],
+        "demos": ["validation-run", "render-run", "retry-failed-render"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "edl-csv", "transcript-csv", "webvtt", "rss-xml", "show-notes-markdown", "timeline-svg"],
+        "import_modes": ["canonical-json"],
+        "value_bounds": [
+          "timeline time and source ranges are non-negative integer milliseconds and remain within source bounds",
+          "chapters do not overlap and cover the approved timeline under declared intro and credit rules",
+          "rights require allowed usage, territory, attribution, and expiry after publish date",
+          "PodcastEpisodePackage schemaVersion is exactly podcast-episode-package/v1"
+        ],
+        "visible_postconditions": [
+          "inserting a source range creates a timeline instance without changing the source clip and selecting it highlights bound transcript, rights, waveform, and sibling instances",
+          "timeline and transcript edits update episode timing while preserving source timing and immediately refresh validation findings and stale approval indicators",
+          "reordering narrative blocks shows a ripple preview and moves the corresponding clip groups when confirmed",
+          "a material edit after approval marks the affected checksum-bound approvals stale",
+          "the first render run fails transcript timestamp and RSS enclosure outputs while preserving successful outputs; retry-failed completes only those failed outputs",
+          "canonical JSON import reconstructs the visible cut and invalid import names offending fields without changing state",
+          "re-export changes only exportedAt in canonical JSON while CSV, VTT, RSS, Markdown, and SVG remain byte-identical"
+        ]
+      },
+      "mechanics_exclusions": [
+        "Timeline drag, trim, split, ripple/nonripple movement, gap close, fades, crossfades, and automation-curve dragging are gesture mechanics graded through Playwright; equivalent state mutations use bound editor operations",
+        "Keyboard shortcuts, mobile numeric editing, lane hover states, responsive layout, focus indicators, dialogs, and visual transitions remain Playwright-driven",
+        "Waveform, loudness, peak, clipping, ducking, and fade-continuity visuals are observed through Playwright; validation session state uses command-session bindings",
+        "File downloads, native file-picker interaction, and clipboard contents remain Playwright responsibilities"
+      ]
+    },
+    {
       "task": "frontend-workflow-quality-audit-desk",
       "modules": [
         "browse-query-v1",
@@ -7853,6 +7981,31 @@
         "Export drawer enter/exit, Copy confirmation, and command palette open animation stay Playwright-observed",
         "Bulk checkbox selection and Apply classification to selected use the real toolbar controls; WebMCP entity create/update covers single adjudication parity",
         "Trajectory step advance and arrow-key scrubbing stay Playwright-observed; active step selection remains entity/browse state"
+      ]
+    },
+    {
+      "task": "frontend-planning-stage-blocking-path-studio",
+      "modules": [
+        "structured-editor-v1",
+        "command-session-v1",
+        "artifact-transfer-v1"
+      ],
+      "bindings": {
+        "editor_object_types": ["actor-waypoint", "prop-waypoint", "blocking-branch"],
+        "editor_operations": ["select", "add", "delete", "update_property", "switch_mode", "preview"],
+        "editor_properties": ["beat", "x", "y", "facing", "movement-type", "hold"],
+        "editor_modes": ["stage", "paths", "sightlines", "custody", "rehearsal", "artifacts"],
+        "session_operations": ["start", "pause", "resume", "stop", "restart", "advance"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "stage-map-svg", "path-atlas-svg", "waypoint-csv", "custody-csv", "rehearsal-csv", "script-markdown"],
+        "import_modes": ["canonical-json"],
+        "visible_postconditions": ["selected entity and waypoint", "current beat and stage positions", "active branch and rehearsal trace", "artifact preview"]
+      },
+      "mechanics_exclusions": [
+        "Waypoint dragging, snapping, mirroring, and retiming gestures stay Playwright-driven; editor operations expose the resulting score state without bypassing gesture criteria",
+        "Collision, sightline, focus, entrance, and custody overlay geometry stays Playwright-observed",
+        "Rehearsal timing, smooth path interpolation, handoff animation, and reduced-motion behavior stay Playwright-observed",
+        "File picker, clipboard contents, downloaded artifact bytes, and SVG rendering fidelity remain Playwright responsibilities"
       ]
     },
     {

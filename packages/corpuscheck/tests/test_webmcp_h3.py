@@ -97,12 +97,12 @@ class TestWebmcpContract(unittest.TestCase):
             self.assertIn("$WEBMCP_CDP_ENDPOINT", pw_args)
 
     def test_assignment_map_has_unique_registered_tasks(self) -> None:
-        # New task branches can merge concurrently, so enforce the corpus floor
-        # and uniqueness instead of coupling every branch to an exact count.
+        # Keep the historical corpus floor while allowing concurrent task PRs
+        # to add assignments without making every open branch stale.
         data = json.loads((SCHEMAS / "webmcp-assignments.json").read_text())
         self.assertEqual(data["contract_version"], "zto-webmcp-v1")
         tasks = [entry["task"] for entry in data["assignments"]]
-        self.assertGreaterEqual(len(tasks), 103)
+        self.assertGreaterEqual(len(tasks), 104)
         self.assertEqual(len(tasks), len(set(tasks)))
         for entry in data["assignments"]:
             contract = webmcp_h3.render_contract(entry)

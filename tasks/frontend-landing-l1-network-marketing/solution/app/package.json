@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "verify:build": "npm run build && node -e \"require('fs').accessSync('dist/index.html')\"",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs",
     "start": "npx --yes serve dist -l 3000 -n",
     "build": "astro build",
     "dev": "astro dev",

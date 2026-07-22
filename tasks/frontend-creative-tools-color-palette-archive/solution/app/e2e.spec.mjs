@@ -135,6 +135,34 @@ test('1.2 six_seeded_palettes_visible', async ({ page }) => {
   expect(await page.locator('.palette-card').count()).toBeGreaterThanOrEqual(6);
 });
 
+test('regression modal dialogs trap and restore focus', async ({ page }) => {
+  await page.goto(BASE);
+  await page.locator('button[data-view="palette"]').click();
+  await page.locator('.js-select').nth(0).check();
+  await page.locator('.js-select').nth(1).check();
+
+  const batchDelete = page.locator('#tray-delete');
+  await batchDelete.click();
+  await expect(page.locator('#confirm-cancel')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(batchDelete).toBeFocused();
+
+  const newsletter = page.locator('#footer-newsletter');
+  await newsletter.scrollIntoViewIfNeeded();
+  await newsletter.click();
+  await expect(page.locator('#popup-close')).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(page.locator('#subscribe-popup button[type="submit"]')).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#popup-close')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(newsletter).toBeFocused();
+  await expect(page.locator('#subscribe-popup')).toBeHidden();
+
+  await newsletter.click();
+  await expect(page.locator('#subscribe-popup')).toBeHidden();
+});
+
 // NOT-AUTOMATABLE: 1.2 editor_export_popup_focus_trap — Unimplemented or requires visual evaluation
 // DROPPED (fails against oracle — hallucinated/incomplete selectors): test '1.3 ...'
 // NOT-AUTOMATABLE: 1.3 chrome_icons_have_accessible_names — Unimplemented or requires visual evaluation
