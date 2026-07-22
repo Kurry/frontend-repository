@@ -1,0 +1,5 @@
+status,site_count,percent_of_archive_sites
+mirrored,4434,71.551
+not_in_live_scope,1635,26.384
+no_html,124,2.001
+timeout,4,0.065
