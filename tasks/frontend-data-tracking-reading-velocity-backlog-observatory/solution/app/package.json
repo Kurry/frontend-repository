@@ -20,6 +20,12 @@
     "electron-to-chromium": "1.5.393",
     "typescript": "^4.9.5"
   },
+  "overrides": {
+    "own-keys": "1.0.1",
+    "workbox-build": {
+      "source-map": "0.8.0-beta.0"
+    }
+  },
   "scripts": {
     "start": "HOST=0.0.0.0 PORT=3000 react-scripts start",
     "build": "react-scripts build",
