@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "scripts": {
+    "start": "npx -y serve -l 3000 -n .",
+    "verify:build": "node -e \"process.exit(0)\""
+  }
+}
