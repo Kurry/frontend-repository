@@ -1,0 +1,176 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "paint_save_increments_gallery"
+description = "Save flow: paint several cells, open Save board, and submit a valid Board payload (trimmed unique name ≤40 chars and trimmed tag ≤24 chars) — the gallery collection count increases by exactly one, the new board card appears in Gallery mode with a thumbnail matching the painted cells and its tag, the Export session JSON boards array includes that board under name/tag/favorite/cells, and switching between Paint and Gallery modes shows the same new board without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "empty_save_name_inline_validation"
+description = "Create flow: submitting Save board with a Board field-contract violation (empty or whitespace-only name, empty tag, name over 40 characters, or a duplicate name) triggers immediate inline validation naming the offending field, keeps the save control disabled until name and tag are valid, and does not increase the gallery count."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "rename_updates_card_in_place"
+description = "Rename flow: renaming a board updates that same card's name in Gallery without changing the collection count and without creating a duplicate card."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "delete_removes_card_and_selection"
+description = "Delete flow: deleting a board removes its card, decreases the count by exactly one, clears it from any current selection, and the deleted board no longer appears under any tag filter."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "load_board_to_paint_with_undo"
+description = "Load flow: from Gallery mode, load a saved board — its cells appear on the paint canvas immediately, the app switches to Paint mode showing the loaded art, painting a further cell changes only that cell, and pressing Undo reverts exactly that one change while the rest of the loaded board stays intact."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "last_delete_reveals_empty_gallery"
+description = "After deleting every board, Gallery mode shows an empty state with a message explaining the gallery is empty and how to save a board."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "favorite_and_tag_filter_flow"
+description = "Favorite and filter flow: marking a board as favorite updates its indicator on the card immediately; choosing a tag filter recomputes the visible gallery to only boards with that tag, and clearing the filter restores the full collection with the favorite state preserved."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "toolbar_drag_preserves_paint_state"
+description = "On desktop, grabbing the tools header repositions the floating toolbar; the current brush mode, active swatch, grid overlay state, and painted board all survive the drag with workflow continuity."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "camera_cancel_leaves_board_unlocked"
+description = "Camera overlay flow: Cancel closes the overlay without altering the canvas or locking the cell-size slider."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "reload_returns_seeded_baseline"
+description = "Reload baseline: a page reload returns the app to its seeded state — the blank canvas, the unlocked cell-size slider, and exactly the seeded boards in Gallery; boards saved before the reload are gone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "export_import_roundtrip_flow"
+description = "End-to-end: paint cells, set Horizontal or Vertical mirror, save or rename one board, open Export and confirm the session JSON preview includes schemaVersion shapeshift-session-v1 plus brushMode, paletteColor, mirrorMode, fillStats, cells, and boards; Download or Copy that JSON, then Import it — canvas, mirror mode, fill stats, and gallery boards match the pre-export state; then Import a non-conforming payload (wrong schemaVersion or missing required fields) and confirm an inline error names the import problem while the studio stays unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "mirror_then_fill_stats_flow"
+description = "Mirror paint flow: set mirrorMode to Horizontal or Vertical, paint one blank cell near an edge — the mirror-partner cell receives the same brush and color; fill stats increase for both cells when both were blank; switching mirrorMode to Off then painting a different cell changes only that cell."
+type = "binary"
+weight = 1.0
