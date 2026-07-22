@@ -1,0 +1,9 @@
+test results:
+  ✘   3 e2e.spec.mjs:62:3 › workspace contract (canonical) › reduced motion behaviorally suppresses animation (2.2s)
+  ✘   4 e2e.spec.mjs:109:3 › workspace contract (canonical) › no horizontal overflow at 375px (611ms)
+  ✘   5 e2e.spec.mjs:120:1 › 14.2 sibling_reorder_proves_live_tree (30.0s)
+  ✘   6 e2e.spec.mjs:135:1 › 14.5 root_create_count_delta_is_exact (5.7s)
+  ✘   7 e2e.spec.mjs:149:1 › 6.1 create_root_appears_in_tree_and_export (5.7s)
+  ✘   8 e2e.spec.mjs:178:1 › 6.3 add_child_updates_ring_and_export (30.0s)
+  ✘   9 e2e.spec.mjs:196:1 › 6.4 archive_restore_updates_all_surfaces (30.0s)
+  ✘  10 e2e.spec.mjs:212:1 › 6.10 grove_import_recovers_session_without_reload (5.7s)
