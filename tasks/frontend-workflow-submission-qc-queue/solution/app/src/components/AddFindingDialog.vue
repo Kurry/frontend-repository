@@ -20,11 +20,12 @@ const { handleSubmit, meta, isSubmitting, resetForm, validate } = useForm({ vali
 const tierOptions = [{ label: 'Blocker — gate stopping', value: 'blocker' }, { label: 'Major — material issue', value: 'major' }, { label: 'Minor — polish issue', value: 'minor' }]
 const categoryOptions = [{ label: 'Correctness', value: 'correctness' }, { label: 'Instruction clarity', value: 'instruction-clarity' }, { label: 'Rubric alignment', value: 'rubric-alignment' }, { label: 'Environment', value: 'environment' }, { label: 'Scoring', value: 'scoring' }, { label: 'Tooling', value: 'tooling' }]
 const submit = handleSubmit(async (values) => { if (store.addFinding(submission.value.id, values)) await nextTick(() => resetForm()) })
+const close = () => { resetForm(); store.dialogs.add = false }
 watch(() => store.dialogs.add, async (open) => { if (open) { await nextTick(); await validate() } })
 </script>
 
 <template>
-  <NModal v-if="store.dialogs.add" :show="true" :mask-closable="true" :close-on-esc="true" display-directive="if" class="review-modal" transform-origin="center" @update:show="(v) => { if (!v) store.dialogs.add = false }" @esc="store.dialogs.add = false">
+  <NModal v-if="store.dialogs.add" :show="true" :mask-closable="true" :close-on-esc="true" display-directive="if" class="review-modal" transform-origin="center" @update:show="(v) => { if (!v) close() }" @esc="close">
     <NCard role="dialog" aria-modal="true" aria-labelledby="add-finding-title" class="modal-card" tabindex="-1">
       <div class="modal-heading"><span class="modal-icon blocker-icon"><IconAlert /></span><div><p class="eyebrow">Review record</p><h2 id="add-finding-title">Add finding</h2><p>Capture a precise issue against {{ submission?.title }}.</p></div></div>
       <form class="review-form" novalidate @submit.prevent="submit">
@@ -40,7 +41,7 @@ watch(() => store.dialogs.add, async (open) => { if (open) { await nextTick(); a
         <Field v-slot="{ value, handleChange, handleBlur }" name="evidence">
           <div class="form-field"><label for="evidence">Evidence <i>Optional</i></label><NInput :input-props="{ id: 'evidence', name: 'evidence', 'aria-label': 'Evidence' }" :value="value" type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" placeholder="Paste an observed example or trial note…" @update:value="handleChange" @blur="handleBlur" /></div>
         </Field>
-        <div class="modal-actions"><NButton @click="store.dialogs.add = false">Cancel</NButton><NButton attr-type="submit" type="primary" :disabled="!meta.valid || isSubmitting" :loading="isSubmitting"><IconPlus /> Add finding</NButton></div>
+        <div class="modal-actions"><NButton @click="close">Cancel</NButton><NButton attr-type="submit" type="primary" :disabled="!meta.valid || isSubmitting" :loading="isSubmitting"><IconPlus /> Add finding</NButton></div>
       </form>
     </NCard>
   </NModal>

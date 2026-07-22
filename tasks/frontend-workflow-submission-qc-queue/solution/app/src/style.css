@@ -457,3 +457,14 @@ html[data-density='compact'] .finding-card { padding-top: 10px; padding-bottom: 
   padding: 4px 8px;
   font-size: 14px;
 }
+
+/* Keep this override after every component transition declaration so later
+   source-order rules cannot re-enable motion for reduced-motion users. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
