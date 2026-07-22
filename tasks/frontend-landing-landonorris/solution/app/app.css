@@ -33,6 +33,15 @@
   --accent-lime: #d2ff00;     /* rgb(210,255,0)  */
   --accent-lime-off: #b2c73a; /* rgb(178,199,58) */
   --accent-orange: #ff6b00;
+
+  --lime: #d2ff00;
+  --dark-green: #282c20;
+  --white: #f4f4ed;
+  --black: #111112;
+  --lime-off: #b2c73a;
+  --green-off-white-1: #dde1d2;
+  --green-off-white-2: #b4b8a5;
+  --orange: #ff6b00;
   --ease: cubic-bezier(0.65, 0.05, 0, 1);
   --unit: 1.25rem; /* 20px baseline */
   --sans: "Mona Sans", system-ui, sans-serif;
@@ -85,8 +94,8 @@ img, svg, video, canvas { max-width: 100%; }
 }
 .nav-brand-link { text-decoration: none; display: inline-flex; flex-direction: column; justify-self: start; }
 .nav-brand { display: flex; flex-direction: column; line-height: 0.86; }
-.wordmark-avery { font-family: var(--serif); font-weight: 400; font-size: 32px; color: var(--text-black); }
-.wordmark-vale { font-family: var(--sans); font-weight: 900; font-size: 32px; color: var(--text-black); letter-spacing: 0.01em; }
+.wordmark-avery { font-family: var(--serif); font-weight: 400; font-size: clamp(24px, 3vw, 32px); color: var(--text-black); }
+.wordmark-vale { font-family: var(--sans); font-weight: 900; font-size: clamp(24px, 3vw, 32px); color: var(--text-black); letter-spacing: 0.01em; }
 .nav-brand-sub { display: none; font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: var(--text-black); opacity: 0.72; margin-top: 6px; }
 .nav-middle { justify-self: center; }
 .nav-monogram { display: inline-flex; transition: transform 0.4s var(--ease); }
@@ -140,7 +149,7 @@ body.is-menu-open .nav-monogram { transform: skewX(-8deg); }
 
 /* ===== Menu overlay (dark-green, ellipse clip expand 750ms) ===== */
 .nav-menu-w {
-  position: fixed; inset: 0; z-index: 80; background: var(--surface-dark);
+  position: fixed; inset: 0; z-index: 80; background-color: var(--surface-dark);
   visibility: hidden; clip-path: ellipse(0% 0% at 100% 0%);
   transition: clip-path 0.75s var(--ease), visibility 0s linear 0.75s;
   will-change: clip-path;
@@ -520,7 +529,6 @@ section { position: relative; }
   #hero, #horizontal-media, #social-stream, #race-calendar { scroll-margin-top: 140px; }
 }
 @media (max-width: 479px) {
-  .wordmark-avery, .wordmark-vale { font-size: 24px; }
   .nav-ham { width: 48px; height: 48px; }
   .nav-ham { flex-basis: 48px; }
   .btn-w.is-nav { font-size: 16px; padding: 12px 14px; }

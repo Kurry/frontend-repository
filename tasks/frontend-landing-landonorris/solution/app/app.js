@@ -111,6 +111,20 @@
 
   /* ---------------- Clipboard helper (with legacy fallback) ---------------- */
   async function copyText(text) {
+    let ok = false;
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      ok = document.execCommand('copy');
+      ta.remove();
+    } catch (_) {}
+    if (ok) return true;
     try { await navigator.clipboard.writeText(text); return true; } catch (_) { /* fall through */ }
     try {
       const ta = document.createElement('textarea');
@@ -341,7 +355,8 @@
 
   /* ---------------- Build editorial + helmet cards + marquees ---------------- */
   function buildEditorial() {
-    const track = $('#horizontalTrack');
+    const section = $('#horizontalMedia');
+  const track = $('#horizontalTrack');
     track.innerHTML = '';
     EDITORIALS.forEach(e => {
       const card = document.createElement('div');
@@ -419,6 +434,8 @@
     return out.join('\r\n');
   }
   function currentPreviewText() {
+    if (selectedRaces().length === 0 && state.shortlist.length === 0) return 'The selection list is empty.';
+
     if (state.activeTab === 'json') return JSON.stringify(pressKitJSON(), null, 2);
     if (state.activeTab === 'markdown') return pressKitMarkdown();
     return pressKitICS();
@@ -521,7 +538,10 @@
     input.value = '';
     $('#newsletterSubmit').disabled = true;   // synchronous: double-activation shows exactly one confirmation
     msg.textContent = 'Signup succeeded — welcome to the Nova Racing dispatch.';
-    msg.className = 'newsletter-msg is-shown is-ok';
+    msg.className = 'newsletter-msg is-ok';
+    requestAnimationFrame(() => {
+      msg.classList.add('is-shown');
+    });
     announce('Newsletter signup succeeded');
     renderCounts();
     if (state.pressKitOpen) renderPreview();
