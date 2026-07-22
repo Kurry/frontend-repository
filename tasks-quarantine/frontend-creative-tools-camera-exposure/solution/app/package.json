@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "verify:build": "vite build",
-    "start": "npx serve -l 3000 dist"
+    "start": "npx serve -l 3000 dist",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@iconify-json/ph": "^1.2.2",
@@ -23,5 +24,8 @@
     "vite": "^6.4.3",
     "vite-plugin-solid": "^2.11.13",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.0"
   }
 }
