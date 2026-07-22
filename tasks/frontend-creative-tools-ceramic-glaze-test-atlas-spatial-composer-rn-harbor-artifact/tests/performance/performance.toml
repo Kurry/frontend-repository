@@ -1,0 +1,7 @@
+[[criterion]]
+id = "AC-09"
+name = "large_collection"
+description = "Exercise a seeded collection with at least 100 records."
+required_evidence = "The signature interaction remains responsive and unrelated rows stay stable."
+type = "binary"
+weight = 1.0

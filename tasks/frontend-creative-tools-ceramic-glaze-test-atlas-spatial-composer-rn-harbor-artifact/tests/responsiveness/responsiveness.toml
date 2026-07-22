@@ -1,0 +1,7 @@
+[[criterion]]
+id = "AC-07"
+name = "mobile_mode"
+description = "Use the signature interaction at a narrow viewport."
+required_evidence = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+type = "binary"
+weight = 1.0
