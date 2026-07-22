@@ -1264,47 +1264,13 @@
       ]
     },
     "mechanics_exclusions": [
-      "Live GitHub and AI-endpoint calls (account checks, live PR fetching and paging, live chat-completions streaming) are network behaviors the judge grades by observation only — the judge has no credentials and no tool may simulate a successful connection or Live mode",
+      "Live GitHub and AI-endpoint calls (account checks, live PR fetching and paging, live chat-completions streaming) are network behaviors the judge grades by observation only \u2014 the judge has no credentials and no tool may simulate a successful connection or Live mode",
       "Candidates/Triage/Runs/Library navigation, PR source-file bound filters, require-linked-issue toggle, and library filter chips are simple visible controls the judge drives directly via Playwright",
       "Credential masked-field show/hide toggles and the Connections slide-over transition stay Playwright-driven",
       "Evaluate/Generate streaming cadence, the pulsing streaming affordance, and the rate-limit reset countdown ticking stay Playwright-observed",
       "Triage card column-move and undo-return animations stay Playwright-observed",
       "Command palette Cmd+K/Ctrl+K gesture and keyboard navigation stay Playwright-driven",
       "File downloads, file-picker import interaction, and clipboard contents remain Playwright responsibilities"
-    ]
-  },
-  {
-    "task": "frontend-creative-tools-session-compression-loom",
-    "modules": [
-      "structured-editor-v1",
-      "artifact-transfer-v1"
-    ],
-    "bindings": {
-      "editor_object_types": [
-        "capsule"
-      ],
-      "editor_operations": [
-        "select",
-        "update_property",
-        "preview",
-        "add"
-      ],
-      "artifact_operations": [
-        "export",
-        "import"
-      ],
-      "export_formats": [
-        "session-pack"
-      ]
-    },
-    "mechanics_exclusions": [
-      "drag",
-      "resize",
-      "drawing",
-      "snapping",
-      "keyboard movement remain Playwright-driven when mechanism matters",
-      "raw files, filesystem paths, blobs, base64, or artifact contents in WebMCP arguments or results",
-      "file picker interaction, clipboard contents, and downloaded artifacts remain Playwright responsibilities"
     ]
   }
 ]
