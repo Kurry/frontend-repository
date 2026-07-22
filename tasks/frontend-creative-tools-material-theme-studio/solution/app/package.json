@@ -6,7 +6,8 @@
     "build": "vite build",
     "test:e2e": "playwright test",
     "verify:build": "vite build && node -e \"require('fs').accessSync('dist/index.html')\"",
-    "start": "npx serve -s dist -l 3000"
+    "start": "npx serve -s dist -l 3000",
+    "test:e2e:canonical": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -29,7 +30,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@playwright/test": "1.61.1",
+    "@playwright/test": "1.61.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",

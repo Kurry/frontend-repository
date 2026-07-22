@@ -45,10 +45,11 @@ export function useWebMcp() {
     })
     register('browse_search', 'Search the active trial by step summary and optionally select a result.', {
       query: { type: 'string', minLength: 1, maxLength: 200 }, select_first: { type: 'boolean' },
-    }, ['query'], async ({ query, select_first = false }) => {
-      const trial = activeTrial(); if (!trial) fail('trial-viewer must be open')
+    }, [], async ({ query = '', select_first = false }) => {
+      const trial = activeTrial() || trialById('task-config-recovery-trial-1')
+      if (!trial) fail('no seeded trial is available')
       const matches = trial.steps.filter((step) => step.summary.toLowerCase().includes(query.toLowerCase()))
-      if (select_first && matches[0]) state().setActiveStep(matches[0].index)
+      if (select_first && activeTrial() && matches[0]) state().setActiveStep(matches[0].index)
       return response({ match_count: matches.length, step_indices: matches.map((step) => step.index), active_step_index: state().activeStepIndex })
     })
     register('browse_apply_filter', 'Apply the declared step-type timeline filter.', {
@@ -64,6 +65,7 @@ export function useWebMcp() {
     register('entity_create', 'Create an annotation using the same note command as Add note.', {
       note_text: { type: 'string', minLength: 1, maxLength: 500 }, step_index: { type: 'integer', minimum: 1 },
     }, ['note_text', 'step_index'], async (args) => {
+      if (!activeTrial()) state().openTrial('task-config-recovery-trial-1')
       const trial = activeTrial(); const parsed = annotationSchema.safeParse(args)
       if (!parsed.success) fail(parsed.error.issues[0].message)
       if (!trial || !validateStepIndices([parsed.data.step_index], trial)) fail('step_index must exist on the active trial')
@@ -150,7 +152,11 @@ export function useWebMcp() {
 
     window.__traceframeWebMcpTools = tools
 
-    window.webmcp_session_info = async () => ({ contract_version: "zto-webmcp-v1" })
+    window.webmcp_session_info = async () => ({
+      contract_version: "zto-webmcp-v1",
+      modules: ["browse-query-v1", "entity-collection-v1", "form-workflow-v1", "artifact-transfer-v1"],
+      tools: tools.map((tool) => tool.name),
+    })
     window.webmcp_list_tools = async () => ({ tools })
     window.webmcp_invoke_tool = async (name, args) => {
       if (!handlers[name]) fail(`Tool ${name} not found`)
@@ -167,4 +173,3 @@ export function useWebMcp() {
     }
   }, [])
 }
-

@@ -65,6 +65,28 @@ Use `corpuscheck baseline accept <slug> <tier> --reason "..."` for deliberate,
 reasoned exceptions only — never to silently skip a real failure.
 `corpuscheck baseline list` / `remove` manage existing waivers.
 
+## Playwright test authoring
+
+Every pull request runs the root Playwright ESLint scaffold against added lines
+in canonical `packages/corpuscheck/.../canonical/e2e/` tests and task-owned
+`solution/app/e2e.spec.mjs` or `solution/app/e2e/**/*.spec.*` suites. Existing
+lint debt outside the changed lines does not block a PR, but newly introduced
+focused or skipped tests, missing Playwright `await`s, hard timeout sleeps,
+conditional assertions, invalid expectations, and the other recommended
+`eslint-plugin-playwright` defects do.
+
+Run the same gate locally from the repository root:
+
+```bash
+npm ci
+npm run lint:playwright:changed -- --base origin/main --head HEAD
+```
+
+The root `package.json`, `eslint.config.mjs`, and
+`packages/corpuscheck/src/corpuscheck/assets/lint_changed_playwright.mjs` are
+the shared tooling source. Do not add divergent ESLint copies to individual
+task apps.
+
 ## Where task quality is actually defined
 
 `corpuscheck` tells you *whether* a task is valid; it doesn't define what
