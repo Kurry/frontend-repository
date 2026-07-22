@@ -18,10 +18,10 @@ const SESSION_INFO = {
   contract_version: 'zto-webmcp-v1',
   app: 'Schema Forge',
   modules: [
-    { id: 'structured-editor-v1', title: 'Structured editor' },
-    { id: 'command-session-v1', title: 'Command / session' },
-    { id: 'entity-collection-v1', title: 'Entity collection' },
-    { id: 'artifact-transfer-v1', title: 'Artifact transfer' },
+    'structured-editor-v1',
+    'command-session-v1',
+    'entity-collection-v1',
+    'artifact-transfer-v1',
   ],
 };
 

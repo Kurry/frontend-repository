@@ -5,6 +5,9 @@
   "description": "Fully fictional Avery Vale / Nova Racing driver homepage (reference oracle).",
   "scripts": {
     "start": "node server.js",
-    "verify:build": "node -e \"['index.html','app.js','app.css','hero-gl.js','server.js','assets/fonts/MonaSans-VariableFont.woff2','assets/fonts/abril-fatface-display.woff2','assets/video/avery-loop.webm','assets/gl/avery-sculpture.glb','assets/gl/basecolor.png','assets/gl/roughness.png','assets/gl/metallic.png','assets/gl/studio.hdr','assets/editorial/strip-1.png','assets/editorial/strip-6.png','assets/menu/menu-1.png','assets/menu/menu-4.png','assets/images/social-poster.png'].forEach(function(f){require('fs').accessSync(f)}); console.log('build ok')\""
+    "verify:build": "node -e \"['index.html','app.js','app.css','hero-gl.js','rive-motif.js','server.js','assets/fonts/MonaSans-VariableFont.woff2','assets/fonts/abril-fatface-display.woff2','assets/video/avery-loop.webm','assets/gl/avery-sculpture.glb','assets/gl/basecolor.png','assets/gl/roughness.png','assets/gl/metallic.png','assets/gl/studio.hdr','assets/rive/rive.js','assets/rive/rive.wasm','assets/rive/avery-apex.riv','assets/editorial/strip-1.png','assets/editorial/strip-6.png','assets/menu/menu-1.png','assets/menu/menu-4.png','assets/images/social-poster.png'].forEach(function(f){require('fs').accessSync(f)}); console.log('build ok')\""
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
   }
 }

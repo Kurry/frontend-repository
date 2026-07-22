@@ -1,0 +1,175 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "spacing_matches_terminal_window_scale"
+description = "At 1440px, spacing among the atmospheric wallpaper, centered terminal window, and macOS traffic-light titlebar follows a consistent scale matching the reference screenshots — no arbitrary one-off gaps that break the terminal-over-wallpaper composition."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "typography_matches_jetbrains_mono_spec"
+description = "Terminal body, prompt, and output use JetBrains Mono (bundled) consistent with the reference — not a default system UI stack for shell text."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "desktop_composition_matches_reference"
+description = "At 1440px the layout matches the reference composition within a small tolerance: full-bleed wallpaper behind a centered terminal window with traffic-light titlebar — one terminal-over-wallpaper composition, not a multi-section marketing landing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "specified_state_changes_have_motion"
+description = "State changes the spec calls out — boot typewriter lines, post-boot ASCII/welcome enter, CLI thinking + staggered output, skill-bar fill, project card enter/exit on the board, and mode switch — show the specified transitions rather than hard cuts (verified via real UI controls)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "responsive_behavior_matches_reference_patterns"
+description = "At 375px vs 1440px, responsive behavior matches the reference patterns: at ≤768px the terminal expands toward full viewport width and the two-column welcome box stacks; Projects Board becomes a single column without losing badges or filters."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "chrome_and_board_styled_not_browser_default"
+description = "Traffic-light dots, consent banner, status badges, project cards/rows, Export Center tabs, Config Studio controls, and primary shell buttons use the terminal/chrome treatments from the spec rather than unstyled browser defaults."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "clear_hierarchy_ascii_welcome_prompt"
+description = "Typography hierarchy clearly distinguishes ASCII name art, welcome-box labels, command output blocks, and the focused prompt line."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "component_states_match_spec"
+description = "Titlebar dots, project cards/rows, autocomplete rows, and social/close buttons show distinct default, hover, and active treatments as specified."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "four_themes_recolor_consistently"
+description = "Dark (default), light, retro, and glass each recolor terminal background, text, accents, and chrome consistently from shared design tokens — switching via /themes, /dark, /light, /retro, or /glass updates the visible palette without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "microinteraction_timing_matches_spec"
+description = "Hover easing on titlebar dots, project cards/rows, autocomplete rows, and social/close buttons, plus brief fade on validation/confirmation lines, follow the specified microinteraction timing when driven through real controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "hardened_surfaces_fit_terminal_chrome"
+description = "Export Center, Config Studio, and Profiles panels read as in-terminal surfaces consistent with the reference terminal-over-wallpaper chrome rather than a bolted-on second app shell."
+type = "binary"
+weight = 1.0
+

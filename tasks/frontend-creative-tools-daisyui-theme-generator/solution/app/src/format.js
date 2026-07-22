@@ -16,6 +16,10 @@ function fontCss(id) {
   return f.css;
 }
 
+function fontContractValue(id) {
+  return (FONT_FAMILIES.find((x) => x.id === id) || FONT_FAMILIES[0]).contract;
+}
+
 export function toCSS(theme) {
   const lines = [];
   lines.push(`[data-theme="${slugOf(theme.name)}"] {`);
@@ -41,7 +45,7 @@ export function toJSON(theme) {
     size: { field: theme.size.field, selector: theme.size.selector },
     border: theme.border,
     effects: { depth: theme.depth === 1, noise: theme.noise === 1 },
-    fontFamily: theme.fontFamily,
+    fontFamily: fontContractValue(theme.fontFamily),
     options: {
       defaultTheme: !!theme.options.defaultTheme,
       defaultDarkTheme: !!theme.options.defaultDarkTheme,
@@ -141,9 +145,10 @@ export function validateDeclaredTheme(text) {
     else noise = doc.effects.noise ? 1 : 0;
   }
   let fontFamily = 'outfit';
-  if (!FONT_FAMILIES.some((f) => f.id === doc.fontFamily)) {
-    errors.push(`fontFamily must be one of ${FONT_FAMILIES.map((f) => f.id).join(', ')}`);
-  } else fontFamily = doc.fontFamily;
+  const declaredFont = FONT_FAMILIES.find((f) => f.contract === doc.fontFamily);
+  if (!declaredFont) {
+    errors.push(`fontFamily must be one of ${FONT_FAMILIES.map((f) => f.contract).join(', ')}`);
+  } else fontFamily = declaredFont.id;
   const options = { defaultTheme: false, defaultDarkTheme: false, darkColorScheme: false };
   if (typeof doc.options !== 'object' || doc.options === null) {
     errors.push('options is required (object with defaultTheme, defaultDarkTheme, darkColorScheme)');

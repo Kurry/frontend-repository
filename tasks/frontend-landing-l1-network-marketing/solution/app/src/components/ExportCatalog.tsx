@@ -2,12 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '@nanostores/react';
 import { $exportCatalogOpen, $events, $leads, $theme, loadCatalog, announce } from '../store';
 import { X, Copy, Download, UploadSimple } from 'phosphor-react';
-
-const escapeIcsText = (value: string) => value
-  .replace(/\\/g, '\\\\')
-  .replace(/\r\n|\r|\n/g, '\\n')
-  .replace(/;/g, '\\;')
-  .replace(/,/g, '\\,');
+import { buildCatalogJson, buildEventsIcs } from '../artifacts';
 
 export default function ExportCatalog() {
   const isOpen = useStore($exportCatalogOpen);
@@ -32,7 +27,7 @@ export default function ExportCatalog() {
     window.setTimeout(() => {
       $exportCatalogOpen.set(false);
       setClosing(false);
-      lastFocused.current?.focus?.();
+      lastFocused.current?.focus({ preventScroll: true });
       lastFocused.current = null;
     }, 160);
   };
@@ -49,36 +44,8 @@ export default function ExportCatalog() {
     }
   }, [isOpen, closing]);
 
-  const jsonPayload = JSON.stringify({
-    version: 1,
-    theme,
-    counts: {
-      events: events.length,
-      leads: leads.length,
-      upcoming: events.filter(e => e.status === 'upcoming').length,
-      featured: events.filter(e => e.status === 'featured').length,
-      past: events.filter(e => e.status === 'past').length
-    },
-    events,
-    leads
-  }, null, 2);
-
-  const icsPayload = [
-    'BEGIN:VCALENDAR',
-    'VERSION:2.0',
-    'PRODID:-//Ridge//Events//EN',
-    'CALSCALE:GREGORIAN',
-    ...events.map(e => [
-      'BEGIN:VEVENT',
-      `UID:${e.id}@ridge`,
-      `DTSTART;VALUE=DATE:${e.date.replace(/-/g, '')}`,
-      `SUMMARY:${escapeIcsText(e.title)}`,
-      `LOCATION:${escapeIcsText(e.city)}`,
-      `DESCRIPTION:${escapeIcsText(`${e.category} - ${e.status}`)}`,
-      'END:VEVENT'
-    ].join('\r\n')),
-    'END:VCALENDAR'
-  ].join('\r\n');
+  const jsonPayload = buildCatalogJson(events, leads, theme);
+  const icsPayload = buildEventsIcs(events);
 
   const copyText = async (text: string, setter: (val: boolean) => void, label: string) => {
     try {
@@ -151,23 +118,23 @@ export default function ExportCatalog() {
       <div
         ref={dialogRef}
         onKeyDown={trapFocus}
-        className={`bg-surface w-full max-w-5xl max-h-[88vh] rounded-xl shadow-2xl flex flex-col border border-white/10 overflow-hidden ${closing ? 'overlay-out' : 'overlay-in'}`}
+        className={`surface-copy bg-surface w-full max-w-5xl max-h-[88vh] rounded-xl shadow-2xl flex flex-col border border-current/10 overflow-hidden ${closing ? 'overlay-out' : 'overlay-in'}`}
       >
 
-        <div className="flex justify-between items-center p-6 border-b border-white/10 bg-void/50">
+        <div className="flex justify-between items-center p-6 border-b border-current/10 bg-surface">
           <h2 className="text-2xl font-bold display-font">Export Catalog</h2>
           <button ref={firstFocusRef} className="btn btn-square btn-ghost text-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={requestClose} aria-label="Close Export Catalog">
             <X size={24} />
           </button>
         </div>
 
-        <div className="flex-1 overflow-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-void">
+        <div className="void-copy flex-1 overflow-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-void">
 
           <div className="flex flex-col gap-4 min-h-[280px]">
             <div className="flex justify-between items-end gap-2 flex-wrap">
               <h3 className="font-bold text-lg">JSON Export</h3>
               <div className="flex gap-2">
-                <button aria-label="Copy catalog JSON" className="btn btn-sm btn-ghost gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => copyText(jsonPayload, setCopiedJson, 'Export JSON')}>
+                <button aria-label="Copy catalog JSON" className="btn btn-sm btn-ghost gap-2 text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => copyText(jsonPayload, setCopiedJson, 'Export JSON')}>
                   <Copy size={16} /> {copiedJson ? 'Copied' : 'Copy'}
                 </button>
                 <button aria-label="Download catalog JSON" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => downloadFile(jsonPayload, 'ridge-catalog.json', 'application/json')}>
@@ -175,7 +142,7 @@ export default function ExportCatalog() {
                 </button>
               </div>
             </div>
-            <div className="flex-1 bg-surface/50 border border-white/10 rounded-lg p-4 overflow-auto text-sm font-mono whitespace-pre text-gray-300" aria-label="JSON preview">
+            <div className="surface-copy flex-1 bg-surface border border-current/10 rounded-lg p-4 overflow-auto text-sm font-mono whitespace-pre opacity-90" aria-label="JSON preview">
               {jsonPayload}
             </div>
           </div>
@@ -185,7 +152,7 @@ export default function ExportCatalog() {
               <div className="flex justify-between items-end gap-2 flex-wrap">
                 <h3 className="font-bold text-lg">ICS Calendar</h3>
                 <div className="flex gap-2">
-                  <button aria-label="Copy catalog ICS" className="btn btn-sm btn-ghost gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => copyText(icsPayload, setCopiedIcs, 'Export ICS')}>
+                  <button aria-label="Copy catalog ICS" className="btn btn-sm btn-ghost gap-2 text-white hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => copyText(icsPayload, setCopiedIcs, 'Export ICS')}>
                     <Copy size={16} /> {copiedIcs ? 'Copied' : 'Copy'}
                   </button>
                   <button aria-label="Download catalog ICS" className="btn btn-sm btn-primary gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => downloadFile(icsPayload, 'ridge-events.ics', 'text/calendar')}>
@@ -193,14 +160,14 @@ export default function ExportCatalog() {
                   </button>
                 </div>
               </div>
-              <div className="flex-1 bg-surface/50 border border-white/10 rounded-lg p-4 overflow-auto text-sm font-mono whitespace-pre text-gray-300" aria-label="ICS preview">
+              <div className="surface-copy flex-1 bg-surface border border-current/10 rounded-lg p-4 overflow-auto text-sm font-mono whitespace-pre opacity-90" aria-label="ICS preview">
                 {icsPayload}
               </div>
             </div>
 
-            <div className="p-6 bg-surface/30 rounded-lg border border-white/10 flex flex-col gap-4">
+            <div className="surface-copy p-6 bg-surface rounded-lg border border-current/10 flex flex-col gap-4">
               <h3 className="font-bold text-lg">Import Catalog</h3>
-              <p className="text-sm text-gray-400">Load a previously exported catalog JSON file.</p>
+              <p className="text-sm opacity-70">Load a previously exported catalog JSON file.</p>
 
               <div className="flex gap-4 items-center flex-wrap">
                 <input

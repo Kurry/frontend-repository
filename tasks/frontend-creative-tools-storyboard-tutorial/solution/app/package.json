@@ -3,9 +3,13 @@
   "private": true,
   "scripts": {
     "verify:build": "node -e \"require('fs').accessSync('index.html')\"",
-    "start": "npx --yes serve -l 3000 -n"
+    "start": "npx --yes serve -l 3000 -n",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "serve": "^14.2.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
   }
 }

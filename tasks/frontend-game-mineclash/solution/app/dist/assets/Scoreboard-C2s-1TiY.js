@@ -1,1 +1,0 @@
-import{_}from"./preload-helper-CVfkMyKi.js";import{y as o,L as r}from"./core.min-DGtNB905.js";const t=o(r(()=>_(()=>import("./Scoreboard.tsx_Scoreboard_component_IcXLrc5UqwU-DsEiUc-B.js"),[]),"s_IcXLrc5UqwU")),e=o(r(()=>_(()=>import("./Scoreboard.tsx_PlayerPanel_component_nwa1BvVxOjY-YOLh5Vw3.js"),[]),"s_nwa1BvVxOjY"));export{e as P,t as S};

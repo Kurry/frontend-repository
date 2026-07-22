@@ -1,5 +1,11 @@
 import type { Lead, RidgeEvent, Theme } from './store';
 
+const escapeIcsText = (value: string) => value
+  .replace(/\\/g, '\\\\')
+  .replace(/\r\n|\r|\n/g, '\\n')
+  .replace(/;/g, '\\;')
+  .replace(/,/g, '\\,');
+
 export function buildCatalogJson(events: RidgeEvent[], leads: Lead[], theme: Theme) {
   return JSON.stringify({
     version: 1,
@@ -21,13 +27,14 @@ export function buildEventsIcs(events: RidgeEvent[]) {
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
     'PRODID:-//Ridge//Events//EN',
+    'CALSCALE:GREGORIAN',
     ...events.map((event) => [
       'BEGIN:VEVENT',
       `UID:${event.id}@ridge`,
-      `DTSTART:${event.date.replace(/-/g, '')}T000000Z`,
-      `SUMMARY:${event.title}`,
-      `LOCATION:${event.city}`,
-      `DESCRIPTION:${event.category} - ${event.status}`,
+      `DTSTART;VALUE=DATE:${event.date.replace(/-/g, '')}`,
+      `SUMMARY:${escapeIcsText(event.title)}`,
+      `LOCATION:${escapeIcsText(event.city)}`,
+      `DESCRIPTION:${escapeIcsText(`${event.category} - ${event.status}`)}`,
       'END:VEVENT',
     ].join('\r\n')),
     'END:VCALENDAR',

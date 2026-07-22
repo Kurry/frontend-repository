@@ -244,6 +244,7 @@ function toggleCompare() {
 }
 function setCeiling(val) {
   if (!Number.isInteger(val) || val < 0 || val > 100) return false;
+  if (state.ceiling === val) return true;
   pushUndo();
   state.ceiling = val;
   commit();
@@ -251,6 +252,7 @@ function setCeiling(val) {
 }
 function setFloor(val) {
   if (!Number.isInteger(val) || val < 0 || val > 1000000) return false;
+  if (state.floor === val) return true;
   pushUndo();
   state.floor = val;
   commit();
@@ -593,34 +595,44 @@ function buildChrome() {
 
   C.ceilingErr = el('div', { class: 'err-msg', id: 'err-bounce-rate-ceiling', role: 'alert' });
   C.ceilingHint = el('div', { class: 'thresh-hint', id: 'ceiling-hint' });
+  let ceilingCommitTimer = null;
+  const handleCeilingEntry = (e, immediate = false) => {
+    clearTimeout(ceilingCommitTimer);
+    const raw = e.target.value.trim();
+    const num = Number(raw);
+    if (raw === '' || !Number.isInteger(num) || num < 0 || num > 100) {
+      txt(C.ceilingErr, 'Bounce-rate ceiling must be an integer from 0 to 100');
+      return;
+    }
+    txt(C.ceilingErr, '');
+    if (immediate) setCeiling(num);
+    else ceilingCommitTimer = setTimeout(() => setCeiling(num), 250);
+  };
   C.ceilingInput = el('input', {
     type: 'number', class: 'thresh-input', id: 'bounce-rate-ceiling', min: 0, max: 100, step: 1,
     'aria-describedby': 'err-bounce-rate-ceiling ceiling-hint',
-    onchange: (e) => {
-      const raw = e.target.value.trim();
-      const num = Number(raw);
-      if (raw === '' || !Number.isInteger(num) || num < 0 || num > 100) {
-        txt(C.ceilingErr, 'Bounce-rate ceiling must be an integer from 0 to 100');
-        return;
-      }
-      txt(C.ceilingErr, '');
-      setCeiling(num);
-    },
+    oninput: (e) => handleCeilingEntry(e),
+    onchange: (e) => handleCeilingEntry(e, true),
   });
   C.floorErr = el('div', { class: 'err-msg', id: 'err-visitor-floor', role: 'alert' });
+  let floorCommitTimer = null;
+  const handleFloorEntry = (e, immediate = false) => {
+    clearTimeout(floorCommitTimer);
+    const raw = e.target.value.trim();
+    const num = Number(raw);
+    if (raw === '' || !Number.isInteger(num) || num < 0 || num > 1000000) {
+      txt(C.floorErr, 'Visitor floor must be an integer from 0 to 1,000,000');
+      return;
+    }
+    txt(C.floorErr, '');
+    if (immediate) setFloor(num);
+    else floorCommitTimer = setTimeout(() => setFloor(num), 250);
+  };
   C.floorInput = el('input', {
     type: 'number', class: 'thresh-input', id: 'visitor-floor', min: 0, max: 1000000, step: 1,
     'aria-describedby': 'err-visitor-floor',
-    onchange: (e) => {
-      const raw = e.target.value.trim();
-      const num = Number(raw);
-      if (raw === '' || !Number.isInteger(num) || num < 0 || num > 1000000) {
-        txt(C.floorErr, 'Visitor floor must be an integer from 0 to 1,000,000');
-        return;
-      }
-      txt(C.floorErr, '');
-      setFloor(num);
-    },
+    oninput: (e) => handleFloorEntry(e),
+    onchange: (e) => handleFloorEntry(e, true),
   });
 
   C.segBtn = el('button', {
@@ -929,7 +941,7 @@ function buildSiteModal() {
   const overlay = el('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Add site' }, [content]);
   installTrap(overlay, () => content, () => closeModal('site'));
   document.body.appendChild(overlay);
-  return { overlay, content, reset() { nameInput.value = ''; domainInput.value = ''; tzSelect.value = ''; txt(nameErr, ''); txt(domainErr, ''); txt(tzErr, ''); submitBtn.disabled = true; } };
+  return { overlay, content, reset() { nameInput.value = ''; domainInput.value = ''; tzSelect.value = ''; validate(); } };
 }
 
 function buildGoalModal() {
@@ -985,7 +997,7 @@ function buildGoalModal() {
   const overlay = el('div', { class: 'modal', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Add goal' }, [content]);
   installTrap(overlay, () => content, () => closeModal('goal'));
   document.body.appendChild(overlay);
-  return { overlay, content, reset() { nameInput.value = ''; typeSelect.value = ''; matchInput.value = ''; txt(nameErr, ''); txt(typeErr, ''); txt(matchErr, ''); submitBtn.disabled = true; } };
+  return { overlay, content, reset() { nameInput.value = ''; typeSelect.value = ''; matchInput.value = ''; validate(); } };
 }
 
 function buildSaveModal() {
@@ -1022,7 +1034,7 @@ function buildSaveModal() {
   document.body.appendChild(overlay);
   return {
     overlay, content,
-    onOpen() { nameInput.value = ''; txt(nameErr, ''); validate(false); },
+    onOpen() { nameInput.value = ''; validate(true); },
   };
 }
 
@@ -1369,8 +1381,14 @@ function update() {
   txt(C.ceilingHint, `now ${model.kpi.bounceRate}%`);
   C.customRangeControl.style.display = state.period === 'custom' ? '' : 'none';
   if (state.customRange) {
-    if (document.activeElement !== C.customFrom) C.customFrom.value = state.customRange.from;
-    if (document.activeElement !== C.customTo) C.customTo.value = state.customRange.to;
+    if (document.activeElement !== C.customFrom) {
+      C.customFrom.value = state.customRange.from;
+      txt(C.customFromErr, '');
+    }
+    if (document.activeElement !== C.customTo) {
+      C.customTo.value = state.customRange.to;
+      txt(C.customToErr, '');
+    }
   }
   C.siteBox.refresh();
   C.periodBox.refresh();

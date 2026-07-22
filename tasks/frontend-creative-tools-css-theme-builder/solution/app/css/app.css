@@ -1398,6 +1398,10 @@ input[aria-invalid="true"] ~ .validation-error {
     overflow: auto;
   }
 
+  .app-shell {
+    height: auto;
+  }
+
   .workspace {
     grid-template-columns: 1fr;
     height: auto;

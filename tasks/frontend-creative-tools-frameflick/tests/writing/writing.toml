@@ -1,0 +1,177 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.5
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "15.1"
+name = "headings_consistent_capitalization"
+description = "Where the app renders headings and section titles (FrameFlick branding, Background, Caption, Watermark, Saved presets, Collaboration labels), they use one consistent capitalization convention throughout."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.2"
+name = "action_labels_are_specific_verbs"
+description = "Where the app renders button or action labels, they use specific verbs such as Save preset, Apply to canvas, Download PNG, Copy image, Go offline, and Go online rather than generic Submit or OK when a specific label is possible."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.3"
+name = "errors_name_problem_and_fix"
+description = "Where the app renders error messages, they name the problem and the fix — for example Unsupported file type. Choose a PNG or JPG image, Invalid color. Enter six hexadecimal digits after #, or an empty-name message that names the name field — not merely Invalid."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.4"
+name = "empty_canvas_explains_next_step"
+description = "Where the app renders the empty canvas state, the copy Upload an image to get started explains what belongs there and how to add it."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.5"
+name = "body_copy_spelling_grammar"
+description = "Where the app renders body or panel helper copy (drop zone Drop PNG/JPG here / Choose image / Replace image, shadow labels None through Hard, Collaboration Shared editor / Shared content), rate how free it is of spelling and grammatical errors."
+type = "likert"
+points = 5
+weight = 0.5
+
+[[criterion]]
+id = "15.6"
+name = "frameflick_terminology_consistent"
+description = "Where the app renders labels for the same concept in multiple places, terminology stays consistent (Saved presets / Apply / Del, Caption, Watermark, Shared content) rather than mixing synonyms like preset vs theme or caption vs title inconsistently."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.7"
+name = "slider_values_and_units_consistent"
+description = "Where the app renders slider values and units, formatting is consistent: padding as a whole percent, corner radius in px, watermark opacity as percent, and zoom as percent."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.8"
+name = "copied_confirmation_specific"
+description = "Where the app renders confirmation after Copy image, it states Copied! rather than a vague affirmation."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "style_export_action_labels_specific"
+description = "Where the app renders export and history actions, labels use specific verbs such as Download style JSON, Copy style JSON, Import style JSON, Copy settings, Paste settings, Before/After, and Reset style rather than generic Submit or OK."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "hex_field_error_names_field_and_fix"
+description = "Where the app renders an invalid hex rejection, the copy names the problem and the fix as Invalid color. Enter six hexadecimal digits after # rather than a bare Invalid or Zod/schema jargon."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.13"
+name = "field_contract_import_error_names_field"
+description = "Where the app renders a field-contract import rejection (missing key, out-of-enum, out-of-bounds, or invalid hex), the visible copy names the offending field or shows Invalid style JSON for unparseable input — not a bare Failed or schema-library jargon alone."
+type = "binary"
+weight = 0.5
+

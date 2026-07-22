@@ -1,0 +1,158 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "8.1"
+name = "buttons_hover_state"
+description = "Log Reps, Gear Equip/Unlock, Reset Quest, History Delete, Settings Save/toggles, Game Mode, Start/Pause/Resume/End run, Undo/Redo/Apply scenario change, Export/Import, Save Progress, Resume Saved Run, and Difficulty controls show a visible hover state on the real UI controls"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "8.2"
+name = "keyboard_focus_ring_visible"
+description = "Those same controls show a visible focus ring when reached by keyboard Tab"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "8.3"
+name = "character_glides_on_log"
+description = "When a new set is logged via the real Log Reps control, the character sprite advances smoothly (glides, not teleports) along the quest map canvas path"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "8.4"
+name = "transient_notification_slide_and_dismiss"
+description = "Transient notification banners for zone unlock, boss defeat, gear bought, quest reset, export/import feedback, Victory, or Defeat slide or fade in and dismiss themselves shortly after"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "8.5"
+name = "history_delete_reveals_on_hover"
+description = "History Delete controls reveal on row hover or focus on wider viewports"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "8.6"
+name = "boss_defeat_confetti_celebration"
+description = "Defeating a boss or achieving Challenge Victory via the real qualifying action triggers a brief one-time confetti-style particle celebration that does not loop ambiently"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "8.7"
+name = "history_entries_animate_in_out"
+description = "Adding a set animates the new entry into the top of the History list, and deleting an entry animates it out rather than snapping"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "8.8"
+name = "reminder_banner_attention_treatment"
+description = "The Daily Reminder banner uses a noticeable attention treatment such as a pulse while visible"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "8.9"
+name = "zone_palette_swaps_on_reach"
+description = "Zone transitions on the quest map canvas swap the background palette as soon as a new zone is reached via real logging"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "8.10"
+name = "victory_defeat_panel_animates_in"
+description = "Victory and Defeat result panels animate in (fade or slide) when the run resolves rather than appearing with no transition"
+type = "binary"
+weight = 1.0

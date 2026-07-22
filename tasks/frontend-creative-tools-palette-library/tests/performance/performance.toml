@@ -1,0 +1,175 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_under_two_seconds"
+description = "On a local cold load the palette library becomes interactive within 2 seconds, with the seeded palettes and Nomenclature Browse view already usable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_clean_during_full_exercise"
+description = "No console errors or warnings appear during a full exercise: browsing all three views, filtering by period, creating, editing, deleting, copying a swatch, exporting, importing, cart add, and dismissing the subscribe popup."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "view_and_filter_respond_under_100ms"
+description = "Switching Nomenclature/Palette/Swatch or changing Filter by Period updates the visible library with UI response in under 100ms (perceived immediate)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "shell_visible_while_settling"
+description = "While the app settles after first paint, the sticky header and library region remain visible rather than a blank white screen with no controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "library_scrolls_without_lag"
+description = "With the seeded historical rows and at least six user palettes present, scrolling Nomenclature or Palette view shows no perceived lag."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "ui_interactive_during_state_changes"
+description = "During create/delete card transitions and view switches, controls remain interactive — the UI does not freeze until animations finish."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "card_and_view_motion_holds_frame_rate"
+description = "Driven through real UI controls, palette card enter/exit and Browse view switches maintain a smooth frame rate without visible hitching."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_view_and_filter_never_hang"
+description = "Rapid repeated view switching and filter changes stay responsive with no hangs, dropped interactions, or layout breakage, and leave the visible layout consistent with the selected view and period."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_library_session_stable"
+description = "After an extended session of many view switches, filter changes, creates, edits, deletes, and swatch copies, the tab remains responsive without runaway memory growth that freezes the UI."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.10"
+name = "no_layout_jumps_after_first_paint"
+description = "After first paint no visible layout jumps occur; header, intro, and library regions hold their space as the app settles."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.11"
+name = "color_recompute_keeps_up"
+description = "Contrast-matrix recomputation, color-wheel dragging, and batch H/S/L live preview keep up with pointer movement without freezing editor controls or dropping the interaction"
+type = "binary"
+weight = 1.0
+

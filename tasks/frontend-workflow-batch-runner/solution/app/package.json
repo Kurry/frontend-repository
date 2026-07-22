@@ -11,8 +11,8 @@
     "@carbon/icons-react": "^11.70.0",
     "@carbon/react": "^1.90.0",
     "@hookform/resolvers": "^5.2.2",
-    "@tanstack/react-virtual": "^3.13.12",
     "@tailwindcss/vite": "4.3.2",
+    "@tanstack/react-virtual": "^3.13.12",
     "papaparse": "^5.5.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -22,11 +22,12 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "sass": "^1.83.0",
+    "@playwright/test": "^1.61.0",
     "@types/papaparse": "^5.3.16",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.2",
+    "sass": "^1.83.0",
     "typescript": "^5.9.2",
     "vite": "^7.1.5"
   }

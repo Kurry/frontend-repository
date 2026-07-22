@@ -1,4 +1,4 @@
-import { component$, useContext, useSignal, useVisibleTask$ } from '@builder.io/qwik';
+import { component$, useComputed$, useContext, useSignal, useVisibleTask$ } from '@builder.io/qwik';
 import { AppCtx } from '../context';
 import type { HistoryNode } from '../types';
 import { undoHistory, redoHistory, applyHistoryNode } from '../gameLogic';
@@ -6,10 +6,17 @@ import { undoHistory, redoHistory, applyHistoryNode } from '../gameLogic';
 export const HistoryPanel = component$(() => {
   const store = useContext(AppCtx);
 
-  const current = store.historyNodes.find(n => n.id === store.currentHistoryId);
-  const selected = store.historyNodes.find(n => n.id === store.selectedHistoryId);
-  const canUndo = !!current && current.parentId !== null;
-  const canRedo = (current?.childIds.length ?? 0) > 0;
+  // These nodes are derived from ids that change in event handlers. Keeping
+  // them as computed signals prevents Qwik from serializing a stale node into
+  // the history detail panel while the direct current/selected markers move.
+  const current = useComputed$(() =>
+    store.historyNodes.find(n => n.id === store.currentHistoryId),
+  );
+  const selected = useComputed$(() =>
+    store.historyNodes.find(n => n.id === store.selectedHistoryId),
+  );
+  const canUndo = useComputed$(() => !!current.value && current.value.parentId !== null);
+  const canRedo = useComputed$(() => (current.value?.childIds.length ?? 0) > 0);
 
   // Entries that left the list (a branch was discarded on round reset / resume)
   // keep rendering with a fade-out class briefly instead of the list snapping
@@ -47,16 +54,16 @@ export const HistoryPanel = component$(() => {
         <div style={{ display: 'flex', gap: '6px' }}>
           <button
             class="btn-secondary"
-            style={{ padding: '4px 10px', fontSize: '12px', opacity: canUndo ? 1 : 0.4 }}
-            disabled={!canUndo}
+            style={{ padding: '4px 10px', fontSize: '12px', opacity: canUndo.value ? 1 : 0.4 }}
+            disabled={!canUndo.value}
             onClick$={() => undoHistory(store)}
           >
             ↩ Undo
           </button>
           <button
             class="btn-secondary"
-            style={{ padding: '4px 10px', fontSize: '12px', opacity: canRedo ? 1 : 0.4 }}
-            disabled={!canRedo}
+            style={{ padding: '4px 10px', fontSize: '12px', opacity: canRedo.value ? 1 : 0.4 }}
+            disabled={!canRedo.value}
             onClick$={() => redoHistory(store)}
           >
             Redo ↪
@@ -107,22 +114,22 @@ export const HistoryPanel = component$(() => {
         <div style={{ color: '#A8A29E', fontSize: '11px', letterSpacing: '0.4px', marginBottom: '6px' }}>
           History state
         </div>
-        {selected ? (
+        {selected.value ? (
           <div style={{ fontSize: '12px', lineHeight: 1.6 }}>
             <div>
               <span style={{ color: '#38BDF8', fontWeight: '700' }}>You</span>
               <span style={{ fontFamily: "'Courier New', monospace", color: '#FAFAF9', marginLeft: '6px' }}>
-                {selected.snapshot.player.score} pts, {selected.snapshot.player.strikes} {selected.snapshot.player.strikes === 1 ? 'strike' : 'strikes'}
+                {selected.value.snapshot.player.score} pts, {selected.value.snapshot.player.strikes} {selected.value.snapshot.player.strikes === 1 ? 'strike' : 'strikes'}
               </span>
             </div>
             <div>
               <span style={{ color: '#FB923C', fontWeight: '700' }}>Rival</span>
               <span style={{ fontFamily: "'Courier New', monospace", color: '#FAFAF9', marginLeft: '6px' }}>
-                {selected.snapshot.rival.score} pts, {selected.snapshot.rival.strikes} {selected.snapshot.rival.strikes === 1 ? 'strike' : 'strikes'}
+                {selected.value.snapshot.rival.score} pts, {selected.value.snapshot.rival.strikes} {selected.value.snapshot.rival.strikes === 1 ? 'strike' : 'strikes'}
               </span>
             </div>
             <div style={{ color: '#A8A29E' }}>
-              Turn: <span style={{ color: '#FAFAF9' }}>{selected.snapshot.currentTurn === 'player' ? 'Yours' : 'Rival\'s'}</span>
+              Turn: <span style={{ color: '#FAFAF9' }}>{selected.value.snapshot.currentTurn === 'player' ? 'Yours' : 'Rival\'s'}</span>
             </div>
           </div>
         ) : (
@@ -134,7 +141,7 @@ export const HistoryPanel = component$(() => {
       <button
         class="btn-primary"
         style={{ width: '100%', fontSize: '13px', padding: '8px' }}
-        disabled={!selected || selected.id === store.currentHistoryId}
+        disabled={!selected.value || selected.value.id === store.currentHistoryId}
         onClick$={() => {
           if (store.selectedHistoryId) {
             applyHistoryNode(store, store.selectedHistoryId);

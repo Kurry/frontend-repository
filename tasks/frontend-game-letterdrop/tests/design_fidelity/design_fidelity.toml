@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "spacing_follows_4px_scale"
+description = "HUD panels, tabs, and chrome spacing follow the 4px base unit and ~6px panel/card radius from the visual spec — evaluate HUD/screen fidelity, not canvas pixel-parity."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "typography_matches_letterdrop_spec"
+description = "Typography matches the spec: Arial-based stack; H1 near 34px (LetterDrop title), H2 near 17px, body near 17px on chrome surfaces."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "hud_layout_matches_reference_screens"
+description = "At desktop width, HUD + tabs + board chrome composition matches /reference-screenshots/ overview and segment panels within a small tolerance (spec text wins on conflict) — not pixel-perfect canvas tiles."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "specified_game_state_motions_present"
+description = "Spec-required motion states are present via the real UI path: tile fall, streak meter fill/reset, invalid-tray shake, pause dim + Paused overlay, toast fades, Board Cleared!/achievement particle bursts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "responsive_hud_matches_spec"
+description = "Responsive behavior matches the spec: at ~375px the board and HUD scale without horizontal scroll; at 1440px and 375px tabs/HUD/settings remain usable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "pill_buttons_match_spec"
+description = "Primary buttons (Submit Word, Pause, Export Run, Save Progress) use #007AFF / #FEFEFE full-pill (radius ~1000px) with no shadow; secondary (Undo Last Tile, Resume, Resume Saved Run, Copy, Import, Export History) use #E6EEF7 / #007AFF full-pill with no shadow — not browser-default buttons."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "title_vs_body_hierarchy"
+description = "Typography hierarchy clearly distinguishes the LetterDrop H1 title from 17px body/HUD labels."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "control_states_match_spec"
+description = "Button hover states are visible on Submit Word, Undo Last Tile, Pause, Resume, Save, Save Progress, Export Run, and Play again; Settings Save stays disabled until the form is valid."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "palette_and_hazard_treatments"
+description = "Chrome uses #F5F5F7 background with #007AFF accent for primary CTA, streak badge, and tier readout; the danger line reads as a warning-toned hazard distinct from the board; locked achievements use muted/grayscale vs full color when unlocked."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "microinteractions_match_spec_path"
+description = "Hover/focus-visible transitions on real chrome controls and settings open/close short transition match the motion/visual spec when exercised through the UI (not a state shortcut)."
+type = "binary"
+weight = 1.0
+

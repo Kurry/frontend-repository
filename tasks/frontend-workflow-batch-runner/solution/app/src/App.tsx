@@ -306,7 +306,7 @@ function PendingQueue({ run }: { run: Run }) {
 
   const focusQueueEntry = (itemIndex: number) => {
     window.requestAnimationFrame(() => {
-      document.querySelector<HTMLElement>(`[data-queue-item="${itemIndex}"] [aria-label^="Move item"]`)?.focus()
+      document.querySelector<HTMLElement>(`[data-queue-item="${itemIndex}"] button:not(:disabled)`)?.focus()
     })
   }
 

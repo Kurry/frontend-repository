@@ -1,0 +1,170 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "capture_then_today_flow"
+description = "Create flow: capturing a spark via the capture bar increases the inbox count by one, shows the spark at the top with a Captured timestamp, and Today lists it under Unthreaded without reload."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.2"
+name = "invalid_capture_inline_validation"
+description = "Create flow: empty capture or empty thread title shows the exact inline validation message and creates nothing."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.3"
+name = "edit_spark_updates_everywhere"
+description = "Edit flow: editing a spark's text updates it in the inbox or Timeline, search results, and Today without reload."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.4"
+name = "delete_spark_clears_all_surfaces"
+description = "Delete flow: deleting a spark removes it from inbox/Timeline, Today, search, and removes its reflections."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.5"
+name = "home_today_archived_switch_retains_data"
+description = "View switch: moving among Home, Today, Archived, and thread detail retains the same sparks/threads/statuses without reload."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.6"
+name = "last_delete_reveals_empty_states"
+description = "Edge: deleting the last spark and last thread restores 'Capture your first spark' and 'No threads yet'."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.7"
+name = "tag_and_search_filter_flows"
+description = "Filter flow: tag chips and Search narrow visible sparks/threads; Clear Filters / clearing search restores full lists."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.8"
+name = "export_drawer_preserves_workflow"
+description = "Chrome: opening Export then closing it returns to the prior Home/Today/detail context with data intact."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.9"
+name = "merge_and_import_overlays"
+description = "Overlays: Merge Into… two-step confirm, Export drawer, Import dialog, and command palette support their expected flows and dismiss cleanly."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.10"
+name = "failed_import_recovers_without_reload"
+description = "Recovery: a rejected Import leaves prior workspace intact and the user can continue capturing without a reload."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.11"
+name = "artifact_end_state_flow"
+description = "Artifact end-state flow: capture, thread, assign, tag, reflect, set status, open Export — Workspace JSON and Today digest contain the session work; Copy confirms; Download+Import reconstructs the same visible state."
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "6.12"
+name = "batch_then_undo_flow"
+description = "Batch then undo: select three sparks, bulk Add Tag, confirm tag filter count rises by three, Undo restores prior tags and counts."
+type = "binary"
+weight = 1.0

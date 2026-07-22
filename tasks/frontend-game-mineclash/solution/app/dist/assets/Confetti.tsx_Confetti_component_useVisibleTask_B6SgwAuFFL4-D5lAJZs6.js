@@ -1,0 +1,1 @@
+import{v as o}from"./core.min-DVALGa4Q.js";import{x as u}from"./core.min-DVALGa4Q.js";import"./preloader-Bns9QiKi.js";const a=()=>{const[t]=o(),e=setTimeout(()=>{t.value=!1},1600);return()=>clearTimeout(e)};export{u as _hW,a as s_B6SgwAuFFL4};
