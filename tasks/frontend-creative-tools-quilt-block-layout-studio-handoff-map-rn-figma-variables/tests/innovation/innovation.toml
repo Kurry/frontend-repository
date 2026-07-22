@@ -1,0 +1,29 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation"
+description = "Did the builder implement any substantial, domain-relevant features, polished interactions, or power-user enhancements not covered by other criteria? (Requires clear evidence of functionality beyond the baseline requirements)."
+type = "binary"
+weight = 0.0
+
+[[criterion]]
+id = "AC-11"
+name = "linked_utility"
+description = "Linked views provide domain utility beyond CRUD for making the next decision."
+type = "binary"
+weight = 1.0

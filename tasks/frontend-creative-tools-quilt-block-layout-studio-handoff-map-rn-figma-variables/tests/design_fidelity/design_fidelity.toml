@@ -1,0 +1,29 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "AC-12"
+name = "source_fidelity"
+description = "The visual and interaction thesis is coherent without copying unrelated screens."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-28"
+name = "clear_design_system"
+description = "A distinctive, domain-specific workbench with clear state tokens."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,36 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "AC-04"
+name = "schema_contract"
+description = "The tool result and artifact contain the declared API-shaped fields."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-21"
+name = "in_memory_state_only"
+description = "The application uses only in-memory state; reloading the page resets the app to the seeded baseline."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-22"
+name = "web_mcp_bindings"
+description = "WebMCP bindings correctly implement editor, entity, and artifact operations based on the state."
+type = "binary"
+weight = 1.0

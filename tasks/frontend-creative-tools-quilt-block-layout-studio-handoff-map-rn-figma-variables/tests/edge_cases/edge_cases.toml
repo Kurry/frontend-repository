@@ -1,0 +1,29 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "AC-06"
+name = "boundaries_recovery"
+description = "Each invalid action (exact bounds, invalid cross-field value, empty state, malformed import) gives field-level recovery and preserves prior valid state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-24"
+name = "duplicate_ids_rejected"
+description = "Importing records with duplicate IDs rejects the import with no mutation."
+type = "binary"
+weight = 1.0

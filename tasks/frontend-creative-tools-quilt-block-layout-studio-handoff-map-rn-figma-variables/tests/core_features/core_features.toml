@@ -1,0 +1,50 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+
+[[criterion]]
+id = "AC-01"
+name = "signature_mutation"
+description = "Connecting a selected record to a handoff owner and updating its readiness changes the primary record, linked view, and status together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-14"
+name = "invalid_mutation_rejected"
+description = "A conflicting or incomplete mutation is rejected without partial updates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-15"
+name = "undo_restores_state"
+description = "Undo restores ordering, selection, and derived values after a mutation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-16"
+name = "invalid_fields_preserve_state"
+description = "Invalid required fields preserve the prior valid record and explain recovery."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-17"
+name = "shared_state_updates"
+description = "Mutating records updates the handoff-map geometry/selection, derived summaries, and event history."
+type = "binary"
+weight = 1.0
