@@ -540,7 +540,7 @@ function LibraryView() {
           </button>
           <Tag type="blue" size="sm">{item.technique}</Tag>
           <span className="attachment-count"><Attachment size={15} />{item.attachments.length}</span>
-          <Button size="sm" kind="ghost" renderIcon={TrashCan} onClick={() => removeWithExit(item.id)} {...iconOnly(`Delete ${item.title}`)} />
+          <Button size="sm" kind="ghost" renderIcon={TrashCan} disabled={leaving.includes(item.id)} onClick={() => removeWithExit(item.id)} {...iconOnly(`Delete ${item.title}`)} />
         </Tile>
       ))}</div> : library.length === 0 ? (
         <div className="empty-state library-empty"><FolderOpen size={42} /><h2>Your Library Is Empty</h2><p>Saved prompt records will appear here with their techniques and attachments.</p><Button onClick={() => switchView('workbench')}>Return to Workbench</Button></div>

@@ -4,7 +4,10 @@ import { ASSETS, MODELS, PERSONAS, SEEDED_LIBRARY, detectVariables, modelById, r
 const makeBindings = (text, current = {}) => Object.fromEntries(detectVariables(text).map((name) => [name, current[name] ?? '']))
 
 const snapshotKeys = ['draft', 'bindings', 'selectedModelId', 'activePersona', 'attachmentIds', 'library']
-const snapshot = (state) => Object.fromEntries(snapshotKeys.map((key) => [key, structuredClone(state[key])]))
+// Workbench mutations replace arrays/objects instead of mutating them in place,
+// so history can retain their immutable references. Deep-cloning the seeded
+// library on every editor keystroke made large drafts needlessly expensive.
+const snapshot = (state) => Object.fromEntries(snapshotKeys.map((key) => [key, state[key]]))
 
 const withHistory = (set, get, changes) => {
   const before = snapshot(get())

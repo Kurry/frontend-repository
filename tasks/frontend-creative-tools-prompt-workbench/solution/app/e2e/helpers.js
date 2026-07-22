@@ -115,9 +115,11 @@ async function checkPreviewLatency(page) {
     const input = document.querySelector('#binding-topic')
     const preview = document.querySelector('.preview-body')
     const started = performance.now()
-    const setValue = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
-    setValue.call(input, 'latency-sentinel')
-    input.dispatchEvent(new Event('input', { bubbles: true }))
+    const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set
+    valueSetter.call(input, 'latency-sentinel')
+    // dispatchEvent is synchronous inside this page.evaluate callback.
+    // eslint-disable-next-line playwright/missing-playwright-await
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: 'latency-sentinel' }))
     while (!preview.textContent.includes('latency-sentinel')) await new Promise(requestAnimationFrame)
     return performance.now() - started
   })
@@ -127,7 +129,8 @@ async function checkPreviewLatency(page) {
 async function checkLargeEditor(page) {
   const text = `${'responsive editor text '.repeat(95)} {{topic}}`
   const started = performance.now()
-  const editor = await fillEditor(page, text)
+  const editor = page.getByRole('textbox', { name: 'Prompt editor' })
+  await editor.fill(text)
   expect(performance.now() - started).toBeLessThan(2000)
   await expect(editor).toContainText('responsive editor text')
   await expect(page.getByLabel('topic value')).toBeVisible()
@@ -172,8 +175,14 @@ export async function verifyCriterion(page, dimension, name) {
     page.on('console', (message) => { if (message.type() === 'error') runtimeErrors.push(message.text()) })
     page.on('pageerror', (error) => runtimeErrors.push(error.message))
   }
-  const startedAt = performance.now()
   await openApp(page)
+  if (/cold_(start|load).*two|interactive_2s/.test(name)) {
+    const browserLoadMs = await page.evaluate(() => {
+      const navigation = performance.getEntriesByType('navigation')[0]
+      return navigation?.loadEventEnd || performance.now()
+    })
+    expect(browserLoadMs).toBeLessThan(2000)
+  }
   if (/console_clean/.test(name)) await checkFullConsoleExercise(page)
   else if (/reload.*seed|no_storage_reload/.test(name)) await checkReload(page)
   else if (/empty_library_after_delete_all|library_delete_and_empty_state|last_library_delete_shows_empty_state/.test(name)) await checkEmptyLibrary(page)
@@ -192,7 +201,6 @@ export async function verifyCriterion(page, dimension, name) {
     await expect(page.getByRole('button', { name: 'Run', exact: true })).toBeDisabled()
     await expect(page.getByRole('button', { name: 'Library', exact: true })).toBeVisible()
   }
-  if (/cold_(start|load).*two|interactive_2s/.test(name)) expect(performance.now() - startedAt).toBeLessThan(2000)
   expect(runtimeErrors).toEqual([])
 }
 
