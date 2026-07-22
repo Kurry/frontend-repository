@@ -99,6 +99,11 @@
     "instruction": "tasks/frontend-creative-tools-prompt-workbench/instruction.md",
     "description": "Prompt workbench editor with streaming runs, variants, and library."
   },
+  "frontend-creative-tools-quilt-seam-topology-studio": {
+    "source": "feature-quilt-seam-topology-studio PRD",
+    "instruction": "tasks/frontend-creative-tools-quilt-seam-topology-studio/instruction.md",
+    "description": "Quilt topology studio for pieces, seams, fabric nesting, assembly, and interoperable project artifacts."
+  },
   "frontend-creative-tools-rubric-studio": {
     "source": "mercor-constellation rubric surfaces (debranded)",
     "instruction": "tasks/frontend-creative-tools-rubric-studio/instruction.md",

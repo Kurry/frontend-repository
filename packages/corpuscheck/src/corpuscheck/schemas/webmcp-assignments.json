@@ -1471,6 +1471,31 @@
       ]
     },
     {
+      "task": "frontend-creative-tools-quilt-seam-topology-studio",
+      "modules": [
+        "structured-editor-v1",
+        "entity-collection-v1",
+        "artifact-transfer-v1"
+      ],
+      "bindings": {
+        "editor_object_types": ["piece", "seam", "nest"],
+        "editor_properties": ["transform", "orientation"],
+        "editor_operations": ["select", "update_property", "switch_mode", "preview", "set_content"],
+        "editor_modes": ["geometry", "fabric", "topology", "assembly", "proof"],
+        "entity": "quilt-entity",
+        "entity_operations": ["create", "select", "update", "delete", "toggle"],
+        "entity_fields": ["entity-type", "dimensions", "material", "order", "revision"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["quilt-project-json", "piece-manifest-csv", "templates-svg", "assembly-plan-json", "maker-notes-md"],
+        "import_modes": ["quilt-project-json"]
+      },
+      "mechanics_exclusions": [
+        "Canvas selection, panning, zooming, dragging, snapping, and keyboard movement stay Playwright-observed",
+        "Hover previews and export-menu reveal mechanics stay Playwright-observed",
+        "Native download, file-picker import, and clipboard contents stay Playwright-observed; WebMCP returns no artifact contents"
+      ]
+    },
+    {
       "task": "frontend-creative-tools-rubric-studio",
       "modules": [
         "structured-editor-v1",
