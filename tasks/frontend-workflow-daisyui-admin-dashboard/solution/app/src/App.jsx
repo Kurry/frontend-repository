@@ -87,7 +87,7 @@ function Sidebar() {
   const current = store.activeView.value;
   const setGroup = (name) => store.sidebarGroup.value = open === name ? null : name;
   return <>
-    {store.sidebarOpen.value && <button className="mobile-overlay" aria-label="Close navigation" onClick={() => store.sidebarOpen.value = false} />}
+    <button className={`mobile-overlay ${store.sidebarOpen.value ? 'open' : ''}`} aria-label="Close navigation" onClick={() => store.sidebarOpen.value = false} />
     <aside className={`sidebar ${store.sidebarOpen.value ? 'open' : ''}`} aria-label="Primary navigation">
       <div className="brand"><span className="brand-mark"><GlobeAltIcon className="icon" /></span>Pineapple Tech</div>
       <nav className="sidebar-nav">
@@ -229,7 +229,7 @@ function OperationsOverview() {
         <MetricLine a="Net revenue retention" b="112%"/><MetricLine a="Refund pressure" b="3.8%"/><MetricLine a="VIP escalations" b="14"/><MetricLine a="Stock on hand" b="42,800"/>
       </OverviewCard>
       <OverviewCard span="4" title="Inventory pressure" icon={ArchiveBoxIcon} action="Inventory board"><Progress label="Low stock · 42 SKUs" value={42}/><Progress label="Oversold · 7 SKUs" value={7}/><Progress label="Healthy stock · 1,284 SKUs" value={91}/></OverviewCard>
-      <OverviewCard span="6" title="Plugin and tool status" icon={PuzzlePieceIcon} action="Plugins"><table className="activity-table"><thead><tr><th>Component</th><th>Status</th><th>Signal</th></tr></thead><tbody>{[['Fraud Shield','Active','426 coupon blocks'],['Media Optimizer','Update','Backlog impact'],['Backup Vault','Active','Last snapshot 18m ago'],['Import queue','Ready','3 validated files']].map(r=><tr key={r[0]}><td>{r[0]}</td><td><span className="pill">{r[1]}</span></td><td>{r[2]}</td></tr>)}</tbody></table></OverviewCard>
+      <OverviewCard span="6" title="Plugin and tool status" icon={PuzzlePieceIcon} action="Plugins"><div className="table-scroll"><table className="activity-table"><thead><tr><th>Component</th><th>Status</th><th>Signal</th></tr></thead><tbody>{[['Fraud Shield','Active','426 coupon blocks'],['Media Optimizer','Update','Backlog impact'],['Backup Vault','Active','Last snapshot 18m ago'],['Import queue','Ready','3 validated files']].map(r=><tr key={r[0]}><td>{r[0]}</td><td><span className="pill">{r[1]}</span></td><td>{r[2]}</td></tr>)}</tbody></table></div></OverviewCard>
       <OverviewCard span="6" title="Fulfillment throughput" subtitle="Packed, shipped, returned, and delayed order movement" icon={TruckIcon}>
         <div className="chart-wrap small"><ChartCanvas data={lineData([16,22,31,28,42,53,61,55,67,78,88,81,94,103,109])}/></div><div className="metric-row"><div><strong>9,482</strong><span className="muted">Packed</span></div><div><strong>624</strong><span className="muted">Queued</span></div><div><strong>118</strong><span className="muted">Returns</span></div></div>
       </OverviewCard>
