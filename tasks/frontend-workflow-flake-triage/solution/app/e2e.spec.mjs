@@ -560,7 +560,7 @@ test('6.5 suite_switch_retains_chrome', async ({ page }) => {
 test('6.6 empty_quarantine_is_clear', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  await page.getByRole('button', { name: /Export triage report/i }).click();
+  await page.getByRole('button', { name: 'Export triage report', exact: true }).click();
   await page.getByRole('tab', { name: /Triage report JSON/i }).click();
   const report = JSON.parse(await page.locator('[data-export-preview="triage-report-json"]').innerText());
   for (const testRecord of report.tests) {
@@ -568,14 +568,15 @@ test('6.6 empty_quarantine_is_clear', async ({ page }) => {
     for (const run of testRecord.runs) run.result = 'pass';
   }
   report.quarantine = { allFail: [], flaky: [] };
-  await page.getByRole('button', { name: /Close export triage report/i }).click();
+  await page.getByRole('button', { name: 'Close export triage report' }).click();
+  await expect(page.getByRole('button', { name: 'Close export triage report' })).toBeHidden();
   await page.getByRole('button', { name: /Import triage report/i }).click();
   await page.locator('#import-json').fill(JSON.stringify(report));
   await page.getByRole('button', { name: /Import and replace suite/i }).click();
 
   await expect(page.locator('#all-fail-heading').locator('xpath=ancestor::section[1]')).toContainText('No tests whose five runs all fail.');
   await expect(page.locator('#flaky-heading').locator('xpath=ancestor::section[1]')).toContainText('No tests with mixed pass and fail runs.');
-  await page.getByRole('button', { name: /Export triage report/i }).click();
+  await page.getByRole('button', { name: 'Export triage report', exact: true }).click();
   await page.getByRole('tab', { name: /Triage report JSON/i }).click();
   const exported = JSON.parse(await page.locator('[data-export-preview="triage-report-json"]').innerText());
   expect(exported.quarantine).toEqual({ allFail: [], flaky: [] });
