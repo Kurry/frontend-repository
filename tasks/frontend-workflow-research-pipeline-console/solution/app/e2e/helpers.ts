@@ -48,6 +48,45 @@ export async function submitAndGetNewRun(page: Page, dialog: Locator) {
   return page.locator('.run-strip').first();
 }
 
+// One-shot read of the live "active jobs" rollup. The board's background
+// simulation ticks in real time (seeded runs can complete mid-test), so an
+// auto-retrying `toHaveText` assertion held open for several seconds can
+// observe a value change out from under it purely due to test/CI slowness
+// elsewhere in the run, unrelated to the action under test. Callers should
+// read this immediately after the definitive UI signal (e.g. right after
+// submitAndGetNewRun resolves, which already confirms the same store update
+// landed) and assert with a single equality check rather than a long retry
+// window.
+export async function activeJobs(page: Page) {
+  return Number((await page.getByTestId('active-jobs').textContent()) ?? 0);
+}
+
+// Installs a MutationObserver over the polite live region(s) and records
+// every value they ever hold. The board only keeps the single latest alert
+// in `aria-live="polite"` text, and the background simulation can push its
+// own alert (a seeded run completing) moments after an action under test —
+// reading the region's *current* text, even immediately, can miss the
+// announcement under test if it was already superseded by the time the test
+// gets to check. Recording the full history sidesteps the race entirely:
+// call this once near the start of a test, then assert against
+// `liveRegionLog` for whether the expected announcement was ever shown.
+export async function watchLiveRegions(page: Page) {
+  await page.evaluate(() => {
+    const w = window as unknown as { __liveRegionLog?: string[] };
+    w.__liveRegionLog = [];
+    const attach = (el: Element) => {
+      const record = () => w.__liveRegionLog!.push(el.textContent ?? '');
+      record();
+      new MutationObserver(record).observe(el, { childList: true, characterData: true, subtree: true });
+    };
+    document.querySelectorAll('.sr-only[aria-live="polite"]').forEach(attach);
+  });
+}
+
+export async function liveRegionLog(page: Page): Promise<string[]> {
+  return page.evaluate(() => (window as unknown as { __liveRegionLog?: string[] }).__liveRegionLog ?? []);
+}
+
 export async function downloadText(download: Download) {
   const path = await download.path();
   expect(path).toBeTruthy();

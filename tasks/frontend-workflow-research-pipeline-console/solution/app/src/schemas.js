@@ -20,9 +20,19 @@ export const makeJobConfigSchema = (eligibleDatasets = [], eligibleCheckpoints =
     if (!value.benchmark) ctx.addIssue({ code: 'custom', path: ['benchmark'], message: 'Benchmark is missing. Select a benchmark.' });
     if (value.repetitions == null || Number.isNaN(value.repetitions)) ctx.addIssue({ code: 'custom', path: ['repetitions'], message: 'Repetition count is missing. Enter a repetition count.' });
     if (value.model && !eligibleCheckpoints.includes(value.model)) ctx.addIssue({ code: 'custom', path: ['model'], message: 'Model is ineligible. Select a checkpoint from a completed fine-tuning phase.' });
+    if ('autoEvaluate' in value && value.autoEvaluate !== undefined) ctx.addIssue({ code: 'custom', path: ['autoEvaluate'], message: 'autoEvaluate must be absent for Evaluate' });
   }
-  if (value.jobType === 'Fine-tune' && value.dataset && !eligibleDatasets.includes(value.dataset)) {
-    ctx.addIssue({ code: 'custom', path: ['dataset'], message: 'Dataset is ineligible. Select a dataset from a completed data generation phase.' });
+  if (value.jobType === 'Fine-tune') {
+    if (value.dataset && !eligibleDatasets.includes(value.dataset)) {
+      ctx.addIssue({ code: 'custom', path: ['dataset'], message: 'Dataset is ineligible. Select a dataset from a completed data generation phase.' });
+    }
+    if ('benchmark' in value && value.benchmark !== undefined) ctx.addIssue({ code: 'custom', path: ['benchmark'], message: 'benchmark must be absent' });
+    if ('repetitions' in value && value.repetitions !== undefined) ctx.addIssue({ code: 'custom', path: ['repetitions'], message: 'repetitions must be absent' });
+  }
+  if (value.jobType === 'Data generation') {
+    if ('benchmark' in value && value.benchmark !== undefined) ctx.addIssue({ code: 'custom', path: ['benchmark'], message: 'benchmark must be absent' });
+    if ('repetitions' in value && value.repetitions !== undefined) ctx.addIssue({ code: 'custom', path: ['repetitions'], message: 'repetitions must be absent' });
+    if ('autoEvaluate' in value && value.autoEvaluate !== undefined) ctx.addIssue({ code: 'custom', path: ['autoEvaluate'], message: 'autoEvaluate must be absent' });
   }
 });
 
@@ -43,22 +53,50 @@ export function sanitizeJobConfig(raw, eligibleDatasets = [], eligibleCheckpoint
   return config;
 }
 
-export const exportedRunSchema = z.object({
-  runId: z.string(),
-  jobType: z.enum(JOB_TYPES),
-  dataset: z.string().min(1),
-  model: z.string().min(1),
-  count: z.number().int().min(1).max(50),
-  cluster: z.enum(CLUSTERS),
-  benchmark: z.enum(BENCHMARKS).optional(),
-  repetitions: z.number().int().min(1).max(10).optional(),
-  autoEvaluate: z.boolean().optional(),
-  phaseStatuses: z.tuple([
-    z.object({ phase: z.literal('data'), status: z.string() }),
-    z.object({ phase: z.literal('fineTune'), status: z.string() }),
-    z.object({ phase: z.literal('evaluation'), status: z.string() }),
-  ]),
-});
+export const exportedRunSchema = z.discriminatedUnion('jobType', [
+  z.object({
+    runId: z.string(),
+    jobType: z.literal('Data generation'),
+    dataset: z.string().min(1),
+    model: z.string().min(1),
+    count: z.number().int().min(1).max(50),
+    cluster: z.enum(CLUSTERS),
+    phaseStatuses: z.tuple([
+      z.object({ phase: z.literal('data'), status: z.string() }),
+      z.object({ phase: z.literal('fineTune'), status: z.string() }),
+      z.object({ phase: z.literal('evaluation'), status: z.string() }),
+    ]),
+  }).strict(),
+  z.object({
+    runId: z.string(),
+    jobType: z.literal('Fine-tune'),
+    dataset: z.string().min(1),
+    model: z.string().min(1),
+    count: z.number().int().min(1).max(50),
+    cluster: z.enum(CLUSTERS),
+    autoEvaluate: z.boolean().optional(),
+    phaseStatuses: z.tuple([
+      z.object({ phase: z.literal('data'), status: z.string() }),
+      z.object({ phase: z.literal('fineTune'), status: z.string() }),
+      z.object({ phase: z.literal('evaluation'), status: z.string() }),
+    ]),
+  }).strict(),
+  z.object({
+    runId: z.string(),
+    jobType: z.literal('Evaluate'),
+    dataset: z.string().min(1),
+    model: z.string().min(1),
+    count: z.number().int().min(1).max(50),
+    cluster: z.enum(CLUSTERS),
+    benchmark: z.enum(BENCHMARKS),
+    repetitions: z.number().int().min(1).max(10),
+    phaseStatuses: z.tuple([
+      z.object({ phase: z.literal('data'), status: z.string() }),
+      z.object({ phase: z.literal('fineTune'), status: z.string() }),
+      z.object({ phase: z.literal('evaluation'), status: z.string() }),
+    ]),
+  }).strict(),
+]);
 
 export const exportSchema = z.object({
   schemaVersion: z.literal(1),
