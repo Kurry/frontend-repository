@@ -1,0 +1,11 @@
+[task]
+slug = "frontend-data-tracking-household-waste-diversion-tracker-recovery-board-rn-canva-live-preview"
+genre = "good-app"
+name = "mercor-intelligence/frontend-data-tracking-household-waste-diversion-tracker-recovery-board-rn-canva-live-preview"
+
+[features]
+offline = true
+auth = false
+
+[portability]
+artifact = "waste-diversion-v1-recovery-board.json"

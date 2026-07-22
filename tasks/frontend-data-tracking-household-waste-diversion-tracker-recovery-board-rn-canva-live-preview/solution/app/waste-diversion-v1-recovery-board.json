@@ -1,0 +1,4117 @@
+{
+  "schemaVersion": "v1",
+  "exportedAt": "2026-07-22T14:18:20.351Z",
+  "records": [
+    {
+      "id": "evt-1001",
+      "name": "Household Waste Collection 1",
+      "date": "2026-06-16",
+      "status": "resolved",
+      "weightKg": 9.9,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 626,
+        "y": 273,
+        "selected": false
+      },
+      "notes": "Repaired downstream weight adjustment"
+    },
+    {
+      "id": "evt-1002",
+      "name": "Household Waste Collection 2",
+      "date": "2026-06-29",
+      "status": "changed",
+      "weightKg": 48,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 10,
+        "y": 152,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1003",
+      "name": "Household Waste Collection 3",
+      "date": "2026-05-21",
+      "status": "archived",
+      "weightKg": 43,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 186,
+        "y": 513,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1004",
+      "name": "Household Waste Collection 4",
+      "date": "2026-06-26",
+      "status": "conflict",
+      "weightKg": 20,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 126,
+        "y": 464,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1005",
+      "name": "Household Waste Collection 5",
+      "date": "2026-04-27",
+      "status": "resolved",
+      "weightKg": 7,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 511,
+        "y": 404,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1006",
+      "name": "Household Waste Collection 6",
+      "date": "2026-05-13",
+      "status": "draft",
+      "weightKg": 9,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 322,
+        "y": 40,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1007",
+      "name": "Household Waste Collection 7",
+      "date": "2026-05-05",
+      "status": "ready",
+      "weightKg": 15,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 200,
+        "y": 198,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1008",
+      "name": "Household Waste Collection 8",
+      "date": "2026-06-02",
+      "status": "changed",
+      "weightKg": 8,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 20,
+        "y": 374,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1009",
+      "name": "Household Waste Collection 9",
+      "date": "2026-06-13",
+      "status": "archived",
+      "weightKg": 53,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 721,
+        "y": 71,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1010",
+      "name": "Household Waste Collection 10",
+      "date": "2026-04-06",
+      "status": "conflict",
+      "weightKg": 45,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 607,
+        "y": 109,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1011",
+      "name": "Household Waste Collection 11",
+      "date": "2026-04-16",
+      "status": "resolved",
+      "weightKg": 34,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 338,
+        "y": 590,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1012",
+      "name": "Household Waste Collection 12",
+      "date": "2026-06-15",
+      "status": "draft",
+      "weightKg": 17,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 40,
+        "y": 445,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1013",
+      "name": "Household Waste Collection 13",
+      "date": "2026-05-03",
+      "status": "ready",
+      "weightKg": 35,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 344,
+        "y": 90,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1014",
+      "name": "Household Waste Collection 14",
+      "date": "2026-05-04",
+      "status": "changed",
+      "weightKg": 17,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 643,
+        "y": 418,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1015",
+      "name": "Household Waste Collection 15",
+      "date": "2026-06-28",
+      "status": "archived",
+      "weightKg": 47,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 417,
+        "y": 190,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1016",
+      "name": "Household Waste Collection 16",
+      "date": "2026-04-25",
+      "status": "conflict",
+      "weightKg": 7,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 260,
+        "y": 394,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1017",
+      "name": "Household Waste Collection 17",
+      "date": "2026-05-08",
+      "status": "resolved",
+      "weightKg": 10,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 749,
+        "y": 522,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1018",
+      "name": "Household Waste Collection 18",
+      "date": "2026-07-12",
+      "status": "draft",
+      "weightKg": 10,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 190,
+        "y": 596,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1019",
+      "name": "Household Waste Collection 19",
+      "date": "2026-05-17",
+      "status": "ready",
+      "weightKg": 48,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 780,
+        "y": 65,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1020",
+      "name": "Household Waste Collection 20",
+      "date": "2026-06-08",
+      "status": "changed",
+      "weightKg": 8,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 67,
+        "y": 377,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1021",
+      "name": "Household Waste Collection 21",
+      "date": "2026-07-05",
+      "status": "archived",
+      "weightKg": 8,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 377,
+        "y": 387,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1022",
+      "name": "Household Waste Collection 22",
+      "date": "2026-06-27",
+      "status": "conflict",
+      "weightKg": 7,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 50,
+        "y": 443,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1023",
+      "name": "Household Waste Collection 23",
+      "date": "2026-04-03",
+      "status": "resolved",
+      "weightKg": 18,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 590,
+        "y": 410,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1024",
+      "name": "Household Waste Collection 24",
+      "date": "2026-06-11",
+      "status": "draft",
+      "weightKg": 30,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 65,
+        "y": 422,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1025",
+      "name": "Household Waste Collection 25",
+      "date": "2026-04-19",
+      "status": "ready",
+      "weightKg": 53,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 315,
+        "y": 531,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1026",
+      "name": "Household Waste Collection 26",
+      "date": "2026-07-11",
+      "status": "changed",
+      "weightKg": 24,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 651,
+        "y": 586,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1027",
+      "name": "Household Waste Collection 27",
+      "date": "2026-04-08",
+      "status": "archived",
+      "weightKg": 32,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 60,
+        "y": 278,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1028",
+      "name": "Household Waste Collection 28",
+      "date": "2026-06-26",
+      "status": "conflict",
+      "weightKg": 36,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 761,
+        "y": 38,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1029",
+      "name": "Household Waste Collection 29",
+      "date": "2026-05-17",
+      "status": "resolved",
+      "weightKg": 42,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 590,
+        "y": 260,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1030",
+      "name": "Household Waste Collection 30",
+      "date": "2026-05-29",
+      "status": "draft",
+      "weightKg": 11,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 289,
+        "y": 544,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1031",
+      "name": "Household Waste Collection 31",
+      "date": "2026-05-21",
+      "status": "ready",
+      "weightKg": 52,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 450,
+        "y": 181,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1032",
+      "name": "Household Waste Collection 32",
+      "date": "2026-03-30",
+      "status": "changed",
+      "weightKg": 12,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 747,
+        "y": 591,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1033",
+      "name": "Household Waste Collection 33",
+      "date": "2026-07-04",
+      "status": "archived",
+      "weightKg": 23,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 488,
+        "y": 146,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1034",
+      "name": "Household Waste Collection 34",
+      "date": "2026-04-28",
+      "status": "conflict",
+      "weightKg": 5,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 553,
+        "y": 554,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1035",
+      "name": "Household Waste Collection 35",
+      "date": "2026-04-26",
+      "status": "resolved",
+      "weightKg": 34,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 743,
+        "y": 483,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1036",
+      "name": "Household Waste Collection 36",
+      "date": "2026-06-01",
+      "status": "draft",
+      "weightKg": 46,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 606,
+        "y": 500,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1037",
+      "name": "Household Waste Collection 37",
+      "date": "2026-03-30",
+      "status": "ready",
+      "weightKg": 46,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 278,
+        "y": 530,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1038",
+      "name": "Household Waste Collection 38",
+      "date": "2026-05-29",
+      "status": "changed",
+      "weightKg": 23,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 362,
+        "y": 403,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1039",
+      "name": "Household Waste Collection 39",
+      "date": "2026-07-11",
+      "status": "archived",
+      "weightKg": 27,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 274,
+        "y": 358,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1040",
+      "name": "Household Waste Collection 40",
+      "date": "2026-04-23",
+      "status": "conflict",
+      "weightKg": 34,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 285,
+        "y": 242,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1041",
+      "name": "Household Waste Collection 41",
+      "date": "2026-04-27",
+      "status": "resolved",
+      "weightKg": 42,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 303,
+        "y": 238,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1042",
+      "name": "Household Waste Collection 42",
+      "date": "2026-05-09",
+      "status": "draft",
+      "weightKg": 9,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 761,
+        "y": 89,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1043",
+      "name": "Household Waste Collection 43",
+      "date": "2026-07-05",
+      "status": "ready",
+      "weightKg": 7,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 179,
+        "y": 344,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1044",
+      "name": "Household Waste Collection 44",
+      "date": "2026-05-14",
+      "status": "changed",
+      "weightKg": 33,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 246,
+        "y": 67,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1045",
+      "name": "Household Waste Collection 45",
+      "date": "2026-06-20",
+      "status": "archived",
+      "weightKg": 35,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 34,
+        "y": 120,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1046",
+      "name": "Household Waste Collection 46",
+      "date": "2026-04-09",
+      "status": "conflict",
+      "weightKg": 20,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 335,
+        "y": 267,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1047",
+      "name": "Household Waste Collection 47",
+      "date": "2026-04-14",
+      "status": "resolved",
+      "weightKg": 6,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 25,
+        "y": 295,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1048",
+      "name": "Household Waste Collection 48",
+      "date": "2026-06-21",
+      "status": "draft",
+      "weightKg": 36,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 400,
+        "y": 4,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1049",
+      "name": "Household Waste Collection 49",
+      "date": "2026-06-19",
+      "status": "ready",
+      "weightKg": 27,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 277,
+        "y": 156,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1050",
+      "name": "Household Waste Collection 50",
+      "date": "2026-06-26",
+      "status": "changed",
+      "weightKg": 22,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 306,
+        "y": 347,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1051",
+      "name": "Household Waste Collection 51",
+      "date": "2026-04-30",
+      "status": "archived",
+      "weightKg": 48,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 30,
+        "y": 373,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1052",
+      "name": "Household Waste Collection 52",
+      "date": "2026-06-13",
+      "status": "conflict",
+      "weightKg": 17,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 522,
+        "y": 277,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1053",
+      "name": "Household Waste Collection 53",
+      "date": "2026-04-15",
+      "status": "resolved",
+      "weightKg": 40,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 352,
+        "y": 144,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1054",
+      "name": "Household Waste Collection 54",
+      "date": "2026-05-06",
+      "status": "draft",
+      "weightKg": 36,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 500,
+        "y": 583,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1055",
+      "name": "Household Waste Collection 55",
+      "date": "2026-06-15",
+      "status": "ready",
+      "weightKg": 20,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 602,
+        "y": 226,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1056",
+      "name": "Household Waste Collection 56",
+      "date": "2026-05-28",
+      "status": "changed",
+      "weightKg": 12,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 435,
+        "y": 197,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1057",
+      "name": "Household Waste Collection 57",
+      "date": "2026-05-11",
+      "status": "archived",
+      "weightKg": 13,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 767,
+        "y": 361,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1058",
+      "name": "Household Waste Collection 58",
+      "date": "2026-06-14",
+      "status": "conflict",
+      "weightKg": 30,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 709,
+        "y": 231,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1059",
+      "name": "Household Waste Collection 59",
+      "date": "2026-07-16",
+      "status": "resolved",
+      "weightKg": 38,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 278,
+        "y": 254,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1060",
+      "name": "Household Waste Collection 60",
+      "date": "2026-07-10",
+      "status": "draft",
+      "weightKg": 17,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 355,
+        "y": 165,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1061",
+      "name": "Household Waste Collection 61",
+      "date": "2026-06-01",
+      "status": "ready",
+      "weightKg": 9,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 757,
+        "y": 152,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1062",
+      "name": "Household Waste Collection 62",
+      "date": "2026-05-17",
+      "status": "changed",
+      "weightKg": 39,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 40,
+        "y": 158,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1063",
+      "name": "Household Waste Collection 63",
+      "date": "2026-05-24",
+      "status": "archived",
+      "weightKg": 33,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 228,
+        "y": 81,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1064",
+      "name": "Household Waste Collection 64",
+      "date": "2026-05-19",
+      "status": "conflict",
+      "weightKg": 38,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 164,
+        "y": 282,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1065",
+      "name": "Household Waste Collection 65",
+      "date": "2026-06-25",
+      "status": "resolved",
+      "weightKg": 52,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 363,
+        "y": 280,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1066",
+      "name": "Household Waste Collection 66",
+      "date": "2026-05-19",
+      "status": "draft",
+      "weightKg": 11,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 131,
+        "y": 158,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1067",
+      "name": "Household Waste Collection 67",
+      "date": "2026-05-28",
+      "status": "ready",
+      "weightKg": 13,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 623,
+        "y": 342,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1068",
+      "name": "Household Waste Collection 68",
+      "date": "2026-06-18",
+      "status": "changed",
+      "weightKg": 38,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 506,
+        "y": 589,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1069",
+      "name": "Household Waste Collection 69",
+      "date": "2026-04-07",
+      "status": "archived",
+      "weightKg": 5,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 194,
+        "y": 299,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1070",
+      "name": "Household Waste Collection 70",
+      "date": "2026-04-21",
+      "status": "conflict",
+      "weightKg": 35,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 330,
+        "y": 447,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1071",
+      "name": "Household Waste Collection 71",
+      "date": "2026-04-17",
+      "status": "resolved",
+      "weightKg": 40,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 106,
+        "y": 158,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1072",
+      "name": "Household Waste Collection 72",
+      "date": "2026-04-30",
+      "status": "draft",
+      "weightKg": 47,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 5,
+        "y": 78,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1073",
+      "name": "Household Waste Collection 73",
+      "date": "2026-04-02",
+      "status": "ready",
+      "weightKg": 12,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 213,
+        "y": 279,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1074",
+      "name": "Household Waste Collection 74",
+      "date": "2026-05-24",
+      "status": "changed",
+      "weightKg": 30,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 776,
+        "y": 156,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1075",
+      "name": "Household Waste Collection 75",
+      "date": "2026-06-19",
+      "status": "archived",
+      "weightKg": 20,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 519,
+        "y": 475,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1076",
+      "name": "Household Waste Collection 76",
+      "date": "2026-03-28",
+      "status": "conflict",
+      "weightKg": 12,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 790,
+        "y": 117,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1077",
+      "name": "Household Waste Collection 77",
+      "date": "2026-06-24",
+      "status": "resolved",
+      "weightKg": 54,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 222,
+        "y": 8,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1078",
+      "name": "Household Waste Collection 78",
+      "date": "2026-07-15",
+      "status": "draft",
+      "weightKg": 14,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 141,
+        "y": 264,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1079",
+      "name": "Household Waste Collection 79",
+      "date": "2026-06-16",
+      "status": "ready",
+      "weightKg": 36,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 359,
+        "y": 5,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1080",
+      "name": "Household Waste Collection 80",
+      "date": "2026-07-19",
+      "status": "changed",
+      "weightKg": 52,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 464,
+        "y": 33,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1081",
+      "name": "Household Waste Collection 81",
+      "date": "2026-04-05",
+      "status": "archived",
+      "weightKg": 22,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 207,
+        "y": 127,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1082",
+      "name": "Household Waste Collection 82",
+      "date": "2026-04-05",
+      "status": "conflict",
+      "weightKg": 30,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 598,
+        "y": 512,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1083",
+      "name": "Household Waste Collection 83",
+      "date": "2026-07-09",
+      "status": "resolved",
+      "weightKg": 34,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 652,
+        "y": 158,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1084",
+      "name": "Household Waste Collection 84",
+      "date": "2026-07-08",
+      "status": "draft",
+      "weightKg": 28,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 217,
+        "y": 387,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1085",
+      "name": "Household Waste Collection 85",
+      "date": "2026-07-15",
+      "status": "ready",
+      "weightKg": 12,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 26,
+        "y": 292,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1086",
+      "name": "Household Waste Collection 86",
+      "date": "2026-06-29",
+      "status": "changed",
+      "weightKg": 34,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 684,
+        "y": 528,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1087",
+      "name": "Household Waste Collection 87",
+      "date": "2026-05-15",
+      "status": "archived",
+      "weightKg": 53,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 427,
+        "y": 489,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1088",
+      "name": "Household Waste Collection 88",
+      "date": "2026-05-15",
+      "status": "conflict",
+      "weightKg": 49,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 431,
+        "y": 138,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1089",
+      "name": "Household Waste Collection 89",
+      "date": "2026-04-20",
+      "status": "resolved",
+      "weightKg": 24,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 629,
+        "y": 440,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1090",
+      "name": "Household Waste Collection 90",
+      "date": "2026-04-22",
+      "status": "draft",
+      "weightKg": 31,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 70,
+        "y": 13,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1091",
+      "name": "Household Waste Collection 91",
+      "date": "2026-06-25",
+      "status": "ready",
+      "weightKg": 44,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 585,
+        "y": 82,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1092",
+      "name": "Household Waste Collection 92",
+      "date": "2026-07-14",
+      "status": "changed",
+      "weightKg": 29,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 31,
+        "y": 312,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1093",
+      "name": "Household Waste Collection 93",
+      "date": "2026-04-12",
+      "status": "archived",
+      "weightKg": 10,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 82,
+        "y": 105,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1094",
+      "name": "Household Waste Collection 94",
+      "date": "2026-05-14",
+      "status": "conflict",
+      "weightKg": 18,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 16,
+        "y": 195,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1095",
+      "name": "Household Waste Collection 95",
+      "date": "2026-06-21",
+      "status": "resolved",
+      "weightKg": 33,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 653,
+        "y": 182,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1096",
+      "name": "Household Waste Collection 96",
+      "date": "2026-05-21",
+      "status": "draft",
+      "weightKg": 44,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 413,
+        "y": 278,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1097",
+      "name": "Household Waste Collection 97",
+      "date": "2026-05-21",
+      "status": "ready",
+      "weightKg": 27,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 448,
+        "y": 119,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1098",
+      "name": "Household Waste Collection 98",
+      "date": "2026-05-25",
+      "status": "changed",
+      "weightKg": 5,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 594,
+        "y": 527,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1099",
+      "name": "Household Waste Collection 99",
+      "date": "2026-07-10",
+      "status": "archived",
+      "weightKg": 46,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 460,
+        "y": 374,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1100",
+      "name": "Household Waste Collection 100",
+      "date": "2026-06-14",
+      "status": "conflict",
+      "weightKg": 45,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 263,
+        "y": 222,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1101",
+      "name": "Household Waste Collection 101",
+      "date": "2026-06-26",
+      "status": "resolved",
+      "weightKg": 43,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 791,
+        "y": 501,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1102",
+      "name": "Household Waste Collection 102",
+      "date": "2026-05-16",
+      "status": "draft",
+      "weightKg": 30,
+      "category": "Landfill",
+      "recoveryBoardState": {
+        "x": 104,
+        "y": 471,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1103",
+      "name": "Household Waste Collection 103",
+      "date": "2026-05-03",
+      "status": "ready",
+      "weightKg": 20,
+      "category": "Hazardous",
+      "recoveryBoardState": {
+        "x": 379,
+        "y": 23,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1104",
+      "name": "Household Waste Collection 104",
+      "date": "2026-07-15",
+      "status": "changed",
+      "weightKg": 18,
+      "category": "Recycling",
+      "recoveryBoardState": {
+        "x": 548,
+        "y": 102,
+        "selected": false
+      }
+    },
+    {
+      "id": "evt-1105",
+      "name": "Household Waste Collection 105",
+      "date": "2026-06-23",
+      "status": "archived",
+      "weightKg": 7,
+      "category": "Compost",
+      "recoveryBoardState": {
+        "x": 93,
+        "y": 341,
+        "selected": false
+      }
+    }
+  ],
+  "derived": {
+    "summary": {
+      "totalEvents": 105,
+      "totalWeightKg": 2887.9,
+      "readyCount": 17,
+      "conflictCount": 17,
+      "resolvedCount": 18
+    }
+  },
+  "history": [
+    [
+      {
+        "id": "evt-1001",
+        "name": "Household Waste Collection 1",
+        "date": "2026-06-16",
+        "status": "ready",
+        "weightKg": 11,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 626,
+          "y": 273,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1002",
+        "name": "Household Waste Collection 2",
+        "date": "2026-06-29",
+        "status": "changed",
+        "weightKg": 48,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 10,
+          "y": 152,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1003",
+        "name": "Household Waste Collection 3",
+        "date": "2026-05-21",
+        "status": "archived",
+        "weightKg": 43,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 186,
+          "y": 513,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1004",
+        "name": "Household Waste Collection 4",
+        "date": "2026-06-26",
+        "status": "conflict",
+        "weightKg": 20,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 126,
+          "y": 464,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1005",
+        "name": "Household Waste Collection 5",
+        "date": "2026-04-27",
+        "status": "resolved",
+        "weightKg": 7,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 511,
+          "y": 404,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1006",
+        "name": "Household Waste Collection 6",
+        "date": "2026-05-13",
+        "status": "draft",
+        "weightKg": 9,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 322,
+          "y": 40,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1007",
+        "name": "Household Waste Collection 7",
+        "date": "2026-05-05",
+        "status": "ready",
+        "weightKg": 15,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 200,
+          "y": 198,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1008",
+        "name": "Household Waste Collection 8",
+        "date": "2026-06-02",
+        "status": "changed",
+        "weightKg": 8,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 20,
+          "y": 374,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1009",
+        "name": "Household Waste Collection 9",
+        "date": "2026-06-13",
+        "status": "archived",
+        "weightKg": 53,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 721,
+          "y": 71,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1010",
+        "name": "Household Waste Collection 10",
+        "date": "2026-04-06",
+        "status": "conflict",
+        "weightKg": 45,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 607,
+          "y": 109,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1011",
+        "name": "Household Waste Collection 11",
+        "date": "2026-04-16",
+        "status": "resolved",
+        "weightKg": 34,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 338,
+          "y": 590,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1012",
+        "name": "Household Waste Collection 12",
+        "date": "2026-06-15",
+        "status": "draft",
+        "weightKg": 17,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 40,
+          "y": 445,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1013",
+        "name": "Household Waste Collection 13",
+        "date": "2026-05-03",
+        "status": "ready",
+        "weightKg": 35,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 344,
+          "y": 90,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1014",
+        "name": "Household Waste Collection 14",
+        "date": "2026-05-04",
+        "status": "changed",
+        "weightKg": 17,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 643,
+          "y": 418,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1015",
+        "name": "Household Waste Collection 15",
+        "date": "2026-06-28",
+        "status": "archived",
+        "weightKg": 47,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 417,
+          "y": 190,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1016",
+        "name": "Household Waste Collection 16",
+        "date": "2026-04-25",
+        "status": "conflict",
+        "weightKg": 7,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 260,
+          "y": 394,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1017",
+        "name": "Household Waste Collection 17",
+        "date": "2026-05-08",
+        "status": "resolved",
+        "weightKg": 10,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 749,
+          "y": 522,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1018",
+        "name": "Household Waste Collection 18",
+        "date": "2026-07-12",
+        "status": "draft",
+        "weightKg": 10,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 190,
+          "y": 596,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1019",
+        "name": "Household Waste Collection 19",
+        "date": "2026-05-17",
+        "status": "ready",
+        "weightKg": 48,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 780,
+          "y": 65,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1020",
+        "name": "Household Waste Collection 20",
+        "date": "2026-06-08",
+        "status": "changed",
+        "weightKg": 8,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 67,
+          "y": 377,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1021",
+        "name": "Household Waste Collection 21",
+        "date": "2026-07-05",
+        "status": "archived",
+        "weightKg": 8,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 377,
+          "y": 387,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1022",
+        "name": "Household Waste Collection 22",
+        "date": "2026-06-27",
+        "status": "conflict",
+        "weightKg": 7,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 50,
+          "y": 443,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1023",
+        "name": "Household Waste Collection 23",
+        "date": "2026-04-03",
+        "status": "resolved",
+        "weightKg": 18,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 590,
+          "y": 410,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1024",
+        "name": "Household Waste Collection 24",
+        "date": "2026-06-11",
+        "status": "draft",
+        "weightKg": 30,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 65,
+          "y": 422,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1025",
+        "name": "Household Waste Collection 25",
+        "date": "2026-04-19",
+        "status": "ready",
+        "weightKg": 53,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 315,
+          "y": 531,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1026",
+        "name": "Household Waste Collection 26",
+        "date": "2026-07-11",
+        "status": "changed",
+        "weightKg": 24,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 651,
+          "y": 586,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1027",
+        "name": "Household Waste Collection 27",
+        "date": "2026-04-08",
+        "status": "archived",
+        "weightKg": 32,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 60,
+          "y": 278,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1028",
+        "name": "Household Waste Collection 28",
+        "date": "2026-06-26",
+        "status": "conflict",
+        "weightKg": 36,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 761,
+          "y": 38,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1029",
+        "name": "Household Waste Collection 29",
+        "date": "2026-05-17",
+        "status": "resolved",
+        "weightKg": 42,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 590,
+          "y": 260,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1030",
+        "name": "Household Waste Collection 30",
+        "date": "2026-05-29",
+        "status": "draft",
+        "weightKg": 11,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 289,
+          "y": 544,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1031",
+        "name": "Household Waste Collection 31",
+        "date": "2026-05-21",
+        "status": "ready",
+        "weightKg": 52,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 450,
+          "y": 181,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1032",
+        "name": "Household Waste Collection 32",
+        "date": "2026-03-30",
+        "status": "changed",
+        "weightKg": 12,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 747,
+          "y": 591,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1033",
+        "name": "Household Waste Collection 33",
+        "date": "2026-07-04",
+        "status": "archived",
+        "weightKg": 23,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 488,
+          "y": 146,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1034",
+        "name": "Household Waste Collection 34",
+        "date": "2026-04-28",
+        "status": "conflict",
+        "weightKg": 5,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 553,
+          "y": 554,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1035",
+        "name": "Household Waste Collection 35",
+        "date": "2026-04-26",
+        "status": "resolved",
+        "weightKg": 34,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 743,
+          "y": 483,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1036",
+        "name": "Household Waste Collection 36",
+        "date": "2026-06-01",
+        "status": "draft",
+        "weightKg": 46,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 606,
+          "y": 500,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1037",
+        "name": "Household Waste Collection 37",
+        "date": "2026-03-30",
+        "status": "ready",
+        "weightKg": 46,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 278,
+          "y": 530,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1038",
+        "name": "Household Waste Collection 38",
+        "date": "2026-05-29",
+        "status": "changed",
+        "weightKg": 23,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 362,
+          "y": 403,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1039",
+        "name": "Household Waste Collection 39",
+        "date": "2026-07-11",
+        "status": "archived",
+        "weightKg": 27,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 274,
+          "y": 358,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1040",
+        "name": "Household Waste Collection 40",
+        "date": "2026-04-23",
+        "status": "conflict",
+        "weightKg": 34,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 285,
+          "y": 242,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1041",
+        "name": "Household Waste Collection 41",
+        "date": "2026-04-27",
+        "status": "resolved",
+        "weightKg": 42,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 303,
+          "y": 238,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1042",
+        "name": "Household Waste Collection 42",
+        "date": "2026-05-09",
+        "status": "draft",
+        "weightKg": 9,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 761,
+          "y": 89,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1043",
+        "name": "Household Waste Collection 43",
+        "date": "2026-07-05",
+        "status": "ready",
+        "weightKg": 7,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 179,
+          "y": 344,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1044",
+        "name": "Household Waste Collection 44",
+        "date": "2026-05-14",
+        "status": "changed",
+        "weightKg": 33,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 246,
+          "y": 67,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1045",
+        "name": "Household Waste Collection 45",
+        "date": "2026-06-20",
+        "status": "archived",
+        "weightKg": 35,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 34,
+          "y": 120,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1046",
+        "name": "Household Waste Collection 46",
+        "date": "2026-04-09",
+        "status": "conflict",
+        "weightKg": 20,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 335,
+          "y": 267,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1047",
+        "name": "Household Waste Collection 47",
+        "date": "2026-04-14",
+        "status": "resolved",
+        "weightKg": 6,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 25,
+          "y": 295,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1048",
+        "name": "Household Waste Collection 48",
+        "date": "2026-06-21",
+        "status": "draft",
+        "weightKg": 36,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 400,
+          "y": 4,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1049",
+        "name": "Household Waste Collection 49",
+        "date": "2026-06-19",
+        "status": "ready",
+        "weightKg": 27,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 277,
+          "y": 156,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1050",
+        "name": "Household Waste Collection 50",
+        "date": "2026-06-26",
+        "status": "changed",
+        "weightKg": 22,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 306,
+          "y": 347,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1051",
+        "name": "Household Waste Collection 51",
+        "date": "2026-04-30",
+        "status": "archived",
+        "weightKg": 48,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 30,
+          "y": 373,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1052",
+        "name": "Household Waste Collection 52",
+        "date": "2026-06-13",
+        "status": "conflict",
+        "weightKg": 17,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 522,
+          "y": 277,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1053",
+        "name": "Household Waste Collection 53",
+        "date": "2026-04-15",
+        "status": "resolved",
+        "weightKg": 40,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 352,
+          "y": 144,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1054",
+        "name": "Household Waste Collection 54",
+        "date": "2026-05-06",
+        "status": "draft",
+        "weightKg": 36,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 500,
+          "y": 583,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1055",
+        "name": "Household Waste Collection 55",
+        "date": "2026-06-15",
+        "status": "ready",
+        "weightKg": 20,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 602,
+          "y": 226,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1056",
+        "name": "Household Waste Collection 56",
+        "date": "2026-05-28",
+        "status": "changed",
+        "weightKg": 12,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 435,
+          "y": 197,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1057",
+        "name": "Household Waste Collection 57",
+        "date": "2026-05-11",
+        "status": "archived",
+        "weightKg": 13,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 767,
+          "y": 361,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1058",
+        "name": "Household Waste Collection 58",
+        "date": "2026-06-14",
+        "status": "conflict",
+        "weightKg": 30,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 709,
+          "y": 231,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1059",
+        "name": "Household Waste Collection 59",
+        "date": "2026-07-16",
+        "status": "resolved",
+        "weightKg": 38,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 278,
+          "y": 254,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1060",
+        "name": "Household Waste Collection 60",
+        "date": "2026-07-10",
+        "status": "draft",
+        "weightKg": 17,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 355,
+          "y": 165,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1061",
+        "name": "Household Waste Collection 61",
+        "date": "2026-06-01",
+        "status": "ready",
+        "weightKg": 9,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 757,
+          "y": 152,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1062",
+        "name": "Household Waste Collection 62",
+        "date": "2026-05-17",
+        "status": "changed",
+        "weightKg": 39,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 40,
+          "y": 158,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1063",
+        "name": "Household Waste Collection 63",
+        "date": "2026-05-24",
+        "status": "archived",
+        "weightKg": 33,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 228,
+          "y": 81,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1064",
+        "name": "Household Waste Collection 64",
+        "date": "2026-05-19",
+        "status": "conflict",
+        "weightKg": 38,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 164,
+          "y": 282,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1065",
+        "name": "Household Waste Collection 65",
+        "date": "2026-06-25",
+        "status": "resolved",
+        "weightKg": 52,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 363,
+          "y": 280,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1066",
+        "name": "Household Waste Collection 66",
+        "date": "2026-05-19",
+        "status": "draft",
+        "weightKg": 11,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 131,
+          "y": 158,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1067",
+        "name": "Household Waste Collection 67",
+        "date": "2026-05-28",
+        "status": "ready",
+        "weightKg": 13,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 623,
+          "y": 342,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1068",
+        "name": "Household Waste Collection 68",
+        "date": "2026-06-18",
+        "status": "changed",
+        "weightKg": 38,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 506,
+          "y": 589,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1069",
+        "name": "Household Waste Collection 69",
+        "date": "2026-04-07",
+        "status": "archived",
+        "weightKg": 5,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 194,
+          "y": 299,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1070",
+        "name": "Household Waste Collection 70",
+        "date": "2026-04-21",
+        "status": "conflict",
+        "weightKg": 35,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 330,
+          "y": 447,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1071",
+        "name": "Household Waste Collection 71",
+        "date": "2026-04-17",
+        "status": "resolved",
+        "weightKg": 40,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 106,
+          "y": 158,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1072",
+        "name": "Household Waste Collection 72",
+        "date": "2026-04-30",
+        "status": "draft",
+        "weightKg": 47,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 5,
+          "y": 78,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1073",
+        "name": "Household Waste Collection 73",
+        "date": "2026-04-02",
+        "status": "ready",
+        "weightKg": 12,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 213,
+          "y": 279,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1074",
+        "name": "Household Waste Collection 74",
+        "date": "2026-05-24",
+        "status": "changed",
+        "weightKg": 30,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 776,
+          "y": 156,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1075",
+        "name": "Household Waste Collection 75",
+        "date": "2026-06-19",
+        "status": "archived",
+        "weightKg": 20,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 519,
+          "y": 475,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1076",
+        "name": "Household Waste Collection 76",
+        "date": "2026-03-28",
+        "status": "conflict",
+        "weightKg": 12,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 790,
+          "y": 117,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1077",
+        "name": "Household Waste Collection 77",
+        "date": "2026-06-24",
+        "status": "resolved",
+        "weightKg": 54,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 222,
+          "y": 8,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1078",
+        "name": "Household Waste Collection 78",
+        "date": "2026-07-15",
+        "status": "draft",
+        "weightKg": 14,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 141,
+          "y": 264,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1079",
+        "name": "Household Waste Collection 79",
+        "date": "2026-06-16",
+        "status": "ready",
+        "weightKg": 36,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 359,
+          "y": 5,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1080",
+        "name": "Household Waste Collection 80",
+        "date": "2026-07-19",
+        "status": "changed",
+        "weightKg": 52,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 464,
+          "y": 33,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1081",
+        "name": "Household Waste Collection 81",
+        "date": "2026-04-05",
+        "status": "archived",
+        "weightKg": 22,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 207,
+          "y": 127,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1082",
+        "name": "Household Waste Collection 82",
+        "date": "2026-04-05",
+        "status": "conflict",
+        "weightKg": 30,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 598,
+          "y": 512,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1083",
+        "name": "Household Waste Collection 83",
+        "date": "2026-07-09",
+        "status": "resolved",
+        "weightKg": 34,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 652,
+          "y": 158,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1084",
+        "name": "Household Waste Collection 84",
+        "date": "2026-07-08",
+        "status": "draft",
+        "weightKg": 28,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 217,
+          "y": 387,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1085",
+        "name": "Household Waste Collection 85",
+        "date": "2026-07-15",
+        "status": "ready",
+        "weightKg": 12,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 26,
+          "y": 292,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1086",
+        "name": "Household Waste Collection 86",
+        "date": "2026-06-29",
+        "status": "changed",
+        "weightKg": 34,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 684,
+          "y": 528,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1087",
+        "name": "Household Waste Collection 87",
+        "date": "2026-05-15",
+        "status": "archived",
+        "weightKg": 53,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 427,
+          "y": 489,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1088",
+        "name": "Household Waste Collection 88",
+        "date": "2026-05-15",
+        "status": "conflict",
+        "weightKg": 49,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 431,
+          "y": 138,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1089",
+        "name": "Household Waste Collection 89",
+        "date": "2026-04-20",
+        "status": "resolved",
+        "weightKg": 24,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 629,
+          "y": 440,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1090",
+        "name": "Household Waste Collection 90",
+        "date": "2026-04-22",
+        "status": "draft",
+        "weightKg": 31,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 70,
+          "y": 13,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1091",
+        "name": "Household Waste Collection 91",
+        "date": "2026-06-25",
+        "status": "ready",
+        "weightKg": 44,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 585,
+          "y": 82,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1092",
+        "name": "Household Waste Collection 92",
+        "date": "2026-07-14",
+        "status": "changed",
+        "weightKg": 29,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 31,
+          "y": 312,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1093",
+        "name": "Household Waste Collection 93",
+        "date": "2026-04-12",
+        "status": "archived",
+        "weightKg": 10,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 82,
+          "y": 105,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1094",
+        "name": "Household Waste Collection 94",
+        "date": "2026-05-14",
+        "status": "conflict",
+        "weightKg": 18,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 16,
+          "y": 195,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1095",
+        "name": "Household Waste Collection 95",
+        "date": "2026-06-21",
+        "status": "resolved",
+        "weightKg": 33,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 653,
+          "y": 182,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1096",
+        "name": "Household Waste Collection 96",
+        "date": "2026-05-21",
+        "status": "draft",
+        "weightKg": 44,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 413,
+          "y": 278,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1097",
+        "name": "Household Waste Collection 97",
+        "date": "2026-05-21",
+        "status": "ready",
+        "weightKg": 27,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 448,
+          "y": 119,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1098",
+        "name": "Household Waste Collection 98",
+        "date": "2026-05-25",
+        "status": "changed",
+        "weightKg": 5,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 594,
+          "y": 527,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1099",
+        "name": "Household Waste Collection 99",
+        "date": "2026-07-10",
+        "status": "archived",
+        "weightKg": 46,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 460,
+          "y": 374,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1100",
+        "name": "Household Waste Collection 100",
+        "date": "2026-06-14",
+        "status": "conflict",
+        "weightKg": 45,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 263,
+          "y": 222,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1101",
+        "name": "Household Waste Collection 101",
+        "date": "2026-06-26",
+        "status": "resolved",
+        "weightKg": 43,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 791,
+          "y": 501,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1102",
+        "name": "Household Waste Collection 102",
+        "date": "2026-05-16",
+        "status": "draft",
+        "weightKg": 30,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 104,
+          "y": 471,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1103",
+        "name": "Household Waste Collection 103",
+        "date": "2026-05-03",
+        "status": "ready",
+        "weightKg": 20,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 379,
+          "y": 23,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1104",
+        "name": "Household Waste Collection 104",
+        "date": "2026-07-15",
+        "status": "changed",
+        "weightKg": 18,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 548,
+          "y": 102,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1105",
+        "name": "Household Waste Collection 105",
+        "date": "2026-06-23",
+        "status": "archived",
+        "weightKg": 7,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 93,
+          "y": 341,
+          "selected": false
+        }
+      }
+    ],
+    [
+      {
+        "id": "evt-1001",
+        "name": "Household Waste Collection 1",
+        "date": "2026-06-16",
+        "status": "conflict",
+        "weightKg": 11,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 626,
+          "y": 273,
+          "selected": true
+        }
+      },
+      {
+        "id": "evt-1002",
+        "name": "Household Waste Collection 2",
+        "date": "2026-06-29",
+        "status": "changed",
+        "weightKg": 48,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 10,
+          "y": 152,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1003",
+        "name": "Household Waste Collection 3",
+        "date": "2026-05-21",
+        "status": "archived",
+        "weightKg": 43,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 186,
+          "y": 513,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1004",
+        "name": "Household Waste Collection 4",
+        "date": "2026-06-26",
+        "status": "conflict",
+        "weightKg": 20,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 126,
+          "y": 464,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1005",
+        "name": "Household Waste Collection 5",
+        "date": "2026-04-27",
+        "status": "resolved",
+        "weightKg": 7,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 511,
+          "y": 404,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1006",
+        "name": "Household Waste Collection 6",
+        "date": "2026-05-13",
+        "status": "draft",
+        "weightKg": 9,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 322,
+          "y": 40,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1007",
+        "name": "Household Waste Collection 7",
+        "date": "2026-05-05",
+        "status": "ready",
+        "weightKg": 15,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 200,
+          "y": 198,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1008",
+        "name": "Household Waste Collection 8",
+        "date": "2026-06-02",
+        "status": "changed",
+        "weightKg": 8,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 20,
+          "y": 374,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1009",
+        "name": "Household Waste Collection 9",
+        "date": "2026-06-13",
+        "status": "archived",
+        "weightKg": 53,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 721,
+          "y": 71,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1010",
+        "name": "Household Waste Collection 10",
+        "date": "2026-04-06",
+        "status": "conflict",
+        "weightKg": 45,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 607,
+          "y": 109,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1011",
+        "name": "Household Waste Collection 11",
+        "date": "2026-04-16",
+        "status": "resolved",
+        "weightKg": 34,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 338,
+          "y": 590,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1012",
+        "name": "Household Waste Collection 12",
+        "date": "2026-06-15",
+        "status": "draft",
+        "weightKg": 17,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 40,
+          "y": 445,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1013",
+        "name": "Household Waste Collection 13",
+        "date": "2026-05-03",
+        "status": "ready",
+        "weightKg": 35,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 344,
+          "y": 90,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1014",
+        "name": "Household Waste Collection 14",
+        "date": "2026-05-04",
+        "status": "changed",
+        "weightKg": 17,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 643,
+          "y": 418,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1015",
+        "name": "Household Waste Collection 15",
+        "date": "2026-06-28",
+        "status": "archived",
+        "weightKg": 47,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 417,
+          "y": 190,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1016",
+        "name": "Household Waste Collection 16",
+        "date": "2026-04-25",
+        "status": "conflict",
+        "weightKg": 7,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 260,
+          "y": 394,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1017",
+        "name": "Household Waste Collection 17",
+        "date": "2026-05-08",
+        "status": "resolved",
+        "weightKg": 10,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 749,
+          "y": 522,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1018",
+        "name": "Household Waste Collection 18",
+        "date": "2026-07-12",
+        "status": "draft",
+        "weightKg": 10,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 190,
+          "y": 596,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1019",
+        "name": "Household Waste Collection 19",
+        "date": "2026-05-17",
+        "status": "ready",
+        "weightKg": 48,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 780,
+          "y": 65,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1020",
+        "name": "Household Waste Collection 20",
+        "date": "2026-06-08",
+        "status": "changed",
+        "weightKg": 8,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 67,
+          "y": 377,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1021",
+        "name": "Household Waste Collection 21",
+        "date": "2026-07-05",
+        "status": "archived",
+        "weightKg": 8,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 377,
+          "y": 387,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1022",
+        "name": "Household Waste Collection 22",
+        "date": "2026-06-27",
+        "status": "conflict",
+        "weightKg": 7,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 50,
+          "y": 443,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1023",
+        "name": "Household Waste Collection 23",
+        "date": "2026-04-03",
+        "status": "resolved",
+        "weightKg": 18,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 590,
+          "y": 410,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1024",
+        "name": "Household Waste Collection 24",
+        "date": "2026-06-11",
+        "status": "draft",
+        "weightKg": 30,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 65,
+          "y": 422,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1025",
+        "name": "Household Waste Collection 25",
+        "date": "2026-04-19",
+        "status": "ready",
+        "weightKg": 53,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 315,
+          "y": 531,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1026",
+        "name": "Household Waste Collection 26",
+        "date": "2026-07-11",
+        "status": "changed",
+        "weightKg": 24,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 651,
+          "y": 586,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1027",
+        "name": "Household Waste Collection 27",
+        "date": "2026-04-08",
+        "status": "archived",
+        "weightKg": 32,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 60,
+          "y": 278,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1028",
+        "name": "Household Waste Collection 28",
+        "date": "2026-06-26",
+        "status": "conflict",
+        "weightKg": 36,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 761,
+          "y": 38,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1029",
+        "name": "Household Waste Collection 29",
+        "date": "2026-05-17",
+        "status": "resolved",
+        "weightKg": 42,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 590,
+          "y": 260,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1030",
+        "name": "Household Waste Collection 30",
+        "date": "2026-05-29",
+        "status": "draft",
+        "weightKg": 11,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 289,
+          "y": 544,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1031",
+        "name": "Household Waste Collection 31",
+        "date": "2026-05-21",
+        "status": "ready",
+        "weightKg": 52,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 450,
+          "y": 181,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1032",
+        "name": "Household Waste Collection 32",
+        "date": "2026-03-30",
+        "status": "changed",
+        "weightKg": 12,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 747,
+          "y": 591,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1033",
+        "name": "Household Waste Collection 33",
+        "date": "2026-07-04",
+        "status": "archived",
+        "weightKg": 23,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 488,
+          "y": 146,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1034",
+        "name": "Household Waste Collection 34",
+        "date": "2026-04-28",
+        "status": "conflict",
+        "weightKg": 5,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 553,
+          "y": 554,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1035",
+        "name": "Household Waste Collection 35",
+        "date": "2026-04-26",
+        "status": "resolved",
+        "weightKg": 34,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 743,
+          "y": 483,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1036",
+        "name": "Household Waste Collection 36",
+        "date": "2026-06-01",
+        "status": "draft",
+        "weightKg": 46,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 606,
+          "y": 500,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1037",
+        "name": "Household Waste Collection 37",
+        "date": "2026-03-30",
+        "status": "ready",
+        "weightKg": 46,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 278,
+          "y": 530,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1038",
+        "name": "Household Waste Collection 38",
+        "date": "2026-05-29",
+        "status": "changed",
+        "weightKg": 23,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 362,
+          "y": 403,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1039",
+        "name": "Household Waste Collection 39",
+        "date": "2026-07-11",
+        "status": "archived",
+        "weightKg": 27,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 274,
+          "y": 358,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1040",
+        "name": "Household Waste Collection 40",
+        "date": "2026-04-23",
+        "status": "conflict",
+        "weightKg": 34,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 285,
+          "y": 242,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1041",
+        "name": "Household Waste Collection 41",
+        "date": "2026-04-27",
+        "status": "resolved",
+        "weightKg": 42,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 303,
+          "y": 238,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1042",
+        "name": "Household Waste Collection 42",
+        "date": "2026-05-09",
+        "status": "draft",
+        "weightKg": 9,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 761,
+          "y": 89,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1043",
+        "name": "Household Waste Collection 43",
+        "date": "2026-07-05",
+        "status": "ready",
+        "weightKg": 7,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 179,
+          "y": 344,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1044",
+        "name": "Household Waste Collection 44",
+        "date": "2026-05-14",
+        "status": "changed",
+        "weightKg": 33,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 246,
+          "y": 67,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1045",
+        "name": "Household Waste Collection 45",
+        "date": "2026-06-20",
+        "status": "archived",
+        "weightKg": 35,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 34,
+          "y": 120,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1046",
+        "name": "Household Waste Collection 46",
+        "date": "2026-04-09",
+        "status": "conflict",
+        "weightKg": 20,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 335,
+          "y": 267,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1047",
+        "name": "Household Waste Collection 47",
+        "date": "2026-04-14",
+        "status": "resolved",
+        "weightKg": 6,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 25,
+          "y": 295,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1048",
+        "name": "Household Waste Collection 48",
+        "date": "2026-06-21",
+        "status": "draft",
+        "weightKg": 36,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 400,
+          "y": 4,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1049",
+        "name": "Household Waste Collection 49",
+        "date": "2026-06-19",
+        "status": "ready",
+        "weightKg": 27,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 277,
+          "y": 156,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1050",
+        "name": "Household Waste Collection 50",
+        "date": "2026-06-26",
+        "status": "changed",
+        "weightKg": 22,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 306,
+          "y": 347,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1051",
+        "name": "Household Waste Collection 51",
+        "date": "2026-04-30",
+        "status": "archived",
+        "weightKg": 48,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 30,
+          "y": 373,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1052",
+        "name": "Household Waste Collection 52",
+        "date": "2026-06-13",
+        "status": "conflict",
+        "weightKg": 17,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 522,
+          "y": 277,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1053",
+        "name": "Household Waste Collection 53",
+        "date": "2026-04-15",
+        "status": "resolved",
+        "weightKg": 40,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 352,
+          "y": 144,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1054",
+        "name": "Household Waste Collection 54",
+        "date": "2026-05-06",
+        "status": "draft",
+        "weightKg": 36,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 500,
+          "y": 583,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1055",
+        "name": "Household Waste Collection 55",
+        "date": "2026-06-15",
+        "status": "ready",
+        "weightKg": 20,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 602,
+          "y": 226,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1056",
+        "name": "Household Waste Collection 56",
+        "date": "2026-05-28",
+        "status": "changed",
+        "weightKg": 12,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 435,
+          "y": 197,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1057",
+        "name": "Household Waste Collection 57",
+        "date": "2026-05-11",
+        "status": "archived",
+        "weightKg": 13,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 767,
+          "y": 361,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1058",
+        "name": "Household Waste Collection 58",
+        "date": "2026-06-14",
+        "status": "conflict",
+        "weightKg": 30,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 709,
+          "y": 231,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1059",
+        "name": "Household Waste Collection 59",
+        "date": "2026-07-16",
+        "status": "resolved",
+        "weightKg": 38,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 278,
+          "y": 254,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1060",
+        "name": "Household Waste Collection 60",
+        "date": "2026-07-10",
+        "status": "draft",
+        "weightKg": 17,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 355,
+          "y": 165,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1061",
+        "name": "Household Waste Collection 61",
+        "date": "2026-06-01",
+        "status": "ready",
+        "weightKg": 9,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 757,
+          "y": 152,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1062",
+        "name": "Household Waste Collection 62",
+        "date": "2026-05-17",
+        "status": "changed",
+        "weightKg": 39,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 40,
+          "y": 158,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1063",
+        "name": "Household Waste Collection 63",
+        "date": "2026-05-24",
+        "status": "archived",
+        "weightKg": 33,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 228,
+          "y": 81,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1064",
+        "name": "Household Waste Collection 64",
+        "date": "2026-05-19",
+        "status": "conflict",
+        "weightKg": 38,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 164,
+          "y": 282,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1065",
+        "name": "Household Waste Collection 65",
+        "date": "2026-06-25",
+        "status": "resolved",
+        "weightKg": 52,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 363,
+          "y": 280,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1066",
+        "name": "Household Waste Collection 66",
+        "date": "2026-05-19",
+        "status": "draft",
+        "weightKg": 11,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 131,
+          "y": 158,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1067",
+        "name": "Household Waste Collection 67",
+        "date": "2026-05-28",
+        "status": "ready",
+        "weightKg": 13,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 623,
+          "y": 342,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1068",
+        "name": "Household Waste Collection 68",
+        "date": "2026-06-18",
+        "status": "changed",
+        "weightKg": 38,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 506,
+          "y": 589,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1069",
+        "name": "Household Waste Collection 69",
+        "date": "2026-04-07",
+        "status": "archived",
+        "weightKg": 5,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 194,
+          "y": 299,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1070",
+        "name": "Household Waste Collection 70",
+        "date": "2026-04-21",
+        "status": "conflict",
+        "weightKg": 35,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 330,
+          "y": 447,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1071",
+        "name": "Household Waste Collection 71",
+        "date": "2026-04-17",
+        "status": "resolved",
+        "weightKg": 40,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 106,
+          "y": 158,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1072",
+        "name": "Household Waste Collection 72",
+        "date": "2026-04-30",
+        "status": "draft",
+        "weightKg": 47,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 5,
+          "y": 78,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1073",
+        "name": "Household Waste Collection 73",
+        "date": "2026-04-02",
+        "status": "ready",
+        "weightKg": 12,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 213,
+          "y": 279,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1074",
+        "name": "Household Waste Collection 74",
+        "date": "2026-05-24",
+        "status": "changed",
+        "weightKg": 30,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 776,
+          "y": 156,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1075",
+        "name": "Household Waste Collection 75",
+        "date": "2026-06-19",
+        "status": "archived",
+        "weightKg": 20,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 519,
+          "y": 475,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1076",
+        "name": "Household Waste Collection 76",
+        "date": "2026-03-28",
+        "status": "conflict",
+        "weightKg": 12,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 790,
+          "y": 117,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1077",
+        "name": "Household Waste Collection 77",
+        "date": "2026-06-24",
+        "status": "resolved",
+        "weightKg": 54,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 222,
+          "y": 8,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1078",
+        "name": "Household Waste Collection 78",
+        "date": "2026-07-15",
+        "status": "draft",
+        "weightKg": 14,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 141,
+          "y": 264,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1079",
+        "name": "Household Waste Collection 79",
+        "date": "2026-06-16",
+        "status": "ready",
+        "weightKg": 36,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 359,
+          "y": 5,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1080",
+        "name": "Household Waste Collection 80",
+        "date": "2026-07-19",
+        "status": "changed",
+        "weightKg": 52,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 464,
+          "y": 33,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1081",
+        "name": "Household Waste Collection 81",
+        "date": "2026-04-05",
+        "status": "archived",
+        "weightKg": 22,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 207,
+          "y": 127,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1082",
+        "name": "Household Waste Collection 82",
+        "date": "2026-04-05",
+        "status": "conflict",
+        "weightKg": 30,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 598,
+          "y": 512,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1083",
+        "name": "Household Waste Collection 83",
+        "date": "2026-07-09",
+        "status": "resolved",
+        "weightKg": 34,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 652,
+          "y": 158,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1084",
+        "name": "Household Waste Collection 84",
+        "date": "2026-07-08",
+        "status": "draft",
+        "weightKg": 28,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 217,
+          "y": 387,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1085",
+        "name": "Household Waste Collection 85",
+        "date": "2026-07-15",
+        "status": "ready",
+        "weightKg": 12,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 26,
+          "y": 292,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1086",
+        "name": "Household Waste Collection 86",
+        "date": "2026-06-29",
+        "status": "changed",
+        "weightKg": 34,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 684,
+          "y": 528,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1087",
+        "name": "Household Waste Collection 87",
+        "date": "2026-05-15",
+        "status": "archived",
+        "weightKg": 53,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 427,
+          "y": 489,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1088",
+        "name": "Household Waste Collection 88",
+        "date": "2026-05-15",
+        "status": "conflict",
+        "weightKg": 49,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 431,
+          "y": 138,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1089",
+        "name": "Household Waste Collection 89",
+        "date": "2026-04-20",
+        "status": "resolved",
+        "weightKg": 24,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 629,
+          "y": 440,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1090",
+        "name": "Household Waste Collection 90",
+        "date": "2026-04-22",
+        "status": "draft",
+        "weightKg": 31,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 70,
+          "y": 13,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1091",
+        "name": "Household Waste Collection 91",
+        "date": "2026-06-25",
+        "status": "ready",
+        "weightKg": 44,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 585,
+          "y": 82,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1092",
+        "name": "Household Waste Collection 92",
+        "date": "2026-07-14",
+        "status": "changed",
+        "weightKg": 29,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 31,
+          "y": 312,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1093",
+        "name": "Household Waste Collection 93",
+        "date": "2026-04-12",
+        "status": "archived",
+        "weightKg": 10,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 82,
+          "y": 105,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1094",
+        "name": "Household Waste Collection 94",
+        "date": "2026-05-14",
+        "status": "conflict",
+        "weightKg": 18,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 16,
+          "y": 195,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1095",
+        "name": "Household Waste Collection 95",
+        "date": "2026-06-21",
+        "status": "resolved",
+        "weightKg": 33,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 653,
+          "y": 182,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1096",
+        "name": "Household Waste Collection 96",
+        "date": "2026-05-21",
+        "status": "draft",
+        "weightKg": 44,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 413,
+          "y": 278,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1097",
+        "name": "Household Waste Collection 97",
+        "date": "2026-05-21",
+        "status": "ready",
+        "weightKg": 27,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 448,
+          "y": 119,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1098",
+        "name": "Household Waste Collection 98",
+        "date": "2026-05-25",
+        "status": "changed",
+        "weightKg": 5,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 594,
+          "y": 527,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1099",
+        "name": "Household Waste Collection 99",
+        "date": "2026-07-10",
+        "status": "archived",
+        "weightKg": 46,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 460,
+          "y": 374,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1100",
+        "name": "Household Waste Collection 100",
+        "date": "2026-06-14",
+        "status": "conflict",
+        "weightKg": 45,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 263,
+          "y": 222,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1101",
+        "name": "Household Waste Collection 101",
+        "date": "2026-06-26",
+        "status": "resolved",
+        "weightKg": 43,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 791,
+          "y": 501,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1102",
+        "name": "Household Waste Collection 102",
+        "date": "2026-05-16",
+        "status": "draft",
+        "weightKg": 30,
+        "category": "Landfill",
+        "recoveryBoardState": {
+          "x": 104,
+          "y": 471,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1103",
+        "name": "Household Waste Collection 103",
+        "date": "2026-05-03",
+        "status": "ready",
+        "weightKg": 20,
+        "category": "Hazardous",
+        "recoveryBoardState": {
+          "x": 379,
+          "y": 23,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1104",
+        "name": "Household Waste Collection 104",
+        "date": "2026-07-15",
+        "status": "changed",
+        "weightKg": 18,
+        "category": "Recycling",
+        "recoveryBoardState": {
+          "x": 548,
+          "y": 102,
+          "selected": false
+        }
+      },
+      {
+        "id": "evt-1105",
+        "name": "Household Waste Collection 105",
+        "date": "2026-06-23",
+        "status": "archived",
+        "weightKg": 7,
+        "category": "Compost",
+        "recoveryBoardState": {
+          "x": 93,
+          "y": 341,
+          "selected": false
+        }
+      }
+    ]
+  ]
+}
