@@ -79,6 +79,7 @@ export function reducer(state, action) {
             break;
         case 'COMPLETE_JOIN':
             newState.seams = state.seams.map(s => s.id === action.seamId ? { ...s, completed: true } : s);
+            newState.assemblyGroups = state.assemblyGroups.map(g => g.seams.includes(action.seamId) ? { ...g, completed: true } : g);
             newState.clock++;
             newState.events = [...state.events, { time: newState.clock, type: 'JOIN_COMPLETED', seamId: action.seamId }];
             newState.revisions++;
@@ -86,6 +87,7 @@ export function reducer(state, action) {
             break;
         case 'UNPICK_JOIN':
             newState.seams = state.seams.map(s => s.id === action.seamId ? { ...s, completed: false } : s);
+            newState.assemblyGroups = state.assemblyGroups.map(g => g.seams.includes(action.seamId) ? { ...g, completed: false } : g);
             newState.clock++;
             newState.events = [...state.events, { time: newState.clock, type: 'JOIN_UNPICKED', seamId: action.seamId }];
             newState.revisions++;
@@ -97,6 +99,45 @@ export function reducer(state, action) {
             break;
         case 'IMPORT':
             newState = action.payload;
+            break;
+        case 'UPDATE_SEAM':
+            newState.seams = state.seams.map(s => s.id === action.id ? { ...s, ...action.changes } : s);
+            newState.revisions++;
+            newState.isStale = true;
+            break;
+        case 'UPDATE_LOT':
+            newState.lots = state.lots.map(l => l.id === action.id ? { ...l, ...action.changes } : l);
+            newState.revisions++;
+            newState.isStale = true;
+            break;
+        case 'CREATE_ENTITY': {
+            const { entityType, entity } = action;
+            if (entityType === 'fabric-lot') newState.lots = [...state.lots, entity];
+            else if (entityType === 'assembly-group') newState.assemblyGroups = [...state.assemblyGroups, entity];
+            else if (entityType === 'variant-branch') newState.branches = { ...state.branches, [entity.id]: entity };
+            else return state;
+            newState.revisions++;
+            newState.isStale = true;
+            break;
+        }
+        case 'DELETE_ENTITY': {
+            const { entityType, id } = action;
+            if (entityType === 'fabric-lot') newState.lots = state.lots.filter(l => l.id !== id);
+            else if (entityType === 'assembly-group') newState.assemblyGroups = state.assemblyGroups.filter(g => g.id !== id);
+            else if (entityType === 'variant-branch') {
+                if (id === 'main') return state;
+                const { [id]: removed, ...branches } = state.branches;
+                if (!removed) return state;
+                newState.branches = branches;
+                if (state.activeBranch === id) newState.activeBranch = 'main';
+            } else return state;
+            newState.revisions++;
+            newState.isStale = true;
+            break;
+        }
+        case 'SELECT_BRANCH':
+            if (!state.branches[action.id]) return state;
+            newState.activeBranch = action.id;
             break;
         default:
             return state;

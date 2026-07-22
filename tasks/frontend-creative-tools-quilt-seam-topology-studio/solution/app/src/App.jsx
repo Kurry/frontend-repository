@@ -7,12 +7,28 @@ export default function App() {
   const [state, dispatch] = useReducer(reducer, null, initialFixture);
   const [selectedView, setSelectedView] = useState('canvas');
   const [selectedPiece, setSelectedPiece] = useState(null);
+  const importRef = useRef(null);
+  const viewRef = useRef(selectedView);
 
   const stateRef = useRef(state);
   stateRef.current = state;
+  viewRef.current = selectedView;
 
   useEffect(() => {
-    initWebMCP(() => stateRef.current, dispatch);
+    initWebMCP(() => stateRef.current, dispatch, {
+      select: (type, value) => {
+        if (type === 'piece') { setSelectedPiece(value); setSelectedView('canvas'); }
+        if (type === 'seam') setSelectedView('topology');
+      },
+      switchMode: mode => setSelectedView({ geometry: 'canvas', fabric: 'nesting', proof: 'issues' }[mode] || mode),
+      mode: () => viewRef.current,
+      exportArtifact: format => handleExport({
+        'quilt-project-json': 'json', 'piece-manifest-csv': 'csv', 'templates-svg': 'svg',
+        'assembly-plan-json': 'assembly-json', 'maker-notes-md': 'md'
+      }[format]),
+      openImport: () => importRef.current?.click(),
+      copyProject: () => navigator.clipboard?.writeText(JSON.stringify(stateRef.current, null, 2)),
+    });
   }, []);
 
   const handleExport = (format) => {
@@ -34,6 +50,10 @@ export default function App() {
       ).join('') + `</svg>`;
       mime = "image/svg+xml";
       ext = "svg";
+    } else if (format === 'assembly-json') {
+      content = JSON.stringify({ revision: state.revisions, groups: state.assemblyGroups }, null, 2);
+      mime = "application/json";
+      ext = "assembly.json";
     } else if (format === 'md') {
       content = `# Maker Notes\nRevisions: ${state.revisions}\nProofs: ${state.proofs.length}`;
       mime = "text/markdown";
@@ -90,7 +110,7 @@ export default function App() {
         <div className="flex items-center gap-2">
           <label className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-white border border-gray-300 rounded-md hover:bg-gray-50 text-gray-700 shadow-sm transition-all cursor-pointer">
             <Upload size={14} /> Import
-            <input type="file" accept=".json" className="hidden" onChange={handleImport} />
+            <input ref={importRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
           </label>
           <div className="relative group">
             <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-700 text-white shadow-sm transition-all">
@@ -101,6 +121,7 @@ export default function App() {
               <button className="block w-full text-left px-3 py-2 hover:bg-gray-100" onClick={() => handleExport('csv')}>Manifest CSV</button>
               <button className="block w-full text-left px-3 py-2 hover:bg-gray-100" onClick={() => handleExport('svg')}>Templates SVG</button>
               <button className="block w-full text-left px-3 py-2 hover:bg-gray-100" onClick={() => handleExport('md')}>Maker Notes</button>
+              <button className="block w-full text-left px-3 py-2 hover:bg-gray-100" onClick={() => navigator.clipboard?.writeText(JSON.stringify(state, null, 2))}>Copy Project JSON</button>
             </div>
           </div>
         </div>
