@@ -228,7 +228,10 @@ const handlers = {
     const res = createTheme(name);
     if (!res.ok) return err(res.error);
     // initial tokens are part of the create gesture — no extra history entry
-    if (applyTokenPatch(res.theme, fields.tokens)) notify('structure');
+    if (applyTokenPatch(res.theme, fields.tokens)) {
+      syncHash();
+      notify('structure');
+    }
     return { ok: true, name: res.theme.name, count: state.customs.length };
   },
 
@@ -254,7 +257,10 @@ const handlers = {
       // editing a built-in via entity_update forks like the visible editor
       const res = createTheme(fields.name || uniqueName(`${activeTheme().name}-edit`));
       if (!res.ok) return err(res.error);
-      applyTokenPatch(res.theme, fields.tokens);
+      if (applyTokenPatch(res.theme, fields.tokens)) {
+        syncHash();
+        notify('structure');
+      }
       return { ok: true, name: res.theme.name, count: state.customs.length };
     }
     state.activeId = target.id;
