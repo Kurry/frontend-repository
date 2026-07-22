@@ -1,0 +1,161 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "clean_start_has_no_credited_work"
+description = "On a fresh load the workbench shows zero readings, zero history events, no selection, all six derived values at zero, and actionable empty states; no authored, exported, or completed milestone is preseeded"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "reading_schema_boundaries"
+description = "Through the visible create or edit form, AQI and projected AQI accept the exact integer bounds 0 and 500 while -1, 501, and a non-integer are rejected; confidence accepts 0 and 1 while adjacent out-of-range values are rejected, and inline errors name the field and recovery"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "create_updates_linked_surfaces_once"
+description = "Creating one valid reading adds exactly one selected row, increases the active count by exactly one, updates current and projected averages, renders the same stable ID in the inspector, and appends exactly one stable history event"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "forecast_ribbon_signature_mutation"
+description = "After selecting a non-archived reading and using the real Forecast Ribbon control to apply a different exact projected AQI, the row status becomes changed and the row, ribbon, inspector, projected average, attention count, and newest history event all show the same canonical mutation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "undo_restores_complete_snapshot"
+description = "After applying a forecast, activating visible Undo restores the prior record value, status, record order, selected stable ID, saved query, sort mode, derived summary, and history anchor in one action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "duplicate_merge_converges"
+description = "Creating a reading whose duplicate-of field names a valid target and activating Merge duplicate removes exactly the duplicate, keeps and selects the target, combines the larger AQI, projected AQI, and confidence values, and appends one merge event"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "artifact_shape_and_live_content"
+description = "Export opens a live air-quality-v1 preview and downloads air-quality-v1-forecast-ribbon.json with exactly schemaVersion, exportedAt, records, derived, history, and view; every named nested field is present and reflects the session's visible mutations, selection, query, sort, summary, and stable event order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "transactional_import_reports_all_errors"
+description = "Pasting one artifact with at least a duplicate ID and AQI 501 into the visible import form reports both record-and-field diagnostics together and leaves record count, selection, query, sort, derived summary, and history unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.n1"
+name = "no_op_or_double_action_creates_extra_event"
+description = "An unchanged forecast Apply, a cancelled form, or a rapid double activation creates an extra record or history event beyond the single canonical mutation"
+type = "binary"
+negate = true
+weight = 1.0
