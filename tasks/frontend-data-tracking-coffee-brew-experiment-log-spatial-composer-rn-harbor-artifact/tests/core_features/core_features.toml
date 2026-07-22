@@ -1,0 +1,8 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-01"
+title = "signature_mutation"
+description = "The spatial composer mutation changes the primary record, linked view, and status together."
+weight = 1.0
