@@ -248,3 +248,10 @@ description = "The app exhibits a significant, browser-observable defect in crit
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "AC-05"
+name = "complete_user_flow"
+description = "Create, edit, mutate, undo, and complete one record. The end-to-end job is recoverable without reload."
+type = "binary"
+weight = 1.0

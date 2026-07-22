@@ -91,16 +91,11 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
-[[criterion]]
-id = "visual_design.1"
-name = "visual_hierarchy"
-description = "The visual hierarchy makes current state and next action clear."
-type = "binary"
-weight = 1
+
 
 [[criterion]]
-id = "visual_design.2"
-name = "distinctive_workbench"
-description = "A distinctive, domain-specific workbench with clear state tokens, intentional density, and a calm focused canvas."
+id = "AC-02"
+name = "visual_hierarchy"
+description = "Inspect the primary work surface, linked summary, and detail panel. The visual hierarchy makes current state and next action clear."
 type = "binary"
-weight = 1
+weight = 1.0

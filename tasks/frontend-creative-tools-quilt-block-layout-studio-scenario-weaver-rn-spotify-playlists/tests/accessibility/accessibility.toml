@@ -248,3 +248,10 @@ description = "The app exhibits a significant, browser-observable defect in acce
 type = "binary"
 negate = true
 weight = 1.0
+
+[[criterion]]
+id = "AC-08"
+name = "alternate_input"
+description = "Repeat the signature interaction with keyboard and touch-equivalent controls. Alternate input produces identical state with visible focus and live feedback."
+type = "binary"
+weight = 1.0

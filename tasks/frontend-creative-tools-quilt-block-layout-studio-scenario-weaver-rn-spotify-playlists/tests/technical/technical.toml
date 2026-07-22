@@ -91,9 +91,10 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
+
 [[criterion]]
-id = "technical.1"
+id = "AC-04"
 name = "schema_contract"
-description = "The tool result and artifact contain the declared API-shaped fields."
+description = "Query the current state and export after the mutation. The tool result and artifact contain the declared API-shaped fields."
 type = "binary"
-weight = 1
+weight = 1.0
