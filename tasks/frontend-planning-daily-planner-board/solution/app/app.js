@@ -853,7 +853,7 @@
     var cancel = el("button", "btn sm", "Cancel"); cancel.type = "button"; cancel.dataset.act = "add-cancel";
     actions.appendChild(submit); actions.appendChild(cancel);
     form.appendChild(actions);
-    updateAddFormValidity(form, false);
+    updateAddFormValidity(form, true);
     addWrap.appendChild(form);
     col.appendChild(addWrap);
 
@@ -1272,7 +1272,7 @@
     }
   }
   function setAddFormError(form, field, date, msg) {
-    var err = byId("add-" + field + "-err-" + date);
+    var err = form.querySelector("#add-" + field + "-err-" + date) || byId("add-" + field + "-err-" + date);
     var input = form.querySelector(".add-" + field);
     if (err) {
       if (msg) err.textContent = msg;
