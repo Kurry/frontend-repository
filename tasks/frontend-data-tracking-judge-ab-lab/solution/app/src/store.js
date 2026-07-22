@@ -24,11 +24,14 @@ export function visibleTrials(state) {
   const direction = state.sort.direction === 'asc' ? 1 : -1
   rows = [...rows].sort((a, b) => {
     if (state.sort.type === 'task-name') return direction * (a.taskName.localeCompare(b.taskName) || a.id.localeCompare(b.id))
-    if (state.sort.type === 'label-reward') return direction * ((a.results[state.sort.label]?.totalReward ?? -1) - (b.results[state.sort.label]?.totalReward ?? -1))
+    if (state.sort.type === 'label-reward') {
+      const rewardDelta = (a.results[state.sort.label]?.totalReward ?? -1) - (b.results[state.sort.label]?.totalReward ?? -1)
+      return direction * (rewardDelta || a.id.localeCompare(b.id))
+    }
     const [la, lb] = state.deltaPair
     const da = Math.abs((a.results[lb]?.totalReward ?? 0) - (a.results[la]?.totalReward ?? 0))
     const db = Math.abs((b.results[lb]?.totalReward ?? 0) - (b.results[la]?.totalReward ?? 0))
-    return direction * (da - db)
+    return direction * ((da - db) || a.id.localeCompare(b.id))
   })
   return rows
 }

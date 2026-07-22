@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActionIcon, Button, Divider, Group, MantineProvider, Menu, Modal, MultiSelect, NumberInput, Paper,
-  Popover, Progress, ScrollArea, Select, Stack, Table, Textarea, TextInput, Tooltip,
+  Popover, Portal, Progress, ScrollArea, Select, Stack, Table, Textarea, TextInput, Tooltip,
 } from '@mantine/core'
 import { Notifications, notifications } from '@mantine/notifications'
 import { Controller, useForm } from 'react-hook-form'
@@ -777,46 +777,48 @@ function AttributionDrawer() {
     if (outcome.saved) { reset(); close() }
   }
   return (
-    <aside className="attr-drawer" role="dialog" aria-label="Attribute verdict flip">
-      <div className="drawer-head">
-        <div><span className="eyebrow">Operator judgment</span><h2>Attribute verdict flip</h2></div>
-        <ActionIcon variant="subtle" className="icon-btn" aria-label="Close attribution form" onClick={close}><IconX size={16} aria-hidden="true" /></ActionIcon>
-      </div>
-      <div className="form-context">
-        <span>{draft.trialId}</span>
-        <strong>{draft.criterionId}</strong>
-        <small>{draft.labelA} → {draft.labelB}</small>
-      </div>
-      <form onSubmit={handleSubmit(submit)} noValidate className="drawer-form">
-        <Controller
-          name="cause"
-          control={control}
-          render={({ field }) => (
-            <Select
-              {...field}
-              label="Cause"
-              placeholder="Choose a closed-enum cause"
-              description="The submitted record is the would-be attribution API request body."
-              data={Object.entries(CAUSE_LABELS).map(([value, label]) => ({ value, label }))}
-              error={errors.cause?.message}
-              required
-            />
-          )}
-        />
-        <Textarea
-          label="Note"
-          description="Optional operator context, up to 200 characters."
-          minRows={3}
-          {...register('note')}
-          error={errors.note?.message}
-        />
-        <Group justify="flex-end" mt="sm">
-          <Button variant="default" onClick={close}>Cancel</Button>
-          <Button type="submit">Save attribution</Button>
-        </Group>
-      </form>
-      <p className="drawer-note">The drawer stays out of the way — switch views or open the command palette while it is open, then finish the attribution when you return.</p>
-    </aside>
+    <Portal>
+      <aside className="attr-drawer" role="dialog" aria-label="Attribute verdict flip">
+        <div className="drawer-head">
+          <div><span className="eyebrow">Operator judgment</span><h2>Attribute verdict flip</h2></div>
+          <ActionIcon variant="subtle" className="icon-btn" aria-label="Close attribution form" onClick={close}><IconX size={16} aria-hidden="true" /></ActionIcon>
+        </div>
+        <div className="form-context">
+          <span>{draft.trialId}</span>
+          <strong>{draft.criterionId}</strong>
+          <small>{draft.labelA} → {draft.labelB}</small>
+        </div>
+        <form onSubmit={handleSubmit(submit)} noValidate className="drawer-form">
+          <Controller
+            name="cause"
+            control={control}
+            render={({ field }) => (
+              <Select
+                {...field}
+                label="Cause"
+                placeholder="Choose a closed-enum cause"
+                description="The submitted record is the would-be attribution API request body."
+                data={Object.entries(CAUSE_LABELS).map(([value, label]) => ({ value, label }))}
+                error={errors.cause?.message}
+                required
+              />
+            )}
+          />
+          <Textarea
+            label="Note"
+            description="Optional operator context, up to 200 characters."
+            minRows={3}
+            {...register('note')}
+            error={errors.note?.message}
+          />
+          <Group justify="flex-end" mt="sm">
+            <Button variant="default" onClick={close}>Cancel</Button>
+            <Button type="submit">Save attribution</Button>
+          </Group>
+        </form>
+        <p className="drawer-note">The drawer stays out of the way — switch views or open the command palette while it is open, then finish the attribution when you return.</p>
+      </aside>
+    </Portal>
   )
 }
 
