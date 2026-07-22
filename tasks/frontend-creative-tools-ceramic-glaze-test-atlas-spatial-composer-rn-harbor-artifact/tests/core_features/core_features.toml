@@ -1,0 +1,7 @@
+[[criterion]]
+id = "AC-01"
+name = "signature_mutation"
+description = "place a selected record in a spatial composer and rebalance capacity."
+required_evidence = "The spatial composer mutation changes the primary record, linked view, and status together."
+type = "binary"
+weight = 1.0

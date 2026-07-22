@@ -1,0 +1,7 @@
+[[criterion]]
+id = "AC-03"
+name = "causal_motion"
+description = "place a selected record in a spatial composer and rebalance capacity."
+required_evidence = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+type = "binary"
+weight = 1.0
