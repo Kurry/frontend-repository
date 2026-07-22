@@ -23,5 +23,8 @@
     "vite": "^6.4.3",
     "vite-plugin-solid": "^2.11.13",
     "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1"
   }
 }
