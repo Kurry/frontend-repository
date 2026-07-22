@@ -30,13 +30,13 @@ const downloadExport = () => store.downloadExport()
           <button :class="{ active: store.exportFormat === 'markdown' }" @click="store.exportFormat = 'markdown'"><IconFileText /> QC report <span>MARKDOWN</span></button>
         </div>
         <div class="export-actions">
-          <span class="live-sync"><IconRefresh /> Live from session</span>
-          <NButton @click="copyExport"><IconCheck v-if="store.copyConfirmed" class="copy-success" /><IconClipboard v-else />{{ store.copyConfirmed ? 'Copied!' : 'Copy export' }}</NButton>
+          <span class="live-sync" aria-live="polite"><IconRefresh /> Live from session</span>
+          <NButton @click="copyExport" aria-live="polite"><IconCheck v-if="store.copyConfirmed" class="copy-success" /><IconClipboard v-else />{{ store.copyConfirmed ? 'Copied!' : 'Copy export' }}</NButton>
           <NButton type="primary" @click="downloadExport"><IconDownload /> Download {{ store.exportFormat === 'json' ? '.json' : '.md' }}</NButton>
         </div>
       </div>
       <div class="code-window">
-        <div class="code-titlebar"><span><i></i><i></i><i></i></span><strong>{{ store.exportFormat === 'json' ? 'arcfield-qc-package.json' : 'arcfield-qc-report.md' }}</strong><small>{{ preview.length.toLocaleString() }} characters</small></div>
+        <div class="code-titlebar" aria-live="polite"><span><i></i><i></i><i></i></span><strong>{{ store.exportFormat === 'json' ? 'arcfield-qc-package.json' : 'arcfield-qc-report.md' }}</strong><small>{{ preview.length.toLocaleString() }} characters</small></div>
         <pre tabindex="0" :aria-label="`${store.exportFormat} export preview`"><code>{{ preview }}</code></pre>
       </div>
       <div class="contract-strip">

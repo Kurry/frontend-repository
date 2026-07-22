@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { Field, useForm } from 'vee-validate'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
@@ -19,7 +19,7 @@ const schema = z.object({
 const { handleSubmit, meta, isSubmitting, resetForm, validate } = useForm({ validationSchema: toTypedSchema(schema), validateOnMount: true, initialValues: { tier: undefined, category: undefined, description: '', evidence: '' } })
 const tierOptions = [{ label: 'Blocker — gate stopping', value: 'blocker' }, { label: 'Major — material issue', value: 'major' }, { label: 'Minor — polish issue', value: 'minor' }]
 const categoryOptions = [{ label: 'Correctness', value: 'correctness' }, { label: 'Instruction clarity', value: 'instruction-clarity' }, { label: 'Rubric alignment', value: 'rubric-alignment' }, { label: 'Environment', value: 'environment' }, { label: 'Scoring', value: 'scoring' }, { label: 'Tooling', value: 'tooling' }]
-const submit = handleSubmit(async (values) => { if (store.addFinding(submission.value.id, values)) await nextTick(() => resetForm()) })
+const isBusy = ref(false); const submit = handleSubmit(async (values) => { if (isBusy.value) return; isBusy.value = true; if (store.addFinding(submission.value.id, values)) await nextTick(() => resetForm()); isBusy.value = false; })
 watch(() => store.dialogs.add, async (open) => { if (open) { await nextTick(); await validate() } })
 </script>
 
@@ -27,7 +27,7 @@ watch(() => store.dialogs.add, async (open) => { if (open) { await nextTick(); a
   <NModal v-if="store.dialogs.add" :show="true" :mask-closable="true" :close-on-esc="true" display-directive="if" class="review-modal" transform-origin="center" @update:show="(v) => { if (!v) store.dialogs.add = false }" @esc="store.dialogs.add = false">
     <NCard role="dialog" aria-modal="true" aria-labelledby="add-finding-title" class="modal-card" tabindex="-1">
       <div class="modal-heading"><span class="modal-icon blocker-icon"><IconAlert /></span><div><p class="eyebrow">Review record</p><h2 id="add-finding-title">Add finding</h2><p>Capture a precise issue against {{ submission?.title }}.</p></div></div>
-      <form class="review-form" novalidate @submit.prevent="submit">
+      <form class="review-form" novalidate autocomplete="off" @submit.prevent="submit">
         <Field v-slot="{ value, handleChange, handleBlur, errorMessage }" name="tier">
           <div class="form-field" :class="{ invalid: errorMessage || !value }"><label for="tier">Tier <b>Required</b></label><select :value="value || ''" id="tier" name="tier" aria-invalid="!!errorMessage || !value" aria-describedby="tier-error" @change="handleChange($event.target.value)" @blur="handleBlur" class="filter-select"><option value="" disabled>Select severity tier</option><option v-for="opt in tierOptions" :key="opt.value" :value="opt.value">{{ opt.label }}</option></select></div><p v-if="errorMessage || !value" id="tier-error" class="field-error" role="alert" aria-live="assertive">{{ errorMessage || 'Tier is required.' }}</p>
         </Field>
@@ -40,7 +40,7 @@ watch(() => store.dialogs.add, async (open) => { if (open) { await nextTick(); a
         <Field v-slot="{ value, handleChange, handleBlur }" name="evidence">
           <div class="form-field"><label for="evidence">Evidence <i>Optional</i></label><NInput :input-props="{ id: 'evidence', name: 'evidence', 'aria-label': 'Evidence' }" :value="value" type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" placeholder="Paste an observed example or trial note…" @update:value="handleChange" @blur="handleBlur" /></div>
         </Field>
-        <div class="modal-actions"><NButton @click="store.dialogs.add = false">Cancel</NButton><NButton attr-type="submit" type="primary" :disabled="!meta.valid || isSubmitting" :loading="isSubmitting"><IconPlus /> Add finding</NButton></div>
+        <div class="modal-actions"><NButton @click="store.dialogs.add = false">Cancel</NButton><NButton attr-type="submit" type="primary"  :loading="isSubmitting"><IconPlus /> Add finding</NButton></div>
       </form>
     </NCard>
   </NModal>
