@@ -25,14 +25,15 @@ HOW TO FILL THIS OUT
      d = json.load(open('jobs/<job-id>/<trial-dir>/verifier/reward-details.json'))
      dimensions = d.get('dimensions', d)
      for dimname, dim in dimensions.items():
-         for c in dim.get('criteria', []):
-             v = c.get('value')
-             if v is None or v < 1.0:
-                 reasoning = str(c.get('reasoning', '')).strip()
-                 verdict = next((p for p in ('FAIL', 'BLOCKED') if reasoning.startswith(f'{p}:')), 'UNPREFIXED')
-                 print(f\"- [ ] **{c.get('id')} {c.get('name')}** ({verdict})\")
-                 print(f\"  Requires: {c.get('description','').strip()}\")
-                 print(f\"  Judge finding: {reasoning}\")
+         failing = [c for c in dim.get('criteria', []) if c.get('value') is None or c.get('value') < 1.0]
+         if failing:
+             print(f\"\\n### {dimname}\")
+         for c in failing:
+             reasoning = str(c.get('reasoning', '')).strip()
+             verdict = next((p for p in ('FAIL', 'BLOCKED') if reasoning.startswith(f'{p}:')), 'UNPREFIXED')
+             print(f\"- [ ] **{c.get('id')} {c.get('name')}** ({verdict})\")
+             print(f\"  Requires: {c.get('description','').strip()}\")
+             print(f\"  Judge finding: {reasoning}\")
      "
 
 4. Fill in the dimension score table below from the job's summary table (or
