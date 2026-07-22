@@ -1,0 +1,98 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+
+[[criterion]]
+id = "core_features_01"
+name = "core_features_01"
+description = "Drag phase boundary resizes correctly and conserves total tokens"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features_02"
+name = "core_features_02"
+description = "Event pinning protects ancestors and recomputes deficit"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features_03"
+name = "core_features_03"
+description = "Selecting fallback summary reduces token cost"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features_04"
+name = "core_features_04"
+description = "Applies scenario pressure context 18k correctly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "core_features_05"
+name = "core_features_05"
+description = "Compare mode displays exact differences between current and checkpoint"
+type = "binary"
+weight = 1.0

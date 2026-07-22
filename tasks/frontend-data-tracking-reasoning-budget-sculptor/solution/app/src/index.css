@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #f8fafc;
+  --color-canvas-dark: #0f172a;
+}
