@@ -12,3 +12,26 @@ description = "The app exhibits a significant, browser-observable defect in perf
 type = "binary"
 negate = true
 weight = 1.0
+
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = ["/tests/webmcp_stdio_server.mjs"]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = ["-y", "@playwright/mcp@0.0.76", "--browser", "chromium", "--cdp-endpoint", "$WEBMCP_CDP_ENDPOINT", "--isolated"]
+
+[scoring]
+aggregation = "weighted_mean"
