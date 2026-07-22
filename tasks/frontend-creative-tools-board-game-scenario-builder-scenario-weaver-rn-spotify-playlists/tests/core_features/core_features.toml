@@ -1,0 +1,10 @@
+
+[[criterion]]
+id = "AC-01"
+name = "signature_mutation"
+description = "The scenario weaver mutation changes the primary record, linked view, and status together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+weight = 1.0
