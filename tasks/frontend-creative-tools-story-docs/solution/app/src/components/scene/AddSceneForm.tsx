@@ -119,7 +119,7 @@ export function AddSceneForm() {
       {/* Stepper */}
       <div className="flex items-center gap-2 border-b border-gray-100 bg-[#fafaf8] px-5 py-3">
         <Ri name="add-line" size={16} className="text-yellow-600" />
-        <span className="text-sm font-bold tracking-tight text-gray-900">Add Scene</span>
+        <h2 className="text-sm font-bold tracking-tight text-gray-900">Add Scene</h2>
         <ol className="ml-3 hidden items-center gap-1.5 sm:flex" aria-label="Create steps">
           {STEPS.map((s, i) => (
             <li key={s} className="flex items-center gap-1.5">

@@ -196,14 +196,14 @@ export function SceneCard({
 
       <div className={clsx('flex min-w-0 flex-1 flex-col', isSlide ? 'p-5 sm:p-6' : 'p-3.5')}>
         <div className="mb-1.5 flex items-start justify-between gap-2">
-          <h3
+          <h2
             className={clsx(
               'min-w-0 flex-1 truncate font-bold tracking-tight text-gray-900',
               isSlide ? 'text-xl' : 'text-[15px]'
             )}
           >
             {scene.title}
-          </h3>
+          </h2>
           {checklist.total > 0 && (
             <span
               className="inline-flex shrink-0 items-center gap-1 rounded-full bg-yellow-50 px-2 py-0.5 text-[11px] font-bold tabular-nums text-yellow-800 ring-1 ring-inset ring-yellow-200/80"

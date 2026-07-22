@@ -129,7 +129,7 @@ test.describe('frontend-creative-tools-story-docs criteria', () => {
     const first = cards.first();
     await expect(first.locator('.scene-position')).toBeVisible();
     await expect(first.locator('img')).toBeVisible();
-    await expect(first.locator('h3')).not.toHaveText('');
+    await expect(first.getByRole('heading').first()).not.toHaveText('');
   });
 
   test('1.3 count_delta_after_creates', async ({ page }) => {
@@ -173,7 +173,7 @@ test.describe('frontend-creative-tools-story-docs criteria', () => {
     await page.goto(BASE);
     await page.waitForLoadState('networkidle');
     const firstCard = page.locator('article.scene-item').first();
-    const title = await firstCard.locator('h3').innerText();
+    const title = await firstCard.getByRole('heading').first().innerText();
     await firstCard.getByRole('button', { name: /options$/ }).click();
     await page.getByRole('menuitem', { name: 'Delete Scene' }).click();
     await expect(page.getByRole('heading', { name: title })).toHaveCount(0);
@@ -336,4 +336,118 @@ test.describe('frontend-creative-tools-story-docs criteria', () => {
     await expect(page.getByRole('button', { name: 'Notifications' })).toHaveAttribute('aria-label', 'Notifications');
     await expect(page.getByRole('button', { name: 'Account' })).toHaveAttribute('aria-label', 'Account');
   });
+});
+
+const validPackage = (scenes) => ({
+  schemaVersion: 1,
+  project: 'Demo Projects',
+  storyboard: '1. Getting Started',
+  scenes,
+  generatedAt: new Date().toISOString(),
+});
+
+const validScene = {
+  title: 'Imported Scene',
+  body: 'A valid imported scene body.',
+  status: 'draft',
+  order: 1,
+};
+
+async function openImport(page, pkg) {
+  await page.getByRole('button', { name: 'Import', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Import StoryboardPackage' });
+  await dialog.getByRole('textbox', { name: 'StoryboardPackage JSON' }).fill(JSON.stringify(pkg));
+  return dialog;
+}
+
+test('storyboard package enforces required exact fields and board order', async ({ page }) => {
+  await page.goto(BASE);
+  await expect(page.getByRole('article')).toHaveCount(8);
+  const initialCount = await page.getByRole('article').count();
+  const candidates = [
+    (() => {
+      const pkg = validPackage([validScene]);
+      delete pkg.generatedAt;
+      return { pkg, field: 'generatedAt' };
+    })(),
+    { pkg: { ...validPackage([validScene]), generatedAt: 'tomorrow' }, field: 'generatedAt' },
+    { pkg: { ...validPackage([validScene]), unexpected: true }, field: 'Unrecognized key' },
+    { pkg: validPackage([{ ...validScene, internalId: 'not-portable' }]), field: 'Unrecognized key' },
+    {
+      pkg: validPackage([validScene, { ...validScene, title: 'Second Scene', order: 1 }]),
+      field: 'scenes.1.order',
+    },
+  ];
+
+  for (const candidate of candidates) {
+    const dialog = await openImport(page, candidate.pkg);
+    const textbox = dialog.getByRole('textbox', { name: 'StoryboardPackage JSON' });
+    await textbox.blur();
+    await expect(dialog.getByRole('button', { name: 'Import', exact: true })).toBeDisabled();
+    await expect(dialog.getByRole('alert')).toContainText(candidate.field);
+    await dialog.getByRole('button', { name: 'Close import dialog' }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(page.getByRole('article')).toHaveCount(initialCount);
+  }
+});
+
+test('empty storyboard package round-trips to the visible empty board', async ({ page }) => {
+  await page.goto(BASE);
+  const dialog = await openImport(page, validPackage([]));
+  await expect(dialog.getByRole('button', { name: 'Import', exact: true })).toBeEnabled();
+  await dialog.getByRole('button', { name: 'Import', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'No Scenes Left' })).toBeVisible();
+  await expect(page.getByRole('article')).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Export', exact: true }).click();
+  const exportDrawer = page.getByRole('dialog', { name: 'Export storyboard' });
+  await exportDrawer.getByRole('tab', { name: 'JSON' }).click();
+  const exported = JSON.parse(await exportDrawer.getByLabel('json preview').innerText());
+  expect(exported.scenes).toEqual([]);
+  expect(exported.generatedAt).toMatch(/Z$/);
+});
+
+test('workspace heading outline does not skip levels', async ({ page }) => {
+  await page.goto(BASE);
+  await expect(page.getByRole('article')).toHaveCount(8);
+  const levels = await page.locator('h1, h2, h3, h4, h5, h6').evaluateAll((headings) =>
+    headings.map((heading) => Number(heading.tagName.slice(1)))
+  );
+  expect(levels[0]).toBe(1);
+  for (let index = 1; index < levels.length; index += 1) {
+    expect(levels[index]).toBeLessThanOrEqual(levels[index - 1] + 1);
+  }
+
+  await page.getByRole('button', { name: 'Add Scene', exact: true }).last().click();
+  const addScene = page.getByRole('region', { name: 'Add Scene' });
+  await expect(addScene.getByRole('heading', { name: 'Add Scene', level: 2 })).toBeVisible();
+  await page.getByRole('button', { name: 'Start', exact: true }).click();
+  await expect(addScene.getByLabel(/^Title/)).toBeVisible();
+  const formLevels = await page.locator('h1, h2, h3, h4, h5, h6').evaluateAll((headings) =>
+    headings.map((heading) => Number(heading.tagName.slice(1)))
+  );
+  for (let index = 1; index < formLevels.length; index += 1) {
+    expect(formLevels[index]).toBeLessThanOrEqual(formLevels[index - 1] + 1);
+  }
+});
+
+test('mobile header keeps both titles and utility tools visible', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto(BASE);
+  await expect(page.getByRole('button', { name: 'Demo Projects' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '1. Getting Started', level: 1 })).toBeVisible();
+  for (const name of [
+    'Open storyboard sidebar',
+    'Storyboard Options',
+    'Notifications',
+    'Dashboard',
+    'Account',
+  ]) {
+    await expect(page.getByRole('button', { name })).toBeVisible();
+  }
+  const overflow = await page.evaluate(() =>
+    document.documentElement.scrollWidth - document.documentElement.clientWidth
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
 });
