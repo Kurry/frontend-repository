@@ -1,0 +1,182 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "AC-03"
+name = "causal_motion"
+description = "place a selected record in a spatial composer and rebalance capacity. Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.1"
+name = "state_changes_animated"
+description = "Major state changes have subtle, purposeful animation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "hover_active_states_animated"
+description = "Hover and active states transition smoothly."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "enter_exit_animations_present"
+description = "Elements entering/exiting the DOM are animated."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "loading_states_animated"
+description = "Loading states use clear, smooth animation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "animations_respect_reduced_motion"
+description = "Animations disable or simplify if prefers-reduced-motion is enabled."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.n1"
+name = "animations_jarring"
+description = "Animations are jarring, too fast, or too slow."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n2"
+name = "animations_distracting"
+description = "Animations distract from the core task."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n3"
+name = "elements_snap_harshly"
+description = "Elements snap harshly where a transition is expected."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n4"
+name = "animations_block_interaction"
+description = "Long animations unnecessarily block user interaction."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "3.n5"
+name = "ignores_reduced_motion"
+description = "App completely ignores prefers-reduced-motion settings for large animations."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "motion.catchall"
+name = "motion_catchall"
+description = "The app exhibits a significant defect."
+type = "binary"
+negate = true
+weight = 1.0

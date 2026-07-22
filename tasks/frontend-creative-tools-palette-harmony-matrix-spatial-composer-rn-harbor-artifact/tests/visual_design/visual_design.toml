@@ -1,0 +1,257 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "AC-02"
+name = "visual_hierarchy"
+description = "Inspect the primary work surface, linked summary, and detail panel. The visual hierarchy makes current state and next action clear."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.1"
+name = "layout_structure_logical"
+description = "Layout structure is logical and follows common patterns."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "spacing_consistent"
+description = "Spacing (margins, padding) is consistent."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "typography_readable"
+description = "Typography is readable with clear hierarchy."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "color_palette_coherent"
+description = "Color palette is coherent and purposeful."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "interactive_elements_styled"
+description = "Interactive elements are styled consistently."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "focus_states_visible"
+description = "Focus states are visible."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "error_states_clear"
+description = "Error states are visually clear."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.8"
+name = "empty_states_designed"
+description = "Empty states are designed and helpful."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.9"
+name = "icons_consistent"
+description = "Icons are consistent in style and size."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "borders_shadows_consistent"
+description = "Borders and shadows are applied consistently."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.n1"
+name = "layout_broken"
+description = "Layout is broken or elements overlap unintentionally."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n2"
+name = "spacing_erratic"
+description = "Spacing is highly erratic or missing."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n3"
+name = "typography_unreadable"
+description = "Text is unreadable (size, contrast, overlap)."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n4"
+name = "colors_clash"
+description = "Colors severely clash or lack contrast."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n5"
+name = "interactive_elements_hidden"
+description = "Buttons/links look like plain text."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n6"
+name = "focus_states_missing"
+description = "Keyboard focus states are missing."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n7"
+name = "errors_invisible"
+description = "Errors are visually indistinguishable from normal text."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n8"
+name = "empty_state_blank"
+description = "Empty states are literally blank screens."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n9"
+name = "icons_mismatched"
+description = "Icons are a mismatched mix of styles."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "2.n10"
+name = "visual_noise_excessive"
+description = "Excessive visual noise (borders, colors, shadows) distracts from content."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "visual_design.catchall"
+name = "visual_design_catchall"
+description = "The app exhibits a significant defect."
+type = "binary"
+negate = true
+weight = 1.0
