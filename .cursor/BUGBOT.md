@@ -410,6 +410,19 @@ structure the Bug with this template:
    canonical exports enforce console-error collection that mocks silently drop.
 4. **Run-output honesty**: if the PR body quotes playwright output, verify the
    passed/skipped/failed split matches the suite's actual test dispositions.
+5. **Templated-vacuity dominance** (BLOCKING; added after two vacuity-dominant suites
+   passed review with green live runs — PRs #921/#922): count occurrences of
+   content-existence boilerplate — `toBeGreaterThan(0)` on element counts,
+   `innerText().length` / `bodyText.length` checks, `expect(body).toBeVisible()` —
+   and compare against the number of criterion-titled tests. If a material share of
+   distinct criterion titles carry the SAME assertion block (e.g. a test named
+   `images_and_icons_have_alt_text` asserting only `mainCount > 0` and
+   `allText.length > 10`), the suite is padding: it passes on ANY rendered page and
+   records false coverage under criterion ids — worse than absence. A 100% pass
+   result is NOT evidence against this pattern; vacuous tests always pass. GATE: FAIL
+   with the ratio and three named examples; require each templated block replaced by
+   the criterion's specific observable or the test deleted and its id listed under
+   "not yet covered".
 
 ## Motion procedure
 
