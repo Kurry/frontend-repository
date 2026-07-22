@@ -1,0 +1,23 @@
+{
+  "name": "clockcraft-oracle",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 3000 --strictPort",
+    "start": "vite preview --host 0.0.0.0 --port 3000 --strictPort",
+    "verify:build": "vite build",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
+  },
+  "dependencies": {
+    "svelte": "5.56.4"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "7.2.0",
+    "typescript": "6.0.3",
+    "vite": "8.1.4",
+    "@playwright/test": "^1.61.1"
+  }
+}

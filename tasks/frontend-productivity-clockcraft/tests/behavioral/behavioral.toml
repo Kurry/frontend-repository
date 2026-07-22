@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_resets_to_empty"
+description = "Multi-facet round-trip: create two entries with different categories, assign a custom tag, apply the Meaningful filter, open Export so Session JSON is non-empty, then reload. Confirm every facet coherently resets to the empty seeded baseline — no entries, no tags, All filter, empty export previews, empty heat-map — never a mix of surviving and cleared facets."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "category_filter_reversal_proves_live_list"
+description = "Filter-reversal proof (genre stand-in for sort reversal): with Meaningful and Draining entries present, select Meaningful and note only Meaningful rows, select Draining and note only Draining rows, then select All. Confirm All restores both sets — proving the list is derived from the live collection."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "category_change_moves_chart_and_ratio"
+description = "Derived-view sensitivity: change an entry from Draining to Meaningful and confirm the Meaningful ratio, today's Weekly overview segments, and heat-map cell change meaningfully rather than redrawing identically."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "manual_add_echoes_list_timeline_export"
+description = "Cross-view echo: submit a manual entry named Deep Work; without reload confirm it appears in All entries, Today's timeline, and both Export session format previews."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "manual_add_count_delta_exact"
+description = "Count-delta integrity: measure the All entries list count, submit one valid manual entry, and re-measure immediately — the count increases by exactly one."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "different_durations_different_timeline_blocks"
+description = "Input-dependent output: add a 30-minute entry and a 60-minute entry; confirm the 60-minute timeline block is roughly twice as tall as the 30-minute block and Export CSV rows show the two different durationMinutes values."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_timer_and_export_flows"
+description = "Interleaved-flow integrity: start the Live timer, open Export session and note the preview, stop the timer (completing interruption if shown), then reopen Export; confirm the new entry appears in Session JSON and CSV without corrupting the prior entries."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "empty_then_repopulate_derived_surfaces"
+description = "Edge-state round-trip: delete every entry (empty states and zero Today's minutes), then add two manual entries; confirm empty states clear and ratio, chart, heat-map, and export previews track both transitions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "export_import_round_trip_preserves_session"
+description = "Mutate → derived → export → import: create entries and a custom tag; confirm Export Session JSON contains them and rollup matches header stats; Download Session JSON; delete all entries; Import the downloaded JSON with confirmation; confirm list, timeline, tags, ratio, chart, heat-map, and Export reconstruct the exported state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "undo_round_trip_restores_export_surfaces"
+description = "Undo round-trip: add a manual entry (list, timeline, Export update), Undo restores the prior empty-or-previous collection everywhere those surfaces show it including Export previews, Redo reapplies the entry everywhere."
+type = "binary"
+weight = 1.0
+
