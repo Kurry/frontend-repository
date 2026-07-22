@@ -1,0 +1,92 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+    "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+    "webmcp_session_info",
+    "webmcp_list_tools",
+    "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+    "-y",
+    "@playwright/mcp@0.0.76",
+    "--browser",
+    "chromium",
+    "--cdp-endpoint",
+    "$WEBMCP_CDP_ENDPOINT",
+    "--isolated",
+    "--output-dir",
+    "/logs/verifier/screenshots",
+]
+allowed_tools = [
+    "browser_navigate",
+    "browser_navigate_back",
+    "browser_resize",
+    "browser_tabs",
+    "browser_click",
+    "browser_close",
+    "browser_console_messages",
+    "browser_drag",
+    "browser_evaluate",
+    "browser_file_upload",
+    "browser_fill_form",
+    "browser_handle_dialog",
+    "browser_hover",
+    "browser_network_requests",
+    "browser_press_key",
+    "browser_select_option",
+    "browser_snapshot",
+    "browser_take_screenshot",
+    "browser_type",
+    "browser_wait_for",
+]
+
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+    "-y",
+    "@playwright/mcp@0.0.76",
+    "--browser",
+    "chromium",
+    "--cdp-endpoint",
+    "$WEBMCP_RM_CDP_ENDPOINT",
+    "--isolated",
+    "--output-dir",
+    "/logs/verifier/screenshots",
+]
+allowed_tools = [
+    "browser_navigate",
+    "browser_resize",
+    "browser_snapshot",
+    "browser_take_screenshot",
+    "browser_evaluate",
+    "browser_console_messages",
+    "browser_wait_for",
+    "browser_press_key",
+    "browser_click",
+    "browser_hover",
+]
+
+[[criterion]]
+id = "AC-01"
+title = "Complete canonical pointer placement"
+description = "One event moves BADGE-27 from G–L overflow to M–R slot 7, shifts five occupants to 8..12, changes status to filed, yields counts 12 each, deviation 0, redirects 0, route steps 48, completion 09:23:50, back mark M–R/07, resolved ISSUE-05, conserved 48 badges, changed rail hash, and selected badge."
+weight = 1.0
