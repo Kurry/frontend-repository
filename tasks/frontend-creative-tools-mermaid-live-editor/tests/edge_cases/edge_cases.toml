@@ -1,0 +1,189 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_source_stable_feedback"
+description = "Clearing the source to empty leaves the app stable: the preview shows the error treatment or an empty-source message rather than a stale diagram presented as current, export controls become unavailable, and no uncaught errors appear in the console."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "invalid_config_json_inline_validation"
+description = "Entering configuration text that is not valid JSON, or valid JSON that fails the Mermaid Config field contract (missing theme, theme outside default|base|dark|forest|neutral, or a non-object root), shows an inline validation message under the Config pane naming the theme field or the config document before apply, and the invalid configuration is not applied."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "syntax_error_names_parser_message"
+description = "When source syntax is invalid, the error region uses a Syntax error heading and surfaces the parser's actual message rather than only a bare 'Invalid'."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "copy_image_shows_confirmation"
+description = "With valid source, Copy image shows a visible confirmation that the diagram was copied."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "rapid_edits_settle_to_one_render"
+description = "Typing at least three quick consecutive source changes leaves exactly one rendered diagram matching the final source, with no overlapping or duplicated renders in the preview region."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "invalid_config_keeps_last_valid"
+description = "Invalid JSON in the Config tab never breaks the workspace: the diagram keeps rendering with the last valid configuration and the Code tab remains fully usable while the config error is shown."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "large_diagram_stays_contained"
+description = "Rendering a sample with at least eight nodes (for example Mindmap or Class) keeps the drawing inside the preview region without overflowing the page or forcing horizontal scrolling of the whole document."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "editor_controls_use_semantic_tags"
+description = "Code/Config tabs, sample buttons, SVG/PNG/MMD/Session JSON/Import/Copy image actions, and the theme toggle use semantic button/input elements rather than unlabeled decorative wrappers."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "exports_blocked_on_syntax_error"
+description = "While a Syntax error is shown, SVG, PNG, Copy image, and MMD are unavailable; correcting the source re-enables them."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "undo_after_edit_restores_prior"
+description = "After editing the source, pressing the undo keyboard shortcut restores the previous source and the preview follows that prior diagram."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "config_theme_enum_rejected"
+description = "A Config document that parses as JSON but sets theme outside default|base|dark|forest|neutral (or omits theme) is rejected with validation naming the theme field or the config document, is not applied, and leaves the last valid configuration on the preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "session_json_import_rejects_bad_contract"
+description = "Importing malformed Session JSON, or JSON that fails the MermaidSession field contract (wrong schemaVersion, missing required keys, illegal config.theme/appTheme/activeTab/diagramType), leaves source, config, theme, tab, and badge unchanged and shows visible validation naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "empty_mmd_import_stable"
+description = "Importing an empty or whitespace-only mmd payload leaves the workspace stable with the same empty-source or error treatment as clearing Code, without an uncaught console error or crash."
+type = "binary"
+weight = 0.5
+
