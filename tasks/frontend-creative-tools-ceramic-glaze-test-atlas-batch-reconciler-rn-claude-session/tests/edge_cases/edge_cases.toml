@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-06"
+name = "Invalid actions give field-level recovery and preserve valid state"
+description = "Trying exact bounds, invalid cross-field values, or malformed import results in error feedback while preserving prior valid state."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-07"
+name = "Desktop surface becomes a usable stack/drawer on mobile"
+description = "Using the signature interaction at a narrow viewport avoids horizontal overflow and converts secondary surfaces into drawers or stacks."
+type = "binary"
+weight = 1.0

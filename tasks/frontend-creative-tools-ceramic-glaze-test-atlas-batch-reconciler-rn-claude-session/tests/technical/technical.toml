@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-04"
+name = "The tool result and artifact contain the declared API-shaped fields"
+description = "Querying the state and exporting produces a JSON containing schemaVersion, exportedAt, records, derived, and history matching the specification."
+type = "binary"
+weight = 1.0

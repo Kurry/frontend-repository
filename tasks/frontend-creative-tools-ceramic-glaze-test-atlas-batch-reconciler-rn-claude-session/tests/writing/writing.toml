@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-10"
+name = "Copy names domain consequence and recovery action precisely"
+description = "Labels, statuses, errors, and empty-state text are domain-specific to ceramic glaze tests."
+type = "binary"
+weight = 1.0

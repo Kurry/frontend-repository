@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-13"
+name = "Authored order and domain state survive export/import"
+description = "Exporting, clearing, and importing the edited variant record restores authored order, selection, and derived state. Invalid import is a no-op."
+type = "binary"
+weight = 1.0

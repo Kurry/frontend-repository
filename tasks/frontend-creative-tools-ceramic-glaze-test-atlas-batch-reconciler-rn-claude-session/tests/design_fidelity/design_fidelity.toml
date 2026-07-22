@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-12"
+name = "Visual and interaction thesis is coherent"
+description = "The application visually evokes a domain-specific workbench for glaze testing."
+type = "binary"
+weight = 1.0

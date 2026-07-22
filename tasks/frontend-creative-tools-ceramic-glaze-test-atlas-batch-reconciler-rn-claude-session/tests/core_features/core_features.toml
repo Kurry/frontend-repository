@@ -1,0 +1,20 @@
+[[criterion]]
+id = "AC-01"
+name = "group selected records into a batch and reconcile aggregate totals"
+description = "The batch reconciler mutation changes the primary record, linked view, and status together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "CF-02"
+name = "Create, edit, archive, and filter glaze tests"
+description = "User can create new glaze tests, edit existing ones, archive them, and filter by status (empty, draft, ready, changed, archived)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "CF-03"
+name = "Undo restores ordering, selection, and derived values"
+description = "Pressing Undo (or Ctrl/Cmd+Z) after grouping records restores the previous state exactly."
+type = "binary"
+weight = 1.0

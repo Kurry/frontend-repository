@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-09"
+name = "Responsive interaction with 100+ records"
+description = "Grouping records in a list of 100+ items is fast and unrelated rows remain stable."
+type = "binary"
+weight = 1.0
