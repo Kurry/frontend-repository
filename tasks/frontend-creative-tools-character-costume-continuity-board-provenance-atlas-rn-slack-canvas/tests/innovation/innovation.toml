@@ -1,0 +1,16 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-character-costume-continuity-board-provenance-atlas-rn-slack-canvas"
+description = "Character Costume Continuity Board — Provenance Atlas — Slack Canvas"
+genre = "good-app"
+
+[[criterion]]
+id = "AC-11"
+title = "linked_utility"
+description = "Mutate a record and use the linked representation to make the next decision."
+weight = 1.0
+
+[[criterion]]
+id = "innovation.catchall"
+title = "innovation_catchall"
+description = "Catch-all for innovation, ensuring novel interactions not covered by other dimensions are evaluated based on visual and mechanical evidence."
+weight = 1.0

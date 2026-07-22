@@ -1,0 +1,10 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-character-costume-continuity-board-provenance-atlas-rn-slack-canvas"
+description = "Character Costume Continuity Board — Provenance Atlas — Slack Canvas"
+genre = "good-app"
+
+[[criterion]]
+id = "AC-06"
+title = "boundaries_recovery"
+description = "Try exact bounds, an invalid cross-field value, an empty state, and malformed import."
+weight = 1.0
