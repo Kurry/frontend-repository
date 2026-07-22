@@ -1,0 +1,7 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-drum-pattern-practice-board-forecast-ribbon-rn-github-issue-fields"
+description = "Drum Pattern Practice Board - Forecast Ribbon - GitHub Issue Fields"
+version = "1.0.0"
+
+[task.metadata]
+genre = "good-app"
