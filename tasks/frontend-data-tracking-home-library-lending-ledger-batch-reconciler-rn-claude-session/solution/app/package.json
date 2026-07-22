@@ -1,0 +1,27 @@
+{
+  "name": "home-library-lending-ledger",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite preview --host 0.0.0.0 --port 3000",
+    "verify:build": "vite build",
+    "start+verify:build": "npm run verify:build && npm start"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "4.3.2",
+    "@zto/webmcp-contracts": "file:../../../packages/webmcp-contracts",
+    "framer-motion": "^11.16.0",
+    "lucide-react": "^0.470.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "4.3.2",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "vite": "^5.4.1"
+  }
+}
