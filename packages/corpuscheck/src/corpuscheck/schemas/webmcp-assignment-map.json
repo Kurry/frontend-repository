@@ -7892,5 +7892,59 @@
       "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
       "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
     ]
+  },
+  {
+    "task": "frontend-landing-polo-atelier",
+    "modules": [
+      "browse-query-v1",
+      "command-session-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "destinations": [
+        "lobby",
+        "knitting",
+        "dyeing",
+        "embroidering",
+        "entry-form",
+        "confirmation",
+        "rules-overlay"
+      ],
+      "session_operations": [
+        "start",
+        "restart",
+        "advance"
+      ],
+      "entity": "entrant",
+      "entity_operations": [
+        "create",
+        "update",
+        "select"
+      ],
+      "entity_fields": [
+        "first_name",
+        "last_name",
+        "email",
+        "country",
+        "terms_accepted",
+        "dye_color"
+      ],
+      "artifact_operations": [
+        "export",
+        "copy"
+      ],
+      "export_formats": [
+        "json"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Press-and-hold charge timing and button depression stay Playwright-observed",
+      "Machine run choreography, particles, and spotlight reveal stay Playwright-observed",
+      "WebGL rendering and orbit gesture fidelity stay Playwright-observed",
+      "Chapter transition choreography stays Playwright-observed",
+      "Audio playback and the sound toggle's audible effect stay Playwright-observed",
+      "Clipboard contents and downloaded atelier-pass artifacts remain Playwright responsibilities"
+    ]
   }
 ]

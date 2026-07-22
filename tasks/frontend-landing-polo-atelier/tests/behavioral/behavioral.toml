@@ -1,0 +1,183 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_resets"
+description = "Multi-facet round-trip: run the Knitting hall, pick River Blue in Dyeing, open the prize-draw form, and toggle sound off; then reload. All facets coherently reset to the seeded baseline — preloader plays, experience returns to the lobby, no completed halls, empty run log, no chosen dye color, no entrant data — never a mixed partial survival. In-memory genre: nothing persists."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "dye_swatch_derived_sensitivity"
+description = "Derived-view sensitivity: run the Dyeing hall once with River Blue and confirm the resulting polo, run-log color, and summary/export dye_color all read River Blue; on a fresh session run it with Clay Red and confirm those same surfaces read Clay Red — the derived color changes meaningfully with the chosen swatch, not an identical redraw."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "progress_rail_active_echo"
+description = "Cross-view echo: complete the Knitting run and confirm the progress rail marks Knitting completed and Dyeing active while Embroidering stays locked; navigate between the hall scene and the progress rail without reload — the same completion/active/locked state is echoed in both."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "run_count_delta_integrity"
+description = "Count-delta integrity: note the run count / run-log length immediately before completing a machine run, complete exactly one run, and confirm the count and log length each increase by exactly one with no off-by-one duplicate or lagging counter."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "invalid_vs_valid_entry_outcomes_differ"
+description = "Input-dependent output: attempt the prize-draw submission with an invalid entry (empty first name, malformed email, terms unchecked) and see inline errors with no confirmation chapter, then with a valid entry and see the Congratulations confirmation chapter appear; the two outcomes differ as the inputs dictate."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_charge_and_rotate_overlay"
+description = "Interleaved-flow integrity: begin charging the arcade button, trigger the rotate-device overlay (portrait/narrow) mid-charge and confirm the charge cancels safely, return to landscape and confirm the hall is restored to its pre-charge state, then charge to completion and confirm the run plays — neither flow corrupted the other's state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "charge_release_round_trip"
+description = "Edge-state round-trip: press and hold the arcade button (cap depresses, meter fills), release before completion (meter drains, no run), then press and hold to full charge; the cap depression and meter track both transitions with no stuck intermediate charge state and a run fires only on the completed hold."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "export_derived_sensitivity"
+description = "Derived-view sensitivity: note the pre-tour atelier-pass state, complete all three halls (with a chosen dye color) and submit a valid entrant, then Download or Copy the pass; the JSON now names the entrant, marks knitting/dyeing/embroidering true, carries the chosen dye_color, and lists one runs entry per run performed — not an identical empty redraw."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "replay_run_count_round_trip"
+description = "Edge-state round-trip: from the confirmation chapter note the run count, navigate back to a completed hall via the progress rail and re-run its machine (run count and run-log length increment), return to confirmation, and confirm the summary card and a re-export reflect the appended run rather than the stale earlier count."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "entrant_echoes_into_export"
+description = "Cross-view echo: submit the prize-draw form with a given first name, last name, email, and country; open Download/Copy pass and confirm the atelier-pass entrant fields equal those values; a fresh session with a different entrant yields a different entrant block in the exported pass."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.12"
+name = "sound_toggle_state_coherent"
+description = "Cross-view echo: toggle sound off in the lobby, advance to a hall and confirm the sound toggle in the hall chrome still reads off, toggle it back on there, and confirm the state stays coherent wherever the toggle is shown across chapters without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.13"
+name = "no_source_brand_in_state_surfaces"
+description = "Negative: no behavioral state surface (progress rail, run log, summary card, atelier-pass JSON, rules overlay) exposes any source-brand element — no crocodile mascot, no real brand name Lacoste or its logotype, and no source-site copy — as it updates through the session."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.14"
+name = "behavioral_catch_all"
+description = "Open-ended: a behavioral probe reveals stale, hardcoded, or incoherent state handling in the Polo Atelier session (hall progression, charge/run, dye color, run log, entrant, or atelier-pass export) not covered by any other criterion in this dimension."
+type = "binary"
+weight = 1.0

@@ -1,0 +1,274 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "2.1"
+name = "console_clean_during_flows"
+description = "No console errors or unhandled promise rejections appear while the experience and its interaction workflows (preloader dismiss, Begin the tour, pressing and holding the arcade button to charge and run each hall, swatch selection, progress-rail navigation, run log, prize-draw form fill and submit, confirmation, Download/Copy pass, rules overlay open/close, sound toggle) are exercised."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.2"
+name = "all_assets_same_origin"
+description = "Loading the experience issues zero network asset requests to a non-origin host; fonts, images, audio, Three.js models, textures, HDR/environment maps, CSS, and JS are all served same-origin with no CDN, analytics, tag-manager, or remote font/model host contacted at runtime."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.3"
+name = "fonts_resolve_bundled"
+description = "Rendered text resolves to the two bundled open-license faces — a rounded sporty display face for headlines and a sans for UI text — rather than a Times or generic system fallback."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.4"
+name = "tab_title_exact"
+description = "The browser tab title reads exactly 'The Heron & Loom Polo Atelier Experience', and the hall names (Knitting, Dyeing, Embroidering), dye color names (Marsh Green, River Blue, Clay Red, Sand, Ink, Chalk), and the confirmation headline 'Congratulations' appear verbatim in the DOM at their respective chapters."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.5"
+name = "storage_stays_empty"
+description = "localStorage, sessionStorage, and cookies remain empty after a full session (preloader through Download/Copy pass) is exercised; nothing is written to any browser storage API during the session."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.6"
+name = "webgl_scene_same_origin"
+description = "The required original Three.js machine scene assets (GLB models, base-color/roughness/metallic textures, and the local HDR/environment map) load successfully from same-origin paths and contribute to the visible 3D machine hall, issuing no request to a model or package CDN host."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.7"
+name = "audio_local_or_synthesized"
+description = "Effect audio (button press, machine run, chapter chime) is either Web Audio synthesized or loaded from same-origin bundled files; no audio request is issued to a non-origin host."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.10"
+name = "paper_atelier_tokens_applied"
+description = "The paper-atelier palette is consistently applied via computed styles: a warm off-white paper field, a deep botanical green primary, and a warm clay accent appear on the field, chrome, and cards rather than unstyled component-library defaults."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.11"
+name = "progress_rail_reflects_state"
+description = "The progress rail's DOM text reflects true hall state at all times: exactly the run halls read completed, the current hall reads active, and un-unlocked halls read locked, matching the actual chapter shown."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.12"
+name = "rules_overlay_focus_behavior"
+description = "The rules overlay opened from the terms label behaves as a modal dialog: it traps focus while open, closes on Escape and via its close control, and returns focus to the terms checkbox label on close, never navigating away."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.13"
+name = "keyboard_operable_with_focus_ring"
+description = "Every interactive control (Begin the tour, progress rail, arcade button via hold Space/Enter, swatch picker, sound toggle, prize-draw fields, terms checkbox, submit, Download pass, Copy pass, rules overlay controls) is reachable and operable with the keyboard alone and shows a visible focus indicator."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.14"
+name = "canvas_accessible_name_and_dom_text"
+description = "Each machine-hall canvas carries a descriptive accessible name, and all meaningful state (progress-rail labels, run log, summary card) also exists as readable DOM text rather than living only inside the canvas."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.15"
+name = "charge_and_completion_aria_live"
+description = "Charge progress, run completion, hall unlocks, form errors, and copy confirmation are announced through ARIA live regions in addition to their visual state."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.16"
+name = "form_errors_aria_live_announcements"
+description = "Prize-draw inline field errors and the copy-with-confirmation feedback are announced through an aria-live region as well as shown visually."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.17"
+name = "sound_toggle_state_visible"
+description = "The persistent sound toggle's on/off state is visible in the chrome across every chapter, and toggling it off suppresses all effect audio while toggling on restores it."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.18"
+name = "interactive_fast_no_layout_shift"
+description = "The preloader reaches first meaningful render within about 2 seconds of a local cold load, and after first paint no visible layout jumps occur as fonts, illustrations, or the 3D scene finish loading — the canvas region holds its space from the start."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.19"
+name = "smooth_chapter_transitions"
+description = "Chapter transitions (lobby to halls to form to confirmation) play without visible hitching or dropped frames, and content never pops between chapters."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "2.21"
+name = "wcag_aa_contrast_surfaces"
+description = "Text over the paper field, green sections, and textured backgrounds, plus control labels including clay-accented controls, meet WCAG AA contrast."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.22"
+name = "semantic_landmarks_and_canvas_role"
+description = "The page chrome uses semantic landmarks (header, main, footer) and native buttons for interactive controls, and each machine-hall canvas is either aria-hidden when a static DOM sibling conveys its state or carries role img with a descriptive aria-label."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.23"
+name = "single_page_route_only"
+description = "The experience runs at route / only; all chapters are client-side states within one document and no second document ever loads during a full session."
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "2.24"
+name = "required_authored_assets_load"
+description = "Browser network evidence shows successful same-origin loads with no 404s or decode errors for the required authored asset families: the origami-heron logo and mascot marks, the three machine-hall illustrations, the rotate-device illustration, decorative patterns, the Three.js GLB models with material textures and HDR environment, and the bundled or synthesized audio cues."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.25"
+name = "shared_state_coherence_export"
+description = "Shared-state coherence: running a hall, selecting a dye swatch, or filling the entrant fields updates the progress rail, run log, and confirmation summary card immediately without reload, and the downloaded/copied atelier-pass JSON reflects those exact mutations (entrant, ordered run log, chosen dye color, hall completion states)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.26"
+name = "schema_validated_form_and_export"
+description = "The prize-draw form validates through a client-side schema (first/last name non-empty trimmed, RFC-shaped email, country from the closed eight-value enum, terms literal true): invalid input shows named per-field errors before commit, and a valid submission compiles an atelier-pass export ({ pass_id, entrant, dye_color, halls, runs }) that validates through the same schema."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "2.27"
+name = "no_source_brand_artifacts"
+description = "No source-brand artifact appears anywhere in the running experience: no crocodile mascot, no 'Lacoste' name or logotype, and no source-site links or copied copy in any rendered text, alt text, title, DOM comment, or console output."
+type = "binary"
+weight = 1.0
+negate = true
+
+[[criterion]]
+id = "2.28"
+name = "open_ended_technical_defect"
+description = "The experience exhibits a significant, browser-observable technical defect (stack coherence, storage, network, console, or state-source integrity) not covered by any other criterion in this dimension."
+type = "binary"
+weight = 1.0
+negate = true

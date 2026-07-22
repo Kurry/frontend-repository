@@ -1,0 +1,173 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.5
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "15.1"
+name = "cta_labels_specific_and_in_voice"
+description = "Where the app renders primary call-to-action labels, they use the mandated specific wording (Begin the tour, Claim your entry, Download pass, Copy pass) in the atelier-brand voice rather than generic Submit/OK/Next alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.2"
+name = "hall_and_swatch_labels_exact"
+description = "Where the app names the three machine halls and the dye swatches, they read exactly Knitting, Dyeing, Embroidering and Marsh Green, River Blue, Clay Red, Sand, Ink, Chalk."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.3"
+name = "form_errors_name_field_and_fix"
+description = "Where the app renders prize-draw validation messages, they name the offending field and state the fix (e.g. enter a valid email address, first name required, accept the terms of participation) rather than only saying Invalid or Error."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.4"
+name = "exact_mandated_strings"
+description = "Where the app renders mandated copy, the exact strings appear: tab title The Heron & Loom Polo Atelier Experience; preloader wording Welcome to the Heron & Loom Polo Atelier; lobby headline The Polo Atelier Experience; confirmation headline Congratulations; rotate overlay text Rotate your device to continue; hall names Knitting, Dyeing, Embroidering; dye colors Marsh Green, River Blue, Clay Red, Sand, Ink, Chalk; and the eight country options United States, United Kingdom, France, Germany, Spain, Italy, Japan, Australia."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.5"
+name = "body_copy_spelling_grammar"
+description = "Where the app renders body or marketing copy across the Heron & Loom experience (lobby invitation, hall blurbs, rules overlay, confirmation paragraph, microcopy), rate how free it is of spelling and grammatical errors."
+type = "likert"
+points = 5
+weight = 0.5
+
+[[criterion]]
+id = "15.6"
+name = "heron_loom_terminology_consistent"
+description = "Where the app renders the brand identity, terminology stays consistent as Heron & Loom with the origami-heron mascot (not mixed with leftover source naming, a real brand name, or a crocodile mascot)."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.7"
+name = "supporting_copy_sentence_case"
+description = "Where the app renders supporting body copy (not chapter titles or button labels), it uses one consistent sentence-case convention."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.8"
+name = "confirmation_copy_states_success"
+description = "Where the app renders the confirmation chapter copy, it clearly states the prize-draw entry succeeded and summarizes the session rather than a vague affirmation alone."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.9"
+name = "rules_overlay_plain_language_fictional"
+description = "Where the app renders the rules overlay, it describes a fictional prize draw in plain language, names no real brand or prize partner, and links only in-page (never to an external site)."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.n1"
+name = "no_source_brand_copy_or_names"
+description = "NEGATIVE: fail if any rendered text names the real source brand (e.g. Lacoste), references a crocodile mascot, reuses source-site slogans or copy, or names a real retailer or prize partner. Answer yes only if such source-brand language is directly observed in the running app."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "15.10"
+name = "locked_hall_and_copy_confirmation_plain_language"
+description = "The locked-hall affordance explains in plain language that halls unlock in order, and the copy-pass confirmation states in plain language that the pass was copied, rather than silent failure or cryptic codes."
+type = "binary"
+weight = 0.5
+optional = true
+

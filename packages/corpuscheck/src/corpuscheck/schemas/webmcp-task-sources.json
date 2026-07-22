@@ -513,5 +513,10 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-landing-polo-atelier": {
+    "source": "PoloAtelier",
+    "instruction": "PoloAtelier/instruction.md",
+    "description": "Debranded immersive polo-factory-tour experience fidelity eval."
   }
 }
