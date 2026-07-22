@@ -7831,6 +7831,31 @@
       ]
     },
     {
+      "task": "frontend-planning-stage-blocking-path-studio",
+      "modules": [
+        "structured-editor-v1",
+        "command-session-v1",
+        "artifact-transfer-v1"
+      ],
+      "bindings": {
+        "editor_object_types": ["actor-waypoint", "prop-waypoint", "blocking-branch"],
+        "editor_operations": ["select", "add", "delete", "update_property", "switch_mode", "preview"],
+        "editor_properties": ["beat", "x", "y", "facing", "movement-type", "hold"],
+        "editor_modes": ["stage", "paths", "sightlines", "custody", "rehearsal", "artifacts"],
+        "session_operations": ["start", "pause", "resume", "stop", "restart", "advance"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "stage-map-svg", "path-atlas-svg", "waypoint-csv", "custody-csv", "rehearsal-csv", "script-markdown"],
+        "import_modes": ["canonical-json"],
+        "visible_postconditions": ["selected entity and waypoint", "current beat and stage positions", "active branch and rehearsal trace", "artifact preview"]
+      },
+      "mechanics_exclusions": [
+        "Waypoint dragging, snapping, mirroring, and retiming gestures stay Playwright-driven; editor operations expose the resulting score state without bypassing gesture criteria",
+        "Collision, sightline, focus, entrance, and custody overlay geometry stays Playwright-observed",
+        "Rehearsal timing, smooth path interpolation, handoff animation, and reduced-motion behavior stay Playwright-observed",
+        "File picker, clipboard contents, downloaded artifact bytes, and SVG rendering fidelity remain Playwright responsibilities"
+      ]
+    },
+    {
       "task": "frontend-workflow-workflow-builder",
       "modules": [
         "structured-editor-v1",

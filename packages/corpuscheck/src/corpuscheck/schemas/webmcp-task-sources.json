@@ -314,6 +314,11 @@
     "instruction": "TripItinerary/instruction.md",
     "description": "French Riviera trip itinerary planner good-app eval."
   },
+  "frontend-planning-stage-blocking-path-studio": {
+    "source": "stage blocking and rehearsal planning concept",
+    "instruction": "tasks/frontend-planning-stage-blocking-path-studio/instruction.md",
+    "description": "Stage blocking studio with beat-aligned paths, rehearsal analysis, branches, and score artifacts."
+  },
   "frontend-productivity-cipherlog": {
     "source": "Cipherlog",
     "instruction": "Cipherlog/instruction.md",
