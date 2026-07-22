@@ -7020,6 +7020,19 @@
       ]
     },
     {
+      "task": "frontend-planning-multilevel-accessible-route-lab",
+      "modules": ["entity-collection-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "entity": "route-stop",
+        "entity_operations": ["create", "update", "delete", "reorder", "select"],
+        "entity_fields": ["nodeId", "dwell"],
+        "artifact_operations": ["export", "import"],
+        "export_formats": ["route-plan-json", "route-geojson"],
+        "import_modes": ["route-plan-json"]
+      },
+      "mechanics_exclusions": ["Map route drawing, keyboard navigation, responsive layout, and native file transfer remain Playwright-observed"]
+    },
+    {
       "task": "frontend-workflow-quality-audit-desk",
       "modules": [
         "browse-query-v1",

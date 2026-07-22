@@ -464,6 +464,11 @@
     "instruction": "tasks/frontend-workflow-live-task-factory/instruction.md",
     "description": "Live PR-to-task factory console with real GitHub/AI integration."
   },
+  "frontend-planning-multilevel-accessible-route-lab": {
+    "source": "multilevel accessible route planning workflow concept",
+    "instruction": "tasks/frontend-planning-multilevel-accessible-route-lab/instruction.md",
+    "description": "Accessible campus route planner with layered stops, route constraints, and interoperable route artifacts."
+  },
   "frontend-workflow-quality-audit-desk": {
     "source": "codebase-atlas quality audit (debranded)",
     "instruction": "tasks/frontend-workflow-quality-audit-desk/instruction.md",
