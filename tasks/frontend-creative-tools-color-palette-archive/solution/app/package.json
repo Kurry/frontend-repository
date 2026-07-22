@@ -1,6 +1,6 @@
 {
   "name": "palette-library-archive",
-  "description": "Object and Archive \u2014 a fine-art colour palette archive with historical naming, contrast + harmony analysis, and palette-archive.v1 export/import. Static app, zero runtime dependencies.",
+  "description": "Object and Archive — a fine-art colour palette archive with historical naming, contrast + harmony analysis, and palette-archive.v1 export/import. Static app, zero runtime dependencies.",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,6 +9,6 @@
     "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "devDependencies": {
-    "@playwright/test": "1.61.0"
+    "@playwright/test": "^1.61.0"
   }
 }
