@@ -1,0 +1,29 @@
+{
+  "name": "scenario-builder",
+  "version": "1.0.0",
+  "scripts": {
+    "verify:build": "npm run build",
+    "test:e2e": "playwright test e2e.spec.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "start": "vite --port 3000 --host 0.0.0.0"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.42.2",
+    "lucide-react": "^0.473.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.6.0",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@tailwindcss/vite": "^4.0.0-beta.8",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "tailwindcss": "^4.0.0-beta.8",
+    "vite": "^6.0.7"
+  }
+}
