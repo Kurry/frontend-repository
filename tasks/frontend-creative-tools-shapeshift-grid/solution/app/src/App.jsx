@@ -1280,10 +1280,10 @@ export default function App() {
                     </label>
                   )}
                 </form.Field>
-                <Show when={formError()}>{(message) => <div class="form-alert" role="alert">{message()}</div>}</Show>
+                <Show when={formError()}>{(message) => <div class="form-alert" role="alert" aria-live="polite">{message()}</div>}</Show>
                 <div class="dialog-actions">
                   <Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton>
-                  <button class="primary-button" type="submit">Save board <IconArrowRight size={17} /></button>
+                  <button class="primary-button" type="submit" disabled={!valid()}>Save board <IconArrowRight size={17} /></button>
                 </div>
               </form>
               <Dialog.CloseButton class="icon-close" aria-label="Close Save board dialog"><IconX size={19} /></Dialog.CloseButton>
@@ -1438,7 +1438,7 @@ export default function App() {
               <Dialog.Title>Capture image</Dialog.Title>
               <Dialog.Description>The center square will be pixelized into the seven-color palette.</Dialog.Description>
               <div class="camera-frame"><video ref={videoRef} playsinline muted /></div>
-              <Show when={cameraError()}>{(message) => <div class="form-alert" role="alert">{message()}</div>}</Show>
+              <Show when={cameraError()}>{(message) => <div class="form-alert" role="alert" aria-live="polite">{message()}</div>}</Show>
               <div class="dialog-actions">
                 <Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton>
                 <button class="primary-button" type="button" onClick={() => captureCamera().catch(() => setCameraError("camera: capture failed"))}><IconCamera size={17} /> Capture</button>
@@ -1492,7 +1492,7 @@ export default function App() {
                   {(field) => <label class="form-field" for={`rename-board-tag-${props.board.id}`}><span>Tag <em>required · max 24</em></span><input id={`rename-board-tag-${props.board.id}`} value={field().state.value} onInput={(event) => field().handleChange(event.currentTarget.value)} onBlur={field().handleBlur} aria-invalid={Boolean((attempted() || field().state.meta.isTouched) && tagIssue())} />
                     <Show when={(attempted() || field().state.meta.isTouched) && tagIssue()}>{(issue) => <small class="field-error" role="alert" aria-live="assertive">{issue()}</small>}</Show></label>}
                 </form.Field>
-                <Show when={formError()}>{(message) => <div class="form-alert" role="alert">{message()}</div>}</Show>
+                <Show when={formError()}>{(message) => <div class="form-alert" role="alert" aria-live="polite">{message()}</div>}</Show>
                 <div class="dialog-actions"><Dialog.CloseButton class="text-button">Cancel</Dialog.CloseButton><button class="primary-button" type="submit" disabled={Boolean(nameIssue() || tagIssue())}>Update board</button></div>
               </form>
               <Dialog.CloseButton class="icon-close" aria-label="Close Rename dialog"><IconX size={19} /></Dialog.CloseButton>
@@ -1605,7 +1605,7 @@ export default function App() {
             </div>
             <button class="action-button share-button" onClick={() => sharePng().catch(() => flashNotice("PNG share failed", 2200))}><span>Share PNG</span><IconShare size={17} /></button>
           </div>
-          <Show when={sessionNotice()}>{(notice) => <div class="session-notice" role="status">{notice()}</div>}</Show>
+          <Show when={sessionNotice()}>{(notice) => <div class="session-notice" role="status" aria-live="polite">{notice()}</div>}</Show>
         </div>
       </aside>
     );
