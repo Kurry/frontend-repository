@@ -1,0 +1,8 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-03"
+title = "causal_motion"
+description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+weight = 1.0

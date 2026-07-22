@@ -1,0 +1,14 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "innovation.catchall"
+title = "Innovation Catch-all"
+description = "Evaluates innovative aspects not covered by other criteria. Provide evidence."
+weight = 1.0
+
+[[criterion]]
+id = "AC-11"
+title = "linked_utility"
+description = "Linked views provide domain utility beyond CRUD."
+weight = 1.0

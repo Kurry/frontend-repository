@@ -1,0 +1,8 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-12"
+title = "source_fidelity"
+description = "The visual and interaction thesis is coherent without copying unrelated screens."
+weight = 1.0

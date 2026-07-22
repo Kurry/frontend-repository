@@ -1,0 +1,8 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-13"
+title = "artifact_round_trip"
+description = "Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+weight = 1.0

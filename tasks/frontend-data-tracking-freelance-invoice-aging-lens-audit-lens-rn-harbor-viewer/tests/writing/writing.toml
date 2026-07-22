@@ -1,0 +1,8 @@
+[judge]
+model = "claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-10"
+title = "domain_copy"
+description = "Copy names the domain consequence and recovery action precisely."
+weight = 1.0
