@@ -126,7 +126,7 @@ button:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--brand)
 .counter-value { font-size: 15px; }
 .summary-context { align-self: center; margin-left: auto; color: var(--muted); font-size: 11px; }
 .selection-bar { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 8px 18px; color: #3b4670; background: #f0edff; border-bottom: 1px solid #d9d1f7; font-size: 12px; animation: fade-in .16s ease; }
-.surface-wrap { min-height: 0; flex: 1; animation: surface-crossfade .26s ease; }
+.surface-wrap { min-height: 0; flex: 1; animation: surface-crossfade .15s ease; }
 .diff-scroll { height: calc(100vh - 278px); min-height: 420px; overflow: auto; background: white; }
 .split-diff { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-content: start; min-width: 840px; }
 .pane-caption { position: sticky; top: 0; z-index: 4; display: flex; justify-content: space-between; padding: 9px 16px 9px 58px; color: #5f6b80; background: #f6f8fb; border-bottom: 1px solid var(--border); font-size: 10px; font-weight: 600; letter-spacing: .08em; }
