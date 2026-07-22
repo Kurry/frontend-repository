@@ -109,6 +109,11 @@ owns e2e execution and report artifacts for each changed task, then updates one
 PR comment with every task's pass, fail, or skip status. Local invocations
 continue to run all six stages unless they explicitly pass `--skip-e2e`.
 
+When a PR changes a task's `e2e.spec.mjs` or recursive `e2e/` suite, the
+Playwright check also requires an executed task-specific test whose title
+matches a criterion name from that task's dimension TOMLs. The four propagated
+workspace-contract tests do not satisfy this gate by themselves.
+
 The command copies each `solution/app` to a temporary directory before install,
 build, and serve, so tracked oracle files stay unchanged. Install the root Node
 workspace and Playwright Chromium once before local use:
