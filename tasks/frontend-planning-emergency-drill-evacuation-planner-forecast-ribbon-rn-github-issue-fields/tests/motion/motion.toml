@@ -1,0 +1,11 @@
+[criteria]
+
+[[criterion]]
+id = "motion.state_transition"
+description = "The acted-on item moves or morphs into its new state."
+weight = 1
+
+[[criterion]]
+id = "motion.reduced_motion"
+description = "Reduced motion preference preserves feedback without transforms."
+weight = 1
