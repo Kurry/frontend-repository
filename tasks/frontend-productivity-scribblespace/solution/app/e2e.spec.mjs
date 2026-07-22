@@ -450,9 +450,12 @@ test('1.48 flow_stream_counts_in_lockstep', async ({ page }) => {
   // Wait a moment for some events
   await page.waitForTimeout(1000);
 
-  // The footer count should match the number of objects on canvas
+  // The footer count should match the number of objects on canvas. The app
+  // pluralizes: exactly "1 object" for a single object, "N objects" (with
+  // an explicit trailing "s") for zero or any other count.
   const canvasCount = await page.locator('.canvas-object-wrapper').count();
-  await expect(page.getByText(`${canvasCount} object`)).toBeVisible();
+  const expectedFooterText = canvasCount === 1 ? '1 object' : `${canvasCount} objects`;
+  await expect(page.getByText(expectedFooterText)).toBeVisible();
 });
 
 // DROPPED (fails live oracle): '1.49 flow_export_import_round_trip'
