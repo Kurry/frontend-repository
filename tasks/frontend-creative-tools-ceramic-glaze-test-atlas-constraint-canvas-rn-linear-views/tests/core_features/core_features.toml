@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-01"
+name = "signature_interaction"
+description = "The constraint canvas mutation changes the primary record, linked view, and status together."
+type = "binary"
+weight = 1.0
