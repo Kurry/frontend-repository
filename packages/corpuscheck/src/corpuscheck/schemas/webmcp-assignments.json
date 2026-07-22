@@ -3028,6 +3028,28 @@
       ]
     },
     {
+      "task": "frontend-data-tracking-music-practice-loop-studio",
+      "modules": ["structured-editor-v1", "entity-collection-v1", "command-session-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "editor_object_types": ["practice-loop", "tempo-point", "take-event"],
+        "editor_properties": ["name", "start", "end", "repetitions", "rules", "bpm", "measure", "beat", "event-type"],
+        "editor_operations": ["select", "add", "delete", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_modes": ["score", "tempo", "takes", "schedule"],
+        "entity": "practice-item",
+        "entity_operations": ["create", "select", "update", "delete", "toggle"],
+        "entity_fields": ["entity-type", "name", "range", "repetitions", "rules", "day", "status"],
+        "session_operations": ["start", "pause", "resume", "stop", "restart"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["practice-dossier-json", "practice-events-csv", "score-overlay-svg", "practice-schedule-ics", "practice-summary-md"],
+        "import_modes": ["practice-dossier-json"]
+      },
+      "mechanics_exclusions": [
+        "Score brushing, range resizing, curve dragging, scrubbing, and keyboard navigation stay Playwright-observed",
+        "Metronome timing, playback cadence, and animation endpoints stay Playwright-observed",
+        "Native downloads, file-picker import, and clipboard contents stay Playwright-observed; WebMCP returns no artifact contents"
+      ]
+    },
+    {
       "task": "frontend-data-tracking-model-monitor",
       "modules": [
         "browse-query-v1",

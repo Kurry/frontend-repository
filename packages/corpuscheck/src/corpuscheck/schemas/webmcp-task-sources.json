@@ -214,6 +214,11 @@
     "instruction": "MediaTimeline/instruction.md",
     "description": "Media history timeline explorer good-app eval."
   },
+  "frontend-data-tracking-music-practice-loop-studio": {
+    "source": "feature-music-practice-loop-studio PRD",
+    "instruction": "tasks/frontend-data-tracking-music-practice-loop-studio/instruction.md",
+    "description": "Music practice loop studio with score ranges, tempo plans, session recovery, take alignment, scheduling, and interoperable artifacts."
+  },
   "frontend-data-tracking-model-monitor": {
     "source": "feature-monitor-openrouter-monitor PRD (debranded)",
     "instruction": "tasks/frontend-data-tracking-model-monitor/instruction.md",
