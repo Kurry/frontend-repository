@@ -314,22 +314,25 @@ function UserForm() {
     : null;
   const defaults = draftValues || (editing ? {...editing,temporaryPassword:''} : source ? {...source,id:undefined,email:'',temporaryPassword:'',status:'Invited',sendInvitation:true} : defaultUser);
   const schema = editing ? store.userEditSchema : store.userCreateSchema;
-  const {register,handleSubmit,formState:{errors,isSubmitting,isValid},watch} = useForm({resolver:zodResolver(schema),mode:'onChange',defaultValues:defaults});
+  const {register,handleSubmit,formState:{errors,isSubmitting,isValid,dirtyFields},watch} = useForm({resolver:zodResolver(schema),mode:'onChange',defaultValues:defaults});
   const lock = useRef(false);
+  const statusExplicit = useRef(Boolean(draftValues && draft?.statusExplicit));
   useEffect(() => {
-    const sub = watch((values) => {
+    const sub = watch((values, info) => {
+      if (info.name === 'status') statusExplicit.current = true;
       store.formDraft.value = {
         mode,
         editId: editing?.id ?? null,
         sourceId: source?.id ?? null,
-        values
+        values,
+        statusExplicit: statusExplicit.current
       };
     });
     return () => sub.unsubscribe();
   }, [watch, mode, editing?.id, source?.id]);
   const submit = (data) => {
     if(lock.current)return; lock.current=true;
-    try { editing ? store.updateUser(editing.id,data) : store.createUser(data); store.formDraft.value = null; store.setView('all-users'); }
+    try { const payload=!editing&&data.sendInvitation&&!dirtyFields.status&&!statusExplicit.current?{...data,status:'Invited'}:data; editing ? store.updateUser(editing.id,payload) : store.createUser(payload); store.formDraft.value = null; store.setView('all-users'); }
     catch(error){ store.toast.value=error.message; }
     finally { setTimeout(()=>lock.current=false,400); }
   };
@@ -450,7 +453,7 @@ export default function App() {
   const activeView=store.activeView.value;
   const commandTriggerRef=useRef(null),exportTriggerRef=useRef(null);
   useEffect(()=>{document.documentElement.dataset.theme=store.theme.value},[store.theme.value]);
-  useEffect(()=>{const key=(e)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();store.commandOpen.value=true}if(e.key==='Escape'){store.resetTransientMenus();if(store.importOpen.value)store.importOpen.value=false;if(store.bulkDialog.value)store.bulkDialog.value=null}};document.addEventListener('keydown',key);return()=>document.removeEventListener('keydown',key)},[]);
+  useEffect(()=>{const key=(e)=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();store.commandOpen.value=true}if(e.key==='Escape'){const menuTrigger=document.querySelector('.account-btn[aria-expanded="true"], .utility-header button[aria-expanded="true"]');store.resetTransientMenus();if(store.exportOpen.value){store.exportOpen.value=false;setTimeout(()=>(window.__lastExportTrigger||exportTriggerRef.current)?.focus(),0)}if(store.importOpen.value)store.importOpen.value=false;if(store.bulkDialog.value)store.bulkDialog.value=null;if(menuTrigger)setTimeout(()=>menuTrigger.focus(),0)}};document.addEventListener('keydown',key);return()=>document.removeEventListener('keydown',key)},[]);
   useEffect(()=>{if(!store.toast.value)return;const timer=setTimeout(()=>store.toast.value='',2600);return()=>clearTimeout(timer)},[store.toast.value]);
   useEffect(()=>registerWebMcp(),[]);
   const rememberExportTrigger=(event)=>{const button=event.target.closest?.('button');if(!button)return;const label=`${button.textContent} ${button.getAttribute('aria-label')||''}`;if(/export/i.test(label))window.__lastExportTrigger=button.closest('.command-card')?commandTriggerRef.current:button;};

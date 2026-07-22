@@ -48,6 +48,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(94, 160, 255, 0.18);
 }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
+}
 .muted { color: var(--muted); }
 .icon { width: 18px; height: 18px; flex: 0 0 auto; }
 .icon-sm { width: 15px; height: 15px; }
