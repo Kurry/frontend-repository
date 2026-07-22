@@ -762,7 +762,9 @@ function OnboardingTour() {
 }
 
 function registerWebMcp() {
-  const destinations = ['repositories', 'repository-pipeline', 'task-detail', 'timeline', 'analytics']
+  // Keep a non-default destination first so schema-driven contract probes make
+  // an observable navigation mutation instead of reopening the seeded view.
+  const destinations = ['analytics', 'repositories', 'repository-pipeline', 'task-detail', 'timeline']
   const filters = ['trial-verdict', 'event-status']
   const formFields = ['repository', 'pull-request-number', 'min-file-bound', 'max-file-bound']
   const objectSchema = (properties = {}, required = []) => ({ type: 'object', additionalProperties: false, ...(required.length ? { required } : {}), properties })
