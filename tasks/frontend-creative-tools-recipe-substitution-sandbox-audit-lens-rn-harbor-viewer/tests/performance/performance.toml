@@ -1,0 +1,9 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-09"
+type = "browser-observable"
+title = "large_collection"
+description = "The signature interaction remains responsive and unrelated rows stay stable when exercising a seeded collection with at least 100 records."
+weight = 1.0

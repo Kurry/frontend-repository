@@ -1,0 +1,9 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-04"
+type = "browser-observable"
+title = "schema_contract"
+description = "The tool result and artifact contain the declared API-shaped fields after a mutation."
+weight = 1.0

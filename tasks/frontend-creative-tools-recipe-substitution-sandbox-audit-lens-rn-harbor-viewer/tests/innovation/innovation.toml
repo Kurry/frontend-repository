@@ -1,0 +1,16 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-11"
+type = "browser-observable"
+title = "linked_utility"
+description = "Linked views provide domain utility beyond CRUD when mutating a record to make the next decision."
+weight = 1.0
+
+[[criterion]]
+id = "innovation.catchall"
+type = "browser-observable"
+title = "innovation_catchall"
+description = "Did the model implement any material, usable domain-specific enhancements not covered by other criteria? Provide evidence of real code and visible UI."
+weight = 1.0

@@ -1,0 +1,9 @@
+[judge]
+model = "anthropic/claude-3-5-sonnet-20241022"
+
+[[criterion]]
+id = "AC-10"
+type = "browser-observable"
+title = "domain_copy"
+description = "Copy names the domain consequence and recovery action precisely for labels, statuses, errors, and empty-state text."
+weight = 1.0
