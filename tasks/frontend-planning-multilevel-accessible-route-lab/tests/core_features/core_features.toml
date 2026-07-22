@@ -1,0 +1,140 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "cf-01"
+title = "Layered map and stop authoring"
+description = "The visitor drags destination pins from a catalog onto the map or selects them through keyboard/mobile search."
+weight = 1.0
+
+[[criterion]]
+id = "cf-02"
+title = "Floor stack and vertical connectors"
+description = "Entering a building reveals stacked floor mini-maps with stairs, ramps, and elevator shafts aligned."
+weight = 1.0
+
+[[criterion]]
+id = "cf-03"
+title = "Mobility and preference profile"
+description = "Profiles are standard|step-free|low-slope with preferences for outdoor exposure, elevator use, and maximum slope."
+weight = 1.0
+
+[[criterion]]
+id = "cf-04"
+title = "Departure and closure time machine"
+description = "A time scrubber spans 08:00–20:00 in five-minute steps."
+weight = 1.0
+
+[[criterion]]
+id = "cf-05"
+title = "Waypoint and alternative-route sculpting"
+description = "Dragging up to three free waypoints onto eligible path nodes forces ordered traversal."
+weight = 1.0
+
+[[criterion]]
+id = "cf-06"
+title = "Linked directions, elevation, and conflict panel"
+description = "Turn cards include segment id, instruction, floor transition, distance, duration, arrival, and accessibility evidence."
+weight = 1.0
+
+[[criterion]]
+id = "cf-07"
+title = "Route rehearsal and responsive mode"
+description = "A rehearsal cursor travels the route with pause/resume and step controls."
+weight = 1.0
+
+[[criterion]]
+id = "cf-08"
+title = "Checkpoints and artifact"
+description = "Two named route checkpoints compare stop order, profile, departure, path membership, floors, duration, distance, and conflicts."
+weight = 1.0
