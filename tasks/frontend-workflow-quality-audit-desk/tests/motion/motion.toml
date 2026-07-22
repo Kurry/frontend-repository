@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "8.1"
+name = "run_step_transitions_animate"
+description = "During a run started from the real Run checks control, the running indicator shows continuous activity, a completing step's status transitions with a short fade rather than snapping, and the retry backoff countdown ticks visibly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.2"
+name = "queue_rows_animate_on_filter"
+description = "Applying or removing a filter through the real filter controls animates rows entering and leaving the visible set rather than snapping the table to its new contents"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.3"
+name = "rollup_cells_pulse_on_change"
+description = "A rollup cell gives a brief highlight pulse when its value changes after a run, verdict change, or feedback entry"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "8.4"
+name = "chart_bars_grow_and_retarget"
+description = "Chart bars grow from zero height over roughly 400 milliseconds when a chart first renders, and animate to their new heights when the underlying data changes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.5"
+name = "detail_slide_and_chevron_rotation"
+description = "The task detail view slides in when a row is clicked and slides out when closed, and the guidance disclosures expand and collapse with their chevrons rotating"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.6"
+name = "stage_badge_transition_animates"
+description = "When a record changes lifecycle stage through a real action (run completion, verdict change, escalation), the new stage badge fades or scales in rather than swapping instantly, and the state machine strip highlight moves to the new stage with a short transition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.7"
+name = "modal_enter_exit_transition"
+description = "Modals and the escalation form enter with a short opacity and scale transition of roughly 200 to 300 milliseconds and exit the same way"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.8"
+name = "toasts_slide_and_autodismiss"
+description = "Feedback toasts after adding an entry, completing a run, escalating, resolving, copying or downloading an export, and importing a package slide in, remain readable, and auto-dismiss with a fade"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.9"
+name = "hover_system_present"
+description = "Hover feedback is present as a system, verified with computed styles while hovering: buttons ease background and shadow with a slight press effect; queue rows, rollup cells, reviewer rows, and timeline entries take a full-width hover wash; form controls show focus rings"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "8.10"
+name = "reduced_motion_instant_states"
+description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly, with rows, bars, and badges appearing in place and every flow still completable"
+type = "binary"
+weight = 1.0
+

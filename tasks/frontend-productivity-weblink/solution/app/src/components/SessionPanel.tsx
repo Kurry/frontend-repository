@@ -1,5 +1,4 @@
 import { createForm } from "@tanstack/solid-form";
-import { zodValidator } from "@tanstack/zod-form-adapter";
 import { Show, createEffect, on } from "solid-js";
 import { Motion } from "@motionone/solid";
 import { state, setName, joinRoom, leaveRoom, setRoomIdle } from "../store";
@@ -26,7 +25,6 @@ export default function SessionPanel() {
     defaultValues: {
       displayName: state.identity.name,
     },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
       setName(value.displayName);
     },
@@ -36,7 +34,6 @@ export default function SessionPanel() {
     defaultValues: {
       roomId: state.room.roomId,
     },
-    validatorAdapter: zodValidator(),
     onSubmit: async ({ value }) => {
        if (state.room.status === "connecting" || state.room.status === "waiting") return;
        joinRoom(value.roomId);
@@ -77,7 +74,12 @@ export default function SessionPanel() {
       <div class="mb-4">
         <nameForm.Field
           name="displayName"
-          validators={{ onChange: PeerIdentitySchema.shape.displayName }}
+          validators={{
+            onChange: ({ value }) => {
+              const result = PeerIdentitySchema.shape.displayName.safeParse(value);
+              return result.success ? undefined : result.error.issues[0]?.message;
+            },
+          }}
         >
           {(field) => (
             <div class="relative">
@@ -88,7 +90,13 @@ export default function SessionPanel() {
                 id="peer-name"
                 class="w-full rounded-lg border border-slate-300 bg-transparent px-3 py-1.5 text-sm transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200 dark:border-slate-700 dark:focus:ring-sky-900"
                 value={field().state.value}
-                onInput={(e) => field().handleChange(e.target.value)}
+                onInput={(e) => {
+                  const value = e.target.value;
+                  field().handleChange(value);
+                  if (PeerIdentitySchema.shape.displayName.safeParse(value).success) {
+                    setName(value);
+                  }
+                }}
                 onBlur={field().handleBlur}
                 data-testid="peer-name-input"
               />
@@ -128,7 +136,12 @@ export default function SessionPanel() {
       >
         <roomForm.Field
           name="roomId"
-          validators={{ onSubmit: JoinSessionSchema.shape.roomId }}
+          validators={{
+            onSubmit: ({ value }) => {
+              const result = JoinSessionSchema.shape.roomId.safeParse(value);
+              return result.success ? undefined : result.error.issues[0]?.message;
+            },
+          }}
         >
           {(field) => (
             <div class="mb-2 relative">

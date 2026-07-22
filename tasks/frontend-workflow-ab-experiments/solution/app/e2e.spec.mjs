@@ -61,42 +61,48 @@ test.describe('workspace contract (canonical)', () => {
 
   test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    // Install the collector before navigation so load/hydration animations are
+    // observed too. Keep it running through network idle and a settled 1.5s
+    // window so late-starting effects cannot escape the assertion.
+    await page.addInitScript(() => {
+      window.__reducedMotionOffenders = [];
+      const seen = new Set();
+      const sample = () => {
+        for (const animation of document.getAnimations({ subtree: true })) {
+          if (animation.playState !== 'running') continue;
+          let timing = {};
+          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
+          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
+          if (duration <= 1) continue;
+          const offender = {
+            kind: animation.constructor?.name ?? 'Animation',
+            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
+            duration,
+            iterations: timing.iterations ?? 1,
+          };
+          const key = JSON.stringify(offender);
+          if (!seen.has(key)) {
+            seen.add(key);
+            window.__reducedMotionOffenders.push(offender);
+          }
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
     await page.goto(BASE);
-    // Load fully first: animations kicked off during hydration or by
-    // late-arriving resources must fall inside the observation window, so the
-    // sampling loop only starts once the page is settled.
     await page.waitForLoadState('networkidle');
     // Precondition sanity check: the emulation actually reaches the app.
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
-    await page.waitForTimeout(250); // small settle after idle
-    // Observe every frame across a 1.5s window and assert on what was seen.
+    // Observe every frame for another 1.5s after load settles and assert on
+    // everything seen since the document started.
     // Finished, idle, or paused effects and durations <=1ms are allowed; any
     // meaningfully timed RUNNING effect at any sample is a reduced-motion
     // failure. Apps with zero animations pass vacuously (the render/console
     // test still gates them).
-    const offenders = await page.evaluate(async () => {
-      const seen = new Map();
-      const deadline = performance.now() + 1500;
-      while (performance.now() < deadline) {
-        for (const a of document.getAnimations({ subtree: true })) {
-          if (a.playState !== 'running') continue;
-          let timing = {};
-          try { timing = a.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
-          const dur = typeof timing.duration === 'number' ? timing.duration : 0;
-          if (dur <= 1) continue; // fill-only / effectively instant
-          const offender = {
-            kind: a.constructor?.name ?? 'Animation',
-            name: a.animationName ?? a.transitionProperty ?? a.id ?? '(anonymous)',
-            duration: dur,
-            iterations: timing.iterations ?? 1,
-          };
-          seen.set(JSON.stringify(offender), offender);
-        }
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-      }
-      return [...seen.values()];
-    });
+    await page.waitForTimeout(1500);
+    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
@@ -111,3 +117,85 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test.describe('AB Experiments user paths', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('library starts with the five seeded experiments', async ({ page }) => {
+    await expect(page.getByRole('heading', { name: 'Experiment Library' })).toBeVisible();
+    await expect(page.locator('tbody tr')).toHaveCount(5);
+    await expect(page.getByRole('button', { name: 'Onboarding assistant — confidence and warmth' })).toBeVisible();
+  });
+
+  test('search and status filters narrow the same library table', async ({ page }) => {
+    await page.getByRole('textbox', { name: 'Search experiments' }).fill('Safety response');
+    await expect(page.locator('tbody tr')).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Safety response formatting' })).toBeVisible();
+    await page.getByRole('textbox', { name: 'Search experiments' }).fill('');
+    await page.getByRole('button', { name: 'Pending', exact: true }).click();
+    await expect(page.locator('tbody tr')).toHaveCount(2);
+  });
+
+  test('new experiment modal exposes labelled API-shaped fields', async ({ page }) => {
+    await page.getByRole('button', { name: 'New Experiment' }).click();
+    const dialog = page.getByRole('dialog', { name: 'ExperimentUpsert · API-shaped design' });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByLabel('Experiment name')).toBeVisible();
+    await expect(dialog.getByLabel('Hypothesis')).toBeVisible();
+    await expect(dialog.getByLabel('Success metric')).toBeVisible();
+    await expect(dialog.getByText('Traffic allocation', { exact: true })).toBeVisible();
+  });
+
+  test('valid experiment creation adds exactly one pending row', async ({ page }) => {
+    const before = await page.locator('tbody tr').count();
+    await page.getByRole('button', { name: 'New Experiment' }).click();
+    const dialog = page.getByRole('dialog', { name: 'ExperimentUpsert · API-shaped design' });
+    await dialog.getByLabel('Experiment name').fill('CI allocation study');
+    await dialog.getByLabel('Hypothesis').fill('Evidence prompts will improve factual accuracy for the seeded evaluation set.');
+    await dialog.getByRole('button', { name: 'Create Experiment' }).click();
+    await expect(dialog).toBeHidden();
+    await expect(page.locator('tbody tr')).toHaveCount(before + 1);
+    await expect(page.getByRole('button', { name: 'CI allocation study' })).toBeVisible();
+  });
+
+  test('preview compares every configured variant for one shared input', async ({ page }) => {
+    await page.getByRole('button', { name: 'New Experiment' }).click();
+    const dialog = page.getByRole('dialog', { name: 'ExperimentUpsert · API-shaped design' });
+    await dialog.getByRole('button', { name: 'Preview playground' }).click();
+    await dialog.getByLabel('Shared test input').fill('Explain confidence intervals.');
+    await dialog.getByRole('button', { name: 'Run preview' }).click();
+    await expect(dialog.locator('.preview-column')).toHaveCount(2);
+    await expect(dialog.locator('.preview-column p').filter({ hasText: 'Explain confidence intervals.' })).toHaveCount(2);
+  });
+
+  test('criteria view exposes the seeded reusable judges', async ({ page }) => {
+    await page.getByRole('button', { name: 'Criteria' }).click();
+    await expect(page.getByRole('heading', { name: 'Scoring Criteria' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Factual accuracy' })).toBeVisible();
+    await expect(page.locator('.criterion-card')).toHaveCount(4);
+  });
+
+  test('completed experiment opens coherent result views and export', async ({ page }) => {
+    await page.getByRole('button', { name: 'Onboarding assistant — confidence and warmth' }).click();
+    const panel = page.getByRole('complementary', { name: /Results for Onboarding assistant/ });
+    await expect(panel.getByText('Mean score')).toBeVisible();
+    await expect(panel.getByRole('tab', { name: 'Results' })).toBeVisible();
+    await panel.getByRole('tab', { name: 'Monitoring' }).click();
+    await expect(panel.getByRole('heading', { name: 'Sequential monitoring' })).toBeVisible();
+    await panel.getByRole('button', { name: 'Export report' }).click();
+    await expect(page.getByRole('dialog', { name: /portable result pack/ })).toBeVisible();
+    await expect(page.getByLabel('Experiment Report JSON preview')).toContainText('generatedAt');
+  });
+
+  test('pending experiment starts a visible per-variant run', async ({ page }) => {
+    const row = page.getByRole('row', { name: /Launch copy brevity/ });
+    await row.getByRole('button', { name: 'Run Experiment' }).click();
+    const panel = page.getByRole('complementary', { name: /Results for Launch copy brevity/ });
+    await expect(panel.getByText('Evaluation in progress')).toBeVisible();
+    await expect(panel.getByText(/A progress|A progress/i)).toBeVisible();
+    await expect(panel.getByRole('button', { name: 'Pause run' })).toBeVisible();
+  });
+});
