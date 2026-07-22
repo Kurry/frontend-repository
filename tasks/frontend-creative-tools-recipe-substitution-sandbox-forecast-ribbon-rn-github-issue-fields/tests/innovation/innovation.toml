@@ -1,0 +1,226 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.25
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "11.1"
+name = "delightful_microinteractions"
+description = "The app has unique, delightful microinteractions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.2"
+name = "advanced_motion_mechanics"
+description = "The app has advanced animation or transition mechanics such as parallax or scroll storytelling."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.3"
+name = "guided_onboarding"
+description = "The app has a narrative or guided onboarding flow."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.4"
+name = "enhanced_interactive_graphics"
+description = "Data visualizations or interactive graphics provide extra usability."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.5"
+name = "alternative_input_support"
+description = "The app supports voice, gesture, or another alternative input."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.6"
+name = "preference_personalization"
+description = "The app provides personalization features for user preferences."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.7"
+name = "polished_brand_narrative"
+description = "The app presents polished storytelling or a branding narrative."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.8"
+name = "dynamic_theming_beyond_requirements"
+description = "The app provides dynamic theming or a color mode beyond requirements."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.9"
+name = "genre_appropriate_platform_features"
+description = "The app uses web platform features such as PWA or offline support where the genre allows."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.10"
+name = "competition_level_innovation"
+description = "Competition-level innovation is visible to users."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "11.n1"
+name = "demo_is_bare_spec_only"
+description = "The demo is purely spec-compliant, barebones, and unenhanced."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n2"
+name = "experience_is_generic_or_copied"
+description = "Interactions and visuals are generic, templated, or copied."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n3"
+name = "experience_lacks_polish_guidance_story"
+description = "The app has no polish, guidance, or story."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n4"
+name = "experience_lacks_extra_polish"
+description = "The app has no extra visual or interactive polish."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n5"
+name = "interface_is_flat_and_static"
+description = "The UI is flat and static with no immersion."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n6"
+name = "helpful_platform_capabilities_ignored"
+description = "Modern platform capabilities are ignored where they would clearly help."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n7"
+name = "personalization_is_impossible"
+description = "Personalization is impossible."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n8"
+name = "delightful_moments_are_absent"
+description = "The app has no new or delightful user moments."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n9"
+name = "design_has_no_twist"
+description = "The design repeats well-trod patterns without a twist."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "11.n10"
+name = "effort_stops_at_mvp"
+description = "The app shows minimal effort beyond the MVP or deliverable."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "AC-11"
+name = "linked_utility"
+description = "User action: Mutate a record and use the linked representation to make the next decision. Linked views provide domain utility beyond CRUD."
+type = "binary"
+weight = 1.0
