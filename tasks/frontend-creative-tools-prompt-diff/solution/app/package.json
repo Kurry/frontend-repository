@@ -26,6 +26,6 @@
   "devDependencies": {
     "@vitejs/plugin-react": "latest",
     "vite": "latest",
-    "@playwright/test": "^1.61.0"
+    "@playwright/test": "1.61.0"
   }
 }
