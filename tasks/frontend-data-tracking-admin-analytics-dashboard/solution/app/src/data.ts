@@ -96,7 +96,7 @@ export function sortUsers(users: User[], key: SortKey): User[] {
   const a = [...users];
   if (key === 'name-az') return a.sort((x, y) => x.firstName.localeCompare(y.firstName) || x.lastName.localeCompare(y.lastName));
   if (key === 'highest-spend') return a.sort((x, y) => y.payments - x.payments);
-  if (key === 'newest') return a.sort((x, y) => +new Date(y.lastActive) - +new Date(x.lastActive));
+  if (key === 'newest') return a.reverse();
   if (key === 'last-active') return a.sort((x, y) => +new Date(y.lastActive) - +new Date(x.lastActive));
   return a;
 }

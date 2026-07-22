@@ -24,7 +24,7 @@ const show = (e: React.MouseEvent, html: string) => setTip({ x: e.clientX, y: e.
 const move = (e: React.MouseEvent, html: string) => setTip({ x: e.clientX, y: e.clientY, html });
 const hide = () => setTip(null);
 
-export function ColumnChart({ values, labels, color = 'var(--color-primary)', height = 200, showAvg = false }:
+export function ColumnChart({ values, labels, color = 'var(--c-teal)', height = 200, showAvg = false }:
   { values: number[]; labels: string[]; color?: string; height?: number; showAvg?: boolean }) {
   const W = 600, H = height, pad = 8;
   const max = Math.max(...values) * 1.1;
@@ -44,7 +44,7 @@ export function ColumnChart({ values, labels, color = 'var(--color-primary)', he
   );
 }
 
-export function LineChart({ values, color = 'var(--color-info)', height = 150, suffix = '' }:
+export function LineChart({ values, color = 'var(--c-sky)', height = 150, suffix = '' }:
   { values: number[]; color?: string; height?: number; suffix?: string }) {
   const W = 320, H = height, pad = 10;
   const max = Math.max(...values) * 1.12, min = Math.min(...values) * 0.88;
