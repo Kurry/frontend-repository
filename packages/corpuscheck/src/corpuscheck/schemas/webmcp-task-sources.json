@@ -513,5 +513,10 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-workflow-volunteer-shift-exchange-board": {
+    "source": "Volunteer Shift Exchange Board PRD",
+    "instruction": "tasks/frontend-workflow-volunteer-shift-exchange-board/instruction.md",
+    "description": "Workflow for multi-person shift exchanges."
   }
 }

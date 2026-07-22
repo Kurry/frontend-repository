@@ -1,0 +1,148 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "cf_roster_canvas"
+name = "Roster and coverage canvas features work as defined"
+type = "browser_eval"
+weight = 1.0
+description = "Verify that dragging a card to another volunteer proposes reassignment; drawing successive edges creates a two- to five-person exchange loop. Keyboard source-target selection and mobile exchange sheets equal pointer gestures. Coverage cells show required versus assigned role counts and select exact shifts."
+
+[[criterion]]
+id = "cf_transaction_composer"
+name = "Exchange transaction composer features work as defined"
+type = "browser_eval"
+weight = 1.0
+description = "Verify each exchange stores offered shift, requested/received shift, role assignment, participants, rationale, expiry, and optional coordinator override. Open chains are invalid; duplicate shift/participant roles and self-loops reject. The composer previews before/after roster, coverage, hours, fairness, travel, and conflicts without mutating committed ownership."
+
+[[criterion]]
+id = "cf_constraint_graph"
+name = "Constraint graph features work as defined"
+type = "browser_eval"
+weight = 1.0
+description = "Verify hard rules cover availability, skill/certification, accessibility-compatible venue, overlapping time, 11-hour rest, 20-hour cap, role coverage, and cross-venue travel. Soft rules cover preferences and fairness. Selecting a conflict highlights exact volunteer, shifts, edge, threshold, and remediation. Overrides are allowed only for declared soft rules and require a note."
+
+[[criterion]]
+id = "cf_response_workflow"
+name = "Participant response workflow features work as defined"
+type = "browser_eval"
+weight = 1.0
+description = "Verify sending a proposal creates tentative shift reservations and response tasks for every participant. States transition correctly. One decline or expiry releases all reservations. Editing after acceptance creates a revision and resets affected responses with visible lineage."
+
+[[criterion]]
+id = "cf_coordinator_approval"
+name = "Coordinator approval and atomic commit features work as defined"
+type = "browser_eval"
+weight = 1.0
+description = "Verify when all participants accept and hard constraints pass, the coordinator compares the current roster checksum against the proposal base. If current state changed, approval becomes stale and requires rebase/review. Commit changes all shift owners simultaneously and appends ownership history."
+
+[[criterion]]
+id = "cf_failure_simulation"
+name = "Partial-failure simulation and rollback features work as defined"
+type = "browser_eval"
+weight = 1.0
+description = "Verify the fixture can fail after two internal ownership writes. The UI must expose the failed commit attempt while canonical roster remains at the pretransaction snapshot, then allow retry atomic commit, rebase, edit revision, or cancel. Retry is idempotent."
+
+[[criterion]]
+id = "cf_fairness_routing"
+name = "Fairness and waitlist routing features work as defined"
+type = "browser_eval"
+weight = 1.0
+description = "Verify charts show desirable/undesirable hours, total hours, preference match, and recent swap burden per volunteer. A waitlist routes open shifts to eligible volunteers in deterministic priority order and produces proposals only."
+
+[[criterion]]
+id = "cf_responsive_artifacts"
+name = "Responsive roster and artifacts features work as defined"
+type = "browser_eval"
+weight = 1.0
+description = "Verify desktop and mobile flows. Verify Export produces canonical JSON, one ICS roster, CSV shift ownership/audit ledger, and SVG exchange diagram; import reconstructs transactions exactly."

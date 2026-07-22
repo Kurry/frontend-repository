@@ -1,0 +1,29 @@
+{
+  "name": "volunteer-shift-exchange-board",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "echo 'Serving on port 3000' && http-server dist -p 3000",
+    "dev": "vite",
+    "build": "vite build",
+    "verify:build": "node -e \"const fs = require('fs'); if (!fs.existsSync('dist/index.html')) process.exit(1);\""
+  },
+  "dependencies": {
+    "@headlessui/react": "^1.7.15",
+    "@reduxjs/toolkit": "^1.9.5",
+    "date-fns": "^2.30.0",
+    "http-server": "^14.1.1",
+    "lucide-react": "^0.263.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.26",
+    "tailwindcss": "^3.3.0",
+    "vite": "^4.4.5"
+  }
+}

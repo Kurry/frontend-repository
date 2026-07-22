@@ -7892,5 +7892,72 @@
       "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
       "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
     ]
+  },
+  {
+    "task": "frontend-workflow-volunteer-shift-exchange-board",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "shift-exchange-edge"
+      ],
+      "editor_properties": [
+        "reservation",
+        "override",
+        "revision"
+      ],
+      "editor_modes": [
+        "draft",
+        "sent",
+        "committed",
+        "rolled-back",
+        "failed"
+      ],
+      "editor_operations": [
+        "select",
+        "add",
+        "delete",
+        "update_property",
+        "set_content",
+        "switch_mode",
+        "preview"
+      ],
+      "entity": "shift-ownership",
+      "entity_operations": [
+        "create",
+        "select",
+        "update",
+        "delete",
+        "toggle"
+      ],
+      "entity_fields": [
+        "volunteer",
+        "shift",
+        "role",
+        "time"
+      ],
+      "artifact_operations": [
+        "export",
+        "import",
+        "copy"
+      ],
+      "export_formats": [
+        "session-json",
+        "ics",
+        "csv",
+        "svg"
+      ],
+      "import_modes": [
+        "session-json"
+      ]
+    },
+    "mechanics_exclusions": [
+      "Drag/drop canvas interactions",
+      "Waitlist logical-clock scheduling internals",
+      "Detailed accessibility tooltips"
+    ]
   }
 ]
