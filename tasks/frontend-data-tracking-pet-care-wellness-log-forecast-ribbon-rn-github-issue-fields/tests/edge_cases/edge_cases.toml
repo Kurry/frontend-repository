@@ -250,7 +250,7 @@ negate = true
 weight = 1.0
 
 [[criterion]]
-id = "edge_cases.boundaries_recovery"
+id = "AC-06"
 name = "boundaries_recovery"
 description = "Each invalid action gives field-level recovery and preserves prior valid state."
 type = "binary"

@@ -92,7 +92,7 @@ allowed_tools = [
 aggregation = "weighted_mean"
 
 [[criterion]]
-id = "core_features.signature_mutation"
+id = "AC-01"
 name = "signature_mutation"
 description = "The forecast ribbon mutation changes the primary record, linked view, and status together."
 type = "binary"

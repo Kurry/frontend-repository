@@ -236,7 +236,7 @@ negate = true
 weight = 1.0
 
 [[criterion]]
-id = "performance.large_collection"
+id = "AC-09"
 name = "large_collection"
 description = "The signature interaction remains responsive and unrelated rows stay stable."
 type = "binary"

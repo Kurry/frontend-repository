@@ -250,7 +250,7 @@ type = "binary"
 weight = 1.0
 
 [[criterion]]
-id = "innovation.linked_utility"
+id = "AC-11"
 name = "linked_utility"
 description = "Linked views provide domain utility beyond CRUD."
 type = "binary"

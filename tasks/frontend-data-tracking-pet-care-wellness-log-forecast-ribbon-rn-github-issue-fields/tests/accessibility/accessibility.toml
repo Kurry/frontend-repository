@@ -250,7 +250,7 @@ negate = true
 weight = 1.0
 
 [[criterion]]
-id = "accessibility.alternate_input"
+id = "AC-08"
 name = "alternate_input"
 description = "Alternate input produces identical state with visible focus and live feedback."
 type = "binary"

@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
-    "@zto/webmcp-contracts": "file:../../../../packages/webmcp-contracts",
     "date-fns": "^4.4.0",
     "lucide-react": "^1.25.0",
     "react": "^19.2.7",

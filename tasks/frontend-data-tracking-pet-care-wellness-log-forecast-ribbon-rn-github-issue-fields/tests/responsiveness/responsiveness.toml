@@ -250,7 +250,7 @@ negate = true
 weight = 1.0
 
 [[criterion]]
-id = "responsiveness.mobile_mode"
+id = "AC-07"
 name = "mobile_mode"
 description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
 type = "binary"

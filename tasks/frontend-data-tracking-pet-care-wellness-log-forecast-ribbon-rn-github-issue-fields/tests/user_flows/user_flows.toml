@@ -250,7 +250,7 @@ negate = true
 weight = 1.0
 
 [[criterion]]
-id = "user_flows.complete_user_flow"
+id = "AC-05"
 name = "complete_user_flow"
 description = "The end-to-end job is recoverable without reload."
 type = "binary"
