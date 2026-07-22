@@ -39,6 +39,11 @@ export default function SaveModal({ launcherButtonRef }) {
 
   useEffect(() => {
     if (!open) return undefined
+    function onBackdropClick(event) {
+      if (!(event.target instanceof Element)) return
+      if (event.target.closest('.cds--modal-container')) return
+      if (event.target.closest('.cds--modal')) close()
+    }
     function onKeyDown(event) {
       if (event.key === 'Escape') {
         event.preventDefault()
@@ -65,8 +70,12 @@ export default function SaveModal({ launcherButtonRef }) {
         last.focus()
       }
     }
+    document.addEventListener('click', onBackdropClick, true)
     document.addEventListener('keydown', onKeyDown, true)
-    return () => document.removeEventListener('keydown', onKeyDown, true)
+    return () => {
+      document.removeEventListener('click', onBackdropClick, true)
+      document.removeEventListener('keydown', onKeyDown, true)
+    }
   }, [open]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function close() {

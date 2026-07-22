@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { Button, Select, SelectItem, Tag, ToastNotification, ContentSwitcher, Switch } from '@carbon/react'
 import {
   Asleep,
@@ -60,7 +61,7 @@ function Sidebar() {
               key={technique.id}
               className={`technique-item ${active ? 'is-active' : ''}`}
               aria-current={active ? 'page' : undefined}
-              onClick={() => selectTechnique(technique.id)}
+              onClick={() => flushSync(() => selectTechnique(technique.id))}
             >
               <span className="technique-index">{String(index + 1).padStart(2, '0')}</span>
               <span className="technique-name">{technique.name}</span>
