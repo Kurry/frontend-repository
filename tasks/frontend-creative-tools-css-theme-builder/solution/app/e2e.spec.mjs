@@ -74,7 +74,7 @@ test.describe('workspace contract (canonical)', () => {
     expect(new Set(names).size, 'tool names are unique').toBe(names.length);
   });
 
-  test('playwright_reduced_motion', async ({ page }) => {
+  test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     // Install the collector before navigation so load/hydration animations are
     // observed too. Keep it running through network idle and a settled 1.5s
@@ -121,7 +121,7 @@ test.describe('workspace contract (canonical)', () => {
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
-  test('no_horizontal_scroll_at_375', async ({ page }) => {
+  test('no horizontal overflow at 375px', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
     await page.waitForLoadState('networkidle');
@@ -134,6 +134,15 @@ test.describe('workspace contract (canonical)', () => {
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
 
 test.describe('task-specific criteria', () => {
+  test('7.8 no_horizontal_scroll_at_375', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const overflow = await page.evaluate(() =>
+      document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow, 'no horizontal page scroll at 375px (criterion 7.8)').toBeLessThanOrEqual(1);
+  });
+
   test('panels_stack_below_768', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
