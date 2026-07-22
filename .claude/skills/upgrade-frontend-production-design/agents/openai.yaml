@@ -1,0 +1,4 @@
+interface:
+  display_name: "Upgrade Frontend Production Design"
+  short_description: "Raise task art direction and motion quality"
+  default_prompt: "Use $upgrade-frontend-production-design to strengthen this frontend task into a production-grade visual and interaction brief."

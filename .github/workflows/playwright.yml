@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  issues: write
+  pull-requests: write
 
 concurrency:
   group: playwright-${{ github.event.pull_request.number }}
@@ -178,6 +180,7 @@ jobs:
       actions: read
       contents: read
       issues: write
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: Download task statuses

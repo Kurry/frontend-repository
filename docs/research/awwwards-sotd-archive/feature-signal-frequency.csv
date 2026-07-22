@@ -1,0 +1,14 @@
+signal,site_count,percent_of_live_sites
+svg,3060,67.076
+video,1721,37.725
+css_animation,1161,25.449
+webgl,1056,23.148
+three_d,815,17.865
+smooth_scroll,775,16.988
+canvas,680,14.906
+audio,477,10.456
+lottie,420,9.206
+service_worker,118,2.587
+model_3d_asset,56,1.228
+rive,44,0.964
+webassembly,20,0.438
