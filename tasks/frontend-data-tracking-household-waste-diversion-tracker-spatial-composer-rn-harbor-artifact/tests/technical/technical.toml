@@ -1,0 +1,15 @@
+[dimensions.technical]
+id = "technical"
+name = "Technical"
+
+[[criterion]]
+id = "technical.schema_contract"
+name = "Schema contract"
+description = "The tool result and artifact contain the declared API-shaped fields."
+weight = 1
+
+[[criterion]]
+id = "technical.catchall"
+name = "Technical (General)"
+description = "Other technical issues not covered by specific criteria."
+weight = 0.5

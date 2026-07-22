@@ -1,0 +1,15 @@
+[dimensions.responsiveness]
+id = "responsiveness"
+name = "Responsiveness"
+
+[[criterion]]
+id = "responsiveness.mobile_mode"
+name = "Mobile mode"
+description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
+weight = 1
+
+[[criterion]]
+id = "responsiveness.catchall"
+name = "Responsiveness (General)"
+description = "Other responsiveness issues not covered by specific criteria."
+weight = 0.5

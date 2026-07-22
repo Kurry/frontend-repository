@@ -1,0 +1,15 @@
+[dimensions.motion]
+id = "motion"
+name = "Motion"
+
+[[criterion]]
+id = "motion.causal_motion"
+name = "Causal motion"
+description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+weight = 1
+
+[[criterion]]
+id = "motion.catchall"
+name = "Motion (General)"
+description = "Other motion issues not covered by specific criteria."
+weight = 0.5

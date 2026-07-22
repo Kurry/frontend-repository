@@ -1,0 +1,6 @@
+[task]
+id = "frontend-data-tracking-household-waste-diversion-tracker-spatial-composer-rn-harbor-artifact"
+name = "mercor-intelligence/frontend-data-tracking-household-waste-diversion-tracker-spatial-composer-rn-harbor-artifact"
+title = "Household Waste Diversion Tracker — Spatial Composer — Harbor Artifact Provenance"
+description = "Manage waste events through a domain-native browser surface where one meaningful mutation updates linked views and an interoperable artifact. Variant focus: place a selected record in a spatial composer and rebalance capacity. Release-derived concept: an evidence artifact inspector with redaction, source lineage, downloadable files, and no silent failure."
+genre = "good-app"
