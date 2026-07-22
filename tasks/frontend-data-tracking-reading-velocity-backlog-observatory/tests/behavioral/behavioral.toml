@@ -1,0 +1,169 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "in_memory_multi_facet_reload_reset"
+description = "Starting on Paint: switch to Color Brush, pick a non-default swatch, paint at least 3 cells, switch to Gallery and save a uniquely named board, then reload. All facets coherently reset to the seeded baseline together — blank canvas, unlocked cell-size slider, and exactly the seeded boards in Gallery — never a mix of persisted user art with reset tools."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "tag_filter_then_clear_restores_list"
+description = "Filter-reversal proof: note the full gallery list, filter by a seeded board's tag so the list narrows, then clear the filter; the full list restores exactly (same boards, same count), proving the visible list is derived from the shared collection rather than two hardcoded snapshots."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "gallery_list_responds_to_tag_filter"
+description = "Derived-view sensitivity: apply a tag filter that matches a subset of boards; the visible gallery list changes meaningfully (fewer cards, only matching tags). Clearing the filter restores the full list rather than redrawing identically regardless of filter input."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "paint_save_echo_across_modes"
+description = "Cross-view echo: paint a recognizable pattern in Paint mode, save it with a valid name and tag, switch between Paint and Gallery without reload — the painted board remains intact in Paint and Gallery shows the new card with a thumbnail matching those cells."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "gallery_count_delta_exact"
+description = "Count-delta integrity: note the gallery count, save one new uniquely named board, and confirm the count increases by exactly one; after deleting that board, confirm the count decreases by exactly one with no off-by-one lag."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "different_paints_save_different_thumbnails"
+description = "Input-dependent output: paint two clearly different patterns (for example red block vs blue block), save each with a distinct name; the two gallery thumbnails differ in the ways those painted cells dictate."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_paint_and_gallery"
+description = "Interleaved-flow integrity: start painting in Paint mode, switch to Gallery and favorite/filter a seeded board, return to Paint and continue; neither flow corrupts the other — painted cells and gallery facets remain coherent without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "empty_gallery_then_repopulate"
+description = "Edge-state round-trip: delete every board (empty-gallery state visible), then paint and save a new named board; the gallery count tracks through both transitions (zero then one) and the new card appears with a matching thumbnail."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "export_import_roundtrip_under_session_schema"
+description = "Starting with a blank canvas: paint cells with a known paletteColor, set mirrorMode to horizontal or vertical, save one uniquely named board, open Export and confirm the preview shows schemaVersion shapeshift-session-v1 with brushMode, paletteColor, mirrorMode, fillStats, cells, and boards, Download or Copy that session JSON, then Import it. Confirm canvas cells, mirror mode, fill stats, and the saved board return under the same field-contract keys — proving the export contains the session's actual work."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.10"
+name = "import_schema_rejection_preserves_studio"
+description = "With painted cells and at least one gallery board already present: attempt Import with a payload that violates the Session field contract (wrong schemaVersion or missing required board keys). Confirm an inline error names the import problem, gallery count is unchanged, and canvas cells match the pre-import state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.11"
+name = "mirror_and_fill_stats_cross_view"
+description = "Input-dependent derived surfaces: with mirrorMode Horizontal, paint two distinct blank cells in sequence; fill stats increase by two painted cells per stroke when partners were blank, and Export Session JSON mirrorMode plus fillStats match the on-stage readout without a reload."
+type = "binary"
+weight = 1.0
