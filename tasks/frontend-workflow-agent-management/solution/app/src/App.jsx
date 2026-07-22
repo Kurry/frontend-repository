@@ -217,7 +217,7 @@ function AgentTable() {
         <TableBody>
           {filtered.map((agent) => {
             return (
-              <TableRow key={agent.id} className={`agent-row ${agent.isNew ? 'new-agent-row' : ''} ${store.exitingAgentId === agent.id ? 'agent-row-exit' : ''} ${store.detailAgentId === agent.id ? 'is-selected' : ''}`} onClick={() => store.selectAgent(agent.id)} tabIndex={0} onKeyDown={(event) => { if (event.currentTarget === event.target && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); store.selectAgent(agent.id) } }}>
+              <TableRow key={agent.id} className={['agent-row', agent.isNew && 'new-agent-row', store.exitingAgentId === agent.id && 'agent-row-exit', store.detailAgentId === agent.id && 'is-selected'].filter(Boolean).join(' ')} onClick={() => store.selectAgent(agent.id)} tabIndex={0} onKeyDown={(event) => { if (event.currentTarget === event.target && (event.key === 'Enter' || event.key === ' ')) { event.preventDefault(); store.selectAgent(agent.id) } }}>
                 <TableCell className="checkbox-cell" onClick={(event) => event.stopPropagation()}><label className="row-checkbox"><input id={`select-${agent.id}`} type="checkbox" aria-label={`Select ${agent.name}`} checked={store.selectedIds.includes(agent.id)} onChange={(event) => store.toggleSelection(agent.id, event.target.checked)} /><span className="sr-only">{`Select ${agent.name}`}</span></label></TableCell>
                 <TableCell><div className="agent-identity"><span className={`agent-mark type-${agent.agentType}`}>{agent.name.slice(0, 1)}</span><div><strong>{agent.name}</strong><CurrentWork agent={agent} /></div></div></TableCell>
                 <TableCell><span className="type-label">{TYPE_LABELS[agent.agentType]}</span></TableCell>

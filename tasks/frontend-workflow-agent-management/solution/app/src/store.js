@@ -492,7 +492,7 @@ export const useFleetStore = create((set, get) => ({
     document.body.appendChild(anchor)
     anchor.click()
     document.body.removeChild(anchor)
-    URL.revokeObjectURL(url)
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
   },
   openImport: () => { captureFocus(); set({ importOpen: true, importError: '', paletteOpen: false, exportOpen: false, modal: null }) },
   closeImport: () => { set({ importOpen: false, importError: '' }); restoreFocus() },
