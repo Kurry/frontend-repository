@@ -6,7 +6,8 @@
   "scripts": {
     "start": "vite preview --host 0.0.0.0 --port 3000 --strictPort",
     "verify:build": "vite build",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:e2e:canonical": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@carbon/icons-react": "11.72.0",

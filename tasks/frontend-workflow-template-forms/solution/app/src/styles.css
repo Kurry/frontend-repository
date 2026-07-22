@@ -699,6 +699,10 @@ a:focus-visible,
 }
 
 @media (max-width: 430px) {
+  .app-header { padding: 0 12px; gap: 8px; }
+  .view-nav { overflow-x: auto; scrollbar-width: none; }
+  .view-nav::-webkit-scrollbar { display: none; }
+  .view-nav .cds--btn { padding-inline: 9px; font-size: 12px; flex-shrink: 0; white-space: nowrap; }
   .brand > span:last-child { display: none; }
   .view-nav .header-preference { display: none; }
   .view-nav .cds--btn { padding-inline: 9px; font-size: 12px; }
@@ -721,7 +725,7 @@ a:focus-visible,
   .preview-actions { align-items: stretch; flex-direction: column; }
   .preview-actions .cds--btn { flex: none; width: 100%; }
   .library-actions { align-items: stretch; flex-direction: column; }
-  .library-row { grid-template-columns: minmax(0, 1fr) 72px; }
+  .library-row { grid-template-columns: minmax(0, 1fr) 104px; }
   .row-open { gap: 10px; padding-left: 8px; }
   .row-icon { width: 44px; height: 44px; }
   .row-actions .cds--btn { width: 44px; min-height: 44px; min-width: 44px; }
