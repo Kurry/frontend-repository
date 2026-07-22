@@ -1,0 +1,13 @@
+[[criterion]]
+id = "AC-03"
+title = "causal_motion"
+description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
+type = "behavioral"
+weight = 1.0
+
+[[criterion]]
+id = "motion.catchall"
+title = "catch-all"
+description = "All motion features."
+type = "behavioral"
+weight = 1.0

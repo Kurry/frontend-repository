@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-13"
+title = "artifact_round_trip"
+description = "Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+type = "behavioral"
+weight = 1.0
