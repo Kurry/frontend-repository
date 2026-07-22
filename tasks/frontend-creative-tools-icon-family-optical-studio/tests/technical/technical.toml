@@ -56,3 +56,9 @@ args = ["-y", "@playwright/mcp@0.0.76", "--browser", "chromium", "--cdp-endpoint
 
 [scoring]
 aggregation = "weighted_mean"
+
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = ["-y", "@playwright/mcp@0.0.76", "--browser", "chromium", "--cdp-endpoint", "$WEBMCP_RM_CDP_ENDPOINT", "--isolated", "--config", "/tests/playwright_rm_config.json"]

@@ -35,3 +35,9 @@ description = "The app exhibits a significant, browser-observable defect in acce
 type = "binary"
 negate = true
 weight = 1.0
+
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = ["-y", "@playwright/mcp@0.0.76", "--browser", "chromium", "--cdp-endpoint", "$WEBMCP_RM_CDP_ENDPOINT", "--isolated", "--config", "/tests/playwright_rm_config.json"]
