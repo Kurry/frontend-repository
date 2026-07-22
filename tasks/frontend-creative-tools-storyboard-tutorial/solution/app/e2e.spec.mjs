@@ -1390,6 +1390,46 @@ async function createScene(page, { title, body = 'A complete scene description.'
     await expect(page.locator('#f-title')).toBeVisible();
   });
 
+  test('regression import rejects a non-string scene id without mutating the board', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+
+    await page.getByRole('button', { name: 'Export storyboard' }).click();
+    const original = JSON.parse(await page.locator('#exp-preview').textContent());
+    await page.getByRole('button', { name: 'Close export' }).click();
+    const invalid = structuredClone(original);
+    invalid.scenes[0].id = null;
+
+    await page.getByRole('button', { name: 'Import storyboard' }).click();
+    await page.locator('#imp-area').fill(JSON.stringify(invalid));
+    await expect(page.locator('#imp-status')).toContainText('scenes[0].id');
+    await expect(page.locator('#imp-ok')).toBeDisabled();
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+
+    await page.getByRole('button', { name: 'Export storyboard' }).click();
+    expect(JSON.parse(await page.locator('#exp-preview').textContent())).toEqual(original);
+  });
+
+  test('regression import rejects scene order that contradicts array board order', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+
+    await page.getByRole('button', { name: 'Export storyboard' }).click();
+    const original = JSON.parse(await page.locator('#exp-preview').textContent());
+    await page.getByRole('button', { name: 'Close export' }).click();
+    const invalid = structuredClone(original);
+    [invalid.scenes[0], invalid.scenes[1]] = [invalid.scenes[1], invalid.scenes[0]];
+
+    await page.getByRole('button', { name: 'Import storyboard' }).click();
+    await page.locator('#imp-area').fill(JSON.stringify(invalid));
+    await expect(page.locator('#imp-status')).toContainText('scenes[0].order');
+    await expect(page.locator('#imp-ok')).toBeDisabled();
+    await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+
+    await page.getByRole('button', { name: 'Export storyboard' }).click();
+    expect(JSON.parse(await page.locator('#exp-preview').textContent())).toEqual(original);
+  });
+
 // NOT-AUTOMATABLE: 3.1 spacing_matches_storyboard_scale - At 1440px, spacing among the product header, Tile/List/Slide nav bar, and multi-column scene grid follows a consistent scale matching the reference screenshots — no arbitrary one-off gaps that break the docs/storyboard composition.
 // NOT-AUTOMATABLE: 3.2 typography_matches_geometric_sans_spec - Header titles and board UI use a rounded geometric sans-serif face consistent with the reference light workspace; scene description copy follows the tutorial hierarchy — not a default system UI stack for chrome.
 // NOT-AUTOMATABLE: 3.3 desktop_composition_matches_reference - At 1440px the layout matches the reference composition within a small tolerance: product header (logo, Demo Projects, 1. Getting Started, kebab, utility tools) above a Tile multi-column scene grid with trailing camera placeholders and Add Scene — a docs/storyboard workspace, not a marketing landing.
