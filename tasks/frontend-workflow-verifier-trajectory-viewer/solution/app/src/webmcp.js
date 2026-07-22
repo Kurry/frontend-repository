@@ -10,9 +10,9 @@ import {
 import { adjudicationFormSchema, bulkSchema, classifications } from "./schemas";
 
 const destinations = [
+  "review-workspace",
   "task-list",
   "task-detail",
-  "review-workspace",
   "agent-trajectory-pane",
   "scorer-trajectory-pane",
   "verdict-table",
@@ -265,7 +265,7 @@ const definitions = [
         taskId: { type: "string", enum: tasks.map((t) => t.id) },
         trialId: { type: "string", enum: allTrials.map((x) => x.trial.id) },
       },
-      required: ["destination"],
+      required: ["destination", "trialId"],
       additionalProperties: false,
     },
     execute: (args) => result(navigate(args.destination, args)),
