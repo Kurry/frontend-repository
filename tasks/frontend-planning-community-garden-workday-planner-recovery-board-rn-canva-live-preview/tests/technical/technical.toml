@@ -1,0 +1,132 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+[[criterion]]
+id = "AC-04"
+name = "schema_and_artifact_runtime_contract"
+description = "After a real recovery mutation, entity_select_record and the visible artifact preview agree on the record's stable ID, status, recoveryBoardState, repair note, exact derived counts, and history event count."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.2"
+name = "single_shared_state_coherence"
+description = "A create, edit, archive, reorder, recovery, resolve, undo, clear, or valid import made in one surface appears immediately in the collection, board, preview, inspector, event history, WebMCP query, and artifact preview without a stale or disconnected copy."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.3"
+name = "in_memory_reload_baseline"
+description = "After several mutations, localStorage, sessionStorage, IndexedDB, and cookies remain empty, and a page reload restores exactly 104 fixture tasks, one Failed task, no Recovery or Resolved task, no selection, and zero authored events."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.4"
+name = "exact_webmcp_tool_surface"
+description = "The page exposes session info, tool list, and invocation for entity_create_record, entity_select_record, entity_update_record, entity_delete_record, entity_toggle_record, entity_reorder_record, artifact_export_session_json, artifact_import_session_json, and artifact_copy_session_json; handlers use the same commands as visible controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.n1"
+name = "webmcp_leaks_artifact_bytes"
+description = "An artifact WebMCP argument or result exposes raw JSON contents, file paths, blobs, base64, or clipboard contents instead of opening the visible export, import, or copy workflow."
+type = "binary"
+negate = true
+weight = 1.0
