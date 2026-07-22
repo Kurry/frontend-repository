@@ -4,6 +4,7 @@ import {
   $eventsFilter, $eventsSort, $selectedEventIds,
   EVENT_CATEGORIES, EVENT_STATUSES,
   addEvent, updateEvent, deleteEvents, addLead, announce,
+  isIsoCalendarDate,
   type RidgeEvent, type EventCategory, type EventStatus,
 } from '../store';
 import { contactSchema, type ContactFormValues } from './ContactForm';
@@ -99,7 +100,7 @@ function parseEvent(fields: Record<string, string>, base?: RidgeEvent): Omit<Rid
   const status = (fields.status ?? base?.status ?? '') as EventStatus;
   const featured = fields.featured === undefined ? (base?.featured ?? false) : parseFeatured(fields.featured);
   if (title.length < 2) throw new Error('title must contain at least 2 characters');
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) throw new Error('date must use YYYY-MM-DD');
+  if (!isIsoCalendarDate(date)) throw new Error('date must be a real calendar date using YYYY-MM-DD');
   if (city.length < 2) throw new Error('city must contain at least 2 characters');
   if (!EVENT_CATEGORIES.includes(category)) throw new Error(`category must be one of ${EVENT_CATEGORIES.join(', ')}`);
   if (!EVENT_STATUSES.includes(status)) throw new Error(`status must be one of ${EVENT_STATUSES.join(', ')}`);

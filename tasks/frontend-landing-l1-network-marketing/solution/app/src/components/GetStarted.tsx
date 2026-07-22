@@ -2,9 +2,9 @@ import React from 'react';
 import { ArrowRight } from 'phosphor-react';
 
 const steps = [
-  { id: '1', title: 'Read the Docs', copy: 'Dive into our technical documentation and quickstarts.' },
-  { id: '2', title: 'Deploy a Contract', copy: 'Use our web IDE to deploy your first smart contract.' },
-  { id: '3', title: 'Join the Community', copy: 'Connect with other builders in our developer hub.' },
+  { id: '1', title: 'Read the Docs', copy: 'Dive into our technical documentation and quickstarts.', action: 'Read documentation', target: 'developer-resources' },
+  { id: '2', title: 'Deploy a Contract', copy: 'Use our web IDE to deploy your first smart contract.', action: 'Explore network activity', target: 'network-in-action' },
+  { id: '3', title: 'Join the Community', copy: 'Connect with other builders in our developer hub.', action: 'Join developer community', target: 'community' },
 ];
 
 export default function GetStarted() {
@@ -17,15 +17,15 @@ export default function GetStarted() {
           {steps.map((step, i) => (
             <article
               key={step.id}
-              className="trio-card bg-surface/50 p-8 notch-br border border-white/5 flex flex-col justify-between items-start group hover:bg-surface transition-colors"
+              className="trio-card surface-copy bg-surface p-8 notch-br border border-current/10 flex flex-col justify-between items-start group hover:brightness-[.97] transition-all"
               style={{ '--i': i } as React.CSSProperties}
             >
               <div>
                 <h3 className="text-2xl display-font font-bold mb-4">{step.title}</h3>
-                <p className="text-gray-400 mb-8">{step.copy}</p>
+                <p className="opacity-70 mb-8">{step.copy}</p>
               </div>
-              <button type="button" className="cta notch-br btn btn-primary flex items-center gap-2 group-hover:brightness-110 transition-all">
-                CTA <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              <button type="button" className="cta notch-br btn btn-primary flex items-center gap-2 group-hover:brightness-110 transition-all" onClick={() => document.getElementById(step.target)?.scrollIntoView({ behavior: 'smooth' })}>
+                {step.action} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </article>
           ))}

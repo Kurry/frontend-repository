@@ -29,14 +29,14 @@ export default function GlobalEvents() {
   const filtered = Boolean(filter.status || filter.category);
 
   return (
-    <section className="events chapter py-24 bg-surface text-current relative z-20" id="events" aria-label="Global Events">
+    <section className="events surface-copy chapter py-24 bg-surface relative z-20" id="events" aria-label="Global Events">
       <div className="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 
         <div className="events-copy">
           <h2 className="events-headline text-5xl md:text-7xl font-bold display-font tracking-tight mb-8 min-h-[4rem]" id="eventsHeadline" aria-label="RIDGE GLOBAL EVENTS">
             {/* Decoded by JS */}
           </h2>
-          <div className="events-blurb text-xl text-gray-400 max-w-lg mb-8" id="eventsBlurb" aria-hidden="true">
+          <div className="events-blurb text-xl opacity-70 max-w-lg mb-8" id="eventsBlurb" aria-hidden="true">
             <p>Join our worldwide network of developers, founders, and enterprise partners building the future of institutional infrastructure.</p>
           </div>
           <p className="sr-only" id="eventsBlurbA11y">
@@ -53,19 +53,19 @@ export default function GlobalEvents() {
 
         <div className="flex flex-col gap-4">
           {featuredEvents.length === 0 ? (
-            <div className="events-card notch-br bg-void border border-white/10 p-8 lg:p-12 text-current">
+            <div className="events-card void-copy notch-br bg-void border border-white/10 p-8 lg:p-12">
               <span className="w-12 h-1 bg-accent block mb-4"></span>
               <p className="text-sm font-bold tracking-widest uppercase text-accent mb-2">Featured</p>
-              <p className="text-gray-400">No featured events yet — mark an event featured in Events Manager to surface it here.</p>
+              <p className="opacity-70">No featured events yet — mark an event featured in Events Manager to surface it here.</p>
             </div>
           ) : (
             featuredEvents.map((fe) => (
-              <div key={fe.id} className="events-card notch-br bg-void border border-white/10 p-8 lg:p-12 text-current group hover:border-white/20 transition-colors" data-featured-event={fe.id}>
+              <div key={fe.id} className="events-card void-copy notch-br bg-void border border-white/10 p-8 lg:p-12 group hover:border-white/30 transition-colors" data-featured-event={fe.id}>
                 <div className="events-card-block mb-8">
                   <span className="w-12 h-1 bg-accent block mb-4"></span>
                   <p className="text-sm font-bold tracking-widest uppercase text-accent mb-2">Featured / {fe.category}</p>
                   <h3 className="text-3xl display-font font-bold line-clamp-2">{fe.title}</h3>
-                  <p className="text-gray-400 mt-2">{fe.city} — {formatEventDate(fe.date)}</p>
+                  <p className="opacity-70 mt-2">{fe.city} — {formatEventDate(fe.date)}</p>
                 </div>
                 <button type="button" className="cta notch-br btn btn-primary flex items-center gap-2 group-hover:brightness-110 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
                   Learn more <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
@@ -78,13 +78,13 @@ export default function GlobalEvents() {
 
       {/* Live landing listing (shares the manager's collection / filter / sort) */}
       <div className="container mx-auto px-4 mt-12">
-        <div className="notch-br bg-void border border-white/10 p-6">
+        <div className="void-copy notch-br bg-void border border-white/10 p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold display-font tracking-wide">Global Events lineup</h3>
             {filtered && (
               <button
                 type="button"
-                className="btn btn-ghost btn-sm text-gray-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
+                className="btn btn-ghost btn-sm opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
                 onClick={() => $eventsFilter.set({ status: '', category: '' })}
               >
                 Clear filters
@@ -92,17 +92,17 @@ export default function GlobalEvents() {
             )}
           </div>
           {listing.length === 0 ? (
-            <p className="text-gray-400 text-sm py-6 text-center">No events match the active filter.</p>
+            <p className="opacity-70 text-sm py-6 text-center">No events match the active filter.</p>
           ) : (
             <ul className="divide-y divide-white/5" data-events-listing aria-label="Global events listing">
               {listing.map((e) => (
                 <li key={e.id} className="flex items-center justify-between gap-4 py-3" data-event-row={e.id}>
                   <div className="min-w-0">
                     <p className="font-medium truncate">{e.title}</p>
-                    <p className="text-xs text-gray-500">{e.city} · {e.category}</p>
+                    <p className="text-xs opacity-60">{e.city} · {e.category}</p>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    <time className="text-sm text-gray-400 tabular-nums" dateTime={e.date}>{formatEventDate(e.date)}</time>
+                    <time className="text-sm opacity-70 tabular-nums" dateTime={e.date}>{formatEventDate(e.date)}</time>
                     <span className={`badge badge-sm notch-br ${e.status === 'featured' ? 'badge-accent' : e.status === 'past' ? 'badge-neutral' : 'badge-primary'}`}>{e.status}</span>
                   </div>
                 </li>

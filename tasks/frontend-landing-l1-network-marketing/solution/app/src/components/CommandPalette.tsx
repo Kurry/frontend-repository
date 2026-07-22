@@ -29,7 +29,7 @@ export default function CommandPalette() {
     window.setTimeout(() => {
       $commandPaletteOpen.set(false);
       setClosing(false);
-      lastFocused.current?.focus?.();
+      lastFocused.current?.focus({ preventScroll: true });
       lastFocused.current = null;
     }, 160);
   };
@@ -89,10 +89,10 @@ export default function CommandPalette() {
       <div
         ref={dialogRef}
         onKeyDown={trapFocus}
-        className={`bg-surface w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-white/10 ${closing ? 'overlay-out' : 'overlay-in'}`}
+        className={`surface-copy bg-surface w-full max-w-lg rounded-xl shadow-2xl overflow-hidden border border-current/10 ${closing ? 'overlay-out' : 'overlay-in'}`}
       >
         <div className="flex items-center p-4 border-b border-white/10">
-          <MagnifyingGlass size={20} className="text-gray-400 mr-3" aria-hidden="true" />
+          <MagnifyingGlass size={20} className="opacity-70 mr-3" aria-hidden="true" />
           <input
             ref={inputRef}
             type="text"
@@ -112,7 +112,7 @@ export default function CommandPalette() {
         </div>
         <ul id="palette-listbox" role="listbox" aria-label="Destinations" className="max-h-64 overflow-y-auto py-2">
           {filtered.length === 0 ? (
-            <li className="px-4 py-3 text-gray-500 text-center" role="presentation">No matching destinations</li>
+            <li className="px-4 py-3 opacity-60 text-center" role="presentation">No matching destinations</li>
           ) : (
             filtered.map((dest, i) => (
               <li key={dest.id} role="option" aria-selected={i === activeIndex} id={`palette-opt-${dest.id}`} className="px-2">
@@ -131,7 +131,7 @@ export default function CommandPalette() {
             ))
           )}
         </ul>
-        <div className="flex items-center gap-4 px-4 py-2 border-t border-white/10 text-[11px] text-gray-500">
+        <div className="flex items-center gap-4 px-4 py-2 border-t border-current/10 text-[11px] opacity-60">
           <span className="flex items-center gap-1"><ArrowUp size={12} /><ArrowDown size={12} /> navigate</span>
           <span className="flex items-center gap-1">↵ select</span>
           <span>esc close</span>

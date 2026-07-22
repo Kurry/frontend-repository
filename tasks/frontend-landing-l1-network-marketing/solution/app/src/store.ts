@@ -34,6 +34,15 @@ export const EVENT_STATUSES: EventStatus[] = ['upcoming', 'featured', 'past'];
 export const EVENT_CATEGORIES: EventCategory[] = ['Summit', 'Meetup', 'Workshop', 'Hackathon', 'Webinar'];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
+export function isIsoCalendarDate(value: string): boolean {
+  if (!DATE_RE.test(value)) return false;
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year
+    && date.getUTCMonth() === month - 1
+    && date.getUTCDate() === day;
+}
+
 // Initial seed
 const SEED_EVENTS: RidgeEvent[] = [
   { id: '1', title: 'Ridge Summit 2026', date: '2026-10-15', city: 'Denver', category: 'Summit', status: 'featured', featured: true },
@@ -199,7 +208,7 @@ export function loadCatalog(jsonStr: string, catalogName = 'catalog'): LoadCatal
     if (typeof e.title !== 'string' || e.title.length < 2) {
       return { ok: false, error: `Import failed: ${catalogName} has an event with an invalid title.` };
     }
-    if (typeof e.date !== 'string' || !DATE_RE.test(e.date)) {
+    if (typeof e.date !== 'string' || !isIsoCalendarDate(e.date)) {
       return { ok: false, error: `Import failed: ${catalogName} has an event with an invalid date.` };
     }
     if (typeof e.city !== 'string' || e.city.length < 2) {
