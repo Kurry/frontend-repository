@@ -114,6 +114,11 @@
     "instruction": "Shapeshift/instruction.md",
     "description": "SHAPESHIFT QR color grid painter good-app eval."
   },
+  "frontend-creative-tools-stack-trace-path-finder": {
+    "source": "Stack-trace path finder task PRD",
+    "instruction": "tasks/frontend-creative-tools-stack-trace-path-finder/instruction.md",
+    "description": "Interactive stack-trace cartographer with frame mapping, path hypotheses, and portable session artifacts."
+  },
   "frontend-creative-tools-story-docs": {
     "source": "StoryDocs",
     "instruction": "StoryDocs/instruction.md",

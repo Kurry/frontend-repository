@@ -30,7 +30,7 @@ export function parseTrace(rawText) {
         // at db.js:45 (execute)
         const jsMatch2 = line.match(/at ([^:]+):(\d+) \(([^)]+)\)/);
         if (jsMatch2) {
-          parsed = { ...parsed, basename: jsMatch2[1], line: parseInt(jsMatch1[2]), symbol: jsMatch2[3], language: 'javascript', confidence: 90 };
+          parsed = { ...parsed, basename: jsMatch2[1], line: parseInt(jsMatch2[2]), symbol: jsMatch2[3], language: 'javascript', confidence: 90 };
         } else {
           parsed = { ...parsed, type: 'unresolved', confidence: 50 };
         }
