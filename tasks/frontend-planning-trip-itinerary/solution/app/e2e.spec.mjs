@@ -178,6 +178,7 @@ function expenseRow(page, description) {
 
 async function openAddExpense(page) {
   await page.getByRole('button', { name: /Add expense/ }).click();
+  await expect(page.locator('#ef-desc')).toBeFocused();
 }
 
 function expenseSubmitButton(page) {
