@@ -103,7 +103,7 @@ class TestWebmcpContract(unittest.TestCase):
         # reinstating one is a plain `git mv` back.
         data = json.loads((SCHEMAS / "webmcp-assignments.json").read_text())
         self.assertEqual(data["contract_version"], "zto-webmcp-v1")
-        self.assertEqual(len(data["assignments"]), 103)
+        self.assertEqual(len(data["assignments"]), 104)
         for entry in data["assignments"]:
             contract = webmcp_h3.render_contract(entry)
             self.assertIn("<webmcp_action_contract>", contract)

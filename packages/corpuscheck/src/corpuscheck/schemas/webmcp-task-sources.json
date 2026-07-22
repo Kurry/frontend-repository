@@ -513,5 +513,10 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-creative-tools-leitner-memory-terrain": {
+    "source": "Leitner Memory Terrain PRD",
+    "instruction": "tasks/frontend-creative-tools-leitner-memory-terrain/instruction.md",
+    "description": "Hard browser app/flashcard study tool with spatial memory terrain."
   }
 }
