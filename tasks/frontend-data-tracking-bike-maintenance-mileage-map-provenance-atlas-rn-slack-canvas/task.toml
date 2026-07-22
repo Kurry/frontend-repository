@@ -1,0 +1,6 @@
+[task]
+id = "frontend-data-tracking-bike-maintenance-mileage-map-provenance-atlas-rn-slack-canvas"
+name = "Bike Maintenance Mileage Map — Provenance Atlas — Slack Canvas"
+description = "Manage bike service records through a domain-native browser surface where one meaningful mutation updates linked views and an interoperable artifact."
+category = "frontend"
+tags = ["react", "vite", "zustand", "tailwindcss", "good-app"]
