@@ -1,0 +1,183 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "toolbar_gallery_keyboard_operable"
+description = "Every toolbar control, swatch, and gallery action is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "camera_overlay_focus_trap"
+description = "The camera overlay behaves as a modal dialog: focus moves into it when opened, stays trapped while open, and returns to the triggering control on close."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "swatches_and_tools_named"
+description = "Palette swatches expose accessible names for their colors (white, black, red, yellow, green, blue, pink) rather than being unlabeled colored squares; tool toggles (QR Brush, Color Brush, Eraser, Grid On/Off) likewise expose accessible names."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "save_validation_announced_live"
+description = "The inline save-validation message is announced to assistive technology (for example via an aria-live region) as well as shown visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "save_rename_fields_labeled"
+description = "Save board and rename form fields use explicit label elements associated with the controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "headings_follow_logical_order"
+description = "Studio headings (for example <SHAPESHIFT GRID TOOL> / gallery section titles) follow a logical order with no skips such as H1 jumping directly to H3."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "landmarks_present"
+description = "The page exposes semantic landmarks (for example main for the paint stage or gallery) so assistive technology can navigate the chrome."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "text_and_controls_have_contrast"
+description = "Toolbar labels, gallery card text, and form copy on the light paper stage have sufficient color contrast against the ink and washes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "selected_tool_not_color_alone"
+description = "Palette swatches and tool toggles expose a discernible selected state to assistive technology (aria-pressed, aria-checked, or equivalent), not color alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "reduced_motion_respected"
+description = "With prefers-reduced-motion set, animations are removed and state changes apply instantly while every feature remains usable — verified on a fresh load."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "export_dialog_focus_trap"
+description = "The Export surface behaves as a modal dialog: focus moves into it when opened, stays trapped while open, closes on Escape, and returns to the triggering control on close."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "import_validation_announced"
+description = "Import validation messages that name the offending field-contract key are announced to assistive technology (for example via an aria-live region) as well as shown visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "fill_stats_not_color_alone"
+description = "Fill-stats counts (painted, qr, colorFilled, blank) are exposed as text numerals readable by assistive technology, not color alone."
+type = "binary"
+weight = 1.0

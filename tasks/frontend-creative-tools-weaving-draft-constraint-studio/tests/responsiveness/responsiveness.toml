@@ -1,0 +1,169 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "7.1"
+name = "layout_adapts_1440_to_375"
+description = "Layout adapts gracefully from 1440px desktop (floating toolbar over centered canvas) to 375px mobile without broken stage or unreachable tools."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.2"
+name = "mobile_tap_targets_large_enough"
+description = "On a 375px viewport, toolbar tools, swatches, and gallery actions present tap targets at least 44px."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.3"
+name = "typography_readable_across_breakpoints"
+description = "Typography remains readable at both desktop and 375px mobile — title, toolbar labels, and gallery card text do not become illegibly tiny."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.4"
+name = "no_clip_or_overflow_at_375"
+description = "At 375px width the canvas and toolbar reflow to fit with no horizontal scrolling and no clipped controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.5"
+name = "toolbar_docks_or_reflows_on_narrow"
+description = "At small widths the floating toolbar may dock, but all brush modes, swatches, mirror control, fill stats, Export, Import, and actions stay reachable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.6"
+name = "gallery_cards_reflow_single_column"
+description = "Gallery cards reflow from a dense multi-column desktop arrangement to a single column at narrow widths without losing names, tags, or actions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.7"
+name = "touch_drag_paints_on_mobile"
+description = "At 375px width, painting by touch drag works on the mobile layout — cells the stroke crosses fill in one gesture."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.8"
+name = "no_horizontal_scroll_at_375"
+description = "At 375px width, no horizontal scrolling appears on the paint stage or gallery."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.9"
+name = "canvas_grid_sizes_responsively"
+description = "The paint canvas and grid size responsively to fit the layout at desktop and mobile widths without a fixed size overflowing the viewport."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.10"
+name = "docked_toolbar_actions_accessible"
+description = "Fixed or docked toolbar controls (brush modes, swatches, and actions) remain accessible on mobile devices."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.11"
+name = "export_import_usable_at_375"
+description = "At 375px width the Export and Import surfaces remain readable and operable without clipped format tabs, Copy/Download, or paste/file controls."
+type = "binary"
+weight = 1.0
