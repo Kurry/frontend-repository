@@ -720,7 +720,7 @@ test('2.13 keyboard_only_operability', async ({ page }) => {
   const hasFocusIndicator = await page.evaluate(() => {
     const el = document.activeElement;
     const cs = window.getComputedStyle(el);
-    return cs.outlineStyle !== 'none' || cs.boxShadow !== 'none';
+    return cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) >= 3 && parseFloat(cs.outlineOffset) >= 2;
   });
   expect(hasFocusIndicator, 'focused control shows a visible focus indicator').toBe(true);
   await page.keyboard.press('Enter');
@@ -734,7 +734,8 @@ test('2.13 keyboard_only_operability', async ({ page }) => {
   // Panel control: reachable and operable with the keyboard alone.
   expect(await tabToControl('Show outline'), 'Show outline panel control reachable via Tab').toBe(true);
   await page.keyboard.press('Enter');
-  await expect(page.locator('.app-outline, [aria-label*="outline"i], [class*="outline"]')).not.toHaveCount(0);
+  await expect(page.getByRole('heading', { name: 'Outline of Board 2' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Show canvas' })).toHaveAttribute('aria-pressed', 'true');
 
   // Command-palette (dialog) control: reachable and dismissible with the
   // keyboard alone.
