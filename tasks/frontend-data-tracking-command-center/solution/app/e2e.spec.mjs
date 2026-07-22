@@ -202,6 +202,28 @@ test.describe('Command Center E2E', () => {
     const describedBy = await nameInput.getAttribute('aria-errormessage');
     const errorText = page.locator(`#${describedBy}`);
     await expect(errorText, 'the referenced error text names the field it belongs to').toContainText('Agent name');
+    await page.keyboard.press('Escape');
+
+    // Criterion 1.5 also covers the night-schedule fields — Carbon associates
+    // their error text via a static aria-describedby (not aria-errormessage),
+    // so drive that real path too.
+    await page.locator('.night-badge').click();
+    const popover = page.getByRole('dialog', { name: 'Night mode' });
+    await expect(popover).toBeVisible();
+    // Carbon renders the visible toggle label on top of the switch button, so
+    // a real user clicks the label to toggle it (same pattern as the 1.9
+    // checkbox test).
+    await page.locator('label[for="night-enable"]').click();
+    const startInput = page.locator('#night-start');
+    // Clear the (valid, defaulted) start time so the required/format
+    // validation actually fires — native <input type="time"> rejects
+    // out-of-range literals like "99:99" as malformed before React ever sees
+    // a change, so an empty value is the real way to trigger the error path.
+    await startInput.fill('');
+    await startInput.blur();
+    const startDescribedBy = await startInput.getAttribute('aria-describedby');
+    expect(startDescribedBy, 'night start-time field is associated with error text via aria-describedby').toBeTruthy();
+    await expect(page.locator(`#${startDescribedBy}`), 'the referenced night-schedule error text names the field it belongs to').toContainText('Start time');
   });
 
   test('1.6 status_not_color_only', async ({ page }) => {
@@ -211,7 +233,8 @@ test.describe('Command Center E2E', () => {
     expect(text, 'status chip carries a real text label, not color alone').toMatch(/^[A-Za-z][A-Za-z\s]*$/);
   });
 
-  test('1.7 aria_live_announces_mutations', async ({ page }) => {
+  test('1.7 aria_live_announces_mutations', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     const live = page.locator('[aria-live="polite"]');
     await expect(live).toBeAttached();
     await page.getByRole('button', { name: 'Connect agent', exact: true }).first().click();
@@ -219,6 +242,42 @@ test.describe('Command Center E2E', () => {
     await page.locator('#agent-model').selectOption('gpt-4.1');
     await page.getByRole('button', { name: 'Connect agent', exact: true }).last().click();
     await expect(live, 'connecting an agent is announced through the aria-live region').toHaveText(/Agent QA Bot connected\./);
+
+    // Criterion 1.7 also names disconnect, bulk disconnect, export copy, and
+    // import completion — drive each real control and assert on the same
+    // aria-live region.
+    const disconnectButton = page.getByRole('button', { name: 'Disconnect QA Bot' });
+    await disconnectButton.click();
+    const disconnectConfirm = page.getByRole('dialog', { name: 'Disconnect QA Bot?' });
+    await disconnectConfirm.getByRole('button', { name: 'Disconnect agent', exact: true }).click();
+    await expect(live, 'disconnecting a single agent is announced through the aria-live region').toHaveText(/Agent QA Bot disconnected\./);
+    // The confirm dialog's overlay plays a short exit animation and keeps
+    // intercepting pointer events in the DOM until it fully unmounts; wait
+    // for actual removal (not just accessibility visibility) so the next
+    // real click isn't racing a closing overlay.
+    await expect(page.locator('.overlay-center'), 'the disconnect confirm overlay fully unmounts before continuing').toHaveCount(0);
+
+    // Carbon renders the visible checkbox label on top of the (visually
+    // hidden) native input, so a real user clicks the label to toggle it
+    // (same pattern as the 1.9 checkbox test).
+    await page.locator('label[for="select-all-agents"]').click();
+    const selectedCount = await page.evaluate(() => document.querySelectorAll('.agent-select input[type="checkbox"]:checked').length);
+    await page.getByRole('button', { name: /Disconnect selected/ }).click();
+    const bulkConfirm = page.getByRole('dialog', { name: new RegExp(`Disconnect ${selectedCount} selected agents\\?`) });
+    await bulkConfirm.getByRole('button', { name: 'Disconnect selected', exact: true }).click();
+    await expect(live, 'bulk disconnect is announced through the aria-live region').toHaveText(new RegExp(`${selectedCount} agents disconnected\\.`));
+    await expect(page.locator('.overlay-center'), 'the bulk-disconnect confirm overlay fully unmounts before continuing').toHaveCount(0);
+
+    await page.getByRole('button', { name: 'Export session', exact: true }).first().click();
+    const dialog = page.getByRole('dialog', { name: 'Export session' });
+    await expect(dialog).toBeVisible();
+    await page.getByRole('button', { name: 'Copy', exact: true }).click();
+    await expect(live, 'export copy is announced through the aria-live region').toHaveText(/Session JSON copied\./);
+
+    const sessionJson = await page.locator('.export-preview').innerText();
+    await page.locator('#session-import').fill(sessionJson);
+    await page.getByRole('button', { name: 'Import session', exact: true }).click();
+    await expect(live, 'import completion is announced through the aria-live region').toHaveText(/Session JSON import completed\./);
   });
 
   test('1.8 labels_on_form_controls', async ({ page }) => {
@@ -227,6 +286,15 @@ test.describe('Command Center E2E', () => {
     expect(nameLabel, 'agent name field has a visible <label>').toBe('Agent name');
     const modelLabel = await page.locator('#agent-model').evaluate((el) => document.querySelector(`label[for="${el.id}"]`)?.textContent?.trim());
     expect(modelLabel, 'model field has a visible <label>').toBe('Model');
+    await page.keyboard.press('Escape');
+
+    // Criterion 1.8 also covers the night-schedule form controls.
+    await page.locator('.night-badge').click();
+    await expect(page.getByRole('dialog', { name: 'Night mode' })).toBeVisible();
+    const startLabel = await page.locator('#night-start').evaluate((el) => document.querySelector(`label[for="${el.id}"]`)?.textContent?.trim());
+    expect(startLabel, 'night-schedule start time field has a visible <label>').toBe('Start time');
+    const endLabel = await page.locator('#night-end').evaluate((el) => document.querySelector(`label[for="${el.id}"]`)?.textContent?.trim());
+    expect(endLabel, 'night-schedule end time field has a visible <label>').toBe('End time');
   });
 
   test('1.9 checkbox_and_bulk_actions_labeled', async ({ page }) => {
@@ -287,6 +355,45 @@ test.describe('Command Center E2E', () => {
     await expect(dialog).toBeVisible();
     const seconds = await dialog.evaluate((el) => parseFloat(window.getComputedStyle(el).animationDuration) || 0);
     expect(seconds, 'dialog open transition applies effectively instantly under reduced motion').toBeLessThanOrEqual(0.01);
+    await page.keyboard.press('Escape');
+
+    // Criterion 4.8 also requires the night popover, export drawer, command
+    // palette, feed items, and step-status indicators to apply instantly.
+    await page.locator('.night-badge').click();
+    const popover = page.getByRole('dialog', { name: 'Night mode' });
+    await expect(popover).toBeVisible();
+    const popoverSeconds = await popover.evaluate((el) => parseFloat(window.getComputedStyle(el).animationDuration) || 0);
+    expect(popoverSeconds, 'night popover transition applies effectively instantly under reduced motion').toBeLessThanOrEqual(0.01);
+    await page.keyboard.press('Escape');
+
+    await page.getByRole('button', { name: 'Export session', exact: true }).first().click();
+    const drawer = page.getByRole('dialog', { name: 'Export session' });
+    await expect(drawer).toBeVisible();
+    const drawerSeconds = await drawer.evaluate((el) => parseFloat(window.getComputedStyle(el).animationDuration) || 0);
+    expect(drawerSeconds, 'export drawer transition applies effectively instantly under reduced motion').toBeLessThanOrEqual(0.01);
+    await page.keyboard.press('Escape');
+
+    await page.getByRole('button', { name: 'Commands ⌘K', exact: true }).click();
+    const palette = page.getByRole('dialog', { name: 'Command palette' });
+    await expect(palette).toBeVisible();
+    const paletteSeconds = await palette.evaluate((el) => parseFloat(window.getComputedStyle(el).animationDuration) || 0);
+    expect(paletteSeconds, 'command palette transition applies effectively instantly under reduced motion').toBeLessThanOrEqual(0.01);
+    await page.keyboard.press('Escape');
+
+    const runningStepPulse = page.locator('.step-running .step-pulse').first();
+    await expect(runningStepPulse).toBeVisible();
+    const pulseTiming = await runningStepPulse.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return { duration: parseFloat(style.animationDuration) || 0, iterations: style.animationIterationCount };
+    });
+    expect(pulseTiming.duration, 'running step-status pulse applies effectively instantly under reduced motion').toBeLessThanOrEqual(0.01);
+    expect(pulseTiming.iterations, 'running step-status pulse does not keep looping under reduced motion').toBe('1');
+
+    await page.getByRole('button', { name: 'Simulate activity', exact: true }).click();
+    const newFeedItem = page.locator('.feed-item.feed-enter').first();
+    await expect(newFeedItem).toBeVisible();
+    const feedSeconds = await newFeedItem.evaluate((el) => parseFloat(window.getComputedStyle(el).animationDuration) || 0);
+    expect(feedSeconds, 'new feed item entrance applies effectively instantly under reduced motion').toBeLessThanOrEqual(0.01);
   });
 
   // ---- Responsiveness (tests/responsiveness/responsiveness.toml) ----
