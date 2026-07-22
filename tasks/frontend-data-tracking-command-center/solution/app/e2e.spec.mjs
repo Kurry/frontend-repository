@@ -127,58 +127,77 @@ test.describe('workspace contract (canonical)', () => {
 test.describe('Command Center E2E', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
   });
 
   // ---- Accessibility (tests/accessibility/accessibility.toml) ----
 
   test('1.1 keyboard_reaches_primary_controls', async ({ page }) => {
     const connectButton = page.getByRole('button', { name: 'Connect agent', exact: true }).first();
-    let reached = false;
-    for (let i = 0; i < 40 && !reached; i++) {
+    const focusSequence = [];
+    for (let i = 0; i < 40; i++) {
       await page.keyboard.press('Tab');
-      reached = await connectButton.evaluate((el) => el === document.activeElement);
+      focusSequence.push(await connectButton.evaluate((el) => el === document.activeElement));
     }
-    expect(reached, 'Connect agent header control is reachable via sequential Tab').toBe(true);
+    expect(focusSequence, 'Connect agent header control is reachable via sequential Tab').toContain(true);
+    await connectButton.focus();
     await page.keyboard.press('Enter');
     await expect(page.getByRole('dialog', { name: 'Connect agent' }), 'Enter activates the reached control').toBeVisible();
   });
 
   test('1.2 visible_focus_indicators', async ({ page }) => {
     const kpiButton = page.locator('.kpi-button').first();
-    let reached = false;
-    for (let i = 0; i < 40 && !reached; i++) {
+    const focusSequence = [];
+    for (let i = 0; i < 40; i++) {
       await page.keyboard.press('Tab');
-      reached = await kpiButton.evaluate((el) => el === document.activeElement);
+      focusSequence.push(await kpiButton.evaluate((el) => el === document.activeElement));
     }
-    expect(reached, 'first KPI tile is reachable via sequential Tab').toBe(true);
+    expect(focusSequence, 'first KPI tile is reachable via sequential Tab').toContain(true);
+    await kpiButton.focus();
     const outline = await kpiButton.evaluate((el) => {
       const style = window.getComputedStyle(el);
       return { outlineStyle: style.outlineStyle, outlineWidth: style.outlineWidth, boxShadow: style.boxShadow };
     });
-    const hasIndicator = (outline.outlineStyle !== 'none' && outline.outlineWidth !== '0px') || outline.boxShadow !== 'none';
-    expect(hasIndicator, 'focused KPI tile renders a visible outline or box-shadow focus ring').toBe(true);
+    const outlineSignal = Number(outline.outlineStyle !== 'none') * parseFloat(outline.outlineWidth);
+    const shadowSignal = Number(outline.boxShadow !== 'none');
+    expect(outlineSignal + shadowSignal, 'focused KPI tile renders a visible outline or box-shadow focus ring').toBeGreaterThan(0);
   });
 
   test('1.3 dialogs_trap_focus_and_escape', async ({ page }) => {
+    const exerciseOverlay = async ({ opener, dialog, label }) => {
+      await opener.click();
+      await expect(dialog, `${label} opens`).toBeVisible();
+      const focusables = dialog.locator('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+      const focusableCount = await focusables.count();
+      expect(focusableCount, `${label} exposes focusable controls`).toBeGreaterThan(0);
+      await focusables.first().focus();
+      for (let i = 0; i < focusableCount + 3; i++) await page.keyboard.press('Tab');
+      const stillInside = await dialog.evaluate((el) => el.contains(document.activeElement));
+      expect(stillInside, `focus stays trapped inside ${label}`).toBe(true);
+      await page.keyboard.press('Escape');
+      await expect(dialog, `Escape closes ${label}`).toBeHidden();
+      await expect(opener, `${label} returns focus to its opener`).toBeFocused();
+    };
+
     // The app registers the same connectButtonRef on both the header's and
     // the agent panel's "Connect agent" buttons (src/App.jsx passes one ref
     // to both <Header> and <AgentPanel>); whichever mounts last wins the ref,
     // so the panel's button is the one the focus-trap actually returns focus
     // to. Open through it so this test exercises the real, current opener.
-    const opener = page.locator('.agent-panel .panel-actions').getByRole('button', { name: 'Connect agent', exact: true });
-    await opener.click();
-    const dialog = page.getByRole('dialog', { name: 'Connect agent' });
-    await expect(dialog).toBeVisible();
-    const focusableCount = await dialog.evaluate((el) =>
-      el.querySelectorAll('button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])').length);
-    expect(focusableCount, 'dialog exposes focusable controls').toBeGreaterThan(0);
-    for (let i = 0; i < focusableCount + 3; i++) await page.keyboard.press('Tab');
-    const stillInside = await dialog.evaluate((el) => el.contains(document.activeElement));
-    expect(stillInside, 'focus stays trapped inside the dialog after tabbing past its last control').toBe(true);
-    await page.keyboard.press('Escape');
-    await expect(dialog, 'Escape closes the dialog').not.toBeVisible();
-    await expect(opener, 'focus returns to the control that opened the dialog').toBeFocused();
+    await exerciseOverlay({
+      opener: page.locator('.agent-panel .panel-actions').getByRole('button', { name: 'Connect agent', exact: true }),
+      dialog: page.getByRole('dialog', { name: 'Connect agent' }),
+      label: 'Connect agent dialog',
+    });
+    await exerciseOverlay({
+      opener: page.getByRole('button', { name: 'Export session', exact: true }),
+      dialog: page.getByRole('dialog', { name: 'Export session' }),
+      label: 'export drawer',
+    });
+    await exerciseOverlay({
+      opener: page.getByRole('button', { name: /Commands/ }),
+      dialog: page.getByRole('dialog', { name: 'Command palette' }),
+      label: 'command palette',
+    });
   });
 
   test('1.4 night_popover_escape_returns_focus', async ({ page }) => {
@@ -187,7 +206,7 @@ test.describe('Command Center E2E', () => {
     const popover = page.getByRole('dialog', { name: 'Night mode' });
     await expect(popover).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(popover, 'Escape closes the night-mode popover').not.toBeVisible();
+    await expect(popover, 'Escape closes the night-mode popover').toBeHidden();
     await expect(badge, 'focus returns to the night-mode badge after Escape').toBeFocused();
   });
 
@@ -221,9 +240,8 @@ test.describe('Command Center E2E', () => {
     // a change, so an empty value is the real way to trigger the error path.
     await startInput.fill('');
     await startInput.blur();
-    const startDescribedBy = await startInput.getAttribute('aria-describedby');
-    expect(startDescribedBy, 'night start-time field is associated with error text via aria-describedby').toBeTruthy();
-    await expect(page.locator(`#${startDescribedBy}`), 'the referenced night-schedule error text names the field it belongs to').toContainText('Start time');
+    await expect(startInput, 'night start-time field is associated with error text via aria-describedby').toHaveAttribute('aria-describedby', 'night-start-validation');
+    await expect(page.locator('#night-start-validation'), 'the referenced night-schedule error text names the field it belongs to').toContainText('Start time');
   });
 
   test('1.6 status_not_color_only', async ({ page }) => {
@@ -234,7 +252,7 @@ test.describe('Command Center E2E', () => {
   });
 
   test('1.7 aria_live_announces_mutations', async ({ page, context }) => {
-    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await context.grantPermissions(['clipboard-read', 'clipboard-write'], { origin: BASE });
     const live = page.locator('[aria-live="polite"]');
     await expect(live).toBeAttached();
     await page.getByRole('button', { name: 'Connect agent', exact: true }).first().click();
@@ -271,10 +289,15 @@ test.describe('Command Center E2E', () => {
     await page.getByRole('button', { name: 'Export session', exact: true }).first().click();
     const dialog = page.getByRole('dialog', { name: 'Export session' });
     await expect(dialog).toBeVisible();
-    await page.getByRole('button', { name: 'Copy', exact: true }).click();
-    await expect(live, 'export copy is announced through the aria-live region').toHaveText(/Session JSON copied\./);
-
+    await expect(dialog.getByRole('button', { name: 'Close Export session drawer' })).toBeFocused();
     const sessionJson = await page.locator('.export-preview').innerText();
+    await dialog.getByRole('tab', { name: 'Agents CSV' }).click();
+    await expect(dialog.getByRole('tab', { name: 'Agents CSV' })).toHaveAttribute('aria-selected', 'true');
+    const copyButton = dialog.getByRole('button', { name: 'Copy', exact: true });
+    await copyButton.click();
+    await expect(dialog.getByRole('button', { name: 'Copied', exact: true })).toBeVisible();
+    await expect(live, 'export copy is announced through the aria-live region').toHaveText(/Agents CSV copied\./);
+
     await page.locator('#session-import').fill(sessionJson);
     await page.getByRole('button', { name: 'Import session', exact: true }).click();
     await expect(live, 'import completion is announced through the aria-live region').toHaveText(/Session JSON import completed\./);
@@ -300,11 +323,7 @@ test.describe('Command Center E2E', () => {
   test('1.9 checkbox_and_bulk_actions_labeled', async ({ page }) => {
     const checkbox = page.locator('.agent-select input[type="checkbox"]').first();
     await expect(checkbox).toHaveCount(1);
-    const accessibleName = await checkbox.evaluate((el) => {
-      const label = el.id ? document.querySelector(`label[for="${el.id}"]`) : null;
-      return el.getAttribute('aria-label') || label?.textContent?.trim() || '';
-    });
-    expect(accessibleName.length, 'agent selection checkbox has a name for assistive technology').toBeGreaterThan(0);
+    await expect(checkbox, 'agent selection checkbox has a name for assistive technology').toHaveAccessibleName(/.+/);
     // Carbon renders the visible checkbox label on top of the (visually
     // hidden) native input, so a real user clicks the label to toggle it.
     await page.locator('.agent-select label').first().click();
@@ -323,7 +342,7 @@ test.describe('Command Center E2E', () => {
     // The drawer's own focus trap moves focus to its first control ~30ms
     // after opening; wait for that one-time settle so it cannot race with
     // (and undo) the keyboard interaction below.
-    await page.waitForTimeout(200);
+    await expect(dialog.getByRole('button', { name: 'Close Export session drawer' })).toBeFocused();
     const jsonTab = page.locator('#export-tab-json');
     const csvTab = page.locator('#export-tab-csv');
     await expect(jsonTab).toHaveAttribute('aria-selected', 'true');
@@ -344,12 +363,12 @@ test.describe('Command Center E2E', () => {
   test('4.8 reduced_motion_fallback', async ({ page }, testInfo) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
     const kpiValue = page.locator('.kpi-value').first();
     const before = await kpiValue.innerText();
-    await page.waitForTimeout(900);
-    const after = await kpiValue.innerText();
-    expect(after, 'KPI count-up shows its final value instantly and does not keep animating under reduced motion').toBe(before);
+    const settleAt = await page.evaluate(() => performance.now() + 900);
+    await page.waitForFunction((deadline) => performance.now() >= deadline, settleAt);
+    const after = kpiValue;
+    await expect(after, 'KPI count-up shows its final value instantly and does not keep animating under reduced motion').toHaveText(before);
     await page.getByRole('button', { name: 'Connect agent', exact: true }).first().click();
     const dialog = page.getByRole('dialog', { name: 'Connect agent' });
     await expect(dialog).toBeVisible();
@@ -401,7 +420,6 @@ test.describe('Command Center E2E', () => {
   test('7.2 tablet_kpi_wrap_feed_stacks', async ({ page }) => {
     await page.setViewportSize({ width: 900, height: 900 });
     await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
     const tiles = page.locator('.kpi-tile');
     const box0 = await tiles.nth(0).boundingBox();
     const box2 = await tiles.nth(2).boundingBox();
@@ -415,7 +433,6 @@ test.describe('Command Center E2E', () => {
   test('7.3 mobile_no_page_horizontal_scroll', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, 'no page-level horizontal scroll at 375px').toBeLessThanOrEqual(1);
     const bodyOverflow = await page.evaluate(() => document.body.scrollWidth - document.body.clientWidth);
@@ -425,7 +442,6 @@ test.describe('Command Center E2E', () => {
   test('7.4 suggestions_row_self_scrolls', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
     const wrap = page.locator('.suggestion-wrap');
     const overflowsInternally = await wrap.evaluate((el) => el.scrollWidth > el.clientWidth + 1);
     expect(overflowsInternally, 'suggestions row overflows within its own scroll container at 375px').toBe(true);
@@ -436,13 +452,14 @@ test.describe('Command Center E2E', () => {
   test('7.5 export_drawer_usable_on_mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
     await page.getByRole('button', { name: 'Export session', exact: true }).first().click();
     const dialog = page.getByRole('dialog', { name: 'Export session' });
     await expect(dialog).toBeVisible();
     // Let the drawer's 210ms slide-in transition finish before measuring its
     // resting position, or the box is read mid-animation.
-    await page.waitForTimeout(300);
+    await dialog.evaluate(async (element) => {
+      await Promise.allSettled(element.getAnimations().map((animation) => animation.finished));
+    });
     const box = await dialog.boundingBox();
     expect(box.x, 'export drawer stays within the 375px viewport').toBeGreaterThanOrEqual(-1);
     expect(box.x + box.width, 'export drawer does not render off-screen at 375px').toBeLessThanOrEqual(376);
@@ -452,11 +469,12 @@ test.describe('Command Center E2E', () => {
   test('7.6 command_palette_usable_on_mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
     await page.getByRole('button', { name: /Commands/ }).first().click();
     const dialog = page.locator('.palette-card');
     await expect(dialog).toBeVisible();
-    await page.waitForTimeout(300); // let the 180ms dialog-in transition settle before measuring
+    await dialog.evaluate(async (element) => {
+      await Promise.allSettled(element.getAnimations().map((animation) => animation.finished));
+    });
     const box = await dialog.boundingBox();
     expect(box.x, 'command palette stays within the 375px viewport').toBeGreaterThanOrEqual(-1);
     expect(box.x + box.width, 'command palette does not render off-screen at 375px').toBeLessThanOrEqual(376);
@@ -466,7 +484,6 @@ test.describe('Command Center E2E', () => {
   test('7.7 undo_redo_visible_on_mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
     await page.getByRole('button', { name: 'Connect agent', exact: true }).first().click();
     await page.locator('#agent-name').fill('Mobile QA');
     await page.locator('#agent-model').selectOption('gpt-4.1');
@@ -483,11 +500,12 @@ test.describe('Command Center E2E', () => {
   test('7.8 connect_dialog_usable_on_mobile', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
     await page.getByRole('button', { name: 'Connect agent', exact: true }).first().click();
     const dialog = page.getByRole('dialog', { name: 'Connect agent' });
     await expect(dialog).toBeVisible();
-    await page.waitForTimeout(300); // let the dialog-in transition settle before measuring
+    await dialog.evaluate(async (element) => {
+      await Promise.allSettled(element.getAnimations().map((animation) => animation.finished));
+    });
     const box = await dialog.boundingBox();
     expect(box.x, 'connect dialog stays within the 375px viewport').toBeGreaterThanOrEqual(-1);
     expect(box.x + box.width, 'connect dialog does not render off-screen at 375px').toBeLessThanOrEqual(376);
@@ -501,7 +519,12 @@ test.describe('Command Center E2E', () => {
     // The page fixture's afterEach asserts zero console/page errors across
     // the whole test; give the 1.7s agent-step interval and count-up
     // animation a full cycle to fire before the assertion runs.
-    await page.waitForTimeout(1800);
+    const progress = page.locator('.agent-progress');
+    const initialProgress = await progress.evaluateAll((elements) => elements.map((element) => element.textContent));
+    await expect.poll(
+      () => progress.evaluateAll((elements) => elements.map((element) => element.textContent)),
+      { timeout: 3000 },
+    ).not.toEqual(initialProgress);
     await expect(page.locator('.app-shell')).toBeVisible();
   });
 
