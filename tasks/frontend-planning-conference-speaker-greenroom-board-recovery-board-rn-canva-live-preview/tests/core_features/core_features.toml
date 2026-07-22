@@ -1,0 +1,154 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "5.1"
+name = "eight_slot_clean_baseline"
+description = "A fresh page shows exactly eight deterministic slots across draft, ready, changed, and failed, with zero recovery, zero resolved, no event history, and no exported or success confirmation preseeded."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.2"
+name = "slot_crud_and_exact_field_contract"
+description = "Through visible Add, Edit, Archive, and Delete controls, speaker slots enforce speakerName 2–80, sessionTitle 3–120, rooms Main Hall/Studio A/Studio B, startMinute 480–1080 in five-minute steps, duration 15–90 in five-minute steps, mobileNote at most 160, unique 3–32 character shortLink, and closed status enums; valid mutations update all views exactly once."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.3"
+name = "signature_recovery_mutation"
+description = "Moving failed slot-maya through the real pointer or 44-pixel button path creates one move-to-recovery event, preserves its stable ID, selects it, moves it to Recovery path, changes its phone preview to Holding, and immediately recomputes failed, recovery, and minutes-at-risk summaries."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.4"
+name = "repair_downstream_consequences"
+description = "For a recovery slot, a non-overlapping five-minute replacement start in 480–1080 plus an 8–160 character repair note creates exactly one repair event, moves the card to Resolved, stores both values, and changes the linked mobile preview to Live."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.5"
+name = "filter_search_sort_and_fixture"
+description = "Status filter plus title-or-speaker search combine over the one collection; clearing both restores all records in stable board order; ascending then descending start-time sorts reverse live order; Load 104 produces exactly 104 deterministic non-completed records with a usable failed recovery case."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.6"
+name = "live_preview_and_share_artifact"
+description = "The selected record's speaker, title, room, formatted time, duration, note, exact greenroom.local short link, state banner, and duration-sensitive timing bar agree across the table, board, and phone preview, and mutate live when the selected record changes."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.7"
+name = "portable_artifact_shape_and_download"
+description = "Export JSON downloads speaker-greenroom-v1-recovery-board.json whose exact top-level keys are schemaVersion, exportedAt, records, derived, and history; records are stably sorted and carry full recovery geometry, derived equals visible summaries, history is ordered, and each export regenerates RFC3339 exportedAt."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.n1"
+name = "no_op_or_double_action_creates_events"
+description = "A cancelled drag, invalid or incomplete mutation, move of a non-failed slot, or rapid double activation creates extra records, history events, or partial linked-view changes."
+type = "binary"
+negate = true
+weight = 1.0

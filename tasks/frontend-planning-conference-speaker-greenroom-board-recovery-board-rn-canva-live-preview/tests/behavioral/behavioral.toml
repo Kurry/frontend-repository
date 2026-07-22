@@ -1,0 +1,140 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "signature_flow_cross_view_echo"
+description = "Starting from eight records, move slot-maya to Recovery path and apply a valid repair: exactly two canonical events appear, the card becomes resolved, the mobile preview becomes Live, the summary counts change, and entity.select plus exported JSON report the same stable-ID state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "undo_then_branch_integrity"
+description = "Move slot-maya to recovery, undo, then make a different valid edit to slot-jordan; the complete pre-move selection, ordering, filters, counts, preview, and history return after undo, and the new edit discards the abandoned redo branch."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "artifact_semantic_round_trip"
+description = "Edit a seeded slot, move and repair a failed slot, export JSON, clear, import that JSON, and re-export: records, recoveryBoardState order, derived values, selectedId, and history are semantically identical, with only exportedAt allowed to change."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "derived_preview_sensitivity"
+description = "Edit slot-jordan from 45 to 60 minutes and change its mobile note; the table, minutes-at-risk or timing summaries where applicable, phone note, timing-chart number and width, WebMCP query, and exported record all reflect the new inputs without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "invalid_import_atomic_noop"
+description = "After a local edit, attempt one import containing multiple invalid records, duplicate IDs, a dangling selectedId, stale derived totals, and an unknown enum; all diagnostics appear together and the pre-import records, selection, filters, history, and export bytes remain unchanged."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "linked_surfaces_desynchronize"
+description = "After a visible create, edit, move-to-recovery, repair, archive, or delete action, any table, board lane, summary, mobile preview, event timeline, WebMCP query, or exported artifact remains stale relative to another linked surface."
+type = "binary"
+negate = true
+weight = 1.0

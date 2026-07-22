@@ -1,0 +1,140 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "create_recover_repair_export_flow"
+description = "Starting from eight slots, add one valid failed slot, confirm total and failed counts each rise by one, move and repair it, then confirm resolved rises, mobile preview reads Live, and export contains the new record plus both canonical events."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "alternate_input_undo_flow"
+description = "Select slot-maya, use pointer drag to recover it, confirm one event and Holding preview, press Ctrl/Cmd+Z to restore every prior facet, then use the keyboard/touch-equivalent button and confirm identical stable-ID event semantics."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "edit_linked_preview_flow"
+description = "Edit slot-jordan from 45 to 60 minutes and set the specified keynote note; table row, phone note, timing bar number and width, WebMCP query, and export update without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "export_clear_import_flow"
+description = "Export a mutated session, clear it after confirmation, import the exact JSON, reopen the edited stable ID, and confirm board geometry, selected ID, summaries, preview, and history match while exportedAt regenerates."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "mobile_recovery_flow"
+description = "At 375 by 812 pixels, complete Slots → Recover → Preview through visible controls; each step retains the selected stable ID and applying repair automatically advances to the Live preview."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.n1"
+name = "flow_requires_reload_or_loses_selection"
+description = "Any critical create, move, repair, edit, undo, or import flow requires a reload to continue, loses its stable selection, or reaches a dead end without a visible recovery action."
+type = "binary"
+negate = true
+weight = 1.0

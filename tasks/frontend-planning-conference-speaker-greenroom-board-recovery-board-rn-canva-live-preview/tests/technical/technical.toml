@@ -1,0 +1,140 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "10.1"
+name = "single_coherent_runtime_state"
+description = "A visible mutation and the equivalent WebMCP command both update the same stable-ID record, linked summaries, selection, preview, history, and export rather than parallel or stale copies."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.2"
+name = "good_app_storage_and_reload_rule"
+description = "After exercising every flow, localStorage, sessionStorage, IndexedDB, cookies, and other persistence remain empty; reload returns exactly eight seeded records, zero recovery/resolved, empty history, and no success confirmation."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.3"
+name = "webmcp_exact_contract_surface"
+description = "webmcp_session_info declares browse-query-v1, entity-collection-v1, form-workflow-v1, and artifact-transfer-v1; listed tools use only permitted prefix.operation names and their handlers enforce bounded fields, confirm=true delete, visible validation, and no artifact bytes in results."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.4"
+name = "atomic_schema_and_derived_validation"
+description = "Create, edit, repair, and import enforce the declared API-shaped record and ConferenceSpeakerGreenroomBoardSession fields, relationships, and derived equality before one commit; invalid transactions retain byte-equivalent state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.5"
+name = "runtime_clean_and_same_origin"
+description = "A complete create-edit-recover-repair-export-clear-import exercise produces zero console errors, page errors, unhandled rejections, visible debug output, or non-local network requests."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "10.n1"
+name = "handler_bypasses_visible_domain_logic"
+description = "A WebMCP handler accepts an undeclared enum or bound, bypasses visible validation, returns artifact contents, or produces state that the equivalent visible control cannot reach."
+type = "binary"
+negate = true
+weight = 1.0
