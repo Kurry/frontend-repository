@@ -20,7 +20,7 @@ jobs:
     outputs:
       slugs: ${{ steps.diff.outputs.slugs }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - id: diff
@@ -47,7 +47,7 @@ jobs:
       run:
         working-directory: tasks/${{ matrix.slug }}/solution/app
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -66,7 +66,7 @@ jobs:
             echo "required=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: "22"
 
@@ -76,7 +76,7 @@ jobs:
           if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
       - name: Cache Playwright browsers
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles(format('tasks/{0}/solution/app/package-lock.json', matrix.slug)) }}
@@ -175,7 +175,7 @@ jobs:
 
       - name: Upload task status
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-status-${{ matrix.slug }}
           path: ${{ runner.temp }}/playwright-status-${{ matrix.slug }}.json
@@ -184,7 +184,7 @@ jobs:
 
       - name: Upload report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: playwright-report-${{ matrix.slug }}
           path: |
@@ -205,7 +205,7 @@ jobs:
     steps:
       - name: Download task statuses
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           pattern: playwright-status-*
           path: ${{ runner.temp }}/playwright-statuses
