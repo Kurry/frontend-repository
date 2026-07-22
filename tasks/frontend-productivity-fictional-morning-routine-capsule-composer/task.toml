@@ -1,0 +1,4 @@
+[task]
+name = "mercor-intelligence/frontend-productivity-fictional-morning-routine-capsule-composer"
+description = "Fictional Morning-Routine Capsule Composer"
+authors = [{ name = "Name", email = "email@example.com" }]
