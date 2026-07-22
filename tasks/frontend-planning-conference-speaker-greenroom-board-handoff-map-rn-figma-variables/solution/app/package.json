@@ -1,0 +1,29 @@
+{
+  "name": "conference-speaker-greenroom-board",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "vite --host 0.0.0.0 --port 3000",
+    "build": "tsc && vite build",
+    "verify:build": "npm run build",
+    "start+verify:build": "npm run verify:build && npm start"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "framer-motion": "^11.0.8",
+    "lucide-react": "^0.344.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^4.0.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.64",
+    "@types/react-dom": "^18.2.21",
+    "@vitejs/plugin-react": "^4.2.1",
+    "playwright": "^1.61.1",
+    "typescript": "^5.2.2",
+    "vite": "^5.1.6"
+  }
+}
