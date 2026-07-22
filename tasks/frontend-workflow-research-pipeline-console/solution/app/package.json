@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "vite --host 0.0.0.0 --port 3000",
-    "verify:build": "vite build"
+    "verify:build": "vite build",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@mantine/core": "^8.2.1",
@@ -25,5 +26,7 @@
     "zod": "^4.0.5",
     "recharts": "^3.1.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@playwright/test": "1.61.0"
+  }
 }

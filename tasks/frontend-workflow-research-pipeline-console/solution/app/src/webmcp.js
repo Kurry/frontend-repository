@@ -69,7 +69,7 @@ const handlers = {
   browse_search: async ({ query } = {}) => {
     const q = String(query ?? '').toLowerCase();
     const run = state().runs.find((r) => r.id.toLowerCase() === q || r.label.toLowerCase().includes(q));
-    if (!run) return result(false, 'No run matched the visible query; state unchanged.', snapshot());
+    if (!run) return result(true, 'No run matched the visible query; state unchanged.', { ...snapshot(), query: String(query ?? ''), matches: [] });
     state().setView('pipeline'); state().selectRun(run.id);
     await paint();
     return result(true, `Opened matching run ${run.id}.`, { ...snapshot(), destination: 'run-detail', runId: run.id });

@@ -59,7 +59,7 @@ function Sidebar({ mobile = false }) {
         <p className="eyebrow nav-label">Workspace</p>
         {nav.map(({ id, label, icon: NavIcon }) => (
           <button key={id} type="button" className={`nav-item ${activeView === id ? 'active' : ''}`} onClick={() => setView(id)} aria-current={activeView === id ? 'page' : undefined}>
-            <Icon icon={NavIcon} label={label} size={18} /><span>{label}</span>{activeView === id && <span className="nav-indicator" aria-hidden="true" />}
+            <Icon icon={NavIcon} label={label} size={18} decorative /><span>{label}</span>{activeView === id && <span className="nav-indicator" aria-hidden="true" />}
           </button>
         ))}
       </nav>
@@ -268,7 +268,7 @@ function ResultsView() {
     raw.sort((a, b) => {
       const delta = (a[sort.key] - b[sort.key]) * dir;
       if (delta !== 0) return delta;
-      return a.model.localeCompare(b.model);
+      return a.model.localeCompare(b.model) * dir;
     });
     return raw;
   }, [trialData, sort]);
@@ -330,7 +330,7 @@ function RunDetail() {
   useEffect(() => enableTimelineAnimations(!reducedMotion), [enableTimelineAnimations, reducedMotion]);
   const run = runs.find((r)=>r.id===selectedRunId);
   const filtered = run?.events.filter((e)=>(timelinePhase==='all'||e.phase===timelinePhase)&&(timelineStatus==='all'||e.status===timelineStatus)) ?? [];
-  return <Drawer opened={activeView === 'pipeline' && Boolean(run)} onClose={()=>selectRun(null)} position="right" size="xl" withinPortal keepMounted={false} title={run ? <div className="drawer-title"><span className="eyebrow">Run detail</span><strong>{run.id} · {run.label}</strong><small>Submitted {fmtTime(run.createdAt)}</small></div> : ''} overlayProps={{backgroundOpacity:.2,blur:2}} classNames={{body:'run-drawer-body', content:'run-drawer-content'}} closeOnEscape closeOnClickOutside closeButtonProps={{'aria-label':'Close run detail'}}>
+  return <Drawer opened={activeView === 'pipeline' && Boolean(run)} onClose={()=>selectRun(null)} position="right" size="xl" withinPortal keepMounted={false} title={run ? <div className="drawer-title"><span className="eyebrow">Run detail</span><strong>{run.id} · {run.label}</strong><small>Submitted {fmtTime(run.createdAt)}</small></div> : ''} overlayProps={{backgroundOpacity:.2,blur:2,className:'run-drawer-overlay'}} classNames={{body:'run-drawer-body', content:'run-drawer-content'}} closeOnEscape closeOnClickOutside closeButtonProps={{'aria-label':'Close run detail'}}>
     {run && <div className="run-detail"><section><div className="detail-section-title"><h2>Phase outputs</h2><span>Click a timeline event to locate its phase</span></div><div className="detail-phases">{run.phases.map((p)=><div key={p.key}><PhaseCard runId={run.id} phase={p} detailed highlighted={highlightedPhase===p.key}/><dl className="output-meta"><div><dt>Started</dt><dd>{fmtTime(p.startedAt)}</dd></div><div><dt>Completed</dt><dd>{fmtTime(p.completedAt)}</dd></div><div><dt>Output</dt><dd>{p.output ?? 'Not available yet'}</dd></div></dl></div>)}</div></section>
       <section className="timeline-section"><div className="detail-section-title"><h2>Event timeline</h2><span>{run.events.length} recorded transitions</span></div><div className="timeline-filters"><Select aria-label="Filter timeline by phase" value={timelinePhase} onChange={setTimelinePhase} data={[{value:'all',label:'All phases'},...Object.entries(phaseLabel).map(([value,label])=>({value,label}))]}/><Select aria-label="Filter timeline by status" value={timelineStatus} onChange={setTimelineStatus} data={['all','Pending','Running','Complete','Failed','Skipped'].map((x)=>({value:x,label:x==='all'?'All statuses':x}))}/>{(timelinePhase!=='all'||timelineStatus!=='all')&&<Button variant="subtle" leftSection={<Icon icon={IconX} label="Clear" size={14} />} onClick={()=>{setTimelinePhase('all');setTimelineStatus('all')}}>Clear timeline filters</Button>}</div>
         <div className="timeline-list" ref={timelineListRef}>{filtered.map((e)=><button type="button" key={e.id} className={`timeline-entry ${highlightedPhase===e.phase?'selected':''}`} onClick={()=>setHighlightedPhase(e.phase)}><span className="timeline-marker" style={{background:statusDot[e.status]}} aria-hidden="true"/><div><span>{phaseLabel[e.phase]}</span><strong>{e.message}</strong><time>{fmtTime(e.timestamp)}</time></div><StatusChip status={e.status}/></button>)}{!filtered.length&&<EmptyState title="No timeline events match" body={`No events match the selected ${timelinePhase} / ${timelineStatus} filters. Clear filters to restore the full timeline or wait for new events to occur.`} action="Clear timeline filters" onAction={()=>{setTimelinePhase('all');setTimelineStatus('all')}}/>}</div>
@@ -427,7 +427,7 @@ function SubmissionDrawer() {
         )}/>
         <div className="form-row"><Controller name="count" control={control} render={({field})=>(
           <div>
-            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label={jobType==='Fine-tune'?'Epoch count':jobType==='Data generation'?'Trial count':'Trial budget'} min={1} max={50} clampBehavior="none" error={errors.count?.message} required incrementButtonProps={{ tabIndex: 0 }} decrementButtonProps={{ tabIndex: 0 }} />
+            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label={jobType==='Fine-tune'?'Epoch count':jobType==='Data generation'?'Trial count':'Trial budget'} min={1} max={50} clampBehavior="none" error={errors.count?.message} required />
           </div>
         )}/><Controller name="cluster" control={control} render={({field})=>(
           <div>
@@ -442,7 +442,7 @@ function SubmissionDrawer() {
           </div>
         )}/><Controller name="repetitions" control={control} render={({field})=>(
           <div>
-            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label="Repetition count" min={1} max={10} clampBehavior="none" error={errors.repetitions?.message} required incrementButtonProps={{ tabIndex: 0 }} decrementButtonProps={{ tabIndex: 0 }} />
+            <NumberInput {...field} value={field.value??''} onChange={field.onChange} label="Repetition count" min={1} max={10} clampBehavior="none" error={errors.repetitions?.message} required />
           </div>
         )}/></div></div>}
         {jobType==='Fine-tune'&&<Controller name="autoEvaluate" control={control} render={({field})=><Switch checked={field.value} onChange={(e)=>field.onChange(e.currentTarget.checked)} label="Start evaluation automatically when training completes" description="Adds a timeline trigger and starts the evaluation phase from the saved checkpoint."/>}/>}
@@ -453,7 +453,7 @@ function SubmissionDrawer() {
           {importError && <p className="field-error" role="alert" aria-live="assertive">{importError}</p>}
         </div>
       </div>
-      <aside className="preview-panel"><div className="preview-heading"><div><span className="eyebrow">Request body</span><h2>Config preview</h2></div><span className={isValid?'valid-config':'invalid-config'}>{isValid?<><Icon icon={IconCheck} label="Valid" size={13} />Valid</>:<><Icon icon={IconAlertTriangle} label="Incomplete" size={13} />Incomplete</>}</span></div><pre aria-label="Live job configuration preview">{preview}</pre><div className="preview-actions"><Button type="button" variant="default" leftSection={<Icon icon={IconCopy} label="Copy" size={15} />} onClick={copy}>Copy</Button><Button type="button" variant="default" leftSection={<Icon icon={IconDownload} label="Download" size={15} />} onClick={()=>downloadText(preview,'job-config.json')}>Download job-config.json</Button></div><div className="preview-note"><Icon icon={IconCheck} label="Schema note" size={15} /><p>Copy, download, and successful submission use this exact request-body schema.</p></div><Button type="submit" size="md" fullWidth disabled={!isValid||isSubmitting||submitLock.current} loading={isSubmitting} leftSection={<Icon icon={IconBolt} label="Submit" size={16} />}>Submit job</Button><Button type="button" variant="subtle" color="gray" fullWidth onClick={close}>Cancel submission</Button></aside>
+      <aside className="preview-panel"><div className="preview-heading"><div><span className="eyebrow">Request body</span><h2>Config preview</h2></div><span className={isValid?'valid-config':'invalid-config'}>{isValid?<><Icon icon={IconCheck} label="Valid" size={13} />Valid</>:<><Icon icon={IconAlertTriangle} label="Incomplete" size={13} />Incomplete</>}</span></div><pre aria-label="Live job configuration preview">{preview}</pre><div className="preview-actions"><Button type="button" variant="default" leftSection={<Icon icon={IconCopy} label="Copy" size={15} />} onClick={copy}>Copy</Button><Button type="button" variant="default" leftSection={<Icon icon={IconDownload} label="Download" size={15} />} onClick={()=>downloadText(preview,'job-config.json')}>Download job-config.json</Button></div><div className="preview-note"><Icon icon={IconCheck} label="Schema note" size={15} /><p>Copy, download, and successful submission use this exact request-body schema.</p></div><Button type="submit" size="md" fullWidth disabled={!isValid||isSubmitting||submitLock.current} loading={isSubmitting} leftSection={<Icon icon={IconBolt} label="Submit" size={16} decorative />}>Submit job</Button><Button type="button" variant="subtle" color="gray" fullWidth onClick={close}>Cancel submission</Button></aside>
     </form>
   </Modal>;
 }
