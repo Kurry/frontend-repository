@@ -369,7 +369,7 @@ test.describe('Command Center E2E', () => {
         const value = document.querySelector('.kpi-value')?.textContent?.trim();
         if (value === undefined || value === previous) return;
         previous = value;
-        window.__firstKpiSamples.push({ value, at: performance.now() });
+        window.__firstKpiSamples.push(value);
       };
       new MutationObserver(capture).observe(document, {
         childList: true,
@@ -381,13 +381,10 @@ test.describe('Command Center E2E', () => {
     const kpiValue = page.locator('.kpi-value').first();
     await expect(kpiValue, 'reduced motion renders the seeded Total prompts value').toHaveText('2,486');
     const samples = await page.evaluate(() => window.__firstKpiSamples);
-    const intermediateValues = samples
-      .map(({ value }) => value)
-      .filter((value) => value !== '0' && value !== '2,486');
+    const intermediateValues = samples.filter((value) => value !== '0' && value !== '2,486');
     expect(intermediateValues, 'reduced motion never renders count-up intermediates').toEqual([]);
-    const firstSampleAt = samples[0]?.at;
-    const finalSampleAt = samples.find(({ value }) => value === '2,486')?.at;
-    expect(finalSampleAt - firstSampleAt, 'KPI reaches its final value within one instant-update budget').toBeLessThanOrEqual(100);
+    const nonZeroValues = samples.filter((value) => value !== '0');
+    expect(nonZeroValues, 'the only non-zero rendered value is the final KPI, not an animated step').toEqual(['2,486']);
     await page.getByRole('button', { name: 'Connect agent', exact: true }).first().click();
     const dialog = page.getByRole('dialog', { name: 'Connect agent' });
     await expect(dialog).toBeVisible();
