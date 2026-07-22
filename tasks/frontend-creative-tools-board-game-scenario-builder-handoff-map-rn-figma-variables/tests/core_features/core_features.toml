@@ -1,0 +1,75 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[criteria]]
+id = "scenario_crud"
+title = "Scenario Cards collection — Create, edit, archive, and filter scenario cards with explicit domain statuses (empty, draft, ready, changed, archived)."
+weight = 1.0
+
+[[criteria]]
+id = "exact_boundaries"
+title = "Exact field boundaries are accepted while adjacent out-of-range values are rejected."
+weight = 1.0
+
+[[criteria]]
+id = "invalid_recovery"
+title = "Invalid required fields preserve the prior valid record and explain recovery."
+weight = 1.0
+
+[[criteria]]
+id = "seeded_collection"
+title = "Seed the collection with at least 100 deterministic records in various states (empty, boundary, valid, conflict) without the target outcome pre-completed."
+weight = 1.0
+
+[[criteria]]
+id = "handoff_mutation"
+title = "Handoff Map surface — Use the handoff map interaction to connect a selected record to a handoff owner and update readiness."
+weight = 1.0
+
+[[criteria]]
+id = "undo_mutation"
+title = "Undo the last mutation (Ctrl/Cmd+Z) and inspect the linked representation. Undo restores ordering, selection, and derived values."
+weight = 1.0
+
+[[criteria]]
+id = "reject_conflict"
+title = "A conflicting or incomplete mutation is rejected without partial updates."
+weight = 1.0
+
+[[criteria]]
+id = "export_artifact"
+title = "Portable work artifact — Export the current artifact, containing schemaVersion, exportedAt, records[], derived{}, and history[]."
+weight = 1.0
+
+[[criteria]]
+id = "clear_session"
+title = "Clear the current session."
+weight = 1.0
+
+[[criteria]]
+id = "import_validation"
+title = "Import an artifact with field-level validation. Malformed schema, duplicate IDs, unknown references, and invalid bounds make no state change."
+weight = 1.0
+
+[[criteria]]
+id = "valid_import_restores"
+title = "A valid import restores authored structure and regenerates exportedAt."
+weight = 1.0
