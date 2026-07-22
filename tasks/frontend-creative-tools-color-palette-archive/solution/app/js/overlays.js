@@ -239,6 +239,7 @@ let confirmEntry = null;
 
 export function confirmDialog({ title, body, confirmLabel, onConfirm }) {
   const el = $('#confirm-dialog');
+  const returnFocus = document.activeElement;
   $('#confirm-title').textContent = title;
   $('#confirm-body').textContent = body;
   const confirmBtn = $('#confirm-ok');
@@ -250,8 +251,9 @@ export function confirmDialog({ title, body, confirmLabel, onConfirm }) {
     el.classList.remove('is-open');
     confirmBtn.onclick = null;
     cancelBtn.onclick = null;
+    if (returnFocus instanceof HTMLElement && document.contains(returnFocus)) returnFocus.focus();
   };
-  cancelBtn.onclick = () => { cleanup(); cancelBtn.focus?.(); };
+  cancelBtn.onclick = cleanup;
   confirmBtn.onclick = () => { cleanup(); onConfirm?.(); };
   el.hidden = false;
   requestAnimationFrame(() => el.classList.add('is-open'));
@@ -301,6 +303,7 @@ export function applyBatchTag() {
 // ================= Subscribe popup ================================================
 
 let popupEntry = null;
+let popupInvoker = null;
 let idleTimer = null;
 const IDLE_MS = 45000;
 
@@ -346,6 +349,7 @@ export function showPopup(force = false) {
   if (ui.popupOpen || (ui.popupDismissed && !force)) return;
   if (force) ui.popupDismissed = false;
   const el = $('#subscribe-popup');
+  popupInvoker = document.activeElement;
   ui.popupOpen = true;
   if (el.hasAttribute('popover') && typeof el.showPopover === 'function' && !el.matches(':popover-open')) el.showPopover();
   else el.hidden = false;
@@ -363,6 +367,8 @@ export function dismissPopup(viaSubmit = false) {
   const el = $('#subscribe-popup');
   el.classList.remove('is-visible');
   if (popupEntry) { closeOverlay(popupEntry); popupEntry = null; }
+  if (popupInvoker instanceof HTMLElement && document.contains(popupInvoker)) popupInvoker.focus();
+  popupInvoker = null;
   setTimeout(() => {
     if (el.hasAttribute('popover') && typeof el.hidePopover === 'function' && el.matches(':popover-open')) el.hidePopover();
     else el.hidden = true;

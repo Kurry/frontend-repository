@@ -1,0 +1,196 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "join_enables_composer_and_adds_message"
+description = "Join-and-chat flow: enter a valid roomId and Join Room; the badge leaves idle, the composer enables, and submitting one valid ChatMessage increases the transcript line count by exactly one with the new line right-aligned."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "invalid_join_or_message_shows_field_contract_errors"
+description = "Invalid JoinSession or ChatMessage payloads (empty/illegal roomId, whitespace-only or over-long text) show immediate inline validation naming roomId or text and do not start a join or append a transcript line."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "display_name_edit_echoes_to_session_pack"
+description = "Edit a valid displayName, then open Export Session: the Session Pack peer.displayName matches the visible session-panel name without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "leave_room_disables_composer_keeps_transcript"
+description = "Leave Room while waiting flips the badge to disconnected, disables the composer with its explanatory note, and keeps every previously sent transcript line."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "theme_toggle_retained_across_export"
+description = "Toggle theme, then open Export Session: the Session Pack theme enum matches the active surface (light or dark) and the three panels stay in place."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "empty_file_queue_shows_empty_state"
+description = "With zero queued files, the file-transfer panel shows its empty-state message in place of table rows."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "file_queue_two_files_flow"
+description = "Choosing two different local files replaces the empty state with exactly two queue rows, each with its own name, size, and Not Started status, regardless of connection state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "export_import_session_pack_flow"
+description = "Artifact end-state flow: after distinctive name/room/chat/file mutations, Export Session preview shows weblink-session-v2 field-contract keys with those values; Download then Import Session reconstructs the same visible state with the badge at rest."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "export_import_overlays_close_cleanly"
+description = "Export Session and Import Session surfaces open from their controls, support Escape or an explicit close, and return focus so Join Room and the composer remain usable afterward."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "invalid_import_recovers_without_reload"
+description = "After a rejected invalid Session Pack Import (field-contract error visible), the workspace remains usable: Join Room, composer (after a valid join), and Export Session still operate without a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "transfer_lifecycle_flow"
+description = "Transfer lifecycle flow: queue one file, Start (status Transferring, readout advancing), Pause (readout frozen), Resume (continues from the frozen value), Cancel (Canceled with partial readout kept), Retry (Not Started at zero); the transfer log shows one entry per action in order and Export Session shows the row's current status and bytesTransferred"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.12"
+name = "batch_select_remove_retry_flow"
+description = "Batch flow: queue three files, select two; the bulk bar appears showing the selected count; Remove Selected leaves exactly the unselected row and logs one removed entry per file; after the survivor completes, selecting it and clicking Retry Selected returns it to Not Started at zero"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.13"
+name = "drag_reorder_flow"
+description = "Reorder flow: with three queued rows, drag the first row's handle to the last position; the on-screen order updates immediately, survives a reload, and the Session Pack fileQueue array lists rows in that same order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "transcript_export_flow"
+description = "Transcript flow: send a distinctive chat line, open Export Transcript, and confirm the markdown contains that line with its role label and timestamp; Copy shows confirmation; Download produces a real .md matching the preview"
+type = "binary"
+weight = 1.0
+

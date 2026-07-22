@@ -1,0 +1,358 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "workspace_shell_renders_on_load"
+description = "On load, the session panel (peer name, read-only client ID, room/peer identifier field, Join Room and Leave Room controls, connection badge), the chat panel, and the file-transfer panel all render together instead of a generic starter page"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "badge_idle_on_load"
+description = "On load, the connection badge shows an idle label such as \"Not connected\" and never a connected/online label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "seeded_demo_transcript_on_load"
+description = "On load, the chat panel shows at least 2 seeded local/loopback demo lines"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "empty_queue_shows_empty_state"
+description = "When no files are queued, the file-transfer panel shows an empty-state message in place of table rows explaining that chosen files will appear there"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "join_moves_badge_to_connecting"
+description = "After typing a room or peer identifier and clicking Join Room, the connection badge changes to a connecting label"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "attempt_settles_to_waiting_no_peer_claim"
+description = "After the connection attempt settles (within 5 seconds after Join Room), the connection badge shows a waiting-for-peer label, and no visible text anywhere claims a peer connected"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "leave_room_returns_disconnected"
+description = "After clicking Leave Room while connecting or waiting, the connection badge changes to a disconnected label immediately, and Join Room is available again afterward to start a new attempt"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "composer_disabled_when_idle_with_note"
+description = "When idle or disconnected, the chat composer input is disabled and a nearby note states that sending is unavailable because no session is active"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "composer_enabled_after_join_sends_right_aligned"
+description = "After clicking Join Room, the chat composer input becomes enabled and typing then submitting a message adds it to the transcript immediately, right-aligned to distinguish it from the seeded demo lines"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "chosen_file_adds_queue_row"
+description = "After choosing a local file via the file-transfer control, its filename and size appear as a new row in the queue table with a Not Started status, without any room or connected peer required"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "second_file_adds_distinct_row"
+description = "After choosing a second, different local file, a second distinct row appears in the queue table showing the second file's own name and size, without merging or overwriting the first row"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "join_field_shows_latest_identifier"
+description = "After typing a second room or peer identifier over a first, the join field shows only the latest value typed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "theme_toggle_switches_surface"
+description = "After clicking the theme toggle, the page surface switches between light and dark backgrounds/text while the connection badge and layout stay in place"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "reload_restores_state_badge_at_rest"
+description = "After reloading the page following Join Room and a file selection, the peer name, client ID, last-entered room identifier, chat transcript, and file queue are restored, and the connection badge resumes at an idle or disconnected label, never connecting or waiting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "seeded_identity_visible_on_load"
+description = "On first load, the session panel shows a non-empty editable display name and a non-empty read-only generated client identifier, both visible without any user action"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "name_edit_updates_identity_live"
+description = "Editing the display name to a value that satisfies the PeerIdentity field contract (trimmed 1–40 characters) updates the visible peer identity immediately, with no save control and no page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "empty_identifier_join_blocked_inline_error"
+description = "With roomId empty, longer than 64 characters, or containing spaces/illegal characters, activating Join Room starts no connection attempt: an inline error naming the roomId field appears next to it, the connection badge stays idle, no other panel changes, and the error clears once a valid roomId (1–64 chars of A–Z a–z 0–9 hyphen underscore) is typed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "whitespace_message_adds_no_line"
+description = "Submitting a chat message consisting only of whitespace while the composer is enabled adds no transcript line; the composer clears or keeps the input without appending anything"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "same_file_twice_distinct_rows"
+description = "Choosing the same local file twice in a row yields two distinct visible queue rows rather than silently merging them, so the queue row count equals the total number of files chosen"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.32"
+name = "join_and_chat_flow_chain"
+description = "Full join-and-chat chain: count the transcript lines, enter a valid roomId, and click Join Room; the badge moves from idle to connecting and then to waiting for peer within 5 seconds, the chat composer becomes enabled at the same moment the badge leaves idle, and submitting one message immediately increases the transcript line count by exactly one with the new line right-aligned; reloading the page afterward restores the peer identity, the last-entered room identifier, and the seeded plus the newly sent line in the same order, with the badge resuming at idle or disconnected, never connecting or waiting"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "file_queue_flow_chain"
+description = "Full file-queue chain: starting with the queue empty and its empty-state message showing, choosing two different local files replaces the empty state with exactly two queue rows, each carrying its own file name, its own size, and a Not Started status, regardless of connection state; reloading the page restores both rows with the same names, sizes, statuses, and order, and the connection badge is back at rest (idle or disconnected)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "leave_and_rejoin_flow_chain"
+description = "Full leave-and-rejoin chain: while the badge shows waiting for peer, clicking Leave Room flips the badge to disconnected immediately, the chat composer disables and its explanatory note appears in the same moment, and the transcript keeps every previously sent line; entering a new identifier and clicking Join Room again starts a fresh attempt whose badge walks idle to connecting to waiting exactly as the first did"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "multi_facet_reload_round_trip"
+description = "Multi-facet round-trip: edit the display name, enter a room identifier, send one chat line while connecting/waiting, queue one file, and toggle the theme, then reload; every facet (name, client ID, room identifier, seeded plus sent transcript, file queue, theme choice) is restored coherently from local storage — never a mix of restored and reset facets — and the connection badge resumes at idle or disconnected"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "1.36"
+name = "peer_identity_field_contract_rejects_invalid_name"
+description = "Editing displayName to whitespace-only or longer than 40 characters shows an inline validation message naming the displayName field and leaves the last valid peer name unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "chat_message_field_contract_bounds"
+description = "While the composer is enabled, submitting whitespace-only text adds no transcript line; submitting text longer than 2000 characters shows an inline message naming the text field and adds no line"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "session_pack_export_shows_field_contract_keys"
+description = "After editing displayName to a distinctive valid value, joining a distinctive valid roomId, sending a distinctive chat line, and queueing one file, opening Export Session shows a Session Pack JSON preview with schemaVersion exactly weblink-session-v2 and required keys peer, roomId, theme, messages, fileQueue, and transferLog, containing those live displayName, roomId, chat text, and file name values"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "session_pack_copy_and_download_match_preview"
+description = "In Export Session, Copy places the visible Session Pack JSON on the clipboard with a visible confirmation, and Download triggers a real client-side .json download whose contents match the preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "session_pack_import_round_trip"
+description = "Download a Session Pack after distinctive displayName, roomId, chat, and file-queue mutations (including a started-then-paused transfer), then Import Session that same JSON: peer displayName, roomId, transcript lines, file queue (statuses, bytesTransferred, and order), transfer log, and theme reconstruct to match the pack, a fresh Export still shows schemaVersion weblink-session-v2 with those values, and the connection badge is at rest (idle or disconnected)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "invalid_session_pack_import_rejected"
+description = "Importing malformed Session Pack JSON, or parseable JSON that fails the field contract (wrong schemaVersion, theme outside light|dark, message role outside local|demo, fileQueue status outside the closed enum or equal to transferring, bytesTransferred outside 0 to sizeBytes, transferLog event outside the closed enum, displayName outside 1–40 characters, illegal roomId characters when non-empty, or missing required keys), shows validation naming the offending field and leaves peer, transcript, queue, transfer log, and theme unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "start_transfer_advances_progress"
+description = "After clicking Start on a Not Started queue row, that row's status changes to Transferring and its progress bar plus numeric readout (bytes of the file's real total, and percent) advance in visible increments until the row reads Completed at 100 percent; no visible text claims a remote peer received the file"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "pause_freezes_resume_continues"
+description = "Clicking Pause on a Transferring row freezes the progress bar and numeric readout at their current values with status Paused; clicking Resume continues from exactly that frozen value — the readout is never lower after Resume than it was at Pause"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "cancel_keeps_partial_retry_resets"
+description = "Clicking Cancel on a Transferring or Paused row sets status Canceled while keeping the partial progress readout visible and offering Retry; clicking Retry returns exactly that row to Not Started with a zeroed readout so Start can run again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "queue_multi_select_bulk_remove"
+description = "Each queue row carries a selection checkbox and the header a select-all checkbox; selecting rows reveals a bulk action bar showing the selected count, and Remove Selected deletes exactly the selected rows while unselected rows are untouched"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "retry_selected_resets_finished_rows"
+description = "With a mix of row states selected, Retry Selected resets every selected Canceled or Completed row to Not Started with zeroed progress and leaves selected Transferring or Paused rows unchanged"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.48"
+name = "drag_reorder_persists_and_exports"
+description = "Dragging a queue row's handle to a new position reorders the queue visibly, the new order survives a page reload, and the Session Pack fileQueue array serializes rows in the on-screen order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "transfer_log_records_lifecycle_events"
+description = "The transfer log lists one timestamped entry per queue lifecycle event (queued, started, paused, resumed, canceled, completed, retried, removed), newest first, each naming its file, appearing immediately when the action happens"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "transcript_markdown_export"
+description = "Export Transcript opens a markdown transcript compiled live from the store — one line per message with its role label (local or demo) and timestamp in transcript order, including a distinctive line sent this session — with Copy confirmation and a real .md download matching the preview"
+type = "binary"
+weight = 1.0
+

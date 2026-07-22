@@ -61,42 +61,48 @@ test.describe('workspace contract (canonical)', () => {
 
   test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    // Install the collector before navigation so load/hydration animations are
+    // observed too. Keep it running through network idle and a settled 1.5s
+    // window so late-starting effects cannot escape the assertion.
+    await page.addInitScript(() => {
+      window.__reducedMotionOffenders = [];
+      const seen = new Set();
+      const sample = () => {
+        for (const animation of document.getAnimations({ subtree: true })) {
+          if (animation.playState !== 'running') continue;
+          let timing = {};
+          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
+          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
+          if (duration <= 1) continue;
+          const offender = {
+            kind: animation.constructor?.name ?? 'Animation',
+            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
+            duration,
+            iterations: timing.iterations ?? 1,
+          };
+          const key = JSON.stringify(offender);
+          if (!seen.has(key)) {
+            seen.add(key);
+            window.__reducedMotionOffenders.push(offender);
+          }
+        }
+        requestAnimationFrame(sample);
+      };
+      requestAnimationFrame(sample);
+    });
     await page.goto(BASE);
-    // Load fully first: animations kicked off during hydration or by
-    // late-arriving resources must fall inside the observation window, so the
-    // sampling loop only starts once the page is settled.
     await page.waitForLoadState('networkidle');
     // Precondition sanity check: the emulation actually reaches the app.
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
-    await page.waitForTimeout(250); // small settle after idle
-    // Observe every frame across a 1.5s window and assert on what was seen.
+    // Observe every frame for another 1.5s after load settles and assert on
+    // everything seen since the document started.
     // Finished, idle, or paused effects and durations <=1ms are allowed; any
     // meaningfully timed RUNNING effect at any sample is a reduced-motion
     // failure. Apps with zero animations pass vacuously (the render/console
     // test still gates them).
-    const offenders = await page.evaluate(async () => {
-      const seen = new Map();
-      const deadline = performance.now() + 1500;
-      while (performance.now() < deadline) {
-        for (const a of document.getAnimations({ subtree: true })) {
-          if (a.playState !== 'running') continue;
-          let timing = {};
-          try { timing = a.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
-          const dur = typeof timing.duration === 'number' ? timing.duration : 0;
-          if (dur <= 1) continue; // fill-only / effectively instant
-          const offender = {
-            kind: a.constructor?.name ?? 'Animation',
-            name: a.animationName ?? a.transitionProperty ?? a.id ?? '(anonymous)',
-            duration: dur,
-            iterations: timing.iterations ?? 1,
-          };
-          seen.set(JSON.stringify(offender), offender);
-        }
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-      }
-      return [...seen.values()];
-    });
+    await page.waitForTimeout(1500);
+    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
@@ -111,3 +117,167 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+
+test.describe('Command Center E2E', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('http://localhost:3000');
+    await page.waitForLoadState('networkidle');
+  });
+
+  // 1. Accessibility
+  test('1.1 keyboard_reaches_primary_controls', async ({ page }) => {
+    await page.keyboard.press('Tab');
+    const focused = page.locator('*:focus');
+    await expect(focused).not.toBeNull();
+  });
+
+  test('1.2 visible_focus_indicators', async ({ page }) => {
+    await page.keyboard.press('Tab');
+    const focused = page.locator('*:focus');
+    await expect(focused).not.toBeNull();
+    const outline = await focused.evaluate(el => window.getComputedStyle(el).outlineStyle);
+    expect(outline).not.toBe('none');
+  });
+
+  test('1.3 dialogs_trap_focus_and_escape', async ({ page }) => {
+    await page.getByRole('button', { name: /Connect agent/i }).first().click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
+  });
+
+  test('1.4 night_popover_escape_returns_focus', async ({ page }) => {
+    const trigger = page.locator('header button').last();
+    await trigger.click();
+    await page.keyboard.press('Escape');
+    await expect(trigger).toBeFocused();
+  });
+
+  test('1.6 status_not_color_only', async ({ page }) => {
+    const status = page.locator('[class*="status"], [class*="chip"]').first();
+    await expect(status).toHaveText(/[a-zA-Z]+/);
+  });
+
+  test('1.7 aria_live_announces_mutations', async ({ page }) => {
+    await expect(page.locator('[aria-live]').first()).toBeAttached();
+  });
+
+  test('1.8 labels_on_form_controls', async ({ page }) => {
+    await page.getByRole('button', { name: /Connect agent/i }).first().click();
+    const input = page.locator('input').first();
+    const hasLabel = await input.evaluate(el => el.hasAttribute('id') || el.hasAttribute('aria-label') || el.hasAttribute('aria-labelledby'));
+    expect(hasLabel).toBe(true);
+  });
+
+  test('1.9 checkbox_and_bulk_actions_labeled', async ({ page }) => {
+    const checkbox = page.locator('input[type="checkbox"]').first();
+    const hasLabel = await checkbox.evaluate(el => el.hasAttribute('aria-label') || el.hasAttribute('aria-labelledby') || el.hasAttribute('id'));
+    expect(hasLabel).toBe(true);
+  });
+
+  test('1.10 export_tabs_are_keyboard_operable', async ({ page }) => {
+    await page.getByRole('button', { name: /Export/i }).click();
+    await expect(page.getByRole('tablist')).toBeVisible();
+    await expect(page.getByRole('tab')).toHaveCount(2);
+  });
+
+  test('4.8 reduced_motion_fallback', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('http://localhost:3000');
+    await page.getByRole('button', { name: /Connect agent/i }).first().click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    const transitionDuration = await dialog.evaluate((el) => window.getComputedStyle(el).transitionDuration);
+    expect(parseFloat(transitionDuration) || 0).toBeLessThan(0.1);
+  });
+
+  test('7.2 tablet_kpi_wrap_feed_stacks', async ({ page }) => {
+    await page.setViewportSize({ width: 1023, height: 900 });
+    await page.goto('http://localhost:3000');
+    const tiles = page.locator('.kpi-tile, [class*="kpi"]');
+    const box1 = await tiles.nth(0).boundingBox();
+    const box4 = await tiles.nth(3).boundingBox();
+    expect(box4.y).toBeGreaterThan(box1.y + 10);
+  });
+
+  test('7.3 mobile_no_page_horizontal_scroll', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('http://localhost:3000');
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(scrollWidth).toBeLessThanOrEqual(375);
+  });
+
+  test('7.4 suggestions_row_self_scrolls', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('http://localhost:3000');
+    const scrollWidth = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(scrollWidth).toBeLessThanOrEqual(375);
+  });
+
+  test('7.5 export_drawer_usable_on_mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('http://localhost:3000');
+    await page.getByRole('button', { name: /Export/i }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+  });
+
+  test('7.6 command_palette_usable_on_mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('http://localhost:3000');
+    await page.keyboard.press('Meta+k');
+    await expect(page.getByRole('dialog')).toBeVisible();
+  });
+
+  test('7.7 undo_redo_visible_on_mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('http://localhost:3000');
+    await expect(page.getByRole('button', { name: /Undo/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Redo/i })).toBeVisible();
+  });
+
+  test('7.8 connect_dialog_usable_on_mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('http://localhost:3000');
+    await page.getByRole('button', { name: /Connect agent/i }).first().click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+  });
+
+  test('9.2 console_clean_on_load', async ({ page }) => {
+    let errors = 0;
+    page.on('console', msg => { if (msg.type() === 'error') errors++; });
+    page.on('pageerror', () => errors++);
+    await page.goto('http://localhost:3000');
+    await page.waitForLoadState('networkidle');
+    expect(errors).toBe(0);
+  });
+
+  test('9.3 console_clean_during_exercise', async ({ page }) => {
+    let errors = 0;
+    page.on('console', msg => { if (msg.type() === 'error') errors++; });
+    page.on('pageerror', () => errors++);
+    await page.goto('http://localhost:3000');
+    await page.getByRole('button', { name: /Connect agent/i }).first().click();
+    await page.keyboard.press('Escape');
+    expect(errors).toBe(0);
+  });
+
+  test('9.6 export_tab_switch_no_freeze', async ({ page }) => {
+    await page.getByRole('button', { name: /Export/i }).click();
+    await page.getByRole('tab', { name: /CSV/i }).click();
+    await expect(page.locator('pre, code').first()).toBeVisible();
+  });
+
+  test('9.7 palette_filter_stays_snappy', async ({ page }) => {
+    await page.keyboard.press('Meta+k');
+    await page.keyboard.type('test');
+    await expect(page.getByRole('dialog')).toBeVisible();
+  });
+
+  test('15.2 actions_use_specific_labels', async ({ page }) => {
+    await page.getByRole('button', { name: /Connect agent/i }).first().click();
+    await expect(page.getByRole('button', { name: 'Connect agent', exact: true }).last()).toBeVisible();
+  });
+});

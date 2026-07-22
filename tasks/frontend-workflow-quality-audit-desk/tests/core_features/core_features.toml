@@ -1,0 +1,469 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "seeded_queue_size_and_repos"
+description = "On first load the Queue view shows a table of at least 42 seeded audit records spanning the 7 seeded repositories (meridian/copperbeam, quartzlab/hollybush, silverpine/driftnet, bluegate/ironvale, cedarworks/lanternfish, foxglove/marrowgrid, oakhaven/pebblecourt), with every repository contributing at least 4 records"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "queue_row_anatomy_complete"
+description = "Each queue row shows a task slug in org-repo-issue-N form (for example meridian-copperbeam-issue-12), the repository, a lifecycle stage badge, a checks summary as passes out of 9, a criteria summary as passes out of 10, a feedback entry count, and a last-activity timestamp"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "seeded_stage_spread_visible"
+description = "Without any user action, the seeded queue shows at least 6 records in the pending stage with no check results, and the pending, checked, held, and admitted stage badges are all visible among the seeded rows"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "column_sort_toggles_direction"
+description = "Clicking a queue column header sorts the table by that column ascending, and clicking the same header again sorts descending, reversing the visible row order relative to ascending"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "check_outcome_filter"
+description = "The queue can be filtered by check outcome — choosing one of the nine named checks plus pass or fail narrows the visible rows to records with that outcome for that check — and the active filter appears as a removable chip above the table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "criterion_stage_reviewer_filters"
+description = "The queue can also be filtered by criterion outcome (one of the ten admission criteria plus pass or fail), by lifecycle stage, and by reviewer; adding or removing any of these filters updates the visible row count immediately and each shows as a removable chip"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "queue_search_narrows_and_restores"
+description = "Typing in the queue search field narrows the visible rows incrementally to records whose slug or repository matches, and clearing the field restores the previously filtered set exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "filter_empty_state_with_clear"
+description = "When active filters match no records, the table region shows an empty state with a message and a Clear filters control, and activating that control restores the full queue"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "rollup_strip_cells_complete"
+description = "The rollup strip above the queue shows a pass-rate cell for each of the nine checks (package-shape, task-config, rubric-wiring, file-modes, harvest, container-parity, dependency-pinning, foils, scoring-contract), a pass-rate cell for each of the ten admission criteria, and an entry-count cell for each seeded reviewer"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "rollup_cells_derive_live"
+description = "After a run, a verdict change, or a new feedback entry, the affected rollup cells update to the new values without a page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "rollup_cell_click_applies_filter"
+description = "Clicking a check cell, criterion cell, or reviewer cell in the rollup strip applies the matching filter to the queue and the corresponding filter chip appears above the table"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "rollup_charts_with_tooltips"
+description = "The rollup strip includes a bar chart of pass rate per check and a bar chart ranking the ten admission criteria by failure count, and hovering a bar with the real pointer shows a tooltip naming the check or criterion and its exact value"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "charts_redraw_on_data_change"
+description = "Completing a run or changing a criterion verdict changes the corresponding bars in the rollup charts — the charts redraw from the new data rather than staying identical"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "detail_view_anatomy"
+description = "Clicking a queue row opens that record's detail view showing the slug, repository, current stage badge, the nine check chips, the admission rubric panel, the feedback thread, and the audit timeline, without a full page reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "state_machine_strip_with_timestamps"
+description = "The detail view renders the lifecycle as a state machine strip — pending, checked, held or admitted, escalated or re-audited, resolved — with the current stage highlighted and a timestamp shown under every stage the record has reached"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "check_chips_three_states"
+description = "Each of the nine check chips shows its check name and one of three visible states — pass, fail, or not run — and activating a failing chip reveals that check's violation detail text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.17"
+name = "check_chip_links_to_run_evidence"
+description = "After a run has completed, activating any check chip jumps to and highlights that check's step in the run evidence log"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.18"
+name = "audit_timeline_event_coverage"
+description = "The audit timeline lists the record's events in order with timestamps, covering run started, step transitions, run completed, verdict changes, feedback entries, fixes applied, escalation, resolution, and report exports where those events have occurred"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.19"
+name = "run_nine_steps_fixed_order"
+description = "Clicking Run checks starts a simulated run decomposed into nine visible steps in the fixed order package-shape, task-config, rubric-wiring, file-modes, harvest, container-parity, dependency-pinning, foils, scoring-contract, each showing the check name and a status that advances visibly through pending, running, and complete or failed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "retry_backoff_attempt_counter"
+description = "During a run, a transiently failing step shows a retrying state with a visible backoff countdown and an attempt counter (such as retry 2 of 3) before the retry executes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "deterministic_outcomes_with_violations"
+description = "Running checks twice on the same unfixed record produces the same final pass and fail outcomes both times, and each step that finishes failed shows an inline violation detail naming what the check found"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.22"
+name = "pause_resume_checkpoint"
+description = "Pausing a running audit freezes step progression at the current step; resuming continues from exactly that step, and steps already completed keep their original outputs and timestamps without re-executing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "run_rollup_derives_live"
+description = "A run-level rollup shows completed count out of 9, elapsed duration, and failure count, and updates as the steps advance"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "run_evidence_log_filter_highlight"
+description = "The run evidence log lists step transitions in order with timestamps, can be filtered by status, and selecting a log entry highlights the corresponding step"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "run_completion_updates_cohere"
+description = "When a run finishes, the record's check chips, its queue row checks summary, its stage badge (pending becomes checked, or held when any check failed), the rollup strip, and the audit timeline all reflect the same run outcome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "batch_run_over_filtered_set"
+description = "With queue filters applied, a Run checks on all filtered control starts a batch run across every visible record, showing per-task progress as task m of n alongside the current task's nine step statuses, and each included record's chips and queue row update as its portion completes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "batch_pause_and_rollup_refresh"
+description = "A batch run can be paused and resumed at the current step of the current task, and when the batch finishes the rollup strip reflects every included record's new outcomes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "rubric_lists_ten_named_criteria"
+description = "The rubric panel lists exactly the ten admission criteria by name: runtime-crux-load-bearing, premise-truthful, question-non-leaking, rubric-scope-alignment, positive-criteria-grade-meaning, negative-criteria-grounded, golden-answer-faithful, foils-discriminating, difficulty-substantive, trial-evidence-valid"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "guidance_disclosure_behavior"
+description = "Each criterion row has a guidance disclosure that is collapsed by default, expands and collapses on activation with a rotating chevron cue, shows guidance text when open, and remembers its open state per criterion while the app stays open"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "rubric_gated_on_first_run"
+description = "Before a record has any completed check run, the rubric panel shows a notice that checks must run first and the verdict toggles are disabled; after the first completed run the toggles become active"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "fail_verdict_requires_rationale"
+description = "Setting a criterion to fail opens a rationale field requiring at least 15 characters; attempting to save a fail verdict with a shorter rationale shows an inline message naming the rationale field and the verdict is not saved"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "failed_verdict_reveals_rationale"
+description = "Activating a failed criterion's verdict chip reveals the saved rationale text for that criterion"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "admission_outcome_banner_derives"
+description = "The admission outcome banner recomputes immediately as verdicts change: all ten criteria passing (with all nine checks passed) shows Admitted, and any failed criterion shows Held with each failing criterion named"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "verdict_change_propagates"
+description = "Changing a criterion verdict updates the record's criteria summary in the queue row, the criterion rollup cells and failure-ranking chart, and the stage badge without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "feedback_thread_entry_anatomy"
+description = "The feedback thread lists timestamped entries, each showing the reviewer name, a structured verdict chip that is one of Approve, Approve with caveats, Needs edit, or Reject, and the findings text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "feedback_form_validation"
+description = "The add-entry form has a reviewer select listing the nine seeded reviewers (Dana Whitfield, Marcus Okafor, Elena Vasquez, Priya Nair, Jonas Keller, Ruth Alvarez, Samir Haddad, Ingrid Larsen, Felix Moreau), a verdict select, and a findings field requiring at least 20 characters; submit stays disabled until all three are valid and inline messages name any invalid field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.37"
+name = "feedback_submit_propagates"
+description = "Submitting a valid feedback entry appends exactly one entry to the thread, increases the queue row's feedback entry count by one, updates that reviewer's rollup cell, and stamps the audit timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "reviewer_detail_view"
+description = "The Reviewers view lists the nine reviewers with entry counts, and choosing a reviewer opens a detail view listing every entry they have made across records — each linking back to its record's detail view in-app — together with a verdict distribution summary showing counts per verdict"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "escalation_flow"
+description = "A held record's Escalate control opens a form with a category select (Spec conflict, Tooling gap, Dataset defect, Scoring disagreement) and a summary field requiring at least 20 characters; submitting a valid escalation moves the stage to escalated, shows the category and summary on the detail view, and stamps the timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "resolve_after_escalation"
+description = "An escalated record shows a Resolve control that requires a resolution note, and resolving moves the stage to resolved and stamps the timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "fix_and_reaudit_flip_rule"
+description = "After activating Apply simulated fixes on a held record, re-running checks flips the outcome deterministically — every check that failed in the previous run now passes, every check that passed stays passing — and the stage becomes re-audited"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "reaudit_reaches_resolved"
+description = "A re-audited record whose nine checks all pass reaches resolved once all ten criteria are set to pass, with the fix, re-run, and verdict events shown in order on the timeline"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "report_summary_sections"
+description = "The Report view's Audit Report Markdown (and matching datasetSummary / checkPassRates / criterionFailureRanking / reviewerActivity in Audit Package JSON) shows admitted, held, escalated, and resolved counts plus the total; a check pass-rate table with one row per check showing passes, fails, and pass rate; a criterion failure ranking ordering the ten criteria by failure count; and reviewer activity with each reviewer's entry count and verdict mix"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "report_appendix_per_touched_task"
+description = "The Audit Report Markdown includes a per-task appendix with one entry for every record touched during the session (any run, verdict change, feedback entry, fix, escalation, or resolution) showing its slug, current stage, check outcomes, each failed criterion with its rationale text, and its feedback verdicts, and the matching tasks entries appear in Audit Package JSON"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "report_tracks_session_state"
+description = "Changing session state and returning to the Report view regenerates both export previews — running more checks, failing a criterion, or adding feedback alters the summary numbers, appendix content, and JSON field values accordingly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "copy_export_with_confirmation"
+description = "A Copy export control puts the exact visible preview text (Audit Package JSON or Audit Report Markdown for the active format) on the clipboard and gives visible confirmation of the copy"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "export_stamps_history_and_timelines"
+description = "Copying or downloading an export appends a timestamped export-history entry with the active format in the Report view header and stamps a report-export event on the audit timeline of every session-touched appendix record"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "feedback_entry_field_contract"
+description = "The add-entry form enforces the FeedbackEntry field contract with inline errors naming each offending field and submit disabled until valid: reviewer from the nine seeded names, verdict exactly one of Approve / Approve with caveats / Needs edit / Reject, and findings at least 20 characters after trim; violations create no entry"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "criterion_fail_verdict_field_contract"
+description = "Saving a fail verdict enforces the CriterionFailVerdict field contract: criterion from the ten admission criteria, verdict exactly fail, and rationale at least 15 characters after trim; a shorter rationale shows an inline message naming the rationale field and is not saved"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "escalation_and_resolution_field_contracts"
+description = "Escalate enforces category from Spec conflict / Tooling gap / Dataset defect / Scoring disagreement and summary at least 20 characters; Resolve enforces note at least 15 characters; violations show named field errors and leave the stage unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "audit_package_json_field_contract"
+description = "The Report view's Audit Package JSON preview shows schemaVersion exactly quality-audit-package-v1, exportedAt as an ISO-8601 string ending in Z, and required keys datasetSummary, checkPassRates, criterionFailureRanking, reviewerActivity, tasks, and exportHistory with field names visible in the preview text; Copy and Download are available"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "download_export_matches_preview"
+description = "A Download export control offers the visible preview as a downloadable file for the active format (JSON or markdown) whose contents match the preview text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.53"
+name = "audit_package_import_round_trip"
+description = "Import package accepts pasted or file-picked Audit Package JSON matching the export field contract; a valid import reconstructs records, stages, checks, criteria, feedback, and rollups so the next export preview matches, and malformed or contract-breaking JSON shows an inline error naming the offending field and leaves the desk unchanged"
+type = "binary"
+weight = 1.0
+

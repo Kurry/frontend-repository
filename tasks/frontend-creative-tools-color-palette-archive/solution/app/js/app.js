@@ -10,7 +10,7 @@ import { openEditor, closeEditor, isEditorOpen, initEditorDrag } from './editor.
 import {
   openExport, closeExport, renderExportDrawer, copyExport, downloadExport, printCatalog, runImport,
   openCompare, closeCompare, renderCompare, openBatchTag, applyBatchTag, closeBatchTag,
-  initPopup, dismissPopup, submitPopup,
+  initPopup, showPopup, dismissPopup, submitPopup,
   openMenu, closeMenu, openCart, closeCart, initCoachmark, dismissCoachmark,
 } from './overlays.js';
 import { requestDelete } from './app-bridge.js';
@@ -204,6 +204,7 @@ $('#batch-tag-cancel').addEventListener('click', closeBatchTag);
 
 $('#popup-close').addEventListener('click', () => dismissPopup());
 $('#popup-form').addEventListener('submit', (e) => { e.preventDefault(); submitPopup(); });
+$('#footer-newsletter').addEventListener('click', () => showPopup());
 initPopup();
 
 // ---------- menu + cart + coachmark ----------------------------------------------------------------

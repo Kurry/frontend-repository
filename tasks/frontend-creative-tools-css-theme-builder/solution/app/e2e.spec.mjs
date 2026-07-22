@@ -111,3 +111,32 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test('mobile panels stack in document flow without overlap', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto(BASE);
+  await page.waitForLoadState('networkidle');
+
+  const layout = await page.evaluate(() => {
+    const box = (selector) => {
+      const element = document.querySelector(selector);
+      const rect = element.getBoundingClientRect();
+      return {
+        top: rect.top,
+        bottom: rect.bottom,
+        height: rect.height,
+        scrollHeight: element.scrollHeight,
+      };
+    };
+    return {
+      themes: box('#themes-panel'),
+      editor: box('#editor-panel'),
+      preview: box('.preview-panel'),
+    };
+  });
+
+  expect(layout.editor.top).toBeGreaterThanOrEqual(layout.themes.bottom - 1);
+  expect(layout.preview.top).toBeGreaterThanOrEqual(layout.editor.bottom - 1);
+  expect(layout.themes.height).toBeGreaterThanOrEqual(layout.themes.scrollHeight - 1);
+  expect(layout.editor.height).toBeGreaterThanOrEqual(layout.editor.scrollHeight - 1);
+});

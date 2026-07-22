@@ -464,6 +464,11 @@ def test_task_directory_config_parallelizes_the_pinned_suite(tmp_path: Path) -> 
 
     assert "fullyParallel: true" in result.stdout
     assert "workers: 4" in result.stdout
+    assert "name: 'functional'" in result.stdout
+    assert "testIgnore: '**/performance.spec.{mjs,cjs,js,ts,tsx,jsx}'" in result.stdout
+    assert "name: 'performance'" in result.stdout
+    assert "dependencies: ['functional']" in result.stdout
+    assert "fullyParallel: false" in result.stdout
 
 
 @requires_playwright_test

@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "habit_controls_keyboard_reachable"
+description = "Every interactive control — New Habit fields, category chips, steppers, one-tap complete, drag handle, Pause/Resume, Export as JSON, Import, and Load Malformed Sample — is reachable with keyboard Tab and activatable with Enter or Space, and shows a clearly visible focus indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "import_dialog_traps_and_restores_focus"
+description = "The Import confirmation dialog traps focus while open and returns focus to the invoking Import control on Cancel or Confirm close"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "chrome_icons_have_accessible_names"
+description = "App chrome icons (Phosphor set) used as controls expose accessible names via aria-label or equivalent text, and decorative icons are hidden from assistive tech"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "recovery_and_malformed_use_alert_live_region"
+description = "The recovery notice and Load Malformed Sample outcome are announced through a role=alert live region without requiring focus to move to them"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "new_habit_fields_explicitly_labeled"
+description = "New Habit form fields (name, icon, targetType, targetCount, category, reminder) and category-create name use explicit labels programmatically associated with their inputs; inline field-contract errors are adjacent to and associated with the named field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "view_headings_logical_order"
+description = "View titles for habits, Stats, Heatmap, and Import/Data use a logical heading order without skipping levels (for example H1 then H2)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "main_landmark_for_habit_shell"
+description = "The habit list / Stats / Heatmap shell exposes a main landmark (or equivalent) so keyboard and assistive-tech users can jump past chrome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "habit_text_and_controls_contrast"
+description = "Primary text (#1B2430 on #F4F7F6/#FFFFFF), muted secondary text, primary buttons (#0F9D74 with white text), and category chips maintain sufficient contrast for readable labels and active states"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "semantic_buttons_for_checkin_and_filters"
+description = "Check-in, stepper, category filter chips, Pause/Resume, Export as JSON, and Import use semantic button (or equivalent role=button) controls rather than bare non-interactive divs"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "reduced_motion_drops_celebration"
+description = "With prefers-reduced-motion set, decorative animations and the streak-milestone confetti celebration are removed or reduced while check-in state, flame treatment, and list membership still update instantly and correctly"
+type = "binary"
+weight = 1.0
+

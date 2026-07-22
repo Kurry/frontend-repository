@@ -773,5 +773,44 @@ test.describe('Northstar Collective — Criteria Tests', () => {
     expect(footerText).toContain('Privacy Policy');
     expect(footerText).toContain('Terms & Conditions');
   });
+  test('4.22 debranded_portfolio_assets_are_local_and_distinct', async ({ page }) => {
+    const requests = [];
+    page.on('request', request => requests.push(request.url()));
+    await page.goto('http://localhost:3000');
+
+    // Exercise the real lazy-loading path before asserting decoded dimensions.
+    // The portfolio and brand grids sit below the full-viewport hero, so their
+    // images are not required to be complete immediately after navigation.
+    await page.locator('#portfolio').scrollIntoViewIfNeeded();
+    await expect.poll(() => page.locator('#portfolio img.particle').evaluateAll(images =>
+      images.every(image => image.complete && image.naturalWidth > 0)
+    )).toBe(true);
+    await page.locator('#brand-grid').scrollIntoViewIfNeeded();
+    await expect.poll(() => page.locator('#brand-grid img').evaluateAll(images =>
+      images.every(image => image.complete && image.naturalWidth > 0)
+    )).toBe(true);
+
+    expect(requests.every(url => url.startsWith('http://localhost:3000') || url.startsWith('data:'))).toBe(true);
+
+    const particles = await page.locator('#portfolio img.particle').evaluateAll(images =>
+      images.map(image => ({ src: image.getAttribute('src'), loaded: image.complete && image.naturalWidth > 0 }))
+    );
+    expect(particles).toHaveLength(12);
+    expect(new Set(particles.map(image => image.src)).size).toBe(12);
+    expect(particles.every(image => image.loaded && image.src.startsWith('/assets/portfolio/'))).toBe(true);
+
+    const marks = await page.locator('#brand-grid img').evaluateAll(images =>
+      images.map(image => ({ src: image.getAttribute('src'), loaded: image.complete && image.naturalWidth > 0 }))
+    );
+    expect(marks).toHaveLength(11);
+    expect(new Set(marks.map(mark => mark.src)).size).toBe(11);
+    expect(marks.filter(mark => mark.src.endsWith('.svg'))).toHaveLength(10);
+    expect(marks.filter(mark => mark.src.endsWith('.png'))).toHaveLength(1);
+    expect(marks.every(mark => mark.loaded && mark.src.startsWith('/assets/brands/'))).toBe(true);
+
+    const manifest = await page.evaluate(async () => (await fetch('/favicon/site.webmanifest')).json());
+    expect(manifest.name).toBe('Northstar Collective');
+    expect(manifest.short_name).toBe('Northstar');
+  });
   // DROPPED (fails against live oracle — selector/DOM mismatch, pending session triage): test '15.11 consent_and_briefing_labels_exact'
 });

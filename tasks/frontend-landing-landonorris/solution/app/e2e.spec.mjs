@@ -111,3 +111,77 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+// Writing-dimension criterion tests. Each asserts a browser-observable string
+// or copy behavior mandated by instruction.md (uppercase nav convention,
+// specific action labels, newsletter validation/confirmation copy, exact
+// mandated chrome strings, fictional-brand terminology, press-kit empty-state
+// and import-error phrasing). Uses the canonical `test`/`expect` above, which
+// also enforces zero console/page errors during each flow.
+test.describe('writing (criterion suite)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('15.1 nav_menu_uppercase_convention', async ({ page }) => {
+    const labels = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('[data-menu-link], [data-store-cta], [data-social-link], .nav-menu-link'))
+        .map((el) => el.innerText.trim())
+        .filter((t) => t.length > 0));
+    expect(labels.length, 'nav/store/social labels present').toBeGreaterThan(0);
+    for (const text of labels) expect(text).toBe(text.toUpperCase());
+  });
+
+  test('15.2 action_labels_specific', async ({ page }) => {
+    const submitBtnText = await page.evaluate(() => {
+      const btn = document.querySelector('.newsletter-submit');
+      return btn ? btn.innerText.trim() : '';
+    });
+    expect(submitBtnText).toBe('Subscribe');
+  });
+
+  test('15.3 newsletter_errors_name_email_and_fix', async ({ page }) => {
+    await page.evaluate(() => {
+      const input = document.getElementById('newsletterEmail');
+      input.value = 'invalid';
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    const errorMsg = (await page.locator('#newsletterMsg').innerText()).toLowerCase();
+    expect(errorMsg).toContain('email');
+    expect(errorMsg).toContain('@');
+    expect(errorMsg).toContain('dot');
+  });
+
+  test('15.4 exact_mandated_chrome_strings', async ({ page }) => {
+    expect(await page.title()).toBe('2025 Apex Grand Prix Driver — Avery Vale');
+    const preloaderText = await page.locator('#preloader .transition-label').textContent();
+    expect(preloaderText.trim()).toBe('LOAD VALE');
+  });
+
+  test('15.6 avery_vale_terminology_consistent', async ({ page }) => {
+    const bodyText = await page.evaluate(() => document.body.innerText);
+    expect(bodyText).toContain('Avery Vale');
+    expect(bodyText).toContain('Nova Racing');
+    expect(bodyText).not.toContain('Lando Norris');
+  });
+
+  test('15.9 press_kit_empty_state_plain_language', async ({ page }) => {
+    await page.click('#pressKitBtn');
+    await page.waitForTimeout(500);
+    await page.click('[data-tab="markdown"]');
+    const preview = (await page.locator('[data-presskit-preview]').textContent()).toLowerCase();
+    // Empty selection/shortlist are described in plain language, not jargon or a blank preview.
+    expect(preview).toContain('is empty');
+  });
+
+  test('15.10 import_errors_are_named_and_specific', async ({ page }) => {
+    await page.click('#pressKitBtn');
+    await page.waitForTimeout(500);
+    await page.fill('[data-import-area]', '{"schemaVersion": 1}');
+    await page.click('[data-import-paste]');
+    const msg = (await page.locator('[data-import-msg]').textContent()).toLowerCase();
+    // A malformed import surfaces a specific, named error rather than failing silently.
+    expect(msg).toContain('import error');
+  });
+});

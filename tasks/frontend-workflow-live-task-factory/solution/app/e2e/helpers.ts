@@ -2,12 +2,12 @@ import { expect, type Download, type Page } from '@playwright/test';
 
 export async function boot(page: Page, preserve = false) {
   if (!preserve) {
-    await page.addInitScript(() => {
-      if (!sessionStorage.getItem('e2e-storage-initialized')) {
-        localStorage.clear();
-        sessionStorage.setItem('e2e-storage-initialized', 'true');
-      }
-    });
+    const resetMarker = `e2e-reset-${Date.now()}-${Math.random()}`;
+    await page.addInitScript((marker) => {
+      if (sessionStorage.getItem(marker)) return;
+      localStorage.clear();
+      sessionStorage.setItem(marker, 'done');
+    }, resetMarker);
   }
   await page.goto('/');
   await expect(page.getByText('Demo data', { exact: true })).toBeVisible();
@@ -568,10 +568,13 @@ export async function interleavedRunProbe(page: Page) {
 }
 
 export async function coldStartProbe(page: Page) {
-  const start = Date.now();
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'TaskFoundry' })).toBeVisible();
-  expect(Date.now() - start).toBeLessThan(2_000);
+  const navigationDuration = await page.evaluate(() => {
+    const [entry] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    return entry?.duration ?? performance.now();
+  });
+  expect(navigationDuration).toBeLessThan(2_000);
 }
 
 export async function paletteProbe(page: Page) {

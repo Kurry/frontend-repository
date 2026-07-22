@@ -1,0 +1,196 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "4.1"
+name = "empty_queue_state_present"
+description = "When the file queue is empty, an empty-state message explains that chosen files will appear there."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.2"
+name = "field_contracts_validate_inline"
+description = "PeerIdentity, JoinSession, ChatMessage, and Import Session validate inline before commit, naming the offending field."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.3"
+name = "field_contract_errors_name_field"
+description = "Field-contract errors name the field (displayName, roomId, text, or the import offender) rather than only saying Invalid."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.4"
+name = "copy_session_pack_shows_confirmation"
+description = "Copy in Export Session shows a visible confirmation after placing Session Pack JSON on the clipboard."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.5"
+name = "connecting_badge_shows_in_progress"
+description = "Immediately after a valid Join Room, the connection badge shows a connecting label before settling to waiting for peer within 5 seconds."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.6"
+name = "leave_room_cancels_pending_attempt"
+description = "Leave Room cancels a connecting or waiting attempt immediately, returning the badge to disconnected without requiring a reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.7"
+name = "disabled_composer_note_explains_why"
+description = "While idle or disconnected, the disabled composer has a nearby note explaining that sending is unavailable because no session is active."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.8"
+name = "controls_use_semantic_tags"
+description = "Buttons, inputs, and labels use semantic tags."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.9"
+name = "export_import_surfaces_support_close"
+description = "Export Session and Import Session surfaces can be dismissed via an explicit close control and/or Escape."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.10"
+name = "long_flows_show_progress"
+description = "Long task flows provide progress or feedback steps."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.11"
+name = "reload_mid_transfer_restores_paused"
+description = "Reloading the page while a row is Transferring restores that row as Paused at its saved progress readout — never as Transferring and never reset to zero"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.12"
+name = "remove_all_returns_empty_state"
+description = "Selecting every queue row and clicking Remove Selected returns the queue to its empty-state message, hides the bulk action bar, and clears the select-all checkbox"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.13"
+name = "import_rejects_invalid_transfer_fields"
+description = "Importing a Session Pack whose fileQueue contains status transferring, a bytesTransferred outside 0 to sizeBytes, or a transferLog event outside the closed enum shows validation naming the offending field and changes nothing"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "4.14"
+name = "zero_byte_file_completes_cleanly"
+description = "Starting a transfer for a zero-byte file completes it immediately at 100 percent with no malformed readout (no NaN, Infinity, or negative values)"
+type = "binary"
+weight = 0.5
+
