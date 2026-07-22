@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, SkipForward, RotateCcw, Plus, FileUp, FileDown, Activity, Calendar, FileJson, Clock } from 'lucide-react';
+import { registerWebMCP } from './webmcp';
 
 // Fixture setup
 const generateFixture = () => {
@@ -37,18 +38,29 @@ export default function App() {
   const [currentRep, setCurrentRep] = useState(1);
   const [takes, setTakes] = useState(fixture.takes);
   const [schedule, setSchedule] = useState([{ day: 3, loop: 'loop-1', status: 'due' }]);
+  const [loopName, setLoopName] = useState('');
+  const [loopReps, setLoopReps] = useState(5);
+  const importRef = useRef(null);
+  const stateRef = useRef(null);
 
-  // Simulated WebMCP Hook
+  stateRef.current = { loops, selectedRange, sessionState, currentBPM, takes, schedule };
+
   useEffect(() => {
-    window.appState = {
-      loops,
-      selectedRange,
-      sessionState,
-      currentBPM,
-      takes,
-      schedule
-    };
-  }, [loops, selectedRange, sessionState, currentBPM, takes, schedule]);
+    registerWebMCP({
+      state: () => stateRef.current,
+      select: (type, objectId) => type === 'practice-loop' ? loops.some(loop => loop.id === objectId) : type === 'take-event' ? takes.some(take => take.events.some((_, index) => `${take.id}-event-${index}` === objectId)) : false,
+      createLoop: values => { const loop = { id: `loop-${Date.now()}`, ...values }; setLoops(current => [...current, loop]); return loop; },
+      deleteLoop: objectId => { const exists = loops.some(loop => loop.id === objectId); if (exists) setLoops(current => current.filter(loop => loop.id !== objectId)); return exists; },
+      updateLoop: (objectId, property, value) => { const exists = loops.some(loop => loop.id === objectId); if (exists) setLoops(current => current.map(loop => loop.id === objectId ? { ...loop, [property]: value } : loop)); return exists; },
+      setRange: setSelectedRange,
+      showMode: mode => document.querySelector(`[data-workspace="${mode}"]`)?.scrollIntoView({ behavior: 'auto', block: 'center' }),
+      toggleSchedule: (day, loopId) => { const existing = schedule.find(item => item.day === day && item.loop === loopId); const status = existing?.status === 'approved' ? 'due' : 'approved'; setSchedule(current => existing ? current.map(item => item === existing ? { ...item, status } : item) : [...current, { day, loop: loopId, status }]); return status; },
+      start: () => { startSession(); return true; }, pause: pauseSession,
+      resume: resumeSession, stop: () => { setSessionState('idle'); return true; }, restart: () => { startSession(); return true; },
+      exportArtifact: handleExport, openImport: () => importRef.current?.click(),
+      copyDossier: () => { const text = JSON.stringify(makeDossier()); navigator.clipboard?.writeText(text); return text.length; },
+    });
+  });
 
   const handleBrush = (m) => {
     setSelectedRange(prev => {
@@ -60,10 +72,10 @@ export default function App() {
   const createLoop = () => {
       setLoops([...loops, {
           id: `loop-${Date.now()}`,
-          name: `Loop ${selectedRange.start}-${selectedRange.end}`,
+          name: loopName.trim() || `Loop ${selectedRange.start}-${selectedRange.end}`,
           start: selectedRange.start,
           end: selectedRange.end,
-          reps: 5,
+          reps: Number(loopReps),
           rules: 'standard'
       }]);
   };
@@ -73,21 +85,33 @@ export default function App() {
       setSessionTick(0);
       setCurrentRep(1);
   };
+  const pauseSession = () => { if (stateRef.current.sessionState !== 'playing') return false; setSessionState('paused'); return true; };
+  const resumeSession = () => { if (stateRef.current.sessionState !== 'paused') return false; setSessionState('playing'); return true; };
 
-  const handleExport = () => {
-      const data = {
+  const makeDossier = () => ({
           schemaVersion: "music-practice-dossier/v1",
           exportedAt: new Date().toISOString(),
           loops,
           sessionState,
           takes,
           schedule
+      });
+
+  const handleExport = (format = 'practice-dossier-json') => {
+      const data = makeDossier();
+      const variants = {
+        'practice-dossier-json': { contents: JSON.stringify(data, null, 2), type: 'application/json', name: 'practice_dossier.json' },
+        'practice-events-csv': { contents: `take,event,measure,beat,type\n${takes.flatMap(take => take.events.map((event, index) => `${take.id},${index},${event.measure},${event.beat},${event.type}`)).join('\n')}`, type: 'text/csv', name: 'practice_events.csv' },
+        'score-overlay-svg': { contents: `<svg xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Practice score overlay"><text x="10" y="24">Measures ${selectedRange.start}-${selectedRange.end}</text></svg>`, type: 'image/svg+xml', name: 'score_overlay.svg' },
+        'practice-schedule-ics': { contents: `BEGIN:VCALENDAR\nVERSION:2.0\n${schedule.map(item => `BEGIN:VEVENT\nUID:${item.loop}-day-${item.day}@practice-studio\nSUMMARY:Practice ${item.loop}\nDTSTART;VALUE=DATE:202601${String(item.day).padStart(2, '0')}\nEND:VEVENT`).join('\n')}\nEND:VCALENDAR`, type: 'text/calendar', name: 'practice_schedule.ics' },
+        'practice-summary-md': { contents: `# Practice Summary\n\nLoops: ${loops.length}\nTakes: ${takes.length}\n`, type: 'text/markdown', name: 'practice_summary.md' },
       };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const artifact = variants[typeof format === 'string' ? format : 'practice-dossier-json'] || variants['practice-dossier-json'];
+      const blob = new Blob([artifact.contents], { type: artifact.type });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'practice_dossier.json';
+      a.download = artifact.name;
       a.click();
   };
 
@@ -119,17 +143,18 @@ export default function App() {
         <div className="flex gap-2">
           <label className="flex items-center gap-2 px-3 py-1.5 text-sm border rounded bg-white hover:bg-gray-50 cursor-pointer">
             <FileUp className="w-4 h-4" /> Import
-            <input type="file" className="hidden" accept=".json" onChange={handleImport} />
+            <input ref={importRef} type="file" className="hidden" accept=".json" onChange={handleImport} />
           </label>
-          <button onClick={handleExport} className="flex items-center gap-2 px-3 py-1.5 text-sm border rounded bg-white hover:bg-gray-50">
+          <button onClick={() => handleExport()} className="flex items-center gap-2 px-3 py-1.5 text-sm border rounded bg-white hover:bg-gray-50">
             <FileDown className="w-4 h-4" /> Export
           </button>
+          <button onClick={() => navigator.clipboard?.writeText(JSON.stringify(makeDossier()))} className="px-3 py-1.5 text-sm border rounded bg-white hover:bg-gray-50">Copy JSON</button>
         </div>
       </header>
 
       <main className="flex-1 overflow-auto flex flex-col p-6 gap-6 max-w-7xl mx-auto w-full">
         {/* Score Range & Loop Editor */}
-        <section className="bg-white p-6 rounded-lg shadow-sm border flex flex-col gap-4">
+        <section data-workspace="score" className="bg-white p-6 rounded-lg shadow-sm border flex flex-col gap-4">
           <h2 className="text-lg font-semibold flex items-center gap-2">Score Strip & Brush</h2>
           <div className="w-full overflow-x-auto border rounded bg-gray-50 p-4 min-h-[120px] flex items-center" tabIndex={0} onKeyDown={(e) => {
               if (e.key === 'ArrowRight') setSelectedRange(prev => ({...prev, end: Math.min(64, prev.end + 1)}));
@@ -156,11 +181,11 @@ export default function App() {
           <div className="flex items-end gap-4">
             <div className="flex-1">
                <label className="block text-sm font-medium text-gray-700 mb-1">New Loop Name</label>
-               <input type="text" className="w-full border rounded px-3 py-2 text-sm" placeholder={`Phrase ${selectedRange.start}-${selectedRange.end}`} />
+               <input type="text" value={loopName} onChange={event => setLoopName(event.target.value)} className="w-full border rounded px-3 py-2 text-sm" placeholder={`Phrase ${selectedRange.start}-${selectedRange.end}`} />
             </div>
             <div>
                <label className="block text-sm font-medium text-gray-700 mb-1">Repetitions</label>
-               <input type="number" className="w-24 border rounded px-3 py-2 text-sm" defaultValue={5} />
+               <input type="number" min="1" max="100" className="w-24 border rounded px-3 py-2 text-sm" value={loopReps} onChange={event => setLoopReps(event.target.value)} />
             </div>
             <button onClick={createLoop} className="bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium hover:bg-blue-700 flex items-center gap-2">
               <Plus className="w-4 h-4" /> Create Loop
@@ -170,7 +195,7 @@ export default function App() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Tempo Ramp Composer */}
-          <section className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border flex flex-col gap-4">
+          <section data-workspace="tempo" className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border flex flex-col gap-4">
              <h2 className="text-lg font-semibold">Tempo Curve Editor</h2>
              <div className="h-48 border rounded bg-gray-50 flex items-end p-4 relative group">
                 <svg className="w-full h-full overflow-visible" preserveAspectRatio="none">
@@ -201,7 +226,7 @@ export default function App() {
                         <div className="text-5xl font-mono text-gray-800">{currentBPM} <span className="text-lg text-gray-500">BPM</span></div>
                         <div className="text-sm text-gray-500 uppercase tracking-widest font-bold">Repetition {currentRep} of 5</div>
                         <div className="flex gap-4 mt-4">
-                            <button onClick={() => setSessionState('idle')} className="p-4 bg-red-100 text-red-600 rounded-full hover:bg-red-200 shadow-sm"><Pause className="w-8 h-8" fill="currentColor" /></button>
+                            <button onClick={pauseSession} className="p-4 bg-red-100 text-red-600 rounded-full hover:bg-red-200 shadow-sm"><Pause className="w-8 h-8" fill="currentColor" /></button>
                         </div>
                     </>
                 ) : (
@@ -210,7 +235,7 @@ export default function App() {
                         <div className="text-sm text-gray-400 uppercase tracking-widest font-bold">Ready</div>
                         <div className="flex gap-4 mt-4">
                             <button className="p-3 bg-gray-200 text-gray-500 rounded-full cursor-not-allowed"><RotateCcw className="w-6 h-6" /></button>
-                            <button onClick={startSession} className="p-4 bg-blue-600 text-white rounded-full hover:bg-blue-700 shadow-lg"><Play className="w-8 h-8" fill="currentColor" /></button>
+                            <button onClick={sessionState === 'paused' ? resumeSession : startSession} className="p-4 bg-blue-600 text-white rounded-full hover:bg-blue-700 shadow-lg"><Play className="w-8 h-8" fill="currentColor" /></button>
                             <button className="p-3 bg-gray-200 text-gray-500 rounded-full cursor-not-allowed"><SkipForward className="w-6 h-6" /></button>
                         </div>
                     </>
@@ -220,7 +245,7 @@ export default function App() {
         </div>
 
         {/* Take Comparison & Alignment */}
-        <section className="bg-white p-6 rounded-lg shadow-sm border flex flex-col gap-4">
+        <section data-workspace="takes" className="bg-white p-6 rounded-lg shadow-sm border flex flex-col gap-4">
           <h2 className="text-lg font-semibold flex justify-between">
               Take Comparison & Event Alignment
               <span className="text-sm font-normal text-blue-600 hover:underline cursor-pointer">Accept Alignment</span>
@@ -252,7 +277,7 @@ export default function App() {
         </section>
 
         {/* Schedule & Performance Plan */}
-        <section className="bg-white p-6 rounded-lg shadow-sm border flex flex-col gap-4">
+        <section data-workspace="schedule" className="bg-white p-6 rounded-lg shadow-sm border flex flex-col gap-4">
           <h2 className="text-lg font-semibold flex items-center gap-2"><Calendar className="w-5 h-5 text-purple-600"/> 21-Day Schedule & Evaluator</h2>
           <div className="grid grid-cols-7 gap-2">
              {Array.from({length: 21}).map((_, i) => {
