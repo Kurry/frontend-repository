@@ -38,7 +38,9 @@ export const invokeTool = (page, name, args = {}) => page.evaluate(async ([n, a]
 
 test.describe('workspace contract (canonical)', () => {
   test('serves non-empty app with zero console errors', async ({ page }) => {
-    await page.goto(BASE);
+    const response = await page.goto(BASE);
+    expect(response, 'navigation returns an HTTP response').not.toBeNull();
+    expect(response.ok(), `HTTP ${response.status()} from ${response.url()}`).toBe(true);
     await page.waitForLoadState('networkidle');
     const len = await page.evaluate(() => document.body?.innerText?.trim().length ?? 0);
     expect(len, 'body renders visible content').toBeGreaterThan(0);
@@ -53,28 +55,37 @@ test.describe('workspace contract (canonical)', () => {
       invoke_tool: typeof window.webmcp_invoke_tool,
     }));
     expect(kinds).toEqual({ session_info: 'function', list_tools: 'function', invoke_tool: 'function' });
+    const session = await page.evaluate(async () => {
+      const value = await window.webmcp_session_info();
+      return typeof value === 'string' ? JSON.parse(value) : value;
+    });
+    expect(session, 'webmcp_session_info returns metadata').toBeTruthy();
+    expect(Array.isArray(session), 'session metadata is an object, not an array').toBe(false);
+    expect(typeof session, 'session metadata is an object').toBe('object');
+    expect(Object.keys(session).length, 'session metadata is non-empty').toBeGreaterThan(0);
     const tools = await listTools(page);
     const arr = Array.isArray(tools) ? tools : tools?.tools ?? [];
     expect(arr.length, 'at least one webmcp tool registered').toBeGreaterThan(0);
-    for (const t of arr) expect(typeof (t.name ?? t.id), 'every tool has a name').toBe('string');
+    const names = arr.map((t) => t?.name ?? t?.id);
+    for (const name of names) {
+      expect(typeof name, 'every tool has a name').toBe('string');
+      expect(name.trim().length, 'tool names are non-empty').toBeGreaterThan(0);
+    }
+    expect(new Set(names).size, 'tool names are unique').toBe(names.length);
   });
 
   test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto(BASE);
-    // Load fully first: animations kicked off during hydration or by
-    // late-arriving resources must fall inside the observation window, so the
-    // sampling loop only starts once the page is settled.
-    await page.waitForLoadState('networkidle');
+    // Start observing at navigation commit, before short intro animations can
+    // finish and disappear from document.getAnimations(). Sampling only after
+    // networkidle/settle would falsely pass a forbidden sub-second animation.
+    await page.goto(BASE, { waitUntil: 'commit' });
     // Precondition sanity check: the emulation actually reaches the app.
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
-    await page.waitForTimeout(250); // small settle after idle
-    // Observe every frame across a 1.5s window and assert on what was seen.
-    // Finished, idle, or paused effects and durations <=1ms are allowed; any
-    // meaningfully timed RUNNING effect at any sample is a reduced-motion
-    // failure. Apps with zero animations pass vacuously (the render/console
-    // test still gates them).
+    // Observe every frame through the intro/settle window. Finished, idle, or
+    // paused effects and durations <=1ms are allowed; any meaningfully timed
+    // running effect at any sample is a reduced-motion failure.
     const offenders = await page.evaluate(async () => {
       const seen = new Map();
       const deadline = performance.now() + 1500;
@@ -97,6 +108,7 @@ test.describe('workspace contract (canonical)', () => {
       }
       return [...seen.values()];
     });
+    await page.waitForLoadState('networkidle');
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
