@@ -585,7 +585,7 @@ test.describe('Command Center E2E', () => {
       page.getByRole('button', { name: 'Redo' }),
     ];
     for (const button of namedButtons) {
-      const name = (await button.evaluate((el) => el.textContent?.trim() || el.getAttribute('aria-label') || '')).trim();
+      const name = (await button.evaluate((el) => el.textContent?.trim() || el.ariaLabel || '')).trim();
       expect(genericLabels.has(name), `action label "${name}" is a specific verb, not a generic one`).toBe(false);
     }
     await page.getByRole('button', { name: 'Export session', exact: true }).first().click();
