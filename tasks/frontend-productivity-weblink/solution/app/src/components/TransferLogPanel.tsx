@@ -11,7 +11,10 @@ function formatLogTime(iso: string): string {
 export default function TransferLogPanel() {
   const reducedMotion = usePrefersReducedMotion();
   return (
-    <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-800/60 mt-4 flex flex-col max-h-[300px]">
+    <section
+      class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-colors dark:border-slate-800 dark:bg-slate-800/60 mt-4 flex flex-col max-h-[300px]"
+      data-testid="transfer-log-panel"
+    >
       <div class="flex items-center justify-between mb-3">
          <h2 class="text-sm font-semibold uppercase tracking-wide text-slate-500">
            Transfer Log
