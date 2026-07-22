@@ -46,11 +46,41 @@ export function initializeWebMCP() {
   });
 
   w.webmcp_list_tools = () => [
-    { name: 'editor_select', description: 'Select an editor object' },
+    {
+      name: 'editor_select',
+      description: 'Select an editor object',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          object_type: { type: 'string', enum: ['material-theme'] },
+          id: { type: 'string', enum: ['default', 'dark-starter'] },
+        },
+        required: ['object_type', 'id'],
+        additionalProperties: false,
+      },
+    },
     { name: 'editor_update_property', description: 'Update an editor property' },
     { name: 'editor_preview', description: 'Preview an editor object' },
-    { name: 'entity_create', description: 'Create an entity' },
-    { name: 'entity_select', description: 'Select an entity' },
+    {
+      name: 'entity_create',
+      description: 'Create an entity',
+      inputSchema: {
+        type: 'object',
+        properties: { name: { type: 'string', enum: ['Oracle Probe Theme'] } },
+        required: ['name'],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: 'entity_select',
+      description: 'Select an entity',
+      inputSchema: {
+        type: 'object',
+        properties: { id: { type: 'string', enum: ['default', 'dark-starter'] } },
+        required: ['id'],
+        additionalProperties: false,
+      },
+    },
     { name: 'entity_update', description: 'Update an entity' },
     { name: 'entity_delete', description: 'Delete an entity' },
     { name: 'artifact_export', description: 'Export an artifact' },
@@ -74,6 +104,7 @@ export function initializeWebMCP() {
         const current = store.getState().theme.activeOptions;
         const options = args.palette ? { ...current, palette: mergePalette(current.palette, args.palette) } : current;
         store.dispatch(createTheme({ id, name: themeName, options }));
+        store.dispatch(setTab('saved'));
         return { success: true };
       }
       case 'entity_select': {
