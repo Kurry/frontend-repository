@@ -691,7 +691,7 @@ kbd {
 }
 @media (max-width: 900px) {
   .main-grid { grid-template-columns: minmax(0, 1fr); }
-  .cost-sidebar { display: none; }
+  .main-grid > .cost-sidebar { display: none; }
   .mobile-cost-button { display: inline-flex; }
   .ops-banner { grid-template-columns: 1fr; }
 }
