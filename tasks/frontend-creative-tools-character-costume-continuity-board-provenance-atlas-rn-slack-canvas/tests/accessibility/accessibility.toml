@@ -1,0 +1,10 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-character-costume-continuity-board-provenance-atlas-rn-slack-canvas"
+description = "Character Costume Continuity Board — Provenance Atlas — Slack Canvas"
+genre = "good-app"
+
+[[criterion]]
+id = "AC-08"
+title = "alternate_input"
+description = "Repeat the signature interaction with keyboard and touch-equivalent controls."
+weight = 1.0

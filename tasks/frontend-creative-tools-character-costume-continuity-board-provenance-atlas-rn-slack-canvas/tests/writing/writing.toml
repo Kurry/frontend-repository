@@ -1,0 +1,10 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-character-costume-continuity-board-provenance-atlas-rn-slack-canvas"
+description = "Character Costume Continuity Board — Provenance Atlas — Slack Canvas"
+genre = "good-app"
+
+[[criterion]]
+id = "AC-10"
+title = "domain_copy"
+description = "Inspect labels, statuses, errors, and empty-state text."
+weight = 1.0

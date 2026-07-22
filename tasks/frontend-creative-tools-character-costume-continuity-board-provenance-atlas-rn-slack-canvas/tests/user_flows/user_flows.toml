@@ -1,0 +1,10 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-character-costume-continuity-board-provenance-atlas-rn-slack-canvas"
+description = "Character Costume Continuity Board — Provenance Atlas — Slack Canvas"
+genre = "good-app"
+
+[[criterion]]
+id = "user_flows.catchall"
+title = "user_flows_catchall"
+description = "Catch-all for user flows not covered by specific deterministic checks."
+weight = 1.0

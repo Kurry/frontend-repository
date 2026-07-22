@@ -1,0 +1,10 @@
+[task]
+name = "mercor-intelligence/frontend-creative-tools-character-costume-continuity-board-provenance-atlas-rn-slack-canvas"
+description = "Character Costume Continuity Board — Provenance Atlas — Slack Canvas"
+genre = "good-app"
+
+[[criterion]]
+id = "AC-02"
+title = "visual_hierarchy"
+description = "Inspect the primary work surface, linked summary, and detail panel."
+weight = 1.0
