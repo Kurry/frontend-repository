@@ -513,5 +513,10 @@
     "source": "feature-workflow-builder-workflow-builder PRD",
     "instruction": "tasks/frontend-workflow-workflow-builder/instruction.md",
     "description": "Node-graph workflow builder with durable executions and timelines."
+  },
+  "frontend-planning-constraint-packing-atlas": {
+    "source": "framework-agnostic use of orchestration canvas, adaptive grid, task progress, prediction, review, schema-renderer, and branching workflow primitives",
+    "instruction": "tasks/frontend-planning-constraint-packing-atlas/instruction.md",
+    "description": "Constraint Packing Atlas spatial packing planner"
   }
 }

@@ -1,0 +1,22 @@
+{
+  "name": "constraint-packing-atlas",
+  "version": "1.0.0",
+  "private": true, "type": "module",
+  "scripts": {
+    "start": "serve -s dist -l 3000",
+    "build": "vite build",
+    "verify:build": "node -e \"const fs = require('fs'); if (!fs.existsSync('dist/index.html')) process.exit(1);\""
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "lucide-react": "^0.294.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^4.3.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "serve": "^14.2.1",
+    "vite": "^5.0.0"
+  }
+}
