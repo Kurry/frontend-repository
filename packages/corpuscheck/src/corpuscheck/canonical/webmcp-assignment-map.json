@@ -1272,5 +1272,44 @@
       "Command palette Cmd+K/Ctrl+K gesture and keyboard navigation stay Playwright-driven",
       "File downloads, file-picker import interaction, and clipboard contents remain Playwright responsibilities"
     ]
+  },
+  {
+    "task": "frontend-productivity-focus-soundscape-automation-mixer",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "preset",
+        "automation",
+        "source"
+      ],
+      "editor_properties": [
+        "gain",
+        "pan",
+        "filter",
+        "freq"
+      ],
+      "collection_types": [
+        "profiles",
+        "sessions"
+      ],
+      "collection_actions": [
+        "list",
+        "add",
+        "remove",
+        "update"
+      ],
+      "transfer_formats": [
+        "json",
+        "wav"
+      ],
+      "transfer_directions": [
+        "import",
+        "export"
+      ]
+    }
   }
 ]

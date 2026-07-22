@@ -7892,5 +7892,44 @@
       "Multi-select marquee geometry and Shift-click chord timing stay Playwright when mechanism matters",
       "Timeline status filter chips and Saved Workflows / Artifact panel open toggles stay Playwright-driven; no browse-query module is assigned"
     ]
+  },
+  {
+    "task": "frontend-productivity-focus-soundscape-automation-mixer",
+    "modules": [
+      "structured-editor-v1",
+      "entity-collection-v1",
+      "artifact-transfer-v1"
+    ],
+    "bindings": {
+      "editor_object_types": [
+        "preset",
+        "automation",
+        "source"
+      ],
+      "editor_properties": [
+        "gain",
+        "pan",
+        "filter",
+        "freq"
+      ],
+      "collection_types": [
+        "profiles",
+        "sessions"
+      ],
+      "collection_actions": [
+        "list",
+        "add",
+        "remove",
+        "update"
+      ],
+      "transfer_formats": [
+        "json",
+        "wav"
+      ],
+      "transfer_directions": [
+        "import",
+        "export"
+      ]
+    }
   }
 ]
