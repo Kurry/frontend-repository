@@ -60,8 +60,10 @@ export async function removeAll(page) {
     const button = first.getByRole('button', { name: /^Delete / })
     const name = (await button.getAttribute('aria-label')).replace(/^Delete /, '')
     const card = cards(page).filter({ has: page.getByRole('heading', { name: new RegExp(`^${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') }) })
-    await button.click({ force: true })
-    await card.getByRole('button', { name: `Confirm delete ${name}` }).click({ force: true })
+    await button.click()
+    const confirm = card.getByRole('button', { name: `Confirm delete ${name}` })
+    await expect(confirm).toBeVisible()
+    await confirm.click()
     await expect(card).toHaveCount(0)
   }
 }
