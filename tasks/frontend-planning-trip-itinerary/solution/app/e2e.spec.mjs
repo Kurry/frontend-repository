@@ -405,7 +405,7 @@ test.describe('core_features', () => {
     await card.locator('[role="tab"]', { hasText: 'Reviews' }).click();
     const reviewsText = card.locator('.panel');
     await expect(reviewsText).not.toHaveText(aboutText);
-    expect(reviewsText).toContain('reviews');
+    await expect(reviewsText).toContainText(/reviews/i);
     expect(page.url()).toBe(BASE + '/');
     await card.locator('[role="tab"]', { hasText: 'Photos' }).click();
     await expect(card.locator('.photo-grid')).toBeVisible();
@@ -656,14 +656,15 @@ test.describe('core_features', () => {
     await inputs.nth(2).fill('1'); await inputs.nth(2).blur();
     await inputs.nth(3).fill('1'); await inputs.nth(3).blur();
     await goBudgetTab(page, 'Settle up');
-    const avaBal = page.locator('.bal-row', { hasText: 'Ava' }).locator('.amt');
+    const avaBalWeighted = await page.locator('.bal-row', { hasText: 'Ava' }).locator('.amt')
+      .evaluate((el) => el.textContent.trim());
     // Ava paid the 64 EUR expense (fronted) but now owes 4/7 of it instead of
     // 1/4 (16 EUR) under per-capita — her net position must differ from a
     // fresh reload's per-capita baseline.
     await page.reload();
     await goBudgetTab(page, 'Settle up');
     const avaBalBaseline = await page.locator('.bal-row', { hasText: 'Ava' }).locator('.amt').innerText();
-    await expect(avaBal).not.toHaveText(avaBalBaseline);
+    expect(avaBalWeighted).not.toBe(avaBalBaseline);
   });
 
   test('1.42 debt_visualizer_minimum_transactions', async ({ page }) => {
@@ -1303,7 +1304,7 @@ test.describe('technical', () => {
     await openAddStopForDay(page, 'Sun, 7/5');
     const titleField = page.locator('#sf-title');
     await expect(titleField).toBeFocused(); // form auto-focuses the first field on open
-    expect(await hasVisibleRing(titleField)).toBe(true);
+    expect(await hasVisibleRing(titleField)).toBeGreaterThan(0);
   });
 
   test('2.11 detail_tabs_keyboard_and_selected_state', async ({ page }) => {
