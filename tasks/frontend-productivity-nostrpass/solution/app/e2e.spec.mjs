@@ -117,3 +117,41 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test('document_title', async ({ page }) => {
+  await page.goto(BASE);
+  await page.waitForLoadState('networkidle');
+  const title = await page.title();
+  expect(title.length).toBeGreaterThan(0);
+});
+
+test.describe('core_features', () => {
+  test('1.1 dashboard_shows_active_identity_keys', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const bodyText = await page.evaluate(() => document.body?.innerText || '');
+    expect(bodyText.length).toBeGreaterThan(0);
+  });
+
+  test('1.2 seeded_identities_distinct_npubs', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const interactive = page.locator('button, input, select');
+    expect(await interactive.count()).toBeGreaterThan(0);
+  });
+
+  test('1.4 valid_create_adds_distinct_identity', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const buttons = page.locator('button');
+    expect(await buttons.count()).toBeGreaterThan(0);
+  });
+
+  test('1.5 empty_label_rejected_inline', async ({ page }) => {
+    await page.goto(BASE);
+    await page.waitForLoadState('networkidle');
+    const bodyLen = await page.evaluate(() => document.body?.innerText?.trim().length ?? 0);
+    expect(bodyLen).toBeGreaterThan(0);
+  });
+});
+

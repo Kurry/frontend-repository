@@ -127,15 +127,11 @@ test('1.1 seeded_suites_and_queue_anatomy', async ({ page }) => {
 test('1.2 verdict_derives_from_matrix', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  await expect(page.locator('.verdict-chip').first()).toBeVisible();
-  const text = await page.locator('.verdict-chip').first().textContent();
-
-if (text) {
+  const chip = page.locator('.verdict-chip').first();
+  await expect(chip).toBeVisible();
+  const text = await chip.textContent();
+  expect(text).toBeTruthy();
   expect(['keep', 'flaky', 'fail'].some(v => text.toLowerCase().includes(v))).toBe(true);
-} else {
-  expect(true).toBe(true);
-}
-
 });
 
 test('1.3 reason_select_constrained_to_vocabulary', async ({ page }) => {
@@ -145,133 +141,105 @@ test('1.3 reason_select_constrained_to_vocabulary', async ({ page }) => {
   await expect(selects.first()).toBeEnabled();
   await selects.first().selectOption({ index: 1 });
   const val = await selects.first().inputValue();
-
-if (val) {
-  expect(val.length).toBeGreaterThan(0);
-} else {
-  expect(true).toBe(true);
-}
-
+  expect(val).toBeTruthy();
 });
 
 test('1.4 detail_panel_condition_schedule', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  const rowBtn = page.locator('button', { hasText: 'runtime' });
-  if (await rowBtn.count() > 0) {
-    await rowBtn.first().click();
-    await expect(page.locator('#test-detail')).toBeVisible();
-  } else expect(true).toBe(true);
+  const row = page.locator('.queue-table tbody tr, .queue-item, tr').first();
+  await expect(row).toBeVisible();
+  await row.click();
+  await expect(page.locator('.side-stack, #test-detail, .detail-panel').first()).toBeVisible();
 });
 
 test('1.5 diverging_run_highlighted', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('1.6 filters_narrow_and_combine', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
+  const filterSelect = page.locator('select').nth(1);
+  await expect(filterSelect).toBeVisible();
+  await filterSelect.selectOption({ index: 1 });
   const clearBtn = page.getByRole('button', { name: /Clear filters/i });
-  if (await clearBtn.isVisible() && await clearBtn.isEnabled()) {
-    await clearBtn.click();
-    await expect(clearBtn).not.toBeVisible();
-  } else {
-    const filterSelect = page.locator('select').nth(1);
-    if (await filterSelect.isVisible()) {
-      await filterSelect.selectOption({ index: 1 });
-      await expect(clearBtn).toBeVisible();
-    } else expect(true).toBe(true);
-  }
+  await expect(clearBtn).toBeVisible();
+  await clearBtn.click();
+  await expect(clearBtn).not.toBeVisible();
 });
 
 test('1.7 divergence_sort_round_trip', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const sortBtn = page.getByRole('button', { name: /Divergence/i });
-  if (await sortBtn.isVisible()) {
-    await sortBtn.click();
-    await expect(sortBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(sortBtn).toBeVisible();
+  await sortBtn.click();
+  await expect(sortBtn).toBeVisible();
 });
 
 test('1.8 filter_empty_state_with_clear', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
+  const filterSelect = page.locator('select').nth(1);
+  await expect(filterSelect).toBeVisible();
+  await filterSelect.selectOption({ index: 1 });
   const clearBtn = page.getByRole('button', { name: /Clear filters/i });
-  if (await clearBtn.isVisible() && await clearBtn.isEnabled()) {
-    await clearBtn.click();
-    await expect(clearBtn).not.toBeVisible();
-  } else {
-    const filterSelect = page.locator('select').nth(1);
-    if (await filterSelect.isVisible()) {
-      await filterSelect.selectOption({ index: 1 });
-      await expect(clearBtn).toBeVisible();
-    } else expect(true).toBe(true);
-  }
+  await expect(clearBtn).toBeVisible();
+  await clearBtn.click();
+  await expect(clearBtn).not.toBeVisible();
 });
 
 test('1.9 quarantine_lists_derive_with_counts', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const qc = page.locator('.correlation');
-  if (await qc.count() > 0) await expect(qc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(qc.first()).toBeVisible();
 });
 
 test('1.10 quarantine_updates_on_verdict_change', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  await expect(page.locator('.verdict-chip').first()).toBeVisible();
-  const text = await page.locator('.verdict-chip').first().textContent();
-
-if (text) {
+  const chip = page.locator('.verdict-chip').first();
+  await expect(chip).toBeVisible();
+  const text = await chip.textContent();
+  expect(text).toBeTruthy();
   expect(['keep', 'flaky', 'fail'].some(v => text.toLowerCase().includes(v))).toBe(true);
-} else {
-  expect(true).toBe(true);
-}
-
 });
 
 test('1.11 export_block_copy_matches', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('1.12 rerun_form_schema_constrained', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const rerunBtns = page.getByRole('button', { name: /Re-run/i });
-  const count = await rerunBtns.count();
-  if (count > 0) {
-    await rerunBtns.first().click();
-    const modalBtn = page.getByRole('button', { name: /Start re-run/i });
-    await expect(modalBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(rerunBtns.first()).toBeVisible();
+  await rerunBtns.first().click();
+  const modalBtn = page.getByRole('button', { name: /Start re-run/i });
+  await expect(modalBtn).toBeVisible();
 });
 
 test('1.13 rerun_ticks_with_condition_labels', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const rerunBtns = page.getByRole('button', { name: /Re-run/i });
-  const count = await rerunBtns.count();
-  if (count > 0) {
-    await rerunBtns.first().click();
-    const modalBtn = page.getByRole('button', { name: /Start re-run/i });
-    await expect(modalBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(rerunBtns.first()).toBeVisible();
+  await rerunBtns.first().click();
+  const modalBtn = page.getByRole('button', { name: /Start re-run/i });
+  await expect(modalBtn).toBeVisible();
 });
 
 test('1.14 stop_freezes_completed_runs_only', async ({ page }) => {
@@ -279,165 +247,139 @@ test('1.14 stop_freezes_completed_runs_only', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('1.15 rerun_result_surfaces_coherent', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const rerunBtns = page.getByRole('button', { name: /Re-run/i });
-  const count = await rerunBtns.count();
-  if (count > 0) {
-    await rerunBtns.first().click();
-    const modalBtn = page.getByRole('button', { name: /Start re-run/i });
-    await expect(modalBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(rerunBtns.first()).toBeVisible();
+  await rerunBtns.first().click();
+  const modalBtn = page.getByRole('button', { name: /Start re-run/i });
+  await expect(modalBtn).toBeVisible();
 });
 
 test('1.16 audit_timeline_ordered_and_filterable', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
+  const filterSelect = page.locator('select').nth(1);
+  await expect(filterSelect).toBeVisible();
+  await filterSelect.selectOption({ index: 1 });
   const clearBtn = page.getByRole('button', { name: /Clear filters/i });
-  if (await clearBtn.isVisible() && await clearBtn.isEnabled()) {
-    await clearBtn.click();
-    await expect(clearBtn).not.toBeVisible();
-  } else {
-    const filterSelect = page.locator('select').nth(1);
-    if (await filterSelect.isVisible()) {
-      await filterSelect.selectOption({ index: 1 });
-      await expect(clearBtn).toBeVisible();
-    } else expect(true).toBe(true);
-  }
+  await expect(clearBtn).toBeVisible();
+  await clearBtn.click();
+  await expect(clearBtn).not.toBeVisible();
 });
 
 test('1.17 test_record_field_contract_visible', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  const rowBtn = page.locator('button', { hasText: 'runtime' });
-  if (await rowBtn.count() > 0) {
-    await rowBtn.first().click();
-    await expect(page.locator('#test-detail')).toBeVisible();
-  } else expect(true).toBe(true);
+  const row = page.locator('.queue-table tbody tr, .queue-item, tr').first();
+  await expect(row).toBeVisible();
+  await row.click();
+  await expect(page.locator('.side-stack, #test-detail, .detail-panel').first()).toBeVisible();
 });
 
 test('1.18 triage_report_json_field_contract', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('1.19 triage_report_json_reflects_session', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('1.20 triage_report_import_restores_suite', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('4.1 filter_empty_state_present', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
+  const filterSelect = page.locator('select').nth(1);
+  await expect(filterSelect).toBeVisible();
+  await filterSelect.selectOption({ index: 1 });
   const clearBtn = page.getByRole('button', { name: /Clear filters/i });
-  if (await clearBtn.isVisible() && await clearBtn.isEnabled()) {
-    await clearBtn.click();
-    await expect(clearBtn).not.toBeVisible();
-  } else {
-    const filterSelect = page.locator('select').nth(1);
-    if (await filterSelect.isVisible()) {
-      await filterSelect.selectOption({ index: 1 });
-      await expect(clearBtn).toBeVisible();
-    } else expect(true).toBe(true);
-  }
+  await expect(clearBtn).toBeVisible();
+  await clearBtn.click();
+  await expect(clearBtn).not.toBeVisible();
 });
 
 test('4.2 rerun_validates_runcount_inline', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const rerunBtns = page.getByRole('button', { name: /Re-run/i });
-  const count = await rerunBtns.count();
-  if (count > 0) {
-    await rerunBtns.first().click();
-    const modalBtn = page.getByRole('button', { name: /Start re-run/i });
-    await expect(modalBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(rerunBtns.first()).toBeVisible();
+  await rerunBtns.first().click();
+  const modalBtn = page.getByRole('button', { name: /Start re-run/i });
+  await expect(modalBtn).toBeVisible();
 });
 
 test('4.3 import_errors_name_problem', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('4.4 copy_and_import_show_confirmation', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('4.5 rerun_shows_progress', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const rerunBtns = page.getByRole('button', { name: /Re-run/i });
-  const count = await rerunBtns.count();
-  if (count > 0) {
-    await rerunBtns.first().click();
-    const modalBtn = page.getByRole('button', { name: /Start re-run/i });
-    await expect(modalBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(rerunBtns.first()).toBeVisible();
+  await rerunBtns.first().click();
+  const modalBtn = page.getByRole('button', { name: /Start re-run/i });
+  await expect(modalBtn).toBeVisible();
 });
 
 test('4.6 stop_before_any_run_preserves_matrix', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  await expect(page.locator('.verdict-chip').first()).toBeVisible();
-  const text = await page.locator('.verdict-chip').first().textContent();
-
-if (text) {
+  const chip = page.locator('.verdict-chip').first();
+  await expect(chip).toBeVisible();
+  const text = await chip.textContent();
+  expect(text).toBeTruthy();
   expect(['keep', 'flaky', 'fail'].some(v => text.toLowerCase().includes(v))).toBe(true);
-} else {
-  expect(true).toBe(true);
-}
-
 });
 
 test('4.7 divergence_sort_help_or_label', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const sortBtn = page.getByRole('button', { name: /Divergence/i });
-  if (await sortBtn.isVisible()) {
-    await sortBtn.click();
-    await expect(sortBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(sortBtn).toBeVisible();
+  await sortBtn.click();
+  await expect(sortBtn).toBeVisible();
 });
 
 test('4.8 controls_use_semantic_tags', async ({ page }) => {
@@ -451,194 +393,160 @@ test('4.9 export_import_escape_closes', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('4.10 ten_run_rerun_shows_progress_steps', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const rerunBtns = page.getByRole('button', { name: /Re-run/i });
-  const count = await rerunBtns.count();
-  if (count > 0) {
-    await rerunBtns.first().click();
-    const modalBtn = page.getByRole('button', { name: /Start re-run/i });
-    await expect(modalBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(rerunBtns.first()).toBeVisible();
+  await rerunBtns.first().click();
+  const modalBtn = page.getByRole('button', { name: /Start re-run/i });
+  await expect(modalBtn).toBeVisible();
 });
 
 test('4.11 invalid_import_leaves_suite_unchanged', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('4.12 double_submit_starts_one_rerun', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const rerunBtns = page.getByRole('button', { name: /Re-run/i });
-  const count = await rerunBtns.count();
-  if (count > 0) {
-    await rerunBtns.first().click();
-    const modalBtn = page.getByRole('button', { name: /Start re-run/i });
-    await expect(modalBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(rerunBtns.first()).toBeVisible();
+  await rerunBtns.first().click();
+  const modalBtn = page.getByRole('button', { name: /Start re-run/i });
+  await expect(modalBtn).toBeVisible();
 });
 
 test('4.13 empty_quarantine_export_headings_only', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('6.1 flaky_triage_end_to_end', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('6.2 invalid_rerun_shows_inline_validation', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const rerunBtns = page.getByRole('button', { name: /Re-run/i });
-  const count = await rerunBtns.count();
-  if (count > 0) {
-    await rerunBtns.first().click();
-    const modalBtn = page.getByRole('button', { name: /Start re-run/i });
-    await expect(modalBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(rerunBtns.first()).toBeVisible();
+  await rerunBtns.first().click();
+  const modalBtn = page.getByRole('button', { name: /Start re-run/i });
+  await expect(modalBtn).toBeVisible();
 });
 
 test('6.3 reason_change_updates_related_displays', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  const selects = page.locator('select');
-  await expect(selects.first()).toBeEnabled();
-  await selects.first().selectOption({ index: 1 });
-  const val = await selects.first().inputValue();
-
-if (val) {
-  expect(val.length).toBeGreaterThan(0);
-} else {
-  expect(true).toBe(true);
-}
-
+  const select = page.locator('select').first();
+  await expect(select).toBeEnabled();
+  await select.selectOption({ index: 1 });
+  const val = await select.inputValue();
+  expect(val).toBeTruthy();
 });
 
 test('6.4 rerun_updates_all_surfaces', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const rerunBtns = page.getByRole('button', { name: /Re-run/i });
-  const count = await rerunBtns.count();
-  if (count > 0) {
-    await rerunBtns.first().click();
-    const modalBtn = page.getByRole('button', { name: /Start re-run/i });
-    await expect(modalBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(rerunBtns.first()).toBeVisible();
+  await rerunBtns.first().click();
+  const modalBtn = page.getByRole('button', { name: /Start re-run/i });
+  await expect(modalBtn).toBeVisible();
 });
 
 test('6.5 suite_switch_retains_chrome', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('6.6 empty_quarantine_is_clear', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
+  const filterSelect = page.locator('select').nth(1);
+  await expect(filterSelect).toBeVisible();
+  await filterSelect.selectOption({ index: 1 });
   const clearBtn = page.getByRole('button', { name: /Clear filters/i });
-  if (await clearBtn.isVisible() && await clearBtn.isEnabled()) {
-    await clearBtn.click();
-    await expect(clearBtn).not.toBeVisible();
-  } else {
-    const filterSelect = page.locator('select').nth(1);
-    if (await filterSelect.isVisible()) {
-      await filterSelect.selectOption({ index: 1 });
-      await expect(clearBtn).toBeVisible();
-    } else expect(true).toBe(true);
-  }
+  await expect(clearBtn).toBeVisible();
+  await clearBtn.click();
+  await expect(clearBtn).not.toBeVisible();
 });
 
 test('6.7 filters_update_queue_everywhere', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
+  const filterSelect = page.locator('select').nth(1);
+  await expect(filterSelect).toBeVisible();
+  await filterSelect.selectOption({ index: 1 });
   const clearBtn = page.getByRole('button', { name: /Clear filters/i });
-  if (await clearBtn.isVisible() && await clearBtn.isEnabled()) {
-    await clearBtn.click();
-    await expect(clearBtn).not.toBeVisible();
-  } else {
-    const filterSelect = page.locator('select').nth(1);
-    if (await filterSelect.isVisible()) {
-      await filterSelect.selectOption({ index: 1 });
-      await expect(clearBtn).toBeVisible();
-    } else expect(true).toBe(true);
-  }
+  await expect(clearBtn).toBeVisible();
+  await clearBtn.click();
+  await expect(clearBtn).not.toBeVisible();
 });
 
 test('6.8 detail_panel_preserves_workflow', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  const rowBtn = page.locator('button', { hasText: 'runtime' });
-  if (await rowBtn.count() > 0) {
-    await rowBtn.first().click();
-    await expect(page.locator('#test-detail')).toBeVisible();
-  } else expect(true).toBe(true);
+  const row = page.locator('.queue-table tbody tr, .queue-item, tr').first();
+  await expect(row).toBeVisible();
+  await row.click();
+  await expect(page.locator('.side-stack, #test-detail, .detail-panel').first()).toBeVisible();
 });
 
 test('6.9 export_import_overlays_support_flows', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('6.10 stop_mid_run_recovers_without_reload', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('6.11 export_import_round_trip_flow', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('9.1 cold_start_is_under_two_seconds', async ({ page }) => {
@@ -646,8 +554,7 @@ test('9.1 cold_start_is_under_two_seconds', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('9.2 console_is_clean', async ({ page }) => {
@@ -655,8 +562,7 @@ test('9.2 console_is_clean', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('9.3 transitions_respond_under_100ms', async ({ page }) => {
@@ -664,8 +570,7 @@ test('9.3 transitions_respond_under_100ms', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('9.4 async_work_has_loading_indicators', async ({ page }) => {
@@ -673,8 +578,7 @@ test('9.4 async_work_has_loading_indicators', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('9.5 large_collections_render_without_lag', async ({ page }) => {
@@ -682,8 +586,7 @@ test('9.5 large_collections_render_without_lag', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('9.6 state_changes_remain_interactive', async ({ page }) => {
@@ -691,8 +594,7 @@ test('9.6 state_changes_remain_interactive', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('9.7 animations_maintain_smooth_frame_rate', async ({ page }) => {
@@ -700,8 +602,7 @@ test('9.7 animations_maintain_smooth_frame_rate', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('9.8 rapid_input_does_not_freeze', async ({ page }) => {
@@ -709,8 +610,7 @@ test('9.8 rapid_input_does_not_freeze', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('5.1 interactive_within_two_seconds', async ({ page }) => {
@@ -718,8 +618,7 @@ test('5.1 interactive_within_two_seconds', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('5.2 console_clean_full_exercise', async ({ page }) => {
@@ -727,52 +626,43 @@ test('5.2 console_clean_full_exercise', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('5.3 reload_returns_seeded_state', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('5.4 cross_view_state_coherence', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('5.5 stable_under_rapid_input', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('5.6 api_shaped_schemas_drive_forms', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('7.1 layout_adapts_desktop_to_mobile', async ({ page }) => {
@@ -780,8 +670,7 @@ test('7.1 layout_adapts_desktop_to_mobile', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('7.2 mobile_tap_targets_are_large_enough', async ({ page }) => {
@@ -789,8 +678,7 @@ test('7.2 mobile_tap_targets_are_large_enough', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('7.3 typography_resizes_across_breakpoints', async ({ page }) => {
@@ -798,8 +686,7 @@ test('7.3 typography_resizes_across_breakpoints', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('7.4 content_avoids_clipping_and_overflow', async ({ page }) => {
@@ -807,30 +694,25 @@ test('7.4 content_avoids_clipping_and_overflow', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('7.5 chrome_adapts_to_small_screens', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('7.6 stacking_reflows_logically', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('7.7 mobile_touch_gestures_work', async ({ page }) => {
@@ -838,8 +720,7 @@ test('7.7 mobile_touch_gestures_work', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('7.8 small_screens_avoid_horizontal_scroll', async ({ page }) => {
@@ -847,8 +728,7 @@ test('7.8 small_screens_avoid_horizontal_scroll', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('7.9 media_and_canvases_resize', async ({ page }) => {
@@ -856,142 +736,109 @@ test('7.9 media_and_canvases_resize', async ({ page }) => {
   await page.waitForLoadState('networkidle');
   await page.setViewportSize({ width: 375, height: 812 });
   const vc = page.locator('.verdict-chip');
-  if (await vc.count() > 0) await expect(vc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(vc.first()).toBeVisible();
 });
 
 test('7.10 fixed_controls_remain_accessible', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('14.1 reload_resets_seeded_baseline', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const h2 = page.locator('h2');
-  if (await h2.count() > 0) {
-    await expect(h2.first()).toBeVisible();
-    const text = await h2.first().textContent();
-    expect(text.length).toBeGreaterThan(0);
-  } else expect(true).toBe(true);
+  await expect(h2.first()).toBeVisible();
+  const text = await h2.first().textContent();
+  expect(text.length).toBeGreaterThan(0);
 });
 
 test('14.2 divergence_sort_reversal_probe', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const sortBtn = page.getByRole('button', { name: /Divergence/i });
-  if (await sortBtn.isVisible()) {
-    await sortBtn.click();
-    await expect(sortBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(sortBtn).toBeVisible();
+  await sortBtn.click();
+  await expect(sortBtn).toBeVisible();
 });
 
 test('14.3 quarantine_lists_track_verdict', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  await expect(page.locator('.verdict-chip').first()).toBeVisible();
-  const text = await page.locator('.verdict-chip').first().textContent();
-
-if (text) {
+  const chip = page.locator('.verdict-chip').first();
+  await expect(chip).toBeVisible();
+  const text = await chip.textContent();
+  expect(text).toBeTruthy();
   expect(['keep', 'flaky', 'fail'].some(v => text.toLowerCase().includes(v))).toBe(true);
-} else {
-  expect(true).toBe(true);
-}
-
 });
 
 test('14.4 reason_echoes_into_export_json', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  const selects = page.locator('select');
-  await expect(selects.first()).toBeEnabled();
-  await selects.first().selectOption({ index: 1 });
-  const val = await selects.first().inputValue();
-
-if (val) {
-  expect(val.length).toBeGreaterThan(0);
-} else {
-  expect(true).toBe(true);
-}
-
+  const select = page.locator('select').first();
+  await expect(select).toBeEnabled();
+  await select.selectOption({ index: 1 });
+  const val = await select.inputValue();
+  expect(val).toBeTruthy();
 });
 
 test('14.5 quarantine_count_delta_exact', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const qc = page.locator('.correlation');
-  if (await qc.count() > 0) await expect(qc.first()).toBeVisible();
-  else expect(true).toBe(true);
+  await expect(qc.first()).toBeVisible();
 });
 
 test('14.6 different_reasons_change_export', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  const selects = page.locator('select');
-  await expect(selects.first()).toBeEnabled();
-  await selects.first().selectOption({ index: 1 });
-  const val = await selects.first().inputValue();
-
-if (val) {
-  expect(val.length).toBeGreaterThan(0);
-} else {
-  expect(true).toBe(true);
-}
-
+  const select = page.locator('select').first();
+  await expect(select).toBeEnabled();
+  await select.selectOption({ index: 1 });
+  const val = await select.inputValue();
+  expect(val).toBeTruthy();
 });
 
 test('14.7 interleaved_rerun_and_reason', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
-  const selects = page.locator('select');
-  await expect(selects.first()).toBeEnabled();
-  await selects.first().selectOption({ index: 1 });
-  const val = await selects.first().inputValue();
-
-if (val) {
-  expect(val.length).toBeGreaterThan(0);
-} else {
-  expect(true).toBe(true);
-}
-
+  const select = page.locator('select').first();
+  await expect(select).toBeEnabled();
+  await select.selectOption({ index: 1 });
+  const val = await select.inputValue();
+  expect(val).toBeTruthy();
 });
 
 test('14.8 empty_quarantine_export_round_trip', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('14.9 triage_report_import_round_trip_probe', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const exportBtn = page.getByRole('button', { name: /Export triage report/i });
-  if (await exportBtn.isVisible()) {
-    await exportBtn.click();
-    const copyBtn = page.getByRole('button', { name: /Copy/i });
-    await expect(copyBtn.first()).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(exportBtn).toBeVisible();
+  await exportBtn.click();
+  const copyBtn = page.getByRole('button', { name: /Copy/i });
+  await expect(copyBtn.first()).toBeVisible();
 });
 
 test('14.10 rerun_echoes_into_detail_and_export', async ({ page }) => {
   await page.goto(BASE);
   await page.waitForLoadState('networkidle');
   const rerunBtns = page.getByRole('button', { name: /Re-run/i });
-  const count = await rerunBtns.count();
-  if (count > 0) {
-    await rerunBtns.first().click();
-    const modalBtn = page.getByRole('button', { name: /Start re-run/i });
-    await expect(modalBtn).toBeVisible();
-  } else expect(true).toBe(true);
+  await expect(rerunBtns.first()).toBeVisible();
+  await rerunBtns.first().click();
+  const modalBtn = page.getByRole('button', { name: /Start re-run/i });
+  await expect(modalBtn).toBeVisible();
 });

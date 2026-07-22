@@ -19,7 +19,7 @@
     "zod": "^4.0.10"
   },
   "devDependencies": {
-    "@playwright/test": "^1.61.1",
+    "@playwright/test": "1.61.0",
     "@sveltejs/vite-plugin-svelte": "^6.1.0",
     "typescript": "^5.8.3",
     "vite": "^7.0.0"

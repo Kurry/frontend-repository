@@ -7,7 +7,8 @@
     "build": "ng build",
     "verify:build": "ng build && node -e \"require('fs').accessSync('dist/app/browser/index.html')\"",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "private": true,
   "dependencies": {
@@ -42,7 +43,7 @@
     "@angular-devkit/build-angular": "^19.2.27",
     "@angular/cli": "^19.2.27",
     "@angular/compiler-cli": "^19.2.0",
-    "@playwright/test": "^1.61.0",
+    "@playwright/test": "1.61.0",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.6.0",
     "karma": "~6.4.0",

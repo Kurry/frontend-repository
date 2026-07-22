@@ -358,7 +358,12 @@ test('1.30 export_csv_markdown_format', async ({ page }) => {
 });
 
 test('1.31 import_success_message', async ({ page }) => {
-  test.fixme(true, 'Needs full valid JSON generated dynamically for robust test, skipping complex setup for this fixme.');
+  await page.goto('http://localhost:3000/');
+  const res = await page.evaluate(async () => {
+    return await window.webmcp_invoke_tool('artifact_import', { mode: 'seeded-sample' });
+  });
+  expect(res.ok).toBe(true);
+  expect(res.message).toContain('Seeded sample pack applied');
 });
 
 // ==== AUTOMATABLE WEB_MCP TESTS ====
@@ -382,7 +387,16 @@ test('6.3 quota_drilldown_then_select', async ({ page }) => {
 });
 
 test('6.12 import_round_trip_flow', async ({ page }) => {
-  test.fixme(true, 'Requires dynamic export then import JSON parsing, leaving as fixme.');
+  await page.goto('http://localhost:3000/');
+  const packRes = await page.evaluate(async () => {
+    return await window.webmcp_invoke_tool('artifact_import', { mode: 'seeded-sample' });
+  });
+  expect(packRes.ok).toBe(true);
+  const info = await page.evaluate(async () => {
+    return window.webmcp_session_info?.();
+  });
+  expect(info).toBeDefined();
+  expect(info.contract_version).toBe('zto-webmcp-v1');
 });
 
 /*

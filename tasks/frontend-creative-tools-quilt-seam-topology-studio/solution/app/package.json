@@ -23,7 +23,7 @@
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
     "vite": "^5.2.0",
-    "@playwright/test": "^1.61.1"
+    "@playwright/test": "1.61.0"
   },
   "overrides": {
     "baseline-browser-mapping": "2.10.42",

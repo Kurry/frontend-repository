@@ -7,7 +7,8 @@
     "build": "ng build",
     "verify:build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "private": true,
   "dependencies": {
@@ -47,7 +48,8 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.5.2"
+    "typescript": "~5.5.2",
+    "@playwright/test": "1.61.0"
   },
   "overrides": {
     "p-map": "7.0.5"

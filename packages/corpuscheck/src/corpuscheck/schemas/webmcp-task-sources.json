@@ -159,6 +159,11 @@
     "instruction": "Vert/instruction.md",
     "description": "VERT private local file converter good-app eval."
   },
+  "frontend-creative-tools-session-compression-loom": {
+    "source": "Session Compression Loom",
+    "instruction": "tasks/frontend-creative-tools-session-compression-loom/instruction.md",
+    "description": "Session compression loom with trajectory event folding, summary capsules, token budget ruler, and provenance tracing."
+  },
   "frontend-creative-tools-weaving-draft-constraint-studio": {
     "source": "weaving draft and loom constraint studio concept",
     "instruction": "tasks/frontend-creative-tools-weaving-draft-constraint-studio/instruction.md",
