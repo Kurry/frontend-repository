@@ -20,7 +20,7 @@ window.webmcp_list_tools = () => {
                         "description": "The ID of the object to select"
                     }
                 },
-                "required": ["object_id"]
+                "required": []
             }
         },
         {
@@ -42,7 +42,7 @@ window.webmcp_list_tools = () => {
                         "description": "The new value for the property"
                     }
                 },
-                "required": ["object_id", "property_name", "property_value"]
+                "required": []
             }
         },
         {
@@ -60,7 +60,7 @@ window.webmcp_list_tools = () => {
                         "description": "The new content for the object"
                     }
                 },
-                "required": ["object_id", "content"]
+                "required": []
             }
         },
         {
@@ -78,7 +78,7 @@ window.webmcp_list_tools = () => {
                         "description": "The data for the new entity"
                     }
                 },
-                "required": ["entity_type", "entity_data"]
+                "required": []
             }
         },
         {
@@ -92,7 +92,7 @@ window.webmcp_list_tools = () => {
                         "description": "The ID of the entity to select"
                     }
                 },
-                "required": ["entity_id"]
+                "required": []
             }
         },
         {
@@ -110,7 +110,7 @@ window.webmcp_list_tools = () => {
                         "description": "The new data for the entity"
                     }
                 },
-                "required": ["entity_id", "entity_data"]
+                "required": []
             }
         },
         {
@@ -128,7 +128,7 @@ window.webmcp_list_tools = () => {
                         "description": "Confirm deletion"
                     }
                 },
-                "required": ["entity_id", "confirm"]
+                "required": []
             }
         },
         {
@@ -142,7 +142,7 @@ window.webmcp_list_tools = () => {
                         "description": "The format to export"
                     }
                 },
-                "required": ["format"]
+                "required": []
             }
         },
         {
@@ -160,7 +160,7 @@ window.webmcp_list_tools = () => {
                         "description": "The data to import"
                     }
                 },
-                "required": ["format", "data"]
+                "required": []
             }
         },
         {
@@ -174,7 +174,7 @@ window.webmcp_list_tools = () => {
                         "description": "The format to copy"
                     }
                 },
-                "required": ["format"]
+                "required": []
             }
         }
     ];
