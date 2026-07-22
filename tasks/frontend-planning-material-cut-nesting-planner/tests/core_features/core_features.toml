@@ -1,0 +1,148 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "CF-01"
+title = "Place and drag pieces on stock sheet canvas with constraints"
+description = "Verifies that pieces can be dragged on a 1-mm grid, rotated 90 degrees (if grain permits), stay inside usable stock, and avoid defects and other pieces by 3-mm kerf clearance."
+eval_type = "AUTOMATABLE"
+weight = 1.0
+
+[[criterion]]
+id = "CF-02"
+title = "Allocate project parts to pieces"
+description = "Verifies that the user can allocate required parts to exactly one placement and that unassigned pieces remain separately visible."
+eval_type = "AUTOMATABLE"
+weight = 1.0
+
+[[criterion]]
+id = "CF-03"
+title = "Draw guillotine cut tree"
+description = "Verifies that users can draw full-length cuts that consume 3mm kerf, creating two child regions, and preventing non-guillotine cuts."
+eval_type = "AUTOMATABLE"
+weight = 1.0
+
+[[criterion]]
+id = "CF-04"
+title = "Display constraint lenses"
+description = "Verifies that grain direction, required edges, defect regions, and support risk lenses are visible and correctly indicate state."
+eval_type = "AUTOMATABLE"
+weight = 1.0
+
+[[criterion]]
+id = "CF-05"
+title = "Retain offcut lineage and inventory"
+description = "Verifies that unconsumed leaf regions can be retained as named offcuts and track parent stock/cut lineage and properties."
+eval_type = "AUTOMATABLE"
+weight = 1.0
+
+[[criterion]]
+id = "CF-06"
+title = "Analyze cost and waste"
+description = "Verifies that linked charts show correct purchased area, part area, kerf loss, defect exclusion, and scrap."
+eval_type = "AUTOMATABLE"
+weight = 1.0
+
+[[criterion]]
+id = "CF-07"
+title = "Execute cuts and recover from failures"
+description = "Verifies the execution workflow (reserve, verify, execute in order) and ability to handle deterministic failures like wrong orientation or damaged regions."
+eval_type = "AUTOMATABLE"
+weight = 1.0
+
+[[criterion]]
+id = "CF-08"
+title = "Export canonical artifacts"
+description = "Verifies that the exact cut diagrams, inventory, and ledger can be exported as JSON, SVG, CSV, and Markdown."
+eval_type = "AUTOMATABLE"
+weight = 1.0
