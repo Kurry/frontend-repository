@@ -1,0 +1,21 @@
+
+[[criterion]]
+id = "1.50"
+name = "signature_interaction"
+description = "Trace a selected record to source evidence and quarantine a bad lineage changes the primary record, linked view, and status together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "crud_glaze_tests"
+description = "Create, edit, archive, and filter glaze tests with explicit domain statuses."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.52"
+name = "invalid_fields_preserves_state"
+description = "Invalid required fields preserve the prior valid record and explain recovery."
+type = "binary"
+weight = 1.0
