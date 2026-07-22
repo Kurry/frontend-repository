@@ -1,0 +1,194 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_round_trip"
+description = "Multi-facet round-trip: configure several independent facets (e.g. active view, a membership change, a sort order, a created item), then reload. In persistence genres, all facets survive the reload; in in-memory genres, all facets coherently reset to the seeded baseline — never a mix."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "sort_reversal_proves_live_data"
+description = "Sort-reversal proof: sort a collection ascending, note the order, then sort descending; the order reverses correctly relative to ascending, proving sort is derived from live data rather than two hardcoded orders."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "derived_view_responds_to_input"
+description = "Derived-view sensitivity: change an input (timeframe, filter, category) and confirm the derived view (chart, total, list) changes meaningfully rather than redrawing identically regardless of input."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "cross_view_echo_without_reload"
+description = "Cross-view echo: make a change in one view and confirm the same datum updates in a second, structurally different view (list ↔ detail, board ↔ stats) without reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "count_delta_is_exact"
+description = "Count-delta integrity: measure a count immediately before and immediately after the action that changes it; the delta matches exactly with no off-by-one or lagging counter."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "different_inputs_change_outcomes"
+description = "Input-dependent output: perform the same workflow twice with different inputs and confirm the two outcomes differ in the ways the inputs dictate."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_flows_preserve_state"
+description = "Interleaved-flow integrity: interleave two flows (e.g. start creating item A, switch views, finish creating item B, return) and confirm neither flow corrupted the other's state."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "empty_to_repopulated_round_trip"
+description = "Edge-state round-trip: drive a collection to empty, then repopulate; derived surfaces (totals, charts, badges) track through both transitions."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.n1"
+name = "partial_persistence_is_incoherent"
+description = "A facet of user-configured state silently reverts while others survive, producing incoherent partial persistence."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n2"
+name = "derived_surface_ignores_inputs"
+description = "A derived surface renders identically regardless of its inputs."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n3"
+name = "different_inputs_produce_identical_output"
+description = "Repeating an action with different inputs yields byte-identical output."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "14.n4"
+name = "cross_view_state_is_stale"
+description = "State changes appear in one view but not another until reload."
+type = "binary"
+negate = true
+weight = 1.0
+
+[[criterion]]
+id = "behavioral.catchall"
+name = "behavioral_catchall"
+description = "The app exhibits a significant, browser-observable defect in behavioral or state-integrity flows that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0
