@@ -1,0 +1,16 @@
+<<<<<<< SEARCH
+Build a Classroom Lesson Arc Planner using React and Tailwind CSS. The app manages lesson blocks in a bounded local workflow where one meaningful mutation updates linked views and an interoperable artifact. The signature interaction allows the user to scrub a selected record through its timeline and restore a prior checkpoint. The concept adapts a media board where selections, batch edits, histogram ranges, and sequence exports remain synchronized into a self contained frontend job. The application must operate entirely in memory with no local storage or backend persistence. The final output is an interoperable lesson blocks session artifact named lesson-arc-v1.json that preserves authored state and derived consequences for a clean round trip.
+=======
+Build a Classroom Lesson Arc Planner using React and Tailwind CSS 4.3.2. The app manages lesson blocks in a bounded local workflow where one meaningful mutation updates linked views and an interoperable artifact. The signature interaction allows the user to scrub a selected record through its timeline and restore a prior checkpoint. The concept adapts a media board where selections, batch edits, histogram ranges, and sequence exports remain synchronized into a self contained frontend job. The application must operate entirely in memory with no local storage or backend persistence. The final output is an interoperable lesson blocks session artifact named lesson-arc-v1.json that preserves authored state and derived consequences for a clean round trip.
+>>>>>>> REPLACE
+<<<<<<< SEARCH
+Persistence. The state must be entirely in memory. Export and import act as the sole persistence boundary. Do not use local storage or external backend syncing.
+
+Import and export validation. The artifact uses the replay timeline schema for export and import, rejects invalid records without any partial mutation, and regenerates exportedAt upon successful import.
+=======
+Persistence. The state must be entirely in memory. Export and import act as the sole persistence boundary. Do not use local storage or external backend syncing.
+
+Dependencies. All dependencies must be strictly local (npm install). Do not use CDNs or external network links for scripts, styles, or assets.
+
+Import and export validation. The artifact uses the replay timeline schema for export and import, rejects invalid records without any partial mutation, and regenerates exportedAt upon successful import.
+>>>>>>> REPLACE
