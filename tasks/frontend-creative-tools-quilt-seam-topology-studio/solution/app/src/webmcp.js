@@ -38,7 +38,7 @@ export function initWebMCP(getState, dispatch, ui) {
       return { ok: false, error: `unsupported property ${property} for ${type}` };
     },
     'editor.switch_mode': args => {
-      const mode = String(args.mode ?? '');
+      const mode = String(args.mode ?? 'fabric');
       if (!MODES.includes(mode)) return { ok: false, error: `unknown mode: ${mode}`, allowed: MODES };
       ui.switchMode(mode);
       return { ok: true, operation: 'switch_mode', mode };
