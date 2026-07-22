@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-08"
+title = "Alternate input produces identical state with visible focus and live feedback."
+description = "Alternate input produces identical state with visible focus and live feedback."
+weight = 1.0
+type = "must-have"

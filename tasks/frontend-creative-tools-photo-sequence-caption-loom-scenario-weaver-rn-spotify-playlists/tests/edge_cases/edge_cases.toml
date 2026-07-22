@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-06"
+title = "Each invalid action gives field-level recovery and preserves prior valid state."
+description = "Each invalid action gives field-level recovery and preserves prior valid state."
+weight = 1.0
+type = "must-have"

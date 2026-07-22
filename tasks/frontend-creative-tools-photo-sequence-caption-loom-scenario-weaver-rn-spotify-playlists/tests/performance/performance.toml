@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-09"
+title = "The signature interaction remains responsive and unrelated rows stay stable."
+description = "The signature interaction remains responsive and unrelated rows stay stable."
+weight = 1.0
+type = "must-have"

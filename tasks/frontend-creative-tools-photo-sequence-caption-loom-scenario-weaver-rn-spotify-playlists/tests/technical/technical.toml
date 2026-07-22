@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-04"
+title = "The tool result and artifact contain the declared API-shaped fields."
+description = "The tool result and artifact contain the declared API-shaped fields."
+weight = 1.0
+type = "must-have"

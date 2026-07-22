@@ -1,0 +1,13 @@
+[[criterion]]
+id = "AC-11"
+title = "Linked views provide domain utility beyond CRUD."
+description = "Linked views provide domain utility beyond CRUD."
+weight = 1.0
+type = "must-have"
+
+[[criterion]]
+id = "innovation.catchall"
+title = "Any additional innovative elements implemented gracefully."
+description = "Bonus points for elements not covered in the original requirements. Evidence required."
+weight = 0.5
+type = "nice-to-have"
