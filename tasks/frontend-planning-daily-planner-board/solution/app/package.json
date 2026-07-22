@@ -5,7 +5,8 @@
     "verify:build": "node --check app.js && node -e \"const fs=require('fs');fs.accessSync('index.html');fs.accessSync('styles.css');fs.accessSync('app.js')\"",
     "start": "npx --yes serve -l 3000 -n",
     "test:e2e": "playwright test",
-    "test:e2e:criteria": "playwright test e2e.spec.mjs"
+    "test:e2e:criteria": "playwright test e2e.spec.mjs",
+    "test:e2e:canonical": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "serve": "14.2.6"
