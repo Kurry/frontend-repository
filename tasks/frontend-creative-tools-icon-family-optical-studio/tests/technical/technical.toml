@@ -1,0 +1,35 @@
+[[criterion]]
+id = "AC-04"
+name = "technical_consistency"
+description = "Interleave UI/WebMCP path/anchor, constraint, variant, hint, branch, validation/approval, history, and transfer actions → ids, fixed-point geometry, checksums, files match."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.1"
+name = "in_memory_state"
+description = "Reloading the page resets the app to the default seeded fixture (no localStorage)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.2"
+name = "zero_console_errors"
+description = "Application runs and performs basic actions without producing console errors."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "5.3"
+name = "webmcp_integration"
+description = "WebMCP tools reflect editing actions and valid JSON structure."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "technical.catchall"
+name = "technical_catchall"
+description = "The app exhibits a significant, browser-observable defect in technical consistency that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+negate = true
+weight = 1.0

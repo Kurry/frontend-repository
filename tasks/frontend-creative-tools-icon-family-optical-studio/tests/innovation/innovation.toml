@@ -1,0 +1,13 @@
+[[criterion]]
+id = "AC-11"
+name = "innovative_coherence"
+description = "Edit one constrained master path → optical family metrics, inherited variants, small-size behavior, interaction states, approval, and exported symbol system remain coherent."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app exhibits a significant, browser-observable defect in innovative features that is NOT covered by any other criterion in this file. 'Significant' means it would plausibly matter to a real user, not a nitpick. If present, name the defect and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the defect is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0
