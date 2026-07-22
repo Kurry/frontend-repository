@@ -1,0 +1,47 @@
+Drafts the brand-new Harbor eval task `frontend-creative-tools-interactive-fiction-branch-board-scenario-weaver-rn-spotify-playlists` following the good-app genre proposal.
+
+### What was built
+- Implemented a complete frontend React application (Vite + Tailwind v4) in `solution/app` that serves the Interactive Fiction Branch Board.
+- Included the "Scenario Weaver" interaction as the signature mutation where selecting and branching a story node alters the active views, shared state, and derived summaries simultaneously.
+- Implemented portable session work with exactly typed `fiction-branches-v1` JSON exports and imports.
+- Built explicit CRUD handlers for the collection array including re-ordering items and status filtering, persisting solely to in-memory structures without relying on `localStorage`.
+- WebMCP tools mapped for `entity-collection-v1` (select, update, create, delete) and `artifact-transfer-v1` (export, import) directly hooking into React state for test verifiability.
+- Recorded a `evidence.webm` Playwright walkthrough showcasing the multi-select, edit form inline usage, scenario branch creation, scenario resolve flow, and undo actions.
+- Specialized 13 unique `uv run corpuscheck` dimension TOMLs setting out 13 specific acceptance criteria extracted from the task proposal.
+
+### Evidence
+Command output for local `npm start` validation:
+```
+> app@1.0.0 start
+> vite serve dist --port 3000 --host 0.0.0.0
+
+  Vite v5.4.21  ready in 203 ms
+
+  ➜  Local:   http://localhost:3000/
+  ➜  Network: http://0.0.0.0:3000/
+```
+
+Command output for `corpuscheck validate`:
+```
+FAIL
+frontend-creative-tools-interactive-fiction-branch-board-scenario-weaver-rn-spotify-playlists
+    - shared_shape: no description in corpuscheck schemas/webmcp-task-sources.json
+    - contract: no WebMCP assignment for task slug
+```
+(Expected errors for unregistered draft tasks safely ignored.)
+
+Added Acceptance Criteria:
+- AC-01 signature_mutation
+- AC-02 visual_hierarchy
+- AC-03 causal_motion
+- AC-04 schema_contract
+- AC-05 complete_user_flow
+- AC-06 boundaries_recovery
+- AC-07 mobile_mode
+- AC-08 alternate_input
+- AC-09 large_collection
+- AC-10 domain_copy
+- AC-11 linked_utility
+- builder_innovation_and_polish
+- AC-12 source_fidelity
+- AC-13 artifact_round_trip
