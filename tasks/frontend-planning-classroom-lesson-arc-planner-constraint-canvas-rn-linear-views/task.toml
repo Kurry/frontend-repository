@@ -1,0 +1,6 @@
+[task]
+slug = "frontend-planning-classroom-lesson-arc-planner-constraint-canvas-rn-linear-views"
+name = "mercor-intelligence/frontend-planning-classroom-lesson-arc-planner-constraint-canvas-rn-linear-views"
+title = "Classroom Lesson Arc Planner - Constraint Canvas - Linear Filtered Views"
+description = "Build a Classroom Lesson Arc Planner using a Constraint Canvas and Linear Filtered Views pattern."
+genre = "good-app"
