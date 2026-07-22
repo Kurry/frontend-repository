@@ -6,7 +6,7 @@
   "scripts": {
     "start": "vite --host 0.0.0.0 --port 3000",
     "verify:build": "vite build",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test e2e.spec.mjs"
   },
   "dependencies": {
     "@tabler/icons-svelte": "3.45.0",
@@ -16,7 +16,7 @@
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.1",
+    "@playwright/test": "^1.61.1",
     "@sveltejs/vite-plugin-svelte": "7.2.0",
     "@tailwindcss/vite": "4.3.2",
     "tailwindcss": "4.3.2",
