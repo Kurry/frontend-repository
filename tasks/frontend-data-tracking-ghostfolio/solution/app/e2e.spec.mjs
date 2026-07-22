@@ -389,6 +389,7 @@ test.describe('frontend-data-tracking-ghostfolio criteria', () => {
   });
 
   test('1.50 import_round_trip_portfolio_json', async ({ page }) => {
+    const snapshotNetWorth = parseMoney(await page.locator('#net-worth').textContent());
     await page.locator('#export-btn').click();
     const snapshotText = await page.locator('#export-preview').textContent();
     const snapshot = JSON.parse(snapshotText);
@@ -410,6 +411,21 @@ test.describe('frontend-data-tracking-ghostfolio criteria', () => {
     const symbols = await page.locator('#holdings-body td.cell-symbol').allTextContents();
     expect(symbols.sort()).toEqual(snapshot.holdings.map((h) => h.symbol).sort());
     await expect(page.locator('#holdings-body td.cell-symbol', { hasText: 'PSNP' })).toHaveCount(0);
+    await expect(page.locator('#activities-body tr[data-id]')).toHaveCount(snapshot.activities.length);
+    expect(parseMoney(await page.locator('#net-worth').textContent())).toBe(snapshotNetWorth);
+
+    // Re-export the restored state and compare every domain field, not merely
+    // row identities. exportedAt is intentionally regenerated on each export.
+    await page.locator('#export-btn').click();
+    const restored = JSON.parse(await page.locator('#export-preview').textContent());
+    expect(restored.holdings).toEqual(snapshot.holdings);
+    expect(restored.activities).toEqual(snapshot.activities);
+    expect(restored.meta).toMatchObject({
+      version: snapshot.meta.version,
+      holdingCount: snapshot.holdings.length,
+      activityCount: snapshot.activities.length,
+    });
+    expect(restored.meta.exportedAt).not.toBe(snapshot.meta.exportedAt);
   });
 
   test('1.51 undo_reverses_mutation', async ({ page }) => {
