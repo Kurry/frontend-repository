@@ -491,7 +491,7 @@
   }
   function setCmdActive(i) { cmdActive = i; $$(".cmd-item", cmdList).forEach(function (li, k) { li.classList.toggle("active", k === i); }); }
   function chooseCmd(i) { var c = cmdFiltered[i]; if (!c) return; closePalette(); if (c[1] === "book-inquiry") openInquiry(); else if (c[1] === "shortlist") openDrawer(); else scrollToSel(c[2]); }
-  function openPalette(query) { if (!palette) return false; var q = query || ""; palette.classList.add("open"); cmdInput.value = q; renderCmd(q); setTimeout(function () { cmdInput.focus(); }, 20); return true; }
+  function openPalette(query) { if (!palette) return false; var q = query || ""; palette.classList.add("open"); cmdInput.value = q; renderCmd(q); cmdInput.focus(); return true; }
   function closePalette() { if (!palette) return; palette.classList.remove("open"); }
   function bootPalette() {
     if (!palette) return;

@@ -333,7 +333,13 @@ async function browserAndWebMcp(config) {
     );
     await browser.close();
     browser = null;
-    await e2eStage(config);
+    if (config.runE2e === false) {
+      console.log(
+        `ORACLE_CI_STAGE ${config.slug} [e2e]: SKIP (delegated to Playwright Tests workflow)`,
+      );
+    } else {
+      await e2eStage(config);
+    }
     await judgeSetup(config);
   } finally {
     if (browser) await browser.close().catch(() => {});
@@ -349,6 +355,7 @@ async function e2eStage(config) {
     slug: config.slug,
     appDir: config.appDir,
     runtimeDir: config.runtimeDir,
+    taskDir: config.taskDir,
   });
   if (result.status === 'skip') {
     console.log(

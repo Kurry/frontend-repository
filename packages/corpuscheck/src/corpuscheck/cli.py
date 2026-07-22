@@ -263,6 +263,11 @@ def oracle_ci_cmd(
     base_ref: str = typer.Option(
         "origin/main", "--base-ref", help="git base used by --changed"
     ),
+    skip_e2e: bool = typer.Option(
+        False,
+        "--skip-e2e",
+        help="delegate Playwright e2e execution to a separate CI check",
+    ),
 ) -> None:
     """Build, serve, probe WebMCP, and dry-run judge setup without LLM calls."""
     from .oracle_ci import OracleCIError, changed_oracle_slugs, run_oracle_ci
@@ -286,7 +291,12 @@ def oracle_ci_cmd(
         if not selected:
             console.print("[blue]SKIP[/blue] no changed task solution trees")
             return
-        run_oracle_ci(selected, tasks_root=tasks_root, repo_root=repo_root)
+        run_oracle_ci(
+            selected,
+            tasks_root=tasks_root,
+            repo_root=repo_root,
+            run_e2e=not skip_e2e,
+        )
     except OracleCIError as exc:
         err.print(f"[red]FAIL[/red] {exc}")
         raise typer.Exit(1) from exc
