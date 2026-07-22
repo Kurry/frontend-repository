@@ -13,6 +13,36 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Material-UI Theme Creator' })).toBeVisible();
 });
 
+test('mobile shell stays within the viewport without announcing a closed form', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.reload();
+
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+  await expect(page.locator('[data-announcer]')).toBeEmpty();
+  await expect(page.getByRole('button', { name: /Commands/ })).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'Tutorial' })).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'GitHub (inert)' })).toBeInViewport();
+});
+
+test('WebMCP descriptors synthesize a read probe and a visible mutation', async ({ page }) => {
+  const tools = await page.evaluate(() => (window as any).webmcp_list_tools());
+  const byName = new Map(tools.map((tool: any) => [tool.name, tool]));
+  const select = byName.get('editor_select') as any;
+  const exportTool = byName.get('artifact_export') as any;
+
+  expect(select.module).toBe('structured-editor-v1');
+  expect(select.inputSchema.required).toEqual(['object_type', 'id']);
+  expect(exportTool.module).toBe('artifact-transfer-v1');
+  expect(exportTool.inputSchema.properties.format.enum).toEqual(['json', 'css']);
+
+  expect(await page.evaluate(() => (window as any).webmcp_invoke_tool('editor_select', {
+    object_type: 'material-theme',
+    id: 'default',
+  }))).toEqual({ success: true });
+  await page.evaluate(() => (window as any).webmcp_invoke_tool('artifact_export', { format: 'json' }));
+  await expect(page.getByRole('tab', { name: 'Export' })).toHaveAttribute('aria-selected', 'true');
+});
+
 test('exported JSON round-trips, regenerates CSS, rejects incomplete palettes, and downloads exact artifacts', async ({ page }) => {
   await page.getByRole('tab', { name: 'Export' }).click();
   const preview = page.locator('[data-export-preview]');
