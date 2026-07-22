@@ -208,11 +208,11 @@ test.describe('core_features', () => {
   test('1.2 create_stop_appears_in_plan_list', async ({ page }) => {
     await gotoApp(page);
     await openAddStopForDay(page, 'Sun, 7/5');
-    await fillStopForm(page, { title: 'Harbor Lookout', day: '2025-07-05', category: 'sightseeing' });
+    await fillStopForm(page, { title: 'Clifftop Lookout', day: '2025-07-05', category: 'sightseeing' });
     await expect(stopSubmitButton(page)).toBeEnabled();
     await stopSubmitButton(page).click();
     const section = page.locator('.day-section', { hasText: 'Sun, 7/5' });
-    await expect(section.locator('.stop-row', { hasText: 'Harbor Lookout' })).toBeVisible();
+    await expect(section.locator('.stop-row', { hasText: 'Clifftop Lookout' })).toBeVisible();
   });
 
   test('1.3 stop_count_delta_after_three_creates', async ({ page }) => {
