@@ -1,0 +1,13 @@
+[dimensions.core_features]
+name = "Core Features"
+description = "Verifies the signature mutation and linked state updates."
+
+[[criterion]]
+id = "core_features.signature_mutation"
+description = "The forecast ribbon mutation changes the primary record, linked view, and status together."
+weight = 1
+
+[[criterion]]
+id = "core_features.undo"
+description = "Undo restores ordering, selection, and derived values."
+weight = 1

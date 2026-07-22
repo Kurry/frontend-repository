@@ -1,0 +1,8 @@
+[dimensions.technical]
+name = "Technical"
+description = "Verifies technical contracts."
+
+[[criterion]]
+id = "technical.schema_contract"
+description = "The tool result and artifact contain the declared API-shaped fields."
+weight = 1
