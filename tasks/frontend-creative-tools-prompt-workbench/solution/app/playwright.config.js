@@ -1,17 +1,21 @@
 import { defineConfig } from '@playwright/test'
 
 export default defineConfig({
-  testDir: './tests',
-  fullyParallel: true,
-  timeout: 30_000,
+  testDir: './e2e',
+  fullyParallel: false,
+  workers: 4,
+  retries: 0,
+  timeout: 20_000,
+  expect: { timeout: 5_000 },
   use: {
-    baseURL: 'http://127.0.0.1:3627',
+    baseURL: 'http://127.0.0.1:3000',
+    viewport: { width: 1440, height: 1000 },
     trace: 'retain-on-failure',
   },
   webServer: {
-    command: 'npm run start -- --port 3627',
-    url: 'http://127.0.0.1:3627',
+    command: 'npm start',
+    url: 'http://127.0.0.1:3000',
     reuseExistingServer: false,
-    timeout: 120_000,
+    timeout: 30_000,
   },
 })
