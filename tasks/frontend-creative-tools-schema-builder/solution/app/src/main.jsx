@@ -7,7 +7,9 @@ import { registerWebMCP } from './webmcp';
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <MotionConfig reducedMotion="user">
+    {/* useDur and the reduced-motion stylesheet own the zero-duration policy.
+        Keeping Motion's detector off avoids its development-only console warning. */}
+    <MotionConfig reducedMotion="never">
       <App />
     </MotionConfig>
   </React.StrictMode>,

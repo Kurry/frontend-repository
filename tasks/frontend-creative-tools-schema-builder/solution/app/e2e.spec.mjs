@@ -25,6 +25,7 @@ export const test = base.extend({
     expect(errors, 'zero console/page errors required').toEqual([]);
   },
 });
+
 export { expect };
 
 export const listTools = (page) => page.evaluate(async () => {
@@ -117,6 +118,67 @@ test.describe('workspace contract (canonical)', () => {
 });
 
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
+
+test('reduced-motion load is free of console warnings', async ({ page }) => {
+  const warnings = [];
+  page.on('console', (message) => {
+    // ConsoleMessage.type() is synchronous; the Playwright lint rule treats
+    // methods named `type` as locator actions unless explicitly suppressed.
+    // eslint-disable-next-line playwright/missing-playwright-await
+    if (message.type() === 'warning') warnings.push(message.text());
+  });
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto(BASE);
+  await expect(page.locator('#schema-name')).toBeVisible();
+  expect(warnings).toEqual([]);
+});
+
+test('SchemaPackage import rejects type-incompatible field constraints', async ({ page }) => {
+  await page.goto(BASE);
+  const initialTitle = await page.locator('#schema-name').inputValue();
+  const invalidPackage = {
+    schemaVersion: 'schema-package-v1',
+    name: 'Invalid constraint package',
+    jsonSchema: {
+      $schema: 'http://json-schema.org/draft-07/schema#',
+      type: 'object',
+      properties: {},
+      required: [],
+    },
+    fields: [{ key: 'score', type: 'number', required: true, enumValues: ['high'] }],
+    metadata: {},
+    examplePayload: { score: 1 },
+    formatInstruction: 'Return score.',
+  };
+  await invokeTool(page, 'editor_set_content', { property: 'schema-package-json', value: JSON.stringify(invalidPackage) });
+  const result = await invokeTool(page, 'artifact_import', { mode: 'schema-package' });
+
+  expect(result.ok).toBe(false);
+  expect(result.error).toContain('enumValues only applies when type is string');
+  await expect(page.locator('#schema-name')).toHaveValue(initialTitle);
+});
+
+test('SchemaPackage export preserves empty structured fields for re-import', async ({ page }) => {
+  await page.goto(BASE);
+  await dismissOnboarding(page);
+
+  await page.getByRole('button', { name: 'Add field', exact: true }).click();
+  await rowByKey(page, 'new_field').locator('button.node-name').click();
+  await page.locator('#cfg-type').selectOption('object');
+  await page.getByRole('button', { name: 'Export', exact: true }).click();
+  await page.getByRole('tab', { name: 'SchemaPackage JSON' }).click();
+  const exported = JSON.parse(await page.getByLabel(/SchemaPackage JSON preview/).innerText());
+  const emptyObject = exported.fields.find((item) => item.key === 'new_field');
+
+  expect(emptyObject).toMatchObject({ type: 'object', children: [] });
+
+  await invokeTool(page, 'editor_set_content', {
+    property: 'schema-package-json',
+    value: JSON.stringify(exported),
+  });
+  const result = await invokeTool(page, 'artifact_import', { mode: 'schema-package' });
+  expect(result.ok).toBe(true);
+});
 
 // Helper: the row (<li data-tree-row>) for a field whose visible name is
 // `key`. Node names are unique within the seeded "Evaluation result" tree
