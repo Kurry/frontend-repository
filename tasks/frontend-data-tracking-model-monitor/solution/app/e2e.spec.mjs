@@ -275,7 +275,8 @@ test('11.4 optional_budget_burn_projection', async ({ page }) => {
 });
 
 test('11.5 optional_provider_health_affordance', async ({ page }) => {
-  await page.goto('http://localhost:3000'); await expect(page.locator('text="Provider Health"')).toBeVisible();
+  await page.goto('http://localhost:3000');
+  await expect(page.getByText('Fastest simulated provider link')).toBeVisible();
 });
 
 // NOT-AUTOMATABLE: innovation.catchall is a subjective judge-only criterion
