@@ -1,0 +1,11 @@
+Drafts the proposed Harbor evaluation task `frontend-creative-tools-board-game-scenario-builder-scenario-weaver-rn-spotify-playlists`.
+
+### Deliverables included
+1. **instruction.md**: Formatted as a PRD representing the prompt's specifications, stripped of disallowed markdown inside core blocks.
+2. **Oracle Application**: Fully functional React/Vite implementation in `solution/app` running cleanly on port 3000 (`npm start` starts the Vite server in preview/dev mode). Includes complete in-memory logic managed by Zustand for the "Scenario Weaver" mutations, and the WebMCP tool implementations.
+3. **Evidence Video**: Playwright script generated the required VP9 `evidence.webm` capturing the canonical end-to-end paths, placed correctly in `solution/app/testing/evidence.webm`.
+4. **Dimension Criteria**: Propagated the 13 required `AC-X` criteria to the specific dimension TOMLs (core_features, visual_design, edge_cases, etc.), and filled in the required `innovation.catchall`.
+5. **E2E tests**: Mapped Playwright tests (`e2e.spec.mjs`) tracking all automatable criteria. Non-automatable visual rules were skipped with rationale comments.
+
+### Validation
+`uv run corpuscheck validate` passes everything aside from the known-failing maintainer checks `contract: no WebMCP assignment` and `shared_shape: no description` which are expected for unregistered draft tasks.
