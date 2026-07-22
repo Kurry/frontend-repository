@@ -143,12 +143,13 @@
       const s = doc.scenes[i];
       const p = "scenes[" + i + "].";
       if (!s || typeof s !== "object") return { error: p + "each scene must be an object." };
-      if (typeof s.id === "undefined") return { error: p + "id is required." };
+      if (typeof s.id !== "string" || !s.id.trim()) return { error: p + "id is required and must be a non-empty string." };
       if (typeof s.title !== "string" || !trimLen(s.title, 1, 80)) return { error: p + "title must be a string of 1 to 80 characters." };
       if (typeof s.body !== "string" || !trimLen(s.body, 1, 500)) return { error: p + "body must be a string of 1 to 500 characters." };
       if (clampInt(s.duration, 1, 300) == null) return { error: p + "duration must be an integer between 1 and 300." };
       if (!SHOT_VALUES.includes(s.shotType)) return { error: p + "shotType must be one of wide, medium, close-up, insert, or pov." };
       if (clampInt(s.order, 1, doc.scenes.length) == null) return { error: p + "order must be a 1-based integer with no gaps." };
+      if (s.order !== i + 1) return { error: p + "order must match the scene's 1-based position in the scenes array." };
       orders.push(s.order);
     }
     const sorted = orders.slice().sort((a, b) => a - b);
