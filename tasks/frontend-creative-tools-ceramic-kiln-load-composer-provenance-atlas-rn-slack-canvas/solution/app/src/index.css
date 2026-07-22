@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --color-kiln-empty: #f3f4f6;
+  --color-kiln-draft: #e5e7eb;
+  --color-kiln-ready: #d1fae5;
+  --color-kiln-changed: #fef08a;
+  --color-kiln-archived: #fca5a5;
+  --color-kiln-quarantined: #ef4444;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  background-color: #f9fafb;
+}
