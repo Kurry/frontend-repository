@@ -1,0 +1,8 @@
+{
+  "name": "frontend-creative-tools-icon-family-optical-studio",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "cd solution/app && npm run dev",
+    "verify:build": "cd solution/app && npm run build"
+  }
+}

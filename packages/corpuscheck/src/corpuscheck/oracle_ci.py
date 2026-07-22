@@ -265,6 +265,7 @@ def _runtime_stage(
     *,
     run: Run,
     app_dir: Path | None = None,
+    run_e2e: bool = True,
 ) -> None:
     node = shutil.which("node")
     if node is None:
@@ -282,6 +283,7 @@ def _runtime_stage(
             "assignmentsPath": str(schemas_path("webmcp-assignments.json")),
             "servers": [server.as_json() for server in servers],
             "runtimeDir": str(runtime_dir),
+            "runE2e": run_e2e,
         }
         config_path = runtime_dir / "config.json"
         config_path.write_text(json.dumps(config))
@@ -327,6 +329,7 @@ def run_oracle_ci(
     tasks_root: Path,
     repo_root: Path | None = None,
     run: Run = subprocess.run,
+    run_e2e: bool = True,
 ) -> int:
     """Run all oracle-CI stages serially for each requested task."""
     root = repo_root or find_repo_root(tasks_root)
@@ -347,5 +350,11 @@ def run_oracle_ci(
             print(f"{slug} [build]: running npm ci + verify:build")
             _build_stage(task, run=run, app_dir=app_dir)
             print(f"{slug} [build]: PASS")
-            _runtime_stage(task, root, run=run, app_dir=app_dir)
+            _runtime_stage(
+                task,
+                root,
+                run=run,
+                app_dir=app_dir,
+                run_e2e=run_e2e,
+            )
     return 0
