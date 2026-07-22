@@ -49,6 +49,22 @@ def bullet_count(body: str) -> int:
     return sum(1 for line in body.splitlines() if line.lstrip().startswith("- "))
 
 
+def frozen_skeleton(text: str) -> str:
+    """Return the document with only editable section bodies abstracted away."""
+    parts: list[str] = []
+    cursor = 0
+    for match in TAG_RE.finditer(text):
+        parts.append(text[cursor : match.start()])
+        name = match.group(1)
+        if name in EDITABLE_TAGS:
+            parts.append(f"<{name}>__EDITABLE_BODY__</{name}>")
+        else:
+            parts.append(match.group(0))
+        cursor = match.end()
+    parts.append(text[cursor:])
+    return "".join(parts)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("task_dir", type=Path)
@@ -78,6 +94,8 @@ def main() -> int:
     after_names = [name for name, _ in after_tags]
     if before_names != after_names:
         failures.append("XML tag names or order changed")
+    if frozen_skeleton(before) != frozen_skeleton(after):
+        failures.append("content outside editable section bodies changed")
 
     before_map = dict(before_tags)
     after_map = dict(after_tags)
