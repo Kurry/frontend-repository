@@ -1,0 +1,9 @@
+[setup]
+[dimensions.user_flows]
+description = "Verifies user flows"
+[[criterion]]
+id = "AC-05"
+title = "complete_user_flow"
+description = "Create, edit, mutate, undo, and complete one record; the end-to-end job is recoverable without reload."
+type = "negative"
+weight = 1

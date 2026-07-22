@@ -1,0 +1,9 @@
+[setup]
+[dimensions.edge_cases]
+description = "Verifies edge cases"
+[[criterion]]
+id = "AC-06"
+title = "boundaries_recovery"
+description = "Each invalid action gives field-level recovery and preserves prior valid state."
+type = "negative"
+weight = 1

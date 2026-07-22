@@ -1,0 +1,9 @@
+[setup]
+[dimensions.accessibility]
+description = "Verifies accessibility"
+[[criterion]]
+id = "AC-08"
+title = "alternate_input"
+description = "Alternate input produces identical state with visible focus and live feedback."
+type = "negative"
+weight = 1

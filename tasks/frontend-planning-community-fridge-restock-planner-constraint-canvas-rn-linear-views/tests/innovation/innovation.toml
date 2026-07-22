@@ -1,0 +1,15 @@
+[setup]
+[dimensions.innovation]
+description = "Verifies innovation"
+[[criterion]]
+id = "AC-11"
+title = "linked_utility"
+description = "Linked views provide domain utility beyond CRUD."
+type = "negative"
+weight = 1
+[[criterion]]
+id = "innovation.catchall"
+title = "not covered"
+description = "not covered by evidence"
+type = "negative"
+weight = 1

@@ -1,0 +1,9 @@
+[setup]
+[dimensions.behavioral]
+description = "Verifies behavioral rules"
+[[criterion]]
+id = "AC-13"
+title = "artifact_round_trip"
+description = "Authored order/selection/geometry and domain state survive; invalid import is a no-op."
+type = "negative"
+weight = 1

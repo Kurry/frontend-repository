@@ -1,0 +1,24 @@
+[task]
+name = "mercor-intelligence/frontend-planning-community-fridge-restock-planner-constraint-canvas-rn-linear-views"
+schema_version = "1"
+family = "harbor"
+tier = 4
+
+[evaluation]
+tests_timeout = 600
+
+[grading]
+total_points = 1.0
+
+[grading.breakdown]
+core_features = 0.4
+design_fidelity = 0.1
+motion = 0.05
+responsiveness = 0.1
+accessibility = 0.1
+performance = 0.05
+writing = 0.05
+edge_cases = 0.05
+user_flows = 0.05
+innovation = 0.0
+behavioral = 0.0
