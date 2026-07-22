@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-05"
+name = "The end-to-end job is recoverable without reload"
+description = "Creating, editing, mutating, undoing, and completing a record works seamlessly without page reloads."
+type = "binary"
+weight = 1.0

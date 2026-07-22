@@ -1,0 +1,6 @@
+[[criterion]]
+id = "AC-03"
+name = "Motion connects the acted-on item to its new state"
+description = "Grouping selected records animates the items into their new batch container. Reduced motion preserves feedback without transforms."
+type = "binary"
+weight = 1.0
