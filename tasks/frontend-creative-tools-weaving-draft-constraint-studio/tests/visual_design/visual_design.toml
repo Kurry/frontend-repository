@@ -1,0 +1,209 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "creative_tool_not_dashboard"
+description = "Paint stage + floating toolbar + Gallery density remains a creative tool, not a dashboard"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "empty_gallery_visually_present"
+description = "Empty Gallery state is visually present when no boards remain"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "paper_stage_condensed_type"
+description = "The stage is a light paper background with high-contrast ink-dark text, soft radial washes, and condensed UI type, with a large centered canvas under the toolbar in a desktop-first creative-tool composition"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "angle_bracket_title_and_intro_line"
+description = "On first load an angle-bracket display title reading <SHAPESHIFT GRID TOOL> and a typewriter-style intro line are visible"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "black_toolbar_contains_all_controls"
+description = "A floating black toolbar contains the cell-size slider, the three brush-mode buttons, the mirror-mode control, seven square color swatches, and action buttons including Export and Import"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.7"
+name = "seven_swatches_with_active_marking"
+description = "Exactly seven palette swatches (white, black, red, yellow, green, blue, pink) render as square chips and the currently selected swatch shows a visible active marking"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.8"
+name = "canvas_cell_render_styles"
+description = "On the canvas, QR cells render as a scannable festival QR mask, Color cells render as flat color fills, and when the grid overlay is on, light hairlines are drawn between cells"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.9"
+name = "single_consistent_icon_set"
+description = "Icons in the toolbar and gallery share one consistent icon set and stroke style across the whole app, with no mismatched or pixelated icons"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.10"
+name = "mobile_375_reflow_no_overflow"
+description = "At 375px viewport width the canvas and toolbar reflow to fit with no horizontal scrolling and no clipped controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "toolbar_controls_reachable_all_widths"
+description = "At desktop widths the toolbar floats over the stage; at narrow widths (whether docked or floating) all brush modes, swatches, and action buttons remain visible and reachable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "gallery_reflows_to_single_column"
+description = "Gallery cards reflow from a dense multi-column desktop arrangement to a single column at narrow widths without losing names, tags, or actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "empty_state_copy_actionable"
+description = "The gallery empty-state copy explains that the gallery is empty and tells the user how to save a board"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.15"
+name = "consistent_terminology_and_case"
+description = "Headings, buttons, and labels use one consistent capitalization convention, and the same concepts (boards, gallery, tags) are named consistently across Paint mode, Gallery mode, and dialogs"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.16"
+name = "touch_drag_paint_works_on_mobile_layout"
+description = "At 375px viewport width, painting across cells by touch drag works on the mobile layout, filling the cells under the drag path"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "export_surface_format_tabs_and_preview"
+description = "Export opens as a centered surface with Session JSON / PNG format tabs, a scrollable monospaced Session JSON preview, and visible Copy and Download affordances distinct from the rest of the studio chrome"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.18"
+name = "fill_stats_readout_visible"
+description = "A live fill-stats readout near the stage shows painted, qr, colorFilled, and blank counts as readable numerals on the light paper stage"
+type = "binary"
+weight = 1.0

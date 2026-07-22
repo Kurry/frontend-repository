@@ -8,10 +8,10 @@ export const contactSchema = z.object({
   name: z.string().min(2, 'Name is required — enter at least 2 characters.'),
   email: z.string().min(1, 'Email is required — enter a valid address like name@company.com.')
     .email('Email must be a valid address like name@company.com.')
-    .refine(val => val.includes('@') && (val.split('@')[1] || '').includes('.'), 'Email must include a domain, e.g. name@company.com.'),
+    .refine(val => (val.match(/@/g) || []).length === 1 && (val.split('@')[1] || '').includes('.'), 'Email must contain one @ and a domain segment, e.g. name@company.com.'),
   company: z.string().optional(),
-  interest: z.enum(['Build', 'Solutions', 'Community', 'Enterprise'], { errorMap: () => ({ message: 'Interest is required — choose Build, Solutions, Community, or Enterprise.' }) }),
-  privacy_consent: z.literal(true, { errorMap: () => ({ message: 'Privacy consent is required — check the box to continue.' }) }),
+  interest: z.enum(['Build', 'Solutions', 'Community', 'Enterprise'], { error: 'Interest is required — choose Build, Solutions, Community, or Enterprise.' }),
+  privacy_consent: z.literal(true, { error: 'Privacy consent is required — check the box to continue.' }),
   message: z.string().optional().refine(val => !val || val.length >= 10, 'Message must be at least 10 characters when provided.'),
 });
 
@@ -46,14 +46,14 @@ export default function ContactForm() {
       <div className="container mx-auto px-4 max-w-3xl">
         <h2 className="chapter-title text-4xl md:text-5xl font-bold mb-12 tracking-tight text-center">GET IN TOUCH</h2>
 
-        <div className="bg-surface/50 p-8 md:p-12 notch-br border border-white/10 relative overflow-hidden">
+        <div className="surface-copy bg-surface p-8 md:p-12 notch-br border border-current/10 relative overflow-hidden">
           {success ? (
-            <div className="absolute inset-0 bg-surface z-10 flex flex-col items-center justify-center p-8 text-center success-in">
+            <div className="min-h-[32rem] flex flex-col items-center justify-center p-8 text-center success-in" role="status">
                <div className="w-16 h-16 bg-accent/20 rounded-full flex items-center justify-center mb-6">
                  <span className="text-accent text-2xl" aria-hidden="true">✓</span>
                </div>
                <h3 className="text-2xl display-font font-bold mb-2">Message Sent</h3>
-               <p className="text-gray-400">We'll be in touch shortly. Your lead is now in Session leads.</p>
+               <p className="opacity-70">We'll be in touch shortly. Your lead is now in Session leads.</p>
                <button className="btn btn-outline mt-8 notch-br text-current border-current focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" onClick={() => setSuccess(false)}>Send another</button>
             </div>
           ) : null}
@@ -63,7 +63,7 @@ export default function ContactForm() {
             {errorSummary ? `Contact form has errors. ${errorSummary}` : ''}
           </p>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
+          {!success && <form onSubmit={handleSubmit(onSubmit)} className="space-y-6" noValidate>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium mb-2">Name</label>
@@ -134,8 +134,8 @@ export default function ContactForm() {
               {errors.privacy_consent && <span className="text-error text-sm block" role="alert">{errors.privacy_consent.message}</span>}
             </div>
 
-            <button type="submit" className="btn btn-primary w-full notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">Submit</button>
-          </form>
+            <button type="submit" className="btn btn-primary w-full notch-br focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2" disabled={!isValid} aria-disabled={!isValid}>Send contact request</button>
+          </form>}
         </div>
       </div>
     </section>

@@ -1,0 +1,427 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "paint_stage_first_load"
+description = "On first load the app opens directly to Paint mode with the <GRID PAINT STUDIO> title, angle-bracketed typewriter tagline, floating dark toolbar, large centered canvas, QR Brush active, black active swatch, Mirror Off, Vision Off, and no login or splash screen"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "seeded_gallery_boards"
+description = "Opening Gallery on first load shows at least four seeded saved boards, each with a name, cell-snapshot thumbnail, and a closed-enum tag from pattern, portrait, abstract, logo, study, or signal"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "save_board_create"
+description = "After painting a recognizable pattern and saving it as 'Harbor Signal' with a valid closed-enum tag, the gallery count increases by exactly one and a 'Harbor Signal' entry shows a matching cell-snapshot thumbnail and that tag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "save_count_delta"
+description = "After adding 3 new boards on top of the seed set, Gallery shows exactly 3 more items than the initial seeded count"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "load_board_to_canvas"
+description = "Loading a saved board from Gallery returns to Paint mode and writes that board's thumbnail pattern into the shared canvas while preserving its colors and cell arrangement"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "rename_board_in_place"
+description = "After renaming a saved board to 'Evening Grid', that same gallery card shows the new name in place with its thumbnail, tag, and favorite state attached, the old name disappears, the gallery count stays exactly the same, and no duplicate card appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "delete_board"
+description = "After deleting a selected saved board, the gallery count decreases by exactly one, that board name disappears from unfiltered and matching filtered views, and no stale selection remains"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "empty_gallery_state"
+description = "After deleting all boards, an empty state is visible in Gallery"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "invalid_board_name_validation"
+description = "Submitting Save board with an empty and then a whitespace-only name leaves the gallery count unchanged both times and shows visible inline validation feedback at the name field"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "favorite_marker_and_tag_filter"
+description = "With the seeded boards visible, favoriting one board toggles a visible favorite marker on its card immediately, choosing a tag filter shows exactly the boards carrying that tag, and clearing the filter restores the full list exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.11"
+name = "paint_gallery_export_mode_switch"
+description = "After switching among Paint, Gallery, and Export center modes, the main surface shows the chosen mode without full page navigation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.12"
+name = "cell_resolution_retiles_and_resamples"
+description = "Before painting, moving Cell from its default 40 to two distinct allowed values rebuilds the board to floor(1024 / cell) rows and columns each time; after loading a nonblank saved board, changing an available Cell value resamples that artwork into the new cell count rather than clearing it"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.13"
+name = "qr_brush_color_rules"
+description = "Through real canvas strokes with QR Brush active, a white swatch produces a black QR glyph on white, black produces a white glyph on black, and a colored swatch produces that color's QR glyph on white"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.14"
+name = "cell_lock_and_clear"
+description = "After the first painted cell and separately after an image import, Cell becomes visibly muted and disabled; Clear empties the canvas, clears the artwork lock, and re-enables Cell"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.15"
+name = "toolbar_tool_and_grid_controls"
+description = "QR Brush, Color Brush, Flood Fill, and Eraser each become the sole active tool when clicked, and clicking the grid button alternates its label between Grid On and Grid Off while the hairline cell overlay visibly shows and hides"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.16"
+name = "continuous_stroke_and_undo"
+description = "A single real pointer press-drag across multiple cells paints every crossed cell continuously and adds exactly one history step; one Undo or Backspace restores the entire pre-stroke pattern rather than reverting only one cell"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.20"
+name = "exact_seven_color_palette"
+description = "Exactly seven square palette swatches (black, white, red, yellow, green, blue, pink) select the active color, the active swatch is visibly ringed, and the choice tints both Color Brush fills and QR cells"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.21"
+name = "color_brush_and_eraser"
+description = "Using real canvas strokes, Color Brush fills whole crossed cells with the active swatch and Eraser returns the crossed painted cells to the blank state without changing other cells"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.23"
+name = "keyboard_shortcut_parity"
+description = "Keyboard shortcuts drive the tools: Q/B/F/E switch to QR/Color/Flood Fill/Eraser, G toggles the grid overlay, M cycles Mirror, Backspace undoes, Ctrl/Cmd+Z undoes, Ctrl/Cmd+Shift+Z redoes, and number keys 1-7 pick the matching palette swatch"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.24"
+name = "download_branded_png"
+description = "Download PNG produces grid_paint.png from the current board with no hairline grid overlay and with a black footer strip captioned '/MADE WITH GRID PAINT STUDIO' on the left and '<GRIDPAINT.STUDIO>' on the right"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.25"
+name = "upload_pixelizes_image"
+description = "Upload opens a file picker and, after choosing an image, fills the board with one averaged color per grid cell from a cover-scaled, centered version of the image and locks the Cell control"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.26"
+name = "camera_capture_and_cancel"
+description = "Camera opens an in-toolbar front-facing preview overlay; Cancel closes it without changing the board, while Capture center-crops a square frame, pixelizes it into cells, closes the overlay, and locks Cell"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.27"
+name = "share_or_download_fallback"
+description = "Share attempts to hand the same branded PNG to the native share sheet when sharing is available and otherwise triggers the same grid_paint.png download fallback"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.28"
+name = "paint_save_filter_load_flow"
+description = "Starting from a recorded gallery count: paint one multicolor stroke pattern, save it as 'Harbor Signal' with a tag, favorite it, filter by that tag, load it, and return to Paint; the count is exactly one higher, the filtered Gallery shows the same card with its favorite marker and matching thumbnail, and the canvas reproduces the saved pattern without reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.29"
+name = "rename_delete_empty_repopulate_flow"
+description = "Rename a saved board, then delete every board and observe the empty-gallery state, then paint and save a valid replacement; the old names remain absent, the empty state clears, the count becomes one, and the replacement can load back into Paint mode"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.30"
+name = "tool_palette_undo_clear_flow"
+description = "Starting on a blank board, choose a numbered colored swatch, use B to paint one multi-cell stroke, use E for a second erasing stroke, press Backspace once, then Clear; each active indicator matches the shortcut, the undo restores the whole erased stroke only, Clear blanks the board, and Cell is enabled again"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.31"
+name = "load_flow_locks_cell_and_gallery_unchanged"
+description = "Load-and-verify chain: from Gallery, load a seeded board; the app returns to Paint mode with that board's artwork visible on the canvas, the Cell control is visibly disabled because the board now holds art, and reopening Gallery still lists the same board with its name, thumbnail, and tag unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.32"
+name = "delete_loaded_board_keeps_canvas"
+description = "Delete chain: load a board onto the canvas, return to Gallery, and delete that same board; its card disappears, the gallery count decreases by exactly one, and switching back to Paint shows the canvas still holding the loaded pixels — only the collection changed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.33"
+name = "filter_echo_favorite_live_update"
+description = "Filter-echo chain: favorite a board, filter the gallery by that board's tag, and confirm the filtered list shows the card with its favorite marker intact; then toggle the favorite off while the filter is still active and confirm the same visible card's marker updates immediately without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.34"
+name = "no_match_tag_filter_empty_state"
+description = "When the tag filter matches no boards, the list region shows an empty state instead of a blank area, and clearing the filter restores the full list exactly"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.35"
+name = "undo_noop_without_history"
+description = "On a fresh blank board with no strokes recorded, Undo and Redo controls are disabled; activating them changes nothing on the canvas or toolbar and produces no visible error"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.36"
+name = "camera_denied_visible_message"
+description = "When camera access is denied, the app shows a visible message explaining the camera is unavailable instead of a broken or empty overlay, and the board is left unchanged"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.37"
+name = "double_save_single_entry"
+description = "Rapidly double-activating the Save board submit with a valid name creates exactly one gallery entry: the count increases by exactly one and only one new card appears"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.38"
+name = "flood_fill_contiguous_region"
+description = "With Flood Fill active, clicking a cell replaces every contiguous cell matching that cell's current value with a flat whole-cell fill of the active swatch in one update, and Undo restores the entire filled region"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.39"
+name = "mirror_horizontal_paints_pair"
+description = "With Mirror set to Horizontal, a real Color Brush stroke that paints one cell also paints its horizontal mirror in the same step, and one Undo clears both cells together"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.40"
+name = "redo_restores_undone_stroke"
+description = "After painting one stroke and undoing it, Redo (or Ctrl/Cmd+Shift+Z) restores that stroke; painting a new stroke after an undo clears the redo stack and disables Redo"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.41"
+name = "live_histogram_tracks_cells"
+description = "The live color histogram shows bars for the seven palette colors plus blank; after painting red cells then erasing some, the red and blank bars change heights to match the board without a reload"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.42"
+name = "vision_preview_does_not_mutate"
+description = "Cycling Vision preview to Protanopia, Deuteranopia, or Tritanopia visibly filters the paint stage; toggling Vision Off restores the original swatch appearance of every painted cell without rewriting stored colors"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.43"
+name = "snap_version_and_compare"
+description = "Snap version with a valid name adds a Versions list entry with a thumbnail; selecting that version and the live board and activating Compare shows a labeled before/after split; exiting Compare restores the live editable board unchanged"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.44"
+name = "export_center_live_project_json"
+description = "After painting a recognizable pattern and saving a named board with a closed-enum tag, Export center Project JSON contains that cell pattern and the new board name under ProjectDocument field names, and the CSS palette block lists custom properties for all seven swatches"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.45"
+name = "export_copy_and_download_project"
+description = "Copy on the Project JSON artifact shows a visible confirmation, and Download Project produces a .json file of the current Project JSON text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.46"
+name = "import_project_round_trip"
+description = "Importing a previously exported Project JSON reconstructs the board cells, cell size lock when non-blank, gallery boards, and versions from that payload so the canvas and gallery match the export"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.47"
+name = "bulk_gallery_favorite_and_delete"
+description = "Selecting three gallery boards and choosing Favorite selected marks all three; Delete selected after a confirmation naming the count removes exactly those three and decreases the gallery count by three"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.48"
+name = "command_palette_loads_board"
+description = "Pressing Ctrl+K or Cmd+K opens the command palette; typing part of a seeded board name and pressing Enter on that result loads the board onto the canvas in Paint mode"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.49"
+name = "project_document_field_contract"
+description = "With painted cells and at least one saved board, Export center Project JSON visible text includes required ProjectDocument keys cellSize, tool (qr|color|fill|erase), swatch (one of the seven palette hexes), mirror (off|horizontal|vertical|both), vision (off|protanopia|deuteranopia|tritanopia), gridVisible, cells, boards, and versions; boards entries show SavedBoard keys name, tag, favorite, cellSize, and cells; cells dimensions match floor(1024 / cellSize)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.50"
+name = "saved_board_field_contract_on_create"
+description = "Save board create submits a SavedBoard request-body payload: unique trimmed name (max 40) and a tag from pattern|portrait|abstract|logo|study|signal; after a valid save, the new gallery card and the Project JSON boards entry both show that name and tag under the same field names, with favorite false until toggled"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.51"
+name = "import_rejects_invalid_project_document"
+description = "Import Project with JSON missing a required ProjectDocument key, using tool/swatch/mirror/vision outside their closed enums, cells dimensions that disagree with cellSize, a QR cell missing kind or color, or a boards/versions entry that violates SavedBoard / VersionSnapshot rules (invalid tag, overlong name, non-boolean favorite, or cells/cellSize mismatch) shows a visible error naming the offending field and leaves board and gallery unchanged"
+type = "binary"
+weight = 1.0
+

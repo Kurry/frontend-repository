@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "7.1"
+name = "layout_adapts_desktop_to_375"
+description = "Resizing from 1280px+ desktop to about 375px mobile keeps a usable Mermaid workspace: editor, preview, samples, and actions remain present and operable at both widths."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.2"
+name = "mobile_tap_targets_adequate"
+description = "At about 375px width, sample buttons, SVG/PNG/Copy image controls, Code/Config tabs, and the theme toggle present tap targets at least 44px in at least one dimension."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.3"
+name = "typography_readable_both_widths"
+description = "Header title, tab labels, sample/action labels, and error text remain legible at both 1280px+ and about 375px — type scales or reflows without becoming unreadably small on mobile."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.4"
+name = "no_clip_or_overflow_at_375"
+description = "At about 375px width, editor, preview, samples, and actions never clip or overflow the viewport."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.5"
+name = "regions_stack_at_phone_width"
+description = "At a narrow phone width around 375px the two regions reflow into a single readable column and the export controls stay reachable without horizontal page scrolling."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.6"
+name = "narrow_stack_order_stays_usable"
+description = "At about 375px width, editor and preview reflow into a logical stacking order without covering each other into an unusable pile."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.7"
+name = "mobile_controls_tappable"
+description = "At about 375px width, tap/click activation works on Code/Config tabs, sample buttons, export/copy controls, and the theme toggle."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.8"
+name = "no_horizontal_scroll_at_375"
+description = "At about 375px width the page does not produce horizontal scrolling of the document."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.9"
+name = "preview_diagram_scales"
+description = "The rendered diagram SVG/canvas sizes responsively inside the preview region rather than staying a fixed overflowing size at 375px or desktop widths."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "7.10"
+name = "side_by_side_at_desktop"
+description = "At desktop widths 1280px and above the editor column and preview region sit side by side; resizing between desktop and phone widths never produces horizontal scrolling of the document or content cut off outside the viewport."
+type = "binary"
+weight = 1.0
+

@@ -429,12 +429,19 @@ a:focus-visible, button:focus-visible, [tabindex]:focus-visible, select:focus-vi
    Reduced motion — settle everything, keep all controls operable
    ========================================================================= */
 @media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
   html { scroll-behavior: auto; }
   .threejs-scroll-section { height: 100vh; }
   #canvas-container { position: absolute; }
   .ticker-track { animation: none; }
   [data-hero-fade] { opacity: 1 !important; transform: none !important; }
   .loader-logo, .loader-track { animation: none !important; opacity: 1 !important; }
+  .loader-bar { transition: none !important; }
   .wr-word { opacity: 1 !important; }
   #threejs-logo, #scroll-nudge { transition: none; }
   .rive-card { transition: none; }

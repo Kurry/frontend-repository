@@ -1,0 +1,158 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "overview_composition_matches_reference"
+description = "At desktop width the overall Quest composition (map, log form, progress, chart region, tab chrome) matches the reference overview structure; where screenshot and instruction conflict, instruction wins"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.2"
+name = "segment_map_region_matches"
+description = "The quest map canvas region and waypoint path placement align with the reference segments' map treatment"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.3"
+name = "tab_chrome_matches_reference"
+description = "Quest / History / Gear / Settings tab chrome placement and active treatment align with the reference"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.4"
+name = "progress_and_streak_placement"
+description = "Daily-goal progress and Current Streak placement match the reference hierarchy near the quest map"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.5"
+name = "gear_shop_card_layout"
+description = "Gear Shop cards show cost and locked/unlocked treatment in a layout consistent with the reference gear segment"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.6"
+name = "history_list_layout"
+description = "History list rows with reps and timestamps match the reference list density and ordering cues"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.7"
+name = "settings_form_layout"
+description = "Settings daily goal and reminder controls match the reference settings segment structure"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.8"
+name = "weekly_chart_region"
+description = "The weekly summary chart region sits where the reference shows it relative to the map and progress"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.9"
+name = "spacing_and_sizing_follow_reference"
+description = "Spacing and control sizing follow the reference scale rather than a cramped or oversized reinterpretation"
+type = "binary"
+weight = 1.0
+[[criterion]]
+id = "3.10"
+name = "component_states_match_reference"
+description = "Default/hover/active treatments on primary controls are consistent with the reference's interactive chrome"
+type = "binary"
+weight = 1.0

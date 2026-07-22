@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isIsoCalendarDate } from './store';
 
 export const contactSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -7,8 +8,8 @@ export const contactSchema = z.object({
     'Must contain a domain segment',
   ),
   company: z.string().optional(),
-  interest: z.enum(['Build', 'Solutions', 'Community', 'Enterprise'], { errorMap: () => ({ message: 'Invalid interest' }) }),
-  privacy_consent: z.literal(true, { errorMap: () => ({ message: 'Consent is required' }) }),
+  interest: z.enum(['Build', 'Solutions', 'Community', 'Enterprise'], { error: 'Interest is required' }),
+  privacy_consent: z.literal(true, { error: 'Privacy consent is required' }),
   message: z.string().optional().refine((value) => !value || value.length >= 10, 'Message must be at least 10 characters if provided'),
 });
 
@@ -21,10 +22,10 @@ export const leadSchema = z.object({
 
 export const eventSchema = z.object({
   title: z.string().min(2, 'Title must be at least 2 characters'),
-  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD'),
+  date: z.string().refine(isIsoCalendarDate, 'Must be a real calendar date in YYYY-MM-DD format'),
   city: z.string().min(2, 'City must be at least 2 characters'),
-  category: z.enum(['Summit', 'Meetup', 'Workshop', 'Hackathon', 'Webinar'], { errorMap: () => ({ message: 'Invalid category' }) }),
-  status: z.enum(['upcoming', 'featured', 'past'], { errorMap: () => ({ message: 'Invalid status' }) }),
+  category: z.enum(['Summit', 'Meetup', 'Workshop', 'Hackathon', 'Webinar'], { error: 'Invalid category' }),
+  status: z.enum(['upcoming', 'featured', 'past'], { error: 'Invalid status' }),
   featured: z.boolean(),
 }).refine((data) => (data.featured ? data.status === 'featured' : data.status !== 'featured'), {
   message: 'If featured is true, status must be featured, and vice versa.',

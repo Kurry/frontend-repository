@@ -51,3 +51,44 @@ test('declared-theme JSON preserves its generated timestamp through import', asy
   const imported = JSON.parse(await page.locator('#artifact-code').textContent());
   expect(imported.generatedAt).toBe(before.generatedAt);
 });
+
+test('font controls export and import the public declared-theme enum', async ({ page }) => {
+  await page.goto('/');
+
+  for (const [label, declaredValue] of [
+    ['Outfit', 'Outfit'],
+    ['System', 'system-ui'],
+    ['Serif', 'serif'],
+    ['Mono', 'monospace'],
+  ]) {
+    await page.getByRole('button', { name: `Font family ${label}` }).click();
+    await page.getByRole('button', { name: /^CSS / }).click();
+    await page.getByRole('tab', { name: 'JSON' }).click();
+    const exported = JSON.parse(await page.locator('#artifact-code').textContent());
+    expect(exported.fontFamily).toBe(declaredValue);
+    await page.locator('#import-src').fill(JSON.stringify(exported));
+    await page.getByRole('button', { name: 'Import Theme' }).click();
+    await expect(page.getByRole('button', { name: `Font family ${label}` })).toHaveAttribute('aria-pressed', 'true');
+    await page.getByRole('button', { name: 'Close artifact center' }).click();
+  }
+});
+
+test('entity creation with initial tokens writes those tokens into the share hash', async ({ page, context }) => {
+  await page.goto('/');
+  const result = await page.evaluate(() => window.webmcp_invoke_tool('entity_create', {
+    entity: 'theme',
+    fields: {
+      name: 'hash-ready',
+      tokens: { colors: { '--color-primary': '#123456' } },
+    },
+  }));
+  expect(result.ok).toBe(true);
+  await expect(page.getByLabel('Primary color')).toHaveValue('#123456');
+
+  const sharedUrl = page.url();
+  expect(new URL(sharedUrl).hash).toMatch(/^#theme=/);
+  const freshPage = await context.newPage();
+  await freshPage.goto(sharedUrl);
+  await expect(freshPage.locator('#theme-name')).toHaveValue('hash-ready');
+  await expect(freshPage.getByLabel('Primary color')).toHaveValue('#123456');
+});

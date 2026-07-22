@@ -1,0 +1,161 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "14.1"
+name = "multi_facet_reload_persists_all"
+description = "Starting from seed: edit the source to a distinct valid diagram, switch to Config and change the theme value to another valid theme, leave Config as the active tab, and toggle the app theme to dark; then reload. Confirm every facet survives together — restored source, active Config tab, edited configuration, dark theme, and a preview consistent with those documents — never a mix of surviving and reverted facets."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.2"
+name = "sample_type_reversal_proves_live_state"
+description = "Selection-reversal proof (genre stand-in for sort reversal): click Sequence and note source/preview/badge, click Flowchart and note the different type, then click Sequence again. Confirm sequence source, sequence preview marks, and sequence badge return — proving editor/preview/badge are derived from live sample state, not two hardcoded snapshots."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.3"
+name = "source_edit_derived_preview_sensitivity"
+description = "Derived-view sensitivity: replace the source with two clearly different valid diagrams in sequence. Confirm the preview changes meaningfully for each input rather than redrawing an identical diagram regardless of source."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.4"
+name = "source_edit_echoes_preview_and_badge"
+description = "Cross-view echo: after selecting Mindmap, confirm without reload that the editor source, the preview render, and the header diagram-type badge all reflect the mindmap type together."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.5"
+name = "export_availability_delta_on_error"
+description = "Count-delta integrity (export availability): with valid source note that SVG/PNG/Copy image/MMD are enabled; introduce invalid syntax and re-check immediately — those controls become unavailable; correct the source and re-check — they become available again (exact enablement delta, no lagging controls)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.6"
+name = "different_sources_different_outcomes"
+description = "Input-dependent output: load Sequence then Class via samples (or two distinct valid sources). Confirm the two outcomes differ in the ways the inputs dictate (not byte-identical preview marks or identical badge labels)."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.7"
+name = "interleaved_config_and_code_flows"
+description = "Interleaved-flow integrity: start editing Code with a valid change, switch to Config and enter invalid JSON or an illegal theme enum (validation visible naming the theme field or config document, last valid config kept), switch back to Code and finish a second distinct valid edit; confirm Code shows the finished edit, Config still shows the validation error, and the preview reflects the latest valid Code without corrupting either document."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.8"
+name = "empty_then_repopulate_source"
+description = "Edge-state round-trip: clear the source to empty (error/empty treatment, exports unavailable), then paste or type a valid flowchart (or click Flowchart sample); confirm the empty/error treatment clears, the preview renders the new diagram, exports re-enable, and the badge matches."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "14.9"
+name = "session_json_export_import_roundtrip"
+description = "Full-pipeline artifact probe: mutate source to a distinctive valid diagram, set config.theme to another valid Mermaid Config enum, select Sequence, toggle appTheme to dark; confirm Session JSON preview contains those values under schemaVersion mermaid-session-v1 with every required MermaidSession key; Download then Import reconstructs the same source, config theme, sequence badge, and dark theme; MMD export then Import restores matching Code text; a second Session JSON import with wrong schemaVersion or illegal theme leaves state unchanged with field-named validation."
+type = "binary"
+weight = 1.0
+

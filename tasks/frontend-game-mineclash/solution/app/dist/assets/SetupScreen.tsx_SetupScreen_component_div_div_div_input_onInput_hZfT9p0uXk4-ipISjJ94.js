@@ -1,0 +1,1 @@
+import{v as s}from"./core.min-DVALGa4Q.js";import"./preloader-Bns9QiKi.js";const n=a=>{const[e,o]=s(),t=a.target.value;o.playerName=t;const r=t.trim();r.length<2||r.length>20?e.value="playerName field must be 2 to 20 non-space characters":e.value=""};export{n as s_hZfT9p0uXk4};

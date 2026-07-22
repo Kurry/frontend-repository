@@ -54,10 +54,10 @@ export function DeveloperResources() {
 
 export function NetworkInAction() {
   return (
-    <section className="network-in-action chapter py-24 bg-surface relative z-20" aria-labelledby="network-in-action-title">
+    <section className="network-in-action surface-copy chapter py-24 bg-surface relative z-20" id="network-in-action" aria-labelledby="network-in-action-title">
       <div className="container mx-auto px-4">
         <h2 id="network-in-action-title" className="chapter-title text-4xl md:text-5xl font-bold mb-16 tracking-tight">Network in action</h2>
-        <div className="notch-br bg-void border border-current/10 p-6 overflow-hidden">
+        <div className="void-copy notch-br bg-void border border-current/10 p-6 overflow-x-auto">
           <table className="table w-full text-sm">
             <thead>
               <tr className="opacity-70 border-b border-current/10">

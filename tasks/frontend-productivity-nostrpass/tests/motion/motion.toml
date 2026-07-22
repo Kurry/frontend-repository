@@ -1,0 +1,193 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "4.1"
+name = "hover_feedback_wash_required"
+description = """Interactive chrome (nav items, buttons, identity cards, toggles) shows a hover feedback wash with background/border/shadow easing plus a slight lift"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.2"
+name = "theme_switch_recolors_immediately"
+description = """The theme switch recolors backgrounds, text, and borders across the shell immediately with no flash of unstyled content"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.3"
+name = "reveal_requires_real_click"
+description = """The reveal-key control swaps masked dots for the real nsec only on a real UI click and swaps back on a second click"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.4"
+name = "identity_switch_without_reload"
+description = """Selecting a different identity transitions dashboard keys and permission badges without a full page reload"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.5"
+name = "permission_toggle_handle_animates"
+description = """The permission toggle switch animates its handle between revoked (left) and granted (right) when clicked"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.6"
+name = "new_card_entrance_animation"
+description = """A newly created identity card animates into the grid over roughly 150 to 300 milliseconds rather than appearing instantly"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.7"
+name = "audit_entry_entrance_animation"
+description = """New Audit log entries animate in at the top when an action is recorded while the view is visible"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.8"
+name = "toast_slide_and_dismiss"
+description = """Create, permission, copy, export, and import toasts slide in, remain readable, and auto-dismiss with a fade"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.9"
+name = "export_drawer_and_dialogs_transition"
+description = """The Export vault drawer slides in; delete and import confirmations enter and exit with a brief transition"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.10"
+name = "reduced_motion_removes_animations"
+description = """With prefers-reduced-motion set, entrance and toggle animations are removed and state changes apply instantly while features remain usable"""
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "4.11"
+name = "bulk_switches_animate_together"
+description = "Activating Grant all or Revoke all animates every affected matrix switch handle in the same moment rather than leaving some cells snapping later or not moving"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "4.12"
+name = "rotation_crossfades_key_surfaces"
+description = "After confirming a rotation via the real dialog, the dashboard's npub and nsec surfaces transition to the new values with a brief crossfade rather than snapping"
+type = "binary"
+weight = 0.5
+

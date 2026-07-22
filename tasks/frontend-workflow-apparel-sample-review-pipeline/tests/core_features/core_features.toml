@@ -1,0 +1,140 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "1.1"
+name = "callout_coordinates_update"
+description = "Move a callout on the garment diagram and edit its measurement base and rule. The table and diagram both show the new position and recomputed size targets; entering an invalid dependency rejects the edit."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "materials_reserve_stale"
+description = "Bind a new material lot to a callout and observe usage updates. The lot reserves integer usage, previous snapshots or approvals mark stale, and the material table reflects the new binding."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "snapshot_records_immutable"
+description = "Receive a new sample, enter a measured value outside tolerance, and annotate a region issue. The sample snapshot freezes spec version and logs the high/low classification along with the annotated construction issue."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "issues_route_into_spec"
+description = "Move an issue through routing stages to accepted, and implement it in spec. The workflow state transitions properly, creates a new spec revision branch, and marks older dependent samples as stale."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "compare_highlights_tolerance"
+description = "Compare two sample revisions. A heatmap identifies exact target/actual deltas, distinguishing between zero and missing, and highlights material/callout differences."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "package_fails_then_retries"
+description = "Approve gates and package, triggering deterministic failure, then retry failed-only. The first run fails one diagram and one checksum; retrying preserves successes and completes the final package."
+type = "binary"
+weight = 1.0

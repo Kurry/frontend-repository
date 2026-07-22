@@ -7,7 +7,8 @@
     "build": "vite build",
     "start": "http-server dist -a 0.0.0.0 -p 3000 -c-1",
     "dev": "vite",
-    "verify:build": "vite build"
+    "verify:build": "vite build",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
   },
   "dependencies": {
     "@builder.io/qwik": "1.20.0",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "http-server": "14.1.1",
     "typescript": "6.0.3",
-    "vite": "7.3.6"
+    "vite": "7.3.6",
+    "@playwright/test": "1.61.0"
   }
 }

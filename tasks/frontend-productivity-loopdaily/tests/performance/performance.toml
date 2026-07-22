@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "9.1"
+name = "cold_start_under_two_seconds"
+description = "The app is interactive within 2 seconds of a local cold load (habit list or empty-state create affordance usable)"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.2"
+name = "console_clean_through_malformed_path"
+description = "No console errors appear during a full exercise including create, check-in, Stats, Heatmap, Export as JSON, Import cancel, and Load Malformed Sample"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.3"
+name = "checkin_and_filter_transitions_snappy"
+description = "Category chip filter changes and check-in/stepper updates begin reflecting in the UI in under about 100ms of perceived lag"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.4"
+name = "export_import_stay_responsive"
+description = "Export as JSON download and Import FileReader confirmation remain responsive with visible confirmation feedback rather than a multi-second frozen shell"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.5"
+name = "many_habits_list_stays_usable"
+description = "With a moderately large habit list (dozens of habits via create or field-contract-valid import), scrolling the list and tapping steppers remains usable without multi-second freezes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.6"
+name = "stats_update_keeps_ui_interactive"
+description = "Recording a check-in that updates Stats monthly completions and the trend chart leaves the habit list and navigation interactive without a blocking wait"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.7"
+name = "habit_enter_and_confetti_smooth"
+description = "Habit enter/exit list animations and the milestone confetti burst (when not reduced-motion) maintain a smooth perceived frame rate without long jank spikes"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.8"
+name = "rapid_stepper_taps_stay_responsive"
+description = "Rapid repeated stepper taps stay responsive with no hangs, and every tap is reflected in the n/target fraction and progress bar"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.9"
+name = "extended_checkin_session_stable"
+description = "An extended session of creates, check-ins, filter toggles, and Export as JSON shows no runaway memory growth that makes the tab unusable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "9.10"
+name = "malformed_recovery_without_hang"
+description = "Load Malformed Sample and corrupted-localStorage recovery complete with a role=alert outcome without hanging the UI in a blank loading state"
+type = "binary"
+weight = 1.0
+

@@ -1,0 +1,175 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "6.1"
+name = "edit_break_recover_and_reload"
+description = "Edit/break/recover flow: starting from the seeded Christmas flowchart, typing an edit that leaves syntax invalid shows the Syntax error region with the parser's message, dims the preview while the last valid diagram stays visible, and disables SVG, PNG, Copy image, and MMD; correcting the source clears the error, restores full-opacity corrected preview, and re-enables those exports; reloading then restores the corrected source, matching preview, and no error region."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.2"
+name = "invalid_config_inline_validation"
+description = "Config validation flow: switching to Config and entering text that is not valid JSON, or JSON that fails the Mermaid Config field contract (missing theme or theme outside default|base|dark|forest|neutral), shows an inline validation message naming the theme field or the config document, does not apply the invalid configuration, and keeps the preview on the last valid configuration."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.3"
+name = "config_theme_edit_preserves_code"
+description = "Config follows-through flow: on Config, changing the theme value to another valid Mermaid Config theme enum (default, base, dark, forest, or neutral) re-renders the preview with visibly different diagram colors; switching back to Code shows the diagram source unchanged by the config edit; reloading restores both the edited configuration and the active tab."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.4"
+name = "sample_replaces_source_preview_badge"
+description = "Sample flow: clicking Sequence replaces the editor source with sequence syntax, re-renders the preview as a sequence diagram with no flowchart marks remaining, and updates the header badge to name the sequence type."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.5"
+name = "code_config_tab_switch_retains_docs"
+description = "Tab switch: switching Code ↔ Config swaps which document the editor pane edits without a full page reload and without losing either document's content."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.6"
+name = "empty_source_disables_exports"
+description = "Empty-source edge: clearing the source to empty leaves the workspace stable with error treatment or an empty-source message (not a stale diagram presented as current) and export controls unavailable."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.7"
+name = "sample_export_theme_reload_roundtrip"
+description = "Sample/export/theme round-trip: after Sequence sample selection, clicking SVG downloads a file matching mermaid-diagram-YYYY-MM-DD-HHmmss.svg; toggling theme to dark recolors header, panels, editor, and diagram together without reloading; reloading restores dark theme, sequence source, sequence render, and matching badge."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.8"
+name = "panels_remain_reachable_during_edit"
+description = "During source editing and sample switching, the Sample diagrams and Actions panels remain reachable and usable without a dead end requiring reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.9"
+name = "copy_image_confirmation_visible"
+description = "With valid source, Copy image copies the diagram and shows a visible confirmation that appears with motion and remains readable before dismissing."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.10"
+name = "syntax_error_recovery_without_reload"
+description = "After a syntax error, correcting the source recovers the workspace (clears error, restores preview opacity, re-enables exports) without requiring a full page reload."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.11"
+name = "session_json_artifact_end_state"
+description = "Session artifact end state: edit Code to a distinctive valid diagram, set Config theme to a different valid Mermaid Config enum value, leave Config active, toggle app theme to dark, confirm Session JSON preview shows schemaVersion mermaid-session-v1 with matching code, config.theme, appTheme dark, activeTab config, and diagramType plus every required MermaidSession key; Copy Session JSON confirms; Download then Import of that JSON reconstructs the same source, config theme, dark theme, active tab, and badge; MMD download matches the Code text; Import of that MMD after a further Code edit restores the downloaded source."
+type = "binary"
+weight = 1.0
+

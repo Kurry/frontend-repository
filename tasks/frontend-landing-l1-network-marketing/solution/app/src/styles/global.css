@@ -12,6 +12,11 @@
   --color-accent-hover: #f43f5e;
 }
 
+:root {
+  --ridge-radius-module: 1.5rem;
+  --ridge-radius-control: 0.5rem;
+}
+
 /* ---- Bundled open-license display + body faces (no CDN) ---- */
 @font-face {
   font-family: 'Space Grotesk';
@@ -57,11 +62,29 @@ h1, h2, h3, h4, h5, h6, .display-font, .chapter-title {
 }
 
 /* ---- Why Ridge progressive sticky pile (desktop only) ---- */
+.sticky-title,
 .why-card { position: static; }
+
+:root[data-theme="light"] .why-card--neutral {
+  background-color: rgb(247 247 245 / 0.94);
+  color: #101114;
+}
+
+:root[data-theme="dark"] .why-card--neutral {
+  background-color: rgb(32 33 36 / 0.96);
+  color: #f8fafc;
+}
+
 @media (min-width: 768px) {
+  .sticky-title {
+    position: sticky;
+    top: 96px;
+    z-index: 10;
+  }
+
   .why-card {
     position: sticky;
-    top: calc(96px + var(--i, 0) * 32px);
+    top: calc(176px + var(--i, 0) * 32px);
     z-index: calc(var(--i, 0) + 1);
   }
 }
@@ -144,26 +167,74 @@ tbody tr.row-exit {
     transition-delay: 0ms !important;
     scroll-behavior: auto !important;
   }
-  .why-card { position: static !important; top: auto !important; }
+  .sticky-title, .why-card { position: static !important; top: auto !important; }
   .trio-card { transform: none !important; opacity: 1 !important; }
   .load-target { transform: none !important; clip-path: none !important; opacity: 1 !important; }
 }
 
-/* Thematic custom properties handled via classes or data-theme */
+/* Theme tokens intentionally override DaisyUI's semantic defaults. */
 :root[data-theme="light"] {
-  --color-void: #ffffff;
-  --color-surface: #f3f4f6;
-  color: #000000;
+  --color-void: #050505;
+  --color-surface: #f4f4f2;
+  --color-ink: #173b72;
+  --color-accent: #d92d35;
+  --color-accent-hover: #ef454c;
+  --color-primary: #c6232e;
+  --color-primary-content: #ffffff;
+  --color-accent-content: #ffffff;
+  --color-neutral: #18181b;
+  --color-neutral-content: #ffffff;
+  --color-base-100: #f4f4f2;
+  --color-base-content: #101114;
+  color: #f8fafc;
 }
-:root[data-theme="light"] .on-dark-plane,
-:root[data-theme="light"] .ink { color: #ffffff; }
 :root[data-theme="dark"] {
   --color-void: #000000;
-  --color-surface: #111111;
+  --color-surface: #151515;
+  --color-ink: #244d8f;
+  --color-accent: #ff6b67;
+  --color-accent-hover: #ff8983;
+  --color-primary: #d92d35;
+  --color-primary-content: #ffffff;
+  --color-accent-content: #111111;
+  --color-neutral: #27272a;
+  --color-neutral-content: #ffffff;
+  --color-base-100: #151515;
+  --color-base-content: #f8fafc;
+  color: #f8fafc;
+}
+
+:root[data-theme="light"] body {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+:root[data-theme="dark"] body {
+  background-color: #000000;
   color: #ffffff;
 }
+
+:root[data-theme="light"] .surface-copy { color: #101114; }
+:root[data-theme="light"] .void-copy,
+:root[data-theme="light"] .on-dark-plane,
+:root[data-theme="light"] .ink { color: #f8fafc; }
+:root[data-theme="dark"] .surface-copy,
+:root[data-theme="dark"] .void-copy { color: #f8fafc; }
+
+.why-media {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 24%, transparent), transparent 58%),
+    repeating-linear-gradient(90deg, color-mix(in srgb, currentColor 8%, transparent) 0 1px, transparent 1px 22px),
+    color-mix(in srgb, var(--color-ink) 24%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.panel-in { animation: ridge-row-in 0.24s cubic-bezier(0.16, 0.84, 0.44, 1) both; }
 
 .void {
   background-color: var(--color-void);
   min-height: 100vh;
 }
+
+:root[data-theme="light"] .void { color: #f8fafc; }
+:root[data-theme="dark"] .void { color: #f8fafc; }

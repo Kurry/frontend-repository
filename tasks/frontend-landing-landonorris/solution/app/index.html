@@ -107,6 +107,10 @@
         <img class="home-hero-figure" src="/images/hero-figure.svg" alt="" />
       </div>
       <canvas class="home-hero-gl" data-hero-canvas role="img" aria-label="Abstract Avery Vale racer composition"></canvas>
+      <div class="rive-motif" data-rive-motif role="img" tabindex="0" aria-label="Interactive Avery Vale apex vector emblem">
+        <canvas id="riveMotifCanvas" width="240" height="240" aria-hidden="true"></canvas>
+        <span>APEX / 25</span>
+      </div>
       <div class="home-hero-next-race-w" data-next-race>
         <span class="home-hero-next-race-eyebrow">NEXT RACE</span>
         <span class="home-hero-next-race-circuit" aria-hidden="true">
@@ -168,10 +172,10 @@
     <section class="social-stream-section" id="social-stream" data-section="social-stream">
       <h2 class="section-eyebrow">SOCIAL</h2>
       <div class="video-stream-wrap" data-video-stream-wrap>
-        <video id="socialVideo" data-video-el muted loop playsinline preload="metadata" poster="/images/social-poster.png" aria-label="Muted looping Avery Vale social clip">
+        <video id="socialVideo" data-video-el muted loop playsinline preload="metadata" poster="/images/social-poster.png" aria-label="Muted looping fictional Nova Racing cockpit clip">
           <source src="/video/avery-loop.webm" type="video/webm" />
         </video>
-        <img class="video-stream-placeholder" data-video-stream-placeholder src="/images/social-poster.png" alt="Social video preview" width="880" height="495" />
+        <img class="video-stream-placeholder" data-video-stream-placeholder src="/images/social-poster.png" alt="Fictional Nova Racing driver in a rain-lit cockpit" width="880" height="495" />
         <button type="button" class="video-play-btn" data-video-play-btn aria-pressed="false" aria-label="Play the social clip">PLAY</button>
         <span class="video-stream-hint" data-video-hint aria-hidden="true">HOVER TO PLAY</span>
       </div>
@@ -254,6 +258,8 @@
     <ul class="palette-list" id="paletteList" role="listbox" aria-label="Commands"></ul>
   </div>
 
+  <script src="/rive/rive.js"></script>
+  <script src="/rive-motif.js"></script>
   <script src="/hero-gl.js"></script>
   <script src="/app.js"></script>
 </body>

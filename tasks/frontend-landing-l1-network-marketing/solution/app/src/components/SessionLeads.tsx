@@ -2,20 +2,14 @@ import React, { useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { $leads, $theme, undoLastLead, announce } from '../store';
 import { Download, Copy, ArrowUUpLeft } from 'phosphor-react';
+import { buildLeadsJson } from '../artifacts';
 
 export default function SessionLeads() {
   const leads = useStore($leads);
   const theme = useStore($theme);
   const [copied, setCopied] = useState(false);
 
-  const getExportData = () => {
-    return JSON.stringify({
-      version: 1,
-      theme,
-      counts: { total: leads.length },
-      leads
-    }, null, 2);
-  };
+  const getExportData = () => buildLeadsJson(leads, theme);
 
   const handleDownload = () => {
     const blob = new Blob([getExportData()], { type: 'application/json' });
@@ -50,12 +44,12 @@ export default function SessionLeads() {
   };
 
   return (
-    <section className="session-leads py-12 bg-surface/30 border-t border-white/10" id="session-leads-section" aria-label="Session Leads">
+    <section className="session-leads surface-copy py-12 bg-surface border-t border-current/10" id="session-leads-section" aria-label="Session Leads">
       <div className="container mx-auto px-4 max-w-5xl">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8">
           <div>
             <h2 className="text-2xl font-bold display-font">Session Leads</h2>
-            <p className="text-sm text-gray-400 mt-1" aria-live="polite">Total: {leads.length}</p>
+            <p className="text-sm opacity-70 mt-1" aria-live="polite">Total: {leads.length}</p>
           </div>
           <div className="flex flex-wrap gap-2 sm:justify-end">
              <button
@@ -83,20 +77,21 @@ export default function SessionLeads() {
           </div>
         </div>
 
-        <div className="bg-void notch-br border border-white/10 p-6 min-h-[200px]">
+        <div className="void-copy bg-void notch-br border border-white/10 p-6 min-h-[200px]">
           {leads.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full py-12 text-center">
-              <p className="text-gray-400">Contact submissions will appear here. Submit the contact form above to capture a session lead.</p>
+              <p className="opacity-70">Contact submissions will appear here. Submit the contact form above to capture a session lead.</p>
             </div>
           ) : (
             <div className="space-y-4">
               {leads.map(lead => (
-                <div key={lead.id} className="p-4 bg-surface/50 border border-white/5 rounded flex justify-between items-center gap-3 row-enter">
+                <div key={lead.id} className="surface-copy p-4 bg-surface border border-current/10 rounded flex justify-between items-center gap-3 row-enter">
                   <div className="min-w-0">
                     <span className="badge badge-sm badge-accent mr-3">{lead.kind}</span>
                     <span className="font-medium">{lead.payload.name} — {lead.payload.interest}</span>
+                    <span className="block text-sm opacity-70 mt-1">{lead.payload.email}</span>
                   </div>
-                  <div className="text-xs text-gray-500 shrink-0">
+                  <div className="text-xs opacity-60 shrink-0">
                     {new Date(lead.submittedAt).toLocaleTimeString()}
                   </div>
                 </div>

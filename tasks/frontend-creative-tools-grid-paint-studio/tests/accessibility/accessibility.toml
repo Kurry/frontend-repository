@@ -1,0 +1,168 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "toolbar_gallery_keyboard_operable"
+description = "Every toolbar control, swatch, gallery action, command palette result, and form field is reachable and operable with the keyboard alone (Tab, Shift+Tab, Enter/Space), each showing a visible focus indicator when focused."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "camera_overlay_focus_trap"
+description = "The camera overlay behaves as a modal dialog: it traps focus while open and returns focus to the Camera button on close."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "tools_and_swatches_named"
+description = "Palette swatches and tool toggles (QR Brush, Color Brush, Flood Fill, Eraser, Grid On/Off, Mirror) expose accessible names and a discernible selected state so assistive technology can identify them, not color alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "validation_announced_live"
+description = "Validation messages for the save, rename, version, and import forms (including name, tag, and ProjectDocument field errors) are announced via an aria-live polite region as well as shown visually."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "save_rename_fields_labeled"
+description = "Save board, rename, and Snap version name fields use explicit label elements associated with the controls."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "command_palette_focus_trap"
+description = "The command palette traps focus while open, closes on Escape, and returns focus to the control that opened it."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "export_compare_dialogs_modal"
+description = "Export center dialogs and Compare overlays that behave as modals trap focus while open and return focus on close."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "histogram_not_color_only"
+description = "Histogram bars expose text values or accessible names so cell-count information is not conveyed by color alone."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "headings_follow_logical_order"
+description = "Headings for the studio title, Gallery, Export center, and Versions follow a logical order without skipping levels."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "1.10"
+name = "sufficient_contrast"
+description = "Toolbar labels, gallery text, Export center monospaced previews, and validation messages meet readable contrast against their backgrounds."
+type = "binary"
+weight = 1.0
+

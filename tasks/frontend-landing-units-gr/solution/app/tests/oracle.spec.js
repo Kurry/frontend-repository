@@ -57,11 +57,25 @@ test("mobile menu locks position and closes cleanly at the desktop breakpoint", 
   await page.evaluate(() => window.scrollTo(0, 500));
   await expect.poll(() => page.evaluate(() => Math.round(window.scrollY))).toBe(500);
 
-  await page.getByRole("button", { name: "Άνοιγμα μενού" }).click();
+  await page.getByRole("button", { name: /^Shortlist/ }).click();
+  await expect(page.locator("#shortlist-drawer")).toBeVisible();
+
+  // Exercise the conflicting pre-existing drawer/menu state used by WebMCP navigation.
+  await page.getByRole("button", { name: "Άνοιγμα μενού" }).click({ force: true });
   await expect(page.locator("#nav-overlay")).toHaveAttribute("aria-hidden", "false");
+  await expect(page.locator("#shortlist-drawer")).not.toBeVisible();
+  await expect(page.locator("body")).not.toHaveClass(/drawer-open/);
   await page.mouse.wheel(0, 700);
   await page.waitForTimeout(150);
   expect(await page.evaluate(() => Math.round(window.scrollY))).toBe(500);
+
+  await page.getByRole("button", { name: "Κλείσιμο μενού" }).click();
+  await expect(page.locator("#nav-overlay")).toHaveAttribute("aria-hidden", "true");
+  await page.mouse.wheel(0, 300);
+  await expect.poll(() => page.evaluate(() => Math.round(window.scrollY))).toBeGreaterThan(500);
+
+  await page.getByRole("button", { name: "Άνοιγμα μενού" }).click();
+  await expect(page.locator("#nav-overlay")).toHaveAttribute("aria-hidden", "false");
 
   await page.setViewportSize({ width: 1280, height: 800 });
   await expect(page.locator("#nav-overlay")).toHaveAttribute("aria-hidden", "true");
