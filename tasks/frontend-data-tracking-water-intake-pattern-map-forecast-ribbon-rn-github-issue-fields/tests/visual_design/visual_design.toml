@@ -62,7 +62,7 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "AC-02"
-name = "Visual hierarchy clearly differentiates the primary work surface, linked summary, and detail panel."
+name = "visual_hierarchy"
 description = "Verify that the visual design separates the records list from the forecast ribbon and the daily projection summary, with clear state tokens indicating selected or changed status."
 type = "binary"
 weight = 1.0

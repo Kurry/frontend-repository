@@ -220,7 +220,7 @@ weight = 1.0
 
 [[criterion]]
 id = "AC-12"
-name = "Source fidelity."
+name = "source_fidelity"
 description = "Compare the implementation with the cited source interaction vocabulary; verify the visual and interaction thesis is coherent without copying unrelated screens."
 type = "binary"
 weight = 1.0

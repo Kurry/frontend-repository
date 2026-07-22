@@ -219,7 +219,7 @@ type = "binary"
 weight = 1.0
 [[criterion]]
 id = "AC-11"
-name = "Linked utility"
+name = "linked_utility"
 description = "Mutate a record and verify the linked representation provides domain utility beyond CRUD to make the next decision."
 type = "binary"
 weight = 1.0

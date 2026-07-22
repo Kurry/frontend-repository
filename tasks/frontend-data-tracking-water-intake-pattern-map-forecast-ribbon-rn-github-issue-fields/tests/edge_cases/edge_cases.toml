@@ -220,7 +220,7 @@ weight = 1.0
 
 [[criterion]]
 id = "AC-06"
-name = "Boundaries and recovery."
+name = "boundaries_recovery"
 description = "Try exact bounds, an invalid cross-field value, an empty state, and a malformed import; each invalid action must give field-level recovery and preserve the prior valid state."
 type = "binary"
 weight = 1.0

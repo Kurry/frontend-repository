@@ -62,7 +62,7 @@ aggregation = "weighted_mean"
 
 [[criterion]]
 id = "AC-01"
-name = "Signature mutation affects primary record, linked view, and status together."
+name = "signature_mutation"
 description = "Verify that adjusting a selected record on a forecast ribbon instantly updates the record volume, its domain status, and the derived projection summary without a reload."
 type = "binary"
 weight = 1.0
