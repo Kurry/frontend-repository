@@ -194,5 +194,4 @@ id = "writing.domain_copy"
 name = "domain_copy"
 description = "Copy names the domain consequence and recovery action precisely."
 type = "binary"
-negate = true
-weight = 1
+weight = 1.0

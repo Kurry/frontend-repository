@@ -91,10 +91,9 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
-
 [[criterion]]
 id = "technical.schema_contract"
 name = "schema_contract"
 description = "The tool result and artifact contain the declared API-shaped fields."
 type = "binary"
-weight = 1
+weight = 1.0

@@ -254,5 +254,4 @@ id = "responsiveness.mobile_mode"
 name = "mobile_mode"
 description = "The desktop surface becomes a usable stack/drawer/stepper without horizontal overflow."
 type = "binary"
-negate = true
-weight = 1
+weight = 1.0

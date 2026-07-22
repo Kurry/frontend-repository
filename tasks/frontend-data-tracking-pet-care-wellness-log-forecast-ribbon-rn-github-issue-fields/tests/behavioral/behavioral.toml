@@ -192,5 +192,4 @@ id = "behavioral.artifact_round_trip"
 name = "artifact_round_trip"
 description = "Authored order/selection/geometry and domain state survive; invalid import is a no-op."
 type = "binary"
-negate = true
-weight = 1
+weight = 1.0

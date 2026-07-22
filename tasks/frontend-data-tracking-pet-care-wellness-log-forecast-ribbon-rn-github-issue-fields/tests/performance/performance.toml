@@ -240,5 +240,4 @@ id = "performance.large_collection"
 name = "large_collection"
 description = "The signature interaction remains responsive and unrelated rows stay stable."
 type = "binary"
-negate = true
-weight = 1
+weight = 1.0

@@ -91,10 +91,9 @@ allowed_tools = [
 [scoring]
 aggregation = "weighted_mean"
 
-
 [[criterion]]
 id = "motion.causal_motion"
 name = "causal_motion"
 description = "Motion connects the acted-on item to its new state and has a reduced-motion equivalent."
 type = "binary"
-weight = 1
+weight = 1.0

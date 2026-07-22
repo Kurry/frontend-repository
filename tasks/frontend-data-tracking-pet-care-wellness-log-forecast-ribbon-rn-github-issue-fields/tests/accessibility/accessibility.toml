@@ -254,5 +254,4 @@ id = "accessibility.alternate_input"
 name = "alternate_input"
 description = "Alternate input produces identical state with visible focus and live feedback."
 type = "binary"
-negate = true
-weight = 1
+weight = 1.0
