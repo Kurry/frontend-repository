@@ -338,6 +338,7 @@ function RunRollup({ script }) {
 
 function RunConsole() {
   const lines = useStudio(s => s.consoleLines)
+  const selectedScriptId = useStudio(s => s.selectedScriptId)
   const theme = useStudio(s => s.consoleTheme)
   const following = useStudio(s => s.consoleFollowing)
   const jumpDismissed = useStudio(s => s.consoleJumpDismissed)
@@ -348,10 +349,11 @@ function RunConsole() {
   const scrollRef = useRef(null)
   const jumpLockRef = useRef(false)
   const [jumpVisible, setJumpVisible] = useState(false)
-  useEffect(() => { if (following && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }, [lines.length, following])
+  const visibleLines = lines.filter(line => line.scriptId === selectedScriptId)
+  useEffect(() => { if (following && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }, [visibleLines.length, following])
   const className = theme === 'Ocean' ? 'console-ocean' : theme === 'Solar' ? 'console-solar' : 'console-midnight'
   return <section className={`panel console ${className}`} aria-label="Run console">
-    <div className="console-toolbar"><div className="flex items-center gap-2"><Terminal size={17} /><strong className="text-sm">Run console</strong><span className="text-xs opacity-60">{lines.length} events</span></div>
+    <div className="console-toolbar"><div className="flex items-center gap-2"><Terminal size={17} /><strong className="text-sm">Run console</strong><span className="text-xs opacity-60">{visibleLines.length} events</span></div>
       <Select id="console-theme" hideLabel labelText="Console theme" size="sm" value={theme} onChange={e => setTheme(e.target.value)}><SelectItem value="Midnight" text="Midnight" /><SelectItem value="Ocean" text="Ocean" /><SelectItem value="Solar" text="Solar" /></Select>
     </div>
     <div ref={scrollRef} className="console-body"
@@ -362,8 +364,8 @@ function RunConsole() {
         setFollowing(atBottom)
         setJumpVisible(!atBottom)
       }}>
-      {!lines.length && <div className="opacity-70">Ready. Run a script to stream step events.</div>}
-      {lines.map((line, index) => <div key={line.id}><div className={`console-line ${line.level}`}><span className="opacity-60">{timeOnly(line.timestamp)}</span><span>{line.text}</span></div>{line.screenshot && <button className="screenshot-thumb" onClick={() => setUi({ screenshotModal: { label: line.screenshotLabel } })}><DataView size={30} /><strong>Screenshot captured</strong><span>Open full-size preview</span></button>}</div>)}
+      {!visibleLines.length && <div className="opacity-70">Ready. Run a script to stream step events.</div>}
+      {visibleLines.map(line => <div key={line.id}><div className={`console-line ${line.level}`}><span className="opacity-60">{timeOnly(line.timestamp)}</span><span>{line.text}</span></div>{line.screenshot && <button className="screenshot-thumb" onClick={() => setUi({ screenshotModal: { label: line.screenshotLabel } })}><DataView size={30} /><strong>Screenshot captured</strong><span>Open full-size preview</span></button>}</div>)}
       {jumpVisible && !jumpDismissed && <button className="jump-latest" onClick={event => {
         event.currentTarget.hidden = true
         jumpLockRef.current = true

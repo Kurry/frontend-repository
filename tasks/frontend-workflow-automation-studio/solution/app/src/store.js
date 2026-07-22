@@ -37,7 +37,7 @@ async function runDelay(get, token, ms) {
 }
 
 function addConsole(set, get, level, text, stepId, extra = {}) {
-  const line = { id: makeId('line'), timestamp: isoNow(), level, text, stepId, ...extra }
+  const line = { id: makeId('line'), timestamp: isoNow(), scriptId: get().liveRun?.scriptId ?? null, level, text, stepId, ...extra }
   set({ consoleLines: [...get().consoleLines, line].slice(-500) })
 }
 
@@ -365,7 +365,7 @@ export const useStudio = create((set, get) => ({
   retryFailed: () => {
     const live = get().liveRun; if (!live || live.status !== 'failed') return
     engineToken += 1; const token = engineToken
-    set({ liveRun: { ...live, status: 'running', retryCount: live.retryCount + 1 }, announcement: 'Retry started' })
+    set({ liveRun: { ...live, status: 'running', finishedAt: null, retryCount: live.retryCount + 1 }, announcement: 'Retry started' })
     const script = get().scripts.find(s => s.id === live.scriptId); const step = script?.steps[live.failedIndex]
     addEvent(set, get, step, 'retrying', 'Manual retry started')
     executeRun(set, get, token, live.failedIndex, true)

@@ -340,8 +340,8 @@ export async function jumpLatestProbe(page: Page) {
   for (const label of firstSix) await label.click()
   await bulk.getByRole('button', { name: 'Duplicate selected' }).click()
   await page.getByRole('button', { name: 'Run Script' }).click()
-  await expect.poll(() => page.locator('.console-line').count(), { timeout: 10_000 }).toBeGreaterThan(10)
   const console = page.locator('.console-body')
+  await expect.poll(() => console.evaluate(element => element.scrollHeight > element.clientHeight), { timeout: 10_000 }).toBe(true)
   await console.hover()
   await page.mouse.wheel(0, -1200)
   const jump = page.getByRole('button', { name: 'Jump to latest' })
@@ -785,7 +785,9 @@ export async function consoleProbe(page: Page) {
   page.on('console', async message => {
     const text = message.text()
     const sandboxInstrumentation = /Blocked script execution in 'about:srcdoc'.*sandboxed.*allow-scripts/.test(text)
-    if (await message.type() === 'error' && !sandboxInstrumentation) errors.push(text)
+    // ConsoleMessage.type() is synchronous; this is not a locator action.
+    // eslint-disable-next-line playwright/missing-playwright-await
+    if (message.type() === 'error' && !sandboxInstrumentation) errors.push(text)
   })
   page.on('pageerror', error => errors.push(error.message))
   await libraryProbe(page)
