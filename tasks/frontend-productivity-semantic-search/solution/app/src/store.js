@@ -95,6 +95,8 @@ const initialIndexed = initialDocs.map((doc) => doc.id)
 let indexTimeout = null
 let indexInterval = null
 let toastTimer = null
+let eventSequence = 0
+const nextEventId = () => `event-${Date.now()}-${eventSequence++}`
 
 const clearIndexTimers = () => {
   if (indexTimeout) clearTimeout(indexTimeout)
@@ -297,7 +299,7 @@ export const useAppStore = create((set, get) => ({
     const documents = get().documents
     const startedAt = Date.now()
     const steps = documents.map((doc) => ({ id: doc.id, title: doc.title, status: 'pending', attempts: 0, startedAt: null, completedAt: null, error: null }))
-    set({ indexRun: { status: 'running', steps, current: 0, startedAt, elapsed: 0, events: [{ id: `event-${Date.now()}`, time: now(), status: 'running', text: 'Index run started' }] }, liveMessage: 'Indexing started' })
+    set({ indexRun: { status: 'running', steps, current: 0, startedAt, elapsed: 0, events: [{ id: nextEventId(), time: now(), status: 'running', text: 'Index run started' }] }, liveMessage: 'Indexing started' })
     get().advanceIndex()
   },
   advanceIndex: () => {
@@ -314,7 +316,7 @@ export const useAppStore = create((set, get) => ({
           status: 'complete',
           current: s.indexRun.steps.length,
           elapsed: Date.now() - s.indexRun.startedAt,
-          events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'complete', text: 'Index run completed' }],
+          events: [...s.indexRun.events, { id: nextEventId(), time: now(), status: 'complete', text: 'Index run completed' }],
         },
         liveMessage: `Indexed ${s.documents.length} documents`,
       }))
@@ -325,7 +327,7 @@ export const useAppStore = create((set, get) => ({
     if (step.status === 'failed') return
     const attempts = step.attempts + 1
     const runningSteps = run.steps.map((item, i) => i === nextIndex ? { ...item, status: 'running', attempts, startedAt: item.startedAt || now() } : item)
-    set({ indexRun: { ...run, current: nextIndex, steps: runningSteps, elapsed: Date.now() - run.startedAt, events: [...run.events, { id: `event-${Date.now()}-${nextIndex}`, time: now(), status: 'running', text: `${step.title} · attempt ${attempts}` }] } })
+    set({ indexRun: { ...run, current: nextIndex, steps: runningSteps, elapsed: Date.now() - run.startedAt, events: [...run.events, { id: nextEventId(), time: now(), status: 'running', text: `${step.title} · attempt ${attempts}` }] } })
     indexTimeout = setTimeout(() => {
       const latest = get(); if (latest.indexRun?.status !== 'running') return
       const numericId = Number(step.id.replace(/\D/g, '').slice(-3) || 0)
@@ -337,7 +339,7 @@ export const useAppStore = create((set, get) => ({
           indexRun: {
             ...s.indexRun,
             steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, status: 'retrying', retryIn: wait, error: 'Transient tokenizer timeout' } : item),
-            events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'retrying', text: `${step.title} · waiting before retry ${attempts + 1} of 3` }],
+            events: [...s.indexRun.events, { id: nextEventId(), time: now(), status: 'retrying', text: `${step.title} · waiting before retry ${attempts + 1} of 3` }],
           },
           liveMessage: `${step.title} retrying in ${wait}s`,
         }))
@@ -362,7 +364,7 @@ export const useAppStore = create((set, get) => ({
             ...s.indexRun,
             status: 'failed',
             steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, status: 'failed', error: 'Tokenizer timeout after 3 attempts' } : item),
-            events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'failed', text: `${step.title} failed after 3 attempts` }],
+            events: [...s.indexRun.events, { id: nextEventId(), time: now(), status: 'failed', text: `${step.title} failed after 3 attempts` }],
           },
           liveMessage: `${step.title} failed — use Retry to continue`,
         }))
@@ -373,7 +375,7 @@ export const useAppStore = create((set, get) => ({
         indexRun: {
           ...s.indexRun,
           steps: s.indexRun.steps.map((item, i) => i === nextIndex ? { ...item, status: 'complete', completedAt: now(), error: null, retryIn: null } : item),
-          events: [...s.indexRun.events, { id: `event-${Date.now()}`, time: now(), status: 'complete', text: `${step.title} indexed` }],
+          events: [...s.indexRun.events, { id: nextEventId(), time: now(), status: 'complete', text: `${step.title} indexed` }],
         },
       }))
       get().advanceIndex()

@@ -165,7 +165,17 @@ function SearchWorkspace() {
       <div className="search-kicker"><WatsonHealthStackedScrolling_1 size={16} /> Semantic workspace</div>
       <h1 className="search-title">Find the idea, not just <em>the words.</em></h1>
       <form className="search-row" autoComplete="off" role="search" onSubmit={submit}>
-        <Search size="lg" labelText="Search the knowledge library" placeholder="" value={state.activeRaw} onChange={(e) => state.setRaw(e.target.value)} autoComplete="off" />
+        <Search
+          size="lg"
+          labelText="Search the knowledge library"
+          placeholder=""
+          value={state.activeRaw}
+          onChange={(e) => state.setRaw(e.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') submit(event)
+          }}
+          autoComplete="off"
+        />
         <Button type="submit" renderIcon={SearchIcon}>Search library</Button>
       </form>
       <p className="syntax-help">Filter the corpus with <code>tag:react</code> <code>type:guide</code> or <code>before:2026-01-01</code>. Press <kbd>⌘K</kbd> or <kbd>Ctrl+K</kbd> for commands.</p>
@@ -179,7 +189,7 @@ function ResultControls({ visible }) {
   const state = useAppStore()
   return <div className="result-tools">
     {(state.filters.length > 0 || state.invalidFilters.length > 0) && <div className="chips-row" aria-label="Active search filters">{state.filters.map((filter, index) => <span className="filter-chip" key={`${filter.kind}-${filter.value}`}><Filter size={13} />{filter.kind}:{filter.value}<button aria-label={`Remove ${filter.kind} ${filter.value}`} onClick={() => state.removeFilter(index)}><Close size={12} /></button></span>)}{state.invalidFilters.map((filter) => <span className="unmatched" key={`${filter.kind}-${filter.value}`}><WarningAlt size={14} /> No matching {filter.kind}: “{filter.value}”</span>)}</div>}
-    <div className="controls-line"><div className="slider-wrap"><Slider labelText="Minimum score" min={0} max={1} step={0.05} value={state.threshold} hideTextInput onChange={({ value }) => state.setThreshold(value)} /><output className="slider-value">{state.threshold.toFixed(2)}</output></div><div className="control-actions"><Toggle id="group-topic" size="sm" labelText="Group by topic" labelA="Off" labelB="On" toggled={state.grouped} onToggle={state.setGrouped} /><Button size="sm" kind="ghost" renderIcon={Reset} disabled={!Object.keys(state.feedbackByQuery[`${state.activeQuery.toLowerCase()}|${state.filters.map((f) => `${f.kind}:${f.value.toLowerCase()}`).sort().join('|')}`] || {}).length} onClick={state.resetFeedback}>Reset feedback</Button><Button size="sm" kind="tertiary" renderIcon={Save} onClick={() => useAppStore.setState({ saveOpen: true })}>Save search</Button></div></div>
+    <div className="controls-line"><div className="slider-wrap"><Slider labelText="Minimum score" ariaLabelInput="Minimum similarity score" min={0} max={1} step={0.05} value={state.threshold} hideTextInput onChange={({ value }) => state.setThreshold(value)} /><output className="slider-value">{state.threshold.toFixed(2)}</output></div><div className="control-actions"><Toggle id="group-topic" size="sm" labelText="Group by topic" labelA="Off" labelB="On" toggled={state.grouped} onToggle={state.setGrouped} /><Button size="sm" kind="ghost" renderIcon={Reset} disabled={!Object.keys(state.feedbackByQuery[`${state.activeQuery.toLowerCase()}|${state.filters.map((f) => `${f.kind}:${f.value.toLowerCase()}`).sort().join('|')}`] || {}).length} onClick={state.resetFeedback}>Reset feedback</Button><Button size="sm" kind="tertiary" renderIcon={Save} onClick={() => useAppStore.setState({ saveOpen: true })}>Save search</Button></div></div>
     <div className="result-summary"><div><div className="eyebrow">Ranked retrieval</div><h2>{visible.mode === 'keyword' ? 'Keyword results (no semantic matches above threshold)' : 'Semantic results'}</h2>{visible.mode === 'keyword' && <span className="fallback-label">No semantic matches above threshold</span>}</div><div role="status" aria-live="polite"><strong>{visible.items.length}</strong> <span className="muted">matching results</span></div></div>
   </div>
 }
