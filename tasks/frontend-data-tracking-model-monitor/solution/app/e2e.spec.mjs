@@ -401,7 +401,7 @@ test('11.5 optional_provider_health_affordance', async ({ page }) => {
   await expect(latencyCues.first()).toBeVisible();
   expect(await latencyCues.count()).toBeGreaterThan(0);
   await expect(latencyCues.first()).toHaveText(/^\d+ ms$/);
-  await expect(latencyCues.first()).toHaveClass(/\b(?:fast|steady|slow)\b/);
+  await expect(latencyCues.first()).toHaveClass(/\b(?:fast|steady|busy)\b/);
 });
 
 // NOT-AUTOMATABLE: innovation.catchall is a subjective judge-only criterion
