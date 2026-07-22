@@ -351,7 +351,7 @@ function RunConsole() {
     </div>
     <div ref={scrollRef} className="console-body" onScroll={e => { const el = e.currentTarget; const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 8; setFollowing(atBottom) }}>
       {!lines.length && <div className="opacity-70">Ready. Run a script to stream step events.</div>}
-      {lines.map(line => <div key={line.id}><div className={`console-line ${line.level}`}><span className="opacity-60">{timeOnly(line.timestamp)}</span><span>{line.text}</span></div>{line.screenshot && <button className="screenshot-thumb" onClick={() => setUi({ screenshotModal: { label: line.screenshotLabel } })}><DataView size={30} /><strong>Screenshot captured</strong><span>Open full-size preview</span></button>}</div>)}
+      {lines.map((line, index) => <div key={line.id}><div className={`console-line ${line.level}`} style={{ animationDelay: `${index * 20}ms` }}><span className="opacity-60">{timeOnly(line.timestamp)}</span><span>{line.text}</span></div>{line.screenshot && <button className="screenshot-thumb" onClick={() => setUi({ screenshotModal: { label: line.screenshotLabel } })}><DataView size={30} /><strong>Screenshot captured</strong><span>Open full-size preview</span></button>}</div>)}
       {!following && <button className="jump-latest" onClick={() => { setFollowing(true); if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight }}><ArrowDown size={13} className="mr-1 inline" />Jump to latest</button>}
     </div>
   </section>
@@ -381,7 +381,7 @@ function EditorView() {
   const [stepMenu, setStepMenu] = useState(false)
   if (!script) return <div className="panel empty-state"><h1 className="page-title text-slate-900">No script selected</h1><p className="mt-3">Choose a script from the library or create a new script to open the editor.</p><Button className="mt-6" renderIcon={Add} onClick={() => setUi({ newScriptModal: true })}>New Script</Button></div>
   const running = live?.scriptId === script.id && ['running','retrying','paused'].includes(live.status)
-  const canRun = script.steps.length > 0
+  const canRun = script.steps.length > 0 && script.steps.every(step => Object.keys(validateStep(step)).length === 0)
   return <>
     <div className="editor-grid">
       <section className="panel min-w-0">
@@ -416,19 +416,31 @@ function PlaygroundView() {
   const html = useStudio(s => s.playgroundHtml)
   const selector = useStudio(s => s.playgroundSelector)
   const matches = useStudio(s => s.playgroundMatches)
+  const playgroundError = useStudio(s => s.playgroundError)
   const target = useStudio(s => s.playgroundTargetStep)
   const { setPlayground, sendSelectorToStep } = useStudio()
   const schema = z.object({ mock_html: z.string().min(1, 'Mock HTML is required'), selector: z.string().min(1, 'Selector is required').superRefine((value, ctx) => { try { document.createElement('div').querySelector(value) } catch (error) { ctx.addIssue({ code: 'custom', message: `Selector is invalid: ${error.message}` }) } }) })
   const { register, formState: { errors }, setValue, trigger } = useForm({ resolver: zodResolver(schema), mode: 'onChange', defaultValues: { mock_html: html, selector } })
   const preview = useMemo(() => {
     try {
-      const doc = new DOMParser().parseFromString(html, 'text/html'); const found = selector ? [...doc.querySelectorAll(selector)] : []
+      const doc = new DOMParser().parseFromString(html, 'text/html')
+      doc.querySelectorAll('script').forEach(node => node.remove())
+      doc.querySelectorAll('*').forEach(node => [...node.attributes].forEach(attribute => {
+        if (attribute.name.toLowerCase().startsWith('on') || /^(href|src|srcset|action|formaction)$/i.test(attribute.name)) node.removeAttribute(attribute.name)
+      }))
+      let found = []
+      let matchingFailed = false
+      try { found = selector ? [...doc.querySelectorAll(selector)] : [] }
+      catch (error) {
+        matchingFailed = true
+        if (matches !== 0 || playgroundError !== error.message) setTimeout(() => setPlayground({ playgroundMatches: 0, playgroundError: error.message }), 0)
+      }
       found.forEach(el => el.setAttribute('data-ternwave-match', 'true'))
       const style = doc.createElement('style'); style.textContent = `body{font-family:IBM Plex Sans,Arial;padding:24px;color:#172033} [data-ternwave-match]{outline:3px solid #0f62fe!important;background:#dceaff!important;animation:tw .25s ease}@keyframes tw{from{transform:scale(.98)}to{transform:none}} article{border:1px solid #d8dee8;padding:14px;margin:10px 0;border-radius:6px}`; doc.head.appendChild(style)
-      if (found.length !== matches) setTimeout(() => setPlayground({ playgroundMatches: found.length, playgroundError: '' }), 0)
+      if (!matchingFailed && (found.length !== matches || playgroundError)) setTimeout(() => setPlayground({ playgroundMatches: found.length, playgroundError: '' }), 0)
       return '<!doctype html>' + doc.documentElement.outerHTML
-    } catch (error) { setTimeout(() => setPlayground({ playgroundError: error.message }), 0); return html }
-  }, [html, selector])
+    } catch (error) { setTimeout(() => setPlayground({ playgroundError: error.message }), 0); return '<!doctype html><html><body></body></html>' }
+  }, [html, selector, matches, playgroundError])
   const selectorError = errors.selector?.message || useStudio.getState().playgroundError
   const eligible = script?.steps.filter(s => ['click','type','extract','assert_text'].includes(s.type)) || []
   const eligibleIds = eligible.map(s => s.id).join(',')
@@ -559,9 +571,10 @@ function App() {
   useEffect(() => {
     const onKey = event => {
       const meta = event.ctrlKey || event.metaKey
+      const editable = event.target instanceof HTMLElement && (event.target.matches('input, textarea, select') || event.target.isContentEditable)
       if (meta && event.key.toLowerCase() === 'k') { event.preventDefault(); setUi({ paletteOpen: true, paletteQuery: '', paletteIndex: 0 }) }
-      if (meta && event.key.toLowerCase() === 'z' && !event.shiftKey) { event.preventDefault(); undo() }
-      if (meta && event.key.toLowerCase() === 'z' && event.shiftKey) { event.preventDefault(); redo() }
+      if (!editable && meta && event.key.toLowerCase() === 'z' && !event.shiftKey) { event.preventDefault(); undo() }
+      if (!editable && meta && event.key.toLowerCase() === 'z' && event.shiftKey) { event.preventDefault(); redo() }
       if (event.key === 'Escape') {
         const state = useStudio.getState()
         if (state.paletteOpen) { setUi({ paletteOpen: false }); return }
@@ -571,7 +584,7 @@ function App() {
         if (state.historyOpen) { setUi({ historyOpen: false }) }
       }
     }
-    window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey)
+    window.addEventListener('keydown', onKey, true); return () => window.removeEventListener('keydown', onKey, true)
   }, [])
   const page = { 'step-editor': <EditorView />, playground: <PlaygroundView />, runs: <RunsView />, 'scheduled-queue': <ScheduledView />, export: <ExportView /> }[view]
   return <div className="app-shell" data-density={density}><Sidebar newScriptRef={newScriptRef} /><div className="workspace"><Toolbar /><main className="content">{onboardingOpen && <section className="onboarding-card" aria-label="Automation studio quick start"><div><strong>Build, run, and export your first automation</strong><p>Choose a seeded script, edit its ordered steps, then run it to watch the console and report update together.</p></div><Button size="sm" kind="ghost" onClick={dismissOnboarding}>Dismiss tips</Button></section>}{page}</main></div>
