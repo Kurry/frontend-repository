@@ -185,3 +185,52 @@ test('version changes and undo invalidate annotation drafts tied to stale lines'
   await page.getByRole('button', { name: 'Annotate range' }).click();
   await expect(page.getByLabel('bodyMarkdown')).toHaveValue('');
 });
+
+test('restore and import invalidate annotation drafts tied to replaced context', async ({ page }) => {
+  const selectFirstTwoBaseLines = () => page.evaluate(() => {
+    const lines = [...document.querySelectorAll('.split-diff .diff-line[data-side="base"]')];
+    const first = lines[0]?.querySelector('.line-code');
+    const second = lines[1]?.querySelector('.line-code');
+    if (!first || !second) throw new Error('Expected two visible base lines');
+    const range = document.createRange();
+    range.setStart(first, 0);
+    range.setEnd(second, second.childNodes.length);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    first.closest('.diff-scroll').dispatchEvent(new MouseEvent('mouseup', { bubbles: true }));
+  });
+  const draftAndClose = async (text) => {
+    await selectFirstTwoBaseLines();
+    await page.getByRole('button', { name: 'Annotate range' }).click();
+    await page.getByLabel('bodyMarkdown').fill(text);
+    await page.keyboard.press('Escape');
+  };
+  await page.goto(BASE);
+  await page.waitForLoadState('networkidle');
+  await draftAndClose('STALE RESTORE DRAFT');
+  await page.getByRole('button', { name: 'Restore to compare' }).click();
+  const restoreHeading = await page.getByRole('heading', { name: /Restore source v/ }).textContent();
+  const sourceVersion = restoreHeading.match(/v\d+/)[0];
+  await page.getByLabel('Change note').fill(`Restore ${sourceVersion} after review`);
+  await page.getByRole('button', { name: 'Restore version' }).click();
+  await selectFirstTwoBaseLines();
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await expect(page.getByLabel('bodyMarkdown')).toHaveValue('');
+  await page.keyboard.press('Escape');
+
+  await draftAndClose('STALE IMPORT DRAFT');
+  await page.getByRole('button', { name: 'Export' }).click();
+  await page.getByRole('tab', { name: 'Version package' }).click();
+  const preview = page.getByLabel('package preview');
+  await expect(preview).toBeVisible({ timeout: 3000 });
+  const packageJson = await preview.textContent();
+  await page.getByRole('button', { name: 'Import' }).click();
+  await page.getByLabel('Package JSON').fill(packageJson);
+  await page.getByRole('button', { name: 'Import package' }).click();
+  await expect(page.getByText(/Imported \d+ versions/).first()).toBeVisible();
+  await page.keyboard.press('Escape');
+  await selectFirstTwoBaseLines();
+  await page.getByRole('button', { name: 'Annotate range' }).click();
+  await expect(page.getByLabel('bodyMarkdown')).toHaveValue('');
+});

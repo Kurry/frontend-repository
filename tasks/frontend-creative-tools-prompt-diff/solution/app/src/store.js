@@ -272,7 +272,8 @@ export const useStudioStore = create((set, get) => ({
     set({
       undoStack: [...state.undoStack, snapshot(state)].slice(-50), redoStack: [],
       prompts: state.prompts.map((item) => item.id === prompt.id ? { ...item, versions: [...item.versions, restored] } : item),
-      compareVersionId: versionId, restoreDialog: null, historySelection: { ...state.historySelection, [prompt.id]: [] },
+      compareVersionId: versionId, restoreDialog: null, selectedRange: null, annotationDraft: null, annotationComposerOpen: false,
+      historySelection: { ...state.historySelection, [prompt.id]: [] },
       toasts: [...state.toasts.slice(-3), toast(message)], liveMessage: message, liveNonce: state.liveNonce + 1, newNodeId: versionId,
     });
     return { ok: true, versionId, versionNumber };
@@ -363,6 +364,7 @@ export const useStudioStore = create((set, get) => ({
       undoStack: [...state.undoStack, snapshot(state)].slice(-50), redoStack: [], prompts, annotations, mergedHeads,
       selectedPromptId: imported.id, baseVersionId: packageData.baseVersionId, compareVersionId: packageData.compareVersionId,
       historySelection: { ...state.historySelection, [imported.id]: [] }, mergeSession: null,
+      selectedRange: null, annotationDraft: null, annotationComposerOpen: false,
       importOpen: false, importDraft: '', importError: '', importBusy: false,
       toasts: [...state.toasts.slice(-3), toast(message)], liveMessage: message, liveNonce: state.liveNonce + 1,
     };
