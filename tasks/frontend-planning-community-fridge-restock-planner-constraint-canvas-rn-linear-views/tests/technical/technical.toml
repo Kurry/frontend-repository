@@ -1,0 +1,11 @@
+[setup]
+
+[dimensions.technical]
+description = "Verifies the technical aspects of the Restock Planner"
+
+[[criterion]]
+id = "AC-04"
+title = "schema_contract"
+description = "The tool result and artifact contain the declared API-shaped fields after mutation."
+type = "negative"
+weight = 1

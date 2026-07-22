@@ -1,0 +1,9 @@
+[setup]
+[dimensions.design_fidelity]
+description = "Verifies design fidelity"
+[[criterion]]
+id = "AC-12"
+title = "source_fidelity"
+description = "The visual and interaction thesis is coherent without copying unrelated screens."
+type = "negative"
+weight = 1

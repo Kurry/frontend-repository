@@ -1,0 +1,9 @@
+[setup]
+[dimensions.performance]
+description = "Verifies performance"
+[[criterion]]
+id = "AC-09"
+title = "large_collection"
+description = "The signature interaction remains responsive and unrelated rows stay stable."
+type = "negative"
+weight = 1
