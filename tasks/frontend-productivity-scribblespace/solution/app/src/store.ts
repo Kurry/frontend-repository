@@ -250,7 +250,7 @@ export const useAppStore = defineStore('app', {
           type: 'flashcard',
           width: 230,
           height: 160,
-          color: '#FFFFFF',
+          color: NOTE_COLORS[0].hex,
           front: '',
           back: '',
           flipped: false,

@@ -343,7 +343,7 @@ const motionConfig = computed(() => {
         zIndex: isEditing ? 10000 : obj.zIndex,
         boxShadow: isSearchHighlight ? '0 0 0 4px #E0A030' : isConnectSource ? '0 0 0 3px #3F9E6E' : isSelected ? undefined : (obj.type === 'note' || obj.type === 'flashcard') ? '0 2px 8px rgba(33, 29, 58, 0.12)' : 'none',
         borderRadius: obj.type === 'circle' ? '50%' : '8px',
-        backgroundColor: obj.type === 'flashcard' ? '#FFFFFF' : obj.color,
+        backgroundColor: obj.color,
         display: 'flex',
         flexDirection: 'column',
         transform: (!prefersReducedMotion && obj.type === 'flashcard' && obj.flipped) ? 'rotateY(180deg)' : 'rotateY(0deg)',
