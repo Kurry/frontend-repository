@@ -19,7 +19,7 @@ const BASE = 'http://localhost:3000';
 export const test = base.extend({
   page: async ({ page }, use) => {
     const errors = [];
-    page.on('console', (m) => { if (m.type() === 'error') errors.push(`console.error: ${m.text()}`); });
+    page.on('console', async (m) => { if (await m.type() === 'error') errors.push(`console.error: ${m.text()}`); });
     page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
     await use(page);
     expect(errors, 'zero console/page errors required').toEqual([]);
@@ -36,17 +36,17 @@ export const invokeTool = (page, name, args = {}) => page.evaluate(async ([n, a]
   try { return typeof r === 'string' ? JSON.parse(r) : r; } catch { return r; }
 }, [name, args]);
 
+const normalizeTools = (tools) => Array.isArray(tools) ? tools : tools?.tools ?? [];
+
 test.describe('workspace contract (canonical)', () => {
   test('serves non-empty app with zero console errors', async ({ page }) => {
-    await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
     const len = await page.evaluate(() => document.body?.innerText?.trim().length ?? 0);
     expect(len, 'body renders visible content').toBeGreaterThan(0);
   });
 
   test('webmcp surface is registered and well-formed', async ({ page }) => {
-    await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
     const kinds = await page.evaluate(() => ({
       session_info: typeof window.webmcp_session_info,
       list_tools: typeof window.webmcp_list_tools,
@@ -54,7 +54,7 @@ test.describe('workspace contract (canonical)', () => {
     }));
     expect(kinds).toEqual({ session_info: 'function', list_tools: 'function', invoke_tool: 'function' });
     const tools = await listTools(page);
-    const arr = Array.isArray(tools) ? tools : tools?.tools ?? [];
+    const arr = normalizeTools(tools);
     expect(arr.length, 'at least one webmcp tool registered').toBeGreaterThan(0);
     for (const t of arr) expect(typeof (t.name ?? t.id), 'every tool has a name').toBe('string');
   });
@@ -90,32 +90,24 @@ test.describe('workspace contract (canonical)', () => {
       };
       requestAnimationFrame(sample);
     });
-    await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
     // Precondition sanity check: the emulation actually reaches the app.
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
     // Observe every frame for another 1.5s after load settles and assert on
-    // everything seen since the document started. The wait itself runs
-    // in-page (real time via a Promise/setTimeout, not Playwright's
-    // page.waitForTimeout) so the sampling loop keeps ticking off
-    // requestAnimationFrame the whole time.
+    // everything seen since the document started.
     // Finished, idle, or paused effects and durations <=1ms are allowed; any
     // meaningfully timed RUNNING effect at any sample is a reduced-motion
     // failure. Apps with zero animations pass vacuously (the render/console
     // test still gates them).
-    const offenders = await page.evaluate(
-      () => new Promise((resolve) => {
-        setTimeout(() => resolve(window.__reducedMotionOffenders ?? []), 1500);
-      }),
-    );
+    await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 1500)));
+    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
   test('no horizontal overflow at 375px', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
+    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
     const overflow = await page.evaluate(() =>
       document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow, 'no horizontal page scroll at 375px').toBeLessThanOrEqual(1);
