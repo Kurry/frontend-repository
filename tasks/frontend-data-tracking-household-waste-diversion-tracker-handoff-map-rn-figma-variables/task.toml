@@ -1,0 +1,11 @@
+[task]
+slug = "frontend-data-tracking-household-waste-diversion-tracker-handoff-map-rn-figma-variables"
+name = "mercor-intelligence/frontend-data-tracking-household-waste-diversion-tracker-handoff-map-rn-figma-variables"
+description = "Manage waste events through a domain-native browser surface where one meaningful mutation updates linked views and an interoperable artifact."
+author = "Kurry"
+
+[task.metadata]
+status = "draft"
+domain = "frontend"
+tags = ["data-tracking", "figma-variables", "household-waste", "react", "vite"]
+difficulty = "medium"
