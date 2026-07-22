@@ -184,10 +184,11 @@ test.describe('frontend-productivity-prompt-library criteria', () => {
     const rowsBefore = await page.locator(ROWS).count();
     await page.getByRole('button', { name: 'New Prompt', exact: true }).click();
     const modal = page.locator('.prompt-form-modal');
-    // Fill body + technique but leave title empty, then attempt submit.
+    // Fill body + technique but leave title empty. The all-mode form should
+    // expose the named validation error while keeping submission gated.
     await modal.locator('#prompt-body').fill('Body present but title missing.');
     await modal.getByLabel('Technique tag').selectOption('Few-shot');
-    await modal.getByRole('button', { name: 'Create prompt' }).click();
+    await expect(modal.getByRole('button', { name: 'Create prompt' })).toBeDisabled();
 
     // Modal must stay open and show a validation message naming "Title".
     await expect(modal).toBeVisible();
