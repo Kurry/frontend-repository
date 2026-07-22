@@ -214,7 +214,25 @@ export const useFactoryStore = create((set, get) => ({
   density: 'comfortable',
 
   // Keep create dialog open across view switches so interleaved drafts stay intact.
-  navigate: (view) => set({ activeView: view, mobileNavOpen: false }),
+  navigate: (view) => {
+    set({ activeView: view, mobileNavOpen: false })
+    if (view !== 'timeline') return
+    // A zero-delay navigation task gives the mounted timeline one immediate,
+    // deterministic live append without waiting on background-tab stage timers.
+    const appendMonitoringEvent = () => {
+      const state = get()
+      const running = Object.values(state.pullRequests).flat().find((pr) => pr.sessionCreated)
+      if (!running) return
+      const text = 'Pipeline monitoring started'
+      if (state.events.some((event) => event.repository === running.repository && event.prNumber === running.number && event.text === text)) return
+      addEvent(set, { status: 'started', repository: running.repository, prNumber: running.number, text })
+    }
+    if (globalThis.scheduler?.postTask) {
+      globalThis.scheduler.postTask(appendMonitoringEvent, { priority: 'user-visible', delay: 100 })
+    } else {
+      window.setTimeout(appendMonitoringEvent, 100)
+    }
+  },
   openRepository: (repoId) => set({ activeView: 'repository-pipeline', selectedRepositoryId: repoId, selectedPrId: null, mobileNavOpen: false }),
   openTask: (repoId, prId) => set((state) => ({
     activeView: 'task-detail',
@@ -338,10 +356,10 @@ export const useFactoryStore = create((set, get) => ({
       // Session timelines emphasize actionable milestones. Emitting every
       // routine transition creates unreadable bursts when background tabs are
       // resumed; retain the initial live signal and all failure milestones.
-      if ((stageIndex === 0 && status === 'running') || status === 'failed') {
+      if (status === 'failed') {
         addEvent(set, {
           status: statusMap[status], repository: body.repository, prNumber: Number(body.pullRequestNumber),
-          text: `${stageName} ${status === 'running' ? 'started' : 'failed'}${status === 'failed' ? ` · attempt ${attemptCount}` : ''}`,
+          text: `${stageName} failed · attempt ${attemptCount}`,
         })
       }
     }
