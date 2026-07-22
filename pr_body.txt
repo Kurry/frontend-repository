@@ -1,0 +1,19 @@
+Test run complete: 4 passed, 108 failed.
+
+Not-Automatable:
+NOT-AUTOMATABLE: 1.6 — headings_follow_logical_order
+NOT-AUTOMATABLE: 1.7 — landmark_navigation_is_present
+NOT-AUTOMATABLE: 1.8 — focus_management_on_modals
+NOT-AUTOMATABLE: 4.5 — graph_node_animates_in
+NOT-AUTOMATABLE: 4.10 — export_surface_transition
+NOT-AUTOMATABLE: 9.4 — async_work_has_loading_indicators
+NOT-AUTOMATABLE: 9.7 — animations_maintain_smooth_frame_rate
+NOT-AUTOMATABLE: 15.1 — headings_use_consistent_capitalization
+NOT-AUTOMATABLE: 15.2 — actions_use_specific_labels
+NOT-AUTOMATABLE: 15.3 — errors_name_problem_and_fix
+NOT-AUTOMATABLE: 15.4 — empty_states_explain_next_step
+NOT-AUTOMATABLE: 15.5 — body_copy_is_well_written
+NOT-AUTOMATABLE: 15.6 — terminology_is_consistent
+NOT-AUTOMATABLE: 15.7 — numbers_dates_and_units_are_consistent
+NOT-AUTOMATABLE: 15.8 — success_messages_are_specific
+NOT-AUTOMATABLE: innovation.catchall — innovation_catchall

@@ -1,0 +1,1143 @@
+[
+  {
+    "id": "1.1",
+    "name": "prompt_picker_search_filters",
+    "description": "Typing in the prompt search input filters the prompt list incrementally to matching entries, selecting a prompt loads its full version history into both pickers, and clearing the field restores the full prompt list exactly",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.2",
+    "name": "seeded_version_chains",
+    "description": "At least 4 seeded prompts each carry 4 to 6 versions, and every version shows its version number, a fictional author, a timestamp, and a change note in the picker options and the history list",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.3",
+    "name": "pickers_rerender_without_reload",
+    "description": "The header holds base (left) and compare (right) version pickers listing all versions by number and relative timestamp, and switching either picker immediately re-renders the diff panel without a full page reload",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.4",
+    "name": "split_pane_aligned_lines",
+    "description": "The split view shows the base version left and compare version right with numbered lines aligned so corresponding lines sit at the same height in both panes",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.5",
+    "name": "line_diff_coloring_gutter",
+    "description": "Added lines carry a green success-background treatment and removed lines a red error-background treatment, unchanged lines are unstyled, and each changed line's gutter shows a plus or minus symbol in the matching color",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.6",
+    "name": "word_level_highlighting_exact",
+    "description": "Within changed lines, word-level highlighting marks exactly the differing words with a visibly stronger shade than the line background, leaving unchanged words inside changed lines unmarked",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.7",
+    "name": "unified_toggle_context_lines",
+    "description": "The unified-diff toggle collapses the split into a single column showing only changed blocks with three lines of unchanged context above and below each change, and toggling back restores the split view at the same scroll region",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.8",
+    "name": "summary_counters_recompute",
+    "description": "The change summary strip shows lines added, lines removed, and a positive-or-negative net token delta between the two selected versions, and the counters recompute whenever either picker changes or either Ignore whitespace or Ignore case toggle changes",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.9",
+    "name": "counter_click_scrolls_to_change",
+    "description": "Clicking a summary counter scrolls the diff panel to the first change of that type and pulses the target block's background before settling",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.10",
+    "name": "three_way_conflict_highlighting",
+    "description": "Compare Branches presents the base and two branch versions in three labeled panes, rendering regions changed by only one branch in that branch's accent and regions changed differently by both branches as numbered conflict regions with a distinct conflict treatment",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.11",
+    "name": "merge_region_choices",
+    "description": "The merge flow offers Choose left, Choose right, and Edit manually (a prefilled inline text area) per conflict region, shows resolved-out-of-total progress, and keeps Complete merge disabled until every region is resolved",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.12",
+    "name": "bulk_resolution_controls",
+    "description": "Bulk controls resolve all remaining regions to the left or right side in one action, and each affected region's chip updates to show its resolution",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.13",
+    "name": "merge_result_reflects_choices",
+    "description": "Completing a merge creates a new head version whose text reflects exactly the per-region choices made \u2014 each region matching the chosen side or the manually edited text \u2014 with a change note naming the two merged branches and a success toast",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.14",
+    "name": "blame_attribution_gutter",
+    "description": "The Blame tab renders the selected version's text with a per-line gutter showing the version number and author that last changed each line, and hovering an attribution with the real pointer shows that version's change note and timestamp",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.15",
+    "name": "blame_click_selects_version",
+    "description": "Clicking a blame attribution selects that version into the compare picker so the diff shows the change that introduced the line",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.16",
+    "name": "version_graph_topology",
+    "description": "The Graph tab renders the version topology as connected nodes \u2014 the main chain in a column, branch nodes offset, and merge nodes joined to two parents with visible edges \u2014 each node showing its version number and author initials",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.17",
+    "name": "graph_node_click_and_marking",
+    "description": "Clicking a graph node loads that version into the base picker and highlights the node, and the currently compared pair is visually marked on the graph",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.18",
+    "name": "graph_gains_merge_node",
+    "description": "After completing a merge, the graph gains a new merge node connected to both parent branches without a reload",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.19",
+    "name": "restore_creates_new_head",
+    "description": "Restore to Base and Restore to Compare open a confirmation naming the version; confirming creates a new head version whose text equals the restored version with a change note naming the restore source and shows a success toast",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.20",
+    "name": "history_never_rewritten",
+    "description": "Restoring and merging never rewrite or delete existing versions: the history list and graph keep every prior version and gain exactly one new head entry per operation",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.21",
+    "name": "annotation_composer_markdown",
+    "description": "Selecting a line range offers an Annotate control opening a thread composer anchored to that range, supporting markdown with code highlighting and checklists rendered in a live preview",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.22",
+    "name": "annotation_threads_replies_resolve",
+    "description": "Posting an annotation shows a marker on the annotated lines; clicking it opens the thread with the formatted note, author, and timestamp, supports replies, and a resolved toggle collapses the thread with a resolved treatment",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.23",
+    "name": "annotation_anchors_survive_mode_switch",
+    "description": "Annotation threads keep their line anchors when switching between split and unified modes",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.24",
+    "name": "global_search_across_versions",
+    "description": "The global search input searches the text of every version of every prompt, lists results with prompt, version number, and a highlighted snippet, and clicking a result loads that prompt and version into the base picker",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.25",
+    "name": "undo_redo_version_operations",
+    "description": "Undo and Redo revert and reapply posted annotations, merge resolution choices, restores, and completed merges \u2014 undoing a merge or restore removes the created head version from the history and graph, redo re-adds it identically, and the controls disable when there is nothing to undo or redo",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.26",
+    "name": "history_report_live_derived",
+    "description": "Export offers History report, Version package, and Merged prompt text tabs with Copy and Download; the History report lists numbers, authors, timestamps, change notes, counters, and any completed merge with per-region resolutions, and the preview updates when a new version is created before exporting",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.27",
+    "name": "multi_select_serialized_package",
+    "description": "Multi-selecting two or more versions in the history list exports a single serialized package containing exactly the selected versions' full texts and metadata",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.28",
+    "name": "merged_text_export_identical",
+    "description": "After a merge, the export offers the merged prompt text and the exported text is identical to the merge result shown in the app",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.29",
+    "name": "self_compare_and_alignment_edges",
+    "description": "Comparing a version with itself shows an explicit no-differences state with zero counters, and comparing the shortest and longest versions keeps line numbering aligned with filler alignment in the shorter pane",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.30",
+    "name": "duplicate_action_and_thread_guards",
+    "description": "Double-activating Complete merge or a Restore confirmation creates exactly one new version, and annotating a range that already carries a thread adds to the existing thread rather than stacking a second marker",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.31",
+    "name": "search_and_note_edge_handling",
+    "description": "The version search matches case-insensitively, an empty query shows no result list, a no-match search shows an empty state naming the query, and a change note longer than 80 characters truncates with an ellipsis in the picker option while showing in full in the history list",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "1.32",
+    "name": "ignore_whitespace_recomputes_diff",
+    "description": "Turning Ignore whitespace on through the real control makes whitespace-only differences compare as unchanged and immediately recomputes counters, word-level highlights, and unified blocks for the same pair; turning it off restores the whitespace-sensitive diff without a reload",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.33",
+    "name": "ignore_case_recomputes_diff",
+    "description": "Turning Ignore case on through the real control makes letter-case-only differences compare as unchanged and immediately recomputes counters and highlights for the same pair; turning it off restores the case-sensitive diff without a reload",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.34",
+    "name": "annotation_create_field_contract",
+    "description": "Posting an annotation requires a valid AnnotationCreate payload: empty or over-4000-character bodyMarkdown, empty author, or lineEnd less than lineStart shows inline validation naming the offending field and posts nothing; a valid post creates a thread marker on the anchored lines",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.35",
+    "name": "version_package_field_contract_export",
+    "description": "Export Version package JSON preview shows schemaVersion exactly prompt-diff-package-v1 plus required promptId, promptTitle, versions, baseVersionId, compareVersionId, counters, and annotations keys; after a merge the preview includes the new head in versions and a non-null merge object whose resolutions match the per-region choices",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.36",
+    "name": "version_package_import_round_trip",
+    "description": "Import of a conforming Version package JSON replaces the selected prompt chain so history, pickers, and graph match the package texts and topology; Import of malformed JSON or a payload failing the VersionPackage field contract (wrong schemaVersion, missing required keys, illegal kind, or baseVersionId not in versions) leaves the chain unchanged and names the offending field",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.1",
+    "name": "empty_states_designed",
+    "description": "Empty state UI renders for a no-match prompt search, a no-match version search naming the query, and the no-differences self-compare state.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.2",
+    "name": "forms_validate_inline",
+    "description": "AnnotationCreate, AnnotationReply, RestoreCreate, and Import validate inline before submit with per-field messages naming bodyMarkdown, changeNote, schemaVersion, or the offending VersionPackage field.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.3",
+    "name": "errors_name_problem_and_fix",
+    "description": "Blocking messages name the problem and the fix \u2014 unresolved conflict count before Complete merge, bodyMarkdown length, schemaVersion must be prompt-diff-package-v1 \u2014 rather than only saying Invalid.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.4",
+    "name": "actions_show_confirmation",
+    "description": "Merges, restores, exports, successful imports, and posted annotations each produce visible success feedback such as a toast naming what happened.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.5",
+    "name": "long_operations_show_progress",
+    "description": "The merge flow shows resolved-out-of-total progress, and Export shows its live preview before Copy or Download.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.6",
+    "name": "destructive_actions_guarded",
+    "description": "Restores and merge completion require confirmation, cancel leaves the chain intact, and undo reverts completed merges and restores.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.7",
+    "name": "nonobvious_controls_have_help",
+    "description": "Non-obvious controls \u2014 the net token delta counter, blame attributions, conflict markers, and Ignore whitespace / Ignore case toggles \u2014 carry a tooltip or inline explanation.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.8",
+    "name": "controls_use_semantic_tags",
+    "description": "Buttons, inputs, selects, and labels for pickers, Ignore toggles, Export, Import, and merge choices use semantic elements rather than bare divs or spans.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.9",
+    "name": "modal_close_paths",
+    "description": "The restore confirmation, merge confirmation, and Export surface close from their close control, Escape, and a background click where offered.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.10",
+    "name": "merge_flow_stepwise_feedback",
+    "description": "The region-by-region merge flow gives stepwise feedback: each MergeRegionResolution choice updates its chip and the progress indicator immediately.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.11",
+    "name": "import_rejects_malformed_json",
+    "description": "Importing malformed JSON shows an inline parse error naming the import problem and leaves the prompt chain unchanged.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.12",
+    "name": "import_rejects_field_contract_failures",
+    "description": "Importing parseable JSON that fails the VersionPackage field contract \u2014 missing required keys, schemaVersion not prompt-diff-package-v1, kind outside main|branch|merge|restore, parentIds length outside 0-2, baseVersionId absent from versions, or resolution outside choose-left|choose-right|edit-manually \u2014 leaves the chain unchanged and names the offending field.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.13",
+    "name": "annotation_range_and_length_guards",
+    "description": "AnnotationCreate with bodyMarkdown longer than 4000 characters or with lineEnd less than lineStart posts nothing and names the offending field.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.14",
+    "name": "seeded_export_still_opens",
+    "description": "Export with only the seeded chain and no session merge still opens and shows a Version package including schemaVersion prompt-diff-package-v1 and every required VersionPackage key; Download and Copy remain available.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.1",
+    "name": "spacing_matches_studio_scale",
+    "description": "At 1440px, spacing among the left rail, header pickers, Ignore toggles, summary strip, and diff surface follows a consistent studio scale \u2014 no arbitrary one-off gaps that break the composition.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.2",
+    "name": "typography_matches_chrome_and_mono_spec",
+    "description": "UI chrome uses the sans-serif hierarchy (app title larger than panel headings, larger than body/labels) and all prompt text in diff, blame, merge, and Export uses monospaced type as specified.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.3",
+    "name": "layout_matches_rail_header_diff_spec",
+    "description": "At 1440px the layout matches the specified composition: left rail (prompt picker + history), header (pickers, mode tabs, Ignore toggles, summary strip), and diff surface filling the remaining area \u2014 a dense studio, not a marketing landing.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.4",
+    "name": "specified_state_changes_animate",
+    "description": "Transitions are applied to the state changes the spec calls out: diff cross-fade (~150ms), counter pulse (~400ms), unified/split pane transition, merge resolution motion, graph node entrance, thread expand/collapse, and Export enter/exit \u2014 verified via real UI controls.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.5",
+    "name": "responsive_behavior_matches_spec",
+    "description": "At 375px vs 1440px, responsive behavior matches the spec: below 768px the split stacks with a base/compare segment switch and the rail collapses behind a toggle; Export and Ignore toggles remain operable.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.6",
+    "name": "control_styling_matches_spec",
+    "description": "Buttons, inputs, selects, tabs, and Ignore toggles show the specified default, hover, focus ring, disabled, and error treatments rather than unstyled browser defaults.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.7",
+    "name": "typography_has_clear_hierarchy",
+    "description": "Typography hierarchy clearly distinguishes the app title, panel headings, body/labels, and monospaced prompt text.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.8",
+    "name": "component_states_match_spec",
+    "description": "Component states match the spec, including disabled Complete merge while regions remain unresolved, disabled Undo/Redo when stacks are empty, and the marked head version in the history list.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.9",
+    "name": "diff_surface_treatments_match_spec",
+    "description": "Added/removed line backgrounds, stronger word-level highlights, summary tag colors (green/red/blue), and distinct conflict treatment match the visual design spec.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.10",
+    "name": "microinteractions_match_spec",
+    "description": "Hover/press on buttons, history rows, search results, and graph nodes, plus toast slide-in/auto-dismiss, follow the specified microinteraction behavior when driven through real controls.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "11.1",
+    "name": "delightful_diff_microinteractions",
+    "description": "Beyond the required counter pulse and cross-fade, the diff studio adds a delightful microinteraction such as linked hover highlight between split panes or a subtle change-stepper cue.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "11.2",
+    "name": "advanced_graph_or_blame_motion",
+    "description": "The version graph or blame view offers advanced motion or interaction beyond the minimum \u2014 for example animated edge routing, minimap, or blame heat intensity \u2014 that a real operator would notice.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "11.3",
+    "name": "guided_first_merge_coachmarks",
+    "description": "Optional guided coachmarks or a first-run tip walk the user through Compare Branches and Merge without blocking the seeded workflow.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "11.4",
+    "name": "enhanced_interactive_graphics",
+    "description": "The diff, blame, graph, or merge surfaces provide extra usability beyond the minimum \u2014 such as linked highlighting between views, richer node tooltips, or navigable change-by-change stepping.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "11.5",
+    "name": "keyboard_power_user_shortcuts",
+    "description": "Beyond basic Tab focus, the app exposes power-user shortcuts (for example next/previous change or toggle Ignore whitespace) that are discoverable in the UI.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "11.6",
+    "name": "preference_personalization",
+    "description": "The app lets the operator personalize a non-required preference such as default unified mode, denser gutters, or relative versus absolute timestamps for the session.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "11.7",
+    "name": "polished_studio_branding",
+    "description": "The chrome presents a polished prompt-diff studio identity (distinct title treatment, cohesive empty states) beyond a bare unlabeled tool shell.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "11.8",
+    "name": "theme_or_density_beyond_requirements",
+    "description": "The app provides a density or appearance control beyond requirements (for example compact diff density) that observably changes the layout.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "11.9",
+    "name": "shareable_deep_link_or_print",
+    "description": "Beyond Version package export, the app offers an extra shareable affordance such as a print-friendly history report layout or a copyable compare summary card.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "11.10",
+    "name": "competition_level_innovation",
+    "description": "A competition-level enhancement is visible \u2014 for example three-way conflict minimap, annotation @mentions styling, or side-by-side package diff \u2014 that clearly exceeds the written minimum.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "innovation.catchall",
+    "name": "innovation_catchall",
+    "description": "The app demonstrates a noteworthy, browser-observable enhancement beyond the spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered \u2014 even partially \u2014 by another criterion in this file, answer no here and let that criterion carry it.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "15.1",
+    "name": "headings_use_consistent_capitalization",
+    "description": "Where the app renders headings, tabs, and section titles (Diff, Compare Branches, Blame, Graph, Export tabs), they use consistent capitalization throughout.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "15.2",
+    "name": "actions_use_specific_labels",
+    "description": "Where the app renders button or action labels, they are specific verbs such as Compare branches, Complete merge, Restore version, Ignore whitespace, Export, Import, Copy, and Download \u2014 not generic Submit or OK when a specific label is possible.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "15.3",
+    "name": "errors_name_problem_and_fix",
+    "description": "Where the app renders blocking or error messages, they name the field or problem and the fix \u2014 unresolved conflict count, bodyMarkdown length, changeNote required, schemaVersion prompt-diff-package-v1 \u2014 not just Invalid.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "15.4",
+    "name": "empty_states_explain_next_step",
+    "description": "Where the app renders empty states (no search matches, no-differences self-compare), the copy explains what belongs there or that the versions are identical.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "15.5",
+    "name": "body_copy_is_well_written",
+    "description": "Where the app renders seeded prompt content, change notes, and author names, they read as plausible product data free of spelling and grammatical errors.",
+    "type": "likert",
+    "weight": 0.5
+  },
+  {
+    "id": "15.6",
+    "name": "terminology_is_consistent",
+    "description": "Where the app renders labels for version, merge, annotation, export, and package, terminology stays consistent across the rail, header, Export surface, and toasts.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "15.7",
+    "name": "numbers_dates_and_units_are_consistent",
+    "description": "Where the app renders version numbers, relative timestamps, and counter integers, formatting is consistent across pickers, history rows, and Export previews.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "15.8",
+    "name": "success_messages_are_specific",
+    "description": "Where the app renders confirmation and success messages for merge, restore, export, and import, they state what happened rather than vague affirmations.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "6.1",
+    "name": "merge_and_restore_create_versions",
+    "description": "Create flow: a version created through the merge flow or a restore with a valid RestoreCreate changeNote appears at the head of the history list, in both pickers, on the graph, and in the Export Version package preview.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.2",
+    "name": "incomplete_merge_blocked_with_feedback",
+    "description": "Create flow: Complete merge stays disabled with the unresolved count visible until every conflict region is resolved, and the annotation composer rejects an empty AnnotationCreate bodyMarkdown inline before posting.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.3",
+    "name": "resolution_edits_update_preview",
+    "description": "Edit flow: changing a region's MergeRegionResolution (choose-left, choose-right, or edit-manually with manualText) updates the region chip and the merge result preview immediately.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.4",
+    "name": "undo_removes_created_version",
+    "description": "Delete-equivalent flow: undoing a merge or restore removes the created head version from the history list, pickers, and graph together.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.5",
+    "name": "mode_tabs_retain_context",
+    "description": "View switch: switching between Diff, Compare Branches, Blame, and Graph retains the selected prompt, picker selections, Ignore toggles, and unified/split preference.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.6",
+    "name": "no_differences_state_visible",
+    "description": "Edge: comparing a version with itself shows the explicit no-differences state with zero counters instead of a blank panel.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.7",
+    "name": "search_filters_consistently",
+    "description": "Edge: the prompt picker search and the global version search narrow their lists consistently, and clearing either restores the prior list exactly.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.8",
+    "name": "rail_collapse_reopen",
+    "description": "Collapsible chrome: collapsing the left rail (at narrow widths) and reopening it preserves the selected prompt and history scroll context.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.9",
+    "name": "dialogs_support_expected_flows",
+    "description": "Overlays: the restore confirmation, merge flow, annotation threads, and Export surface open, complete, and cancel as expected without losing surrounding state.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.10",
+    "name": "recovery_without_reload",
+    "description": "Recovery: canceling a merge mid-resolution, dismissing a confirmation, closing Export, or rejecting an invalid Import never dead-ends the app; every flow is recoverable without a reload.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.11",
+    "name": "diff_options_flow",
+    "description": "Diff options flow: with a pair that differs only by whitespace or letter case, turn Ignore whitespace or Ignore case on and confirm the counters drop those differences; turn the toggle off and confirm the differences return.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.12",
+    "name": "artifact_export_import_end_state",
+    "description": "Artifact end state: after a merge, Export Version package shows schemaVersion prompt-diff-package-v1 and required keys including the new head; Download or Copy then Import that JSON reconstructs the same version texts and merge topology in history and graph.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "6.13",
+    "name": "schema_validation_flow",
+    "description": "Schema validation flow: empty AnnotationCreate bodyMarkdown posts nothing naming bodyMarkdown; empty RestoreCreate changeNote creates no head; Import with schemaVersion not prompt-diff-package-v1 leaves the chain unchanged naming schemaVersion; then a valid annotation and valid import succeed.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.1",
+    "name": "controls_are_keyboard_accessible",
+    "description": "All interactive controls \u2014 pickers, tabs, Ignore whitespace and Ignore case toggles, counters, merge choice and bulk controls, graph nodes, thread markers, undo/redo, Export, Import, Copy, and Download \u2014 are keyboard accessible with Tab, Shift+Tab, Enter, or Space.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.2",
+    "name": "modals_manage_focus",
+    "description": "The restore confirmation, merge confirmation, and Export surface trap focus, close on Escape, and return focus to the originating control on close.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.3",
+    "name": "images_and_icons_have_alt_text",
+    "description": "Toolbar and gutter icons (plus/minus, thread markers, Export) expose accessible names via aria-label, title, or equivalent \u2014 not unlabeled decorative-only controls.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.4",
+    "name": "feedback_uses_live_regions",
+    "description": "Merge completion, restores, posted annotations, successful imports, and blocking AnnotationCreate/Import validation are conveyed both visually and via ARIA live regions or associated field errors.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.5",
+    "name": "forms_have_explicit_labels",
+    "description": "AnnotationCreate bodyMarkdown, RestoreCreate changeNote, and Import paste fields use explicit labels or aria-labelledby associations.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.6",
+    "name": "headings_follow_logical_order",
+    "description": "Headings for the app title, mode panels, Export tabs, and merge flow follow a logical order without skipping levels.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.7",
+    "name": "landmark_navigation_is_present",
+    "description": "The left rail, main diff surface, and header toolbar are exposed with landmark roles or semantic regions (nav/main/aside or equivalent).",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.8",
+    "name": "text_and_controls_have_contrast",
+    "description": "Diff chrome labels, summary tags, picker text, and form labels have sufficient contrast against their backgrounds.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.9",
+    "name": "semantic_html_roles_are_used",
+    "description": "Pickers, tabs, Ignore toggles, Export, and merge choices use button/checkbox/tab semantics rather than unlabeled clickable divs.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.10",
+    "name": "reduced_motion_is_respected",
+    "description": "The diff cross-fade, counter pulse, Export enter/exit, and thread transitions respect the prefers-reduced-motion setting by applying instantly.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "1.11",
+    "name": "diff_not_color_alone",
+    "description": "Added and removed lines are distinguishable by gutter plus/minus symbols and accessible line annotations, not by color alone.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "9.1",
+    "name": "cold_start_is_under_two_seconds",
+    "description": "Cold start to interactive (prompt list and pickers respond) is under 2 seconds on local render.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "9.2",
+    "name": "console_is_clean",
+    "description": "Browser devtools show no errors or warnings on load or during compare, Ignore toggle, merge, restore, annotate, export, and import flows.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "9.3",
+    "name": "transitions_respond_under_100ms",
+    "description": "Picker switches, Ignore toggles, and mode tab switches begin updating the visible diff within about 100ms of the control activation.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "9.4",
+    "name": "async_work_has_loading_indicators",
+    "description": "When Export regenerates a large Version package preview or Import parses a package, a visible busy or preview-updating affordance appears rather than a frozen blank surface.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "9.5",
+    "name": "large_collections_render_without_lag",
+    "description": "Diffing the longest seeded versions and searching across every version of every prompt complete without perceived lag.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "9.6",
+    "name": "state_changes_remain_interactive",
+    "description": "The UI remains interactive while the diff recomputes after a picker switch, Ignore toggle, or mode toggle.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "9.7",
+    "name": "animations_maintain_smooth_frame_rate",
+    "description": "Diff cross-fade, counter pulse, graph node entrance, and Export enter/exit maintain smooth motion without visible stutter during normal use.",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "9.8",
+    "name": "rapid_input_does_not_freeze",
+    "description": "Rapid repeated picker switches, Ignore toggles, and searches do not hang or freeze the app.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.1",
+    "name": "rail_header_diff_layout",
+    "description": "The app composes as a left rail with the prompt picker and history list, a header row with the version pickers, the Diff, Compare Branches, Blame, and Graph mode tabs, Ignore whitespace and Ignore case toggles, and the change summary strip, with the diff surface filling the remaining area",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.2",
+    "name": "split_pane_divider_gutter",
+    "description": "Split panes are equal-width columns separated by a 1 pixel subtle border divider, with line numbers in a fixed-width muted gutter visually distinct from the text area",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.3",
+    "name": "diff_color_treatments",
+    "description": "Added lines use a light green background with a strong-green gutter plus symbol, removed lines a light red background with a strong-red gutter minus symbol, and word-level highlights use a visibly stronger shade of the same hue than their line background",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.4",
+    "name": "summary_tags_and_conflict_accent",
+    "description": "The change summary strip uses green, red, and blue tag treatments for added, removed, and net token delta, and three-way conflict regions carry a distinct third treatment never confused with plain adds or removes",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.5",
+    "name": "picker_and_history_anatomy",
+    "description": "Version picker options show version number and relative timestamp, and history rows show number, author, timestamp, and change note with the head version visibly marked plus multi-select checkboxes for package export",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.6",
+    "name": "graph_node_kind_distinction",
+    "description": "Graph nodes are visually distinct by kind \u2014 chain, branch, and merge nodes differ in shape or accent \u2014 and selected and compared nodes carry a visible highlight ring",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.7",
+    "name": "monospace_prompt_type_hierarchy",
+    "description": "All prompt text in diff, blame, merge, and export surfaces renders in monospaced type, while UI chrome shows a clear sans-serif hierarchy with the app title larger than panel headings, which are larger than body and label text",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.8",
+    "name": "control_states_and_icon_set",
+    "description": "Buttons, inputs, selects, tabs, and toggles show distinct default, hover, focus (visible ring), disabled, and error treatments, and one consistent icon set is used across tabs, gutter symbols, thread markers, and toolbar actions",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.9",
+    "name": "responsive_stack_and_rail",
+    "description": "At widths of 768 pixels and below the split view stacks into a single column with a base/compare segment switch and the left rail collapses behind a toggle, while at 375 pixel width no content clips or overflows the viewport, no page-level horizontal scrolling appears, and long lines wrap or scroll within the diff surface's container",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "3.10",
+    "name": "export_surface_anatomy",
+    "description": "Export opens as a centered surface with History report / Version package / Merged prompt text format tabs, a scrollable monospaced preview, and Copy, Download, and Import affordances",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.1",
+    "name": "shared_state_coherence",
+    "description": "All surfaces derive from one shared state: switching a picker or Ignore toggle recomputes the diff, counters, and highlights together; completing a merge or restore updates the history list, pickers, graph, search index, and Export together; Import mutates that same store; and annotations and resolutions appear everywhere they are shown, all without a reload",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.2",
+    "name": "no_storage_reload_seeded",
+    "description": "No browser storage is used: localStorage and sessionStorage remain empty after comparing, merging, restoring, annotating, undoing, exporting, and importing, and a page reload returns the app to its seeded state (seeded prompts and version chains, no unseeded annotations, merges, or restores)",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.5",
+    "name": "console_clean",
+    "description": "The console is free of errors and warnings on first load and stays clean while comparing versions, toggling Ignore options, merging, restoring, annotating, searching, undoing, exporting, and importing",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.6",
+    "name": "cold_load_interactive_2s",
+    "description": "The app is interactive (prompt list and pickers respond) within 2 seconds of a local cold load",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.7",
+    "name": "rapid_input_no_stale_renders",
+    "description": "Rapid repeated picker switches, Ignore toggles, mode toggles, and searches cause no hangs, dropped interactions, or stale renders showing a previous selection's diff or counters",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.8",
+    "name": "new_versions_immediately_searchable",
+    "description": "A version created by merge or restore is immediately findable through the global version search without a reload",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.9",
+    "name": "keyboard_operability_focus",
+    "description": "Every interactive control \u2014 pickers, tabs, Ignore toggles, counters, merge choices, bulk resolution, graph nodes, thread markers, undo/redo, Export, Import, Copy, and Download \u2014 is reachable and operable with the keyboard alone (Tab/Shift+Tab, Enter/Space), with a visible focus indicator at each stop",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.10",
+    "name": "modal_focus_trap_escape",
+    "description": "The restore confirmation, merge confirmation, and Export surface trap keyboard focus while open, close on the Escape key, and return focus to the control that opened them",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.11",
+    "name": "diff_not_color_only",
+    "description": "Added and removed lines are distinguishable by the gutter plus and minus symbols and accessible line annotations in addition to color",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.12",
+    "name": "aria_live_announcements",
+    "description": "Completing a merge, completing a restore, posting an annotation, and a successful import are announced through an aria-live region in addition to their visual indication",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.13",
+    "name": "fictional_names_only",
+    "description": "Every author name and any model reference rendered in the UI is fictional; no real people, AI providers, or model brand names appear",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "2.14",
+    "name": "field_contract_validation_visible",
+    "description": "AnnotationCreate, RestoreCreate, and Import validation failures show inline messages naming the offending field (for example bodyMarkdown, changeNote, or schemaVersion) before any state mutation",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "7.1",
+    "name": "layout_adapts_desktop_to_mobile",
+    "description": "Layout adapts from 1440px to 375px: the left rail, version pickers, Ignore toggles, diff panes, graph, Export surface, and threads reflow without breakage.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "7.2",
+    "name": "mobile_tap_targets_are_large_enough",
+    "description": "At 375px, pickers, tabs, Ignore toggles, merge choices, Export, Import, Undo, and Redo are tap targets at least 44px in at least one dimension.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "7.3",
+    "name": "typography_resizes_across_breakpoints",
+    "description": "Chrome labels and headings remain readable at both 1440px and 375px without shrinking into illegible sizes.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "7.4",
+    "name": "content_avoids_clipping_and_overflow",
+    "description": "At 375px no content clips or overflows the viewport and no page-level horizontal scrolling appears; long prompt lines wrap or scroll within the diff surface's own container.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "7.5",
+    "name": "rail_collapses_split_stacks",
+    "description": "At widths of 768 pixels and below the left rail collapses behind a toggle and the split view stacks into a single column with a base/compare segment switch; at desktop widths both are visible together.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "7.6",
+    "name": "stacking_reflows_logically",
+    "description": "At narrow widths the header controls, Ignore toggles, summary strip, and stacked panes reflow in a logical reading order rather than overlapping.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "7.7",
+    "name": "mobile_touch_gestures_work",
+    "description": "At 375px tap activates pickers, tabs, Ignore toggles, merge choices, Export, and Import without requiring hover-only activation.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "7.8",
+    "name": "small_screens_avoid_horizontal_scroll",
+    "description": "At 375px the page has no page-level horizontal scrolling.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "7.9",
+    "name": "graph_and_panes_resize",
+    "description": "The version graph and diff panes size responsively to fit the layout at 1440px, 768px, and 375px.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "7.10",
+    "name": "export_import_operable_at_375",
+    "description": "The Export surface, Ignore toggles, and Import control stay fully visible and operable at 375px rather than rendering off-screen.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.1",
+    "name": "diff_crossfade_150ms",
+    "description": "Changing a version picker or an Ignore whitespace/Ignore case toggle through the real control cross-fades the diff panel contents over roughly 150 milliseconds rather than snapping",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.2",
+    "name": "counter_scroll_pulse_400ms",
+    "description": "Clicking a summary counter scrolls the diff to the first change of that type and highlights the target block with a roughly 400 millisecond background pulse before settling",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.3",
+    "name": "unified_toggle_animates",
+    "description": "Toggling between split and unified modes through the real toggle animates the pane transition rather than snapping between layouts",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.4",
+    "name": "merge_resolution_motion",
+    "description": "Choosing a side for a merge region slides the chosen content into the result preview and the resolved-progress indicator fills smoothly",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.5",
+    "name": "graph_node_animates_in",
+    "description": "After completing a merge or restore through the real controls, the version graph animates the new node and its edges into place rather than redrawing instantly",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "4.6",
+    "name": "annotation_marker_thread_motion",
+    "description": "Annotation markers fade in when posted, and threads expand and collapse with a short height transition and a rotating chevron",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.7",
+    "name": "hover_animations_required",
+    "description": "Buttons ease background and shadow with a slight press effect on hover; history rows, search results, and graph nodes take a visible hover treatment; and form controls show focus rings",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.8",
+    "name": "toasts_slide_autodismiss",
+    "description": "Toasts after merges, restores, exports, and successful imports slide in, remain readable long enough to scan, and auto-dismiss with a fade",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.9",
+    "name": "reduced_motion_respected",
+    "description": "With prefers-reduced-motion set, the diff cross-fade, counter pulse, mode-toggle transition, and thread animations apply instantly",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "4.10",
+    "name": "export_surface_transition",
+    "description": "Opening and closing the Export surface through the real control uses a brief opacity and scale transition rather than appearing or disappearing instantly",
+    "type": "binary",
+    "weight": 0.5
+  },
+  {
+    "id": "14.1",
+    "name": "multi_facet_reload_resets_seeded",
+    "description": "Multi-facet round-trip: switch the compare picker to a non-default version, post an annotation, toggle unified mode, and complete a restore, then reload the page. All four facets coherently reset to the seeded baseline (seeded prompts and chains, default pickers and mode, no unseeded annotations or restore versions) \u2014 never a mix of surviving and reset facets.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "14.2",
+    "name": "picker_swap_inverts_diff",
+    "description": "Diff-inversion proof: with two versions selected, note which lines render added and removed, then swap the base and compare selections; the added and removed treatments invert correctly relative to the first orientation, proving the diff derives from live version data rather than a hardcoded rendering.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "14.3",
+    "name": "counters_track_picker_inputs",
+    "description": "Derived-view sensitivity: change either version picker and confirm the lines-added, lines-removed, and net-token-delta counters change to match the newly compared pair rather than redrawing identically regardless of input.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "14.4",
+    "name": "merge_echoes_across_views",
+    "description": "Cross-view echo: complete a merge and confirm the history list, both version pickers, the version graph, and the Export Version package preview all show the new head version and schemaVersion prompt-diff-package-v1 without a reload.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "14.5",
+    "name": "history_count_delta_exact",
+    "description": "Count-delta integrity: note the history list's entry count, complete a restore, and confirm the count increased by exactly one; undo it and confirm the count decreased by exactly one immediately.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "14.6",
+    "name": "merge_pipeline_probe",
+    "description": "Full-pipeline probe: edit two branch resolutions differently across two merge passes \u2014 first resolve a given conflict region to the left branch, complete the merge, undo it, then resolve the same region to the right branch and complete again; the two resulting merge versions differ exactly at that region, and the merged text, graph node, and history report each track the choice actually made.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "14.7",
+    "name": "interleaved_annotation_and_merge",
+    "description": "Interleaved-flow integrity: start composing an annotation, switch to the Graph tab and back, then start and complete a merge, and finally post the annotation; confirm the annotation anchors and text are intact and the merge result is unaffected by the interleaving.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "14.8",
+    "name": "resolve_unresolve_round_trip",
+    "description": "Edge-state round-trip: resolve every conflict region with the bulk control so Complete merge enables, then change one region back to unresolved or a different choice; the progress indicator, region chips, and Complete merge enablement track through both transitions.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "14.9",
+    "name": "version_package_round_trip_probe",
+    "description": "Full-pipeline export probe: complete a merge, open Export Version package and confirm schemaVersion prompt-diff-package-v1 plus the new head and merge resolutions, Copy or Download the JSON, Import it, and confirm history and graph reconstruct the same version texts and merge topology; then Import a payload with schemaVersion not prompt-diff-package-v1 and confirm the chain is unchanged with schemaVersion named.",
+    "type": "binary",
+    "weight": 1.0
+  },
+  {
+    "id": "14.10",
+    "name": "ignore_toggles_input_dependent",
+    "description": "Input-dependent derived output: with a pair that differs only by whitespace, note counters with Ignore whitespace off, turn it on and confirm counters change, then turn it off and confirm the prior counters return \u2014 proving the diff derives from live options rather than a hardcoded rendering.",
+    "type": "binary",
+    "weight": 1.0
+  }
+]
