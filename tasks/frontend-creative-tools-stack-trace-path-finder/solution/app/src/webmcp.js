@@ -1,60 +1,6 @@
 import { useStore } from './store';
 
-const sessionInfo = {
-  schemaVersion: "stack-path-hypothesis/v1",
-  tools: [
-    {
-      name: "editor_select",
-      description: "Select an object",
-      parameters: { type: "object", properties: { id: { type: "string" }, type: { type: "string" } } }
-    },
-    {
-      name: "editor_update_property",
-      description: "Update property",
-      parameters: { type: "object", properties: { id: { type: "string" }, property: { type: "string" }, value: { type: "any" } } }
-    },
-    {
-      name: "editor_preview",
-      description: "Preview state",
-      parameters: { type: "object", properties: {} }
-    },
-    {
-      name: "editor_set_content",
-      description: "Set content",
-      parameters: { type: "object", properties: { content: { type: "string" } } }
-    },
-    {
-      name: "entity_create",
-      description: "Create hypothesis",
-      parameters: { type: "object", properties: { name: { type: "string" } } }
-    },
-    {
-      name: "entity_select",
-      description: "Select hypothesis",
-      parameters: { type: "object", properties: { id: { type: "string" } } }
-    },
-    {
-      name: "entity_delete",
-      description: "Delete hypothesis",
-      parameters: { type: "object", properties: { id: { type: "string" } } }
-    },
-    {
-      name: "artifact_export",
-      description: "Export artifact",
-      parameters: { type: "object", properties: { format: { type: "string" } } }
-    },
-    {
-      name: "artifact_import",
-      description: "Import artifact",
-      parameters: { type: "object", properties: { data: { type: "object" } } }
-    },
-    {
-      name: "artifact_copy",
-      description: "Copy artifact",
-      parameters: { type: "object", properties: { format: { type: "string" } } }
-    }
-  ]
-};
+const modules = ['structured-editor-v1', 'entity-collection-v1', 'artifact-transfer-v1'];
 
 window.webmcp_session_info = () => {
   return { contract_version: "zto-webmcp-v1", modules: ["structured-editor-v1", "entity-collection-v1", "artifact-transfer-v1"] };
