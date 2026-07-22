@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFieldArray, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
-  Button, TextInput, TextArea, Select, SelectItem, NumberInput, Modal, Tag, Toggle,
+  Button, TextInput, TextArea, Select, SelectItem, NumberInput, Modal, Tag, DismissibleTag, Toggle,
   InlineLoading, ToastNotification, ProgressBar, Tabs, TabList, Tab, TabPanels, TabPanel, Slider,
   Tile, Checkbox, Dropdown, RadioButtonGroup, RadioButton, FileUploaderDropContainer
 } from '@carbon/react'
@@ -144,7 +144,7 @@ function Library({ rememberLauncher, rememberPanelLauncher }) {
       </div>
       <div className="active-filter-row">
         <span><strong>{visible.length}</strong> experiment{visible.length === 1 ? '' : 's'}</span>
-        {state.filters.map(filter => <Tag key={filter} type="purple" filter onClose={() => state.toggleFilter(filter)} title={`Remove ${statusLabel(filter)} filter`}>{statusLabel(filter)}</Tag>)}
+        {state.filters.map(filter => <DismissibleTag key={filter} type="purple" onClose={() => state.toggleFilter(filter)} title={`Remove ${statusLabel(filter)} filter`} text={statusLabel(filter)} />)}
         {(state.filters.length > 0 || state.search || state.showArchived) && <button className="text-action" onClick={state.clearFilters}>Clear filters</button>}
       </div>
       <AnimatePresence>{state.selectedIds.length > 0 && <motion.div className="bulk-bar" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}><strong>{state.selectedIds.length} selected</strong><Button size="sm" kind="secondary" renderIcon={Archive} onClick={openArchive}>Archive selected</Button><Button size="sm" kind="danger--tertiary" renderIcon={TrashCan} onClick={openDelete}>Delete selected</Button><Button size="sm" kind="ghost" onClick={() => state.setField('selectedIds', [])}>Clear</Button></motion.div>}</AnimatePresence>
