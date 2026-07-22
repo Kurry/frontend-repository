@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3b82f6;
+  --color-primary-dark: #2563eb;
+  --color-secondary: #64748b;
+  --color-accent: #f59e0b;
+  --color-danger: #ef4444;
+  --color-success: #10b981;
+}
+
+@layer base {
+  body {
+    @apply antialiased text-gray-900 bg-gray-50;
+  }
+}
+
+.lane-draft { @apply bg-gray-100 border-gray-300; }
+.lane-ready { @apply bg-blue-50 border-blue-200; }
+.lane-changed { @apply bg-amber-50 border-amber-200; }
+.lane-conflict { @apply bg-red-50 border-red-200; }
+.lane-resolved { @apply bg-emerald-50 border-emerald-200; }
