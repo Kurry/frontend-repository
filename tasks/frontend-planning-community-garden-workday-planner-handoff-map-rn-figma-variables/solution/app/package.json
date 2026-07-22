@@ -1,0 +1,39 @@
+{
+  "name": "community-garden-workday-planner",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "verify:build": "tsc -b && vite build",
+    "start": "vite preview --host 0.0.0.0 --port 3000",
+    "start+verify:build": "npm run verify:build && npm start"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.475.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.0.1",
+    "tailwindcss": "^4.0.7"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "@tailwindcss/vite": "^4.0.7",
+    "@types/node": "^26.1.1",
+    "@types/react": "^19.0.10",
+    "@types/react-dom": "^19.0.4",
+    "@vitejs/plugin-react": "^4.3.4",
+    "eslint": "^9.21.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^15.15.0",
+    "playwright": "^1.61.1",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.1",
+    "vite": "^6.2.0"
+  }
+}
