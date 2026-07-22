@@ -2022,6 +2022,27 @@
       ]
     },
     {
+      "task": "frontend-creative-tools-weaving-draft-constraint-studio",
+      "modules": ["entity-collection-v1", "structured-editor-v1", "command-session-v1", "artifact-transfer-v1"],
+      "bindings": {
+        "entity": "draft-variant",
+        "entity_operations": ["create", "select", "update", "toggle"],
+        "entity_fields": ["name", "threading", "tie-up", "treadling", "warp-colors", "weft-colors", "repeat", "approval"],
+        "editor_object_types": ["threading-cell", "tie-up-cell", "treadling-cell", "color-cell", "repeat-range", "variant-range"],
+        "editor_operations": ["select", "update_property", "set_content", "switch_mode", "preview"],
+        "editor_properties": ["shaft", "treadle", "lifted", "color-id", "operation", "offset", "max-float", "sequence"],
+        "editor_modes": ["paint", "erase", "threading", "tie-up", "treadling", "colors", "repeat", "analysis", "variants", "simulation", "artifacts"],
+        "session_operations": ["start", "restart", "advance", "trigger_demo"],
+        "demos": ["wrong-treadle", "wrong-color", "broken-yarn", "branch-at-error"],
+        "artifact_operations": ["export", "import", "copy"],
+        "export_formats": ["canonical-json", "wif-ini", "draft-svg", "drawdown-svg", "yarn-pick-ledger-csv"],
+        "import_modes": ["canonical-json", "wif-ini"],
+        "value_bounds": ["ends integer 1-64 and picks integer 1-96", "shaft and treadle indices integer 1-4", "repeat nesting depth at most 2", "float threshold integer 3-7", "yarn calculations use declared integer millimeter and gram rounding"],
+        "visible_postconditions": ["editing threading, tie-up, treadling, or color cells immediately recomputes the derived drawdown and highlights bound inputs without permitting direct drawdown edits", "repeat transforms preserve bounded source ranges and show the first expected-versus-actual break; incompatible overlaps block", "float and structural analysis lists run type, length, and coordinates plus empty treadles, unused shafts, duplicate picks, and edge balance", "forking and merging named variants updates cell/color/yarn comparisons while approved checksums remain frozen", "simulation advance, pause, error, unweave, correction, resume, and branch-at-error update the visible pick and recovery history", "canonical JSON or WIF import reconstructs the visible draft; export formats reflect current grid, color, yarn, repeat, variant, and simulation state" ]
+      },
+      "mechanics_exclusions": ["Grid painting, erasing, range drag selection, direct keyboard navigation, mobile sequence sheets, palette reorder, and simulation control gestures are driven with Playwright; equivalent bounded state uses editor and session tools", "Drawdown highlight causality, repeat overlays, responsive layout, focus indicators, hover states, and transitions remain Playwright-observed", "File downloads, native file selection, and clipboard contents remain Playwright responsibilities"]
+    },
+    {
       "task": "frontend-data-tracking-admin-analytics-dashboard",
       "modules": [
         "browse-query-v1",

@@ -134,6 +134,11 @@
     "instruction": "Vert/instruction.md",
     "description": "VERT private local file converter good-app eval."
   },
+  "frontend-creative-tools-weaving-draft-constraint-studio": {
+    "source": "weaving draft and loom constraint studio concept",
+    "instruction": "tasks/frontend-creative-tools-weaving-draft-constraint-studio/instruction.md",
+    "description": "Weaving draft studio with bounded threading grids, derived drawdown, repeats, structural analysis, variant merges, simulation, and interoperable loom artifacts."
+  },
   "frontend-data-tracking-admin-analytics-dashboard": {
     "source": "variants/AdminAnalyticsDashboard",
     "instruction": "variants/AdminAnalyticsDashboard/instruction.md",
