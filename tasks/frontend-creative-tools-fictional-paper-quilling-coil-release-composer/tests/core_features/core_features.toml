@@ -1,0 +1,128 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "AC-01-CF-01"
+title = "Coil selection and manipulation"
+weight = 1.0
+description = "Starting clean, user can select coil-07, drag radius from 40 to 50, inspect feed-forward preview, cancel, repeat, and confirm."
+
+[[criterion]]
+id = "AC-01-CF-02"
+title = "Linked radial, contact, and renderer evidence"
+weight = 1.0
+description = "Synchronize board, close-up, radial-spacing profile, sampled-vertex table, nearest-gap strip, contact graph, motif component map, strip ledger, and proof preview."
+
+[[criterion]]
+id = "AC-01-CF-03"
+title = "Motifs and assembly sequence"
+weight = 1.0
+description = "Motif cards show member coils, contact components, tangent prerequisites, blockers. Assembly steps can be previewed."
+
+[[criterion]]
+id = "AC-01-CF-04"
+title = "Comparison, decisions, history, and approval"
+weight = 1.0
+description = "Record a preferred layout with rationale, annotate tangent contact, compare alternate order, bookmark undo, review, and approve."
+
+[[criterion]]
+id = "AC-01-CF-05"
+title = "Export portable sample packet"
+weight = 1.0
+description = "Export exact sample packet (ZIP) containing manifest.json, coil-project.json, CSVs, SVGs, HTML, and schema, after approval."
+
+[[criterion]]
+id = "AC-01-CF-06"
+title = "Import and clean reset"
+weight = 1.0
+description = "Import validates exactly the packet/JSON before mutation, leaving state unchanged on failure. Reset clears state cleanly."
