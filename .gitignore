@@ -68,8 +68,6 @@ venv/
 
 /.harden-locks
 
-# Built oracle output — rebuilt by verify:build, never committed
-tasks/*/solution/app/dist/
 
 # Stray dev/QA captures at oracle app roots (reference screenshots live in
 # tasks/*/environment/reference-screenshots/, which stays tracked)

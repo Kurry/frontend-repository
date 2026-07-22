@@ -1,0 +1,129 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "MO-1"
+name = "hover_press_and_focus_feedback"
+description = "Hovering (without clicking) a sidebar row, the Create note button, a formatting toolbar button, and a toolbar control each shows a visibly distinct hover state with the background easing rather than snapping, clicking a button shows a slight press effect, and keyboard Tab focus shows a visible focus ring on interactive controls"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "MO-2"
+name = "saved_label_and_toasts_animate"
+description = "Editing a note shows a transient Saved label that fades and slides in and clears on its own, and creating and deleting a note each show their own transient toast that slides up from the lower corner, dismisses on its own, and is visually distinct from the Saved indicator"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "MO-3"
+name = "focus_mode_and_drawer_animate"
+description = "Toggling Focus Mode through its real control animates the sidebar's width, opacity, and position rather than snapping, the mobile drawer slides in and out when opened and closed at a narrow viewport, and the Quick Switcher highlight visibly moves between results as the arrow keys are pressed"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "MO-6"
+name = "sidebar_rows_animate_position_changes"
+description = "Creating, deleting, pinning, or edit-driven re-sorting of a note, performed through the real UI controls, animates the affected sidebar row into or out of its position rather than the list snapping instantly to its new order"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "MO-7"
+name = "overlays_enter_with_transition"
+description = "Opening the Quick Switcher and the Shortcuts overlay through their real controls shows each appearing over a dimmed backdrop with a brief enter transition rather than popping in fully formed with no animation"
+type = "binary"
+weight = 0.5
+optional = true
+
