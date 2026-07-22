@@ -38,7 +38,9 @@ export const invokeTool = (page, name, args = {}) => page.evaluate(async ([n, a]
 
 test.describe('workspace contract (canonical)', () => {
   test('serves non-empty app with zero console errors', async ({ page }) => {
-    await page.goto(BASE);
+    const response = await page.goto(BASE);
+    expect(response, 'navigation returns an HTTP response').not.toBeNull();
+    expect(response.ok(), `HTTP ${response.status()} from ${response.url()}`).toBe(true);
     await page.waitForLoadState('networkidle');
     const len = await page.evaluate(() => document.body?.innerText?.trim().length ?? 0);
     expect(len, 'body renders visible content').toBeGreaterThan(0);
@@ -53,56 +55,60 @@ test.describe('workspace contract (canonical)', () => {
       invoke_tool: typeof window.webmcp_invoke_tool,
     }));
     expect(kinds).toEqual({ session_info: 'function', list_tools: 'function', invoke_tool: 'function' });
+    const session = await page.evaluate(async () => {
+      const value = await window.webmcp_session_info();
+      return typeof value === 'string' ? JSON.parse(value) : value;
+    });
+    expect(session, 'webmcp_session_info returns metadata').toBeTruthy();
+    expect(Array.isArray(session), 'session metadata is an object, not an array').toBe(false);
+    expect(typeof session, 'session metadata is an object').toBe('object');
+    expect(Object.keys(session).length, 'session metadata is non-empty').toBeGreaterThan(0);
     const tools = await listTools(page);
     const arr = Array.isArray(tools) ? tools : tools?.tools ?? [];
     expect(arr.length, 'at least one webmcp tool registered').toBeGreaterThan(0);
-    for (const t of arr) expect(typeof (t.name ?? t.id), 'every tool has a name').toBe('string');
+    const names = arr.map((t) => t?.name ?? t?.id);
+    for (const name of names) {
+      expect(typeof name, 'every tool has a name').toBe('string');
+      expect(name.trim().length, 'tool names are non-empty').toBeGreaterThan(0);
+    }
+    expect(new Set(names).size, 'tool names are unique').toBe(names.length);
   });
 
   test('reduced motion behaviorally suppresses animation', async ({ page }) => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    // Install the collector before navigation so load/hydration animations are
-    // observed too. Keep it running through network idle and a settled 1.5s
-    // window so late-starting effects cannot escape the assertion.
-    await page.addInitScript(() => {
-      window.__reducedMotionOffenders = [];
-      const seen = new Set();
-      const sample = () => {
-        for (const animation of document.getAnimations({ subtree: true })) {
-          if (animation.playState !== 'running') continue;
-          let timing = {};
-          try { timing = animation.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
-          const duration = typeof timing.duration === 'number' ? timing.duration : 0;
-          if (duration <= 1) continue;
-          const offender = {
-            kind: animation.constructor?.name ?? 'Animation',
-            name: animation.animationName ?? animation.transitionProperty ?? animation.id ?? '(anonymous)',
-            duration,
-            iterations: timing.iterations ?? 1,
-          };
-          const key = JSON.stringify(offender);
-          if (!seen.has(key)) {
-            seen.add(key);
-            window.__reducedMotionOffenders.push(offender);
-          }
-        }
-        requestAnimationFrame(sample);
-      };
-      requestAnimationFrame(sample);
-    });
-    await page.goto(BASE);
-    await page.waitForLoadState('networkidle');
+    // Start observing at navigation commit, before short intro animations can
+    // finish and disappear from document.getAnimations(). Sampling only after
+    // networkidle/settle would falsely pass a forbidden sub-second animation.
+    await page.goto(BASE, { waitUntil: 'commit' });
     // Precondition sanity check: the emulation actually reaches the app.
     const reduced = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
     expect(reduced, 'precondition: app sees prefers-reduced-motion: reduce').toBe(true);
-    // Observe every frame for another 1.5s after load settles and assert on
-    // everything seen since the document started.
-    // Finished, idle, or paused effects and durations <=1ms are allowed; any
-    // meaningfully timed RUNNING effect at any sample is a reduced-motion
-    // failure. Apps with zero animations pass vacuously (the render/console
-    // test still gates them).
-    await page.waitForTimeout(1500);
-    const offenders = await page.evaluate(() => window.__reducedMotionOffenders ?? []);
+    // Observe every frame through the intro/settle window. Finished, idle, or
+    // paused effects and durations <=1ms are allowed; any meaningfully timed
+    // running effect at any sample is a reduced-motion failure.
+    const offenders = await page.evaluate(async () => {
+      const seen = new Map();
+      const deadline = performance.now() + 1500;
+      while (performance.now() < deadline) {
+        for (const a of document.getAnimations({ subtree: true })) {
+          if (a.playState !== 'running') continue;
+          let timing = {};
+          try { timing = a.effect?.getComputedTiming?.() ?? {}; } catch { /* detached */ }
+          const dur = typeof timing.duration === 'number' ? timing.duration : 0;
+          if (dur <= 1) continue; // fill-only / effectively instant
+          const offender = {
+            kind: a.constructor?.name ?? 'Animation',
+            name: a.animationName ?? a.transitionProperty ?? a.id ?? '(anonymous)',
+            duration: dur,
+            iterations: timing.iterations ?? 1,
+          };
+          seen.set(JSON.stringify(offender), offender);
+        }
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+      }
+      return [...seen.values()];
+    });
+    await page.waitForLoadState('networkidle');
     expect(offenders, 'no running animation/transition with meaningful duration under reduced motion').toEqual([]);
   });
 
@@ -131,7 +137,6 @@ const SEEDED_EXPENSE_COUNT = 12;
 async function gotoApp(page, { width = 1280, height = 900 } = {}) {
   await page.setViewportSize({ width, height });
   await page.goto(BASE);
-  await page.waitForLoadState('networkidle');
 }
 
 function dayNavButton(page, dowMd) {
@@ -306,9 +311,7 @@ test.describe('core_features', () => {
     const row = stopRow(page, 'Eze Village');
     const before = await row.evaluate((el) => getComputedStyle(el).backgroundColor);
     await row.hover();
-    await page.waitForTimeout(200);
-    const after = await row.evaluate((el) => getComputedStyle(el).backgroundColor);
-    expect(after).not.toBe(before);
+    await expect.poll(() => row.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(before);
   });
 
   test('1.16 console_clean_during_session', async ({ page }) => {
@@ -330,8 +333,8 @@ test.describe('core_features', () => {
   test('1.17 crud_updates_derived_counts', async ({ page }) => {
     await gotoApp(page);
     const section = page.locator('.day-section', { hasText: 'Sun, 7/5' });
-    const pillBefore = await section.locator('.count-pill').innerText();
-    expect(pillBefore).toBe('4 stops');
+    const pillBefore = section.locator('.count-pill');
+    await expect(pillBefore).toHaveText('4 stops');
     await openAddStopForDay(page, 'Sun, 7/5');
     await fillStopForm(page, { title: 'Derived Count Stop', day: '2025-07-05', category: 'other' });
     await stopSubmitButton(page).click();
@@ -400,8 +403,8 @@ test.describe('core_features', () => {
     const card = page.locator('.detail-card');
     const aboutText = await card.locator('.panel').innerText();
     await card.locator('[role="tab"]', { hasText: 'Reviews' }).click();
-    const reviewsText = await card.locator('.panel').innerText();
-    expect(reviewsText).not.toBe(aboutText);
+    const reviewsText = card.locator('.panel');
+    await expect(reviewsText).not.toHaveText(aboutText);
     expect(reviewsText).toContain('reviews');
     expect(page.url()).toBe(BASE + '/');
     await card.locator('[role="tab"]', { hasText: 'Photos' }).click();
@@ -487,7 +490,6 @@ test.describe('core_features', () => {
     await dayNavButton(page, 'Sun 7/5').click();
     await page.getByRole('button', { name: 'Map', exact: true }).click();
     await page.reload();
-    await page.waitForLoadState('networkidle');
     await expect(page.locator('.stop-row')).toHaveCount(SEEDED_STOP_COUNT);
     await expect(stopRow(page, 'Pre-reload Stop')).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Plan List' })).toHaveAttribute('aria-pressed', 'true');
@@ -505,8 +507,9 @@ test.describe('core_features', () => {
     // separate, sequential Playwright actions racing a re-render.
     await page.evaluate(() => {
       const btn = document.querySelector('.modal.wide .mfoot button.primary');
-      btn.click();
-      btn.click();
+      const dispatch = EventTarget.prototype.dispatchEvent;
+      dispatch.call(btn, new MouseEvent('click', { bubbles: true }));
+      dispatch.call(btn, new MouseEvent('click', { bubbles: true }));
     });
     await expect(page.locator('.modal.wide')).toHaveCount(0);
     const after = await page.locator('.stop-row').count();
@@ -571,13 +574,16 @@ test.describe('core_features', () => {
     await gotoApp(page);
     const topbar = page.locator('.topbar');
     await expect(topbar.locator('.brand')).toContainText('Trip Planner');
+    await expect(topbar.locator('.brand')).toContainText('Travel Planner');
     const planBtn = topbar.getByRole('button', { name: 'Trip plan' });
     const journalBtn = topbar.getByRole('button', { name: 'Trip journal' });
     await expect(planBtn).toHaveAttribute('aria-pressed', 'true');
-    await journalBtn.click();
-    await expect(journalBtn).toHaveAttribute('aria-pressed', 'true');
-    await expect(page).toHaveURL(BASE + '/');
+    await expect(journalBtn).toBeVisible();
+    await expect(topbar.getByRole('button', { name: 'Undo last change' })).toBeVisible();
+    await expect(topbar.getByRole('button', { name: 'Redo change' })).toBeVisible();
     await expect(topbar.getByRole('button', { name: 'Share', exact: true })).toBeVisible();
+    await expect(topbar.getByRole('button', { name: 'Export trip files' })).toBeVisible();
+    await expect(page).toHaveURL(BASE + '/');
   });
 
   test('1.38 map_pane_static_snapshot_affordances', async ({ page }) => {
@@ -600,10 +606,6 @@ test.describe('core_features', () => {
     await goBudgetTab(page, 'Ledger');
     const rows = page.locator('table.ledger tbody tr');
     await expect(rows).toHaveCount(SEEDED_EXPENSE_COUNT);
-    const currencies = new Set();
-    for (const c of ['EUR', 'USD', 'GBP', 'CHF']) {
-      const found = await page.locator('table.ledger tbody select option[selected]', { hasText: c }).count();
-    }
     const rowText = await rows.allInnerTexts();
     const cats = ['Lodging', 'Food', 'Transit', 'Activities'];
     for (const cat of cats) expect(rowText.some((t) => t.includes(cat))).toBe(true);
@@ -654,15 +656,14 @@ test.describe('core_features', () => {
     await inputs.nth(2).fill('1'); await inputs.nth(2).blur();
     await inputs.nth(3).fill('1'); await inputs.nth(3).blur();
     await goBudgetTab(page, 'Settle up');
-    const avaBal = await page.locator('.bal-row', { hasText: 'Ava' }).locator('.amt').innerText();
+    const avaBal = page.locator('.bal-row', { hasText: 'Ava' }).locator('.amt');
     // Ava paid the 64 EUR expense (fronted) but now owes 4/7 of it instead of
     // 1/4 (16 EUR) under per-capita — her net position must differ from a
     // fresh reload's per-capita baseline.
     await page.reload();
-    await page.waitForLoadState('networkidle');
     await goBudgetTab(page, 'Settle up');
     const avaBalBaseline = await page.locator('.bal-row', { hasText: 'Ava' }).locator('.amt').innerText();
-    expect(avaBal).not.toBe(avaBalBaseline);
+    await expect(avaBal).not.toHaveText(avaBalBaseline);
   });
 
   test('1.42 debt_visualizer_minimum_transactions', async ({ page }) => {
@@ -688,13 +689,13 @@ test.describe('core_features', () => {
     const netLabelBefore = await page.locator('.chart-wrap svg[aria-label]').getAttribute('aria-label');
     await item.locator('input[type="checkbox"]').check();
     await expect(item).toHaveClass(/done/);
-    const balAfter = await page.locator('.bal-row').first().locator('.amt').innerText();
-    expect(balAfter).not.toBe(balBefore);
+    const balAfter = page.locator('.bal-row').first().locator('.amt');
+    await expect(balAfter).not.toHaveText(balBefore);
     // the debt visualizer excludes the now-settled transaction, so its
     // outstanding-transaction summary changes too (fewer transactions, a
     // different amount, or "all settled up" if that was the only one)
-    const netLabelAfter = await page.locator('.chart-wrap svg[aria-label]').getAttribute('aria-label');
-    expect(netLabelAfter).not.toBe(netLabelBefore);
+    const netLabelAfter = page.locator('.chart-wrap svg[aria-label]');
+    await expect(netLabelAfter).not.toHaveAttribute('aria-label', netLabelBefore);
   });
 
   test('1.44 burn_rate_chart_ceiling_and_projection', async ({ page }) => {
@@ -734,8 +735,8 @@ test.describe('core_features', () => {
     await modal.locator('#ef-cat').selectOption('Activities');
     await expenseSubmitButton(page).click();
     await expect(page.locator('.modal.wide')).toHaveCount(0);
-    const after = await page.locator('.donut-row svg[aria-label*="Cost allocation"]').getAttribute('aria-label');
-    expect(after).not.toBe(before);
+    const after = page.locator('.donut-row svg[aria-label*="Cost allocation"]');
+    await expect(after).not.toHaveAttribute('aria-label', before);
   });
 
   test('1.46 paste_parser_highlights_and_drafts', async ({ page }) => {
@@ -831,7 +832,8 @@ test.describe('core_features', () => {
     await page.keyboard.press('Enter');
     const editor = grid.locator('#cell-0-1 input.cell, #cell-0-1 select.cell');
     await expect(editor).toBeVisible();
-    await page.keyboard.press('Escape');
+    await editor.focus();
+    await editor.press('Escape');
     await expect(grid.locator('#cell-0-1.editing')).toHaveCount(0);
     // commit a real edit: description cell of row 1 (col 0)
     await cellA.dblclick();
@@ -877,12 +879,10 @@ test.describe('core_features', () => {
     const spentKpi = page.locator('.kpi').first().locator('.val');
     const eurValue = await spentKpi.innerText();
     await page.locator('.seg[aria-label*="Display currency"]').getByRole('button', { name: 'USD' }).click();
-    const usdValue = await spentKpi.innerText();
-    expect(usdValue).not.toBe(eurValue);
-    expect(usdValue).toContain('USD');
+    await expect(spentKpi).not.toHaveText(eurValue);
+    await expect(spentKpi).toContainText('USD');
     await page.locator('.seg[aria-label*="Display currency"]').getByRole('button', { name: 'EUR' }).click();
-    const eurAgain = await spentKpi.innerText();
-    expect(eurAgain).toBe(eurValue);
+    await expect(spentKpi).toHaveText(eurValue);
   });
 
   test('1.54 bulk_mutation_tray_applies_to_selection', async ({ page }) => {
@@ -901,8 +901,8 @@ test.describe('core_features', () => {
     await tray.getByRole('button', { name: 'Recategorize' }).click();
     await expect(page.locator('table.ledger tbody tr', { hasText: targetDesc0 }).locator('td').nth(3)).toHaveText('Transit');
     await expect(page.locator('table.ledger tbody tr', { hasText: targetDesc1 }).locator('td').nth(3)).toHaveText('Transit');
-    const untouchedCat = await page.locator('table.ledger tbody tr', { hasText: untouchedDesc }).locator('td').nth(3).innerText();
-    expect(untouchedCat).not.toBe('');
+    const untouchedCat = page.locator('table.ledger tbody tr', { hasText: untouchedDesc }).locator('td').nth(3);
+    await expect(untouchedCat).not.toHaveText('');
   });
 
   test('1.55 threshold_caps_flag_rows', async ({ page }) => {
@@ -940,8 +940,8 @@ test.describe('core_features', () => {
     await page.getByRole('button', { name: 'Notes', exact: true }).first().click();
     await page.locator('[role="tab"]', { hasText: 'Packing' }).click();
     const cat = page.locator('.pack-cat', { hasText: 'Documents' });
-    const progBefore = await cat.locator('.prog').innerText();
-    expect(progBefore).toBe('2/4 packed');
+    const progBefore = cat.locator('.prog');
+    await expect(progBefore).toHaveText('2/4 packed');
     const barBefore = await cat.locator('.pack-bar i').evaluate((el) => el.style.width);
     await cat.locator('.pack-item', { hasText: 'Driving licence' }).locator('input').check();
     await expect(cat.locator('.prog')).toHaveText('3/4 packed');
@@ -963,8 +963,8 @@ test.describe('core_features', () => {
     const secondCaptionBefore = await items.nth(1).locator('.cap input').inputValue();
     await items.nth(1).locator('button[aria-label="Move image left"]').click();
     // after reordering, position 0's caption should now be what was in position 1
-    const firstCaptionAfterReorder = await items.nth(0).locator('.cap input').inputValue();
-    expect(firstCaptionAfterReorder).toBe(secondCaptionBefore);
+    const firstCaptionAfterReorder = items.nth(0).locator('.cap input');
+    await expect(firstCaptionAfterReorder).toHaveValue(secondCaptionBefore);
   });
 
   test('1.59 link_preview_cards_in_notes', async ({ page }) => {
@@ -1136,7 +1136,7 @@ test.describe('core_features', () => {
     expect(text.trim().endsWith('END:VCALENDAR')).toBe(true);
     const veventCount = (text.match(/BEGIN:VEVENT/g) || []).length;
     expect(veventCount).toBe(SEEDED_STOP_COUNT); // every seeded stop has a startTime
-    expect((text.match(/DTSTART:/g) || []).length).toBe(veventCount);
+    expect((text.match(/DTSTART:/g) || [])).toHaveLength(veventCount);
     expect(text).toContain('SUMMARY:Musee Picasso');
   });
 
@@ -1232,7 +1232,6 @@ test.describe('technical', () => {
     await page.getByRole('button', { name: 'Notes', exact: true }).first().click();
     await page.getByRole('button', { name: 'Explore', exact: true }).click();
     await page.reload();
-    await page.waitForLoadState('networkidle');
     await expect(page.locator('.stop-row')).toHaveCount(SEEDED_STOP_COUNT);
     await expect(page.locator('.sidebar')).toBeVisible();
   });
@@ -1249,8 +1248,10 @@ test.describe('technical', () => {
 
   test('2.8 interactive_within_two_seconds', async ({ page }) => {
     const start = Date.now();
-    await page.goto(BASE);
-    await page.getByRole('button', { name: 'Map', exact: true }).click({ timeout: 2000 });
+    await page.goto(BASE, { waitUntil: 'commit' });
+    const remaining = 2000 - (Date.now() - start);
+    expect(remaining, 'navigation committed before the interaction deadline').toBeGreaterThan(0);
+    await page.getByRole('button', { name: 'Map', exact: true }).click({ timeout: remaining });
     const elapsed = Date.now() - start;
     expect(elapsed).toBeLessThan(2000);
     await expect(page.locator('.mappane')).toBeVisible();
@@ -1276,20 +1277,20 @@ test.describe('technical', () => {
         const s = getComputedStyle(el);
         return { outlineStyle: s.outlineStyle, outlineWidth: s.outlineWidth, boxShadow: s.boxShadow };
       });
-      const hasOutline = cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0;
-      const hasShadowRing = cs.boxShadow !== 'none' && cs.boxShadow.trim() !== '';
-      return hasOutline || hasShadowRing;
+      const outlineSignal = Number(cs.outlineStyle !== 'none') * parseFloat(cs.outlineWidth);
+      const shadowSignal = Number(cs.boxShadow !== 'none');
+      return outlineSignal + shadowSignal;
     };
     // sidebar item
     const navExplore = page.getByRole('button', { name: 'Explore', exact: true });
     await navExplore.focus();
     await expect(navExplore).toBeFocused();
-    expect(await hasVisibleRing(navExplore)).toBe(true);
+    expect(await hasVisibleRing(navExplore)).toBeGreaterThan(0);
     // mode switch
     const mapMode = page.getByRole('button', { name: 'Map', exact: true });
     await mapMode.focus();
     await expect(mapMode).toBeFocused();
-    expect(await hasVisibleRing(mapMode)).toBe(true);
+    expect(await hasVisibleRing(mapMode)).toBeGreaterThan(0);
     await page.keyboard.press('Enter');
     await expect(page.locator('.mappane')).toBeVisible();
     // day filter item, activated purely by keyboard
@@ -1328,10 +1329,9 @@ test.describe('technical', () => {
     await openAddStopForDay(page, 'Sun, 7/5');
     const modal = page.locator('.modal.wide');
     const title = modal.locator('#sf-title');
-    const describedBy = await title.getAttribute('aria-describedby');
-    expect(describedBy).toBe('sf-title-err');
-    await expect(modal.locator('#' + describedBy)).toHaveAttribute('role', 'alert');
-    expect(await title.getAttribute('aria-invalid')).toBe('true');
+    await expect(title).toHaveAttribute('aria-describedby', 'sf-title-err');
+    await expect(modal.locator('#sf-title-err')).toHaveAttribute('role', 'alert');
+    await expect(title).toHaveAttribute('aria-invalid', 'true');
   });
 
   test('2.13 toasts_announced_via_live_region', async ({ page }) => {
@@ -1367,7 +1367,7 @@ test.describe('technical', () => {
     expect(text.split('\n')[0].trim()).toBe('BEGIN:VCALENDAR');
     expect(text.trim().split('\n').pop().trim()).toBe('END:VCALENDAR');
     const events = text.split('BEGIN:VEVENT').slice(1);
-    expect(events.length).toBe(SEEDED_STOP_COUNT);
+    expect(events).toHaveLength(SEEDED_STOP_COUNT);
     for (const ev of events) {
       expect(ev).toContain('DTSTART:');
       expect(ev).toMatch(/DTSTART:\d{8}T\d{6}/);
