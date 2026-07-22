@@ -1,0 +1,4 @@
+[task]
+name = "mercor-intelligence/frontend-planning-community-garden-workday-planner-audit-lens-rn-harbor-viewer"
+title = "Community Garden Workday Planner - Audit Lens - Harbor Viewer"
+description = "Manage work tasks through a domain-native browser surface where one meaningful mutation updates linked views and an interoperable artifact."
