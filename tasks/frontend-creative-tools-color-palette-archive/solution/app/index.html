@@ -176,7 +176,7 @@
         <ul>
           <li><button type="button" class="inert-nav">Contact Us</button></li>
           <li><button type="button" class="inert-nav">Instagram</button></li>
-          <li><button type="button" class="inert-nav" id="footer-newsletter" onclick="const popup=document.getElementById('subscribe-popup'); popup.hidden=false; requestAnimationFrame(() => popup.classList.add('is-visible')); document.getElementById('popup-close').focus();">Newsletter</button></li>
+          <li><button type="button" class="inert-nav" id="footer-newsletter">Newsletter</button></li>
         </ul>
       </div>
       <div class="site-footer__col">
@@ -294,9 +294,9 @@
   </div>
 
   <!-- Subscribe popup -->
-  <div class="oa-popup" id="subscribe-popup" role="dialog" aria-modal="true" aria-labelledby="popup-title" hidden onkeydown="if(event.key==='Escape'){ event.preventDefault(); this.classList.remove('is-visible'); this.hidden=true; document.getElementById('footer-newsletter').focus(); }">
+  <div class="oa-popup" id="subscribe-popup" role="dialog" aria-modal="true" aria-labelledby="popup-title" hidden>
     <div class="oa-popup__panel">
-      <button type="button" class="oa-popup__close" id="popup-close" aria-label="Close subscribe popup" onclick="const popup=document.getElementById('subscribe-popup'); popup.classList.remove('is-visible'); popup.hidden=true; document.getElementById('footer-newsletter').focus();">×</button>
+      <button type="button" class="oa-popup__close" id="popup-close" aria-label="Close subscribe popup">×</button>
       <h2 class="oa-popup__title" id="popup-title">Subscribe and receive 10% off your first piece</h2>
       <form id="popup-form" class="oa-popup__form" novalidate>
         <span>

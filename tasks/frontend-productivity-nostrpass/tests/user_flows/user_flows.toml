@@ -1,0 +1,223 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+
+[[criterion]]
+id = "6.1"
+name = "create_flow_updates_all_surfaces"
+description = "Create flow: submitting a valid identity label adds a card, increments the identity-count tile by one, activates the new identity on the dashboard, and includes it in the Export vault JSON preview"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.2"
+name = "invalid_create_shows_inline_validation"
+description = "Create flow: empty, whitespace-only, or over-40-character labels trigger inline validation naming the label field and add no identity"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.3"
+name = "rename_flow_updates_related_displays"
+description = "Rename flow: a valid rename updates the card label, the dashboard nickname when active, and the matching label in the Export vault JSON preview without a reload"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.4"
+name = "delete_flow_updates_all_surfaces"
+description = "Delete flow: confirming delete on a non-sole identity removes the card, decreases the identity count by one, and drops the identity from the export preview"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.5"
+name = "view_switch_retains_vault_state"
+description = "View switch: navigating Dashboard, Identities, Permissions, Audit log, and Settings retains the same active identity, grants, and export-preview vault contents"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.6"
+name = "search_empty_state_and_clear"
+description = "Edge: a search that matches no identities shows an empty state with a clear-search control that restores every card"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.7"
+name = "search_and_sort_update_grid"
+description = "Search and sort: search narrows cards and Label A–Z versus Label Z–A reverses order from the live collection"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.8"
+name = "sidebar_collapse_preserves_workflow"
+description = "At 768px and below the sidebar collapses to a compact nav that still reaches all five destinations without losing the active identity"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.9"
+name = "delete_and_import_dialogs_support_cancel"
+description = "Delete and import confirmations can be cancelled without mutating identities, grants, theme, or the export preview"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.10"
+name = "failed_import_recovers_without_reload"
+description = "Recovery: a rejected import shows a field-named error and leaves the vault usable without a reload"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.11"
+name = "export_import_round_trip_flow"
+description = "Export then import round-trip: after a create or grant toggle, importing the exported vault JSON restores dashboard, Identities, Permissions, theme, and export preview to the pre-export mutated state including version nostrpass-vault-v1"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.12"
+name = "undo_after_rename_or_delete_flow"
+description = "Rename then Undo restores the prior label on card, dashboard, and export preview; delete then Undo restores the identity with the same npub and grants"
+type = "binary"
+weight = 1.0
+
+
+[[criterion]]
+id = "6.13"
+name = "rotation_flow_chain"
+description = "Rotation flow: note the active npub, Rotate keys, confirm; dashboard npub and nsec change, the vault export shows the new npub, and the top audit entry names the rotation with shortened old and new npubs; Undo restores the noted npub everywhere; Redo reapplies the rotation"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.14"
+name = "bulk_grant_flow_chain"
+description = "Bulk grant flow: with at least three identities, Grant all in one application's column flips that application to granted for every identity, updates the active identity's dashboard pill and connected-app tile, and records one audit entry naming the application and count; one Undo restores every prior grant"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.15"
+name = "backup_round_trip_flow"
+description = "Backup flow: Export backup for a non-active identity, Copy or Download the JSON, delete that identity, then Import backup with the same JSON; the identity card returns with identical label, npub, nsec, and grants and the identity count is restored"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "6.16"
+name = "audit_filter_flow"
+description = "Audit filter flow: after at least one permission toggle and one rotation, filtering the Audit log to the rotation type shows only rotation entries, and returning to All restores the full list in the same order"
+type = "binary"
+weight = 1.0
+

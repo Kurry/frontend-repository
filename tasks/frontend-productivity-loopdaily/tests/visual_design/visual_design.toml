@@ -1,0 +1,211 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "3.1"
+name = "core_palette_computed_colors"
+description = "The canvas background computes to #F4F7F6, the habit card surface computes to #FFFFFF, and the primary button computes to #0F9D74 background with white text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.2"
+name = "manrope_type_hierarchy"
+description = "Headings and body text render in Manrope (or its declared Segoe UI/system-ui fallback), with headings visibly larger than body text"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.3"
+name = "consistent_8px_radius"
+description = "Habit cards, buttons, and inputs all render with a consistent 8px border-radius"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.4"
+name = "flame_treatments_distinct"
+description = "The three flame milestone treatments (plain, bright, gold) are visually distinguishable from each other as a present graphic element, not a placeholder"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.5"
+name = "active_chip_highlighted"
+description = "The active category filter chip is visually highlighted distinctly from inactive chips"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.6"
+name = "paused_habit_dimmed"
+description = "A paused habit renders with a visibly muted or dimmed treatment distinct from active habits wherever it appears"
+type = "binary"
+weight = 0.5
+optional = true
+
+[[criterion]]
+id = "3.7"
+name = "mobile_single_column_layout"
+description = "At approximately 375px viewport width, habit rows stack in a single column with no horizontal scrolling and the New Habit form remains fully usable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.10"
+name = "heading_and_body_type_scale"
+description = "Top-level headings render at roughly 28px-equivalent size, section headings at roughly 20px, and list text, counts, and helper copy at a 16px base size"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.11"
+name = "ink_and_secondary_accent_colors"
+description = "Primary text computes to #1B2430, muted secondary text to #64748B, and the #FFB020 secondary accent appears on milestone flame accents"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.12"
+name = "button_styles_match_spec"
+description = "The primary button is a filled #0F9D74 background with white text, 8px border-radius, and no shadow; the secondary button is transparent with a 1px #64748B border, #1B2430 text, 8px border-radius, and no shadow"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.13"
+name = "spacing_on_4px_grid"
+description = "Padding and gaps between elements are multiples of a 4px base unit in computed styles, with no arbitrary one-off spacing values"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.14"
+name = "consistent_chrome_icon_set"
+description = "Icons across the app chrome come from one consistent icon set rendered at consistent sizes, alongside the fixed emoji palette used for habit icons"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.15"
+name = "recovery_notice_distinct_styling"
+description = "The recovery notice, when active, is visually distinct from ordinary toasts or banners, and its Retry and Reset controls are visually distinguishable from ordinary actions"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.16"
+name = "narrow_width_grids_and_notice_fit"
+description = "At narrow (roughly 375px) width the Heatmap month grid and the 7-day grid remain fully visible without clipping, the Stats numbers and trend chart fit the viewport, and the recovery notice remains legible with its Retry and Reset controls reachable"
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "3.17"
+name = "capitalization_and_verb_labels"
+description = "Headings, buttons, and chips use one consistent capitalization convention throughout, and action labels are specific verbs or verb phrases such as Add habit, Export as JSON, and Load Malformed Sample rather than generic labels"
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "3.19"
+name = "messages_name_problem_and_fix"
+description = "Error messages and the recovery notice name the problem and the fix, and empty states explain what belongs there and how to add it"
+type = "binary"
+weight = 0.5
+

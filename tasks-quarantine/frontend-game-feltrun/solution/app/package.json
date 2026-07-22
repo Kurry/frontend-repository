@@ -1,0 +1,12 @@
+{
+  "name": "frontend-game-feltrun",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx serve -l 3000 dist",
+    "test:e2e": "playwright test -c e2e.playwright.config.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.61.0"
+  }
+}

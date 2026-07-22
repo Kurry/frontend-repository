@@ -1,0 +1,196 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+weight = 0.25
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  # Chromium's --force-prefers-reduced-motion is silently ignored on current
+  # builds; real emulation happens at the MCP context level (reducedMotion:
+  # "reduce" flips both matchMedia and CSS @media evaluation).
+  "--config",
+  "/tests/playwright_rm_config.json",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "11.1"
+name = "qr_brush_recolor_craft"
+description = "Beyond bare cell fills, QR Brush mask recoloring with the active swatch (white→black QR on white, black→white QR on black, color→colored QR on white) feels like a polished creative mechanic."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.2"
+name = "typewriter_bracket_intro"
+description = "The angle-bracket <SHAPESHIFT GRID TOOL> title with a typewriter-style intro line reads as intentional brand motion beyond a static headline."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.3"
+name = "draggable_toolbar_craft"
+description = "The floating black draggable toolbar that repositions from its tools header feels like a finished creative-tool workspace, not a static bar."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.4"
+name = "gallery_thumbnail_workflow"
+description = "Saved-board thumbnails plus favorite/tag filter form a delightful recall workflow beyond a minimal name-only list."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.5"
+name = "camera_capture_pixelize_polish"
+description = "Camera overlay with Capture center-crop pixelization feels like a thoughtful import path, not a stub file picker only."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.6"
+name = "branded_export_footer"
+description = "Download or Share a PNG with the black branded footer (/MADE WITH SHAPESHIFT GRID TOOL and <SHAPESHIFTFESTIVAL.COM>) elevates export beyond a silent dump."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.7"
+name = "paper_stage_studio_identity"
+description = "The light paper stage with soft radial washes, high-contrast ink, and condensed angle-bracket branding reads as a cohesive SHAPESHIFT Grid Tool identity rather than a default admin template."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.8"
+name = "change_aware_undo_feel"
+description = "Recording a cell to undo history only when its value actually changes (so redundant same-cell strokes do not spam history) feels like intentional painting craft."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.9"
+name = "cell_lock_and_resample_craft"
+description = "Cell-size lock after first paint/upload/capture plus art resampling on rebuild (when unlocked via Clear) feels like a thoughtful resolution workflow."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.10"
+name = "competition_level_tool_feel"
+description = "Taken together, QR Brush, draggable toolbar, gallery recall, and branded festival export present competition-level creative-tool craft visible to a real user."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.11"
+name = "mirror_paint_symmetry_craft"
+description = "Horizontal/Vertical mirror painting that writes partner cells in the same stroke feels like intentional festival-grid craft beyond a single-cell brush."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.12"
+name = "session_json_artifact_craft"
+description = "A live Session JSON Export with Copy/Download plus Import round-trip elevates the end state beyond PNG-only download."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "11.13"
+name = "live_fill_stats_craft"
+description = "A live painted/qr/colorFilled/blank readout that tracks every stroke feels like a useful studio meter beyond a bare canvas."
+type = "binary"
+weight = 0.5
+
+[[criterion]]
+id = "innovation.catchall"
+name = "innovation_catchall"
+description = "The app demonstrates a noteworthy, browser-observable enhancement beyond the SHAPESHIFT Grid Tool spec that is NOT covered by any other criterion in this file. The enhancement must plausibly matter to a real user, not be a nitpick. If present, name the enhancement and cite the concrete evidence (element, page state, screenshot) that demonstrates it. If the enhancement is already covered — even partially — by another criterion in this file, answer no here and let that criterion carry it."
+type = "binary"
+weight = 1.0

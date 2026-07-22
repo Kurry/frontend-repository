@@ -27,7 +27,7 @@
     });
   });
 
-  let virtualItems = $derived.by(() => virtualizer?.getVirtualItems() ?? []);
+  let virtualItems = $derived.by(() => $virtualizer?.getVirtualItems() ?? []);
   let renderedCount = $derived.by(() => virtualItems.length);
 
   function focusItem(id: string | null) {
@@ -41,13 +41,13 @@
       e.preventDefault();
       const next = Math.min(index + 1, filteredItems.length - 1);
       selectedId = filteredItems[next]?.id ?? null;
-      virtualizer?.scrollToIndex(next, { align: 'auto' });
+      $virtualizer?.scrollToIndex(next, { align: 'auto' });
       queueMicrotask(() => focusItem(selectedId));
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       const prev = Math.max(index - 1, 0);
       selectedId = filteredItems[prev]?.id ?? null;
-      virtualizer?.scrollToIndex(prev, { align: 'auto' });
+      $virtualizer?.scrollToIndex(prev, { align: 'auto' });
       queueMicrotask(() => focusItem(selectedId));
     }
   }
@@ -69,8 +69,8 @@
     </label>
   </div>
   <div class="flex-1 overflow-auto" bind:this={scrollRef}>
-    {#if virtualizer}
-      <div style="height: {virtualizer.getTotalSize()}px; width: 100%; position: relative;">
+    {#if $virtualizer}
+      <div style="height: {$virtualizer.getTotalSize()}px; width: 100%; position: relative;">
         {#each virtualItems as virtualItem (virtualItem.key)}
           {@const item = filteredItems[virtualItem.index]}
           <div

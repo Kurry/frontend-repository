@@ -109,6 +109,11 @@
     "instruction": "tasks/frontend-creative-tools-schema-builder/instruction.md",
     "description": "Output schema builder with tree editor, playground, and versions."
   },
+  "frontend-creative-tools-session-compression-loom": {
+    "source": "Session Compression Loom",
+    "instruction": "tasks/frontend-creative-tools-session-compression-loom/instruction.md",
+    "description": "Session compression editor with capsule summaries, preview, and artifact export."
+  },
   "frontend-creative-tools-shapeshift-grid": {
     "source": "Shapeshift",
     "instruction": "Shapeshift/instruction.md",
@@ -133,6 +138,11 @@
     "source": "Vert",
     "instruction": "Vert/instruction.md",
     "description": "VERT private local file converter good-app eval."
+  },
+  "frontend-creative-tools-weaving-draft-constraint-studio": {
+    "source": "weaving draft and loom constraint studio concept",
+    "instruction": "tasks/frontend-creative-tools-weaving-draft-constraint-studio/instruction.md",
+    "description": "Weaving draft studio with bounded threading grids, derived drawdown, repeats, structural analysis, variant merges, simulation, and interoperable loom artifacts."
   },
   "frontend-data-tracking-admin-analytics-dashboard": {
     "source": "variants/AdminAnalyticsDashboard",
@@ -319,6 +329,11 @@
     "instruction": "TripItinerary/instruction.md",
     "description": "French Riviera trip itinerary planner good-app eval."
   },
+  "frontend-planning-stage-blocking-path-studio": {
+    "source": "stage blocking and rehearsal planning concept",
+    "instruction": "tasks/frontend-planning-stage-blocking-path-studio/instruction.md",
+    "description": "Stage blocking studio with beat-aligned paths, rehearsal analysis, branches, and score artifacts."
+  },
   "frontend-productivity-cipherlog": {
     "source": "Cipherlog",
     "instruction": "Cipherlog/instruction.md",
@@ -424,6 +439,11 @@
     "instruction": "tasks/frontend-workflow-agent-management/instruction.md",
     "description": "Agent registry with durable work runs, timelines, and status filters."
   },
+  "frontend-workflow-apparel-sample-review-pipeline": {
+    "source": "apparel sample review and tech-pack pipeline concept",
+    "instruction": "tasks/frontend-workflow-apparel-sample-review-pipeline/instruction.md",
+    "description": "Apparel review pipeline with garment callouts, graded measurements, material lots, immutable samples, issue revisions, comparisons, approvals, and recoverable tech-pack artifacts."
+  },
   "frontend-workflow-automation-studio": {
     "source": "feature-automation-browser-studio PRD",
     "instruction": "tasks/frontend-workflow-automation-studio/instruction.md",
@@ -468,6 +488,21 @@
     "source": "SWE-gen pipeline, live dual-mode (debranded)",
     "instruction": "tasks/frontend-workflow-live-task-factory/instruction.md",
     "description": "Live PR-to-task factory console with real GitHub/AI integration."
+  },
+  "frontend-workflow-partial-fill-allocation-reconciliation-floor": {
+    "source": "partial-fill allocation and reconciliation workflow concept",
+    "instruction": "tasks/frontend-workflow-partial-fill-allocation-reconciliation-floor/instruction.md",
+    "description": "Allocation reconciliation floor with typed import repair, conserved lot splits, rule guards, execution history, checkpoints, and interoperable exports."
+  },
+  "frontend-workflow-podcast-episode-assembly-board": {
+    "source": "podcast episode assembly workflow concept",
+    "instruction": "tasks/frontend-workflow-podcast-episode-assembly-board/instruction.md",
+    "description": "Podcast assembly board with source provenance, multitrack editing, approvals, branch cuts, and interoperable episode artifacts."
+  },
+  "frontend-planning-multilevel-accessible-route-lab": {
+    "source": "multilevel accessible route planning workflow concept",
+    "instruction": "tasks/frontend-planning-multilevel-accessible-route-lab/instruction.md",
+    "description": "Accessible campus route planner with layered stops, route constraints, and interoperable route artifacts."
   },
   "frontend-workflow-quality-audit-desk": {
     "source": "codebase-atlas quality audit (debranded)",
