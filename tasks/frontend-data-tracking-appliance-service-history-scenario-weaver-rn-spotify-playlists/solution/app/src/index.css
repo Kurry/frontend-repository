@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #f8fafc;
+  --color-surface: #ffffff;
+  --color-border: #e2e8f0;
+
+  --color-brand-primary: #0f172a;
+  --color-brand-secondary: #334155;
+
+  --color-status-empty: #94a3b8;
+  --color-status-draft: #f59e0b;
+  --color-status-ready: #10b981;
+  --color-status-changed: #3b82f6;
+  --color-status-archived: #64748b;
+
+  --color-conflict: #ef4444;
+  --color-resolved: #10b981;
+}
+
+body {
+  background-color: var(--color-canvas);
+  color: var(--color-brand-primary);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
