@@ -1,0 +1,162 @@
+[judge]
+judge = "codex"
+model = "gpt-5.6-sol"
+prompt_template = "../system_prompt.md"
+cwd = "/logs/verifier"
+mode = "batched"
+timeout = 3000
+
+[[judge.mcp_servers]]
+name = "webmcp"
+transport = "stdio"
+command = "node"
+args = [
+  "/tests/webmcp_stdio_server.mjs",
+]
+allowed_tools = [
+  "webmcp_session_info",
+  "webmcp_list_tools",
+  "webmcp_invoke_tool",
+]
+
+[[judge.mcp_servers]]
+name = "playwright"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_navigate_back",
+  "browser_resize",
+  "browser_tabs",
+  "browser_click",
+  "browser_close",
+  "browser_console_messages",
+  "browser_drag",
+  "browser_evaluate",
+  "browser_file_upload",
+  "browser_fill_form",
+  "browser_handle_dialog",
+  "browser_hover",
+  "browser_network_requests",
+  "browser_press_key",
+  "browser_select_option",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_type",
+  "browser_wait_for",
+]
+
+# Observation browser with prefers-reduced-motion forced (the entrypoint's second
+# Chrome, --force-prefers-reduced-motion, CDP $WEBMCP_RM_CDP_ENDPOINT). Use ONLY
+# for reduced-motion criteria; every other criterion is graded on `playwright`.
+[[judge.mcp_servers]]
+name = "playwright_reduced_motion"
+transport = "stdio"
+command = "npx"
+args = [
+  "-y",
+  "@playwright/mcp@0.0.76",
+  "--browser",
+  "chromium",
+  "--cdp-endpoint",
+  "$WEBMCP_RM_CDP_ENDPOINT",
+  "--isolated",
+  "--output-dir",
+  "/logs/verifier/screenshots",
+]
+allowed_tools = [
+  "browser_navigate",
+  "browser_resize",
+  "browser_snapshot",
+  "browser_take_screenshot",
+  "browser_evaluate",
+  "browser_console_messages",
+  "browser_wait_for",
+  "browser_press_key",
+  "browser_click",
+  "browser_hover",
+]
+
+[scoring]
+aggregation = "weighted_mean"
+
+[[criterion]]
+id = "1.1"
+name = "drag_snaps_anchors_shifts_descendants"
+description = "Cue cards drag across lanes and time, resizing in 5s increments and snapping to dependency/fixed anchors; moving an upstream cue shifts unlocked after descendants."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.2"
+name = "fixed_locked_creates_visible_conflicts"
+description = "Fixed and locked cues create visible slack or overlap conflicts when dependencies push them rather than shifting time."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.3"
+name = "connect_ports_declares_trigger_types"
+description = "Connecting cue ports declares triggers (after, with); fixed/manual triggers can be set, and cyclic/incompatible triggers are rejected."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.4"
+name = "resource_conflict_matrix_updates"
+description = "A lane-independent matrix maps time vs crew/resource; reassigning owner/resource updates cards, matrix, and identifies exact cue overlap conflicts."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.5"
+name = "rehearsal_clock_drift_simulation"
+description = "Rehearsal plays through planned cues with an accelerated deterministic clock; injecting delay/hold updates actual/projected markers, critical path, and end time without marking show live."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.6"
+name = "live_show_call_go_hold_skip"
+description = "Live mode presents oversized current/next cues with GO, HOLD, SKIP, COMPLETE controls; GO requires readiness or explicit override, recording actual times and drift."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.7"
+name = "contingency_branch_reroutes_dependencies"
+description = "Choosing a valid contingency branch atomically disables incompatible future cues, enables branch cues, reroutes dependencies, and updates projected end/resources."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.8"
+name = "conflict_drawer_navigation_compare"
+description = "The conflict drawer distinguishes plan/readiness/late/collision issues; the lead can save checkpoints and compare topology/timings."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.9"
+name = "mobile_runway_transformation"
+description = "On mobile viewports, the desktop timeline transforms into now/next show-call cards, a vertical cue runway, and compact sheets."
+type = "binary"
+weight = 1.0
+
+[[criterion]]
+id = "1.10"
+name = "export_json_ics_preserves_state"
+description = "Export generates valid ICS and JSON preserving planning/live state, and Import reconstructs the exact state atomically."
+type = "binary"
+weight = 1.0
