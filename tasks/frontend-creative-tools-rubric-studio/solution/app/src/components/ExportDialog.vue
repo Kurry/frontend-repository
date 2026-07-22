@@ -5,11 +5,13 @@ import Button from 'primevue/button'
 import { PhCopy as Copy, PhCheck as Check, PhDownloadSimple as DownloadSimple } from '@phosphor-icons/vue'
 import { useStudioStore } from '../store'
 import { useFocusTrap } from '../focus-trap'
+import { useDialogEscape } from '../composables/useDialogEscape'
 
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close', 'copied'])
 const store = useStudioStore()
 useFocusTrap(computed(() => props.open))
+useDialogEscape(props, emit)
 const copied = ref(false)
 const tabs = [
   { value: 'structured-text', label: 'Structured text', filename: 'rubric.txt', mime: 'text/plain' },
@@ -46,7 +48,7 @@ function downloadPreview() {
 </script>
 
 <template>
-  <Dialog :visible="open" modal header="Export center" class="export-dialog" :style="{ width: 'min(960px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
+  <Dialog :visible="open" :modal="false" header="Export center" class="export-dialog" :style="{ width: 'min(960px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
     <div class="export-head">
       <div class="export-tabs" role="tablist" aria-label="Export formats">
         <button v-for="tab in tabs" :key="tab.value" type="button" role="tab" :aria-selected="store.ui.exportTab === tab.value" :class="{ active: store.ui.exportTab === tab.value }" @click="store.ui.exportTab = tab.value">

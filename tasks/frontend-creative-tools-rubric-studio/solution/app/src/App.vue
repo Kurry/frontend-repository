@@ -49,6 +49,7 @@ function clearCollapseTimers() {
   collapseTimers.clear()
 }
 onMounted(() => {
+  window.addEventListener('app-announce', (e) => { announcement.value = e.detail; setTimeout(() => { if(announcement.value === e.detail) announcement.value = '' }, 3000) });
   registerWebMCP(store)
   markDecorativeIcons()
   iconObserver = new MutationObserver(() => markDecorativeIcons())
@@ -388,8 +389,8 @@ function onShortcut(event) {
               <div class="rubric-title-line"><h1 id="rubric-title">{{ store.activeRubric.name }}</h1><span class="hero-version">v{{ store.activeRubric.version }}</span></div>
             </div>
             <div class="header-fields">
-              <label><span>Arbiter model</span><Select :model-value="store.activeRubric.arbiterModel" :options="models" option-label="label" option-value="value" aria-label="Arbiter model" @update:model-value="store.setModel" /></label>
-              <label><span>Aggregation mode</span><Select :model-value="store.activeRubric.aggregationMode" :options="aggregations" option-label="label" option-value="value" aria-label="Aggregation mode" @update:model-value="store.setAggregation" /></label>
+              <label for="arbiter-model"><span>Arbiter model</span></label><Select inputId="arbiter-model" :model-value="store.activeRubric.arbiterModel" :options="models" option-label="label" option-value="value" @update:model-value="store.setModel" />
+              <label for="aggregation-mode"><span>Aggregation mode</span></label><Select inputId="aggregation-mode" :model-value="store.activeRubric.aggregationMode" :options="aggregations" option-label="label" option-value="value" @update:model-value="store.setAggregation" />
             </div>
           </div>
           <div class="rollup-line">
@@ -443,6 +444,9 @@ function onShortcut(event) {
               <Accordion v-if="store.activeRubric.criteria.length" multiple :value="store.ui.expandedCriteria" class="criteria-accordion" @update:value="onAccordionUpdate">
                 <AccordionPanel v-for="item in store.activeRubric.criteria" :key="item.id" :value="item.id" class="criterion-panel" :class="{ 'load-bearing': item.weight >= 3, 'new-row': store.ui.newCriterionId === item.id, 'row-leave': store.ui.leavingId === item.id, collapsing: store.ui.collapsingIds.includes(item.id) }">
                   <AccordionHeader>
+                    <template #toggleicon="slotProps">
+                      <CaretDown :size="16" aria-hidden="true" :class="[slotProps.class, { rotated: slotProps.active }]" />
+                    </template>
                     <div class="criterion-summary">
                       <div class="criterion-identity"><code>{{ item.id }}</code><strong>{{ item.name }}</strong></div>
                       <div class="criterion-meta">
@@ -488,7 +492,7 @@ function onShortcut(event) {
                   <div v-if="!store.activeRubric.criteria.length" class="empty-state compact"><h3>No criteria to tune</h3><p>Add criteria in the Criteria view to see performance bars.</p></div>
                   <div v-else-if="!store.includedCases.length" class="empty-state compact"><div class="empty-icon"><SlidersHorizontal :size="25" aria-hidden="true" /></div><h3>No cases included</h3><p>Turn on at least one labelled case to compute precision, recall, and F1 without zero-division artifacts.</p></div>
                   <article v-for="item in store.includedCases.length ? store.activeRubric.criteria : []" :key="item.id" class="metric-card">
-                    <div class="metric-card-head"><div><code>{{ item.id }}</code><h3>{{ item.name }}</h3></div><label v-if="item.type === 'likert'" class="threshold-control"><span>Pass threshold</span><Select :model-value="store.thresholds[store.activeSlug][item.id]" :options="Array.from({ length: item.likertMax - item.likertMin + 1 }, (_, i) => item.likertMin + i)" :aria-label="`Pass threshold for ${item.name}`" @update:model-value="store.setThreshold(item.id, $event)" /></label></div>
+                    <div class="metric-card-head"><div><code>{{ item.id }}</code><h3>{{ item.name }}</h3></div><label v-if="item.type === 'likert'" class="threshold-control" :for="`threshold-${item.id}`"><span>Pass threshold</span></label><Select v-if="item.type === 'likert'" :inputId="`threshold-${item.id}`" :model-value="store.thresholds[store.activeSlug][item.id]" :options="Array.from({ length: item.likertMax - item.likertMin + 1 }, (_, i) => item.likertMin + i)" :aria-label="`Pass threshold for ${item.name}`" @update:model-value="store.setThreshold(item.id, $event)" /></div>
                     <div v-for="metric in ['precision', 'recall', 'f1']" :key="metric" class="metric-row"><span>{{ metric === 'f1' ? 'F1' : metric }}</span><div class="metric-track"><span :style="{ width: percent(metricsMap[item.id]?.[metric]) }" /></div><strong>{{ formatMetric(metricsMap[item.id]?.[metric]) }}</strong></div>
                     <div class="confusion-matrix" role="img" :aria-label="`Confusion matrix for ${item.name}: ${metricsMap[item.id]?.tp ?? 0} true positives, ${metricsMap[item.id]?.fp ?? 0} false positives, ${metricsMap[item.id]?.fn ?? 0} false negatives, ${metricsMap[item.id]?.tn ?? 0} true negatives`">
                       <span class="cm-title"><GridFour :size="13" aria-hidden="true" />Confusion matrix</span>

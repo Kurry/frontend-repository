@@ -9,11 +9,13 @@ import Button from 'primevue/button'
 import { SemverSchema } from '../schemas'
 import { nextVersion, requiredVersion, useStudioStore } from '../store'
 import { useFocusTrap } from '../focus-trap'
+import { useDialogEscape } from '../composables/useDialogEscape'
 
 const props = defineProps({ open: Boolean })
 const emit = defineEmits(['close', 'apply'])
 const store = useStudioStore()
 useFocusTrap(computed(() => props.open))
+useDialogEscape(props, emit)
 const schema = toTypedSchema(z.object({ version: SemverSchema }))
 const { defineField, errors, meta, handleSubmit, resetForm, validate } = useForm({ validationSchema: schema, initialValues: { version: '' }, validateOnMount: true })
 const [version, versionAttrs] = defineField('version', { validateOnModelUpdate: true })
@@ -39,7 +41,7 @@ const submit = handleSubmit(({ version: candidate }) => emit('apply', candidate)
 </script>
 
 <template>
-  <Dialog :visible="open" modal header="Version gate" class="version-dialog" :style="{ width: 'min(480px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
+  <Dialog :visible="open" :modal="false" header="Version gate" class="version-dialog" :style="{ width: 'min(480px, calc(100vw - 24px))' }" @update:visible="!$event && emit('close')">
     <form class="version-form" novalidate @submit.prevent="submit">
       <div class="bump-callout" :class="`bump-${kind}`">
         <div class="bump-callout-row"><strong>{{ kind }} bump required</strong><span class="bump-chip" :class="`bump-chip-${kind}`">{{ kind === 'major' ? 'MAJOR' : kind === 'minor' ? 'MINOR' : 'PATCH' }}</span></div>

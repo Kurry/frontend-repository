@@ -11,11 +11,13 @@ import Button from 'primevue/button'
 import { CriterionSchema } from '../schemas'
 import { useStudioStore } from '../store'
 import { useFocusTrap } from '../focus-trap'
+import { useDialogEscape } from '../composables/useDialogEscape'
 
 const props = defineProps({ open: Boolean, mode: { type: String, default: 'add' }, criterion: { type: Object, default: null } })
 const emit = defineEmits(['close', 'submitted'])
 const store = useStudioStore()
 useFocusTrap(computed(() => props.open))
+useDialogEscape(props, emit)
 
 const blank = () => ({ id: '', name: '', description: '', type: 'binary', likertMin: null, likertMax: null, weight: 1, importance: 'nice-to-have' })
 const { defineField, errors, meta, handleSubmit, resetForm, validate, setFieldValue } = useForm({
@@ -36,37 +38,15 @@ const duplicateId = computed(() => {
   const normalized = (id.value || '').trim()
   return store.activeRubric.criteria.some((item) => item.id === normalized && (props.mode === 'add' || item.id !== props.criterion?.id))
 })
-const canSubmit = computed(() => meta.value.valid && meta.value.dirty && !duplicateId.value)
-let opener = null
+const canSubmit = computed(() => meta.value.valid && !duplicateId.value)
 
-function onEscape(event) {
-  if (event.key !== 'Escape' || !props.open) return
-  // If a PrimeVue overlay (select dropdown) is open, let it handle Escape first.
-  const overlayOpen = Array.from(document.querySelectorAll('.p-select-overlay, .p-autocomplete-overlay'))
-    .some((overlay) => overlay.getClientRects().length > 0 && getComputedStyle(overlay).visibility !== 'hidden')
-  if (overlayOpen) return
-  event.preventDefault()
-  event.stopImmediatePropagation()
-  emit('close')
-}
-watch(() => props.open, async (open, wasOpen) => {
-  if (open) {
-    opener = document.activeElement
-    document.addEventListener('keydown', onEscape, true)
-  } else {
-    document.removeEventListener('keydown', onEscape, true)
-    if (wasOpen) {
-      await nextTick()
-      if (opener?.isConnected) opener.focus()
-      opener = null
-    }
-    return
-  }
+watch(() => props.open, async (open) => {
+  if (!open) return
   resetForm({ values: props.criterion ? { ...props.criterion } : blank() })
   await nextTick()
   await validate()
 })
-onBeforeUnmount(() => document.removeEventListener('keydown', onEscape, true))
+
 watch(type, (value) => {
   if (value === 'binary') {
     setFieldValue('likertMin', null, true)
@@ -77,7 +57,16 @@ watch(type, (value) => {
   }
 })
 
-const submit = handleSubmit((values) => emit('submitted', CriterionSchema.parse(values)))
+const submit = handleSubmit(
+  (values) => emit('submitted', CriterionSchema.parse(values)),
+  (ctx) => {
+    const errs = Object.values(ctx.errors);
+    if (errs.length > 0) {
+      const event = new CustomEvent('app-announce', { detail: 'Validation failed: ' + errs.join(', ') });
+      window.dispatchEvent(event);
+    }
+  }
+)
 </script>
 
 <template>
@@ -111,17 +100,17 @@ const submit = handleSubmit((values) => emit('submitted', CriterionSchema.parse(
       <div class="field-grid three-col">
         <div class="field-block">
           <label for="criterion-type">Type</label>
-          <Select v-model="type" v-bind="typeAttrs" :options="['binary', 'likert']" input-id="criterion-type" aria-label="Type" aria-describedby="criterion-type-error" :invalid="!!errors.type" />
+          <Select v-model="type" v-bind="typeAttrs" :options="['binary', 'likert']" inputId="criterion-type" aria-describedby="criterion-type-error" :invalid="!!errors.type" />
           <small id="criterion-type-error" class="field-error" role="alert">{{ errors.type }}</small>
         </div>
         <div class="field-block">
           <label for="criterion-weight">Weight</label>
-          <InputNumber v-model="weight" v-bind="weightAttrs" :step="0.5" :min-fraction-digits="1" :max-fraction-digits="1" input-id="criterion-weight" aria-label="Weight" aria-describedby="criterion-weight-error" :invalid="!!errors.weight" />
+          <InputNumber v-model="weight" v-bind="weightAttrs" :step="0.5" :min-fraction-digits="1" :max-fraction-digits="1" inputId="criterion-weight" aria-describedby="criterion-weight-error" :invalid="!!errors.weight" />
           <small id="criterion-weight-error" class="field-error" role="alert">{{ errors.weight }}</small>
         </div>
         <div class="field-block">
           <label for="criterion-importance">Importance</label>
-          <Select v-model="importance" v-bind="importanceAttrs" :options="['must-have', 'nice-to-have']" input-id="criterion-importance" aria-label="Importance" aria-describedby="criterion-importance-error" :invalid="!!errors.importance" />
+          <Select v-model="importance" v-bind="importanceAttrs" :options="['must-have', 'nice-to-have']" inputId="criterion-importance" aria-describedby="criterion-importance-error" :invalid="!!errors.importance" />
           <small id="criterion-importance-error" class="field-error" role="alert">{{ errors.importance }}</small>
         </div>
       </div>
@@ -129,12 +118,12 @@ const submit = handleSubmit((values) => emit('submitted', CriterionSchema.parse(
       <div v-if="type === 'likert'" class="field-grid two-col range-fields">
         <div class="field-block">
           <label for="criterion-min">Likert min</label>
-          <InputNumber v-model="likertMin" v-bind="likertMinAttrs" :min="1" :max="10" input-id="criterion-min" aria-label="Likert min" aria-describedby="criterion-min-error" :invalid="!!errors.likertMin" />
+          <InputNumber v-model="likertMin" v-bind="likertMinAttrs" :min="1" :max="10" inputId="criterion-min" aria-describedby="criterion-min-error" :invalid="!!errors.likertMin" />
           <small id="criterion-min-error" class="field-error" role="alert">{{ errors.likertMin }}</small>
         </div>
         <div class="field-block">
           <label for="criterion-max">Likert max</label>
-          <InputNumber v-model="likertMax" v-bind="likertMaxAttrs" :min="1" :max="10" input-id="criterion-max" aria-label="Likert max" aria-describedby="criterion-max-error" :invalid="!!errors.likertMax" />
+          <InputNumber v-model="likertMax" v-bind="likertMaxAttrs" :min="1" :max="10" inputId="criterion-max" aria-describedby="criterion-max-error" :invalid="!!errors.likertMax" />
           <small id="criterion-max-error" class="field-error" role="alert">{{ errors.likertMax }}</small>
         </div>
       </div>
