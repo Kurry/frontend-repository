@@ -236,8 +236,25 @@ jobs:
               stream.write(f"success={'true' if success else 'false'}\n")
           PY
 
+      # harbor's own exit code stays 0 even when every trial raises (0 valid
+      # trials => report.outputs.success=false), so gate on that instead of
+      # steps.harbor.outcome. Jobs dir is otherwise discarded with the runner,
+      # taking the only copy of the per-trial exception traceback with it.
+      - name: Upload jobs dir for failed runs
+        if: always() && steps.report.outputs.success == 'false'
+        uses: actions/upload-artifact@v7
+        with:
+          name: judge-jobs-${{ github.run_id }}
+          path: ${{ runner.temp }}/judge-jobs
+          retention-days: 14
+          if-no-files-found: warn
+
+      # PR-comment failures (e.g. HTTP 403 Resource not accessible by
+      # integration) must not fail a run whose judge score is otherwise
+      # valid - "Enforce successful judge result" below is the real gate.
       - name: Post or update PR score comment
         if: always() && github.event_name != 'workflow_dispatch' && steps.report.outcome == 'success'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ steps.target.outputs.pr_number }}
@@ -257,36 +274,41 @@ jobs:
             gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --input - <<<"$payload"
           fi
 
-      - uses: actions/checkout@v7
-        if: always() && steps.report.outputs.success == 'true'
-        with:
-          repository: ${{ github.repository }}
-          ref: main
-          path: ledger
-          fetch-depth: 1
-
+      # main requires signed commits (org ruleset "verify_commits", no bypass
+      # actors), and a plain `git commit` from CI has no signature - that push
+      # would be rejected. The Contents API instead has GitHub author and sign
+      # the commit itself, which satisfies the required-signatures check.
       - name: Append committed judge ledger
         id: ledger
         if: always() && steps.report.outputs.success == 'true'
-        working-directory: ledger
         env:
+          GH_TOKEN: ${{ github.token }}
           REPORT_JSON: ${{ runner.temp }}/judge-result.json
+          SLUG: ${{ steps.target.outputs.slug }}
         run: |
           set -euo pipefail
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          line="$(jq -c . "$REPORT_JSON")"
+          path="repos/$GITHUB_REPOSITORY/contents/docs/judge-ledger.jsonl"
           for attempt in {1..5}; do
-            git fetch origin main
-            git switch --detach origin/main
-            mkdir -p docs
-            touch docs/judge-ledger.jsonl
-            jq -c . "$REPORT_JSON" >> docs/judge-ledger.jsonl
-            git add docs/judge-ledger.jsonl
-            git commit -m "ci: record OAuth oracle score for ${{ steps.target.outputs.slug }}"
-            if git push origin HEAD:main; then
+            if current="$(gh api "$path?ref=main" 2>/dev/null)"; then
+              sha_field="$(jq -n --arg sha "$(jq -r .sha <<<"$current")" '{sha: $sha}')"
+              existing="$(jq -r .content <<<"$current" | base64 --decode)"
+            else
+              sha_field='{}'
+              existing=""
+            fi
+            new_content="$(printf '%s%s\n' "$existing" "$line" | base64 -w0)"
+            payload="$(jq -n \
+              --arg msg "ci: record OAuth oracle score for $SLUG" \
+              --arg content "$new_content" \
+              --arg branch "main" \
+              --argjson sha_field "$sha_field" \
+              '{message: $msg, content: $content, branch: $branch} + $sha_field')"
+            if gh api --method PUT "$path" --input - <<<"$payload" >/dev/null; then
               exit 0
             fi
-            echo "Ledger push raced with main (attempt $attempt/5); rebuilding from latest main." >&2
+            echo "Ledger push raced with main (attempt $attempt/5); retrying." >&2
+            sleep "$attempt"
           done
           echo "Could not publish the judge ledger after 5 attempts." >&2
           exit 1
