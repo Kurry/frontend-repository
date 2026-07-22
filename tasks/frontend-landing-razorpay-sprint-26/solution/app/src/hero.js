@@ -1,3 +1,11 @@
+function isWebGLAvailable() {
+  try {
+    const canvas = document.createElement('canvas');
+    return !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+  } catch (e) {
+    return false;
+  }
+}
 /**
  * Three.js scroll hero (Novapay Sprint 26).
  * Loads the Draco-compressed GLB scene and scrubs its baked camera animation
@@ -110,7 +118,7 @@ export function initHero() {
     window.dispatchEvent(new CustomEvent("glbLoaded"));
   }
 
-  if (navigator.webdriver) { fallback(); return; }
+  if (navigator.webdriver || !isWebGLAvailable()) { fallback(); return; }
 
   let renderer;
   try { renderer = new THREE.WebGLRenderer({ antialias: !isMobileBP(), powerPreference: isMobileBP() ? "low-power" : "high-performance", failIfMajorPerformanceCaveat: false }); }
