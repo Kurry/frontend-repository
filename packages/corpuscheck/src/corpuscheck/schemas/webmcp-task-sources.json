@@ -489,6 +489,11 @@
     "instruction": "tasks/frontend-workflow-podcast-episode-assembly-board/instruction.md",
     "description": "Podcast assembly board with source provenance, multitrack editing, approvals, branch cuts, and interoperable episode artifacts."
   },
+  "frontend-planning-multilevel-accessible-route-lab": {
+    "source": "multilevel accessible route planning workflow concept",
+    "instruction": "tasks/frontend-planning-multilevel-accessible-route-lab/instruction.md",
+    "description": "Accessible campus route planner with layered stops, route constraints, and interoperable route artifacts."
+  },
   "frontend-workflow-quality-audit-desk": {
     "source": "codebase-atlas quality audit (debranded)",
     "instruction": "tasks/frontend-workflow-quality-audit-desk/instruction.md",

@@ -7074,6 +7074,19 @@
     "mechanics_exclusions": ["Timeline drag, trim, split, ripple/nonripple movement, gap close, fades, crossfades, and automation-curve dragging are gesture mechanics graded through Playwright; equivalent state mutations use bound editor operations", "Keyboard shortcuts, mobile numeric editing, lane hover states, responsive layout, focus indicators, dialogs, and visual transitions remain Playwright-driven", "Waveform, loudness, peak, clipping, ducking, and fade-continuity visuals are observed through Playwright; validation session state uses command-session bindings", "File downloads, native file-picker interaction, and clipboard contents remain Playwright responsibilities"]
   },
   {
+    "task": "frontend-planning-multilevel-accessible-route-lab",
+    "modules": ["entity-collection-v1", "artifact-transfer-v1"],
+    "bindings": {
+      "entity": "route-stop",
+      "entity_operations": ["create", "update", "delete", "reorder", "select"],
+      "entity_fields": ["nodeId", "dwell"],
+      "artifact_operations": ["export", "import"],
+      "export_formats": ["route-plan-json", "route-geojson"],
+      "import_modes": ["route-plan-json"]
+    },
+    "mechanics_exclusions": ["Map route drawing, keyboard navigation, responsive layout, and native file transfer remain Playwright-observed"]
+  },
+  {
     "task": "frontend-workflow-quality-audit-desk",
     "modules": [
       "browse-query-v1",
