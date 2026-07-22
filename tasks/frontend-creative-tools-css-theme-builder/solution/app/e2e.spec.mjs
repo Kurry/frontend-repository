@@ -134,7 +134,7 @@ test.describe('workspace contract (canonical)', () => {
 // ==== END CANONICAL REGION — add task-specific criterion tests below. ====
 
 test.describe('task-specific criteria', () => {
-  test('7.5-7.6 mobile panels stack in document flow without overlap', async ({ page }) => {
+  test('7.6 narrow_stack_order_stays_usable', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto(BASE);
     await page.waitForLoadState('networkidle');
