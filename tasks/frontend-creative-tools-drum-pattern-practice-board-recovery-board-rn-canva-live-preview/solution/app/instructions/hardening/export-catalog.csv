@@ -1,0 +1,6 @@
+type,path,status
+instruction,instruction.md,ready
+feature-status,solution/app/instructions/hardening/feature-status.md,ready
+design-status,solution/app/instructions/hardening/design-status.md,ready
+evidence-video,hardening-delivery/vp9/evidence.webm,pending
+evidence-image,hardening-delivery/vp9/screenshot.png,pending
