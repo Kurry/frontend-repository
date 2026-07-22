@@ -1,0 +1,8 @@
+[dimensions.visual_design]
+name = "Visual Design"
+description = "Verifies visual hierarchy and presentation."
+
+[[criterion]]
+id = "visual_design.visual_hierarchy"
+description = "The visual hierarchy makes current state and next action clear."
+weight = 1
